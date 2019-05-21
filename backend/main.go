@@ -13,6 +13,9 @@ import (
 // Version of the service
 const version = "1.0.0"
 
+// URL for the search API
+var searchAPI string
+
 // getVersion reports the version of the serivce
 func getVersion(c *gin.Context) {
 	c.String(http.StatusOK, "Virgo4 Client server version %s", version)
@@ -23,14 +26,30 @@ func healthCheck(c *gin.Context) {
 	c.String(http.StatusOK, "Virgo4 Client server is alive")
 }
 
+// getConfig returns front-end configuration data as JSON
+func getConfig(c *gin.Context) {
+	type config struct {
+		SearchAPI string `json:"searchAPI"`
+	}
+	cfg := config{SearchAPI: searchAPI}
+	c.JSON(http.StatusOK, cfg)
+}
+
 /**
  * MAIN
  */
 func main() {
 	log.Printf("===> Virgo4 client server staring up <===")
 	var port int
+
 	flag.IntVar(&port, "port", 8080, "Service port (default 8080)")
+	flag.StringVar(&searchAPI, "search", "", "Search API URL")
 	flag.Parse()
+	if searchAPI == "" {
+		log.Fatal("search param is required")
+	} else {
+		log.Printf("Search API endpoint: %s", searchAPI)
+	}
 
 	log.Printf("Setup routes...")
 	gin.SetMode(gin.ReleaseMode)
@@ -38,6 +57,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/version", getVersion)
 	router.GET("/healthcheck", healthCheck)
+	router.GET("/config", getConfig)
 
 	// Note: in dev mode, this is never actually used. The front end is served
 	// by yarn and it proxies all requests to the API to the routes above
