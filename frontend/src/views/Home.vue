@@ -16,15 +16,20 @@
          <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
       </div>
       <h4 class="error">{{ error }}</h4>
+      <SearchResults v-if="hasResults"/>
    </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { mapFields } from "vuex-map-fields";
+import { mapState } from "vuex"
+import { mapGetters } from "vuex";
+import { mapFields } from "vuex-map-fields"
+import SearchResults from "@/components/SearchResults"
 export default {
    name: "home",
-   components: {},
+   components: {
+     SearchResults
+   },
    data: function() {
       return {};
    },
@@ -34,6 +39,9 @@ export default {
          fatal: state => state.fatal,
          error: state => state.error,
          searching: state => state.searching
+      }),
+      ...mapGetters({
+        hasResults: 'hasResults',
       }),
       ...mapFields(["query.keyword"])
    },

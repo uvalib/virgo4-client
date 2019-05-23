@@ -5,12 +5,25 @@ import { getField, updateField } from 'vuex-map-fields'
 
 Vue.use(Vuex)
 
+// Plugin to listen for error messages being set. After a delay, clear them
+const errorPlugin = store => {
+  store.subscribe((mutation) => {
+    if (mutation.type === "setError") {
+      if ( mutation.payload != null ) { 
+        setTimeout( ()=>{ store.commit('setError', null)}, 10000)
+      }   
+    }   
+  })  
+}
+
 export default new Vuex.Store({
   state: {
     searchAPI: "",
     fatal: "",
     searching: false,
     error: "",
+    searchSummary: "",
+    hits: [],
     query: {
       keyword: "",
       author: "",
@@ -27,6 +40,9 @@ export default new Vuex.Store({
   },
   getters: {
     getField,
+    hasResults: state => {
+      return state.hits.length > 0
+    }
   },
   mutations: {
     updateField,
@@ -42,9 +58,15 @@ export default new Vuex.Store({
     setSearching(state, flag) {
       state.searching = flag
     },
+    setSearchResults(state, results) {
+      let pr = results.pool_results[0] // only one pool for now
+      state.searchSummary = pr.summary + " in "+ pr.elapsed_ms + "MS"
+      state.hits = pr.record_list
+    }
   },
   actions: {
     doSearch(ctx) {
+      ctx.commit('setError', "")
       ctx.commit('setSearching', true)
       let req = {
         query: ctx.state.query,
@@ -53,7 +75,7 @@ export default new Vuex.Store({
       }
       let url = ctx.state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
-        console.log(response)
+        ctx.commit('setSearchResults', response.data)
         ctx.commit('setSearching', false)
       }).catch((error) => {
         ctx.commit('setError', error) 
@@ -67,5 +89,6 @@ export default new Vuex.Store({
         ctx.commit('setFatalError', "Unable to get configuration: "+error.response.data) 
       })
     }
-  }
+  },
+  plugins: [errorPlugin]
 })
