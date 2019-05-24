@@ -1,11 +1,13 @@
 <template>
    <div class="home">
       <p class="fatal">{{fatal}}</p>
-      <div v-if="searching" class="search-panel">
-         <h4>Searching...</h4>
-         <img src="../assets/spinner2.gif">
+      <div v-show="searching" class="searching-overlay">
+        <div class="search-box">
+          <h4>Searching...</h4>
+          <img src="../assets/spinner2.gif">
+        </div>
       </div>
-      <div v-else class="search-panel pure-form">
+      <div class="search-panel pure-form">
         <template v-if="basicSearch">
           <input
               @keyup.enter="searchClicked"
@@ -99,6 +101,20 @@ export default {
 </script>
 
 <style scoped>
+.searching-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 16%;
+}
+div.search-box {
+  background: white;
+  display: inline-block;
+  padding: 20px 150px;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 10px #ccc;
+  border-radius: 5px;
+}
 .advanced-panel table td.label {
   font-weight: bold;
   text-align: right;

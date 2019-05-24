@@ -28,16 +28,20 @@ export default {
       }
    },
    methods: {
-      firstPageClicked() {
+      firstPageClicked(event) {
+         if (event.currentTarget.classList.contains("disabled")) return
          this.$store.dispatch("firstPage")
       },
       lastPageClicked() {
+         if (event.currentTarget.classList.contains("disabled")) return
          this.$store.dispatch("lastPage")
       },
       nextPageClicked() {
+         if (event.currentTarget.classList.contains("disabled")) return
          this.$store.dispatch("nextPage")
       },
       prevPageClicked() {
+         if (event.currentTarget.classList.contains("disabled")) return
          this.$store.dispatch("prevPage")
       }
    }
