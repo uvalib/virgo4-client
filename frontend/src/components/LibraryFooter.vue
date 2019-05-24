@@ -30,7 +30,6 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 footer {
-   border-bottom: 1px solid #5e7799;
    border-top: 1px solid #5e7799;
    background-color: #20406e;
    color: #d2e5f7;
