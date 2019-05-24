@@ -21,7 +21,7 @@ export default {
 html, body {
    margin: 0;
    padding: 0;
-   background: white;
+   background: #20406e;
 }
 
 #app {
@@ -29,9 +29,10 @@ html, body {
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    text-align: center;
-   color: #2c3e50;
+   color: #444;
    margin:0;
    padding:0;
+   background: white;
 }
 
 #app a {

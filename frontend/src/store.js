@@ -24,15 +24,14 @@ export default new Vuex.Store({
     error: "",
     searchSummary: "",
     hits: [],
+    total: 0,
+    page: 0,
+    pageSize: 25,
     query: {
       keyword: "",
       author: "",
       title: "",
       subject: "",
-    },
-    pagination: {
-      start: 0,
-      rows: 50
     },
     search_preferences: {
       default_search_pool: "catalog"
@@ -42,6 +41,11 @@ export default new Vuex.Store({
     getField,
     hasResults: state => {
       return state.hits.length > 0
+    },
+    getPagination: state => {
+      return {
+        start: state.page * state.pageSize, rows: state.pageSize,
+      }
     }
   },
   mutations: {
@@ -60,17 +64,56 @@ export default new Vuex.Store({
     },
     setSearchResults(state, results) {
       let pr = results.pool_results[0] // only one pool for now
-      state.searchSummary = pr.summary + " in "+ pr.elapsed_ms + "MS"
+      state.searchSummary = pr.summary + " in "+ pr.elapsed_ms + "ms"
       state.hits = pr.record_list
+      state.total = pr.pagination.total
+      state.page = pr.pagination.start / state.pageSize
+    },
+    gotoFirstPage(state) {
+      state.page = 0
+    },
+    gotoLastPage(state) {
+      state.page = Math.floor( state.total / state.pageSize)
+    },
+    nextPage(state) {
+      state.page++
+    },
+    prevPage(state) {
+      state.page--
+    },
+    resetSearchResults(state) {
+      state.page = 0
+      state.total = 0
+    },
+    clearAdvancedSearch(state) {
+      state.query.author = ""
+      state.query.title = ""
+      state.query.subject = ""
     }
   },
   actions: {
+    firstPage( ctx ) {
+      ctx.commit('gotoFirstPage')
+      ctx.dispatch("doSearch")
+    },
+    prevPage( ctx ) {
+      ctx.commit('prevPage')
+      ctx.dispatch("doSearch")
+    },
+    nextPage( ctx ) {
+      ctx.commit('nextPage')
+      ctx.dispatch("doSearch")
+    },
+    lastPage( ctx ) {
+      ctx.commit('gotoLastPage')
+      ctx.dispatch("doSearch")
+    },
     doSearch(ctx) {
       ctx.commit('setError', "")
       ctx.commit('setSearching', true)
       let req = {
         query: ctx.state.query,
-        pagination: ctx.state.pagination,
+        pagination: ctx.getters.getPagination,
         search_preferences: ctx.state.search_preferences
       }
       let url = ctx.state.searchAPI+"/api/search"

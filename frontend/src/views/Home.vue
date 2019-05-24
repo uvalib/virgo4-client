@@ -84,12 +84,14 @@ export default {
    },
    methods: {
       searchClicked() {
-         this.$store.dispatch("doSearch");
+        this.$store.commit("resetSearchResults");
+        this.$store.dispatch("doSearch");
       },
       advancedClicked() {
         this.mode = "advanced"
       },
       cancelClicked() {
+        this.$store.commit("clearAdvancedSearch");
         this.mode = "basic"
       }
    }
