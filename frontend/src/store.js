@@ -21,6 +21,7 @@ export default new Vuex.Store({
     searchAPI: "",
     fatal: "",
     searching: false,
+    searched: false,
     error: "",
     searchSummary: "",
     hits: [],
@@ -33,14 +34,11 @@ export default new Vuex.Store({
       title: "",
       subject: "",
     },
-    search_preferences: {
-      default_search_pool: "catalog"
-    }
   },
   getters: {
     getField,
     hasResults: state => {
-      return state.hits.length > 0
+      return state.searched
     },
     getPagination: state => {
       return {
@@ -63,11 +61,16 @@ export default new Vuex.Store({
       state.searching = flag
     },
     setSearchResults(state, results) {
-      let pr = results.pool_results[0] // only one pool for now
-      state.searchSummary = pr.summary + " in "+ pr.elapsed_ms + "ms"
-      state.hits = pr.record_list
+      let pr = results.pool_results[0] // just take the first for now
+      state.searchSummary = results.pools_searched+ " pools searched in "+results.total_time_ms+"ms. "+results.total_hits+" hits."
+      if (pr.pagination.total > 0) {
+        state.hits = pr.record_list
+      } else {
+        state.hits = []
+      }
       state.total = pr.pagination.total
       state.page = pr.pagination.start / state.pageSize
+      state.searched = true
     },
     gotoFirstPage(state) {
       state.page = 0
@@ -84,11 +87,14 @@ export default new Vuex.Store({
     resetSearchResults(state) {
       state.page = 0
       state.total = 0
+      state.searched = false
     },
     clearAdvancedSearch(state) {
+      state.query.keyword = ""
       state.query.author = ""
       state.query.title = ""
       state.query.subject = ""
+      state.searched = false
     }
   },
   actions: {
@@ -112,9 +118,8 @@ export default new Vuex.Store({
       ctx.commit('setError', "")
       ctx.commit('setSearching', true)
       let req = {
-        query: ctx.state.query,
+        query: buildQueryString(ctx.state.query),
         pagination: ctx.getters.getPagination,
-        search_preferences: ctx.state.search_preferences
       }
       let url = ctx.state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
@@ -135,3 +140,24 @@ export default new Vuex.Store({
   },
   plugins: [errorPlugin]
 })
+
+const buildQueryString = (params) => { 
+  // params: keyword (no field designation), author, title, subject
+  let mapping  = {"title": "title_t", "author": "author_t", "subject": "subject_t", "keyword": "NONE"}
+  let q = []
+  for (let [key, value] of Object.entries(params)) {
+    let qv = value.trim()
+    if (qv.length == 0) continue
+
+    if (qv.includes(" ")) {
+      qv = `"${value}"`
+    }
+    let fn = mapping[key]
+    if (fn === "NONE") {
+      q.push(qv)
+    } else {
+      q.push(`${fn}:${qv}`)
+    }
+  }
+  return q.join(" +")
+}

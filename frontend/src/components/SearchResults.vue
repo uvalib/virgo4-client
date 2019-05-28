@@ -2,7 +2,7 @@
    <div class="results-panel">
       <div class="toolbar">
          <span class="summary">{{searchSummary}}</span>
-         <ResultsPager/>
+         <ResultsPager v-if="hits.length>0"/>
       </div>
       <div class="hits">
          <div class="hit" v-for="hit in hits" :key="hit.id">
