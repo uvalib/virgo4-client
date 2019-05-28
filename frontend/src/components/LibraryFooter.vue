@@ -38,6 +38,17 @@ footer {
    box-sizing: border-box;
    font-weight: 500;
 }
+@media only screen and (min-width: 768px) {
+   footer .external_links {
+      float:right;
+      text-align: right;
+   }
+}
+@media only screen and (max-width: 768px) {
+   footer .external_links {
+     display: none;
+   }
+}
 footer .external_links {
    float:right;
    text-align: right;

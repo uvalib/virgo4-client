@@ -19,6 +19,7 @@ const errorPlugin = store => {
 export default new Vuex.Store({
   state: {
     searchAPI: "",
+    pools: [],
     fatal: "",
     searching: false,
     searched: false,
@@ -48,6 +49,12 @@ export default new Vuex.Store({
   },
   mutations: {
     updateField,
+    setPools(state, data) {
+      state.pools = data
+      if (state.pools.length == 0 ) {
+        state.fatal = "No search pools configured"
+      }
+    },
     setFatalError(state, err) {
       state.fatal = err
     },
@@ -135,6 +142,14 @@ export default new Vuex.Store({
         ctx.commit('setConfig', response.data )
       }).catch((error) => {
         ctx.commit('setFatalError', "Unable to get configuration: "+error.response.data) 
+      })
+    },
+    getPools(ctx) {
+      let url = ctx.state.searchAPI+"/api/pools"
+      axios.get(url).then((response)  =>  {
+        ctx.commit('setPools', response.data )
+      }).catch((error) => {
+        ctx.commit('setFatalError', "Unable to pools: "+error.response.data) 
       })
     }
   },

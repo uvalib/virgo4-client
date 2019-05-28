@@ -1,7 +1,7 @@
 <template>
    <div class="results-panel">
       <div class="toolbar">
-         <span class="summary">{{searchSummary}}</span>
+         <p class="summary">{{searchSummary}}</p>
          <ResultsPager v-if="hits.length>0"/>
       </div>
       <div class="hits">
@@ -19,6 +19,9 @@
                <span class="value">{{hit.author}}</span>
             </div>
          </div>
+      </div>
+      <div class="toolbar">
+         <ResultsPager v-if="hits.length>0"/>
       </div>
    </div>
 </template>
@@ -41,15 +44,18 @@ export default {
 
 <style scoped>
 .summary {
-   float: left;
+   margin: 10px;
+   font-size: 0.9em;
    font-weight: 100;
+   text-align: center;
 }
 div.toolbar {
    text-align: right;
 }
 div.results-panel {
-   width: 50%;
-   margin: 0 auto;
+   max-width: 600px;
+   margin: 0 auto 2em auto;
+   padding: 0 0.75em;
 }
 div.hits {
    text-align: left;

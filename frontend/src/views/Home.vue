@@ -16,11 +16,13 @@
               type="text"
               placeholder="Search for books, maps, DVDs and other catalog materials."
           >
-          <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-          <span class="advanced" @click="advancedClicked">Advanced</span>
+          <div class="controls">
+            <span class="pure-button pure-button-secondary" @click="advancedClicked">Advanced</span>
+            <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+          </div>
         </template>
         <div class="advanced-panel" v-else>
-          <p>Advanced Search</p>
+          <h4>Advanced Search</h4>
           <table>
             <tr>
               <td class="label">Author</td><td><input v-model="author" type="text"></td>
@@ -36,12 +38,13 @@
             </tr>
           </table>
           <div class="controls">
-            <span @click="cancelClicked" class="pure-button pure-button-primary">Cancel</span>
+            <span @click="poolsClicked" class="pools pure-button pure-button-secondary">Pool Information</span>
+            <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
         </div>
       </div>
-      <h4 class="error">{{ error }}</h4>
+      <h3 class="error">{{ error }}</h3>
       <SearchResults v-if="hasResults"/>
    </div>
 </template>
@@ -95,17 +98,35 @@ export default {
       cancelClicked() {
         this.$store.commit("clearAdvancedSearch");
         this.mode = "basic"
+      },
+      poolsClicked() {
+        alert("ef")
       }
    }
 };
 </script>
 
 <style scoped>
+h4 {
+  color: #eb5f0c;
+  margin: 10px 0;
+  border-bottom: 1px dashed;
+  padding-bottom: 5px;
+}
+.pure-button.pure-button-secondary {
+  background: rgb(66, 184, 221); 
+  color: white;
+}
+.pure-button.pure-button-cancel {
+  background: rgb(202, 60, 60);
+  color: white;
+}
 .searching-overlay {
   position: absolute;
   left: 0;
   right: 0;
   top: 16%;
+  z-index: 1000;
 }
 div.search-box {
   background: white;
@@ -114,16 +135,19 @@ div.search-box {
   border: 1px solid #ccc;
   box-shadow: 2px 2px 10px #ccc;
   border-radius: 5px;
+  z-index: 1005;
 }
 .advanced-panel table td.label {
-  font-weight: bold;
+  font-weight: 500;
   text-align: right;
   padding-right: 10px;
   width: 80px;
+  color: #666;
 }
 .advanced-panel {
-  width: 50%;
   margin: 0 auto;
+  padding: 0 0.75em;
+  max-width: 600px;
 }
 .advanced-panel table {
   width: 100%;
@@ -134,12 +158,21 @@ div.search-box {
 .advanced-panel table td {
   padding: 5px 0;
 }
-span.pure-button.pure-button-primary {
+span.pure-button {
   margin: 0 0 0 10px;
+  border-radius: 5px;
+  opacity: 0.8;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+span.pure-button:hover {
+  opacity: 1;
 }
 .controls {
+  font-size: 0.85em;
+  font-weight: bold;
   text-align: right;
   padding-top: 10px;
+  position: relative;
 }
 .advanced {
   margin-left: 5px;
@@ -154,16 +187,18 @@ span.pure-button.pure-button-primary {
 .home {
    min-height: 400px;
 }
-p.fatal, h4.error {
+p.fatal, h3.error {
    font-weight: bold;
    color: firebrick;
 }
 .search-panel {
-   margin: 5% auto 0 auto;
-   text-align: center;
+  margin: 5% auto 0 auto;
+  text-align: center;
+  max-width: 800px;
+  padding: 0.75em;
 }
 #keyword {
    margin: 0;
-   width: 60%;
+   width: 100%;
 }
 </style>
