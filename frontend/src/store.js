@@ -20,6 +20,7 @@ export default new Vuex.Store({
   state: {
     searchAPI: "",
     pools: [],
+    showPools: false,
     fatal: "",
     searching: false,
     searched: false,
@@ -49,6 +50,9 @@ export default new Vuex.Store({
   },
   mutations: {
     updateField,
+    showPoolsOverlay(state, show) {
+      state.showPools = show
+    },
     setPools(state, data) {
       state.pools = data
       if (state.pools.length == 0 ) {
@@ -140,6 +144,7 @@ export default new Vuex.Store({
     getConfig(ctx) {
       axios.get("/config").then((response)  =>  {
         ctx.commit('setConfig', response.data )
+        ctx.dispatch('getPools' )
       }).catch((error) => {
         ctx.commit('setFatalError', "Unable to get configuration: "+error.response.data) 
       })

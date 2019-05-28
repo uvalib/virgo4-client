@@ -7,6 +7,7 @@
           <img src="../assets/spinner2.gif">
         </div>
       </div>
+      <PoolsList v-if="showPools"/>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
           <input
@@ -54,10 +55,11 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex";
 import { mapFields } from "vuex-map-fields"
 import SearchResults from "@/components/SearchResults"
+import PoolsList from "@/components/PoolsList"
 export default {
    name: "home",
    components: {
-     SearchResults
+     SearchResults, PoolsList
    },
    data: function() {
       return {
@@ -72,6 +74,7 @@ export default {
          searchAPI: state => state.searchAPI,
          fatal: state => state.fatal,
          error: state => state.error,
+         showPools: state => state.showPools,
          searching: state => state.searching
       }),
       ...mapGetters({
@@ -85,7 +88,7 @@ export default {
       ])
    },
    created: function() {
-      this.$store.dispatch("getConfig");
+      this.$store.dispatch("getConfig")
    },
    methods: {
       searchClicked() {
@@ -100,7 +103,7 @@ export default {
         this.mode = "basic"
       },
       poolsClicked() {
-        alert("ef")
+        this.$store.commit("showPoolsOverlay", true);
       }
    }
 };
