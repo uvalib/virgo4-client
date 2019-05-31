@@ -15,6 +15,8 @@ const version = "1.0.0"
 
 // URL for the search API
 var searchAPI string
+var showDebug bool
+var showWarn bool
 
 // getVersion reports the version of the serivce
 func getVersion(c *gin.Context) {
@@ -30,8 +32,10 @@ func healthCheck(c *gin.Context) {
 func getConfig(c *gin.Context) {
 	type config struct {
 		SearchAPI string `json:"searchAPI"`
+		ShowDebug bool   `json:"showDebug"`
+		ShowWarn  bool   `json:"showWarn"`
 	}
-	cfg := config{SearchAPI: searchAPI}
+	cfg := config{SearchAPI: searchAPI, ShowDebug: showDebug, ShowWarn: showWarn}
 	c.JSON(http.StatusOK, cfg)
 }
 
@@ -43,6 +47,8 @@ func main() {
 	var port int
 
 	flag.IntVar(&port, "port", 8080, "Service port (default 8080)")
+	flag.BoolVar(&showDebug, "debug", false, "Show debug info")
+	flag.BoolVar(&showWarn, "warn", false, "Show warning info")
 	flag.StringVar(&searchAPI, "search", "", "Search API URL")
 	flag.Parse()
 	if searchAPI == "" {
@@ -50,6 +56,7 @@ func main() {
 	} else {
 		log.Printf("Search API endpoint: %s", searchAPI)
 	}
+	log.Printf("Show debug: %t, Show warn: %t", showDebug, showWarn)
 
 	log.Printf("Setup routes...")
 	gin.SetMode(gin.ReleaseMode)
