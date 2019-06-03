@@ -36,7 +36,7 @@ export default {
   position: absolute;
   left: 0;
   right: 0;
-  top: 25%;
+  top: 15%;
   z-index: 1000;
 }
 .pools-container {
@@ -59,6 +59,8 @@ export default {
 .pools-list {
    margin: 5px 10px;
    font-size: 0.9em;
+   max-height: 350px;
+   overflow-y: scroll;
 }
 .pool {
    margin:10px 0;

@@ -9,7 +9,7 @@ Vue.use(Vuex)
 const errorPlugin = store => {
   store.subscribe((mutation) => {
     if (mutation.type === "setError") {
-      if ( mutation.payload != null ) { 
+      if ( mutation.payload != null && mutation.payload != "" ) { 
         setTimeout( ()=>{ store.commit('setError', null)}, 10000)
       }   
     }   
@@ -26,9 +26,9 @@ export default new Vuex.Store({
     searched: false,
     error: "",
     searchSummary: "",
-    hits: [],
+    currPoolIdx: -1,
+    poolHits: [],
     total: 0,
-    page: 0,
     pageSize: 25,
     query: {
       keyword: "",
@@ -36,15 +36,30 @@ export default new Vuex.Store({
       title: "",
       subject: "",
     },
+    preferences: {
+      targetPoolURL: "",
+      excludePoolURLs: []
+    }
   },
   getters: {
     getField,
     hasResults: state => {
-      return state.searched
+      return state.searched && state.currPoolIdx != -1
     },
-    getPagination: state => {
-      return {
-        start: state.page * state.pageSize, rows: state.pageSize,
+    currPool: state => {
+      if (state.currPoolIdx == -1 || state.currPoolIdx > state.poolHits.length-1 ) {
+        return {url:"", page: 0, total: 0, name: ""}
+      } else {
+        let info = state.poolHits[state.currPoolIdx]
+        return info
+      }
+    },
+    getPagination: state=>{ 
+      if (state.currPoolIdx == -1 || state.currPoolIdx > state.poolHits.length-1 ) {
+        return {start: 0, rows: state.pageSize}
+      } else {
+        let info = state.poolHits[state.currPoolIdx]
+        return {start: info.page * state.pageSize, rows: state.pageSize}
       }
     }
   },
@@ -71,33 +86,64 @@ export default new Vuex.Store({
     setSearching(state, flag) {
       state.searching = flag
     },
+
+    // These results are from a single pool and can be a result of paging
+    setPoolSearchResults(state, results) {
+      let info = state.poolHits[state.currPoolIdx]
+      info.hits = results.record_list
+    },
+
+    // this should just be called from top level search; resets results from all pools
     setSearchResults(state, results) {
-      let pr = results.pool_results[0] // just take the first for now
-      state.searchSummary = results.pools_searched+ " pools searched in "+results.total_time_ms+"ms. "+results.total_hits+" hits."
-      if (pr.pagination.total > 0) {
-        state.hits = pr.record_list
-      } else {
-        state.hits = []
-      }
-      state.total = pr.pagination.total
-      state.page = pr.pagination.start / state.pageSize
+      let poolHitCnt = 0    
+      state.currPoolIdx = -1
+      state.poolHits = []
+
+      // Push all results into the poolHits structure. Reset paging for each
+      var best = -1
+      results.pool_results.forEach( function(pr, idx) {
+        console.log(pr.service_url+" time "+ pr.elapsed_ms)
+        if (pr.record_list) {
+          state.poolHits.push({ url: pr.service_url, 
+            name: poolNameFromURL(pr.service_url, state.pools),
+            total: pr.pagination.total,
+            hits: pr.record_list,
+            page: 0
+          })
+          if (pr.pagination.total > best) {
+              state.currPoolIdx = idx
+              best = pr.pagination.total
+          }
+          poolHitCnt++
+        } else {
+          state.poolHits.push({ url: pr.service_url, 
+            name: poolNameFromURL(pr.service_url, state.pools),
+            total: 0, hits: [], page: 0})
+        }
+      })
+
+      state.searchSummary = results.pools_searched+ " pools searched in "+
+        results.total_time_ms+"ms. "+results.total_hits+" hits from "+poolHitCnt+" pools."
       state.searched = true
     },
     gotoFirstPage(state) {
-      state.page = 0
+      state.poolHits[state.currPoolIdx].page = 0
+      // state.page = 0
     },
     gotoLastPage(state) {
-      state.page = Math.floor( state.total / state.pageSize)
+      let info = state.poolHits[state.currPoolIdx]
+      info.page = Math.floor( info.total / state.pageSize)
+      state.poolHits[state.currPoolURL] = info
     },
     nextPage(state) {
-      state.page++
+      state.poolHits[state.currPoolIdx].page++
     },
     prevPage(state) {
-      state.page--
+      state.poolHits[state.currPoolIdx].page--
     },
     resetSearchResults(state) {
-      state.page = 0
-      state.total = 0
+      state.poolHits = []
+      state.currPoolIdx = -1
       state.searched = false
     },
     clearAdvancedSearch(state) {
@@ -111,30 +157,46 @@ export default new Vuex.Store({
   actions: {
     firstPage( ctx ) {
       ctx.commit('gotoFirstPage')
-      ctx.dispatch("doSearch")
+      ctx.dispatch("doPoolSearch")
     },
     prevPage( ctx ) {
       ctx.commit('prevPage')
-      ctx.dispatch("doSearch")
+      ctx.dispatch("doPoolSearch")
     },
     nextPage( ctx ) {
       ctx.commit('nextPage')
-      ctx.dispatch("doSearch")
+      ctx.dispatch("doPoolSearch")
     },
     lastPage( ctx ) {
       ctx.commit('gotoLastPage')
-      ctx.dispatch("doSearch")
+      ctx.dispatch("doPoolSearch")
     },
     doSearch(ctx) {
       ctx.commit('setError', "")
       ctx.commit('setSearching', true)
       let req = {
         query: buildQueryString(ctx.state.query),
-        pagination: ctx.getters.getPagination,
+        pagination: {start: 0, rows: ctx.state.pageSize},
       }
       let url = ctx.state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
         ctx.commit('setSearchResults', response.data)
+        ctx.commit('setSearching', false)
+      }).catch((error) => {
+        ctx.commit('setError', error) 
+        ctx.commit('setSearching', false)
+      })
+    },
+    doPoolSearch(ctx) {
+      ctx.commit('setError', "")
+      ctx.commit('setSearching', true)
+      let req = {
+        query: buildQueryString(ctx.state.query),
+        pagination: ctx.getters.getPagination
+      }
+      let url = ctx.getters.currPool.url+"/api/search"
+      axios.post(url, req).then((response)  =>  {
+        ctx.commit('setPoolSearchResults', response.data)
         ctx.commit('setSearching', false)
       }).catch((error) => {
         ctx.commit('setError', error) 
@@ -160,6 +222,16 @@ export default new Vuex.Store({
   },
   plugins: [errorPlugin]
 })
+
+const poolNameFromURL = (url, pools) => {
+  let name = ""
+  pools.forEach( function(p) {
+    if (p.url == url) {
+      name= p.name
+    }
+  })
+  return name
+}
 
 const buildQueryString = (params) => { 
   // params: keyword (no field designation), author, title, subject

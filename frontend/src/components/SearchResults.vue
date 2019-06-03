@@ -2,10 +2,11 @@
    <div class="results-panel">
       <div class="toolbar">
          <p class="summary">{{searchSummary}}</p>
-         <ResultsPager v-if="hits.length>0"/>
+         <p class="curr-pool">Showing {{ currPool.total }} results from {{ currPool.name}} </p>
+         <ResultsPager v-if="currPoolHitCnt>0"/>
       </div>
       <div class="hits">
-         <div class="hit" v-for="hit in hits" :key="hit.id">
+         <div class="hit" v-for="hit in currPool.hits" :key="hit.id">
             <div>
                <label>Identifier:</label>
                <span class="value">{{hit.id}}</span>
@@ -21,28 +22,37 @@
          </div>
       </div>
       <div class="toolbar">
-         <ResultsPager v-if="hits.length>0"/>
+         <ResultsPager v-if="currPoolHitCnt>0"/>
       </div>
    </div>
 </template>
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 import ResultsPager from "@/components/ResultsPager"
 export default {
    components: {
       ResultsPager
    },
    computed: {
+      ...mapGetters({
+         currPool: 'currPool'
+      }),
       ...mapState({
-         hits: state => state.hits,
-         searchSummary: state => state.searchSummary
-      })
+         searchSummary: state => state.searchSummary,
+      }),
+      currPoolHitCnt() {
+         return this.currPool.hits.length
+      }
    }
 }
 </script>
 
 <style scoped>
+.curr-pool {
+   text-align: left;
+}
 .summary {
    margin: 10px;
    font-size: 0.9em;

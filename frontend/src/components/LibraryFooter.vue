@@ -31,6 +31,9 @@
 <style scoped>
 footer {
    border-top: 1px solid #5e7799;
+   border-bottom: none;
+   border-left: none;
+   border-right: none;
    background-color: #20406e;
    color: #d2e5f7;
    padding:20px;

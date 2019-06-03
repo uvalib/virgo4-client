@@ -9,14 +9,22 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    computed: {
       ...mapState({
-         total: state => state.total,
-         page: state => state.page,
          pageSize: state => state.pageSize,
       }),
+      ...mapGetters({
+         currPool: 'currPool'
+      }),
+      page() {
+         return this.currPool.page
+      },
+      total() {
+         return this.currPool.total
+      },
       lastPage() {
          return  Math.floor( this.total / this.pageSize)+1
       },
