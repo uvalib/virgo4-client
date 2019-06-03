@@ -140,6 +140,10 @@ div.search-box {
   border-radius: 5px;
   z-index: 1005;
 }
+div.search-box h4 {
+  color: #555;
+  border: none;
+}
 .advanced-panel table td.label {
   font-weight: 500;
   text-align: right;

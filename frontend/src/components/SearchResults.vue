@@ -2,8 +2,13 @@
    <div class="results-panel">
       <div class="toolbar">
          <p class="summary">{{searchSummary}}</p>
-         <p class="curr-pool">Showing {{ currPool.total }} results from {{ currPool.name}} </p>
-         <ResultsPager v-if="currPoolHitCnt>0"/>
+         <template v-if="total>0" >
+            <p class="curr-pool">Showing {{ currPool.total }} results from {{ currPool.name}} </p>
+            <ResultsPager v-if="currPoolHitCnt>0"/>
+         </template>
+         <template v-else>
+            <h4 class="no-hits">No matching records found</h4>
+         </template>
       </div>
       <div class="hits">
          <div class="hit" v-for="hit in currPool.hits" :key="hit.id">
@@ -40,6 +45,7 @@ export default {
          currPool: 'currPool'
       }),
       ...mapState({
+         total: state=>state.total,
          searchSummary: state => state.searchSummary,
       }),
       currPoolHitCnt() {
@@ -50,6 +56,11 @@ export default {
 </script>
 
 <style scoped>
+h4.no-hits {
+   text-align: center;
+   color: #555;
+   font-size: 1.25em;
+}
 .curr-pool {
    text-align: left;
 }

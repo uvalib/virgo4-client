@@ -27,7 +27,7 @@ export default new Vuex.Store({
     error: "",
     searchSummary: "",
     currPoolIdx: -1,
-    poolHits: [],
+    results: [],
     total: 0,
     pageSize: 25,
     query: {
@@ -44,21 +44,21 @@ export default new Vuex.Store({
   getters: {
     getField,
     hasResults: state => {
-      return state.searched && state.currPoolIdx != -1
+      return state.searched
     },
     currPool: state => {
-      if (state.currPoolIdx == -1 || state.currPoolIdx > state.poolHits.length-1 ) {
+      if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length-1 ) {
         return {url:"", page: 0, total: 0, name: ""}
       } else {
-        let info = state.poolHits[state.currPoolIdx]
+        let info = state.results[state.currPoolIdx]
         return info
       }
     },
     getPagination: state=>{ 
-      if (state.currPoolIdx == -1 || state.currPoolIdx > state.poolHits.length-1 ) {
+      if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length-1 ) {
         return {start: 0, rows: state.pageSize}
       } else {
-        let info = state.poolHits[state.currPoolIdx]
+        let info = state.results[state.currPoolIdx]
         return {start: info.page * state.pageSize, rows: state.pageSize}
       }
     }
@@ -89,7 +89,7 @@ export default new Vuex.Store({
 
     // These results are from a single pool and can be a result of paging
     setPoolSearchResults(state, results) {
-      let info = state.poolHits[state.currPoolIdx]
+      let info = state.results[state.currPoolIdx]
       info.hits = results.record_list
     },
 
@@ -97,14 +97,14 @@ export default new Vuex.Store({
     setSearchResults(state, results) {
       let poolHitCnt = 0    
       state.currPoolIdx = -1
-      state.poolHits = []
+      state.results = []
 
-      // Push all results into the poolHits structure. Reset paging for each
+      // Push all results into the results structure. Reset paging for each
       var best = -1
       results.pool_results.forEach( function(pr, idx) {
         console.log(pr.service_url+" time "+ pr.elapsed_ms)
         if (pr.record_list) {
-          state.poolHits.push({ url: pr.service_url, 
+          state.results.push({ url: pr.service_url, 
             name: poolNameFromURL(pr.service_url, state.pools),
             total: pr.pagination.total,
             hits: pr.record_list,
@@ -116,33 +116,36 @@ export default new Vuex.Store({
           }
           poolHitCnt++
         } else {
-          state.poolHits.push({ url: pr.service_url, 
+          state.results.push({ url: pr.service_url, 
             name: poolNameFromURL(pr.service_url, state.pools),
             total: 0, hits: [], page: 0})
         }
       })
 
+      // No hits found, just call head as the current pool
+      if (state.currPoolIdx == -1 ) {
+        state.currPoolIdx = 0
+      }
       state.searchSummary = results.pools_searched+ " pools searched in "+
         results.total_time_ms+"ms. "+results.total_hits+" hits from "+poolHitCnt+" pools."
       state.searched = true
     },
     gotoFirstPage(state) {
-      state.poolHits[state.currPoolIdx].page = 0
-      // state.page = 0
+      state.results[state.currPoolIdx].page = 0
     },
     gotoLastPage(state) {
-      let info = state.poolHits[state.currPoolIdx]
+      let info = state.results[state.currPoolIdx]
       info.page = Math.floor( info.total / state.pageSize)
-      state.poolHits[state.currPoolURL] = info
+      state.results[state.currPoolURL] = info
     },
     nextPage(state) {
-      state.poolHits[state.currPoolIdx].page++
+      state.results[state.currPoolIdx].page++
     },
     prevPage(state) {
-      state.poolHits[state.currPoolIdx].page--
+      state.results[state.currPoolIdx].page--
     },
     resetSearchResults(state) {
-      state.poolHits = []
+      state.results = []
       state.currPoolIdx = -1
       state.searched = false
     },
