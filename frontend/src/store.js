@@ -21,6 +21,7 @@ export default new Vuex.Store({
     searchAPI: "",
     pools: [],
     showPools: false,
+    showResultsPicker: false,
     fatal: "",
     searching: false,
     searched: false,
@@ -86,7 +87,12 @@ export default new Vuex.Store({
     setSearching(state, flag) {
       state.searching = flag
     },
-
+    toggleResultsPicker(state) {
+      state.showResultsPicker = !state.showResultsPicker
+    },
+    switchResultsPool(state, idx) {
+      state.currPoolIdx = idx
+    },
     // These results are from a single pool and can be a result of paging
     setPoolSearchResults(state, results) {
       let info = state.results[state.currPoolIdx]
@@ -128,6 +134,7 @@ export default new Vuex.Store({
       }
       state.searchSummary = results.pools_searched+ " pools searched in "+
         results.total_time_ms+"ms. "+results.total_hits+" hits from "+poolHitCnt+" pools."
+      state.total = results.total_hits
       state.searched = true
     },
     gotoFirstPage(state) {
