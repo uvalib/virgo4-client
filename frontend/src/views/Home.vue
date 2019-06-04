@@ -7,7 +7,6 @@
           <img src="../assets/spinner2.gif">
         </div>
       </div>
-      <PoolsList v-if="showPools"/>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
           <input
@@ -18,7 +17,7 @@
               placeholder="Search for books, maps, DVDs and other catalog materials."
           >
           <div class="controls">
-            <span @click="poolsClicked" class="pools pure-button pure-button-secondary">Pool Information</span>
+            <PoolsList/>
             <span class="pure-button pure-button-primary" @click="advancedClicked">Advanced</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
@@ -40,7 +39,7 @@
             </tr>
           </table>
           <div class="controls">
-            <span @click="poolsClicked" class="pools pure-button pure-button-secondary">Pool Information</span>
+            <PoolsList/>
             <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
@@ -102,9 +101,6 @@ export default {
       cancelClicked() {
         this.$store.commit("clearAdvancedSearch");
         this.mode = "basic"
-      },
-      poolsClicked() {
-        this.$store.commit("showPoolsOverlay", true);
       }
    }
 };

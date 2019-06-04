@@ -43,4 +43,53 @@ html, body {
 #app a:hover {
    text-decoration: underline;
 }
+
+/* for v-popover styles */
+.tooltip {
+  display: block !important;
+  z-index: 10000;
+}
+.tooltip.popover.vue-popover-theme  {
+   outline: none;
+}
+.tooltip .tooltip-arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  position: absolute;
+  margin: 5px;
+  border-color: #0078e7;
+  z-index: 1;
+}
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+  border-width: 0 10px 10px 10px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-top-color: transparent !important;
+  top: -10px;
+  left: calc(50% - 10px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.tooltip[x-placement^="top"] .tooltip-arrow {
+  border-width: 10px 10px 0 10px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  bottom: -10px;
+  left: calc(50% - 10px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.tooltip[aria-hidden='true'] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity .15s;
+}
 </style>

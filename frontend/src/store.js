@@ -20,7 +20,6 @@ export default new Vuex.Store({
   state: {
     searchAPI: "",
     pools: [],
-    showPools: false,
     showResultsPicker: false,
     fatal: "",
     error: "",
@@ -79,9 +78,6 @@ export default new Vuex.Store({
 
   mutations: {
     updateField,
-    showPoolsOverlay(state, show) {
-      state.showPools = show
-    },
     setPools(state, data) {
       state.pools = data
       if (state.pools.length == 0 ) {
@@ -153,7 +149,7 @@ export default new Vuex.Store({
             hits: pr.record_list,
             page: 0
           })
-          if (pr.pagination.total > best) {
+          if (state.preferences.targetPoolURL == "" && pr.pagination.total > best) {
               state.currPoolIdx = idx
               best = pr.pagination.total
           }
@@ -162,6 +158,9 @@ export default new Vuex.Store({
           state.results.push({ url: pr.service_url, 
             name: poolNameFromURL(pr.service_url, state.pools),
             total: 0, hits: [], page: 0})
+        }
+        if (state.preferences.targetPoolURL == pr.service_url) {
+          state.currPoolIdx = idx
         }
       })
 
@@ -223,7 +222,10 @@ export default new Vuex.Store({
       let req = {
         query: buildQueryString(ctx.state.query),
         pagination: {start: 0, rows: ctx.state.pageSize},
-        preferences: ctx.state.preferences
+        preferences: {
+          target_pool: ctx.state.preferences.targetPoolURL,
+          exclude_pool: ctx.state.preferences.excludePoolURLs,
+        }
       }
       let url = ctx.state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
