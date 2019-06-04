@@ -25,9 +25,10 @@ var showWarn bool
 // getVersion reports the version of the serivce
 func getVersion(c *gin.Context) {
 	build := "unknown"
-	files, _ := filepath.Glob("buildtag.*")
+	// cos our CWD is the bin directory
+	files, _ := filepath.Glob("../buildtag.*")
 	if len(files) == 1 {
-		build = strings.Replace(files[0], "buildtag.", "", 1)
+		build = strings.Replace(files[0], "../buildtag.", "", 1)
 	}
 
 	vMap := make(map[string]string)
