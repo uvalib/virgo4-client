@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
 
 // Version of the service
-const version = "1.0.0"
+const version = "0.0.1"
 
 // URL for the search API
 var searchAPI string
@@ -20,12 +24,36 @@ var showWarn bool
 
 // getVersion reports the version of the serivce
 func getVersion(c *gin.Context) {
-	c.String(http.StatusOK, "Virgo4 Client server version %s", version)
+	build := "unknown"
+	files, _ := filepath.Glob("buildtag.*")
+	if len(files) == 1 {
+		build = strings.Replace(files[0], "buildtag.", "", 1)
+	}
+
+	vMap := make(map[string]string)
+	vMap["version"] = version
+	vMap["build"] = build
+	c.JSON(http.StatusOK, vMap)
 }
 
 // healthCheck reports the health of the server
 func healthCheck(c *gin.Context) {
-	c.String(http.StatusOK, "Virgo4 Client server is alive")
+	hcMap := make(map[string]string)
+	hcMap["v4client"] = "true"
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	apiURL := fmt.Sprintf("%s/version", searchAPI)
+	_, err := client.Get(apiURL)
+	if err != nil {
+		log.Printf("ERROR: SearchAPI %s ping failed: %s", searchAPI, err.Error())
+		hcMap["v4search"] = "false"
+	} else {
+		hcMap["v4search"] = "true"
+	}
+
+	c.JSON(http.StatusOK, hcMap)
 }
 
 // getConfig returns front-end configuration data as JSON
@@ -62,6 +90,9 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DisableConsoleColor()
 	router := gin.Default()
+	p := ginprometheus.NewPrometheus("gin")
+	p.Use(router)
+
 	router.GET("/version", getVersion)
 	router.GET("/healthcheck", healthCheck)
 	router.GET("/config", getConfig)
