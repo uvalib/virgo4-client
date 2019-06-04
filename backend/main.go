@@ -28,7 +28,7 @@ func getVersion(c *gin.Context) {
 	// cos our CWD is the bin directory
 	files, _ := filepath.Glob("../buildtag.*")
 	if len(files) == 1 {
-		build = strings.Replace(files[0], "buildtag.", "", 1)
+		build = strings.Replace(files[0], "../buildtag.", "", 1)
 	}
 
 	vMap := make(map[string]string)
