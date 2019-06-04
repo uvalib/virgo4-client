@@ -11,4 +11,5 @@ dist/
 .idea
 env.*
 /pkg
-*.sh
+node_modules/
+yarn.lock
