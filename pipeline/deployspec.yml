@@ -1,0 +1,32 @@
+#
+# deployspec.yml
+#
+
+version: 0.2
+
+#env:
+#  variables:
+#    name: value
+
+phases:
+#  install:
+#    commands:
+#      - printenv
+#      - echo SERVICE_NAME = [$SERVICE_NAME]
+#  pre_build:
+#    commands:
+#      - echo logging in to AWS ECR
+#      - $(aws ecr get-login --no-include-email --region $AWS_REGION)
+  build:
+    commands:
+      - echo deploy sequence begins at `date`
+      - aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --force-new-deployment
+  post_build:
+    commands:
+      - expected_build=$(aws --region=$AWS_REGION ssm get-parameter --name /containers/$CONTAINER_IMAGE/latest | grep "Value" | awk -F\" '{print $4}')
+      - echo waiting for deployment to report build $expected_build
+      - sh ./pipeline/wait_for_version.sh $TC_ENDPOINT $expected_build 90
+
+#
+# end of file
+#
