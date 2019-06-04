@@ -55,7 +55,9 @@ export default {
 }
 .pools-list p:hover {
    cursor: pointer;
-   background: #dedede;
+   background: rgb(66, 184, 221);
+   border-radius: 20px;
+   color:white;
 }
 h4 {
    padding: 5px;
