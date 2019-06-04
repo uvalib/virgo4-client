@@ -23,13 +23,12 @@ export default new Vuex.Store({
     showPools: false,
     showResultsPicker: false,
     fatal: "",
-    searching: false,
-    searched: false,
     error: "",
+    searching: false,
     searchSummary: "",
     currPoolIdx: -1,
     results: [],
-    total: 0,
+    total: -1,
     pageSize: 25,
     query: {
       keyword: "",
@@ -42,10 +41,11 @@ export default new Vuex.Store({
       excludePoolURLs: []
     }
   },
+
   getters: {
     getField,
     hasResults: state => {
-      return state.searched
+      return state.total >= 0
     },
     currPool: state => {
       if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length-1 ) {
@@ -62,8 +62,21 @@ export default new Vuex.Store({
         let info = state.results[state.currPoolIdx]
         return {start: info.page * state.pageSize, rows: state.pageSize}
       }
+    },
+    isTargetPool: state => poolURL => {
+      return state.preferences.targetPoolURL == poolURL
+    },
+    isPoolExcluded: state => pooURL => {
+      let excluded = false 
+      state.preferences.excludePoolURLs.forEach( function(url) {
+        if ( url == pooURL) {
+          excluded = true
+        }
+      })
+      return excluded
     }
   },
+
   mutations: {
     updateField,
     showPoolsOverlay(state, show) {
@@ -73,6 +86,30 @@ export default new Vuex.Store({
       state.pools = data
       if (state.pools.length == 0 ) {
         state.fatal = "No search pools configured"
+      }
+    },
+    includeAll(state) {
+      state.preferences.excludePoolURLs = []
+    },
+    excludeAll(state) {
+      state.preferences.excludePoolURLs = []
+      state.pools.forEach( function(p) {
+        state.preferences.excludePoolURLs.push(p.url)
+      })
+    },
+    toggleExcludePool(state,poolURL) {
+      let idx = state.preferences.excludePoolURLs.indexOf(poolURL)
+      if ( idx > -1) {
+        state.preferences.excludePoolURLs.splice(idx,1)
+      } else {
+        state.preferences.excludePoolURLs.push(poolURL)
+      }
+    },
+    toggleTargetPool(state,poolURL) {
+      if (state.preferences.targetPoolURL == poolURL) {
+        state.preferences.targetPoolURL = ""
+      } else {
+        state.preferences.targetPoolURL = poolURL
       }
     },
     setFatalError(state, err) {
@@ -93,15 +130,15 @@ export default new Vuex.Store({
     switchResultsPool(state, idx) {
       state.currPoolIdx = idx
     },
-    // These results are from a single pool and can be a result of paging
     setPoolSearchResults(state, results) {
+      // These results are from a single pool; generally a call to get next page
       let info = state.results[state.currPoolIdx]
       info.hits = results.record_list
     },
-
-    // this should just be called from top level search; resets results from all pools
     setSearchResults(state, results) {
+      // this is called from top level search; resets results from all pools
       let poolHitCnt = 0    
+      state.total = -1
       state.currPoolIdx = -1
       state.results = []
 
@@ -135,7 +172,6 @@ export default new Vuex.Store({
       state.searchSummary = results.pools_searched+ " pools searched in "+
         results.total_time_ms+"ms. "+results.total_hits+" hits from "+poolHitCnt+" pools."
       state.total = results.total_hits
-      state.searched = true
     },
     gotoFirstPage(state) {
       state.results[state.currPoolIdx].page = 0
@@ -154,16 +190,16 @@ export default new Vuex.Store({
     resetSearchResults(state) {
       state.results = []
       state.currPoolIdx = -1
-      state.searched = false
+      state.total = -1
     },
     clearAdvancedSearch(state) {
       state.query.keyword = ""
       state.query.author = ""
       state.query.title = ""
       state.query.subject = ""
-      state.searched = false
     }
   },
+
   actions: {
     firstPage( ctx ) {
       ctx.commit('gotoFirstPage')
@@ -187,6 +223,7 @@ export default new Vuex.Store({
       let req = {
         query: buildQueryString(ctx.state.query),
         pagination: {start: 0, rows: ctx.state.pageSize},
+        preferences: ctx.state.preferences
       }
       let url = ctx.state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {

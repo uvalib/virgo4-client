@@ -13,3 +13,4 @@ env.*
 /pkg
 node_modules/
 yarn.lock
+run.sh

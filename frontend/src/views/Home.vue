@@ -18,7 +18,8 @@
               placeholder="Search for books, maps, DVDs and other catalog materials."
           >
           <div class="controls">
-            <span class="pure-button pure-button-secondary" @click="advancedClicked">Advanced</span>
+            <span @click="poolsClicked" class="pools pure-button pure-button-secondary">Pool Information</span>
+            <span class="pure-button pure-button-primary" @click="advancedClicked">Advanced</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
         </template>
@@ -52,7 +53,7 @@
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex";
+import { mapGetters } from "vuex"
 import { mapFields } from "vuex-map-fields"
 import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
