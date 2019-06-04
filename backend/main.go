@@ -38,21 +38,24 @@ func getVersion(c *gin.Context) {
 
 // healthCheck reports the health of the server
 func healthCheck(c *gin.Context) {
+	log.Printf("Got healthcheck request")
 	hcMap := make(map[string]string)
 	hcMap["v4client"] = "true"
-	timeout := time.Duration(5 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
-	apiURL := fmt.Sprintf("%s/version", searchAPI)
-	_, err := client.Get(apiURL)
-	if err != nil {
-		log.Printf("ERROR: SearchAPI %s ping failed: %s", searchAPI, err.Error())
-		hcMap["v4search"] = "false"
-	} else {
-		hcMap["v4search"] = "true"
-	}
 
+	if searchAPI != "" {
+		timeout := time.Duration(5 * time.Second)
+		client := http.Client{
+			Timeout: timeout,
+		}
+		apiURL := fmt.Sprintf("%s/version", searchAPI)
+		_, err := client.Get(apiURL)
+		if err != nil {
+			log.Printf("ERROR: SearchAPI %s ping failed: %s", searchAPI, err.Error())
+			hcMap["v4search"] = "false"
+		} else {
+			hcMap["v4search"] = "true"
+		}
+	}
 	c.JSON(http.StatusOK, hcMap)
 }
 
