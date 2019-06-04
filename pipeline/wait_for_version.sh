@@ -42,6 +42,11 @@ while true; do
 
    VERSION=$($CURL_TOOL $ENDPOINT/version 2>/dev/null | $AWK_TOOL -F\" '{print $4}')
 
+   # if we did not get a version, tag as unknown
+   if [ -z "$VERSION" ]; then
+      VERSION="unknown"
+   fi
+
    # did we get the right version
    if [ "$VERSION" = "$EXPECTED_VERSION" ]; then
       echo "Reported version: $VERSION, done waiting"
