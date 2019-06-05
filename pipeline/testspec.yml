@@ -21,7 +21,7 @@ phases:
 
 #  build:
 #    commands:
-#      - make test
+#      - unset GOPATH; unset GOROOT; make test
 
 #  post_build:
 #    commands:
