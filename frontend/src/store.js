@@ -20,7 +20,6 @@ export default new Vuex.Store({
   state: {
     searchAPI: "",
     pools: [],
-    showResultsPicker: false,
     fatal: "",
     error: "",
     searching: false,
@@ -119,9 +118,6 @@ export default new Vuex.Store({
     },
     setSearching(state, flag) {
       state.searching = flag
-    },
-    toggleResultsPicker(state) {
-      state.showResultsPicker = !state.showResultsPicker
     },
     switchResultsPool(state, idx) {
       state.currPoolIdx = idx

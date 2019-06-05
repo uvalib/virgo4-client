@@ -6,9 +6,9 @@
             <p class="curr-pool">
                <span>Showing {{ currPool.total }} results from {{ currPool.name}}</span>
             </p>
-            <span @click="showPickerClicked" class="other-pools pure-button pure-button-primary">Other Pool Results</span>
             <ResultsPager v-if="currPoolHitCnt>0"/>
-            <PoolResultsPicker v-if="showResultsPicker"/>
+            <PoolResultsPicker/>
+            <div style="clear:both;"></div>
          </template>
          <template v-else>
             <h4 class="no-hits">No matching records found</h4>
@@ -32,6 +32,7 @@
       </div>
       <div class="toolbar">
          <ResultsPager v-if="currPoolHitCnt>0"/>
+         <div style="clear:both;"></div>
       </div>
    </div>
 </template>
@@ -59,20 +60,11 @@ export default {
       }
    },
    methods: {
-      showPickerClicked() {
-        this.$store.commit("toggleResultsPicker")
-      }
    }
 }
 </script>
 
 <style scoped>
-.other-pools {
-   font-size: 0.75em;
-   padding: 3px 12px;   
-   float: left;
-   font-weight: bold;
-}
 h4.no-hits {
    text-align: center;
    color: #555;
@@ -88,7 +80,6 @@ h4.no-hits {
    text-align: center;
 }
 div.toolbar {
-   text-align: right;
    position: relative;
 }
 div.results-panel {

@@ -58,10 +58,8 @@ export default {
 
 <style scoped>
 .pager {
-   /* position: absolute;
-   right:0;
-   top:0; */
    font-size: 12px;
+   float: right;
 }
 .total {
    margin-right: 10px;

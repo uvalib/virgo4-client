@@ -1,14 +1,17 @@
 <template>
-   <div class="results-picker">
-      <h4>Pool Results<i class="action close fas fa-times-circle" @click="closeClicked"></i></h4>
-      <div class="pools-list">
-         <div class="results" v-for="(r,idx) in results" :key="r.url">
-            <template v-if="r.total > 0">
-               <p @click="poolClicked" :data-idx="idx">{{r.name}} ({{r.total}} hits)</p>
-         </template>
+   <v-popover style="float:left;" offset="10">
+      <span class="other-pools pure-button pure-button-secondary">Other Pool Results</span>
+      <div class="results-picker"  slot="popover">
+         <h4>Pool Results</h4>
+         <div class="pools-list">
+            <div class="results" v-for="(r,idx) in results" :key="r.url">
+               <template v-if="r.total > 0">
+                  <p v-close-popover @click="poolClicked" :data-idx="idx">{{r.name}} ({{r.total}} hits)</p>
+            </template>
+            </div>
          </div>
       </div>
-   </div>
+   </v-popover>
 </template>
 
 <script>
@@ -22,28 +25,33 @@ export default {
       })
    },
    methods: {
-      closeClicked() {
-         this.$store.commit("toggleResultsPicker")
-      },
       poolClicked(event) {
          let idx = event.currentTarget.dataset.idx 
          this.$store.commit("switchResultsPool", idx)
-         this.$store.commit("toggleResultsPicker")
       }
    }
 }
 </script>
 
 <style scoped>
+.other-pools {
+   font-size: 0.75em;
+   padding: 3px 12px;   
+   background: #0078e7;
+   color:white;
+   font-weight: bold;
+}
 .results-picker {
-   position: absolute;
    background: white;
    padding: 0;
    text-align: left;
    font-size: 0.8em;
+   box-shadow: 2px 2px 10px #ccc;
+   color: #555;
+   display: inline-block;
 }
 .pools-list {
-   padding: 5px 15px;
+   padding: 5px 0;
    max-height: 300px;
    overflow-y: scroll;
    border: 1px solid #ccc;
@@ -51,20 +59,18 @@ export default {
 }
 .pools-list p {
    margin: 0;
-   padding: 2px 6px
+   padding: 2px 12px;
 }
 .pools-list p:hover {
    cursor: pointer;
-   background: rgb(66, 184, 221);
-   border-radius: 20px;
-   color:white;
+   background: #f5f5ff;
 }
 h4 {
    padding: 5px;
    margin: 0;
    text-align: left;
    font-size: 0.8em;
-   background: #449;
+   background: #0078e7;
    color: white;
    position: relative;
 }

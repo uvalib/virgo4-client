@@ -76,7 +76,7 @@ html, body {
   border-left-color: transparent !important;
   border-right-color: transparent !important;
   border-bottom-color: transparent !important;
-  bottom: -10px;
+  bottom: -6px;
   left: calc(50% - 10px);
   margin-top: 0;
   margin-bottom: 0;
