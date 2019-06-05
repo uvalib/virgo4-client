@@ -13,7 +13,7 @@ phases:
     runtime-versions:
       golang: 1.12
     commands:
-#      - printenv
+      - printenv
 #      - apt-get update -y
       - apt-get install -y wget unzip
       - wget https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip
@@ -28,10 +28,10 @@ phases:
       - cd terraform-infrastructure/virgo4.lib.virginia.edu/ecs-tasks/virgo4-client
       - terraform init
       - terraform apply -auto-approve -var container_tag=$latest_build
-  post_build:
-    commands:
       - echo waiting for deployment to report build $latest_build
       - sh ./pipeline/wait_for_version.sh $TC_ENDPOINT $latest_build 120
+#  post_build:
+#    commands:
 
 #
 # end of file

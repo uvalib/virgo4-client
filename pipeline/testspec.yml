@@ -10,21 +10,18 @@ version: 0.2
 
 phases:
   install:
-    commands:
+    runtime-versions:
+      golang: 1.12
+#    commands:
 #      - printenv
 #      - echo TC_ENDPOINT = [$TC_ENDPOINT]
-#      - rm go.mod go.sum
-#      - go get github.com/parnurzeal/gorequest
-#      - go get gopkg.in/yaml.v2
 #  pre_build:
 #    commands:
-  build:
-    commands:
-      - echo test sequence begins at `date`
+#  build:
+#    commands:
 #      - make test
-  post_build:
-    commands:
-      - echo test sequence complete `date`
+#  post_build:
+#    commands:
 
 #
 # end of file
