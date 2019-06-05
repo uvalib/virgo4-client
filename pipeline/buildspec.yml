@@ -13,13 +13,12 @@ phases:
     runtime-versions:
       docker: 18
 #    commands:
-#      - echo CONTAINER_REGISTRY = [$CONTAINER_REGISTRY]
-#      - echo CONTAINER_IMAGE = [$CONTAINER_IMAGE]
+
   pre_build:
     commands:
       - $(aws ecr get-login --no-include-email --region $AWS_REGION)
-      - echo converting build start time to human-readable version number
       - BUILD_VERSION=$(date --date="@$(echo $CODEBUILD_START_TIME | cut -c1-10)" +"%Y%m%d%H%M%S")
+
   build:
     commands:
       - docker build -f package/Dockerfile -t $CONTAINER_IMAGE:latest --build-arg BUILD_TAG=$BUILD_VERSION .
@@ -28,6 +27,7 @@ phases:
       - docker push $CONTAINER_REGISTRY/$CONTAINER_IMAGE:latest
       - docker push $CONTAINER_REGISTRY/$CONTAINER_IMAGE:build-$BUILD_VERSION
       - aws --region=$AWS_REGION ssm put-parameter --name /containers/$CONTAINER_IMAGE/latest --value build-$BUILD_VERSION --type String --overwrite
+
 #  post_build:
 #    commands:
 

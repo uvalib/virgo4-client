@@ -15,11 +15,14 @@ phases:
 #    commands:
 #      - printenv
 #      - echo TC_ENDPOINT = [$TC_ENDPOINT]
+
 #  pre_build:
 #    commands:
+
 #  build:
 #    commands:
 #      - make test
+
 #  post_build:
 #    commands:
 
