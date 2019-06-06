@@ -279,22 +279,22 @@ const poolNameFromURL = (url, pools) => {
 }
 
 const buildQueryString = (params) => { 
-  // params: keyword (no field designation), author, title, subject
-  let mapping  = {"title": "title_t", "author": "author_t", "subject": "subject_t", "keyword": "NONE"}
-  let q = []
-  for (let [key, value] of Object.entries(params)) {
-    let qv = value.trim()
-    if (qv.length == 0) continue
-
-    if (qv.includes(" ")) {
-      qv = `"${value}"`
-    }
-    let fn = mapping[key]
-    if (fn === "NONE") {
-      q.push(qv)
-    } else {
-      q.push(`${fn}:${qv}`)
-    }
+  // convert into the standard v4 search string format. Ex:
+  // title : {"susan sontag" OR music title}   AND keyword:{ Maunsell } ) OR author:{ liberty }
+  // For now, all 'fields' are AND'd together and the raw strings entered in the form just
+  // tacked on after the key.
+  var q = []
+  if (params.keyword != "") {
+    q.push("keyword: {"+params.keyword+"}")
   }
-  return q.join(" +")
+  if (params.author != "") {
+    q.push("author: {"+params.author+"}")
+  }
+  if (params.title != "") {
+    q.push("title: {"+params.title+"}")
+  }
+  if (params.subject != "") {
+    q.push("subject: {"+params.subject+"}")
+  }
+  return q.join(" AND ")
 }
