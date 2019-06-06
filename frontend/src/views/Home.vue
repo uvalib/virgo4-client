@@ -1,6 +1,5 @@
 <template>
    <div class="home">
-      <p class="fatal">{{fatal}}</p>
       <div v-show="searching" class="searching-overlay">
         <div class="search-box">
           <h4>Searching...</h4>

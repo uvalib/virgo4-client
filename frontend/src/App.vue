@@ -1,5 +1,6 @@
 <template>
    <div id="app">
+      <FatalError v-if="fatal.length > 0"/>
       <VirgoHeader/>
       <router-view/>
       <LibraryFooter/>
@@ -9,10 +10,18 @@
 <script>
 import LibraryFooter from "@/components/LibraryFooter"
 import VirgoHeader from "@/components/VirgoHeader"
+import FatalError from "@/components/FatalError"
+import { mapState } from "vuex"
 export default {
    components: {
       VirgoHeader,
-      LibraryFooter
+      LibraryFooter,
+      FatalError
+   },
+   computed: {
+      ...mapState({
+         fatal: state => state.fatal,
+      }),
    }
 };
 </script>
