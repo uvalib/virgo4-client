@@ -19,6 +19,7 @@
             <PoolsList/>
             <span class="pure-button pure-button-primary" @click="advancedClicked">Advanced</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+            <p class="tips"><SearchTips/></p>
           </div>
         </template>
         <div v-else class="advanced-panel">
@@ -49,6 +50,7 @@
             <PoolsList/>
             <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+            <p class="tips"><SearchTips/></p>
           </div>
         </div>
       </div>
@@ -64,10 +66,11 @@ import { mapFields } from "vuex-map-fields"
 import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
 import SearchOpPicker from "@/components/SearchOpPicker"
+import SearchTips from "@/components/SearchTips"
 export default {
    name: "home",
    components: {
-     SearchResults, PoolsList, SearchOpPicker
+     SearchResults, PoolsList, SearchOpPicker,SearchTips
    },
    data: function() {
       return {
@@ -217,5 +220,15 @@ p.fatal, h3.error {
 #keyword {
    margin: 0;
    width: 100%;
+}
+p.tips {
+  font-weight: bold;
+  color:cornflowerblue;
+  cursor:pointer;
+  margin:20px 0;
+  opacity: 0.8;
+}
+p.tips:hover {
+  opacity:1;
 }
 </style>

@@ -112,6 +112,7 @@ p.pool-desc {
    font-weight: 100;
    display: inline-block;
    padding-bottom: 5px;
+   border-radius: 10px;
 }
 .pools-container h4 {
    padding: 5px 40px;
@@ -121,6 +122,7 @@ p.pool-desc {
    color: white;
    position: relative;
    font-weight: 100;
+    border-radius: 10px 10px 0 0;
 }
 .pools-list {
    margin: 5px 0 10px 0;

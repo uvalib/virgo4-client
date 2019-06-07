@@ -49,12 +49,12 @@ export default {
    box-shadow: 2px 2px 10px #ccc;
    color: #555;
    display: inline-block;
+   border-radius: 10px;
 }
 .pools-list {
    padding: 5px 0;
    max-height: 300px;
    overflow-y: scroll;
-   border: 1px solid #ccc;
    border-top: none;
 }
 .pools-list p {
@@ -73,6 +73,8 @@ h4 {
    background: #0078e7;
    color: white;
    position: relative;
+   border-radius: 10px 10px 0 0;
+   text-align: center;
 }
 i.close {
   opacity: 0.8;

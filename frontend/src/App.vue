@@ -96,6 +96,35 @@ html, body {
   margin-top: 0;
   margin-bottom: 0;
 }
+.tooltip[x-placement^="right"] {
+  margin-left: 10px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+  border-width: 10px 10px 10px 0;
+  border-left-color: transparent !important;
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+  left: -10px;
+  top: calc(50% - 10px);
+  margin-left: 0;
+  margin-right: 0;
+}
+.tooltip[x-placement^="left"] {
+  margin-right: 10px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+  border-width: 10px 0 10px 10px;
+  border-top-color: transparent !important;
+  border-right-color: transparent !important;
+  border-bottom-color: transparent !important;
+  right: -10px;
+  top: calc(50% - 10px);
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .tooltip[aria-hidden='true'] {
   visibility: hidden;
   opacity: 0;
