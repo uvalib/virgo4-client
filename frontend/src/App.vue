@@ -70,15 +70,8 @@ html, body {
   border-color: #0078e7;
   z-index: 1;
 }
-.tooltip[x-placement^="bottom"] .tooltip-arrow {
-  border-width: 0 10px 10px 10px;
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
-  border-top-color: transparent !important;
-  top: -10px;
-  left: calc(50% - 10px);
-  margin-top: 0;
-  margin-bottom: 0;
+.tooltip[x-placement^="top"] {
+  margin-bottom: 10px;
 }
 .tooltip[x-placement^="top"] .tooltip-arrow {
   border-width: 10px 10px 0 10px;
@@ -86,6 +79,19 @@ html, body {
   border-right-color: transparent !important;
   border-bottom-color: transparent !important;
   bottom: -6px;
+  left: calc(50% - 10px);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.tooltip[x-placement^="bottom"] {
+  margin-top: 10px;
+}
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+  border-width: 0 10px 10px 10px;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  border-top-color: transparent !important;
+  top: -10px;
   left: calc(50% - 10px);
   margin-top: 0;
   margin-bottom: 0;

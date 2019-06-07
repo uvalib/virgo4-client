@@ -21,20 +21,28 @@
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
         </template>
-        <div class="advanced-panel" v-else>
+        <div v-else class="advanced-panel">
           <h4>Advanced Search</h4>
           <table>
             <tr>
-              <td class="label">Author</td><td><input v-model="author" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="authorOp"/></td>
+              <td class="label">Author</td>
+              <td><input v-model="author" type="text"></td>
             </tr>
             <tr>
-              <td class="label">Title</td><td><input v-model="title" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="titleOp"/></td>
+              <td class="label">Title</td>
+              <td><input v-model="title" type="text"></td>
             </tr>
             <tr>
-              <td class="label">Subject</td><td><input v-model="subject" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
+              <td class="label">Subject</td>
+              <td><input v-model="subject" type="text"></td>
             </tr>
             <tr>
-              <td class="label">Keyword</td><td><input v-model="keyword" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
+              <td class="label">Keyword</td>
+              <td><input v-model="keyword" type="text"></td>
             </tr>
           </table>
           <div class="controls">
@@ -55,10 +63,11 @@ import { mapGetters } from "vuex"
 import { mapFields } from "vuex-map-fields"
 import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
+import SearchOpPicker from "@/components/SearchOpPicker"
 export default {
    name: "home",
    components: {
-     SearchResults, PoolsList
+     SearchResults, PoolsList, SearchOpPicker
    },
    data: function() {
       return {
@@ -84,6 +93,10 @@ export default {
         'query.author',
         'query.title',
         'query.subject',
+        'query.keywordOp',
+        'query.authorOp',
+        'query.titleOp',
+        'query.subjectOp',
       ])
    },
    created: function() {
@@ -91,7 +104,6 @@ export default {
    },
    methods: {
       searchClicked() {
-        this.$store.commit("resetSearchResults");
         this.$store.dispatch("doSearch");
       },
       advancedClicked() {
@@ -147,10 +159,12 @@ div.search-box h4 {
   width: 80px;
   color: #666;
 }
+.advanced-panel table td.op{
+ width: 60px;
+}
 .advanced-panel {
   margin: 0 auto;
   padding: 0 0.75em;
-  max-width: 600px;
 }
 .advanced-panel table {
   width: 100%;
@@ -195,7 +209,7 @@ p.fatal, h3.error {
    color: firebrick;
 }
 .search-panel {
-  margin: 5% auto 0 auto;
+  margin: 25px auto;
   text-align: center;
   max-width: 800px;
   padding: 0.75em;

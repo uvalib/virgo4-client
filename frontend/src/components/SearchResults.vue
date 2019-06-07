@@ -22,7 +22,7 @@
             </div>
             <div>
                <label>Title:</label>
-               <span class="value">{{hit.title}}</span>
+               <span class="value">{{fullTitle(hit)}}</span>
             </div>
             <div>
                <label>Author:</label>
@@ -60,6 +60,12 @@ export default {
       }
    },
    methods: {
+      fullTitle(hit) {
+         if (hit.subtitle) {
+            return hit.title + " " + hit.subtitle
+         }
+         return hit.title
+      }
    }
 }
 </script>
@@ -83,8 +89,7 @@ div.toolbar {
    position: relative;
 }
 div.results-panel {
-   max-width: 600px;
-   margin: 0 auto 2em auto;
+   margin: 0 15vw 5vw 15vw;
    padding: 0 0.75em;
 }
 div.hits {

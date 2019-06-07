@@ -1,5 +1,5 @@
 <template>
-   <v-popover style="display:inline-block;" offset="10" placement="bottom-end">
+   <v-popover style="display:inline-block;">
       <span class="pools pure-button pure-button-secondary">Pool Information</span>
       <div class="pools-container" slot="popover">
          <h4>

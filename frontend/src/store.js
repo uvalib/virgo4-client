@@ -30,9 +30,13 @@ export default new Vuex.Store({
     pageSize: 25,
     query: {
       keyword: "",
+      keywordOp: "AND",
       author: "",
+      authorOp: "AND",
       title: "",
+      titleOp: "AND",
       subject: "",
+      subjectOp: "AND",
     },
     preferences: {
       targetPoolURL: "",
@@ -170,11 +174,6 @@ export default new Vuex.Store({
     prevPage(state) {
       state.results[state.currPoolIdx].page--
     },
-    resetSearchResults(state) {
-      state.results = []
-      state.currPoolIdx = -1
-      state.total = -1
-    },
     clearAdvancedSearch(state) {
       state.query.keyword = ""
       state.query.author = ""
@@ -271,18 +270,41 @@ const buildQueryString = (params) => {
   // title : {"susan sontag" OR music title}   AND keyword:{ Maunsell } ) OR author:{ liberty }
   // For now, all 'fields' are AND'd together and the raw strings entered in the form just
   // tacked on after the key.
-  var q = []
+  var andTerms = []
+  var orTerms = []
   if (params.keyword != "") {
-    q.push("keyword: {"+params.keyword+"}")
+    if (params.keywordOp == "AND") {
+      andTerms.push("keyword: {"+params.keyword+"}")
+    } else {
+      orTerms.push("keyword: {"+params.keyword+"}")
+    }
   }
   if (params.author != "") {
-    q.push("author: {"+params.author+"}")
+    if (params.authorOp == "AND") {
+      andTerms.push("author: {"+params.author+"}")
+    } else {
+      orTerms.push("author: {"+params.author+"}")
+    }
   }
   if (params.title != "") {
-    q.push("title: {"+params.title+"}")
+    if (params.titleOp == "AND") {
+      andTerms.push("title: {"+params.title+"}")
+    } else {
+      orTerms.push("title: {"+params.title+"}")
+    }
   }
   if (params.subject != "") {
-    q.push("subject: {"+params.subject+"}")
+    if (params.subjectOp == "AND") {
+      andTerms.push("subject: {"+params.subject+"}")
+    } else {
+      orTerms.push("subject: {"+params.subject+"}")
+    }
   }
-  return q.join(" AND ")
+  let anded = andTerms.join(" AND ")
+  let ored = orTerms.join(" OR ")
+  if (anded.length > 0 && ored.length > 0) {
+    return anded + " OR " + ored
+  }
+  if (anded.length > 0) return anded
+  if (ored.length > 0) return ored
 }

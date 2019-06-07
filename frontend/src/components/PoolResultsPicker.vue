@@ -1,5 +1,5 @@
 <template>
-   <v-popover style="float:left;" offset="10">
+   <v-popover style="float:left;">
       <span class="other-pools pure-button pure-button-secondary">Other Pool Results</span>
       <div class="results-picker"  slot="popover">
          <h4>Pool Results</h4>
