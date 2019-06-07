@@ -135,9 +135,7 @@ export default new Vuex.Store({
       state.results = []
 
       // Push all results into the results structure. Reset paging for each
-      var best = -1
-      results.pool_results.forEach( function(pr, idx) {
-        console.log(pr.service_url+" time "+ pr.elapsed_ms)
+      results.pool_results.forEach( function(pr) {
         if (pr.record_list) {
           state.results.push({ url: pr.service_url, 
             name: poolNameFromURL(pr.service_url, state.pools),
@@ -145,25 +143,15 @@ export default new Vuex.Store({
             hits: pr.record_list,
             page: 0
           })
-          if (state.preferences.targetPoolURL == "" && pr.pagination.total > best) {
-              state.currPoolIdx = idx
-              best = pr.pagination.total
-          }
           poolHitCnt++
         } else {
           state.results.push({ url: pr.service_url, 
             name: poolNameFromURL(pr.service_url, state.pools),
             total: 0, hits: [], page: 0})
         }
-        if (state.preferences.targetPoolURL == pr.service_url) {
-          state.currPoolIdx = idx
-        }
       })
 
-      // No hits found, just call head as the current pool
-      if (state.currPoolIdx == -1 ) {
-        state.currPoolIdx = 0
-      }
+      state.currPoolIdx = 0
       state.searchSummary = results.pools_searched+ " pools searched in "+
         results.total_time_ms+"ms. "+results.total_hits+" hits from "+poolHitCnt+" pools."
       state.total = results.total_hits
