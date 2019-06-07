@@ -14,14 +14,15 @@ phases:
       golang: 1.12
 #    commands:
 #      - printenv
-#      - echo TC_ENDPOINT = [$TC_ENDPOINT]
 
-#  pre_build:
-#    commands:
+  pre_build:
+    commands:
+      - git clone https://$GITHUB_USER:$GITHUB_TOKEN@github.com/uvalib/standard-ws-tester
 
-#  build:
-#    commands:
-#      - unset GOPATH; unset GOROOT; make test
+  build:
+    commands:
+      - cd standard-ws-tester; unset GOPATH; unset GOROOT; make test
+
 
 #  post_build:
 #    commands:
