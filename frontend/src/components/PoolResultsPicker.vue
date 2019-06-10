@@ -52,7 +52,7 @@ export default {
    border-radius: 10px;
 }
 .pools-list {
-   padding: 5px 0;
+   padding: 10px 0;
    max-height: 300px;
    overflow-y: scroll;
    border-top: none;

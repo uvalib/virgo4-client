@@ -1,6 +1,6 @@
 <template>
    <v-popover style="display:inline-block;">
-      <span class="pools pure-button pure-button-secondary">Pool Information</span>
+      <span class="pure-button pure-button-secondary">Pool Information</span>
       <div class="pools-container" slot="popover">
          <h4>
             Available Search Pools
@@ -57,11 +57,6 @@ export default {
 </script>
 
 <style scoped>
-.pure-button.pure-button-secondary {
-   background: rgb(66, 184, 221); 
-   color: white;
-   border-radius: 5px;
-}
 i.far.fa-star {
    opacity: 0.5;
    margin-right: 10px;
@@ -71,7 +66,7 @@ i.far.fa-star {
 }
 i.fas.fa-star {
    opacity: 1;
-   color: goldenrod;
+   color: gold;
    margin-right: 10px;
    cursor: pointer;
    font-size: 1.1em;
@@ -94,7 +89,7 @@ p.pool-desc {
    cursor: default;
 }
 .toolbar {
-   font-size: 0.75em;
+   font-size: 0.9em;
    font-weight: bold;
    text-align: right;
    padding: 5px 15px 10px 0;
@@ -103,6 +98,11 @@ p.pool-desc {
    padding: 3px 15px;
    margin-left: 5px;
    font-weight: 100;
+   border-radius: 5px;
+   opacity: 0.8;
+}
+.toolbar .pure-button.pure-button-primary:hover {
+   opacity:1;
 }
 .pools-container {
    background: white;
@@ -114,12 +114,11 @@ p.pool-desc {
    border-radius: 10px;
 }
 .pools-container h4 {
-   padding: 5px 40px;
+   padding: 5px 0;
    margin: 0;
    text-align: center;
    background: var(--color-primary-orange);
    color: white;
-   position: relative;
    font-weight: 100;
    border-radius: 10px 10px 0 0;
 }

@@ -26,6 +26,8 @@ export default new Vuex.Store({
     searchSummary: "",
     currPoolIdx: -1,
     results: [],
+    debug: {},
+    warnings: [],
     total: -1,
     pageSize: 25,
     query: {
@@ -76,6 +78,18 @@ export default new Vuex.Store({
         }
       })
       return excluded
+    },
+    hasDebugInfo: state => {
+      return Object.entries(state.debug).length
+    },
+    debugInfo: state => {
+      return state.debug
+    },
+    hasWarningInfo: state => {
+      return state.warnings.length > 0
+    },
+    warningInfo: state => {
+      return state.warnings
     }
   },
 
@@ -137,6 +151,8 @@ export default new Vuex.Store({
       state.total = -1
       state.currPoolIdx = -1
       state.results = []
+      state.debug = results.debug
+      state.warnings = results.warnings
 
       // Push all results into the results structure. Reset paging for each
       results.pool_results.forEach( function(pr) {
@@ -157,7 +173,7 @@ export default new Vuex.Store({
 
       state.currPoolIdx = 0
       state.searchSummary = results.pools_searched+ " pools searched in "+
-        results.total_time_ms+"ms. "+results.total_hits+" hits from "+poolHitCnt+" pools."
+        results.total_time_ms+"ms. "+results.total_hits+" hits in "+poolHitCnt+" pools."
       state.total = results.total_hits
     },
     gotoFirstPage(state) {
@@ -209,6 +225,11 @@ export default new Vuex.Store({
           target_pool: ctx.state.preferences.targetPoolURL,
           exclude_pool: ctx.state.preferences.excludePoolURLs,
         }
+      }
+      if (req.query.length == 0) {
+        ctx.commit('setError', "Please enter a search query") 
+        ctx.commit('setSearching', false)
+        return
       }
       let url = ctx.state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
@@ -307,4 +328,5 @@ const buildQueryString = (params) => {
   }
   if (anded.length > 0) return anded
   if (ored.length > 0) return ored
+  return ""
 }

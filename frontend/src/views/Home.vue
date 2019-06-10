@@ -1,7 +1,7 @@
 <template>
    <div class="home">
       <div v-show="searching" class="searching-overlay">
-        <div class="search-box">
+        <div class="searching-box">
           <h4>Searching...</h4>
           <img src="../assets/spinner2.gif">
         </div>
@@ -13,8 +13,8 @@
               @keyup.enter="searchClicked"
               id="keyword"
               v-model="keyword"
+              autocomplete="off"
               type="text"
-              placeholder="Search for books, maps, DVDs and other catalog materials."
           >
           <div class="controls">
             <PoolsList/>
@@ -129,10 +129,6 @@ h4 {
   font-weight: bold;
   font-size: 22px;
 }
-.pure-button.pure-button-secondary {
-  background: rgb(66, 184, 221); 
-  color: white;
-}
 .pure-button.pure-button-cancel {
   background: rgb(202, 60, 60);
   color: white;
@@ -144,7 +140,7 @@ h4 {
   top: 16%;
   z-index: 1000;
 }
-div.search-box {
+div.searching-box {
   background: white;
   display: inline-block;
   padding: 20px 150px;
@@ -153,8 +149,8 @@ div.search-box {
   border-radius: 5px;
   z-index: 1005;
 }
-div.search-box h4 {
-  color: var(--color-primary-text);;
+div.searching-box h4 {
+  color: var(--color-primary-text);
   border: none;
 }
 .advanced-panel table td.label {
@@ -171,10 +167,6 @@ div.search-box h4 {
   padding: 0 0 0 10px;
   color: #777;
 }
-.advanced-panel {
-  margin: 0 auto;
-  padding: 0 0.75em;
-}
 .advanced-panel table {
   width: 100%;
 }
@@ -182,13 +174,12 @@ div.search-box h4 {
   width: 100%;
 }
 .advanced-panel table td {
-  padding: 5px 0;
+  padding: 0.75vw 0;
 }
 span.pure-button {
   margin: 0 0 0 10px;
   border-radius: 5px;
   opacity: 0.8;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 span.pure-button:hover {
   opacity: 1;
@@ -218,14 +209,22 @@ p.fatal, h3.error {
    color: var(--color-error);
 }
 .search-panel {
-  margin: 25px auto;
+  margin: 25px auto 0 auto;
   text-align: center;
   max-width: 800px;
-  padding: 0.75em;
+  padding: 0 2vw;
 }
 #keyword {
-   margin: 0;
-   width: 100%;
+  margin: 0;
+  width: 100%;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 1.1em;
+  box-shadow: none;
+  padding: 0.5vw 0.75vw;
+  outline: none;
+  border: 1px solid #ccc;
 }
 p.tips {
   font-weight: bold;

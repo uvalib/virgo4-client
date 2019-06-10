@@ -1,8 +1,11 @@
 <template>
    <div class="debug-info">
-      <div class="info" v-for="(val, key) in debugInfo" :key="key">
-         <label><i class="fas fa-bug"></i>&nbsp;{{ key }}:</label>
-         <span class="value">{{ val }}</span>
+      <p class="debug-header">Debug Information</p>
+      <div class="debug-list">
+         <div class="info" v-for="(val, key) in debugInfo" :key="key">
+            <label>{{ key }}:</label>
+            <span class="value">{{ val }}</span>
+         </div>
       </div>
    </div>
 </template>
@@ -17,13 +20,25 @@ export default {
 
 <style scoped>
 .debug-info {
-   border-top: 1px solid #eee;
-   margin-top: 10px;
-   padding-top: 10px;
+   text-align: left;
+   padding: 0;
+}
+.debug-list {
+   font-size: 0.9em;
+   padding: 5px 20px;
+   border: 1px solid #f0f0f0;
+   border-top: 0;
+   border-radius: 0 0 10px 10px;
+}
+.debug-header {
+   margin: 10px 0 0 0;
+   padding: 2px 10px;
+   background: #f0f0f0;
+   border-radius: 10px 10px 0 0;
+   font-size: 0.9em;
 }
 label {
    font-weight: bold;
-   width: 80px;
    text-align: right;
    margin-right: 10px;
    display: inline-block;

@@ -14,6 +14,7 @@
             <h4 class="no-hits">No matching records found</h4>
          </template>
       </div>
+      <DebugPanel v-if="hasDebugInfo" :debugInfo="debugInfo"/>
       <div class="hits">
          <div class="hit" v-for="hit in currPool.hits" :key="hit.id">
             <div>
@@ -50,7 +51,9 @@ export default {
    },
    computed: {
       ...mapGetters({
-         currPool: 'currPool'
+         currPool: 'currPool',
+         hasDebugInfo: 'hasDebugInfo',
+         debugInfo: 'debugInfo'
       }),
       ...mapState({
          total: state=>state.total,
@@ -81,21 +84,30 @@ h4.no-hits {
    color: var(--color-primary-text);;
    font-size: 1.25em;
 }
-.curr-pool {
+
+.summary, .curr-pool {
+   margin: 0 0 0.4vw 0;
+   font-weight: 100;
    text-align: left;
 }
-.summary {
-   margin: 10px;
-   font-size: 0.9em;
-   font-weight: 100;
-   text-align: center;
+.curr-pool {
+   margin-bottom: 1vw;
 }
 div.toolbar {
    position: relative;
 }
-div.results-panel {
-   margin: 0 15vw 5vw 15vw;
-   padding: 0 0.75em;
+@media only screen and (min-width: 768px) {
+   div.results-panel {
+      margin: 0 auto 5vw auto;
+      padding: 0;
+      max-width: 800px;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.results-panel {
+      margin: 0 2vw 2vw 2vw;
+      padding: 0;
+   }
 }
 div.hits {
    text-align: left;
@@ -106,6 +118,7 @@ div.hits {
    padding: 10px;
    margin: 10px 0;
    box-sizing: border-box;
+   border-radius: 5px;
 }
 label {
    font-weight: bold;

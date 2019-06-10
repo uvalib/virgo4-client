@@ -38,6 +38,16 @@ export default {
    --color-error: firebrick;
 }
 
+#app .pure-button.pure-button-secondary {
+   background: rgb(66, 184, 221); 
+   color: white;
+   border-radius: 5px;
+   opacity: 0.8;
+}
+#app .pure-button.pure-button-secondary:hover {
+  opacity: 1;
+}
+
 html, body {
    margin: 0;
    padding: 0;
