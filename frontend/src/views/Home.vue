@@ -8,6 +8,7 @@
       </div>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
+           <h4>Basic Search</h4>
           <input
               @keyup.enter="searchClicked"
               id="keyword"
@@ -123,9 +124,10 @@ export default {
 <style scoped>
 h4 {
   color: var(--color-primary-orange);
-  margin: 10px 0;
-  border-bottom: 1px dashed;
+  margin: 8px 0;
   padding-bottom: 5px;
+  font-weight: bold;
+  font-size: 22px;
 }
 .pure-button.pure-button-secondary {
   background: rgb(66, 184, 221); 
@@ -213,7 +215,7 @@ span.pure-button:hover {
 }
 p.fatal, h3.error {
    font-weight: bold;
-   color: firebrick;
+   color: var(--color-error);
 }
 .search-panel {
   margin: 25px auto;

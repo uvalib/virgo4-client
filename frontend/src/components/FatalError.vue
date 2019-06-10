@@ -33,7 +33,7 @@ div.fatal {
    margin: 50px auto;
    text-align: center;
    padding: 50px;
-   border: 5px solid firebrick;
+   border: 5px solid var(--color-error);
    border-radius: 5px;
    box-shadow: 2px 2px 8px black;
    color: #644;

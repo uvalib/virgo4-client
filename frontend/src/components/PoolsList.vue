@@ -83,7 +83,7 @@ i.fas.selected {
    font-size: 1.1em;
 }
 i.fas.excluded {
-   color: firebrick;
+   color: var(--color-error);;
    margin-right: 10px;
    cursor: pointer;
    font-size: 1.1em;

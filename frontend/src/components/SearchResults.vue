@@ -28,6 +28,7 @@
                <label>Author:</label>
                <span class="value">{{hit.author}}</span>
             </div>
+            <DebugPanel v-if="hasDebug(hit)" :debugInfo="hit.debug"/>
          </div>
       </div>
       <div class="toolbar">
@@ -42,9 +43,10 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import ResultsPager from "@/components/ResultsPager"
 import PoolResultsPicker from "@/components/PoolResultsPicker"
+import DebugPanel from "@/components/DebugPanel"
 export default {
    components: {
-      ResultsPager, PoolResultsPicker
+      ResultsPager, PoolResultsPicker, DebugPanel
    },
    computed: {
       ...mapGetters({
@@ -65,6 +67,9 @@ export default {
             return hit.title + " " + hit.subtitle
          }
          return hit.title
+      },
+      hasDebug(hit) {
+         return hit.debug
       }
    }
 }

@@ -30,11 +30,12 @@ export default {
 /* Color variable definitions */
 :root {
    --color-primary-orange: #e57200;
-   --color-link: cornflowerblue;
+   --color-link: #2979ff;
    --color-primary-blue: #0078e7;
    --color-primary-text: #555;
    --color-dark-blue: rgb(0, 47, 108);
    --color-hover-highight: #f5f5ff;
+   --color-error: firebrick;
 }
 
 html, body {
