@@ -73,7 +73,7 @@ export default {
 <style scoped>
 h4.no-hits {
    text-align: center;
-   color: #555;
+   color: var(--color-primary-text);;
    font-size: 1.25em;
 }
 .curr-pool {

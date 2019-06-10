@@ -71,7 +71,7 @@ export default {
    padding: 4px 0;
    text-align: center;
    margin: 1px;
-   background: #0078e7;
+   background: var(--color-primary-blue);
    color: white;
 }
 .button.fas:hover {

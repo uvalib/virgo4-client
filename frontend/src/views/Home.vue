@@ -122,7 +122,7 @@ export default {
 
 <style scoped>
 h4 {
-  color: #eb5f0c;
+  color: var(--color-primary-orange);
   margin: 10px 0;
   border-bottom: 1px dashed;
   padding-bottom: 5px;
@@ -152,7 +152,7 @@ div.search-box {
   z-index: 1005;
 }
 div.search-box h4 {
-  color: #555;
+  color: var(--color-primary-text);;
   border: none;
 }
 .advanced-panel table td.label {
@@ -161,13 +161,13 @@ div.search-box h4 {
   padding-right: 10px;
   width:1%;
   white-space:nowrap;
-  color: #666;
+  color: #777;
 }
 .advanced-panel table td.op{
   width:1%;
   white-space:nowrap;
   padding: 0 0 0 10px;
-  color: #666;
+  color: #777;
 }
 .advanced-panel {
   margin: 0 auto;
@@ -202,7 +202,7 @@ span.pure-button:hover {
   margin-left: 5px;
   font-size: 0.9em;
   font-weight: bold;
-  color:cornflowerblue
+  color: var(--color-link)
 }
 .advanced:hover {
   text-decoration: underline;
@@ -227,7 +227,7 @@ p.fatal, h3.error {
 }
 p.tips {
   font-weight: bold;
-  color:cornflowerblue;
+  color:var(--color-link);
   cursor:pointer;
   margin:20px 0;
   opacity: 0.8;

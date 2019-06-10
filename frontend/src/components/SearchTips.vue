@@ -36,7 +36,7 @@ export default {
 .tips-container {
    background: white;
    box-shadow: 2px 2px 10px #ccc;
-   color: #555;
+   color: var(--color-primary-text);;
    font-size: 0.9em;
    font-weight: 100;
    display: inline-block;
@@ -47,7 +47,7 @@ export default {
    padding: 5px 40px;
    margin: 0;
    text-align: center;
-   background: #0078e7;
+   background: var(--color-primary-orange);
    color: white;
    position: relative;
    font-weight: 100;

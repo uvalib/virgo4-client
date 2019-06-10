@@ -5,10 +5,6 @@
          <h4>
             Available Search Pools
          </h4>
-         <div class="toolbar">
-            <span @click="includeAllClicked" class="pure-button pure-button-primary">Include All</span>
-            <span @click="clearAllClicked" class="pure-button pure-button-primary">Exclude All</span>
-         </div>
          <div class="pools-list">
             <div class="pool" v-for="p in pools" :key="p.id">
                <i @click="toggleTargetPool(p.url)" v-if="isTargetPool(p.url)" class="fas fa-star"></i>
@@ -17,6 +13,10 @@
                <i @click="toggleExcludePool(p.url)" v-else class="selected fas fa-check-circle"></i>
                <p class="pool-desc">{{p.description}}</p>
             </div>
+         </div>
+         <div class="toolbar">
+            <span @click="includeAllClicked" class="pure-button pure-button-primary">Include All</span>
+            <span @click="clearAllClicked" class="pure-button pure-button-primary">Exclude All</span>
          </div>
       </div>
    </v-popover>
@@ -97,7 +97,7 @@ p.pool-desc {
    font-size: 0.75em;
    font-weight: bold;
    text-align: right;
-   padding: 10px 10px 5px 0;
+   padding: 5px 15px 10px 0;
 }
 .toolbar .pure-button.pure-button-primary {
    padding: 3px 15px;
@@ -107,7 +107,6 @@ p.pool-desc {
 .pools-container {
    background: white;
    box-shadow: 2px 2px 10px #ccc;
-   color: #555;
    font-size: 0.9em;
    font-weight: 100;
    display: inline-block;
@@ -118,14 +117,14 @@ p.pool-desc {
    padding: 5px 40px;
    margin: 0;
    text-align: center;
-   background: #0078e7;
+   background: var(--color-primary-orange);
    color: white;
    position: relative;
    font-weight: 100;
-    border-radius: 10px 10px 0 0;
+   border-radius: 10px 10px 0 0;
 }
 .pools-list {
-   margin: 5px 0 10px 0;
+   margin: 5px 0 5px 0;
    font-size: 0.9em;
    max-height: 350px;
    overflow-y: scroll;

@@ -33,19 +33,27 @@ html, body {
    background: #20406e;
 }
 
+/* Color variable definitions */
+:root {
+   --color-primary-orange: #e57200;
+   --color-link: cornflowerblue;
+   --color-primary-blue: #0078e7;
+   --color-primary-text: #555;
+}
+
 #app {
    font-family: "Avenir", Helvetica, Arial, sans-serif;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    text-align: center;
-   color: #444;
+   color: var(--color-primary-text);
    margin:0;
    padding:0;
    background: white;
 }
 
 #app a {
-   color: cornflowerblue;
+   color: var(--color-link);
    font-weight: 500;
    text-decoration: none;
 }
@@ -58,6 +66,10 @@ html, body {
   display: block !important;
   z-index: 10000;
 }
+.tooltip .tooltip-inner {
+  border-radius: 10px;
+  padding: 0px 0px 4px;
+}
 .tooltip.popover.vue-popover-theme  {
    outline: none;
 }
@@ -67,7 +79,7 @@ html, body {
   border-style: solid;
   position: absolute;
   margin: 5px;
-  border-color: #0078e7;
+  border-color: var(--color-primary-orange);
   z-index: 1;
 }
 .tooltip[x-placement^="top"] {

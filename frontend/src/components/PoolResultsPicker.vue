@@ -37,7 +37,7 @@ export default {
 .other-pools {
    font-size: 0.75em;
    padding: 3px 12px;   
-   background: #0078e7;
+   background: var(--color-primary-blue);
    color:white;
    font-weight: bold;
 }
@@ -47,7 +47,7 @@ export default {
    text-align: left;
    font-size: 0.8em;
    box-shadow: 2px 2px 10px #ccc;
-   color: #555;
+   color: var(--color-primary-text);;
    display: inline-block;
    border-radius: 10px;
 }
@@ -70,7 +70,7 @@ h4 {
    margin: 0;
    text-align: left;
    font-size: 0.8em;
-   background: #0078e7;
+   background: var(--color-primary-orange);
    color: white;
    position: relative;
    border-radius: 10px 10px 0 0;
