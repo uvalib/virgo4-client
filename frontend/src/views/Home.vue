@@ -26,24 +26,24 @@
           <h4>Advanced Search</h4>
           <table>
             <tr>
-              <td class="op"><SearchOpPicker v-model="authorOp"/></td>
               <td class="label">Author</td>
               <td><input v-model="author" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="authorOp"/></td>
             </tr>
             <tr>
-              <td class="op"><SearchOpPicker v-model="titleOp"/></td>
               <td class="label">Title</td>
               <td><input v-model="title" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="titleOp"/></td>
             </tr>
             <tr>
-              <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
               <td class="label">Subject</td>
               <td><input v-model="subject" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
             </tr>
             <tr>
-              <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
               <td class="label">Keyword</td>
               <td><input v-model="keyword" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
             </tr>
           </table>
           <div class="controls">
@@ -159,11 +159,15 @@ div.search-box h4 {
   font-weight: 500;
   text-align: right;
   padding-right: 10px;
-  width: 80px;
+  width:1%;
+  white-space:nowrap;
   color: #666;
 }
 .advanced-panel table td.op{
- width: 60px;
+  width:1%;
+  white-space:nowrap;
+  padding: 0 0 0 10px;
+  color: #666;
 }
 .advanced-panel {
   margin: 0 auto;
