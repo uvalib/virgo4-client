@@ -135,6 +135,6 @@ p.pool-desc {
    position: relative;
 }
 .pool:hover {
-   background: #f5f5ff;
+   background: var(--color-hover-highight);
 }
 </style>

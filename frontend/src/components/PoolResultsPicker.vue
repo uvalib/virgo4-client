@@ -63,7 +63,7 @@ export default {
 }
 .pools-list p:hover {
    cursor: pointer;
-   background: #f5f5ff;
+   background: var(--color-hover-highight);
 }
 h4 {
    padding: 5px;

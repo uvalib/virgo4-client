@@ -27,18 +27,20 @@ export default {
 </script>
 
 <style>
-html, body {
-   margin: 0;
-   padding: 0;
-   background: #20406e;
-}
-
 /* Color variable definitions */
 :root {
    --color-primary-orange: #e57200;
    --color-link: cornflowerblue;
    --color-primary-blue: #0078e7;
    --color-primary-text: #555;
+   --color-dark-blue: rgb(0, 47, 108);
+   --color-hover-highight: #f5f5ff;
+}
+
+html, body {
+   margin: 0;
+   padding: 0;
+   background: var(--color-dark-blue);
 }
 
 #app {

@@ -21,11 +21,9 @@ export default {
 
 <style scoped>
 div.header {
-   background-color: #20406e;
+   background-color: var(--color-dark-blue);
    color: white;
    padding:10px;
-   border-bottom: 1px solid #5e7799;
-   border-top: 1px solid #5e7799;
    text-align: left;
    position: relative;
    box-sizing: border-box;
@@ -38,7 +36,6 @@ div.header span.site-name {
    margin: 0;
    font-family: 'Cinzel', serif;
    font-size: 2.5em;
-   /* font-weight: bold; */
    position: relative;
 }
 div.site-link {
