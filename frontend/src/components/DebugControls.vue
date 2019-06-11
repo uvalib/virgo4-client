@@ -1,22 +1,19 @@
 <template>
    <div class="debug-options">
-      <span v-if="isDebugEnabled" @click="toggleDebug" class="debug pure-button pure-button-primary">{{debugLabel}}</span>
-      <span v-if="areWarningsEnabled" @click="toggleWarn" class="debug pure-button pure-button-primary">{{warnLabel}}</span>
+      <span v-if="debugEnabled" @click="toggleDebug" class="debug pure-button pure-button-primary">{{debugLabel}}</span>
+      <span v-if="warnEnabled" @click="toggleWarn" class="debug pure-button pure-button-primary">{{warnLabel}}</span>
    </div>
 </template>
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"
 export default {
    computed: {
       ...mapState({
-         showDebug: state => state.showDebug,
-         showWarn: state => state.showWarn,
-      }),
-      ...mapGetters({
-        isDebugEnabled: 'isDebugEnabled',
-        areWarningsEnabled: 'areWarningsEnabled'
+         debugEnabled: state => state.diagnostics.debugEnabled,
+         warnEnabled: state => state.diagnostics.warnEnabled,
+         showDebug: state => state.diagnostics.showDebug,
+         showWarn: state => state.diagnostics.showWarn,
       }),
       debugLabel() {
         if (this.showDebug) {
@@ -33,10 +30,10 @@ export default {
    },
    methods: {
       toggleDebug() {
-         this.$store.commit("toggleDebug")
+         this.$store.commit("diagnostics/toggleDebug")
       },
       toggleWarn() {
-         this.$store.commit("toggleWarn") 
+         this.$store.commit("diagnostics/toggleWarn") 
       }
    }
 };

@@ -97,8 +97,6 @@ export default {
       }),
       ...mapGetters({
         hasResults: 'hasResults',
-        isDebugEnabled: 'isDebugEnabled',
-        areWarningsEnabled: 'areWarningsEnabled'
       }),
       ...mapFields([
         'query.keyword',
@@ -157,7 +155,7 @@ h4 {
   position: absolute;
   left: 0;
   right: 0;
-  top: 16%;
+  top: 5vw;
   z-index: 1000;
 }
 div.searching-box {

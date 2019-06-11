@@ -1,5 +1,5 @@
 <template>
-   <div v-if="areWarningsEnabled && showWarn" class="warn-info">
+   <div v-if="warnEnabled && showWarn" class="warn-info">
       <p class="warn-header">Warnings</p>
       <div class="warn-list">
          <div class="info" v-for="(w, idx) in warnings" :key="idx">
@@ -11,14 +11,11 @@
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"
 export default {
    computed: {
       ...mapState({
-         showWarn: state => state.showWarn,
-      }),
-      ...mapGetters({
-        areWarningsEnabled: 'areWarningsEnabled',
+         showWarn: state => state.diagnostics.showWarn,
+         warnEnabled: state => state.diagnostics.warnEnabled,
       }),
    },
    props: {

@@ -1,5 +1,5 @@
 <template>
-   <div v-if="isDebugEnabled && showDebug" class="debug-info">
+   <div v-if="debugEnabled && showDebug" class="debug-info">
       <p class="debug-header">Debug Information</p>
       <div class="debug-list">
          <div class="info" v-for="(val, key) in debugInfo" :key="key">
@@ -12,14 +12,11 @@
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"
 export default {
    computed: {
       ...mapState({
-         showDebug: state => state.showDebug,
-      }),
-      ...mapGetters({
-        isDebugEnabled: 'isDebugEnabled',
+         debugEnabled: state => state.diagnostics.debugEnabled,
+         showDebug: state => state.diagnostics.showDebug,
       }),
    },
    props: {
@@ -39,6 +36,7 @@ export default {
    border: 1px solid #f0f0f0;
    border-top: 0;
    border-radius: 0 0 10px 10px;
+   color: #999;
 }
 .debug-header {
    margin: 10px 0 0 0;

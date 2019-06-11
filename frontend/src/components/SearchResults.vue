@@ -14,7 +14,7 @@
             <h4 class="no-hits">No matching records found</h4>
          </template>
       </div>
-      <DebugPanel v-if="hasDebugInfo" :debugInfo="debugInfo"/>
+      <DebugPanel v-if="hasDebug" :debugInfo="debugInfo"/>
       <WarningPanel v-if="hasWarnings" :warnings="warnings"/>
       <div class="hits">
          <div class="hit" v-for="hit in currPool.hits" :key="hit.id">
@@ -54,10 +54,10 @@ export default {
    computed: {
       ...mapGetters({
          currPool: 'currPool',
-         hasDebugInfo: 'hasDebugInfo',
-         debugInfo: 'debugInfo',
-         hasWarnings: 'hasWarnings',
-         warnings: 'warnings',
+         hasDebug: 'diagnostics/hasDebug',
+         debugInfo: 'diagnostics/debugInfo',
+         hasWarnings: 'diagnostics/hasWarnings',
+         warnings: 'diagnostics/warnings',
       }),
       ...mapState({
          total: state=>state.total,

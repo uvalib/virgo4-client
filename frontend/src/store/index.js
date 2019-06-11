@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import diagnostics from './modules/diagnostics'
 import { getField, updateField } from 'vuex-map-fields'
 
 Vue.use(Vuex)
@@ -18,6 +19,7 @@ const errorPlugin = store => {
 
 export default new Vuex.Store({
   state: {
+    searchAPI: "",
     pools: [],
     fatal: "",
     error: "",
@@ -25,15 +27,6 @@ export default new Vuex.Store({
     searchSummary: "",
     currPoolIdx: -1,
     results: [],
-    config: {
-      searchAPI: "",
-      debugEnabled: false,
-      warnEnabled: false,
-    },
-    showDebug: false,
-    debug: {},
-    showWarn: false,
-    warnings: [],
     total: -1,
     pageSize: 25,
     query: {
@@ -85,44 +78,6 @@ export default new Vuex.Store({
       })
       return excluded
     },
-
-    // TODO split all of this into a diagnostic module?
-    // modules: root state has cfg, pools, error 
-    //          diagnostic has all of the debug/warn handling stuff 
-    //          search has search and paging
-    isDebugEnabled: state => {
-      return state.config.debugEnabled
-    },
-    hasDebugInfo: (state, getters) => {
-      if (state.config.debugEnabled == false) return false
-      if (typeof state.debug === "undefined") return false
-      let dbg = getters.debugInfo
-      return Object.entries(dbg).length 
-    },
-    debugInfo: state => {
-      if (state.config.debugEnabled == false) return {}
-      let poolDebug = {}
-      if (state.currPoolIdx > -1 ) {
-        poolDebug = state.results[state.currPoolIdx].debug
-      }
-      return {...state.debug, ...poolDebug }
-    },
-    areWarningsEnabled: state => {
-      return state.config.warnEnabled
-    },
-    hasWarnings: (state,getters) => {
-      if (state.config.warnEnabled == false) return false
-      let warns = getters.warnings
-      return warns.length > 0
-    },
-    warnings: state => {
-      if (state.config.warnEnabled == false) return []
-      let poolWarn = []
-      if (state.currPoolIdx > -1 ) {
-        poolWarn = state.results[state.currPoolIdx].warnings
-      }
-      return state.warnings.concat(poolWarn)
-    }
   },
 
   mutations: {
@@ -163,16 +118,8 @@ export default new Vuex.Store({
     setError(state, err) {
       state.error = err
     },
-    toggleDebug(state) {
-      state.showDebug = !state.showDebug
-    },
-    toggleWarn(state) {
-      state.showWarn = !state.showWarn
-    },
     setConfig(state, cfg) {
-      state.config.searchAPI = cfg.searchAPI
-      state.config.debugEnabled = cfg.showDebug
-      state.config.warnEnabled = cfg.showWarn
+      state.searchAPI = cfg.searchAPI
     },
     setSearching(state, flag) {
       state.searching = flag
@@ -191,8 +138,6 @@ export default new Vuex.Store({
       state.total = -1
       state.currPoolIdx = -1
       state.results = []
-      state.debug = results.debug
-      state.warnings = results.warnings
 
       // Push all results into the results structure. Reset paging for each
       results.pool_results.forEach( function(pr) {
@@ -201,15 +146,13 @@ export default new Vuex.Store({
             name: poolNameFromURL(pr.service_url, state.pools),
             total: pr.pagination.total,
             hits: pr.record_list,
-            page: 0,
-            debug: pr.debug,
-            warnings: pr.warnings
+            page: 0
           })
           poolHitCnt++
         } else {
           state.results.push({ url: pr.service_url, 
             name: poolNameFromURL(pr.service_url, state.pools),
-            total: 0, hits: [], page: 0, debug:{}, warnings: []})
+            total: 0, hits: [], page: 0})
         }
       })
 
@@ -273,9 +216,10 @@ export default new Vuex.Store({
         ctx.commit('setSearching', false)
         return
       }
-      let url = ctx.state.config.searchAPI+"/api/search"
+      let url = ctx.state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
         ctx.commit('setSearchResults', response.data)
+        ctx.commit('diagnostics/setSearchDiagnostics', response.data)
         ctx.commit('setSearching', false)
       }).catch((error) => {
         ctx.commit('setError', error) 
@@ -289,9 +233,11 @@ export default new Vuex.Store({
         query: buildQueryString(ctx.state.query),
         pagination: ctx.getters.getPagination
       }
-      let url = ctx.getters.currPool.url+"/api/search"
+      let url = ctx.getters.currPool.url+"/api/search?debug=1"
       axios.post(url, req).then((response)  =>  {
         ctx.commit('setPoolSearchResults', response.data)
+        let diagPayload = {currPoolIdx: ctx.state.currPoolIdx, debug: response.data.debug, warnings: response.data.warnings}
+        ctx.commit('diagnostics/setPoolDiagnostics', diagPayload)
         ctx.commit('setSearching', false)
       }).catch((error) => {
         ctx.commit('setError', error) 
@@ -301,19 +247,23 @@ export default new Vuex.Store({
     getConfig(ctx) {
       axios.get("/config").then((response)  =>  {
         ctx.commit('setConfig', response.data )
+        ctx.commit('diagnostics/setConfig', response.data )
         ctx.dispatch('getPools' )
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to get configuration: "+error.response.data) 
       })
     },
     getPools(ctx) {
-      let url = ctx.state.config.searchAPI+"/api/pools"
+      let url = ctx.state.searchAPI+"/api/pools"
       axios.get(url).then((response)  =>  {
         ctx.commit('setPools', response.data )
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to pools: "+error.response.data) 
       })
     }
+  },
+  modules: {
+    diagnostics: diagnostics
   },
   plugins: [errorPlugin]
 })
