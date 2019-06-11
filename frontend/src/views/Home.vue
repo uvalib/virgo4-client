@@ -65,7 +65,7 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import { mapFields } from "vuex-map-fields"
+import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
 import SearchOpPicker from "@/components/SearchOpPicker"
@@ -98,15 +98,15 @@ export default {
       ...mapGetters({
         hasResults: 'hasResults',
       }),
-      ...mapFields([
-        'query.keyword',
-        'query.author',
-        'query.title',
-        'query.subject',
-        'query.keywordOp',
-        'query.authorOp',
-        'query.titleOp',
-        'query.subjectOp',
+      ...mapFields('query',[
+        'keyword',
+        'author',
+        'title',
+        'subject',
+        'keywordOp',
+        'authorOp',
+        'titleOp',
+        'subjectOp',
       ]),
       debugLabel() {
         if (this.showDebug) {
@@ -132,7 +132,7 @@ export default {
         this.mode = "advanced"
       },
       cancelClicked() {
-        this.$store.commit("clearAdvancedSearch")
+        this.$store.commit("query/clear")
         this.mode = "basic"
       }
    }

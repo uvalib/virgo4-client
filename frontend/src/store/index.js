@@ -3,8 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import diagnostics from './modules/diagnostics'
 import preferences from './modules/preferences'
-import { getField, updateField } from 'vuex-map-fields'
-
+import query from './modules/query'
 Vue.use(Vuex)
 
 // Plugin to listen for error messages being set. After a delay, clear them
@@ -30,20 +29,9 @@ export default new Vuex.Store({
     results: [],
     total: -1,
     pageSize: 25,
-    query: {
-      keyword: "",
-      keywordOp: "AND",
-      author: "",
-      authorOp: "AND",
-      title: "",
-      titleOp: "AND",
-      subject: "",
-      subjectOp: "AND",
-    },
   },
 
   getters: {
-    getField,
     hasResults: state => {
       return state.total >= 0
     },
@@ -66,7 +54,6 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    updateField,
     setPools(state, data) {
       state.pools = data
       if (state.pools.length == 0 ) {
@@ -136,12 +123,6 @@ export default new Vuex.Store({
     prevPage(state) {
       state.results[state.currPoolIdx].page--
     },
-    clearAdvancedSearch(state) {
-      state.query.keyword = ""
-      state.query.author = ""
-      state.query.title = ""
-      state.query.subject = ""
-    }
   },
 
   actions: {
@@ -161,11 +142,11 @@ export default new Vuex.Store({
       ctx.commit('gotoLastPage')
       ctx.dispatch("doPoolSearch")
     },
-    doSearch({ state, commit, rootState }) {
+    doSearch({ state, commit, rootState, rootGetters }) {
       commit('setError', "")
       commit('setSearching', true)
       let req = {
-        query: buildQueryString(state.query),
+        query: rootGetters['query/string'],
         pagination: {start: 0, rows: state.pageSize},
         preferences: {
           target_pool: rootState.preferences.targetPoolURL,
@@ -187,22 +168,24 @@ export default new Vuex.Store({
         commit('setSearching', false)
       })
     },
-    doPoolSearch(ctx) {
-      ctx.commit('setError', "")
-      ctx.commit('setSearching', true)
+
+    // eslint-disable-next-line
+    doPoolSearch({ state, commit, _rootState, rootGetters }) {
+      commit('setError', "")
+      commit('setSearching', true)
       let req = {
-        query: buildQueryString(ctx.state.query),
-        pagination: ctx.getters.getPagination
+        query: rootGetters['query/string'],
+        pagination: rootGetters.getPagination
       }
-      let url = ctx.getters.currPool.url+"/api/search?debug=1"
+      let url = rootGetters.currPool.url+"/api/search?debug=1"
       axios.post(url, req).then((response)  =>  {
-        ctx.commit('setPoolSearchResults', response.data)
-        let diagPayload = {currPoolIdx: ctx.state.currPoolIdx, debug: response.data.debug, warnings: response.data.warnings}
-        ctx.commit('diagnostics/setPoolDiagnostics', diagPayload)
-        ctx.commit('setSearching', false)
+        commit('setPoolSearchResults', response.data)
+        let diagPayload = {currPoolIdx: state.currPoolIdx, debug: response.data.debug, warnings: response.data.warnings}
+        commit('diagnostics/setPoolDiagnostics', diagPayload)
+        commit('setSearching', false)
       }).catch((error) => {
-        ctx.commit('setError', error) 
-        ctx.commit('setSearching', false)
+        commit('setError', error) 
+        commit('setSearching', false)
       })
     },
     getConfig(ctx) {
@@ -225,7 +208,8 @@ export default new Vuex.Store({
   },
   modules: {
     diagnostics: diagnostics,
-    preferences: preferences
+    preferences: preferences,
+    query: query
   },
   plugins: [errorPlugin]
 })
@@ -238,49 +222,4 @@ const poolNameFromURL = (url, pools) => {
     }
   })
   return name
-}
-
-const buildQueryString = (params) => { 
-  // convert into the standard v4 search string format. Ex:
-  // title : {"susan sontag" OR music title}   AND keyword:{ Maunsell } ) OR author:{ liberty }
-  // For now, all 'fields' are AND'd together and the raw strings entered in the form just
-  // tacked on after the key.
-  var andTerms = []
-  var orTerms = []
-  if (params.keyword != "") {
-    if (params.keywordOp == "AND") {
-      andTerms.push("keyword: {"+params.keyword+"}")
-    } else {
-      orTerms.push("keyword: {"+params.keyword+"}")
-    }
-  }
-  if (params.author != "") {
-    if (params.authorOp == "AND") {
-      andTerms.push("author: {"+params.author+"}")
-    } else {
-      orTerms.push("author: {"+params.author+"}")
-    }
-  }
-  if (params.title != "") {
-    if (params.titleOp == "AND") {
-      andTerms.push("title: {"+params.title+"}")
-    } else {
-      orTerms.push("title: {"+params.title+"}")
-    }
-  }
-  if (params.subject != "") {
-    if (params.subjectOp == "AND") {
-      andTerms.push("subject: {"+params.subject+"}")
-    } else {
-      orTerms.push("subject: {"+params.subject+"}")
-    }
-  }
-  let anded = andTerms.join(" AND ")
-  let ored = orTerms.join(" OR ")
-  if (anded.length > 0 && ored.length > 0) {
-    return anded + " OR " + ored
-  }
-  if (anded.length > 0) return anded
-  if (ored.length > 0) return ored
-  return ""
 }
