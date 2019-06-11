@@ -32,25 +32,22 @@ export default {
          pools: state => state.pools
       }),
       ...mapGetters({
-         isPoolExcluded: "isPoolExcluded",
-         isTargetPool: "isTargetPool"
+         isPoolExcluded: "preferences/isPoolExcluded",
+         isTargetPool: "preferences/isTargetPool"
       })
    },
    methods: {
-      closeClicked() {
-         this.$store.commit("showPoolsOverlay", false)
-      },
       includeAllClicked() {
-         this.$store.commit("includeAll")
+         this.$store.commit("preferences/includeAll")
       },
       clearAllClicked() {
-         this.$store.commit("excludeAll")
+         this.$store.commit("preferences/excludeAll")
       },
       toggleTargetPool(url) {
-         this.$store.commit("toggleTargetPool", url)
+         this.$store.commit("preferences/toggleTargetPool", url)
       },
       toggleExcludePool(url) {
-         this.$store.commit("toggleExcludePool", url)
+         this.$store.commit("preferences/toggleExcludePool", url)
       }
    }
 };

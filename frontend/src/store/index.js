@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import diagnostics from './modules/diagnostics'
+import preferences from './modules/preferences'
 import { getField, updateField } from 'vuex-map-fields'
 
 Vue.use(Vuex)
@@ -39,10 +40,6 @@ export default new Vuex.Store({
       subject: "",
       subjectOp: "AND",
     },
-    preferences: {
-      targetPoolURL: "",
-      excludePoolURLs: []
-    }
   },
 
   getters: {
@@ -66,18 +63,6 @@ export default new Vuex.Store({
         return {start: info.page * state.pageSize, rows: state.pageSize}
       }
     },
-    isTargetPool: state => poolURL => {
-      return state.preferences.targetPoolURL == poolURL
-    },
-    isPoolExcluded: state => pooURL => {
-      let excluded = false 
-      state.preferences.excludePoolURLs.forEach( function(url) {
-        if ( url == pooURL) {
-          excluded = true
-        }
-      })
-      return excluded
-    },
   },
 
   mutations: {
@@ -86,30 +71,6 @@ export default new Vuex.Store({
       state.pools = data
       if (state.pools.length == 0 ) {
         state.fatal = "No search pools configured"
-      }
-    },
-    includeAll(state) {
-      state.preferences.excludePoolURLs = []
-    },
-    excludeAll(state) {
-      state.preferences.excludePoolURLs = []
-      state.pools.forEach( function(p) {
-        state.preferences.excludePoolURLs.push(p.url)
-      })
-    },
-    toggleExcludePool(state,poolURL) {
-      let idx = state.preferences.excludePoolURLs.indexOf(poolURL)
-      if ( idx > -1) {
-        state.preferences.excludePoolURLs.splice(idx,1)
-      } else {
-        state.preferences.excludePoolURLs.push(poolURL)
-      }
-    },
-    toggleTargetPool(state,poolURL) {
-      if (state.preferences.targetPoolURL == poolURL) {
-        state.preferences.targetPoolURL = ""
-      } else {
-        state.preferences.targetPoolURL = poolURL
       }
     },
     setFatal(state, err) {
@@ -200,30 +161,30 @@ export default new Vuex.Store({
       ctx.commit('gotoLastPage')
       ctx.dispatch("doPoolSearch")
     },
-    doSearch(ctx) {
-      ctx.commit('setError', "")
-      ctx.commit('setSearching', true)
+    doSearch({ state, commit, rootState }) {
+      commit('setError', "")
+      commit('setSearching', true)
       let req = {
-        query: buildQueryString(ctx.state.query),
-        pagination: {start: 0, rows: ctx.state.pageSize},
+        query: buildQueryString(state.query),
+        pagination: {start: 0, rows: state.pageSize},
         preferences: {
-          target_pool: ctx.state.preferences.targetPoolURL,
-          exclude_pool: ctx.state.preferences.excludePoolURLs,
+          target_pool: rootState.preferences.targetPoolURL,
+          exclude_pool: rootState.preferences.excludePoolURLs,
         }
       }
       if (req.query.length == 0) {
-        ctx.commit('setError', "Please enter a search query") 
-        ctx.commit('setSearching', false)
+        commit('setError', "Please enter a search query") 
+        commit('setSearching', false)
         return
       }
-      let url = ctx.state.searchAPI+"/api/search"
+      let url = state.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
-        ctx.commit('setSearchResults', response.data)
-        ctx.commit('diagnostics/setSearchDiagnostics', response.data)
-        ctx.commit('setSearching', false)
+        commit('setSearchResults', response.data)
+        commit('diagnostics/setSearchDiagnostics', response.data)
+        commit('setSearching', false)
       }).catch((error) => {
-        ctx.commit('setError', error) 
-        ctx.commit('setSearching', false)
+        commit('setError', error) 
+        commit('setSearching', false)
       })
     },
     doPoolSearch(ctx) {
@@ -263,7 +224,8 @@ export default new Vuex.Store({
     }
   },
   modules: {
-    diagnostics: diagnostics
+    diagnostics: diagnostics,
+    preferences: preferences
   },
   plugins: [errorPlugin]
 })
