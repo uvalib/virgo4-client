@@ -1,5 +1,6 @@
 <template>
    <div class="home">
+      <DebugControls v-if="hasResults" />
       <div v-show="searching" class="searching-overlay">
         <div class="searching-box">
           <h4>Searching...</h4>
@@ -55,8 +56,9 @@
           </div>
         </div>
       </div>
-      <h3 class="error">{{ error }}</h3>
+      <h3 v-if="error" class="error">{{ error }}</h3>
       <SearchResults v-if="hasResults"/>
+      <DebugControls v-if="hasResults" />
    </div>
 </template>
 
@@ -68,10 +70,12 @@ import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
 import SearchOpPicker from "@/components/SearchOpPicker"
 import SearchTips from "@/components/SearchTips"
+import DebugControls from "@/components/DebugControls"
 export default {
    name: "home",
    components: {
-     SearchResults, PoolsList, SearchOpPicker,SearchTips
+     SearchResults, PoolsList, SearchOpPicker,
+     SearchTips, DebugControls
    },
    data: function() {
       return {
@@ -87,10 +91,14 @@ export default {
          fatal: state => state.fatal,
          error: state => state.error,
          showPools: state => state.showPools,
-         searching: state => state.searching
+         searching: state => state.searching,
+         showDebug: state => state.showDebug,
+         showWarn: state => state.showWarn,
       }),
       ...mapGetters({
         hasResults: 'hasResults',
+        isDebugEnabled: 'isDebugEnabled',
+        areWarningsEnabled: 'areWarningsEnabled'
       }),
       ...mapFields([
         'query.keyword',
@@ -101,20 +109,32 @@ export default {
         'query.authorOp',
         'query.titleOp',
         'query.subjectOp',
-      ])
+      ]),
+      debugLabel() {
+        if (this.showDebug) {
+          return "Hide Debug"
+        }
+        return "Show Debug"
+      },
+      warnLabel() {
+        if (this.showWarn) {
+          return "Hide Warnings"
+        }
+        return "Show Warnings"
+      }
    },
    created: function() {
       this.$store.dispatch("getConfig")
    },
    methods: {
       searchClicked() {
-        this.$store.dispatch("doSearch");
+        this.$store.dispatch("doSearch")
       },
       advancedClicked() {
         this.mode = "advanced"
       },
       cancelClicked() {
-        this.$store.commit("clearAdvancedSearch");
+        this.$store.commit("clearAdvancedSearch")
         this.mode = "basic"
       }
    }
@@ -203,16 +223,17 @@ span.pure-button:hover {
 }
 .home {
    min-height: 400px;
+   position: relative;
 }
 p.fatal, h3.error {
    font-weight: bold;
    color: var(--color-error);
 }
 .search-panel {
-  margin: 25px auto 0 auto;
+  margin: 0 auto 0 auto;
   text-align: center;
   max-width: 800px;
-  padding: 0 2vw;
+  padding: 10px 2vw;
 }
 #keyword {
   margin: 0;
@@ -235,5 +256,9 @@ p.tips {
 }
 p.tips:hover {
   opacity:1;
+}
+.debug.pure-button.pure-button-primary {
+  font-size: 0.75em;
+  padding: 2px 12px;
 }
 </style>

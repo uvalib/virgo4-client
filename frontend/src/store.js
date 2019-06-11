@@ -18,7 +18,6 @@ const errorPlugin = store => {
 
 export default new Vuex.Store({
   state: {
-    searchAPI: "",
     pools: [],
     fatal: "",
     error: "",
@@ -26,7 +25,14 @@ export default new Vuex.Store({
     searchSummary: "",
     currPoolIdx: -1,
     results: [],
+    config: {
+      searchAPI: "",
+      debugEnabled: false,
+      warnEnabled: false,
+    },
+    showDebug: false,
     debug: {},
+    showWarn: false,
     warnings: [],
     total: -1,
     pageSize: 25,
@@ -79,16 +85,37 @@ export default new Vuex.Store({
       })
       return excluded
     },
+
+    // TODO split all of this into a diagnostic module?
+    // modules: root state has cfg, pools, error 
+    //          diagnostic has all of the debug/warn handling stuff 
+    //          search has search and paging
+    isDebugEnabled: state => {
+      return state.config.debugEnabled
+    },
     hasDebugInfo: state => {
-      return Object.entries(state.debug).length
+      if (state.config.debugEnabled == false) return false
+      if (typeof state.debug === "undefined") return false
+      // TODO also check for pool result debug info
+      return Object.entries(state.debug).length 
     },
     debugInfo: state => {
-      return state.debug
+      let poolDebug = {}
+      if (state.currPoolIdx > -1 ) {
+        poolDebug = state.results[state.currPoolIdx].debug
+      }
+      return {...state.debug, ...poolDebug }
+    },
+    areWarningsEnabled: state => {
+      return state.config.warnEnabled
     },
     hasWarningInfo: state => {
+      if (state.config.warnEnabled == false) return false
+      // TODO also check for pool result warning info
       return state.warnings.length > 0
     },
     warningInfo: state => {
+      // TODO include pool result warning info
       return state.warnings
     }
   },
@@ -125,14 +152,22 @@ export default new Vuex.Store({
         state.preferences.targetPoolURL = poolURL
       }
     },
-    setFatalError(state, err) {
+    setFatal(state, err) {
       state.fatal = err
     },
     setError(state, err) {
       state.error = err
     },
+    toggleDebug(state) {
+      state.showDebug = !state.showDebug
+    },
+    toggleWarn(state) {
+      state.showWarn = !state.showWarn
+    },
     setConfig(state, cfg) {
-      state.searchAPI = cfg.searchAPI
+      state.config.searchAPI = cfg.searchAPI
+      state.config.debugEnabled = cfg.showDebug
+      state.config.warnEnabled = cfg.showWarn
     },
     setSearching(state, flag) {
       state.searching = flag
@@ -161,13 +196,15 @@ export default new Vuex.Store({
             name: poolNameFromURL(pr.service_url, state.pools),
             total: pr.pagination.total,
             hits: pr.record_list,
-            page: 0
+            page: 0,
+            debug: pr.debug,
+            warnings: pr.warnings
           })
           poolHitCnt++
         } else {
           state.results.push({ url: pr.service_url, 
             name: poolNameFromURL(pr.service_url, state.pools),
-            total: 0, hits: [], page: 0})
+            total: 0, hits: [], page: 0, debug:{}, warnings: []})
         }
       })
 
@@ -231,7 +268,7 @@ export default new Vuex.Store({
         ctx.commit('setSearching', false)
         return
       }
-      let url = ctx.state.searchAPI+"/api/search"
+      let url = ctx.state.config.searchAPI+"/api/search"
       axios.post(url, req).then((response)  =>  {
         ctx.commit('setSearchResults', response.data)
         ctx.commit('setSearching', false)
@@ -261,15 +298,15 @@ export default new Vuex.Store({
         ctx.commit('setConfig', response.data )
         ctx.dispatch('getPools' )
       }).catch((error) => {
-        ctx.commit('setFatalError', "Unable to get configuration: "+error.response.data) 
+        ctx.commit('setFatal', "Unable to get configuration: "+error.response.data) 
       })
     },
     getPools(ctx) {
-      let url = ctx.state.searchAPI+"/api/pools"
+      let url = ctx.state.config.searchAPI+"/api/pools"
       axios.get(url).then((response)  =>  {
         ctx.commit('setPools', response.data )
       }).catch((error) => {
-        ctx.commit('setFatalError', "Unable to pools: "+error.response.data) 
+        ctx.commit('setFatal', "Unable to pools: "+error.response.data) 
       })
     }
   },

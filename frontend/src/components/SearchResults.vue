@@ -86,9 +86,10 @@ h4.no-hits {
 }
 
 .summary, .curr-pool {
-   margin: 0 0 0.4vw 0;
+   margin: 0 0 0.2vw 0;
    font-weight: 100;
    text-align: left;
+   font-size: 0.85em;
 }
 .curr-pool {
    margin-bottom: 1vw;
