@@ -93,13 +93,14 @@ export default new Vuex.Store({
     isDebugEnabled: state => {
       return state.config.debugEnabled
     },
-    hasDebugInfo: state => {
+    hasDebugInfo: (state, getters) => {
       if (state.config.debugEnabled == false) return false
       if (typeof state.debug === "undefined") return false
-      // TODO also check for pool result debug info
-      return Object.entries(state.debug).length 
+      let dbg = getters.debugInfo
+      return Object.entries(dbg).length 
     },
     debugInfo: state => {
+      if (state.config.debugEnabled == false) return {}
       let poolDebug = {}
       if (state.currPoolIdx > -1 ) {
         poolDebug = state.results[state.currPoolIdx].debug
@@ -109,14 +110,18 @@ export default new Vuex.Store({
     areWarningsEnabled: state => {
       return state.config.warnEnabled
     },
-    hasWarningInfo: state => {
+    hasWarnings: (state,getters) => {
       if (state.config.warnEnabled == false) return false
-      // TODO also check for pool result warning info
-      return state.warnings.length > 0
+      let warns = getters.warnings
+      return warns.length > 0
     },
-    warningInfo: state => {
-      // TODO include pool result warning info
-      return state.warnings
+    warnings: state => {
+      if (state.config.warnEnabled == false) return []
+      let poolWarn = []
+      if (state.currPoolIdx > -1 ) {
+        poolWarn = state.results[state.currPoolIdx].warnings
+      }
+      return state.warnings.concat(poolWarn)
     }
   },
 

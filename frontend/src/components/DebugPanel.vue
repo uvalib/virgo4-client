@@ -50,12 +50,8 @@ export default {
 label {
    font-weight: bold;
    text-align: right;
-   margin-right: 10px;
+   margin-right: 15px;
    display: inline-block;
    text-transform: capitalize;
-}
-i.fas.fa-bug {
-   font-size: 0.8em;
-   color: #999;
 }
 </style>

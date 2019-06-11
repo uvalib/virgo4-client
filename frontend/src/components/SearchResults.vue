@@ -15,6 +15,7 @@
          </template>
       </div>
       <DebugPanel v-if="hasDebugInfo" :debugInfo="debugInfo"/>
+      <WarningPanel v-if="hasWarnings" :warnings="warnings"/>
       <div class="hits">
          <div class="hit" v-for="hit in currPool.hits" :key="hit.id">
             <div>
@@ -29,7 +30,7 @@
                <label>Author:</label>
                <span class="value">{{hit.author}}</span>
             </div>
-            <DebugPanel v-if="hasDebug(hit)" :debugInfo="hit.debug"/>
+            <DebugPanel v-if="hit.debug" :debugInfo="hit.debug"/>
          </div>
       </div>
       <div class="toolbar">
@@ -45,15 +46,18 @@ import { mapGetters } from "vuex"
 import ResultsPager from "@/components/ResultsPager"
 import PoolResultsPicker from "@/components/PoolResultsPicker"
 import DebugPanel from "@/components/DebugPanel"
+import WarningPanel from "@/components/WarningPanel"
 export default {
    components: {
-      ResultsPager, PoolResultsPicker, DebugPanel
+      ResultsPager, PoolResultsPicker, DebugPanel, WarningPanel
    },
    computed: {
       ...mapGetters({
          currPool: 'currPool',
          hasDebugInfo: 'hasDebugInfo',
-         debugInfo: 'debugInfo'
+         debugInfo: 'debugInfo',
+         hasWarnings: 'hasWarnings',
+         warnings: 'warnings',
       }),
       ...mapState({
          total: state=>state.total,
@@ -71,9 +75,6 @@ export default {
          }
          return hit.title
       },
-      hasDebug(hit) {
-         return hit.debug
-      }
    }
 }
 </script>
