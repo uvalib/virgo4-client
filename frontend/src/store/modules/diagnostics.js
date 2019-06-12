@@ -13,11 +13,13 @@ const disgnostics = {
    getters: {
       hasDebug: (state, getters, rootState) => {
          if (state.debugEnabled == false || rootState.searching) return false
+         if ( state.poolDiag.length == 0) return false
          let dbg = getters.debugInfo
          return Object.entries(dbg).length
       },
       debugInfo: (state, _getters, rootState) => {
-         if (state.debugEnabled == false || rootState.searching) return {}
+         if ( state.debugEnabled == false || rootState.searching) return {}
+         if ( state.poolDiag.length == 0) return {}
          let poolDebug = {}
          if (rootState.currPoolIdx > -1) {
             poolDebug = state.poolDiag[rootState.currPoolIdx].debug
@@ -26,11 +28,13 @@ const disgnostics = {
       },
       hasWarnings: (state, getters, rootState) => {
          if (state.warnEnabled == false || rootState.searching) return false
+         if ( state.poolDiag.length == 0) return false
          let warns = getters.warnings
          return warns.length > 0
       },
       warnings: (state, _getters, rootState) => {
          if (state.warnEnabled == false || rootState.searching) return []
+         if ( state.poolDiag.length == 0) return []
          let poolWarn = []
          if (rootState.currPoolIdx > -1) {
             poolWarn = state.poolDiag[rootState.currPoolIdx].warnings

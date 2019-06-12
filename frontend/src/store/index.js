@@ -37,7 +37,7 @@ export default new Vuex.Store({
     },
     currPool: state => {
       if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length-1 ) {
-        return {url:"", page: 0, total: 0, name: ""}
+        return {url:"", page: 0, total: 0, name: "", hits:[]}
       } else {
         let info = state.results[state.currPoolIdx]
         return info
@@ -164,7 +164,7 @@ export default new Vuex.Store({
         commit('diagnostics/setSearchDiagnostics', response.data)
         commit('setSearching', false)
       }).catch((error) => {
-        commit('setError', error) 
+        commit('setError', error.response.data) 
         commit('setSearching', false)
       })
     },
@@ -184,7 +184,7 @@ export default new Vuex.Store({
         commit('diagnostics/setPoolDiagnostics', diagPayload)
         commit('setSearching', false)
       }).catch((error) => {
-        commit('setError', error) 
+        commit('setError', error.response.data) 
         commit('setSearching', false)
       })
     },
