@@ -22,9 +22,9 @@ const preferences = {
       includeAll(state) {
          state.excludePoolURLs = []
       },
-      excludeAll(state) {
+      excludeAll(state, pools) {
          state.excludePoolURLs = []
-         state.pools.forEach(function (p) {
+         pools.forEach(function (p) {
             state.excludePoolURLs.push(p.url)
          })
       },

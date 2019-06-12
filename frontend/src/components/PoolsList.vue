@@ -16,7 +16,7 @@
          </div>
          <div class="toolbar">
             <span @click="includeAllClicked" class="pure-button pure-button-primary">Include All</span>
-            <span @click="clearAllClicked" class="pure-button pure-button-primary">Exclude All</span>
+            <span @click="excludeAllClicked" class="pure-button pure-button-primary">Exclude All</span>
          </div>
       </div>
    </v-popover>
@@ -40,8 +40,8 @@ export default {
       includeAllClicked() {
          this.$store.commit("preferences/includeAll")
       },
-      clearAllClicked() {
-         this.$store.commit("preferences/excludeAll")
+      excludeAllClicked() {
+         this.$store.commit("preferences/excludeAll", this.pools)
       },
       toggleTargetPool(url) {
          this.$store.commit("preferences/toggleTargetPool", url)

@@ -62,10 +62,10 @@ const query = {
    mutations: {
       updateField,
       clear(state) {
-         state.query.keyword = ""
-         state.query.author = ""
-         state.query.title = ""
-         state.query.subject = ""
+         state.keyword = ""
+         state.author = ""
+         state.title = ""
+         state.subject = ""
       }
    }
 }
