@@ -4,6 +4,7 @@
       <div class="pools-container" slot="popover">
          <h4>
             Available Search Pools
+            <i v-close-popover class="action close fas fa-times-circle"></i>
          </h4>
          <div class="pools-list">
             <div class="pool" v-for="p in pools" :key="p.id">

@@ -4,6 +4,7 @@
       <div class="tips-container" slot="popover">
          <h4>
             Search Tips
+            <i v-close-popover class="close fas fa-times-circle"></i>
          </h4>
          <div class="tips">
             <ul>

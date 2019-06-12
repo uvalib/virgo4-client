@@ -54,6 +54,18 @@ html, body {
    background: var(--color-dark-blue);
 }
 
+i.fas.fa-times-circle.close {
+   opacity: 0.8;
+   font-size: 1.1em;
+   position: absolute;
+   top: 6px;
+   right: 6px;
+}
+i.fas.fa-times-circle.close:hover {
+   opacity: 1;
+   cursor: pointer;
+}
+
 #app {
    font-family: "Avenir", Helvetica, Arial, sans-serif;
    -webkit-font-smoothing: antialiased;

@@ -2,7 +2,7 @@
    <v-popover style="float:left;">
       <span class="other-pools pure-button pure-button-secondary">Other Pool Results</span>
       <div class="results-picker"  slot="popover">
-         <h4>Pool Results</h4>
+         <h4>Pool Results<i v-close-popover class="close fas fa-times-circle"></i></h4>
          <div class="pools-list">
             <div class="results" v-for="(r,idx) in results" :key="r.url">
                <template v-if="r.total > 0">
