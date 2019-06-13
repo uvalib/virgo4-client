@@ -56,7 +56,7 @@
           </div>
         </div>
       </div>
-      <h3 v-if="error" class="error">{{ error }}</h3>
+      <h3 v-bind:class="{invisible: error.length==0}" class="error">{{ error }}</h3>
       <SearchResults v-if="hasResults"/>
       <DebugControls v-if="hasResults" />
    </div>
@@ -224,8 +224,16 @@ span.pure-button:hover {
    position: relative;
 }
 p.fatal, h3.error {
-   font-weight: bold;
-   color: var(--color-error);
+  font-weight: bold;
+  margin: 0;
+  color: var(--color-error);
+  transition: opacity .5s ease .25s;
+  opacity: 1;
+  visibility: visible;
+}
+h3.error.invisible {
+  opacity:0;
+  visibility: hidden;
 }
 .search-panel {
   margin: 0 auto 0 auto;
