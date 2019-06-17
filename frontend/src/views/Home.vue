@@ -27,15 +27,20 @@
         <div v-else class="advanced-panel">
           <h4>Advanced Search</h4>
           <table>
-            <tr>
-              <td class="label">Author</td>
-              <td><input v-model="author" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="authorOp"/></td>
+             <tr>
+              <td class="label">Identifier</td>
+              <td><input v-model="identifier" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="identifierOp"/></td>
             </tr>
             <tr>
               <td class="label">Title</td>
               <td><input v-model="title" type="text"></td>
               <td class="op"><SearchOpPicker v-model="titleOp"/></td>
+            </tr>
+            <tr>
+              <td class="label">Author</td>
+              <td><input v-model="author" type="text"></td>
+              <td class="op"><SearchOpPicker v-model="authorOp"/></td>
             </tr>
             <tr>
               <td class="label">Subject</td>
@@ -99,10 +104,12 @@ export default {
         hasResults: 'hasResults',
       }),
       ...mapFields('query',[
+        'identifier',
         'keyword',
         'author',
         'title',
         'subject',
+        'identifierOp',
         'keywordOp',
         'authorOp',
         'titleOp',

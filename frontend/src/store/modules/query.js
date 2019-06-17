@@ -3,6 +3,8 @@ import { getField, updateField } from 'vuex-map-fields'
 const query = {
    namespaced: true,
    state: {
+      identifier: "",
+      identifierOp: "AND",
       keyword: "",
       keywordOp: "AND",
       author: "",
@@ -21,6 +23,13 @@ const query = {
          // tacked on after the key.
          var andTerms = []
          var orTerms = []
+         if (state.identifier != "") {
+            if (state.identifierOp == "AND") {
+               andTerms.push("identifier: {" + state.identifier + "}")
+            } else {
+               orTerms.push("identifier: {" + state.identifier + "}")
+            }
+         }
          if (state.keyword != "") {
             if (state.keywordOp == "AND") {
                andTerms.push("keyword: {" + state.keyword + "}")
