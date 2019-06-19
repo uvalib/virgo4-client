@@ -1,6 +1,7 @@
 <template>
    <div id="app">
       <FatalError v-if="fatal.length > 0"/>
+      <AuthorizePanel v-if="authorizing"/>
       <VirgoHeader/>
       <router-view/>
       <LibraryFooter/>
@@ -11,16 +12,19 @@
 import LibraryFooter from "@/components/LibraryFooter"
 import VirgoHeader from "@/components/VirgoHeader"
 import FatalError from "@/components/FatalError"
+import AuthorizePanel from "@/components/AuthorizePanel"
 import { mapState } from "vuex"
 export default {
    components: {
       VirgoHeader,
       LibraryFooter,
-      FatalError
+      FatalError,
+      AuthorizePanel
    },
    computed: {
       ...mapState({
          fatal: state => state.fatal,
+         authorizing: state => state.authorizing
       }),
    }
 };

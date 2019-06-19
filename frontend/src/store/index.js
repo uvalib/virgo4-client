@@ -29,9 +29,14 @@ export default new Vuex.Store({
     results: [],
     total: -1,
     pageSize: 25,
+    authToken: "",
+    authorizing: false
   },
 
   getters: {
+    hasAuthToken: state => {
+      return state.authToken.length > 0
+    },
     hasResults: state => {
       return state.total >= 0
     },
@@ -54,6 +59,12 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    setAuthToken(state, token) {
+      state.authToken = token
+    },
+    setAuthorizing(state, auth) {
+      state.authorizing = auth
+    },
     setPools(state, data) {
       state.pools = data
       if (state.pools.length == 0) {
@@ -149,6 +160,17 @@ export default new Vuex.Store({
   },
 
   actions: {
+    getAuthToken(ctx) {
+      ctx.commit('setAuthorizing', true)
+      axios.post("/authorize").then((response) => {
+        ctx.commit('setAuthToken', response.data)
+        ctx.commit('setAuthorizing', false)
+      }).catch((error) => {
+        ctx.commit('setAuthToken', '')
+        ctx.commit('setFatal', "Authorization failed" + error.response.data)
+        ctx.commit('setAuthorizing', false)
+      })
+    },
     firstPage(ctx) {
       ctx.commit('gotoFirstPage')
       ctx.dispatch("doPoolSearch")
