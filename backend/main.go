@@ -15,7 +15,7 @@ import (
 )
 
 // Version of the service
-const version = "0.1.0"
+const version = "0.2.0"
 
 // URL for the search API
 var searchAPI string
@@ -103,6 +103,7 @@ func main() {
 	router.GET("/version", getVersion)
 	router.GET("/healthcheck", healthCheck)
 	router.GET("/config", getConfig)
+	router.POST("/authenticate", authenticate)
 
 	// Note: in dev mode, this is never actually used. The front end is served
 	// by yarn and it proxies all requests to the API to the routes above
