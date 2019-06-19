@@ -8,9 +8,9 @@ import (
 	"github.com/rs/xid"
 )
 
-// Authenticate is a placeholder API for minting API access tokens.
+// Authorize is a placeholder API for minting API access tokens.
 // This implementation simply generates a random token and returns it.
-func authenticate(c *gin.Context) {
+func authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
 	token := xid.New().String()
 	c.String(http.StatusOK, token)

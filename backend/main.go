@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
@@ -97,13 +98,14 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DisableConsoleColor()
 	router := gin.Default()
+	router.Use(cors.Default())
 	p := ginprometheus.NewPrometheus("gin")
 	p.Use(router)
 
 	router.GET("/version", getVersion)
 	router.GET("/healthcheck", healthCheck)
 	router.GET("/config", getConfig)
-	router.POST("/authenticate", authenticate)
+	router.POST("/authorize", authorize)
 
 	// Note: in dev mode, this is never actually used. The front end is served
 	// by yarn and it proxies all requests to the API to the routes above
