@@ -203,7 +203,7 @@ export default new Vuex.Store({
         commit('setSearching', false)
         return
       }
-      let url = state.searchAPI + "/api/search"
+      let url = state.searchAPI + "/api/search?debug=1&intuit=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
       axios.post(url, req).then((response) => {
         commit('setSearchResults', response.data)
@@ -215,7 +215,6 @@ export default new Vuex.Store({
       })
     },
 
-    // eslint-disable-next-line
     doPoolSearch({ state, commit, _rootState, rootGetters }) {
       commit('setError', "")
       commit('setSearching', true)
