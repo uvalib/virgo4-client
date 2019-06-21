@@ -216,7 +216,7 @@ export default new Vuex.Store({
     },
 
     doPoolSearch({ state, commit, _rootState, rootGetters }) {
-      commit('setError', "")
+      //commit('setError', "")
       commit('setSearching', true)
       let req = {
         query: rootGetters['query/string'],
