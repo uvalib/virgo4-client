@@ -29,27 +29,27 @@
           <table>
              <tr>
               <td class="label">Identifier</td>
-              <td><input v-model="identifier" type="text"></td>
+              <td><input @keyup.enter="searchClicked" v-model="identifier" type="text"></td>
               <td class="op"><SearchOpPicker v-model="identifierOp"/></td>
             </tr>
             <tr>
               <td class="label">Title</td>
-              <td><input v-model="title" type="text"></td>
+              <td><input @keyup.enter="searchClicked" v-model="title" type="text"></td>
               <td class="op"><SearchOpPicker v-model="titleOp"/></td>
             </tr>
             <tr>
               <td class="label">Author</td>
-              <td><input v-model="author" type="text"></td>
+              <td><input @keyup.enter="searchClicked" v-model="author" type="text"></td>
               <td class="op"><SearchOpPicker v-model="authorOp"/></td>
             </tr>
             <tr>
               <td class="label">Subject</td>
-              <td><input v-model="subject" type="text"></td>
+              <td><input @keyup.enter="searchClicked" v-model="subject" type="text"></td>
               <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
             </tr>
             <tr>
               <td class="label">Keyword</td>
-              <td><input v-model="keyword" type="text"></td>
+              <td><input @keyup.enter="searchClicked" v-model="keyword" type="text"></td>
               <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
             </tr>
           </table>
