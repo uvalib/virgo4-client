@@ -21,9 +21,9 @@ COPY frontend ./frontend
 RUN make linux-full
 
 #
-# build the targewt container
+# build the target container
 #
-FROM alpine:3.9
+FROM alpine:3.10
 
 # update the packages
 RUN apk update && apk upgrade && apk add bash tzdata ca-certificates && rm -rf /var/cache/apk/*
