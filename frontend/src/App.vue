@@ -81,6 +81,23 @@ i.fas.fa-times-circle.close:hover {
    background: white;
 }
 
+#app span.pure-button {
+  margin: 0 0 0 10px;
+  border-radius: 5px;
+  opacity: 0.8;
+}
+#app span.pure-button:hover {
+  opacity: 1;
+}
+
+#app h4 {
+  color: var(--color-primary-orange);
+  margin: 8px 0;
+  padding-bottom: 5px;
+  font-weight: bold;
+  font-size: 22px;
+}
+
 #app a {
    color: var(--color-link);
    font-weight: 500;

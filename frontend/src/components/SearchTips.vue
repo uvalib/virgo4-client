@@ -1,30 +1,32 @@
 <template>
-   <v-popover placement="left">
-      <span class="trigger"><i class="fas fa-info-circle"></i>&nbsp;Search Tips</span>
-      <div class="tips-container" slot="popover">
-         <h4>
-            Search Tips
-            <i v-close-popover class="close fas fa-times-circle"></i>
-         </h4>
-         <div class="tips">
-            <ul>
-               <li class="no-pad">
-                  <p>Use quotation marks to find exact phrases:</p> 
-                  <p class="example">"grapes of wrath"</p>
-               </li>
-               <li>
-                  <p>Use uppercase OR, AND, and NOT to create complex searches:</p>
-                  <p class="example">kyoto NOT protocol</p>
-                  <p class="example">"frida kahlo" AND exhibitions</p>
-               </li>
-               <li>
-                  <p>Use parentheses to group parts of your search:</p>
-                  <p class="example">(calico OR "tortoise shell") AND cats</p>
-               </li>
-            </ul>
+   <p class="tips">
+      <v-popover placement="left">
+         <span class="trigger"><i class="fas fa-info-circle"></i>&nbsp;Search Tips</span>
+         <div class="tips-container" slot="popover">
+            <h4>
+               Search Tips
+               <i v-close-popover class="close fas fa-times-circle"></i>
+            </h4>
+            <div class="tips">
+               <ul>
+                  <li class="no-pad">
+                     <p>Use quotation marks to find exact phrases:</p> 
+                     <p class="example">"grapes of wrath"</p>
+                  </li>
+                  <li>
+                     <p>Use uppercase OR, AND, and NOT to create complex searches:</p>
+                     <p class="example">kyoto NOT protocol</p>
+                     <p class="example">"frida kahlo" AND exhibitions</p>
+                  </li>
+                  <li>
+                     <p>Use parentheses to group parts of your search:</p>
+                     <p class="example">(calico OR "tortoise shell") AND cats</p>
+                  </li>
+               </ul>
+            </div>
          </div>
-      </div>
-   </v-popover>
+      </v-popover>
+   </p>
 </template>
 
 <script>
@@ -55,7 +57,7 @@ export default {
    font-size: 0.9em;
    border-radius: 10px 10px 0 0;
 }
-.tips {
+div.tips {
    margin: 0;
    font-size: 0.9em;
    padding: 0px 20px 10px 20px;
@@ -80,5 +82,15 @@ p.example {
 }
 span.trigger:hover {
    opacity: 1;
+}
+p.tips {
+  font-weight: bold;
+  color:var(--color-link);
+  cursor:pointer;
+  margin:20px 0;
+  opacity: 0.8;
+}
+p.tips:hover {
+  opacity:1;
 }
 </style>

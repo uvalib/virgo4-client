@@ -20,6 +20,7 @@ const errorPlugin = store => {
 export default new Vuex.Store({
   state: {
     searchAPI: "",
+    searchMode: "basic",
     pools: [],
     fatal: "",
     error: "",
@@ -59,6 +60,12 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    setAdvancedSearch(state) {
+      state.searchMode = "advanced"
+    },
+    setBasicSearch(state) {
+      state.searchMode = "basic"
+    },
     setAuthToken(state, token) {
       state.authToken = token
     },

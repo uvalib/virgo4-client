@@ -21,46 +21,10 @@
             <PoolsList/>
             <span class="pure-button pure-button-primary" @click="advancedClicked">Advanced</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-            <p class="tips"><SearchTips/></p>
+            <SearchTips/>
           </div>
         </template>
-        <div v-else class="advanced-panel">
-          <h4>Advanced Search</h4>
-          <table>
-             <tr>
-              <td class="label">Identifier</td>
-              <td><input @keyup.enter="searchClicked" v-model="identifier" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="identifierOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Title</td>
-              <td><input @keyup.enter="searchClicked" v-model="title" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="titleOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Author</td>
-              <td><input @keyup.enter="searchClicked" v-model="author" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="authorOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Subject</td>
-              <td><input @keyup.enter="searchClicked" v-model="subject" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Keyword</td>
-              <td><input @keyup.enter="searchClicked" v-model="keyword" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
-            </tr>
-            <DateSearch/>
-          </table>
-          <div class="controls">
-            <PoolsList/>
-            <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
-            <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-            <p class="tips"><SearchTips/></p>
-          </div>
-        </div>
+        <AdvancedSearch v-else/>
       </div>
       <h3 v-bind:class="{invisible: error.length==0}" class="error">{{ error }}</h3>
       <SearchResults v-if="hasResults"/>
@@ -74,15 +38,14 @@ import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
-import DateSearch from "@/components/DateSearch"
-import SearchOpPicker from "@/components/SearchOpPicker"
 import SearchTips from "@/components/SearchTips"
 import DebugControls from "@/components/DebugControls"
+import AdvancedSearch from "@/components/AdvancedSearch"
 export default {
    name: "home",
    components: {
-     SearchResults, PoolsList, SearchOpPicker,
-     SearchTips, DebugControls, DateSearch
+     SearchResults, PoolsList,
+     SearchTips, DebugControls, AdvancedSearch
    },
    data: function() {
       return {
@@ -90,9 +53,6 @@ export default {
       };
    },
    computed: {
-      basicSearch() {
-        return this.mode == "basic"
-      },
       ...mapState({
          searchAPI: state => state.searchAPI,
          fatal: state => state.fatal,
@@ -101,22 +61,17 @@ export default {
          searching: state => state.searching,
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
+         searchMode: state => state.searchMode
       }),
       ...mapGetters({
         hasResults: 'hasResults',
       }),
       ...mapFields('query',[
-        'identifier',
         'keyword',
-        'author',
-        'title',
-        'subject',
-        'identifierOp',
-        'keywordOp',
-        'authorOp',
-        'titleOp',
-        'subjectOp',
       ]),
+      basicSearch() {
+        return this.searchMode == "basic"
+      },
       debugLabel() {
         if (this.showDebug) {
           return "Hide Debug"
@@ -138,28 +93,13 @@ export default {
         this.$store.dispatch("doSearch")
       },
       advancedClicked() {
-        this.mode = "advanced"
+        this.$store.commit("setAdvancedSearch")
       },
-      cancelClicked() {
-        this.$store.commit("query/clear")
-        this.mode = "basic"
-      }
    }
 };
 </script>
 
 <style scoped>
-h4 {
-  color: var(--color-primary-orange);
-  margin: 8px 0;
-  padding-bottom: 5px;
-  font-weight: bold;
-  font-size: 22px;
-}
-.pure-button.pure-button-cancel {
-  background: rgb(202, 60, 60);
-  color: white;
-}
 .searching-overlay {
   position: absolute;
   left: 0;
@@ -180,53 +120,12 @@ div.searching-box h4 {
   color: var(--color-primary-text);
   border: none;
 }
-.advanced-panel table td.label {
-  font-weight: 500;
-  text-align: right;
-  padding-right: 10px;
-  width:1%;
-  white-space:nowrap;
-  color: #777;
-}
-.advanced-panel table td.op{
-  width:1%;
-  white-space:nowrap;
-  padding: 0 0 0 10px;
-  color: #777;
-}
-.advanced-panel table {
-  width: 100%;
-}
-.advanced-panel table input {
-  width: 100%;
-}
-.advanced-panel table td {
-  padding: 0.75vw 0;
-}
-span.pure-button {
-  margin: 0 0 0 10px;
-  border-radius: 5px;
-  opacity: 0.8;
-}
-span.pure-button:hover {
-  opacity: 1;
-}
 .controls {
   font-size: 0.85em;
   font-weight: bold;
   text-align: right;
   padding-top: 10px;
   position: relative;
-}
-.advanced {
-  margin-left: 5px;
-  font-size: 0.9em;
-  font-weight: bold;
-  color: var(--color-link)
-}
-.advanced:hover {
-  text-decoration: underline;
-  cursor: pointer;
 }
 .home {
    min-height: 400px;
@@ -261,16 +160,6 @@ h3.error.invisible {
   padding: 0.5vw 0.75vw;
   outline: none;
   border: 1px solid #ccc;
-}
-p.tips {
-  font-weight: bold;
-  color:var(--color-link);
-  cursor:pointer;
-  margin:20px 0;
-  opacity: 0.8;
-}
-p.tips:hover {
-  opacity:1;
 }
 .debug.pure-button.pure-button-primary {
   font-size: 0.75em;
