@@ -52,6 +52,7 @@
               <td><input @keyup.enter="searchClicked" v-model="keyword" type="text"></td>
               <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
             </tr>
+            <DateSearch/>
           </table>
           <div class="controls">
             <PoolsList/>
@@ -73,6 +74,7 @@ import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
+import DateSearch from "@/components/DateSearch"
 import SearchOpPicker from "@/components/SearchOpPicker"
 import SearchTips from "@/components/SearchTips"
 import DebugControls from "@/components/DebugControls"
@@ -80,7 +82,7 @@ export default {
    name: "home",
    components: {
      SearchResults, PoolsList, SearchOpPicker,
-     SearchTips, DebugControls
+     SearchTips, DebugControls, DateSearch
    },
    data: function() {
       return {
