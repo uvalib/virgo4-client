@@ -10,7 +10,7 @@
          </select>
          <input @keyup.enter="searchClicked" v-model="date0" type="text">
          <span v-if="dateRangeType=='BETWEEN'">
-            <span class="date-sep">-</span>
+            <span class="date-sep">and</span>
             <input @keyup.enter="searchClicked" v-model="date1" type="text">
          </span>
       </td>
@@ -62,7 +62,7 @@ table td.op{
   color: #777;
 }
 .date-sep {
-   font-weight: bold;
-   margin: 0 1vw;
+   font-weight: 100;
+   margin: 0 .5vw;
 }
 </style>

@@ -3,37 +3,37 @@
       <h4>Advanced Search</h4>
       <table>
          <tr>
-         <td class="label">Identifier</td>
-         <td><input @keyup.enter="searchClicked" v-model="identifier" type="text"></td>
-         <td class="op"><SearchOpPicker v-model="identifierOp"/></td>
-      </tr>
-      <tr>
-         <td class="label">Title</td>
-         <td><input @keyup.enter="searchClicked" v-model="title" type="text"></td>
-         <td class="op"><SearchOpPicker v-model="titleOp"/></td>
-      </tr>
-      <tr>
-         <td class="label">Author</td>
-         <td><input @keyup.enter="searchClicked" v-model="author" type="text"></td>
-         <td class="op"><SearchOpPicker v-model="authorOp"/></td>
-      </tr>
-      <tr>
-         <td class="label">Subject</td>
-         <td><input @keyup.enter="searchClicked" v-model="subject" type="text"></td>
-         <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
-      </tr>
-      <tr>
-         <td class="label">Keyword</td>
-         <td><input @keyup.enter="searchClicked" v-model="keyword" type="text"></td>
-         <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
-      </tr>
-      <DateSearch/>
+            <td class="label">Identifier</td>
+            <td><input @keyup.enter="searchClicked" v-model="identifier" type="text"></td>
+            <td class="op"><SearchOpPicker v-model="identifierOp"/></td>
+         </tr>
+         <tr>
+            <td class="label">Title</td>
+            <td><input @keyup.enter="searchClicked" v-model="title" type="text"></td>
+            <td class="op"><SearchOpPicker v-model="titleOp"/></td>
+         </tr>
+         <tr>
+            <td class="label">Author</td>
+            <td><input @keyup.enter="searchClicked" v-model="author" type="text"></td>
+            <td class="op"><SearchOpPicker v-model="authorOp"/></td>
+         </tr>
+         <tr>
+            <td class="label">Subject</td>
+            <td><input @keyup.enter="searchClicked" v-model="subject" type="text"></td>
+            <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
+         </tr>
+         <tr>
+            <td class="label">Keyword</td>
+            <td><input @keyup.enter="searchClicked" v-model="keyword" type="text"></td>
+            <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
+         </tr>
+         <DateSearch/>
       </table>
       <div class="controls">
-      <PoolsList/>
-      <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
-      <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-      <p class="tips"><SearchTips/></p>
+         <PoolsList/>
+         <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
+         <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+         <p class="tips"><SearchTips/></p>
       </div>
    </div>
 </template>

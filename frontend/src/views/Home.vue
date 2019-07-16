@@ -148,6 +148,7 @@ h3.error.invisible {
   text-align: center;
   max-width: 800px;
   padding: 10px 2vw;
+  font-size: 0.95em;
 }
 #keyword {
   margin: 0;

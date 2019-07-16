@@ -81,6 +81,11 @@ i.fas.fa-times-circle.close:hover {
    background: white;
 }
 
+#app .pure-form input, #app .pure-form select, #app .pure-form textarea {
+   box-shadow: none;
+   margin-bottom: .3em;
+}
+
 #app span.pure-button {
   margin: 0 0 0 10px;
   border-radius: 5px;
