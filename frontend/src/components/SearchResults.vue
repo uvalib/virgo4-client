@@ -11,7 +11,7 @@
             <div style="clear:both;"></div>
          </template>
          <template v-else>
-            <h4 class="no-hits">No matching records found</h4>
+            <h5 class="no-hits">No matching records found</h5>
          </template>
       </div>
       <DebugPanel v-if="hasDebug" :debugInfo="debugInfo"/>

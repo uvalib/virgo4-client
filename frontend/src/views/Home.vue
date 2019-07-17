@@ -3,7 +3,7 @@
       <DebugControls v-if="hasResults" />
       <div v-show="searching" class="searching-overlay">
         <div class="searching-box">
-          <h4>Searching...</h4>
+          <h3>Searching...</h3>
           <img src="../assets/spinner2.gif">
         </div>
       </div>

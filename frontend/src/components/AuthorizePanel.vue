@@ -1,7 +1,7 @@
 <template>
    <div class="authorize-overlay">
       <div class="authorize">
-         <h4>Authorizing...</h4>
+         <h3>Authorizing...</h3>
          <img src="../assets/spinner2.gif">
       </div>
    </div>
