@@ -1,21 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import errorPlugin from './plugins/errors'
+import versionChecker from './plugins/version'
 import diagnostics from './modules/diagnostics'
 import preferences from './modules/preferences'
 import query from './modules/query'
 Vue.use(Vuex)
-
-// Plugin to listen for error messages being set. After a delay, clear them
-const errorPlugin = store => {
-  store.subscribe((mutation) => {
-    if (mutation.type === "setError") {
-      if (mutation.payload != null && mutation.payload != "") {
-        setTimeout(() => { store.commit('setError', "") }, 10000)
-      }
-    }
-  })
-}
 
 export default new Vuex.Store({
   state: {
@@ -31,7 +22,7 @@ export default new Vuex.Store({
     total: -1,
     pageSize: 25,
     authToken: "",
-    authorizing: false
+    authorizing: false,
   },
 
   getters: {
@@ -95,7 +86,7 @@ export default new Vuex.Store({
         state.error = error.response.data
       } else if (error.request) {
         // The request was made but no response was received
-        state.error = "Seearch is non-responsive"
+        state.error = "Search is non-responsive"
       } else  if (error.message ) {
         // Something happened in setting up the request that triggered an Error
         state.error = error.message
@@ -258,14 +249,14 @@ export default new Vuex.Store({
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to pools: " + error.response.data)
       })
-    }
+    },
   },
   modules: {
     diagnostics: diagnostics,
     preferences: preferences,
     query: query
   },
-  plugins: [errorPlugin]
+  plugins: [errorPlugin,versionChecker]
 })
 
 const poolNameFromURL = (url, pools) => {
