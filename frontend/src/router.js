@@ -31,8 +31,10 @@ const router = new Router({
 //     window.location.href = authURL
 router.beforeEach((_to, _from, next) => {
     let getters = store.getters
-    if (getters["hasAuthToken"] == false) {
-      store.dispatch("getAuthToken")
+    if (getters["auth/hasAuthToken"] == false) {
+      store.dispatch("auth/getAuthToken")
+    } else {
+      alert( store.auth.authToken)
     }
  
   next()

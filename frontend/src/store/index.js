@@ -5,6 +5,7 @@ import errorPlugin from './plugins/errors'
 import versionChecker from './plugins/version'
 import diagnostics from './modules/diagnostics'
 import preferences from './modules/preferences'
+import auth from './modules/auth'
 import query from './modules/query'
 Vue.use(Vuex)
 
@@ -21,14 +22,9 @@ export default new Vuex.Store({
     results: [],
     total: -1,
     pageSize: 25,
-    authToken: "",
-    authorizing: false,
   },
 
   getters: {
-    hasAuthToken: state => {
-      return state.authToken.length > 0
-    },
     hasResults: state => {
       return state.total >= 0
     },
@@ -56,12 +52,6 @@ export default new Vuex.Store({
     },
     setBasicSearch(state) {
       state.searchMode = "basic"
-    },
-    setAuthToken(state, token) {
-      state.authToken = token
-    },
-    setAuthorizing(state, auth) {
-      state.authorizing = auth
     },
     setPools(state, data) {
       state.pools = data
@@ -158,17 +148,6 @@ export default new Vuex.Store({
   },
 
   actions: {
-    getAuthToken(ctx) {
-      ctx.commit('setAuthorizing', true)
-      axios.post("/authorize").then((response) => {
-        ctx.commit('setAuthToken', response.data)
-        ctx.commit('setAuthorizing', false)
-      }).catch((error) => {
-        ctx.commit('setAuthToken', '')
-        ctx.commit('setFatal', "Authorization failed" + error.response.data)
-        ctx.commit('setAuthorizing', false)
-      })
-    },
     firstPage(ctx) {
       ctx.commit('gotoFirstPage')
       ctx.dispatch("doPoolSearch")
@@ -252,6 +231,7 @@ export default new Vuex.Store({
     },
   },
   modules: {
+    auth: auth,
     diagnostics: diagnostics,
     preferences: preferences,
     query: query

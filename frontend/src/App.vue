@@ -24,7 +24,7 @@ export default {
    computed: {
       ...mapState({
          fatal: state => state.fatal,
-         authorizing: state => state.authorizing
+         authorizing: state => state.auth.authorizing
       }),
    }
 };
