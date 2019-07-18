@@ -181,7 +181,7 @@ export default new Vuex.Store({
         return
       }
       let url = state.searchAPI + "/api/search?debug=1&intuit=1"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
         commit('setSearchResults', response.data)
         commit('diagnostics/setSearchDiagnostics', response.data)
@@ -200,7 +200,7 @@ export default new Vuex.Store({
         pagination: rootGetters.getPagination
       }
       let url = rootGetters.currPool.url + "/api/search?debug=1"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
         commit('setPoolSearchResults', response.data)
         let diagPayload = { currPoolIdx: state.currPoolIdx, debug: response.data.debug, warnings: response.data.warnings }
@@ -222,7 +222,7 @@ export default new Vuex.Store({
     },
     getPools(ctx) {
       let url = ctx.state.searchAPI + "/api/pools"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.auth.authToken
       axios.get(url).then((response) => {
         ctx.commit('setPools', response.data)
       }).catch((error) => {
