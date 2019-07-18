@@ -6,7 +6,7 @@
          <div class="pools-list">
             <div class="results" v-for="(r,idx) in results" :key="r.url">
                <template v-if="r.total > 0">
-                  <p v-close-popover @click="poolClicked" :data-idx="idx">{{r.name}} ({{r.total}} hits)</p>
+                  <p v-close-popover @click="poolClicked" :data-idx="idx">{{poolName(r.url)}} ({{r.total}} hits)</p>
             </template>
             </div>
          </div>
@@ -16,15 +16,26 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    components: {
    },
    computed: {
       ...mapState({
          results: state => state.results,
-      })
+      }),
+      ...mapGetters({
+         findPool: 'pools/find',
+      }),
    },
    methods: {
+      poolName(url) {
+         let p = this.findPool(url) 
+         if (p) {
+            return p.name
+         }
+         return url
+      },
       poolClicked(event) {
          let idx = event.currentTarget.dataset.idx 
          this.$store.commit("switchResultsPool", idx)

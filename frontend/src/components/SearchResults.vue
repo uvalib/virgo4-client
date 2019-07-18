@@ -4,7 +4,7 @@
          <p class="summary">{{searchSummary}}</p>
          <template v-if="total>0" >
             <p class="curr-pool">
-               <span>Showing {{ currPool.total }} results from {{ currPool.name}}</span>
+               <span>Showing {{ currPool.total }} results from {{ poolName(currPool.url) }}</span>
             </p>
             <ResultsPager v-if="currPoolHitCnt>0"/>
             <PoolResultsPicker/>
@@ -58,6 +58,7 @@ export default {
          debugInfo: 'diagnostics/debugInfo',
          hasWarnings: 'diagnostics/hasWarnings',
          warnings: 'diagnostics/warnings',
+         findPool: 'pools/find',
       }),
       ...mapState({
          total: state=>state.total,
@@ -69,6 +70,13 @@ export default {
       }
    },
    methods: {
+      poolName(url) {
+         let p = this.findPool(url) 
+         if (p) {
+            return p.name
+         }
+         return url
+      },
       fullTitle(hit) {
          if (hit.subtitle) {
             return hit.title + " " + hit.subtitle

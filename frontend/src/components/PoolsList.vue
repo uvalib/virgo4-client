@@ -30,28 +30,28 @@ export default {
    components: {},
    computed: {
       ...mapState({
-         pools: state => state.pools
+         pools: state => state.pools.list
       }),
       ...mapGetters({
-         isPoolExcluded: "preferences/isPoolExcluded",
-         isTargetPool: "preferences/isTargetPool"
+         isPoolExcluded: "pools/isPoolExcluded",
+         isTargetPool: "pools/isTargetPool"
       })
    },
    methods: {
       getPools() {
-         this.$store.dispatch('getPools')
+         this.$store.dispatch('pools/getPools')
       },
       includeAllClicked() {
-         this.$store.commit("preferences/includeAll")
+         this.$store.commit("pools/includeAll")
       },
       excludeAllClicked() {
-         this.$store.commit("preferences/excludeAll", this.pools)
+         this.$store.commit("pools/excludeAll")
       },
       toggleTargetPool(url) {
-         this.$store.commit("preferences/toggleTargetPool", url)
+         this.$store.commit("pools/toggleTargetPool", url)
       },
       toggleExcludePool(url) {
-         this.$store.commit("preferences/toggleExcludePool", url)
+         this.$store.commit("pools/toggleExcludePool", url)
       }
    }
 };

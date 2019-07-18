@@ -4,7 +4,7 @@ import axios from 'axios'
 import errorPlugin from './plugins/errors'
 import versionChecker from './plugins/version'
 import diagnostics from './modules/diagnostics'
-import preferences from './modules/preferences'
+import pools from './modules/pools'
 import auth from './modules/auth'
 import query from './modules/query'
 Vue.use(Vuex)
@@ -13,15 +13,13 @@ export default new Vuex.Store({
   state: {
     searchAPI: "",
     searchMode: "basic",
-    pools: [],
     fatal: "",
     error: "",
     searching: false,
-    searchSummary: "",
-    currPoolIdx: -1,
+    pageSize: 25,
     results: [],
     total: -1,
-    pageSize: 25,
+    currPoolIdx: -1,
   },
 
   getters: {
@@ -52,12 +50,6 @@ export default new Vuex.Store({
     },
     setBasicSearch(state) {
       state.searchMode = "basic"
-    },
-    setPools(state, data) {
-      state.pools = data
-      if (state.pools.length == 0) {
-        state.fatal = "No search pools configured"
-      }
     },
     setFatal(state, err) {
       state.fatal = err
@@ -100,7 +92,7 @@ export default new Vuex.Store({
       info.hits = results.record_list
     },
     setSearchResults(state, results) {
-      // this is called from top level search; resets results from all pools
+      // // this is called from top level search; resets results from all pools
       let poolHitCnt = 0
       state.total = -1
       state.currPoolIdx = -1
@@ -111,7 +103,6 @@ export default new Vuex.Store({
         if (pr.record_list) {
           state.results.push({
             url: pr.service_url,
-            name: poolNameFromURL(pr.service_url, state.pools),
             total: pr.pagination.total,
             hits: pr.record_list,
             page: 0
@@ -120,7 +111,6 @@ export default new Vuex.Store({
         } else {
           state.results.push({
             url: pr.service_url,
-            name: poolNameFromURL(pr.service_url, state.pools),
             total: 0, hits: [], page: 0
           })
         }
@@ -171,8 +161,8 @@ export default new Vuex.Store({
         query: rootGetters['query/string'],
         pagination: { start: 0, rows: state.pageSize },
         preferences: {
-          target_pool: rootState.preferences.targetPoolURL,
-          exclude_pool: rootState.preferences.excludePoolURLs,
+          target_pool: rootState.pools.targetPoolURL,
+          exclude_pool: rootState.pools.excludePoolURLs,
         }
       }
       if (req.query.length == 0) {
@@ -184,6 +174,7 @@ export default new Vuex.Store({
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
         commit('setSearchResults', response.data)
+        commit('pools/setPools', response.data.pools)
         commit('diagnostics/setSearchDiagnostics', response.data)
         commit('setSearching', false)
       }).catch((error) => {
@@ -193,7 +184,6 @@ export default new Vuex.Store({
     },
 
     doPoolSearch({ state, commit, _rootState, rootGetters }) {
-      //commit('setError', "")
       commit('setSearching', true)
       let req = {
         query: rootGetters['query/string'],
@@ -218,32 +208,13 @@ export default new Vuex.Store({
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)
       })
-    },
-    getPools(ctx) {
-      let url = ctx.state.searchAPI + "/api/pools"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.auth.authToken
-      axios.get(url).then((response) => {
-        ctx.commit('setPools', response.data)
-      }).catch((error) => {
-        ctx.commit('setFatal', "Unable to pools: " + error.response.data)
-      })
-    },
+    }
   },
   modules: {
     auth: auth,
     diagnostics: diagnostics,
-    preferences: preferences,
-    query: query
+    pools: pools,
+    query: query,
   },
   plugins: [errorPlugin,versionChecker]
 })
-
-const poolNameFromURL = (url, pools) => {
-  let name = ""
-  pools.forEach(function (p) {
-    if (p.url == url) {
-      name = p.name
-    }
-  })
-  return name
-}

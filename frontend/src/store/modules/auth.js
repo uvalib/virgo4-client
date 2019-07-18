@@ -30,7 +30,7 @@ const auth = {
           ctx.commit('setAuthorizing', false)
         }).catch((error) => {
           ctx.commit('setAuthToken', '')
-          ctx.commit('setFatal', "Authorization failed" + error.response.data)
+          ctx.commit('setFatal', "Authorization failed: " + error.response.data, { root: true })
           ctx.commit('setAuthorizing', false)
         })
       },
