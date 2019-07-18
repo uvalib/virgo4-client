@@ -1,6 +1,6 @@
 <template>
    <v-popover style="display:inline-block;">
-      <span class="pure-button pure-button-secondary">Pool Information</span>
+      <span @click="getPools" class="pure-button pure-button-secondary">Pool Information</span>
       <div class="pools-container" slot="popover">
          <h4>
             Available Search Pools
@@ -38,6 +38,9 @@ export default {
       })
    },
    methods: {
+      getPools() {
+         this.$store.dispatch('getPools')
+      },
       includeAllClicked() {
          this.$store.commit("preferences/includeAll")
       },

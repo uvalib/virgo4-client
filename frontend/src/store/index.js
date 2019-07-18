@@ -127,7 +127,7 @@ export default new Vuex.Store({
       })
 
       state.currPoolIdx = 0
-      state.searchSummary = results.pools_searched + " pools searched in " +
+      state.searchSummary = results.pools.length + " pools searched in " +
         results.total_time_ms + "ms. " + results.total_hits + " hits in " + poolHitCnt + " pools."
       state.total = results.total_hits
     },
@@ -215,7 +215,6 @@ export default new Vuex.Store({
       axios.get("/config").then((response) => {
         ctx.commit('setConfig', response.data)
         ctx.commit('diagnostics/setConfig', response.data)
-        ctx.dispatch('getPools')
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)
       })

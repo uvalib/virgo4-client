@@ -54,10 +54,8 @@ export default {
    },
    computed: {
       ...mapState({
-         searchAPI: state => state.searchAPI,
          fatal: state => state.fatal,
          error: state => state.error,
-         showPools: state => state.showPools,
          searching: state => state.searching,
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
