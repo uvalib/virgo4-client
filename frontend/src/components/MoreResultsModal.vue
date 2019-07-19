@@ -2,6 +2,11 @@
    <div @click="closePool" class="more-results-overlay">
       <div class="more-results-modal">
          <h2>{{poolDescription(selectedPool.url)}}<i @click="closePool" class="pool-close fas fa-times-circle"></i></h2>
+         <div class="hits">
+             <template v-for="hit in selectedPool.hits">
+               <SearchHit :hit="hit" :key="hit.id"/>
+            </template>
+         </div>
       </div>
    </div>
 </template>
@@ -9,7 +14,11 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import SearchHit from "@/components/SearchHit"
 export default {
+   components: {
+      SearchHit
+   },
    computed: {
       ...mapState({
          results: state=>state.results,
@@ -54,7 +63,7 @@ export default {
 }
 @media only screen and (min-width: 768px) {
    .more-results-modal {
-      left: 40%;
+      left: 50%;
    }
 }
 @media only screen and (max-width: 768px) {
@@ -69,6 +78,10 @@ h2 {
    margin:0;
    padding: 5px 15px;
    text-align: left;
+   position: absolute;
+   z-index: 2;
+   left: 0;
+   right: 0;
 }
 .pool-close {
    position: absolute;
@@ -79,5 +92,15 @@ h2 {
 }
 .pool-close:hover {
    opacity: 1;
+}
+.hits {
+   position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-top:40px;
 }
 </style>

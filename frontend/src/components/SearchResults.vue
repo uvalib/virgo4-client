@@ -17,21 +17,9 @@
       <div class="pools" v-if="total>0">
          <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.id">
             <div class="pool-titlebar">{{poolDescription(pool.url)}}</div>
-            <div class="hit" v-for="hit in pool.hits.slice(0,3)" :key="hit.id">
-               <div>
-                  <label>Identifier:</label>
-                  <span class="value">{{hit.id}}</span>
-               </div>
-               <div>
-                  <label>Title:</label>
-                  <span class="value">{{fullTitle(hit)}}</span>
-               </div>
-               <div>
-                  <label>Author:</label>
-                  <span class="value">{{hit.author}}</span>
-               </div>
-               <DebugPanel v-if="hit.debug" :debugInfo="hit.debug"/>
-            </div>
+            <template v-for="hit in pool.hits.slice(0,3)">
+               <SearchHit :hit="hit" :key="hit.id"/>
+            </template>
             <div @click="selectPool(poolIdx)" class="more-panel">
                See More Results<img class="more-icon" src="../assets/more.png"/>
             </div>
@@ -44,11 +32,12 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import SearchHit from "@/components/SearchHit"
 import DebugPanel from "@/components/diagnostics/DebugPanel"
 import WarningPanel from "@/components/diagnostics/WarningPanel"
 export default {
    components: {
-      DebugPanel, WarningPanel
+      DebugPanel, WarningPanel,SearchHit
    },
    computed: {
       ...mapGetters({
@@ -89,12 +78,6 @@ export default {
             return p.description
          }
          return url
-      },
-      fullTitle(hit) {
-         if (hit.subtitle) {
-            return hit.title + " " + hit.subtitle
-         }
-         return hit.title
       },
    }
 }
@@ -195,19 +178,5 @@ div.toolbar {
 }
 div.pools {
    text-align: left;
-}
-.hit {
-   width: 100%;
-   border: 1px solid #ccc;
-   border-top: none;
-   padding: 10px;
-   box-sizing: border-box;
-}
-label {
-   font-weight: bold;
-   width: 80px;
-   text-align: right;
-   margin-right: 10px;
-   display: inline-block;
 }
 </style>
