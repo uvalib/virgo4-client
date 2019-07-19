@@ -2,6 +2,7 @@
    <div id="app">
       <FatalError v-if="fatal.length > 0"/>
       <AuthorizePanel v-if="authorizing"/>
+       <MoreResultsModal v-if="isPoolSelected"/>
       <VirgoHeader/>
       <router-view/>
       <LibraryFooter/>
@@ -13,19 +14,25 @@ import LibraryFooter from "@/components/LibraryFooter"
 import VirgoHeader from "@/components/VirgoHeader"
 import FatalError from "@/components/FatalError"
 import AuthorizePanel from "@/components/AuthorizePanel"
+import MoreResultsModal from "@/components/MoreResultsModal"
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    components: {
       VirgoHeader,
       LibraryFooter,
       FatalError,
-      AuthorizePanel
+      AuthorizePanel,
+      MoreResultsModal
    },
    computed: {
       ...mapState({
          fatal: state => state.fatal,
          authorizing: state => state.auth.authorizing
       }),
+      ...mapGetters({
+         isPoolSelected: 'isPoolSelected',
+      })
    }
 };
 </script>

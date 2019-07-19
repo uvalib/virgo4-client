@@ -36,6 +36,15 @@ export default new Vuex.Store({
       })
       return out
     },
+    selectedPool: state => {
+      if (state.explorePoolIdx === -1 ) {
+        return {url: "none", total: 0}
+      }
+      return state.results[state.explorePoolIdx]
+    },
+    isPoolSelected: state => {
+      return state.explorePoolIdx > -1
+    }
   },
 
   mutations: {
@@ -76,8 +85,11 @@ export default new Vuex.Store({
     setSearching(state, flag) {
       state.searching = flag
     },
-    setExplorePoolIdx(state, idx) {
+    selectPoolResults(state, idx) {
       state.explorePoolIdx = idx
+    },
+    closePoolResults(state) {
+      state.explorePoolIdx = -1
     },
     toggleResultVisibility(state, idx) {
       state.results[idx].show = !state.results[idx].show

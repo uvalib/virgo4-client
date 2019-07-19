@@ -1,6 +1,6 @@
 <template>
    <div class="debug-options">
-      <span v-if="debugEnabled && hasDebug" @click="toggleDebug" class="debug pure-button pure-button-primary">{{debugLabel}}</span>
+      <span v-if="debugEnabled" @click="toggleDebug" class="debug pure-button pure-button-primary">{{debugLabel}}</span>
       <span v-if="warnEnabled && hasWarnings" @click="toggleWarn" class="debug pure-button pure-button-primary">{{warnLabel}}</span>
    </div>
 </template>
@@ -17,7 +17,6 @@ export default {
          showWarn: state => state.diagnostics.showWarn,
       }),
       ...mapGetters({
-         hasDebug: 'diagnostics/hasDebug',
          hasWarnings: 'diagnostics/hasWarnings',
       }),
       debugLabel() {

@@ -14,8 +14,8 @@
       <DebugPanel v-if="hasDebug" :debugInfo="debugInfo"/>
       <WarningPanel v-if="hasWarnings" :warnings="warnings"/>
 
-      <div class="pools">
-         <div class="pool-panel" v-for="pool in visibleResults" :key="pool.id">
+      <div class="pools" v-if="total>0">
+         <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.id">
             <div class="pool-titlebar">{{poolDescription(pool.url)}}</div>
             <div class="hit" v-for="hit in pool.hits.slice(0,3)" :key="hit.id">
                <div>
@@ -32,7 +32,7 @@
                </div>
                <DebugPanel v-if="hit.debug" :debugInfo="hit.debug"/>
             </div>
-            <div class="more-panel">
+            <div @click="selectPool(poolIdx)" class="more-panel">
                See More Results<img class="more-icon" src="../assets/more.png"/>
             </div>
          </div>
@@ -44,8 +44,8 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import DebugPanel from "@/components/DebugPanel"
-import WarningPanel from "@/components/WarningPanel"
+import DebugPanel from "@/components/diagnostics/DebugPanel"
+import WarningPanel from "@/components/diagnostics/WarningPanel"
 export default {
    components: {
       DebugPanel, WarningPanel
@@ -70,6 +70,9 @@ export default {
       },
    },
    methods: {
+      selectPool(resultIdx) {
+         this.$store.commit("selectPoolResults", resultIdx)
+      },
       toggleVisibility(resultIdx) {
          this.$store.commit("toggleResultVisibility", resultIdx)
       },

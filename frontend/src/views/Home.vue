@@ -37,7 +37,7 @@ import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import PoolsList from "@/components/PoolsList"
 import SearchTips from "@/components/SearchTips"
-import DebugControls from "@/components/DebugControls"
+import DebugControls from "@/components/diagnostics/DebugControls"
 import AdvancedSearch from "@/components/AdvancedSearch"
 export default {
    name: "home",
