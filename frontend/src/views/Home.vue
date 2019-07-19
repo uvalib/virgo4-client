@@ -9,7 +9,7 @@
       </div>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
-           <h4>Basic Search</h4>
+           <h4>Basic Search<SearchTips/></h4>
           <input
               @keyup.enter="searchClicked"
               id="keyword"
@@ -21,14 +21,12 @@
             <PoolsList/>
             <span class="pure-button pure-button-primary" @click="advancedClicked">Advanced</span>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-            <SearchTips/>
           </div>
         </template>
         <AdvancedSearch v-else/>
       </div>
       <h3 v-bind:class="{invisible: error.length==0}" class="error">{{ error }}</h3>
       <SearchResults v-if="hasResults"/>
-      <DebugControls v-if="hasResults" />
    </div>
 </template>
 
@@ -145,7 +143,7 @@ h3.error.invisible {
   margin: 0 auto 0 auto;
   text-align: center;
   max-width: 800px;
-  padding: 10px 2vw;
+  padding: 10px 2vw 30px 2vw;
   font-size: 0.95em;
 }
 #keyword {

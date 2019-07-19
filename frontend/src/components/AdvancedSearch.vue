@@ -1,6 +1,6 @@
 <template>
    <div class="advanced-panel">
-      <h4>Advanced Search</h4>
+      <h4>Advanced Search<SearchTips/></h4>
       <table>
          <tr>
             <td class="label">Identifier</td>
@@ -33,7 +33,6 @@
          <PoolsList/>
          <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
          <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-         <p class="tips"><SearchTips/></p>
       </div>
    </div>
 </template>

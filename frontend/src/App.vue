@@ -101,6 +101,7 @@ i.fas.fa-times-circle.close:hover {
   padding-bottom: 5px;
   font-weight: bold;
   font-size: 22px;
+  position: relative;
 }
 
 #app a {

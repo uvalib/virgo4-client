@@ -17,30 +17,24 @@ export default new Vuex.Store({
     error: "",
     searching: false,
     pageSize: 25,
+    cardResultSize: 10,
     results: [],
+    explorePoolIdx: -1,
     total: -1,
-    currPoolIdx: -1,
   },
 
   getters: {
     hasResults: state => {
       return state.total >= 0
     },
-    currPool: state => {
-      if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length - 1) {
-        return { url: "", page: 0, total: 0, name: "", hits: [] }
-      } else {
-        let info = state.results[state.currPoolIdx]
-        return info
-      }
-    },
-    getPagination: state => {
-      if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length - 1) {
-        return { start: 0, rows: state.pageSize }
-      } else {
-        let info = state.results[state.currPoolIdx]
-        return { start: info.page * state.pageSize, rows: state.pageSize }
-      }
+    visibleResults: state => {
+      let out = [] 
+      state.results.forEach(function (r) {
+        if (r["show"] === true) {
+          out.push(r)
+        }
+      })
+      return out
     },
   },
 
@@ -57,7 +51,6 @@ export default new Vuex.Store({
     setError(state, error) {
       // clear any prior results
       state.total = -1
-      state.currPoolIdx = -1
       state.results = []
       if (error == null) {
         error = ""
@@ -83,75 +76,54 @@ export default new Vuex.Store({
     setSearching(state, flag) {
       state.searching = flag
     },
-    switchResultsPool(state, idx) {
-      state.currPoolIdx = idx
+    setExplorePoolIdx(state, idx) {
+      state.explorePoolIdx = idx
     },
-    setPoolSearchResults(state, results) {
-      // These results are from a single pool; generally a call to get next page
-      let info = state.results[state.currPoolIdx]
-      info.hits = results.record_list
+    toggleResultVisibility(state, idx) {
+      state.results[idx].show = !state.results[idx].show
+    },
+    addPoolSearchResults(state, results) {
+      let info = state.results[state.explorePoolIdx]
+      info.hits = info.hits.concat(results.record_list)
     },
     setSearchResults(state, results) {
       // // this is called from top level search; resets results from all pools
-      let poolHitCnt = 0
+      let visiblePoolCnt = 0
       state.total = -1
-      state.currPoolIdx = -1
       state.results = []
 
       // Push all results into the results structure. Reset paging for each
       results.pool_results.forEach(function (pr) {
         if (pr.record_list) {
-          state.results.push({
-            url: pr.service_url,
-            total: pr.pagination.total,
-            hits: pr.record_list,
-            page: 0
-          })
-          poolHitCnt++
+          let result = { url: pr.service_url, total: pr.pagination.total,
+            hits: pr.record_list, page: 0, show: false }
+          if (pr.confidence != "low" && visiblePoolCnt < 3) {
+            visiblePoolCnt++
+            result["show"] = true
+          }
+          state.results.push(result)
+          
         } else {
           state.results.push({
             url: pr.service_url,
-            total: 0, hits: [], page: 0
-          })
+            total: 0, hits: [], page: 0, show: false })
         }
       })
-
-      state.currPoolIdx = 0
+      if (visiblePoolCnt == 0) {
+        state.results[0]["show"] = true  
+      }
       state.searchSummary = results.pools.length + " pools searched in " +
-        results.total_time_ms + "ms. " + results.total_hits + " hits in " + poolHitCnt + " pools."
+        results.total_time_ms + "ms. " + results.total_hits + " total hits."
       state.total = results.total_hits
     },
-    gotoFirstPage(state) {
-      state.results[state.currPoolIdx].page = 0
-    },
-    gotoLastPage(state) {
-      let info = state.results[state.currPoolIdx]
-      info.page = Math.floor(info.total / state.pageSize)
-      state.results[state.currPoolURL] = info
-    },
-    nextPage(state) {
-      state.results[state.currPoolIdx].page++
-    },
-    prevPage(state) {
-      state.results[state.currPoolIdx].page--
+    moreResults(state) {
+      state.results[state.explorePoolIdx].page++
     },
   },
 
   actions: {
-    firstPage(ctx) {
-      ctx.commit('gotoFirstPage')
-      ctx.dispatch("doPoolSearch")
-    },
-    prevPage(ctx) {
-      ctx.commit('prevPage')
-      ctx.dispatch("doPoolSearch")
-    },
-    nextPage(ctx) {
-      ctx.commit('nextPage')
-      ctx.dispatch("doPoolSearch")
-    },
-    lastPage(ctx) {
-      ctx.commit('gotoLastPage')
+    moreResults(ctx) {
+      ctx.commit('moreResults')
       ctx.dispatch("doPoolSearch")
     },
     doSearch({ state, commit, rootState, rootGetters }) {
@@ -185,15 +157,19 @@ export default new Vuex.Store({
 
     doPoolSearch({ state, commit, _rootState, rootGetters }) {
       commit('setSearching', true)
+      let tgtPage = 0
+      if (state.explorePoolIdx > -1) {
+        tgtPage = state.results[state.explorePoolIdx].page
+      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: rootGetters.getPagination
+        pagination: { start: tgtPage * state.pageSize, rows: state.pageSize }
       }
       let url = rootGetters.currPool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
-        commit('setPoolSearchResults', response.data)
-        let diagPayload = { currPoolIdx: state.currPoolIdx, debug: response.data.debug, warnings: response.data.warnings }
+        commit('addPoolSearchResults', response.data)
+        let diagPayload = { currPoolIdx: state.explorePoolIdx, debug: response.data.debug, warnings: response.data.warnings }
         commit('diagnostics/setPoolDiagnostics', diagPayload)
         commit('setSearching', false)
       }).catch((error) => {

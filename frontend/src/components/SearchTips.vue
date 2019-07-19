@@ -1,7 +1,7 @@
 <template>
    <p class="tips">
-      <v-popover placement="left">
-         <span class="trigger"><i class="fas fa-info-circle"></i>&nbsp;Search Tips</span>
+      <v-popover placement="top-end">
+         <span class="trigger">Search Tips&nbsp;<i class="fas fa-info-circle"></i></span>
          <div class="tips-container" slot="popover">
             <h4>
                Search Tips
@@ -89,6 +89,11 @@ p.tips {
   cursor:pointer;
   margin:20px 0;
   opacity: 0.8;
+  font-size: 12px;
+  position: absolute;
+  right:0;
+  bottom:5px;
+  margin:0;
 }
 p.tips:hover {
   opacity:1;
