@@ -1,8 +1,10 @@
 <template>
    <div @click="closePool" class="more-results-overlay">
-      <div class="more-results-modal">
-         <h2>{{poolDescription(selectedPool.url)}}<i @click="closePool" class="pool-close fas fa-times-circle"></i></h2>
-         <div class="hits">
+      <div class="more-header">
+         {{poolDescription(selectedPool.url)}}<i @click="closePool" class="pool-close fas fa-times-circle"></i>
+      </div>
+      <div class="more-results-content">
+         <div  v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  class="hits">
              <template v-for="hit in selectedPool.hits">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
@@ -15,20 +17,32 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
+import infiniteScroll from 'vue-infinite-scroll'
+
 export default {
+   directives: {
+      infiniteScroll
+   },
    components: {
       SearchHit
    },
    computed: {
       ...mapState({
          results: state=>state.results,
+         searching: state=>state.searching
       }),
       ...mapGetters({
          selectedPool: 'selectedPool',
          findPool: 'pools/find',
+         hasMoreHits: 'hasMoreHits'
       }),
    },
    methods: {
+      loadMoreResults() {
+         if (this.hasMoreHits) {
+            this.$store.dispatch("moreResults")
+         }
+      },
       closePool() {
          this.$store.commit("closePoolResults")
       },
@@ -53,35 +67,35 @@ export default {
    z-index: 1000;
    background:rgba(0,0,0,0.6);
 }
-.more-results-modal {
-   position: absolute;
+.more-results-content {
+   position: fixed;
    right: 0;
    top: 0;
    height: 100%;
-   z-index: 1000;
+   z-index: 100;
    background: white;
+   box-sizing: border-box;
 }
 @media only screen and (min-width: 768px) {
-   .more-results-modal {
+   .more-results-modal, .more-results-content, div.more-header {
       left: 50%;
    }
 }
 @media only screen and (max-width: 768px) {
-   .more-results-modal {
+   .more-results-modal, .more-results-content, div.more-header {
       left: 10%;
    }
 }
-h2 {
+div.more-header {
+   position: fixed;
+   right: 0;
    font-size: 1.1em;
    color: white;
    background: var(--color-primary-orange);
    margin:0;
    padding: 5px 15px;
    text-align: left;
-   position: absolute;
-   z-index: 2;
-   left: 0;
-   right: 0;
+   z-index: 500;
 }
 .pool-close {
    position: absolute;
@@ -101,6 +115,7 @@ h2 {
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  padding-top:40px;
+  padding-top: 40px;
+    box-sizing: border-box;
 }
 </style>

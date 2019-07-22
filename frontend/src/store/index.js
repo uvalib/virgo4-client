@@ -44,6 +44,13 @@ export default new Vuex.Store({
     },
     isPoolSelected: state => {
       return state.explorePoolIdx > -1
+    },
+    hasMoreHits: state => {
+      if (state.explorePoolIdx === -1 ) {
+        return false
+      }
+      let tgtPool = state.results[state.explorePoolIdx]
+      return tgtPool.total > tgtPool.hits.length
     }
   },
 
@@ -138,6 +145,7 @@ export default new Vuex.Store({
       ctx.commit('moreResults')
       ctx.dispatch("doPoolSearch")
     },
+    
     doSearch({ state, commit, rootState, rootGetters }) {
       commit('setError', "")
       commit('setSearching', true)
@@ -177,7 +185,7 @@ export default new Vuex.Store({
         query: rootGetters['query/string'],
         pagination: { start: tgtPage * state.pageSize, rows: state.pageSize }
       }
-      let url = rootGetters.currPool.url + "/api/search?debug=1"
+      let url = rootGetters.selectedPool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
@@ -189,6 +197,7 @@ export default new Vuex.Store({
         commit('setSearching', false)
       })
     },
+
     getConfig(ctx) {
       axios.get("/config").then((response) => {
         ctx.commit('setConfig', response.data)
@@ -198,11 +207,13 @@ export default new Vuex.Store({
       })
     }
   },
+
   modules: {
     auth: auth,
     diagnostics: diagnostics,
     pools: pools,
     query: query,
   },
+
   plugins: [errorPlugin,versionChecker]
 })

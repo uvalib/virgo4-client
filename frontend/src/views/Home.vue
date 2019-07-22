@@ -97,7 +97,7 @@ export default {
 
 <style scoped>
 .searching-overlay {
-  position: absolute;
+  position: fixed;
   left: 0;
   right: 0;
   top: 5vw;
