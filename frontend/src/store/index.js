@@ -17,8 +17,8 @@ export default new Vuex.Store({
     error: "",
     searching: false,
     pageSize: 25,
-    cardResultSize: 10,
     results: [],
+    visibleResults: [],
     explorePoolIdx: -1,
     total: -1,
   },
@@ -29,10 +29,8 @@ export default new Vuex.Store({
     },
     visibleResults: state => {
       let out = [] 
-      state.results.forEach(function (r) {
-        if (r["show"] === true) {
-          out.push(r)
-        }
+      state.visibleResults.forEach(function (idx) {
+        out.push(state.results[idx])
       })
       return out
     },
@@ -98,8 +96,17 @@ export default new Vuex.Store({
     closePoolResults(state) {
       state.explorePoolIdx = -1
     },
-    toggleResultVisibility(state, idx) {
-      state.results[idx].show = !state.results[idx].show
+    toggleResultVisibility(state, poolResultsIdx) {
+      // NOTES: the result itself is tagged with show true/false for ease of detecting
+      // which results are showing. A separate visibleResults array tracks the order 
+      // that pools were selected to be seen.
+      state.results[poolResultsIdx]["show"] = !state.results[poolResultsIdx]["show"]
+      let visibleIdx = state.visibleResults.indexOf(poolResultsIdx)
+      if (visibleIdx == -1) {
+        state.visibleResults.push(poolResultsIdx)
+      } else {
+        state.visibleResults.splice(visibleIdx,1)
+      }
     },
     addPoolSearchResults(state, results) {
       let info = state.results[state.explorePoolIdx]
@@ -107,29 +114,29 @@ export default new Vuex.Store({
     },
     setSearchResults(state, results) {
       // // this is called from top level search; resets results from all pools
-      let visiblePoolCnt = 0
       state.total = -1
       state.results = []
+      state.visibleResults = []
 
       // Push all results into the results structure. Reset paging for each
       results.pool_results.forEach(function (pr) {
         if (pr.record_list) {
           let result = { url: pr.service_url, total: pr.pagination.total,
             hits: pr.record_list, page: 0, show: false }
-          if (pr.confidence != "low" && visiblePoolCnt < 3) {
-            visiblePoolCnt++
-            result["show"] = true
-          }
           state.results.push(result)
-          
+          if (pr.confidence != "low" && state.visibleResults.length < 3) {
+            result["show"] = true
+            state.visibleResults.push(state.results.length-1)
+          }
         } else {
           state.results.push({
             url: pr.service_url,
             total: 0, hits: [], page: 0, show: false })
         }
       })
-      if (visiblePoolCnt == 0) {
-        state.results[0]["show"] = true  
+      if (state.visibleResults.length == 0) {
+        state.results[0]["show"] = true
+        state.visibleResults.push(0)
       }
       state.searchSummary = results.pools.length + " pools searched in " +
         results.total_time_ms + "ms. " + results.total_hits + " total hits."

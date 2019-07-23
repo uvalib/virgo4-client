@@ -90,6 +90,7 @@ export default {
 <style scoped>
 .pool-buttons {
    margin-top: 10px;
+   text-align: left;
 }
 span.total {
    font-weight: 100;
