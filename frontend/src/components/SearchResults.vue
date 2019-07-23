@@ -14,8 +14,12 @@
       <DebugPanel v-if="hasDebug" :debugInfo="debugInfo"/>
       <WarningPanel v-if="hasWarnings" :warnings="warnings"/>
 
-      <div class="pools" v-if="total>0">
-         <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.id">
+      <transition-group tag="div" class="pools" 
+            name="pool-transition"
+            enter-active-class="animated faster fadeIn"
+            leave-active-class="animated faster fadeOut"
+            v-if="total>0">
+         <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.url">
             <div class="pool-titlebar">{{poolDescription(pool.url)}}</div>
             <template v-for="hit in pool.hits.slice(0,3)">
                <SearchHit :hit="hit" :key="hit.id"/>
@@ -24,7 +28,7 @@
                See More Results<img class="more-icon" src="../assets/more.png"/>
             </div>
          </div>
-      </div>
+      </transition-group>
 
    </div>
 </template>
@@ -118,6 +122,7 @@ div.pools {
    background: #f5f5f5;
    text-align: center;
    cursor: pointer;
+   border-radius: 0 0 6px 6px
 }
 .more-panel:hover {
    text-decoration: underline;
@@ -137,6 +142,7 @@ div.pools {
    background-color: var(--color-primary-orange);
    color: white;
    font-weight: bold;
+   border-radius: 6px 6px 0 0;
 }
 h4.no-hits {
    text-align: center;

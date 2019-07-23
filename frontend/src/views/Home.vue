@@ -25,7 +25,9 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
-      <h3 v-bind:class="{invisible: error.length==0}" class="error">{{ error }}</h3>
+      <transition name="fade">
+        <p v-if="error" class="error">{{ error }}</p>
+      </transition>
       <SearchResults v-if="hasResults"/>
    </div>
 </template>
@@ -127,17 +129,12 @@ div.searching-box h4 {
    min-height: 400px;
    position: relative;
 }
-p.fatal, h3.error {
+p.fatal, p.error {
   font-weight: bold;
   margin: 0;
   color: var(--color-error);
-  transition: opacity .5s ease .25s;
   opacity: 1;
   visibility: visible;
-}
-h3.error.invisible {
-  opacity:0;
-  visibility: hidden;
 }
 .search-panel {
   margin: 0 auto 0 auto;

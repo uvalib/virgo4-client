@@ -2,7 +2,14 @@
    <div id="app">
       <FatalError v-if="fatal.length > 0"/>
       <AuthorizePanel v-if="authorizing"/>
-       <MoreResultsModal v-if="isPoolSelected"/>
+      <transition name="fade">
+        <div class="dimmer" v-if="isPoolSelected"></div>
+      </transition>
+      <transition name="more-transition"
+            enter-active-class="animated faster slideInRight"
+            leave-active-class="animated faster slideOutRight">
+        <MoreResultsModal v-if="isPoolSelected"/>
+      </transition>
       <VirgoHeader/>
       <router-view/>
       <LibraryFooter/>
@@ -33,6 +40,8 @@ export default {
       ...mapGetters({
          isPoolSelected: 'isPoolSelected',
       })
+   },
+   methods: {
    }
 };
 </script>
@@ -49,6 +58,20 @@ export default {
    --color-error: firebrick;
 }
 
+#app .fade-enter-active, .fade-leave-active {
+  transition: opacity .25s;
+}
+#app .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+#app .slide-enter-active, .slide-leave-active {
+  transition: all .5s ease;
+}
+#app .slide-enter, .slide-leave-to /* .slide-leave-active below version 2.1.8 */ {
+  width: 0;
+}
+
 #app .pure-button.pure-button-secondary {
    background: rgb(66, 184, 221); 
    color: white;
@@ -57,6 +80,16 @@ export default {
 }
 #app .pure-button.pure-button-secondary:hover {
   opacity: 1;
+}
+
+#app .dimmer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background:rgba(0,0,0,0.5);
 }
 
 html, body {

@@ -3,9 +3,10 @@
       <div class="more-header">
          {{poolDescription(selectedPool.url)}}<i @click="closePool" class="pool-close fas fa-times-circle"></i>
       </div>
-      <div class="more-results-content">
+      <div @click="contentClick" class="more-results-content">
          <div  v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  class="hits">
-             <template v-for="hit in selectedPool.hits">
+            <div class="summary"><b>{{selectedPool.total}} results for  </b> {{queryString()}}</div>
+            <template v-for="hit in selectedPool.hits">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
          </div>
@@ -34,10 +35,20 @@ export default {
       ...mapGetters({
          selectedPool: 'selectedPool',
          findPool: 'pools/find',
-         hasMoreHits: 'hasMoreHits'
+         hasMoreHits: 'hasMoreHits',
+         rawQueryString: 'query/string',
       }),
    },
    methods: {
+      queryString() {
+         return this.rawQueryString.replace(/\{|\}/g, "")
+      },
+      contentClick(event) {
+        event.stopPropagation() 
+      },
+      infiniteScrollEnabled() {
+         return (this.searching == false && this.hasMoreHits == true)
+      },
       loadMoreResults() {
          if (this.hasMoreHits) {
             this.$store.dispatch("moreResults")
@@ -65,7 +76,6 @@ export default {
    width: 100%;
    height: 100%;
    z-index: 1000;
-   background:rgba(0,0,0,0.6);
 }
 .more-results-content {
    position: fixed;
@@ -75,6 +85,9 @@ export default {
    z-index: 100;
    background: white;
    box-sizing: border-box;
+   border-left: 4px solid var(--color-primary-orange);
+   box-shadow: -2px 0px 10px #333;
+   border-radius: 10px 0 0 0;
 }
 @media only screen and (min-width: 768px) {
    .more-results-modal, .more-results-content, div.more-header {
@@ -96,6 +109,7 @@ div.more-header {
    padding: 5px 15px;
    text-align: left;
    z-index: 500;
+   border-radius: 10px 0 0 0;
 }
 .pool-close {
    position: absolute;
@@ -107,15 +121,22 @@ div.more-header {
 .pool-close:hover {
    opacity: 1;
 }
+.summary {
+   text-align: left;
+   padding: 5px 0px 5px 16px;
+   border-bottom: 1px solid #ccc;
+   background-color: #fafafa;
+}
 .hits {
    position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  padding-top: 40px;
-    box-sizing: border-box;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   overflow-y: scroll;
+   overflow-x: hidden;
+   padding-top: 35px;
+   box-sizing: border-box;
+   color: #555;
 }
 </style>

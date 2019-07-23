@@ -142,11 +142,13 @@ export default new Vuex.Store({
 
   actions: {
     moreResults(ctx) {
+      console.log("MORE RESULTS ACTION")
       ctx.commit('moreResults')
       ctx.dispatch("doPoolSearch")
     },
     
     doSearch({ state, commit, rootState, rootGetters }) {
+      console.log("DO SEWRACH ACTION")
       commit('setError', "")
       commit('setSearching', true)
       let req = {
