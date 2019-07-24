@@ -5,12 +5,16 @@ const auth = {
    state: {
       authToken: "",
       authorizing: false,
+      loggedInUser: ""
    },
 
    getters: {
       hasAuthToken: state => {
         return state.authToken.length > 0
       },
+      isLoggedIn: state => {
+         return state.loggedInUser != ""  
+      }
    },
 
    mutations: {

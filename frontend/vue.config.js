@@ -30,6 +30,11 @@ module.exports = {
         changeOrigin: true,
         logLevel: 'debug'
       },
+      '/authenticate/netbadge': {
+        target: process.env.V4_CONFIG, // or 'http://localhost:8095',
+        changeOrigin: true,
+        logLevel: 'debug'
+      },
     }
   },
   configureWebpack: {

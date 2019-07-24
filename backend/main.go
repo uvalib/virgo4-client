@@ -22,6 +22,7 @@ const version = "0.2.0"
 var searchAPI string
 var showDebug bool
 var showWarn bool
+var devAuthUser string
 
 // getVersion reports the version of the serivce
 func getVersion(c *gin.Context) {
@@ -86,6 +87,7 @@ func main() {
 	flag.BoolVar(&showDebug, "debug", false, "Show debug info")
 	flag.BoolVar(&showWarn, "warn", false, "Show warning info")
 	flag.StringVar(&searchAPI, "search", "", "Search API URL")
+	flag.StringVar(&devAuthUser, "devuser", "", "Authorized computing id for dev")
 	flag.Parse()
 	if searchAPI == "" {
 		log.Fatal("search param is required")
@@ -106,6 +108,11 @@ func main() {
 	router.GET("/healthcheck", healthCheck)
 	router.GET("/config", getConfig)
 	router.POST("/authorize", authorize)
+	auth := router.Group("/authenticate")
+	{
+		auth.GET("/netbadge", netbadgeAuthentication)
+		auth.GET("/public", publicAuthentication)
+	}
 
 	// Note: in dev mode, this is never actually used. The front end is served
 	// by yarn and it proxies all requests to the API to the routes above

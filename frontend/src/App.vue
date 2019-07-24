@@ -11,6 +11,7 @@
         <MoreResultsModal v-if="isPoolSelected"/>
       </transition>
       <VirgoHeader/>
+      <MenuBar/>
       <router-view/>
       <LibraryFooter/>
    </div>
@@ -19,6 +20,7 @@
 <script>
 import LibraryFooter from "@/components/LibraryFooter"
 import VirgoHeader from "@/components/VirgoHeader"
+import MenuBar from "@/components/MenuBar"
 import FatalError from "@/components/FatalError"
 import AuthorizePanel from "@/components/AuthorizePanel"
 import MoreResultsModal from "@/components/MoreResultsModal"
@@ -30,7 +32,8 @@ export default {
       LibraryFooter,
       FatalError,
       AuthorizePanel,
-      MoreResultsModal
+      MoreResultsModal,
+      MenuBar
    },
    computed: {
       ...mapState({
@@ -52,6 +55,7 @@ export default {
    --color-primary-orange: #e57200;
    --color-link: #2979ff;
    --color-primary-blue: #0078e7;
+   --color-secondary-blue: #002359;
    --color-primary-text: #555;
    --color-dark-blue: rgb(0, 47, 108);
    --color-hover-highight: #f5f5ff;
@@ -95,7 +99,6 @@ export default {
 html, body {
    margin: 0;
    padding: 0;
-   background: var(--color-dark-blue);
 }
 
 i.fas.fa-times-circle.close {
