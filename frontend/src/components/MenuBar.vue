@@ -1,8 +1,8 @@
 <template>
    <div class="menu">
-      <template v-if="isLoggedIn">
+      <template v-if="isSignedIn">
          <span @click="accountClick" class="menu-item">
-            <i class="fas fa-user"></i>&nbsp;My Account ({{loggedInUser}})
+            <i class="fas fa-user"></i>&nbsp;My Account ({{signedInUser}})
          </span>
          <span class="sep">|</span>
          <span @click="signOut" class="menu-item">Sign out</span>
@@ -25,15 +25,15 @@ import { mapGetters } from "vuex"
 export default {
    computed: {
       ...mapState({
-         loggedInUser: state => state.loggedInUser,
+         signedInUser: state => state.auth.signedInUser,
       }),
       ...mapGetters({
-        isLoggedIn: 'auth/isLoggedIn',
+        isSignedIn: 'auth/isSignedIn',
       }),
    },
    methods: {
       netbadgeLogin() {
-
+         this.$store.dispatch("auth/netbadge")
       },
       publicLogin() {
 
@@ -42,7 +42,7 @@ export default {
 
       },
       signOut() {
-
+         this.$store.dispatch("auth/signout")
       }
    }
 }

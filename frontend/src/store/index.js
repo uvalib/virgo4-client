@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import errorPlugin from './plugins/errors'
+import messaging from './plugins/messaging'
 import versionChecker from './plugins/version'
 import diagnostics from './modules/diagnostics'
 import pools from './modules/pools'
@@ -224,5 +224,5 @@ export default new Vuex.Store({
     query: query,
   },
 
-  plugins: [errorPlugin,versionChecker]
+  plugins: [messaging, versionChecker]
 })

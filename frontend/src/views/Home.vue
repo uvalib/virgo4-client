@@ -25,8 +25,17 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
-      <transition name="fade">
+      <transition name="message-transition"
+          enter-active-class="animated faster fadeIn"
+          leave-active-class="animated faster fadeOut">
         <p v-if="error" class="error">{{ error }}</p>
+      </transition>
+      <transition name="message-transition"
+            enter-active-class="animated faster fadeIn"
+            leave-active-class="animated faster fadeOut">
+        <div class="signin-message" v-if="signInMessage">
+          {{signInMessage}}
+        </div>
       </transition>
       <SearchResults v-if="hasResults"/>
    </div>
@@ -49,7 +58,6 @@ export default {
    },
    data: function() {
       return {
-        mode: "basic"
       };
    },
    computed: {
@@ -59,7 +67,8 @@ export default {
          searching: state => state.searching,
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
-         searchMode: state => state.searchMode
+         searchMode: state => state.searchMode,
+         signInMessage: state => state.auth.signInMessage
       }),
       ...mapGetters({
         hasResults: 'hasResults',
@@ -158,5 +167,14 @@ p.fatal, p.error {
 .debug.pure-button.pure-button-primary {
   font-size: 0.75em;
   padding: 2px 12px;
+}
+.signin-message {
+  width: 50%;
+  margin: 5px auto;
+  background: var(--color-primary-orange);
+  color: white;
+  padding: 2px;
+  border-radius: 5px;
+  font-weight: bold;
 }
 </style>

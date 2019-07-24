@@ -99,6 +99,7 @@ export default {
 html, body {
    margin: 0;
    padding: 0;
+   background-color: var(--color-dark-blue);
 }
 
 i.fas.fa-times-circle.close {

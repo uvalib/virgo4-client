@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Plugin to watch for version changes and reload
-const versionCheker = (_store) => {
+const versionChecker = (_store) => {
    var currBuild = "unknown"
    axios.get("/version").then((response) => {
       currBuild = response.data.build
@@ -16,4 +16,4 @@ const versionCheker = (_store) => {
     })
  }
 
- export default versionCheker
+ export default versionChecker
