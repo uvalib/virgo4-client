@@ -33,6 +33,8 @@ const auth = {
          state.authToken = user.token
          state.sessionType = user.type
          state.signInMessage = `You are now signed in as '${state.signedInUser}'`
+         Vue.cookies.remove("v4_auth")
+         Vue.cookies.remove("v4_auth_user")
       },
       clearSignInMessage(state) {
          state.signInMessage = ""
