@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import SignedOut from './views/SignedOut.vue'
+import Forbidden from './views/Forbidden.vue'
 import store from './store'
 
 Vue.use(Router)
@@ -36,6 +37,11 @@ const router = new Router({
       name: 'signedout',
       component: SignedOut
     },
+    {
+      path: '/forbidden',
+      name: 'forbidden',
+      component: Forbidden
+    },
   ],
   scrollBehavior(/*to, from, savedPosition*/) {
     // each new 'page' will scroll to the top of the screen
@@ -46,7 +52,7 @@ const router = new Router({
 // This is called before every URL in the SPA is hit. Use
 // it to be sure an authentication token is present
 router.beforeEach((to, _from, next) => {
-  if (to.name == "signedin" || to.name == "signedout") {
+  if (to.name == "signedin" || to.name == "signedout" || to.name == "forbidden") {
     // no need to request auth with these pages
     next()
     return
