@@ -49,8 +49,8 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
-import PoolSetup from "@/components/PoolSetup"
-import SearchTips from "@/components/SearchTips"
+import PoolSetup from "@/components/popovers/PoolSetup"
+import SearchTips from "@/components/popovers/SearchTips"
 import DebugControls from "@/components/diagnostics/DebugControls"
 import AdvancedSearch from "@/components/AdvancedSearch"
 export default {

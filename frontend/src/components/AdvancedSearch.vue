@@ -41,8 +41,8 @@
 import { mapFields } from 'vuex-map-fields'
 import DateSearch from "@/components/DateSearch"
 import SearchOpPicker from "@/components/SearchOpPicker"
-import PoolSetup from "@/components/PoolSetup"
-import SearchTips from "@/components/SearchTips"
+import PoolSetup from "@/components/popovers/PoolSetup"
+import SearchTips from "@/components/popovers/SearchTips"
 export default {
    components: {
      SearchOpPicker, DateSearch, PoolSetup, SearchTips
