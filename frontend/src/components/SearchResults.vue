@@ -3,6 +3,7 @@
       <h3>Showing results for: <i>{{queryString}}</i></h3>
       <div class="toolbar">
          <p class="summary">{{searchSummary}}</p>
+         <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
          <div v-if="total>0" class="pool-buttons">
             <div v-bind:class="{showing: r.show}" @click="toggleVisibility(idx)" class="pool pure-button" v-for="(r,idx) in results" :key="idx">
                {{poolName(r.url)}} <span class="total">({{r.total}})</span>
@@ -57,12 +58,16 @@ export default {
          total: state=>state.total,
          searchSummary: state => state.searchSummary,
          results: state=>state.results,
+         searchMode: state=>state.searchMode
       }),
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
    },
    methods: {
+      refineClicked() {
+         this.$store.commit("setAdvancedSearch")
+      },
       selectPool(resultIdx) {
          this.$store.commit("selectPoolResults", resultIdx)
       },
@@ -96,9 +101,9 @@ span.total {
    font-weight: 100;
 }
 .pool.pure-button {
-   margin: 2px 4px;
-   padding: 2px 25px;
-   border-radius: 15px;
+   margin: 4px;
+   padding: 2px 20px;
+   border-radius:    5px;
    font-size: 0.85em;
    font-weight: bold;
    color: #666;
@@ -185,5 +190,10 @@ div.toolbar {
 }
 div.pools {
    text-align: left;
+}
+.refine {
+   display: block;
+   text-align: left;
+   font-size: 0.9em;
 }
 </style>

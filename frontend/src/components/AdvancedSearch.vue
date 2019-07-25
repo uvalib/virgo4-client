@@ -30,7 +30,7 @@
          <DateSearch/>
       </table>
       <div class="controls">
-         <PoolsList/>
+         <PoolSetup/>
          <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
          <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
       </div>
@@ -41,11 +41,11 @@
 import { mapFields } from 'vuex-map-fields'
 import DateSearch from "@/components/DateSearch"
 import SearchOpPicker from "@/components/SearchOpPicker"
-import PoolsList from "@/components/PoolsList"
+import PoolSetup from "@/components/PoolSetup"
 import SearchTips from "@/components/SearchTips"
 export default {
    components: {
-     SearchOpPicker, DateSearch, PoolsList, SearchTips
+     SearchOpPicker, DateSearch, PoolSetup, SearchTips
    },
    computed: {
       ...mapFields('query',[
@@ -88,10 +88,12 @@ export default {
   text-decoration: underline;
   cursor: pointer;
 }
+.advanced-panel table td {
+  padding: 2px 5px !important;
+}
 .advanced-panel table td.label {
   font-weight: 500;
   text-align: right;
-  padding-right: 10px;
   width:1%;
   white-space:nowrap;
   color: #777;
@@ -99,14 +101,15 @@ export default {
 .advanced-panel table td.op{
   width:1%;
   white-space:nowrap;
-  padding: 0 0 0 10px;
   color: #777;
 }
 .advanced-panel table {
   width: 100%;
+  font-size: 0.9em;
 }
 .advanced-panel table input {
   width: 100%;
+  box-sizing: border-box;
 }
 .advanced-panel table td {
   padding: 0.75vw 0;

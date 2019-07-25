@@ -43,11 +43,12 @@ export default {
 <style scoped>
 td.dates {
    text-align: left;
+   padding: 2px 5px;
 }
 td.label {
   font-weight: 500;
   text-align: right;
-  padding-right: 10px;
+  padding: 2px 5px;
   width:1%;
   white-space:nowrap;
   color: #777;
@@ -58,7 +59,7 @@ td.label {
 table td.op{
   width:1%;
   white-space:nowrap;
-  padding: 0 0 0 10px;
+   padding: 2px 5px;
   color: #777;
 }
 .date-sep {

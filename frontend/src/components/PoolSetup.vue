@@ -1,19 +1,30 @@
 <template>
    <v-popover style="display:inline-block;">
-      <span @click="getPools" class="pure-button pure-button-secondary">Pool Information</span>
+      <span @click="getPools" class="pure-button pure-button-secondary">Search Pool Setup</span>
       <div class="pools-container" slot="popover">
          <h4>
-            Available Search Pools
+            Search Pool Setup
             <i v-close-popover class="action close fas fa-times-circle"></i>
          </h4>
          <div class="pools-list">
-            <div class="pool" v-for="p in pools" :key="p.id">
-               <i @click="toggleTargetPool(p.url)" v-if="isTargetPool(p.url)" class="fas fa-star"></i>
-               <i @click="toggleTargetPool(p.url)" v-else class="far fa-star"></i>
-               <i @click="toggleExcludePool(p.url)" v-if="isPoolExcluded(p.url)" class="excluded fas fa-times-circle"></i>
-               <i @click="toggleExcludePool(p.url)" v-else class="selected fas fa-check-circle"></i>
-               <p class="pool-desc">{{p.description}}</p>
-            </div>
+            <table>
+               <tr>
+                  <th>Primary</th><th>Include</th><th>Name</th>
+               </tr>
+               <tr class="pool" v-for="p in pools" :key="p.id">
+                  <td class="centered">
+                     <i @click="toggleTargetPool(p.url)" v-if="isTargetPool(p.url)" class="fas fa-star"></i>
+                     <i @click="toggleTargetPool(p.url)" v-else class="far fa-star"></i>
+                  </td>
+                  <td class="centered">
+                     <i @click="toggleExcludePool(p.url)" v-if="isPoolExcluded(p.url)" class="excluded fas fa-times-circle"></i>
+                     <i @click="toggleExcludePool(p.url)" v-else class="selected fas fa-check-circle"></i>
+                  </td>
+                  <td>
+                     <p class="pool-desc">{{p.description}}</p>
+                  </td>
+               </tr>
+            </table>
          </div>
          <div class="toolbar">
             <span @click="includeAllClicked" class="pure-button pure-button-primary">Include All</span>
@@ -58,6 +69,16 @@ export default {
 </script>
 
 <style scoped>
+i.fas.fa-times-circle.close {
+   opacity: 0.8;
+   font-size: 1.1em;
+   float:right;
+   margin-right: 8px;
+}
+i.fas.fa-times-circle.close:hover {
+   opacity: 1;
+   cursor: pointer;
+}
 i.far.fa-star {
    opacity: 0.5;
    margin-right: 10px;
@@ -112,22 +133,36 @@ p.pool-desc {
    font-weight: 100;
    display: inline-block;
    padding-bottom: 5px;
-   border-radius: 10px;
+   border-radius: 5px;
 }
 .pools-container h4 {
-   padding: 5px 0;
+   padding: 8px 0 6px 0;
    margin: 0;
    text-align: center;
    background: var(--color-primary-orange);
    color: white;
-   font-weight: 100;
-   border-radius: 10px 10px 0 0;
+   font-weight: normal;
+   border-radius: 5px 5px 0 0;
 }
 .pools-list {
-   margin: 5px 0 5px 0;
-   font-size: 0.9em;
-   max-height: 350px;
+   margin: 10px 15px;
+   max-height: 400px;
    overflow-y: scroll;
+   color: #444;
+   font-weight: 100;
+}
+td {
+   padding: 4px 0px;
+}
+td.centered {
+   text-align: center;
+}
+th {
+   font-weight: 500;
+   text-align: left;
+   padding: 0 10px 4px 0;
+   border-bottom: 1px solid #ccc;
+   color: #888;
 }
 .pool {
    text-align: left;

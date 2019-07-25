@@ -16,11 +16,14 @@
               v-model="keyword"
               autocomplete="off"
               type="text"
+              placeholder="Search Virgo for books, articles, digital materials and more"
           >
           <div class="controls">
-            <PoolsList/>
-            <span class="pure-button pure-button-primary" @click="advancedClicked">Advanced</span>
+            <PoolSetup/>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+            <span class="text-button advanced-link" @click="advancedClicked">
+              Advanced Options&nbsp;<i class="fas fa-search-plus"></i>
+            </span>
           </div>
         </template>
         <AdvancedSearch v-else/>
@@ -46,19 +49,15 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
-import PoolsList from "@/components/PoolsList"
+import PoolSetup from "@/components/PoolSetup"
 import SearchTips from "@/components/SearchTips"
 import DebugControls from "@/components/diagnostics/DebugControls"
 import AdvancedSearch from "@/components/AdvancedSearch"
 export default {
    name: "home",
    components: {
-     SearchResults, PoolsList,
+     SearchResults, PoolSetup,
      SearchTips, DebugControls, AdvancedSearch
-   },
-   data: function() {
-      return {
-      };
    },
    computed: {
       ...mapState({
@@ -176,5 +175,10 @@ p.fatal, p.error {
   padding: 2px;
   border-radius: 5px;
   font-weight: bold;
+}
+.text-button.advanced-link {
+  margin-top: 15px;
+  font-size: 1.1em;
+  display: block;
 }
 </style>

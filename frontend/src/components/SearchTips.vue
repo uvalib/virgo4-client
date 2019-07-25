@@ -1,7 +1,7 @@
 <template>
    <p class="tips">
       <v-popover placement="top-end">
-         <span class="trigger">Search Tips&nbsp;<i class="fas fa-info-circle"></i></span>
+         <span class="text-button trigger">Search Tips&nbsp;<i class="fas fa-info-circle"></i></span>
          <div class="tips-container" slot="popover">
             <h4>
                Search Tips
@@ -36,6 +36,16 @@ export default {
 </script>
 
 <style scoped>
+i.fas.fa-times-circle.close {
+   opacity: 0.8;
+   font-size: 1.1em;
+   float:right;
+   margin-right: 8px;
+}
+i.fas.fa-times-circle.close:hover {
+   opacity: 1;
+   cursor: pointer;
+}
 .tips-container {
    background: white;
    box-shadow: 2px 2px 10px #ccc;
@@ -44,18 +54,17 @@ export default {
    font-weight: 100;
    display: inline-block;
    padding-bottom: 5px;
-   border-radius: 10px;
+   border-radius: 5px;
 }
 .tips-container h4 {
-   padding: 5px 40px;
+   padding: 8px 0 6px 0;
    margin: 0;
    text-align: center;
    background: var(--color-primary-orange);
    color: white;
    position: relative;
-   font-weight: 100;
-   font-size: 0.9em;
-   border-radius: 10px 10px 0 0;
+   font-weight: normal;
+   border-radius: 5px 5px 0 0;
 }
 div.tips {
    margin: 0;
@@ -84,18 +93,12 @@ span.trigger:hover {
    opacity: 1;
 }
 p.tips {
-  font-weight: bold;
-  color:var(--color-link);
-  cursor:pointer;
   margin:20px 0;
-  opacity: 0.8;
   font-size: 12px;
   position: absolute;
   right:0;
   bottom:5px;
   margin:0;
 }
-p.tips:hover {
-  opacity:1;
-}
+
 </style>
