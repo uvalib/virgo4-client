@@ -22,7 +22,7 @@
             <PoolSetup/>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
             <span class="text-button advanced-link" @click="advancedClicked">
-              Advanced Options&nbsp;<i class="fas fa-search-plus"></i>
+              Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
             </span>
           </div>
         </template>
