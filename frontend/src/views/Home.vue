@@ -3,67 +3,44 @@
       <DebugControls v-if="hasResults" />
       <div v-show="searching" class="searching-overlay">
         <div class="searching-box">
-          <h4>Searching...</h4>
+          <h3>Searching...</h3>
           <img src="../assets/spinner2.gif">
         </div>
       </div>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
-           <h4>Basic Search</h4>
+           <h4>Basic Search<SearchTips/></h4>
           <input
               @keyup.enter="searchClicked"
               id="keyword"
               v-model="keyword"
               autocomplete="off"
               type="text"
+              placeholder="Search Virgo for books, articles, digital materials and more"
           >
           <div class="controls">
-            <PoolsList/>
-            <span class="pure-button pure-button-primary" @click="advancedClicked">Advanced</span>
+            <PoolSetup/>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-            <p class="tips"><SearchTips/></p>
+            <span class="text-button advanced-link" @click="advancedClicked">
+              Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
+            </span>
           </div>
         </template>
-        <div v-else class="advanced-panel">
-          <h4>Advanced Search</h4>
-          <table>
-             <tr>
-              <td class="label">Identifier</td>
-              <td><input @keyup.enter="searchClicked" v-model="identifier" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="identifierOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Title</td>
-              <td><input @keyup.enter="searchClicked" v-model="title" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="titleOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Author</td>
-              <td><input @keyup.enter="searchClicked" v-model="author" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="authorOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Subject</td>
-              <td><input @keyup.enter="searchClicked" v-model="subject" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
-            </tr>
-            <tr>
-              <td class="label">Keyword</td>
-              <td><input @keyup.enter="searchClicked" v-model="keyword" type="text"></td>
-              <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
-            </tr>
-          </table>
-          <div class="controls">
-            <PoolsList/>
-            <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
-            <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-            <p class="tips"><SearchTips/></p>
-          </div>
-        </div>
+        <AdvancedSearch v-else/>
       </div>
-      <h3 v-bind:class="{invisible: error.length==0}" class="error">{{ error }}</h3>
+      <transition name="message-transition"
+          enter-active-class="animated faster fadeIn"
+          leave-active-class="animated faster fadeOut">
+        <p v-if="error" class="error">{{ error }}</p>
+      </transition>
+      <transition name="message-transition"
+            enter-active-class="animated faster fadeIn"
+            leave-active-class="animated faster fadeOut">
+        <div class="signin-message" v-if="signInMessage">
+          {{signInMessage}}
+        </div>
+      </transition>
       <SearchResults v-if="hasResults"/>
-      <DebugControls v-if="hasResults" />
    </div>
 </template>
 
@@ -72,49 +49,35 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
-import PoolsList from "@/components/PoolsList"
-import SearchOpPicker from "@/components/SearchOpPicker"
-import SearchTips from "@/components/SearchTips"
-import DebugControls from "@/components/DebugControls"
+import PoolSetup from "@/components/popovers/PoolSetup"
+import SearchTips from "@/components/popovers/SearchTips"
+import DebugControls from "@/components/diagnostics/DebugControls"
+import AdvancedSearch from "@/components/AdvancedSearch"
 export default {
    name: "home",
    components: {
-     SearchResults, PoolsList, SearchOpPicker,
-     SearchTips, DebugControls
-   },
-   data: function() {
-      return {
-        mode: "basic"
-      };
+     SearchResults, PoolSetup,
+     SearchTips, DebugControls, AdvancedSearch
    },
    computed: {
-      basicSearch() {
-        return this.mode == "basic"
-      },
       ...mapState({
-         searchAPI: state => state.searchAPI,
          fatal: state => state.fatal,
          error: state => state.error,
-         showPools: state => state.showPools,
          searching: state => state.searching,
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
+         searchMode: state => state.searchMode,
+         signInMessage: state => state.auth.signInMessage
       }),
       ...mapGetters({
         hasResults: 'hasResults',
       }),
       ...mapFields('query',[
-        'identifier',
         'keyword',
-        'author',
-        'title',
-        'subject',
-        'identifierOp',
-        'keywordOp',
-        'authorOp',
-        'titleOp',
-        'subjectOp',
       ]),
+      basicSearch() {
+        return this.searchMode == "basic"
+      },
       debugLabel() {
         if (this.showDebug) {
           return "Hide Debug"
@@ -136,30 +99,15 @@ export default {
         this.$store.dispatch("doSearch")
       },
       advancedClicked() {
-        this.mode = "advanced"
+        this.$store.commit("setAdvancedSearch")
       },
-      cancelClicked() {
-        this.$store.commit("query/clear")
-        this.mode = "basic"
-      }
    }
 };
 </script>
 
 <style scoped>
-h4 {
-  color: var(--color-primary-orange);
-  margin: 8px 0;
-  padding-bottom: 5px;
-  font-weight: bold;
-  font-size: 22px;
-}
-.pure-button.pure-button-cancel {
-  background: rgb(202, 60, 60);
-  color: white;
-}
 .searching-overlay {
-  position: absolute;
+  position: fixed;
   left: 0;
   right: 0;
   top: 5vw;
@@ -178,37 +126,6 @@ div.searching-box h4 {
   color: var(--color-primary-text);
   border: none;
 }
-.advanced-panel table td.label {
-  font-weight: 500;
-  text-align: right;
-  padding-right: 10px;
-  width:1%;
-  white-space:nowrap;
-  color: #777;
-}
-.advanced-panel table td.op{
-  width:1%;
-  white-space:nowrap;
-  padding: 0 0 0 10px;
-  color: #777;
-}
-.advanced-panel table {
-  width: 100%;
-}
-.advanced-panel table input {
-  width: 100%;
-}
-.advanced-panel table td {
-  padding: 0.75vw 0;
-}
-span.pure-button {
-  margin: 0 0 0 10px;
-  border-radius: 5px;
-  opacity: 0.8;
-}
-span.pure-button:hover {
-  opacity: 1;
-}
 .controls {
   font-size: 0.85em;
   font-weight: bold;
@@ -216,37 +133,23 @@ span.pure-button:hover {
   padding-top: 10px;
   position: relative;
 }
-.advanced {
-  margin-left: 5px;
-  font-size: 0.9em;
-  font-weight: bold;
-  color: var(--color-link)
-}
-.advanced:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
 .home {
    min-height: 400px;
    position: relative;
 }
-p.fatal, h3.error {
+p.fatal, p.error {
   font-weight: bold;
   margin: 0;
   color: var(--color-error);
-  transition: opacity .5s ease .25s;
   opacity: 1;
   visibility: visible;
-}
-h3.error.invisible {
-  opacity:0;
-  visibility: hidden;
 }
 .search-panel {
   margin: 0 auto 0 auto;
   text-align: center;
   max-width: 800px;
-  padding: 10px 2vw;
+  padding: 10px 2vw 30px 2vw;
+  font-size: 0.95em;
 }
 #keyword {
   margin: 0;
@@ -260,18 +163,22 @@ h3.error.invisible {
   outline: none;
   border: 1px solid #ccc;
 }
-p.tips {
-  font-weight: bold;
-  color:var(--color-link);
-  cursor:pointer;
-  margin:20px 0;
-  opacity: 0.8;
-}
-p.tips:hover {
-  opacity:1;
-}
 .debug.pure-button.pure-button-primary {
   font-size: 0.75em;
   padding: 2px 12px;
+}
+.signin-message {
+  width: 50%;
+  margin: 5px auto;
+  background: var(--color-primary-orange);
+  color: white;
+  padding: 2px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+.text-button.advanced-link {
+  margin-top: 15px;
+  font-size: 1.1em;
+  display: block;
 }
 </style>

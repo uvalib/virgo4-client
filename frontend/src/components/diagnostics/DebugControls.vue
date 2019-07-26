@@ -1,12 +1,13 @@
 <template>
    <div class="debug-options">
       <span v-if="debugEnabled" @click="toggleDebug" class="debug pure-button pure-button-primary">{{debugLabel}}</span>
-      <span v-if="warnEnabled" @click="toggleWarn" class="debug pure-button pure-button-primary">{{warnLabel}}</span>
+      <span v-if="warnEnabled && hasWarnings" @click="toggleWarn" class="debug pure-button pure-button-primary">{{warnLabel}}</span>
    </div>
 </template>
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    computed: {
       ...mapState({
@@ -14,6 +15,9 @@ export default {
          warnEnabled: state => state.diagnostics.warnEnabled,
          showDebug: state => state.diagnostics.showDebug,
          showWarn: state => state.diagnostics.showWarn,
+      }),
+      ...mapGetters({
+         hasWarnings: 'diagnostics/hasWarnings',
       }),
       debugLabel() {
         if (this.showDebug) {

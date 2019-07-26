@@ -1,75 +1,63 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import messaging from './plugins/messaging'
+import versionChecker from './plugins/version'
 import diagnostics from './modules/diagnostics'
-import preferences from './modules/preferences'
+import pools from './modules/pools'
+import auth from './modules/auth'
 import query from './modules/query'
 Vue.use(Vuex)
-
-// Plugin to listen for error messages being set. After a delay, clear them
-const errorPlugin = store => {
-  store.subscribe((mutation) => {
-    if (mutation.type === "setError") {
-      if (mutation.payload != null && mutation.payload != "") {
-        setTimeout(() => { store.commit('setError', "") }, 10000)
-      }
-    }
-  })
-}
 
 export default new Vuex.Store({
   state: {
     searchAPI: "",
-    pools: [],
+    searchMode: "basic",
     fatal: "",
     error: "",
     searching: false,
-    searchSummary: "",
-    currPoolIdx: -1,
-    results: [],
-    total: -1,
     pageSize: 25,
-    authToken: "",
-    authorizing: false
+    results: [],
+    visibleResults: [],
+    explorePoolIdx: -1,
+    total: -1,
   },
 
   getters: {
-    hasAuthToken: state => {
-      return state.authToken.length > 0
-    },
     hasResults: state => {
       return state.total >= 0
     },
-    currPool: state => {
-      if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length - 1) {
-        return { url: "", page: 0, total: 0, name: "", hits: [] }
-      } else {
-        let info = state.results[state.currPoolIdx]
-        return info
-      }
+    visibleResults: state => {
+      let out = [] 
+      state.visibleResults.forEach(function (idx) {
+        out.push(state.results[idx])
+      })
+      return out
     },
-    getPagination: state => {
-      if (state.currPoolIdx == -1 || state.currPoolIdx > state.results.length - 1) {
-        return { start: 0, rows: state.pageSize }
-      } else {
-        let info = state.results[state.currPoolIdx]
-        return { start: info.page * state.pageSize, rows: state.pageSize }
+    selectedPool: state => {
+      if (state.explorePoolIdx === -1 ) {
+        return {url: "none", total: 0}
       }
+      return state.results[state.explorePoolIdx]
     },
+    isPoolSelected: state => {
+      return state.explorePoolIdx > -1
+    },
+    hasMoreHits: state => {
+      if (state.explorePoolIdx === -1 ) {
+        return false
+      }
+      let tgtPool = state.results[state.explorePoolIdx]
+      return tgtPool.total > tgtPool.hits.length
+    }
   },
 
   mutations: {
-    setAuthToken(state, token) {
-      state.authToken = token
+    setAdvancedSearch(state) {
+      state.searchMode = "advanced"
     },
-    setAuthorizing(state, auth) {
-      state.authorizing = auth
-    },
-    setPools(state, data) {
-      state.pools = data
-      if (state.pools.length == 0) {
-        state.fatal = "No search pools configured"
-      }
+    setBasicSearch(state) {
+      state.searchMode = "basic"
     },
     setFatal(state, err) {
       state.fatal = err
@@ -77,7 +65,6 @@ export default new Vuex.Store({
     setError(state, error) {
       // clear any prior results
       state.total = -1
-      state.currPoolIdx = -1
       state.results = []
       if (error == null) {
         error = ""
@@ -88,7 +75,7 @@ export default new Vuex.Store({
         state.error = error.response.data
       } else if (error.request) {
         // The request was made but no response was received
-        state.error = "Seearch is non-responsive"
+        state.error = "Search is non-responsive"
       } else  if (error.message ) {
         // Something happened in setting up the request that triggered an Error
         state.error = error.message
@@ -103,99 +90,80 @@ export default new Vuex.Store({
     setSearching(state, flag) {
       state.searching = flag
     },
-    switchResultsPool(state, idx) {
-      state.currPoolIdx = idx
+    selectPoolResults(state, idx) {
+      state.explorePoolIdx = idx
     },
-    setPoolSearchResults(state, results) {
-      // These results are from a single pool; generally a call to get next page
-      let info = state.results[state.currPoolIdx]
-      info.hits = results.record_list
+    closePoolResults(state) {
+      state.explorePoolIdx = -1
+    },
+    toggleResultVisibility(state, poolResultsIdx) {
+      // NOTES: the result itself is tagged with show true/false for ease of detecting
+      // which results are showing. A separate visibleResults array tracks the order 
+      // that pools were selected to be seen.
+      state.results[poolResultsIdx]["show"] = !state.results[poolResultsIdx]["show"]
+      let visibleIdx = state.visibleResults.indexOf(poolResultsIdx)
+      if (visibleIdx == -1) {
+        state.visibleResults.push(poolResultsIdx)
+      } else {
+        state.visibleResults.splice(visibleIdx,1)
+      }
+    },
+    addPoolSearchResults(state, results) {
+      let info = state.results[state.explorePoolIdx]
+      info.hits = info.hits.concat(results.record_list)
     },
     setSearchResults(state, results) {
-      // this is called from top level search; resets results from all pools
-      let poolHitCnt = 0
+      // // this is called from top level search; resets results from all pools
       state.total = -1
-      state.currPoolIdx = -1
       state.results = []
+      state.visibleResults = []
 
       // Push all results into the results structure. Reset paging for each
       results.pool_results.forEach(function (pr) {
         if (pr.record_list) {
-          state.results.push({
-            url: pr.service_url,
-            name: poolNameFromURL(pr.service_url, state.pools),
-            total: pr.pagination.total,
-            hits: pr.record_list,
-            page: 0
-          })
-          poolHitCnt++
+          let result = { url: pr.service_url, total: pr.pagination.total,
+            hits: pr.record_list, page: 0, show: false }
+          state.results.push(result)
+          if (pr.confidence != "low" && state.visibleResults.length < 3) {
+            result["show"] = true
+            state.visibleResults.push(state.results.length-1)
+          }
         } else {
           state.results.push({
             url: pr.service_url,
-            name: poolNameFromURL(pr.service_url, state.pools),
-            total: 0, hits: [], page: 0
-          })
+            total: 0, hits: [], page: 0, show: false })
         }
       })
-
-      state.currPoolIdx = 0
-      state.searchSummary = results.pools_searched + " pools searched in " +
-        results.total_time_ms + "ms. " + results.total_hits + " hits in " + poolHitCnt + " pools."
+      if (state.visibleResults.length == 0) {
+        state.results[0]["show"] = true
+        state.visibleResults.push(0)
+      }
+      state.searchSummary = results.pools.length + " pools searched in " +
+        results.total_time_ms + "ms. " + results.total_hits + " total hits."
       state.total = results.total_hits
     },
-    gotoFirstPage(state) {
-      state.results[state.currPoolIdx].page = 0
-    },
-    gotoLastPage(state) {
-      let info = state.results[state.currPoolIdx]
-      info.page = Math.floor(info.total / state.pageSize)
-      state.results[state.currPoolURL] = info
-    },
-    nextPage(state) {
-      state.results[state.currPoolIdx].page++
-    },
-    prevPage(state) {
-      state.results[state.currPoolIdx].page--
+    moreResults(state) {
+      state.results[state.explorePoolIdx].page++
     },
   },
 
   actions: {
-    getAuthToken(ctx) {
-      ctx.commit('setAuthorizing', true)
-      axios.post("/authorize").then((response) => {
-        ctx.commit('setAuthToken', response.data)
-        ctx.commit('setAuthorizing', false)
-      }).catch((error) => {
-        ctx.commit('setAuthToken', '')
-        ctx.commit('setFatal', "Authorization failed" + error.response.data)
-        ctx.commit('setAuthorizing', false)
-      })
-    },
-    firstPage(ctx) {
-      ctx.commit('gotoFirstPage')
+    moreResults(ctx) {
+      console.log("MORE RESULTS ACTION")
+      ctx.commit('moreResults')
       ctx.dispatch("doPoolSearch")
     },
-    prevPage(ctx) {
-      ctx.commit('prevPage')
-      ctx.dispatch("doPoolSearch")
-    },
-    nextPage(ctx) {
-      ctx.commit('nextPage')
-      ctx.dispatch("doPoolSearch")
-    },
-    lastPage(ctx) {
-      ctx.commit('gotoLastPage')
-      ctx.dispatch("doPoolSearch")
-    },
+    
     doSearch({ state, commit, rootState, rootGetters }) {
+      console.log("DO SEWRACH ACTION")
       commit('setError', "")
       commit('setSearching', true)
       let req = {
         query: rootGetters['query/string'],
         pagination: { start: 0, rows: state.pageSize },
         preferences: {
-          target_pool: rootState.preferences.targetPoolURL,
-          exclude_pool: rootState.preferences.excludePoolURLs,
+          target_pool: rootState.pools.targetPoolURL,
+          exclude_pool: rootState.pools.excludePoolURLs,
         }
       }
       if (req.query.length == 0) {
@@ -204,9 +172,10 @@ export default new Vuex.Store({
         return
       }
       let url = state.searchAPI + "/api/search?debug=1&intuit=1"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
         commit('setSearchResults', response.data)
+        commit('pools/setPools', response.data.pools)
         commit('diagnostics/setSearchDiagnostics', response.data)
         commit('setSearching', false)
       }).catch((error) => {
@@ -216,17 +185,20 @@ export default new Vuex.Store({
     },
 
     doPoolSearch({ state, commit, _rootState, rootGetters }) {
-      //commit('setError', "")
       commit('setSearching', true)
+      let tgtPage = 0
+      if (state.explorePoolIdx > -1) {
+        tgtPage = state.results[state.explorePoolIdx].page
+      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: rootGetters.getPagination
+        pagination: { start: tgtPage * state.pageSize, rows: state.pageSize }
       }
-      let url = rootGetters.currPool.url + "/api/search?debug=1"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
+      let url = rootGetters.selectedPool.url + "/api/search?debug=1"
+      axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
-        commit('setPoolSearchResults', response.data)
-        let diagPayload = { currPoolIdx: state.currPoolIdx, debug: response.data.debug, warnings: response.data.warnings }
+        commit('addPoolSearchResults', response.data)
+        let diagPayload = { currPoolIdx: state.explorePoolIdx, debug: response.data.debug, warnings: response.data.warnings }
         commit('diagnostics/setPoolDiagnostics', diagPayload)
         commit('setSearching', false)
       }).catch((error) => {
@@ -234,39 +206,23 @@ export default new Vuex.Store({
         commit('setSearching', false)
       })
     },
+
     getConfig(ctx) {
       axios.get("/config").then((response) => {
         ctx.commit('setConfig', response.data)
         ctx.commit('diagnostics/setConfig', response.data)
-        ctx.dispatch('getPools')
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)
       })
-    },
-    getPools(ctx) {
-      let url = ctx.state.searchAPI + "/api/pools"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
-      axios.get(url).then((response) => {
-        ctx.commit('setPools', response.data)
-      }).catch((error) => {
-        ctx.commit('setFatal', "Unable to pools: " + error.response.data)
-      })
     }
   },
-  modules: {
-    diagnostics: diagnostics,
-    preferences: preferences,
-    query: query
-  },
-  plugins: [errorPlugin]
-})
 
-const poolNameFromURL = (url, pools) => {
-  let name = ""
-  pools.forEach(function (p) {
-    if (p.url == url) {
-      name = p.name
-    }
-  })
-  return name
-}
+  modules: {
+    auth: auth,
+    diagnostics: diagnostics,
+    pools: pools,
+    query: query,
+  },
+
+  plugins: [messaging, versionChecker]
+})

@@ -13,6 +13,10 @@ const query = {
       titleOp: "AND",
       subject: "",
       subjectOp: "AND",
+      date0: "",
+      date1: "",
+      dateRangeType: "EQUAL",
+      dateRangeOp: "AND",
    },
    getters: {
       getField,
@@ -58,6 +62,22 @@ const query = {
                orTerms.push("subject: {" + state.subject + "}")
             }
          }
+
+         if (state.date0 != "") {
+            let dateQ = ""
+            if (state.dateRangeType == "BEFORE" || state.dateRangeType == "AFTER" ) {
+               dateQ = state.dateRangeType + " " + state.date0
+            } else if (state.dateRangeType == "BETWEEN") {
+               dateQ = state.date0 + " TO "+ state.date1
+            } else {
+               dateQ = state.date0
+            }
+            if (state.dateRangeOp == "AND") {
+               andTerms.push("date: {" + dateQ + "}")
+            } else {
+               orTerms.push("date: {" + dateQ + "}" )
+            }
+         }
          let anded = andTerms.join(" AND ")
          let ored = orTerms.join(" OR ")
          if (anded.length > 0 && ored.length > 0) {
@@ -71,10 +91,20 @@ const query = {
    mutations: {
       updateField,
       clear(state) {
+         state.identifier = ""
+         state.identifierOp = "AND"
          state.keyword = ""
+         state.keywordOp = "AND"
          state.author = ""
+         state.authorOp = "AND"
          state.title = ""
+         state.titleOp = "AND"
          state.subject = ""
+         state.subjectOp = "AND"
+         state.date0 = ""
+         state.date1 = ""
+         state.dateRangeType = "EQUAL"
+         state.dateRangeOp = "AND"
       }
    }
 }

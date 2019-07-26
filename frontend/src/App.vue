@@ -2,7 +2,16 @@
    <div id="app">
       <FatalError v-if="fatal.length > 0"/>
       <AuthorizePanel v-if="authorizing"/>
+      <transition name="fade">
+        <div class="dimmer" v-if="isPoolSelected"></div>
+      </transition>
+      <transition name="more-transition"
+            enter-active-class="animated faster slideInRight"
+            leave-active-class="animated faster slideOutRight">
+        <MoreResultsModal v-if="isPoolSelected"/>
+      </transition>
       <VirgoHeader/>
+      <MenuBar/>
       <router-view/>
       <LibraryFooter/>
    </div>
@@ -11,21 +20,31 @@
 <script>
 import LibraryFooter from "@/components/LibraryFooter"
 import VirgoHeader from "@/components/VirgoHeader"
+import MenuBar from "@/components/MenuBar"
 import FatalError from "@/components/FatalError"
 import AuthorizePanel from "@/components/AuthorizePanel"
+import MoreResultsModal from "@/components/MoreResultsModal"
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    components: {
       VirgoHeader,
       LibraryFooter,
       FatalError,
-      AuthorizePanel
+      AuthorizePanel,
+      MoreResultsModal,
+      MenuBar
    },
    computed: {
       ...mapState({
          fatal: state => state.fatal,
-         authorizing: state => state.authorizing
+         authorizing: state => state.auth.authorizing
       }),
+      ...mapGetters({
+         isPoolSelected: 'isPoolSelected',
+      })
+   },
+   methods: {
    }
 };
 </script>
@@ -36,10 +55,25 @@ export default {
    --color-primary-orange: #e57200;
    --color-link: #2979ff;
    --color-primary-blue: #0078e7;
+   --color-secondary-blue: #002359;
    --color-primary-text: #555;
    --color-dark-blue: rgb(0, 47, 108);
    --color-hover-highight: #f5f5ff;
    --color-error: firebrick;
+}
+
+#app .fade-enter-active, .fade-leave-active {
+  transition: opacity .25s;
+}
+#app .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+#app .slide-enter-active, .slide-leave-active {
+  transition: all .5s ease;
+}
+#app .slide-enter, .slide-leave-to /* .slide-leave-active below version 2.1.8 */ {
+  width: 0;
 }
 
 #app .pure-button.pure-button-secondary {
@@ -52,22 +86,20 @@ export default {
   opacity: 1;
 }
 
+#app .dimmer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background:rgba(0,0,0,0.5);
+}
+
 html, body {
    margin: 0;
    padding: 0;
-   background: var(--color-dark-blue);
-}
-
-i.fas.fa-times-circle.close {
-   opacity: 0.8;
-   font-size: 1.1em;
-   position: absolute;
-   top: 6px;
-   right: 6px;
-}
-i.fas.fa-times-circle.close:hover {
-   opacity: 1;
-   cursor: pointer;
+   background-color: var(--color-dark-blue);
 }
 
 #app {
@@ -79,6 +111,29 @@ i.fas.fa-times-circle.close:hover {
    margin:0;
    padding:0;
    background: white;
+}
+
+#app .pure-form input, #app .pure-form select, #app .pure-form textarea {
+   box-shadow: none;
+   margin-bottom: .3em;
+}
+
+#app span.pure-button {
+  margin: 0 0 0 10px;
+  border-radius: 5px;
+  opacity: 0.8;
+}
+#app span.pure-button:hover {
+  opacity: 1;
+}
+
+#app h4 {
+  color: var(--color-primary-orange);
+  margin: 8px 0;
+  padding-bottom: 5px;
+  font-weight: bold;
+  font-size: 22px;
+  position: relative;
 }
 
 #app a {
@@ -176,5 +231,16 @@ i.fas.fa-times-circle.close:hover {
   visibility: visible;
   opacity: 1;
   transition: opacity .15s;
+}
+
+.text-button {
+  font-weight: normal;
+  color:var(--color-link);
+  cursor:pointer;
+  opacity: 0.8;
+  display: inline-block
+}
+.text-button:hover {
+  opacity:1;
 }
 </style>
