@@ -232,22 +232,34 @@ export default new Vuex.Store({
 
 function mergeRepeatedFields( hits ) {
   hits.forEach(function(hit) {
-    let mergedFields = []
+    let mergedBasicFields = []
+    let mergedDetailFields = []
     hit.fields.forEach(function(field) {
-      if (field.value !== "") {
-        let existing = mergedFields.find(f => f.name === field.name) 
-        if (existing) {
-          // this field has already been encountered. Convert the value 
-          // to an array and push the new value into it
-          if (Array.isArray(existing.value)===false) {
-            existing.value = [existing.value]
-          }
-          existing.value.push(field.value)
-        } else {
-          mergedFields.push(field)
+      if (field.value === "") {
+        return
+      }
+      if (field.name == "preview_url") {
+        hit.previewURL = field.value
+        return
+      }
+      let tgtMerged = mergedBasicFields 
+      if (field.visibility == "detailed") {
+        tgtMerged = mergedDetailFields
+      }
+      let existing = tgtMerged.find(f => f.name === field.name) 
+      if (existing) {
+        // this field has already been encountered. Convert the value 
+        // to an array and push the new value into it
+        if (Array.isArray(existing.value)===false) {
+          existing.value = [existing.value]
         }
+        existing.value.push(field.value)
+      } else {
+        tgtMerged.push(field)
       }
     })
-    hit.fields = mergedFields
+    hit.basicFields = mergedBasicFields
+    hit.detailFields = mergedDetailFields
+    delete hit.fields
   })
 }

@@ -24,7 +24,7 @@
             v-if="total>0">
          <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.url">
             <div class="pool-titlebar">{{poolDescription(pool.url)}}</div>
-            <template v-for="hit in pool.hits.slice(0,5)">
+            <template v-for="hit in pool.hits.slice(0,3)">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
             <div @click="selectPool(poolIdx)" class="more-panel">

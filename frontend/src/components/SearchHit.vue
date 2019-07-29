@@ -1,24 +1,33 @@
 <template>
    <div class="hit">
-      <img v-if="getPreviewImage()" :src="getPreviewImage()" class="preview"/>
+      <img v-if="hit.previewURL" :src="hit.previewURL" class="preview"/>
       <table>
-         <tr v-for="field in primaryFields()" :key="getKey(field)">
-            <td class="label">{{field.label}}</td>
+         <tr v-for="field in hit.basicFields" :key="getKey(field)">
+            <td class="label">{{field.label}}:</td>
             <td class="value" v-html="fieldValueString(field)"></td>
          </tr>
       </table>
+      <AccordionContent title="Details">
+         <table>
+            <tr v-for="field in hit.detailFields" :key="getKey(field)">
+               <td class="label">{{field.label}}:</td>
+               <td class="value" v-html="fieldValueString(field)"></td>
+            </tr>
+         </table>
+      </AccordionContent>
       <DebugPanel v-if="hit.debug" :debugInfo="hit.debug"/>
    </div>
 </template>
 
 <script>
+import AccordionContent from '@/components/AccordionContent'
 import DebugPanel from "@/components/diagnostics/DebugPanel"
 export default {
    props: {
       hit: { type: Object, required: true}
    },
    components: {
-      DebugPanel
+      DebugPanel,AccordionContent
    },
    computed: {
    },
@@ -30,26 +39,11 @@ export default {
          if ( Array.isArray(field.value)) {
             return field.value.join(",<br>")
          }
+         if (field.type == "url") {
+            return `<a href="${field.value}" target="_blank">${field.value}</a>`
+         }
          return field.value
       },
-      primaryFields() {
-         let fields = []
-         this.hit.fields.forEach(function (field) {
-            if (field.visibility != "detailed") {
-               fields.push(field)
-            }
-         })
-         return fields
-      },
-      getPreviewImage() {
-         let url = ""
-         this.hit.fields.forEach(function (field) {
-            if (field.name == "preview_url") {
-               url = field.value
-            }
-         })
-         return url
-      }
    }
 };
 </script>
