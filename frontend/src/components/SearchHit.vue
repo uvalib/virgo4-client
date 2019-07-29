@@ -1,17 +1,12 @@
 <template>
    <div class="hit">
-      <div>
-         <label>Identifier:</label>
-         <span class="value">{{hit.id}}</span>
-      </div>
-      <div>
-         <label>Title:</label>
-         <span class="value">{{fullTitle()}}</span>
-      </div>
-      <div>
-         <label>Author:</label>
-         <span class="value">{{hit.author}}</span>
-      </div>
+      <img v-if="getPreviewImage()" :src="getPreviewImage()" class="preview"/>
+      <table>
+         <tr v-for="field in primaryFields()" :key="getKey(field)">
+            <td class="label">{{field.label}}</td>
+            <td class="value" v-html="fieldValueString(field)"></td>
+         </tr>
+      </table>
       <DebugPanel v-if="hit.debug" :debugInfo="hit.debug"/>
    </div>
 </template>
@@ -25,13 +20,36 @@ export default {
    components: {
       DebugPanel
    },
+   computed: {
+   },
    methods: {
-      fullTitle() {
-         if (this.hit.subtitle) {
-            return this.hit.title + " " + this.hit.subtitle
-         }
-         return this.hit.title
+      getKey(field) {
+         return field.name+field.value
       },
+      fieldValueString( field ) {
+         if ( Array.isArray(field.value)) {
+            return field.value.join(",<br>")
+         }
+         return field.value
+      },
+      primaryFields() {
+         let fields = []
+         this.hit.fields.forEach(function (field) {
+            if (field.visibility != "detailed") {
+               fields.push(field)
+            }
+         })
+         return fields
+      },
+      getPreviewImage() {
+         let url = ""
+         this.hit.fields.forEach(function (field) {
+            if (field.name == "preview_url") {
+               url = field.value
+            }
+         })
+         return url
+      }
    }
 };
 </script>
@@ -44,8 +62,13 @@ export default {
    padding: 10px;
    box-sizing: border-box;
    text-align: left;
+   font-size: 0.8em;
 }
-label {
+
+img.preview {
+   float:right;
+}
+.hit table td.label {
    font-weight: bold;
    width: 80px;
    text-align: right;

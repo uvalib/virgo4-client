@@ -4,11 +4,13 @@
       <div class="toolbar">
          <p class="summary">{{searchSummary}}</p>
          <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
-         <div v-if="total>0" class="pool-buttons">
-            <div v-bind:class="{showing: r.show}" @click="toggleVisibility(idx)" class="pool pure-button" v-for="(r,idx) in results" :key="idx">
-               {{poolName(r.url)}} <span class="total">({{r.total}})</span>
+         <template v-if="total>0">
+            <div class="pool-buttons">
+               <div v-bind:class="{showing: r.show}" @click="toggleVisibility(idx)" class="pool pure-button" v-for="(r,idx) in results" :key="idx">
+                  {{poolName(r.url)}} <span class="total">({{r.total}})</span>
+               </div>
             </div>
-         </div>
+         </template>
          <h5 v-else class="no-hits">No matching records found</h5>
       </div>
 
@@ -22,7 +24,7 @@
             v-if="total>0">
          <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.url">
             <div class="pool-titlebar">{{poolDescription(pool.url)}}</div>
-            <template v-for="hit in pool.hits.slice(0,3)">
+            <template v-for="hit in pool.hits.slice(0,5)">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
             <div @click="selectPool(poolIdx)" class="more-panel">

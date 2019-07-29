@@ -1,4 +1,4 @@
-const disgnostics = {
+const diagnostics = {
    namespaced: true,
    state: {
       debugEnabled: false,
@@ -79,4 +79,4 @@ const disgnostics = {
    }
 }
 
-export default disgnostics
+export default diagnostics

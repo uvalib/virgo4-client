@@ -7,6 +7,7 @@ import diagnostics from './modules/diagnostics'
 import pools from './modules/pools'
 import auth from './modules/auth'
 import query from './modules/query'
+import filters from './modules/filters'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -110,6 +111,7 @@ export default new Vuex.Store({
     },
     addPoolSearchResults(state, results) {
       let info = state.results[state.explorePoolIdx]
+      mergeRepeatedFields( results.record_list )
       info.hits = info.hits.concat(results.record_list)
     },
     setSearchResults(state, results) {
@@ -121,6 +123,7 @@ export default new Vuex.Store({
       // Push all results into the results structure. Reset paging for each
       results.pool_results.forEach(function (pr) {
         if (pr.record_list) {
+          mergeRepeatedFields( pr.record_list )
           let result = { url: pr.service_url, total: pr.pagination.total,
             hits: pr.record_list, page: 0, show: false }
           state.results.push(result)
@@ -149,13 +152,11 @@ export default new Vuex.Store({
 
   actions: {
     moreResults(ctx) {
-      console.log("MORE RESULTS ACTION")
       ctx.commit('moreResults')
       ctx.dispatch("doPoolSearch")
     },
     
     doSearch({ state, commit, rootState, rootGetters }) {
-      console.log("DO SEWRACH ACTION")
       commit('setError', "")
       commit('setSearching', true)
       let req = {
@@ -177,6 +178,7 @@ export default new Vuex.Store({
         commit('setSearchResults', response.data)
         commit('pools/setPools', response.data.pools)
         commit('diagnostics/setSearchDiagnostics', response.data)
+        commit('filters/setAllAvailableFacets', response.data)
         commit('setSearching', false)
       }).catch((error) => {
         commit('setError', error)
@@ -222,7 +224,30 @@ export default new Vuex.Store({
     diagnostics: diagnostics,
     pools: pools,
     query: query,
+    filters: filters
   },
 
   plugins: [messaging, versionChecker]
 })
+
+function mergeRepeatedFields( hits ) {
+  hits.forEach(function(hit) {
+    let mergedFields = []
+    hit.fields.forEach(function(field) {
+      if (field.value !== "") {
+        let existing = mergedFields.find(f => f.name === field.name) 
+        if (existing) {
+          // this field has already been encountered. Convert the value 
+          // to an array and push the new value into it
+          if (Array.isArray(existing.value)===false) {
+            existing.value = [existing.value]
+          }
+          existing.value.push(field.value)
+        } else {
+          mergedFields.push(field)
+        }
+      }
+    })
+    hit.fields = mergedFields
+  })
+}

@@ -1,8 +1,11 @@
 <template>
    <div @click="closePool" class="more-results-overlay">
       <div class="more-header">
-         {{poolDescription(selectedPool.url)}}<i @click="closePool" class="pool-close fas fa-times-circle"></i>
+         <span class="pool-name">{{poolDescription(selectedPool.url)}}</span>
+         <i @click="closePool" class="pool-close fas fa-times-circle"></i>
+         <SearchFilters />
       </div>
+      
       <div @click="contentClick" class="more-results-content">
          <div  v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  class="hits">
             <div class="summary"><b>{{selectedPool.total}} results for  </b> {{queryString()}}</div>
@@ -18,6 +21,7 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
+import SearchFilters from "@/components/SearchFilters"
 import infiniteScroll from 'vue-infinite-scroll'
 
 export default {
@@ -25,7 +29,7 @@ export default {
       infiniteScroll
    },
    components: {
-      SearchHit
+      SearchHit,SearchFilters
    },
    computed: {
       ...mapState({
@@ -106,10 +110,13 @@ div.more-header {
    color: white;
    background: var(--color-primary-orange);
    margin:0;
-   padding: 5px 15px;
+   padding: 4px 0 4px 4px;
    text-align: left;
    z-index: 500;
-   border-radius: 10px 0 0 0;
+   border-radius: 5px 0 0 0;
+}
+.pool-name {
+   margin-left: 10px;
 }
 .pool-close {
    position: absolute;
@@ -135,7 +142,7 @@ div.more-header {
    height: 100%;
    overflow-y: scroll;
    overflow-x: hidden;
-   padding-top: 35px;
+   padding-top: 90px;
    box-sizing: border-box;
    color: #555;
 }
