@@ -2,9 +2,16 @@
    <div class="filters">
       <div class="filters-head">
          <span>Search Filters</span>
+         <span v-if="hasFilter" @click="applyClicked" class="apply">Apply Filters</span>
          <span v-if="!addingFilter" @click="addClicked" class="add">Add</span>
       </div>
       <template v-if="hasFilter">
+         <table>
+            <tr class="filter" v-for="(filter,i) in rawFilters" :key="filter-i">
+               <td class="label">{{filter.facet}}:</td>
+               <td class="filter">{{formatValues(filter.values)}}</td>
+            </tr>
+         </table>
       </template>
       <div v-else class="no-filter">
          <span>None</span>
@@ -15,7 +22,7 @@
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"
+import { mapGetters } from "vuex"   
 import AddFilter from '@/components/AddFilter'
 export default {
    components: {
@@ -25,6 +32,7 @@ export default {
       ...mapState({
          addingFilter: state => state.filters.adding,
          poolIdx: state => state.explorePoolIdx,
+         rawFilters: state => state.filters.filters,
       }),
       ...mapGetters({
          hasFilter: 'filters/hasFilter',
@@ -32,15 +40,43 @@ export default {
       }),
    },
    methods: {
+      formatValues(values) {
+         // The values list has objects like {value: value, name: value (count)}. 
+         // Only want comma-separated values
+         let out = []
+         values.forEach( function(vObj) {
+            out.push(vObj.value)
+         })
+         return out.join(", ")
+      },
       addClicked(event) {
          event.stopPropagation()
          this.$store.commit("filters/showAdd")
       },
+      applyClicked() {
+
+      }
    }
 }
 </script>
 
 <style scoped>
+table {
+   margin-left: 15px;
+}
+table td {
+   padding: 2px 5px;
+}
+td.filter {
+   font-weight: 100;
+   width: 100%;
+}
+td.label {
+   padding: 0 5px 0 0;
+   font-weight: bold;
+   vertical-align: text-top;
+   text-align: right;
+}
 .filters {
    background: white;
    color: #666;
@@ -52,24 +88,28 @@ export default {
 .filters-head {
    font-weight: bold;
    border-bottom: 1px solid #ccc;
-   margin-bottom: 5px;
+   margin-bottom: 10px;
+   padding-bottom: 5px;
 }
 .no-filter {
    margin-left: 15px;
 }
-.add {
-   background: var(--color-primary-blue);;
+.add, .apply {
+   background: var(--color-primary-blue);
    float: right;
    margin-right: 6px;
    color: white;
    font-size:0.8em;
-   padding: 1px 20px;
+   padding: 2px 20px;
    border-radius: 5px;
    cursor:pointer;
    opacity: 0.7;
 }
-.add:hover {
+.add:hover, .apply:hover {
    opacity: 1;
+}
+.add {
+   background: var(--color-pale-blue);
 }
 .slide-enter-active {
    transition: all 0.1s ease;

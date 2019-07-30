@@ -6,7 +6,7 @@
             <tr>
                <td class="label">Facet:</td>
                <td class="sel">
-                  <select onclick="event.stopPropagation()" v-model="selectedFacet" @change="facetChosen" class="facets">
+                  <select v-model="selectedFacet" @change="facetChosen" class="facets">
                      <option value="">Select a facet</option>
                      <option v-for="facet in poolFacets(poolIdx)" :key="facet" :value="facet">
                         {{ facet }}
@@ -61,7 +61,7 @@ export default {
       ...mapGetters({
          poolFacets: 'filters/poolFacets',
          facetValuesAvailable: 'filters/facetValuesAvailable',
-         facetBuckets: 'filters/facetBuckets'
+         facetBuckets: 'filters/facetBuckets',
       }),
    },
    methods: {
@@ -71,11 +71,14 @@ export default {
       },
       addFilter(event) {
          event.stopPropagation()
+         // IMPORTANT: vue-multiselect binds v-model to this.values. The binding shoves
+         // the whole json object for the option into the array ({name: xxx, value: yyy} instead of just the value)
+         this.$store.commit("filters/addFilter", {facet: this.selectedFacet, values: this.values})
          this.$store.commit("filters/closeAdd")
       },
       facetChosen() {
          if (this.facetValuesAvailable(this.selectedFacet) === false) {
-            this.$store.dispatch("filters/getBuckets", {poolIdx: this.poolIdx, facet: this.selectedFacet})
+            this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet})
          }
       }
    }

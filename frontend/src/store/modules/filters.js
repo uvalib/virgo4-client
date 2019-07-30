@@ -24,6 +24,18 @@ const filters = {
       },
       facetBuckets: (state) => (facet) => {
          return state.facetBuckets[facet]
+      },
+      filter: (state) => {
+         // API expects filters to be specified as [ {name: facet, value: bucketName}, ...]
+         // The state tracks filters like: [ {facet: name, values: [{name: display, value: value}, ...]}, ...]
+         // Convert to API format
+         let apiFilter = []
+         state.filters.forEach(function(filterObj) {
+            filterObj.values.forEach(function(bucketOpt){
+               apiFilter.push({name: filterObj.facet, value: bucketOpt.value})
+            } )
+         })
+         return apiFilter
       }
    },
 
@@ -37,9 +49,11 @@ const filters = {
          })
       },
       showAdd(state) {
+         state.facetBuckets = {}
          state.adding = true
       },
       closeAdd(state) {
+         state.facetBuckets = {}
          state.adding = false
       },
       setFacetBuckets(state, data) {
@@ -47,6 +61,11 @@ const filters = {
          data.buckets.forEach(function (b) {
             state.facetBuckets[data.facet].push( {value: b.value, name: `${b.value} (${b.count})`} )
          })
+      },
+      addFilter(state, data) {
+         // IMPORTANT: the data comes from vue-multiselect which binds 
+         // the whole json object for the option into the array instead of just the name
+         state.filters.push(data)
       }
    },
 
@@ -54,7 +73,7 @@ const filters = {
       getBuckets({ _state, commit, rootState, rootGetters}, data) {
          // Recreate the query for the target pool, but include a 
          // request for facet/bucket info for the  specified facet
-         let poolURL = rootGetters['pools/poolURL'](data.poolIdx)
+         let poolURL = rootGetters['poolResultsURL'](data.poolResultsIdx)
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },

@@ -53,6 +53,9 @@ export default new Vuex.Store({
       }
       let tgtPool = state.results[state.explorePoolIdx]
       return tgtPool.total > tgtPool.hits.length
+    },
+    poolResultsURL: state => resultIdx => {
+      return state.results[resultIdx].url
     }
   },
 
