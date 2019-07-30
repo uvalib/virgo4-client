@@ -81,13 +81,16 @@ export default {
 .accordion-content {
    overflow: hidden;
    transition: 500ms ease-out;
+   background: #fafafa;
+   padding: 0 10px 5px 10px;
 }
 div.title {
-   padding: 0px;
+   padding: 0px 8px;
    text-align: right;
    cursor: pointer;
-   margin: 2px;
+   margin: 2px 0 0 0;
    color: #666;
+   background: #fafafa;
 }
 .title .text {
    padding-right: 5px;

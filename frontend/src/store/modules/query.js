@@ -22,9 +22,8 @@ const query = {
       getField,
       string: state => {
          // convert into the standard v4 search string format. Ex:
-         // title : {"susan sontag" OR music title}   AND keyword:{ Maunsell } ) OR author:{ liberty }
-         // For now, all 'fields' are AND'd together and the raw strings entered in the form just
-         // tacked on after the key.
+         // title : {"susan sontag" OR music title} AND keyword:{ Maunsell } ) OR author:{ liberty }
+         // Fields are joined together with AND or OR based on the fieldOp setting
          var andTerms = []
          var orTerms = []
          if (state.identifier != "") {

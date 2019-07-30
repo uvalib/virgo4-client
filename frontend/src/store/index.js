@@ -35,6 +35,9 @@ export default new Vuex.Store({
       })
       return out
     },
+    selectedPoolIdx: state => {
+      return state.explorePoolIdx
+    },
     selectedPool: state => {
       if (state.explorePoolIdx === -1 ) {
         return {url: "none", total: 0}

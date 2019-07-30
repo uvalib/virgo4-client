@@ -29,6 +29,9 @@ const pools = {
             }
          })
          return match
+      },
+      poolURL: state => idx => {
+         return state.list[idx].url
       }
    },
 

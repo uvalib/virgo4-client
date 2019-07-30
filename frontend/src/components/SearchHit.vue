@@ -40,7 +40,7 @@ export default {
             return field.value.join(",<br>")
          }
          if (field.type == "url") {
-            return `<a href="${field.value}" target="_blank">${field.value}</a>`
+            return `<a href="${field.value}" class="pure-button pure-button-primary ext" target="_blank">External Link&nbsp;&nbsp;<i class="fas fa-external-link-alt"></i></a>`
          }
          return field.value
       },
@@ -58,7 +58,20 @@ export default {
    text-align: left;
    font-size: 0.8em;
 }
-
+ #app td.value >>> a.pure-button.pure-button-primary.ext {
+   background-color:rgb(66, 184, 221);
+   color: white; 
+   padding: 4px 24px;
+   border-radius: 5px; 
+   font-size: 0.9em;
+   font-weight: bold;
+}
+#app td.value >>> a.pure-button.pure-button-primary.ext:hover {
+   text-decoration: none;  
+}
+.hit .value .pure-button.ext-link:hover {
+   text-decoration: none;
+}
 img.preview {
    float:right;
 }

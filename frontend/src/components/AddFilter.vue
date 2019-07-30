@@ -1,0 +1,178 @@
+<template>
+   <div class="add-filter clearfix pure-form">
+      <p>Add a Filter</p>
+      <div class="add-contents">
+         <table class="settings">
+            <tr>
+               <td class="label">Facet:</td>
+               <td class="sel">
+                  <select onclick="event.stopPropagation()" v-model="selectedFacet" @change="facetChosen" class="facets">
+                     <option value="">Select a facet</option>
+                     <option v-for="facet in poolFacets(poolIdx)" :key="facet" :value="facet">
+                        {{ facet }}
+                     </option>
+                  </select>
+               </td>
+            </tr>
+            <tr>
+               <td class="label">Value:</td>
+               <td class="sel">
+                  <template v-if="selectedFacet && !searching">
+                     <multiselect v-model="values" class="buckets"  :multiple="true"  :taggable="true"
+                           placeholder="Select at least one value"
+                           :block-keys="['Tab', 'Enter']" :hideSelected="true"
+                           :showLabels="false"
+                           track-by="value" label="name" :searchable="false"
+                           :options="facetBuckets(selectedFacet)">
+                     </multiselect>
+                  </template>
+                  <label v-else>Select a facet to see value options</label>
+               </td>
+            </tr>
+         </table>
+      </div>
+      <div class="controls">
+         <span @click="addFilter" class="pure-button pure-button-primary filter">OK</span>
+         <span @click="cancelAdd" class="pure-button pure-button-primary filter">Cancel</span>
+      </div>
+   </div>
+
+</template>
+
+<script>
+import { mapState } from "vuex"
+import { mapGetters } from "vuex"
+import Multiselect from 'vue-multiselect'
+export default {
+   components: {
+      Multiselect
+   },
+   data: function()  {
+      return {
+         selectedFacet: '',
+         values: []
+      }
+   },
+   computed: {
+      ...mapState({
+         poolIdx: state => state.explorePoolIdx,
+         searching: state => state.searching,
+      }),
+      ...mapGetters({
+         poolFacets: 'filters/poolFacets',
+         facetValuesAvailable: 'filters/facetValuesAvailable',
+         facetBuckets: 'filters/facetBuckets'
+      }),
+   },
+   methods: {
+      cancelAdd(event) {
+         event.stopPropagation()
+         this.$store.commit("filters/closeAdd")
+      },
+      addFilter(event) {
+         event.stopPropagation()
+         this.$store.commit("filters/closeAdd")
+      },
+      facetChosen() {
+         if (this.facetValuesAvailable(this.selectedFacet) === false) {
+            this.$store.dispatch("filters/getBuckets", {poolIdx: this.poolIdx, facet: this.selectedFacet})
+         }
+      }
+   }
+}
+</script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style>
+#app li.multiselect__element span.multiselect__option.multiselect__option--highlight {
+   background: var(--color-pale-blue);
+   color: white;
+}
+#app li.multiselect__element span.multiselect__option {
+   padding: 4px 16px;
+}
+#app .buckets span.multiselect__placeholder {
+   margin-bottom:0;
+   padding-top: 1px;
+}
+#app .buckets div.multiselect__select {
+   height: 35px;
+}
+#app .buckets span.multiselect__tag {
+   background: var(--color-pale-blue);
+   color: white;
+   margin-bottom: 0;
+   margin-right: 5px;
+   cursor: default;
+   font-size: 0.9em;
+   font-weight: bold;
+} 
+#app .buckets .multiselect__tags {
+   padding: 5px 40px 0px 5px;
+   min-height: 32px;
+}
+#app i.multiselect__tag-icon:after {
+   color: white;
+}
+#app i.multiselect__tag-icon:hover {
+   background: var(--color-primary-blue);
+}
+</style>
+
+<style scoped>
+p{
+  margin: 0 0 5px 2px;
+  font-weight: bold;
+}
+.add-contents {
+   padding: 5px 15px 0 15px;
+}
+#app .add-filter.pure-form select {
+   height: initial;
+   display: inline-block;
+   margin-right: 10px;
+}
+select {
+   box-sizing: border-box;
+   width: 100%;
+}
+select.disabled {
+   opacity: 0.6;
+}
+div.add-filter {
+   border-top: 1px solid #ccc;
+   padding-top: 7px;
+   margin-top: 5px;
+}
+div.controls {
+   text-align: right;
+   margin: 8px 0 0 0;
+}
+#app span.pure-button.pure-button-primary.filter {
+   padding: 2px 20px;
+   margin: 0 5px 0 0;
+   font-size: 0.9em;
+
+}
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+table {
+   width: 100%;
+}
+td {
+   padding: 0 5px 0 0;
+}
+td.label {
+   font-weight: bold;
+}
+td.sel {
+   width: 100%;
+}
+label {
+   color: #999;
+   font-style: italic;
+}
+</style>

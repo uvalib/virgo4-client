@@ -55,6 +55,7 @@ export default {
    --color-primary-orange: #e57200;
    --color-link: #2979ff;
    --color-primary-blue: #0078e7;
+   --color-pale-blue: rgb(66, 184, 221);
    --color-secondary-blue: #002359;
    --color-primary-text: #555;
    --color-dark-blue: rgb(0, 47, 108);
@@ -69,15 +70,8 @@ export default {
   opacity: 0;
 }
 
-#app .slide-enter-active, .slide-leave-active {
-  transition: all .5s ease;
-}
-#app .slide-enter, .slide-leave-to /* .slide-leave-active below version 2.1.8 */ {
-  width: 0;
-}
-
 #app .pure-button.pure-button-secondary {
-   background: rgb(66, 184, 221); 
+   background: var(--color-pale-blue);
    color: white;
    border-radius: 5px;
    opacity: 0.8;

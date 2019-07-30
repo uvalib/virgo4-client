@@ -1,5 +1,5 @@
 <template>
-   <div @click="closePool" class="more-results-overlay">
+   <div class="more-results-overlay">
       <div class="more-header">
          <span class="pool-name">{{poolDescription(selectedPool.url)}}</span>
          <i @click="closePool" class="pool-close fas fa-times-circle"></i>
@@ -7,8 +7,8 @@
       </div>
       
       <div @click="contentClick" class="more-results-content">
-         <div  v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  class="hits">
-            <div class="summary"><b>{{selectedPool.total}} results for  </b> {{queryString()}}</div>
+         <div  v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  class="hits" v-bind:style="{ top: scrollTop + 'px' }">
+            <div class="summary"><b>{{selectedPool.total}} results for </b>{{queryString()}}</div>
             <template v-for="hit in selectedPool.hits">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
@@ -27,6 +27,11 @@ import infiniteScroll from 'vue-infinite-scroll'
 export default {
    directives: {
       infiniteScroll
+   },
+   data: function()  {
+      return {
+         scrollTop: 90
+      }
    },
    components: {
       SearchHit,SearchFilters
@@ -136,13 +141,11 @@ div.more-header {
 }
 .hits {
    position: absolute;
-   top: 0;
    left: 0;
    width: 100%;
    height: 100%;
    overflow-y: scroll;
    overflow-x: hidden;
-   padding-top: 90px;
    box-sizing: border-box;
    color: #555;
 }
