@@ -3,13 +3,15 @@
       <div class="filters-head">
          <span>Search Filters</span>
          <span v-if="hasFilter" @click="applyClicked" class="apply">Apply Filters</span>
+         <span v-if="hasFilter" @click="clearClicked" class="clear">Clear</span>
          <span v-if="!addingFilter" @click="addClicked" class="add">Add</span>
       </div>
       <template v-if="hasFilter">
          <table>
-            <tr class="filter" v-for="(filter,i) in rawFilters" :key="filter-i">
+            <tr class="filter" v-for="(filter,i) in rawFilters" :key="i">
                <td class="label">{{filter.facet}}:</td>
                <td class="filter">{{formatValues(filter.values)}}</td>
+               <td class="label"><i @click="removeFilter(i)" class="remove-filter fas fa-trash-alt"></i></td>
             </tr>
          </table>
       </template>
@@ -55,6 +57,12 @@ export default {
       },
       applyClicked() {
 
+      },
+      clearClicked() {
+         this.$store.commit("filters/cleaAllFilters")
+      },
+      removeFilter(_idx) {
+          this.$store.commit("filters/removeFilter")
       }
    }
 }
@@ -94,7 +102,7 @@ td.label {
 .no-filter {
    margin-left: 15px;
 }
-.add, .apply {
+.add, .apply, .clear {
    background: var(--color-primary-blue);
    float: right;
    margin-right: 6px;
@@ -105,11 +113,23 @@ td.label {
    cursor:pointer;
    opacity: 0.7;
 }
-.add:hover, .apply:hover {
+.add:hover, .apply:hover, .clear:hover {
    opacity: 1;
 }
 .add {
    background: var(--color-pale-blue);
+}
+span.clear {
+    background: var(--color-error);
+}
+.remove-filter {
+   padding-right: 10px;
+   color: #666;
+   opacity: 0.5;
+   cursor: pointer;
+}
+.remove-filter:hover {
+   opacity: 1;
 }
 .slide-enter-active {
    transition: all 0.1s ease;

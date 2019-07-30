@@ -66,6 +66,12 @@ const filters = {
          // IMPORTANT: the data comes from vue-multiselect which binds 
          // the whole json object for the option into the array instead of just the name
          state.filters.push(data)
+      },
+      removeFilter(state, idx) {
+         state.filters.splice(idx, 1)
+      },
+      cleaAllFilters(state) {
+         state.filters = []
       }
    },
 

@@ -1,13 +1,14 @@
 <template>
    <div class="more-results-overlay">
-      <div class="more-header">
+      <div id="more-header" class="more-header">
          <span class="pool-name">{{poolDescription(selectedPool.url)}}</span>
          <i @click="closePool" class="pool-close fas fa-times-circle"></i>
          <SearchFilters />
       </div>
       
       <div @click="contentClick" class="more-results-content">
-         <div  v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  class="hits" v-bind:style="{ top: scrollTop + 'px' }">
+         <div id="hits-scroller" v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  
+               class="hits" v-bind:style="{ top: scrollTop + 'px' }">
             <div class="summary"><b>{{selectedPool.total}} results for </b>{{queryString()}}</div>
             <template v-for="hit in selectedPool.hits">
                <SearchHit :hit="hit" :key="hit.id"/>
@@ -39,7 +40,8 @@ export default {
    computed: {
       ...mapState({
          results: state=>state.results,
-         searching: state=>state.searching
+         searching: state=>state.searching,
+         rawFilters: state => state.filters.filters,
       }),
       ...mapGetters({
          selectedPool: 'selectedPool',
@@ -47,8 +49,29 @@ export default {
          hasMoreHits: 'hasMoreHits',
          rawQueryString: 'query/string',
       }),
+      filterLength() {
+         return this.rawFilters.length
+      }
+   },
+   watch: {
+      filterLength() {
+         // give a delay to allow add section to close
+         setTimeout( () => {
+            this.calcHeaderHeight()
+         }, 10)
+      }
    },
    methods: {
+      calcHeaderHeight() {
+         let hdrEle = document.getElementById("more-header")
+            let hdrStyle = getComputedStyle(hdrEle)
+            let hdrH = 0
+            hdrH += parseInt(hdrStyle.getPropertyValue("height").replace("px", ""),10)
+            hdrH += parseInt(hdrStyle.getPropertyValue("padding-top").replace("px", ""),10)
+            hdrH += parseInt(hdrStyle.getPropertyValue("padding-bottom").replace("px", ""),10)
+            let scroller = document.getElementById("hits-scroller")
+            scroller.style.top = hdrH+"px"
+      },
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
@@ -73,6 +96,9 @@ export default {
          }
          return url
       },
+   },
+   mounted() {
+      this.calcHeaderHeight()
    }
 }
 </script>
