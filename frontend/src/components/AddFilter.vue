@@ -8,7 +8,7 @@
                <td class="sel">
                   <select v-model="selectedFacet" @change="facetChosen" class="facets">
                      <option value="">Select a facet</option>
-                     <option v-for="facet in poolFacets(poolIdx)" :key="facet" :value="facet">
+                     <option v-for="(facet,idx) in poolFacets(poolIdx)" :key="idx" :value="facet">
                         {{ facet }}
                      </option>
                   </select>
@@ -17,16 +17,20 @@
             <tr>
                <td class="label">Value:</td>
                <td class="sel">
-                  <template v-if="selectedFacet && !searching">
+                  <template v-if="selectedFacet && !updatingBuckets">
                      <multiselect v-model="values" class="buckets"  :multiple="true"  :taggable="true"
                            placeholder="Select at least one value"
                            :block-keys="['Tab', 'Enter']" :hideSelected="true"
-                           :showLabels="false"
+                           :showLabels="false" :closeOnSelect="false"
                            track-by="value" label="name" :searchable="false"
-                           :options="facetBuckets(selectedFacet)">
+                           :optionHeight="32" :loading="updatingBuckets"
+                           :options="facetBuckets(poolIdx, selectedFacet)">
                      </multiselect>
                   </template>
-                  <label v-else>Select a facet to see value options</label>
+                  <template v-else>
+                     <label v-if="updatingBuckets">Loading facet values...</label>
+                     <label v-else>Select a facet to see value options</label>
+                  </template>
                </td>
             </tr>
          </table>
@@ -55,12 +59,13 @@ export default {
    },
    computed: {
       ...mapState({
-         poolIdx: state => state.explorePoolIdx,
+         poolIdx: state => state.selectedPoolIdx,
          searching: state => state.searching,
+         updatingBuckets: state => state.filters.updatingBuckets
       }),
       ...mapGetters({
          poolFacets: 'filters/poolFacets',
-         facetValuesAvailable: 'filters/facetValuesAvailable',
+         facetBucketsAvailable: 'filters/facetBucketsAvailable',
          facetBuckets: 'filters/facetBuckets',
       }),
    },
@@ -73,11 +78,12 @@ export default {
          event.stopPropagation()
          // IMPORTANT: vue-multiselect binds v-model to this.values. The binding shoves
          // the whole json object for the option into the array ({name: xxx, value: yyy} instead of just the value)
-         this.$store.commit("filters/addFilter", {facet: this.selectedFacet, values: this.values})
+         this.$store.commit("filters/addFilter", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet, values: this.values})
          this.$store.commit("filters/closeAdd")
+         // this.$store.dispatch("searchSelectedPool")
       },
       facetChosen() {
-         if (this.facetValuesAvailable(this.selectedFacet) === false) {
+         if (this.facetBucketsAvailable( this.poolIdx, this.selectedFacet) === false) {
             this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet})
          }
       }
@@ -92,7 +98,8 @@ export default {
    color: white;
 }
 #app li.multiselect__element span.multiselect__option {
-   padding: 4px 16px;
+   padding: 10px;
+   font-size: 0.9em;
 }
 #app .buckets span.multiselect__placeholder {
    margin-bottom:0;

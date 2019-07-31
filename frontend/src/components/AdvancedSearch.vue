@@ -63,7 +63,7 @@ export default {
    },
    methods: {
       searchClicked() {
-        this.$store.dispatch("doSearch")
+        this.$store.dispatch("searchAllPools")
       },
       cancelClicked() {
         this.$store.commit("query/clear")

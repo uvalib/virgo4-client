@@ -3,75 +3,109 @@ import axios from 'axios'
 const filters = {
    namespaced: true,
    state: {
-      facets: [],
-      facetBuckets: {},
-      filters: [],
+      // facet/filter array indexes match main poolResults array
+      // IMPORTANT: Must use arrays here instead of a map from 
+      // resultsIdx -> filter data as vuex cannot detect state changes 
+      // in nested objects!
+      poolFacets: [], 
+      poolFilters: [],
       adding: false,
+      updatingBuckets: false
    },
 
    getters: {
       poolFacets: (state) => (idx) => {
-         if (idx == -1) {
+         if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
          }
-         return state.facets[idx]
+         // Faceets array contains some nested bucket info; map only facet name
+         return  state.poolFacets[idx].map( f => f.facet )
       },
-      hasFilter: (state) => {
-         return state.filters.length > 0
+      facetBucketsAvailable: (state) => (idx, facetName) => {
+         if ( idx == -1 || idx >= state.poolFacets.length) {
+            return false
+         }
+         // Facet info is an array of objects - {facet: name, buckets: []}
+         // find the object with facet name matching passed facet and see
+         // if the bucket list empty
+         let facet = state.poolFacets[idx].find(f => f.facet === facetName) 
+         return facet.buckets.length > 0
       },
-      facetValuesAvailable: (state) => (facet) => {
-         return (facet in state.facetBuckets)
+      facetBuckets: (state) => (idx, facetName) => {
+         if ( idx == -1 || idx >= state.poolFacets.length) {
+            return []
+         }
+         let facet = state.poolFacets[idx].find(f => f.facet === facetName) 
+         return facet.buckets
       },
-      facetBuckets: (state) => (facet) => {
-         return state.facetBuckets[facet]
+      hasFilter: (state) => (idx) => {
+         return state.poolFilters[idx].length > 0
       },
-      filter: (state) => {
-         // API expects filters to be specified as [ {name: facet, value: bucketName}, ...]
-         // The state tracks filters like: [ {facet: name, values: [{name: display, value: value}, ...]}, ...]
-         // Convert to API format
-         let apiFilter = []
-         state.filters.forEach(function(filterObj) {
-            filterObj.values.forEach(function(bucketOpt){
-               apiFilter.push({name: filterObj.facet, value: bucketOpt.value})
-            } )
-         })
-         return apiFilter
+
+      // By default the data stored for the filter is heirarchical; one facet
+      // owning a list of values: [ {facet: name, values: [v1,v2,...]}, ... ]
+      // The API wants a simple flat list with multiple facet/value pairs like:
+      // [ {name: facet, value: v1}, ...]
+      // This getter takes a fmt param that is either api or raw to control the response
+      poolFilter: (state) => (idx, fmt) => {
+         if (fmt == "api") {
+            let apiFilter = []
+            state.poolFilters[idx].forEach(function(filterObj) {
+               filterObj.values.forEach(function(bucketOpt){
+                  apiFilter.push({name: filterObj.facet, value: bucketOpt.value})
+               } )
+            })
+            return apiFilter
+         }
+         return state.poolFilters[idx]
       }
    },
 
    mutations: {
       setAllAvailableFacets(state, data) {
-         state.facets = []
-         state.filters = []
-         state.facetBuckets = {}
-         data.pool_results.forEach(function (pr) {
-            state.facets.push( pr.available_facets.filter(f => f != "all") )
+         state.poolFacets = []
+         state.poolFilters = []
+         data.pool_results.forEach(function (pr, resultIdx) {
+            let poolFacets = []
+            state.poolFilters.push([])  // add empty filter for each pool
+            pr.available_facets.forEach( function(f) {
+               poolFacets.push( {facet: f, buckets: []} )
+            })
+            state.poolFacets[resultIdx] = poolFacets
          })
       },
       showAdd(state) {
-         state.facetBuckets = {}
          state.adding = true
       },
       closeAdd(state) {
-         state.facetBuckets = {}
          state.adding = false
       },
       setFacetBuckets(state, data) {
-         state.facetBuckets[data.facet] = []
+         let allPoolFacets = state.poolFacets[data.poolResultsIdx]
+         let facetInfo = allPoolFacets.find(f => f.facet === data.facet) 
+         facetInfo.buckets = []
          data.buckets.forEach(function (b) {
-            state.facetBuckets[data.facet].push( {value: b.value, name: `${b.value} (${b.count})`} )
+            facetInfo.buckets.push( {value: b.value, name: `${b.value} (${b.count})`} )
          })
       },
       addFilter(state, data) {
-         // IMPORTANT: the data comes from vue-multiselect which binds 
-         // the whole json object for the option into the array instead of just the name
-         state.filters.push(data)
+         // data = {poolResultsIdx: idx, facet: name, values: VALUES
+         // IMPORTANT: VALUES comes from vue-multiselect which binds 
+         // the whole json object for the option into the array
+         // Simplify the value objects into just an array of string values
+         let filter = state.poolFilters[data.poolResultsIdx]
+         filter.push( {facet: data.facet, values: data.values.map(f=>f.value)})
       },
-      removeFilter(state, idx) {
-         state.filters.splice(idx, 1)
+      removeFilter(state, data) {
+         // data = {poolResultsIdx: idx, filterIdx: fidx}
+         let filters = state.poolFilters[data.poolResultsIdx]
+         filters.splice(data.filterIdx,1)
       },
-      cleaAllFilters(state) {
-         state.filters = []
+      clearAllFilters(state, idx) {
+         state.poolFilters[idx].splice(0, state.poolFilters[idx].length)
+      },
+      setUpdatingBuckets(state, flag) {
+         state.updatingBuckets = flag
       }
    },
 
@@ -87,13 +121,13 @@ const filters = {
           }
          let tgtURL = poolURL+"/api/search"
          axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.auth.authToken
-         commit('setSearching', true, { root: true })
+         commit('setUpdatingBuckets', true)
          axios.post(tgtURL, req).then((response) => {
-            commit("setFacetBuckets", {facet: data.facet, buckets: response.data.facet_list[0].buckets})
-            commit('setSearching', false, { root: true })
+            commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, facet: data.facet, buckets: response.data.facet_list[0].buckets})
+            commit('setUpdatingBuckets', false)
          }).catch((error) => {
             commit('setError', error, { root: true })
-            commit('setSearching', false, { root: true })
+            commit('setUpdatingBuckets', false)
           })
       }
    }

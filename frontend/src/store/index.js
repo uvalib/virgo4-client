@@ -19,9 +19,9 @@ export default new Vuex.Store({
     searching: false,
     pageSize: 25,
     results: [],
-    visibleResults: [],
-    explorePoolIdx: -1,
     total: -1,
+    visibleResults: [],
+    selectedPoolIdx: -1,
   },
 
   getters: {
@@ -36,22 +36,22 @@ export default new Vuex.Store({
       return out
     },
     selectedPoolIdx: state => {
-      return state.explorePoolIdx
+      return state.selectedPoolIdx
     },
     selectedPool: state => {
-      if (state.explorePoolIdx === -1 ) {
+      if (state.selectedPoolIdx === -1 ) {
         return {url: "none", total: 0}
       }
-      return state.results[state.explorePoolIdx]
+      return state.results[state.selectedPoolIdx]
     },
     isPoolSelected: state => {
-      return state.explorePoolIdx > -1
+      return state.selectedPoolIdx > -1
     },
     hasMoreHits: state => {
-      if (state.explorePoolIdx === -1 ) {
+      if (state.selectedPoolIdx === -1 ) {
         return false
       }
-      let tgtPool = state.results[state.explorePoolIdx]
+      let tgtPool = state.results[state.selectedPoolIdx]
       return tgtPool.total > tgtPool.hits.length
     },
     poolResultsURL: state => resultIdx => {
@@ -98,10 +98,10 @@ export default new Vuex.Store({
       state.searching = flag
     },
     selectPoolResults(state, idx) {
-      state.explorePoolIdx = idx
+      state.selectedPoolIdx = idx
     },
     closePoolResults(state) {
-      state.explorePoolIdx = -1
+      state.selectedPoolIdx = -1
     },
     toggleResultVisibility(state, poolResultsIdx) {
       // NOTES: the result itself is tagged with show true/false for ease of detecting
@@ -116,7 +116,7 @@ export default new Vuex.Store({
       }
     },
     addPoolSearchResults(state, results) {
-      let info = state.results[state.explorePoolIdx]
+      let info = state.results[state.selectedPoolIdx]
       mergeRepeatedFields( results.record_list )
       info.hits = info.hits.concat(results.record_list)
     },
@@ -152,19 +152,23 @@ export default new Vuex.Store({
       state.total = results.total_hits
     },
     moreResults(state) {
-      state.results[state.explorePoolIdx].page++
+      state.results[state.selectedPoolIdx].page++
     },
   },
 
   actions: {
+    // When an infinite scroll reaches the bottom of the results, call this to get the next
+    // batch of records from the currently selected pool
     moreResults(ctx) {
       ctx.commit('moreResults')
-      ctx.dispatch("doPoolSearch")
+      ctx.dispatch("searchSelectedPool")
     },
     
-    doSearch({ state, commit, rootState, rootGetters }) {
+    // Search ALL configured pools. This is the initial search call using only the basic or
+    // advanced search parameters and will always start at page 1. Filters do not apply
+    // to all pools so they are not used here.
+    searchAllPools({ state, commit, rootState, rootGetters }) {
       commit('setError', "")
-      commit('setSearching', true)
       let req = {
         query: rootGetters['query/string'],
         pagination: { start: 0, rows: state.pageSize },
@@ -175,12 +179,16 @@ export default new Vuex.Store({
       }
       if (req.query.length == 0) {
         commit('setError', "Please enter a search query")
-        commit('setSearching', false)
         return
       }
+
+      commit('setSearching', true)
       let url = state.searchAPI + "/api/search?debug=1&intuit=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
+        // The response includes all available pools, pool search resonses, 
+        // pool-specific diagnostics and a list of available facets for each pool.
+        // Store this data in the appropriate module 
         commit('setSearchResults', response.data)
         commit('pools/setPools', response.data.pools)
         commit('diagnostics/setSearchDiagnostics', response.data)
@@ -192,21 +200,26 @@ export default new Vuex.Store({
       })
     },
 
-    doPoolSearch({ state, commit, _rootState, rootGetters }) {
+    // SearchSelectedPool is called only when one specific set of pool results is selected for
+    // exploration. It is used to query for next page during infinite scroll and
+    // when filters are added and removed. Pool results are APPENDED to existing during infinite 
+    // scroll. If newly filtered, reset paging and re-query
+    searchSelectedPool({ state, commit, _rootState, rootGetters }) {
       commit('setSearching', true)
       let tgtPage = 0
-      if (state.explorePoolIdx > -1) {
-        tgtPage = state.results[state.explorePoolIdx].page
+      if (state.selectedPoolIdx > -1) {
+        tgtPage = state.results[state.selectedPoolIdx].page
       }
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: tgtPage * state.pageSize, rows: state.pageSize }
+        pagination: { start: tgtPage * state.pageSize, rows: state.pageSize },
+        filters: rootGetters['filters/filter']
       }
       let url = rootGetters.selectedPool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
-        let diagPayload = { currPoolIdx: state.explorePoolIdx, debug: response.data.debug, warnings: response.data.warnings }
+        let diagPayload = { poolResultsIdx: state.selectedPoolIdx, debug: response.data.debug, warnings: response.data.warnings }
         commit('diagnostics/setPoolDiagnostics', diagPayload)
         commit('setSearching', false)
       }).catch((error) => {
@@ -215,6 +228,7 @@ export default new Vuex.Store({
       })
     },
 
+    // Call getConfig at startup to get client configuration parameters
     getConfig(ctx) {
       axios.get("/config").then((response) => {
         ctx.commit('setConfig', response.data)
@@ -236,6 +250,11 @@ export default new Vuex.Store({
   plugins: [messaging, versionChecker]
 })
 
+// Each search ppol hit contains an array of field objects. These may be repeated, but for display 
+// purposes they need to be merged into a single field object with an array value. Additionally, the fields 
+// are classified as basic (show by default) or detailed (hidden by default). Split them into two separate
+// arrays of fields. Finally, the preview_url is a special case. It is placed and rendered differently than 
+// all others. Pull it out of the fields lists and place it in the top-level of the hit info.
 function mergeRepeatedFields( hits ) {
   hits.forEach(function(hit) {
     let mergedBasicFields = []

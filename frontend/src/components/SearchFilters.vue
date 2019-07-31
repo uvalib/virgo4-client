@@ -2,13 +2,12 @@
    <div class="filters">
       <div class="filters-head">
          <span>Search Filters</span>
-         <span v-if="hasFilter" @click="applyClicked" class="apply">Apply Filters</span>
-         <span v-if="hasFilter" @click="clearClicked" class="clear">Clear</span>
+         <span v-if="hasFilter(poolIdx)" @click="clearClicked" class="clear">Clear</span>
          <span v-if="!addingFilter" @click="addClicked" class="add">Add</span>
       </div>
-      <template v-if="hasFilter">
+      <template v-if="hasFilter(poolIdx)">
          <table>
-            <tr class="filter" v-for="(filter,i) in rawFilters" :key="i">
+            <tr class="filter" v-for="(filter,i) in poolFilter(poolIdx, 'raw')" :key="i">
                <td class="label">{{filter.facet}}:</td>
                <td class="filter">{{formatValues(filter.values)}}</td>
                <td class="label"><i @click="removeFilter(i)" class="remove-filter fas fa-trash-alt"></i></td>
@@ -33,36 +32,27 @@ export default {
    computed: {
       ...mapState({
          addingFilter: state => state.filters.adding,
-         poolIdx: state => state.explorePoolIdx,
-         rawFilters: state => state.filters.filters,
+         poolIdx: state => state.selectedPoolIdx,
       }),
       ...mapGetters({
          hasFilter: 'filters/hasFilter',
          poolFacets: 'filters/poolFacets',
+         poolFilter: 'filters/poolFilter',
       }),
    },
    methods: {
       formatValues(values) {
-         // The values list has objects like {value: value, name: value (count)}. 
-         // Only want comma-separated values
-         let out = []
-         values.forEach( function(vObj) {
-            out.push(vObj.value)
-         })
-         return out.join(", ")
+         return values.join(", ")
       },
       addClicked(event) {
          event.stopPropagation()
          this.$store.commit("filters/showAdd")
       },
-      applyClicked() {
-
-      },
       clearClicked() {
-         this.$store.commit("filters/cleaAllFilters")
+         this.$store.commit("filters/clearAllFilters", this.poolIdx)
       },
-      removeFilter(_idx) {
-          this.$store.commit("filters/removeFilter")
+      removeFilter(idx) {
+          this.$store.commit("filters/removeFilter", {poolResultsIdx: this.poolIdx, filterIdx: idx})
       }
    }
 }
@@ -80,7 +70,7 @@ td.filter {
    width: 100%;
 }
 td.label {
-   padding: 0 5px 0 0;
+   padding: 2px 5px 0 0;
    font-weight: bold;
    vertical-align: text-top;
    text-align: right;

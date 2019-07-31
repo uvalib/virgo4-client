@@ -41,21 +41,27 @@ export default {
       ...mapState({
          results: state=>state.results,
          searching: state=>state.searching,
-         rawFilters: state => state.filters.filters,
+         selectedPoolIdx: state => state.selectedPoolIdx,
+         addingFilter: state => state.filters.adding,
       }),
       ...mapGetters({
          selectedPool: 'selectedPool',
          findPool: 'pools/find',
          hasMoreHits: 'hasMoreHits',
          rawQueryString: 'query/string',
+         poolFilter: 'filters/poolFilter',
       }),
       filterLength() {
-         return this.rawFilters.length
+         return this.poolFilter(this.selectedPoolIdx, 'raw').length
       }
    },
    watch: {
       filterLength() {
-         // give a delay to allow add section to close
+         setTimeout( () => {
+            this.calcHeaderHeight()
+         }, 10)
+      },
+      addingFilter() {
          setTimeout( () => {
             this.calcHeaderHeight()
          }, 10)
@@ -161,9 +167,10 @@ div.more-header {
 }
 .summary {
    text-align: left;
-   padding: 5px 0px 5px 16px;
+   padding: 5px 10px;
    border-bottom: 1px solid #ccc;
-   background-color: #fafafa;
+   border-left: 1px solid #ccc;
+   background-color: #eee;
 }
 .hits {
    position: absolute;

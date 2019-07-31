@@ -5,9 +5,12 @@ const diagnostics = {
       warnEnabled: false,
       showDebug: false,
       showWarn: false,
-      debug: {},
-      warnings: [],
-      poolDiag: [],
+      debug: {},        // debug info for the overall search
+      warnings: [],     // warning info for the oveall search
+
+      // pool specific debug and warning keyed by result index:
+      //    [ {debug: {}, warnings: []}, ..., ...]
+      poolDiag: [],     
    },
 
    getters: {
@@ -23,7 +26,7 @@ const diagnostics = {
          let poolDebug = {}
          if (rootState.currPoolIdx > -1) {
             poolDebug = state.poolDiag[rootState.currPoolIdx].debug
-         }
+         } 
          return { ...state.debug, ...poolDebug }
       },
       hasWarnings: (state, getters, rootState) => {
@@ -55,7 +58,7 @@ const diagnostics = {
          state.showWarn = !state.showWarn
       },
       setPoolDiagnostics(state, diagPayload) {
-         let info = state.poolDiag[diagPayload.currPoolIdx]
+         let info = state.poolDiag[diagPayload.poolResultsIdx]
          info.debug = diagPayload.debug
          if (typeof info.debug === "undefined") {
             info.debug = {}
@@ -72,6 +75,10 @@ const diagnostics = {
          state.debug = results.debug
          state.warnings = results.warnings
          state.poolDiag = []
+
+         // populate an array of pool diagnistics that matches 
+         // the results array ordering; an index into results is same 
+         // as index into poolDiag 
          results.pool_results.forEach( function(pr) {
             state.poolDiag.push({debug: pr.debug, warnings: pr.warnings})
          })
