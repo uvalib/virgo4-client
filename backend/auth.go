@@ -38,10 +38,10 @@ func netbadgeAuthentication(c *gin.Context) {
 	}
 	log.Printf("NetBadge headers are valid. Checking for authorization token...")
 
-	// Now get the authorization token from the v4_token cookie
+	// Now get the authorization token from the v4_auth cookie
 	authToken, err := c.Cookie("v4_auth")
 	if err != nil {
-		log.Printf("ERROR: Unable to read cookie v4_token: %s", err.Error())
+		log.Printf("ERROR: Unable to read cookie v4_auth: %s", err.Error())
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}

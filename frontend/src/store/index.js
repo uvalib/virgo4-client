@@ -48,7 +48,7 @@ export default new Vuex.Store({
       return state.selectedPoolIdx > -1
     },
     hasMoreHits: state => {
-      if (state.selectedPoolIdx === -1 ) {
+      if (state.selectedPoolIdx === -1 || state.searching  ) {
         return false
       }
       let tgtPool = state.results[state.selectedPoolIdx]
@@ -144,6 +144,7 @@ export default new Vuex.Store({
       let tgtPool = state.results[state.selectedPoolIdx]
       mergeRepeatedFields( results.record_list )
       tgtPool.hits = tgtPool.hits.concat(results.record_list)
+      tgtPool.timeMS = results.elapsed_ms
       if (tgtPool.total == 0 ) {
         // if pool total is zero add the new results total to overall
         tgtPool.total = results.pagination.total
@@ -158,11 +159,14 @@ export default new Vuex.Store({
       state.visibleResults = []
 
       // Push all results into the results structure. Reset paging for each
-      results.pool_results.forEach(function (pr) {
+      // NOTE: need to have resultIdx attached to result to cover the case when pools are 
+      // re-sorted by add/remove from view. This is tracked in visibleResults where the index
+      // is not the same as the index into the results array.
+      results.pool_results.forEach(function (pr,idx) {
         if (pr.record_list) {
           mergeRepeatedFields( pr.record_list )
           let result = { url: pr.service_url, total: pr.pagination.total,
-            hits: pr.record_list, page: 0, show: false }
+            hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx }
           state.results.push(result)
           if (pr.confidence != "low" && state.visibleResults.length < 3) {
             result["show"] = true
@@ -171,7 +175,7 @@ export default new Vuex.Store({
         } else {
           state.results.push({
             url: pr.service_url,
-            total: 0, hits: [], page: 0, show: false })
+            total: 0, hits: [], page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx })
         }
       })
       if (state.visibleResults.length == 0) {

@@ -26,12 +26,30 @@
             leave-active-class="animated faster fadeOut"
             v-if="total>0">
          <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.url">
-            <div class="pool-titlebar">{{poolDescription(pool.url)}}</div>
+            <div class="pool-titlebar">
+               <span>{{poolDescription(pool.url)}}</span>
+               <i @click="toggleVisibility(pool.resultIdx)" class="hide-pool fas fa-times-circle"></i>
+            </div>
+            <div class="pool-info">
+               <div class="metrics">
+                  <span>{{pool.total}} matches found in {{pool.timeMS}} ms</span>
+                  <span @click="selectPool(pool.resultIdx)" class="view-all">View All</span>
+               </div>
+               <template v-if="hasFilter(pool.resultIdx)">
+                  <div class="filter-head">Search Filters</div>
+                  <table class="filters">
+                     <tr class="filter" v-for="(filter,i) in poolFilter(pool.resultIdx, 'raw')" :key="i">
+                        <td class="label">{{filter.facet}}:</td>
+                        <td class="filter">{{formatFilterValues(filter.values)}}</td>
+                     </tr>
+                  </table>
+               </template>
+            </div>
             <template v-for="hit in pool.hits.slice(0,3)">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
             <div @click="selectPool(poolIdx)" class="more-panel">
-               See More Results<img class="more-icon" src="../assets/more.png"/>
+               See More Results&nbsp;<i class="more-icon fas fa-arrow-circle-right"></i>
             </div>
          </div>
       </transition-group>
@@ -58,7 +76,9 @@ export default {
          warnings: 'diagnostics/warnings',
          findPool: 'pools/find',
          rawQueryString: 'query/string',
-         hitPoolCount: 'hitPoolCount'
+         hitPoolCount: 'hitPoolCount',
+         hasFilter: 'filters/hasFilter',
+         poolFilter: 'filters/poolFilter',
       }),
       ...mapState({
          total: state=>state.total,
@@ -70,6 +90,9 @@ export default {
       },
    },
    methods: {
+      formatFilterValues(values) {
+         return values.join(", ")
+      },
       refineClicked() {
          this.$store.commit("setAdvancedSearch")
       },
@@ -102,6 +125,48 @@ export default {
    margin-top: 10px;
    text-align: left;
 }
+.hide-pool {
+   float: right;
+   position: relative;
+   top: 3px;
+   cursor: pointer;
+   opacity: 0.6;
+}
+.hide-pool:hover {
+   opacity: 1;
+}
+.pool-info {
+   border-right: 1px solid #ccc;
+   border-left: 1px solid #ccc;
+   border-bottom: 1px solid #ccc;
+   margin: 0;
+   padding: 5px;
+   font-size: 0.7em;
+   font-weight: 100;
+   background-color: #f5f5f5;
+}
+.filter-head {
+   font-weight: normal; 
+   margin: 3px 0 0 1px;
+   border-bottom: 1px solid #ccc;
+}
+table td {
+   padding: 2px 5px;
+}
+td.filter {
+   font-weight: 100;
+   width: 100%;
+}
+td.label {
+   padding: 2px 4px 0 0;
+   font-weight: normal;
+   vertical-align: text-top;
+   text-align: right;
+}
+span.view-all {
+   float: right;
+   cursor: pointer;
+}
 div.right-indent {
    margin-left: 5px;
 }
@@ -114,7 +179,7 @@ div.right-indent {
    color: #666;
 }
 .pool.pure-button.showing {
-   background-color: rgb(66, 184, 221);
+   background-color: var(--color-primary-blue);
    color: #fff;
 }
 .pool.pure-button.disabled {
@@ -141,21 +206,20 @@ div.pools {
    cursor: pointer;
    border-radius: 0 0 5px 5px
 }
-.more-panel:hover {
-   text-decoration: underline;
+.more-panel:hover, .view-all:hover {
+   color: var(--color-link);
 }
 .more-panel:hover .more-icon {
-   opacity: 0.6;
+   opacity: 0.9;
+   color: var(--color-link);
 }
 .more-icon {
-   opacity: 0.3;
-   margin-left: 15px;
+   opacity: 0.6;
+   margin-left: 5px;
    display: inline-block;
-   position: relative;
-   top: 2px;
 }
 .pool-titlebar {
-   padding: 4px 10px;
+   padding: 4px 6px 4px 10px;
    background-color: var(--color-primary-orange);
    color: white;
    font-weight: normal;
@@ -176,15 +240,12 @@ h4.no-hits {
 .query-summary  i {
    font-weight: 100;
 }
-.summary, .curr-pool {
+.summary {
    margin: 0 0 0.2vw 0;
    font-weight: 100;
    text-align: left;
    font-size: 0.85em;
    position: relative;
-}
-.curr-pool {
-   margin-bottom: 1vw;
 }
 div.toolbar {
    position: relative;
