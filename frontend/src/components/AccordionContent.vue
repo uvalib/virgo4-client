@@ -81,7 +81,7 @@ export default {
 .accordion-content {
    overflow: hidden;
    transition: 500ms ease-out;
-   background: #fafafa;
+   background: white;
    padding: 0 10px 5px 10px;
 }
 div.title {
@@ -90,7 +90,7 @@ div.title {
    cursor: pointer;
    margin: 2px 0 0 0;
    color: #666;
-   background: #fafafa;
+   background: white;
 }
 .title .text {
    padding-right: 5px;

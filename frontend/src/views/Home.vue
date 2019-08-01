@@ -148,7 +148,7 @@ p.fatal, p.error {
   margin: 0 auto 0 auto;
   text-align: center;
   max-width: 800px;
-  padding: 10px 2vw 30px 2vw;
+  padding: 10px 2vw 10px 2vw;
   font-size: 0.95em;
 }
 #keyword {

@@ -56,6 +56,15 @@ export default new Vuex.Store({
     },
     poolResultsURL: state => resultIdx => {
       return state.results[resultIdx].url
+    },
+    hitPoolCount: state => {
+      let poolCnt = 0
+      state.results.forEach(function(p) {
+        if (p.total > 0) {
+          poolCnt++
+        }
+      })
+      return poolCnt
     }
   },
 
@@ -104,6 +113,10 @@ export default new Vuex.Store({
       state.selectedPoolIdx = -1
     },
     toggleResultVisibility(state, poolResultsIdx) {
+      // Don't change visibility if there are no results to see
+      if (state.results[poolResultsIdx].total == 0) {
+        return
+      }
       // NOTES: the result itself is tagged with show true/false for ease of detecting
       // which results are showing. A separate visibleResults array tracks the order 
       // that pools were selected to be seen.
@@ -115,11 +128,29 @@ export default new Vuex.Store({
         state.visibleResults.splice(visibleIdx,1)
       }
     },
-    addPoolSearchResults(state, results) {
-      let info = state.results[state.selectedPoolIdx]
-      mergeRepeatedFields( results.record_list )
-      info.hits = info.hits.concat(results.record_list)
+
+    clearSelectedPoolResults(state) {
+      // When the results are cleared, reset pagination, remove pool
+      // total from overall total and reset pool total to 0
+      let tgtPool = state.results[state.selectedPoolIdx]
+      let oldPoolTotal = tgtPool.total 
+      tgtPool.total = 0
+      tgtPool.page = 0
+      state.results[state.selectedPoolIdx].hits = []
+      state.total -= oldPoolTotal
     },
+
+    addPoolSearchResults(state, results) {
+      let tgtPool = state.results[state.selectedPoolIdx]
+      mergeRepeatedFields( results.record_list )
+      tgtPool.hits = tgtPool.hits.concat(results.record_list)
+      if (tgtPool.total == 0 ) {
+        // if pool total is zero add the new results total to overall
+        tgtPool.total = results.pagination.total
+        state.total += results.pagination.total
+      }
+    },
+
     setSearchResults(state, results) {
       // // this is called from top level search; resets results from all pools
       state.total = -1
@@ -147,17 +178,16 @@ export default new Vuex.Store({
         state.results[0]["show"] = true
         state.visibleResults.push(0)
       }
-      state.searchSummary = results.pools.length + " pools searched in " +
-        results.total_time_ms + "ms. " + results.total_hits + " total hits."
       state.total = results.total_hits
     },
+
     moreResults(state) {
       state.results[state.selectedPoolIdx].page++
     },
   },
 
   actions: {
-    // When an infinite scroll reaches the bottom of the results, call this to get the next
+    // When an infinite scroll reaches the bottom of the page, call this to get the next
     // batch of records from the currently selected pool
     moreResults(ctx) {
       ctx.commit('moreResults')
@@ -210,10 +240,11 @@ export default new Vuex.Store({
       if (state.selectedPoolIdx > -1) {
         tgtPage = state.results[state.selectedPoolIdx].page
       }
+      let f = rootGetters['filters/poolFilter'](state.selectedPoolIdx, "api")
       let req = {
         query: rootGetters['query/string'],
         pagination: { start: tgtPage * state.pageSize, rows: state.pageSize },
-        filters: rootGetters['filters/filter']
+        filters: f
       }
       let url = rootGetters.selectedPool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken

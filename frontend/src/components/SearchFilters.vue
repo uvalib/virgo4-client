@@ -50,9 +50,13 @@ export default {
       },
       clearClicked() {
          this.$store.commit("filters/clearAllFilters", this.poolIdx)
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
       },
       removeFilter(idx) {
-          this.$store.commit("filters/removeFilter", {poolResultsIdx: this.poolIdx, filterIdx: idx})
+         this.$store.commit("filters/removeFilter", {poolResultsIdx: this.poolIdx, filterIdx: idx})
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
       }
    }
 }

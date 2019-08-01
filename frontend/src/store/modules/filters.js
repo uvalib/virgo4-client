@@ -51,8 +51,8 @@ const filters = {
          if (fmt == "api") {
             let apiFilter = []
             state.poolFilters[idx].forEach(function(filterObj) {
-               filterObj.values.forEach(function(bucketOpt){
-                  apiFilter.push({name: filterObj.facet, value: bucketOpt.value})
+               filterObj.values.forEach(function(val){
+                  apiFilter.push({name: filterObj.facet, value: val})
                } )
             })
             return apiFilter

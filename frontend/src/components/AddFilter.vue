@@ -18,11 +18,11 @@
                <td class="label">Value:</td>
                <td class="sel">
                   <template v-if="selectedFacet && !updatingBuckets">
-                     <multiselect v-model="values" class="buckets"  :multiple="true"  :taggable="true"
+                     <multiselect v-model="values" class="buckets"  :multiple="true"  
                            placeholder="Select at least one value"
                            :block-keys="['Tab', 'Enter']" :hideSelected="true"
-                           :showLabels="false" :closeOnSelect="false"
-                           track-by="value" label="name" :searchable="false"
+                           :showLabels="false" 
+                           track-by="value" label="name" :searchable="true"
                            :optionHeight="32" :loading="updatingBuckets"
                            :options="facetBuckets(poolIdx, selectedFacet)">
                      </multiselect>
@@ -80,7 +80,8 @@ export default {
          // the whole json object for the option into the array ({name: xxx, value: yyy} instead of just the value)
          this.$store.commit("filters/addFilter", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet, values: this.values})
          this.$store.commit("filters/closeAdd")
-         // this.$store.dispatch("searchSelectedPool")
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
       },
       facetChosen() {
          if (this.facetBucketsAvailable( this.poolIdx, this.selectedFacet) === false) {
@@ -105,8 +106,12 @@ export default {
    margin-bottom:0;
    padding-top: 1px;
 }
-#app .buckets div.multiselect__select {
-   height: 35px;
+#app .buckets .multiselect--active div.multiselect__select {
+   top: -10px;
+}
+#app .buckets div.multiselect__select:before {
+   border-color: #888 transparent transparent;
+   border-width: 10px 8px 0;
 }
 #app .buckets span.multiselect__tag {
    background: var(--color-pale-blue);

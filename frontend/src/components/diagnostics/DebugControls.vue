@@ -47,6 +47,7 @@ export default {
 .debug-options {
    text-align: right;
    padding: 3px 5px;
+   float: right;
 }
 .debug.pure-button.pure-button-primary {
   font-size: 0.75em;

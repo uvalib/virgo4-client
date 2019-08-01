@@ -1,12 +1,15 @@
 <template>
    <div class="results-panel">
-      <h3>Showing results for: <i>{{queryString}}</i></h3>
+      <div class="query-summary">Showing results for: <i>{{queryString}}</i></div>
       <div class="toolbar">
-         <p class="summary">{{searchSummary}}</p>
-         <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
+         <div class="right-indent">
+            <p class="summary">{{total}} matches found in {{hitPoolCount}} pools</p>
+            <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
+         </div>
          <template v-if="total>0">
             <div class="pool-buttons">
-               <div v-bind:class="{showing: r.show}" @click="toggleVisibility(idx)" class="pool pure-button" v-for="(r,idx) in results" :key="idx">
+               <div  v-for="(r,idx) in results" :key="idx"  @click="toggleVisibility(idx)" 
+                  class="pool pure-button" v-bind:class="{showing: r.show, disabled: r.total==0}">
                   {{poolName(r.url)}} <span class="total">({{r.total}})</span>
                </div>
             </div>
@@ -55,10 +58,10 @@ export default {
          warnings: 'diagnostics/warnings',
          findPool: 'pools/find',
          rawQueryString: 'query/string',
+         hitPoolCount: 'hitPoolCount'
       }),
       ...mapState({
          total: state=>state.total,
-         searchSummary: state => state.searchSummary,
          results: state=>state.results,
          searchMode: state=>state.searchMode
       }),
@@ -99,11 +102,11 @@ export default {
    margin-top: 10px;
    text-align: left;
 }
-span.total {
-   font-weight: 100;
+div.right-indent {
+   margin-left: 5px;
 }
 .pool.pure-button {
-   margin: 4px;
+   margin: 5px;
    padding: 2px 20px;
    border-radius:    5px;
    font-size: 0.85em;
@@ -113,6 +116,12 @@ span.total {
 .pool.pure-button.showing {
    background-color: rgb(66, 184, 221);
    color: #fff;
+}
+.pool.pure-button.disabled {
+   opacity: 0.3;
+   cursor:default;
+   color: #444;
+   background: #ddd;
 }
 div.pools {
    display: grid;
@@ -130,7 +139,7 @@ div.pools {
    background: #f5f5f5;
    text-align: center;
    cursor: pointer;
-   border-radius: 0 0 6px 6px
+   border-radius: 0 0 5px 5px
 }
 .more-panel:hover {
    text-decoration: underline;
@@ -149,19 +158,22 @@ div.pools {
    padding: 4px 10px;
    background-color: var(--color-primary-orange);
    color: white;
-   font-weight: bold;
-   border-radius: 6px 6px 0 0;
+   font-weight: normal;
+   font-size: 0.9em;
+   border-radius: 5px 5px 0 0;
 }
 h4.no-hits {
    text-align: center;
    color: var(--color-primary-text);;
    font-size: 1.25em;
 }
-h3 {
+.query-summary {
    text-align: left;
-   margin: 0 0 5px 0;
+   margin: 0 0 0.2vw 0;
+   font-weight: bold;
+   font-size: 1.1em;
 }
-h3 i {
+.query-summary  i {
    font-weight: 100;
 }
 .summary, .curr-pool {
