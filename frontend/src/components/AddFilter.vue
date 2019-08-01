@@ -84,6 +84,7 @@ export default {
          this.$store.dispatch("searchSelectedPool")
       },
       facetChosen() {
+         this.values.splice(0, this.values.length)
          if (this.facetBucketsAvailable( this.poolIdx, this.selectedFacet) === false) {
             this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet})
          }
