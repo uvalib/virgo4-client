@@ -142,8 +142,10 @@ export default new Vuex.Store({
 
     addPoolSearchResults(state, results) {
       let tgtPool = state.results[state.selectedPoolIdx]
-      mergeRepeatedFields( results.record_list )
-      tgtPool.hits = tgtPool.hits.concat(results.record_list)
+      if (results.pagination.total > 0) {
+        mergeRepeatedFields( results.record_list )
+        tgtPool.hits = tgtPool.hits.concat(results.record_list)
+      }
       tgtPool.timeMS = results.elapsed_ms
       if (tgtPool.total == 0 ) {
         // if pool total is zero add the new results total to overall
