@@ -29,11 +29,18 @@ export default {
       }),
       ...mapGetters({
         isSignedIn: 'auth/isSignedIn',
+        hasAuthToken: 'auth/hasAuthToken'
       }),
    },
    methods: {
       netbadgeLogin() {
-         this.$store.dispatch("auth/netbadge")
+         if (this.hasAuthToken) {
+            this.$store.dispatch("auth/netbadge")
+         } else {
+            this.$store.dispatch("auth/getAuthToken").then(_response => {
+               this.$store.dispatch("auth/netbadge")
+            })
+         }
       },
       publicLogin() {
 

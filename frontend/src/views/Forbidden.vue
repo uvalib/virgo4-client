@@ -28,6 +28,7 @@ export default {
 .forbidden {
    min-height: 400px;
    position: relative;
+   margin-top: 4vw;
 }
 .messages {
    width:50%;

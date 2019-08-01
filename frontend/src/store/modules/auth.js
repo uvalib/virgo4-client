@@ -49,7 +49,7 @@ const auth = {
    actions: {
       getAuthToken(ctx) {
         ctx.commit('setAuthorizing', true)
-        axios.post("/authorize").then((response) => {
+        return axios.post("/authorize").then((response) => {
           ctx.commit('setAuthToken', response.data)
           ctx.commit('setAuthorizing', false)
         }).catch((error) => {
