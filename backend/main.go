@@ -20,6 +20,7 @@ const version = "0.2.0"
 
 // URL for the search API
 var searchAPI string
+var ilsAPI string
 var showDebug bool
 var showWarn bool
 var devAuthUser string
@@ -87,12 +88,18 @@ func main() {
 	flag.BoolVar(&showDebug, "debug", false, "Show debug info")
 	flag.BoolVar(&showWarn, "warn", false, "Show warning info")
 	flag.StringVar(&searchAPI, "search", "", "Search API URL")
+	flag.StringVar(&ilsAPI, "ils", "https://ils-connector.lib.virginia.edu/v2", "ILS Connector API URL")
 	flag.StringVar(&devAuthUser, "devuser", "", "Authorized computing id for dev")
 	flag.Parse()
 	if searchAPI == "" {
 		log.Fatal("search param is required")
 	} else {
 		log.Printf("Search API endpoint: %s", searchAPI)
+	}
+	if ilsAPI == "" {
+		log.Fatal("ils param is required")
+	} else {
+		log.Printf("ILS Connector API endpoint: %s", ilsAPI)
 	}
 	log.Printf("Show debug: %t, Show warn: %t", showDebug, showWarn)
 
