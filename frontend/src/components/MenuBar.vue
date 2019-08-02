@@ -43,7 +43,7 @@ export default {
          }
       },
       publicLogin() {
-
+         this.$router.push("/signin")
       },
       accountClick() {
 

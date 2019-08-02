@@ -62,6 +62,18 @@ const auth = {
          ctx.commit('signOutUser')
          router.push("/signedout")
       },
+      signin(ctx, data) {
+         ctx.commit('setAuthorizing', true)
+         axios.post("/authenticate/public", data).then((response) => {
+            ctx.commit("setSignedInUser", {userId: response.data, 
+               token: ctx.state.authToken, type: "public"} )
+            ctx.commit('setAuthorizing', false)
+            router.push("/signedin")
+         }).catch((_error) => {
+            ctx.commit('setAuthorizing', false)
+            router.push("/forbidden")
+          })
+      },
       netbadge(ctx) {
          ctx.commit('setAuthorizing', true)
          // NOTES: The redirect below and the subsequent redirect 

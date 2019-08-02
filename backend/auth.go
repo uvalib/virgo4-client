@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
@@ -63,5 +67,55 @@ func netbadgeAuthentication(c *gin.Context) {
 
 // PublicAuthentication aill authenticate public users of Virgo4
 func publicAuthentication(c *gin.Context) {
-	c.String(http.StatusNotImplemented, "Not yet implemented")
+	log.Printf("Public signin request; checking parameters")
+	var auth struct {
+		Barcode  string `json:"barcode"`
+		Password string `json:"password"`
+	}
+	if err := c.BindJSON(&auth); err != nil {
+		log.Printf("Unable to parse params: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	authURL := fmt.Sprintf("%s/users/%s/check_pin?pin=%s", ilsAPI, auth.Barcode, auth.Password)
+	resp, err := client.Get(authURL)
+	if err != nil {
+		status := http.StatusBadRequest
+		errMsg := err.Error()
+		if strings.Contains(err.Error(), "Timeout") {
+			status = http.StatusRequestTimeout
+			errMsg = fmt.Sprintf("pin_check for %s timed out", auth.Barcode)
+		} else if strings.Contains(err.Error(), "connection refused") {
+			status = http.StatusServiceUnavailable
+			errMsg = fmt.Sprintf("%s refused connection", ilsAPI)
+		}
+		log.Printf("ERROR: pin_check request failed: %s", errMsg)
+		c.String(status, errMsg)
+		return
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	var xmlValidPin bool
+	log.Printf("Raw pinCheck response %s", bodyBytes)
+	if err := xml.Unmarshal(bodyBytes, &xmlValidPin); err != nil {
+		log.Printf("ERROR: unable to parse pin_check  response: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if !xmlValidPin {
+		log.Printf("ERROR: pin for %s falied authentication", auth.Barcode)
+		c.String(http.StatusForbidden, "Authentication failed")
+		return
+	}
+
+	log.Printf("%s passed pin check", auth.Barcode)
+	c.String(http.StatusOK, auth.Barcode)
 }

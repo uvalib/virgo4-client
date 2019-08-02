@@ -16,7 +16,7 @@
               v-model="keyword"
               autocomplete="off"
               type="text"
-              placeholder="Search Virgo for books, articles, digital materials and more"
+              placeholder="Search Virgo for books, articles and more"
           >
           <div class="controls">
             <PoolSetup/>

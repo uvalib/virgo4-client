@@ -16,13 +16,11 @@ import (
 )
 
 // Version of the service
-const version = "0.2.0"
+const version = "0.3.0"
 
 // URL for the search API
 var searchAPI string
 var ilsAPI string
-var showDebug bool
-var showWarn bool
 var devAuthUser string
 
 // getVersion reports the version of the serivce
@@ -70,10 +68,8 @@ func healthCheck(c *gin.Context) {
 func getConfig(c *gin.Context) {
 	type config struct {
 		SearchAPI string `json:"searchAPI"`
-		ShowDebug bool   `json:"showDebug"`
-		ShowWarn  bool   `json:"showWarn"`
 	}
-	cfg := config{SearchAPI: searchAPI, ShowDebug: showDebug, ShowWarn: showWarn}
+	cfg := config{SearchAPI: searchAPI}
 	c.JSON(http.StatusOK, cfg)
 }
 
@@ -85,8 +81,6 @@ func main() {
 	var port int
 
 	flag.IntVar(&port, "port", 8080, "Service port (default 8080)")
-	flag.BoolVar(&showDebug, "debug", false, "Show debug info")
-	flag.BoolVar(&showWarn, "warn", false, "Show warning info")
 	flag.StringVar(&searchAPI, "search", "", "Search API URL")
 	flag.StringVar(&ilsAPI, "ils", "https://ils-connector.lib.virginia.edu/v2", "ILS Connector API URL")
 	flag.StringVar(&devAuthUser, "devuser", "", "Authorized computing id for dev")
@@ -101,7 +95,6 @@ func main() {
 	} else {
 		log.Printf("ILS Connector API endpoint: %s", ilsAPI)
 	}
-	log.Printf("Show debug: %t, Show warn: %t", showDebug, showWarn)
 
 	log.Printf("Setup routes...")
 	gin.SetMode(gin.ReleaseMode)
@@ -118,7 +111,7 @@ func main() {
 	auth := router.Group("/authenticate")
 	{
 		auth.GET("/netbadge", netbadgeAuthentication)
-		auth.GET("/public", publicAuthentication)
+		auth.POST("/public", publicAuthentication)
 	}
 
 	// Note: in dev mode, this is never actually used. The front end is served

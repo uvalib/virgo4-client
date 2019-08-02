@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
+import SignIn from './views/SignIn.vue'
 import SignedOut from './views/SignedOut.vue'
 import Forbidden from './views/Forbidden.vue'
 import store from './store'
@@ -31,6 +32,11 @@ const router = new Router({
         }
         next('/')
       }
+    },
+    {
+      path: '/signin',
+      name: 'signin',
+      component: SignIn
     },
     {
       path: '/signedout',
