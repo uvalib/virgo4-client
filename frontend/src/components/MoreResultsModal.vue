@@ -1,12 +1,12 @@
 <template>
-   <div class="more-results-overlay">
-      <div id="more-header" class="more-header">
+   <div @click="closePool" class="more-results-overlay">
+      <div  @click="blockClick" id="more-header" class="more-header">
          <span class="pool-name">{{poolDescription(selectedPool.url)}}</span>
          <i @click="closePool" class="pool-close fas fa-times-circle"></i>
          <SearchFilters />
       </div>
       
-      <div @click="contentClick" class="more-results-content">
+      <div @click="blockClick" class="more-results-content">
          <div id="hits-scroller" v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  
                class="hits" v-bind:style="{ top: scrollTop + 'px' }">
             <div class="summary"><b>{{selectedPool.total}} results for </b>{{queryString()}}</div>
@@ -81,7 +81,7 @@ export default {
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
-      contentClick(event) {
+      blockClick(event) {
         event.stopPropagation() 
       },
       infiniteScrollEnabled() {

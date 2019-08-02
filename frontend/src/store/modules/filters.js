@@ -21,16 +21,6 @@ const filters = {
          // Faceets array contains some nested bucket info; map only facet name
          return  state.poolFacets[idx].map( f => f.facet )
       },
-      facetBucketsAvailable: (state) => (idx, facetName) => {
-         if ( idx == -1 || idx >= state.poolFacets.length) {
-            return false
-         }
-         // Facet info is an array of objects - {facet: name, buckets: []}
-         // find the object with facet name matching passed facet and see
-         // if the bucket list empty
-         let facet = state.poolFacets[idx].find(f => f.facet === facetName) 
-         return facet.buckets.length > 0
-      },
       facetBuckets: (state) => (idx, facetName) => {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
@@ -110,24 +100,28 @@ const filters = {
    },
 
    actions: {
-      getBuckets({ _state, commit, rootState, rootGetters}, data) {
+      // ctx members:  getters, rootGetters, rootState, state
+      getBuckets(ctx, data) {
          // Recreate the query for the target pool, but include a 
          // request for facet/bucket info for the  specified facet
-         let poolURL = rootGetters['poolResultsURL'](data.poolResultsIdx)
+         let poolURL = ctx.rootGetters['poolResultsURL'](data.poolResultsIdx)
          let req = {
-            query: rootGetters['query/string'],
+            query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
-            facet: data.facet
+            facet: data.facet,
+            filters: ctx.getters.poolFilter(data.poolResultsIdx, "api")
           }
          let tgtURL = poolURL+"/api/search"
-         axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.auth.authToken
-         commit('setUpdatingBuckets', true)
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.auth.authToken
+         ctx.commit('setUpdatingBuckets', true)
          axios.post(tgtURL, req).then((response) => {
-            commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, facet: data.facet, buckets: response.data.facet_list[0].buckets})
-            commit('setUpdatingBuckets', false)
+            ctx.commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, 
+               facet: data.facet, buckets: response.data.facet_list[0].buckets}
+            )
+            ctx.commit('setUpdatingBuckets', false)
          }).catch((error) => {
-            commit('setError', error, { root: true })
-            commit('setUpdatingBuckets', false)
+            ctx.commit('setError', error, { root: true })
+            ctx.commit('setUpdatingBuckets', false)
           })
       }
    }

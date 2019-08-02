@@ -65,17 +65,14 @@ export default {
       }),
       ...mapGetters({
          poolFacets: 'filters/poolFacets',
-         facetBucketsAvailable: 'filters/facetBucketsAvailable',
          facetBuckets: 'filters/facetBuckets',
       }),
    },
    methods: {
-      cancelAdd(event) {
-         event.stopPropagation()
+      cancelAdd() {
          this.$store.commit("filters/closeAdd")
       },
-      addFilter(event) {
-         event.stopPropagation()
+      addFilter() {
          // IMPORTANT: vue-multiselect binds v-model to this.values. The binding shoves
          // the whole json object for the option into the array ({name: xxx, value: yyy} instead of just the value)
          this.$store.commit("filters/addFilter", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet, values: this.values})
@@ -85,9 +82,7 @@ export default {
       },
       facetChosen() {
          this.values.splice(0, this.values.length)
-         if (this.facetBucketsAvailable( this.poolIdx, this.selectedFacet) === false) {
-            this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet})
-         }
+         this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet})
       }
    }
 }
