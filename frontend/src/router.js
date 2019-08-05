@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import SignIn from './views/SignIn.vue'
 import SignedOut from './views/SignedOut.vue'
 import Forbidden from './views/Forbidden.vue'
+import NotFound from './views/NotFound.vue'
 import store from './store'
 
 Vue.use(Router)
@@ -48,6 +49,11 @@ const router = new Router({
       name: 'forbidden',
       component: Forbidden
     },
+    {
+      path: "*",
+      name: "notfound",
+      component: NotFound
+    }
   ],
   scrollBehavior(/*to, from, savedPosition*/) {
     // each new 'page' will scroll to the top of the screen
