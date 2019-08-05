@@ -1,7 +1,7 @@
 <template>
    <div class="filters">
-      <div class="filters-head">
-         <span>Search Filters</span>
+      <div class="filters-head clearfix">
+         <span class="title">Search Filters</span>
          <span v-if="hasFilter(poolIdx)" @click="clearClicked" class="clear">Clear</span>
          <span v-if="!addingFilter" @click="addClicked" class="add">Add</span>
       </div>
@@ -67,14 +67,13 @@ table {
    margin-left: 15px;
 }
 table td {
-   padding: 2px 5px;
+   padding: 4px 5px 0 0;
 }
 td.filter {
    font-weight: 100;
    width: 100%;
 }
 td.label {
-   padding: 2px 5px 0 0;
    font-weight: bold;
    vertical-align: text-top;
    text-align: right;
@@ -83,26 +82,36 @@ td.label {
    background: white;
    color: #666;
    font-size: 0.8em;
-   padding: 5px 0 5px 8px;
+   padding: 5px 0;
    margin-top: 5px;
    border-radius: 5px 0 0 0;
 }
 .filters-head {
    font-weight: bold;
    border-bottom: 1px solid #ccc;
-   margin-bottom: 10px;
+   margin-bottom: 5px;
    padding-bottom: 5px;
+}
+.filters-head .title {
+   vertical-align: -webkit-baseline-middle;
+   font-size: 1.1em;
+   padding-left: 10px;
 }
 .no-filter {
    margin-left: 15px;
 }
-.add, .apply, .clear {
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+.add, .clear {
    background: var(--color-primary-blue);
    float: right;
    margin-right: 6px;
    color: white;
-   font-size:0.8em;
-   padding: 2px 20px;
+   font-size:0.9em;
+   padding: 5px 20px;
    border-radius: 5px;
    cursor:pointer;
    opacity: 0.7;
@@ -120,6 +129,7 @@ span.clear {
    padding-right: 10px;
    color: #666;
    opacity: 0.5;
+   font-size: 1.25em;
    cursor: pointer;
 }
 .remove-filter:hover {

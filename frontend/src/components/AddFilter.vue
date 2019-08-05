@@ -22,7 +22,7 @@
                            placeholder="Select at least one value"
                            :block-keys="['Tab', 'Enter']" :hideSelected="true"
                            :showLabels="false" 
-                           track-by="value" label="name" :searchable="true"
+                           track-by="value" label="name" :searchable="false"
                            :optionHeight="32" :loading="updatingBuckets"
                            :options="facetBuckets(poolIdx, selectedFacet)">
                      </multiselect>
@@ -160,7 +160,7 @@ div.controls {
    margin: 8px 0 0 0;
 }
 #app span.pure-button.pure-button-primary.filter {
-   padding: 2px 20px;
+   padding: 4px 20px;
    margin: 0 5px 0 0;
    font-size: 0.9em;
 

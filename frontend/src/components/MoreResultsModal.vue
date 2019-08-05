@@ -143,7 +143,7 @@ export default {
 div.more-header {
    position: fixed;
    right: 0;
-   font-size: 1.1em;
+   font-size: 1em;
    color: white;
    background: var(--color-primary-orange);
    margin:0;
@@ -153,12 +153,14 @@ div.more-header {
    border-radius: 5px 0 0 0;
 }
 .pool-name {
-   margin-left: 10px;
+   display: inline-block;
+   padding: 5px 0 5px 5px;
 }
 .pool-close {
    position: absolute;
    right: 8px;
    top: 8px;
+   font-size: 1.5em;
    cursor: pointer;
    opacity: 0.6;
 }

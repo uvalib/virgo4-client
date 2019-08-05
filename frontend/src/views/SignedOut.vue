@@ -39,15 +39,13 @@ export default {
 .signedout {
    min-height: 400px;
    position: relative;
+   margin-top: 4vw;
 }
 .messages {
-   width:50%;
+   width:40%;
    margin: 5px auto 30px auto;
    color: #444;
    font-size: 1.1em;
-}
-p {
-   margin: 5px 0;
 }
 </style>
 

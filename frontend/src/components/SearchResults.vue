@@ -33,7 +33,6 @@
             <div class="pool-info">
                <div class="metrics">
                   <span>{{pool.total}} matches found in {{pool.timeMS}} ms</span>
-                  <span @click="selectPool(pool.resultIdx)" class="view-all">View All</span>
                </div>
                <template v-if="hasFilter(pool.resultIdx)">
                   <div class="filter-head">Search Filters</div>
@@ -122,15 +121,14 @@ export default {
 
 <style scoped>
 .pool-buttons {
-   margin-top: 10px;
+   margin-top: 5px;
    text-align: left;
 }
 .hide-pool {
    float: right;
-   position: relative;
-   top: 3px;
    cursor: pointer;
    opacity: 0.6;
+   font-size: 1.5em;
 }
 .hide-pool:hover {
    opacity: 1;
@@ -140,15 +138,24 @@ export default {
    border-left: 1px solid #ccc;
    border-bottom: 1px solid #ccc;
    margin: 0;
-   padding: 5px;
+   padding: 0px;
    font-size: 0.7em;
    font-weight: 100;
    background-color: #f5f5f5;
 }
+.metrics {
+   padding: 5px;
+}
 .filter-head {
-   font-weight: normal; 
-   margin: 3px 0 0 1px;
+   margin: 0;
    border-bottom: 1px solid #ccc;
+   border-top: 1px solid #ccc;
+   padding: 2px 5px;
+   font-weight: bold;
+   background: #e5e5e5;
+}
+table.filters {
+   margin: 3px 5px;
 }
 table td {
    padding: 2px 5px;
@@ -162,6 +169,7 @@ td.label {
    font-weight: normal;
    vertical-align: text-top;
    text-align: right;
+   font-weight: 500;
 }
 span.view-all {
    float: right;
@@ -172,7 +180,7 @@ div.right-indent {
 }
 .pool.pure-button {
    margin: 5px;
-   padding: 2px 20px;
+   padding: 5px 20px;
    border-radius:    5px;
    font-size: 0.85em;
    font-weight: bold;
@@ -219,7 +227,7 @@ div.pools {
    display: inline-block;
 }
 .pool-titlebar {
-   padding: 4px 6px 4px 10px;
+   padding: 10px 8px 10px 10px;
    background-color: var(--color-primary-orange);
    color: white;
    font-weight: normal;
@@ -249,7 +257,6 @@ h4.no-hits {
 }
 div.toolbar {
    position: relative;
-   margin-bottom: 10px;
 }
 @media only screen and (min-width: 768px) {
    div.results-panel {
