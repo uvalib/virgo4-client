@@ -10,30 +10,34 @@
       <AccordionContent title="Details">
          <table>
             <tr v-for="field in hit.detailFields" :key="getKey(field)">
-               <td class="label">{{field.label}}:</td>
+               <td class="label">{{fieldLabel(field)}}:</td>
                <td class="value" v-html="fieldValueString(field)"></td>
             </tr>
          </table>
       </AccordionContent>
-      <DebugPanel v-if="hit.debug" :debugInfo="hit.debug"/>
    </div>
 </template>
 
 <script>
 import AccordionContent from '@/components/AccordionContent'
-import DebugPanel from "@/components/diagnostics/DebugPanel"
 export default {
    props: {
       hit: { type: Object, required: true}
    },
    components: {
-      DebugPanel,AccordionContent
+      AccordionContent
    },
    computed: {
    },
    methods: {
       getKey(field) {
          return field.name+field.value
+      },
+      fieldLabel(field) {
+         if (field.label == "Access in Virgo Classic") {
+            return "More Information"
+         }
+         return field.label
       },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
