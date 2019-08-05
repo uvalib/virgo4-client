@@ -17,9 +17,6 @@
          <h5 v-else class="no-hits">No matching records found</h5>
       </div>
 
-      <DebugPanel v-if="hasDebug" :debugInfo="debugInfo"/>
-      <WarningPanel v-if="hasWarnings" :warnings="warnings"/>
-
       <transition-group tag="div" class="pools" 
             name="pool-transition"
             enter-active-class="animated faster fadeIn"
@@ -60,19 +57,13 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
-import DebugPanel from "@/components/diagnostics/DebugPanel"
-import WarningPanel from "@/components/diagnostics/WarningPanel"
 export default {
    components: {
-      DebugPanel, WarningPanel,SearchHit
+      SearchHit
    },
    computed: {
       ...mapGetters({
          visibleResults: 'visibleResults',
-         hasDebug: 'diagnostics/hasDebug',
-         debugInfo: 'diagnostics/debugInfo',
-         hasWarnings: 'diagnostics/hasWarnings',
-         warnings: 'diagnostics/warnings',
          findPool: 'pools/find',
          rawQueryString: 'query/string',
          hitPoolCount: 'hitPoolCount',

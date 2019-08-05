@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import messaging from './plugins/messaging'
 import versionChecker from './plugins/version'
-import diagnostics from './modules/diagnostics'
 import pools from './modules/pools'
 import auth from './modules/auth'
 import query from './modules/query'
@@ -222,12 +221,8 @@ export default new Vuex.Store({
       let url = state.searchAPI + "/api/search?debug=1&intuit=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
-        // The response includes all available pools, pool search resonses, 
-        // pool-specific diagnostics and a list of available facets for each pool.
-        // Store this data in the appropriate module 
         commit('setSearchResults', response.data)
         commit('pools/setPools', response.data.pools)
-        commit('diagnostics/setSearchDiagnostics', response.data)
         commit('filters/setAllAvailableFacets', response.data)
         commit('setSearching', false)
       }).catch((error) => {
@@ -256,8 +251,6 @@ export default new Vuex.Store({
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
-        let diagPayload = { poolResultsIdx: state.selectedPoolIdx, debug: response.data.debug, warnings: response.data.warnings }
-        commit('diagnostics/setPoolDiagnostics', diagPayload)
         commit('setSearching', false)
       }).catch((error) => {
         commit('setError', error)
@@ -269,7 +262,6 @@ export default new Vuex.Store({
     getConfig(ctx) {
       axios.get("/config").then((response) => {
         ctx.commit('setConfig', response.data)
-        ctx.commit('diagnostics/setConfig', response.data)
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)
       })
@@ -278,7 +270,6 @@ export default new Vuex.Store({
 
   modules: {
     auth: auth,
-    diagnostics: diagnostics,
     pools: pools,
     query: query,
     filters: filters

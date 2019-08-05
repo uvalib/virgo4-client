@@ -35,7 +35,7 @@ export default {
       },
       fieldLabel(field) {
          if (field.label == "Access in Virgo Classic") {
-            return "More Information"
+            return "More"
          }
          return field.label
       },

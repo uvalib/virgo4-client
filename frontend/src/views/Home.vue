@@ -1,6 +1,5 @@
 <template>
    <div class="home">
-      <DebugControls v-if="hasResults" />
       <div v-show="searching" class="searching-overlay">
         <div class="searching-box">
           <h3>Searching...</h3>
@@ -51,13 +50,12 @@ import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import PoolSetup from "@/components/popovers/PoolSetup"
 import SearchTips from "@/components/popovers/SearchTips"
-import DebugControls from "@/components/diagnostics/DebugControls"
 import AdvancedSearch from "@/components/AdvancedSearch"
 export default {
    name: "home",
    components: {
      SearchResults, PoolSetup,
-     SearchTips, DebugControls, AdvancedSearch
+     SearchTips, AdvancedSearch
    },
    computed: {
       ...mapState({
