@@ -105,6 +105,9 @@ export default {
    },
    mounted() {
       this.calcHeaderHeight()
+      if ( this.selectedPool.statusCode == 408) {
+         this.$store.dispatch("searchSelectedPool")
+      }
    }
 }
 </script>

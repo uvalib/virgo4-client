@@ -58,9 +58,11 @@ const filters = {
          data.pool_results.forEach(function (pr, resultIdx) {
             let poolFacets = []
             state.poolFilters.push([])  // add empty filter for each pool
-            pr.available_facets.forEach( function(f) {
-               poolFacets.push( {facet: f, buckets: []} )
-            })
+            if ( pr.available_facets) {
+               pr.available_facets.forEach( function(f) {
+                  poolFacets.push( {facet: f, buckets: []} )
+               })
+            } 
             state.poolFacets[resultIdx] = poolFacets
          })
       },

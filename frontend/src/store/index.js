@@ -64,6 +64,25 @@ export default new Vuex.Store({
         }
       })
       return poolCnt
+    },
+    skippedPoolCount: state => {
+      let poolCnt = 0
+      state.results.forEach(function(p) {
+        if (p.total == 0 && p.statusCode == 408) {
+          poolCnt++
+        }
+      })
+      return poolCnt
+    },
+    failedPoolCount: state => {
+      let poolCnt = 0
+      state.results.forEach(function(p) {
+        // no results, not OK code and not timeout code. Must be pool error
+        if (p.total == 0 && p.statusCode != 200 && p.statusCode != 408) {
+          poolCnt++
+        }
+      })
+      return poolCnt
     }
   },
 
@@ -112,8 +131,8 @@ export default new Vuex.Store({
       state.selectedPoolIdx = -1
     },
     toggleResultVisibility(state, poolResultsIdx) {
-      // Don't change visibility if there are no results to see
-      if (state.results[poolResultsIdx].total == 0) {
+      // Don't change visibility if there are no results to see -- unless the pool timed out
+      if (state.results[poolResultsIdx].total == 0 && state.results[poolResultsIdx].statusCode != 408) {
         return
       }
       // NOTES: the result itself is tagged with show true/false for ease of detecting
@@ -139,17 +158,19 @@ export default new Vuex.Store({
       state.total -= oldPoolTotal
     },
 
-    addPoolSearchResults(state, results) {
+    addPoolSearchResults(state, poolResults) {
       let tgtPool = state.results[state.selectedPoolIdx]
-      if (results.pagination.total > 0) {
-        mergeRepeatedFields( results.record_list )
-        tgtPool.hits = tgtPool.hits.concat(results.record_list)
+      if (poolResults.pagination.total > 0) {
+        mergeRepeatedFields( poolResults.record_list )
+        tgtPool.hits = tgtPool.hits.concat(poolResults.record_list)
       }
-      tgtPool.timeMS = results.elapsed_ms
+      tgtPool.timeMS = poolResults.elapsed_ms
+      tgtPool.statusCode = 200 
+      tgtPool.statusMessage = ""
       if (tgtPool.total == 0 ) {
         // if pool total is zero add the new results total to overall
-        tgtPool.total = results.pagination.total
-        state.total += results.pagination.total
+        tgtPool.total = poolResults.pagination.total
+        state.total += poolResults.pagination.total
       }
     },
 
@@ -167,7 +188,8 @@ export default new Vuex.Store({
         if (pr.record_list) {
           mergeRepeatedFields( pr.record_list )
           let result = { url: pr.service_url, total: pr.pagination.total,
-            hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx }
+            hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
+            statusCode: pr.status_code, statusMessage: pr.status_msg }
           state.results.push(result)
           if (pr.confidence != "low" && state.visibleResults.length < 3) {
             result["show"] = true
@@ -176,10 +198,11 @@ export default new Vuex.Store({
         } else {
           state.results.push({
             url: pr.service_url,
-            total: 0, hits: [], page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx })
+            total: 0, hits: [], page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
+            statusCode: pr.status_code, statusMessage: pr.status_msg })
         }
       })
-      if (state.visibleResults.length == 0) {
+      if (state.visibleResults.length == 0 && state.results[0].statusCode == 200  && state.results[0].hits.length > 0) {
         state.results[0]["show"] = true
         state.visibleResults.push(0)
       }
@@ -221,14 +244,14 @@ export default new Vuex.Store({
       let url = state.searchAPI + "/api/search?debug=1&intuit=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
       axios.post(url, req).then((response) => {
-        commit('setSearchResults', response.data)
         commit('pools/setPools', response.data.pools)
+        commit('setSearchResults', response.data)
         commit('filters/setAllAvailableFacets', response.data)
         commit('setSearching', false)
-      }).catch((error) => {
-        commit('setError', error)
-        commit('setSearching', false)
-      })
+      })//.catch((error) => {
+     //   commit('setError', error)
+       // commit('setSearching', false)
+      //})
     },
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for

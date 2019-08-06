@@ -3,25 +3,36 @@
       <div class="query-summary">Showing results for: <i>{{queryString}}</i></div>
       <div class="toolbar">
          <div class="right-indent">
-            <p class="summary">{{total}} matches found in {{hitPoolCount}} pools</p>
+            <p class="summary">
+               <span>{{total}} matches found in {{results.length}} sources.</span> 
+               <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
+               <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
+            </p>
             <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
          </div>
-         <template v-if="total>0">
-            <div class="pool-buttons">
-               <div  v-for="(r,idx) in results" :key="idx"  @click="toggleVisibility(idx)" 
+         <div class="pool-buttons">
+            <template  v-for="(r,idx) in results">  
+               <div v-if="wasPoolSkipped(r)" @click="toggleVisibility(idx)" :key="idx" 
+                  class="pool pure-button" v-bind:class="{showing: r.show}">
+                  {{poolName(r.url)}} <span class="total">(not searched)</span>
+               </div>
+               <div v-else-if="poolFailed(r)" :key="idx" 
+                  class="pool pure-button disabled failed"
+                  :title="r.statusMessage">
+                  {{poolName(r.url)}} <span class="total">(failed)</span>
+               </div>
+               <div v-else @click="toggleVisibility(idx)" :key="idx" 
                   class="pool pure-button" v-bind:class="{showing: r.show, disabled: r.total==0}">
                   {{poolName(r.url)}} <span class="total">({{r.total}})</span>
                </div>
-            </div>
-         </template>
-         <h5 v-else class="no-hits">No matching records found</h5>
+            </template>
+         </div>
       </div>
 
       <transition-group tag="div" class="pools" 
             name="pool-transition"
             enter-active-class="animated faster fadeIn"
-            leave-active-class="animated faster fadeOut"
-            v-if="total>0">
+            leave-active-class="animated faster fadeOut">
          <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.url">
             <div class="pool-titlebar">
                <span>{{poolDescription(pool.url)}}</span>
@@ -67,6 +78,8 @@ export default {
          findPool: 'pools/find',
          rawQueryString: 'query/string',
          hitPoolCount: 'hitPoolCount',
+         skippedPoolCount: 'skippedPoolCount',
+         failedPoolCount: 'failedPoolCount',
          hasFilter: 'filters/hasFilter',
          poolFilter: 'filters/poolFilter',
       }),
@@ -80,6 +93,12 @@ export default {
       },
    },
    methods: {
+      poolFailed(p) {
+         return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
+      },
+      wasPoolSkipped(p) {
+         return p.statusCode == 408 && p.total == 0
+      },
       formatFilterValues(values) {
          return values.join(", ")
       },
@@ -91,6 +110,9 @@ export default {
       },
       toggleVisibility(resultIdx) {
          this.$store.commit("toggleResultVisibility", resultIdx)
+         if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
+            this.selectPool(resultIdx)
+         }
       },
       poolName(url) {
          let p = this.findPool(url) 
@@ -187,6 +209,11 @@ div.right-indent {
    color: #444;
    background: #ddd;
 }
+.pool.pure-button.disabled.failed {
+   background: #D33;
+   color: white;
+   opacity: 0.5;
+}
 div.pools {
    display: grid;
    grid-gap: 10px;
@@ -246,6 +273,10 @@ h4.no-hits {
    font-size: 0.85em;
    position: relative;
 }
+.summary .subtotal {
+   display: block;
+   margin: 2px 0 2px 15px;
+}
 div.toolbar {
    position: relative;
 }
@@ -264,9 +295,13 @@ div.toolbar {
 div.pools {
    text-align: left;
 }
+.total {
+   font-weight: 100;
+}
 .refine {
    display: block;
    text-align: left;
    font-size: 0.9em;
+   margin: 10px 0 5px;
 }
 </style>
