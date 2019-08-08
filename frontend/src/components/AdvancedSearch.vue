@@ -121,11 +121,12 @@ div.search-term {
 }
 input[type=text] {
    padding: 6px !important;
-   flex-grow: 1;
+   flex: 1 1 auto;
    margin-right: 10px;
 }
 .date-range-type {
    margin-right: 10px;
+   flex: 1 1 auto;
 }
 .date-sep {
    font-weight: 100;
@@ -133,12 +134,9 @@ input[type=text] {
 }
 .date-criteria {
    display: flex;
-   flex-grow: 1 1 auto;
+   flex: 1 1 auto;
    flex-wrap: wrap;
    justify-content: space-between;
-}
-select {
-  flex: 1 1 auto;
 }
 select.field {
   margin-right: 10px;
