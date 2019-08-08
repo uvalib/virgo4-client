@@ -37,7 +37,7 @@ div.authorize {
    -webkit-box-shadow: 2px 2px 8px black;
    box-shadow: 2px 2px 8px black;
 }
-div.authorize h4 {
+div.authorize h1 {
   color: #666;
   border: none;
 }

@@ -3,10 +3,10 @@
       <v-popover placement="top-end">
          <span class="text-button trigger">Search Tips&nbsp;<i class="fas fa-info-circle"></i></span>
          <div class="tips-container" slot="popover">
-            <h4>
+            <h1>
                Search Tips
                <i v-close-popover class="close fas fa-times-circle"></i>
-            </h4>
+            </h1>
             <div class="tips">
                <ul>
                   <li class="no-pad">
@@ -56,7 +56,7 @@ i.fas.fa-times-circle.close:hover {
    padding-bottom: 5px;
    border-radius: 5px;
 }
-.tips-container h4 {
+.tips-container h1 {
    padding: 8px 0 6px 0;
    margin: 0;
    text-align: center;

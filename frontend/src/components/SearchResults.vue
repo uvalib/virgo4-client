@@ -252,7 +252,7 @@ div.pools {
    font-size: 0.9em;
    border-radius: 5px 5px 0 0;
 }
-h4.no-hits {
+h1.no-hits {
    text-align: center;
    color: var(--color-primary-text);;
    font-size: 1.25em;

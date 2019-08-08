@@ -1,5 +1,5 @@
 <template>
-   <div class="home">
+   <main class="home">
       <div v-show="searching" class="searching-overlay">
         <div class="searching-box">
           <h3>Searching...</h3>
@@ -8,7 +8,7 @@
       </div>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
-           <h4>Basic Search<SearchTips/></h4>
+           <h1>Basic Search<SearchTips/></h1>
           <input
               @keyup.enter="searchClicked"
               id="keyword"
@@ -40,7 +40,7 @@
         </div>
       </transition>
       <SearchResults v-if="hasResults"/>
-   </div>
+   </main>
 </template>
 
 <script>
@@ -120,7 +120,7 @@ div.searching-box {
   border-radius: 5px;
   z-index: 1005;
 }
-div.searching-box h4 {
+div.searching-box h1 {
   color: var(--color-primary-text);
   border: none;
 }

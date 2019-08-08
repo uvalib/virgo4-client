@@ -1,6 +1,6 @@
 <template>
-   <div class="not-found">
-      <h4>Page Not Found</h4>
+   <main class="not-found">
+      <h1>Page Not Found</h1>
       <div class="messages">
          <p><b>Sorry!</b></p>
          <p>
@@ -26,7 +26,7 @@
       <p>
          <span @click="backClicked" class="pure-button pure-button-primary">Return to Virgo</span>
       </p>
-   </div>
+   </main>
 </template>
 
 <script>

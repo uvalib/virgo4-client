@@ -7,7 +7,7 @@
       </div>
       <div class="library-link">
          <a target="_blank" href="https://library.virginia.edu">
-            <img class="uva-library" src="../assets/uvalogo.png"/>
+            <img alt="University of Virgina Library" class="uva-library" src="../assets/uvalogo.png"/>
          </a>
       </div>
       <div style="clear:both"></div>

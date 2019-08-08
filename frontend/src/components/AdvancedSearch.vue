@@ -1,9 +1,9 @@
 <template>
    <div class="advanced-panel">
-      <h4>
+      <h1>
         <span>Advanced Search</span>
         <SearchTips/>
-      </h4>
+      </h1>
       <div class="criteria">
         <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
           <template v-if="idx > 0" >

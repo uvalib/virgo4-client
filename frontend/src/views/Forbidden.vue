@@ -1,6 +1,6 @@
 <template>
-   <div class="forbidden">
-      <h4>Authentication Failed</h4>
+   <main class="forbidden">
+      <h1>Authentication Failed</h1>
       <div class="messages">
          <p><b>Sorry!</b></p>
          <p>
@@ -10,7 +10,7 @@
       <p>
          <span @click="backClicked" class="pure-button pure-button-primary">Return to Virgo</span>
       </p>
-   </div>
+   </main>
 </template>
 
 <script>

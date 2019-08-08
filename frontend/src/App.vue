@@ -53,13 +53,14 @@ export default {
 /* Color variable definitions */
 :root {
    --color-primary-orange: #e57200;
-   --color-link: #2979ff;
-   --color-primary-blue: #0078e7;
-   --color-pale-blue: rgb(66, 184, 221);
+   --color-link: #007ae7;
+   --color-primary-blue: #007ae7;
+   --color-pale-blue: #459CED;
    --color-secondary-blue: #002359;
    --color-primary-text: #555;
    --color-dark-blue: rgb(0, 47, 108);
-   --color-hover-highight: #f5f5ff;
+   --color-hover-highight: #f5f5h4
+   ff;
    --color-error: firebrick;
 }
 
@@ -74,7 +75,7 @@ export default {
    background: var(--color-pale-blue);
    color: white;
    border-radius: 5px;
-   opacity: 0.8;
+   opacity: 0.9;
 }
 #app .pure-button.pure-button-secondary:hover {
   opacity: 1;
@@ -115,13 +116,9 @@ html, body {
 #app span.pure-button {
   margin: 0 0 0 10px;
   border-radius: 5px;
-  opacity: 0.8;
-}
-#app span.pure-button:hover {
-  opacity: 1;
 }
 
-#app h4 {
+#app h1 {
   color: var(--color-primary-orange);
   margin: 8px 0;
   padding-bottom: 5px;

@@ -1,6 +1,6 @@
 <template>
-   <div class="signin">
-      <h4>Non-UVA User Sign In</h4>
+   <main class="signin">
+      <h1>Non-UVA User Sign In</h1>
       <table class="pure-form form">
          <tr>
             <td class="label">Library ID</td>
@@ -21,7 +21,7 @@
          <span @click="cancelClicked" class="pure-button pure-button-primary">Cancel</span>
          <span @click="signinClicked" class="pure-button pure-button-primary">Sign In</span>
       </div>
-   </div>
+   </main>
 </template>
 
 <script>

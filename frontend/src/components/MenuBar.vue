@@ -1,5 +1,5 @@
 <template>
-   <div class="menu">
+   <nav class="menu">
       <template v-if="isSignedIn">
          <span @click="accountClick" class="menu-item">
             <i class="fas fa-user"></i>&nbsp;My Account ({{signedInUser}})
@@ -16,7 +16,7 @@
       <a class="ask" target="_blank" href="https://library.virginia.edu/askalibrarian">
          <i class="fas fa-comments"></i>&nbsp;Ask a Librarian
       </a>
-   </div>
+   </nav>
 </template>
 
 <script>

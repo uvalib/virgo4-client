@@ -1,6 +1,6 @@
 <template>
-   <div class="signedout">
-      <h4>Signed Out</h4>
+   <main class="signedout">
+      <h1>Signed Out</h1>
       <div class="messages">
          <p>You have successfully ended your Virgo session.</p>
          <p v-if="sessionType=='netbadge'">
@@ -15,7 +15,7 @@
       <p>
          <span @click="backClicked" class="pure-button pure-button-primary">Return to Virgo</span>
       </p>
-   </div>
+   </main>
 </template>
 
 <script>
