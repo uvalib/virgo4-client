@@ -12,7 +12,7 @@
           <input
               @keyup.enter="searchClicked"
               id="keyword"
-              v-model="keyword"
+              v-model="basic"
               autocomplete="off"
               type="text"
               placeholder="Search Virgo for books, articles and more"
@@ -64,14 +64,14 @@ export default {
          searching: state => state.searching,
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
-         searchMode: state => state.searchMode,
+         searchMode: state => state.query.mode,
          signInMessage: state => state.auth.signInMessage
       }),
       ...mapGetters({
         hasResults: 'hasResults',
       }),
       ...mapFields('query',[
-        'keyword',
+        'basic',
       ]),
       basicSearch() {
         return this.searchMode == "basic"
@@ -97,7 +97,7 @@ export default {
         this.$store.dispatch("searchAllPools")
       },
       advancedClicked() {
-        this.$store.commit("setAdvancedSearch")
+        this.$store.commit("query/setAdvancedSearch")
       },
    }
 };

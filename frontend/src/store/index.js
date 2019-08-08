@@ -12,7 +12,6 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     searchAPI: "",
-    searchMode: "basic",
     fatal: "",
     error: "",
     searching: false,
@@ -87,12 +86,6 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    setAdvancedSearch(state) {
-      state.searchMode = "advanced"
-    },
-    setBasicSearch(state) {
-      state.searchMode = "basic"
-    },
     setFatal(state, err) {
       state.fatal = err
     },

@@ -86,7 +86,7 @@ export default {
       ...mapState({
          total: state=>state.total,
          results: state=>state.results,
-         searchMode: state=>state.searchMode
+         searchMode: state=>state.query.mode
       }),
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
@@ -103,7 +103,7 @@ export default {
          return values.join(", ")
       },
       refineClicked() {
-         this.$store.commit("setAdvancedSearch")
+         this.$store.commit("query/setAdvancedSearch")
       },
       selectPool(resultIdx) {
          this.$store.commit("selectPoolResults", resultIdx)

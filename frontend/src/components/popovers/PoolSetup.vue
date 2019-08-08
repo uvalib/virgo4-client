@@ -1,9 +1,9 @@
 <template>
    <v-popover style="display:inline-block;">
-      <span @click="getPools" class="pure-button pure-button-secondary">Sources Setup</span>
+      <span @click="getPools" class="pure-button pure-button-secondary">Sources</span>
       <div class="pools-container" slot="popover">
          <h4>
-            Sources Setup
+            Sources
             <i v-close-popover class="action close fas fa-times-circle"></i>
          </h4>
          <div class="pools-list">

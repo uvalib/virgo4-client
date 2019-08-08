@@ -1,75 +1,84 @@
 <template>
    <div class="advanced-panel">
-      <h4>Advanced Search<SearchTips/></h4>
-      <table>
-         <tr>
-            <td class="label">Identifier</td>
-            <td><input @keyup.enter="searchClicked" v-model="identifier" type="text"></td>
-            <td class="op"><SearchOpPicker v-model="identifierOp"/></td>
-         </tr>
-         <tr>
-            <td class="label">Title</td>
-            <td><input @keyup.enter="searchClicked" v-model="title" type="text"></td>
-            <td class="op"><SearchOpPicker v-model="titleOp"/></td>
-         </tr>
-         <tr>
-            <td class="label">Author</td>
-            <td><input @keyup.enter="searchClicked" v-model="author" type="text"></td>
-            <td class="op"><SearchOpPicker v-model="authorOp"/></td>
-         </tr>
-         <tr>
-            <td class="label">Subject</td>
-            <td><input @keyup.enter="searchClicked" v-model="subject" type="text"></td>
-            <td class="op"><SearchOpPicker v-model="subjectOp"/></td>
-         </tr>
-         <tr>
-            <td class="label">Keyword</td>
-            <td><input @keyup.enter="searchClicked" v-model="keyword" type="text"></td>
-            <td class="op"><SearchOpPicker v-model="keywordOp"/></td>
-         </tr>
-         <DateSearch/>
-      </table>
+      <h4>
+        <span>Advanced Search</span>
+        <SearchTips/>
+      </h4>
+      <div class="criteria">
+        <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
+          <template v-if="idx > 0" >
+            <select class="search-term-op" v-model="term.op">
+              <option value="AND">AND</option>
+              <option value="OR">OR</option>
+              <option value="NOT">NOT</option>
+            </select>
+          </template>
+          <select class="field" v-model="term.field">
+            <option value="keyword">Keyword</option>
+            <option value="identifier">Identifier</option>
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="subject">Subject</option>
+            <option value="date">Date</option>
+          </select>
+          <template v-if="term.field != 'date'">
+            <input @keyup.enter="searchClicked" v-model="term.value" type="text" class="term"/>
+          </template>
+          <template v-else>
+            <span class="date-criteria">
+              <select class="date-range-type"  v-model="term.type">
+                <option value="EQUAL">EQUALS</option>
+                <option value="AFTER">AFTER</option>
+                <option value="BEFORE">BEFORE</option>
+                <option value="BETWEEN">BETWEEN</option>
+              </select>
+              <input @keyup.enter="searchClicked" type="text" v-model="term.value" >
+              <span v-if="term.type=='BETWEEN'">
+                <span class="date-sep">and</span>
+                <input type="text" @keyup.enter="searchClicked" v-model="term.endVal">
+              </span>
+            </span>
+          </template>
+          <span class="remove">
+            <i @click="removeCriteria(idx)" class="remove fas fa-trash-alt"></i>
+          </span>
+        </div>
+      </div>
       <div class="controls">
-         <PoolSetup/>
-         <span @click="cancelClicked" class="pure-button pure-button-cancel">Cancel</span>
-         <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+        <span @click="addClicked" class="pure-button pure-button-secondary">Add Criteria</span>
+        <PoolSetup/>
+        <span @click="basicClicked" class="pure-button pure-button-secondary">Basic Search</span>
+        <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
       </div>
    </div>
 </template>
 
 <script>
-import { mapFields } from 'vuex-map-fields'
-import DateSearch from "@/components/DateSearch"
-import SearchOpPicker from "@/components/SearchOpPicker"
 import PoolSetup from "@/components/popovers/PoolSetup"
 import SearchTips from "@/components/popovers/SearchTips"
+import { mapMultiRowFields } from 'vuex-map-fields'
 export default {
    components: {
-     SearchOpPicker, DateSearch, PoolSetup, SearchTips
+     PoolSetup, SearchTips
    },
    computed: {
-      ...mapFields('query',[
-        'identifier',
-        'keyword',
-        'author',
-        'title',
-        'subject',
-        'identifierOp',
-        'keywordOp',
-        'authorOp',
-        'titleOp',
-        'subjectOp',
-      ]),
+      ...mapMultiRowFields('query',['advanced']),
    },
    methods: {
       searchClicked() {
         this.$store.dispatch("searchAllPools")
       },
-      cancelClicked() {
+      basicClicked() {
         this.$store.commit("query/clear")
-        this.$store.commit("setBasicSearch")
+        this.$store.commit("query/setBasicSearch")
+      },
+      addClicked() {
+        this.$store.commit("query/addCriteria")
+      },
+      removeCriteria(idx) {
+        this.$store.commit("query/removeCriteria", idx)
       }
-   }
+    }
 };
 </script>
 
@@ -78,47 +87,59 @@ export default {
   background: rgb(202, 60, 60);
   color: white;
 }
-.advanced {
-  margin-left: 5px;
+div.criteria {
   font-size: 0.9em;
-  font-weight: bold;
-  color: var(--color-link)
-}
-.advanced:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-.advanced-panel table td {
-  padding: 2px 5px !important;
-}
-.advanced-panel table td.label {
-  font-weight: 500;
-  text-align: right;
-  width:1%;
-  white-space:nowrap;
-  color: #777;
-}
-.advanced-panel table td.op{
-  width:1%;
-  white-space:nowrap;
-  color: #777;
-}
-.advanced-panel table {
-  width: 100%;
-  font-size: 0.9em;
-}
-.advanced-panel table input {
-  width: 100%;
-  box-sizing: border-box;
-}
-.advanced-panel table td {
-  padding: 0.75vw 0;
 }
 .controls {
   font-size: 0.85em;
   font-weight: bold;
   text-align: right;
-  padding-top: 10px;
+  padding: 10px 0;
   position: relative;
+}
+
+span.remove {
+  margin-left: 10px;
+  display: inline-block;
+}
+i.remove {
+  opacity: .6;
+  cursor: pointer;
+  font-size: 1.5em;
+  position: relative;
+  top: 4px;
+}
+i.remove:hover {
+  opacity: 1;
+}
+div.search-term {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: nowrap;
+   margin: 4px 0;
+}
+.search-term-op {
+   display: inline-block;
+   margin-right: 10px;
+}
+input[type=text] {
+   padding: 6px !important;
+   flex: 1 1 auto;
+   margin-right: 10px;
+}
+.date-range-type {
+   margin-right: 10px;
+}
+.date-sep {
+   font-weight: 100;
+   margin-right: 10px;
+}
+.date-criteria {
+   flex: 1 1 auto;
+   display: flex;
+   flex-direction: row;
+}
+select.field {
+  margin-right: 10px;
 }
 </style>
