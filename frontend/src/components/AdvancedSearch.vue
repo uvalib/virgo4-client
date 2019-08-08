@@ -25,7 +25,7 @@
             <input @keyup.enter="searchClicked" v-model="term.value" type="text" class="term"/>
           </template>
           <template v-else>
-            <span class="date-criteria">
+            <div class="date-criteria">
               <select class="date-range-type"  v-model="term.type">
                 <option value="EQUAL">EQUALS</option>
                 <option value="AFTER">AFTER</option>
@@ -33,11 +33,9 @@
                 <option value="BETWEEN">BETWEEN</option>
               </select>
               <input @keyup.enter="searchClicked" type="text" v-model="term.value" >
-              <span v-if="term.type=='BETWEEN'">
-                <span class="date-sep">and</span>
-                <input type="text" @keyup.enter="searchClicked" v-model="term.endVal">
-              </span>
-            </span>
+              <span v-if="term.type=='BETWEEN'" class="date-sep">and</span>
+              <input v-if="term.type=='BETWEEN'" type="text" @keyup.enter="searchClicked" v-model="term.endVal">
+            </div>
           </template>
           <span class="remove">
             <i @click="removeCriteria(idx)" class="remove fas fa-trash-alt"></i>
@@ -114,7 +112,6 @@ i.remove:hover {
 }
 div.search-term {
    display: flex;
-   flex-direction: row;
    flex-wrap: nowrap;
    margin: 4px 0;
 }
@@ -124,7 +121,7 @@ div.search-term {
 }
 input[type=text] {
    padding: 6px !important;
-   flex: 1 1 auto;
+   flex-grow: 1;
    margin-right: 10px;
 }
 .date-range-type {
@@ -135,9 +132,13 @@ input[type=text] {
    margin-right: 10px;
 }
 .date-criteria {
-   flex: 1 1 auto;
    display: flex;
-   flex-direction: row;
+   flex-grow: 1 1 auto;
+   flex-wrap: wrap;
+   justify-content: space-between;
+}
+select {
+  flex: 1 1 auto;
 }
 select.field {
   margin-right: 10px;
