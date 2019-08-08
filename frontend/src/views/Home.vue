@@ -20,9 +20,11 @@
           <div class="controls">
             <PoolSetup/>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
-            <span class="text-button advanced-link" @click="advancedClicked">
-              Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
-            </span>
+            <div class="advanced">
+              <span class="text-button advanced-link" @click="advancedClicked">
+                Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
+              </span>
+            </div>
           </div>
         </template>
         <AdvancedSearch v-else/>
@@ -174,9 +176,14 @@ p.fatal, p.error {
   border-radius: 5px;
   font-weight: bold;
 }
+div.advanced {
+  text-align: right;
+}
 .text-button.advanced-link {
   margin-top: 15px;
   font-size: 1.1em;
-  display: block;
+}
+.text-button.advanced-link:hover {
+  text-decoration: underline;
 }
 </style>

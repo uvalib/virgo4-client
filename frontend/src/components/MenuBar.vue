@@ -8,9 +8,7 @@
          <span @click="signOut" class="menu-item">Sign out</span>
       </template>   
       <template v-else>
-         <span @click="netbadgeLogin" class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
-         <span class="sep">|</span>
-         <span @click="publicLogin" class="menu-item">Non-UVA User?</span>
+         <span @click="signinClicked" class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
       </template>
       <span class="sep">|</span>
       <a class="ask" target="_blank" href="https://library.virginia.edu/askalibrarian">
@@ -29,20 +27,10 @@ export default {
       }),
       ...mapGetters({
         isSignedIn: 'auth/isSignedIn',
-        hasAuthToken: 'auth/hasAuthToken'
       }),
    },
    methods: {
-      netbadgeLogin() {
-         if (this.hasAuthToken) {
-            this.$store.dispatch("auth/netbadge")
-         } else {
-            this.$store.dispatch("auth/getAuthToken").then(_response => {
-               this.$store.dispatch("auth/netbadge")
-            })
-         }
-      },
-      publicLogin() {
+      signinClicked() {
          this.$router.push("/signin")
       },
       accountClick() {

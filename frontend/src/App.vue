@@ -228,7 +228,6 @@ html, body {
   font-weight: normal;
   color:var(--color-link);
   cursor:pointer;
-  opacity: 0.8;
   display: inline-block
 }
 .text-button:hover {

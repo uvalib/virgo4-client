@@ -90,7 +90,11 @@ p.example {
    font-size: 1.2em;
 }
 span.trigger:hover {
+   text-decoration: underline;
+}
+span.text-button.trigger {
    opacity: 1;
+   font-weight: 500;
 }
 p.tips {
   margin:20px 0;

@@ -1,6 +1,6 @@
 <template>
    <main class="signin">
-      <h1>Non-UVA User Sign In</h1>
+      <h1>User Sign In</h1>
       <table class="pure-form form">
          <tr>
             <td class="label">Library ID</td>
@@ -20,13 +20,24 @@
       <div class="controls">
          <span @click="cancelClicked" class="pure-button pure-button-primary">Cancel</span>
          <span @click="signinClicked" class="pure-button pure-button-primary">Sign In</span>
+         <span class="or-sep">OR</span>
+         <span class="netbadge">
+            <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
+            <p class="hint">UVA users only</p>
+         </span>
       </div>
    </main>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
    name: "signin", 
+   computed: {
+       ...mapGetters({
+        hasAuthToken: 'auth/hasAuthToken'
+      }),
+   },
    data: function()  {
       return {
          user: '',
@@ -39,12 +50,25 @@ export default {
       },
       signinClicked() {
          this.$store.dispatch("auth/signin", {barcode: this.user, password: this.pin})
-      }
+      },
+      netbadgeLogin() {
+         if (this.hasAuthToken) {
+            this.$store.dispatch("auth/netbadge")
+         } else {
+            this.$store.dispatch("auth/getAuthToken").then(_response => {
+               this.$store.dispatch("auth/netbadge")
+            })
+         }
+      },
    }
 }
 </script>
 
 <style scoped>
+.or-sep {
+   margin: 0 5px 0 15px;
+   font-weight: normal;
+}
 .signin {
    min-height: 400px;
    position: relative;
@@ -63,7 +87,7 @@ td.label {
   vertical-align: text-top;
 }
 td.value {
-   padding: 2px 5px;
+   padding: 3px 0 10px 0;
    width: 100%;
 }
 #app .signin .pure-form input {
@@ -77,8 +101,13 @@ p.hint {
    color: #666;
    text-align: left;
 }
+span.netbadge p.hint {
+   text-align: right;
+   margin-top: 5px;
+}
 .controls {
    margin-top: 25px;
+   text-align: right;
 }
 </style>
 
