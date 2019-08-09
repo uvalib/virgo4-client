@@ -3,19 +3,19 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
 )
 
+// TODO add middleware thagt will intercept all API requests and ensure that
+// and auth token is present.
+
 // Authorize is a placeholder API for minting API access tokens.
 // This implementation simply generates a random token and returns it.
-func authorize(c *gin.Context) {
+func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
 	token := xid.New().String()
 	c.String(http.StatusOK, token)
@@ -26,12 +26,12 @@ func authorize(c *gin.Context) {
 // NOTE: this is called directly from the front-end as a transient page with
 // window.location.href = "/authenticate/netbadge" to force it through
 // NetBadge authentication.
-func netbadgeAuthentication(c *gin.Context) {
+func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	log.Printf("Checking authentication headers...")
 	computingID := c.GetHeader("remote_user")
 	devMode := false
-	if devAuthUser != "" {
-		computingID = devAuthUser
+	if svc.DevAuthUser != "" {
+		computingID = svc.DevAuthUser
 		devMode = true
 		log.Printf("Using dev auth user ID: %s", computingID)
 	}
@@ -66,7 +66,7 @@ func netbadgeAuthentication(c *gin.Context) {
 }
 
 // PublicAuthentication aill authenticate public users of Virgo4
-func publicAuthentication(c *gin.Context) {
+func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	log.Printf("Public signin request; checking parameters")
 	var auth struct {
 		Barcode  string `json:"barcode"`
@@ -79,29 +79,13 @@ func publicAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
-	timeout := time.Duration(5 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
-	authURL := fmt.Sprintf("%s/users/%s/check_pin?pin=%s", ilsAPI, auth.Barcode, auth.Password)
-	resp, err := client.Get(authURL)
-	if err != nil {
-		status := http.StatusBadRequest
-		errMsg := err.Error()
-		if strings.Contains(err.Error(), "Timeout") {
-			status = http.StatusRequestTimeout
-			errMsg = fmt.Sprintf("pin_check for %s timed out", auth.Barcode)
-		} else if strings.Contains(err.Error(), "connection refused") {
-			status = http.StatusServiceUnavailable
-			errMsg = fmt.Sprintf("%s refused connection", ilsAPI)
-		}
-		log.Printf("ERROR: pin_check request failed: %s", errMsg)
-		c.String(status, errMsg)
+	authURL := fmt.Sprintf("%s/users/%s/check_pin?pin=%s", svc.ILSAPI, auth.Barcode, auth.Password)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(authURL)
+	if ilsErr != nil {
+		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
 
-	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	var xmlValidPin bool
 	log.Printf("Raw pinCheck response %s", bodyBytes)
 	if err := xml.Unmarshal(bodyBytes, &xmlValidPin); err != nil {

@@ -1,13 +1,8 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
-	"net/http"
-	"path/filepath"
-	"strings"
-	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
@@ -16,84 +11,21 @@ import (
 )
 
 // Version of the service
-const version = "0.3.0"
-
-// URL for the search API
-var searchAPI string
-var ilsAPI string
-var devAuthUser string
-
-// getVersion reports the version of the serivce
-func getVersion(c *gin.Context) {
-	build := "unknown"
-	// cos our CWD is the bin directory
-	files, _ := filepath.Glob("../buildtag.*")
-	if len(files) == 1 {
-		build = strings.Replace(files[0], "../buildtag.", "", 1)
-	}
-
-	vMap := make(map[string]string)
-	vMap["version"] = version
-	vMap["build"] = build
-	c.JSON(http.StatusOK, vMap)
-}
-
-// healthCheck reports the health of the server
-func healthCheck(c *gin.Context) {
-	log.Printf("Got healthcheck request")
-	type hcResp struct {
-		Healthy bool   `json:"healthy"`
-		Message string `json:"message,omitempty"`
-	}
-	hcMap := make(map[string]hcResp)
-
-	if searchAPI != "" {
-		timeout := time.Duration(5 * time.Second)
-		client := http.Client{
-			Timeout: timeout,
-		}
-		apiURL := fmt.Sprintf("%s/version", searchAPI)
-		_, err := client.Get(apiURL)
-		if err != nil {
-			log.Printf("ERROR: SearchAPI %s ping failed: %s", searchAPI, err.Error())
-			hcMap["v4search"] = hcResp{Healthy: false, Message: err.Error()}
-		} else {
-			hcMap["v4search"] = hcResp{Healthy: true}
-		}
-	}
-	c.JSON(http.StatusOK, hcMap)
-}
-
-// getConfig returns front-end configuration data as JSON
-func getConfig(c *gin.Context) {
-	type config struct {
-		SearchAPI string `json:"searchAPI"`
-	}
-	cfg := config{SearchAPI: searchAPI}
-	c.JSON(http.StatusOK, cfg)
-}
+const version = "0.4.0"
 
 /**
  * MAIN
  */
 func main() {
-	log.Printf("===> Virgo4 client server staring up <===")
-	var port int
+	log.Printf("===> Virgo4 client service staring up <===")
 
-	flag.IntVar(&port, "port", 8080, "Service port (default 8080)")
-	flag.StringVar(&searchAPI, "search", "", "Search API URL")
-	flag.StringVar(&ilsAPI, "ils", "https://ils-connector.lib.virginia.edu/v2", "ILS Connector API URL")
-	flag.StringVar(&devAuthUser, "devuser", "", "Authorized computing id for dev")
-	flag.Parse()
-	if searchAPI == "" {
-		log.Fatal("search param is required")
-	} else {
-		log.Printf("Search API endpoint: %s", searchAPI)
-	}
-	if ilsAPI == "" {
-		log.Fatal("ils param is required")
-	} else {
-		log.Printf("ILS Connector API endpoint: %s", ilsAPI)
+	log.Printf("Loading service configuration")
+	cfg := LoadConfig()
+
+	log.Printf("Initialize service")
+	svc, err := InitService(version, cfg)
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 
 	log.Printf("Setup routes...")
@@ -104,14 +36,18 @@ func main() {
 	p := ginprometheus.NewPrometheus("gin")
 	p.Use(router)
 
-	router.GET("/version", getVersion)
-	router.GET("/healthcheck", healthCheck)
-	router.GET("/config", getConfig)
-	router.POST("/authorize", authorize)
+	router.GET("/version", svc.GetVersion)
+	router.GET("/healthcheck", svc.HealthCheck)
+	router.GET("/config", svc.GetConfig)
+	router.POST("/authorize", svc.Authorize)
+	api := router.Group("/api")
+	{
+		api.GET("/users/:id", svc.GetUser)
+	}
 	auth := router.Group("/authenticate")
 	{
-		auth.GET("/netbadge", netbadgeAuthentication)
-		auth.POST("/public", publicAuthentication)
+		auth.GET("/netbadge", svc.NetbadgeAuthentication)
+		auth.POST("/public", svc.PublicAuthentication)
 	}
 
 	// Note: in dev mode, this is never actually used. The front end is served
@@ -125,7 +61,7 @@ func main() {
 		c.File("./public/index.html")
 	})
 
-	portStr := fmt.Sprintf(":%d", port)
+	portStr := fmt.Sprintf(":%d", cfg.Port)
 	log.Printf("Start service v%s on port %s", version, portStr)
 	log.Fatal(router.Run(portStr))
 }
