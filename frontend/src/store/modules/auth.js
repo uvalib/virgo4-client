@@ -9,7 +9,8 @@ const auth = {
       authorizing: false,
       signedInUser: "",
       signInMessage: "",
-      sessionType: ""
+      sessionType: "",
+      accountInfo: null
    },
 
    getters: {
@@ -18,6 +19,12 @@ const auth = {
       },
       isSignedIn: state => {
          return state.signedInUser != ""  
+      },
+      hasAccountInfo: state => {
+         if (state.signedInUser.length == 0)  return false
+         if (state.accountInfo == null) return false 
+         if (state.accountInfo.id != state.signedInUser) return false 
+         return true
       }
    },
 
@@ -35,6 +42,9 @@ const auth = {
          state.signInMessage = `You are now signed in as '${state.signedInUser}'`
          Vue.cookies.remove("v4_auth")
          Vue.cookies.remove("v4_auth_user")
+      },
+      setAccountInfo(state, data) {
+         state.accountInfo = data
       },
       clearSignInMessage(state) {
          state.signInMessage = ""
@@ -57,6 +67,13 @@ const auth = {
           ctx.commit('setFatal', "Authorization failed: " + error.response.data, { root: true })
           ctx.commit('setAuthorizing', false)
         })
+      },
+      getAccountInfo(ctx) {
+         return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
+            ctx.commit('setAccountInfo', response.data)
+          }).catch((error) => {
+            ctx.commit('setError', error.response.data, { root: true })
+          })
       },
       signout(ctx) {
          ctx.commit('signOutUser')

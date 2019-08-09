@@ -11,17 +11,18 @@ import (
 
 // UserInfo contains ILS connector details for a user
 type UserInfo struct {
-	DisplayName        string `xml:"displayName"`
-	Title              string `xml:"title"`
-	Profile            string `xml:"profile"`
-	OrganizationalUnit string `xml:"organizationalUnit"`
-	Address            string `xml:"physicalDelivery"`
-	Email              string `xml:"email"`
-	TotalCheckouts     int    `xml:"totalCheckouts"`
-	TotalHolds         int    `xml:"totalHolds"`
-	TotalOverdue       int    `xml:"totalOverdue"`
-	TotalRecalls       int    `xml:"totalRecalls"`
-	TotalReserves      int    `xml:"totalReserves"`
+	ID                 string `json:"id"`
+	DisplayName        string `xml:"displayName" json:"displayName"`
+	Title              string `xml:"title" json:"title"`
+	Profile            string `xml:"profile" json:"profile"`
+	OrganizationalUnit string `xml:"organizationalUnit" json:"organizationalUnit"`
+	Address            string `xml:"physicalDelivery" json:"address"`
+	Email              string `xml:"email" json:"email"`
+	TotalCheckouts     int    `xml:"totalCheckouts" json:"totalCheckouts"`
+	TotalHolds         int    `xml:"totalHolds" json:"totalHolds"`
+	TotalOverdue       int    `xml:"totalOverdue" json:"totalOverdue"`
+	TotalRecalls       int    `xml:"totalRecalls" json:"totalRecalls"`
+	TotalReserves      int    `xml:"totalReserves" json:"totalReserves"`
 }
 
 // GetUser uses ILS Connector V2 API /users to get details for a user
@@ -43,6 +44,6 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	user.ID = userID
 	c.JSON(http.StatusOK, user)
 }

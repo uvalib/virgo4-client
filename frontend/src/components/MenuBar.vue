@@ -34,7 +34,7 @@ export default {
          this.$router.push("/signin")
       },
       accountClick() {
-
+         this.$router.push("/account")
       },
       signOut() {
          this.$store.dispatch("auth/signout")
