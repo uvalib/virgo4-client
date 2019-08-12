@@ -11,7 +11,7 @@
                <tr>
                   <th>Primary</th><th>Include</th><th>Name</th>
                </tr>
-               <tr class="pool" v-for="p in pools" :key="p.id">
+               <tr class="pool" v-for="p in pools" :key="p.url">
                   <td class="centered">
                      <i @click="toggleTargetPool(p.url)" v-if="isTargetPool(p.url)" class="fas fa-star"></i>
                      <i @click="toggleTargetPool(p.url)" v-else class="far fa-star"></i>
