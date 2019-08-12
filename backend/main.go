@@ -42,7 +42,7 @@ func main() {
 	router.POST("/authorize", svc.Authorize)
 	api := router.Group("/api")
 	{
-		api.GET("/users/:id", svc.GetUser)
+		api.GET("/users/:id", svc.AuthMiddleware, svc.GetUser)
 	}
 	auth := router.Group("/authenticate")
 	{

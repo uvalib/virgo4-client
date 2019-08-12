@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
@@ -102,4 +103,31 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("%s passed pin check", auth.Barcode)
 	c.String(http.StatusOK, auth.Barcode)
+}
+
+// AuthMiddleware is middleware that checks for a user auth token in the
+// Authorization header. For now, it does nothing but ensure token presence.
+func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
+	token, err := getBearerToken(c.Request.Header.Get("Authorization"))
+
+	if err != nil {
+		log.Printf("Authentication failed: [%s]", err.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// TODO do something with token
+	log.Printf("got bearer token: [%s]", token)
+}
+
+// getBearerToken is a helper to extract the token from headers
+func getBearerToken(authorization string) (string, error) {
+	components := strings.Split(strings.Join(strings.Fields(authorization), " "), " ")
+
+	// must have two components, the first of which is "Bearer", and the second a non-empty token
+	if len(components) != 2 || components[0] != "Bearer" || components[1] == "" {
+		return "", fmt.Errorf("Invalid Authorization header: [%s]", authorization)
+	}
+
+	return components[1], nil
 }
