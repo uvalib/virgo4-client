@@ -241,10 +241,10 @@ export default new Vuex.Store({
         commit('setSearchResults', response.data)
         commit('filters/setAllAvailableFacets', response.data)
         commit('setSearching', false)
-      })//.catch((error) => {
-     //   commit('setError', error)
-       // commit('setSearching', false)
-      //})
+      }).catch((error) => {
+        commit('setError', error)
+        commit('setSearching', false)
+      })
     },
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
