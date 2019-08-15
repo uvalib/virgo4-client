@@ -72,7 +72,7 @@ const auth = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
-          }).catch((error) => {
+          }).catch((_error) => {
             router.push("/forbidden")
           })
       },

@@ -110,7 +110,7 @@ export default {
    border-width: 10px 8px 0;
 }
 #app .buckets span.multiselect__tag {
-   background: var(--color-pale-blue);
+   background: var(--color-primary-blue);
    color: white;
    margin-bottom: 0;
    margin-right: 5px;
@@ -160,9 +160,10 @@ div.controls {
    margin: 8px 0 0 0;
 }
 #app span.pure-button.pure-button-primary.filter {
-   padding: 4px 20px;
+   padding: 5px 20px;
    margin: 0 5px 0 0;
    font-size: 0.9em;
+   font-weight: bold;
 
 }
 .clearfix::after {

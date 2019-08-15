@@ -114,16 +114,10 @@ td.label {
    padding: 5px 20px;
    border-radius: 5px;
    cursor:pointer;
-   opacity: 0.7;
+   opacity: 0.9;
 }
 .add:hover, .apply:hover, .clear:hover {
    opacity: 1;
-}
-.add {
-   background: var(--color-pale-blue);
-}
-span.clear {
-    background: var(--color-error);
 }
 .remove-filter {
    padding-right: 10px;
