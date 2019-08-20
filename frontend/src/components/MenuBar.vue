@@ -8,7 +8,9 @@
          <span @click="signOut" class="menu-item">Sign out</span>
       </template>   
       <template v-else>
-         <span @click="signinClicked" class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
+         <router-link to="/signin">
+            <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
+         </router-link>
       </template>
       <span class="sep">|</span>
       <a class="ask" target="_blank" href="https://library.virginia.edu/askalibrarian">
@@ -53,18 +55,20 @@ export default {
 .sep {
    margin: 0 15px;
 }
-#app .menu a.ask {
+#app .menu a {
    color: white;
 }
-#app .menu a.ask:hover {
+#app .menu a:hover {
    text-decoration: none;
    border-bottom: 1px solid white;
 }
-.menu-item {
+#app .menu .menu-item {
    cursor: pointer;
+    color: white;
 }
-.menu-item:hover {
+#app .menu .menu-item:hover {
    border-bottom: 1px solid white;
+   text-decoration: none;
 }
 </style>
 

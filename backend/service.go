@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	dbx "github.com/go-ozzo/ozzo-dbx"
+	_ "github.com/lib/pq"
 )
 
 // ServiceContext contains common data used by all handlers
@@ -18,6 +20,7 @@ type ServiceContext struct {
 	SearchAPI   string
 	ILSAPI      string
 	DevAuthUser string
+	DB          *dbx.DB
 }
 
 // RequestError contains http status code and message for a
@@ -31,6 +34,17 @@ type RequestError struct {
 func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version, SearchAPI: cfg.SearchAPI,
 		ILSAPI: cfg.ILSAPI, DevAuthUser: cfg.DevAuthUser}
+
+	log.Printf("Connect to Postgres")
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
+		cfg.DBUser, cfg.DBPass, cfg.DBName, cfg.DBHost, cfg.DBPort)
+	db, err := dbx.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.LogFunc = log.Printf
+	ctx.DB = db
+
 	return &ctx, nil
 }
 
@@ -72,6 +86,16 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 			hcMap["v4search"] = hcResp{Healthy: true}
 		}
 	}
+
+	tq := svc.DB.NewQuery("select count(*) as total from sources")
+	var total int
+	err := tq.Row(&total)
+	if err != nil {
+		hcMap["postgres"] = hcResp{Healthy: false, Message: err.Error()}
+	} else {
+		hcMap["postgres"] = hcResp{Healthy: true}
+	}
+
 	c.JSON(http.StatusOK, hcMap)
 }
 

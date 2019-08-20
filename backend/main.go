@@ -43,11 +43,12 @@ func main() {
 	api := router.Group("/api")
 	{
 		api.GET("/users/:id", svc.AuthMiddleware, svc.GetUser)
+		api.POST("/users/:id/signout", svc.AuthMiddleware, svc.SignoutUser)
 	}
 	auth := router.Group("/authenticate")
 	{
 		auth.GET("/netbadge", svc.NetbadgeAuthentication)
-		auth.POST("/public", svc.PublicAuthentication)
+		auth.POST("/public", svc.AuthMiddleware, svc.PublicAuthentication)
 	}
 
 	// Note: in dev mode, this is never actually used. The front end is served

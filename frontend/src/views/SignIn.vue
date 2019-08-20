@@ -12,7 +12,7 @@
         <tr>
             <td class="label">PIN</td>
             <td class="value">
-               <input v-model="pin" type="password">
+               <input @keyup.enter="signinClicked" v-model="pin" type="password">
                <p class="hint">Last four digits of your ID, unless you've updated it</p>
             </td>
         </tr>

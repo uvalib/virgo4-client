@@ -23,3 +23,16 @@ and includes a simple server written in go to serve it.
 2. In another terminal `cd frontend` then `V4_CONFIG='http://localhost:8080' yarn serve`
     Starts a Yarn dev server with hot reloading and connects to the local go service for config.
 
+### Database Notes
+
+The backend of the client uses a Postgres DB for user settings/preferences. The schema is managed by 
+https://github.com/golang-migrate/migrate and the scripts are in ./backend/db/migrations.
+
+Install the migrate binary on your host system. For OSX, the easiest method is brew. Execute:
+`brew install golang-migrate`.
+
+Define your PSQL connection params in an environment variable, like this:
+`export V4DB=postgres://v4user:pass@localhost:5432/virgo4?sslmode=disable`
+
+Run migrations like this:
+`migrate -database ${V4DB} -path backend/db/migrations up`

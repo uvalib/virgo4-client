@@ -1,28 +1,22 @@
--- Expected databasename virgo4
-
-DROP TABLE IF EXISTS sources CASCADE;
-CREATE TABLE sources (
+CREATE TABLE IF NOT EXISTS sources (
    id serial PRIMARY KEY,
    private_url VARCHAR (80) UNIQUE NOT NULL
 );
 
-DROP TABLE IF EXISTS users CASCADE;
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS  users (
    id serial PRIMARY KEY,
    virgo4_id VARCHAR (80) UNIQUE NOT NULL,
    auth_token VARCHAR(80) UNIQUE NOT NULL,
    auth_created_at timestamptz NOT NULL
 );
 
-DROP TABLE IF EXISTS bookmark_folders CASCADE;
-CREATE TABLE bookmark_folders (
+CREATE TABLE IF NOT EXISTS  bookmark_folders (
    id serial PRIMARY KEY,
    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
    name VARCHAR(255) UNIQUE NOT NULL
 );
 
-DROP TABLE IF EXISTS bookmarks CASCADE;
-CREATE TABLE bookmarks (
+CREATE TABLE IF NOT EXISTS  bookmarks (
    id serial PRIMARY KEY,
    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
    folder_id integer NOT NULL REFERENCES bookmark_folders(id) ON DELETE CASCADE,

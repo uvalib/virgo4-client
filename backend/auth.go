@@ -30,10 +30,8 @@ func (svc *ServiceContext) Authorize(c *gin.Context) {
 func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	log.Printf("Checking authentication headers...")
 	computingID := c.GetHeader("remote_user")
-	devMode := false
 	if svc.DevAuthUser != "" {
 		computingID = svc.DevAuthUser
-		devMode = true
 		log.Printf("Using dev auth user ID: %s", computingID)
 	}
 	if computingID == "" {
@@ -50,19 +48,13 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
+	c.SetCookie("v4_auth", "invalid", -1, "/", "", false, false)
 	log.Printf("NetBadge and authorization token valid. %s is authenticated.", computingID)
 
-	// Set auth info into in an open cookie that the client can use for a one-off validation.
-	// Also place in a secure, http-only cookie that the browser can't touch.
-	// It will be passed along on all admin api requests.
+	// Set auth info in a cookie the client can read and pass along in future requests
 	authStr := fmt.Sprintf("%s|%s|netbadge", computingID, authToken)
 	log.Printf("AuthSession %s", authStr)
 	c.SetCookie("v4_auth_user", authStr, 3600, "/", "", false, false)
-	if devMode {
-		c.SetCookie("v4_auth_session", authStr, 0, "/", "", false, true)
-	} else {
-		c.SetCookie("v4_auth_session", authStr, 0, "/", "", true, true)
-	}
 	c.Redirect(http.StatusFound, "/signedin")
 }
 
@@ -102,14 +94,25 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("%s passed pin check", auth.Barcode)
+	authToken, _ := c.Get("token")
+	authStr := fmt.Sprintf("%s|%s|public", auth.Barcode, authToken)
+	c.SetCookie("v4_auth_user", authStr, 3600, "/", "", false, false)
 	c.String(http.StatusOK, auth.Barcode)
+}
+
+// SignoutUser ends the auth session for the target user. All session tracking
+// data should be cleaned up
+func (svc *ServiceContext) SignoutUser(c *gin.Context) {
+	userID := c.Param("id")
+	log.Printf("Sign out user %s", userID)
+	c.SetCookie("v4_auth_user", "invalid", -1, "/", "", false, false)
+	c.String(http.StatusOK, "signedout")
 }
 
 // AuthMiddleware is middleware that checks for a user auth token in the
 // Authorization header. For now, it does nothing but ensure token presence.
 func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	token, err := getBearerToken(c.Request.Header.Get("Authorization"))
-
 	if err != nil {
 		log.Printf("Authentication failed: [%s]", err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -117,6 +120,9 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	}
 
 	// TODO do something with token
+
+	// add the cookie to the request context so other handlers can access it.
+	c.Set("token", token)
 	log.Printf("got bearer token: [%s]", token)
 }
 

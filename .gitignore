@@ -14,3 +14,6 @@ env.*
 node_modules/
 yarn.lock
 run.sh
+backend/db/dev.sh
+dev_db.sh
+local_db.sh

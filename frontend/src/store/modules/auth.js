@@ -39,9 +39,9 @@ const auth = {
          state.signedInUser = user.userId
          state.authToken = user.token
          state.sessionType = user.type
-         state.signInMessage = `You are now signed in as '${state.signedInUser}'`
-         Vue.cookies.remove("v4_auth")
-         Vue.cookies.remove("v4_auth_user")
+         if (user.quiet === false) {
+            state.signInMessage = `You are now signed in as '${state.signedInUser}'`
+         }
       },
       setAccountInfo(state, data) {
          state.accountInfo = data
@@ -53,6 +53,7 @@ const auth = {
          state.signedInUser = ""
          state.authToken = ""
          state.signInMessage = "" 
+         Vue.cookies.remove("v4_auth_user")
       }
    },
 
@@ -77,16 +78,26 @@ const auth = {
           })
       },
       signout(ctx) {
-         ctx.commit('signOutUser')
-         router.push("/signedout")
+         ctx.commit('setAuthorizing', true)
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         axios.post(`/api/users/${ctx.state.signedInUser}/signout`).then((_response) => {
+            ctx.commit('signOutUser')
+            ctx.commit('setAuthorizing', false)
+            router.push("/signedout")
+          }).catch((_error) => {
+            ctx.commit('signOutUser')
+            ctx.commit('setAuthorizing', false)
+            router.push("/signedout")
+          })
       },
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.post("/authenticate/public", data).then((response) => {
             ctx.commit("setSignedInUser", {userId: response.data, 
-               token: ctx.state.authToken, type: "public"} )
+               token: ctx.state.authToken, type: "public", quiet: false} )
             ctx.commit('setAuthorizing', false)
-            router.push("/signedin")
+            router.push("/")
          }).catch((_error) => {
             ctx.commit('setAuthorizing', false)
             router.push("/forbidden")
