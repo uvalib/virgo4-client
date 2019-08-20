@@ -117,7 +117,8 @@ export default new Vuex.Store({
     setSearching(state, flag) {
       state.searching = flag
     },
-    selectPoolResults(state, idx) {
+    selectPoolResults(state, visiblePoolIdx) {
+      let idx = state.visibleResults[visiblePoolIdx]
       state.selectedPoolIdx = idx
     },
     closePoolResults(state) {

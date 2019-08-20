@@ -33,7 +33,7 @@
             name="pool-transition"
             enter-active-class="animated faster fadeIn"
             leave-active-class="animated faster fadeOut">
-         <div class="pool-panel" v-for="(pool,poolIdx) in visibleResults" :key="pool.url">
+         <div class="pool-panel" v-for="(pool,visibleIdx) in visibleResults" :key="pool.url">
             <div class="pool-titlebar">
                <span>{{poolDescription(pool.url)}}</span>
                <i @click="toggleVisibility(pool.resultIdx)" class="hide-pool fas fa-times-circle"></i>
@@ -55,7 +55,7 @@
             <template v-for="hit in pool.hits.slice(0,3)">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
-            <div @click="selectPool(poolIdx)" class="more-panel">
+            <div @click="selectPool(visibleIdx)" class="more-panel">
                See More Results&nbsp;<i class="more-icon fas fa-arrow-circle-right"></i>
             </div>
          </div>
@@ -105,8 +105,8 @@ export default {
       refineClicked() {
          this.$store.commit("query/setAdvancedSearch")
       },
-      selectPool(resultIdx) {
-         this.$store.commit("selectPoolResults", resultIdx)
+      selectPool(visiblePoolIdx) {
+         this.$store.commit("selectPoolResults", visiblePoolIdx)
       },
       toggleVisibility(resultIdx) {
          this.$store.commit("toggleResultVisibility", resultIdx)
