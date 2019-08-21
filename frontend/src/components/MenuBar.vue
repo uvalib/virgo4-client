@@ -13,16 +13,18 @@
          </router-link>
       </template>
       <span class="sep">|</span>
-      <a class="ask" target="_blank" href="https://library.virginia.edu/askalibrarian">
-         <i class="fas fa-comments"></i>&nbsp;Ask a Librarian
-      </a>
+      <Feedback icon/>
    </nav>
 </template>
 
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import Feedback from "@/components/popovers/Feedback"
 export default {
+   components: {
+      Feedback
+   },
    computed: {
       ...mapState({
          signedInUser: state => state.auth.signedInUser,

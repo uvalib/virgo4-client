@@ -6,14 +6,18 @@
        ph: (434) 924-3021, fax: (434) 924-1431, <a href="mailto:library@virginia.edu">library@virginia.edu</a>
    </div>
    <div class="external_links">
-       <a href="http://www.library.virginia.edu/staff/">Staff Directory</a> | <a href="http://www.virginia.edu/">U.Va. Home</a> | <a href="http://its.virginia.edu/">ITS</a><br>
-       <a href="mailto:site-feedback@virginia.edu?subject=U.Va.%20Library%20Site%20Feedback&amp;body=Thank%20you%20for%20your%20feedback!%20%20Are%20you%20having%20trouble%20finding%20information%20on%20the%20new%20Library%20site%20or%20have%20you%20encountered%20an%20error?%20Please%20let%20us%20know%20below.%0A%0APage%20you%20were%20on%3A%20https://tracksys.lib.virginia.edu/%0A%0AMy%20feedback%3A%20">Feedback</a>
-       | <a href="http://www.library.virginia.edu/askalibrarian/">Questions? Ask a Librarian</a>
-       <br>
+       <a href="http://www.library.virginia.edu/staff/">Staff Directory</a> | <a href="http://www.virginia.edu/">U.Va. Home</a> | 
+       <a href="http://its.virginia.edu/">ITS</a><br>
+       <template v-if="showFeedbackLinks">
+         <a href="mailto:site-feedback@virginia.edu?subject=U.Va.%20Library%20Site%20Feedback&amp;body=Thank%20you%20for%20your%20feedback!%20%20Are%20you%20having%20trouble%20finding%20information%20on%20the%20new%20Library%20site%20or%20have%20you%20encountered%20an%20error?%20Please%20let%20us%20know%20below.%0A%0APage%20you%20were%20on%3A%20https://tracksys.lib.virginia.edu/%0A%0AMy%20feedback%3A%20">Feedback</a>
+         | <a href="http://www.library.virginia.edu/askalibrarian/">Questions? Ask a Librarian</a>
+         <br>
+      </template>
        <a href="http://www.library.virginia.edu/site-search/">Site Search</a> | <a href="http://www.library.virginia.edu/hours/">Hours</a> | <a href="http://www.library.virginia.edu/map/">Map</a> | <a href="http://www.library.virginia.edu/policies/">Policies</a> | <a href="http://www.library.virginia.edu/press/">Press</a> | <a href="http://www.library.virginia.edu/jobs/">Jobs</a><br>
        <a href="http://www2.lib.virginia.edu/campaign/">Give to the Library</a>
        <p class="copy">
           © {{ new Date().getFullYear() }} by the Rector and Visitors of the <a href="http://www.virginia.edu/">University of Virginia</a>
+          <span class="version">&nbsp;-&nbsp;v{{version}}</span>
        </p>
     </div>
     <div class="legal">
@@ -23,11 +27,28 @@
 </template>
 
 <script>
-  export default {
-  }
+import { mapState } from "vuex"
+export default {
+   computed: {
+      ...mapState({
+         version: state => state.version
+      })
+   },
+   data: function() {
+      return {
+         showFeedbackLinks: false
+      }
+   },
+   mounted() {
+      this.$store.dispatch("getVersion")
+   }
+}
 </script>
 
 <style scoped>
+.version {
+   font-size: 0.8em;
+}
 footer {
    border-bottom: none;
    border-left: none;

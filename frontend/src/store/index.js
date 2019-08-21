@@ -20,6 +20,7 @@ export default new Vuex.Store({
     total: -1,
     visibleResults: [],
     selectedPoolIdx: -1,
+    version: "unknown"
   },
 
   getters: {
@@ -86,6 +87,9 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    setVersion(state, data) {
+      state.version = `${data.version}.${data.build}`
+    },
     setFatal(state, err) {
       state.fatal = err
     },
@@ -281,6 +285,12 @@ export default new Vuex.Store({
         ctx.commit('setConfig', response.data)
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)
+      })
+    },
+
+    getVersion(ctx) {
+      axios.get("/version").then((response) => {
+        ctx.commit('setVersion', response.data)
       })
     }
   },
