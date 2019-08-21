@@ -12,7 +12,7 @@
             </div>
             <div class="message">
                <p>For now, direct all Virgo4 feedback to:</p>
-               <p><a class="feedback" href="mailto:lib-virgo4-feedback@virginia.edu">lib-virgo4-feedback@virginia.edu</a></p>
+               <p><a class="feedback" href="mailto:virgo-feedback@virginia.edu">virgo-feedback@virginia.edu</a></p>
             </div>
          </div>
       </v-popover>
