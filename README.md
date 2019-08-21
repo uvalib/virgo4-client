@@ -42,5 +42,5 @@ Run migrations like this:
 
 Example migrate commads to create a migration and run one:
 
-`migrate create -ext sql -dir backend/db/migrations -seq update_user_auth`
-`migrate -database ${V4DB} -path backend/db/migrations/ up`
+* `migrate create -ext sql -dir backend/db/migrations -seq update_user_auth`
+* `migrate -database ${V4DB} -path backend/db/migrations/ up`

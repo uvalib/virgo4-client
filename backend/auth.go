@@ -60,7 +60,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	// Set auth info in a cookie the client can read and pass along in future requests
 	authStr := fmt.Sprintf("%s|%s|netbadge", computingID, authToken)
 	log.Printf("AuthSession %s", authStr)
-	c.SetCookie("v4_auth_user", authStr, 3600, "/", "", false, false)
+	c.SetCookie("v4_auth_user", authStr, 3600*12, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
 }
 
@@ -108,8 +108,9 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 		log.Printf("WARN: Unable to persist user %s access token %v", auth.Barcode, err)
 	}
 
+	// cookie lasts d
 	authStr := fmt.Sprintf("%s|%s|public", auth.Barcode, authToken)
-	c.SetCookie("v4_auth_user", authStr, 3600, "/", "", false, false)
+	c.SetCookie("v4_auth_user", authStr, 3600*12, "/", "", false, false)
 	c.String(http.StatusOK, auth.Barcode)
 }
 
