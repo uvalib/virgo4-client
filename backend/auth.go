@@ -6,16 +6,14 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/rs/xid"
 )
 
-// TODO add middleware thagt will intercept all API requests and ensure that
-// and auth token is present.
-
-// Authorize is a placeholder API for minting API access tokens.
-// This implementation simply generates a random token and returns it.
+// Authorize is the API for minting API access tokens.
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
 	token := xid.New().String()
@@ -41,15 +39,23 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 	log.Printf("NetBadge headers are valid. Checking for authorization token...")
 
-	// Now get the authorization token from the v4_auth cookie
+	// Now get the authorization token from the v4_auth cookie (necessary because of netbadge redirects)
 	authToken, err := c.Cookie("v4_auth")
 	if err != nil {
 		log.Printf("ERROR: Unable to read cookie v4_auth: %s", err.Error())
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
+
+	// the cookie is no longer needed, retire it
 	c.SetCookie("v4_auth", "invalid", -1, "/", "", false, false)
 	log.Printf("NetBadge and authorization token valid. %s is authenticated.", computingID)
+
+	// Persist token in v4 user storage
+	err = svc.updateAccessToken(computingID, authToken)
+	if err != nil {
+		log.Printf("WARN: Unable to persist user %s access token %v", computingID, err)
+	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
 	authStr := fmt.Sprintf("%s|%s|netbadge", computingID, authToken)
@@ -95,9 +101,44 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("%s passed pin check", auth.Barcode)
 	authToken, _ := c.Get("token")
+
+	// Persist token in v4 user storage
+	err := svc.updateAccessToken(auth.Barcode, authToken.(string))
+	if err != nil {
+		log.Printf("WARN: Unable to persist user %s access token %v", auth.Barcode, err)
+	}
+
 	authStr := fmt.Sprintf("%s|%s|public", auth.Barcode, authToken)
 	c.SetCookie("v4_auth_user", authStr, 3600, "/", "", false, false)
 	c.String(http.StatusOK, auth.Barcode)
+}
+
+// updateAccessToken checks if the user has an acces token and if it matches.
+// If no user found, create a new one and set access token. If token exists and
+// doesn't match fail.
+func (svc *ServiceContext) updateAccessToken(userID string, token string) error {
+	var user UserSettings
+	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
+	q.Bind(dbx.Params{"id": userID})
+	err := q.One(&user)
+	if err != nil {
+		log.Printf("User %s does not exist, creating and setting auth token", userID)
+		user := UserSettings{ID: 0, Virgo4ID: userID, AuthToken: token,
+			AuthUpdatedAt: time.Now(), SignedIn: true}
+		return svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
+	}
+
+	if user.AuthToken != token {
+		user.AuthToken = token
+		user.AuthUpdatedAt = time.Now()
+		user.SignedIn = true
+		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+		if err != nil {
+			log.Printf("WARN: Unable to update user %s auth token: %v", userID, err)
+		}
+	}
+
+	return nil
 }
 
 // SignoutUser ends the auth session for the target user. All session tracking
@@ -105,6 +146,23 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 func (svc *ServiceContext) SignoutUser(c *gin.Context) {
 	userID := c.Param("id")
 	log.Printf("Sign out user %s", userID)
+
+	var user UserSettings
+	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
+	q.Bind(dbx.Params{"id": userID})
+	err := q.One(&user)
+	if err != nil {
+		log.Printf("WARN: attempt to sign out user %s that has no user record", userID)
+	} else {
+		user.AuthUpdatedAt = time.Now()
+		user.SignedIn = false
+		user.AuthToken += "_signedout"
+		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+		if err != nil {
+			log.Printf("WARN: Unable to update users table for %s: %v", userID, err)
+		}
+	}
+
 	c.SetCookie("v4_auth_user", "invalid", -1, "/", "", false, false)
 	c.String(http.StatusOK, "signedout")
 }

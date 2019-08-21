@@ -29,10 +29,18 @@ The backend of the client uses a Postgres DB for user settings/preferences. The 
 https://github.com/golang-migrate/migrate and the scripts are in ./backend/db/migrations.
 
 Install the migrate binary on your host system. For OSX, the easiest method is brew. Execute:
+
 `brew install golang-migrate`.
 
 Define your PSQL connection params in an environment variable, like this:
+
 `export V4DB=postgres://v4user:pass@localhost:5432/virgo4?sslmode=disable`
 
 Run migrations like this:
+
 `migrate -database ${V4DB} -path backend/db/migrations up`
+
+Example migrate commads to create a migration and run one:
+
+`migrate create -ext sql -dir backend/db/migrations -seq update_user_auth`
+`migrate -database ${V4DB} -path backend/db/migrations/ up`

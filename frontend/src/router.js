@@ -30,7 +30,7 @@ const router = new Router({
           let userId = authInfo.split("|")[0]
           let token = authInfo.split("|")[1]
           let type = authInfo.split("|")[2]
-          store.commit("auth/setSignedInUser", {userId: userId, token: token, type: type, quiet: true})
+          store.commit("auth/setSignedInUser", {userId: userId, token: token, type: type, quiet: false})
         } 
         next('/')
       }

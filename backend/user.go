@@ -5,15 +5,24 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 // UserSettings contains virgo4 user data like session token, bookmarks and preferences
 type UserSettings struct {
-	ID              string           `dynamodbav:"userID"`
-	AccessToken     string           `dynamodbav:"accessToken"`
-	BookMarkFolders []BookMarkFolder `dynamodbav:"bookmarkFolders"`
+	ID              int              `db:"id" json:"-"`
+	Virgo4ID        string           `db:"virgo4_id" json:"id"`
+	AuthToken       string           `db:"auth_token" json:"-"`
+	AuthUpdatedAt   time.Time        `db:"auth_updated_at" json:"-"`
+	SignedIn        bool             `db:"signed_in" json:"-"`
+	BookMarkFolders []BookMarkFolder `json:"bookmarkFolders"`
+}
+
+// TableName sets the name of the table in the DB that this struct binds to
+func (e *UserSettings) TableName() string {
+	return "users"
 }
 
 // BookMarkFolder is a named container for bookmarks
@@ -93,6 +102,6 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	// 	}
 	// }
 
-	user := User{&ilsUser, userSettings.AccessToken, &userSettings.BookMarkFolders}
+	user := User{&ilsUser, userSettings.AuthToken, &userSettings.BookMarkFolders}
 	c.JSON(http.StatusOK, user)
 }
