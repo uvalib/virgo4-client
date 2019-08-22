@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -34,7 +35,7 @@ func (u *UserSettings) TableName() string {
 // GetBookmarks will load all folders and bookmarks for a user
 func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 	log.Printf("Load bookmarks for %s", u.Virgo4ID)
-	q := db.NewQuery(`SELECT f.name,b.catalog_key,b.details FROM bookmark_folders f  
+	q := db.NewQuery(`SELECT f.name,b.identifier,b.details FROM bookmark_folders f  
 		LEFT JOIN bookmarks b ON b.folder_id=f.id
 		where f.user_id={:id}`)
 	q.Bind(dbx.Params{"id": u.ID})
@@ -44,26 +45,35 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 		return
 	}
 
+	// parse each bookmark row into the UserSettings structure
 	for rows.Next() {
-		log.Printf("ROWS %+v", rows)
 		var raw struct {
 			Name       string `db:"name"`
-			CatalogKey string `db:"catalog_key"`
+			Identifier string `db:"identifier"`
 			Details    string `db:"details"`
 		}
 		rows.ScanStruct(&raw)
 		if _, ok := u.Bookmarks[raw.Name]; !ok {
 			u.Bookmarks[raw.Name] = make([]Bookmark, 0)
+			if raw.Identifier != "" {
+				bookmark := Bookmark{Identifier: raw.Identifier}
+				err := json.Unmarshal([]byte(raw.Details), &bookmark)
+				if err != nil {
+					log.Printf("Unable to parse bookmark data %s: %v", raw.Details, err)
+				} else {
+					u.Bookmarks[raw.Name] = append(u.Bookmarks[raw.Name], bookmark)
+				}
+			}
 		}
 	}
 }
 
 // Bookmark contains minimal details on a bookmarked item
 type Bookmark struct {
-	CatalogKey string
-	Title      string
-	Author     string
-	Format     string
+	Identifier string `json:"identifier"`
+	Title      string `json:"title"`
+	Author     string `json:"author"`
+	Format     string `json:"format"`
 }
 
 // ILSUserInfo contains ILS connector details for a user
