@@ -57,7 +57,7 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 			u.Bookmarks[raw.Name] = make([]Bookmark, 0)
 			if raw.Identifier != "" {
 				bookmark := Bookmark{Identifier: raw.Identifier}
-				err := json.Unmarshal([]byte(raw.Details), &bookmark)
+				err := json.Unmarshal([]byte(raw.Details), &bookmark.Details)
 				if err != nil {
 					log.Printf("Unable to parse bookmark data %s: %v", raw.Details, err)
 				} else {
@@ -70,10 +70,8 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 
 // Bookmark contains minimal details on a bookmarked item
 type Bookmark struct {
-	Identifier string `json:"identifier"`
-	Title      string `json:"title"`
-	Author     string `json:"author"`
-	Format     string `json:"format"`
+	Identifier string            `json:"identifier"`
+	Details    map[string]string `json:"details"`
 }
 
 // ILSUserInfo contains ILS connector details for a user
@@ -133,4 +131,130 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 
 	user := User{&ilsUser, userSettings.AuthToken, &userSettings.Bookmarks}
 	c.JSON(http.StatusOK, user)
+}
+
+// AddBookmarkFolder will add a new blank folder for bookmarks
+func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
+	v4UserID := c.Param("id")
+	var folder struct{ Name string }
+	err := c.ShouldBindJSON(&folder)
+	if err != nil {
+		log.Printf("ERROR: invalid folder add payload: %v", err)
+		c.String(http.StatusBadRequest, "Invalid add folder request")
+		return
+	}
+
+	log.Printf("User %s adding bookmark folder %s", v4UserID, folder.Name)
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": v4UserID})
+	var uid int
+	uq.Row(&uid)
+
+	q := svc.DB.NewQuery("insert into bookmark_folders (user_id, name) values ({:uid},{:name})")
+	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"name": folder.Name})
+	_, err = q.Execute()
+	if err != nil {
+		log.Printf("ERROR: add folder %s%s failed: %v", v4UserID, folder.Name, err)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.String(http.StatusOK, "added %s", folder.Name)
+}
+
+// DeleteBookmarkFolder will remove a folder and all of its content
+func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
+	v4UserID := c.Param("id")
+	folder := c.Query("name")
+	log.Printf("User %s deleting bookmark folder %s", v4UserID, folder)
+
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": v4UserID})
+	var uid int
+	uq.Row(&uid)
+
+	q := svc.DB.NewQuery("delete from bookmark_folders where user_id={:uid} and name={:name}")
+	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"name": folder})
+	_, err := q.Execute()
+	if err != nil {
+		log.Printf("ERROR: unable to remove %s:%s - %v", v4UserID, folder, err)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "%s removed", folder)
+}
+
+// AddBookmark will add a bookmark to a folder
+func (svc *ServiceContext) AddBookmark(c *gin.Context) {
+	v4UserID := c.Param("id")
+	var item struct {
+		Folder string
+		Bookmark
+	}
+	err := c.ShouldBindJSON(&item)
+	if err != nil {
+		log.Printf("ERROR: invalid item add payload: %v", err)
+		c.String(http.StatusBadRequest, "Invalid bookmark request")
+		return
+	}
+	log.Printf("User %s adding bookmark %+v", v4UserID, item)
+
+	// get user ID
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": v4UserID})
+	var uid int
+	uq.Row(&uid)
+
+	// get folder ID
+	fq := svc.DB.NewQuery("select id from bookmark_folders where name={:name}")
+	fq.Bind(dbx.Params{"name": item.Folder})
+	var fid int
+	err = uq.Row(&fid)
+	if err != nil {
+		log.Printf("ERROR: User %s folder %s not found", v4UserID, item.Folder)
+		c.String(http.StatusNotFound, "Folder %s not found", item.Folder)
+		return
+	}
+
+	q := svc.DB.NewQuery(`insert into bookmarks (user_id,folder_id,identifier,details)
+		values ({:uid}, {:fid}, {:bid}, {:detail})`)
+	json, _ := json.Marshal(item.Bookmark.Details)
+	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"fid": fid})
+	q.Bind(dbx.Params{"bid": item.Identifier})
+	q.Bind(dbx.Params{"detail": json})
+	_, err = q.Execute()
+	if err != nil {
+		log.Printf("ERROR: User %s unable to add bookmark %+v: %v", v4UserID, item, err)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
+}
+
+// DeleteBookmark will remove bookmark from a folder
+func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
+	v4UserID := c.Param("id")
+	bookmarkIdentifier := c.Query("identifier")
+	log.Printf("User %s deleting bookmark %s", v4UserID, bookmarkIdentifier)
+
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": v4UserID})
+	var uid int
+	uq.Row(&uid)
+
+	q := svc.DB.NewQuery("delete from bookmarks where user_id={:uid} and identifier={:bid}")
+	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"bid": bookmarkIdentifier})
+	_, err := q.Execute()
+	if err != nil {
+		log.Printf("ERROR: unable to remove item %s:%s - %v", v4UserID, bookmarkIdentifier, err)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "%s removed", bookmarkIdentifier)
 }

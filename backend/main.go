@@ -44,6 +44,13 @@ func main() {
 	{
 		api.GET("/users/:id", svc.GetUser)
 		api.POST("/users/:id/signout", svc.AuthMiddleware, svc.SignoutUser)
+		bookmarks := api.Group("/users/:id/bookmarks")
+		{
+			bookmarks.POST("/folders", svc.AddBookmarkFolder)
+			bookmarks.DELETE("/folders", svc.DeleteBookmarkFolder)
+			bookmarks.POST("/items", svc.AddBookmark)
+			bookmarks.DELETE("/items", svc.AuthMiddleware, svc.DeleteBookmark)
+		}
 	}
 	auth := router.Group("/authenticate")
 	{
