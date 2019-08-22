@@ -1,6 +1,6 @@
 <template>
    <main class="account">
-      <h1>My Account</h1>
+      <h1>Account Information</h1>
       <div class="account-content">
          <div class="working" v-if="lookingUp" >
             <div>Looking up account details...</div>
