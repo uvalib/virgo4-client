@@ -318,6 +318,9 @@ function mergeRepeatedFields( hits ) {
       if (field.value === "") {
         return
       }
+      if (field.display == "optional") {
+        return
+      }
       if (field.name == "preview_url") {
         hit.previewURL = field.value
         return
