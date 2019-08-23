@@ -2,7 +2,7 @@
    <div class="authorize-overlay">
       <div class="authorize">
          <h3>Authorizing...</h3>
-         <img src="../assets/spinner2.gif">
+         <img src="../../assets/spinner2.gif">
       </div>
    </div>
 </template>

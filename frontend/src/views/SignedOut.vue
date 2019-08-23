@@ -26,7 +26,7 @@ export default {
    },
    computed: {
       ...mapState({
-         sessionType: state => state.auth.sessionType,
+         sessionType: state => state.user.sessionType,
       }),
    }
 }

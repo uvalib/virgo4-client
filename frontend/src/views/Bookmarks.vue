@@ -6,6 +6,8 @@
             <div>Looking up account details...</div>
             <img src="../assets/spinner2.gif">
          </div>
+         <div v-else>
+         </div>
          <BackToVirgo />
       </div>
    </main>
@@ -27,17 +29,17 @@ export default {
    },
    computed: {
       ...mapState({
-         info: state => state.auth.accountInfo,
+         info: state => state.user.accountInfo,
       }),
       ...mapGetters({
-        hasAccountInfo: 'auth/hasAccountInfo',
+        hasAccountInfo: 'user/hasAccountInfo',
       }),
    },
    methods: {
    },
    created() {
       if (this.hasAccountInfo ==  false) {
-         this.$store.dispatch("auth/getAccountInfo").then(_response => {
+         this.$store.dispatch("user/getAccountInfo").then(_response => {
             this.lookingUp = false
          })
       } else {

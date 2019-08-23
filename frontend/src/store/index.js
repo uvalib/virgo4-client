@@ -4,7 +4,7 @@ import axios from 'axios'
 import messaging from './plugins/messaging'
 import versionChecker from './plugins/version'
 import pools from './modules/pools'
-import auth from './modules/auth'
+import user from './modules/user'
 import query from './modules/query'
 import filters from './modules/filters'
 Vue.use(Vuex)
@@ -240,7 +240,7 @@ export default new Vuex.Store({
 
       commit('setSearching', true)
       let url = state.searchAPI + "/api/search?debug=1&intuit=1"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
         commit('setSearchResults', response.data)
@@ -269,7 +269,7 @@ export default new Vuex.Store({
         filters: f
       }
       let url = rootGetters.selectedPool.url + "/api/search?debug=1"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.auth.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
@@ -296,7 +296,7 @@ export default new Vuex.Store({
   },
 
   modules: {
-    auth: auth,
+    user: user,
     pools: pools,
     query: query,
     filters: filters

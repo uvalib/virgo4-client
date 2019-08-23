@@ -93,7 +93,7 @@ footer div.legal {
    clear: both;
 }
 footer #fdlp-badge {
-   background: url(../assets/fdlp-badge.png);
+   background: url(../../assets/fdlp-badge.png);
    height: 34px;  width: 39px;
    display: inline-block;
    position: relative;

@@ -2,7 +2,7 @@ import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
 
-const auth = {
+const user = {
    namespaced: true,
    state: {
       authToken: "",
@@ -117,4 +117,4 @@ const auth = {
    }
 }
 
-export default auth
+export default user

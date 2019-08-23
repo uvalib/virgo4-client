@@ -5,8 +5,8 @@ const messaging = store => {
       if (mutation.payload != null && mutation.payload != "") {
         setTimeout(() => { store.commit('setError', "") }, 10000)
       }
-    } else if (mutation.type === "auth/setSignedInUser") {
-      setTimeout(() => { store.commit('auth/clearSignInMessage') }, 5000)
+    } else if (mutation.type === "user/setSignedInUser") {
+      setTimeout(() => { store.commit('user/clearSignInMessage') }, 5000)
     }
   })
 }

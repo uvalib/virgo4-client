@@ -68,7 +68,7 @@ const pools = {
    actions: {
       getPools(ctx) {
         let url = ctx.rootState.searchAPI + "/api/pools"
-        axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.auth.authToken
+        axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
         axios.get(url).then((response) => {
           ctx.commit('setPools', response.data)
         }).catch((error) => {

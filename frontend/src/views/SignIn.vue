@@ -35,7 +35,7 @@ export default {
    name: "signin", 
    computed: {
        ...mapGetters({
-        hasAuthToken: 'auth/hasAuthToken'
+        hasAuthToken: 'user/hasAuthToken'
       }),
    },
    data: function()  {
@@ -49,14 +49,14 @@ export default {
          this.$router.push("/")
       },
       signinClicked() {
-         this.$store.dispatch("auth/signin", {barcode: this.user, password: this.pin})
+         this.$store.dispatch("user/signin", {barcode: this.user, password: this.pin})
       },
       netbadgeLogin() {
          if (this.hasAuthToken) {
-            this.$store.dispatch("auth/netbadge")
+            this.$store.dispatch("user/netbadge")
          } else {
-            this.$store.dispatch("auth/getAuthToken").then(_response => {
-               this.$store.dispatch("auth/netbadge")
+            this.$store.dispatch("user/getAuthToken").then(_response => {
+               this.$store.dispatch("user/netbadge")
             })
          }
       },

@@ -119,7 +119,7 @@ const filters = {
             filters: ctx.getters.poolFilter(data.poolResultsIdx, "api")
           }
          let tgtURL = poolURL+"/api/search"
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.auth.authToken
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          ctx.commit('setUpdatingBuckets', true)
          axios.post(tgtURL, req).then((response) => {
             ctx.commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, 

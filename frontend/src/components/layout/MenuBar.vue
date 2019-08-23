@@ -3,14 +3,16 @@
       <template v-if="isSignedIn">
          <span @mouseover="showMenu" @mouseleave="hideMenu" class="menu-item account">
             <i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;<i class="fas fa-caret-down"></i>
-               <div v-if="menuOpen" class="user-menu" @mouseover="showMenu" >
-                  <div class="submenu">
-                     <router-link to="/account">Account Info</router-link>
+               <transition name="fade">
+                  <div v-if="menuOpen" class="user-menu" @mouseover="showMenu" >
+                     <div class="submenu">
+                        <router-link to="/account">Account Info</router-link>
+                     </div>
+                     <div class="submenu">
+                        <router-link to="/bookmarks">Bookmarks</router-link>
+                     </div>
                   </div>
-                  <div class="submenu">
-                     <router-link to="/bookmarks">Bookmarks</router-link>
-                  </div>
-               </div>
+               </transition>
          </span>
          <span class="sep">|</span>
          <span @click="signOut" class="menu-item">Sign out</span>
@@ -35,10 +37,10 @@ export default {
    },
    computed: {
       ...mapState({
-         signedInUser: state => state.auth.signedInUser,
+         signedInUser: state => state.user.signedInUser,
       }),
       ...mapGetters({
-        isSignedIn: 'auth/isSignedIn',
+        isSignedIn: 'user/isSignedIn',
       }),
    },
    data: function() {
@@ -56,12 +58,8 @@ export default {
       hideMenu() {
          this.menuOpen = false
       },
-      accountClick() {
-         // this.$router.push("/account")
-         this.menuOpen = !this.menuOpen
-      },
       signOut() {
-         this.$store.dispatch("auth/signout")
+         this.$store.dispatch("user/signout")
       }
    }
 }
@@ -103,9 +101,11 @@ export default {
 .submenu {
    margin:0;
    padding: 2px 10px;
+   margin: 1px 5px;
+   border-radius: 5px;
 }
 #app .menu .submenu a {
-   color: #444;
+   color:white;
 }
 #app .menu .submenu a:hover {
    text-decoration: none;
@@ -119,10 +119,9 @@ export default {
 .user-menu {
   position: absolute;
   z-index: 1000;
-  color: #444;
-  background: white;
+  background: var(--color-secondary-blue);
   padding: 5px 0;
-  border-radius: 0 0 7px 7px;
+  border-radius: 0 0 10px 10px;
   border: 1px solid var(--color-secondary-blue);
   border-top: 11px solid var(--color-secondary-blue);
   right: 0;

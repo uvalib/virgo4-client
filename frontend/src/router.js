@@ -31,7 +31,7 @@ const router = new Router({
           let userId = authInfo.split("|")[0]
           let token = authInfo.split("|")[1]
           let type = authInfo.split("|")[2]
-          store.commit("auth/setSignedInUser", {userId: userId, token: token, type: type, quiet: false})
+          store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: false})
         } 
         next('/')
       }
@@ -83,7 +83,7 @@ router.beforeEach((to, _from, next) => {
   }
 
   let getters = store.getters
-  if (getters["auth/hasAuthToken"] == false) {
+  if (getters["user/hasAuthToken"] == false) {
     // see if there is an auth user cookie set from which we can retrieve
     // the auth token and logged in user info....
     console.log("NO AUTH")
@@ -93,10 +93,10 @@ router.beforeEach((to, _from, next) => {
       let userId = authInfo.split("|")[0]
       let token = authInfo.split("|")[1]
       let type = authInfo.split("|")[2]
-      store.commit("auth/setSignedInUser", {userId: userId, token: token, type: type, quiet: true})
+      store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: true})
     } else {
       console.log("REQUEST AUTH")
-      store.dispatch("auth/getAuthToken")
+      store.dispatch("user/getAuthToken")
     }
   } 
 

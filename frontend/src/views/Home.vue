@@ -67,7 +67,7 @@ export default {
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
-         signInMessage: state => state.auth.signInMessage
+         signInMessage: state => state.user.signInMessage
       }),
       ...mapGetters({
         hasResults: 'hasResults',

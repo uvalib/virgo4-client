@@ -18,11 +18,11 @@
 </template>
 
 <script>
-import LibraryFooter from "@/components/LibraryFooter"
-import VirgoHeader from "@/components/VirgoHeader"
-import MenuBar from "@/components/MenuBar"
-import FatalError from "@/components/FatalError"
-import AuthorizePanel from "@/components/AuthorizePanel"
+import LibraryFooter from "@/components/layout/LibraryFooter"
+import VirgoHeader from "@/components/layout/VirgoHeader"
+import MenuBar from "@/components/layout/MenuBar"
+import FatalError from "@/components/layout/FatalError"
+import AuthorizePanel from "@/components/layout/AuthorizePanel"
 import MoreResultsModal from "@/components/MoreResultsModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -38,7 +38,7 @@ export default {
    computed: {
       ...mapState({
          fatal: state => state.fatal,
-         authorizing: state => state.auth.authorizing
+         authorizing: state => state.user.authorizing
       }),
       ...mapGetters({
          isPoolSelected: 'isPoolSelected',
