@@ -26,6 +26,8 @@ const filters = {
             return []
          }
          let facet = state.poolFacets[idx].find(f => f.facet === facetName) 
+         // TODO filter this list to exclude values that are being used 
+         // in filters
          return facet.buckets
       },
       hasFilter: (state) => (idx) => {

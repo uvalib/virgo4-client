@@ -22,20 +22,17 @@
                <p><a href="https://guides.lib.virginia.edu/az.php" target="_blank">Databases A–Z</a></p>
             </div>
          </div>
+         <BackToVirgo />
       </div>
-      <p>
-         <span @click="backClicked" class="pure-button pure-button-primary">Return to Virgo</span>
-      </p>
    </main>
 </template>
 
 <script>
+import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "notfound",
-   methods: {
-      backClicked() {
-         this.$router.push("/")
-      }
+   components: {
+      BackToVirgo
    }
 }
 </script>
@@ -44,7 +41,7 @@ export default {
 .not-found {
    min-height: 400px;
    position: relative;
-   margin: 4vw 0;
+   margin: 25px 0;
 }
 .messages, .info {
    width:40%;

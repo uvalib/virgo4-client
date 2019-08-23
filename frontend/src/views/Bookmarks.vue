@@ -1,16 +1,10 @@
 <template>
-   <main class="account">
-      <h1>Account Information</h1>
-      <div class="account-content">
+   <main class="bookmarks">
+      <h1>Bookmarks</h1>
+      <div class="bookmarks-content">
          <div class="working" v-if="lookingUp" >
             <div>Looking up account details...</div>
             <img src="../assets/spinner2.gif">
-         </div>
-         <div v-else class="details">
-            <div class="user-name">{{info.displayName}} ({{info.id}})</div>   
-            <div>{{info.organizationalUnit}} - {{info.profile}}</div>
-            <div>{{info.address}}</div>
-            <div>{{info.email}}</div>
          </div>
          <BackToVirgo />
       </div>
@@ -22,7 +16,7 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import BackToVirgo from "@/components/BackToVirgo"
 export default {
-   name: "account",
+   name: "bookmarks",
    components: {
       BackToVirgo
    },
@@ -39,6 +33,8 @@ export default {
         hasAccountInfo: 'auth/hasAccountInfo',
       }),
    },
+   methods: {
+   },
    created() {
       if (this.hasAccountInfo ==  false) {
          this.$store.dispatch("auth/getAccountInfo").then(_response => {
@@ -52,7 +48,7 @@ export default {
 </script>
 
 <style scoped>
-.account {
+.bookmarks {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
@@ -65,16 +61,12 @@ export default {
 .working img {
    margin: 30px 0;
 }
-.account-content {
+.bookmarks-content {
    width: 40%;
    margin: 0 auto;
 }
 .details {
    text-align: left;
-}
-.user-name {
-   font-size: 1.1em;
-   font-weight: bold;
 }
 </style>
 

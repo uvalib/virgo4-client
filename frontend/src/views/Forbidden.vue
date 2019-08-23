@@ -6,20 +6,17 @@
          <p>
             Authentication for your account has failed.
          </p>
+         <BackToVirgo />
       </div>
-      <p>
-         <span @click="backClicked" class="pure-button pure-button-primary">Return to Virgo</span>
-      </p>
    </main>
 </template>
 
 <script>
+import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "forbidden",
-   methods: {
-      backClicked() {
-         this.$router.push("/")
-      }
+   components: {
+      BackToVirgo
    }
 }
 </script>
@@ -28,7 +25,7 @@ export default {
 .forbidden {
    min-height: 400px;
    position: relative;
-   margin-top: 4vw;
+   margin-top: 25px;
 }
 .messages {
    width:50%;

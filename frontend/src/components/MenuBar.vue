@@ -4,8 +4,12 @@
          <span @mouseover="showMenu" @mouseleave="hideMenu" class="menu-item account">
             <i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;<i class="fas fa-caret-down"></i>
                <div v-if="menuOpen" class="user-menu" @mouseover="showMenu" >
-                  <div class="submenu"><router-link to="/account">Account Info</router-link></div>
-                  <!-- <div class="submenu">Bookmarks</div> -->
+                  <div class="submenu">
+                     <router-link to="/account">Account Info</router-link>
+                  </div>
+                  <div class="submenu">
+                     <router-link to="/bookmarks">Bookmarks</router-link>
+                  </div>
                </div>
          </span>
          <span class="sep">|</span>

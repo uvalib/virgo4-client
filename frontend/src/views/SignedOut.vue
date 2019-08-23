@@ -11,26 +11,23 @@
                click here to turn in your NetBadge.
             </a> 
          </p>
+         <BackToVirgo />
       </div>
-      <p>
-         <span @click="backClicked" class="pure-button pure-button-primary">Return to Virgo</span>
-      </p>
    </main>
 </template>
 
 <script>
 import { mapState } from "vuex"
+import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "signedout",
+   components: {
+      BackToVirgo
+   },
    computed: {
       ...mapState({
          sessionType: state => state.auth.sessionType,
       }),
-   },
-   methods: {
-      backClicked() {
-         this.$router.push("/")
-      }
    }
 }
 </script>
@@ -39,7 +36,7 @@ export default {
 .signedout {
    min-height: 400px;
    position: relative;
-   margin-top: 4vw;
+   margin-top: 25px;
 }
 .messages {
    width:40%;
