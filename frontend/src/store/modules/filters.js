@@ -73,11 +73,14 @@ const filters = {
          state.adding = false
       },
       setFacetBuckets(state, data) {
+         // NOTE: for all pools but EDS, the facets array is length one
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
-         let facetInfo = allPoolFacets.find(f => f.facet === data.facet) 
-         facetInfo.buckets = []
-         data.buckets.forEach(function (b) {
-            facetInfo.buckets.push( {value: b.value, name: `${b.value} (${b.count})`} )
+         data.facets.forEach( function(facet) {
+            let facetInfo = allPoolFacets.find(f => f.facet === facet.name) 
+            facetInfo.buckets = []
+            facet.buckets.forEach(function (b) {
+               facetInfo.buckets.push( {value: b.value, name: `${b.value} (${b.count})`} )
+            })
          })
       },
       addFilter(state, data) {
@@ -118,8 +121,7 @@ const filters = {
          ctx.commit('setUpdatingBuckets', true)
          axios.post(tgtURL, req).then((response) => {
             ctx.commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, 
-               facet: data.facet, buckets: response.data.facet_list[0].buckets}
-            )
+               facets: response.data.facet_list})
             ctx.commit('setUpdatingBuckets', false)
          }).catch((error) => {
             ctx.commit('setError', error, { root: true })
