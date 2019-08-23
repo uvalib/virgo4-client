@@ -30,6 +30,11 @@ const user = {
          if (state.accountInfo == null) return false 
          if (state.accountInfo.bookmarks == null) return false 
          return Object.keys(state.accountInfo.bookmarks).length > 0
+      },
+      bookmarks: state => {
+         if (state.accountInfo == null) return {}
+         if (state.accountInfo.bookmarks == null) return {}
+         return state.accountInfo.bookmarks
       }
    },
 

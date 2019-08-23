@@ -11,7 +11,9 @@
                You have no bookmarked items.
             </p>
             <template v-else>
-               You have bookmarked items.
+               <AccordionContent v-for="folder in Object.keys(bookmarks)"  :title="folder" :key="folder" align="left">
+                  <p>{{bookmarks[folder]}}</p>
+               </AccordionContent>
             </template>
          </div>
          <BackToVirgo />
@@ -23,10 +25,11 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import BackToVirgo from "@/components/BackToVirgo"
+import AccordionContent from "@/components/AccordionContent"
 export default {
    name: "bookmarks",
    components: {
-      BackToVirgo
+      BackToVirgo,AccordionContent
    },
    data: function() {
       return {
@@ -39,7 +42,8 @@ export default {
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
-        hasBookmarks: 'user/hasBookmarks'
+        hasBookmarks: 'user/hasBookmarks',
+        bookmarks: 'user/bookmarks'
       }),
    },
    methods: {

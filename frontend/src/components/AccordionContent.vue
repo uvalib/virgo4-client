@@ -1,6 +1,6 @@
 <template>
    <div class="accordion">
-      <div class="title" @click="accordionClicked">
+      <div class="title" @click="accordionClicked" :class="align">
          <span class="text">{{title}}</span>
          <i class="accordion-icon fas fa-angle-down" v-bind:style="{ transform: rotation }"></i>
       </div>
@@ -19,6 +19,10 @@ export default {
    props: {
       title: String,
       subtitle: String,
+      align: {
+         type: String,
+         default: "right"
+      },
       watched: {
          type: Array,
          default: null
@@ -83,6 +87,12 @@ export default {
    transition: 500ms ease-out;
    background: white;
    padding: 0 10px 5px 10px;
+}
+div.title.right {
+   text-align: right;
+}
+div.title.left {
+   text-align: left;
 }
 div.title {
    padding: 0px 8px;

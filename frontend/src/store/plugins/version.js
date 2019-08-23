@@ -9,9 +9,10 @@ const versionChecker = (store) => {
          axios.get("/version").then((ckResp) => {
             if (currBuild!= ckResp.data.build) {
                // load without cache
-               store.commit('setFatal', "")
                window.location.reload(true)
-             }
+            } else {
+               store.commit('setFatal', "")
+            }
          }).catch((_error) => {
             store.commit('setFatal', "Lost connection to Virgo backend services")
          })
