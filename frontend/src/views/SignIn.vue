@@ -52,13 +52,7 @@ export default {
          this.$store.dispatch("user/signin", {barcode: this.user, password: this.pin})
       },
       netbadgeLogin() {
-         if (this.hasAuthToken) {
-            this.$store.dispatch("user/netbadge")
-         } else {
-            this.$store.dispatch("user/getAuthToken").then(_response => {
-               this.$store.dispatch("user/netbadge")
-            })
-         }
+         this.$store.dispatch("user/netbadge")
       },
    }
 }

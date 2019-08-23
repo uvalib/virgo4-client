@@ -25,6 +25,11 @@ const user = {
          if (state.accountInfo == null) return false 
          if (state.accountInfo.id != state.signedInUser) return false 
          return true
+      },
+      hasBookmarks: state => {
+         if (state.accountInfo == null) return false 
+         if (state.accountInfo.bookmarks == null) return false 
+         return Object.keys(state.accountInfo.bookmarks).length > 0
       }
    },
 
@@ -105,13 +110,6 @@ const user = {
       },
       netbadge(ctx) {
          ctx.commit('setAuthorizing', true)
-         // NOTES: The redirect below and the subsequent redirect 
-         // back to V4 will wipe out the Vuex data model.  Any info that 
-         // needs to be preserved must be set in a cookie. These will 
-         // be passed back to the client in another cookie to be processed 
-         // and re-introduced to vuex in the SignIn page beforeEnter handling.
-         // Right now, the only useful info is the auth token.
-         Vue.cookies.set("v4_auth", ctx.state.authToken, 5)
          window.location.href = "/authenticate/netbadge"
       }
    }

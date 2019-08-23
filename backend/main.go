@@ -55,7 +55,7 @@ func main() {
 	auth := router.Group("/authenticate")
 	{
 		auth.GET("/netbadge", svc.NetbadgeAuthentication)
-		auth.POST("/public", svc.AuthMiddleware, svc.PublicAuthentication)
+		auth.POST("/public", svc.PublicAuthentication)
 	}
 
 	// Note: in dev mode, this is never actually used. The front end is served

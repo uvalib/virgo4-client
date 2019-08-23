@@ -37,22 +37,11 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
-	log.Printf("NetBadge headers are valid. Checking for authorization token...")
+	log.Printf("NetBadge headers are valid. Generate new auth token for %s", computingID)
 
-	// Now get the authorization token from the v4_auth cookie (necessary because of netbadge redirects)
-	authToken, err := c.Cookie("v4_auth")
-	if err != nil {
-		log.Printf("ERROR: Unable to read cookie v4_auth: %s", err.Error())
-		c.Redirect(http.StatusFound, "/forbidden")
-		return
-	}
-
-	// the cookie is no longer needed, retire it
-	c.SetCookie("v4_auth", "invalid", -1, "/", "", false, false)
-	log.Printf("NetBadge and authorization token valid. %s is authenticated.", computingID)
-
-	// Persist token in v4 user storage
-	err = svc.updateAccessToken(computingID, authToken)
+	// Generate a new access token and persist it in v4 user storage
+	authToken := xid.New().String()
+	err := svc.updateAccessToken(computingID, authToken)
 	if err != nil {
 		log.Printf("WARN: Unable to persist user %s access token %v", computingID, err)
 	}
@@ -60,7 +49,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	// Set auth info in a cookie the client can read and pass along in future requests
 	authStr := fmt.Sprintf("%s|%s|netbadge", computingID, authToken)
 	log.Printf("AuthSession %s", authStr)
-	c.SetCookie("v4_auth_user", authStr, 3600*12, "/", "", false, false)
+	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
 }
 
@@ -100,17 +89,17 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("%s passed pin check", auth.Barcode)
-	authToken, _ := c.Get("token")
 
-	// Persist token in v4 user storage
-	err := svc.updateAccessToken(auth.Barcode, authToken.(string))
+	// Generate new auth token and ersist in v4 user storage
+	authToken := xid.New().String()
+	err := svc.updateAccessToken(auth.Barcode, authToken)
 	if err != nil {
 		log.Printf("WARN: Unable to persist user %s access token %v", auth.Barcode, err)
 	}
 
-	// cookie lasts d
+	// Generate a cookie with auth info
 	authStr := fmt.Sprintf("%s|%s|public", auth.Barcode, authToken)
-	c.SetCookie("v4_auth_user", authStr, 3600*12, "/", "", false, false)
+	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
 	c.String(http.StatusOK, auth.Barcode)
 }
 

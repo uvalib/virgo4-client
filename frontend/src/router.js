@@ -18,7 +18,10 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: Home,
+      beforeEnter: (_to, _from, next) => {
+        ensureAuthTokenPresent(next)
+      }
     },
     {
       // NOTES: the signedin route doesn't actually have a 
@@ -26,13 +29,7 @@ const router = new Router({
       // setup and redirects to home page
       path: '/signedin',
       beforeEnter: (_to, _from, next) => {
-        let authInfo = Vue.cookies.get("v4_auth_user")
-        if (authInfo) {
-          let userId = authInfo.split("|")[0]
-          let token = authInfo.split("|")[1]
-          let type = authInfo.split("|")[2]
-          store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: false})
-        } 
+        getSignedInUserFromCookie()
         next('/')
       }
     },
@@ -44,12 +41,28 @@ const router = new Router({
     {
       path: '/account',
       name: 'account',
-      component: Account
+      component: Account,
+      beforeEnter: (_to, _from, next) => {
+        if (getSignedInUserFromCookie()) {
+          next()
+        } else {
+          next("/")
+          window.location.reload(true)
+        }
+      }
     },
     {
       path: '/bookmarks',
       name: 'bookmarks',
-      component: Bookmarks
+      component: Bookmarks,
+      beforeEnter: (_to, _from, next) => {
+        if (getSignedInUserFromCookie()) {
+          next()
+        } else {
+          next("/") 
+          window.location.reload(true)
+        }
+      }
     },
     {
       path: '/signedout',
@@ -73,34 +86,47 @@ const router = new Router({
   },
 })
 
-// This is called before every URL in the SPA is hit. Use
-// it to be sure an authentication token is present
-router.beforeEach((to, _from, next) => {
-  if (to.name == "signedin" || to.name == "signedout" || to.name == "forbidden") {
-    // no need to request auth with these pages
+function getSignedInUserFromCookie() {
+  let authInfo = Vue.cookies.get("v4_auth_user")
+  if (authInfo) {
+    let userId = authInfo.split("|")[0]
+    let token = authInfo.split("|")[1]
+    let type = authInfo.split("|")[2]
+    store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: false})
+    return true
+  } 
+  return false
+}
+
+function ensureAuthTokenPresent(next) {
+  let getters = store.getters
+  if (getters["user/hasAuthToken"]) {
     next()
     return
   }
 
-  let getters = store.getters
-  if (getters["user/hasAuthToken"] == false) {
-    // see if there is an auth user cookie set from which we can retrieve
-    // the auth token and logged in user info....
-    console.log("NO AUTH")
-    let authInfo = Vue.cookies.get("v4_auth_user")
-    if (authInfo) {
-      console.log("IN COOKIE AUTH, signing in")
-      let userId = authInfo.split("|")[0]
-      let token = authInfo.split("|")[1]
-      let type = authInfo.split("|")[2]
-      store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: true})
-    } else {
-      console.log("REQUEST AUTH")
-      store.dispatch("user/getAuthToken")
-    }
-  } 
+  // see if there is an auth user cookie set from which we can retrieve
+  // the auth token and logged in user info....
+  console.log("NO AUTH")
+  let authInfo = Vue.cookies.get("v4_auth_user")
+  if (authInfo) {
+    console.log("IN COOKIE AUTH, signing in")
+    let userId = authInfo.split("|")[0]
+    let token = authInfo.split("|")[1]
+    let type = authInfo.split("|")[2]
+    store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: true})
+    next()
+    return
+  }
 
-  next()
-})
+  // No token. Request one and WAIT FOR RESPONSE before calling next()
+  console.log("REQUEST AUTH")
+  store.dispatch("user/getAuthToken")
+  store.dispatch("user/getAuthToken").then(_response => {
+    next()
+  }).catch((_error) => {
+    next("/")
+  })
+}
 
 export default router

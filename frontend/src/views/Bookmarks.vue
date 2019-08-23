@@ -7,6 +7,12 @@
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else>
+            <p v-if="hasBookmarks == false">
+               You have no bookmarked items.
+            </p>
+            <template v-else>
+               You have bookmarked items.
+            </template>
          </div>
          <BackToVirgo />
       </div>
@@ -33,6 +39,7 @@ export default {
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
+        hasBookmarks: 'user/hasBookmarks'
       }),
    },
    methods: {

@@ -5,17 +5,18 @@
             <i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;<i class="fas fa-caret-down"></i>
                <transition name="fade">
                   <div v-if="menuOpen" class="user-menu" @mouseover="showMenu" >
-                     <div class="submenu">
-                        <router-link to="/account">Account Info</router-link>
-                     </div>
-                     <div class="submenu">
-                        <router-link to="/bookmarks">Bookmarks</router-link>
+                     <router-link to="/account">
+                        <div class="submenu">Account Info</div>
+                     </router-link>
+                     <router-link to="/bookmarks">
+                        <div class="submenu">Bookmarks</div>
+                     </router-link>
+                     <div  @click="signOut" class="submenu">
+                        <span>Sign out</span>
                      </div>
                   </div>
                </transition>
          </span>
-         <span class="sep">|</span>
-         <span @click="signOut" class="menu-item">Sign out</span>
       </template>   
       <template v-else>
          <router-link to="/signin">
@@ -120,7 +121,7 @@ export default {
   position: absolute;
   z-index: 1000;
   background: var(--color-secondary-blue);
-  padding: 5px 0;
+  padding: 0 0 5px 0;
   border-radius: 0 0 10px 10px;
   border: 1px solid var(--color-secondary-blue);
   border-top: 11px solid var(--color-secondary-blue);
