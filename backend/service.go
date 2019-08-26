@@ -110,7 +110,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 
 // ILSConnectorGet returns front-end configuration data as JSON
 func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
-	timeout := time.Duration(2 * time.Second)
+	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}

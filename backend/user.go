@@ -35,9 +35,11 @@ func (u *UserSettings) TableName() string {
 // GetBookmarks will load all folders and bookmarks for a user
 func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 	log.Printf("Load bookmarks for %s", u.Virgo4ID)
-	q := db.NewQuery(`SELECT f.name,b.identifier,b.details FROM bookmark_folders f  
-		LEFT JOIN bookmarks b ON b.folder_id=f.id
-		where f.user_id={:id}`)
+	q := db.NewQuery(`SELECT f.name as folder, s.name as pool, b.identifier, b.details, b.added_at
+	 	FROM bookmark_folders f  
+			LEFT JOIN bookmarks b ON b.folder_id=f.id
+			LEFT JOIN sources s ON s.id = b.source_id 
+		WHERE f.user_id={:id} ORDER BY added_at ASC`)
 	q.Bind(dbx.Params{"id": u.ID})
 	rows, err := q.Rows()
 	if err != nil {
@@ -48,21 +50,23 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 	// parse each bookmark row into the UserSettings structure
 	for rows.Next() {
 		var raw struct {
-			Name       string `db:"name"`
-			Identifier string `db:"identifier"`
-			Details    string `db:"details"`
+			Folder     string    `db:"folder"`
+			Pool       string    `db:"pool"`
+			Identifier string    `db:"identifier"`
+			Details    string    `db:"details"`
+			AddedAt    time.Time `db:"added_at"`
 		}
 		rows.ScanStruct(&raw)
-		if _, ok := u.Bookmarks[raw.Name]; !ok {
-			u.Bookmarks[raw.Name] = make([]Bookmark, 0)
-			if raw.Identifier != "" {
-				bookmark := Bookmark{Identifier: raw.Identifier}
-				err := json.Unmarshal([]byte(raw.Details), &bookmark.Details)
-				if err != nil {
-					log.Printf("Unable to parse bookmark data %s: %v", raw.Details, err)
-				} else {
-					u.Bookmarks[raw.Name] = append(u.Bookmarks[raw.Name], bookmark)
-				}
+		if _, ok := u.Bookmarks[raw.Folder]; !ok {
+			u.Bookmarks[raw.Folder] = make([]Bookmark, 0)
+		}
+		if raw.Identifier != "" {
+			bookmark := Bookmark{Pool: raw.Pool, Identifier: raw.Identifier, AddedAt: raw.AddedAt}
+			err := json.Unmarshal([]byte(raw.Details), &bookmark.Details)
+			if err != nil {
+				log.Printf("Unable to parse bookmark data %s: %v", raw.Details, err)
+			} else {
+				u.Bookmarks[raw.Folder] = append(u.Bookmarks[raw.Folder], bookmark)
 			}
 		}
 	}
@@ -70,6 +74,8 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 
 // Bookmark contains minimal details on a bookmarked item
 type Bookmark struct {
+	Pool       string            `json:"pool"` // this is the unique, internal pool name
+	AddedAt    time.Time         `json:"addedAt"`
 	Identifier string            `json:"identifier"`
 	Details    map[string]string `json:"details"`
 }
@@ -110,7 +116,6 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	}
 
 	var ilsUser ILSUserInfo
-	log.Printf("Raw user response %s", bodyBytes)
 	if err := xml.Unmarshal(bodyBytes, &ilsUser); err != nil {
 		log.Printf("ERROR: unable to parse user response: %s", err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
@@ -188,7 +193,8 @@ func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
 
 // AddBookmark will add a bookmark to a folder
 func (svc *ServiceContext) AddBookmark(c *gin.Context) {
-	v4UserID := c.Param("id")
+	user := NewUserSettings()
+	user.Virgo4ID = c.Param("id")
 	var item struct {
 		Folder string
 		Bookmark
@@ -199,62 +205,81 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid bookmark request")
 		return
 	}
-	log.Printf("User %s adding bookmark %+v", v4UserID, item)
+	log.Printf("User %s adding bookmark %+v", user.Virgo4ID, item)
 
 	// get user ID
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": v4UserID})
-	var uid int
-	uq.Row(&uid)
+	log.Printf("Lookup user %s ID", user.Virgo4ID)
+	q := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	q.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	q.Row(&user.ID)
 
 	// get folder ID
-	fq := svc.DB.NewQuery("select id from bookmark_folders where name={:name}")
-	fq.Bind(dbx.Params{"name": item.Folder})
+	log.Printf("Lookup folder %s ID", item.Folder)
+	q = svc.DB.NewQuery("select id from bookmark_folders where name={:name}")
+	q.Bind(dbx.Params{"name": item.Folder})
 	var fid int
-	err = uq.Row(&fid)
+	err = q.Row(&fid)
 	if err != nil {
-		log.Printf("ERROR: User %s folder %s not found", v4UserID, item.Folder)
+		log.Printf("ERROR: User %s folder %s not found", user.Virgo4ID, item.Folder)
 		c.String(http.StatusNotFound, "Folder %s not found", item.Folder)
 		return
 	}
 
-	q := svc.DB.NewQuery(`insert into bookmarks (user_id,folder_id,identifier,details)
-		values ({:uid}, {:fid}, {:bid}, {:detail})`)
+	// get POOL ID
+	log.Printf("Lookup pool %s ID", item.Pool)
+	q = svc.DB.NewQuery("select id from sources where name={:name}")
+	q.Bind(dbx.Params{"name": item.Pool})
+	var pid int
+	err = q.Row(&pid)
+	if err != nil {
+		log.Printf("ERROR: User %s pool %s not found", user.Virgo4ID, item.Pool)
+		c.String(http.StatusNotFound, "Pool %s not found", item.Pool)
+		return
+	}
+
+	q = svc.DB.NewQuery(`insert into bookmarks (user_id,folder_id,source_id,identifier,details,added_at)
+		values ({:uid}, {:fid}, {:pid}, {:bid}, {:detail}, {:added})`)
 	json, _ := json.Marshal(item.Bookmark.Details)
-	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"uid": user.ID})
 	q.Bind(dbx.Params{"fid": fid})
+	q.Bind(dbx.Params{"pid": pid})
 	q.Bind(dbx.Params{"bid": item.Identifier})
 	q.Bind(dbx.Params{"detail": json})
+	q.Bind(dbx.Params{"added": time.Now()})
 	_, err = q.Execute()
 	if err != nil {
-		log.Printf("ERROR: User %s unable to add bookmark %+v: %v", v4UserID, item, err)
+		log.Printf("ERROR: User %s unable to add bookmark %+v: %v", user.Virgo4ID, item, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.String(http.StatusOK, "ok")
+	// get updated bookmarks and return to user
+	user.GetBookmarks(svc.DB)
+	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
 // DeleteBookmark will remove bookmark from a folder
 func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
-	v4UserID := c.Param("id")
+	user := NewUserSettings()
+	user.Virgo4ID = c.Param("id")
 	bookmarkIdentifier := c.Query("identifier")
-	log.Printf("User %s deleting bookmark %s", v4UserID, bookmarkIdentifier)
+	log.Printf("User %s deleting bookmark %s", user.Virgo4ID, bookmarkIdentifier)
 
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": v4UserID})
-	var uid int
-	uq.Row(&uid)
+	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	uq.Row(&user.ID)
 
 	q := svc.DB.NewQuery("delete from bookmarks where user_id={:uid} and identifier={:bid}")
-	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"uid": user.ID})
 	q.Bind(dbx.Params{"bid": bookmarkIdentifier})
 	_, err := q.Execute()
 	if err != nil {
-		log.Printf("ERROR: unable to remove item %s:%s - %v", v4UserID, bookmarkIdentifier, err)
+		log.Printf("ERROR: unable to remove item %s:%s - %v", user.Virgo4ID, bookmarkIdentifier, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.String(http.StatusOK, "%s removed", bookmarkIdentifier)
+	// Get the new list of bookmarks and return them as JSON
+	user.GetBookmarks(svc.DB)
+	c.JSON(http.StatusOK, user.Bookmarks)
 }

@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/OneOfOne/xxhash v1.2.5 // indirect
-	github.com/aws/aws-sdk-go v1.23.6
+	github.com/aws/aws-sdk-go v1.23.8
 	github.com/dgryski/go-sip13 v0.0.0-20190329191031-25c5027a8c7b // indirect
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -33,6 +33,7 @@ require (
 	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586 // indirect
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
+	golang.org/x/sys v0.0.0-20190825160603-fb81701db80f // indirect
 	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7 // indirect
+	golang.org/x/tools v0.0.0-20190826060629-95c3470cfb70 // indirect
 )
