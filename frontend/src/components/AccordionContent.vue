@@ -94,13 +94,20 @@ div.title.right {
 div.title.left {
    text-align: left;
 }
+
+div.title.left .accordion-icon {
+   float: right;
+}
 div.title {
    padding: 0px 8px;
    text-align: right;
    cursor: pointer;
    margin: 2px 0 0 0;
    color: #666;
-   background: white;
+   /* background: white; */
+   background: #f8f8f8;
+   border-radius: 5px;
+   padding: 3px 12px;
 }
 .title .text {
    padding-right: 5px;

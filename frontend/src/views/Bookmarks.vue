@@ -11,9 +11,24 @@
                You have no bookmarked items.
             </p>
             <template v-else>
-               <AccordionContent v-for="folder in Object.keys(bookmarks)"  :title="folder" :key="folder" align="left">
-                  <p>{{bookmarks[folder]}}</p>
-               </AccordionContent>
+               <div class="folder" v-for="folder in Object.keys(bookmarks)" :key="folder">
+                  <i class="remove-folder fas fa-trash-alt"></i>
+                  <AccordionContent :title="folder" align="left">
+                     <div class="none" v-if="bookmarks[folder].length == 0">
+                        There are no bookmarks in this folder.
+                     </div>
+                     <table v-else>
+                        <tr>
+                           <th/><th>Title</th><th>Author</th>
+                        </tr>
+                        <tr v-for="bookmark in bookmarks[folder]" :key="bookmark.identifier">
+                           <td><i @click="removeBookmark(bookmark.identifier)" class="remove fas fa-trash-alt"></i></td>
+                           <td>{{bookmark.details.title}}</td>
+                           <td>{{bookmark.details.author}}</td>
+                        </tr>
+                     </table>
+                  </AccordionContent>
+               </div>
             </template>
          </div>
          <BackToVirgo />
@@ -47,20 +62,33 @@ export default {
       }),
    },
    methods: {
+      removeBookmark(identifier) {
+          this.$store.dispatch("user/removeBookmark", identifier)
+      }
    },
    created() {
-      if (this.hasAccountInfo ==  false) {
-         this.$store.dispatch("user/getAccountInfo").then(_response => {
-            this.lookingUp = false
-         })
-      } else {
+      this.lookingUp = true
+      this.$store.dispatch("user/getAccountInfo").then(_response => {
          this.lookingUp = false
-      }
+      })
    }
 }
 </script>
 
 <style scoped>
+.remove, .remove-folder {
+   color: #666;
+   opacity: 0.6;
+   cursor: pointer;
+}
+.remove:hover, .remove-folder:hover {
+   opacity: 1;
+}
+.remove-folder {
+   position: absolute;
+   left: 0;
+   top: 5px;
+}
 .bookmarks {
    min-height: 400px;
    position: relative;
@@ -74,12 +102,29 @@ export default {
 .working img {
    margin: 30px 0;
 }
+div.folder {
+   position: relative;
+}
 .bookmarks-content {
    width: 40%;
    margin: 0 auto;
 }
-.details {
+table td, th {
+  padding: 2px 8px;
+  text-align: left;
+}
+table {
+   margin: 10px;
+}
+div.accordion {
+   margin-bottom: 15px;
+   margin-left: 25px;
+}
+div.none {
+   font-size: 1.1em;
    text-align: left;
+   margin: 15px;
+   color: #999;
 }
 </style>
 
