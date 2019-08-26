@@ -1,6 +1,6 @@
 BEGIN;
 TRUNCATE TABLE sources restart identity;
-ALTER TABLE sources ADD COLUMN name varchar(50) NOT NULL;
+ALTER TABLE sources ADD COLUMN name varchar(50) NOT NULL UNIQUE;
 INSERT INTO sources(name, private_url) values 
    ('catalog', 'http://pool-solr-ws-catalog.private.staging:8080'),
    ('video', 'http://pool-solr-ws-video.private.staging:8080'),
