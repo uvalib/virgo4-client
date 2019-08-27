@@ -1,7 +1,7 @@
 <template>
    <div @click="closePool" class="more-results-overlay">
       <div  @click="blockClick" id="more-header" class="more-header">
-         <span class="pool-name">{{poolDescription(selectedPool.url)}}</span>
+         <span class="pool-name">{{selectedResults.pool.description}}</span>
          <i @click="closePool" class="pool-close fas fa-times-circle"></i>
          <SearchFilters />
       </div>
@@ -9,8 +9,8 @@
       <div @click="blockClick" class="more-results-content">
          <div id="hits-scroller" v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  
                class="hits" v-bind:style="{ top: scrollTop + 'px' }">
-            <div class="summary"><b>{{selectedPool.total}} results for </b>{{queryString()}}</div>
-            <template v-for="hit in selectedPool.hits">
+            <div class="summary"><b>{{selectedResults.total}} results for </b>{{queryString()}}</div>
+            <template v-for="hit in selectedResults.hits">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
          </div>
@@ -45,8 +45,7 @@ export default {
          addingFilter: state => state.filters.adding,
       }),
       ...mapGetters({
-         selectedPool: 'selectedPool',
-         findPool: 'pools/find',
+         selectedResults: 'selectedPool',
          hasMoreHits: 'hasMoreHits',
          rawQueryString: 'query/string',
          poolFilter: 'filters/poolFilter',
@@ -95,17 +94,10 @@ export default {
       closePool() {
          this.$store.commit("closePoolResults")
       },
-      poolDescription(url) {
-         let p = this.findPool(url) 
-         if (p) {
-            return p.description
-         }
-         return url
-      },
    },
    mounted() {
       this.calcHeaderHeight()
-      if ( this.selectedPool.statusCode == 408) {
+      if ( this.selectedResults.statusCode == 408) {
          this.$store.dispatch("searchSelectedPool")
       }
    }

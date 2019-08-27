@@ -21,15 +21,6 @@ const pools = {
          })
          return excluded
       },
-      find: state => url => {
-         let match = null
-         state.list.forEach(function (p) {
-            if (p.url == url) {
-               match = p
-            }
-         })
-         return match
-      },
    },
 
    mutations: {

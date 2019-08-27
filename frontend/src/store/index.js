@@ -39,7 +39,7 @@ export default new Vuex.Store({
     },
     selectedPool: state => {
       if (state.selectedPoolIdx === -1 ) {
-        return {url: "none", total: 0}
+        return {total: 0, hits: [], pool: {description:"", id:"none", name:"None", url: ""}}
       }
       return state.results[state.selectedPoolIdx]
     },
@@ -50,11 +50,8 @@ export default new Vuex.Store({
       if (state.selectedPoolIdx === -1 || state.searching  ) {
         return false
       }
-      let tgtPool = state.results[state.selectedPoolIdx]
-      return tgtPool.total > tgtPool.hits.length
-    },
-    poolResultsURL: state => resultIdx => {
-      return state.results[resultIdx].url
+      let tgtResults = state.results[state.selectedPoolIdx]
+      return tgtResults.total > tgtResults.hits.length
     },
     hitPoolCount: state => {
       let poolCnt = 0
@@ -115,6 +112,7 @@ export default new Vuex.Store({
         state.error = error
       }
     },
+
     setConfig(state, cfg) {
       state.searchAPI = cfg.searchAPI
     },
@@ -122,6 +120,8 @@ export default new Vuex.Store({
       state.searching = flag
     },
     selectPoolResults(state, visiblePoolIdx) {
+      // User has selected a visible set of results to explore further. Convert
+      // the visibleIndex into a results index and set it as seleceted
       let idx = state.visibleResults[visiblePoolIdx]
       state.selectedPoolIdx = idx
     },
@@ -179,13 +179,13 @@ export default new Vuex.Store({
       state.visibleResults = []
 
       // Push all results into the results structure. Reset paging for each
-      // NOTE: need to have resultIdx attached to result to cover the case when pools are 
-      // re-sorted by add/remove from view. This is tracked in visibleResults where the index
-      // is not the same as the index into the results array.
+      // NOTE: need to have resultIdx attached to because pools are interacted with
+      // in terms of the visibleResults array. Need easy way to get original resultsIdx.
       results.pool_results.forEach(function (pr,idx) {
+        let pool = findPool(results.pools, pr.pool_id)
         if (pr.record_list) {
           mergeRepeatedFields( pr.record_list )
-          let result = { url: pr.service_url, total: pr.pagination.total,
+          let result = { pool: pool, total: pr.pagination.total,
             hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
             statusCode: pr.status_code, statusMessage: pr.status_msg }
           state.results.push(result)
@@ -195,15 +195,17 @@ export default new Vuex.Store({
           }
         } else {
           state.results.push({
-            url: pr.service_url,
+            pool: pool,
             total: 0, hits: [], page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
             statusCode: pr.status_code, statusMessage: pr.status_msg })
         }
       })
+
       if (state.visibleResults.length == 0 && state.results[0].statusCode == 200  && state.results[0].hits.length > 0) {
         state.results[0]["show"] = true
         state.visibleResults.push(0)
       }
+
       state.total = results.total_hits
     },
 
@@ -258,17 +260,14 @@ export default new Vuex.Store({
     // scroll. If newly filtered, reset paging and re-query
     searchSelectedPool({ state, commit, _rootState, rootGetters }) {
       commit('setSearching', true)
-      let tgtPage = 0
-      if (state.selectedPoolIdx > -1) {
-        tgtPage = state.results[state.selectedPoolIdx].page
-      }
+      let tgtPool = rootGetters.selectedPool
       let f = rootGetters['filters/poolFilter'](state.selectedPoolIdx, "api")
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: tgtPage * state.pageSize, rows: state.pageSize },
+        pagination: { start: tgtPool.page * state.pageSize, rows: state.pageSize },
         filters: f
       }
-      let url = rootGetters.selectedPool.url + "/api/search?debug=1"
+      let url = tgtPool.pool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
@@ -304,6 +303,17 @@ export default new Vuex.Store({
 
   plugins: [messaging, versionChecker]
 })
+
+// Find a pool by internal identifier
+function findPool(pools, id) {
+  let match = null
+  pools.forEach(function (p) {
+     if (p.id == id) {
+        match = p
+     }
+  })
+  return match
+}
 
 // Each search ppol hit contains an array of field objects. These may be repeated, but for display 
 // purposes they need to be merged into a single field object with an array value. Additionally, the fields 

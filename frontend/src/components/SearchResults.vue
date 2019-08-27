@@ -14,16 +14,16 @@
             <template  v-for="(r,idx) in results">  
                <div v-if="wasPoolSkipped(r)" @click="toggleVisibility(idx)" :key="idx" 
                   class="pool pure-button" v-bind:class="{showing: r.show}">
-                  {{poolName(r.url)}} <span class="total">(not searched)</span>
+                  {{r.pool.Name}} <span class="total">(not searched)</span>
                </div>
                <div v-else-if="poolFailed(r)" :key="idx" 
                   class="pool pure-button disabled failed"
                   :title="r.statusMessage">
-                  {{poolName(r.url)}} <span class="total">(failed)</span>
+                  {{r.pool.name}} <span class="total">(failed)</span>
                </div>
                <div v-else @click="toggleVisibility(idx)" :key="idx" 
                   class="pool pure-button" v-bind:class="{showing: r.show, disabled: r.total==0}">
-                  {{poolName(r.url)}} <span class="total">({{r.total}})</span>
+                  {{r.pool.name}} <span class="total">({{r.total}})</span>
                </div>
             </template>
          </div>
@@ -33,26 +33,26 @@
             name="pool-transition"
             enter-active-class="animated faster fadeIn"
             leave-active-class="animated faster fadeOut">
-         <div class="pool-panel" v-for="(pool,visibleIdx) in visibleResults" :key="pool.url">
+         <div class="pool-panel" v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
             <div class="pool-titlebar">
-               <span>{{poolDescription(pool.url)}}</span>
-               <i @click="toggleVisibility(pool.resultIdx)" class="hide-pool fas fa-times-circle"></i>
+               <span>{{result.pool.description}}</span>
+               <i @click="toggleVisibility(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
             </div>
             <div class="pool-info">
                <div class="metrics">
-                  <span>{{pool.total}} matches found in {{pool.timeMS}} ms</span>
+                  <span>{{result.total}} matches found in {{result.timeMS}} ms</span>
                </div>
-               <template v-if="hasFilter(pool.resultIdx)">
+               <template v-if="hasFilter(result.resultIdx)">
                   <div class="filter-head">Search Filters</div>
                   <table class="filters">
-                     <tr class="filter" v-for="(filter,i) in poolFilter(pool.resultIdx, 'raw')" :key="i">
+                     <tr class="filter" v-for="(filter,i) in poolFilter(result.resultIdx, 'raw')" :key="i">
                         <td class="label">{{filter.facet}}:</td>
                         <td class="filter">{{formatFilterValues(filter.values)}}</td>
                      </tr>
                   </table>
                </template>
             </div>
-            <template v-for="hit in pool.hits.slice(0,3)">
+            <template v-for="hit in result.hits.slice(0,3)">
                <SearchHit :hit="hit" :key="hit.id"/>
             </template>
             <div @click="selectPool(visibleIdx)" class="more-panel">
@@ -75,7 +75,6 @@ export default {
    computed: {
       ...mapGetters({
          visibleResults: 'visibleResults',
-         findPool: 'pools/find',
          rawQueryString: 'query/string',
          hitPoolCount: 'hitPoolCount',
          skippedPoolCount: 'skippedPoolCount',
@@ -113,20 +112,6 @@ export default {
          if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
             this.selectPool(resultIdx)
          }
-      },
-      poolName(url) {
-         let p = this.findPool(url) 
-         if (p) {
-            return p.name
-         }
-         return url
-      },
-      poolDescription(url) {
-         let p = this.findPool(url) 
-         if (p) {
-            return p.description
-         }
-         return url
       },
    }
 }

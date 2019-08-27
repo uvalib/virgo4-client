@@ -107,18 +107,17 @@ const filters = {
    },
 
    actions: {
-      // ctx members:  getters, rootGetters, rootState, state
       getBuckets(ctx, data) {
          // Recreate the query for the target pool, but include a 
          // request for facet/bucket info for the  specified facet
-         let poolURL = ctx.rootGetters['poolResultsURL'](data.poolResultsIdx)
+         let pool = ctx.rootState.results[data.poolResultsIdx].pool
          let req = {
             query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
             facet: data.facet,
             filters: ctx.getters.poolFilter(data.poolResultsIdx, "api")
           }
-         let tgtURL = poolURL+"/api/search"
+         let tgtURL = pool.url+"/api/search"
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          ctx.commit('setUpdatingBuckets', true)
          axios.post(tgtURL, req).then((response) => {
