@@ -47,7 +47,6 @@ const router = new Router({
           next()
         } else {
           next("/")
-          window.location.reload(true)
         }
       }
     },
@@ -60,7 +59,6 @@ const router = new Router({
           next()
         } else {
           next("/") 
-          window.location.reload(true)
         }
       }
     },
@@ -87,6 +85,7 @@ const router = new Router({
 })
 
 function getSignedInUserFromCookie() {
+  store.commit("user/setSignedInUser", {userId: "", token: "", type: "", quiet: true})
   let authInfo = Vue.cookies.get("v4_auth_user")
   if (authInfo) {
     let userId = authInfo.split("|")[0]
@@ -107,10 +106,10 @@ function ensureAuthTokenPresent(next) {
 
   // see if there is an auth user cookie set from which we can retrieve
   // the auth token and logged in user info....
-  console.log("NO AUTH")
+  // console.log("NO AUTH")
   let authInfo = Vue.cookies.get("v4_auth_user")
   if (authInfo) {
-    console.log("IN COOKIE AUTH, signing in")
+    // console.log("IN COOKIE AUTH, signing in")
     let userId = authInfo.split("|")[0]
     let token = authInfo.split("|")[1]
     let type = authInfo.split("|")[2]
@@ -120,7 +119,7 @@ function ensureAuthTokenPresent(next) {
   }
 
   // No token. Request one and WAIT FOR RESPONSE before calling next()
-  console.log("REQUEST AUTH")
+  // console.log("REQUEST AUTH")
   store.dispatch("user/getAuthToken")
   store.dispatch("user/getAuthToken").then(_response => {
     next()

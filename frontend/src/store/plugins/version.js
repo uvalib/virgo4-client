@@ -5,7 +5,7 @@ const versionChecker = (store) => {
    var currBuild = "unknown"
    axios.get("/version").then((response) => {
       currBuild = response.data.build
-      setInterval(() => {
+      let timer = setInterval(() => {
          axios.get("/version").then((ckResp) => {
             if (currBuild!= ckResp.data.build) {
                // load without cache
@@ -15,6 +15,7 @@ const versionChecker = (store) => {
             }
          }).catch((_error) => {
             store.commit('setFatal', "Lost connection to Virgo backend services")
+            clearInterval(timer)
          })
       }, 1000*60)
     })
