@@ -41,17 +41,17 @@ export default {
       ...mapState({
          results: state=>state.results,
          searching: state=>state.searching,
-         selectedPoolIdx: state => state.selectedPoolIdx,
+         selectedResultsIdx: state => state.selectedResultsIdx,
          addingFilter: state => state.filters.adding,
       }),
       ...mapGetters({
-         selectedResults: 'selectedPool',
+         selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
          rawQueryString: 'query/string',
          poolFilter: 'filters/poolFilter',
       }),
       filterLength() {
-         return this.poolFilter(this.selectedPoolIdx, 'raw').length
+         return this.poolFilter(this.selectedResultsIdx, 'raw').length
       }
    },
    watch: {

@@ -8,7 +8,7 @@
                <td class="sel">
                   <select v-model="selectedFacet" @change="facetChosen" class="facets">
                      <option value="">Select a facet</option>
-                     <option v-for="(facet,idx) in poolFacets(poolIdx)" :key="idx" :value="facet">
+                     <option v-for="(facet,idx) in poolFacets(resultsIdx)" :key="idx" :value="facet">
                         {{ facet }}
                      </option>
                   </select>
@@ -24,7 +24,7 @@
                            :showLabels="false" 
                            track-by="value" label="name" :searchable="false"
                            :optionHeight="32" :loading="updatingBuckets"
-                           :options="facetBuckets(poolIdx, selectedFacet)">
+                           :options="facetBuckets(resultsIdx, selectedFacet)">
                      </multiselect>
                   </template>
                   <template v-else>
@@ -59,7 +59,7 @@ export default {
    },
    computed: {
       ...mapState({
-         poolIdx: state => state.selectedPoolIdx,
+         resultsIdx: state => state.selectedResultsIdx,
          searching: state => state.searching,
          updatingBuckets: state => state.filters.updatingBuckets
       }),
@@ -75,14 +75,14 @@ export default {
       addFilter() {
          // IMPORTANT: vue-multiselect binds v-model to this.values. The binding shoves
          // the whole json object for the option into the array ({name: xxx, value: yyy} instead of just the value)
-         this.$store.commit("filters/addFilter", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet, values: this.values})
+         this.$store.commit("filters/addFilter", {poolResultsIdx: this.resultsIdx, facet: this.selectedFacet, values: this.values})
          this.$store.commit("filters/closeAdd")
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
       },
       facetChosen() {
          this.values.splice(0, this.values.length)
-         this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.poolIdx, facet: this.selectedFacet})
+         this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.resultsIdx, facet: this.selectedFacet})
       }
    }
 }

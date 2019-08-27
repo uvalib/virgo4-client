@@ -19,7 +19,7 @@ export default new Vuex.Store({
     results: [],
     total: -1,
     visibleResults: [],
-    selectedPoolIdx: -1,
+    selectedResultsIdx: -1,
     version: "unknown"
   },
 
@@ -34,23 +34,17 @@ export default new Vuex.Store({
       })
       return out
     },
-    selectedPoolIdx: state => {
-      return state.selectedPoolIdx
-    },
-    selectedPool: state => {
-      if (state.selectedPoolIdx === -1 ) {
+    selectedResults: state => {
+      if (state.selectedResultsIdx === -1 ) {
         return {total: 0, hits: [], pool: {description:"", id:"none", name:"None", url: ""}}
       }
-      return state.results[state.selectedPoolIdx]
-    },
-    isPoolSelected: state => {
-      return state.selectedPoolIdx > -1
+      return state.results[state.selectedResultsIdx]
     },
     hasMoreHits: state => {
-      if (state.selectedPoolIdx === -1 || state.searching  ) {
+      if (state.selectedResultsIdx === -1 || state.searching  ) {
         return false
       }
-      let tgtResults = state.results[state.selectedPoolIdx]
+      let tgtResults = state.results[state.selectedResultsIdx]
       return tgtResults.total > tgtResults.hits.length
     },
     hitPoolCount: state => {
@@ -91,13 +85,11 @@ export default new Vuex.Store({
       state.fatal = err
     },
     setError(state, error) {
-      // clear any prior results
-      state.total = -1
-      state.results = []
       if (error == null) {
         error = ""
       }
-
+      state.total = -1
+      state.results = []
       if (error.response) {
         // Server responded with a status code out of the range of 2xx
         state.error = error.response.data
@@ -123,10 +115,10 @@ export default new Vuex.Store({
       // User has selected a visible set of results to explore further. Convert
       // the visibleIndex into a results index and set it as seleceted
       let idx = state.visibleResults[visiblePoolIdx]
-      state.selectedPoolIdx = idx
+      state.selectedResultsIdx = idx
     },
     closePoolResults(state) {
-      state.selectedPoolIdx = -1
+      state.selectedResultsIdx = -1
     },
     toggleResultVisibility(state, poolResultsIdx) {
       // Don't change visibility if there are no results to see -- unless the pool timed out
@@ -148,16 +140,16 @@ export default new Vuex.Store({
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool
       // total from overall total and reset pool total to 0
-      let tgtPool = state.results[state.selectedPoolIdx]
+      let tgtPool = state.results[state.selectedResultsIdx]
       let oldPoolTotal = tgtPool.total 
       tgtPool.total = 0
       tgtPool.page = 0
-      state.results[state.selectedPoolIdx].hits = []
+      state.results[state.selectedResultsIdx].hits = []
       state.total -= oldPoolTotal
     },
 
     addPoolSearchResults(state, poolResults) {
-      let tgtPool = state.results[state.selectedPoolIdx]
+      let tgtPool = state.results[state.selectedResultsIdx]
       if (poolResults.pagination.total > 0) {
         mergeRepeatedFields( poolResults.record_list )
         tgtPool.hits = tgtPool.hits.concat(poolResults.record_list)
@@ -210,7 +202,7 @@ export default new Vuex.Store({
     },
 
     moreResults(state) {
-      state.results[state.selectedPoolIdx].page++
+      state.results[state.selectedResultsIdx].page++
     },
   },
 
@@ -260,8 +252,8 @@ export default new Vuex.Store({
     // scroll. If newly filtered, reset paging and re-query
     searchSelectedPool({ state, commit, _rootState, rootGetters }) {
       commit('setSearching', true)
-      let tgtPool = rootGetters.selectedPool
-      let f = rootGetters['filters/poolFilter'](state.selectedPoolIdx, "api")
+      let tgtPool = rootGetters.selectedResults
+      let f = rootGetters['filters/poolFilter'](state.selectedResultsIdx, "api")
       let req = {
         query: rootGetters['query/string'],
         pagination: { start: tgtPool.page * state.pageSize, rows: state.pageSize },

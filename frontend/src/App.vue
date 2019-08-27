@@ -3,12 +3,12 @@
       <FatalError v-if="fatal.length > 0"/>
       <AuthorizePanel v-if="authorizing"/>
       <transition name="fade">
-        <div class="dimmer" v-if="isPoolSelected"></div>
+        <div class="dimmer" v-if="resultsSelected"></div>
       </transition>
       <transition name="more-transition"
             enter-active-class="animated faster slideInRight"
             leave-active-class="animated faster slideOutRight">
-        <MoreResultsModal v-if="isPoolSelected"/>
+        <MoreResultsModal v-if="resultsSelected"/>
       </transition>
       <VirgoHeader/>
       <MenuBar/>
@@ -25,7 +25,6 @@ import FatalError from "@/components/layout/FatalError"
 import AuthorizePanel from "@/components/layout/AuthorizePanel"
 import MoreResultsModal from "@/components/MoreResultsModal"
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"
 export default {
    components: {
       VirgoHeader,
@@ -38,11 +37,12 @@ export default {
    computed: {
       ...mapState({
          fatal: state => state.fatal,
+         selectedResultsIdx: state => state.selectedResultsIdx,
          authorizing: state => state.user.authorizing
       }),
-      ...mapGetters({
-         isPoolSelected: 'isPoolSelected',
-      })
+      resultsSelected() {
+        return this.selectedResultsIdx > -1
+      }
    },
    methods: {
    }

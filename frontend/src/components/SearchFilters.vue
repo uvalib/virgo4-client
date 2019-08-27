@@ -32,7 +32,7 @@ export default {
    computed: {
       ...mapState({
          addingFilter: state => state.filters.adding,
-         poolIdx: state => state.selectedPoolIdx,
+         poolIdx: state => state.selectedResultsIdx,
       }),
       ...mapGetters({
          hasFilter: 'filters/hasFilter',
