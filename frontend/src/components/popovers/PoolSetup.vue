@@ -2,10 +2,10 @@
    <v-popover style="display:inline-block;">
       <span @click="getPools" class="pure-button pure-button-secondary">Sources</span>
       <div class="pools-container" slot="popover">
-         <h1>
+         <div class="popover-title">
             Sources
             <i v-close-popover class="action close fas fa-times-circle"></i>
-         </h1>
+         </div>
          <div class="pools-list">
             <table>
                <tr>
@@ -135,7 +135,7 @@ p.pool-desc {
    padding-bottom: 5px;
    border-radius: 5px;
 }
-.pools-container h1 {
+.pools-container .popover-title {
    padding: 8px 0 6px 0;
    margin: 0;
    text-align: center;
@@ -143,6 +143,8 @@ p.pool-desc {
    color: white;
    font-weight: normal;
    border-radius: 5px 5px 0 0;
+   font-size: 1.25em;
+   font-weight: bold;
 }
 .pools-list {
    margin: 10px 15px;
