@@ -260,20 +260,43 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
-// DeleteBookmark will remove bookmark from a folder
+// DeleteBookmark will remove a bookmark by identifier. By default, all instances
+// of items with the target ID will be deleted. Accept an optional folder param. If
+// specified, only delete bookmarks from that folder.
 func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
 	user := NewUserSettings()
 	user.Virgo4ID = c.Param("id")
 	bookmarkIdentifier := c.Query("identifier")
-	log.Printf("User %s deleting bookmark %s", user.Virgo4ID, bookmarkIdentifier)
+	folder := c.Query("folder")
+	folderID := -1
+	if folder != "" {
+		log.Printf("User %s deleting bookmark %s/%s ", user.Virgo4ID, folder, bookmarkIdentifier)
+		q := svc.DB.NewQuery("select id from bookmark_folders where name={:fn}")
+		q.Bind(dbx.Params{"fn": folder})
+		err := q.Row(&folderID)
+		if err != nil {
+			log.Printf("ERROR: unknown folder %s:%s - %v", user.Virgo4ID, folder, err)
+			c.String(http.StatusNotFound, "Folder %s does not exist", folder)
+			return
+		}
+	} else {
+		log.Printf("User %s deleting bookmark %s from all folders", user.Virgo4ID, bookmarkIdentifier)
+	}
 
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
 	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	uq.Row(&user.ID)
 
-	q := svc.DB.NewQuery("delete from bookmarks where user_id={:uid} and identifier={:bid}")
+	qStr := "delete from bookmarks where user_id={:uid} and identifier={:bid}"
+	if folderID > -1 {
+		qStr += " and folder_id={:fid}"
+	}
+	q := svc.DB.NewQuery(qStr)
 	q.Bind(dbx.Params{"uid": user.ID})
 	q.Bind(dbx.Params{"bid": bookmarkIdentifier})
+	if folderID > -1 {
+		q.Bind(dbx.Params{"fid": folderID})
+	}
 	_, err := q.Execute()
 	if err != nil {
 		log.Printf("ERROR: unable to remove item %s:%s - %v", user.Virgo4ID, bookmarkIdentifier, err)
