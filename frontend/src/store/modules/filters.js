@@ -103,6 +103,10 @@ const filters = {
       },
       setUpdatingBuckets(state, flag) {
          state.updatingBuckets = flag
+      },
+      reset(state) {
+         state.poolFacets = []
+         state.poolFilters = []
       }
    },
 

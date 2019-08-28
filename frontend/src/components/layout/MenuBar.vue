@@ -102,8 +102,7 @@ export default {
 .submenu {
    margin:0;
    padding: 2px 10px;
-   margin: 1px 5px;
-   border-radius: 5px;
+   margin: 0;
 }
 #app .menu .submenu a {
    color:white;
@@ -122,7 +121,7 @@ export default {
   z-index: 1000;
   background: var(--color-secondary-blue);
   padding: 0 0 5px 0;
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 5px 5px;
   border: 1px solid var(--color-secondary-blue);
   border-top: 11px solid var(--color-secondary-blue);
   right: 0;

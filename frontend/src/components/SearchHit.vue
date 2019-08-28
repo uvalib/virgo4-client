@@ -1,6 +1,6 @@
 <template>
    <div class="hit">
-      <div class="bookmark-bar">
+      <div class="bookmark-bar" v-if="isSignedIn">
          <i @click="bookmarkClicked(hit)" class="bookmark far fa-bookmark"></i> 
       </div>
       <div class="basic">
@@ -31,9 +31,15 @@
 
 <script>
 import AccordionContent from '@/components/AccordionContent'
+import { mapGetters } from "vuex"
 export default {
    props: {
       hit: { type: Object, required: true}
+   },
+   computed: {
+      ...mapGetters({
+        isSignedIn: 'user/isSignedIn',
+      }),
    },
    components: {
       AccordionContent

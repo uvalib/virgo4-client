@@ -204,6 +204,13 @@ export default new Vuex.Store({
     moreResults(state) {
       state.results[state.selectedResultsIdx].page++
     },
+
+    resetSearch(state) {
+      state.results = []
+      state.total = -1
+      state.visibleResults = []
+      state.selectedResultsIdx = -1
+    }
   },
 
   actions: {
@@ -233,6 +240,7 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
+      commit('filters/reset')
       let url = state.searchAPI + "/api/search?debug=1&intuit=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {

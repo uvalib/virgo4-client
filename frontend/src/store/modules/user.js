@@ -109,10 +109,14 @@ const user = {
          axios.post(`/api/users/${ctx.state.signedInUser}/signout`).then((_response) => {
             ctx.commit('signOutUser')
             ctx.commit('setAuthorizing', false)
+            ctx.commit('resetSearch', null, { root: true })
+            ctx.rootStatecommit('filters/reset', null, { root: true })
             router.push("/signedout")
           }).catch((_error) => {
             ctx.commit('signOutUser')
             ctx.commit('setAuthorizing', false)
+            ctx.commit('resetSearch', null, { root: true })
+            ctx.commit('filters/reset', null, { root: true })
             router.push("/signedout")
           })
       },
