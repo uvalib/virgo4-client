@@ -3,7 +3,10 @@
       <FatalError v-if="fatal.length > 0"/>
       <AuthorizePanel v-if="authorizing"/>
       <transition name="fade">
-        <div class="dimmer" v-if="resultsSelected"></div>
+        <div class="dimmer" v-if="showDimmer"></div>
+      </transition>
+      <transition name="fade">
+        <AddBookmarkModal v-if="addingBookmark"/>
       </transition>
       <transition name="more-transition"
             enter-active-class="animated faster slideInRight"
@@ -24,7 +27,9 @@ import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
 import AuthorizePanel from "@/components/layout/AuthorizePanel"
 import MoreResultsModal from "@/components/MoreResultsModal"
+import AddBookmarkModal from "@/components/AddBookmarkModal"
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    components: {
       VirgoHeader,
@@ -32,16 +37,24 @@ export default {
       FatalError,
       AuthorizePanel,
       MoreResultsModal,
+      AddBookmarkModal,
       MenuBar
    },
    computed: {
       ...mapState({
          fatal: state => state.fatal,
          selectedResultsIdx: state => state.selectedResultsIdx,
-         authorizing: state => state.user.authorizing
+         authorizing: state => state.user.authorizing,
+         addingBookmark: state => state.user.addingBookmark
+      }),
+      ...mapGetters({
+         addingBookmark: 'user/addingBookmark',
       }),
       resultsSelected() {
         return this.selectedResultsIdx > -1
+      },
+      showDimmer() {
+        return (this.selectedResultsIdx > -1 || this.addingBookmark)
       }
    },
    methods: {
@@ -225,12 +238,13 @@ html, body {
 }
 
 .text-button {
-  font-weight: normal;
+  font-weight: bold;
   color:var(--color-link);
   cursor:pointer;
   display: inline-block
 }
 .text-button:hover {
   opacity:1;
+  text-decoration: underline;
 }
 </style>

@@ -1,13 +1,15 @@
 <template>
    <div class="hit">
       <div class="bookmark-bar">
-         <i class="bookmark far fa-bookmark"></i> 
+         <i @click="bookmarkClicked(hit)" class="bookmark far fa-bookmark"></i> 
       </div>
       <div class="basic">
          <table class="fields">
             <tr v-for="field in hit.basicFields" :key="getKey(field)">
-               <td class="label">{{field.label}}:</td>
-               <td class="value" v-html="fieldValueString(field)"></td>
+               <template v-if="field.display != 'optional'">
+                  <td class="label">{{field.label}}:</td>
+                  <td class="value" v-html="fieldValueString(field)"></td>
+               </template>
             </tr>
          </table>
          <div class="preview">
@@ -18,7 +20,7 @@
          <div class="details">
             <table class="fields">
                <tr v-for="field in hit.detailFields" :key="getKey(field)">
-                  <td class="label">{{fieldLabel(field)}}:</td>
+                  <td class="label">{{field.label}}:</td>
                   <td class="value" v-html="fieldValueString(field)"></td>
                </tr>
             </table>
@@ -36,17 +38,29 @@ export default {
    components: {
       AccordionContent
    },
-   computed: {
-   },
    methods: {
+      bookmarkClicked(hit) {
+         let data = {id: "", title: "", author: ""} 
+         let tgt = [hit.basicFields, hit.basicFields]
+         tgt.forEach(function(fields) {
+            fields.forEach(function(f) {
+               if (f.name=="id") {
+                  data.id = f.value
+               } else if (f.name == "title") {
+                  data.title = f.value
+               } else if (f.name == "author") {
+                  if ( Array.isArray(f.value)) {
+                      data.author = f.value.join(", ")
+                  } else {
+                     data.author = f.value
+                  }
+               }
+            })
+         }) 
+         this.$store.commit("user/showAddBookmark", data)
+      },
       getKey(field) {
          return field.name+field.value
-      },
-      fieldLabel(field) {
-         if (field.label == "Access in Virgo Classic") {
-            return "More"
-         }
-         return field.label
       },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {

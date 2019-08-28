@@ -45,7 +45,6 @@ export default {
          return values.join(", ")
       },
       addClicked(event) {
-         event.stopPropagation()
          this.$store.commit("filters/showAdd")
       },
       clearClicked() {

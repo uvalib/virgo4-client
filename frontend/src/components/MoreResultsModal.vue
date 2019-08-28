@@ -92,6 +92,7 @@ export default {
          }
       },
       closePool() {
+         this.$store.commit("filters/closeAdd")
          this.$store.commit("closePoolResults")
       },
    },

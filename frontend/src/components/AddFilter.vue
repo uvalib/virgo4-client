@@ -36,8 +36,8 @@
          </table>
       </div>
       <div class="controls">
+         <span @click="cancelAdd" class="pure-button pure-button-secondary filter">Cancel</span>
          <span @click="addFilter" class="pure-button pure-button-primary filter">OK</span>
-         <span @click="cancelAdd" class="pure-button pure-button-primary filter">Cancel</span>
       </div>
    </div>
 
@@ -159,7 +159,7 @@ div.controls {
    text-align: right;
    margin: 8px 0 0 0;
 }
-#app span.pure-button.pure-button-primary.filter {
+#app span.pure-button.filter {
    padding: 5px 20px;
    margin: 0 5px 0 0;
    font-size: 0.9em;

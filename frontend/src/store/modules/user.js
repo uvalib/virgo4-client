@@ -10,7 +10,8 @@ const user = {
       signedInUser: "",
       signInMessage: "",
       sessionType: "",
-      accountInfo: null
+      accountInfo: null,
+      newBookmarkInfo: null
    },
 
    getters: {
@@ -35,10 +36,19 @@ const user = {
          if (state.accountInfo == null) return {}
          if (state.accountInfo.bookmarks == null) return {}
          return state.accountInfo.bookmarks
+      },
+      addingBookmark: state => {
+         return state.newBookmarkInfo != null
       }
    },
 
    mutations: {
+      showAddBookmark(state, bookmarkData) {
+         state.newBookmarkInfo = bookmarkData
+      },
+      closeAddBookmark(state) {
+         state.newBookmarkInfo = null
+      },
       setAuthToken(state, token) {
          state.authToken = token
       },
@@ -66,6 +76,9 @@ const user = {
          Vue.cookies.remove("v4_auth_user")
       },
       setBookmarks(state, bookmarks) {
+         if (!state.accountInfo) {
+            state.accountInfo = {}
+         }
          state.accountInfo.bookmarks = bookmarks
       }
    },
@@ -121,6 +134,14 @@ const user = {
          window.location.href = "/authenticate/netbadge"
       },
 
+      getBookmarks(ctx) {
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         return axios.get(`/api/users/${ctx.state.signedInUser}/bookmarks`).then((response) => {
+            ctx.commit('setBookmarks', response.data)
+          }).catch((_error) => {
+            router.push("/forbidden")
+          })
+      },
       removeBookmark(ctx, identifier) {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items?identifier=${identifier}`

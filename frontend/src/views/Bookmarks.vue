@@ -71,7 +71,7 @@ export default {
    },
    created() {
       this.lookingUp = true
-      this.$store.dispatch("user/getAccountInfo").then(_response => {
+      this.$store.dispatch("user/getBookmarks").then(_response => {
          this.lookingUp = false
       })
    }
