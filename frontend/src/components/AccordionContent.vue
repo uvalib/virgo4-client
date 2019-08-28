@@ -104,9 +104,7 @@ div.title {
    cursor: pointer;
    margin: 2px 0 0 0;
    color: #666;
-   /* background: white; */
-   background: #f8f8f8;
-   border-radius: 5px;
+   background: #f5f5f5;
    padding: 3px 12px;
 }
 .title .text {

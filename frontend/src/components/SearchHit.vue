@@ -1,19 +1,28 @@
 <template>
    <div class="hit">
-      <img v-if="hit.previewURL" :src="hit.previewURL" class="preview"/>
-      <table>
-         <tr v-for="field in hit.basicFields" :key="getKey(field)">
-            <td class="label">{{field.label}}:</td>
-            <td class="value" v-html="fieldValueString(field)"></td>
-         </tr>
-      </table>
-      <AccordionContent title="Details">
-         <table>
-            <tr v-for="field in hit.detailFields" :key="getKey(field)">
-               <td class="label">{{fieldLabel(field)}}:</td>
+      <div class="bookmark-bar">
+         <i class="bookmark far fa-bookmark"></i> 
+      </div>
+      <div class="basic">
+         <table class="fields">
+            <tr v-for="field in hit.basicFields" :key="getKey(field)">
+               <td class="label">{{field.label}}:</td>
                <td class="value" v-html="fieldValueString(field)"></td>
             </tr>
          </table>
+         <div class="preview">
+            <img v-if="hit.previewURL" :src="hit.previewURL"/>
+         </div>
+      </div>
+      <AccordionContent title="Details">
+         <div class="details">
+            <table class="fields">
+               <tr v-for="field in hit.detailFields" :key="getKey(field)">
+                  <td class="label">{{fieldLabel(field)}}:</td>
+                  <td class="value" v-html="fieldValueString(field)"></td>
+               </tr>
+            </table>
+         </div>
       </AccordionContent>
    </div>
 </template>
@@ -53,22 +62,46 @@ export default {
 </script>
 
 <style scoped>
+div.bookmark-bar {
+   padding: 6px 0 0 6px;
+   float: left;
+}
+i.bookmark {
+   color: #444; 
+   cursor: pointer;
+   opacity: 0.6;
+   font-size: 1.4em;
+}
+i.bookmark:hover {
+   opacity: 1;
+}
+div.details {
+   padding: 10px 0 0 0;
+}
+div.basic {
+   display: grid;
+   grid-template-columns: minmax(250px, auto) minmax(32px, 50px);
+   padding: 10px 10px 10px 10px;
+}
+div.preview {
+   display:inline-block;
+   text-align: right;
+}
 .hit {
    width: 100%;
    border: 1px solid #ccc;
    border-top: none;
-   padding: 10px;
+   padding: 00px;
    box-sizing: border-box;
    text-align: left;
    font-size: 0.8em;
 }
  #app td.value >>> a.pure-button.pure-button-primary.ext {
-   background-color:rgb(66, 184, 221);
+   background-color:var(--color-primary-blue);
    color: white; 
-   padding: 4px 24px;
-   border-radius: 5px; 
-   font-size: 0.9em;
-   font-weight: bold;
+   padding: 2px 0px;
+   width: 100%;
+   margin: 10px 0;
 }
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
    text-decoration: none;  
@@ -76,14 +109,18 @@ export default {
 .hit .value .pure-button.ext-link:hover {
    text-decoration: none;
 }
-img.preview {
-   float:right;
+.htt table {
+   table-layout: auto;
+   border-collapse: collapse;
+   width: 100%;
 }
 .hit table td.label {
    font-weight: bold;
-   width: 80px;
    text-align: right;
-   margin-right: 10px;
-   display: inline-block;
+   padding: 2px 5px;
+   white-space: nowrap;
+}
+.hit table td.value {
+   width: 100%;
 }
 </style>

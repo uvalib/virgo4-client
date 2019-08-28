@@ -212,10 +212,11 @@ div.pools {
    border: 1px solid #ccc;
    border-top: none;
    padding: 10px;
-   background: #f5f5f5;
+   background: white;
    text-align: center;
    cursor: pointer;
-   border-radius: 0 0 5px 5px
+   border-radius: 0 0 5px 5px;
+   color: #444;
 }
 .more-panel:hover, .view-all:hover {
    color: var(--color-link);
