@@ -131,7 +131,7 @@ export default new Vuex.Store({
       state.results[poolResultsIdx]["show"] = !state.results[poolResultsIdx]["show"]
       let visibleIdx = state.visibleResults.indexOf(poolResultsIdx)
       if (visibleIdx == -1) {
-        state.visibleResults.push(poolResultsIdx)
+        state.visibleResults.unshift(poolResultsIdx)
       } else {
         state.visibleResults.splice(visibleIdx,1)
       }

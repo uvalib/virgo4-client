@@ -29,10 +29,7 @@
          </div>
       </div>
 
-      <transition-group tag="div" class="pools" 
-            name="pool-transition"
-            enter-active-class="animated faster fadeIn"
-            leave-active-class="animated faster fadeOut">
+      <div class="pools"> 
          <div class="pool-panel" v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
             <div class="pool-titlebar">
                <span>{{result.pool.description}}</span>
@@ -59,7 +56,7 @@
                See More Results&nbsp;<i class="more-icon fas fa-arrow-circle-right"></i>
             </div>
          </div>
-      </transition-group>
+      </div>
 
    </div>
 </template>
@@ -234,7 +231,7 @@ div.pools {
    padding: 10px 8px 10px 10px;
    background-color: var(--color-primary-orange);
    color: white;
-   font-weight: normal;
+   font-weight: bold;
    font-size: 0.9em;
    border-radius: 5px 5px 0 0;
 }
