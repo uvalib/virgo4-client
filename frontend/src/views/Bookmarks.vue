@@ -12,7 +12,7 @@
             </p>
             <template v-else>
                <div class="folder" v-for="folder in Object.keys(bookmarks)" :key="folder">
-                  <i class="remove-folder fas fa-trash-alt"></i>
+                  <i @click="removeFolder(folder)" class="remove-folder fas fa-trash-alt"></i>
                   <AccordionContent :title="folder" align="left">
                      <div class="none" v-if="bookmarks[folder].length == 0">
                         There are no bookmarks in this folder.
@@ -64,6 +64,9 @@ export default {
    methods: {
       removeBookmark(identifier) {
           this.$store.dispatch("user/removeBookmark", identifier)
+      },
+      removeFolder(folder) {
+          this.$store.dispatch("user/removeFolder", folder)
       }
    },
    created() {

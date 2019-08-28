@@ -42,13 +42,13 @@ func main() {
 	router.POST("/authorize", svc.Authorize)
 	api := router.Group("/api")
 	{
-		api.GET("/users/:id", svc.GetUser)
+		api.GET("/users/:id", svc.AuthMiddleware, svc.GetUser)
 		api.POST("/users/:id/signout", svc.AuthMiddleware, svc.SignoutUser)
 		bookmarks := api.Group("/users/:id/bookmarks")
 		{
-			bookmarks.POST("/folders", svc.AddBookmarkFolder)
-			bookmarks.DELETE("/folders", svc.DeleteBookmarkFolder)
-			bookmarks.POST("/items", svc.AddBookmark)
+			bookmarks.POST("/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
+			bookmarks.DELETE("/folders", svc.AuthMiddleware, svc.DeleteBookmarkFolder)
+			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
 			bookmarks.DELETE("/items", svc.AuthMiddleware, svc.DeleteBookmark)
 		}
 	}

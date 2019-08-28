@@ -120,9 +120,19 @@ const user = {
          ctx.commit('setAuthorizing', true)
          window.location.href = "/authenticate/netbadge"
       },
+
       removeBookmark(ctx, identifier) {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items?identifier=${identifier}`
+         axios.delete(url).then((response) => {
+            ctx.commit('setBookmarks', response.data)
+         }).catch((error) => {
+            ctx.commit('setError', error, { root: true })
+         })
+      },
+      removeFolder(ctx, folder) {
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders?name=${folder}`
          axios.delete(url).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {

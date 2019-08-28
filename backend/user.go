@@ -169,26 +169,28 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 
 // DeleteBookmarkFolder will remove a folder and all of its content
 func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
-	v4UserID := c.Param("id")
+	user := NewUserSettings()
+	user.Virgo4ID = c.Param("id")
 	folder := c.Query("name")
-	log.Printf("User %s deleting bookmark folder %s", v4UserID, folder)
+	log.Printf("User %s deleting bookmark folder %s", user.Virgo4ID, folder)
 
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": v4UserID})
-	var uid int
-	uq.Row(&uid)
+	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	uq.Row(&user.ID)
 
 	q := svc.DB.NewQuery("delete from bookmark_folders where user_id={:uid} and name={:name}")
-	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"uid": user.ID})
 	q.Bind(dbx.Params{"name": folder})
 	_, err := q.Execute()
 	if err != nil {
-		log.Printf("ERROR: unable to remove %s:%s - %v", v4UserID, folder, err)
+		log.Printf("ERROR: unable to remove %s:%s - %v", user.Virgo4ID, folder, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.String(http.StatusOK, "%s removed", folder)
+	// get updated bookmarks and return to user
+	user.GetBookmarks(svc.DB)
+	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
 // AddBookmark will add a bookmark to a folder
