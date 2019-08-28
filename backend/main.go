@@ -46,6 +46,7 @@ func main() {
 		api.POST("/users/:id/signout", svc.AuthMiddleware, svc.SignoutUser)
 		bookmarks := api.Group("/users/:id/bookmarks")
 		{
+			bookmarks.GET("/", svc.AuthMiddleware, svc.GetBookmarks)
 			bookmarks.POST("/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
 			bookmarks.DELETE("/folders", svc.AuthMiddleware, svc.DeleteBookmarkFolder)
 			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)

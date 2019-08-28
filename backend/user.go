@@ -285,3 +285,14 @@ func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
 	user.GetBookmarks(svc.DB)
 	c.JSON(http.StatusOK, user.Bookmarks)
 }
+
+// GetBookmarks returns bookmark data for the specified user
+func (svc *ServiceContext) GetBookmarks(c *gin.Context) {
+	user := NewUserSettings()
+	user.Virgo4ID = c.Param("id")
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	uq.Row(&user.ID)
+	user.GetBookmarks(svc.DB)
+	c.JSON(http.StatusOK, user.Bookmarks)
+}
