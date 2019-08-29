@@ -224,7 +224,8 @@ export default new Vuex.Store({
     // Search ALL configured pools. This is the initial search call using only the basic or
     // advanced search parameters and will always start at page 1. Filters do not apply
     // to all pools so they are not used here.
-    searchAllPools({ state, commit, rootState, rootGetters }) {
+    // CTX: commit: ƒ boundCommit(type, payload, options)
+    searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
       commit('setError', "")
       let req = {
         query: rootGetters['query/string'],
@@ -237,6 +238,12 @@ export default new Vuex.Store({
       if (req.query.length == 0) {
         commit('setError', "Please enter a search query")
         return
+      }
+
+      // If a user is signed in, make sure bookmarks are up to date when 
+      // searching so the UI can show the correct status per item
+      if ( rootGetters["user/isSignedIn"]) {
+        dispatch("user/getBookmarks")
       }
 
       commit('setSearching', true)
@@ -330,6 +337,10 @@ function mergeRepeatedFields( hits ) {
       }
       if (field.name == "preview_url") {
         hit.previewURL = field.value
+        return
+      }
+      if (field.name == "id") {
+        hit.identifier = field.value
         return
       }
       let tgtMerged = mergedBasicFields 

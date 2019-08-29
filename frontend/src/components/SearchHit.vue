@@ -1,7 +1,8 @@
 <template>
    <div class="hit">
       <div class="bookmark-bar" v-if="isSignedIn">
-         <i @click="bookmarkClicked(hit)" class="bookmark far fa-bookmark"></i> 
+         <i @click="bookmarkClicked" class="bookmark fas fa-bookmark" v-if="isBookmarked"></i> 
+         <i @click="bookmarkClicked" class="bookmark far fa-bookmark" v-else></i> 
       </div>
       <div class="basic">
          <table class="fields">
@@ -40,21 +41,32 @@ export default {
    computed: {
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
-        selectedResults: 'selectedResults'
+        bookmarks: 'user/bookmarks'
       }),
+      isBookmarked() {
+         let found = false
+         Array.from( this.bookmarks.keys()).some( folder => {
+            this.bookmarks.get(folder).some( item => { 
+               if (item.pool == this.pool && item.identifier == this.hit.identifier) {
+                  found = true
+               }
+               return found == true
+            })
+            return found == true
+         })
+         return found
+      }
    },
    components: {
       AccordionContent
    },
    methods: {
-      bookmarkClicked(hit) {
-         let data = {pool: this.pool, identifier: "", title: "", author: ""} 
-         let tgt = [hit.basicFields, hit.basicFields]
+      bookmarkClicked() {
+         let data = {pool: this.pool, identifier: hit.identifier, title: "", author: ""} 
+         let tgt = [this.hit.basicFields, this.hit.basicFields]
          tgt.forEach(function(fields) {
             fields.forEach(function(f) {
-               if (f.name=="id") {
-                  data.identifier = f.value
-               } else if (f.name == "title") {
+               if (f.name == "title") {
                   data.title = f.value
                } else if (f.name == "author") {
                   if ( Array.isArray(f.value)) {
@@ -87,6 +99,13 @@ export default {
 div.bookmark-bar {
    padding: 6px 0 0 6px;
    float: left;
+}
+i.fas.bookmark {
+   color: var(--color-primary-blue);
+   opacity: 1;
+}
+i.fas.bookmark:hover {
+   opacity: 0.7;
 }
 i.bookmark {
    color: #444; 
