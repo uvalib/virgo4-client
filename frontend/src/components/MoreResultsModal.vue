@@ -1,7 +1,7 @@
 <template>
    <div @click="closePool" class="more-results-overlay">
       <div  @click="blockClick" id="more-header" class="more-header">
-         <span class="pool-name">{{selectedResults.pool.description}}</span>
+         <span class="pool-name">{{selectedResults.pool.summary}}</span>
          <i @click="closePool" class="pool-close fas fa-times-circle"></i>
          <SearchFilters />
       </div>

@@ -32,7 +32,7 @@
       <div class="pools"> 
          <div class="pool-panel" v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
             <div class="pool-titlebar">
-               <span>{{result.pool.description}}</span>
+               <span>{{result.pool.summary}}</span>
                <i @click="toggleVisibility(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
             </div>
             <div class="pool-info">
