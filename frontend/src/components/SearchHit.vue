@@ -34,11 +34,13 @@ import AccordionContent from '@/components/AccordionContent'
 import { mapGetters } from "vuex"
 export default {
    props: {
-      hit: { type: Object, required: true}
+      hit: { type: Object, required: true},
+      pool: {type: String, required: true}
    },
    computed: {
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
+        selectedResults: 'selectedResults'
       }),
    },
    components: {
@@ -46,12 +48,12 @@ export default {
    },
    methods: {
       bookmarkClicked(hit) {
-         let data = {id: "", title: "", author: ""} 
+         let data = {pool: this.pool, identifier: "", title: "", author: ""} 
          let tgt = [hit.basicFields, hit.basicFields]
          tgt.forEach(function(fields) {
             fields.forEach(function(f) {
                if (f.name=="id") {
-                  data.id = f.value
+                  data.identifier = f.value
                } else if (f.name == "title") {
                   data.title = f.value
                } else if (f.name == "author") {

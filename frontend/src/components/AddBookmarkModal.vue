@@ -1,15 +1,28 @@
 <template>
    <div class="add-bookmark">
       <div class="modal-title">
-         Add Bookmark
+         <i class="fas fa-bookmark"></i> &nbsp;Add Bookmark
       </div>
       <div class="working" v-if="lookingUp" >
          <div>Loading...</div>
          <img src="../assets/spinner2.gif">
       </div>
       <div class="content">
-         <div>{{newBookmark.id}}</div>
-         <div><b>{{newBookmark.title}}</b> - {{newBookmark.author}}</div>
+         <div>{{newBookmark.identifier}} : <b>{{newBookmark.title}}</b></div>
+         <div>{{newBookmark.author}}</div>
+         <div class="select">
+            <label>Add bookmark to bookmark folder (required):</label> 
+            <multiselect v-model="selectedFolder" class="folders"  
+                  placeholder="Select or create a folder"
+                  :showLabels="false" 
+                  :searchable="true"
+                  :taggable="true"
+                  tagPlaceholder="Press enter to create a new folder"
+                  @tag="addFolder"
+                  :options="folders">
+            </multiselect>
+         </div>
+         <p class="error">{{bookmarkError}}</p>
       </div>
       <div class="controls">
          <span @click="cancelBookmark" class="pure-button pure-button-secondary">Cancel</span>
@@ -20,20 +33,46 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
+import Multiselect from 'vue-multiselect'
 export default {
+   components: {
+      Multiselect
+   },
    data: function() {
       return {
          lookingUp: true,
+         selectedFolder: "",
+         bookmarkError: ""
       };
    },
    computed: {
       ...mapState({
          newBookmark: state => state.user.newBookmarkInfo,
       }),
+       ...mapGetters({
+         folders: 'user/folders',
+       })
    },
    methods: {
+      addFolder(newFolder) {
+         this.$store.dispatch("user/addFolder", newFolder).then(_response => {
+            this.selectedFolder = newFolder
+         }).catch((error) => {
+            this.bookmarkError = error
+         })
+      },
       okBookmark() {
-         this.$store.commit("user/closeAddBookmark")
+         this.bookmarkError = ""
+         if ( this.selectedFolder == "") {
+            this.bookmarkError = "A bookmark folder selection is required"
+            return
+         } 
+         this.$store.dispatch("user/addBookmark", this.selectedFolder).then(_response => {
+            this.$store.commit("user/closeAddBookmark")
+         }).catch((error) => {
+            this.bookmarkError = error
+         })
       },
       cancelBookmark() {
          this.$store.commit("user/closeAddBookmark")
@@ -50,6 +89,8 @@ export default {
 
 <style scoped>
 div.add-bookmark {
+   font-size: 0.9em;
+   color: #444;
    position: fixed;
    width: 40%;
    height: auto;
@@ -60,6 +101,20 @@ div.add-bookmark {
    transform: translate(-50%, 0%);
    box-shadow: 1px 1px 10px #444;
    border-radius: 5px;
+}
+p.error {
+   color: var(--color-error);
+   text-align: center;
+}
+@media only screen and (min-width: 768px) {
+   div.add-bookmark {
+       width: 40%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.add-bookmark {
+       width: 95%;
+   }
 }
 div.content {
    padding: 10px;
@@ -79,6 +134,15 @@ div.controls {
 }
 div.controls .pure-button {
    padding: 4px 16px;
-
+}
+div.select {
+   margin-top: 10px;
+   border-top: 1px solid #ccc;
+   padding-top: 15px;
+}
+label {
+   font-weight: normal;
+   display: block;
+   margin-bottom: 10px;
 }
 </style>

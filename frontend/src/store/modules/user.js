@@ -11,6 +11,7 @@ const user = {
       signInMessage: "",
       sessionType: "",
       accountInfo: null,
+      bookmarks: null,
       newBookmarkInfo: null
    },
 
@@ -28,14 +29,17 @@ const user = {
          return true
       },
       hasBookmarks: state => {
-         if (state.accountInfo == null) return false 
-         if (state.accountInfo.bookmarks == null) return false 
-         return Object.keys(state.accountInfo.bookmarks).length > 0
+         if ( state.bookmarks == null ) return false 
+         return Array.from( state.bookmarks.keys()).length > 0
       },
       bookmarks: state => {
-         if (state.accountInfo == null) return {}
-         if (state.accountInfo.bookmarks == null) return {}
-         return state.accountInfo.bookmarks
+         if ( state.bookmarks == null ) return new Map()
+         return state.bookmarks
+      },
+      folders: state => {
+         if ( state.bookmarks == null ) return []
+         let out = Array.from( state.bookmarks.keys())
+         return out.sort()
       },
       addingBookmark: state => {
          return state.newBookmarkInfo != null
@@ -64,22 +68,32 @@ const user = {
          }
       },
       setAccountInfo(state, data) {
-         state.accountInfo = data
+         // data content {user, authToken, bookmarks}
+         // where bookmarks is an object with each key being a folder
+         // containing an array of bookmarked items
+         state.accountInfo = data.user
+         state.authToken = data.authToken
+         state.bookmarks = new Map()
+         Object.keys(data.bookmarks).forEach(function(folder) {
+            state.bookmarks.set(folder, data.bookmarks[folder])
+         })
       },
       clearSignInMessage(state) {
          state.signInMessage = ""
       },
       signOutUser(state) {
+         state.accountInfo = null
+         state.bookmarks = null
          state.signedInUser = ""
          state.authToken = ""
          state.signInMessage = "" 
          Vue.cookies.remove("v4_auth_user")
       },
       setBookmarks(state, bookmarks) {
-         if (!state.accountInfo) {
-            state.accountInfo = {}
-         }
-         state.accountInfo.bookmarks = bookmarks
+         state.bookmarks = new Map()
+         Object.keys(bookmarks).forEach(function(folder) {
+            state.bookmarks.set(folder, bookmarks[folder])
+         })
       }
    },
 
@@ -100,25 +114,19 @@ const user = {
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
           }).catch((_error) => {
-            router.push("/forbidden")
+            ctx.commit('setError', error, { root: true })
           })
       },
       signout(ctx) {
          ctx.commit('setAuthorizing', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
-         axios.post(`/api/users/${ctx.state.signedInUser}/signout`).then((_response) => {
+         axios.post(`/api/users/${ctx.state.signedInUser}/signout`).finally(function () {
             ctx.commit('signOutUser')
             ctx.commit('setAuthorizing', false)
             ctx.commit('resetSearch', null, { root: true })
             ctx.rootStatecommit('filters/reset', null, { root: true })
             router.push("/signedout")
-          }).catch((_error) => {
-            ctx.commit('signOutUser')
-            ctx.commit('setAuthorizing', false)
-            ctx.commit('resetSearch', null, { root: true })
-            ctx.commit('filters/reset', null, { root: true })
-            router.push("/signedout")
-          })
+         })
       },
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
@@ -142,8 +150,8 @@ const user = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}/bookmarks`).then((response) => {
             ctx.commit('setBookmarks', response.data)
-          }).catch((_error) => {
-            router.push("/forbidden")
+          }).catch((error) => {
+            ctx.commit('setError', error, { root: true })
           })
       },
       removeBookmark(ctx, identifier) {
@@ -153,6 +161,23 @@ const user = {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
             ctx.commit('setError', error, { root: true })
+         })
+      },
+      addBookmark(ctx, folder ) {
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items`
+         // expoected: {"folder":"FolderOne", "pool": "video", "identifier": "u15772", "details": {"title": "Jaws", "author":"Peter Benchly"}}
+         let data = {folder: folder, pool: ctx.state.newBookmarkInfo.pool, identifier: ctx.state.newBookmarkInfo.identifier}
+         data['details'] = {title: ctx.state.newBookmarkInfo.title, author: ctx.state.newBookmarkInfo.author  }
+         return axios.post(url, data).then((response) => {
+            ctx.commit('setBookmarks', response.data)
+         })
+      },
+      addFolder(ctx, folder) {
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders`
+         return axios.post(url, {name: folder}).then((response) => {
+            ctx.commit('setBookmarks', response.data)
          })
       },
       removeFolder(ctx, folder) {

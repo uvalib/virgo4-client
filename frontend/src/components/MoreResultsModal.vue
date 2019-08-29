@@ -11,7 +11,7 @@
                class="hits" v-bind:style="{ top: scrollTop + 'px' }">
             <div class="summary"><b>{{selectedResults.total}} results for </b>{{queryString()}}</div>
             <template v-for="hit in selectedResults.hits">
-               <SearchHit :hit="hit" :key="hit.id"/>
+               <SearchHit :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
             </template>
          </div>
       </div>

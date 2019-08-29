@@ -91,8 +91,12 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style>
 #app li.multiselect__element span.multiselect__option.multiselect__option--highlight {
-   background: var(--color-pale-blue);
+   background: var(--color-primary-blue);
    color: white;
+   font-weight: bold;
+}
+#app li.multiselect__element span.multiselect__option.multiselect__option--highlight:after {
+   background: var(--color-primary-blue) !important;
 }
 #app li.multiselect__element span.multiselect__option {
    padding: 10px;

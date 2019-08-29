@@ -72,8 +72,7 @@ export default {
    --color-secondary-blue: #002359;
    --color-primary-text: #555;
    --color-dark-blue: rgb(0, 47, 108);
-   --color-hover-highight: #f5f5h4
-   ff;
+   --color-hover-highight: #f5f5h4;
    --color-error: firebrick;
 }
 

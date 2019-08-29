@@ -50,7 +50,7 @@
                </template>
             </div>
             <template v-for="hit in result.hits.slice(0,3)">
-               <SearchHit :hit="hit" :key="hit.id"/>
+               <SearchHit :pool="result.pool.id" :hit="hit" :key="hit.id"/>
             </template>
             <div @click="selectPool(visibleIdx)" class="more-panel">
                See More Results&nbsp;<i class="more-icon fas fa-arrow-circle-right"></i>

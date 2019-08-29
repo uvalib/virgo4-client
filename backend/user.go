@@ -98,9 +98,9 @@ type ILSUserInfo struct {
 
 // User contains all user data collected from ILS and Virgo4 sources
 type User struct {
-	*ILSUserInfo
-	AccessToken string                 `json:"acessToken"`
-	Bookmarks   *map[string][]Bookmark `json:"bookmarks"`
+	UserInfo  *ILSUserInfo           `json:"user"`
+	AuthToken string                 `json:"authToken"`
+	Bookmarks *map[string][]Bookmark `json:"bookmarks"`
 }
 
 // GetUser uses ILS Connector V2 API /users to get details for a user
@@ -134,13 +134,16 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 		userSettings.GetBookmarks(svc.DB)
 	}
 
-	user := User{&ilsUser, userSettings.AuthToken, &userSettings.Bookmarks}
+	user := User{UserInfo: &ilsUser,
+		AuthToken: userSettings.AuthToken,
+		Bookmarks: &userSettings.Bookmarks}
 	c.JSON(http.StatusOK, user)
 }
 
 // AddBookmarkFolder will add a new blank folder for bookmarks
 func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
-	v4UserID := c.Param("id")
+	user := NewUserSettings()
+	user.Virgo4ID = c.Param("id")
 	var folder struct{ Name string }
 	err := c.ShouldBindJSON(&folder)
 	if err != nil {
@@ -149,22 +152,24 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 		return
 	}
 
-	log.Printf("User %s adding bookmark folder %s", v4UserID, folder.Name)
+	log.Printf("User %s adding bookmark folder %s", user.Virgo4ID, folder.Name)
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": v4UserID})
-	var uid int
-	uq.Row(&uid)
+	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	uq.Row(&user.ID)
 
 	q := svc.DB.NewQuery("insert into bookmark_folders (user_id, name) values ({:uid},{:name})")
-	q.Bind(dbx.Params{"uid": uid})
+	q.Bind(dbx.Params{"uid": user.ID})
 	q.Bind(dbx.Params{"name": folder.Name})
 	_, err = q.Execute()
 	if err != nil {
-		log.Printf("ERROR: add folder %s%s failed: %v", v4UserID, folder.Name, err)
+		log.Printf("ERROR: add folder %s%s failed: %v", user.Virgo4ID, folder.Name, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.String(http.StatusOK, "added %s", folder.Name)
+
+	// get updated bookmarks and return to user
+	user.GetBookmarks(svc.DB)
+	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
 // DeleteBookmarkFolder will remove a folder and all of its content
