@@ -36,7 +36,7 @@ export default new Vuex.Store({
     },
     selectedResults: state => {
       if (state.selectedResultsIdx === -1 ) {
-        return {total: 0, hits: [], pool: {description:"", id:"none", name:"None", url: ""}}
+        return {total: 0, hits: [], pool: {description:"", id:"none", name:"None", summary: "", url: ""}}
       }
       return state.results[state.selectedResultsIdx]
     },
