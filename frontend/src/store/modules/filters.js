@@ -22,21 +22,30 @@ const filters = {
          return  state.poolFacets[idx].map( f => f.facet )
       },
 
-      facetBuckets: (state) => (idx, facetID) => {
+      facetBuckets: (state,getters) => (idx, facetID) => {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
          }
-         let facet = state.poolFacets[idx].find(f => f.facet.id === facetID) 
-         // TODO filter this list to exclude values that are being used 
-         // in filters
-         return facet.buckets
+         // facetInfo struct:  { facet{id,name}, buckets[ {value,display} ] }
+         // filters struct: [ {facet_id, value_id }]
+         let facetInfo = state.poolFacets[idx].find(f => f.facet.id === facetID) 
+         let buckets = facetInfo.buckets.slice();
+         let filters = getters.poolFilter(idx, "api")
+         filters.forEach( filter => {
+            // see if a filter already exists using the selected facet
+            if (filter.facet_id == facetInfo.facet.id) {
+               // remove filter.value_id from buckets items (item.value)
+               buckets = buckets.filter(b => b.value !=  filter.value_id )
+            }
+         })
+         return buckets
       },
 
       hasFilter: (state) => (idx) => {
          return state.poolFilters[idx].length > 0
       },
 
-      // By default the data stored for the filter is heirarchical; one facet
+      // By default the data stored for the filter is heirarchical; one facet 
       // owning a list of values: [ {facet: name, values: [v1,v2,...]}, ... ]
       // The API wants a simple flat list with multiple facet/value pairs like:
       // [ {name: facet, value: v1}, ...]
@@ -63,6 +72,7 @@ const filters = {
             let poolFacets = []
             state.poolFilters.push([])  // add empty filter for each pool
             if ( pr.available_facets) {
+               // NOTE: Facet is an object with .id and .name
                pr.available_facets.forEach( function(f) {
                   poolFacets.push( {facet: f, buckets: []} )
                })
@@ -95,7 +105,7 @@ const filters = {
       addFilter(state, data) {
          // data = {poolResultsIdx: idx, facet: name, values: VALUES
          // IMPORTANT: VALUES comes from vue-multiselect which binds 
-         // the whole json object for the option into the array
+         // the whole json object for the option into the array. Just add value
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          let facetInfo = allPoolFacets.find(f => f.facet.id === data.facetID) 
          let filter = state.poolFilters[data.poolResultsIdx]
@@ -107,12 +117,15 @@ const filters = {
          let filters = state.poolFilters[data.poolResultsIdx]
          filters.splice(data.filterIdx,1)
       },
+
       clearAllFilters(state, idx) {
          state.poolFilters[idx].splice(0, state.poolFilters[idx].length)
       },
+
       setUpdatingBuckets(state, flag) {
          state.updatingBuckets = flag
       },
+
       reset(state) {
          state.poolFacets = []
          state.poolFilters = []

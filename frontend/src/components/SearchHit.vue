@@ -65,7 +65,7 @@ export default {
          alert("remove")
       },
       addBookmarkClicked() {
-         let data = {pool: this.pool, identifier: hit.identifier, title: "", author: ""} 
+         let data = {pool: this.pool, identifier: this.hit.identifier, title: "", author: ""} 
          let tgt = [this.hit.basicFields, this.hit.basicFields]
          tgt.forEach(function(fields) {
             fields.forEach(function(f) {
