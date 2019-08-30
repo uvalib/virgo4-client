@@ -21,7 +21,7 @@
                      <i @click="toggleExcludePool(p.url)" v-else class="selected fas fa-check-circle"></i>
                   </td>
                   <td>
-                     <p class="pool-desc">{{p.description}}</p>
+                     <p class="pool-desc">{{p.summary}}</p>
                   </td>
                </tr>
             </table>

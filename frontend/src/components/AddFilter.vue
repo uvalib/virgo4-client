@@ -8,8 +8,9 @@
                <td class="sel">
                   <select v-model="selectedFacet" @change="facetChosen" class="facets">
                      <option value="">Select a facet</option>
-                     <option v-for="(facet,idx) in poolFacets(resultsIdx)" :key="idx" :value="facet">
-                        {{ facet }}
+                     <option v-for="(facet) in poolFacets(resultsIdx)" 
+                        :key="facet.id" :value="facet.id ">
+                        {{ facet.name }}
                      </option>
                   </select>
                </td>
@@ -18,11 +19,11 @@
                <td class="label">Value:</td>
                <td class="sel">
                   <template v-if="selectedFacet && !updatingBuckets">
-                     <multiselect v-model="values" class="buckets"  :multiple="true"  
+                     <multiselect v-model="facetValues" class="buckets"  :multiple="true"  
                            placeholder="Select at least one value"
                            :block-keys="['Tab', 'Enter']" :hideSelected="true"
                            :showLabels="false" 
-                           track-by="value" label="name" :searchable="false"
+                           track-by="value" label="display" :searchable="false"
                            :optionHeight="32" :loading="updatingBuckets"
                            :options="facetBuckets(resultsIdx, selectedFacet)">
                      </multiselect>
@@ -54,7 +55,7 @@ export default {
    data: function()  {
       return {
          selectedFacet: '',
-         values: []
+         facetValues: []
       }
    },
    computed: {
@@ -73,15 +74,18 @@ export default {
          this.$store.commit("filters/closeAdd")
       },
       addFilter() {
-         // IMPORTANT: vue-multiselect binds v-model to this.values. The binding shoves
-         // the whole json object for the option into the array ({name: xxx, value: yyy} instead of just the value)
-         this.$store.commit("filters/addFilter", {poolResultsIdx: this.resultsIdx, facet: this.selectedFacet, values: this.values})
+         // IMPORTANT: vue-multiselect binds v-model to this.facetValues. The binding shoves
+         // the whole json object for the option into the array 
+         // ({name: xxx, value: yyy} instead of just the value)
+         this.$store.commit("filters/addFilter", 
+            {poolResultsIdx: this.resultsIdx, facetID: this.selectedFacet, values: this.facetValues}
+         )
          this.$store.commit("filters/closeAdd")
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
       },
       facetChosen() {
-         this.values.splice(0, this.values.length)
+         this.facetValues.splice(0, this.facetValues.length)
          this.$store.dispatch("filters/getBuckets", {poolResultsIdx: this.resultsIdx, facet: this.selectedFacet})
       }
    }

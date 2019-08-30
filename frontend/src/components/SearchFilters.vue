@@ -8,7 +8,7 @@
       <template v-if="hasFilter(poolIdx)">
          <table>
             <tr class="filter" v-for="(filter,i) in poolFilter(poolIdx, 'raw')" :key="i">
-               <td class="label">{{filter.facet}}:</td>
+               <td class="label">{{filter.facet.name}}:</td>
                <td class="filter">{{formatValues(filter.values)}}</td>
                <td class="label"><i @click="removeFilter(i)" class="remove-filter fas fa-trash-alt"></i></td>
             </tr>
@@ -74,7 +74,6 @@ td.filter {
 }
 td.label {
    font-weight: bold;
-   vertical-align: text-top;
    text-align: right;
 }
 .filters {

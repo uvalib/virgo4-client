@@ -65,7 +65,7 @@ export default {
 <style>
 /* Color variable definitions */
 :root {
-   --color-primary-orange: #e57200;
+   --color-primary-orange: #E57200;
    --color-link: #007ae7;
    --color-primary-blue: #007ae7;
    --color-pale-blue: #459CED;

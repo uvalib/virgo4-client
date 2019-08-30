@@ -1,8 +1,8 @@
 <template>
    <div class="hit">
       <div class="bookmark-bar" v-if="isSignedIn">
-         <i @click="bookmarkClicked" class="bookmark fas fa-bookmark" v-if="isBookmarked"></i> 
-         <i @click="bookmarkClicked" class="bookmark far fa-bookmark" v-else></i> 
+         <i @click="removeBookmarkClicked" class="bookmark fas fa-bookmark" v-if="isBookmarked"></i> 
+         <i @click="addBookmarkClicked" class="bookmark far fa-bookmark" v-else></i> 
       </div>
       <div class="basic">
          <table class="fields">
@@ -61,7 +61,10 @@ export default {
       AccordionContent
    },
    methods: {
-      bookmarkClicked() {
+      removeBookmarkClicked() {
+         alert("remove")
+      },
+      addBookmarkClicked() {
          let data = {pool: this.pool, identifier: hit.identifier, title: "", author: ""} 
          let tgt = [this.hit.basicFields, this.hit.basicFields]
          tgt.forEach(function(fields) {

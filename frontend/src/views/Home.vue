@@ -2,8 +2,8 @@
    <main class="home">
       <div v-show="searching" class="searching-overlay">
         <div class="searching-box">
-          <h3>Searching...</h3>
-          <img src="../assets/spinner2.gif">
+          <p>Searching...</p>
+          <img src="../assets/searching.gif">
         </div>
       </div>
       <div class="search-panel pure-form">
@@ -110,21 +110,24 @@ export default {
   position: fixed;
   left: 0;
   right: 0;
-  top: 5vw;
+  top: 0;
+  bottom: 0;
   z-index: 1000;
 }
 div.searching-box {
   background: white;
   display: inline-block;
-  padding: 20px 150px;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 10px #ccc;
-  border-radius: 5px;
+  padding: 20px 90px;
+  border: 5px solid var(--color-primary-orange);
   z-index: 1005;
+  font-weight: bold;
+  margin: 10vw auto;
 }
-div.searching-box h1 {
+div.searching-box p {
   color: var(--color-primary-text);
   border: none;
+  font-size: 1.25em;
+  margin: 0 0 10px 0;
 }
 .controls {
   font-size: 0.85em;

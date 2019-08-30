@@ -32,7 +32,7 @@
       <div class="pools"> 
          <div class="pool-panel" v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
             <div class="pool-titlebar">
-               <span>{{result.pool.description}}</span>
+               <span>{{result.pool.summary}}</span>
                <i @click="toggleVisibility(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
             </div>
             <div class="pool-info">
@@ -43,7 +43,7 @@
                   <div class="filter-head">Search Filters</div>
                   <table class="filters">
                      <tr class="filter" v-for="(filter,i) in poolFilter(result.resultIdx, 'raw')" :key="i">
-                        <td class="label">{{filter.facet}}:</td>
+                        <td class="label">{{filter.facet.name}}:</td>
                         <td class="filter">{{formatFilterValues(filter.values)}}</td>
                      </tr>
                   </table>
@@ -207,13 +207,12 @@ div.pools {
 }
 .more-panel {
    border: 1px solid #ccc;
-   border-top: none;
    padding: 10px;
-   background: white;
    text-align: center;
    cursor: pointer;
    border-radius: 0 0 5px 5px;
    color: #444;
+   background: #e5e5e5
 }
 .more-panel:hover, .view-all:hover {
    color: var(--color-link);

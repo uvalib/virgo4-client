@@ -18,18 +18,20 @@ const filters = {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
          }
-         // Faceets array contains some nested bucket info; map only facet name
+         // Facets array contains some nested bucket info; map only facet
          return  state.poolFacets[idx].map( f => f.facet )
       },
-      facetBuckets: (state) => (idx, facetName) => {
+
+      facetBuckets: (state) => (idx, facetID) => {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
          }
-         let facet = state.poolFacets[idx].find(f => f.facet === facetName) 
+         let facet = state.poolFacets[idx].find(f => f.facet.id === facetID) 
          // TODO filter this list to exclude values that are being used 
          // in filters
          return facet.buckets
       },
+
       hasFilter: (state) => (idx) => {
          return state.poolFilters[idx].length > 0
       },
@@ -44,7 +46,7 @@ const filters = {
             let apiFilter = []
             state.poolFilters[idx].forEach(function(filterObj) {
                filterObj.values.forEach(function(val){
-                  apiFilter.push({name: filterObj.facet, value: val})
+                  apiFilter.push({facet_id: filterObj.facet.id, value_id: val})
                } )
             })
             return apiFilter
@@ -68,31 +70,38 @@ const filters = {
             state.poolFacets[resultIdx] = poolFacets
          })
       },
+
       showAdd(state) {
          state.adding = true
       },
+
       closeAdd(state) {
          state.adding = false
       },
+
       setFacetBuckets(state, data) {
          // NOTE: for all pools but EDS, the facets array is length one
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          data.facets.forEach( function(facet) {
-            let facetInfo = allPoolFacets.find(f => f.facet === facet.name) 
+            let facetInfo = allPoolFacets.find(f => f.facet.id === facet.id) 
             facetInfo.buckets = []
             facet.buckets.forEach(function (b) {
-               facetInfo.buckets.push( {value: b.value, name: `${b.value} (${b.count})`} )
+               // b = {id, value, count}
+               facetInfo.buckets.push( {value: b.id, display: `${b.value} (${b.count})`} )
             })
          })
       },
+
       addFilter(state, data) {
          // data = {poolResultsIdx: idx, facet: name, values: VALUES
          // IMPORTANT: VALUES comes from vue-multiselect which binds 
          // the whole json object for the option into the array
-         // Simplify the value objects into just an array of string values
+         let allPoolFacets = state.poolFacets[data.poolResultsIdx]
+         let facetInfo = allPoolFacets.find(f => f.facet.id === data.facetID) 
          let filter = state.poolFilters[data.poolResultsIdx]
-         filter.push( {facet: data.facet, values: data.values.map(f=>f.value)})
+         filter.push( {facet: facetInfo.facet, values: data.values.map(f=>f.value)})
       },
+
       removeFilter(state, data) {
          // data = {poolResultsIdx: idx, filterIdx: fidx}
          let filters = state.poolFilters[data.poolResultsIdx]
