@@ -3,7 +3,8 @@
       <div class="filters-head clearfix">
          <span class="title">Search Filters</span>
          <span v-if="hasFilter(poolIdx)" @click="clearClicked" class="clear">Clear</span>
-         <span v-if="!addingFilter" @click="addClicked" class="add">Add</span>
+         <span v-if="!addingFilter" @click="addClicked" 
+            v-bind:class="{disabled: total==0}" class="add">Add</span>
       </div>
       <template v-if="hasFilter(poolIdx)">
          <table>
@@ -38,14 +39,20 @@ export default {
          hasFilter: 'filters/hasFilter',
          poolFacets: 'filters/poolFacets',
          poolFilter: 'filters/poolFilter',
+         selectedResults: 'selectedResults',
       }),
+      total() {
+         return this.selectedResults.total
+      }
    },
    methods: {
       formatValues(values) {
          return values.join(", ")
       },
       addClicked(event) {
-         this.$store.commit("filters/showAdd")
+         if ( this.total > 0) {
+            this.$store.commit("filters/showAdd")
+         }
       },
       clearClicked() {
          this.$store.commit("filters/clearAllFilters", this.poolIdx)
@@ -113,6 +120,10 @@ td.label {
    border-radius: 5px;
    cursor:pointer;
    opacity: 0.9;
+}
+.add.disabled {
+   opacity: 0.5;
+   cursor: default;
 }
 .add:hover, .apply:hover, .clear:hover {
    opacity: 1;

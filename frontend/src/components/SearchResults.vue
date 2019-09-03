@@ -159,7 +159,6 @@ table td {
    color: #333;
 }
 td.filter {
-   font-weight: 500;
    width: 100%;
    color: #333;
 }
@@ -169,6 +168,7 @@ td.label {
    vertical-align: text-top;
    text-align: right;
    font-weight: 500;
+   
 }
 span.view-all {
    float: right;
@@ -238,11 +238,6 @@ div.pools {
    font-weight: bold;
    font-size: 0.9em;
    border-radius: 5px 5px 0 0;
-}
-h1.no-hits {
-   text-align: center;
-   color: var(--color-primary-text);;
-   font-size: 1.25em;
 }
 .query-summary {
    text-align: left;
