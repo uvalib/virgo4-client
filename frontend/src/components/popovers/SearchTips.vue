@@ -100,9 +100,7 @@ span.text-button.trigger {
 p.tips {
   margin:20px 0;
   font-size: 12px;
-  position: absolute;
-  right:0;
-  bottom:5px;
+  float: right;
   margin:0;
 }
 

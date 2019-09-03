@@ -6,6 +6,7 @@
       </h1>
       <div class="criteria">
         <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
+          <span>{{idx+1}}.</span>
           <template v-if="idx > 0" >
             <select class="search-term-op" v-model="term.op">
               <option value="AND">AND</option>
@@ -43,10 +44,14 @@
         </div>
       </div>
       <div class="controls">
-        <span @click="addClicked" class="pure-button pure-button-secondary">Add Criteria</span>
+        <span @click="addClicked" class="add pure-button pure-button-secondary">Add Criteria</span>
         <PoolSetup/>
-        <span @click="basicClicked" class="pure-button pure-button-secondary">Basic Search</span>
         <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+        <div class="basic">
+          <span class="text-button basic-link" @click="basicClicked">
+            Basic Search&nbsp;<i class="fas fa-search-plus"></i>
+          </span>
+        </div>
       </div>
    </div>
 </template>
@@ -96,49 +101,60 @@ div.criteria {
   position: relative;
 }
 
-span.remove {
-  margin-left: 10px;
+div.search-term {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0;
+  padding: 0 0 10px 0;
+  align-items: center;
+}
+div.search-term > * {
+  margin: 0 0.8em 0 0;
+  flex-basis: content;
+}
+.search-term-op {
   display: inline-block;
+  padding: 0;
+}
+input[type=text] {
+   flex: 1 1 auto;
+}
+.date-sep {
+  font-weight: 100;
+}
+div.search-term .date-criteria {
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: row wrap;
+  align-items: center;
+  margin-right: 0;
+}
+div.search-term .date-criteria > * {
+  margin: 0 0.8em 0 0;
+  flex-basis: content;
 }
 i.remove {
   opacity: .6;
   cursor: pointer;
   font-size: 1.5em;
-  position: relative;
-  top: 4px;
 }
 i.remove:hover {
   opacity: 1;
 }
-div.search-term {
-   display: flex;
-   flex-wrap: nowrap;
-   margin: 4px 0;
+
+
+div.basic {
+  text-align: right;
 }
-.search-term-op {
-   display: inline-block;
-   margin-right: 10px;
+.text-button.basic-link {
+  margin-top: 15px;
+  font-size: 1.1em;
 }
-input[type=text] {
-   padding: 6px !important;
-   flex: 1 1 auto;
-   margin-right: 10px;
+.text-button.basic-link:hover {
+  text-decoration: underline;
 }
-.date-range-type {
-   margin-right: 10px;
-   flex: 1 1 auto;
-}
-.date-sep {
-   font-weight: 100;
-   margin-right: 10px;
-}
-.date-criteria {
-   display: flex;
-   flex: 1 1 auto;
-   flex-wrap: wrap;
-   justify-content: space-between;
-}
-select.field {
-  margin-right: 10px;
+#app span.add.pure-button.pure-button-secondary {
+  float: left;
+  margin-left: 0;
 }
 </style>

@@ -15,13 +15,14 @@
       </template>
        <a href="http://www.library.virginia.edu/site-search/">Site Search</a> | <a href="http://www.library.virginia.edu/hours/">Hours</a> | <a href="http://www.library.virginia.edu/map/">Map</a> | <a href="http://www.library.virginia.edu/policies/">Policies</a> | <a href="http://www.library.virginia.edu/press/">Press</a> | <a href="http://www.library.virginia.edu/jobs/">Jobs</a><br>
        <a href="http://www2.lib.virginia.edu/campaign/">Give to the Library</a>
-       <p class="copy">
-          © {{ new Date().getFullYear() }} by the Rector and Visitors of the <a href="http://www.virginia.edu/">University of Virginia</a>
-          <span class="version">&nbsp;-&nbsp;v{{version}}</span>
-       </p>
     </div>
     <div class="legal">
        <p class="gov"><a class="fdlp" href="http://guides.lib.virginia.edu/findinggovinfo"><span id="fdlp-badge"></span></a> This library is a Congressionally designated depository for <a href="http://guides.lib.virginia.edu/findinggovinfo">U.S. Government documents</a>. Public access to the Government documents is guaranteed by public law.</p>
+       <p class="copy">
+          <span>© {{ new Date().getFullYear() }} by the Rector and Visitors of the 
+             <a href="http://www.virginia.edu/">University of Virginia</a></span>
+          <span class="version">&nbsp;-&nbsp;v{{version}}</span>
+       </p>
     </div>
    </footer>
 </template>

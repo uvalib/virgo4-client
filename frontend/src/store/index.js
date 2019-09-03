@@ -235,10 +235,6 @@ export default new Vuex.Store({
           exclude_pool: rootState.pools.excludePoolURLs,
         }
       }
-      if (req.query.length == 0) {
-        commit('setError', "Please enter a search query")
-        return
-      }
 
       // If a user is signed in, make sure bookmarks are up to date when 
       // searching so the UI can show the correct status per item

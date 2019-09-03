@@ -140,6 +140,8 @@ export default {
 }
 .metrics {
    padding: 5px;
+   color: #333;
+   font-weight: 500;
 }
 .filter-head {
    margin: 0;
@@ -154,10 +156,12 @@ table.filters {
 }
 table td {
    padding: 2px 5px;
+   color: #333;
 }
 td.filter {
-   font-weight: 100;
+   font-weight: 500;
    width: 100%;
+   color: #333;
 }
 td.label {
    padding: 2px 4px 0 0;
@@ -204,6 +208,7 @@ div.pools {
 .pool-panel {
    margin: 5px;
    padding: 0;
+   color: #333;
 }
 .more-panel {
    border: 1px solid #ccc;

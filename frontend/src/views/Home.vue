@@ -8,7 +8,7 @@
       </div>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
-           <h1>Basic Search<SearchTips/></h1>
+          <h1>Basic Search<SearchTips/></h1>
           <input
               @keyup.enter="searchClicked"
               id="keyword"
@@ -96,7 +96,11 @@ export default {
    },
    methods: {
       searchClicked() {
-        this.$store.dispatch("searchAllPools")
+        if (this.basic.length == 0) {
+          this.$store.commit('setError', "Please enter a search query")
+        } else {
+          this.$store.dispatch("searchAllPools")
+        }
       },
       advancedClicked() {
         this.$store.commit("query/setAdvancedSearch")
@@ -122,6 +126,24 @@ div.searching-box {
   z-index: 1005;
   font-weight: bold;
   margin: 10vw auto;
+}
+@media only screen and (min-width: 768px) {
+   div.searching-box {
+    padding: 20px 90px;
+   }
+   #keyword {
+    padding: 0.5vw 0.75vw;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.searching-box {
+       width: 95%;
+       padding: 20px 0;
+       margin-top:30%;
+   }
+   #keyword {
+      padding: 5px 10px;;
+   }
 }
 div.searching-box p {
   color: var(--color-primary-text);
@@ -157,10 +179,7 @@ p.fatal, p.error {
 #keyword {
   margin: 0;
   width: 100%;
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 1.1em;
+  font-size: 1.15em;
   box-shadow: none;
   padding: 0.5vw 0.75vw;
   outline: none;
