@@ -17,6 +17,7 @@ phases:
 
   pre_build:
     commands:
+      - $(aws ecr get-login --no-include-email --region $AWS_REGION)
       - latest_build=$(aws --region=$AWS_REGION ssm get-parameter --name /containers/$CONTAINER_IMAGE/latest | grep "Value" | awk -F\" '{print $4}')
 
   build:
