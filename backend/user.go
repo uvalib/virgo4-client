@@ -14,17 +14,34 @@ import (
 
 // NewUserSettings creates a new instance of user settings with internal data initialzied
 func NewUserSettings() *UserSettings {
-	return &UserSettings{Bookmarks: make(map[string][]Bookmark)}
+	return &UserSettings{Bookmarks: make([]*Folder, 0, 0)}
+}
+
+// Folder contains details for a bookmark folder
+type Folder struct {
+	ID        int         `json:"id" db:"id"` // this is the unique DB key of the folder
+	Name      string      `json:"folder" db:"name"`
+	AddedAt   time.Time   `json:"addedAt" db:"added_at"`
+	Bookmarks []*Bookmark `json:"bookmarks" db:"-"`
+}
+
+// Bookmark contains minimal details on a bookmarked item
+type Bookmark struct {
+	ID         int               `json:"id"`   // this is the unique DB key of the mark
+	Pool       string            `json:"pool"` // this is the unique, internal pool name
+	AddedAt    time.Time         `json:"addedAt"`
+	Identifier string            `json:"identifier"`
+	Details    map[string]string `json:"details"`
 }
 
 // UserSettings contains virgo4 user data like session token, bookmarks and preferences
 type UserSettings struct {
-	ID            int                   `db:"id" json:"-"`
-	Virgo4ID      string                `db:"virgo4_id" json:"id"`
-	AuthToken     string                `db:"auth_token" json:"-"`
-	AuthUpdatedAt time.Time             `db:"auth_updated_at" json:"-"`
-	SignedIn      bool                  `db:"signed_in" json:"-"`
-	Bookmarks     map[string][]Bookmark `db:"-" json:"bookmarks"`
+	ID            int       `db:"id" json:"-"`
+	Virgo4ID      string    `db:"virgo4_id" json:"id"`
+	AuthToken     string    `db:"auth_token" json:"-"`
+	AuthUpdatedAt time.Time `db:"auth_updated_at" json:"-"`
+	SignedIn      bool      `db:"signed_in" json:"-"`
+	Bookmarks     []*Folder `db:"-" json:"bookmarks"`
 }
 
 // TableName sets the name of the table in the DB that this struct binds to
@@ -35,11 +52,12 @@ func (u *UserSettings) TableName() string {
 // GetBookmarks will load all folders and bookmarks for a user
 func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 	log.Printf("Load bookmarks for %s", u.Virgo4ID)
-	q := db.NewQuery(`SELECT f.name as folder, s.name as pool, b.identifier, b.details, b.added_at
+	q := db.NewQuery(`SELECT f.id as f_id, f.name as folder, b.added_at as f_added_at,
+	   s.name as pool, b.id as b_id, b.identifier, b.details, b.added_at as b_added_at
 	 	FROM bookmark_folders f  
 			LEFT JOIN bookmarks b ON b.folder_id=f.id
 			LEFT JOIN sources s ON s.id = b.source_id 
-		WHERE f.user_id={:id} ORDER BY added_at ASC`)
+		WHERE f.user_id={:id} ORDER BY b.added_at ASC`)
 	q.Bind(dbx.Params{"id": u.ID})
 	rows, err := q.Rows()
 	if err != nil {
@@ -50,34 +68,42 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 	// parse each bookmark row into the UserSettings structure
 	for rows.Next() {
 		var raw struct {
-			Folder     string    `db:"folder"`
-			Pool       string    `db:"pool"`
-			Identifier string    `db:"identifier"`
-			Details    string    `db:"details"`
-			AddedAt    time.Time `db:"added_at"`
+			BookmarkID    int       `db:"b_id"`
+			FolderID      int       `db:"f_id"`
+			FolderAddedAt time.Time `db:"f_added_at"`
+			Folder        string    `db:"folder"`
+			Pool          string    `db:"pool"`
+			Identifier    string    `db:"identifier"`
+			Details       string    `db:"details"`
+			AddedAt       time.Time `db:"b_added_at"`
 		}
 		rows.ScanStruct(&raw)
-		if _, ok := u.Bookmarks[raw.Folder]; !ok {
-			u.Bookmarks[raw.Folder] = make([]Bookmark, 0)
+		var tgtFolder *Folder
+		for _, folder := range u.Bookmarks {
+			if folder.ID == raw.FolderID {
+				tgtFolder = folder
+			}
 		}
+		if tgtFolder == nil {
+			newFolder := Folder{ID: raw.FolderID, Name: raw.Folder, AddedAt: raw.FolderAddedAt}
+			newFolder.Bookmarks = make([]*Bookmark, 0)
+			u.Bookmarks = append(u.Bookmarks, &newFolder)
+			tgtFolder = &newFolder
+			log.Printf("New Folder %+v", newFolder)
+		}
+
 		if raw.Identifier != "" {
-			bookmark := Bookmark{Pool: raw.Pool, Identifier: raw.Identifier, AddedAt: raw.AddedAt}
+			bookmark := Bookmark{ID: raw.BookmarkID, Pool: raw.Pool,
+				Identifier: raw.Identifier, AddedAt: raw.AddedAt}
 			err := json.Unmarshal([]byte(raw.Details), &bookmark.Details)
 			if err != nil {
 				log.Printf("Unable to parse bookmark data %s: %v", raw.Details, err)
 			} else {
-				u.Bookmarks[raw.Folder] = append(u.Bookmarks[raw.Folder], bookmark)
+				tgtFolder.Bookmarks = append(tgtFolder.Bookmarks, &bookmark)
 			}
 		}
 	}
-}
-
-// Bookmark contains minimal details on a bookmarked item
-type Bookmark struct {
-	Pool       string            `json:"pool"` // this is the unique, internal pool name
-	AddedAt    time.Time         `json:"addedAt"`
-	Identifier string            `json:"identifier"`
-	Details    map[string]string `json:"details"`
+	log.Printf("BOOKMARKS %+v", u.Bookmarks)
 }
 
 // ILSUserInfo contains ILS connector details for a user
@@ -98,14 +124,14 @@ type ILSUserInfo struct {
 
 // User contains all user data collected from ILS and Virgo4 sources
 type User struct {
-	UserInfo  *ILSUserInfo           `json:"user"`
-	AuthToken string                 `json:"authToken"`
-	Bookmarks *map[string][]Bookmark `json:"bookmarks"`
+	UserInfo  *ILSUserInfo `json:"user"`
+	AuthToken string       `json:"authToken"`
+	Bookmarks []*Folder    `json:"bookmarks"`
 }
 
 // GetUser uses ILS Connector V2 API /users to get details for a user
 func (svc *ServiceContext) GetUser(c *gin.Context) {
-	userID := c.Param("id")
+	userID := c.Param("uid")
 	log.Printf("Get info for user %s with ILS Connector...", userID)
 
 	userURL := fmt.Sprintf("%s/users/%s", svc.ILSAPI, userID)
@@ -136,14 +162,14 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 
 	user := User{UserInfo: &ilsUser,
 		AuthToken: userSettings.AuthToken,
-		Bookmarks: &userSettings.Bookmarks}
+		Bookmarks: userSettings.Bookmarks}
 	c.JSON(http.StatusOK, user)
 }
 
 // AddBookmarkFolder will add a new blank folder for bookmarks
 func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 	user := NewUserSettings()
-	user.Virgo4ID = c.Param("id")
+	user.Virgo4ID = c.Param("uid")
 	var folder struct{ Name string }
 	err := c.ShouldBindJSON(&folder)
 	if err != nil {
@@ -175,20 +201,20 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 // DeleteBookmarkFolder will remove a folder and all of its content
 func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
 	user := NewUserSettings()
-	user.Virgo4ID = c.Param("id")
-	folder := c.Query("name")
-	log.Printf("User %s deleting bookmark folder %s", user.Virgo4ID, folder)
+	user.Virgo4ID = c.Param("uid")
+	folderID := c.Param("id")
+	log.Printf("User %s deleting bookmark folder %s", user.Virgo4ID, folderID)
 
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
-	uq.Row(&user.ID)
+	q := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	q.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	q.Row(&user.ID)
 
-	q := svc.DB.NewQuery("delete from bookmark_folders where user_id={:uid} and name={:name}")
+	q = svc.DB.NewQuery("delete from bookmark_folders where user_id={:uid} and id={:fid}")
 	q.Bind(dbx.Params{"uid": user.ID})
-	q.Bind(dbx.Params{"name": folder})
+	q.Bind(dbx.Params{"fid": folderID})
 	_, err := q.Execute()
 	if err != nil {
-		log.Printf("ERROR: unable to remove %s:%s - %v", user.Virgo4ID, folder, err)
+		log.Printf("ERROR: unable to remove %s:%s - %v", user.Virgo4ID, folderID, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -201,7 +227,7 @@ func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
 // AddBookmark will add a bookmark to a folder
 func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	user := NewUserSettings()
-	user.Virgo4ID = c.Param("id")
+	user.Virgo4ID = c.Param("uid")
 	var item struct {
 		Folder string
 		Bookmark
@@ -265,46 +291,25 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
-// DeleteBookmark will remove a bookmark by identifier. By default, all instances
-// of items with the target ID will be deleted. Accept an optional folder param. If
-// specified, only delete bookmarks from that folder.
+// DeleteBookmark will remove a bookmark by internal DB identifier
 func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
 	user := NewUserSettings()
-	user.Virgo4ID = c.Param("id")
-	bookmarkIdentifier := c.Query("identifier")
-	folder := c.Query("folder")
-	folderID := -1
-	if folder != "" {
-		log.Printf("User %s deleting bookmark %s/%s ", user.Virgo4ID, folder, bookmarkIdentifier)
-		q := svc.DB.NewQuery("select id from bookmark_folders where name={:fn}")
-		q.Bind(dbx.Params{"fn": folder})
-		err := q.Row(&folderID)
-		if err != nil {
-			log.Printf("ERROR: unknown folder %s:%s - %v", user.Virgo4ID, folder, err)
-			c.String(http.StatusNotFound, "Folder %s does not exist", folder)
-			return
-		}
-	} else {
-		log.Printf("User %s deleting bookmark %s from all folders", user.Virgo4ID, bookmarkIdentifier)
-	}
+	user.Virgo4ID = c.Param("uid")
+	bookmarkID := c.Param("id")
+	log.Printf("User %s deleting bookmarkID %s", user.Virgo4ID, bookmarkID)
 
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
 	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	uq.Row(&user.ID)
 
-	qStr := "delete from bookmarks where user_id={:uid} and identifier={:bid}"
-	if folderID > -1 {
-		qStr += " and folder_id={:fid}"
-	}
+	qStr := "delete from bookmarks where user_id={:uid} and id={:bid}"
 	q := svc.DB.NewQuery(qStr)
 	q.Bind(dbx.Params{"uid": user.ID})
-	q.Bind(dbx.Params{"bid": bookmarkIdentifier})
-	if folderID > -1 {
-		q.Bind(dbx.Params{"fid": folderID})
-	}
+	q.Bind(dbx.Params{"bid": bookmarkID})
+
 	_, err := q.Execute()
 	if err != nil {
-		log.Printf("ERROR: unable to remove item %s:%s - %v", user.Virgo4ID, bookmarkIdentifier, err)
+		log.Printf("ERROR: unable to remove item %s:%s - %v", user.Virgo4ID, bookmarkID, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -317,7 +322,7 @@ func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
 // GetBookmarks returns bookmark data for the specified user
 func (svc *ServiceContext) GetBookmarks(c *gin.Context) {
 	user := NewUserSettings()
-	user.Virgo4ID = c.Param("id")
+	user.Virgo4ID = c.Param("uid")
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
 	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	uq.Row(&user.ID)

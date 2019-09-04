@@ -17,6 +17,7 @@
                   :showLabels="false" 
                   :searchable="true"
                   :taggable="true"
+                  track-by="id" label="name"
                   tagPlaceholder="Press enter to create a new folder"
                   @tag="addFolder"
                   :options="folders">
@@ -42,7 +43,7 @@ export default {
    data: function() {
       return {
          lookingUp: true,
-         selectedFolder: "",
+         selectedFolder: null,
          bookmarkError: ""
       };
    },
@@ -57,18 +58,24 @@ export default {
    methods: {
       addFolder(newFolder) {
          this.$store.dispatch("user/addFolder", newFolder).then(_response => {
-            this.selectedFolder = newFolder
+            this.folders.some( (f)=> {
+               if (f.name == newFolder) {
+                  this.selectedFolder = f
+                  return true
+               }
+               return false
+            })
          }).catch((error) => {
             this.bookmarkError = error
          })
       },
       okBookmark() {
          this.bookmarkError = ""
-         if ( this.selectedFolder == "") {
+         if ( !this.selectedFolder) {
             this.bookmarkError = "A bookmark folder selection is required"
             return
          } 
-         this.$store.dispatch("user/addBookmark", this.selectedFolder).then(_response => {
+         this.$store.dispatch("user/addBookmark", this.selectedFolder.name).then(_response => {
             this.$store.commit("user/closeAddBookmark")
          }).catch((error) => {
             this.bookmarkError = error

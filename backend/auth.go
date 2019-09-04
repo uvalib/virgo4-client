@@ -134,7 +134,7 @@ func (svc *ServiceContext) updateAccessToken(userID string, token string) error 
 // SignoutUser ends the auth session for the target user. All session tracking
 // data should be cleaned up
 func (svc *ServiceContext) SignoutUser(c *gin.Context) {
-	userID := c.Param("id")
+	userID := c.Param("uid")
 	log.Printf("Sign out user %s", userID)
 
 	var user UserSettings

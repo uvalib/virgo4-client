@@ -11,18 +11,18 @@
                You have no bookmarked items.
             </p>
             <template v-else>
-               <div class="folder" v-for="folder in Array.from(bookmarks.keys())" :key="folder">
-                  <i @click="removeFolder(folder)" class="remove-folder fas fa-trash-alt"></i>
-                  <AccordionContent :title="folder" align="left">
-                     <div class="none" v-if="bookmarks.get(folder).length == 0">
+               <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
+                  <i @click="removeFolder(folderInfo.id)" class="remove-folder fas fa-trash-alt"></i>
+                  <AccordionContent :title="folderInfo.folder" align="left">
+                     <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
                      </div>
                      <table v-else>
                         <tr>
                            <th/><th>Title</th><th>Author</th>
                         </tr>
-                        <tr v-for="bookmark in bookmarks.get(folder)" :key="bookmark.identifier">
-                           <td><i @click="removeBookmark(bookmark.identifier)" class="remove fas fa-trash-alt"></i></td>
+                        <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
+                           <td><i @click="removeBookmark(bookmark.id)" class="remove fas fa-trash-alt"></i></td>
                            <td>{{bookmark.details.title}}</td>
                            <td>{{bookmark.details.author}}</td>
                         </tr>
@@ -57,11 +57,11 @@ export default {
       }),
    },
    methods: {
-      removeBookmark(identifier) {
-          this.$store.dispatch("user/removeBookmark", identifier)
+      removeBookmark(id) {
+          this.$store.dispatch("user/removeBookmark", id)
       },
-      removeFolder(folder) {
-          this.$store.dispatch("user/removeFolder", folder)
+      removeFolder(folderID) {
+          this.$store.dispatch("user/removeFolder", folderID)
       }
    },
    created() {

@@ -45,8 +45,8 @@ export default {
       }),
       isBookmarked() {
          let found = false
-         Array.from( this.bookmarks.keys()).some( folder => {
-            this.bookmarks.get(folder).some( item => { 
+         this.bookmarks.some( folder => {
+            folder.bookmarks.some( item => { 
                if (item.pool == this.pool && item.identifier == this.hit.identifier) {
                   found = true
                }
@@ -62,7 +62,17 @@ export default {
    },
    methods: {
       removeBookmarkClicked() {
-         alert("remove")
+         let bookmarkID = -1
+         this.bookmarks.some( folder => {
+            folder.bookmarks.some( item => { 
+               if (item.pool == this.pool && item.identifier == this.hit.identifier) {
+                  bookmarkID = item.id
+                  this.$store.dispatch("user/removeBookmark", bookmarkID)
+               }
+               return bookmarkID != -1
+            })
+            return bookmarkID != -1
+         })
       },
       addBookmarkClicked() {
          let data = {pool: this.pool, identifier: this.hit.identifier, title: "", author: ""} 
