@@ -23,7 +23,7 @@ phases:
     commands:
       - DOCKER_ENTRY="--entrypoint /virgo4-client/scripts/migrate.sh"
       - DOCKER_ENV="-e V4_DB_HOST=$DBHOST -e V4_DB_PORT=$DBPORT -e V4_DB_NAME=$DBNAME -e V4_DB_USER=$DBUSER -e V4_DB_PASS=$DBPASSWD"
-      - echo "docker run -it $DOCKER_ENTRY $DOCKER_ENV $CONTAINER_REGISTRY/$CONTAINER_IMAGE:$latest_build"
+      - docker run -it $DOCKER_ENTRY $DOCKER_ENV $CONTAINER_REGISTRY/$CONTAINER_IMAGE:$latest_build
 
 #  post_build:
 #    commands:
