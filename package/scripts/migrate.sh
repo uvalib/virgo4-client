@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # run any necessary migrations
 #
