@@ -1,0 +1,33 @@
+#
+# migratespec.yml
+#
+
+version: 0.2
+
+#env:
+#  variables:
+#    name: value
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+#    commands:
+#      - printenv
+
+  pre_build:
+    commands:
+      - latest_build=$(aws --region=$AWS_REGION ssm get-parameter --name /containers/$CONTAINER_IMAGE/latest | grep "Value" | awk -F\" '{print $4}')
+
+  build:
+    commands:
+      - DOCKER_ENTRY="--entrypoint /virgo4-client/scripts/migrate.sh"
+      - DOCKER_ENV="-e V4_DB_HOST=$DBHOST -e V4_DB_PORT=$DBPORT -e V4_DB_NAME=$DBNAME -e V4_DB_USER=$DBUSER -e V4_DB_PASS=$DBPASSWD"
+      - echo "docker run -it $DOCKER_ENTRY $DOCKER_ENV $CONTAINER_REGISTRY/$CONTAINER_IMAGE:$latest_build"
+
+#  post_build:
+#    commands:
+
+#
+# end of file
+#
