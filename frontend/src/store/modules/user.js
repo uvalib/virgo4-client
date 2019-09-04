@@ -113,7 +113,7 @@ const user = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
-          }).catch((_error) => {
+          }).catch((error) => {
             ctx.commit('setError', error, { root: true })
           })
       },

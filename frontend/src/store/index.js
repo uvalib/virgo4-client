@@ -201,7 +201,7 @@ export default new Vuex.Store({
       state.total = results.total_hits
     },
 
-    moreResults(state) {
+    incrementPage(state) {
       state.results[state.selectedResultsIdx].page++
     },
 
@@ -217,8 +217,8 @@ export default new Vuex.Store({
     // When an infinite scroll reaches the bottom of the page, call this to get the next
     // batch of records from the currently selected pool
     moreResults(ctx) {
-      ctx.commit('moreResults')
-      ctx.dispatch("searchSelectedPool")
+      ctx.commit('incrementPage')
+      return ctx.dispatch("searchSelectedPool")
     },
     
     // Search ALL configured pools. This is the initial search call using only the basic or
@@ -272,7 +272,7 @@ export default new Vuex.Store({
       }
       let url = tgtPool.pool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
-      axios.post(url, req).then((response) => {
+      return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
       }).catch((error) => {

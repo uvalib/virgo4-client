@@ -27,15 +27,15 @@ const filters = {
             return []
          }
          // facetInfo struct:  { facet{id,name}, buckets[ {value,display} ] }
-         // filters struct: [ {facet_id, value_id }]
+         // filters struct: [ {facet_id, value }]
          let facetInfo = state.poolFacets[idx].find(f => f.facet.id === facetID) 
          let buckets = facetInfo.buckets.slice();
          let filters = getters.poolFilter(idx, "api")
          filters.forEach( filter => {
             // see if a filter already exists using the selected facet
             if (filter.facet_id == facetInfo.facet.id) {
-               // remove filter.value_id from buckets items (item.value)
-               buckets = buckets.filter(b => b.value !=  filter.value_id )
+               // remove filter.value from buckets items (item.value)
+               buckets = buckets.filter(b => b.value !=  filter.value )
             }
          })
          return buckets
@@ -55,7 +55,7 @@ const filters = {
             let apiFilter = []
             state.poolFilters[idx].forEach(function(filterObj) {
                filterObj.values.forEach(function(val){
-                  apiFilter.push({facet_id: filterObj.facet.id, value_id: val})
+                  apiFilter.push({facet_id: filterObj.facet.id, value: val})
                } )
             })
             return apiFilter
@@ -96,8 +96,8 @@ const filters = {
             let facetInfo = allPoolFacets.find(f => f.facet.id === facet.id) 
             facetInfo.buckets = []
             facet.buckets.forEach(function (b) {
-               // b = {id, value, count}
-               facetInfo.buckets.push( {value: b.id, display: `${b.value} (${b.count})`} )
+               // b = {value, count}
+               facetInfo.buckets.push( {value: b.value, display: `${b.value} (${b.count})`} )
             })
          })
       },
