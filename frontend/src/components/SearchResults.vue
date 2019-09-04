@@ -246,11 +246,11 @@ div.pools {
    font-size: 1.1em;
 }
 .query-summary  i {
-   font-weight: 100;
+   font-weight: 500;
 }
 .summary {
    margin: 0 0 0.2vw 0;
-   font-weight: 100;
+   font-weight: 500;
    text-align: left;
    font-size: 0.85em;
    position: relative;

@@ -9,7 +9,6 @@
             <SearchFilters />
          </div>
          <div class="hits" id="hits-scroller">
-            <button @click="hack">CLICK</button>
             <div class="summary"><b>{{selectedResults.total}} results for </b>{{queryString()}}</div>
             <template v-for="hit in selectedResults.hits">
                <SearchHit :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
@@ -55,12 +54,17 @@ export default {
       filterLength() {
          setTimeout( () => {
             this.calcHeaderHeight()
-         }, 10)
+            // A filter has been aded or removed and length of
+            // available results has changed. Need to reset the infinite 
+            // loader so all results can be access. Note that caling this on a 
+            // timeout of 10 did not work. Peril.
+            this.$refs.infiniteLoader.stateChanger.reset()
+         }, 500)
       },
       updatingBuckets() {
          setTimeout( () => {
             this.calcHeaderHeight()
-         }, 10)
+         }, 500)
       },
       addingFilter() {
          setTimeout( () => {
@@ -69,15 +73,13 @@ export default {
       }
    },
    methods: {
-      hack() {
-         this.$refs.infiniteLoader.stateChanger.reset()
-      },
       calcHeaderHeight() {
+         // scroller starts positioned absolute 0,0 and header floats over it
+         // need to update the top of the scroller so it starts where the header
+         // ends. this is called any time the header changes size for filter actions
          let hdrEle = document.getElementById("more-header")
          let scroller = document.getElementById("hits-scroller")
          scroller.style.top = hdrEle.offsetHeight+"px"
-         this.$refs.infiniteLoader.stateChanger.reset()
-         console.log("CHANGE HEIGHT AND RESET")
       },
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
@@ -120,7 +122,7 @@ export default {
    z-index: 1000;
 }
 .more-results-modal {
-   position: absolute;
+   position: fixed;
    right: 0;
    top: 0;
    bottom: 0;
@@ -128,6 +130,7 @@ export default {
    box-sizing: border-box;
    border-left: 4px solid var(--color-primary-orange);
    box-shadow: -2px 0px 10px #333;
+   z-index: 1005;
 }
 @media only screen and (min-width: 768px) {
    .more-results-modal, .more-results-modal, div.more-header {
@@ -140,13 +143,17 @@ export default {
    }
 }
 div.more-header {
+   position: absolute;
+   right:0;
+   left: 0;
    font-size: 1em;
    color: white;
    background: var(--color-primary-orange);
    margin:0;
    text-align: left;
-   border-bottom: 4px solid var(--color-primary-orange);
+   border-bottom: 5px solid var(--color-primary-orange);
    border-top: 4px solid var(--color-primary-orange);
+   z-index: 1020;
 }
 div.overlay-title {
    display: flex;
@@ -158,7 +165,7 @@ div.overlay-title {
    font-weight: bold;
    flex: 1 1 auto;
 }
-.pool-close {
+.pool-close { 
    font-size: 1.5em;
    cursor: pointer;
    opacity: 0.6;
@@ -181,5 +188,6 @@ div.overlay-title {
    overflow: auto;
    overscroll-behavior: contain;
    color: #555;
+   z-index: 1010;
 }
 </style>

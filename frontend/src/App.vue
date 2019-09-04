@@ -237,7 +237,7 @@ html, body {
 }
 
 .text-button {
-  font-weight: bold;
+  font-weight: 500;
   color:var(--color-link);
   cursor:pointer;
   display: inline-block
