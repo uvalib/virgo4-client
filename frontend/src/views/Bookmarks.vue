@@ -38,7 +38,6 @@
 
 <script>
 import { mapGetters } from "vuex"
-import { mapState } from "vuex"
 import BackToVirgo from "@/components/BackToVirgo"
 import AccordionContent from "@/components/AccordionContent"
 export default {

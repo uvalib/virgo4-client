@@ -26,7 +26,7 @@ RUN make linux-full
 FROM alpine:3.10
 
 # update the packages
-RUN apk update && apk upgrade && apk add bash tzdata ca-certificates && rm -rf /var/cache/apk/*
+RUN apk update && apk upgrade && apk add bash tzdata ca-certificates curl && rm -rf /var/cache/apk/*
 
 # Create the run user and group
 RUN addgroup webservice && adduser webservice -G webservice -D
@@ -40,8 +40,11 @@ ENV APP_HOME /virgo4-client
 WORKDIR $APP_HOME
 
 # Create necessary directories
-RUN mkdir -p $APP_HOME $APP_HOME/bin $APP_HOME/scripts
+RUN mkdir -p $APP_HOME $APP_HOME/bin $APP_HOME/scripts $APP_HOME/db
 RUN chown -R webservice $APP_HOME && chgrp -R webservice $APP_HOME
+
+# add the migrate tool
+RUN cd $APP_HOME/bin && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.6.1/migrate.linux-amd64.tar.gz | tar xvz && mv migrate.linux-amd64 migrate
 
 # port and run command
 EXPOSE 8080
@@ -50,12 +53,14 @@ CMD scripts/entry.sh
 # Move in necessary assets
 COPY package/data/container_bash_profile /home/webservice/.profile
 COPY package/scripts/entry.sh $APP_HOME/scripts/entry.sh
+COPY package/scripts/migrate.sh $APP_HOME/scripts/migrate.sh
+COPY backend/db/migrations/*.sql $APP_HOME/db/
 COPY --from=builder /build/bin/v4srv.linux $APP_HOME/bin/v4srv
 COPY --from=builder /build/bin/public $APP_HOME/bin/public
 
 # Ensure permissions are correct
-RUN chown webservice:webservice /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/bin/v4srv && chmod 755 /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/bin/v4srv
-RUN chown -R webservice:webservice $APP_HOME/bin/public && chmod -R 755 $APP_HOME/bin/public
+RUN chown webservice:webservice /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/v4srv $APP_HOME/bin/migrate && chmod 755 /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/v4srv $APP_HOME/bin/migrate
+RUN chown -R webservice:webservice $APP_HOME/bin/public $APP_HOME/db && chmod -R 755 $APP_HOME/bin/public $APP_HOME/db
 
 # Add the build tag
 ARG BUILD_TAG

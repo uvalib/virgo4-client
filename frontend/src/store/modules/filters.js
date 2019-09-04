@@ -35,7 +35,7 @@ const filters = {
             // see if a filter already exists using the selected facet
             if (filter.facet_id == facetInfo.facet.id) {
                // remove filter.value from buckets items (item.value)
-               buckets = buckets.filter(b => b.value !=  filter.value )
+               buckets = buckets.filter(b => b.value != filter.value)
             }
          })
          return buckets

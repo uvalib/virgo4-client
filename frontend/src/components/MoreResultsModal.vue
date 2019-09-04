@@ -1,18 +1,22 @@
 <template>
-   <div @click="closePool" class="more-results-overlay">
-      <div  @click="blockClick" id="more-header" class="more-header">
-         <span class="pool-name">{{selectedResults.pool.summary}}</span>
-         <i @click="closePool" class="pool-close fas fa-times-circle"></i>
-         <SearchFilters />
-      </div>
-      
-      <div @click="blockClick" class="more-results-content">
-         <div id="hits-scroller" v-infinite-scroll="loadMoreResults" infinite-scroll-disabled="searching"  
-               class="hits" v-bind:style="{ top: scrollTop + 'px' }">
+   <div @click="closePool" class="more-results-overlay"> 
+      <div @click="blockClick" class="more-results-modal">
+          <div  @click="blockClick" id="more-header" class="more-header">
+            <div class="overlay-title">
+               <span class="pool-name">{{selectedResults.pool.summary}}</span>
+               <i @click="closePool" class="pool-close fas fa-times-circle"></i>
+            </div>
+            <SearchFilters />
+         </div>
+         <div class="hits" id="hits-scroller">
+            <button @click="hack">CLICK</button>
             <div class="summary"><b>{{selectedResults.total}} results for </b>{{queryString()}}</div>
             <template v-for="hit in selectedResults.hits">
                <SearchHit :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
             </template>
+            <infinite-loading @infinite="loadMoreResults" ref="infiniteLoader" >
+               <span slot="no-more">No more matches</span>
+            </infinite-loading>
          </div>
       </div>
    </div>
@@ -23,19 +27,11 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import SearchFilters from "@/components/SearchFilters"
-import infiniteScroll from 'vue-infinite-scroll'
+import InfiniteLoading from 'vue-infinite-loading'
 
 export default {
-   directives: {
-      infiniteScroll
-   },
-   data: function()  {
-      return {
-         scrollTop: 90
-      }
-   },
    components: {
-      SearchHit,SearchFilters
+      SearchHit,SearchFilters,InfiniteLoading
    },
    computed: {
       ...mapState({
@@ -43,6 +39,7 @@ export default {
          searching: state=>state.searching,
          selectedResultsIdx: state => state.selectedResultsIdx,
          addingFilter: state => state.filters.adding,
+         updatingBuckets: state => state.filters.updatingBuckets,
       }),
       ...mapGetters({
          selectedResults: 'selectedResults',
@@ -54,8 +51,13 @@ export default {
          return this.poolFilter(this.selectedResultsIdx, 'raw').length
       }
    },
-   watch: {
+    watch: {
       filterLength() {
+         setTimeout( () => {
+            this.calcHeaderHeight()
+         }, 10)
+      },
+      updatingBuckets() {
          setTimeout( () => {
             this.calcHeaderHeight()
          }, 10)
@@ -67,15 +69,15 @@ export default {
       }
    },
    methods: {
+      hack() {
+         this.$refs.infiniteLoader.stateChanger.reset()
+      },
       calcHeaderHeight() {
          let hdrEle = document.getElementById("more-header")
-            let hdrStyle = getComputedStyle(hdrEle)
-            let hdrH = 0
-            hdrH += parseInt(hdrStyle.getPropertyValue("height").replace("px", ""),10)
-            hdrH += parseInt(hdrStyle.getPropertyValue("padding-top").replace("px", ""),10)
-            hdrH += parseInt(hdrStyle.getPropertyValue("padding-bottom").replace("px", ""),10)
-            let scroller = document.getElementById("hits-scroller")
-            scroller.style.top = hdrH+"px"
+         let scroller = document.getElementById("hits-scroller")
+         scroller.style.top = hdrEle.offsetHeight+"px"
+         this.$refs.infiniteLoader.stateChanger.reset()
+         console.log("CHANGE HEIGHT AND RESET")
       },
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
@@ -83,15 +85,18 @@ export default {
       blockClick(event) {
         event.stopPropagation() 
       },
-      infiniteScrollEnabled() {
-         return (this.searching == false && this.hasMoreHits == true)
-      },
-      loadMoreResults() {
+      loadMoreResults($state) {
          if (this.hasMoreHits) {
-            this.$store.dispatch("moreResults")
+            this.$store.dispatch("moreResults").finally( ()=> {
+               $state.loaded()
+            })
+         } else {
+            $state.loaded()
+            $state.complete()
          }
       },
       closePool() {
+          this.$refs.infiniteLoader.stateChanger.reset()
          this.$store.commit("filters/closeAdd")
          this.$store.commit("closePoolResults")
       },
@@ -110,53 +115,50 @@ export default {
    position: fixed;
    left: 0;
    top: 0;
-   width: 100%;
-   height: 100%;
+   bottom: 0;
+   right: 0;
    z-index: 1000;
 }
-.more-results-content {
-   position: fixed;
+.more-results-modal {
+   position: absolute;
    right: 0;
    top: 0;
-   height: 100%;
-   z-index: 100;
+   bottom: 0;
    background: white;
    box-sizing: border-box;
    border-left: 4px solid var(--color-primary-orange);
    box-shadow: -2px 0px 10px #333;
-   border-radius: 10px 0 0 0;
 }
 @media only screen and (min-width: 768px) {
-   .more-results-modal, .more-results-content, div.more-header {
+   .more-results-modal, .more-results-modal, div.more-header {
       left: 50%;
    }
 }
 @media only screen and (max-width: 768px) {
-   .more-results-modal, .more-results-content, div.more-header {
+   .more-results-modal, .more-results-modal, div.more-header {
       left: 10%;
    }
 }
 div.more-header {
-   position: fixed;
-   right: 0;
    font-size: 1em;
    color: white;
    background: var(--color-primary-orange);
    margin:0;
-   padding: 4px 0 4px 4px;
    text-align: left;
-   z-index: 500;
-   border-radius: 5px 0 0 0;
+   border-bottom: 4px solid var(--color-primary-orange);
+   border-top: 4px solid var(--color-primary-orange);
+}
+div.overlay-title {
+   display: flex;
+   flex-flow: row wrap;
+   align-items: center;
+   padding: 3px 8px 3px 2px;
 }
 .pool-name {
-   display: inline-block;
-   padding: 5px 0 5px 5px;
    font-weight: bold;
+   flex: 1 1 auto;
 }
 .pool-close {
-   position: absolute;
-   right: 8px;
-   top: 8px;
    font-size: 1.5em;
    cursor: pointer;
    opacity: 0.6;
@@ -174,11 +176,10 @@ div.more-header {
 .hits {
    position: absolute;
    left: 0;
-   width: 100%;
-   height: 100%;
-   overflow-y: scroll;
-   overflow-x: hidden;
-   box-sizing: border-box;
+   right: 0;
+   bottom: 0;
+   overflow: auto;
+   overscroll-behavior: contain;
    color: #555;
 }
 </style>

@@ -49,7 +49,7 @@ export default {
       formatValues(values) {
          return values.join(", ")
       },
-      addClicked(event) {
+      addClicked() {
          if ( this.total > 0) {
             this.$store.commit("filters/showAdd")
          }
@@ -89,7 +89,6 @@ td.label {
    font-size: 0.8em;
    padding: 5px 0;
    margin-top: 5px;
-   border-radius: 5px 0 0 0;
 }
 .filters-head {
    font-weight: bold;

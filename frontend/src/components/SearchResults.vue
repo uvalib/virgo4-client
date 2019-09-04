@@ -14,7 +14,7 @@
             <template  v-for="(r,idx) in results">  
                <div v-if="wasPoolSkipped(r)" @click="toggleVisibility(idx)" :key="idx" 
                   class="pool pure-button" v-bind:class="{showing: r.show}">
-                  {{r.pool.Name}} <span class="total">(not searched)</span>
+                  {{r.pool.name}} <span class="total">(not searched)</span>
                </div>
                <div v-else-if="poolFailed(r)" :key="idx" 
                   class="pool pure-button disabled failed"
