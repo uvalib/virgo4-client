@@ -22,7 +22,7 @@
             <option value="date">Date</option>
           </select>
           <template v-if="term.field != 'date'">
-            <input @keyup.enter="searchClicked" v-model="term.value" type="text" class="term"/>
+            <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term"/>
           </template>
           <template v-else>
             <div class="date-criteria">
@@ -32,9 +32,9 @@
                 <option value="BEFORE">BEFORE</option>
                 <option value="BETWEEN">BETWEEN</option>
               </select>
-              <input @keyup.enter="searchClicked" type="text" v-model="term.value" >
+              <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value" >
               <span v-if="term.type=='BETWEEN'" class="date-sep">and</span>
-              <input v-if="term.type=='BETWEEN'" type="text" @keyup.enter="searchClicked" v-model="term.endVal">
+              <input v-if="term.type=='BETWEEN'" type="text" @keyup.enter="doAdvancedSearch" v-model="term.endVal">
             </div>
           </template>
           <span class="remove">
@@ -45,10 +45,10 @@
       <div class="controls">
         <span @click="addClicked" class="add pure-button pure-button-secondary">Add Criteria</span>
         <PoolSetup/>
-        <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+        <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
         <div class="basic">
           <span class="text-button basic-link" @click="basicClicked">
-            Basic Search&nbsp;<i class="fas fa-search-plus"></i>
+            Basic Search&nbsp;<i class="fas fa-undo-alt"></i>
           </span>
         </div>
       </div>
@@ -57,21 +57,20 @@
 
 <script>
 import PoolSetup from "@/components/popovers/PoolSetup"
-import SearchTips from "@/components/popovers/SearchTips"
 import { mapMultiRowFields } from 'vuex-map-fields'
 import { mapGetters } from "vuex"
 export default {
    components: {
-     PoolSetup, SearchTips
+     PoolSetup
    },
    computed: {
-      ...mapMultiRowFields('query',['advanced']),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
       }),
+      ...mapMultiRowFields('query',['advanced']),
    },
    methods: {
-      searchClicked() {
+      doAdvancedSearch() {
         if (this.queryEntered ) {
           this.$store.dispatch("searchAllPools")
         } else {
@@ -81,6 +80,7 @@ export default {
       basicClicked() {
         this.$store.commit("query/clear")
         this.$store.commit("query/setBasicSearch")
+        this.$store.commit("resetSearch")
       },
       addClicked() {
         this.$store.commit("query/addCriteria")

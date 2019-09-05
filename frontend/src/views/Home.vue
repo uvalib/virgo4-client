@@ -82,18 +82,6 @@ export default {
       basicSearch() {
         return this.searchMode == "basic"
       },
-      debugLabel() {
-        if (this.showDebug) {
-          return "Hide Debug"
-        }
-        return "Show Debug"
-      },
-      warnLabel() {
-        if (this.showWarn) {
-          return "Hide Warnings"
-        }
-        return "Show Warnings"
-      }
    },
    created: function() {
       this.$store.dispatch("getConfig")

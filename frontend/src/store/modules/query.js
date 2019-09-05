@@ -18,7 +18,7 @@ const query = {
          }
          let found = false
          state.advanced.some( term=> {
-            found = term.value.legth > 0
+            found = term.value.length > 0
             return found == true
          })
          return found
