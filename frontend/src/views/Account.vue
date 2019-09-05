@@ -66,8 +66,18 @@ export default {
    margin: 30px 0;
 }
 .account-content {
-   width: 40%;
+   width: 60%;
    margin: 0 auto;
+}
+@media only screen and (min-width: 768px) {
+   div.account-content  {
+       width: 60%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.account-content  {
+       width: 80%;
+   }
 }
 .details {
    text-align: left;

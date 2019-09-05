@@ -33,6 +33,16 @@ export default {
    color: #444;
    font-size: 1.1em;
 }
+@media only screen and (min-width: 768px) {
+   div.messages  {
+       width: 50%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.messages  {
+       width: 70%;
+   }
+}
 p {
    margin: 5px 0;
 }

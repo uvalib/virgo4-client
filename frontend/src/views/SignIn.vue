@@ -19,8 +19,7 @@
       </table>
       <div class="controls">
          <span @click="cancelClicked" class="pure-button pure-button-primary">Cancel</span>
-         <span @click="signinClicked" class="pure-button pure-button-primary">Sign In</span>
-         <span class="or-sep">OR</span>
+         <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
          <span class="netbadge">
             <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
             <p class="hint">UVA users only</p>
@@ -59,25 +58,30 @@ export default {
 </script>
 
 <style scoped>
-.or-sep {
-   margin: 0 5px 0 15px;
-   font-weight: normal;
-}
 .signin {
    min-height: 400px;
    position: relative;
    margin: 4vw auto;
    width:40%;
    color: #444;
-   min-width: 350px;
    font-size: 1.1em;
+}
+@media only screen and (min-width: 768px) {
+   .signin  {
+       width: 50%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .signin  {
+       width: 95%;
+   }
 }
 td.label {
   font-weight: 500;
   text-align: right;
   padding: 8px 5px 0 5px;
   width:1%;
-  white-space:nowrap;
+  white-space: nowrap;
   vertical-align: text-top;
 }
 td.value {
@@ -99,9 +103,21 @@ span.netbadge p.hint {
    text-align: right;
    margin-top: 5px;
 }
+span.netbadge .pure-button {
+   width:100%;
+}
 .controls {
    margin-top: 25px;
-   text-align: right;
+   display: flex;
+   flex-flow: row wrap;
+   align-items: flex-start;
+   justify-content: flex-end;
+}
+.controls .pure-button, span.netbadge {
+    flex: 1 1 auto;
+}
+#app .controls .pure-button {
+   margin: 5px;
 }
 </style>
 

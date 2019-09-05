@@ -44,10 +44,20 @@ export default {
    margin: 25px 0;
 }
 .messages, .info {
-   width:40%;
+   width:50%;
    margin: 5px auto 30px auto;
    color: #444;
    font-size: 1.1em;
+}
+@media only screen and (min-width: 768px) {
+   .messages, .info  {
+       width: 50%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .messages, .info  {
+       width: 80%;
+   }
 }
 .details {
    padding : 10px;
@@ -72,9 +82,10 @@ div.subhead {
    background: var(--color-primary-orange);
    color: white;
    margin: 8px 0 0 0;
-   padding: 5px;
+   padding: 10px;
    font-weight: bold;
    position: relative;
+   border-radius: 5px;
 }
 </style>
 

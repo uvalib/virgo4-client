@@ -46,13 +46,13 @@ i.fas.fa-times-circle.close:hover {
 }
 .tips-popover {
    background: white;
-   box-shadow: 2px 2px 10px #ccc;
+   box-shadow: 1px 1px 15px #333;
    color: var(--color-primary-text);
    font-size: 1em;
    font-weight: normal;
    display: inline-block;
-   padding-bottom: 5px;
    border-radius: 5px;
+   border-bottom: 5px solid var(--color-primary-orange);
 }
 .tips-popover .popover-title {
    padding: 8px 0 6px 0;
@@ -68,12 +68,15 @@ i.fas.fa-times-circle.close:hover {
 div.tips {
    margin: 0;
    font-size: 0.9em;
-   padding: 0px 20px 10px 20px;
+   padding: 10px 20px 10px 20px;
    font-weight: normal;
+   border-right: 5px solid var(--color-primary-orange);
+   border-left: 5px solid var(--color-primary-orange);
 }
 ul {
    list-style-type: none;
    padding:0;
+   margin: 0;
 }
 ul p {
    margin: 0;
@@ -99,5 +102,6 @@ span.text-button.trigger {
 div.v-popover.tips {
    margin:0;
    padding:0;
+   border: 0;
 }
 </style>

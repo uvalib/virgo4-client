@@ -1,10 +1,13 @@
 <template>
    <nav class="menu">
       <template v-if="isSignedIn">
-         <span @mouseover="showMenu" @mouseleave="hideMenu" class="menu-item account">
-            <i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;<i class="fas fa-caret-down"></i>
-               <transition name="fade">
-                  <div v-if="menuOpen" class="user-menu" @mouseover="showMenu" >
+         <span @click="toggleMenu" class="menu-item account">
+            <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
+            <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
+               <transition name="grow"
+                  v-on:before-enter="beforeEnter" v-on:enter="enter"
+                  v-on:before-leave="beforeLeave" v-on:leave="leave">
+                  <div v-if="menuOpen" class="user-menu" >
                      <router-link to="/account">
                         <div class="submenu">Account Info</div>
                      </router-link>
@@ -23,7 +26,9 @@
             <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
          </router-link>
       </template>
-      <Feedback icon/>
+      <span class="menu-item">
+         <Feedback icon/>
+      </span>
    </nav>
 </template>
 
@@ -42,6 +47,12 @@ export default {
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
       }),
+      rotation() {
+         if (this.menuOpen) {
+            return "rotate(180deg)"
+         }
+         return "rotate(0deg)"
+      }
    },
    data: function() {
       return {
@@ -52,14 +63,25 @@ export default {
       signinClicked() {
          this.$router.push("/signin")
       },
-      showMenu() {
-         this.menuOpen = true
-      },
-      hideMenu() {
-         this.menuOpen = false
+      toggleMenu() {
+         this.menuOpen = !this.menuOpen 
       },
       signOut() {
          this.$store.dispatch("user/signout")
+      },
+      beforeEnter: function(el) {
+         el.style.height = '0'
+      },
+      enter: function(el) {
+         el.style.height = el.scrollHeight + 'px'
+         this.expandedItem = el
+      },
+      beforeLeave: function(el) {
+         el.style.height = el.scrollHeight + 'px'
+         this.expandedItem = el
+      },
+      leave: function(el) {
+         el.style.height = '0'
       }
    }
 }
@@ -71,9 +93,10 @@ export default {
    padding: 10px;
    background-color: var(--color-secondary-blue);
    color: white;
-}
-.sep {
-   margin: 0 15px;
+   display: flex;
+   flex-flow: row wrap;
+   align-items: center;
+   justify-content: flex-end;
 }
 #app .menu a {
    color: white;
@@ -85,6 +108,9 @@ export default {
 #app .menu .menu-item {
    cursor: pointer;
    color: white;
+   flex: 0 1 auto;
+   display: inline-block;
+   margin-left: 25px;
 }
 #app .menu .menu-item:hover {
    border-bottom: 1px solid white;
@@ -115,6 +141,10 @@ export default {
    background-color: var(--color-primary-blue);
    color: white;
 }
+.submenu-arrow {
+   transform: rotate(0deg);
+   transition-duration: 200ms;
+}
 .user-menu {
   position: absolute;
   z-index: 1000;
@@ -126,9 +156,8 @@ export default {
   right: 0;
   left: 0;
   font-size: 0.9em;
-}
-.menu-item.account {
-   margin-right: 25px;
+  overflow: hidden;
+  transition: 200ms ease-out;
 }
 </style>
 

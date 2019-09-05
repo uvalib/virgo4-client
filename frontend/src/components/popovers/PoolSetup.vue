@@ -1,5 +1,5 @@
 <template>
-   <v-popover style="display:inline-block;">
+   <v-popover style="display:inline-block;" placement="left">
       <span @click="getPools" class="pure-button pure-button-secondary">Sources</span>
       <div class="pools-container" slot="popover">
          <div class="popover-title">
@@ -21,7 +21,7 @@
                      <i @click="toggleExcludePool(p.url)" v-else class="selected fas fa-check-circle"></i>
                   </td>
                   <td>
-                     <p class="pool-desc">{{p.summary}}</p>
+                     <p class="pool-desc">{{p.name}}</p>
                   </td>
                </tr>
             </table>
@@ -115,6 +115,8 @@ p.pool-desc {
    font-weight: bold;
    text-align: right;
    padding: 5px 15px 10px 0;
+   border-right: 5px solid var(--color-primary-orange);
+   border-left: 5px solid var(--color-primary-orange);
 }
 .toolbar .pure-button.pure-button-primary {
    padding: 5px 25px;
@@ -128,12 +130,14 @@ p.pool-desc {
 }
 .pools-container {
    background: white;
-   box-shadow: 2px 2px 10px #ccc;
+   box-shadow: 1px 1px 15px #333;
    font-size: 0.9em;
    font-weight: normal;
    display: inline-block;
-   padding-bottom: 5px;
+   padding-bottom: 0px;
    border-radius: 5px;
+   border-radius: 5px;
+   border-bottom: 5px solid var(--color-primary-orange);
 }
 .pools-container .popover-title {
    padding: 8px 0 6px 0;
@@ -147,11 +151,13 @@ p.pool-desc {
    font-weight: bold;
 }
 .pools-list {
-   margin: 10px 15px;
+   border-right: 5px solid var(--color-primary-orange);
+   border-left: 5px solid var(--color-primary-orange);
+   padding: 10px 15px;
    max-height: 400px;
    overflow-y: scroll;
    color: #444;
-   font-weight: 100;
+   font-weight: normal;
 }
 td {
    padding: 4px 0px;
