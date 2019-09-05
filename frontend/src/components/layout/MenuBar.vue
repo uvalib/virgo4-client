@@ -4,21 +4,21 @@
          <span @click="toggleMenu" class="menu-item account">
             <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
             <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
-               <transition name="grow"
-                  v-on:before-enter="beforeEnter" v-on:enter="enter"
-                  v-on:before-leave="beforeLeave" v-on:leave="leave">
-                  <div v-if="menuOpen" class="user-menu" >
-                     <router-link to="/account">
-                        <div class="submenu">Account Info</div>
-                     </router-link>
-                     <router-link to="/bookmarks">
-                        <div class="submenu">Bookmarks</div>
-                     </router-link>
-                     <div  @click="signOut" class="submenu">
-                        <span>Sign out</span>
-                     </div>
+            <transition name="grow"
+               v-on:before-enter="beforeEnter" v-on:enter="enter"
+               v-on:before-leave="beforeLeave" v-on:leave="leave">
+               <div @click="blockToggle" v-if="userMenuOpen" class="user-menu" >
+                  <router-link to="/account">
+                     <div class="submenu">Account Info</div>
+                  </router-link>
+                  <router-link to="/bookmarks">
+                     <div class="submenu">Bookmarks</div>
+                  </router-link>
+                  <div  @click="signOut" class="submenu">
+                     <span>Sign out</span>
                   </div>
-               </transition>
+               </div>
+            </transition>
          </span>
       </template>   
       <template v-else>
@@ -43,28 +43,28 @@ export default {
    computed: {
       ...mapState({
          signedInUser: state => state.user.signedInUser,
+         userMenuOpen: state => state.userMenuOpen
       }),
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
       }),
       rotation() {
-         if (this.menuOpen) {
+         if (this.userMenuOpen) {
             return "rotate(180deg)"
          }
          return "rotate(0deg)"
-      }
-   },
-   data: function() {
-      return {
-         menuOpen: false
       }
    },
    methods: {
       signinClicked() {
          this.$router.push("/signin")
       },
-      toggleMenu() {
-         this.menuOpen = !this.menuOpen 
+      blockToggle(e) {
+         e.stopPropagation()
+      },
+      toggleMenu(e) {
+         e.stopPropagation()
+         this.$store.commit("toggleUserMenu")
       },
       signOut() {
          this.$store.dispatch("user/signout")
@@ -126,8 +126,9 @@ export default {
 }
 .submenu {
    margin:0;
-   padding: 2px 10px;
+   padding: 5px 10px;
    margin: 0;
+   font-size: 1.2em;
 }
 #app .menu .submenu a {
    color:white;

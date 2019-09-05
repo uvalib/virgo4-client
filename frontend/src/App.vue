@@ -1,5 +1,5 @@
 <template>
-   <div id="app">
+   <div id="app" @click=closeUserMenu>
       <FatalError v-if="fatal.length > 0"/>
       <AuthorizePanel v-if="authorizing"/>
       <transition name="fade">
@@ -58,6 +58,9 @@ export default {
       }
    },
    methods: {
+     closeUserMenu() {
+       this.$store.commit("closeUserMenu")
+     }
    }
 };
 </script>

@@ -46,11 +46,11 @@
         <span @click="addClicked" class="add pure-button pure-button-secondary">Add Criteria</span>
         <PoolSetup/>
         <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
-        <div class="basic">
-          <span class="text-button basic-link" @click="basicClicked">
-            Basic Search&nbsp;<i class="fas fa-undo-alt"></i>
-          </span>
-        </div>
+      </div>
+      <div class="basic">
+        <span class="text-button basic-link" @click="basicClicked">
+          Basic Search&nbsp;<i class="fas fa-undo-alt"></i>
+        </span>
       </div>
    </div>
 </template>
@@ -103,9 +103,15 @@ div.criteria {
 .controls {
   font-size: 0.85em;
   font-weight: bold;
-  text-align: right;
   padding: 10px 0;
-  position: relative;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.controls  > * {
+  flex: 0 1 auto;
 }
 
 div.search-term {
@@ -114,6 +120,7 @@ div.search-term {
   margin: 0;
   padding: 0 0 10px 0;
   align-items: center;
+  justify-content: flex-start;
 }
 div.search-term > * {
   margin: 0 0.8em 0 0;
@@ -149,19 +156,17 @@ i.remove:hover {
   opacity: 1;
 }
 
-
 div.basic {
   text-align: right;
 }
 .text-button.basic-link {
-  margin-top: 20px;
-  font-size: 1.1em;
+  margin-top: 10px;
+  font-size: 1em;
 }
 .text-button.basic-link:hover {
   text-decoration: underline;
 }
 #app span.add.pure-button.pure-button-secondary {
-  float: left;
-  margin-left: 0;
+    margin-left: 0;
 }
 </style>

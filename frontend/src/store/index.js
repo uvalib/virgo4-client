@@ -20,7 +20,8 @@ export default new Vuex.Store({
     total: -1,
     visibleResults: [],
     selectedResultsIdx: -1,
-    version: "unknown"
+    version: "unknown",
+    userMenuOpen: false
   },
 
   getters: {
@@ -78,6 +79,12 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    toggleUserMenu(state) {
+      state.userMenuOpen = !state.userMenuOpen
+    },
+    closeUserMenu(state) {
+      state.userMenuOpen = false
+    },
     setVersion(state, data) {
       state.version = `${data.version}.${data.build}`
     },
