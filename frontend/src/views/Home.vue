@@ -1,5 +1,8 @@
 <template>
    <main class="home">
+      <div class="tips-container">
+          <SearchTips/>
+      </div>
       <div v-show="searching" class="searching-overlay">
         <div class="searching-box">
           <p>Searching...</p>
@@ -8,7 +11,7 @@
       </div>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
-          <h1>Basic Search<SearchTips/></h1>
+          <h1>Basic Search</h1>
           <input
               @keyup.enter="searchClicked"
               id="keyword"
@@ -71,6 +74,7 @@ export default {
       }),
       ...mapGetters({
         hasResults: 'hasResults',
+        queryEntered: 'query/queryEntered',
       }),
       ...mapFields('query',[
         'basic',
@@ -96,10 +100,10 @@ export default {
    },
    methods: {
       searchClicked() {
-        if (this.basic.length == 0) {
-          this.$store.commit('setError', "Please enter a search query")
-        } else {
+        if (this.queryEntered ) {
           this.$store.dispatch("searchAllPools")
+        } else {
+          this.$store.commit('setError', "Please enter a search query")
         }
       },
       advancedClicked() {
@@ -142,7 +146,10 @@ div.searching-box {
        margin-top:30%;
    }
    #keyword {
-      padding: 5px 10px;;
+      padding: 5px 10px;
+   }
+   div.tips-container {
+     display: none;
    }
 }
 div.searching-box p {
@@ -202,10 +209,16 @@ div.advanced {
   text-align: right;
 }
 .text-button.advanced-link {
-  margin-top: 15px;
+  margin-top: 20px;
   font-size: 1.1em;
 }
 .text-button.advanced-link:hover {
   text-decoration: underline;
+}
+div.tips-container {
+  position: absolute;
+  font-size: 1em;
+  top: 15px; 
+  right: 15px;
 }
 </style>

@@ -118,6 +118,9 @@ export default {
 .pool-buttons {
    margin-top: 5px;
    text-align: left;
+   display: flex;
+   flex-flow: row wrap;
+   align-items: center;
 }
 .hide-pool {
    float: right;
@@ -184,6 +187,7 @@ div.right-indent {
    font-size: 0.85em;
    font-weight: bold;
    color: #666;
+   flex: 1 1 auto;
 }
 .pool.pure-button.showing {
    background-color: var(--color-primary-blue);

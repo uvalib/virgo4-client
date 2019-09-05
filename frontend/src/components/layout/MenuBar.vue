@@ -23,7 +23,6 @@
             <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
          </router-link>
       </template>
-      <span class="sep">|</span>
       <Feedback icon/>
    </nav>
 </template>
@@ -85,7 +84,7 @@ export default {
 }
 #app .menu .menu-item {
    cursor: pointer;
-    color: white;
+   color: white;
 }
 #app .menu .menu-item:hover {
    border-bottom: 1px solid white;
@@ -127,6 +126,9 @@ export default {
   right: 0;
   left: 0;
   font-size: 0.9em;
+}
+.menu-item.account {
+   margin-right: 25px;
 }
 </style>
 

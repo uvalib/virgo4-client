@@ -1,32 +1,30 @@
 <template>
-   <p class="tips">
-      <v-popover placement="top-end">
-         <span class="text-button trigger">Search Tips&nbsp;<i class="fas fa-info-circle"></i></span>
-         <div class="tips-container" slot="popover">
-            <div class="popover-title">
-               Search Tips
-               <i v-close-popover class="close fas fa-times-circle"></i>
-            </div>
-            <div class="tips">
-               <ul>
-                  <li class="no-pad">
-                     <p>Use quotation marks to find exact phrases:</p> 
-                     <p class="example">"grapes of wrath"</p>
-                  </li>
-                  <li>
-                     <p>Use uppercase OR, AND, and NOT to create complex searches:</p>
-                     <p class="example">kyoto NOT protocol</p>
-                     <p class="example">"frida kahlo" AND exhibitions</p>
-                  </li>
-                  <li>
-                     <p>Use parentheses to group parts of your search:</p>
-                     <p class="example">(calico OR "tortoise shell") AND cats</p>
-                  </li>
-               </ul>
-            </div>
+   <v-popover placement="top-end" class="tips">
+      <span class="text-button trigger">Search Tips&nbsp;<i class="fas fa-info-circle"></i></span>
+      <div class="tips-popover" slot="popover">
+         <div class="popover-title">
+            Search Tips
+            <i v-close-popover class="close fas fa-times-circle"></i>
          </div>
-      </v-popover>
-   </p>
+         <div class="tips">
+            <ul>
+               <li class="no-pad">
+                  <p>Use quotation marks to find exact phrases:</p> 
+                  <p class="example">"grapes of wrath"</p>
+               </li>
+               <li>
+                  <p>Use uppercase OR, AND, and NOT to create complex searches:</p>
+                  <p class="example">kyoto NOT protocol</p>
+                  <p class="example">"frida kahlo" AND exhibitions</p>
+               </li>
+               <li>
+                  <p>Use parentheses to group parts of your search:</p>
+                  <p class="example">(calico OR "tortoise shell") AND cats</p>
+               </li>
+            </ul>
+         </div>
+      </div>
+   </v-popover>
 </template>
 
 <script>
@@ -46,17 +44,17 @@ i.fas.fa-times-circle.close:hover {
    opacity: 1;
    cursor: pointer;
 }
-.tips-container {
+.tips-popover {
    background: white;
    box-shadow: 2px 2px 10px #ccc;
    color: var(--color-primary-text);
-   font-size: 0.9em;
+   font-size: 1em;
    font-weight: normal;
    display: inline-block;
    padding-bottom: 5px;
    border-radius: 5px;
 }
-.tips-container .popover-title {
+.tips-popover .popover-title {
    padding: 8px 0 6px 0;
    margin: 0;
    text-align: center;
@@ -71,6 +69,7 @@ div.tips {
    margin: 0;
    font-size: 0.9em;
    padding: 0px 20px 10px 20px;
+   font-weight: normal;
 }
 ul {
    list-style-type: none;
@@ -97,11 +96,8 @@ span.text-button.trigger {
    opacity: 1;
    font-weight: normal;
 }
-p.tips {
-  margin:20px 0;
-  font-size: 12px;
-  float: right;
-  margin:0;
+div.v-popover.tips {
+   margin:0;
+   padding:0;
 }
-
 </style>

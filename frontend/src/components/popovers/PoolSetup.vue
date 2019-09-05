@@ -117,9 +117,9 @@ p.pool-desc {
    padding: 5px 15px 10px 0;
 }
 .toolbar .pure-button.pure-button-primary {
-   padding: 3px 15px;
+   padding: 5px 25px;
    margin-left: 5px;
-   font-weight: 100;
+   font-weight: normal;
    border-radius: 5px;
    opacity: 0.8;
 }
@@ -130,7 +130,7 @@ p.pool-desc {
    background: white;
    box-shadow: 2px 2px 10px #ccc;
    font-size: 0.9em;
-   font-weight: 100;
+   font-weight: normal;
    display: inline-block;
    padding-bottom: 5px;
    border-radius: 5px;

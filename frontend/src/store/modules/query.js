@@ -12,6 +12,17 @@ const query = {
    },
    getters: {
       getField,
+      queryEntered: state => {
+         if ( state.mode == "basic") {
+            return state.basic.length > 0
+         }
+         let found = false
+         state.advanced.some( term=> {
+            found = term.value.legth > 0
+            return found == true
+         })
+         return found
+      },
       string: state => {
          // convert into the standard v4 search string format. Ex:
          // title : {"susan sontag" OR music title} AND keyword:{ Maunsell } ) OR author:{ liberty }

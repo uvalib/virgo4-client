@@ -2,7 +2,6 @@
    <div class="advanced-panel">
       <h1>
         <span>Advanced Search</span>
-        <SearchTips/>
       </h1>
       <div class="criteria">
         <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
@@ -60,16 +59,24 @@
 import PoolSetup from "@/components/popovers/PoolSetup"
 import SearchTips from "@/components/popovers/SearchTips"
 import { mapMultiRowFields } from 'vuex-map-fields'
+import { mapGetters } from "vuex"
 export default {
    components: {
      PoolSetup, SearchTips
    },
    computed: {
       ...mapMultiRowFields('query',['advanced']),
+      ...mapGetters({
+        queryEntered: 'query/queryEntered',
+      }),
    },
    methods: {
       searchClicked() {
-        this.$store.dispatch("searchAllPools")
+        if (this.queryEntered ) {
+          this.$store.dispatch("searchAllPools")
+        } else {
+          this.$store.commit('setError', "Please enter a search query")
+        }
       },
       basicClicked() {
         this.$store.commit("query/clear")
@@ -147,7 +154,7 @@ div.basic {
   text-align: right;
 }
 .text-button.basic-link {
-  margin-top: 15px;
+  margin-top: 20px;
   font-size: 1.1em;
 }
 .text-button.basic-link:hover {
