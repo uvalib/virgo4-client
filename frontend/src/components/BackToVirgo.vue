@@ -11,7 +11,7 @@
 
 <style scoped>
 .controls {
-   margin-top: 35px;
+   margin: 25px 0;
    text-align: right;
    font-size: 0.9em;
 }

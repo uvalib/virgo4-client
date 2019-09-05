@@ -49,9 +49,9 @@ i.fas.fa-times-circle.close:hover {
 .tips-container {
    background: white;
    box-shadow: 2px 2px 10px #ccc;
-   color: var(--color-primary-text);;
+   color: var(--color-primary-text);
    font-size: 0.9em;
-   font-weight: 100;
+   font-weight: normal;
    display: inline-block;
    padding-bottom: 5px;
    border-radius: 5px;
@@ -95,7 +95,7 @@ span.trigger:hover {
 }
 span.text-button.trigger {
    opacity: 1;
-   font-weight: 500;
+   font-weight: normal;
 }
 p.tips {
   margin:20px 0;

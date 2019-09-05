@@ -30,7 +30,13 @@ const user = {
       },
       hasBookmarks: state => {
          if ( state.bookmarks == null ) return false 
-         return Array.from( state.bookmarks.keys()).length > 0
+         if ( state.bookmarks.length === 0) return false
+         let found = false
+         state.bookmarks.some( folderInfo=> {
+            found = folderInfo.bookmarks.length > 0
+            return found == true
+         })
+         return found
       },
       bookmarks: state => {
          if ( state.bookmarks == null ) return []
@@ -72,7 +78,7 @@ const user = {
       },
       setAccountInfo(state, data) {
          // data content {user, authToken, bookmarks}
-         // bookmarks = [ {id, foder, addedAt, bookmarks: [id,pool,identifier,details{}] } ] 
+         // bookmarks = [ {id, folder, addedAt, bookmarks: [id,pool,identifier, details{author, title}] } ] 
          state.accountInfo = data.user
          state.authToken = data.authToken
          state.bookmarks = data.bookmarks

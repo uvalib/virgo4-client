@@ -130,7 +130,7 @@ i.bookmark:hover {
    opacity: 1;
 }
 div.details {
-   padding: 10px 0 0 0;
+   padding: 10px;
 }
 div.basic {
    display: grid;
@@ -153,9 +153,8 @@ div.preview {
  #app td.value >>> a.pure-button.pure-button-primary.ext {
    background-color:var(--color-primary-blue);
    color: white; 
-   padding: 2px 0px;
+   padding: 3px 0px;
    width: 100%;
-   margin: 10px 0;
 }
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
    text-decoration: none;  

@@ -36,7 +36,7 @@ export default {
       watchCount () {
          if (this.isExpanded) {
             setTimeout( () => {
-               this.expandedItem.style.height = this.expandedItem.scrollHeight + 'px'
+               this.expandedItem.style.height = (this.expandedItem.scrollHeight-5) + 'px'
             }, 500)
          }
       }
@@ -84,9 +84,10 @@ export default {
 <style scoped>
 .accordion-content {
    overflow: hidden;
-   transition: 500ms ease-out;
+   transition: 250ms ease-out;
    background: white;
-   padding: 0 10px 5px 10px;
+   margin:0;
+   padding:0;
 }
 div.title.right {
    text-align: right;
@@ -102,7 +103,7 @@ div.title {
    padding: 0px 8px;
    text-align: right;
    cursor: pointer;
-   margin: 2px 0 0 0;
+   margin: 0;
    color: #666;
    background: #f5f5f5;
    padding: 3px 12px;
@@ -110,16 +111,15 @@ div.title {
 .title .text {
    padding-right: 5px;
 }
-div.title :hover {
-   color: #444;
+div.title:hover {
+   color: #333;
 }
 div.title  .accordion-icon {
    font-size: 1.25em;
    position: relative;
    top: 2px;
-   color:#999;
    cursor: pointer;
    transform: rotate(0deg);
-   transition-duration: 500ms;
+   transition-duration: 250ms;
 }
 </style>

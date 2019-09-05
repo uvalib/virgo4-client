@@ -78,14 +78,24 @@ export default {
    color: #666;
    opacity: 0.6;
    cursor: pointer;
+   font-size: 1.2em;
+   padding: 2px 8px 2px 0;
 }
 .remove:hover, .remove-folder:hover {
    opacity: 1;
 }
-.remove-folder {
-   position: absolute;
-   left: 0;
-   top: 5px;
+div.folder {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+   margin-bottom: 15px;
+}
+div.folder .remove-folder {
+   flex: 0 0 auto;
+   padding-top: 4px;
+}
+div.accordion {
+  flex: 1 1 auto; 
 }
 .bookmarks {
    min-height: 400px;
@@ -100,23 +110,32 @@ export default {
 .working img {
    margin: 30px 0;
 }
-div.folder {
-   position: relative;
-}
 .bookmarks-content {
-   width: 40%;
+   width: 60%;
    margin: 0 auto;
+}
+@media only screen and (min-width: 768px) {
+   div.bookmarks-content  {
+       width: 60%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.bookmarks-content  {
+       width: 95%;
+   }
 }
 table td, th {
   padding: 2px 8px;
   text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+table  th {
+  background: #e5e5e5;
 }
 table {
-   margin: 10px;
-}
-div.accordion {
-   margin-bottom: 15px;
-   margin-left: 25px;
+   margin: 0px;
+   border-bottom: 1px solid #ccc;
+   width: 100%;
 }
 div.none {
    font-size: 1.1em;
