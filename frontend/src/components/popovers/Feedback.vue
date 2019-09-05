@@ -38,13 +38,14 @@ div.popover-header {
    background-color: var(--color-primary-orange);
    font-size: 1.15em;
    font-weight: bold;
+   border-radius: 5px 5px 0 0;
 }
 .feedback-container {
    background: white;
-   box-shadow: 2px 2px 10px #ccc;
+   box-shadow: 1px 1px 15px #333;
    color: var(--color-primary-text);
    font-size: 0.9em;
-   font-weight: 100;
+   font-weight: 500;
    display: inline-block;
    padding: 0;
    border-radius: 5px;
@@ -59,9 +60,6 @@ i.fas.fa-times-circle.close:hover {
    opacity: 1;
    cursor: pointer;
 }
-span.trigger:hover {
-   text-decoration: underline;
-}
 span.text-button.trigger {
    opacity: 1;
    font-weight: 500;
@@ -73,15 +71,19 @@ p.feedback {
    margin: 0;
 }
 div.message {
-   margin: 20px;
+   padding: 20px;
    text-align: center;
+   border-left: 5px solid var(--color-primary-orange);
+   border-right: 5px solid var(--color-primary-orange);
+   border-bottom: 5px solid var(--color-primary-orange);
+   border-radius: 0 0 5px 5px;
 }
 a.feedback {
    color: var(--color-link);
    font-weight: 500;
    text-decoration: none;
 }
-a.feedback :hover {
-   text-decoration: underline;
-}
+#app p.feedback .text-button:hover {
+   text-decoration: none;
+} 
 </style>

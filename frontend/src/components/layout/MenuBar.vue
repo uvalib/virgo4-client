@@ -101,10 +101,6 @@ export default {
 #app .menu a {
    color: white;
 }
-#app .menu a:hover {
-   text-decoration: none;
-   border-bottom: 1px solid white;
-}
 #app .menu .menu-item {
    cursor: pointer;
    color: white;
@@ -112,17 +108,9 @@ export default {
    display: inline-block;
    margin-left: 25px;
 }
-#app .menu .menu-item:hover {
-   border-bottom: 1px solid white;
-   text-decoration: none;
-}
 .menu-item.account {
    position: relative;
    display: inline-block;
-   border-bottom: 1px solid var(--color-secondary-blue);
-}
-#app .menu .menu-item.account:hover {
-   border-bottom: 1px solid var(--color-secondary-blue);
 }
 .submenu {
    margin:0;
@@ -159,6 +147,12 @@ export default {
   font-size: 0.9em;
   overflow: hidden;
   transition: 200ms ease-out;
+}
+.menu .menu-item {
+   border-bottom:1px solid var(--color-secondary-blue);
+}
+.menu .menu-item:hover {
+   border-bottom:1px solid white;
 }
 </style>
 

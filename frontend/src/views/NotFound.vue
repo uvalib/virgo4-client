@@ -76,7 +76,7 @@ p {
 }
 .links, .note {
    padding: 5px;
-   font-weight: 100;
+   font-weight: 500;
 }
 div.subhead {
    background: var(--color-primary-orange);

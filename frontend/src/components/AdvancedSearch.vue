@@ -134,7 +134,7 @@ input[type=text] {
    flex: 1 1 auto;
 }
 .date-sep {
-  font-weight: 100;
+  font-weight: 500;
 }
 div.search-term .date-criteria {
   display: flex;

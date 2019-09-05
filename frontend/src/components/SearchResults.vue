@@ -138,7 +138,7 @@ export default {
    margin: 0;
    padding: 0px;
    font-size: 0.7em;
-   font-weight: 100;
+   font-weight: 500;
    background-color: #f5f5f5;
 }
 .metrics {
@@ -163,6 +163,7 @@ table td {
 }
 td.filter {
    width: 100%;
+   font-weight: 500;
    color: #333;
 }
 td.label {
@@ -282,7 +283,7 @@ div.pools {
    text-align: left;
 }
 .total {
-   font-weight: 100;
+   font-weight: 500;
 }
 .refine {
    display: block;

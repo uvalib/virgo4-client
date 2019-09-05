@@ -76,7 +76,7 @@ table td {
    padding: 4px 5px 0 0;
 }
 td.filter {
-   font-weight: 100;
+   font-weight: 500;
    width: 100%;
 }
 td.label {
