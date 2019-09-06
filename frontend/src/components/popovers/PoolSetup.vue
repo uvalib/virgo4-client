@@ -6,7 +6,11 @@
             Sources
             <i v-close-popover class="action close fas fa-times-circle"></i>
          </div>
-         <div class="pools-list">
+         <div v-if="lookingUp" class="pools-list">
+            <p>Finding sources...</p>
+            <img src="../../assets/searching.gif">
+         </div>
+         <div v-else class="pools-list">
             <table>
                <tr>
                   <th>Primary</th><th>Include</th><th>Name</th>
@@ -41,7 +45,8 @@ export default {
    components: {},
    computed: {
       ...mapState({
-         pools: state => state.pools.list
+         pools: state => state.pools.list,
+         lookingUp : state => state.pools.lookingUp
       }),
       ...mapGetters({
          isPoolExcluded: "pools/isPoolExcluded",

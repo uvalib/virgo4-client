@@ -5,7 +5,8 @@ const pools = {
    state: {
       list: [],
       targetPoolURL: "",
-      excludePoolURLs: []
+      excludePoolURLs: [],
+      lookingUp: false,
    },
 
    getters: {
@@ -24,6 +25,9 @@ const pools = {
    },
 
    mutations: {
+      setLookingUp(state, flag) {
+         state.lookingUp = flag
+      },
       includeAll(state) {
          state.excludePoolURLs = []
       },
@@ -58,13 +62,16 @@ const pools = {
 
    actions: {
       getPools(ctx) {
-        let url = ctx.rootState.searchAPI + "/api/pools"
-        axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-        axios.get(url).then((response) => {
-          ctx.commit('setPools', response.data)
-        }).catch((error) => {
-          ctx.commit('setFatal', "Unable to get pools: " + error.response.data, { root: true })
-        })
+         ctx.commit("setLookingUp", true)
+         let url = ctx.rootState.searchAPI + "/api/pools"
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
+         axios.get(url).then((response) => {
+            ctx.commit('setPools', response.data)
+            ctx.commit("setLookingUp", false)
+         }).catch((error) => {
+            ctx.commit('setFatal', "Unable to get pools: " + error.response.data, { root: true })
+            ctx.commit("setLookingUp", false)
+         })
       },
    }
 }
