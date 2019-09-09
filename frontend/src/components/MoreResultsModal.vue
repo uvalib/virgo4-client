@@ -1,11 +1,15 @@
 <template>
    <div @click="closePool" class="more-results-overlay"> 
       <div @click="blockClick" class="more-results-modal">
-          <div  @click="blockClick" id="more-header" class="more-header">
-            <div class="overlay-title">
+         <div id="more-header" class="more-header">
+            <div  @click="closePool"  class="overlay-title">
                <span class="pool-name">{{selectedResults.pool.summary}}</span>
-               <i @click="closePool" class="pool-close fas fa-times-circle"></i>
+               <i class="pool-close fas fa-arrow-circle-right"></i>
             </div>
+            <AccordionContent title="Description" align="left-narrow" 
+               background="var(--color-primary-orange)" color="white">
+               {{selectedResults.pool.description}}
+            </AccordionContent>
             <SearchFilters />
          </div>
          <div class="hits" id="hits-scroller">
@@ -27,10 +31,10 @@ import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import InfiniteLoading from 'vue-infinite-loading'
-
+import AccordionContent from '@/components/AccordionContent'
 export default {
    components: {
-      SearchHit,SearchFilters,InfiniteLoading
+      SearchHit,SearchFilters,InfiniteLoading,AccordionContent
    },
    computed: {
       ...mapState({
@@ -143,6 +147,7 @@ export default {
    }
 }
 div.more-header {
+   cursor: pointer;
    position: absolute;
    right:0;
    left: 0;
@@ -168,10 +173,6 @@ div.overlay-title {
 .pool-close { 
    font-size: 1.5em;
    cursor: pointer;
-   opacity: 0.6;
-}
-.pool-close:hover {
-   opacity: 1;
 }
 .summary {
    text-align: left;

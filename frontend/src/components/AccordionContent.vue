@@ -1,13 +1,14 @@
 <template>
    <div class="accordion">
-      <div class="title" @click="accordionClicked" :class="align">
+      <div class="title" @click="accordionClicked" :class="align" 
+         :style="{ background: background, color: color }">
          <span class="text">{{title}}</span>
-         <i class="accordion-icon fas fa-angle-down" v-bind:style="{ transform: rotation }"></i>
+         <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
       </div>
        <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="accordion-content"  v-show="isExpanded">
+         <div class="accordion-content"  v-show="isExpanded" :style="{ background: background, color: color }">
             <slot></slot>
          </div>
       </transition>
@@ -22,6 +23,14 @@ export default {
       align: {
          type: String,
          default: "right"
+      },
+      background: {
+         type: String,
+         default: "#f5f5f5"
+      },
+      color: {
+         type: String,
+         default: "#666666"
       },
       watched: {
          type: Array,
@@ -92,8 +101,14 @@ export default {
 div.title.right {
    text-align: right;
 }
-div.title.left {
+div.title.left,  div.title.left-narrow {
    text-align: left;
+}
+div.title.left-narrow {
+   padding: 0;
+}
+div.title.left-narrow .accordion-icon {
+   float: unset;
 }
 
 div.title.left .accordion-icon {
@@ -104,7 +119,6 @@ div.title {
    text-align: right;
    cursor: pointer;
    margin: 0;
-   color: #666;
    background: #f5f5f5;
    padding: 3px 12px;
 }

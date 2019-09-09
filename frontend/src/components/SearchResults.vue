@@ -34,6 +34,10 @@
             <div class="pool-titlebar">
                <span>{{result.pool.summary}}</span>
                <i @click="toggleVisibility(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
+               <AccordionContent title="Description"  align="left-narrow" 
+                  background="var(--color-primary-orange)" color="white">
+                  {{result.pool.description}}
+               </AccordionContent>
             </div>
             <div class="pool-info">
                <div class="metrics">
@@ -53,7 +57,7 @@
                <SearchHit :pool="result.pool.id" :hit="hit" :key="hit.id"/>
             </template>
             <div @click="selectPool(visibleIdx)" class="more-panel">
-               See More Results&nbsp;<i class="more-icon fas fa-arrow-circle-right"></i>
+               See More Results&nbsp;<i class="more-icon fas fa-external-link-square-alt"></i>
             </div>
          </div>
       </div>
@@ -65,9 +69,10 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
+import AccordionContent from '@/components/AccordionContent'
 export default {
    components: {
-      SearchHit
+      SearchHit,AccordionContent
    },
    computed: {
       ...mapGetters({
@@ -115,6 +120,9 @@ export default {
 </script>
 
 <style scoped>
+div.accordion {
+   font-size: 0.9em;
+}
 .pool-buttons {
    margin-top: 5px;
    text-align: left;
@@ -125,11 +133,7 @@ export default {
 .hide-pool {
    float: right;
    cursor: pointer;
-   opacity: 0.6;
    font-size: 1.5em;
-}
-.hide-pool:hover {
-   opacity: 1;
 }
 .pool-info {
    border-right: 1px solid #ccc;
@@ -237,7 +241,7 @@ div.pools {
    display: inline-block;
 }
 .pool-titlebar {
-   padding: 10px 8px 10px 10px;
+   padding: 10px 8px 5px 10px;
    background-color: var(--color-primary-orange);
    color: white;
    font-weight: bold;

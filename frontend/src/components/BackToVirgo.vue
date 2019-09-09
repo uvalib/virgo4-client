@@ -1,7 +1,7 @@
 <template>
    <div class="controls">
       <router-link to="/">
-         <span class="pure-button pure-button-primary">Return to Virgo</span>
+         <span class="pure-button pure-button-primary"><i class="fas fa-arrow-circle-left"></i>&nbsp;Return to Virgo</span>
       </router-link>
    </div>
 </template>
