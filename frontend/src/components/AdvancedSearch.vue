@@ -44,7 +44,9 @@
       </div>
       <div class="controls">
         <span @click="addClicked" class="add pure-button pure-button-secondary">Add Criteria</span>
-        <PoolSetup/>
+        <router-link to="/sources">
+          <span class="add pure-button pure-button-secondary">Sources</span>
+        </router-link>
         <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">
@@ -56,13 +58,9 @@
 </template>
 
 <script>
-import PoolSetup from "@/components/popovers/PoolSetup"
 import { mapMultiRowFields } from 'vuex-map-fields'
 import { mapGetters } from "vuex"
 export default {
-   components: {
-     PoolSetup
-   },
    computed: {
       ...mapGetters({
         queryEntered: 'query/queryEntered',

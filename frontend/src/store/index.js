@@ -290,7 +290,7 @@ export default new Vuex.Store({
 
     // Call getConfig at startup to get client configuration parameters
     getConfig(ctx) {
-      axios.get("/config").then((response) => {
+      return axios.get("/config").then((response) => {
         ctx.commit('setConfig', response.data)
       }).catch((error) => {
         ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)

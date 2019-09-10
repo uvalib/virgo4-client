@@ -19,10 +19,12 @@
                <div v-else-if="poolFailed(r)" :key="idx" 
                   class="pool pure-button disabled failed"
                   :title="r.statusMessage">
+                  <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
                   {{r.pool.name}} <span class="total">(failed)</span>
                </div>
                <div v-else @click="toggleVisibility(idx)" :key="idx" 
                   class="pool pure-button" v-bind:class="{showing: r.show, disabled: r.total==0}">
+                  <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
                   {{r.pool.name}} <span class="total">({{r.total}})</span>
                </div>
             </template>
@@ -32,8 +34,13 @@
       <div class="pools"> 
          <div class="pool-panel" v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
             <div class="pool-titlebar">
-               <span>{{result.pool.summary}}</span>
-               <i @click="toggleVisibility(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
+               <div class="title1">
+                  <i v-if="isTargetPool(result.pool.url)" class="fas fa-star"></i>
+                  <i @click="toggleVisibility(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
+               </div>
+               <div class="title2">
+                  <span>{{result.pool.summary}}</span>
+               </div>
                <AccordionContent title="Description"  align="left-narrow" 
                   background="var(--color-primary-orange)" color="white">
                   {{result.pool.description}}
@@ -83,11 +90,12 @@ export default {
          failedPoolCount: 'failedPoolCount',
          hasFilter: 'filters/hasFilter',
          poolFilter: 'filters/poolFilter',
+         isTargetPool: "pools/isTargetPool",
       }),
       ...mapState({
          total: state=>state.total,
          results: state=>state.results,
-         searchMode: state=>state.query.mode
+         searchMode: state=>state.query.mode,
       }),
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
@@ -122,18 +130,15 @@ export default {
 <style scoped>
 div.accordion {
    font-size: 0.9em;
+   padding: 0 10px 5px 10px;
 }
 .pool-buttons {
-   margin-top: 5px;
+   margin: 5px 0;
    text-align: left;
    display: flex;
    flex-flow: row wrap;
    align-items: center;
-}
-.hide-pool {
-   float: right;
-   cursor: pointer;
-   font-size: 1.5em;
+   justify-content: space-between;
 }
 .pool-info {
    border-right: 1px solid #ccc;
@@ -187,8 +192,8 @@ div.right-indent {
 }
 .pool.pure-button {
    margin: 5px;
-   padding: 5px 20px;
-   border-radius:    5px;
+   padding: 5px 10px;
+   border-radius: 5px;
    font-size: 0.85em;
    font-weight: bold;
    color: #666;
@@ -212,10 +217,11 @@ div.right-indent {
 div.pools {
    display: grid;
    grid-gap: 10px;
-   grid-template-columns: repeat(auto-fill, minmax(350px, 5fr) ) ;
+   padding: 0 5px;
+   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr) ) ;
 }
 .pool-panel {
-   margin: 5px;
+   margin: 0;
    padding: 0;
    color: #333;
 }
@@ -240,14 +246,37 @@ div.pools {
    margin-left: 5px;
    display: inline-block;
 }
+
 .pool-titlebar {
-   padding: 10px 8px 5px 10px;
+   padding: 0;
    background-color: var(--color-primary-orange);
    color: white;
    font-weight: bold;
    font-size: 0.9em;
    border-radius: 5px 5px 0 0;
+   
 }
+.title1 {
+   padding: 5px 4px 3px 4px;
+   display: flex;
+   flex-flow: row;
+   align-items: flex-start;
+   justify-content: space-between;
+   border-radius: 5px 5px 0 0;
+   background: var(--color-dark-orange);
+}
+.title1 .hide-pool {
+   cursor: pointer;
+   font-size: 1.5em;
+   margin-left: auto; /* put close on right */
+}
+.title1 i.fas.fa-star {
+   font-size: 1.25em;
+}
+.title2 {
+   padding: 2px 10px 0 10px;
+}
+
 .query-summary {
    text-align: left;
    margin: 0 0 0.2vw 0;

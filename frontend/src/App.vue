@@ -69,12 +69,13 @@ export default {
 /* Color variable definitions */
 :root {
    --color-primary-orange: #E57200;
+   --color-dark-orange: #ac4400;
    --color-link: #007ae7;
-   --color-primary-blue: #007ae7;
-   --color-pale-blue: #459CED;
+   --color-primary-blue: #0052cc;
+   --color-pale-blue: #5d7eff;
    --color-secondary-blue: #002359;
-   --color-primary-text: #555;
-   --color-dark-blue: rgb(0, 47, 108);
+   --color-primary-text: #444;
+   --color-dark-blue: #002f6c;
    --color-hover-highight: #f5f5f4;
    --color-error: firebrick;
 }
@@ -86,14 +87,14 @@ export default {
   opacity: 0;
 }
 
+#app .pure-button.pure-button-primary {
+  background-color: var(--color-primary-blue);
+} 
+
 #app .pure-button.pure-button-secondary {
-   background: var(--color-pale-blue);
+   background-color: var(--color-pale-blue);
    color: white;
    border-radius: 5px;
-   opacity: 0.9;
-}
-#app .pure-button.pure-button-secondary:hover {
-  opacity: 1;
 }
 
 #app .dimmer {

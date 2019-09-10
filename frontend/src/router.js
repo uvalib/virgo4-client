@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
+import Sources from './views/Sources.vue'
 import SignIn from './views/SignIn.vue'
 import Account from './views/Account.vue'
 import Bookmarks from './views/Bookmarks.vue'
@@ -19,6 +20,14 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: Home,
+      beforeEnter: (_to, _from, next) => {
+        ensureAuthTokenPresent(next)
+      }
+    },
+    {
+      path: '/sources',
+      name: 'sources',
+      component: Sources,
       beforeEnter: (_to, _from, next) => {
         ensureAuthTokenPresent(next)
       }

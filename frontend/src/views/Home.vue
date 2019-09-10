@@ -21,7 +21,9 @@
               placeholder="Search Virgo for books, articles and more"
           >
           <div class="controls">
-            <PoolSetup/>
+            <router-link to="/sources">
+              <span class="add pure-button pure-button-secondary">Sources</span>
+            </router-link>
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
           <div class="advanced">
@@ -53,13 +55,12 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
-import PoolSetup from "@/components/popovers/PoolSetup"
 import SearchTips from "@/components/popovers/SearchTips"
 import AdvancedSearch from "@/components/AdvancedSearch"
 export default {
    name: "home",
    components: {
-     SearchResults, PoolSetup,
+     SearchResults,
      SearchTips, AdvancedSearch
    },
    computed: {
@@ -123,18 +124,12 @@ div.searching-box {
    div.searching-box {
     padding: 20px 90px;
    }
-   #keyword {
-    padding: 0.5vw 0.75vw;
-   }
 }
 @media only screen and (max-width: 768px) {
    div.searching-box {
        width: 95%;
        padding: 20px 0;
        margin-top:30%;
-   }
-   #keyword {
-      padding: 5px 10px;
    }
    div.tips-container {
      display: none;

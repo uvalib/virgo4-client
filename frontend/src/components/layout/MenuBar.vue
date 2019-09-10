@@ -1,33 +1,40 @@
 <template>
    <nav class="menu">
-      <template v-if="isSignedIn">
-         <span @click="toggleMenu" class="menu-item account">
-            <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
-            <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
-            <transition name="grow"
-               v-on:before-enter="beforeEnter" v-on:enter="enter"
-               v-on:before-leave="beforeLeave" v-on:leave="leave">
-               <div @click="blockToggle" v-if="userMenuOpen" class="user-menu" >
-                  <router-link to="/account">
-                     <div class="submenu">Account Info</div>
-                  </router-link>
-                  <router-link to="/bookmarks">
-                     <div class="submenu">Bookmarks</div>
-                  </router-link>
-                  <div  @click="signOut" class="submenu">
-                     <span>Sign out</span>
-                  </div>
-               </div>
-            </transition>
-         </span>
-      </template>   
-      <template v-else>
-         <router-link to="/signin">
-            <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
+      <span class="menu-left">
+         <router-link to="/">
+            <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
          </router-link>
-      </template>
-      <span class="menu-item">
-         <Feedback icon/>
+      </span>
+      <span class="menu-right">
+         <template v-if="isSignedIn">
+            <span @click="toggleMenu" class="menu-item account">
+               <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
+               <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
+               <transition name="grow"
+                  v-on:before-enter="beforeEnter" v-on:enter="enter"
+                  v-on:before-leave="beforeLeave" v-on:leave="leave">
+                  <div @click="blockToggle" v-if="userMenuOpen" class="user-menu" >
+                     <router-link to="/account">
+                        <div class="submenu">Account Info</div>
+                     </router-link>
+                     <router-link to="/bookmarks">
+                        <div class="submenu">Bookmarks</div>
+                     </router-link>
+                     <div  @click="signOut" class="submenu">
+                        <span>Sign out</span>
+                     </div>
+                  </div>
+               </transition>
+            </span>
+         </template>   
+         <template v-else>
+            <router-link to="/signin">
+               <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
+            </router-link>
+         </template>
+         <span class="menu-item">
+            <Feedback icon/>
+         </span>
       </span>
    </nav>
 </template>
@@ -96,17 +103,20 @@ export default {
    display: flex;
    flex-flow: row wrap;
    align-items: center;
-   justify-content: flex-end;
+   justify-content: space-between;
 }
-#app .menu a {
+.menu a {
    color: white;
 }
-#app .menu .menu-item {
+.menu .menu-item {
    cursor: pointer;
    color: white;
    flex: 0 1 auto;
    display: inline-block;
    margin-left: 25px;
+}
+.menu-item:first-child {
+   margin-left: 0px;
 }
 .menu-item.account {
    position: relative;

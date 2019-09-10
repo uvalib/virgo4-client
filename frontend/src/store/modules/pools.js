@@ -10,6 +10,13 @@ const pools = {
    },
 
    getters: {
+      sortedList: state => {
+         return state.list.sort( (a,b) => {
+            if (a.name < b.name) return -1 
+            if (a.name > b.name) return 1 
+            return 0
+         })
+      },
       isTargetPool: state => poolURL => {
          return state.targetPoolURL == poolURL
       },
@@ -43,6 +50,9 @@ const pools = {
             state.excludePoolURLs.splice(idx, 1)
          } else {
             state.excludePoolURLs.push(poolURL)
+            if (state.targetPoolURL == poolURL ) {
+               state.targetPoolURL = ""
+            }
          }
       },
       toggleTargetPool(state, poolURL) {
