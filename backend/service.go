@@ -117,7 +117,7 @@ func (svc *ServiceContext) IsAuthenticated(c *gin.Context) {
 	}
 	if out.SignedIn {
 		log.Printf("auth token found and signed in. This is a UVA user")
-		c.String(http.StatusNotFound, "%s is for UVA user", token)
+		c.String(http.StatusOK, "%s is a UVA user", token)
 	} else {
 		log.Printf("auth token found, but not signed in. Not a UVA user")
 		c.String(http.StatusNotFound, "%s not signed in", token)
