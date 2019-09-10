@@ -77,8 +77,7 @@ export default {
       },
       basicClicked() {
         this.$store.commit("query/clear")
-        this.$store.commit("query/setBasicSearch")
-        this.$store.commit("resetSearch")
+        this.$store.commit("resetSearchResults")
       },
       addClicked() {
         this.$store.commit("query/addCriteria")

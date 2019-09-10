@@ -212,7 +212,7 @@ export default new Vuex.Store({
       state.results[state.selectedResultsIdx].page++
     },
 
-    resetSearch(state) {
+    resetSearchResults(state) {
       state.results = []
       state.total = -1
       state.visibleResults = []

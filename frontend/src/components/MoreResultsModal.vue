@@ -7,7 +7,10 @@
                <i class="pool-close fas fa-arrow-circle-right"></i>
             </div>
             <AccordionContent title="Description" align="left-narrow" 
-               background="var(--color-primary-orange)" color="white">
+               background="var(--color-primary-orange)" color="white"
+               v-on:accordion-collapsed="calcHeaderHeight"
+               v-on:accordion-expanded="calcHeaderHeight"
+            >
                {{selectedResults.pool.description}}
             </AccordionContent>
             <SearchFilters />
@@ -118,7 +121,17 @@ export default {
 }
 </script>
 
+<style>
+div.infinite-status-prompt {
+   background-color: var(--color-primary-orange);
+   color: white;
+   font-weight: 500;
+   padding: 5px 0 0 0;
+}
+</style>
+
 <style scoped>
+
 .more-results-overlay {
    position: fixed;
    left: 0;

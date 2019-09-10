@@ -78,6 +78,9 @@ export default {
       enter: function(el) {
          el.style.height = el.scrollHeight + 'px'
          this.expandedItem = el
+         setTimeout( ()=> {
+            this.$emit('accordion-expanded')
+         }, 250)
       },
       beforeLeave: function(el) {
          el.style.height = el.scrollHeight + 'px'
@@ -85,6 +88,9 @@ export default {
       },
       leave: function(el) {
          el.style.height = '0'
+         setTimeout( ()=> {
+            this.$emit('accordion-collapsed')
+         }, 250)
       }
    }
 };

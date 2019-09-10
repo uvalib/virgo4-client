@@ -98,7 +98,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	// Generate a cookie with auth info
-	authStr := fmt.Sprintf("%s|%s|public", auth.Barcode, authToken)
+	authStr := fmt.Sprintf("%s|%s|pin", auth.Barcode, authToken)
 	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
 	c.String(http.StatusOK, auth.Barcode)
 }
@@ -164,20 +164,6 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 		log.Printf("Authentication failed: [%s]", err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
-	}
-
-	u := NewUserSettings()
-	q := svc.DB.NewQuery(`select * from users where auth_token={:token}`)
-	q.Bind(dbx.Params{"token": token})
-	err = q.One(u)
-	if err == nil {
-		log.Printf("Update auth token expiration for %s", u.Virgo4ID)
-		q := svc.DB.NewQuery(`update users set auth_updated_at={:d} where id={:id}`)
-		q.Bind(dbx.Params{"d": time.Now()})
-		q.Bind(dbx.Params{"id": u.ID})
-		q.Execute()
-		authStr := fmt.Sprintf("%s|%s|public", u.Virgo4ID, token)
-		c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
 	}
 
 	// add the cookie to the request context so other handlers can access it.

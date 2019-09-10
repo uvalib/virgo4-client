@@ -71,6 +71,8 @@ const query = {
          state.advanced.splice(idx,1)
        },
       clear(state) {
+         state.mode = "basic"
+         state.basic = ""
          state.advanced = [
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""}]

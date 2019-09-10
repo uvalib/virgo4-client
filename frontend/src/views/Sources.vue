@@ -58,11 +58,11 @@ export default {
    },
    methods: {
       toggleTargetPool(url) {
-         this.$store.commit("resetSearch")
+         this.$store.commit("resetSearchResults")
          this.$store.commit("pools/toggleTargetPool", url)
       },
       toggleExcludePool(url) {
-         this.$store.commit("resetSearch")
+         this.$store.commit("resetSearchResults")
          this.$store.commit("pools/toggleExcludePool", url)
       }
    },
