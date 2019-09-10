@@ -92,13 +92,15 @@ export default {
         event.stopPropagation() 
       },
       loadMoreResults($state) {
+         if ( this.searching) return
+
          if (this.hasMoreHits) {
             this.$store.dispatch("moreResults").finally( ()=> {
                $state.loaded()
             })
          } else {
             $state.loaded()
-            $state.complete()
+            $state.complete() 
          }
       },
       closePool() {

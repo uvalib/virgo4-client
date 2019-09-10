@@ -146,7 +146,6 @@ func (svc *ServiceContext) SignoutUser(c *gin.Context) {
 	} else {
 		user.AuthUpdatedAt = time.Now()
 		user.SignedIn = false
-		user.AuthToken += "_signedout"
 		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
 		if err != nil {
 			log.Printf("WARN: Unable to update users table for %s: %v", userID, err)

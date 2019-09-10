@@ -105,10 +105,13 @@ export default {
    align-items: center;
    justify-content: space-between;
 }
-.menu a {
+#app .menu a {
    color: white;
 }
-.menu .menu-item {
+#app .menu a:hover {
+   text-decoration: none;
+}
+#app .menu .menu-item {
    cursor: pointer;
    color: white;
    flex: 0 1 auto;
