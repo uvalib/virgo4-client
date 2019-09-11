@@ -22,6 +22,7 @@
             </template>
             <infinite-loading @infinite="loadMoreResults" ref="infiniteLoader" >
                <span slot="no-more">No more matches</span>
+               <span slot="spinner"><img src="../assets/searching.gif"></span>
             </infinite-loading>
          </div>
       </div>
@@ -127,6 +128,10 @@ div.infinite-status-prompt {
    color: white;
    font-weight: 500;
    padding: 5px 0 0 0;
+}
+div.infinite-status-prompt  .loading-default {
+   color: white;
+   border: 1px solid white;
 }
 </style>
 

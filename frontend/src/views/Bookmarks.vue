@@ -12,7 +12,12 @@
             </p>
             <template v-else>
                <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
-                  <i @click="removeFolder(folderInfo.id)" class="remove-folder fas fa-trash-alt"></i>
+                  <ConfirmDelete
+                     v-on:delete-approved="removeFolder(folderInfo.id)">
+                     <div>Delete bookmark folder <b>{{folderInfo.folder}}</b>? All bookmarks</div>
+                     <div>contained within it will also be deleted.</div> 
+                     <div><br/>This cannot be reversed.</div>
+                  </ConfirmDelete>
                   <AccordionContent :title="folderInfo.folder" align="left">
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
@@ -38,12 +43,13 @@
 
 <script>
 import { mapGetters } from "vuex"
+import ConfirmDelete from "@/components/popovers/ConfirmDelete"
 import BackToVirgo from "@/components/BackToVirgo"
 import AccordionContent from "@/components/AccordionContent"
 export default {
    name: "bookmarks",
    components: {
-      BackToVirgo,AccordionContent
+      BackToVirgo,AccordionContent,ConfirmDelete
    },
    data: function() {
       return {
@@ -58,10 +64,10 @@ export default {
    },
    methods: {
       removeBookmark(id) {
-          this.$store.dispatch("user/removeBookmark", id)
+         this.$store.dispatch("user/removeBookmark", id)
       },
       removeFolder(folderID) {
-          this.$store.dispatch("user/removeFolder", folderID)
+         this.$store.dispatch("user/removeFolder", folderID)
       }
    },
    created() {
@@ -75,14 +81,10 @@ export default {
 
 <style scoped>
 .remove, .remove-folder {
-   color: #666;
-   opacity: 0.6;
+   color: #999;
    cursor: pointer;
    font-size: 1.2em;
    padding: 2px 8px 2px 0;
-}
-.remove:hover, .remove-folder:hover {
-   opacity: 1;
 }
 div.folder {
    display: flex;

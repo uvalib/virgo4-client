@@ -14,6 +14,7 @@ export default new Vuex.Store({
     searchAPI: "",
     fatal: "",
     error: "",
+    noSpinner: false,
     searching: false,
     pageSize: 25,
     results: [],
@@ -116,7 +117,11 @@ export default new Vuex.Store({
       state.searchAPI = cfg.searchAPI
     },
     setSearching(state, flag) {
-      state.searching = flag
+      if (state.noSpinner ) {
+        state.noSpinner = false
+      } else {
+        state.searching = flag
+      }
     },
     selectPoolResults(state, visiblePoolIdx) {
       // User has selected a visible set of results to explore further. Convert
@@ -209,6 +214,7 @@ export default new Vuex.Store({
     },
 
     incrementPage(state) {
+      state.noSpinner = true
       state.results[state.selectedResultsIdx].page++
     },
 
@@ -217,7 +223,7 @@ export default new Vuex.Store({
       state.total = -1
       state.visibleResults = []
       state.selectedResultsIdx = -1
-    }
+    },
   },
 
   actions: {

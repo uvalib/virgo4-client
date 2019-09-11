@@ -1,25 +1,23 @@
 <template>
-   <p class="feedback">
-      <v-popover>
-         <span class="text-button trigger">
-            <span v-if="icon"><i class="fas fa-comments"></i>&nbsp;</span>
-            <span>Questions? Ask a Librarian</span>
-         </span>
-         <div class="feedback-container" slot="popover">
-            <div class="popover-header">
-               <span>Coming in 2020!</span>
-               <i v-close-popover class="close fas fa-times-circle"></i>
-            </div>
-            <div class="message">
-               <p>For now, direct all Virgo4 feedback to:</p>
-               <p>
-                  <a class="feedback" 
-                     href="mailto:lib-virgo4-feedback@virginia.edu">lib-virgo4-feedback@virginia.edu</a>
-               </p>
-            </div>
+   <v-popover>
+      <span class="trigger">
+         <span v-if="icon"><i class="fas fa-comments"></i>&nbsp;</span>
+         <span>Questions? Ask a Librarian</span>
+      </span>
+      <div class="feedback-container" slot="popover">
+         <div class="popover-header">
+            <span>Coming in 2020!</span>
+            <i v-close-popover class="close fas fa-times-circle"></i>
          </div>
-      </v-popover>
-   </p>
+         <div class="message">
+            <p>For now, direct all Virgo4 feedback to:</p>
+            <p>
+               <a class="feedback" 
+                  href="mailto:lib-virgo4-feedback@virginia.edu">lib-virgo4-feedback@virginia.edu</a>
+            </p>
+         </div>
+      </div>
+   </v-popover>
 </template>
 
 <script>
@@ -60,16 +58,6 @@ i.fas.fa-times-circle.close:hover {
    opacity: 1;
    cursor: pointer;
 }
-span.text-button.trigger {
-   opacity: 1;
-   font-weight: 500;
-   color: white;
-}
-p.feedback {
-   display: inline-block;
-   color: white;
-   margin: 0;
-}
 div.message {
    padding: 20px;
    text-align: center;
@@ -83,7 +71,4 @@ a.feedback {
    font-weight: 500;
    text-decoration: none;
 }
-#app p.feedback .text-button:hover {
-   text-decoration: none;
-} 
 </style>
