@@ -46,7 +46,7 @@ export default {
       BackToVirgo//,AccordionContent
    },
    computed: {
-       ...mapState({
+      ...mapState({
          lookingUp : state => state.pools.lookingUp,
          searchAPI: state => state.searchAPI
       }),

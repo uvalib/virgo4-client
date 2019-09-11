@@ -57,7 +57,7 @@ export default {
    },
    methods: {
       addFolder(newFolder) {
-         this.$store.dispatch("user/addFolder", newFolder).then(_response => {
+         this.$store.dispatch("user/addFolder", newFolder).then( () => {
             this.folders.some( (f)=> {
                if (f.name == newFolder) {
                   this.selectedFolder = f
@@ -75,7 +75,7 @@ export default {
             this.bookmarkError = "A bookmark folder selection is required"
             return
          } 
-         this.$store.dispatch("user/addBookmark", this.selectedFolder.name).then(_response => {
+         this.$store.dispatch("user/addBookmark", this.selectedFolder.name).then( () => {
             this.$store.commit("user/closeAddBookmark")
          }).catch((error) => {
             this.bookmarkError = error
@@ -87,7 +87,7 @@ export default {
    },
    created() {
       this.lookingUp = true
-      this.$store.dispatch("user/getBookmarks").then(_response => {
+      this.$store.dispatch("user/getBookmarks").then(() => {
          this.lookingUp = false
       })
    }

@@ -175,19 +175,19 @@ const user = {
             ctx.commit('setBookmarks', response.data)
          })
       },
-      async removeFolder(ctx, folderID) {
+      removeFolder(ctx, folderID) {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders/${folderID}`
-         await axios.delete(url).then((response) => {
+         axios.delete(url).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
             ctx.commit('setError', error, { root: true })
          })
       },
-      async removeBookmark(ctx, bmID) {
+      removeBookmark(ctx, bmID) {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items/${bmID}`
-         await axios.delete(url).then((response) => {
+         axios.delete(url).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
             ctx.commit('setError', error, { root: true })
