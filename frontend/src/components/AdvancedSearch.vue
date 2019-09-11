@@ -14,12 +14,9 @@
             </select>
           </template>
           <select class="field" v-model="term.field">
-            <option value="keyword">Keyword</option>
-            <option value="identifier">Identifier</option>
-            <option value="title">Title</option>
-            <option value="author">Author</option>
-            <option value="subject">Subject</option>
-            <option value="date">Date</option>
+            <option  v-for="fieldObj in advancedFields" :key="fieldObj.value" :value="fieldObj.value">
+              {{fieldObj.label}}
+            </option>
           </select>
           <template v-if="term.field != 'date'">
             <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term"/>
@@ -60,8 +57,12 @@
 <script>
 import { mapMultiRowFields } from 'vuex-map-fields'
 import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 export default {
    computed: {
+     ...mapState({
+       advancedFields: state => state.query.advancedFields,
+     }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
       }),
@@ -165,5 +166,6 @@ div.basic {
 }
 #app span.add.pure-button.pure-button-secondary {
     margin-left: 0;
+    margin-right: 10px;
 }
 </style>

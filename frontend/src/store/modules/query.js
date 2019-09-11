@@ -8,10 +8,21 @@ const query = {
       advanced: [
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
+      ],
+      advancedFields: [
+         { value: "keyword", label: "Keyword"},
+         { value: "identifier", label: "Identifier"},
+         { value: "title", label: "Title"},
+         { value: "author", label: "Author"},
+         { value: "subject", label: "Subject"},
+         { value: "date", label: "Date"}
       ]
    },
    getters: {
       getField,
+      idQuery: () => id => {
+         return `identifier: {${id}}`
+      },
       queryEntered: state => {
          if ( state.mode == "basic") {
             return state.basic.length > 0
