@@ -75,7 +75,7 @@ const pools = {
          ctx.commit("setLookingUp", true)
          let url = ctx.rootState.searchAPI + "/api/pools"
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-         axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             ctx.commit('setPools', response.data)
             ctx.commit("setLookingUp", false)
          }).catch((error) => {

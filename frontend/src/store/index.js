@@ -76,6 +76,23 @@ export default new Vuex.Store({
         }
       })
       return poolCnt
+    },
+    getItemDetails: state => (pool,identifier) => {
+      let foundPool = false
+      let details = null 
+      state.results.some( result => {
+        if (result.pool.id == pool) {
+          foundPool = true 
+          result.hits.some( hit=> {
+            if (hit.identifier == identifier) {
+              details = hit  
+            }
+            return details != null  
+          })
+        }
+        return foundPool == true
+      })
+      return details
     }
   },
 
@@ -174,6 +191,17 @@ export default new Vuex.Store({
         tgtPool.total = poolResults.pagination.total
         state.total += poolResults.pagination.total
       }
+    },
+
+    setDetailResults(state, {pr, pool}) {
+      state.total = -1
+      state.results = []
+      state.visibleResults = []
+      mergeRepeatedFields( pr.record_list )
+      let result = { pool: pool, total: pr.pagination.total,
+        hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: 0,
+        statusCode: pr.status_code, statusMessage: pr.status_msg }
+      state.results.push(result)
     },
 
     setSearchResults(state, results) {
@@ -294,6 +322,52 @@ export default new Vuex.Store({
       })
     },
 
+    // Get items details by pool and item idntifier. Nothing to do if data is already
+    // in local state. Note use of async... it allows use of await on the supporting 
+    // dispatches to get config and get pools.
+    async getItemDetails(ctx, data) {
+      ctx.commit('setSearching', true)
+      let cached = ctx.rootGetters['getItemDetails'](data.source, data.identifier)
+      if (cached != null ) {
+        ctx.commit('setSearching', false)
+        return
+      }
+
+      // get source from poolID
+      let baseURL = ""
+      let pool = null
+      let pools = ctx.state.pools.list
+      if (pools.length == 0) {
+        if (ctx.state.searchAPI == "") {
+          await ctx.dispatch("getConfig")
+        }
+        await ctx.dispatch("pools/getPools")
+        pools = ctx.state.pools.list
+        pool = findPool(pools, data.source)
+        baseURL = pool.url
+      } else {
+        pool = findPool(pools, data.source)
+        baseURL = pool.url
+      }
+
+      // make identifier query
+      let req = {
+        query: ctx.rootGetters['query/idQuery'](data.identifier),
+        pagination: { start:0, rows: 1 },
+        filters: []
+      }
+
+      let url = `${baseURL}/api/search`
+      axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.user.authToken
+      axios.post(url, req).then((response) => {
+        ctx.commit('setDetailResults', {pr:response.data, pool: pool})
+        ctx.commit('setSearching', false)
+      }).catch((error) => {
+        ctx.commit('setError', error)
+        ctx.commit('setSearching', false)
+      })
+    },
+
     // Call getConfig at startup to get client configuration parameters
     getConfig(ctx) {
       return axios.get("/config").then((response) => {
@@ -323,10 +397,11 @@ export default new Vuex.Store({
 // Find a pool by internal identifier
 function findPool(pools, id) {
   let match = null
-  pools.forEach(function (p) {
+  pools.some(function (p) {
      if (p.id == id) {
         match = p
      }
+     return match != null
   })
   return match
 }

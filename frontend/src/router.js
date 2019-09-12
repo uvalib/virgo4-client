@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
+import Details from './views/Details.vue'
 import Sources from './views/Sources.vue'
 import SignIn from './views/SignIn.vue'
 import Account from './views/Account.vue'
@@ -20,6 +21,14 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: Home,
+      beforeEnter: (_to, _from, next) => {
+        ensureAuthTokenPresent(next)
+      }
+    },
+    {
+      path: '/sources/:src/items/:id',
+      name: 'details',
+      component: Details,
       beforeEnter: (_to, _from, next) => {
         ensureAuthTokenPresent(next)
       }
@@ -131,8 +140,7 @@ function ensureAuthTokenPresent(next) {
 
   // No token. Request one and WAIT FOR RESPONSE before calling next()
   // console.log("REQUEST AUTH")
-  store.dispatch("user/getAuthToken")
-  store.dispatch("user/getAuthToken").then(_response => {
+  store.dispatch("user/getAuthToken").then( ()=> {
     next()
   }).catch((_error) => {
     next("/")

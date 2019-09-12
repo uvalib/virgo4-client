@@ -5,14 +5,16 @@
          <i @click="addBookmarkClicked" class="bookmark far fa-bookmark" v-else></i> 
       </div>
       <div class="basic">
-         <table class="fields">
-            <tr v-for="field in hit.basicFields" :key="getKey(field)">
-               <template v-if="field.display != 'optional'">
-                  <td class="label">{{field.label}}:</td>
-                  <td class="value" v-html="fieldValueString(field)"></td>
-               </template>
-            </tr>
-         </table>
+         <router-link :to="detailsURL">
+            <table class="fields">
+               <tr v-for="field in hit.basicFields" :key="getKey(field)">
+                  <template v-if="field.display != 'optional'">
+                     <td class="label">{{field.label}}:</td>
+                     <td class="value" v-html="fieldValueString(field)"></td>
+                  </template>
+               </tr>
+            </table>
+         </router-link>
          <div class="preview">
             <img v-if="hit.previewURL" :src="hit.previewURL"/>
          </div>
@@ -43,6 +45,9 @@ export default {
         isSignedIn: 'user/isSignedIn',
         bookmarks: 'user/bookmarks'
       }),
+      detailsURL() {
+         return `/sources/${this.pool}/items/${this.hit.identifier}`
+      },
       isBookmarked() {
          let found = false
          this.bookmarks.some( folder => {
@@ -101,7 +106,7 @@ export default {
          }
          if (field.type == "url") {
             return `<a href="${field.value}" class="pure-button pure-button-primary ext" target="_blank">External Link&nbsp;&nbsp;<i class="fas fa-external-link-alt"></i></a>`
-         }
+         } 
          return field.value
       },
    }
@@ -109,6 +114,12 @@ export default {
 </script>
 
 <style scoped>
+#app .basic a {
+   color: var(--color-primary-text)
+}
+#app .basic a:hover {
+   text-decoration: none;
+}
 div.bookmark-bar {
    padding: 6px 0 0 6px;
    float: left;
@@ -151,16 +162,14 @@ div.preview {
    font-size: 0.8em;
 }
  #app td.value >>> a.pure-button.pure-button-primary.ext {
-   background-color:var(--color-primary-blue);
+   background-color:var(--color-pale-blue);
    color: white; 
    padding: 3px 0px;
    width: 100%;
+   border-radius: 5px;
 }
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
    text-decoration: none;  
-}
-.hit .value .pure-button.ext-link:hover {
-   text-decoration: none;
 }
 .htt table {
    table-layout: auto;
@@ -175,5 +184,6 @@ div.preview {
 }
 .hit table td.value {
    width: 100%;
+   font-weight: normal;
 }
 </style>
