@@ -32,7 +32,7 @@ import { mapState } from "vuex"
 export default {
    computed: {
       ...mapState({
-         version: state => state.version
+         version: state => state.system.version
       })
    },
    data: function() {
@@ -41,7 +41,7 @@ export default {
       }
    },
    mounted() {
-      this.$store.dispatch("getVersion")
+      this.$store.dispatch("system/getVersion")
    }
 }
 </script>

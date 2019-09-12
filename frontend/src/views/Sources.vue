@@ -39,16 +39,15 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import BackToVirgo from "@/components/BackToVirgo"
-// import AccordionContent from "@/components/AccordionContent"
 export default {
    name: "sources",
    components: {
-      BackToVirgo//,AccordionContent
+      BackToVirgo
    },
    computed: {
       ...mapState({
          lookingUp : state => state.pools.lookingUp,
-         searchAPI: state => state.searchAPI
+         searchAPI: state => state.system.searchAPI
       }),
       ...mapGetters({
          isPoolExcluded: "pools/isPoolExcluded",
@@ -68,7 +67,7 @@ export default {
    },
    created() {
       if ( this.searchAPI.length == 0) {
-         this.$store.dispatch('getConfig').then(_response => {
+         this.$store.dispatch('system/getConfig').then(_response => {
             this.$store.dispatch('pools/getPools')
          })
       } else {

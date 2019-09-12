@@ -73,7 +73,7 @@ export default {
         if (this.queryEntered ) {
           this.$store.dispatch("searchAllPools")
         } else {
-          this.$store.commit('setError', "Please enter a search query")
+          this.$store.commit('system/setError', "Please enter a search query")
         }
       },
       basicClicked() {

@@ -50,7 +50,7 @@ export default {
    computed: {
       ...mapState({
          signedInUser: state => state.user.signedInUser,
-         userMenuOpen: state => state.userMenuOpen
+         userMenuOpen: state => state.system.userMenuOpen
       }),
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
@@ -71,7 +71,7 @@ export default {
       },
       toggleMenu(e) {
          e.stopPropagation()
-         this.$store.commit("toggleUserMenu")
+         this.$store.commit("system/toggleUserMenu")
       },
       signOut() {
          this.$store.dispatch("user/signout")

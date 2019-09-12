@@ -65,8 +65,8 @@ export default {
    },
    computed: {
       ...mapState({
-         fatal: state => state.fatal,
-         error: state => state.error,
+         fatal: state => state.system.fatal,
+         error: state => state.system.error,
          searching: state => state.searching,
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
@@ -85,14 +85,14 @@ export default {
       },
    },
    created: function() {
-      this.$store.dispatch("getConfig")
+      this.$store.dispatch("system/getConfig")
    },
    methods: {
       searchClicked() {
         if (this.queryEntered ) {
           this.$store.dispatch("searchAllPools")
         } else {
-          this.$store.commit('setError', "Please enter a search query")
+          this.$store.commit('system/setError', "Please enter a search query")
         }
       },
       advancedClicked() {

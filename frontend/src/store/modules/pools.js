@@ -65,7 +65,7 @@ const pools = {
       setPools(state, data) {
          state.list = data
          if (state.list.length == 0) {
-            state.fatal = "No search pools configured"
+            state.system.fatal = "No search pools configured"
          }
       },
    },
@@ -73,13 +73,13 @@ const pools = {
    actions: {
       getPools(ctx) {
          ctx.commit("setLookingUp", true)
-         let url = ctx.rootState.searchAPI + "/api/pools"
+         let url = ctx.rootState.system.searchAPI + "/api/pools"
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          return axios.get(url).then((response) => {
             ctx.commit('setPools', response.data)
             ctx.commit("setLookingUp", false)
          }).catch((error) => {
-            ctx.commit('setFatal', "Unable to get pools: " + error.response.data, { root: true })
+            ctx.commit('system/setFatal', "Unable to get pools: " + error.response.data, { root: true })
             ctx.commit("setLookingUp", false)
          })
       },

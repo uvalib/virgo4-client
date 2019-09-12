@@ -151,7 +151,7 @@ const filters = {
                facets: response.data.facet_list})
             ctx.commit('setUpdatingBuckets', false)
          }).catch((error) => {
-            ctx.commit('setError', error, { root: true })
+            ctx.commit('system/setError', error, { root: true })
             ctx.commit('setUpdatingBuckets', false)
           })
       }

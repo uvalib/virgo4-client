@@ -108,7 +108,7 @@ const user = {
           ctx.commit('setAuthorizing', false)
         }).catch((error) => {
           ctx.commit('setAuthToken', '')
-          ctx.commit('setFatal', "Authorization failed: " + error.response.data, { root: true })
+          ctx.commit('system/setFatal', "Authorization failed: " + error.response.data, { root: true })
           ctx.commit('setAuthorizing', false)
         })
       },
@@ -117,7 +117,7 @@ const user = {
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
           }).catch((error) => {
-            ctx.commit('setError', error, { root: true })
+            ctx.commit('system/setError', error, { root: true })
           })
       },
       signout(ctx) {
@@ -155,7 +155,7 @@ const user = {
          return axios.get(`/api/users/${ctx.state.signedInUser}/bookmarks`).then((response) => {
             ctx.commit('setBookmarks', response.data)
           }).catch((error) => {
-            ctx.commit('setError', error, { root: true })
+            ctx.commit('system/setError', error, { root: true })
           })
       },
       addBookmark(ctx, folder ) {
@@ -181,7 +181,7 @@ const user = {
          axios.delete(url).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
-            ctx.commit('setError', error, { root: true })
+            ctx.commit('system/setError', error, { root: true })
          })
       },
       removeBookmark(ctx, bmID) {
@@ -190,7 +190,7 @@ const user = {
          axios.delete(url).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
-            ctx.commit('setError', error, { root: true })
+            ctx.commit('system/setError', error, { root: true })
          })
       },
    }

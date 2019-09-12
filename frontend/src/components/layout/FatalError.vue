@@ -12,7 +12,7 @@ import { mapState } from "vuex"
 export default {
    computed: {
       ...mapState({
-         fatal: state => state.fatal,
+         fatal: state => state.system.fatal,
       }),
    }
 }

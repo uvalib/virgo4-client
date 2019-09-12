@@ -42,7 +42,7 @@ export default {
    },
    computed: {
       ...mapState({
-         fatal: state => state.fatal,
+         fatal: state => state.system.fatal,
          selectedResultsIdx: state => state.selectedResultsIdx,
          authorizing: state => state.user.authorizing,
          addingBookmark: state => state.user.addingBookmark
@@ -59,7 +59,7 @@ export default {
    },
    methods: {
      closeUserMenu() {
-       this.$store.commit("closeUserMenu")
+       this.$store.commit("system/closeUserMenu")
      }
    }
 };

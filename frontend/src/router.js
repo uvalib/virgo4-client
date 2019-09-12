@@ -61,7 +61,7 @@ const router = new Router({
       name: 'account',
       component: Account,
       beforeEnter: (_to, _from, next) => {
-        store.commit("closeUserMenu")
+        store.commit("system/closeUserMenu")
         if (getSignedInUserFromCookie()) {
           next()
         } else {
@@ -74,7 +74,7 @@ const router = new Router({
       name: 'bookmarks',
       component: Bookmarks,
       beforeEnter: (_to, _from, next) => {
-        store.commit("closeUserMenu")
+        store.commit("system/closeUserMenu")
         if (getSignedInUserFromCookie()) {
           next()
         } else {

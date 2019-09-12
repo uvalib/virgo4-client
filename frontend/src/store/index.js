@@ -3,17 +3,16 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import messaging from './plugins/messaging'
 import versionChecker from './plugins/version'
+import system from './modules/system'
 import pools from './modules/pools'
 import user from './modules/user'
 import query from './modules/query'
 import filters from './modules/filters'
+import * as utils from './modules/utils'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    searchAPI: "",
-    fatal: "",
-    error: "",
     noSpinner: false,
     searching: false,
     pageSize: 25,
@@ -21,8 +20,6 @@ export default new Vuex.Store({
     total: -1,
     visibleResults: [],
     selectedResultsIdx: -1,
-    version: "unknown",
-    userMenuOpen: false
   },
 
   getters: {
@@ -97,42 +94,6 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    toggleUserMenu(state) {
-      state.userMenuOpen = !state.userMenuOpen
-    },
-    closeUserMenu(state) {
-      state.userMenuOpen = false
-    },
-    setVersion(state, data) {
-      state.version = `${data.version}.${data.build}`
-    },
-    setFatal(state, err) {
-      state.fatal = err
-    },
-    setError(state, error) {
-      if (error == null) {
-        error = ""
-      }
-      state.total = -1
-      state.results = []
-      if (error.response) {
-        // Server responded with a status code out of the range of 2xx
-        state.error = error.response.data
-      } else if (error.request) {
-        // The request was made but no response was received
-        state.error = "Search is non-responsive"
-      } else  if (error.message ) {
-        // Something happened in setting up the request that triggered an Error
-        state.error = error.message
-      } else {
-        // likely just a string error; just set it
-        state.error = error
-      }
-    },
-
-    setConfig(state, cfg) {
-      state.searchAPI = cfg.searchAPI
-    },
     setSearching(state, flag) {
       if (state.noSpinner ) {
         state.noSpinner = false
@@ -180,7 +141,7 @@ export default new Vuex.Store({
     addPoolSearchResults(state, poolResults) {
       let tgtPool = state.results[state.selectedResultsIdx]
       if (poolResults.pagination.total > 0) {
-        mergeRepeatedFields( poolResults.record_list )
+        utils.mergeRepeatedFields( poolResults.record_list )
         tgtPool.hits = tgtPool.hits.concat(poolResults.record_list)
       }
       tgtPool.timeMS = poolResults.elapsed_ms
@@ -197,7 +158,7 @@ export default new Vuex.Store({
       state.total = -1
       state.results = []
       state.visibleResults = []
-      mergeRepeatedFields( pr.record_list )
+      utils.mergeRepeatedFields( pr.record_list )
       let result = { pool: pool, total: pr.pagination.total,
         hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: 0,
         statusCode: pr.status_code, statusMessage: pr.status_msg }
@@ -214,9 +175,9 @@ export default new Vuex.Store({
       // NOTE: need to have resultIdx attached to because pools are interacted with
       // in terms of the visibleResults array. Need easy way to get original resultsIdx.
       results.pool_results.forEach(function (pr,idx) {
-        let pool = findPool(results.pools, pr.pool_id)
+        let pool = utils.findPool(results.pools, pr.pool_id)
         if (pr.record_list) {
-          mergeRepeatedFields( pr.record_list )
+          utils.mergeRepeatedFields( pr.record_list )
           let result = { pool: pool, total: pr.pagination.total,
             hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
             statusCode: pr.status_code, statusMessage: pr.status_msg }
@@ -267,7 +228,7 @@ export default new Vuex.Store({
     // to all pools so they are not used here.
     // CTX: commit: ƒ boundCommit(type, payload, options)
     searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
-      commit('setError', "")
+      commit('system/setError', "")
       let req = {
         query: rootGetters['query/string'],
         pagination: { start: 0, rows: state.pageSize },
@@ -285,7 +246,7 @@ export default new Vuex.Store({
 
       commit('setSearching', true)
       commit('filters/reset')
-      let url = state.searchAPI + "/api/search?debug=1&intuit=1"
+      let url = state.system.searchAPI + "/api/search?debug=1&intuit=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
@@ -293,7 +254,7 @@ export default new Vuex.Store({
         commit('filters/setAllAvailableFacets', response.data)
         commit('setSearching', false)
       }).catch((error) => {
-        commit('setError', error)
+        commit('system/setError', error)
         commit('setSearching', false)
       })
     },
@@ -317,7 +278,7 @@ export default new Vuex.Store({
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
       }).catch((error) => {
-        commit('setError', error)
+        commit('system/setError', error)
         commit('setSearching', false)
       })
     },
@@ -338,15 +299,15 @@ export default new Vuex.Store({
       let pool = null
       let pools = ctx.state.pools.list
       if (pools.length == 0) {
-        if (ctx.state.searchAPI == "") {
-          await ctx.dispatch("getConfig")
+        if (ctx.state.system.searchAPI == "") {
+          await ctx.dispatch("system/getConfig")
         }
         await ctx.dispatch("pools/getPools")
         pools = ctx.state.pools.list
-        pool = findPool(pools, data.source)
+        pool = utils.findPool(pools, data.source)
         baseURL = pool.url
       } else {
-        pool = findPool(pools, data.source)
+        pool = utils.findPool(pools, data.source)
         baseURL = pool.url
       }
 
@@ -363,28 +324,14 @@ export default new Vuex.Store({
         ctx.commit('setDetailResults', {pr:response.data, pool: pool})
         ctx.commit('setSearching', false)
       }).catch((error) => {
-        ctx.commit('setError', error)
+        ctx.commit('system/setError', error)
         ctx.commit('setSearching', false)
       })
     },
-
-    // Call getConfig at startup to get client configuration parameters
-    getConfig(ctx) {
-      return axios.get("/config").then((response) => {
-        ctx.commit('setConfig', response.data)
-      }).catch((error) => {
-        ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)
-      })
-    },
-
-    getVersion(ctx) {
-      axios.get("/version").then((response) => {
-        ctx.commit('setVersion', response.data)
-      })
-    }
   },
 
   modules: {
+    system: system,
     user: user,
     pools: pools,
     query: query,
@@ -393,58 +340,3 @@ export default new Vuex.Store({
 
   plugins: [messaging, versionChecker]
 })
-
-// Find a pool by internal identifier
-function findPool(pools, id) {
-  let match = null
-  pools.some(function (p) {
-     if (p.id == id) {
-        match = p
-     }
-     return match != null
-  })
-  return match
-}
-
-// Each search ppol hit contains an array of field objects. These may be repeated, but for display 
-// purposes they need to be merged into a single field object with an array value. Additionally, the fields 
-// are classified as basic (show by default) or detailed (hidden by default). Split them into two separate
-// arrays of fields. Finally, the preview_url is a special case. It is placed and rendered differently than 
-// all others. Pull it out of the fields lists and place it in the top-level of the hit info.
-function mergeRepeatedFields( hits ) {
-  hits.forEach(function(hit) {
-    let mergedBasicFields = []
-    let mergedDetailFields = []
-    hit.fields.forEach(function(field) {
-      if (field.value === "") {
-        return
-      }
-      if (field.name == "preview_url") {
-        hit.previewURL = field.value
-        return
-      }
-      if (field.name == "id") {
-        hit.identifier = field.value
-        return
-      }
-      let tgtMerged = mergedBasicFields 
-      if (field.visibility == "detailed") {
-        tgtMerged = mergedDetailFields
-      }
-      let existing = tgtMerged.find(f => f.name === field.name) 
-      if (existing) {
-        // this field has already been encountered. Convert the value 
-        // to an array and push the new value into it
-        if (Array.isArray(existing.value)===false) {
-          existing.value = [existing.value]
-        }
-        existing.value.push(field.value)
-      } else {
-        tgtMerged.push(field)
-      }
-    })
-    hit.basicFields = mergedBasicFields
-    hit.detailFields = mergedDetailFields
-    delete hit.fields
-  })
-}
