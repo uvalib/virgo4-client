@@ -42,7 +42,12 @@ const filters = {
       },
 
       hasFilter: (state) => (idx) => {
-         return state.poolFilters[idx].length > 0
+         if (idx < 0) return false 
+         let filters = state.poolFilters[idx]
+         if (filters) {
+            return filters.length > 0
+         }
+         return false 
       },
 
       // By default the data stored for the filter is heirarchical; one facet 

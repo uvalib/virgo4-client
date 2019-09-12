@@ -245,6 +245,7 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
+      commit('resetSearchResults')
       commit('filters/reset')
       let url = state.system.searchAPI + "/api/search?debug=1&intuit=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken

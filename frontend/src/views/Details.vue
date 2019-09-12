@@ -13,6 +13,8 @@
             </div>
          </template>
          <template v-else>
+            <BookmarkButton :hit="itemDetails" :pool="this.$route.params.src"/>
+            <img class="preview" v-if="itemDetails.previewURL" :src="itemDetails.previewURL"/>
             <table class="fields">  
                <tr v-for="field in detailFields" :key="getKey(field)">
                   <template v-if="field.display != 'optional'">
@@ -30,21 +32,29 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import BookmarkButton from "@/components/BookmarkButton"
 import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "sources",
    components: {
-      BackToVirgo
+      BackToVirgo,BookmarkButton
    },
    computed: {
       ...mapState({
          searching : state => state.searching,
       }),
       ...mapGetters({
-          getDetails: "getItemDetails",
+         getDetails: "getItemDetails",
+         isSignedIn: 'user/isSignedIn',
+         bookmarks: 'user/bookmarks'
       }),
       notFound() {
          return this.detailFields.length == 0
+      },
+      itemDetails() {
+         let src= this.$route.params.src
+         let id= this.$route.params.id
+         return this.getDetails(src, id)
       },
       detailFields() {
          let src= this.$route.params.src
@@ -74,11 +84,17 @@ export default {
       let src = this.$route.params.src
       let id= this.$route.params.id
       this.$store.dispatch("getItemDetails", {source:src, identifier:id})
+      if ( this.isSignedIn) {
+         this.$store.dispatch("user/getBookmarks")
+      }
    }
 }
 </script>
 
 <style scoped>
+img.preview {
+   float:right;
+}
 .details {
    min-height: 400px;
    position: relative;
@@ -134,6 +150,9 @@ table td.value {
    text-align: left;
    width: 100%;
    padding: 4px 8px;
+}
+.bookmark-container {
+   float:left;
 }
 </style>
 

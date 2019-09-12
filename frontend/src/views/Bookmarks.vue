@@ -24,12 +24,17 @@
                      </div>
                      <table v-else>
                         <tr>
-                           <th/><th>Title</th><th>Author</th>
+                           <th/><th>Title</th><th>Author</th><th/>
                         </tr>
                         <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
                            <td><i @click="removeBookmark(bookmark.id)" class="remove fas fa-trash-alt"></i></td>
                            <td>{{bookmark.details.title}}</td>
                            <td>{{bookmark.details.author}}</td>
+                           <td>
+                               <router-link :to="detailsURL(bookmark)">
+                                  <i class="fas fa-search"></i>
+                               </router-link>
+                           </td>
                         </tr>
                      </table>
                   </AccordionContent>
@@ -63,6 +68,9 @@ export default {
       }),
    },
    methods: {
+      detailsURL(bookmark) {
+         return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
+      },
       removeBookmark(id) {
          this.$store.dispatch("user/removeBookmark", id)
       },
@@ -85,6 +93,10 @@ export default {
    cursor: pointer;
    font-size: 1.2em;
    padding: 2px 8px 2px 0;
+}
+i.fas {
+   color: #999;
+   cursor: pointer;
 }
 div.folder {
    display: flex;
