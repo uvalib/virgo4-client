@@ -48,7 +48,7 @@ const user = {
          let foundGeneral = false
          state.bookmarks.forEach( (folderObj) => {
             if ( folderObj.folder == "General") {
-               foundGeneral == true
+               foundGeneral = true
             }
             out.push( {id: folderObj.id, name: folderObj.folder} )
          })
