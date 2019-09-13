@@ -45,10 +45,21 @@ const user = {
       folders: state => {
          if ( state.bookmarks == null ) return []
          let out = []
-         state.bookmarks.forEach( (folder) => {
-            out.push( {id: folder.id, name: folder.folder} )
+         let foundGeneral = false
+         state.bookmarks.forEach( (folderObj) => {
+            if ( folderObj.folder == "General") {
+               foundGeneral == true
+            }
+            out.push( {id: folderObj.id, name: folderObj.folder} )
          })
-         return out.sort()
+         if (foundGeneral == false ) {
+            out.push( {id: 0, name: "General"} )
+         }
+         return out.sort( (a,b) => {
+            if (a.name < b.name) return -1 
+            if (a.name > b.name) return 1 
+            return 0
+         })
       },
       addingBookmark: state => {
          return state.newBookmarkInfo != null

@@ -11,7 +11,7 @@
          <div>{{newBookmark.identifier}} : <b>{{newBookmark.title}}</b></div>
          <div>{{newBookmark.author}}</div>
          <div class="select">
-            <label>Add bookmark to bookmark folder (required):</label> 
+            <label>Select a folder for the bookmark: </label> 
             <multiselect v-model="selectedFolder" class="folders"  
                   placeholder="Select or create a folder"
                   :showLabels="false" 
@@ -89,6 +89,15 @@ export default {
       this.lookingUp = true
       this.$store.dispatch("user/getBookmarks").then(() => {
          this.lookingUp = false
+         let found = false
+         this.folders.some( fobj=> {
+            console.log("FOLDER "+fobj.name)
+            if (fobj.name == "General") {
+               found = true 
+               this.selectedFolder = fobj
+            }
+            return found == true
+         })
       })
    }
 }
@@ -144,8 +153,8 @@ div.controls .pure-button {
 }
 div.select {
    margin-top: 10px;
-   border-top: 1px solid #ccc;
-   padding-top: 15px;
+   border-top: 5px solid var(--color-primary-orange);
+   padding-top: 25px;
 }
 label {
    font-weight: normal;

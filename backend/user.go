@@ -20,9 +20,15 @@ func NewUserSettings() *UserSettings {
 // Folder contains details for a bookmark folder
 type Folder struct {
 	ID        int         `json:"id" db:"id"` // this is the unique DB key of the folder
+	UserID    int         `json:"-" db:"user_id"`
 	Name      string      `json:"folder" db:"name"`
 	AddedAt   time.Time   `json:"addedAt" db:"added_at"`
 	Bookmarks []*Bookmark `json:"bookmarks" db:"-"`
+}
+
+// TableName sets the name of the table in the DB that this struct binds to
+func (u *Folder) TableName() string {
+	return "bookmark_folders"
 }
 
 // Bookmark contains minimal details on a bookmarked item
@@ -170,25 +176,23 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 	user := NewUserSettings()
 	user.Virgo4ID = c.Param("uid")
-	var folder struct{ Name string }
-	err := c.ShouldBindJSON(&folder)
+	var fp struct{ Name string }
+	err := c.ShouldBindJSON(&fp)
 	if err != nil {
 		log.Printf("ERROR: invalid folder add payload: %v", err)
 		c.String(http.StatusBadRequest, "Invalid add folder request")
 		return
 	}
 
-	log.Printf("User %s adding bookmark folder %s", user.Virgo4ID, folder.Name)
+	log.Printf("User %s adding bookmark folder %s", user.Virgo4ID, fp.Name)
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
 	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	uq.Row(&user.ID)
 
-	q := svc.DB.NewQuery("insert into bookmark_folders (user_id, name) values ({:uid},{:name})")
-	q.Bind(dbx.Params{"uid": user.ID})
-	q.Bind(dbx.Params{"name": folder.Name})
-	_, err = q.Execute()
+	newFolder := Folder{UserID: user.ID, Name: fp.Name, AddedAt: time.Now()}
+	err = svc.DB.Model(&newFolder).Insert()
 	if err != nil {
-		log.Printf("ERROR: add folder %s%s failed: %v", user.Virgo4ID, folder.Name, err)
+		log.Printf("ERROR: add folder %s%s failed: %v", user.Virgo4ID, fp.Name, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -247,15 +251,20 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	q.Row(&user.ID)
 
 	// get folder ID
+	folderObj := Folder{UserID: user.ID, Name: item.Folder}
 	log.Printf("Lookup folder %s ID", item.Folder)
-	q = svc.DB.NewQuery("select id from bookmark_folders where name={:name}")
+	q = svc.DB.NewQuery("select * from bookmark_folders where name={:name}")
 	q.Bind(dbx.Params{"name": item.Folder})
-	var fid int
-	err = q.Row(&fid)
+	err = q.One(&folderObj)
 	if err != nil {
-		log.Printf("ERROR: User %s folder %s not found", user.Virgo4ID, item.Folder)
-		c.String(http.StatusNotFound, "Folder %s not found", item.Folder)
-		return
+		folderObj.AddedAt = time.Now()
+		log.Printf("User %s folder %s not found; creating...", user.Virgo4ID, item.Folder)
+		err := svc.DB.Model(&folderObj).Insert()
+		if err != nil {
+			log.Printf("ERROR: add folder %s%s failed: %v", user.Virgo4ID, folderObj.Name, err)
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
 	// get POOL ID
@@ -274,7 +283,7 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 		values ({:uid}, {:fid}, {:pid}, {:bid}, {:detail}, {:added})`)
 	json, _ := json.Marshal(item.Bookmark.Details)
 	q.Bind(dbx.Params{"uid": user.ID})
-	q.Bind(dbx.Params{"fid": fid})
+	q.Bind(dbx.Params{"fid": folderObj.ID})
 	q.Bind(dbx.Params{"pid": pid})
 	q.Bind(dbx.Params{"bid": item.Identifier})
 	q.Bind(dbx.Params{"detail": json})
