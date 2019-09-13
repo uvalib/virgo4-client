@@ -170,6 +170,7 @@ export default new Vuex.Store({
       state.total = -1
       state.results = []
       state.visibleResults = []
+      let tgtPoolURL  = state.pools.targetPoolURL
 
       // Push all results into the results structure. Reset paging for each
       // NOTE: need to have resultIdx attached to because pools are interacted with
@@ -182,7 +183,7 @@ export default new Vuex.Store({
             hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
             statusCode: pr.status_code, statusMessage: pr.status_msg }
           state.results.push(result)
-          if (pr.confidence != "low" && state.visibleResults.length < 3) {
+          if (tgtPoolURL == pool.url || (pr.confidence != "low" && state.visibleResults.length < 3)) {
             result["show"] = true
             state.visibleResults.push(state.results.length-1)
           }
