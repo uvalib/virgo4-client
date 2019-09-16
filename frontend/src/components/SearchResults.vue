@@ -12,32 +12,13 @@
          </div>
          <div class="pool-buttons">
             <template  v-for="(r,idx) in results">  
-               <div v-if="wasPoolSkipped(r)" @click="resultsButtonClicked(idx)" :key="idx" 
-                  class="pool pure-button" v-bind:class="{showing: r.show}"
-               >
-                  <span>{{r.pool.name}} <span class="total">(not searched)</span></span>
-                  <i class="fas fa-arrow-down"></i>
-               </div>
-
-               <div v-else-if="poolFailed(r)" :key="idx" 
-                  class="pool pure-button disabled failed"
-                  :title="r.statusMessage"
-               >
+               <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: r.show}">
                   <span>
                      <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
-                     {{r.pool.name}} <span class="total">(failed)</span>
+                     {{r.pool.name}}
                   </span>
-               </div>
-
-               <div v-else @click="resultsButtonClicked(idx)" :key="idx" 
-                  class="pool pure-button" v-bind:class="{showing: r.show, disabled: r.total==0}"
-               >
-                  <span>
-                     <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
-                     {{r.pool.name}} <span class="total">({{r.total}})</span>
-                  </span>
-                  <i v-if="r.show" class="fas fa-expand-arrows-alt"></i>
-                  <i v-else-if="r.total" class="fas fa-arrow-down"></i>
+                  <i v-if="r.show" class="showing fas fa-check-circle"></i>
+                  <i v-else class="showing far fa-circle"></i>   
                </div>
             </template>
          </div>
@@ -49,7 +30,7 @@
                <div class="title1">
                   <i v-if="isTargetPool(result.pool.url)" class="fas fa-star"></i>
                   <span class="pool-name">{{result.pool.name}}</span>
-                  <i @click="closeResults(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
+                  <i @click="closeResults(result.resultIdx)" class="hide-pool far fa-times-circle"></i>
                </div>
                <div class="title2">
                   <span>{{result.pool.summary}}</span>
@@ -62,6 +43,9 @@
             <div class="pool-info">
                <div class="metrics">
                   <span>{{result.total}} matches found in {{result.timeMS}} ms</span>
+                  <span class="more" @click="selectPool(visibleIdx)">
+                     See More&nbsp;<i class="more-icon fas fa-external-link-square-alt"></i>
+                  </span>
                </div>
                <template v-if="hasFilter(result.resultIdx)">
                   <div class="filter-head">Search Filters</div>
@@ -135,19 +119,19 @@ export default {
          this.$store.commit("toggleResultVisibility", resultIdx)
       },
       resultsButtonClicked(resultIdx) {
-         if (this.results[resultIdx].show == false) {
+         // if (this.results[resultIdx].show == false) {
             this.$store.commit("toggleResultVisibility", resultIdx)
             if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
                this.selectPool(resultIdx)
             }
-         } else {
-            let visibleIdx = this.visibleResultIdx(resultIdx) 
-            if (visibleIdx > -1) {
-               this.selectPool(visibleIdx)
-            } else {
-                this.$store.commit("toggleResultVisibility", resultIdx)
-            }
-         }
+         // } else {
+         //    let visibleIdx = this.visibleResultIdx(resultIdx) 
+         //    if (visibleIdx > -1) {
+         //       this.selectPool(visibleIdx)
+         //    } else {
+         //        this.$store.commit("toggleResultVisibility", resultIdx)
+         //    }
+         // }
       },
    }
 }
@@ -169,11 +153,13 @@ div.accordion {
 }
 .pool-buttons {
    margin: 5px 0;
-   text-align: left;
    display: flex;
    flex-flow: row wrap;
    align-items: center;
    justify-content: space-between;
+}
+i.showing {
+   font-size:1.15em;
 }
 .pool-info {
    border-right: 1px solid #ccc;
@@ -189,6 +175,14 @@ div.accordion {
    padding: 5px;
    color: #333;
    font-weight: 500;
+   display: flex;
+   flex-flow: row wrap;
+   align-items: center;
+   justify-content: space-between;
+}
+.metrics .more:hover {
+   cursor: pointer;
+   color: var(--color-link)
 }
 .filter-head {
    margin: 0;
