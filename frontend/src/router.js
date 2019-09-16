@@ -31,6 +31,7 @@ const router = new Router({
       component: Details,
       beforeEnter: (_to, _from, next) => {
         ensureAuthTokenPresent(next)
+        store.commit("closePoolResults")
       }
     },
     {
