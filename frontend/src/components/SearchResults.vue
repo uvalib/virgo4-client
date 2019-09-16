@@ -12,20 +12,32 @@
          </div>
          <div class="pool-buttons">
             <template  v-for="(r,idx) in results">  
-               <div v-if="wasPoolSkipped(r)" @click="toggleVisibility(idx)" :key="idx" 
-                  class="pool pure-button" v-bind:class="{showing: r.show}">
-                  {{r.pool.name}} <span class="total">(not searched)</span>
+               <div v-if="wasPoolSkipped(r)" @click="resultsButtonClicked(idx)" :key="idx" 
+                  class="pool pure-button" v-bind:class="{showing: r.show}"
+               >
+                  <span>{{r.pool.name}} <span class="total">(not searched)</span></span>
+                  <i class="fas fa-arrow-down"></i>
                </div>
+
                <div v-else-if="poolFailed(r)" :key="idx" 
                   class="pool pure-button disabled failed"
-                  :title="r.statusMessage">
-                  <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
-                  {{r.pool.name}} <span class="total">(failed)</span>
+                  :title="r.statusMessage"
+               >
+                  <span>
+                     <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
+                     {{r.pool.name}} <span class="total">(failed)</span>
+                  </span>
                </div>
-               <div v-else @click="toggleVisibility(idx)" :key="idx" 
-                  class="pool pure-button" v-bind:class="{showing: r.show, disabled: r.total==0}">
-                  <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
-                  {{r.pool.name}} <span class="total">({{r.total}})</span>
+
+               <div v-else @click="resultsButtonClicked(idx)" :key="idx" 
+                  class="pool pure-button" v-bind:class="{showing: r.show, disabled: r.total==0}"
+               >
+                  <span>
+                     <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
+                     {{r.pool.name}} <span class="total">({{r.total}})</span>
+                  </span>
+                  <i v-if="r.show" class="fas fa-expand-arrows-alt"></i>
+                  <i v-else-if="r.total" class="fas fa-arrow-down"></i>
                </div>
             </template>
          </div>
@@ -36,7 +48,8 @@
             <div class="pool-titlebar">
                <div class="title1">
                   <i v-if="isTargetPool(result.pool.url)" class="fas fa-star"></i>
-                  <i @click="toggleVisibility(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
+                  <span class="pool-name">{{result.pool.name}}</span>
+                  <i @click="closeResults(result.resultIdx)" class="hide-pool fas fa-times-circle"></i>
                </div>
                <div class="title2">
                   <span>{{result.pool.summary}}</span>
@@ -84,6 +97,7 @@ export default {
    computed: {
       ...mapGetters({
          visibleResults: 'visibleResults',
+         visibleResultIdx: 'visibleResultIdx',
          rawQueryString: 'query/string',
          hitPoolCount: 'hitPoolCount',
          skippedPoolCount: 'skippedPoolCount',
@@ -117,10 +131,22 @@ export default {
       selectPool(visiblePoolIdx) {
          this.$store.commit("selectPoolResults", visiblePoolIdx)
       },
-      toggleVisibility(resultIdx) {
+      closeResults(resultIdx) {
          this.$store.commit("toggleResultVisibility", resultIdx)
-         if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
-            this.selectPool(resultIdx)
+      },
+      resultsButtonClicked(resultIdx) {
+         if (this.results[resultIdx].show == false) {
+            this.$store.commit("toggleResultVisibility", resultIdx)
+            if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
+               this.selectPool(resultIdx)
+            }
+         } else {
+            let visibleIdx = this.visibleResultIdx(resultIdx) 
+            if (visibleIdx > -1) {
+               this.selectPool(visibleIdx)
+            } else {
+                this.$store.commit("toggleResultVisibility", resultIdx)
+            }
          }
       },
    }
@@ -128,6 +154,15 @@ export default {
 </script>
 
 <style scoped>
+.pool-buttons div.pool.pure-button {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: space-between;
+}
+.pool-buttons div.pool.pure-button > * {
+   flex: 0 0 auto;
+}
 div.accordion {
    font-size: 0.9em;
    padding: 0 10px 5px 10px;
@@ -200,7 +235,7 @@ div.right-indent {
    flex: 1 1 auto;
 }
 .pool.pure-button.showing {
-   background-color: var(--color-primary-blue);
+   background-color: var(--color-primary-orange);
    color: #fff;
 }
 .pool.pure-button.disabled {
@@ -260,10 +295,13 @@ div.pools {
    padding: 5px 4px 3px 4px;
    display: flex;
    flex-flow: row;
-   align-items: flex-start;
+   align-items: center;
    justify-content: space-between;
    border-radius: 5px 5px 0 0;
    background: var(--color-dark-orange);
+}
+.title1 .pool-name {
+   margin-left: 5px;
 }
 .title1 .hide-pool {
    cursor: pointer;

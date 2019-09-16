@@ -33,6 +33,10 @@ export default new Vuex.Store({
       })
       return out
     },
+    visibleResultIdx: state => (resultIdx) => {
+      // convert a result index to a VISIBLE result idx
+      return state.visibleResults.indexOf(resultIdx)
+    },
     selectedResults: state => {
       if (state.selectedResultsIdx === -1 ) {
         return {total: 0, hits: [], pool: {description:"", id:"none", name:"None", summary: "", url: ""}}
