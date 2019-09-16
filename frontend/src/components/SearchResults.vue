@@ -15,10 +15,15 @@
                <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: r.show}">
                   <span>
                      <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
-                     {{r.pool.name}}
+                     <span>{{r.pool.name}}&nbsp;</span>
+                     <span v-if="poolFailed(r)" class="total">(failed)</span>
+                     <span v-else-if="wasPoolSkipped(r)" class="total">(not searched)</span>
+                     <span v-else class="total">({{r.total}})</span>
                   </span>
-                  <i v-if="r.show" class="showing fas fa-check-circle"></i>
-                  <i v-else class="showing far fa-circle"></i>   
+                  <template v-if="!poolFailed(r)">
+                     <i v-if="r.show" class="showing fas fa-check-circle"></i>
+                     <i v-else class="showing far fa-circle"></i>   
+                  </template>
                </div>
             </template>
          </div>
@@ -232,6 +237,9 @@ div.right-indent {
    background-color: var(--color-primary-orange);
    color: #fff;
 }
+.pool.pure-button i.fa-star {
+   margin-right: 5px;
+}
 .pool.pure-button.disabled {
    opacity: 0.3;
    cursor:default;
@@ -286,7 +294,7 @@ div.pools {
    
 }
 .title1 {
-   padding: 5px 4px 3px 4px;
+   padding: 5px;
    display: flex;
    flex-flow: row;
    align-items: center;
@@ -299,11 +307,8 @@ div.pools {
 }
 .title1 .hide-pool {
    cursor: pointer;
-   font-size: 1.5em;
+   font-size: 1.3em;
    margin-left: auto; /* put close on right */
-}
-.title1 i.fas.fa-star {
-   font-size: 1.25em;
 }
 .title2 {
    padding: 2px 10px 0 10px;
