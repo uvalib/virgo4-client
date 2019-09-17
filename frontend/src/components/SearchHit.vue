@@ -111,7 +111,7 @@ div.preview {
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
    text-decoration: none;  
 }
-.htt table {
+.hit table {
    table-layout: auto;
    border-collapse: collapse;
    width: 100%;

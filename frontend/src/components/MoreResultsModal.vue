@@ -18,7 +18,8 @@
          <div class="hits" id="hits-scroller">
             <div class="summary"><b>{{selectedResults.total}} results for </b>{{queryString()}}</div>
             <template v-for="hit in selectedResults.hits">
-               <SearchHit :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
+               <SearchHit v-if="hit.grouped==false"  :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
+               <GroupedSearchHit v-else :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
             </template>
             <infinite-loading @infinite="loadMoreResults" ref="infiniteLoader" >
                <span slot="no-more">No more matches</span>
@@ -33,12 +34,13 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
+import GroupedSearchHit from "@/components/GroupedSearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import InfiniteLoading from 'vue-infinite-loading'
 import AccordionContent from '@/components/AccordionContent'
 export default {
    components: {
-      SearchHit,SearchFilters,InfiniteLoading,AccordionContent
+      SearchHit,SearchFilters,InfiniteLoading,AccordionContent,GroupedSearchHit
    },
    computed: {
       ...mapState({

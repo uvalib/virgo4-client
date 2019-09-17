@@ -63,7 +63,8 @@
                </template>
             </div>
             <template v-for="hit in result.hits.slice(0,3)">
-               <SearchHit :pool="result.pool.id" :hit="hit" :key="hit.id"/>
+               <SearchHit v-if="hit.grouped==false"  :pool="result.pool.id" :hit="hit" :key="hit.id"/>
+               <GroupedSearchHit v-else :pool="result.pool.id" :hit="hit" :key="hit.id"/>
             </template>
             <div @click="selectPool(visibleIdx)" class="more-panel">
                See More Results&nbsp;<i class="more-icon fas fa-external-link-square-alt"></i>
@@ -78,10 +79,11 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
+import GroupedSearchHit from "@/components/GroupedSearchHit"
 import AccordionContent from '@/components/AccordionContent'
 export default {
    components: {
-      SearchHit,AccordionContent
+      SearchHit,AccordionContent,GroupedSearchHit
    },
    computed: {
       ...mapGetters({

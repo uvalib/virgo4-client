@@ -145,7 +145,7 @@ export default new Vuex.Store({
     addPoolSearchResults(state, poolResults) {
       let tgtPool = state.results[state.selectedResultsIdx]
       if (poolResults.pagination.total > 0) {
-        utils.mergeRepeatedFields( poolResults.record_list )
+        utils.preProcessHitFields( poolResults.record_list )
         tgtPool.hits = tgtPool.hits.concat(poolResults.record_list)
       }
       tgtPool.timeMS = poolResults.elapsed_ms
@@ -162,7 +162,7 @@ export default new Vuex.Store({
       state.total = -1
       state.results = []
       state.visibleResults = []
-      utils.mergeRepeatedFields( pr.record_list )
+      utils.preProcessHitFields( pr.record_list )
       let result = { pool: pool, total: pr.pagination.total,
         hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: 0,
         statusCode: pr.status_code, statusMessage: pr.status_msg }
@@ -179,26 +179,45 @@ export default new Vuex.Store({
       // Push all results into the results structure. Reset paging for each
       // NOTE: need to have resultIdx attached to because pools are interacted with
       // in terms of the visibleResults array. Need easy way to get original resultsIdx.
-      results.pool_results.forEach(function (pr,idx) {
+      results.pool_results.forEach( (pr,idx) => {
+        // Find the pool the results are associated with and populate some top level response info
         let pool = utils.findPool(results.pools, pr.pool_id)
-        if (pr.record_list) {
-          utils.mergeRepeatedFields( pr.record_list )
-          let result = { pool: pool, total: pr.pagination.total,
-            hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
-            statusCode: pr.status_code, statusMessage: pr.status_msg }
-          state.results.push(result)
-          if (tgtPoolURL == pool.url || (pr.confidence != "low" && state.visibleResults.length < 3)) {
-            result["show"] = true
-            state.visibleResults.push(state.results.length-1)
+        let result = { pool: pool, total: pr.pagination.total, page: 0, show: false, 
+          timeMS: pr.elapsed_ms, resultIdx: idx, hits: [], 
+          statusCode: pr.status_code, statusMessage: pr.status_msg}
+        if (!pr.group_list) {
+          pr.group_list = []
+        }
+
+        // Next, drill into group_list data. It containg a count and a record_list
+        // record list is just another list of fields in the hit. field is {name,label,type,value,visibility,display}
+        pr.group_list.forEach( gl => {
+
+          // for each hit in the list, merge repeated fields into arrays, pull out
+          // key fields like identifer to top-level named field and split others into basic and detail
+          utils.preProcessHitFields( gl.record_list )
+
+          if (gl.count == 1) {
+            let hit = gl.record_list[0]
+            hit.grouped = false
+            result.hits.push(hit)
+          } else {
+            let groupTitle = utils.getHitField(gl.record_list[0], "title")
+            let groupAuthor = utils.getHitField(gl.record_list[0], "author")
+            let hit = {grouped: true, title: groupTitle ,author: groupAuthor, count: gl.count, group: gl.record_list}
+            result.hits.push(hit)
           }
-        } else {
-          state.results.push({
-            pool: pool,
-            total: 0, hits: [], page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: idx,
-            statusCode: pr.status_code, statusMessage: pr.status_msg })
+        })
+
+        // all of the grouped and non-grouped hits have been added for this result set. Add it to the results
+        state.results.push(result)
+        if (tgtPoolURL == pool.url || (pr.confidence != "low" && state.visibleResults.length < 3)) {
+          result["show"] = true
+          state.visibleResults.push(state.results.length-1)
         }
       })
 
+      // If nothing was flagged as visible, just pick the first valid result
       if (state.visibleResults.length == 0 && state.results[0].statusCode == 200  && state.results[0].hits.length > 0) {
         state.results[0]["show"] = true
         state.visibleResults.push(0)
@@ -252,7 +271,7 @@ export default new Vuex.Store({
       commit('setSearching', true)
       commit('resetSearchResults')
       commit('filters/reset')
-      let url = state.system.searchAPI + "/api/search?debug=1&intuit=1"
+      let url = state.system.searchAPI + "/api/search?debug=1&intuit=1&grouped=1" // FIXME
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)

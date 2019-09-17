@@ -3,7 +3,7 @@
 // are classified as basic (show by default) or detailed (hidden by default). Split them into two separate
 // arrays of fields. Finally, the preview_url is a special case. It is placed and rendered differently than 
 // all others. Pull it out of the fields lists and place it in the top-level of the hit info.
-export function mergeRepeatedFields( hits ) {
+export function preProcessHitFields( hits ) {
    hits.forEach(function(hit) {
      let mergedBasicFields = []
      let mergedDetailFields = []
@@ -39,6 +39,17 @@ export function mergeRepeatedFields( hits ) {
      hit.detailFields = mergedDetailFields
      delete hit.fields
    })
+ }
+
+ export function getHitField(fields, name ) {
+    let val = ""
+    fields.basicFields.some( fieldObj=> {
+      if (fieldObj.name == name) {
+        val = fieldObj.value
+      }
+      return val != ""
+    })
+    return val
  }
 
  // Find a pool by internal identifier
