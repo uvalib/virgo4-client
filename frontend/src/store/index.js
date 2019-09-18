@@ -142,22 +142,6 @@ export default new Vuex.Store({
       state.total -= oldPoolTotal
     },
 
-    addPoolSearchResults(state, poolResults) {
-      let tgtPool = state.results[state.selectedResultsIdx]
-      if (poolResults.pagination.total > 0) {
-        utils.preProcessHitFields( poolResults.record_list )
-        tgtPool.hits = tgtPool.hits.concat(poolResults.record_list)
-      }
-      tgtPool.timeMS = poolResults.elapsed_ms
-      tgtPool.statusCode = 200 
-      tgtPool.statusMessage = ""
-      if (tgtPool.total == 0 ) {
-        // if pool total is zero add the new results total to overall
-        tgtPool.total = poolResults.pagination.total
-        state.total += poolResults.pagination.total
-      }
-    },
-
     setDetailResults(state, {pr, pool}) {
       state.total = -1
       state.results = []
@@ -167,6 +151,35 @@ export default new Vuex.Store({
         hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: 0,
         statusCode: pr.status_code, statusMessage: pr.status_msg }
       state.results.push(result)
+    },
+
+    addPoolSearchResults(state, poolResults) {
+      let tgtPool = state.results[state.selectedResultsIdx]
+      tgtPool.timeMS = poolResults.elapsed_ms
+      tgtPool.statusCode = 200 
+      tgtPool.statusMessage = ""
+      if (tgtPool.total == 0 ) {
+        // if pool total is zero add the new results total to overall
+        tgtPool.total = poolResults.pagination.total
+        state.total += poolResults.pagination.total
+      }
+      // if (poolResults.pagination.total > 0) {
+      //   utils.preProcessHitFields( poolResults.record_list )
+      //   tgtPool.hits = tgtPool.hits.concat(poolResults.record_list)
+      // }
+      poolResults.group_list.forEach( gl => {
+        utils.preProcessHitFields( gl.record_list )
+        if (gl.count == 1) {
+          let hit = gl.record_list[0]
+          hit.grouped = false
+          tgtPool.hits.push(hit)
+        } else {
+          let groupTitle = utils.getHitField(gl.record_list[0], "title")
+          let groupAuthor = utils.getHitField(gl.record_list[0], "author")
+          let hit = {grouped: true, title: groupTitle ,author: groupAuthor, count: gl.count, group: gl.record_list}
+          tgtPool.hits.push(hit)
+        }
+      })
     },
 
     setSearchResults(state, results) {

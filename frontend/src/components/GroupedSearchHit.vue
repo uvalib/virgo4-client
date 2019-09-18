@@ -1,10 +1,10 @@
 <template>
    <div class="hit">
+      <div class="group-header">
+         <span>Grouped Result&nbsp;<span class="count">({{hit.count}} copies)</span></span>
+         <i class="group-icon fas fa-layer-group"></i>
+      </div>
       <div class="details">
-         <div class="group-header">
-            <span>Grouped Result</span>
-            <i class="group-icon fas fa-layer-group"></i>
-         </div>
          <table>
             <tr>
                <td class="label">Title:</td>
@@ -14,11 +14,8 @@
                <td class="label">Author:</td>
                <td class="value">{{fieldValueString(hit.author)}}</td>
             </tr>
-            <tr>
-               <td class="label">Copies:</td>
-               <td class="value">{{hit.count}}</td>
-            </tr>
          </table>
+         <span class="pure-button pure-button-primary all">See all {{hit.count}} copies</span>
       </div>
    </div>
 </template>
@@ -59,15 +56,27 @@ export default {
    flex-flow: row wrap;
    align-items: center;
    justify-content: space-between;
-   border-bottom: 1px solid #ddd;
-   padding-bottom: 5px;
-   margin-bottom: 5px;
+   border-bottom: 1px solid #999;
+   padding: 5px;
+   background: #e5e5e5;
+   font-weight: bold;
+}
+.group-header .count {
+   font-weight: normal;
 }
 i.group-icon {
    font-size: 1.5em;
 }
 .details {
    padding: 10px;
+   background: #f2f2f2
+}
+#app .details span.pure-button.pure-button-primary.all {
+   margin: 10px 0 0 0;
+   padding: 4px;
+   box-sizing: border-box;
+   width:100%;
+   background-color: var(--color-pale-blue);
 }
 .hit table {
    table-layout: auto;
