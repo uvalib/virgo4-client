@@ -13,6 +13,11 @@
             leave-active-class="animated faster slideOutRight">
         <MoreResultsModal v-if="resultsSelected"/>
       </transition>
+      <transition name="more-transition"
+            enter-active-class="animated faster slideInRight"
+            leave-active-class="animated faster slideOutRight">
+        <GroupedResultsModal v-if="isGroupSelected"/>
+      </transition>
       <VirgoHeader/>
       <MenuBar/>
       <router-view/>
@@ -27,6 +32,7 @@ import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
 import AuthorizePanel from "@/components/layout/AuthorizePanel"
 import MoreResultsModal from "@/components/MoreResultsModal"
+import GroupedResultsModal from "@/components/GroupedResultsModal"
 import AddBookmarkModal from "@/components/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -37,6 +43,7 @@ export default {
       FatalError,
       AuthorizePanel,
       MoreResultsModal,
+      GroupedResultsModal,
       AddBookmarkModal,
       MenuBar
    },
@@ -49,12 +56,13 @@ export default {
       }),
       ...mapGetters({
          addingBookmark: 'user/addingBookmark',
+         isGroupSelected: 'isGroupSelected'
       }),
       resultsSelected() {
         return this.selectedResultsIdx > -1
       },
       showDimmer() {
-        return (this.selectedResultsIdx > -1 || this.addingBookmark)
+        return (this.selectedResultsIdx > -1 || this.addingBookmark || this.isGroupSelected)
       }
    },
    methods: {

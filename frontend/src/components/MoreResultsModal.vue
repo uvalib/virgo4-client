@@ -17,9 +17,9 @@
          </div>
          <div class="hits" id="hits-scroller">
             <div class="summary"><b>{{selectedResults.total}} results for </b>{{queryString()}}</div>
-            <template v-for="hit in selectedResults.hits">
-               <SearchHit v-if="hit.grouped==false"  :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
-               <GroupedSearchHit v-else :pool="selectedResults.pool.id" :hit="hit" :key="hit.id"/>
+            <template v-for="(hit,idx) in selectedResults.hits">
+               <SearchHit v-if="hit.grouped==false"  :pool="selectedResults.pool.id" :hit="hit" :key="idx"/>
+               <GroupedSearchHit v-else :pool="selectedResults.pool.id" :hitIdx="idx" :hit="hit" :key="idx"/>
             </template>
             <infinite-loading @infinite="loadMoreResults" ref="infiniteLoader" >
                <span slot="no-more">No more matches</span>

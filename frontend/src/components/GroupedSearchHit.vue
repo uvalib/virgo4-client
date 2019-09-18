@@ -15,7 +15,9 @@
                <td class="value">{{fieldValueString(hit.author)}}</td>
             </tr>
          </table>
-         <span class="pure-button pure-button-primary all">See all {{hit.count}} copies</span>
+         <span @click="viewClicked" class="pure-button pure-button-primary all">
+            See all {{hit.count}} copies
+         </span>
       </div>
    </div>
 </template>
@@ -24,11 +26,8 @@
 export default {
    props: {
       hit: { type: Object, required: true},
-      pool: {type: String, required: true}
-   },
-   components: {
-   },
-   computed: {
+      pool: {type: String, required: true},
+      hitIdx: {type: Number, required: true}
    },
    methods: {
       fieldValueString( field ) {
@@ -36,6 +35,9 @@ export default {
             return field.value.join(",<br>")
          }
          return field.value
+      },
+      viewClicked() {
+         this.$store.commit("selectGroupDetails", {pool: this.pool, hitIdx: this.hitIdx})
       }
    }
 };

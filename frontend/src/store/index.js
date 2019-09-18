@@ -20,11 +20,15 @@ export default new Vuex.Store({
     total: -1,
     visibleResults: [],
     selectedResultsIdx: -1,
+    groupDetails: {title: "", items: [], pool: ""}
   },
 
   getters: {
     hasResults: state => {
       return state.total >= 0
+    },
+    isGroupSelected: state => {
+      return state.groupDetails.title != ""
     },
     visibleResults: state => {
       let out = [] 
@@ -153,6 +157,22 @@ export default new Vuex.Store({
       state.results.push(result)
     },
 
+    selectGroupDetails(state, {pool,hitIdx} ) {
+      let done = false
+      state.results.some( r=>{
+        if (r.pool.id == pool) {
+          state.groupDetails.items = r.hits[hitIdx].group
+          state.groupDetails.title = r.hits[hitIdx].title
+          state.groupDetails.pool = pool
+          done = true
+        }
+        return done == true
+      })
+    },
+    clearGroup(state) {
+      state.groupDetails = {title: "", items: [], pool: ""}
+    },
+
     addPoolSearchResults(state, poolResults) {
       let tgtPool = state.results[state.selectedResultsIdx]
       tgtPool.timeMS = poolResults.elapsed_ms
@@ -163,10 +183,7 @@ export default new Vuex.Store({
         tgtPool.total = poolResults.pagination.total
         state.total += poolResults.pagination.total
       }
-      // if (poolResults.pagination.total > 0) {
-      //   utils.preProcessHitFields( poolResults.record_list )
-      //   tgtPool.hits = tgtPool.hits.concat(poolResults.record_list)
-      // }
+
       poolResults.group_list.forEach( gl => {
         utils.preProcessHitFields( gl.record_list )
         if (gl.count == 1) {
