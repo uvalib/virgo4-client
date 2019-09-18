@@ -184,16 +184,15 @@ export default new Vuex.Store({
         state.total += poolResults.pagination.total
       }
 
-      poolResults.group_list.forEach( gl => {
-        utils.preProcessHitFields( gl.record_list )
-        if (gl.count == 1) {
-          let hit = gl.record_list[0]
+      poolResults.group_list.forEach( group => {
+        utils.preProcessHitFields( group.record_list )
+        if (group.count == 1) {
+          let hit = group.record_list[0]
           hit.grouped = false
           tgtPool.hits.push(hit)
         } else {
-          let groupTitle = utils.getHitField(gl.record_list[0], "title")
-          let groupAuthor = utils.getHitField(gl.record_list[0], "author")
-          let hit = {grouped: true, title: groupTitle ,author: groupAuthor, count: gl.count, group: gl.record_list}
+          let hit = {grouped: true, count: group.count, group: group.record_list}
+          utils.getGroupHitMetadata(group, hit)
           tgtPool.hits.push(hit)
         }
       })
@@ -221,20 +220,19 @@ export default new Vuex.Store({
 
         // Next, drill into group_list data. It containg a count and a record_list
         // record list is just another list of fields in the hit. field is {name,label,type,value,visibility,display}
-        pr.group_list.forEach( gl => {
+        pr.group_list.forEach( group => {
 
           // for each hit in the list, merge repeated fields into arrays, pull out
           // key fields like identifer to top-level named field and split others into basic and detail
-          utils.preProcessHitFields( gl.record_list )
+          utils.preProcessHitFields( group.record_list )
 
-          if (gl.count == 1) {
-            let hit = gl.record_list[0]
+          if (group.count == 1) {
+            let hit = group.record_list[0]
             hit.grouped = false
             result.hits.push(hit)
           } else {
-            let groupTitle = utils.getHitField(gl.record_list[0], "title")
-            let groupAuthor = utils.getHitField(gl.record_list[0], "author")
-            let hit = {grouped: true, title: groupTitle ,author: groupAuthor, count: gl.count, group: gl.record_list}
+            let hit = {grouped: true, count: group.count, group: group.record_list}
+            utils.getGroupHitMetadata(group, hit)
             result.hits.push(hit)
           }
         })
@@ -301,7 +299,7 @@ export default new Vuex.Store({
       commit('setSearching', true)
       commit('resetSearchResults')
       commit('filters/reset')
-      let url = state.system.searchAPI + "/api/search?debug=1&intuit=1&grouped=1" // FIXME
+      let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
@@ -373,7 +371,7 @@ export default new Vuex.Store({
         filters: []
       }
 
-      let url = `${baseURL}/api/search`
+      let url = `${baseURL}/api/search&grouped=0`
       axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.user.authToken
       axios.post(url, req).then((response) => {
         ctx.commit('setDetailResults', {pr:response.data, pool: pool})

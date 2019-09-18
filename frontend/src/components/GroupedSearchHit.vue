@@ -5,14 +5,10 @@
          <i class="group-icon fas fa-layer-group"></i>
       </div>
       <div class="details">
-         <table>
-            <tr>
-               <td class="label">Title:</td>
-               <td class="value">{{hit.title}}</td>
-            </tr>
-            <tr>
-               <td class="label">Author:</td>
-               <td class="value">{{fieldValueString(hit.author)}}</td>
+         <table class="fields">
+            <tr v-for="(field,idx) in hit.metadata" :key="idx">
+               <td class="label">{{field.label}}:</td>
+               <td class="value" v-html="fieldValueString(field)"></td>
             </tr>
          </table>
          <span @click="viewClicked" class="pure-button pure-button-primary all">
@@ -32,7 +28,7 @@ export default {
    methods: {
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
-            return field.value.join(",<br>")
+            return field.value.join(", ")
          }
          return field.value
       },

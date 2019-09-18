@@ -41,6 +41,20 @@ export function preProcessHitFields( hits ) {
    })
  }
 
+export function getGroupHitMetadata(group, hit) {
+  let groupTitle = getHitField(group.record_list[0], "title")
+  let groupAuthor = getHitField(group.record_list[0], "author")
+  group.fields.forEach( field => {
+    if (field.name == "title") {
+      field.value = groupTitle
+    }
+    if (field.name == "author") {
+      field.value = groupAuthor
+    }
+  })
+  hit.metadata = group.fields
+ }
+
  export function getHitField(fields, name ) {
     let val = ""
     fields.basicFields.some( fieldObj=> {

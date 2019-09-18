@@ -58,7 +58,7 @@ export default {
       },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
-            return field.value.join(",<br>")
+            return field.value.join(", ")
          }
          if (field.type == "url") {
             return `<a href="${field.value}" class="pure-button pure-button-primary ext" target="_blank">External Link&nbsp;&nbsp;<i class="fas fa-external-link-alt"></i></a>`
