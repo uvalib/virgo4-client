@@ -5,7 +5,7 @@
             <div  @click="closeGroupedResults"  class="overlay-title">
                <i class="group-icon fas fa-layer-group"></i>
                <span class="pool-name">{{groupDetails.title}}</span>
-               <i class="pool-close fas fa-arrow-circle-right"></i>
+               <i class="pool-close fas fa-times-circle"></i>
             </div>
          </div>
          <div class="hits" id="hits-scroller">
@@ -31,23 +31,24 @@ export default {
       }),
    },
    methods: {
-      calcHeaderHeight() {
-         // scroller starts positioned absolute 0,0 and header floats over it
-         // need to update the top of the scroller so it starts where the header
-         // ends. this is called any time the header changes size for filter actions
-         let hdrEle = document.getElementById("more-header")
-         let scroller = document.getElementById("hits-scroller")
-         scroller.style.top = hdrEle.offsetHeight+"px"
-      },
       blockClick(event) {
         event.stopPropagation() 
       },
       closeGroupedResults() {
          this.$store.commit("clearGroup")
       },
+      handleKeyUp(evt) {
+         if (evt.keyCode === 27) {
+            evt.stopPropagation()
+            this.closeGroupedResults()
+         }
+      }
    },
-   mounted() {
-      this.calcHeaderHeight()
+   created() {
+      document.addEventListener('keyup', this.handleKeyUp )
+   },
+   destroyed() {
+      document.removeEventListener('keyup', this.handleKeyUp )
    }
 }
 </script>
@@ -60,7 +61,7 @@ export default {
    top: 0;
    bottom: 0;
    right: 0;
-   z-index: 1000;
+   z-index: 2000;
 }
 .group-icon {
    margin: 0 8px 0 2px;
@@ -74,7 +75,7 @@ export default {
    box-sizing: border-box;
    border-left: 5px solid var(--color-primary-blue);
    box-shadow: -2px 0px 10px #333;
-   z-index: 1005;
+   z-index: 2005;
 }
 @media only screen and (min-width: 768px) {
    .grouped-results-modal, .grouped-results-modal, div.more-header {
@@ -98,7 +99,7 @@ div.more-header {
    text-align: left;
    border-bottom: 5px solid var(--color-primary-blue);
    border-top: 4px solid var(--color-primary-blue);
-   z-index: 1020;
+   z-index: 2020;
 }
 div.overlay-title {
    display: flex;
@@ -123,13 +124,14 @@ div.overlay-title {
 }
 .hits {
    position: absolute;
+   top: 40px;
    left: 0;
    right: 0;
    bottom: 0;
    overflow: auto;
    overscroll-behavior: contain;
    color: #555;
-   z-index: 1010;
+   z-index: 2010;
    background-color: white;
 }
 .bottom {

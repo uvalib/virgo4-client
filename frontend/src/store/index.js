@@ -241,7 +241,7 @@ export default new Vuex.Store({
 
         // all of the grouped and non-grouped hits have been added for this result set. Add it to the results
         state.results.push(result)
-        if (tgtPoolURL == pool.url || (pr.confidence != "low" && state.visibleResults.length < 3)) {
+        if (result.statusCode == 200 && (tgtPoolURL == pool.url || (pr.confidence != "low" && state.visibleResults.length < 3))) {
           result["show"] = true
           state.visibleResults.push(state.results.length-1)
         }

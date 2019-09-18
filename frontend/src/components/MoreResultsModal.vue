@@ -4,7 +4,7 @@
          <div id="more-header" class="more-header">
             <div  @click="closePool"  class="overlay-title">
                <span class="pool-name">{{selectedResults.pool.summary}}</span>
-               <i class="pool-close fas fa-arrow-circle-right"></i>
+               <i class="pool-close fas fa-times-circle"></i>
             </div>
             <AccordionContent title="Description" align="left-narrow" 
                background="var(--color-primary-orange)" color="white"
@@ -55,6 +55,7 @@ export default {
          hasMoreHits: 'hasMoreHits',
          rawQueryString: 'query/string',
          poolFilter: 'filters/poolFilter',
+         isGroupSelected: 'isGroupSelected'
       }),
       filterLength() {
          return this.poolFilter(this.selectedResultsIdx, 'raw').length
@@ -114,12 +115,23 @@ export default {
          this.$store.commit("filters/closeAdd")
          this.$store.commit("closePoolResults")
       },
+      handleKeyUp(evt) {
+         if (evt.keyCode === 27 && this.isGroupSelected == false) {
+            this.closePool()
+         }
+      }
    },
    mounted() {
       this.calcHeaderHeight()
       if ( this.selectedResults.statusCode == 408) {
          this.$store.dispatch("searchSelectedPool")
       }
+   },
+   created() {
+      document.addEventListener('keyup', this.handleKeyUp )
+   },
+   destroyed() {
+      document.removeEventListener('keyup', this.handleKeyUp )
    }
 }
 </script>

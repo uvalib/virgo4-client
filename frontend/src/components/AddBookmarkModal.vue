@@ -91,7 +91,6 @@ export default {
          this.lookingUp = false
          let found = false
          this.folders.some( fobj=> {
-            console.log("FOLDER "+fobj.name)
             if (fobj.name == "General") {
                found = true 
                this.selectedFolder = fobj
