@@ -113,7 +113,7 @@ export default {
       closePool() {
           this.$refs.infiniteLoader.stateChanger.reset()
          this.$store.commit("filters/closeAdd")
-         this.$store.commit("closePoolResults")
+         this.$store.commit("deselectPoolResults")
       },
       handleKeyUp(evt) {
          if (evt.keyCode === 27 && this.isGroupSelected == false) {

@@ -45,7 +45,7 @@ export default {
         event.stopPropagation() 
       },
       closeGroupedResults() {
-         this.$store.commit("clearGroup")
+         this.$store.commit("deselectGroupDetails")
       },
       handleKeyUp(evt) {
          if (evt.keyCode === 27) {

@@ -115,7 +115,7 @@ export default new Vuex.Store({
       let idx = state.visibleResults[visiblePoolIdx]
       state.selectedResultsIdx = idx
     },
-    closePoolResults(state) {
+    deselectPoolResults(state) {
       state.selectedResultsIdx = -1
     },
     toggleResultVisibility(state, poolResultsIdx) {
@@ -169,7 +169,7 @@ export default new Vuex.Store({
         return done == true
       })
     },
-    clearGroup(state) {
+    deselectGroupDetails(state) {
       state.groupDetails = {metadata: [], items: [], pool: ""}
     },
 
@@ -371,7 +371,7 @@ export default new Vuex.Store({
         filters: []
       }
 
-      let url = `${baseURL}/api/search&grouped=0`
+      let url = `${baseURL}/api/search?grouped=0`
       axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.user.authToken
       axios.post(url, req).then((response) => {
         ctx.commit('setDetailResults', {pr:response.data, pool: pool})
