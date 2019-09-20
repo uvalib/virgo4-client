@@ -4,7 +4,7 @@
          <div id="more-header" class="more-header">
             <div  @click="closeGroupedResults"  class="overlay-title">
                <i class="group-icon fas fa-layer-group"></i>
-               <span class="pool-name">{{groupDetails.title}}</span>
+               <span class="pool-name">{{groupTitle}}</span>
                <i class="pool-close fas fa-times-circle"></i>
             </div>
          </div>
@@ -29,6 +29,16 @@ export default {
       ...mapState({
          groupDetails: state=>state.groupDetails,
       }),
+      groupTitle() {
+         let title = ""
+         this.groupDetails.metadata.some( md => {
+            if (md.name == "title") {
+               title = md.value
+            }
+            return title != ""
+         })
+         return title
+      }
    },
    methods: {
       blockClick(event) {

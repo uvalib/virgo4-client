@@ -20,7 +20,7 @@ export default new Vuex.Store({
     total: -1,
     visibleResults: [],
     selectedResultsIdx: -1,
-    groupDetails: {title: "", items: [], pool: ""}
+    groupDetails: {metadata: [], items: [], pool: ""}
   },
 
   getters: {
@@ -28,7 +28,7 @@ export default new Vuex.Store({
       return state.total >= 0
     },
     isGroupSelected: state => {
-      return state.groupDetails.title != ""
+      return state.groupDetails.metadata.length > 0
     },
     visibleResults: state => {
       let out = [] 
@@ -162,7 +162,7 @@ export default new Vuex.Store({
       state.results.some( r=>{
         if (r.pool.id == pool) {
           state.groupDetails.items = r.hits[hitIdx].group
-          state.groupDetails.title = r.hits[hitIdx].title
+          state.groupDetails.metadata = r.hits[hitIdx].metadata
           state.groupDetails.pool = pool
           done = true
         }
@@ -170,7 +170,7 @@ export default new Vuex.Store({
       })
     },
     clearGroup(state) {
-      state.groupDetails = {title: "", items: [], pool: ""}
+      state.groupDetails = {metadata: [], items: [], pool: ""}
     },
 
     addPoolSearchResults(state, poolResults) {
