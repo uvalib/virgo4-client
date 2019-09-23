@@ -8,6 +8,7 @@ import pools from './modules/pools'
 import user from './modules/user'
 import query from './modules/query'
 import filters from './modules/filters'
+import item from './modules/item'
 import * as utils from './modules/utils'
 Vue.use(Vuex)
 
@@ -82,23 +83,6 @@ export default new Vuex.Store({
       })
       return poolCnt
     },
-    getItemDetails: state => (pool,identifier) => {
-      let foundPool = false
-      let details = null 
-      state.results.some( result => {
-        if (result.pool.id == pool) {
-          foundPool = true 
-          result.hits.some( hit=> {
-            if (hit.identifier == identifier) {
-              details = hit  
-            }
-            return details != null  
-          })
-        }
-        return foundPool == true
-      })
-      return details
-    }
   },
 
   mutations: {
@@ -144,17 +128,6 @@ export default new Vuex.Store({
       tgtPool.page = 0
       state.results[state.selectedResultsIdx].hits = []
       state.total -= oldPoolTotal
-    },
-
-    setDetailResults(state, {pr, pool}) {
-      state.total = -1
-      state.results = []
-      state.visibleResults = []
-      utils.preProcessHitFields( pr.record_list )
-      let result = { pool: pool, total: pr.pagination.total,
-        hits: pr.record_list, page: 0, show: false, timeMS: pr.elapsed_ms, resultIdx: 0,
-        statusCode: pr.status_code, statusMessage: pr.status_msg }
-      state.results.push(result)
     },
 
     selectGroupDetails(state, {pool,hitIdx} ) {
@@ -335,52 +308,6 @@ export default new Vuex.Store({
         commit('setSearching', false)
       })
     },
-
-    // Get items details by pool and item idntifier. Nothing to do if data is already
-    // in local state. Note use of async... it allows use of await on the supporting 
-    // dispatches to get config and get pools.
-    async getItemDetails(ctx, data) {
-      ctx.commit('setSearching', true)
-      let cached = ctx.rootGetters['getItemDetails'](data.source, data.identifier)
-      if (cached != null ) {
-        ctx.commit('setSearching', false)
-        return
-      }
-
-      // get source from poolID
-      let baseURL = ""
-      let pool = null
-      let pools = ctx.state.pools.list
-      if (pools.length == 0) {
-        if (ctx.state.system.searchAPI == "") {
-          await ctx.dispatch("system/getConfig")
-        }
-        await ctx.dispatch("pools/getPools")
-        pools = ctx.state.pools.list
-        pool = utils.findPool(pools, data.source)
-        baseURL = pool.url
-      } else {
-        pool = utils.findPool(pools, data.source)
-        baseURL = pool.url
-      }
-
-      // make identifier query
-      let req = {
-        query: ctx.rootGetters['query/idQuery'](data.identifier),
-        pagination: { start:0, rows: 1 },
-        filters: []
-      }
-
-      let url = `${baseURL}/api/search?grouped=0`
-      axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.user.authToken
-      axios.post(url, req).then((response) => {
-        ctx.commit('setDetailResults', {pr:response.data, pool: pool})
-        ctx.commit('setSearching', false)
-      }).catch((error) => {
-        ctx.commit('system/setError', error)
-        ctx.commit('setSearching', false)
-      })
-    },
   },
 
   modules: {
@@ -388,7 +315,8 @@ export default new Vuex.Store({
     user: user,
     pools: pools,
     query: query,
-    filters: filters
+    filters: filters,
+    item: item,
   },
 
   plugins: [messaging, versionChecker]

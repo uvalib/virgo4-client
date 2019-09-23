@@ -13,10 +13,10 @@
             </div>
          </template>
          <template v-else>
-            <BookmarkButton :hit="itemDetails" :pool="this.$route.params.src"/>
-            <img class="preview" v-if="itemDetails.previewURL" :src="itemDetails.previewURL"/>
+            <BookmarkButton :hit="details" :pool="this.$route.params.src"/>
+            <img class="preview" v-if="details.previewURL" :src="details.previewURL"/>
             <table class="fields">  
-               <tr v-for="field in detailFields" :key="getKey(field)">
+               <tr v-for="(field,idx) in detailFields" :key="idx">
                   <template v-if="field.display != 'optional'">
                      <td class="label">{{field.label}}:</td>
                      <td class="value" v-html="fieldValueString(field)"></td>
@@ -42,34 +42,20 @@ export default {
    computed: {
       ...mapState({
          searching : state => state.searching,
+         details : state => state.item.details,
       }),
       ...mapGetters({
-         getDetails: "getItemDetails",
          isSignedIn: 'user/isSignedIn',
          bookmarks: 'user/bookmarks'
       }),
       notFound() {
-         return this.detailFields.length == 0
-      },
-      itemDetails() {
-         let src= this.$route.params.src
-         let id= this.$route.params.id
-         return this.getDetails(src, id)
+         return this.details.identifier.length == 0
       },
       detailFields() {
-         let src= this.$route.params.src
-         let id= this.$route.params.id
-         let details =  this.getDetails(src, id)
-         if (details == null ) {
-            return []
-         }
-         return [...details.basicFields.concat(details.detailFields)]
+         return [...this.details.basicFields.concat(this.details.detailFields)]
       }
    },
    methods: {
-      getKey(field) {
-         return field.name+field.value
-      },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
             return field.value.join(",<br>")
@@ -83,7 +69,7 @@ export default {
    created() {
       let src = this.$route.params.src
       let id= this.$route.params.id
-      this.$store.dispatch("getItemDetails", {source:src, identifier:id})
+      this.$store.dispatch("item/getDetails", {source:src, identifier:id})
       if ( this.isSignedIn) {
          this.$store.dispatch("user/getBookmarks")
       }
