@@ -11,6 +11,12 @@ export function preProcessHitFields( hits ) {
        if (field.value === "") {
          return
        }
+
+       // while in flux, toss the cover image stuff. it currently breaks the UI
+       if (field.name=="cover_image") {
+         return
+       }
+
        if (field.name == "preview_url") {
          hit.previewURL = field.value
          return

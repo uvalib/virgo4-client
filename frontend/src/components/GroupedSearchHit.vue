@@ -7,8 +7,10 @@
       <div class="details">
          <table class="fields">
             <tr v-for="(field,idx) in hit.metadata" :key="idx">
-               <td class="label">{{field.label}}:</td>
-               <td class="value" v-html="fieldValueString(field)"></td>
+               <template v-if="field.name!='cover_image'">
+                  <td class="label">{{field.label}}:</td>
+                  <td class="value" v-html="fieldValueString(field)"></td>
+               </template>
             </tr>
          </table>
          <span @click="viewClicked" class="pure-button pure-button-primary all">
