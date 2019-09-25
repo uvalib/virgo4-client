@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -16,11 +18,12 @@ import (
 
 // ServiceContext contains common data used by all handlers
 type ServiceContext struct {
-	Version     string
-	SearchAPI   string
-	ILSAPI      string
-	DevAuthUser string
-	DB          *dbx.DB
+	Version           string
+	SearchAPI         string
+	ILSAPI            string
+	DevAuthUser       string
+	PendingTranslates map[string]string
+	DB                *dbx.DB
 }
 
 // RequestError contains http status code and message for a
@@ -44,6 +47,20 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	}
 	db.LogFunc = log.Printf
 	ctx.DB = db
+
+	ctx.PendingTranslates = make(map[string]string)
+	file, err := os.Open("pendingTranslate.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		bits := strings.Split(line, "=")
+		log.Printf("Pending Translate:  %s", line)
+		ctx.PendingTranslates[strings.TrimSpace(bits[0])] = strings.TrimSpace(bits[1])
+	}
 
 	return &ctx, nil
 }
@@ -127,9 +144,16 @@ func (svc *ServiceContext) IsAuthenticated(c *gin.Context) {
 // GetConfig returns front-end configuration data as JSON
 func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
-		SearchAPI string `json:"searchAPI"`
+		SearchAPI        string `json:"searchAPI"`
+		TranslateMessage string `json:"translateMessage"`
 	}
+	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
+	log.Printf("Accept-Language=%s", acceptLang)
 	cfg := config{SearchAPI: svc.SearchAPI}
+	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
+		log.Printf("Adding translate message to config")
+		cfg.TranslateMessage = msg
+	}
 	c.JSON(http.StatusOK, cfg)
 }
 
