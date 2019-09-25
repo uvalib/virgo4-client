@@ -8,9 +8,22 @@ const system = {
       version: "unknown",
       userMenuOpen: false,
       searchAPI: "",
+      seenTranslateMsg: false,
+      translateMessage: ""
+   },
+
+   getters: {
+      hasTranslateMessage: state => {
+         return state.translateMessage.length > 0 && state.seenTranslateMsg == false
+      }
    },
 
    mutations: {
+      closeTraslateMessage(state) {
+         state.seenTranslateMsg = true
+         state.translateMessage = ""
+      },
+
       toggleUserMenu(state) {
          state.userMenuOpen = !state.userMenuOpen
       },
@@ -50,6 +63,7 @@ const system = {
 
       setConfig(state, cfg) {
          state.searchAPI = cfg.searchAPI
+         state.translateMessage = cfg.translateMessage
       },
    },
 

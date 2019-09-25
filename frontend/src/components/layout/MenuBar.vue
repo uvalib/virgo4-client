@@ -32,7 +32,7 @@
                <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
             </router-link>
          </template>
-         <span class="menu-item">
+         <span class="menu-item feedback">
             <Feedback icon/>
          </span>
       </span>
@@ -95,6 +95,11 @@ export default {
 </script>
 
 <style scoped>
+@media only screen and (max-width: 768px) {
+   span.menu-item.feedback {
+     display: none;
+   }
+}
 .menu {
    text-align: right;
    padding: 10px;
@@ -111,7 +116,7 @@ export default {
 #app .menu a:hover {
    text-decoration: none;
 }
-#app .menu .menu-item {
+.menu .menu-item {
    cursor: pointer;
    color: white;
    flex: 0 1 auto;
