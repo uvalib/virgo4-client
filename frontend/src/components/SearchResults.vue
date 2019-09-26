@@ -21,8 +21,8 @@
                      <span v-else class="total">({{r.total}})</span>
                   </span>
                   <template v-if="!poolFailed(r)">
-                     <i v-if="r.show" class="showing fas fa-check-circle"></i>
-                     <i v-else class="showing far fa-circle"></i>   
+                     <i v-if="r.show" class="showing fas fa-external-link-alt"></i>
+                     <i v-else class="showing fa fa-arrow-down"></i>   
                   </template>
                </div>
             </template>
@@ -49,7 +49,7 @@
                <div class="metrics">
                   <span>{{result.total}} matches found in {{result.timeMS}} ms</span>
                   <span class="more" @click="selectPool(visibleIdx)">
-                     See More&nbsp;<i class="more-icon fas fa-external-link-square-alt"></i>
+                     See More&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
                   </span>
                </div>
                <template v-if="hasFilter(result.resultIdx)">
@@ -67,7 +67,7 @@
                <GroupedSearchHit v-else :hitIdx="idx" :pool="result.pool.id" :hit="hit" :key="idx"/>
             </template>
             <div @click="selectPool(visibleIdx)" class="more-panel">
-               See More Results&nbsp;<i class="more-icon fas fa-external-link-square-alt"></i>
+               See More Results&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
             </div>
          </div>
       </div>
@@ -129,10 +129,18 @@ export default {
          let r = this.results[resultIdx]
          if ( this.poolFailed(r)) return
 
-         this.$store.commit("toggleResultVisibility", resultIdx)
-         if ( r.show && r.statusCode == 408) {
-            let visIdx = this.$store.getters.visibleResultIdx(resultIdx)
-            this.selectPool(visIdx)
+         if (this.results[resultIdx].show == false) {
+            this.$store.commit("toggleResultVisibility", resultIdx)
+            if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
+               this.selectPool(resultIdx)
+            }
+         } else {
+            let visibleIdx = this.visibleResultIdx(resultIdx) 
+            if (visibleIdx > -1) {
+               this.selectPool(visibleIdx)
+            } else {
+                this.$store.commit("toggleResultVisibility", resultIdx)
+            }
          }
       },
    }
