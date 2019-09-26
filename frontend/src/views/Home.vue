@@ -12,6 +12,9 @@
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
           <h1>Basic Search</h1>
+          <div v-if="hasTranslateMessage" class="translate-message">
+            {{translateMessage}}
+          </div>
           <input
               @keyup.enter="searchClicked"
               id="keyword"
@@ -71,11 +74,13 @@ export default {
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
-         signInMessage: state => state.user.signInMessage
+         signInMessage: state => state.user.signInMessage,
+         translateMessage: state => state.system.translateMessage
       }),
       ...mapGetters({
         hasResults: 'hasResults',
         queryEntered: 'query/queryEntered',
+        hasTranslateMessage: 'system/hasTranslateMessage'
       }),
       ...mapFields('query',[
         'basic',
@@ -208,5 +213,9 @@ div.tips-container {
   font-size: 1em;
   top: 15px; 
   right: 15px;
+}
+div.translate-message {
+  margin: 5px 0 15px 0;
+  font-size: 0.85em;
 }
 </style>

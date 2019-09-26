@@ -6,9 +6,6 @@
         <div class="dimmer" v-if="showDimmer"></div>
       </transition>
       <transition name="fade">
-        <TranslateMessage v-if="hasTranslateMessage"/>
-      </transition>
-      <transition name="fade">
         <AddBookmarkModal v-if="addingBookmark"/>
       </transition>
       <transition name="more-transition"
@@ -33,7 +30,6 @@ import LibraryFooter from "@/components/layout/LibraryFooter"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
-import TranslateMessage from "@/components/layout/TranslateMessage"
 import AuthorizePanel from "@/components/layout/AuthorizePanel"
 import MoreResultsModal from "@/components/MoreResultsModal"
 import GroupedResultsModal from "@/components/GroupedResultsModal"
@@ -45,7 +41,6 @@ export default {
       VirgoHeader,
       LibraryFooter,
       FatalError,
-      TranslateMessage,
       AuthorizePanel,
       MoreResultsModal,
       GroupedResultsModal,
@@ -68,8 +63,7 @@ export default {
         return this.selectedResultsIdx > -1
       },
       showDimmer() {
-        return (this.selectedResultsIdx > -1 || this.addingBookmark || 
-          this.isGroupSelected || this.hasTranslateMessage)
+        return (this.selectedResultsIdx > -1 || this.addingBookmark || this.isGroupSelected )
       }
    },
    methods: {
