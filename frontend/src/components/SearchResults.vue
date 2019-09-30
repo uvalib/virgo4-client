@@ -7,8 +7,10 @@
                <span>{{total}} matches found in {{results.length}} sources.</span> 
                <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
                <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
+               <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
             </p>
-            <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
+
+            <AvailabilitySelector/>
          </div>
          <div class="pool-buttons">
             <template  v-for="(r,idx) in results">  
@@ -36,9 +38,6 @@
                   <i v-if="isTargetPool(result.pool.url)" class="fas fa-star"></i>
                   <span class="pool-name">{{result.pool.name}}</span>
                   <i @click="closeResults(result.resultIdx)" class="hide-pool far fa-times-circle"></i>
-               </div>
-               <div class="title2">
-                  <span>{{result.pool.summary}}</span>
                </div>
                <AccordionContent title="Description"  align="left-narrow" 
                   background="var(--color-primary-orange)" color="white">
@@ -81,9 +80,10 @@ import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import GroupedSearchHit from "@/components/GroupedSearchHit"
 import AccordionContent from '@/components/AccordionContent'
+import AvailabilitySelector from '@/components/AvailabilitySelector'
 export default {
    components: {
-      SearchHit,AccordionContent,GroupedSearchHit
+      SearchHit,AccordionContent,GroupedSearchHit,AvailabilitySelector
    },
    computed: {
       ...mapGetters({
@@ -361,9 +361,6 @@ div.pools {
    font-weight: 500;
 }
 .refine {
-   display: block;
-   text-align: left;
-   font-size: 0.9em;
-   margin: 10px 0 5px;
+   margin: 0 0 0 15px;
 }
 </style>

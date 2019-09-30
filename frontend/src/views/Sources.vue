@@ -10,8 +10,7 @@
             <div class="pool" v-for="p in pools" :key="p.id" 
                v-bind:class="{excluded: isPoolExcluded(p.url)}">
                <div class="name">
-                  <span><b>{{p.name}} : </b></span>
-                  <span>{{p.summary}}</span>
+                  <span><b>{{p.name}}</b></span>
                </div>
                 <div class="description">
                    <span>{{p.description}}</span>

@@ -1,5 +1,12 @@
 import axios from 'axios'
 
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+import { getField, updateField } from 'vuex-map-fields'
+
+Vue.use(Vuex)
+
 const filters = {
    namespaced: true,
    state: {
@@ -10,10 +17,12 @@ const filters = {
       poolFacets: [], 
       poolFilters: [],
       adding: false,
-      updatingBuckets: false
+      updatingBuckets: false,
+      globalAvailability: "any"
    },
 
    getters: {
+      getField,
       poolFacets: (state) => (idx) => {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
@@ -42,6 +51,7 @@ const filters = {
       },
 
       hasFilter: (state) => (idx) => {
+         if ( state.globalAvailability == "online" || state.globalAvailability == "onshelf" ) return true
          if (idx < 0) return false 
          let filters = state.poolFilters[idx]
          if (filters) {
@@ -70,6 +80,7 @@ const filters = {
    },
 
    mutations: {
+      updateField,
       setAllAvailableFacets(state, data) {
          state.poolFacets = []
          state.poolFilters = []

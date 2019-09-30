@@ -3,7 +3,7 @@
       <div @click="blockClick" class="more-results-modal">
          <div id="more-header" class="more-header">
             <div  @click="closePool"  class="overlay-title">
-               <span class="pool-name">{{selectedResults.pool.summary}}</span>
+               <span class="pool-name">{{selectedResults.pool.name}}</span>
                <i class="pool-close fas fa-times-circle"></i>
             </div>
             <AccordionContent title="Description" align="left-narrow" 
