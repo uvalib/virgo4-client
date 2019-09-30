@@ -260,8 +260,8 @@ export default new Vuex.Store({
         preferences: {
           target_pool: rootState.pools.targetPoolURL,
           exclude_pool: rootState.pools.excludePoolURLs,
-          filters: rootGetters['filters/globalFilter']
-        }
+        },
+        filters: rootGetters['filters/globalFilter']
       }
 
       // If a user is signed in, make sure bookmarks are up to date when 
