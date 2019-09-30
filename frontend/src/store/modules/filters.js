@@ -18,7 +18,12 @@ const filters = {
       poolFilters: [],
       adding: false,
       updatingBuckets: false,
-      globalAvailability: "any"
+
+      // Global availability and hard-coded filter values
+      globalAvailability: "any",
+      availabilityFacet: "FacetAvailability",
+      availabilityValues: {"online": "Online",
+         "shelf": "On shelf"}
    },
 
    getters: {
@@ -51,7 +56,7 @@ const filters = {
       },
 
       hasFilter: (state) => (idx) => {
-         if ( state.globalAvailability == "online" || state.globalAvailability == "onshelf" ) return true
+         if ( state.globalAvailability != "any" ) return true
          if (idx < 0) return false 
          let filters = state.poolFilters[idx]
          if (filters) {
@@ -66,16 +71,42 @@ const filters = {
       // [ {name: facet, value: v1}, ...]
       // This getter takes a fmt param that is either api or raw to control the response
       poolFilter: (state) => (idx, fmt) => {
+         let apiFilter = []
+         let globalVal = state.availabilityValues[state.globalAvailability]
+         let out = state.poolFilters[idx].slice(0)
+         let globalIncluded = false
+         out.forEach(function(filterObj) {
+            filterObj.values.forEach(function(val){
+               if (filterObj.facet.id == state.availabilityFacet && val == globalVal) {
+                  globalIncluded = true
+               }
+               apiFilter.push({facet_id: filterObj.facet.id, value: val})
+            } )
+         })
+
          if (fmt == "api") {
-            let apiFilter = []
-            state.poolFilters[idx].forEach(function(filterObj) {
-               filterObj.values.forEach(function(val){
-                  apiFilter.push({facet_id: filterObj.facet.id, value: val})
-               } )
-            })
+            if (state.globalAvailability != "any" && globalIncluded == false) {
+               apiFilter.push({facet_id: state.availabilityFacet, value: globalVal})
+            }
             return apiFilter
          }
-         return state.poolFilters[idx]
+         
+         if (state.globalAvailability != "any" && globalIncluded == false) {
+            let availFacet = {"id": state.availabilityFacet, name: "Availability"}
+            out.push( {"facet": availFacet, "values": [globalVal]})
+         }
+   
+         return out
+      },
+
+      // This is only used to get the API-formatted filter for use in global search
+      globalFilter: (state) =>  {
+         let filter = []
+         if (state.globalAvailability != "any") {
+            let globalVal = state.availabilityValues[state.globalAvailability]
+            filter.push({facet_id: state.availabilityFacet, value: globalVal})
+         }
+         return filter
       }
    },
 
@@ -166,10 +197,10 @@ const filters = {
             ctx.commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, 
                facets: response.data.facet_list})
             ctx.commit('setUpdatingBuckets', false)
-         }).catch((error) => {
+         })/*.catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setUpdatingBuckets', false)
-          })
+          })*/
       }
    }
 }

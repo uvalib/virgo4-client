@@ -260,6 +260,7 @@ export default new Vuex.Store({
         preferences: {
           target_pool: rootState.pools.targetPoolURL,
           exclude_pool: rootState.pools.excludePoolURLs,
+          filters: rootGetters['filters/globalFilter']
         }
       }
 
@@ -270,14 +271,14 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
-      commit('resetSearchResults')
-      commit('filters/reset')
+      // commit('resetSearchResults')
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
       axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
-        commit('setSearchResults', response.data)
+        commit('filters/reset')
         commit('filters/setAllAvailableFacets', response.data)
+        commit('setSearchResults', response.data)
         commit('setSearching', false)
       }).catch((error) => {
         commit('system/setError', error)

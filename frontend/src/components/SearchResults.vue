@@ -132,7 +132,8 @@ export default {
          if (this.results[resultIdx].show == false) {
             this.$store.commit("toggleResultVisibility", resultIdx)
             if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
-               this.selectPool(resultIdx)
+               let visibleIdx = this.visibleResultIdx(resultIdx) 
+               this.selectPool(visibleIdx)
             }
          } else {
             let visibleIdx = this.visibleResultIdx(resultIdx) 

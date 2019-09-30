@@ -11,7 +11,9 @@
             <tr class="filter" v-for="(filter,i) in poolFilter(poolIdx, 'raw')" :key="i">
                <td class="label">{{filter.facet.name}}:</td>
                <td class="filter">{{formatValues(filter.values)}}</td>
-               <td class="label"><i @click="removeFilter(i)" class="remove-filter fas fa-trash-alt"></i></td>
+               <td class="label">
+                  <i v-if="!isGlobal(filter)" @click="removeFilter(i)" class="remove-filter fas fa-trash-alt"></i>
+               </td>
             </tr>
          </table>
       </template>
@@ -34,6 +36,9 @@ export default {
       ...mapState({
          addingFilter: state => state.filters.adding,
          poolIdx: state => state.selectedResultsIdx,
+         availabilityFacet: state => state.filters.availabilityFacet,
+         availabilityValues: state => state.filters.availabilityValues,
+         globalAvailability: state => state.filters.globalAvailability
       }),
       ...mapGetters({
          hasFilter: 'filters/hasFilter',
@@ -46,6 +51,11 @@ export default {
       }
    },
    methods: {
+      isGlobal(filter) {
+         if ( filter.facet.id != this.availabilityFacet) return false
+         let val = this.availabilityValues[this.globalAvailability]
+         return filter.values.includes(val)
+      },
       formatValues(values) {
          return values.join(", ")
       },

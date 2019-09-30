@@ -10,7 +10,7 @@
          Online
       </label>
       <label for="shelf" class="pure-radio">
-         <input id="shelf" v-model="globalAvailability" type="radio" name="availability" value="onshelf"> 
+         <input id="shelf" v-model="globalAvailability" type="radio" name="availability" value="shelf"> 
          On Shelf
       </label>
    </div>
@@ -24,10 +24,12 @@ export default {
          'globalAvailability',
       ])
    },
-   methods: {
-      ackMessage() {
-         this.$store.commit("system/closeTraslateMessage")
+   watch: {
+      globalAvailability () {
+         this.$store.dispatch("searchAllPools")
       }
+   },
+   methods: {
    }
 }
 </script>
