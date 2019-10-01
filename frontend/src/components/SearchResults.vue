@@ -31,8 +31,9 @@
          </div>
       </div>
 
-      <div class="pools"> 
-         <div class="pool-panel" v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
+      <div class="pools">
+         <div :id="result.resultIdx" class="pool-panel" 
+            v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
             <div class="pool-titlebar">
                <div class="title1">
                   <i v-if="isTargetPool(result.pool.url)" class="fas fa-star"></i>
@@ -106,6 +107,23 @@ export default {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
    },
+   watch: {
+      visibleResults(newVis, oldVis) {
+         if (newVis.length > oldVis.length) {
+            let resultIdx = newVis[0].resultIdx
+            setTimeout( ()=>{
+               let panel = document.getElementById(resultIdx)
+               let anim = "pulse"
+               panel.classList.add('animated', "faster", anim)  
+               panel.addEventListener('animationend', handleAnimationEnd)
+               function handleAnimationEnd() {
+                  panel.classList.remove('animated', "faster", anim)
+                  panel.removeEventListener('animationend', handleAnimationEnd)
+               }
+            }, 5)
+         }   
+      }
+   },
    methods: {
       poolFailed(p) {
          return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
@@ -123,7 +141,16 @@ export default {
          this.$store.commit("selectPoolResults", visiblePoolIdx)
       },
       closeResults(resultIdx) {
-         this.$store.commit("toggleResultVisibility", resultIdx)
+         let panel = document.getElementById(resultIdx)
+         let anim = "fadeOut"
+         let store = this.$store
+         panel.classList.add('animated', "faster", anim)  
+         panel.addEventListener('animationend', handleAnimationEnd)
+         function handleAnimationEnd() {
+            panel.classList.remove('animated', "faster", anim)
+            panel.removeEventListener('animationend', handleAnimationEnd)
+            store.commit("toggleResultVisibility", resultIdx)
+         }
       },
       resultsButtonClicked(resultIdx) {
          let r = this.results[resultIdx]
