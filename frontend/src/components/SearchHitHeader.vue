@@ -13,13 +13,18 @@
          </div>
          <BookmarkButton :hit="hit" :pool="pool"/>
       </div>
-      <div v-if="hit.header.author"  class="author">{{hit.header.author.join(", ")}}</div>
-      <div class="main-info">
-         <div v-if="hit.header.format" class="info">
-            <b>Format:&nbsp;</b>{{hit.header.format.join(", ")}}
-         </div>
-         <div v-if="hit.header.availability" class="info">
-            <b>Availability:&nbsp;</b>{{hit.header.availability.join(", ")}}
+      <div class="data-image">
+         <img v-bind:class="{small: !fullImage}" class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
+         <div class="details">
+            <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
+            <div class="block">
+               <div v-if="hit.header.format" class="info">
+                  <b>Format:&nbsp;</b>{{hit.header.format.join(", ")}}
+               </div>
+               <div v-if="hit.header.availability" class="info">
+                  <b>Availability:&nbsp;</b>{{hit.header.availability.join(", ")}}
+               </div>
+            </div>
          </div>
       </div>
    </div>
@@ -36,6 +41,10 @@ export default {
       pool: {
          type: String,
          required: true
+      },
+      fullImage: {
+         type: Boolean,
+         default: false
       }
    },
    components: {
@@ -50,6 +59,20 @@ export default {
 </script>
 
 <style scoped>
+.cover-img {
+   border-radius: 3px;
+   margin: 0 5px 0 0;
+}
+.cover-img.small {
+   max-height: 124px;
+   max-width: 100px;
+}
+
+.data-image {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+}
 .header-wrapper {
    text-align: left;
 }
@@ -58,6 +81,7 @@ export default {
    flex-flow: row nowrap;
    align-items: flex-start;
    justify-content: space-between;
+   margin-bottom:5px;
 }
 #app div.header-wrapper a {
    color: var(--color-primary-text)
@@ -77,7 +101,7 @@ export default {
    display: inline-block;
    font-weight: normal;
 }
-.main-info {
+.block {
    margin-left: 10px;
 }
 .author {

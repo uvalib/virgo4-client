@@ -24,7 +24,7 @@
                   </span>
                   <template v-if="!poolFailed(r)">
                      <i v-if="r.show" class="showing fas fa-external-link-alt"></i>
-                     <i v-else class="showing fa fa-arrow-down"></i>   
+                     <i v-else-if="r.total>0" class="showing fa fa-arrow-down"></i>   
                   </template>
                </div>
             </template>

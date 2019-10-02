@@ -13,7 +13,7 @@
             </div>
          </template>
          <template v-else>
-            <SearchHitHeader :hit="details" :pool="this.$route.params.src"/>
+            <SearchHitHeader v-bind:fullImage="true" :hit="details" :pool="this.$route.params.src"/>
             <div class="bar"></div>
             <table class="fields">  
                <tr v-for="(field,idx) in detailFields" :key="idx">

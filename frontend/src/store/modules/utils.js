@@ -15,7 +15,7 @@ export function preProcessHitFields(hits) {
 
       // Special fields are cover image and identifer. Move them to top level
       if (field.name == "cover_image") {
-        // while in flux, toss the cover image stuff. it currently breaks the UI
+        hit.cover_image = field.value
         return
       }
       if (field.type == "identifier" || field.name == "id") {
