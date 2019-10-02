@@ -177,7 +177,7 @@ div.infinite-status-prompt  .loading-default {
 }
 @media only screen and (max-width: 768px) {
    .more-results-modal, .more-results-modal, div.more-header {
-      left: 10%;
+      left: 5%;
    }
 }
 div.more-header {

@@ -13,8 +13,8 @@
             </div>
          </template>
          <template v-else>
-            <BookmarkButton :hit="details" :pool="this.$route.params.src"/>
-            <img class="preview" v-if="details.previewURL" :src="details.previewURL"/>
+            <SearchHitHeader :hit="details" :pool="this.$route.params.src"/>
+            <div class="bar"></div>
             <table class="fields">  
                <tr v-for="(field,idx) in detailFields" :key="idx">
                   <template v-if="field.display != 'optional'">
@@ -34,10 +34,11 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import BookmarkButton from "@/components/BookmarkButton"
 import BackToVirgo from "@/components/BackToVirgo"
+import SearchHitHeader from '@/components/SearchHitHeader'
 export default {
    name: "sources",
    components: {
-      BackToVirgo,BookmarkButton
+      BackToVirgo,BookmarkButton,SearchHitHeader
    },
    computed: {
       ...mapState({
@@ -61,7 +62,7 @@ export default {
             return field.value.join(",<br>")
          }
          if (field.type == "url") {
-            return `<a href="${field.value}" class="pure-button pure-button-primary ext" target="_blank">External Link&nbsp;&nbsp;<i class="fas fa-external-link-alt"></i></a>`
+            return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
          } 
          return field.value
       },
@@ -78,8 +79,9 @@ export default {
 </script>
 
 <style scoped>
-img.preview {
-   float:right;
+.bar {
+   margin: 15px 0;
+   border-top: 4px solid var(--color-primary-orange);
 }
 .details {
    min-height: 400px;

@@ -110,7 +110,7 @@ div.add-bookmark {
    width: 40%;
    height: auto;
    top: 15%;
-   z-index: 2000;
+   z-index: 8000;
    background: white;
    left: 50%;
    transform: translate(-50%, 0%);

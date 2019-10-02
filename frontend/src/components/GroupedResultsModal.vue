@@ -4,7 +4,7 @@
          <div id="more-header" class="more-header">
             <div  @click="closeGroupedResults"  class="overlay-title">
                <i class="group-icon fas fa-layer-group"></i>
-               <span class="pool-name">{{groupTitle}}</span>
+               <span class="pool-name">{{groupDetails.header.title}}</span>
                <i class="pool-close fas fa-times-circle"></i>
             </div>
          </div>
@@ -13,6 +13,7 @@
             <template v-for="(hit,idx) in groupDetails.items">
                <SearchHit :pool="groupDetails.pool" :hit="hit" :key="idx"/>
             </template>
+            <div class="end">No more matches</div>
          </div>
       </div>
    </div>
@@ -29,16 +30,6 @@ export default {
       ...mapState({
          groupDetails: state=>state.groupDetails,
       }),
-      groupTitle() {
-         let title = ""
-         this.groupDetails.metadata.some( md => {
-            if (md.name == "title") {
-               title = md.value
-            }
-            return title != ""
-         })
-         return title
-      }
    },
    methods: {
       blockClick(event) {
@@ -73,6 +64,11 @@ export default {
    right: 0;
    z-index: 2000;
 }
+.end {
+   background-color:  var(--color-primary-blue);
+   color: white;
+   padding: 3px;
+}
 .group-icon {
    margin: 0 8px 0 2px;
 }
@@ -94,7 +90,7 @@ export default {
 }
 @media only screen and (max-width: 768px) {
    .grouped-results-modal, .grouped-results-modal, div.more-header {
-      left: 10%;
+      left: 5%;
    }
 }
 div.more-header {

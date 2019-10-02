@@ -5,27 +5,24 @@
          <i class="group-icon fas fa-layer-group"></i>
       </div>
       <div class="details">
-         <table class="fields">
-            <tr v-for="(field,idx) in hit.metadata" :key="idx">
-               <template v-if="field.name!='cover_image'">
-                  <td class="label">{{field.label}}:</td>
-                  <td class="value" v-html="fieldValueString(field)"></td>
-               </template>
-            </tr>
-         </table>
+         <SearchHitHeader :hit="hit" :pool="pool"/>
          <span @click="viewClicked" class="pure-button pure-button-primary all">
-            See all {{hit.count}} copies
+            See all {{hit.count}} copies<i class="more-icon fas fa-external-link-alt"></i>
          </span>
       </div>
    </div>
 </template>
 
 <script>
+import SearchHitHeader from '@/components/SearchHitHeader'
 export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
       hitIdx: {type: Number, required: true}
+   },
+   components: {
+      SearchHitHeader
    },
    methods: {
       fieldValueString( field ) {
@@ -67,6 +64,9 @@ export default {
 i.group-icon {
    font-size: 1.5em;
 }
+i.more-icon {
+   margin-left: 8px;
+}
 .details {
    padding: 10px;
    background: #f2f2f2
@@ -77,20 +77,5 @@ i.group-icon {
    box-sizing: border-box;
    width:100%;
    background-color: var(--color-pale-blue);
-}
-.hit table {
-   table-layout: auto;
-   border-collapse: collapse;
-   width: 100%;
-}
-.hit table td.label {
-   font-weight: bold;
-   text-align: right;
-   padding: 2px 5px;
-   white-space: nowrap;
-}
-.hit table td.value {
-   width: 100%;
-   font-weight: normal;
 }
 </style>

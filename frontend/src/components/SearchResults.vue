@@ -9,9 +9,9 @@
                <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
                <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
             </p>
-
             <AvailabilitySelector/>
          </div>
+
          <div class="pool-buttons">
             <template  v-for="(r,idx) in results">  
                <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: r.show}">
@@ -48,9 +48,6 @@
             <div class="pool-info">
                <div class="metrics">
                   <span>{{result.total}} matches found in {{result.timeMS}} ms</span>
-                  <span class="more" @click="selectPool(visibleIdx)">
-                     See More&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
-                  </span>
                </div>
                <template v-if="hasFilter(result.resultIdx)">
                   <div class="filter-head">Search Filters</div>
@@ -67,7 +64,7 @@
                <GroupedSearchHit v-else :hitIdx="idx" :pool="result.pool.id" :hit="hit" :key="idx"/>
             </template>
             <div @click="selectPool(visibleIdx)" class="more-panel">
-               See More Results&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
+               See More&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
             </div>
          </div>
       </div>
@@ -250,10 +247,6 @@ td.label {
    font-weight: 500;
    
 }
-span.view-all {
-   float: right;
-   cursor: pointer;
-}
 div.right-indent {
    margin-left: 5px;
 }
@@ -290,11 +283,6 @@ div.pools {
    padding: 0 5px;
    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr) ) ;
 }
-.pool-panel {
-   margin: 0;
-   padding: 0;
-   color: #333;
-}
 .more-panel {
    border: 1px solid #ccc;
    padding: 10px;
@@ -304,7 +292,7 @@ div.pools {
    color: #444;
    background: #e5e5e5
 }
-.more-panel:hover, .view-all:hover {
+.more-panel:hover {
    color: var(--color-link);
 }
 .more-panel:hover .more-icon {
@@ -343,18 +331,11 @@ div.pools {
    font-size: 1.3em;
    margin-left: auto; /* put close on right */
 }
-.title2 {
-   padding: 2px 10px 0 10px;
-}
-
 .query-summary {
    text-align: left;
    margin: 0 0 0.2vw 0;
    font-weight: bold;
    font-size: 1.1em;
-}
-.query-summary  i {
-   font-weight: 500;
 }
 .summary {
    margin: 0 0 0.2vw 0;
@@ -367,9 +348,6 @@ div.pools {
    display: block;
    margin: 2px 0 2px 15px;
 }
-div.toolbar {
-   position: relative;
-}
 @media only screen and (min-width: 768px) {
    div.results-panel {
       margin: 0 5vw 5vw 5vw;
@@ -381,12 +359,6 @@ div.toolbar {
       margin: 0 2vw 2vw 2vw;
       padding: 0;
    }
-}
-div.pools {
-   text-align: left;
-}
-.total {
-   font-weight: 500;
 }
 .refine {
    margin: 0 0 0 15px;

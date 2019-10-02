@@ -1,5 +1,5 @@
 <template>
-   <span class="bookmark-container" v-if="isSignedIn">
+   <span class="bookmark-container" v-if="isSignedIn && !hit.grouped">
       <i @click="removeBookmarkClicked" class="bookmark fas fa-bookmark" v-if="isBookmarked"></i> 
       <i @click="addBookmarkClicked" class="bookmark far fa-bookmark" v-else></i> 
    </span>
@@ -46,21 +46,12 @@ export default {
          })
       },
       addBookmarkClicked() {
-         let data = {pool: this.pool, identifier: this.hit.identifier, title: "", author: ""} 
-         let tgt = [this.hit.basicFields, this.hit.basicFields]
-         tgt.forEach(function(fields) {
-            fields.forEach(function(f) {
-               if (f.name == "title") {
-                  data.title = f.value
-               } else if (f.name == "author") {
-                  if ( Array.isArray(f.value)) {
-                      data.author = f.value.join(", ")
-                  } else {
-                     data.author = f.value
-                  }
-               }
-            })
-         }) 
+         let author = "" 
+         if ( this.hit.header.author ) {
+            author = this.hit.header.author.join(", ")
+         }
+         let data = {pool: this.pool, identifier: this.hit.identifier, 
+            title: this.hit.header.title, author: author} 
          this.$store.commit("user/showAddBookmark", data)
       },
    }
