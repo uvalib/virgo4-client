@@ -2,6 +2,7 @@
    <div class="hit">
       <div class="basic">
          <SearchHitHeader :hit="hit" :pool="pool"/>
+         <div v-if="hit.basicFields.length > 0" class="sep"></div>
          <table class="fields">
             <tr v-for="field in hit.basicFields" :key="getKey(field)">
                <template v-if="field.display != 'optional'">
@@ -56,6 +57,10 @@ export default {
 <style scoped>
 div.details {
    padding: 10px;
+}
+.sep {
+   border-top:1px solid #ccc;
+   margin: 10px 0;
 }
 div.basic {
    padding: 10px 10px 10px 10px;
