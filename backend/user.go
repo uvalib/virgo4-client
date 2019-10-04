@@ -135,6 +135,13 @@ type User struct {
 	Bookmarks []*Folder    `json:"bookmarks"`
 }
 
+// GetUserCheckouts uses ILS Connector V2 API /users to get checked out items
+func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
+	userID := c.Param("uid")
+	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
+	c.String(http.StatusNotImplemented, "not implemented")
+}
+
 // GetUser uses ILS Connector V2 API /users to get details for a user
 func (svc *ServiceContext) GetUser(c *gin.Context) {
 	userID := c.Param("uid")

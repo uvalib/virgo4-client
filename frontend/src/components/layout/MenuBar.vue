@@ -17,6 +17,9 @@
                      <router-link to="/account">
                         <div class="submenu">Account Info</div>
                      </router-link>
+                     <router-link to="/checkouts">
+                        <div class="submenu">Checked-Out Items</div>
+                     </router-link>
                      <router-link to="/bookmarks">
                         <div class="submenu">Bookmarks</div>
                      </router-link>

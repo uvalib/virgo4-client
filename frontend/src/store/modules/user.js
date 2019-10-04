@@ -12,7 +12,8 @@ const user = {
       sessionType: "",
       accountInfo: null,
       bookmarks: null,
-      newBookmarkInfo: null
+      newBookmarkInfo: null,
+      lookingUp: false
    },
 
    getters: {
@@ -67,6 +68,9 @@ const user = {
    },
 
    mutations: {
+      setLookingUp(state, flag) {
+         this.lookingUp = flag
+      },
       showAddBookmark(state, bookmarkData) {
          state.newBookmarkInfo = bookmarkData
       },
@@ -124,12 +128,26 @@ const user = {
         })
       },
       getAccountInfo(ctx) {
+         ctx.commit('setLookingUp', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
-         return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
+         axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
+            ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
           })
+      },
+      getCheckouts(ctx) {
+         ctx.commit('setLookingUp', true)
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         // axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
+         //    ctx.commit('setAccountInfo', response.data)
+         //    ctx.commit('setLookingUp', false)
+         //  }).catch((error) => {
+         //    ctx.commit('system/setError', error, { root: true })
+         //    ctx.commit('setLookingUp', false)
+         //  })
       },
       signout(ctx) {
          ctx.commit('setAuthorizing', true)

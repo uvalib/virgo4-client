@@ -5,6 +5,7 @@ import Details from './views/Details.vue'
 import Sources from './views/Sources.vue'
 import SignIn from './views/SignIn.vue'
 import Account from './views/Account.vue'
+import Checkouts from './views/Checkouts.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
 import Forbidden from './views/Forbidden.vue'
@@ -75,6 +76,19 @@ const router = new Router({
       path: '/bookmarks',
       name: 'bookmarks',
       component: Bookmarks,
+      beforeEnter: (_to, _from, next) => {
+        store.commit("system/closeUserMenu")
+        if (getSignedInUserFromCookie()) {
+          next()
+        } else {
+          next("/") 
+        }
+      }
+    },
+    {
+      path: '/checkouts',
+      name: 'checkouts',
+      component: Checkouts,
       beforeEnter: (_to, _from, next) => {
         store.commit("system/closeUserMenu")
         if (getSignedInUserFromCookie()) {

@@ -44,6 +44,7 @@ func main() {
 	{
 		api.GET("/authenticated/:token", svc.IsAuthenticated)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)
+		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 		bookmarks := api.Group("/users/:uid/bookmarks")
 		{
