@@ -8,7 +8,7 @@
          </div>
          <div v-else class="details">
             <div class="user-name">{{info.displayName}} ({{info.id}})</div>   
-            <div>{{info.organizationalUnit}} - {{info.profile}}</div>
+            <div>{{info.department}} - {{info.profile}}</div>
             <div>{{info.address}}</div>
             <div>{{info.email}}</div>
          </div>

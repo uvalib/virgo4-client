@@ -23,7 +23,7 @@ func LoadConfig() *ServiceConfig {
 	var cfg ServiceConfig
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
-	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu/v2", "ILS Connector API URL")
+	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 	flag.StringVar(&cfg.DevAuthUser, "devuser", "", "Authorized computing id for dev")
 	flag.StringVar(&cfg.DBHost, "dbhost", "localhost", "Database host")
 	flag.IntVar(&cfg.DBPort, "dbport", 5432, "Database port")

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
@@ -114,18 +113,13 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 
 // ILSUserInfo contains ILS connector details for a user
 type ILSUserInfo struct {
-	ID                 string `json:"id"`
-	DisplayName        string `xml:"displayName" json:"displayName"`
-	Title              string `xml:"title" json:"title"`
-	Profile            string `xml:"profile" json:"profile"`
-	OrganizationalUnit string `xml:"organizationalUnit" json:"organizationalUnit"`
-	Address            string `xml:"physicalDelivery" json:"address"`
-	Email              string `xml:"email" json:"email"`
-	TotalCheckouts     int    `xml:"totalCheckouts" json:"totalCheckouts"`
-	TotalHolds         int    `xml:"totalHolds" json:"totalHolds"`
-	TotalOverdue       int    `xml:"totalOverdue" json:"totalOverdue"`
-	TotalRecalls       int    `xml:"totalRecalls" json:"totalRecalls"`
-	TotalReserves      int    `xml:"totalReserves" json:"totalReserves"`
+	ID          string `json:"id"`
+	DisplayName string `json:"displayName"`
+	Title       string `json:"title"`
+	Department  string `json:"department"`
+	Profile     string `json:"profile"`
+	Address     string `json:"address"`
+	Email       string `json:"email"`
 }
 
 // User contains all user data collected from ILS and Virgo4 sources
@@ -147,7 +141,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get info for user %s with ILS Connector...", userID)
 
-	userURL := fmt.Sprintf("%s/users/%s", svc.ILSAPI, userID)
+	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -155,7 +149,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	}
 
 	var ilsUser ILSUserInfo
-	if err := xml.Unmarshal(bodyBytes, &ilsUser); err != nil {
+	if err := json.Unmarshal(bodyBytes, &ilsUser); err != nil {
 		log.Printf("ERROR: unable to parse user response: %s", err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
 		return

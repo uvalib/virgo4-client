@@ -159,6 +159,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 
 // ILSConnectorGet returns front-end configuration data as JSON
 func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
+	log.Printf("ILS Connector request: %s", url)
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
@@ -180,5 +181,6 @@ func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	log.Printf("Raw ILS response %s", bodyBytes)
 	return bodyBytes, nil
 }

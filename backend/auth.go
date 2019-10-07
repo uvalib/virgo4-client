@@ -67,7 +67,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
-	authURL := fmt.Sprintf("%s/users/%s/check_pin?pin=%s", svc.ILSAPI, auth.Barcode, auth.Password)
+	authURL := fmt.Sprintf("%s/v4/users/%s/check_pin?pin=%s", svc.ILSAPI, auth.Barcode, auth.Password)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(authURL)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
