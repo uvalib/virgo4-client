@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
@@ -74,15 +73,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 		return
 	}
 
-	var xmlValidPin bool
-	log.Printf("Raw pinCheck response %s", bodyBytes)
-	if err := xml.Unmarshal(bodyBytes, &xmlValidPin); err != nil {
-		log.Printf("ERROR: unable to parse pin_check  response: %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	if !xmlValidPin {
+	if string(bodyBytes) != "valid" {
 		log.Printf("ERROR: pin for %s falied authentication", auth.Barcode)
 		c.String(http.StatusForbidden, "Authentication failed")
 		return

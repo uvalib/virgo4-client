@@ -122,6 +122,15 @@ type ILSUserInfo struct {
 	Email       string `json:"email"`
 }
 
+// CheckoutInfo has sumary info for a checked out item
+type CheckoutInfo struct {
+	ID         string `json:"id"`
+	Title      string `json:"title"`
+	CallNumber string `json:"callNumber"`
+	Library    string `json:"library"`
+	DueDate    string `json:"due"`
+}
+
 // User contains all user data collected from ILS and Virgo4 sources
 type User struct {
 	UserInfo  *ILSUserInfo `json:"user"`
@@ -133,7 +142,20 @@ type User struct {
 func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
-	c.String(http.StatusNotImplemented, "not implemented")
+	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	if ilsErr != nil {
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	var checkouts []CheckoutInfo
+	if err := json.Unmarshal(bodyBytes, &checkouts); err != nil {
+		log.Printf("ERROR: unable to parse user checkouts: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, checkouts)
 }
 
 // GetUser uses ILS Connector V2 API /users to get details for a user
