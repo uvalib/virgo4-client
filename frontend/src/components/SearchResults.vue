@@ -1,15 +1,19 @@
 <template>
    <div class="results-panel">
-      <div class="query-summary">Showing results for: <i>{{queryString}}</i></div>
+      <div class="query-summary">
+         <span>Showing results for: <i>{{queryString}}</i></span>
+      </div>
       <div class="toolbar">
          <div class="right-indent">
             <p class="summary">
                <span>{{total}} matches found in {{results.length}} sources.</span> 
                <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
                <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
-               <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine text-button">Refine Search</span>
             </p>
+         </div>
+         <div class="search-controls">
             <AvailabilitySelector/>
+            <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine pure-button pure-button-primary">Refine Search</span>
          </div>
 
          <div class="pool-buttons">
@@ -173,6 +177,12 @@ export default {
 </script>
 
 <style scoped>
+#app .pool-buttons div.pool.pure-button:first-child {
+   margin-left: 0;
+}
+#app .pool-buttons div.pool.pure-button:last-child {
+   margin-right: 0;
+}
 .pool-buttons div.pool.pure-button {
    display: flex;
    flex-flow: row nowrap;
@@ -238,6 +248,7 @@ td.filter {
    width: 100%;
    font-weight: 500;
    color: #333;
+   text-align: left;
 }
 td.label {
    padding: 2px 4px 0 0;
@@ -360,7 +371,12 @@ div.pools {
       padding: 0;
    }
 }
-.refine {
-   margin: 0 0 0 15px;
+div.search-controls {
+   display: flex;
+   flex-flow: row wrap;
+   align-items: center;
+}
+#app span.pure-button.pure-button-primary.refine {
+   margin-left: auto;   
 }
 </style>

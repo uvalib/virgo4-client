@@ -7,7 +7,16 @@
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
-            Not yet implemented
+            <table>
+               <tr><th>Title</th><th>Author</th><th>Due</th><th>Library</th><th>Call Number</th></tr>
+               <tr v-for="checkout in checkouts" :key="checkout.id">
+                  <td>{{checkout.title}}</td>
+                  <td>{{checkout.author}}</td>
+                  <td>{{checkout.due}}</td>
+                  <td>{{checkout.library}}</td>
+                  <td>{{checkout.callNumber}}</td>
+               </tr>
+            </table>
          </div>
          <BackToVirgo />
       </div>
@@ -30,7 +39,7 @@ export default {
    },
    computed: {
       ...mapState({
-         // info: state => state.user.checkoutInfo,
+         checkouts: state => state.user.checkouts,
       }),
       ...mapGetters({
       //   hasAccountInfo: 'user/hasAccountInfo',

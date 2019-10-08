@@ -112,6 +112,9 @@ const filters = {
 
    mutations: {
       updateField,
+      setGlobalAvailability(state, status) {
+         state.globalAvailability = status
+      },
       setAllAvailableFacets(state, data) {
          state.poolFacets = []
          state.poolFilters = []

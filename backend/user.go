@@ -124,8 +124,9 @@ type ILSUserInfo struct {
 
 // CheckoutInfo has sumary info for a checked out item
 type CheckoutInfo struct {
-	ID         string `json:"id"`
+	ID         int    `json:"id"`
 	Title      string `json:"title"`
+	Author     string `json:"author"`
 	CallNumber string `json:"callNumber"`
 	Library    string `json:"library"`
 	DueDate    string `json:"due"`

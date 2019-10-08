@@ -1,18 +1,21 @@
 <template>
    <div class="availability-wrapper">
-      <span class="label">Availability: </span>
-      <label for="any" class="pure-radio">
-         <input id="any" v-model="globalAvailability" type="radio" name="availability" value="any" checked> 
-         Any
-      </label>
-      <label for="online" class="pure-radio">
-         <input id="online" v-model="globalAvailability" type="radio" name="availability" value="online"> 
-         Online
-      </label>
-      <label for="shelf" class="pure-radio">
-         <input id="shelf" v-model="globalAvailability" type="radio" name="availability" value="shelf"> 
-         On Shelf
-      </label>
+      <span class="label">Availability&nbsp;</span>
+      <span @click="availClicked('any')" class="pure-button pure-button-primary avail">
+         <span class="label">Any</span>
+         <i v-if="isChecked('any')" class="far fa-check-circle"></i>
+         <i v-else class="far fa-circle"></i>
+      </span>
+      <span @click="availClicked('online')" class="pure-button pure-button-primary avail">
+         <span class="label">Online</span>
+         <i v-if="isChecked('online')" class="far fa-check-circle"></i>
+         <i v-else class="far fa-circle"></i>
+      </span>
+      <span @click="availClicked('shelf')"  class="pure-button pure-button-primary avail">
+         <span class="label">On Shelf</span>
+         <i v-if="isChecked('shelf')" class="far fa-check-circle"></i>
+         <i v-else class="far fa-circle"></i>
+      </span>
    </div>
 </template>
 
@@ -30,14 +33,37 @@ export default {
       }
    },
    methods: {
+      isChecked(avail) {
+         return this.globalAvailability == avail
+      },
+      availClicked( availType ) {
+         this.$store.commit("filters/setGlobalAvailability", availType)  
+      }
    }
 }
 </script>
 
 <style scoped>
-div.availability-wrapper {
-   text-align: left;
-   margin: 10px 0;
+#app span.pure-button.pure-button-primary.avail{
+   padding: 3px 8px;
+   font-size: 0.9em;
+   display: flex;
+   margin: 2px 4px;
+   flex-flow: row nowrap;
+   align-items: center;
+}
+span.pure-button.avail i {
+   margin-left: 10px;
+}
+.availability-wrapper {
+   display: flex;
+   flex-flow: row wrap;
+   align-items: center;
+   background: var(--color-pale-blue);
+   color: white;
+   border-radius: 5px;
+   margin: 10px 0 5px 0;
+   padding: 4px 4px 4px 10px;
 }
 .label {
    font-weight: bold;
