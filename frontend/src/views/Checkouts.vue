@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import BackToVirgo from "@/components/BackToVirgo"
 export default {
@@ -32,23 +31,14 @@ export default {
    components: {
       BackToVirgo
    },
-   data: function() {
-      return {
-         lookingUp: true,
-      };
-   },
    computed: {
       ...mapState({
          checkouts: state => state.user.checkouts,
-      }),
-      ...mapGetters({
-      //   hasAccountInfo: 'user/hasAccountInfo',
+         lookingUp: state => state.user.lookingUp,
       }),
    },
    created() {
-      this.$store.dispatch("user/getCheckouts").then(_response => {
-         this.lookingUp = false
-      })
+      this.$store.dispatch("user/getCheckouts")
    }
 }
 </script>

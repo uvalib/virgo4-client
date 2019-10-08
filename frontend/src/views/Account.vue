@@ -36,9 +36,7 @@ export default {
       }),
    },
    created() {
-      if (this.hasAccountInfo ==  false) {
-         this.$store.dispatch("user/getAccountInfo")
-      }
+      this.$store.dispatch("user/getAccountInfo")
    }
 }
 </script>

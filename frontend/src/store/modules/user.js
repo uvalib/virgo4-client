@@ -11,7 +11,7 @@ const user = {
       signInMessage: "",
       sessionType: "",
       accountInfo: null,
-      checkouts: [],
+      checkouts: null,
       bookmarks: null,
       newBookmarkInfo: null,
       lookingUp: false
@@ -70,7 +70,7 @@ const user = {
 
    mutations: {
       setLookingUp(state, flag) {
-         this.lookingUp = flag
+         state.lookingUp = flag
       },
       setCheckouts(state, co) {
          state.checkouts = co

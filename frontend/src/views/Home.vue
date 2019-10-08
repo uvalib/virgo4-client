@@ -124,6 +124,7 @@ div.searching-box {
   z-index: 1005;
   font-weight: bold;
   margin: 10vw auto;
+  box-shadow: 2px 2px 10px #333;
 }
 @media only screen and (min-width: 768px) {
    div.searching-box {
