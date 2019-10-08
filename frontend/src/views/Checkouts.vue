@@ -9,10 +9,10 @@
          <div v-else class="details">
             <table>
                <tr><th>Title</th><th>Author</th><th>Due</th><th>Library</th><th>Call Number</th></tr>
-               <tr v-for="checkout in checkouts" :key="checkout.id">
+               <tr v-for="(checkout,idx) in checkouts" :key="checkout.id" v-bind:class="{shade: idx%2}" >
                   <td>{{checkout.title}}</td>
                   <td>{{checkout.author}}</td>
-                  <td>{{checkout.due}}</td>
+                  <td class="date">{{formatDate(checkout.due)}}</td>
                   <td>{{checkout.library}}</td>
                   <td>{{checkout.callNumber}}</td>
                </tr>
@@ -37,6 +37,11 @@ export default {
          lookingUp: state => state.user.lookingUp,
       }),
    },
+   methods: {
+      formatDate(dateStr) {
+         return dateStr.split("T")[0]
+      }
+   },
    created() {
       this.$store.dispatch("user/getCheckouts")
    }
@@ -58,17 +63,17 @@ export default {
    margin: 30px 0;
 }
 .checkout-content {
-   width: 60%;
+   width: 80%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    div.checkout-content  {
-       width: 60%;
+       width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {
    div.checkout-content  {
-       width: 80%;
+       width: 95%;
    }
 }
 .details {
@@ -78,5 +83,23 @@ export default {
    font-size: 1.1em;
    font-weight: bold;
 }
+table tr th, td.date {
+   white-space: nowrap;
+}
+table tr th {
+   background-color: #e5e5e5;
+   padding: 4px 8px;
+   color: #444;
+   border-top: 1px solid #ccc;
+   border-bottom: 1px solid #ccc;
+}
+table td {
+   padding: 2px 8px;
+   border-bottom: 1px solid #ccc;
+}
+tr.shade td {
+   background-color: #fafafa;
+}
+
 </style>
 
