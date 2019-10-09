@@ -54,6 +54,15 @@ func main() {
 			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
 			bookmarks.DELETE("/items/:id", svc.AuthMiddleware, svc.DeleteBookmark)
 		}
+		reserves := api.Group("/reserves")
+		{
+			reserves.GET("/desks", svc.GetReserveDesks)
+			reserves.GET("/search", svc.SearchReserves)
+			reserves.GET("/instructors/:uid", svc.ListCoursesByInstructor)
+			reserves.GET("/instructors/:uid/courses/:cid", svc.ListReserves)
+			reserves.GET("/courses/:cid", svc.ListInstructorsForCourse)
+			reserves.GET("/courses/:cid/instructors/:uid", svc.ListReserves)
+		}
 	}
 	auth := router.Group("/authenticate")
 	{
