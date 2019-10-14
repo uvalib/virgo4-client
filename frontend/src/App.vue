@@ -78,12 +78,14 @@ export default {
 /* Color variable definitions */
 :root {
    --color-primary-orange: #E57200;
+   --color-brand-orange: var(--color-primary-orange);
    --color-dark-orange: #ac4400;
    --color-link: #007ae7;
    --color-primary-blue: #0052cc;
    --color-pale-blue: #5d7eff;
    --color-secondary-blue: #002359;
    --color-primary-text: #444;
+   --color-brand-blue: #232D4B;
    --color-dark-blue: #002f6c;
    --color-hover-highight: #f5f5f4;
    --color-error: firebrick;
@@ -98,7 +100,7 @@ export default {
 
 #app .pure-button.pure-button-primary {
   background-color: var(--color-primary-blue);
-} 
+}
 
 #app .pure-button.pure-button-secondary {
    background-color: var(--color-pale-blue);

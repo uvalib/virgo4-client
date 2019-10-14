@@ -6,7 +6,7 @@
       <div class="toolbar">
          <div class="right-indent">
             <p class="summary">
-               <span>{{total}} matches found in {{results.length}} sources.</span> 
+               <span>{{total}} matches found in {{results.length}} sources.</span>
                <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
                <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
             </p>
@@ -17,7 +17,7 @@
          </div>
 
          <div class="pool-buttons">
-            <template  v-for="(r,idx) in results">  
+            <template  v-for="(r,idx) in results">
                <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: r.show}">
                   <span>
                      <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
@@ -28,7 +28,7 @@
                   </span>
                   <template v-if="!poolFailed(r)">
                      <i v-if="r.show" class="showing fas fa-external-link-alt"></i>
-                     <i v-else-if="r.total>0" class="showing fa fa-arrow-down"></i>   
+                     <i v-else-if="r.total>0" class="showing fa fa-arrow-down"></i>
                   </template>
                </div>
             </template>
@@ -36,7 +36,7 @@
       </div>
 
       <div class="pools">
-         <div :id="result.resultIdx" class="pool-panel" 
+         <div :id="result.resultIdx" class="pool-panel"
             v-for="(result,visibleIdx) in visibleResults" :key="visibleIdx">
             <div class="pool-titlebar">
                <div class="title1">
@@ -44,7 +44,7 @@
                   <span class="pool-name">{{result.pool.name}}</span>
                   <i @click="closeResults(result.resultIdx)" class="hide-pool far fa-times-circle"></i>
                </div>
-               <AccordionContent title="Description"  align="left-narrow" 
+               <AccordionContent title="Description"  align="left-narrow"
                   background="var(--color-primary-orange)" color="white">
                   {{result.pool.description}}
                </AccordionContent>
@@ -115,14 +115,14 @@ export default {
             setTimeout( ()=>{
                let panel = document.getElementById(resultIdx)
                let anim = "pulse"
-               panel.classList.add('animated', "faster", anim)  
+               panel.classList.add('animated', "faster", anim)
                panel.addEventListener('animationend', handleAnimationEnd)
                function handleAnimationEnd() {
                   panel.classList.remove('animated', "faster", anim)
                   panel.removeEventListener('animationend', handleAnimationEnd)
                }
             }, 5)
-         }   
+         }
       }
    },
    methods: {
@@ -145,7 +145,7 @@ export default {
          let panel = document.getElementById(resultIdx)
          let anim = "fadeOut"
          let store = this.$store
-         panel.classList.add('animated', "faster", anim)  
+         panel.classList.add('animated', "faster", anim)
          panel.addEventListener('animationend', handleAnimationEnd)
          function handleAnimationEnd() {
             panel.classList.remove('animated', "faster", anim)
@@ -160,11 +160,11 @@ export default {
          if (this.results[resultIdx].show == false) {
             this.$store.commit("toggleResultVisibility", resultIdx)
             if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
-               let visibleIdx = this.visibleResultIdx(resultIdx) 
+               let visibleIdx = this.visibleResultIdx(resultIdx)
                this.selectPool(visibleIdx)
             }
          } else {
-            let visibleIdx = this.visibleResultIdx(resultIdx) 
+            let visibleIdx = this.visibleResultIdx(resultIdx)
             if (visibleIdx > -1) {
                this.selectPool(visibleIdx)
             } else {
@@ -214,7 +214,7 @@ i.showing {
    padding: 0px;
    font-size: 0.7em;
    font-weight: 500;
-   background-color: #f5f5f5;
+   background-color: red;
 }
 .metrics {
    padding: 5px;
@@ -256,7 +256,7 @@ td.label {
    vertical-align: text-top;
    text-align: right;
    font-weight: 500;
-   
+
 }
 div.right-indent {
    margin-left: 5px;
@@ -271,7 +271,7 @@ div.right-indent {
    flex: 1 1 auto;
 }
 .pool.pure-button.showing {
-   background-color: var(--color-primary-orange);
+   background-color: var(--color-brand-blue);
    color: #fff;
 }
 .pool.pure-button i.fa-star {
@@ -301,7 +301,7 @@ div.pools {
    cursor: pointer;
    border-radius: 0 0 5px 5px;
    color: #444;
-   background: #e5e5e5
+   background: #e5e5e5;
 }
 .more-panel:hover {
    color: var(--color-link);
@@ -318,24 +318,26 @@ div.pools {
 
 .pool-titlebar {
    padding: 0;
-   background-color: var(--color-primary-orange);
+   background-color: var(--color-brand-blue);
    color: white;
    font-weight: bold;
    font-size: 0.9em;
    border-radius: 5px 5px 0 0;
-   
+
 }
 .title1 {
-   padding: 5px;
+   padding: 10px;
    display: flex;
    flex-flow: row;
    align-items: center;
    justify-content: space-between;
    border-radius: 5px 5px 0 0;
-   background: var(--color-dark-orange);
+   background: var(--color-brand-blue);
 }
 .title1 .pool-name {
    margin-left: 5px;
+   font-size: 1.5em;
+   font-weight: 900;
 }
 .title1 .hide-pool {
    cursor: pointer;
@@ -377,6 +379,6 @@ div.search-controls {
    align-items: center;
 }
 #app span.pure-button.pure-button-primary.refine {
-   margin-left: auto;   
+   margin-left: auto;
 }
 </style>
