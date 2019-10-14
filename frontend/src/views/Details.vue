@@ -15,7 +15,7 @@
          <template v-else>
             <SearchHitHeader v-bind:fullImage="true" :hit="details" :pool="this.$route.params.src"/>
             <div class="bar"></div>
-            <table class="fields">  
+            <table class="fields">
                <tr v-for="(field,idx) in detailFields" :key="idx">
                   <template v-if="field.display != 'optional'">
                      <td class="label">{{field.label}}:</td>
@@ -23,6 +23,7 @@
                   </template>
                </tr>
             </table>
+            <AvailabilityTable :titleId="details.identifier" />
          </template>
          <BackToVirgo />
       </div>
@@ -32,13 +33,13 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import BookmarkButton from "@/components/BookmarkButton"
 import BackToVirgo from "@/components/BackToVirgo"
 import SearchHitHeader from '@/components/SearchHitHeader'
+import AvailabilityTable from "@/components/AvailabilityTable"
 export default {
    name: "sources",
    components: {
-      BackToVirgo,BookmarkButton,SearchHitHeader
+      BackToVirgo,SearchHitHeader,AvailabilityTable
    },
    computed: {
       ...mapState({
@@ -102,12 +103,12 @@ export default {
 }
 @media only screen and (min-width: 768px) {
    div.details-content  {
-       width: 50%;
+      width: 50%;
    }
 }
 @media only screen and (max-width: 768px) {
    div.details-content  {
-       width: 95%;
+      width: 95%;
    }
 }
 table {

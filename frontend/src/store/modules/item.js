@@ -4,12 +4,17 @@ import * as utils from './utils'
 const item = {
    namespaced: true,
    state: {
-      details: {source: "", identifier:"", basicFields:[], detailFields:[]}
+      details: {source: "", identifier:"", basicFields:[], detailFields:[]},
+      availability: {titleId: '', columns: [], holdings: []}
    },
 
    getters: {
       hasDetails: state => (identifier) => {
          return state.identifier == identifier
+      },
+      availability: state => {
+        if ( state.availability == null ) return []
+        return state.availability
       }
    },
 
@@ -22,8 +27,13 @@ const item = {
       },
       clearDetails(state) {
          state.details = {source: "", identifier:"", basicFields:[], detailFields:[]}
+      },
+      setAvailability(state, {titleId, response}) {
+        state.availability.titleId = titleId
+        state.availability.columns = response.columns
+        state.availability.holdings = response.holdings
       }
-   }, 
+   },
 
    actions: {
       async getDetails(ctx, { source, identifier }) {
@@ -60,6 +70,19 @@ const item = {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })
          })
+      },
+
+      async getAvailability(ctx, titleId ) {
+        console.log(titleId)
+        axios.defaults.headers.common['Authorization'] = "Bearer " + ctx.rootState.user.authToken
+        axios.get("/api/availability/" + titleId).then((response) => {
+          ctx.commit('setSearching', false, { root: true })
+          console.log(response)
+          ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
+        }).catch((error) => {
+          ctx.commit('system/setError', error, { root: true })
+          ctx.commit('setSearching', false, { root: true })
+        })
       }
    }
 }

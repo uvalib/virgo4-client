@@ -177,6 +177,13 @@ func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 		}
 		log.Printf("ERROR: %s request failed: %s", url, errMsg)
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
+	} else if resp.StatusCode == http.StatusInternalServerError {
+		defer resp.Body.Close()
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		status := resp.StatusCode
+		errMsg := fmt.Sprintf("ILS Connector Error: %s", string(bodyBytes))
+		log.Printf("ERROR: %s request failed: %s", url, errMsg)
+		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	}
 
 	defer resp.Body.Close()
