@@ -28,7 +28,6 @@
 <script>
 import AccordionContent from '@/components/AccordionContent'
 import SearchHitHeader from '@/components/SearchHitHeader'
-import { mapGetters } from "vuex"
 export default {
    props: {
       hit: { type: Object, required: true},
