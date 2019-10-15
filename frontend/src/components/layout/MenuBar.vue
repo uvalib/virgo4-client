@@ -4,6 +4,12 @@
          <router-link to="/">
             <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
          </router-link>
+         <router-link to="/course-reserves">
+            <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
+         </router-link>
+         <span class="menu-item feedback">
+            <Feedback icon/>
+         </span>
       </span>
       <span class="menu-right">
          <template v-if="isSignedIn">
@@ -35,9 +41,6 @@
                <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
             </router-link>
          </template>
-         <span class="menu-item feedback">
-            <Feedback icon/>
-         </span>
       </span>
    </nav>
 </template>
@@ -119,15 +122,15 @@ export default {
 #app .menu a:hover {
    text-decoration: none;
 }
+#app .menu a:first-child .menu-item {
+   margin-left:0
+}
 .menu .menu-item {
    cursor: pointer;
    color: white;
    flex: 0 1 auto;
    display: inline-block;
-   margin-left: 25px;
-}
-.menu-item:first-child {
-   margin-left: 0px;
+   margin-left:20px;
 }
 .menu-item.account {
    position: relative;
@@ -174,6 +177,9 @@ export default {
 }
 .menu .menu-item:hover {
    border-bottom:1px solid white;
+}
+.menu-right {
+   margin-left: auto;
 }
 </style>
 

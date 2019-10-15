@@ -188,6 +188,6 @@ func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	log.Printf("Raw ILS response %s", bodyBytes)
+	// log.Printf("Raw ILS response %s", bodyBytes)
 	return bodyBytes, nil
 }
