@@ -5,6 +5,7 @@
          <p>{{reserve.author}}</p>
          <p>{{reserve.callNumber}}</p>
          <p>At {{reserve.reserveDesk}}, Available for: {{reserve.circulationRule}} checkout</p>
+         <p>Copies Available: {{reserve.copies}}</p>
       </div>
    </div>  
 </template>
