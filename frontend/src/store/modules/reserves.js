@@ -7,7 +7,8 @@ const reserves = {
       searching: false,
       query: "",
       searchType: "",
-      courseReserves: []
+      courseReserves: [],
+      noMatch: false
    },
 
    getters: {
@@ -34,6 +35,9 @@ const reserves = {
       setCourseReserves(state, data) {
          state.courseReserves=data
       },
+      setNoMatch(state,flag) {
+         state.noMatch = flag
+      }
    }, 
 
    actions: {
@@ -50,25 +54,29 @@ const reserves = {
       },
       searchCourses(ctx) {
          ctx.commit('setSearching', true)
+         ctx.commit('setNoMatch',false)
          ctx.commit('setCourseSearch')
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.get(`/api/reserves/search?type=COURSE_NAME&query=${ctx.state.query}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false)
-         }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
+         }).catch((_error) => {
+            ctx.commit('setCourseReserves', [])
+            ctx.commit('setNoMatch',true)
             ctx.commit('setSearching', false)
           })
       },
       searchInstructors(ctx) {
          ctx.commit('setSearching', true)
+         ctx.commit('setNoMatch',false)
          ctx.commit('setInstructorSearch')
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.get(`/api/reserves/search?type=INSTRUCTOR_NAME&query=${ctx.state.query}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false)
-         }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
+         }).catch((_error) => {
+            ctx.commit('setCourseReserves', [])
+            ctx.commit('setNoMatch',true)
             ctx.commit('setSearching', false)
           })
       }

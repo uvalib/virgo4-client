@@ -14,11 +14,9 @@
                <span @click="searchInstructorClicked" class="pure-button pure-button-primary">Search Instructors</span>
             </div>    
          </div>
-         <transition name="message-transition"
-            enter-active-class="animated faster fadeIn"
-            leave-active-class="animated faster fadeOut">
-         <p v-if="error" class="error">{{ error }}</p>
-         </transition>
+         <div class="no-match" v-if="noMatch==true">
+            No course reserves that match your request were be found
+         </div>
          <CourseSearchResults v-if="hasCourseResults"/>
          <InstructorSearchResults v-if="hasInstructorResults"/>
       </div>
@@ -40,6 +38,7 @@ export default {
       ...mapState({
          lookingUp: state => state.reserves.searching,
          searchType: state => state.reserves.searchType,
+         noMatch: state => state.reserves.noMatch,
          error: state => state.error,
       }),
       ...mapGetters({
@@ -112,6 +111,12 @@ p.error {
   color: var(--color-error);
   opacity: 1;
   visibility: visible;
+}
+.no-match {
+   font-weight: bold;
+   margin: 0;
+   color: var(--color-error);
+   text-align: center;
 }
 </style>
 

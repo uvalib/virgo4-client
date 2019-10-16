@@ -27,6 +27,7 @@ export default {
    padding: 4px 8px;
    border-bottom: 1px solid #ccc;
    border-right: 1px solid #ccc;
+   font-weight: normal;
 }
 p {
    margin: 2px 0;
