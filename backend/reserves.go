@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"sort"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +48,7 @@ func (svc *ServiceContext) SearchReserves(c *gin.Context) {
 	log.Printf("Search for %s=%s desk=[%s]", searchType, qStr, desk)
 	// EX: /v4/course_reserves/search?type=COURSE_NAME&query=art
 	url := fmt.Sprintf("%s/v4/course_reserves/search?type=%s&query=%s",
-		svc.ILSAPI, searchType, qStr)
+		svc.ILSAPI, searchType, url.QueryEscape(qStr))
 	if desk != "" {
 		url += fmt.Sprintf("&desk=%s", desk)
 	}
