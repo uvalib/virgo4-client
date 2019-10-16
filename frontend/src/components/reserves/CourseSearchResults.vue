@@ -9,6 +9,10 @@
             <p class="value">{{course.id}}</p>
          </div>
          <div class="instructor" v-for="(inst,idx) in course.instructors" :key="idx">
+            <div v-if="idx>0" class="course-name">
+               <p class="value">{{course.name}}</p>
+               <p class="value">{{course.id}}</p>
+            </div>
             <p class="value folder">{{inst.name}}</p>
             <div class="reserves" v-for="reserve in inst.reserves" :key="reserve.catalogKey">
                <ReserveDetail :reserve="reserve" />
@@ -59,13 +63,16 @@ div.course-name {
    color: white;
    padding: 0;
    padding: 4px 8px;
+   background: var(--color-primary-orange);
+   border-radius: 5px 5px 0 0;
+   margin-top: 10px;
+
 }
 div.course {
-   background: var(--color-primary-orange);
+   
    margin: 10px 0 0 0;
    color: white;
    font-weight: bold;
-   border-radius: 5px 5px 0 5px;
    text-align: left;
    padding:0;
 }
