@@ -14,20 +14,37 @@
                <span @click="searchInstructorClicked" class="pure-button pure-button-primary">Search Instructors</span>
             </div>    
          </div>
+         <transition name="message-transition"
+            enter-active-class="animated faster fadeIn"
+            leave-active-class="animated faster fadeOut">
+         <p v-if="error" class="error">{{ error }}</p>
+         </transition>
+         <CourseSearchResults v-if="hasCourseResults"/>
+         <InstructorSearchResults v-if="hasInstructorResults"/>
       </div>
    </main>
 </template>
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
+import CourseSearchResults from "@/components/reserves/CourseSearchResults"
+import InstructorSearchResults from "@/components/reserves/InstructorSearchResults"
 export default {
    name: "course-reserves",
    components: {
+      CourseSearchResults, InstructorSearchResults
    },
    computed: {
       ...mapState({
          lookingUp: state => state.reserves.searching,
+         searchType: state => state.reserves.searchType,
+         error: state => state.error,
+      }),
+      ...mapGetters({
+         hasCourseResults: 'reserves/hasCourseResults',
+         hasInstructorResults: 'reserves/hasInstructorResults',
       }),
       ...mapFields('reserves',[
         'query',
@@ -35,10 +52,10 @@ export default {
    },
    methods: {
       searchInstructorClicked() {
-         alert("instructor "+this.query)
+         this.$store.dispatch("reserves/searchInstructors")
       },
       searchCourseClicked() {
-         alert("course "+this.query)
+         this.$store.dispatch("reserves/searchCourses")
       }
    }
 }
@@ -88,6 +105,13 @@ p {
   flex-flow: row wrap;
   align-items: center;
   justify-content: flex-end;
+}
+p.error {
+  font-weight: bold;
+  margin: 0;
+  color: var(--color-error);
+  opacity: 1;
+  visibility: visible;
 }
 </style>
 
