@@ -4,7 +4,10 @@
       <div class="inset">
          <p>{{reserve.author}}</p>
          <p>{{reserve.callNumber}}</p>
-         <p>At {{reserve.reserveDesk}}, Available for: {{reserve.circulationRule}} checkout</p>
+         <p>At {{reserve.reserveDesk}}, 
+            Available for: {{reserve.circulationRule}} checkout
+            <span v-if="reserve.loanPeriod">for {{reserve.loanPeriod}}</span>
+         </p>
          <p>Copies Available: {{reserve.copies}}</p>
       </div>
    </div>  
