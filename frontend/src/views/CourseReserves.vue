@@ -6,6 +6,7 @@
          <img src="../assets/spinner2.gif">
       </div>
       <div v-else  class="reserves-content">
+         <SearchingOverlay message="Looking up reserved item details..."/>
          <p>Type instructor's last name or course name in the search box and click the corresponding button to search for reserved items</p>
          <div class="search-panel pure-form">
             <input v-model="query" autocomplete="off" type="text">
@@ -27,12 +28,13 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
+import SearchingOverlay from "@/components/layout/SearchingOverlay"
 import CourseSearchResults from "@/components/reserves/CourseSearchResults"
 import InstructorSearchResults from "@/components/reserves/InstructorSearchResults"
 export default {
    name: "course-reserves",
    components: {
-      CourseSearchResults, InstructorSearchResults
+      CourseSearchResults, InstructorSearchResults,SearchingOverlay
    },
    computed: {
       ...mapState({
