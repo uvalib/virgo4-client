@@ -276,9 +276,10 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 
 	// get folder ID
 	folderObj := Folder{UserID: user.ID, Name: item.Folder}
-	log.Printf("Lookup folder %s ID", item.Folder)
-	q = svc.DB.NewQuery("select * from bookmark_folders where name={:name}")
+	log.Printf("Lookup user %s folder %s", user.Virgo4ID, item.Folder)
+	q = svc.DB.NewQuery("select * from bookmark_folders where name={:name} and user_id={:user}")
 	q.Bind(dbx.Params{"name": item.Folder})
+	q.Bind(dbx.Params{"user": user.ID})
 	err = q.One(&folderObj)
 	if err != nil {
 		folderObj.AddedAt = time.Now()
