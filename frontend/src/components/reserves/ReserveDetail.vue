@@ -1,6 +1,8 @@
 <template>
    <div class="reserve-detail">
-      <p class="text-button">{{reserve.title}}</p>
+      <router-link :to="detailsLink(reserve.catalogKey)">
+         <p>{{reserve.title}}</p>
+      </router-link>
       <div class="inset">
          <p>{{reserve.author}}</p>
          <p>{{reserve.callNumber}}</p>
@@ -20,6 +22,11 @@ export default {
          type: Object,
          required:  true
       }
+   },
+   methods: {
+      detailsLink(catalogKey) {
+         return `/sources/course-reserves/items/${catalogKey}`
+      },
    }
 }
 </script>

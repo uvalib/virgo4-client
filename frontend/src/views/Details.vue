@@ -25,7 +25,8 @@
             </table>
             <AvailabilityTable :titleId="details.identifier" />
          </template>
-         <BackToVirgo />
+         <BackToVirgo v-if="fromCourseReserves" backURL="/course-reserves"/>
+         <BackToVirgo v-else />
       </div>
    </main>
 </template>
@@ -55,6 +56,9 @@ export default {
       },
       detailFields() {
          return [...this.details.basicFields.concat(this.details.detailFields)]
+      },
+      fromCourseReserves() {
+         return this.$route.params.src == "course-reserves"
       }
    },
    methods: {
@@ -71,9 +75,13 @@ export default {
    created() {
       let src = this.$route.params.src
       let id= this.$route.params.id
-      this.$store.dispatch("item/getDetails", {source:src, identifier:id})
-      if ( this.isSignedIn) {
-         this.$store.dispatch("user/getBookmarks")
+      if (src == "course-reserves") {
+         this.$store.dispatch("item/lookupCatalogKeyDetail", id )
+      } else {
+         this.$store.dispatch("item/getDetails", {source:src, identifier:id})
+         if ( this.isSignedIn) {
+            this.$store.dispatch("user/getBookmarks")
+         }
       }
    }
 }

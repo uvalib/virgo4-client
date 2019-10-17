@@ -1,12 +1,8 @@
 <template>
    <main class="course-reserves">
       <h1>Course Reserves</h1>
-      <div class="working" v-if="lookingUp" >
-         <div>Looking up course reserves data...</div>
-         <img src="../assets/spinner2.gif">
-      </div>
-      <div v-else  class="reserves-content">
-         <SearchingOverlay message="Looking up reserved item details..."/>
+      <div class="reserves-content">
+         <SearchingOverlay message="Looking up reserved items..."/>
          <p>Type instructor's last name or course name in the search box and click the corresponding button to search for reserved items</p>
          <div class="search-panel pure-form">
             <input v-model="query" autocomplete="off" type="text">
@@ -38,7 +34,6 @@ export default {
    },
    computed: {
       ...mapState({
-         lookingUp: state => state.reserves.searching,
          searchType: state => state.reserves.searchType,
          noMatch: state => state.reserves.noMatch,
          error: state => state.error,

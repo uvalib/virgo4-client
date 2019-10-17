@@ -23,7 +23,6 @@ const item = {
          utils.preProcessHitFields( [fields] )
          fields.source = source
          state.details = fields
-         console.log(state.details)
       },
       clearDetails(state) {
          state.details = {source: "", identifier:"", basicFields:[], detailFields:[]}
@@ -32,6 +31,26 @@ const item = {
         state.availability.titleId = titleId
         state.availability.columns = response.columns
         state.availability.holdings = response.holdings
+      },
+
+      setCatalogKeyDetails(state, data) {
+         // no match or multiple matches
+         if (data.total_hits == 0) return
+         if (data.total_hits > 1) return
+         let found = false
+         data.pool_results.some( pr => {
+            if (pr.group_list && pr.group_list.length == 1) {
+               let obj = pr.group_list[0].record_list[0]
+               if (obj) {
+                  let source = pr.pool_id
+                  utils.preProcessHitFields( [obj] )
+                  obj.source = source
+                  state.details = obj
+                  found = true
+               }
+            }
+            return found == true
+         })
       }
    },
 
@@ -81,6 +100,36 @@ const item = {
           ctx.commit('system/setError', error, { root: true })
           ctx.commit('setSearching', false, { root: true })
         })
+      },
+
+      async lookupCatalogKeyDetail(ctx, catalogKey) {
+         if (ctx.getters.hasDetails(catalogKey)) {
+            return
+         } else {
+            ctx.commit('clearDetails')
+         }
+         ctx.commit('setSearching', true, { root: true })
+         if (ctx.rootState.system.searchAPI == "") {
+            await ctx.dispatch("system/getConfig", null, {root:true})
+         }
+
+         let req = {
+            query: `identifier: {${catalogKey}}`,
+            pagination: { start: 0, rows: 1 },
+            preferences: {
+              target_pool: "",
+              exclude_pool: [],
+            }
+          }
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let url = ctx.rootState.system.searchAPI + "/api/search?intuit=1&debug=1"
+         return axios.post(url, req).then((response) => {
+            ctx.commit('setCatalogKeyDetails', response.data)
+            ctx.commit('setSearching', false, { root: true })
+         }).catch((error) => {
+            alert(error)
+            ctx.commit('setSearching', false, { root: true })
+         })
       }
    }
 }
