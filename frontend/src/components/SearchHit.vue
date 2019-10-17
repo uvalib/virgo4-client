@@ -12,7 +12,7 @@
             </tr>
          </table>
       </div>
-      <AccordionContent title="Details">
+      <AccordionContent v-if="details" title="Details">
          <div class="details">
             <table class="fields">
                <tr v-for="field in hit.detailFields" :key="getKey(field)">
@@ -31,7 +31,8 @@ import SearchHitHeader from '@/components/SearchHitHeader'
 export default {
    props: {
       hit: { type: Object, required: true},
-      pool: {type: String, required: true}
+      pool: {type: String, required: true},
+      details: {type: Boolean, default: true}
    },
    components: {
       AccordionContent,SearchHitHeader
