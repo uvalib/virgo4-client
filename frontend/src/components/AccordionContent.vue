@@ -1,6 +1,6 @@
 <template>
    <div class="accordion">
-      <div class="title" @click="accordionClicked" :class="align" 
+      <div class="title" @click="accordionClicked" :class="align"
          :style="{ background: background, color: color }">
          <span class="text">{{title}}</span>
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
@@ -26,7 +26,7 @@ export default {
       },
       background: {
          type: String,
-         default: "#f5f5f5"
+         default: "#fff"
       },
       color: {
          type: String,

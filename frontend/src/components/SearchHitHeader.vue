@@ -4,7 +4,7 @@
          <router-link v-if="hit.grouped==false" :to="detailsURL">
             <div class="full-title">
                <span class="title">{{hit.header.title}}</span>
-               <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
+               <span v-if="hit.header.subtitle" class="subtitle">{{hit.header.subtitle}}</span>
             </div>
          </router-link>
          <div v-else class="full-title">
@@ -14,7 +14,6 @@
          <BookmarkButton :hit="hit" :pool="pool"/>
       </div>
       <div class="data-image">
-         <img v-bind:class="{small: !fullImage}" class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
          <div class="details">
             <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
             <div class="block">
@@ -26,6 +25,7 @@
                </div>
             </div>
          </div>
+         <img v-bind:class="{small: !fullImage}" class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
       </div>
    </div>
 </template>
@@ -69,9 +69,11 @@ export default {
 }
 
 .data-image {
+  margin-top: 10px;
    display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
+   justify-content: space-between;
 }
 .header-wrapper {
    text-align: left;
@@ -92,7 +94,7 @@ export default {
 }
 .title {
    font-size: 1.2em;
-   font-weight: normal;
+   font-weight: bold;
    margin-bottom: 3px;
    display: inline-block;
    flex: 1 1 auto;

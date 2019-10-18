@@ -45,7 +45,7 @@
                   <i @click="closeResults(result.resultIdx)" class="hide-pool far fa-times-circle"></i>
                </div>
                <AccordionContent title="Description"  align="left-narrow"
-                  background="var(--color-primary-orange)" color="white">
+                  background="var(--color-brand-blue)" color="white">
                   {{result.pool.description}}
                </AccordionContent>
             </div>
@@ -214,10 +214,10 @@ i.showing {
    padding: 0px;
    font-size: 0.7em;
    font-weight: 500;
-   background-color: red;
+   background-color: #ccc;
 }
 .metrics {
-   padding: 5px;
+   padding: 5px 10px;
    color: #333;
    font-weight: 500;
    display: flex;
@@ -335,7 +335,6 @@ div.pools {
    background: var(--color-brand-blue);
 }
 .title1 .pool-name {
-   margin-left: 5px;
    font-size: 1.5em;
    font-weight: 900;
 }
