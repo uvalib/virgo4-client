@@ -109,14 +109,14 @@ func (svc *ServiceContext) updateAccessToken(userID string, token string) error 
 		return svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 	}
 
-	if user.AuthToken != token {
-		user.AuthToken = token
-		user.AuthUpdatedAt = time.Now()
-		user.SignedIn = true
-		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
-		if err != nil {
-			log.Printf("WARN: Unable to update user %s auth token: %v", userID, err)
-		}
+	log.Printf("User found; details: %+v", user)
+	log.Printf("Updating access token")
+	user.AuthToken = token
+	user.AuthUpdatedAt = time.Now()
+	user.SignedIn = true
+	err = svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+	if err != nil {
+		log.Printf("WARN: Unable to update user %s auth token: %v", userID, err)
 	}
 
 	return nil
