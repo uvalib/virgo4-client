@@ -3,12 +3,7 @@
       <div class="tips-container">
           <SearchTips/>
       </div>
-      <div v-show="searching" class="searching-overlay">
-        <div class="searching-box">
-          <p>Searching...</p>
-          <img src="../assets/searching.gif">
-        </div>
-      </div>
+      <SearchingOverlay message="Searching..." />
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
           <h1>Basic Search</h1>
@@ -60,17 +55,17 @@ import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/popovers/SearchTips"
 import AdvancedSearch from "@/components/AdvancedSearch"
+import SearchingOverlay from "@/components/layout/SearchingOverlay"
 export default {
    name: "home",
    components: {
      SearchResults,
-     SearchTips, AdvancedSearch
+     SearchTips, AdvancedSearch,SearchingOverlay
    },
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
          error: state => state.system.error,
-         searching: state => state.searching,
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
@@ -108,45 +103,6 @@ export default {
 </script>
 
 <style scoped>
-.searching-overlay {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 1000;
-}
-div.searching-box {
-  background: white;
-  display: inline-block;
-  padding: 20px 90px;
-  border: 5px solid var(--color-primary-orange);
-  z-index: 1005;
-  font-weight: bold;
-  margin: 10vw auto;
-  box-shadow: 2px 2px 10px #333;
-}
-@media only screen and (min-width: 768px) {
-   div.searching-box {
-    padding: 20px 90px;
-   }
-}
-@media only screen and (max-width: 768px) {
-   div.searching-box {
-       width: 95%;
-       padding: 20px 0;
-       margin-top:30%;
-   }
-   div.tips-container {
-     display: none;
-   }
-}
-div.searching-box p {
-  color: var(--color-primary-text);
-  border: none;
-  font-size: 1.25em;
-  margin: 0 0 10px 0;
-}
 .controls {
   font-size: 0.85em;
   font-weight: bold;

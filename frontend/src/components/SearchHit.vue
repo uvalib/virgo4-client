@@ -1,18 +1,22 @@
 <template>
    <div class="hit">
-      <div class="basic">
-         <SearchHitHeader :hit="hit" :pool="pool"/>
-         <div v-if="hit.basicFields.length > 0" class="sep"></div>
-         <table class="fields">
-            <tr v-for="field in hit.basicFields" :key="getKey(field)">
-               <template v-if="field.display != 'optional'">
-                  <td class="label">{{field.label}}:</td>
-                  <td class="value" v-html="fieldValueString(field)"></td>
-               </template>
-            </tr>
-         </table>
+      <div class="top">
+         <div class="basic">
+            <SearchHitHeader :hit="hit" :pool="pool"/>
+            <table class="fields">
+               <tr v-for="field in hit.basicFields" :key="getKey(field)">
+                  <template v-if="field.display != 'optional'">
+                     <td class="label">{{field.label}}:</td>
+                     <td class="value" v-html="fieldValueString(field)"></td>
+                  </template>
+               </tr>
+            </table>
+         </div>
+         <router-link class="img-link" v-if="hit.grouped==false" :to="detailsURL">
+            <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
+         </router-link>
       </div>
-      <AccordionContent title="Details">
+      <AccordionContent v-if="details" title="Details">
          <div class="details">
             <table class="fields">
                <tr v-for="field in hit.detailFields" :key="getKey(field)">
@@ -28,14 +32,19 @@
 <script>
 import AccordionContent from '@/components/AccordionContent'
 import SearchHitHeader from '@/components/SearchHitHeader'
-import { mapGetters } from "vuex"
 export default {
    props: {
       hit: { type: Object, required: true},
-      pool: {type: String, required: true}
+      pool: {type: String, required: true},
+      details: {type: Boolean, default: true}
    },
    components: {
       AccordionContent,SearchHitHeader
+   },
+   computed: {
+      detailsURL() {
+         return `/sources/${this.pool}/items/${this.hit.identifier}`
+      },
    },
    methods: {
       getKey(field) {
@@ -47,7 +56,7 @@ export default {
          }
          if (field.type == "url") {
             return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
-         } 
+         }
          return field.value
       },
    }
@@ -58,9 +67,20 @@ export default {
 div.details {
    padding: 10px;
 }
-.sep {
-   border-top:1px solid #ccc;
-   margin: 10px 0;
+.top {
+   display:flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+}
+.cover-img {
+   border-radius: 3px;
+   margin: 5px;
+   max-height: 140px;
+   max-width: 140px;
+}
+a.img-link {
+   flex: 0 0 auto;
+   margin-left: auto;
 }
 div.basic {
    padding: 10px 10px 10px 10px;
@@ -77,13 +97,13 @@ div.basic {
 }
  #app td.value >>> a.pure-button.pure-button-primary.ext {
    background-color:var(--color-pale-blue);
-   color: white; 
+   color: white;
    padding: 3px 0px;
    width: 100%;
    border-radius: 5px;
 }
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
-   text-decoration: none;  
+   text-decoration: none;
 }
 .hit table {
    table-layout: auto;
@@ -100,5 +120,21 @@ div.basic {
 .hit table td.value {
    width: 100%;
    font-weight: normal;
+}
+.cover-img {
+   border-radius: 3px;
+   margin: 0 5px 0 0;
+}
+.cover-img.small {
+   max-height: 124px;
+   max-width: 100px;
+}
+
+.data-image {
+  margin-top: 10px;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+   justify-content: space-between;
 }
 </style>

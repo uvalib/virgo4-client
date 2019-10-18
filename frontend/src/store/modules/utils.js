@@ -40,26 +40,26 @@ export function preProcessHitFields(hits) {
         }
         return
       }
-      if (field.type == "availability") {
-        if (Array.isArray(hit.availability) === false) {
-          hit.header.availability = [field.value]
-        } else {
-          hit.header.availability.push(field.value)
-        }
-        return
-      }
-      if (field.name == "format") {
-        if (Array.isArray(hit.format) === false) {
-          hit.header.format = [field.value]
-        } else {
-          hit.header.format.push(field.value)
-        }
-        return
-      }
+      // if (field.type == "availability") {
+      //   if (Array.isArray(hit.availability) === false) {
+      //     hit.header.availability = [field.value]
+      //   } else {
+      //     hit.header.availability.push(field.value)
+      //   }
+      //   return
+      // }
+      // if (field.name == "format") {
+      //   if (Array.isArray(hit.format) === false) {
+      //     hit.header.format = [field.value]
+      //   } else {
+      //     hit.header.format.push(field.value)
+      //   }
+      //   return
+      // }
 
       // Pick which group the fields belong to
       let tgtMerged = hit.basicFields
-      if (field.visibility == "detailed") {
+      if (field.visibility == "detailed" && field.name != "format") {
         tgtMerged = hit.detailFields
       }
 
@@ -84,16 +84,16 @@ export function getGroupHitMetadata(group, hit) {
   hit.header.title = group.record_list[0].header.title
   hit.header.subtitle = group.record_list[0].header.subtitle
   hit.header.author = group.record_list[0].header.author
-  group.fields.forEach(field => {
-    if (field.name == "format") {
-      if (Array.isArray(group.format) === false) {
-        hit.header.format = [field.value]
-      } else {
-        hit.header.format.push(field.value)
-      }
-      return
-    }
-  })
+  // group.fields.forEach(field => {
+  //   if (field.name == "format") {
+  //     if (Array.isArray(group.format) === false) {
+  //       hit.header.format = [field.value]
+  //     } else {
+  //       hit.header.format.push(field.value)
+  //     }
+  //     return
+  //   }
+  // })
   delete group.fields
 }
 

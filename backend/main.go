@@ -11,7 +11,7 @@ import (
 )
 
 // Version of the service
-const version = "0.5.0"
+const version = "0.6.0"
 
 /**
  * MAIN
@@ -59,10 +59,6 @@ func main() {
 		{
 			reserves.GET("/desks", svc.GetReserveDesks)
 			reserves.GET("/search", svc.SearchReserves)
-			reserves.GET("/instructors/:uid", svc.ListCoursesByInstructor)
-			reserves.GET("/instructors/:uid/courses/:cid", svc.ListReserves)
-			reserves.GET("/courses/:cid", svc.ListInstructorsForCourse)
-			reserves.GET("/courses/:cid/instructors/:uid", svc.ListReserves)
 		}
 	}
 	auth := router.Group("/authenticate")

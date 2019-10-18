@@ -9,6 +9,7 @@ import user from './modules/user'
 import query from './modules/query'
 import filters from './modules/filters'
 import item from './modules/item'
+import reserves from './modules/reserves'
 import * as utils from './modules/utils'
 Vue.use(Vuex)
 
@@ -318,6 +319,7 @@ export default new Vuex.Store({
     query: query,
     filters: filters,
     item: item,
+    reserves: reserves,
   },
 
   plugins: [messaging, versionChecker]

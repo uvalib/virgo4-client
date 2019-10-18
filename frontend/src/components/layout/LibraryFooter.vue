@@ -87,6 +87,7 @@ footer a.fdlp {
 }
 footer div.address {
    float:left;
+   text-align: left;
 }
 footer div.legal {
    position: relative;

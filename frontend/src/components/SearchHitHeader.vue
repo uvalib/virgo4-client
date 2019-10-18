@@ -1,31 +1,16 @@
 <template>
    <div class="header-wrapper">
-      <div class="titlebar">
+      <BookmarkButton :hit="hit" :pool="pool"/>
+      <div class="full-title">
          <router-link v-if="hit.grouped==false" :to="detailsURL">
-            <div class="full-title">
-               <span class="title">{{hit.header.title}}</span>
-               <span v-if="hit.header.subtitle" class="subtitle">{{hit.header.subtitle}}</span>
-            </div>
-         </router-link>
-         <div v-else class="full-title">
             <span class="title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
-         </div>
-         <BookmarkButton :hit="hit" :pool="pool"/>
-      </div>
-      <div class="data-image">
-         <div class="details">
-            <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
-            <div class="block">
-               <div v-if="hit.header.format" class="info">
-                  <b>Format:&nbsp;</b>{{hit.header.format.join(", ")}}
-               </div>
-               <div v-if="hit.header.availability" class="info">
-                  <b>Availability:&nbsp;</b>{{hit.header.availability.join(", ")}}
-               </div>
-            </div>
-         </div>
-         <img v-bind:class="{small: !fullImage}" class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
+         </router-link>
+         <template v-else>
+            <span class="title">{{hit.header.title}}</span>
+            <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
+         </template>
+         <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
       </div>
    </div>
 </template>
@@ -41,10 +26,6 @@ export default {
       pool: {
          type: String,
          required: true
-      },
-      fullImage: {
-         type: Boolean,
-         default: false
       }
    },
    components: {
@@ -59,31 +40,13 @@ export default {
 </script>
 
 <style scoped>
-.cover-img {
-   border-radius: 3px;
-   margin: 0 5px 0 0;
-}
-.cover-img.small {
-   max-height: 124px;
-   max-width: 100px;
-}
 
-.data-image {
-  margin-top: 10px;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-   justify-content: space-between;
-}
 .header-wrapper {
    text-align: left;
-}
-.titlebar {
    display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
-   justify-content: space-between;
-   margin-bottom:5px;
+   margin-bottom: 10px;
 }
 #app div.header-wrapper a {
    color: var(--color-primary-text)
@@ -92,6 +55,7 @@ export default {
    text-decoration: none;
    color: var(--color-link)
 }
+
 .title {
    font-size: 1.2em;
    font-weight: bold;
@@ -105,13 +69,16 @@ export default {
 }
 .block {
    margin-left: 10px;
+ }
+
+.full-title {
+   margin-left: 15px;
+   font-size: 1.25em;
+
 }
 .author {
+   font-size: 0.9em;
    font-weight: normal;
-   margin-left: 10px;
-   margin-bottom: 5px;
-}
-.info {
-   font-weight: normal;
+   margin-top:4px;
 }
 </style>

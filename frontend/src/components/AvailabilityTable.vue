@@ -16,12 +16,9 @@
             </thead>
 
             <tr v-for="(holding,idx) in availability.holdings" :key="idx">
-               <template v-for="(field) in holding.fields" >
-                  <template v-if="field.visible" >
-                     <!-- <td class="label">{{field.name}}:</td> -->
-                     <td class="value">{{field.value}}</td>
-                  </template>
-               </template>
+               <td class="value" v-for="(field, id) in visibleFields(holding)" :key="id">
+                  {{field.value}}
+               </td>
             </tr>
          </table>
 
@@ -46,9 +43,12 @@ export default {
    computed: {
       ...mapGetters({
          availability : 'item/availability'
-      })
+      }),
    },
    methods: {
+      visibleFields: function(holding) {
+         return holding.fields.filter(h => h.visible)
+      }
    },
    created() {
       this.lookingUp = true

@@ -1,12 +1,20 @@
 <template>
    <div class="controls">
-      <router-link to="/">
+      <router-link :to="backURL">
          <span class="pure-button pure-button-primary"><i class="fas fa-arrow-circle-left"></i>&nbsp;Return to search</span>
       </router-link>
    </div>
 </template>
 
 <script>
+export default {
+   props: {
+      backURL: {
+         type: String,
+         default: "/"
+      }
+   },
+}
 </script>
 
 <style scoped>
