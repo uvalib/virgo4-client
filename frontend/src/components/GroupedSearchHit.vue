@@ -49,9 +49,7 @@ export default {
    text-align: left;
    font-size: 0.8em;
 }
-.hit:nth-last-of-type(2n+0) /*clear bottom border on last hit*/ {
-  border-bottom: none;
-}
+
 .group-header {
    display: flex;
    flex-flow: row wrap;
