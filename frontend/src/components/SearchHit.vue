@@ -89,7 +89,7 @@ div.basic {
    width: 100%;
    border: 1px solid #ccc;
    border-top: none;
-   padding: 00px;
+   padding: 10px;
    box-sizing: border-box;
    text-align: left;
    font-size: 0.8em;
@@ -121,20 +121,9 @@ div.basic {
    width: 100%;
    font-weight: normal;
 }
-.cover-img {
-   border-radius: 3px;
-   margin: 0 5px 0 0;
-}
 .cover-img.small {
    max-height: 124px;
    max-width: 100px;
 }
 
-.data-image {
-  margin-top: 10px;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-   justify-content: space-between;
-}
 </style>
