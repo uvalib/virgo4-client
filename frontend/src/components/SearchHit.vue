@@ -75,8 +75,8 @@ div.details {
 .cover-img {
    border-radius: 3px;
    margin: 5px;
-   max-height: 140px;
-   max-width: 140px;
+   max-height: 120px;
+   max-width: 100px;
 }
 a.img-link {
    flex: 0 0 auto;
