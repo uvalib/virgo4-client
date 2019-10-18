@@ -43,20 +43,24 @@ export default {
    width: 100%;
    border: 1px solid #ccc;
    border-top: none;
+   border-left: 5px solid var(--color-lightest-blue);
    padding: 00px;
    box-sizing: border-box;
    text-align: left;
    font-size: 0.8em;
+}
+.hit:nth-last-of-type(2n+0) /*clear bottom border on last hit*/ {
+  border-bottom: none;
 }
 .group-header {
    display: flex;
    flex-flow: row wrap;
    align-items: center;
    justify-content: space-between;
-   border-bottom: 1px solid #999;
-   padding: 5px;
-   background: #e5e5e5;
+   padding: 10px;
    font-weight: bold;
+   text-transform: uppercase;
+   background-color: var(--color-lightest-blue);
 }
 .group-header .count {
    font-weight: normal;
@@ -69,13 +73,12 @@ i.more-icon {
 }
 .details {
    padding: 10px;
-   background: #f2f2f2
 }
 #app .details span.pure-button.pure-button-primary.all {
    margin: 10px 0 0 0;
-   padding: 4px;
+   padding: 4px 8px;
+   font-weight: bold;
    box-sizing: border-box;
-   width:100%;
-   background-color: var(--color-pale-blue);
+   background-color: var(--color-light-blue);
 }
 </style>

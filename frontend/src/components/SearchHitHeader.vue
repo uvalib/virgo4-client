@@ -41,6 +41,7 @@ export default {
 </script>
 
 <style scoped>
+
 .header-wrapper {
    text-align: left;
    display: flex;
@@ -55,9 +56,26 @@ export default {
    text-decoration: none;
    color: var(--color-link)
 }
+
+.title {
+   font-size: 1.2em;
+   font-weight: bold;
+   margin-bottom: 3px;
+   display: inline-block;
+   flex: 1 1 auto;
+}
+.subtitle {
+   display: inline-block;
+   font-weight: normal;
+}
+.block {
+   margin-left: 10px;
+ }
+
 .full-title {
    margin-left: 15px;
    font-size: 1.25em;
+
 }
 .author {
    font-size: 0.9em;

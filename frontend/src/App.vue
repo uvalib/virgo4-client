@@ -77,7 +77,16 @@ export default {
 <style>
 /* Color variable definitions */
 :root {
-   --color-primary-orange: #E57200;
+  /*brand colors*/
+   --color-brand-blue: #232D4B;
+   --color-light-blue: #0370B7;
+   --color-lighter-blue: #3395D4;
+   --color-lightest-blue: #87B9D9;
+   --color-brand-orange: #E57200;
+   --color-light-orange: #FFC893;
+   --color-lighter-orange: #FFEAD6;
+  /* TBD */
+   --color-primary-orange: var(--color-brand-orange);
    --color-dark-orange: #ac4400;
    --color-link: #007ae7;
    --color-primary-blue: #0052cc;
@@ -98,7 +107,7 @@ export default {
 
 #app .pure-button.pure-button-primary {
   background-color: var(--color-primary-blue);
-} 
+}
 
 #app .pure-button.pure-button-secondary {
    background-color: var(--color-pale-blue);

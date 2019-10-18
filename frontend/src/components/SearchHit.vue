@@ -56,7 +56,7 @@ export default {
          }
          if (field.type == "url") {
             return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
-         } 
+         }
          return field.value
       },
    }
@@ -89,7 +89,7 @@ div.basic {
    width: 100%;
    border: 1px solid #ccc;
    border-top: none;
-   padding: 00px;
+   padding: 10px;
    box-sizing: border-box;
    text-align: left;
    font-size: 0.8em;
@@ -97,13 +97,13 @@ div.basic {
 }
  #app td.value >>> a.pure-button.pure-button-primary.ext {
    background-color:var(--color-pale-blue);
-   color: white; 
+   color: white;
    padding: 3px 0px;
    width: 100%;
    border-radius: 5px;
 }
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
-   text-decoration: none;  
+   text-decoration: none;
 }
 .hit table {
    table-layout: auto;
@@ -121,4 +121,9 @@ div.basic {
    width: 100%;
    font-weight: normal;
 }
+.cover-img.small {
+   max-height: 124px;
+   max-width: 100px;
+}
+
 </style>
