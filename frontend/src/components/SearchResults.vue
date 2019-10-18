@@ -68,7 +68,7 @@
                <GroupedSearchHit v-else :hitIdx="idx" :pool="result.pool.id" :hit="hit" :key="idx"/>
             </template>
             <div @click="selectPool(visibleIdx)" class="more-panel">
-               See More&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
+               See More Results&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
             </div>
          </div>
       </div>

@@ -13,16 +13,18 @@
             </div>
          </template>
          <template v-else>
-            <SearchHitHeader v-bind:fullImage="true" :hit="details" :pool="this.$route.params.src"/>
-            <div class="bar"></div>
-            <table class="fields">
-               <tr v-for="(field,idx) in detailFields" :key="idx">
-                  <template v-if="field.display != 'optional'">
-                     <td class="label">{{field.label}}:</td>
-                     <td class="value" v-html="fieldValueString(field)"></td>
-                  </template>
-               </tr>
-            </table>
+            <SearchHitHeader :hit="details" :pool="this.$route.params.src"/>
+            <div class="info">
+               <table class="fields">
+                  <tr v-for="(field,idx) in detailFields" :key="idx">
+                     <template v-if="field.display != 'optional'">
+                        <td class="label">{{field.label}}:</td>
+                        <td class="value" v-html="fieldValueString(field)"></td>
+                     </template>
+                  </tr>
+               </table>
+               <img class="cover-img" v-if="details.cover_image" :src="details.cover_image"/>
+            </div>
             <AvailabilityTable :titleId="details.identifier" />
          </template>
          <BackToVirgo v-if="fromCourseReserves" backURL="/course-reserves"/>
@@ -88,15 +90,27 @@ export default {
 </script>
 
 <style scoped>
-.bar {
+.info {
    margin: 15px 0;
    border-top: 4px solid var(--color-primary-orange);
+   display:flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+}
+.fields {
+   flex: 1 1 auto;
 }
 .details {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
+}
+.cover-img {
+   max-width: 300px;
+   margin: 10px;
+   border-radius: 5px;
+   margin-left: auto;
 }
 .working {
    text-align: center;

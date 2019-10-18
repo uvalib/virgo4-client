@@ -1,16 +1,20 @@
 <template>
    <div class="hit">
-      <div class="basic">
-         <SearchHitHeader :hit="hit" :pool="pool"/>
-         <div v-if="hit.basicFields.length > 0" class="sep"></div>
-         <table class="fields">
-            <tr v-for="field in hit.basicFields" :key="getKey(field)">
-               <template v-if="field.display != 'optional'">
-                  <td class="label">{{field.label}}:</td>
-                  <td class="value" v-html="fieldValueString(field)"></td>
-               </template>
-            </tr>
-         </table>
+      <div class="top">
+         <div class="basic">
+            <SearchHitHeader :hit="hit" :pool="pool"/>
+            <table class="fields">
+               <tr v-for="field in hit.basicFields" :key="getKey(field)">
+                  <template v-if="field.display != 'optional'">
+                     <td class="label">{{field.label}}:</td>
+                     <td class="value" v-html="fieldValueString(field)"></td>
+                  </template>
+               </tr>
+            </table>
+         </div>
+         <router-link class="img-link" v-if="hit.grouped==false" :to="detailsURL">
+            <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
+         </router-link>
       </div>
       <AccordionContent v-if="details" title="Details">
          <div class="details">
@@ -37,6 +41,11 @@ export default {
    components: {
       AccordionContent,SearchHitHeader
    },
+   computed: {
+      detailsURL() {
+         return `/sources/${this.pool}/items/${this.hit.identifier}`
+      },
+   },
    methods: {
       getKey(field) {
          return field.name+field.value
@@ -58,9 +67,20 @@ export default {
 div.details {
    padding: 10px;
 }
-.sep {
-   border-top:1px solid #ccc;
-   margin: 10px 0;
+.top {
+   display:flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+}
+.cover-img {
+   border-radius: 3px;
+   margin: 5px;
+   max-height: 140px;
+   max-width: 140px;
+}
+a.img-link {
+   flex: 0 0 auto;
+   margin-left: auto;
 }
 div.basic {
    padding: 10px 10px 10px 10px;
