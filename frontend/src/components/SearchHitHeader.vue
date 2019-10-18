@@ -2,14 +2,15 @@
    <div class="header-wrapper">
       <BookmarkButton :hit="hit" :pool="pool"/>
       <div class="full-title">
-         <router-link v-if="hit.grouped==false" :to="detailsURL">
+         <template v-if="hit.grouped">
+            <span class="title">XX {{hit.header.title}}</span>
+            <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
+         </template>
+         <router-link v-else :to="detailsURL">
             <span class="title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
          </router-link>
-         <template v-else>
-            <span class="title">{{hit.header.title}}</span>
-            <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
-         </template>
+        
          <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
       </div>
    </div>
