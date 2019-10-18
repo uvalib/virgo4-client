@@ -57,7 +57,6 @@ export default {
 }
 
 .title {
-   font-size: 1.2em;
    font-weight: bold;
    margin-bottom: 3px;
    display: inline-block;
@@ -73,8 +72,8 @@ export default {
 
 .full-title {
    margin-left: 15px;
-   font-size: 1.25em;
-
+   font-size: 1.2em;
+   line-height: 1.2;
 }
 .author {
    font-size: 0.9em;
