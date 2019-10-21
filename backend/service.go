@@ -148,14 +148,12 @@ func (svc *ServiceContext) IsAuthenticated(c *gin.Context) {
 // GetConfig returns front-end configuration data as JSON
 func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
-		SearchAPI          string `json:"searchAPI"`
-		CourseReserveEmail string `json:"courseReserveEmail"`
-		TranslateMessage   string `json:"translateMessage"`
+		SearchAPI        string `json:"searchAPI"`
+		TranslateMessage string `json:"translateMessage"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
 	cfg := config{SearchAPI: svc.SearchAPI}
-	cfg.CourseReserveEmail = svc.CourseReserveEmail
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg

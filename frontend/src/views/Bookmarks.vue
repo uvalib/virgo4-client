@@ -18,25 +18,33 @@
                      <div>contained within it will also be deleted.</div> 
                      <div><br/>This cannot be reversed.</div>
                   </ConfirmDelete>
-                  <AccordionContent :title="folderInfo.folder" align="left">
+                  <AccordionContent background="#f5f5f5" :title="folderInfo.folder" align="left">
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
                      </div>
-                     <table v-else>
-                        <tr>
-                           <th/><th>Title</th><th>Author</th><th/>
-                        </tr>
-                        <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
-                           <td><i @click="removeBookmark(bookmark.id)" class="remove fas fa-trash-alt"></i></td>
-                           <td>{{bookmark.details.title}}</td>
-                           <td>{{bookmark.details.author}}</td>
-                           <td>
-                               <router-link :to="detailsURL(bookmark)">
-                                  <i class="fas fa-search"></i>
-                               </router-link>
-                           </td>
-                        </tr>
-                     </table>
+                     <div v-else>
+                        <div class="actions">
+                           <span @click="reserve(folderInfo.bookmarks)" 
+                              class="pure-button pure-button-primary all">
+                              Place items on course reserve
+                           </span>
+                        </div>
+                        <table>
+                           <tr>
+                              <th/><th>Title</th><th>Author</th><th/>
+                           </tr>
+                           <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
+                              <td><i @click="removeBookmark(bookmark.id)" class="remove fas fa-trash-alt"></i></td>
+                              <td>{{bookmark.details.title}}</td>
+                              <td>{{bookmark.details.author}}</td>
+                              <td class="icon">
+                                 <router-link :to="detailsURL(bookmark)">
+                                    <i class="details fas fa-info-circle"></i>
+                                 </router-link>
+                              </td>
+                           </tr>
+                        </table>
+                     </div>
                   </AccordionContent>
                </div>
             </template>
@@ -68,6 +76,10 @@ export default {
       }),
    },
    methods: {
+      reserve(items) {
+         this.$store.commit("user/setReservesList", items)    
+         this.$router.push("/course-reserves-request")
+      },
       detailsURL(bookmark) {
          return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
       },
@@ -138,17 +150,30 @@ div.accordion {
        width: 95%;
    }
 }
+div.actions {
+   font-size: 0.8em;
+   text-align: left;
+   padding: 10px 0;
+   background: #e5e5e5;
+   border-top: 1px solid #ccc;
+}
 table td, th {
   padding: 2px 8px;
   text-align: left;
+  background: white;
   border-bottom: 1px solid #ccc;
 }
 table  th {
   background: #e5e5e5;
 }
+td.icon {
+   text-align: right;
+   padding: 5px 5px 0 5px;
+}
 table {
    margin: 0px;
-   border-bottom: 1px solid #ccc;
+   border: 1px solid #ccc;
+   border-top: 0;
    width: 100%;
 }
 div.none {
@@ -156,6 +181,10 @@ div.none {
    text-align: left;
    margin: 15px;
    color: #999;
+}
+i.details {
+   font-size: 1.25em;
+   color: var(--color-light-blue)
 }
 </style>
 

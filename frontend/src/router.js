@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import CourseReserves from './views/CourseReserves.vue'
+import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import Details from './views/Details.vue'
 import Sources from './views/Sources.vue'
 import SignIn from './views/SignIn.vue'
@@ -31,6 +32,14 @@ const router = new Router({
       path: '/course-reserves',
       name: 'course-reserves',
       component: CourseReserves,
+      beforeEnter: (_to, _from, next) => {
+        ensureAuthTokenPresent(next)
+      }
+    },
+    {
+      path: '/course-reserves-request',
+      name: 'course-reserves-request',
+      component: CourseReservesRequest,
       beforeEnter: (_to, _from, next) => {
         ensureAuthTokenPresent(next)
       }
