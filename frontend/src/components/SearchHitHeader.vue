@@ -3,7 +3,7 @@
       <BookmarkButton :hit="hit" :pool="pool"/>
       <div class="full-title">
          <template v-if="hit.grouped">
-            <span class="title">XX {{hit.header.title}}</span>
+            <span class="title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
          </template>
          <router-link v-else :to="detailsURL">
