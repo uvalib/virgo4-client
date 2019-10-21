@@ -7,15 +7,16 @@ import (
 
 // ServiceConfig defines all of the v4client service configuration parameters
 type ServiceConfig struct {
-	Port        int
-	SearchAPI   string
-	ILSAPI      string
-	DevAuthUser string
-	DBHost      string
-	DBPort      int
-	DBName      string
-	DBUser      string
-	DBPass      string
+	Port               int
+	SearchAPI          string
+	CourseReserveEmail string
+	ILSAPI             string
+	DevAuthUser        string
+	DBHost             string
+	DBPort             int
+	DBName             string
+	DBUser             string
+	DBPass             string
 }
 
 // LoadConfig will load the service configuration from env/cmdline
@@ -23,6 +24,7 @@ func LoadConfig() *ServiceConfig {
 	var cfg ServiceConfig
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
+	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 	flag.StringVar(&cfg.DevAuthUser, "devuser", "", "Authorized computing id for dev")
 	flag.StringVar(&cfg.DBHost, "dbhost", "localhost", "Database host")
@@ -41,6 +43,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("ils param is required")
 	} else {
 		log.Printf("ILS Connector API endpoint: %s", cfg.ILSAPI)
+	}
+	if cfg.CourseReserveEmail == "" {
+		log.Fatal("cremail param is required")
+	} else {
+		log.Printf("Course Reserves email recipient: %s", cfg.CourseReserveEmail)
 	}
 
 	return &cfg

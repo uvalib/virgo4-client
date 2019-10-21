@@ -18,12 +18,13 @@ import (
 
 // ServiceContext contains common data used by all handlers
 type ServiceContext struct {
-	Version           string
-	SearchAPI         string
-	ILSAPI            string
-	DevAuthUser       string
-	PendingTranslates map[string]string
-	DB                *dbx.DB
+	Version            string
+	SearchAPI          string
+	CourseReserveEmail string
+	ILSAPI             string
+	DevAuthUser        string
+	PendingTranslates  map[string]string
+	DB                 *dbx.DB
 }
 
 // RequestError contains http status code and message for a
@@ -35,8 +36,11 @@ type RequestError struct {
 
 // InitService will initialize the service context based on the config parameters
 func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
-	ctx := ServiceContext{Version: version, SearchAPI: cfg.SearchAPI,
-		ILSAPI: cfg.ILSAPI, DevAuthUser: cfg.DevAuthUser}
+	ctx := ServiceContext{Version: version,
+		SearchAPI:          cfg.SearchAPI,
+		CourseReserveEmail: cfg.CourseReserveEmail,
+		ILSAPI:             cfg.ILSAPI,
+		DevAuthUser:        cfg.DevAuthUser}
 
 	log.Printf("Connect to Postgres")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
@@ -144,12 +148,14 @@ func (svc *ServiceContext) IsAuthenticated(c *gin.Context) {
 // GetConfig returns front-end configuration data as JSON
 func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
-		SearchAPI        string `json:"searchAPI"`
-		TranslateMessage string `json:"translateMessage"`
+		SearchAPI          string `json:"searchAPI"`
+		CourseReserveEmail string `json:"courseReserveEmail"`
+		TranslateMessage   string `json:"translateMessage"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
 	cfg := config{SearchAPI: svc.SearchAPI}
+	cfg.CourseReserveEmail = svc.CourseReserveEmail
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg
