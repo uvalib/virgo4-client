@@ -25,6 +25,7 @@ type ServiceContext struct {
 	DevAuthUser        string
 	PendingTranslates  map[string]string
 	DB                 *dbx.DB
+	SMTP               SMTPConfig
 }
 
 // RequestError contains http status code and message for a
@@ -40,17 +41,24 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		SearchAPI:          cfg.SearchAPI,
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		ILSAPI:             cfg.ILSAPI,
+		SMTP:               cfg.SMTP,
 		DevAuthUser:        cfg.DevAuthUser}
 
 	log.Printf("Connect to Postgres")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
-		cfg.DBUser, cfg.DBPass, cfg.DBName, cfg.DBHost, cfg.DBPort)
+		cfg.DB.User, cfg.DB.Pass, cfg.DB.Name, cfg.DB.Host, cfg.DB.Port)
 	db, err := dbx.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	db.LogFunc = log.Printf
 	ctx.DB = db
+
+	if ctx.SMTP.DevMode {
+		log.Printf("Using dev mode for SMTP; all messages will be logged instead of delivered")
+	} else {
+		log.Printf("Using SMTP host: %s", ctx.SMTP.Host)
+	}
 
 	ctx.PendingTranslates = make(map[string]string)
 	file, err := os.Open("pendingTranslate.txt")

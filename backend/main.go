@@ -57,8 +57,9 @@ func main() {
 		}
 		reserves := api.Group("/reserves")
 		{
-			reserves.GET("/desks", svc.GetReserveDesks)
-			reserves.GET("/search", svc.SearchReserves)
+			reserves.POST("/", svc.AuthMiddleware, svc.CreateCourseReserves)
+			reserves.GET("/desks", svc.AuthMiddleware, svc.GetReserveDesks)
+			reserves.GET("/search", svc.AuthMiddleware, svc.SearchReserves)
 		}
 	}
 	auth := router.Group("/authenticate")

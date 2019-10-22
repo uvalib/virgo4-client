@@ -156,6 +156,11 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+	if token == "undefined" {
+		log.Printf("Authentication failed; bearer token is undefined")
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
 
 	// add the cookie to the request context so other handlers can access it.
 	c.Set("token", token)

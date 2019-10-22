@@ -17,6 +17,13 @@ type Desk struct {
 	Name string `json:"name"`
 }
 
+// CreateCourseReserves accepts a POST to create reserves for a course. Sends emails
+// to user and staff that will create the reserves
+func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
+	log.Printf("Received request to create new course reserves")
+	c.String(http.StatusNotImplemented, "not implemented")
+}
+
 // GetReserveDesks gets a list of locations where course reserves are held
 func (svc *ServiceContext) GetReserveDesks(c *gin.Context) {
 	log.Printf("Get reserve desks from ILS Connector...")
