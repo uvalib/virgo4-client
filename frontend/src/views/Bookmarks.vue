@@ -77,7 +77,7 @@ export default {
    },
    methods: {
       reserve(items) {
-         this.$store.commit("user/setReservesList", items)    
+         this.$store.commit("reserves/setRequestList", items)    
          this.$router.push("/course-reserves-request")
       },
       detailsURL(bookmark) {

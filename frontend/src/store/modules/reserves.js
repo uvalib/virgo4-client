@@ -7,7 +7,19 @@ const reserves = {
       query: "",
       searchType: "",
       courseReserves: [],
-      noMatch: false
+      noMatch: false,
+      requestList: [],
+      request: {
+         onBehalfOf: "no",
+         instructorName: "",
+         instructorEmail: "",
+         name: "",
+         email: "",
+         course: "",
+         semester: "",
+         library: "",
+         period: ""
+      }
    },
 
    getters: {
@@ -22,6 +34,41 @@ const reserves = {
 
    mutations: {
       updateField,
+      updateReservedItemsPeriod(state) {
+         state.requestList.forEach(item => {
+            item.period = state.request.period
+         })
+      },
+      setRequestList(state, list) {
+         state.requestList = list.slice(0)
+         state.requestList.forEach(item => {
+            item.period = ""
+            item.notes = ""  
+         });
+         state.request = {onBehalfOf: "no",
+            instructorName: "",
+            instructorEmail: "",
+            name: "",
+            email: "",
+            course: "",
+            semester: "",
+            library: "",
+            period: ""
+         }
+      },
+      clearRequestList(state) {
+         state.requestList = []
+         state.request = {onBehalfOf: "no",
+            instructorName: "",
+            instructorEmail: "",
+            name: "",
+            email: "",
+            course: "",
+            semester: "",
+            library: "",
+            period: ""
+         }
+      },
       setInstructorSearch(state) {
          state.searchType="instructor"
       },

@@ -15,7 +15,6 @@ const user = {
       bookmarks: null,
       newBookmarkInfo: null,
       lookingUp: false,
-      reservesList: []
    },
 
    getters: {
@@ -70,12 +69,6 @@ const user = {
    },
 
    mutations: {
-      setReservesList(state, list) {
-         state.reservesList = list
-      },
-      clearReservesList(state) {
-         state.reservesList = []
-      },
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
