@@ -3,13 +3,13 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 
-build: darwin deploy-templates web
+build: darwin web
 
-all: darwin linux deploy-templates web
+all: darwin linux web
 
-linux-full: linux deploy-templates web
+linux-full: linux web
 
-darwin-full: darwin deploy-templates web
+darwin-full: darwin web
 
 deploy-templates:
 	mkdir -p bin/
