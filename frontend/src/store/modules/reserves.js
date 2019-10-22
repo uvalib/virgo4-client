@@ -86,10 +86,30 @@ const reserves = {
    actions: {
       getDesks(ctx) {
          ctx.commit('setSearching', true, { root: true })
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          axios.get(`/api/reserves/desks`).then((response) => {
             ctx.commit('setDesks', response.data)
             ctx.commit('setSearching', false, { root: true })
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setSearching', false, { root: true })
+          })
+      },
+      createReserves(ctx) {
+         ctx.commit('setSearching', true, { root: true })
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
+         let data = {request: ctx.state.request, items: []}
+         ctx.state.requestList.forEach( item=>{
+            data.items.push( {catalogKey: item.identifier, 
+               title: item.details.title,
+               author: item.details.author,
+               notes: item.notes, 
+               period: item.period} )    
+         })
+         axios.post(`/api/reserves`, data).then((_response) => {
+            ctx.commit('clearRequestList')
+            ctx.commit('setSearching', false, { root: true })
+            // TODO redirect to finished page
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })
@@ -99,7 +119,7 @@ const reserves = {
          ctx.commit('setSearching', true, { root: true })
          ctx.commit('setNoMatch',false)
          ctx.commit('setCourseSearch')
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          axios.get(`/api/reserves/search?type=COURSE_NAME&query=${ctx.state.query}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
@@ -113,7 +133,7 @@ const reserves = {
          ctx.commit('setSearching', true, { root: true })
          ctx.commit('setNoMatch',false)
          ctx.commit('setInstructorSearch')
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          axios.get(`/api/reserves/search?type=INSTRUCTOR_NAME&query=${ctx.state.query}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })

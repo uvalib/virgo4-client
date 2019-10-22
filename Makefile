@@ -3,13 +3,19 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 
-build: darwin web
+build: darwin deploy-templates web
 
-all: darwin linux web
+all: darwin linux deploy-templates web
 
-linux-full: linux web
+linux-full: linux deploy-templates web
 
-darwin-full: darwin web
+darwin-full: darwin deploy-templates web
+
+deploy-templates:
+	mkdir -p bin/
+	rm -rf bin/templates
+	mkdir -p bin/templates
+	cp ./templates/* bin/templates
 
 darwin:
 	GOOS=darwin GOARCH=amd64 $(GOBUILD) -a -o bin/v4srv.darwin backend/*.go

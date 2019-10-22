@@ -274,7 +274,7 @@ export default new Vuex.Store({
       commit('setSearching', true)
       // commit('resetSearchResults')
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
         commit('filters/reset')
@@ -291,7 +291,7 @@ export default new Vuex.Store({
     // exploration. It is used to query for next page during infinite scroll and
     // when filters are added and removed. Pool results are APPENDED to existing during infinite 
     // scroll. If newly filtered, reset paging and re-query
-    searchSelectedPool({ state, commit, _rootState, rootGetters }) {
+    searchSelectedPool({ state, commit, rootState, rootGetters }) {
       commit('setSearching', true)
       let tgtPool = rootGetters.selectedResults
       let f = rootGetters['filters/poolFilter'](state.selectedResultsIdx, "api")
@@ -301,7 +301,7 @@ export default new Vuex.Store({
         filters: f
       }
       let url = tgtPool.pool.url + "/api/search?debug=1"
-      axios.defaults.headers.common['Authorization'] = "Bearer "+state.user.authToken
+      axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)

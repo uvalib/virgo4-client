@@ -113,6 +113,14 @@
                </table>
             </div>
          </div>
+         <div class="controls">
+            <router-link to="/">
+               <span class="pure-button pure-button-secondary">Cancel Request</span>
+            </router-link>
+            <span @click="submitRequest" class="pure-button pure-button-primary">
+               Submit Request
+            </span>
+         </div>
       </div>
    </main>
 </template>
@@ -150,6 +158,9 @@ export default {
       ...mapMultiRowFields('reserves', ['requestList'])
    },
    methods: {
+      submitRequest() {
+         this.$store.dispatch("reserves/createReserves")
+      },
       itemsPeriodChosen() {
          this.$store.commit("reserves/updateReservedItemsPeriod")
       }
@@ -246,7 +257,6 @@ div.items {
    flex-flow: row wrap;
    align-items: stretch;
    justify-content: center;
-   margin-bottom: 25px;
 }
 div.card {
    text-align: left;
@@ -279,6 +289,10 @@ td textarea, td select  {
    border: 1px solid #ccc;
    border-radius: 5px;
    box-sizing: border-box;
+}
+div.controls {
+   text-align: right;
+   margin: 15px;
 }
 </style>
 

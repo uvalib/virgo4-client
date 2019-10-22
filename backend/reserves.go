@@ -17,10 +17,46 @@ type Desk struct {
 	Name string `json:"name"`
 }
 
+// ReserveRequest is the data POST'd by a client for course reserves
+type ReserveRequest struct {
+	Request RequestParams `json:"request"`
+	Items   []RequestItem `json:"items"`
+}
+
+// RequestParams contans the top-level request data for course reserves
+type RequestParams struct {
+	OnBehalfOf      string `json:"onBehalfOf"`
+	InstructorName  string `json:"instructorName"`
+	InstructorEmail string `json:"instructorEmail"`
+	Name            string `json:"name"`
+	Email           string `json:"email"`
+	Course          string `json:"course"`
+	Semester        string `json:"semester"`
+	Library         string `json:"library"`
+	Period          string `json:"period"`
+}
+
+// RequestItem is the details for a particular reserve item
+type RequestItem struct {
+	CatalogKey string `json:"catalogKey"`
+	Title      string `json:"title"`
+	Author     string `json:"author"`
+	Period     string `json:"period"`
+	Notes      string `json:"notes"`
+}
+
 // CreateCourseReserves accepts a POST to create reserves for a course. Sends emails
 // to user and staff that will create the reserves
 func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	log.Printf("Received request to create new course reserves")
+	var reserveReq ReserveRequest
+	err := c.ShouldBindJSON(&reserveReq)
+	if err != nil {
+		log.Printf("ERROR: Unable to parse request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	log.Printf("Request: %+v", reserveReq)
 	c.String(http.StatusNotImplemented, "not implemented")
 }
 
