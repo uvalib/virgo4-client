@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/smtp"
 	"net/url"
 	"sort"
+	"strings"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
@@ -54,6 +56,16 @@ type RequestItem struct {
 	Notes        string `json:"notes"`
 }
 
+var emailMap = map[string]string{"astr": "Sci Resv",
+	"brown":   "Sci Resv",
+	"math":    "Sci Resv",
+	"clem":    "Clemons Resv",
+	"arts":    "Fine Arts Resv",
+	"law":     "Law Resv",
+	"music":   "Music Resv",
+	"physics": "Physics Resv",
+}
+
 // CreateCourseReserves accepts a POST to create reserves for a course. Sends emails
 // to user and staff that will create the reserves
 func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
@@ -79,11 +91,42 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	err = tpl.Execute(&renderedEmail, reserveReq)
 	if err != nil {
 		log.Printf("ERROR: Unable to render reserve email: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
-	log.Println(renderedEmail.String())
 
-	c.String(http.StatusNotImplemented, "not implemented")
+	log.Printf("Generate SMTP message")
+	coordinator := emailMap[reserveReq.Request.Library]
+	if coordinator != "" {
+		coordinator = fmt.Sprintf("%s <%s>", coordinator, svc.CourseReserveEmail)
+	} else {
+		coordinator = svc.CourseReserveEmail
+	}
+	to := []string{coordinator, reserveReq.Request.Email}
+	if reserveReq.Request.InstructorEmail != "" {
+		to = append(to, reserveReq.Request.InstructorEmail)
+	}
+	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
+	subject := fmt.Sprintf("Subject: %s: %s\n", reserveReq.Request.Name, reserveReq.Request.Course)
+	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
+	msg := []byte(subject + toHdr + mime + renderedEmail.String())
+
+	if svc.SMTP.DevMode {
+		log.Printf("Email is in dev mode. Logging message instead of sending")
+		log.Printf("==================================================")
+		log.Printf("%s", msg)
+		log.Printf("==================================================")
+	} else {
+		log.Printf("Sending reserve email to %s", strings.Join(to, ","))
+		err := smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, svc.SMTP.Sender, to, msg)
+		if err != nil {
+			log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	c.String(http.StatusOK, "Reserve email sent")
 }
 
 // GetReserveDesks gets a list of locations where course reserves are held

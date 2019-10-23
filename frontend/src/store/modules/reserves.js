@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { getField, updateField } from 'vuex-map-fields'
+import router from '../../router'
 
 const reserves = {
    namespaced: true,
@@ -117,7 +118,7 @@ const reserves = {
          axios.post(`/api/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')
             ctx.commit('setSearching', false, { root: true })
-            // TODO redirect to finished page
+            router.push("/reserved")
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })

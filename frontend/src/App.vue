@@ -268,4 +268,11 @@ html, body {
   opacity:1;
   text-decoration: underline;
 }
+.error {
+  font-weight: bold;
+  margin: 0;
+  color: var(--color-error);
+  opacity: 1;
+  visibility: visible;
+}
 </style>

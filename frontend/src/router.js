@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
+import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
 import Details from './views/Details.vue'
 import Sources from './views/Sources.vue'
 import SignIn from './views/SignIn.vue'
@@ -43,6 +44,11 @@ const router = new Router({
       beforeEnter: (_to, _from, next) => {
         ensureAuthTokenPresent(next)
       }
+    },
+    {
+      path: '/reserved',
+      name: 'reserved',
+      component: CourseReserveSuccess,
     },
     {
       path: '/sources/:src/items/:id',
