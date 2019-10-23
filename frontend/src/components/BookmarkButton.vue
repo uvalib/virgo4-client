@@ -64,13 +64,7 @@ export default {
       },
       addBookmarkClicked() {
          if ( this.isSignedIn == false) return
-
-         let author = "" 
-         if ( this.hit.header.author ) {
-            author = this.hit.header.author.join(", ")
-         }
-         let data = {pool: this.pool, identifier: this.hit.identifier, 
-            title: this.hit.header.title, author: author} 
+         let data = {pool: this.pool, data: this.hit} 
          this.$store.commit("user/showAddBookmark", data)
       },
    }

@@ -8,8 +8,8 @@
          <img src="../assets/spinner2.gif">
       </div>
       <div class="content">
-         <div>{{newBookmark.identifier}} : <b>{{newBookmark.title}}</b></div>
-         <div>{{newBookmark.author}}</div>
+         <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
+         <div>{{authorText}}</div>
          <div class="select">
             <label>Select a folder for the bookmark: </label> 
             <multiselect v-model="selectedFolder" class="folders"  
@@ -53,7 +53,14 @@ export default {
       }),
        ...mapGetters({
          folders: 'user/folders',
-       })
+      }),
+      authorText() {
+         let author = "" 
+         if ( this.newBookmark.data.header.author ) {
+            author = this.newBookmark.data.header.author.join(", ")
+         }
+         return author
+      }
    },
    methods: {
       addFolder(newFolder) {

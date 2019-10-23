@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
+import * as utils from './utils'
 
 const user = {
    namespaced: true,
@@ -194,9 +195,17 @@ const user = {
       addBookmark(ctx, folder ) {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items`
-         // expected: {"folder":"FolderOne", "pool": "video", "identifier": "u15772", "details": {"title": "Jaws", "author":"Peter Benchly"}}
-         let data = {folder: folder, pool: ctx.state.newBookmarkInfo.pool, identifier: ctx.state.newBookmarkInfo.identifier}
-         data['details'] = {title: ctx.state.newBookmarkInfo.title, author: ctx.state.newBookmarkInfo.author  }
+         let bm = ctx.state.newBookmarkInfo
+         let data = {folder: folder, pool: bm.pool, identifier: bm.data.identifier}
+
+         // required details: title, author, call number, location, library, availability
+         data['details'] = {title :bm.data.header.title, 
+            author: bm.data.header.author.join(", "),
+            callNumber: utils.getFieldValue("call_number", bm.data),
+            location: utils.getFieldValue("location", bm.data),
+            library: utils.getFieldValue("library", bm.data),
+            availability: utils.getFieldValue("availability", bm.data),
+         }
          return axios.post(url, data).then((response) => {
             ctx.commit('setBookmarks', response.data)
          })

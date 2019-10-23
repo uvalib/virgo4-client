@@ -40,22 +40,6 @@ export function preProcessHitFields(hits) {
         }
         return
       }
-      // if (field.type == "availability") {
-      //   if (Array.isArray(hit.availability) === false) {
-      //     hit.header.availability = [field.value]
-      //   } else {
-      //     hit.header.availability.push(field.value)
-      //   }
-      //   return
-      // }
-      // if (field.name == "format") {
-      //   if (Array.isArray(hit.format) === false) {
-      //     hit.header.format = [field.value]
-      //   } else {
-      //     hit.header.format.push(field.value)
-      //   }
-      //   return
-      // }
 
       // Pick which group the fields belong to
       let tgtMerged = hit.basicFields
@@ -79,21 +63,30 @@ export function preProcessHitFields(hits) {
   })
 }
 
+// Find value for the given field name in detailed or basic hit fields
+export function getFieldValue(fieldName, hit) {
+  let out = ""
+  let fieldsSources = [hit.basicFields, hit.detailFields]
+  fieldsSources.some( fields=> {
+    fields.some( f=> {
+      if (f.name == fieldName) {
+        out = f.value
+      }
+      return out != ""
+    })
+    return out != ""
+  })
+  if (out == "") {
+    out = "Unknown"
+  }
+  return out
+}
+
 export function getGroupHitMetadata(group, hit) {
   hit.header = {}
   hit.header.title = group.record_list[0].header.title
   hit.header.subtitle = group.record_list[0].header.subtitle
   hit.header.author = group.record_list[0].header.author
-  // group.fields.forEach(field => {
-  //   if (field.name == "format") {
-  //     if (Array.isArray(group.format) === false) {
-  //       hit.header.format = [field.value]
-  //     } else {
-  //       hit.header.format.push(field.value)
-  //     }
-  //     return
-  //   }
-  // })
   delete group.fields
 }
 
