@@ -19,6 +19,7 @@ import (
 // ServiceContext contains common data used by all handlers
 type ServiceContext struct {
 	Version            string
+	VirgoURL           string
 	SearchAPI          string
 	CourseReserveEmail string
 	ILSAPI             string
@@ -38,6 +39,7 @@ type RequestError struct {
 // InitService will initialize the service context based on the config parameters
 func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
+		VirgoURL:           cfg.VirgoURL,
 		SearchAPI:          cfg.SearchAPI,
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		ILSAPI:             cfg.ILSAPI,

@@ -101,14 +101,17 @@ const reserves = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          let data = {userID: v4UserID, request: ctx.state.request, items: []}
          ctx.state.requestList.forEach( item=>{
+            let notes = item.notes
+            if (notes.length == 0) notes = "-"
             data.items.push( {catalogKey: item.identifier, 
+               pool: item.pool,
                title: item.details.title,
                callNumber: item.details.callNumber,
                author: item.details.author,
                location: item.details.location,
                library: item.details.library,
                availability: item.details.availability,
-               notes: item.notes, 
+               notes: notes, 
                period: item.period} )    
          })
          axios.post(`/api/reserves`, data).then((_response) => {

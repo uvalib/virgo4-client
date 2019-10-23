@@ -5,11 +5,11 @@ GOTEST=$(GOCMD) test
 
 build: darwin web
 
-all: darwin linux web
+all: darwin linux web deploy-templates
 
-linux-full: linux web
+linux-full: linux web deploy-templates
 
-darwin-full: darwin web
+darwin-full: darwin web deploy-templates
 
 deploy-templates:
 	mkdir -p bin/

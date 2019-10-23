@@ -12,4 +12,20 @@ Course ID:  {{.Request.Course}}
 Semester:   {{.Request.Semester}}
 _______________________________________________________________________
 
+{{- $reserveLib := .Request.Library -}}
+{{- $url := .VirgoURL -}}
+{{ range $index, $item := .Items }}
+{{ add $index 1 }}.
+{{ $item.Title}}
+{{ $item.Author}}
+Library: {{ $item.Library }}
+Location: {{ $item.Location }}
+Availability: {{ $item.Availability }}
+Call Number: {{ $item.CallNumber }}
+Reserve Library: {{ $reserveLib }}
+Loan Period: {{ $item.Period }}
+Notes: {{ $item.Notes }}
+
+Virgo URL: {{ $url }}/{{ $item.Pool }}/{{ $item.CatalogKey}}
+{{ end -}}
 _______________________________________________________________________

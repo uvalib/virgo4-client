@@ -27,6 +27,7 @@ type DBConfig struct {
 // ServiceConfig defines all of the v4client service configuration parameters
 type ServiceConfig struct {
 	Port               int
+	VirgoURL           string
 	SearchAPI          string
 	CourseReserveEmail string
 	ILSAPI             string
@@ -39,6 +40,7 @@ type ServiceConfig struct {
 func LoadConfig() *ServiceConfig {
 	var cfg ServiceConfig
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
+	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")

@@ -21,9 +21,10 @@ type Desk struct {
 
 // ReserveRequest is the data POST'd by a client for course reserves
 type ReserveRequest struct {
-	UserID  string        `json:"userID"`
-	Request RequestParams `json:"request"`
-	Items   []RequestItem `json:"items"`
+	VirgoURL string
+	UserID   string        `json:"userID"`
+	Request  RequestParams `json:"request"`
+	Items    []RequestItem `json:"items"`
 }
 
 // RequestParams contans the top-level request data for course reserves
@@ -41,6 +42,7 @@ type RequestParams struct {
 
 // RequestItem is the details for a particular reserve item
 type RequestItem struct {
+	Pool         string `json:"pool"`
 	CatalogKey   string `json:"catalogKey"`
 	CallNumber   string `json:"callNumber"`
 	Title        string `json:"title"`
@@ -63,13 +65,17 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
+	reserveReq.VirgoURL = svc.VirgoURL
 	log.Printf("Request: %+v", reserveReq)
 
 	// TODO check LDAP user info to see if user can make a reserve
 
 	log.Printf("Rendering reserve email body")
 	var renderedEmail bytes.Buffer
-	tpl := template.Must(template.ParseFiles("templates/reserves.txt"))
+	funcs := template.FuncMap{"add": func(x, y int) int {
+		return x + y
+	}}
+	tpl := template.Must(template.New("reserves.txt").Funcs(funcs).ParseFiles("templates/reserves.txt"))
 	err = tpl.Execute(&renderedEmail, reserveReq)
 	if err != nil {
 		log.Printf("ERROR: Unable to render reserve email: %s", err.Error())

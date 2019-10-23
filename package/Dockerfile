@@ -58,10 +58,11 @@ COPY backend/db/migrations/*.sql $APP_HOME/db/
 COPY pendingTranslate.txt $APP_HOME/bin/pendingTranslate.txt
 COPY --from=builder /build/bin/v4srv.linux $APP_HOME/bin/v4srv
 COPY --from=builder /build/bin/public $APP_HOME/bin/public
+COPY --from=builder /build/bin/templates $APP_HOME/bin/templates
 
 # Ensure permissions are correct
 RUN chown webservice:webservice /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/v4srv $APP_HOME/bin/migrate $APP_HOME/bin/pendingTranslate.txt && chmod 755 /home/webservice/.profile $APP_HOME/scripts/entry.sh $APP_HOME/scripts/migrate.sh $APP_HOME/bin/v4srv $APP_HOME/bin/migrate $APP_HOME/bin/pendingTranslate.txt
-RUN chown -R webservice:webservice $APP_HOME/bin/public $APP_HOME/db && chmod -R 755 $APP_HOME/bin/public $APP_HOME/db
+RUN chown -R webservice:webservice $APP_HOME/bin/public $APP_HOME/bin/templates $APP_HOME/db && chmod -R 755 $APP_HOME/bin/templates $APP_HOME/bin/public $APP_HOME/db
 
 # Add the build tag
 ARG BUILD_TAG
