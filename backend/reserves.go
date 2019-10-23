@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"sort"
+	"text/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +21,7 @@ type Desk struct {
 
 // ReserveRequest is the data POST'd by a client for course reserves
 type ReserveRequest struct {
+	UserID  string        `json:"userID"`
 	Request RequestParams `json:"request"`
 	Items   []RequestItem `json:"items"`
 }
@@ -38,11 +41,15 @@ type RequestParams struct {
 
 // RequestItem is the details for a particular reserve item
 type RequestItem struct {
-	CatalogKey string `json:"catalogKey"`
-	Title      string `json:"title"`
-	Author     string `json:"author"`
-	Period     string `json:"period"`
-	Notes      string `json:"notes"`
+	CatalogKey   string `json:"catalogKey"`
+	CallNumber   string `json:"callNumber"`
+	Title        string `json:"title"`
+	Author       string `json:"author"`
+	Location     string `json:"location"`
+	Library      string `json:"library"`
+	Availability string `json:"availability"`
+	Period       string `json:"period"`
+	Notes        string `json:"notes"`
 }
 
 // CreateCourseReserves accepts a POST to create reserves for a course. Sends emails
@@ -57,6 +64,19 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		return
 	}
 	log.Printf("Request: %+v", reserveReq)
+
+	// TODO check LDAP user info to see if user can make a reserve
+
+	log.Printf("Rendering reserve email body")
+	var renderedEmail bytes.Buffer
+	tpl := template.Must(template.ParseFiles("templates/reserves.txt"))
+	err = tpl.Execute(&renderedEmail, reserveReq)
+	if err != nil {
+		log.Printf("ERROR: Unable to render reserve email: %s", err.Error())
+		return
+	}
+	log.Println(renderedEmail.String())
+
 	c.String(http.StatusNotImplemented, "not implemented")
 }
 

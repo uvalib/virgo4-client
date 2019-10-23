@@ -97,12 +97,17 @@ const reserves = {
       },
       createReserves(ctx) {
          ctx.commit('setSearching', true, { root: true })
+         let v4UserID = ctx.rootState.user.signedInUser
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-         let data = {request: ctx.state.request, items: []}
+         let data = {userID: v4UserID, request: ctx.state.request, items: []}
          ctx.state.requestList.forEach( item=>{
             data.items.push( {catalogKey: item.identifier, 
                title: item.details.title,
+               callNumber: item.details.callNumber,
                author: item.details.author,
+               location: item.details.location,
+               library: item.details.library,
+               availability: item.details.availability,
                notes: item.notes, 
                period: item.period} )    
          })
