@@ -18,6 +18,7 @@ WORKDIR /build
 COPY go.mod go.sum Makefile ./
 COPY backend ./backend
 COPY frontend ./frontend
+COPY templates ./templates
 RUN make linux-full
 
 #

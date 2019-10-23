@@ -3,7 +3,7 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 
-build: darwin web
+build: darwin web deploy-templates
 
 all: darwin linux web deploy-templates
 
