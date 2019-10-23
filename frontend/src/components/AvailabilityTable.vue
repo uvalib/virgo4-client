@@ -15,8 +15,8 @@
                </tr>
             </thead>
 
-            <tr v-for="(holding,idx) in availability.holdings" :key="idx">
-               <td class="value" v-for="(field, id) in visibleFields(holding)" :key="id">
+            <tr v-for="(item,idx) in availability.items" :key="idx">
+               <td class="value" v-for="(field, id) in visibleFields(item)" :key="id">
                   {{field.value}}
                </td>
             </tr>
@@ -46,8 +46,8 @@ export default {
       }),
    },
    methods: {
-      visibleFields: function(holding) {
-         return holding.fields.filter(h => h.visible)
+      visibleFields: function(item) {
+         return item.fields.filter(h => h.visible)
       }
    },
    created() {
