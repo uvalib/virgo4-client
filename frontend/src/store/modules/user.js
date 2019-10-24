@@ -19,6 +19,26 @@ const user = {
    },
 
    getters: {
+      canMakeReserves: state => {
+         if (state.isSignedIn == false ) return false
+         if (state.hasAccountInfo == false ) return false
+
+         // can reserve if !undergraduate? && !virginia_borrower?
+         // va borrower: profile.match?(/Virginia Borrower|Other VA Faculty|Alumn/i)
+         let profile = state.accountInfo.profile.toLowerCase().trim()
+         let desc = state.accountInfo.description.toLowerCase().trim()
+         if (desc.indexOf("undergraduate") == 0) {
+            return false
+         }
+         if (profile.indexOf("ugrad") == 0 || profile.indexOf("undergrad") == 0) {
+            return false
+         }
+         if (profile.match(/Virginia Borrower|Other VA Faculty|Alumn/i)) {
+            return false
+         }
+
+         return true
+      },
       hasAuthToken: state => {
         return state.authToken.length > 0
       },
@@ -135,7 +155,7 @@ const user = {
       getAccountInfo(ctx) {
          ctx.commit('setLookingUp', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
-         axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
+         return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
@@ -184,12 +204,18 @@ const user = {
          window.location.href = "/authenticate/netbadge"
       },
 
-      getBookmarks(ctx) {
+      async getBookmarks(ctx) {
+         if (ctx.rootGetters["user/hasAccountInfo"] == false) {
+            await ctx.dispatch("getAccountInfo")
+         }
+         ctx.commit('setLookingUp', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}/bookmarks`).then((response) => {
             ctx.commit('setBookmarks', response.data)
+            ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', true)
           })
       },
       addBookmark(ctx, folder ) {

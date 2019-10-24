@@ -114,12 +114,15 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 // ILSUserInfo contains ILS connector details for a user
 type ILSUserInfo struct {
 	ID          string `json:"id"`
+	Barcode     string `json:"barcode"`
 	DisplayName string `json:"displayName"`
 	Title       string `json:"title"`
 	Department  string `json:"department"`
+	Description string `json:"description"`
 	Profile     string `json:"profile"`
 	Address     string `json:"address"`
 	Email       string `json:"email"`
+	Standing    string `json:"standing"`
 }
 
 // CheckoutInfo has sumary info for a checked out item

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/mail"
 	"net/smtp"
 	"net/url"
 	"sort"
@@ -57,15 +56,15 @@ type RequestItem struct {
 	Notes        string `json:"notes"`
 }
 
-var emailMap = map[string]string{"astr": "Sci Resv",
-	"brown":   "Sci Resv",
-	"math":    "Sci Resv",
-	"clem":    "Clemons Resv",
-	"arts":    "Fine Arts Resv",
-	"law":     "Law Resv",
-	"music":   "Music Resv",
-	"physics": "Physics Resv",
-}
+// var emailMap = map[string]string{"astr": "Sci Resv",
+// 	"brown":   "Sci Resv",
+// 	"math":    "Sci Resv",
+// 	"clem":    "Clemons Resv",
+// 	"arts":    "Fine Arts Resv",
+// 	"law":     "Law Resv",
+// 	"music":   "Music Resv",
+// 	"physics": "Physics Resv",
+// }
 
 // CreateCourseReserves accepts a POST to create reserves for a course. Sends emails
 // to user and staff that will create the reserves
@@ -97,8 +96,12 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	}
 
 	log.Printf("Generate SMTP message")
-	toAddr := mail.Address{Name: emailMap[reserveReq.Request.Library], Address: svc.CourseReserveEmail}
-	to := []string{toAddr.String(), reserveReq.Request.Email}
+	// Per: https://stackoverflow.com/questions/36485857/sending-emails-with-name-email-from-go
+	// sending addresses like 'user name <email.com>' does not work with the default
+	// mail package. Leaving at just email address for now. Can revisit after meetings
+	/// about functionality.
+	// toAddr := mail.Address{Name: emailMap[reserveReq.Request.Library], Address: svc.CourseReserveEmail}
+	to := []string{svc.CourseReserveEmail, reserveReq.Request.Email}
 	if reserveReq.Request.InstructorEmail != "" {
 		to = append(to, reserveReq.Request.InstructorEmail)
 	}

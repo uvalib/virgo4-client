@@ -23,7 +23,7 @@
                         There are no bookmarks in this folder.
                      </div>
                      <div v-else>
-                        <div class="actions">
+                        <div v-if="canMakeReserves" class="actions">
                            <span @click="reserve(folderInfo.bookmarks)" 
                               class="pure-button pure-button-primary all">
                               Place items on course reserve
@@ -56,6 +56,7 @@
 
 <script>
 import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 import ConfirmDelete from "@/components/popovers/ConfirmDelete"
 import BackToVirgo from "@/components/BackToVirgo"
 import AccordionContent from "@/components/AccordionContent"
@@ -64,15 +65,14 @@ export default {
    components: {
       BackToVirgo,AccordionContent,ConfirmDelete
    },
-   data: function() {
-      return {
-         lookingUp: true,
-      };
-   },
    computed: {
+      ...mapState({
+         lookingUp: state=>state.user.lookingUp,
+      }),
       ...mapGetters({
-        hasBookmarks: 'user/hasBookmarks',
-        bookmarks: 'user/bookmarks'
+         hasBookmarks: 'user/hasBookmarks',
+         bookmarks: 'user/bookmarks',
+         canMakeReserves: 'user/canMakeReserves'
       }),
    },
    methods: {
@@ -91,10 +91,7 @@ export default {
       }
    },
    created() {
-      this.lookingUp = true
-      this.$store.dispatch("user/getBookmarks").then(_response => {
-         this.lookingUp = false
-      })
+      this.$store.dispatch("user/getBookmarks")
    }
 }
 </script>
