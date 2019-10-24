@@ -5,7 +5,7 @@ const item = {
    namespaced: true,
    state: {
       details: {source: "", identifier:"", basicFields:[], detailFields:[]},
-      availability: {titleId: '', columns: [], holdings: []}
+      availability: {titleId: '', columns: [], items: []}
    },
 
    getters: {
@@ -30,7 +30,7 @@ const item = {
       setAvailability(state, {titleId, response}) {
         state.availability.titleId = titleId
         state.availability.columns = response.columns
-        state.availability.holdings = response.holdings
+        state.availability.items = response.items
       },
 
       setCatalogKeyDetails(state, data) {
