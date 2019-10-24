@@ -96,13 +96,13 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	}
 
 	log.Printf("Generate SMTP message")
-	coordinator := emailMap[reserveReq.Request.Library]
-	if coordinator != "" {
-		coordinator = fmt.Sprintf("%s <%s>", coordinator, svc.CourseReserveEmail)
-	} else {
-		coordinator = svc.CourseReserveEmail
-	}
-	to := []string{coordinator, reserveReq.Request.Email}
+	// coordinator := emailMap[reserveReq.Request.Library]
+	// if coordinator != "" {
+	// 	coordinator = fmt.Sprintf("%s <%s>", coordinator, svc.CourseReserveEmail)
+	// } else {
+	// 	coordinator = svc.CourseReserveEmail
+	// }
+	to := []string{svc.CourseReserveEmail, reserveReq.Request.Email}
 	if reserveReq.Request.InstructorEmail != "" {
 		to = append(to, reserveReq.Request.InstructorEmail)
 	}
