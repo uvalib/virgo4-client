@@ -90,34 +90,11 @@ export default {
 </script>
 
 <style scoped>
-.info {
-   margin: 15px 0;
-   border-top: 4px solid var(--color-primary-orange);
-   display:flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-}
-.fields {
-   flex: 1 1 auto;
-}
 .details {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-}
-.cover-img {
-   max-width: 300px;
-   margin: 10px;
-   border-radius: 5px;
-   margin-left: auto;
-}
-.working {
-   text-align: center;
-   font-size: 1.25em;
-}
-.working img {
-   margin: 30px 0;
 }
 .details-content {
    width: 50%;
@@ -133,8 +110,27 @@ export default {
       width: 95%;
    }
 }
+.info {
+   margin: 15px 0;
+   border-top: 4px solid var(--color-primary-orange);
+   display:flex;
+   flex-flow: row wrap;
+   align-items: flex-start;
+   justify-content: center;
+}
+.cover-img {
+   max-width: 300px;
+   margin: 10px;
+   border-radius: 5px;
+}
+.working {
+   text-align: center;
+   font-size: 1.25em;
+}
+.working img {
+   margin: 30px 0;
+}
 table {
-   width:100%;
    table-layout: auto;
    margin-top: 15px;
 }
