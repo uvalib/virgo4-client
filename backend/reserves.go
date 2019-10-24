@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/mail"
 	"net/smtp"
 	"net/url"
 	"sort"
@@ -96,13 +97,8 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	}
 
 	log.Printf("Generate SMTP message")
-	// coordinator := emailMap[reserveReq.Request.Library]
-	// if coordinator != "" {
-	// 	coordinator = fmt.Sprintf("%s <%s>", coordinator, svc.CourseReserveEmail)
-	// } else {
-	// 	coordinator = svc.CourseReserveEmail
-	// }
-	to := []string{svc.CourseReserveEmail, reserveReq.Request.Email}
+	toAddr := mail.Address{Name: emailMap[reserveReq.Request.Library], Address: svc.CourseReserveEmail}
+	to := []string{toAddr.String(), reserveReq.Request.Email}
 	if reserveReq.Request.InstructorEmail != "" {
 		to = append(to, reserveReq.Request.InstructorEmail)
 	}
