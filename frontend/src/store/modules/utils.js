@@ -70,7 +70,11 @@ export function getFieldValue(fieldName, hit) {
   fieldsSources.some( fields=> {
     fields.some( f=> {
       if (f.name == fieldName) {
-        out = f.value
+        if (Array.isArray(f.value)) {
+          out = f.value.join(", ")
+        } else {
+          out = f.value
+        }
       }
       return out != ""
     })

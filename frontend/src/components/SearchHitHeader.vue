@@ -1,6 +1,5 @@
 <template>
    <div class="header-wrapper">
-      <BookmarkButton :hit="hit" :pool="pool"/>
       <div class="full-title">
          <template v-if="hit.grouped">
             <span class="title">{{hit.header.title}}</span>
@@ -10,8 +9,9 @@
             <span class="title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
          </router-link>
-        
-         <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
+      </div>
+      <div class="bm-control">
+         <BookmarkButton :hit="hit" :pool="pool"/>
       </div>
    </div>
 </template>
@@ -47,36 +47,36 @@ export default {
    display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
-   margin-bottom: 10px;
 }
+
 #app div.header-wrapper a {
    color: var(--color-primary-text)
 }
+
 #app .basic a:hover {
    text-decoration: none;
    color: var(--color-link)
 }
 
+div.bm-control {
+   margin-left: auto;
+   padding: 5px;
+}
+
 .title {
    font-size: 1.2em;
    font-weight: bold;
-   margin-bottom: 3px;
    display: inline-block;
-   flex: 1 1 auto;
 }
 .subtitle {
    display: inline-block;
    font-weight: normal;
 }
-.block {
-   margin-left: 10px;
- }
 
 .full-title {
-   margin-left: 15px;
    font-size: 1.25em;
-
 }
+
 .author {
    font-size: 0.9em;
    font-weight: normal;

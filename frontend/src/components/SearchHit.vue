@@ -1,8 +1,9 @@
 <template>
    <div class="hit">
+      <SearchHitHeader :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">
-            <SearchHitHeader :hit="hit" :pool="pool"/>
+            <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
             <table class="fields">
                <tr v-for="field in hit.basicFields" :key="getKey(field)">
                   <template v-if="field.display != 'optional'">
@@ -72,6 +73,9 @@ div.details {
    flex-flow: row nowrap;
    align-items: flex-start;
 }
+.author {
+   margin-bottom: 10px;
+}
 .cover-img {
    border-radius: 3px;
    margin: 5px;
@@ -83,7 +87,7 @@ a.img-link {
    margin-left: auto;
 }
 div.basic {
-   padding: 10px 10px 10px 10px;
+   padding: 5px 10px 10px 10px;
 }
 .hit {
    width: 100%;

@@ -72,6 +72,11 @@ export default {
 </script>
 
 <style scoped> 
+.bookmark-container {
+   position: relative;
+   display: inline-block;
+   box-sizing: border-box;
+}
 i.bookmark.disabled {
    color: #ccc;
 }
@@ -83,6 +88,8 @@ i.bookmark {
    color: #444; 
    cursor: pointer;
    font-size: 1.4em;
+   display: inline-block;
+   box-sizing: border-box;
 }
 i.fas.fa-times-circle.close {
    opacity: 0.8;
