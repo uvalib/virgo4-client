@@ -49,7 +49,6 @@
                </div>
             </template>
          </div>
-         <BackToVirgo />
       </div>
    </main>
 </template>
@@ -58,12 +57,11 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import ConfirmDelete from "@/components/popovers/ConfirmDelete"
-import BackToVirgo from "@/components/BackToVirgo"
 import AccordionContent from "@/components/AccordionContent"
 export default {
    name: "bookmarks",
    components: {
-      BackToVirgo,AccordionContent,ConfirmDelete
+      AccordionContent,ConfirmDelete
    },
    computed: {
       ...mapState({

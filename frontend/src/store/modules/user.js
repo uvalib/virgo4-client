@@ -19,9 +19,9 @@ const user = {
    },
 
    getters: {
-      canMakeReserves: state => {
-         if (state.isSignedIn == false ) return false
-         if (state.hasAccountInfo == false ) return false
+      canMakeReserves: (state, getters) => {
+         if (getters.isSignedIn == false ) return false
+         if (getters.hasAccountInfo == false ) return false
 
          // can reserve if !undergraduate? && !virginia_borrower?
          // va borrower: profile.match?(/Virginia Borrower|Other VA Faculty|Alumn/i)
@@ -157,6 +157,7 @@ const user = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
+            ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
@@ -181,6 +182,7 @@ const user = {
             ctx.commit('signOutUser')
             ctx.commit('setAuthorizing', false)
             ctx.commit('resetSearchResults', null, { root: true })
+            ctx.commit('preferences/clear', null, { root: true })
             ctx.commit('query/clear', null, { root: true })
             ctx.commit('filters/reset', null, { root: true })
             router.push("/signedout")

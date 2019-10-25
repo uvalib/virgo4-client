@@ -98,13 +98,13 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 // If no user found, create a new one and set access token. If token exists and
 // doesn't match fail.
 func (svc *ServiceContext) updateAccessToken(userID string, token string) error {
-	var user UserSettings
+	var user V4User
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(&user)
 	if err != nil {
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
-		user := UserSettings{ID: 0, Virgo4ID: userID, AuthToken: token,
+		user := V4User{ID: 0, Virgo4ID: userID, AuthToken: token,
 			AuthUpdatedAt: time.Now(), SignedIn: true}
 		return svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 	}
@@ -128,7 +128,7 @@ func (svc *ServiceContext) SignoutUser(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Sign out user %s", userID)
 
-	var user UserSettings
+	var user V4User
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(&user)

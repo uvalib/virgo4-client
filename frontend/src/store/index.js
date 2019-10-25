@@ -10,6 +10,7 @@ import query from './modules/query'
 import filters from './modules/filters'
 import item from './modules/item'
 import reserves from './modules/reserves'
+import preferences from './modules/preferences'
 import * as utils from './modules/utils'
 Vue.use(Vuex)
 
@@ -177,7 +178,7 @@ export default new Vuex.Store({
       state.total = -1
       state.results = []
       state.visibleResults = []
-      let tgtPoolURL  = state.pools.targetPoolURL
+      let tgtPoolURL  = state.preferences.targetPoolURL
 
       // Push all results into the results structure. Reset paging for each
       // NOTE: need to have resultIdx attached to because pools are interacted with
@@ -259,8 +260,8 @@ export default new Vuex.Store({
         query: rootGetters['query/string'],
         pagination: { start: 0, rows: state.pageSize },
         preferences: {
-          target_pool: rootState.pools.targetPoolURL,
-          exclude_pool: rootState.pools.excludePoolURLs,
+          target_pool: rootState.preferences.targetPoolURL,
+          exclude_pool: rootState.preferences.excludePoolURLs,
         },
         filters: rootGetters['filters/globalFilter']
       }
@@ -313,13 +314,14 @@ export default new Vuex.Store({
   },
 
   modules: {
+    item: item,
+    filters: filters,
+    pools: pools,
+    preferences: preferences,
+    query: query,
+    reserves: reserves,
     system: system,
     user: user,
-    pools: pools,
-    query: query,
-    filters: filters,
-    item: item,
-    reserves: reserves,
   },
 
   plugins: [messaging, versionChecker]

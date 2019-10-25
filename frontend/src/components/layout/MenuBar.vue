@@ -21,13 +21,16 @@
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
                   <div @click="blockToggle" v-if="userMenuOpen" class="user-menu" >
                      <router-link to="/account">
-                        <div class="submenu">Account Info</div>
+                        <div class="submenu">My Account</div>
+                     </router-link>
+                     <router-link to="/bookmarks">
+                        <div class="submenu">Bookmarks</div>
                      </router-link>
                      <router-link to="/checkouts">
                         <div class="submenu">Checked-Out Items</div>
                      </router-link>
-                     <router-link to="/bookmarks">
-                        <div class="submenu">Bookmarks</div>
+                     <router-link to="/preferences">
+                        <div class="submenu">Preferences</div>
                      </router-link>
                      <div  @click="signOut" class="submenu">
                         <span>Sign out</span>

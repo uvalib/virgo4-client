@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/contrib v0.0.0-20190923054218-35076c1b2bea
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-ozzo/ozzo-dbx v1.0.15
+	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gogo/protobuf v1.3.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect

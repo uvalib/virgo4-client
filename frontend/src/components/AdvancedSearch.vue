@@ -41,9 +41,6 @@
       </div>
       <div class="controls">
         <span @click="addClicked" class="add pure-button pure-button-secondary">Add Criteria</span>
-        <router-link to="/sources">
-          <span class="add pure-button pure-button-secondary">Sources</span>
-        </router-link>
         <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">

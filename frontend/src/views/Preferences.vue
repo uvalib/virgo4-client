@@ -1,35 +1,40 @@
 <template>
-   <main class="sources">
-      <h1>Sources</h1>
-      <div class="sources-content">
+   <main class="preferences">
+      <h1>Preferences</h1>
+      <div class="preferences-content">
          <div class="working" v-if="lookingUp" >
-            <div>Looking up sources...</div>
+            <div>Loading preferences...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else>
-            <div class="pool" v-for="p in pools" :key="p.id" 
-               v-bind:class="{excluded: isPoolExcluded(p.url)}">
-               <div class="name">
-                  <span><b>{{p.name}}</b></span>
-               </div>
-                <div class="description">
-                   <span>{{p.description}}</span>
-                </div>
-                <div class="source-controls">
-                  <div class="toggle" @click="toggleTargetPool(p.url)">
-                     <i v-if="isTargetPool(p.url)" class="fas fa-star"></i>
-                     <i v-else class="far fa-star"></i>
-                     <span class="label">Preferred Source</span>
+            <p>
+               Select which sources you want to include in your search results,
+               and which source you prefer to see results from most.
+            </p>
+            <div class="pools">
+               <div class="pool" v-for="p in pools" :key="p.id" 
+                  v-bind:class="{excluded: isPoolExcluded(p.url)}">
+                  <div class="name">
+                     <span><b>{{p.name}}</b></span>
                   </div>
-                  <div class="toggle"  @click="toggleExcludePool(p.url)">
-                     <span class="label">Search this Source</span>
-                     <i v-if="isPoolExcluded(p.url)" class="excluded far fa-circle"></i>
-                     <i v-else class="selected fas fa-check-circle"></i>
+                  <div class="description">
+                     <span>{{p.description}}</span>
                   </div>
-               </div>
-            </div>   
+                  <div class="source-controls">
+                     <div class="toggle" @click="toggleTargetPool(p.url)">
+                        <i v-if="isTargetPool(p.url)" class="fas fa-star"></i>
+                        <i v-else class="far fa-star"></i>
+                        <span class="label">Preferred Source</span>
+                     </div>
+                     <div class="toggle"  @click="toggleExcludePool(p.url)">
+                        <span class="label">Search this Source</span>
+                        <i v-if="isPoolExcluded(p.url)" class="excluded far fa-circle"></i>
+                        <i v-else class="selected fas fa-check-circle"></i>
+                     </div>
+                  </div>
+               </div>   
+            </div>
          </div>
-         <BackToVirgo />
       </div>
    </main>
 </template>
@@ -37,11 +42,9 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import BackToVirgo from "@/components/BackToVirgo"
 export default {
-   name: "sources",
+   name: "preferences",
    components: {
-      BackToVirgo
    },
    computed: {
       ...mapState({
@@ -49,19 +52,19 @@ export default {
          searchAPI: state => state.system.searchAPI
       }),
       ...mapGetters({
-         isPoolExcluded: "pools/isPoolExcluded",
-         isTargetPool: "pools/isTargetPool",
+         isPoolExcluded: "preferences/isPoolExcluded",
+         isTargetPool: "preferences/isTargetPool",
          pools: "pools/sortedList",
       })
    },
    methods: {
       toggleTargetPool(url) {
          this.$store.commit("resetSearchResults")
-         this.$store.commit("pools/toggleTargetPool", url)
+         this.$store.commit("preferences/toggleTargetPool", url)
       },
       toggleExcludePool(url) {
          this.$store.commit("resetSearchResults")
-         this.$store.commit("pools/toggleExcludePool", url)
+         this.$store.dispatch("preferences/toggleExcludePool", url)
       }
    },
    created() {
@@ -77,7 +80,12 @@ export default {
 </script>
 
 <style scoped>
-.sources {
+.pools {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: center;
+}
+.preferences {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
@@ -90,17 +98,17 @@ export default {
 .working img {
    margin: 30px 0;
 }
-.sources-content {
-   width: 60%;
+.preferences-content {
+   width: 80%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
-   div.sources-content  {
-       width: 60%;
+   div.preferences-content  {
+       width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.sources-content  {
+   div.preferences-content  {
        width: 95%;
    }
 }
@@ -108,7 +116,10 @@ div.pool {
    text-align: left;
    padding: 0;
    border-radius: 5px;
-   margin: 0 0 15px 0;
+   margin: 5px;
+   width: 400px;
+   display: inline-block;
+   font-size: 0.9em;
 }
 div.pool.excluded {
    opacity: 0.7;
@@ -118,7 +129,7 @@ div.pool.excluded div.name {
 }
 div.name {
    color: white;
-   background: var(--color-primary-orange);
+   background: var(--color-brand-blue);
    padding: 6px 8px;
    border-radius: 5px 5px 0 0;
 }
@@ -127,6 +138,7 @@ div.description {
    border-right: 1px solid #ccc;
    border-left: 1px solid #ccc;
    margin:0;
+   font-size: 0.8em;
 }
 div.source-controls {
    font-size: 0.85em;

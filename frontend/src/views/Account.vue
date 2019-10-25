@@ -1,18 +1,40 @@
 <template>
    <main class="account">
-      <h1>Account Information</h1>
+      <h1>My Account</h1>
       <div class="account-content">
          <div class="working" v-if="lookingUp || !hasAccountInfo" >
             <div>Looking up account details...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
+            <transition name="message-transition"
+                  enter-active-class="animated faster fadeIn"
+                  leave-active-class="animated faster fadeOut">
+            <div class="signin-message" v-if="signInMessage">
+               {{signInMessage}}
+            </div>
+            </transition>
             <div class="user-name">{{info.displayName}} ({{info.id}})</div>   
             <div>{{info.department}} - {{info.profile}}</div>
             <div>{{info.address}}</div>
             <div>{{info.email}}</div>
          </div>
-         <BackToVirgo />
+         <div class="controls">
+            <p><b>Activities</b></p>
+            <div class="actions">
+               <router-link to="/">Search</router-link>
+               <span class="sep">|</span>
+               <router-link to="/bookmarks">Bookmarks</router-link>
+               <span class="sep">|</span>
+               <router-link to="/checkouts">Checked Out Items</router-link>
+               <span class="sep">|</span>
+               <router-link to="/course-reserves">Course Reserves</router-link>
+               <span class="sep">|</span>
+               <router-link to="/preferences">Preferences</router-link>
+               <span class="sep">|</span>
+               <div  @click="signOut" class="text-button">Sign Out</div>
+            </div>
+         </div>
       </div>
    </main>
 </template>
@@ -20,20 +42,24 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "account",
    components: {
-      BackToVirgo
    },
    computed: {
       ...mapState({
          info: state => state.user.accountInfo,
          lookingUp: state => state.user.lookingUp,
+         signInMessage: state => state.user.signInMessage,
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
       }),
+   },
+   methods: {
+      signOut() {
+         this.$store.dispatch("user/signout")
+      },
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
@@ -47,6 +73,21 @@ export default {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
+}
+.sep {
+   margin: 0 10px;
+}
+.controls {
+   text-align: left;
+}
+.controls p {
+   border-bottom: 4px solid var(--color-brand-orange);
+   padding-bottom: 5px;
+}
+.controls .action {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: center;
 }
 .working {
    text-align: center;
@@ -75,6 +116,16 @@ export default {
 .user-name {
    font-size: 1.1em;
    font-weight: bold;
+}
+.signin-message {
+  width: 50%;
+  margin: 5px auto;
+  background: var(--color-primary-orange);
+  color: white;
+  padding: 2px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
 }
 </style>
 

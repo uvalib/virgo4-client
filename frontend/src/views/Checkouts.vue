@@ -18,19 +18,14 @@
                </tr>
             </table>
          </div>
-         <BackToVirgo />
       </div>
    </main>
 </template>
 
 <script>
 import { mapState } from "vuex"
-import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "checkouts",
-   components: {
-      BackToVirgo
-   },
    computed: {
       ...mapState({
          checkouts: state => state.user.checkouts,

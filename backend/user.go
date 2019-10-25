@@ -11,9 +11,9 @@ import (
 	dbx "github.com/go-ozzo/ozzo-dbx"
 )
 
-// NewUserSettings creates a new instance of user settings with internal data initialzied
-func NewUserSettings() *UserSettings {
-	return &UserSettings{Bookmarks: make([]*Folder, 0, 0)}
+// NewV4User creates a new instance of user settings with internal data initialzied
+func NewV4User() *V4User {
+	return &V4User{Bookmarks: make([]*Folder, 0, 0)}
 }
 
 // Folder contains details for a bookmark folder
@@ -39,23 +39,24 @@ type Bookmark struct {
 	Details    map[string]string `json:"details"`
 }
 
-// UserSettings contains virgo4 user data like session token, bookmarks and preferences
-type UserSettings struct {
+// V4User contains virgo4 user data like session token, bookmarks and preferences
+type V4User struct {
 	ID            int       `db:"id" json:"-"`
 	Virgo4ID      string    `db:"virgo4_id" json:"id"`
 	AuthToken     string    `db:"auth_token" json:"-"`
 	AuthUpdatedAt time.Time `db:"auth_updated_at" json:"-"`
 	SignedIn      bool      `db:"signed_in" json:"-"`
 	Bookmarks     []*Folder `db:"-" json:"bookmarks"`
+	Preferences   string    `db:"preferences" json:"preferences"`
 }
 
 // TableName sets the name of the table in the DB that this struct binds to
-func (u *UserSettings) TableName() string {
+func (u *V4User) TableName() string {
 	return "users"
 }
 
 // GetBookmarks will load all folders and bookmarks for a user
-func (u *UserSettings) GetBookmarks(db *dbx.DB) {
+func (u *V4User) GetBookmarks(db *dbx.DB) {
 	log.Printf("Load bookmarks for %s", u.Virgo4ID)
 	q := db.NewQuery(`SELECT f.id as f_id, f.name as folder, b.added_at as f_added_at,
 	   s.name as pool, b.id as b_id, b.identifier, b.details, b.added_at as b_added_at
@@ -70,7 +71,7 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 		return
 	}
 
-	// parse each bookmark row into the UserSettings structure
+	// parse each bookmark row into the V4User structure
 	for rows.Next() {
 		var raw struct {
 			BookmarkID    int       `db:"b_id"`
@@ -108,7 +109,6 @@ func (u *UserSettings) GetBookmarks(db *dbx.DB) {
 			}
 		}
 	}
-	log.Printf("BOOKMARKS %+v", u.Bookmarks)
 }
 
 // ILSUserInfo contains ILS connector details for a user
@@ -137,9 +137,10 @@ type CheckoutInfo struct {
 
 // User contains all user data collected from ILS and Virgo4 sources
 type User struct {
-	UserInfo  *ILSUserInfo `json:"user"`
-	AuthToken string       `json:"authToken"`
-	Bookmarks []*Folder    `json:"bookmarks"`
+	UserInfo    *ILSUserInfo `json:"user"`
+	AuthToken   string       `json:"authToken"`
+	Bookmarks   []*Folder    `json:"bookmarks"`
+	Preferences string       `json:"preferences"`
 }
 
 // GetUserCheckouts uses ILS Connector V2 API /users to get checked out items
@@ -183,25 +184,28 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	ilsUser.ID = userID
 
 	log.Printf("Load other user settings from v4 internal data source")
-	userSettings := NewUserSettings()
+	v4User := NewV4User()
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
-	err := q.One(userSettings)
+	err := q.One(v4User)
 	if err != nil {
 		log.Printf("ERROR: No v4 user settings found for %s: %+v", userID, err)
 	} else {
-		userSettings.GetBookmarks(svc.DB)
+		log.Printf("USER PREFS: %+v", v4User.Preferences)
+		v4User.GetBookmarks(svc.DB)
 	}
 
 	user := User{UserInfo: &ilsUser,
-		AuthToken: userSettings.AuthToken,
-		Bookmarks: userSettings.Bookmarks}
+		AuthToken:   v4User.AuthToken,
+		Bookmarks:   v4User.Bookmarks,
+		Preferences: v4User.Preferences,
+	}
 	c.JSON(http.StatusOK, user)
 }
 
 // AddBookmarkFolder will add a new blank folder for bookmarks
 func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
-	user := NewUserSettings()
+	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
 	var fp struct{ Name string }
 	err := c.ShouldBindJSON(&fp)
@@ -231,7 +235,7 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 
 // DeleteBookmarkFolder will remove a folder and all of its content
 func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
-	user := NewUserSettings()
+	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
 	folderID := c.Param("id")
 	log.Printf("User %s deleting bookmark folder %s", user.Virgo4ID, folderID)
@@ -257,7 +261,7 @@ func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
 
 // AddBookmark will add a bookmark to a folder
 func (svc *ServiceContext) AddBookmark(c *gin.Context) {
-	user := NewUserSettings()
+	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
 	var item struct {
 		Folder string
@@ -330,7 +334,7 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 
 // DeleteBookmark will remove a bookmark by internal DB identifier
 func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
-	user := NewUserSettings()
+	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
 	bookmarkID := c.Param("id")
 	log.Printf("User %s deleting bookmarkID %s", user.Virgo4ID, bookmarkID)
@@ -358,11 +362,39 @@ func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
 
 // GetBookmarks returns bookmark data for the specified user
 func (svc *ServiceContext) GetBookmarks(c *gin.Context) {
-	user := NewUserSettings()
+	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
 	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	uq.Row(&user.ID)
 	user.GetBookmarks(svc.DB)
 	c.JSON(http.StatusOK, user.Bookmarks)
+}
+
+// SavePreferences will save a block of JSON preference data to the user table
+func (svc *ServiceContext) SavePreferences(c *gin.Context) {
+	uid := c.Param("uid")
+
+	// Bind POST params to interface to be sure they are well formed
+	var prefs interface{}
+	err := c.ShouldBindJSON(&prefs)
+	if err != nil {
+		log.Printf("ERROR: unable to get preference data from %s: %s", uid, err)
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Data is good. Back to JSON string and save...
+	jsonPrefs, _ := json.Marshal(prefs)
+	uq := svc.DB.NewQuery("update users set preferences={:p} where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": uid})
+	uq.Bind(dbx.Params{"p": jsonPrefs})
+	_, err = uq.Execute()
+	if err != nil {
+		log.Printf("ERROR: unable to save preference data for %s: %s", uid, err)
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "OK")
 }

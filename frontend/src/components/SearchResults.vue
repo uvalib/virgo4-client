@@ -97,7 +97,7 @@ export default {
          failedPoolCount: 'failedPoolCount',
          hasFilter: 'filters/hasFilter',
          poolFilter: 'filters/poolFilter',
-         isTargetPool: "pools/isTargetPool",
+         isTargetPool: "preferences/isTargetPool",
       }),
       ...mapState({
          total: state=>state.total,

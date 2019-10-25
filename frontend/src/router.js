@@ -5,7 +5,7 @@ import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
 import Details from './views/Details.vue'
-import Sources from './views/Sources.vue'
+import Preferences from './views/Preferences.vue'
 import SignIn from './views/SignIn.vue'
 import Account from './views/Account.vue'
 import Checkouts from './views/Checkouts.vue'
@@ -24,26 +24,17 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      component: Home,
-      beforeEnter: (_to, _from, next) => {
-        ensureAuthTokenPresent(next)
-      }
+      component: Home
     },
     {
       path: '/course-reserves',
-      name: 'course-reserves',
-      component: CourseReserves,
-      beforeEnter: (_to, _from, next) => {
-        ensureAuthTokenPresent(next)
-      }
+      name: 'course-reserves', 
+      component: CourseReserves
     },
     {
       path: '/course-reserves-request',
       name: 'course-reserves-request',
-      component: CourseReservesRequest,
-      beforeEnter: (_to, _from, next) => {
-        ensureAuthTokenPresent(next)
-      }
+      component: CourseReservesRequest
     },
     {
       path: '/reserved',
@@ -55,27 +46,24 @@ const router = new Router({
       name: 'details',
       component: Details,
       beforeEnter: (_to, _from, next) => {
-        ensureAuthTokenPresent(next)
         store.commit("deselectGroupDetails")
         store.commit("deselectPoolResults")
+        next()
       }
     },
     {
-      path: '/sources',
-      name: 'sources',
-      component: Sources,
-      beforeEnter: (_to, _from, next) => {
-        ensureAuthTokenPresent(next)
-      }
+      path: '/preferences',
+      name: 'preferences',
+      component: Preferences
     },
     {
       // NOTES: the signedin route doesn't actually have a 
       // visual representation. It just handes the auth session 
-      // setup and redirects to home page
+      // setup and redirects to account page
       path: '/signedin',
       beforeEnter: (_to, _from, next) => {
         getSignedInUserFromCookie()
-        next('/')
+        next('/account')
       }
     },
     {
@@ -86,41 +74,17 @@ const router = new Router({
     {
       path: '/account',
       name: 'account',
-      component: Account,
-      beforeEnter: (_to, _from, next) => {
-        store.commit("system/closeUserMenu")
-        if (getSignedInUserFromCookie()) {
-          next()
-        } else {
-          next("/")
-        }
-      }
+      component: Account
     },
     {
       path: '/bookmarks',
       name: 'bookmarks',
-      component: Bookmarks,
-      beforeEnter: (_to, _from, next) => {
-        store.commit("system/closeUserMenu")
-        if (getSignedInUserFromCookie()) {
-          next()
-        } else {
-          next("/") 
-        }
-      }
+      component: Bookmarks
     },
     {
       path: '/checkouts',
       name: 'checkouts',
-      component: Checkouts,
-      beforeEnter: (_to, _from, next) => {
-        store.commit("system/closeUserMenu")
-        if (getSignedInUserFromCookie()) {
-          next()
-        } else {
-          next("/") 
-        }
-      }
+      component: Checkouts
     },
     {
       path: '/signedout',
@@ -142,6 +106,33 @@ const router = new Router({
     // each new 'page' will scroll to the top of the screen
     return { x: 0, y: 0 }
   },
+})
+
+// This is called before every URL in the SPA is hit
+router.beforeEach((to, _from, next) => {
+  // always make sure user menu is closed
+  store.commit("system/closeUserMenu")
+
+  // Some pages just require an auth token...
+  let tokenPages = ["home", "course-reserves"]
+  if (tokenPages.includes(to.name)) {
+    ensureAuthTokenPresent(next)
+    return
+  }
+
+  // Some pages require a signed in user...
+  let userPages = ["details", "preferences", "account", "bookmarks", "checkouts", "course-reserves-request"]
+  if (userPages.includes(to.name)) {
+    if (getSignedInUserFromCookie()) {
+      next()
+    } else {
+      next("/") 
+    }
+    return
+  }
+
+  // All others just proceed...
+  next()
 })
 
 function getSignedInUserFromCookie() {
