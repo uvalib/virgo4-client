@@ -46,6 +46,7 @@ const router = new Router({
       name: 'details',
       component: Details,
       beforeEnter: (_to, _from, next) => {
+        ensureAuthTokenPresent(next)
         store.commit("deselectGroupDetails")
         store.commit("deselectPoolResults")
         next()
