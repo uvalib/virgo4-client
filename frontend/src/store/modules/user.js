@@ -9,7 +9,6 @@ const user = {
       authToken: "",
       authorizing: false,
       signedInUser: "",
-      signInMessage: "",
       sessionType: "",
       accountInfo: null,
       checkouts: null,
@@ -112,9 +111,6 @@ const user = {
          state.signedInUser = user.userId
          state.authToken = user.token
          state.sessionType = user.type
-         if (user.quiet === false) {
-            state.signInMessage = `You are now signed in as '${state.signedInUser}'`
-         }
       },
       setAccountInfo(state, data) {
          // data content {user, authToken, bookmarks}
@@ -123,15 +119,11 @@ const user = {
          state.authToken = data.authToken
          state.bookmarks = data.bookmarks
       },
-      clearSignInMessage(state) {
-         state.signInMessage = ""
-      },
       signOutUser(state) {
          state.accountInfo = null
          state.bookmarks = null
          state.signedInUser = ""
          state.authToken = ""
-         state.signInMessage = "" 
          Vue.cookies.remove("v4_auth_user")
       },
       setBookmarks(state, bookmarks) {

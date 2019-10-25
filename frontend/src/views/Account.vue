@@ -7,13 +7,6 @@
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
-            <transition name="message-transition"
-                  enter-active-class="animated faster fadeIn"
-                  leave-active-class="animated faster fadeOut">
-            <div class="signin-message" v-if="signInMessage">
-               {{signInMessage}}
-            </div>
-            </transition>
             <div class="user-name">{{info.displayName}} ({{info.id}})</div>   
             <div>{{info.department}} - {{info.profile}}</div>
             <div>{{info.address}}</div>
@@ -24,11 +17,11 @@
             <div class="actions">
                <router-link to="/">Search</router-link>
                <span class="sep">|</span>
+               <router-link to="/course-reserves">Course Reserves</router-link>
+               <span class="sep">|</span>
                <router-link to="/bookmarks">Bookmarks</router-link>
                <span class="sep">|</span>
                <router-link to="/checkouts">Checked Out Items</router-link>
-               <span class="sep">|</span>
-               <router-link to="/course-reserves">Course Reserves</router-link>
                <span class="sep">|</span>
                <router-link to="/preferences">Preferences</router-link>
                <span class="sep">|</span>
@@ -50,7 +43,6 @@ export default {
       ...mapState({
          info: state => state.user.accountInfo,
          lookingUp: state => state.user.lookingUp,
-         signInMessage: state => state.user.signInMessage,
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',

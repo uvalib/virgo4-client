@@ -2,7 +2,7 @@
    <main class="preferences">
       <h1>Preferences</h1>
       <div class="preferences-content">
-         <div class="working" v-if="lookingUp" >
+         <div class="working" v-if="lookingUpPools || lookingUpAccount" >
             <div>Loading preferences...</div>
             <img src="../assets/spinner2.gif">
          </div>
@@ -48,7 +48,8 @@ export default {
    },
    computed: {
       ...mapState({
-         lookingUp : state => state.pools.lookingUp,
+         lookingUpPools : state => state.pools.lookingUp,
+         lookingUpAccount : state => state.user.lookingUp,
          searchAPI: state => state.system.searchAPI
       }),
       ...mapGetters({
@@ -60,7 +61,7 @@ export default {
    methods: {
       toggleTargetPool(url) {
          this.$store.commit("resetSearchResults")
-         this.$store.commit("preferences/toggleTargetPool", url)
+         this.$store.dispatch("preferences/toggleTargetPool", url)
       },
       toggleExcludePool(url) {
          this.$store.commit("resetSearchResults")
@@ -68,6 +69,7 @@ export default {
       }
    },
    created() {
+      this.$store.dispatch("user/getAccountInfo")
       if ( this.searchAPI.length == 0) {
          this.$store.dispatch('system/getConfig').then(_response => {
             this.$store.dispatch('pools/getPools')
