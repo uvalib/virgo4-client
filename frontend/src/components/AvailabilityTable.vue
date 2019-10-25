@@ -4,8 +4,8 @@
          <div>Loading...</div>
          <img src="../assets/spinner2.gif">
       </div>
-      <template v-else>
-         <h2 v-if="!lookingUp">Availability</h2>
+      <template v-if="availability.items.length">
+         <h2>Availability</h2>
          <table class="fields">
             <thead>
                <tr>
@@ -36,8 +36,7 @@ export default {
    },
    data: function() {
       return {
-         lookingUp: true,
-         // found: false
+         lookingUp: true
       };
    },
    computed: {
