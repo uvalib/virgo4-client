@@ -115,11 +115,6 @@ export default {
    methods: {
       searchClicked() {
         if (this.queryEntered ) {
-          if ( this.isSignedIn ) {
-             this.$store.dispatch("searchAllPools")
-             return  
-          }
-
           let tgtID = this.selectedSource.id
           this.$store.commit('preferences/clear')
           if (this.selectedSource.value != "all") {
