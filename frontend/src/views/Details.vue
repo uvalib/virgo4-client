@@ -97,12 +97,12 @@ export default {
    color: var(--color-primary-text);
 }
 .details-content {
-   width: 50%;
+   width: 80%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    div.details-content  {
-      width: 50%;
+      width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {

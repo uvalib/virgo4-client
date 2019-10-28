@@ -49,9 +49,10 @@ export default {
    align-items: flex-start;
 }
 
-#app div.header-wrapper a {
-   color: var(--color-primary-text)
-}
+/* #app div.header-wrapper a {
+   color: var(--color-primary-text);
+   text-decoration: underline;
+} */
 
 #app .basic a:hover {
    text-decoration: none;
