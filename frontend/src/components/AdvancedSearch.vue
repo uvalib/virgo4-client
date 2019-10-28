@@ -6,9 +6,9 @@
       <div class="pools-wrapper">
          <h2>Available Sources</h2>
          <div class="pools">
-            <div class="pool pure-button" v-for="src in sources" :key="src.id">
+            <div @click="poolClicked(src.url)" class="pool pure-button" v-for="src in sources" :key="src.id">
                <label>
-                  <input type="checkbox" @click="poolClicked(src.url)" :checked="!isPoolExcluded(src.url)"/>
+                  <input type="checkbox" :checked="!isPoolExcluded(src.url)"/>
                   {{src.name}}
                </label>
             </div>
