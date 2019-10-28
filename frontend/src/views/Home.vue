@@ -1,5 +1,5 @@
 <template>
-   <main class="home">
+   <main @click="closeSources" class="home">
       <div class="tips-container">
           <SearchTips/>
       </div>
@@ -10,14 +10,33 @@
           <div v-if="hasTranslateMessage" class="translate-message">
             {{translateMessage}}
           </div>
-          <input
-              @keyup.enter="searchClicked"
-              id="keyword"
-              v-model="basic"
-              autocomplete="off"
-              type="text"
-              placeholder="Search Virgo for books, articles and more"
-          >
+          <div class="basic-search">
+            <div v-if="isSignedIn == false">
+              <div @click="sourcesClick" class="select">
+                <span class="selection">
+                  {{selectedSource.name}}
+                  <i class="sources-arrow fas fa-angle-down" :style="{ transform: rotation }"></i>
+                </span>
+                <transition name="grow"
+                  v-on:before-enter="beforeEnter" v-on:enter="enter"
+                  v-on:before-leave="beforeLeave" v-on:leave="leave">
+                  <div class="options" v-if="sourcesExpanded">
+                    <div @click="sourceClicked(src)" class="option" v-for="src in sources" :key="src.id">
+                      {{src.name}}
+                    </div>
+                  </div>
+                </transition>
+              </div>
+            </div>
+            <input class="basic"
+                v-bind:class="{border: isSignedIn}"
+                @keyup.enter="searchClicked"
+                v-model="basic"
+                autocomplete="off"
+                type="text"
+                placeholder="Search Virgo for books, articles and more"
+            >
+          </div>
           <div class="controls">
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
@@ -52,6 +71,12 @@ export default {
      SearchResults,
      SearchTips, AdvancedSearch,SearchingOverlay
    },
+   data: function()  {
+      return {
+         selectedSource: {name: "All Sources", value: "all"},
+         sourcesExpanded: false,
+      }
+   },
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
@@ -64,21 +89,47 @@ export default {
       ...mapGetters({
         hasResults: 'hasResults',
         queryEntered: 'query/queryEntered',
-        hasTranslateMessage: 'system/hasTranslateMessage'
+        hasTranslateMessage: 'system/hasTranslateMessage',
+        isSignedIn: 'user/isSignedIn',
+        sources: 'pools/sortedList'
       }),
       ...mapFields('query',[
         'basic',
       ]),
+      rotation() {
+         if (this.sourcesExpanded) {
+            return "rotate(180deg)"
+         }
+         return "rotate(0deg)"
+      },
       basicSearch() {
         return this.searchMode == "basic"
       },
    },
    created: function() {
-      this.$store.dispatch("system/getConfig")
+      this.$store.dispatch("system/getConfig").then(_response => {
+        // once cfg is available, get pools. they may be needed 
+        // to populate the pool selector for non-signed in users
+        this.$store.dispatch('pools/getPools')
+      })
    },
    methods: {
       searchClicked() {
         if (this.queryEntered ) {
+          if ( this.isSignedIn ) {
+             this.$store.dispatch("searchAllPools")
+             return  
+          }
+
+          let tgtID = this.selectedSource.id
+          this.$store.commit('preferences/clear')
+          if (this.selectedSource.value != "all") {
+            this.sources.forEach( src=> {
+              if (src.id != tgtID) {
+                this.$store.commit('preferences/toggleExcludePool', src.url)
+              }
+            })
+          }
           this.$store.dispatch("searchAllPools")
         } else {
           this.$store.commit('system/setError', "Please enter a search query")
@@ -87,11 +138,63 @@ export default {
       advancedClicked() {
         this.$store.commit("query/setAdvancedSearch")
       },
+      sourceClicked(src) {
+         this.sourcesExpanded
+         this.selectedSource = src
+      },
+      sourcesClick(e) {
+        e.stopPropagation()
+        this.sourcesExpanded = !this.sourcesExpanded
+      },
+      closeSources() {
+        this.sourcesExpanded = false;
+      },
+      beforeEnter: function(el) {
+         el.style.height = '0'
+      },
+      enter: function(el) {
+         el.style.height = (el.scrollHeight-20) + 'px'
+         this.expandedItem = el
+      },
+      beforeLeave: function(el) {
+         el.style.height = (el.scrollHeight-20) + 'px'
+         this.expandedItem = el
+      },
+      leave: function(el) {
+         el.style.height = '0'
+      }
    }
 };
 </script>
 
 <style scoped>
+@media only screen and (min-width: 768px) {
+  div.searching-box {
+    padding: 20px 90px;
+  }
+}
+@media only screen and (max-width: 768px) {
+  div.searching-box {
+      width: 95%;
+      padding: 20px 0;
+      margin-top:30%;
+  }
+  div.tips-container {
+    display: none;
+  }
+  ::-webkit-input-placeholder {
+    color:transparent;
+  }
+  :-moz-placeholder { /* Firefox 18- */
+    color:transparent; 
+  }
+  ::-moz-placeholder {  /* Firefox 19+ */
+    color:transparent; 
+  }
+  :-ms-input-placeholder {  
+    color:transparent;
+  }
+}
 .controls {
   font-size: 0.85em;
   font-weight: bold;
@@ -110,6 +213,10 @@ export default {
    min-height: 400px;
    position: relative;
 }
+h2 {
+  margin-top:30px;
+  color: #444;
+}
 p.fatal, p.error {
   font-weight: bold;
   margin: 0;
@@ -124,14 +231,65 @@ p.fatal, p.error {
   padding: 10px 2vw 10px 2vw;
   font-size: 0.95em;
 }
-#keyword {
-  margin: 0;
-  width: 100%;
+.basic-search {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+}
+.basic-search  input.basic {
   font-size: 1.15em;
-  box-shadow: none;
   padding: 0.5vw 0.75vw;
   outline: none;
   border: 1px solid #ccc;
+  margin: 0;
+  flex: 1 1 auto;
+  border-left: 0;
+  border-radius: 0 5px 5px 0;
+}
+input.basic.border {
+  border-left: 1px solid #ccc;
+  border-radius: 5px 
+}
+.select {
+  font-size: 1.15em;
+  padding: 0.5vw 0.75vw;
+  outline: none;
+  border: 1px solid var(--color-brand-blue);;
+  border-radius: 5px 0 0 5px;
+  cursor: pointer;
+  background-color: var(--color-brand-blue);
+  color: white;
+  position: relative;
+  text-align: left;
+}
+.sources-arrow {
+  margin: 0 5px;
+  cursor: pointer;
+  color: white;
+  transform: rotate(0deg);
+  transition-duration: 250ms;
+}
+.options {
+  text-align: left;
+  background-color: var(--color-brand-blue);
+  color: white;
+  cursor: pointer;
+  padding: 10px 0;
+  border-radius: 0 0 5px 5px;
+  position: absolute;
+  top: 25px;
+  left: -1px;
+  right: -1px;
+  border: 1px solid var(--color-brand-blue);
+  font-size: 0.8em;
+  overflow: hidden;
+  transition: 200ms ease-out;
+}
+.option {
+  padding: 0 10px;
+}
+.option:hover {
+  background-color:  var(--color-light-blue);
 }
 .debug.pure-button.pure-button-primary {
   font-size: 0.75em;

@@ -199,7 +199,9 @@ export default new Vuex.Store({
 
           // for each hit in the list, merge repeated fields into arrays, pull out
           // key fields like identifer to top-level named field and split others into basic and detail
-          utils.preProcessHitFields( group.record_list )
+          if (group.record_list) {
+            utils.preProcessHitFields( group.record_list )
+          }
 
           if (group.count == 1) {
             let hit = group.record_list[0]
@@ -283,8 +285,8 @@ export default new Vuex.Store({
         commit('setSearchResults', response.data)
         commit('setSearching', false)
       }).catch((error) => {
-        commit('system/setError', error)
-        commit('setSearching', false)
+         commit('system/setError', error)
+         commit('setSearching', false)
       })
     },
 
