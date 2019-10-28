@@ -189,8 +189,8 @@ export default {
    align-items: center;
    justify-content: space-between;
 }
-.pool-buttons div.pool.pure-button > * {
-   flex: 0 0 auto;
+.total {
+   margin-right: 10px;
 }
 div.accordion {
    font-size: 0.9em;
@@ -201,7 +201,6 @@ div.accordion {
    display: flex;
    flex-flow: row wrap;
    align-items: center;
-   justify-content: space-between;
 }
 i.showing {
    font-size:1.15em;
@@ -268,7 +267,6 @@ div.right-indent {
    font-size: 0.85em;
    font-weight: bold;
    color: #666;
-   flex: 1 1 auto;
 }
 .pool.pure-button.showing {
    background-color: var(--color-brand-blue);

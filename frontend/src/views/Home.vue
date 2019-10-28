@@ -11,7 +11,7 @@
             {{translateMessage}}
           </div>
           <div class="basic-search">
-            <div v-if="isSignedIn == false">
+            <div class="dropdown-wrapped">
               <div @click="sourcesClick" class="select">
                 <span class="selection">
                   {{selectedSource.name}}
@@ -29,7 +29,6 @@
               </div>
             </div>
             <input class="basic"
-                v-bind:class="{border: isSignedIn}"
                 @keyup.enter="searchClicked"
                 v-model="basic"
                 autocomplete="off"
@@ -246,15 +245,11 @@ p.fatal, p.error {
   border-left: 0;
   border-radius: 0 5px 5px 0;
 }
-input.basic.border {
-  border-left: 1px solid #ccc;
-  border-radius: 5px 
-}
 .select {
   font-size: 1.15em;
   padding: 0.5vw 0.75vw;
   outline: none;
-  border: 1px solid var(--color-brand-blue);;
+  border: 1px solid var(--color-brand-blue);
   border-radius: 5px 0 0 5px;
   cursor: pointer;
   background-color: var(--color-brand-blue);
