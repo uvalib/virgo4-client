@@ -41,7 +41,6 @@ export default {
 <style scoped>
 .hit {
    width: 100%;
-   border: 1px solid #ccc;
    border-top: none;
    border-left: 5px solid var(--color-lightest-blue);
    padding: 00px;

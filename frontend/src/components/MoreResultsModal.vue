@@ -17,10 +17,10 @@
          </div>
          <div class="hits" id="hits-scroller">
             <div class="summary"><b>{{selectedResults.total}} results for </b>{{queryString()}}</div>
-            <template v-for="(hit,idx) in selectedResults.hits">
+            <div class="result" v-for="(hit,idx) in selectedResults.hits" :key="idx">
                <SearchHit v-if="hit.grouped==false"  :pool="selectedResults.pool.id" :hit="hit" :key="idx"/>
                <GroupedSearchHit v-else :pool="selectedResults.pool.id" :hitIdx="idx" :hit="hit" :key="idx"/>
-            </template>
+            </div>
             <infinite-loading @infinite="loadMoreResults" ref="infiniteLoader" >
                <span slot="no-more">No more matches</span>
                <span slot="spinner"><img src="../assets/searching.gif"></span>
@@ -224,5 +224,9 @@ div.overlay-title {
    overscroll-behavior: contain;
    color: #555;
    z-index: 1010;
+}
+.result {
+   border: 1px solid #ccc;
+   border-bottom: 0;
 }
 </style>

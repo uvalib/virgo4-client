@@ -27,10 +27,10 @@
                </table>
             </template>
          </div>
-         <template v-for="(hit,idx) in result.hits.slice(0,3)">
+         <div class="result" v-for="(hit,idx) in result.hits.slice(0,3)" :key="idx">
             <SearchHit v-if="hit.grouped==false" v-bind:details="false" :pool="result.pool.id" :hit="hit" :key="idx"/>
             <GroupedSearchHit v-else :hitIdx="idx" :pool="result.pool.id" :hit="hit" :key="idx"/>
-         </template>
+         </div>
          <div @click="selectPool(visibleIdx)" class="more-panel">
             See More Results&nbsp;<i class="more-icon fas fa-external-link-alt"></i>
          </div>
@@ -145,6 +145,10 @@ div.accordion {
    flex-flow: row wrap;
    align-items: center;
    justify-content: space-between;
+}
+.result {
+   border: 1px solid #ccc;
+   border-bottom: 0;
 }
 .metrics .more:hover {
    cursor: pointer;
