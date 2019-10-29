@@ -21,6 +21,9 @@
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
                   <div class="options" v-if="sourcesExpanded">
+                    <div @click="sourceClicked({name: 'All Sources', value: 'all'})" class="option">
+                      All Sources
+                    </div>
                     <div @click="sourceClicked(src)" class="option" v-for="src in sources" :key="src.id">
                       {{src.name}}
                     </div>
@@ -267,10 +270,11 @@ p.fatal, p.error {
   padding: 10px 0;
   border-radius: 0 0 5px 5px;
   position: absolute;
-  top: 25px;
+  /* top: 35px; */
   left: -1px;
   right: -1px;
   border: 1px solid var(--color-brand-blue);
+  border-top: 1px solid var(--color-lightest-blue);
   font-size: 0.8em;
   overflow: hidden;
   transition: 200ms ease-out;
