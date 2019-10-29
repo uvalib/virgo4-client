@@ -92,6 +92,8 @@ export function getGroupHitMetadata(group, hit) {
     hit.header.title = group.record_list[0].header.title
     hit.header.subtitle = group.record_list[0].header.subtitle
     hit.header.author = group.record_list[0].header.author
+  } else {
+    hit.header.title = "ERROR: Mising group data"
   }
   delete group.fields
 }

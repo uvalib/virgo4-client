@@ -6,7 +6,7 @@
       </div>
       <div class="details">
          <SearchHitHeader :hit="hit" :pool="pool"/>
-         <span @click="viewClicked" class="pure-button pure-button-primary all">
+         <span v-if="hit.count>0" @click="viewClicked" class="pure-button pure-button-primary all">
             See all {{hit.count}} copies<i class="more-icon fas fa-external-link-alt"></i>
          </span>
       </div>
