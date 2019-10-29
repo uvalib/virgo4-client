@@ -52,7 +52,8 @@ export default {
          fatal: state => state.system.fatal,
          selectedResultsIdx: state => state.selectedResultsIdx,
          authorizing: state => state.user.authorizing,
-         addingBookmark: state => state.user.addingBookmark
+         addingBookmark: state => state.user.addingBookmark,
+         results: state=>state.results,
       }),
       ...mapGetters({
          addingBookmark: 'user/addingBookmark',
@@ -60,10 +61,10 @@ export default {
          hasTranslateMessage: 'system/hasTranslateMessage'
       }),
       resultsSelected() {
-        return this.selectedResultsIdx > -1
+        return this.selectedResultsIdx > -1 && this.results.length > 1
       },
       showDimmer() {
-        return (this.selectedResultsIdx > -1 || this.addingBookmark || this.isGroupSelected )
+        return (this.resultsSelected || this.addingBookmark || this.isGroupSelected )
       }
    },
    methods: {

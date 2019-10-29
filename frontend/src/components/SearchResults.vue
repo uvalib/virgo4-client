@@ -35,7 +35,10 @@
          </div>
       </div>
 
-      <PoolResultsPreview />
+      <PoolResultsPreview v-if="results.length>1"/>
+      <div v-else>
+         <PoolResultDetail v-if="hasSinglePoolResults" />
+      </div>
 
    </div>
 </template>
@@ -43,11 +46,12 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import PoolResultDetail from "@/components/PoolResultDetail"
 import PoolResultsPreview from "@/components/PoolResultsPreview"
 import AvailabilitySelector from '@/components/AvailabilitySelector'
 export default {
    components: {
-      AvailabilitySelector,PoolResultsPreview
+      AvailabilitySelector,PoolResultsPreview,PoolResultDetail
    },
    computed: {
       ...mapGetters({
@@ -68,6 +72,10 @@ export default {
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
+      hasSinglePoolResults() {
+         if (this.results.length == 0 || this.results.length > 1) return false 
+         return this.results[0].total > 0
+      }
    },
    
    methods: {
