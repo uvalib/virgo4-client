@@ -13,7 +13,7 @@
             </div>
          </template>
          <template v-else>
-            <SearchHitHeader :hit="details" :pool="this.$route.params.src"/>
+            <SearchHitHeader v-bind:link="false" :hit="details" :pool="this.$route.params.src"/>
             <div class="info">
                <table class="fields">
                   <tr v-for="(field,idx) in detailFields" :key="idx">
@@ -23,7 +23,6 @@
                      </template>
                   </tr>
                </table>
-               <img class="cover-img" v-if="details.cover_image" :src="details.cover_image"/>
             </div>
             <AvailabilityTable :titleId="details.identifier" />
          </template>
@@ -97,12 +96,12 @@ export default {
    color: var(--color-primary-text);
 }
 .details-content {
-   width: 80%;
+   width: 60%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    div.details-content  {
-      width: 80%;
+      width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
@@ -112,11 +111,7 @@ export default {
 }
 .info {
    margin: 15px 0;
-   border-top: 4px solid var(--color-primary-orange);
-   display:flex;
-   flex-flow: row wrap;
-   align-items: flex-start;
-   justify-content: center;
+   border-top: 4px solid var(--color-brand-blue);
 }
 .cover-img {
    max-width: 300px;

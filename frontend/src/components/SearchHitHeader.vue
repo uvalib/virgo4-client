@@ -1,7 +1,7 @@
 <template>
    <div class="header-wrapper">
       <div class="full-title">
-         <template v-if="hit.grouped">
+         <template v-if="hit.grouped || link == false">
             <span class="title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
          </template>
@@ -27,6 +27,10 @@ export default {
       pool: {
          type: String,
          required: true
+      },
+      link: {
+         type: Boolean,
+         default: true
       }
    },
    components: {

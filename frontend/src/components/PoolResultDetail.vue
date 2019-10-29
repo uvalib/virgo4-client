@@ -1,5 +1,5 @@
 <template>
-   <div class="pool-results">
+   <div v-if="searching == false" class="pool-results">
       <div class="results-header">
          <div class="pool-name">{{selectedResults.pool.name}}</div>
          <AccordionContent title="Description" align="left-narrow" 
@@ -76,10 +76,11 @@ export default {
 
 <style>
 div.infinite-status-prompt {
-   background-color: var(--color-primary-orange);
-   color: white;
+   background-color: var(--color-lightest-blue); 
+   color: black;
    font-weight: 500;
-   padding: 5px 0 0 0;
+   padding: 5px;
+   border-radius: 5px;
 }
 div.infinite-status-prompt  .loading-default {
    color: white;
