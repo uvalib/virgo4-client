@@ -44,10 +44,9 @@ import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import GroupedSearchHit from "@/components/GroupedSearchHit"
 import AccordionContent from '@/components/AccordionContent'
-import AvailabilitySelector from '@/components/AvailabilitySelector'
 export default {
    components: {
-      SearchHit,AccordionContent,GroupedSearchHit,AvailabilitySelector
+      SearchHit,AccordionContent,GroupedSearchHit
    },
    computed: {
       ...mapGetters({

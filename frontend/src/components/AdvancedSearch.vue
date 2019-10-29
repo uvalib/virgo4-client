@@ -3,12 +3,24 @@
       <h1>
          <span>Advanced Search</span>
       </h1>
-      <div class="pools-wrapper">
+      <div v-if="dropdownSources" class="pools-wrapper">
+         <h2>Available Sources</h2> 
+         <multiselect :multiple="true"  v-model="selectedSources" class="sources"
+               placeholder="Select at least one source"
+               :hideSelected="true"
+               :showLabels="false" 
+               :close-on-select="false"
+               track-by="url" label="name" :searchable="false"
+               :options="sources">
+         </multiselect> 
+      </div>
+      <div v-else class="pools-wrapper">
          <h2>Available Sources</h2>
          <div class="pools">
             <div @click="poolClicked(src.url)" class="pool pure-button" v-for="src in sources" :key="src.id">
                <label>
-                  <input type="checkbox" :checked="!isPoolExcluded(src.url)"/>
+                  <i v-if="isPoolExcluded(src.url)" class="far fa-circle"></i>
+                  <i v-else class="far fa-check-circle"></i>
                   {{src.name}}
                </label>
             </div>
@@ -67,6 +79,7 @@
             <i class="fas fa-undo-alt"></i>
          </span>
       </div>
+      <div class="basic"><label>Dropdown Soures&nbsp;<input type="checkbox" v-model="dropdownSources"/></label></div>
    </div>
 </template>
 
@@ -74,10 +87,20 @@
 import { mapMultiRowFields } from "vuex-map-fields";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
+import Multiselect from 'vue-multiselect'
 export default {
+   data: function() {
+      return {
+         dropdownSources: true,
+         selectedSources: []
+      } 
+   },
+   components: {
+      Multiselect
+   },
    computed: {
       ...mapState({
-         advancedFields: state => state.query.advancedFields
+         advancedFields: state => state.query.advancedFields,
       }),
       ...mapGetters({
          queryEntered: "query/queryEntered",
@@ -94,6 +117,18 @@ export default {
       },
       doAdvancedSearch() {
          if (this.queryEntered) {
+            if ( this.dropdownSources) {
+               // convert source selections to preferences; preferece is which
+               // source NOT TO search, UI is pools TO search. Invert.
+               this.sources.forEach( src=> {
+                  if ( this.selectedSources.includes(src) == false ) {
+                     console.log("SOURCE "+src.id+ " not selected.")
+                     this.$store.commit("preferences/toggleExcludePool", src.url)  
+                  } else {
+                     console.log("SOURCE "+src.id+ " IS SEELECTED")
+                  }
+               })
+            }
             this.$store.dispatch("searchAllPools");
          } else {
             this.$store.commit(
@@ -115,10 +150,17 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
+      this.selectedSources = this.sources
    }
 };
 </script>
 
+<style>
+#app .sources span.multiselect__tag {
+   background: var(--color-light-blue);
+   color: white;
+}
+</style>
 <style scoped>
 .pure-button.pure-button-cancel {
    background: rgb(202, 60, 60);
