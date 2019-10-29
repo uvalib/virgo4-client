@@ -187,7 +187,7 @@ const user = {
             ctx.commit("setSignedInUser", {userId: response.data, 
                token: ctx.state.authToken, type: "public", quiet: false} )
             ctx.commit('setAuthorizing', false)
-            router.push("/")
+            router.push("/account")
          }).catch((_error) => {
             ctx.commit('setAuthorizing', false)
             router.push("/forbidden")

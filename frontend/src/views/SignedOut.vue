@@ -11,19 +11,14 @@
                click here to turn in your NetBadge.
             </a> 
          </p>
-         <BackToVirgo />
       </div>
    </main>
 </template>
 
 <script>
 import { mapState } from "vuex"
-import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "signedout",
-   components: {
-      BackToVirgo
-   },
    computed: {
       ...mapState({
          sessionType: state => state.user.sessionType,

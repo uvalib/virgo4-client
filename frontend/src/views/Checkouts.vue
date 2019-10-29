@@ -7,7 +7,7 @@
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
-            <table>
+            <table v-if="checkouts.length > 0">
                <tr><th>Title</th><th>Author</th><th>Due</th><th>Library</th><th>Call Number</th></tr>
                <tr v-for="(checkout,idx) in checkouts" :key="checkout.id" v-bind:class="{shade: idx%2}" >
                   <td>{{checkout.title}}</td>
@@ -17,6 +17,9 @@
                   <td>{{checkout.callNumber}}</td>
                </tr>
             </table>
+            <div v-else class="none">
+               You currently have no items checked out
+            </div>
          </div>
       </div>
    </main>
@@ -70,6 +73,11 @@ export default {
    div.checkout-content  {
        width: 95%;
    }
+}
+.none {
+   text-align: center;
+   font-size: 1.25em;
+   margin-top: 35px;
 }
 .details {
    text-align: left;
