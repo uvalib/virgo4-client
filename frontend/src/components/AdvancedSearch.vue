@@ -3,7 +3,7 @@
       <h1>
          <span>Advanced Search</span>
       </h1>
-      <div v-if="dropdownSources" class="pools-wrapper">
+      <!-- <div v-if="dropdownSources" class="pools-wrapper">
          <h2>Available Sources</h2> 
          <multiselect :multiple="true"  v-model="selectedSources" class="sources"
                placeholder="Select at least one source"
@@ -25,7 +25,7 @@
                </label>
             </div>
          </div>
-      </div>
+      </div> -->
       <div class="criteria">
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <span>{{idx+1}}.</span>
@@ -117,18 +117,20 @@ export default {
       },
       doAdvancedSearch() {
          if (this.queryEntered) {
-            if ( this.dropdownSources) {
-               // convert source selections to preferences; preferece is which
-               // source NOT TO search, UI is pools TO search. Invert.
-               this.sources.forEach( src=> {
-                  if ( this.selectedSources.includes(src) == false ) {
-                     console.log("SOURCE "+src.id+ " not selected.")
-                     this.$store.commit("preferences/toggleExcludePool", src.url)  
-                  } else {
-                     console.log("SOURCE "+src.id+ " IS SEELECTED")
-                  }
-               })
-            }
+            // if ( this.dropdownSources) {
+            //    // convert source selections to preferences; preferece is which
+            //    // source NOT TO search, UI is pools TO search. Invert.
+            //    this.$store.commit("preferences/clear")
+            //    let picked = this.selectedSources
+            //    this.sources.forEach( src=> {
+            //       if ( picked.includes(src) == false ) {
+            //          console.log("SOURCE "+src.id+ " not selected.")
+            //          this.$store.commit("preferences/toggleExcludePool", src.url)  
+            //       } else {
+            //          console.log("SOURCE "+src.id+ " IS SEELECTED")
+            //       }
+            //    })
+            // }
             this.$store.dispatch("searchAllPools");
          } else {
             this.$store.commit(

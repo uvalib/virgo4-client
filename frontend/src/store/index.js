@@ -223,9 +223,11 @@ export default new Vuex.Store({
       })
 
       // If nothing was flagged as visible, just pick the first valid result
-      if (state.visibleResults.length == 0 && state.results[0].statusCode == 200  && state.results[0].hits.length > 0) {
-        state.results[0]["show"] = true
-        state.visibleResults.push(0)
+      if (state.results.length > 0) {
+        if (state.visibleResults.length == 0 && state.results[0].statusCode == 200  && state.results[0].hits.length > 0) {
+          state.results[0]["show"] = true
+          state.visibleResults.push(0)
+        }
       }
 
       state.total = results.total_hits
