@@ -26,7 +26,7 @@
                      <span v-else-if="wasPoolSkipped(r)" class="total">(not searched)</span>
                      <span v-else class="total">({{r.total}})</span>
                   </span>
-                  <template v-if="!poolFailed(r) && results.length > 1">
+                  <template v-if="!poolFailed(r) && results.length > 0">
                      <i v-if="r.show" class="showing fas fa-external-link-alt"></i>
                      <i v-else-if="r.total>0" class="showing fa fa-arrow-down"></i>
                   </template>
@@ -35,7 +35,7 @@
          </div>
       </div>
 
-      <PoolResultsPreview v-if="results.length>1"/>
+      <PoolResultsPreview v-if="results.length>0"/>
       <div v-else>
          <PoolResultDetail v-if="hasSinglePoolResults" />
       </div>
@@ -99,17 +99,17 @@ export default {
          if ( this.poolFailed(r)) return
 
          if (this.results[resultIdx].show == false) {
-            if ( this.results.length == 1) {
-               this.$store.commit("toggleResultVisibility", 0)
-               this.$store.commit("selectPoolResults", 0)
-               this.$store.dispatch("searchSelectedPool")
-            } else {
+            // if ( this.results.length == 1) {
+            //    this.$store.commit("toggleResultVisibility", 0)
+            //    this.$store.commit("selectPoolResults", 0)
+            //    this.$store.dispatch("searchSelectedPool")
+            // } else {
                this.$store.commit("toggleResultVisibility", resultIdx)
                if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
                   let visibleIdx = this.visibleResultIdx(resultIdx)
                   this.selectPool(visibleIdx)
                }
-            }
+            // }
          } else {
             let visibleIdx = this.visibleResultIdx(resultIdx)
             if (visibleIdx > -1) {

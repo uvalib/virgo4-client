@@ -79,7 +79,7 @@
             <i class="fas fa-undo-alt"></i>
          </span>
       </div>
-      <div class="basic"><label>Dropdown Soures&nbsp;<input type="checkbox" v-model="dropdownSources"/></label></div>
+      <!-- <div class="basic"><label>Dropdown Soures&nbsp;<input type="checkbox" v-model="dropdownSources"/></label></div> -->
    </div>
 </template>
 
