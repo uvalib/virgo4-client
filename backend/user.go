@@ -123,6 +123,7 @@ type ILSUserInfo struct {
 	Address     string `json:"address"`
 	Email       string `json:"email"`
 	Standing    string `json:"standing"`
+	AmountOwed  string `json:"amountOwed"`
 }
 
 // CheckoutInfo has sumary info for a checked out item

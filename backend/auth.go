@@ -105,7 +105,7 @@ func (svc *ServiceContext) updateAccessToken(userID string, token string) error 
 	if err != nil {
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
 		user := V4User{ID: 0, Virgo4ID: userID, AuthToken: token,
-			AuthUpdatedAt: time.Now(), SignedIn: true}
+			AuthUpdatedAt: time.Now(), SignedIn: true, Preferences: "{}"}
 		return svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 	}
 

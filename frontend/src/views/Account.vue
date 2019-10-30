@@ -11,6 +11,12 @@
             <div>{{info.department}} - {{info.profile}}</div>
             <div>{{info.address}}</div>
             <div>{{info.email}}</div>
+            <div class="status-info">
+               <div><b>Standing:</b> {{info.standing}}</div>
+               <div v-if="isBillOwed" class="outstanding-bill">
+                  <b>AMOUNT OWED:</b> ${{info.amountOwed}}
+               </div>
+            </div>
          </div>
          <div class="controls">
             <p><b>Activities</b></p>
@@ -47,6 +53,11 @@ export default {
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
       }),
+      isBillOwed() {
+         console.log("woof")
+         let amtStr = this.info['amountOwed']
+         return parseFloat(amtStr) > 0
+      },
    },
    methods: {
       signOut() {
@@ -109,15 +120,8 @@ export default {
    font-size: 1.1em;
    font-weight: bold;
 }
-.signin-message {
-  width: 50%;
-  margin: 5px auto;
-  background: var(--color-primary-orange);
-  color: white;
-  padding: 2px;
-  border-radius: 5px;
-  font-weight: bold;
-  text-align: center;
+.status-info {
+   margin: 15px 0;
 }
 </style>
 
