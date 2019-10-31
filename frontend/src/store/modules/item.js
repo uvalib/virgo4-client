@@ -32,6 +32,11 @@ const item = {
         state.availability.columns = response.columns
         state.availability.items = response.items
       },
+      clearAvailability(state) {
+        state.availability.titleId = ''
+        state.availability.columns = []
+        state.availability.items = []
+      },
 
       setCatalogKeyDetails(state, data) {
          // no match or multiple matches
@@ -92,12 +97,13 @@ const item = {
       },
 
       async getAvailability(ctx, titleId ) {
+        ctx.commit('clearAvailability')
         axios.defaults.headers.common['Authorization'] = "Bearer " + ctx.rootState.user.authToken
         axios.get("/api/availability/" + titleId).then((response) => {
-          ctx.commit('setSearching', false, { root: true })
+          ctx.commit('setSearching', false, {root: true})
           ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
         }).catch((error) => {
-          ctx.commit('system/setError', error, { root: true })
+          if (error.response.status != 404) ctx.commit('system/setError', error, {root: true})
           ctx.commit('setSearching', false, { root: true })
         })
       },
