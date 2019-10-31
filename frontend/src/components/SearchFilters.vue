@@ -12,7 +12,7 @@
                <td class="label">{{filter.facet.name}}:</td>
                <td class="filter">{{formatValues(filter.values)}}</td>
                <td class="label">
-                  <i v-if="!isGlobal(filter)" @click="removeFilter(i)" class="remove-filter fas fa-trash-alt"></i>
+                  <i v-if="isRemovable(filter)" @click="removeFilter(i)" class="remove-filter fas fa-trash-alt"></i>
                </td>
             </tr>
          </table>
@@ -26,7 +26,7 @@
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"   
+import { mapGetters } from "vuex"
 import AddFilter from '@/components/AddFilter'
 export default {
    components: {
@@ -44,6 +44,7 @@ export default {
          hasFilter: 'filters/hasFilter',
          poolFacets: 'filters/poolFacets',
          poolFilter: 'filters/poolFilter',
+         poolDefaultFacets: 'filters/poolDefaultFacets',
          selectedResults: 'selectedResults',
       }),
       total() {
@@ -51,10 +52,10 @@ export default {
       }
    },
    methods: {
-      isGlobal(filter) {
-         if ( filter.facet.id != this.availabilityFacet) return false
-         let val = this.availabilityValues[this.globalAvailability]
-         return filter.values.includes(val)
+      isRemovable(filter) {
+         if ( filter.facet.id == this.availabilityFacet) return false
+         if (this.poolDefaultFacets(this.poolIdx).includes(filter)) return false
+         return true
       },
       formatValues(values) {
          return values.join(", ")
