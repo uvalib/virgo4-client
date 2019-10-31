@@ -6,7 +6,7 @@
          <span class="sep">|</span>
          <router-link to="/course-reserves">Course Reserves</router-link>
          <span class="sep">|</span>
-         <router-link to="/account">Account Info</router-link>
+         <router-link to="/account">My Account</router-link>
          <span class="sep">|</span>
          <router-link to="/bookmarks">Bookmarks</router-link>
          <span class="sep">|</span>

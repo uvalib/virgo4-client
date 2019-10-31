@@ -10,9 +10,10 @@ const user = {
       authorizing: false,
       signedInUser: "",
       sessionType: "",
-      accountInfo: null,
-      checkouts: null,
-      bookmarks: null,
+      accountInfo: {},
+      checkouts: [],
+      bookmarks: [],
+      bills: [],
       newBookmarkInfo: null,
       lookingUp: false,
    },
@@ -129,6 +130,9 @@ const user = {
       setBookmarks(state, bookmarks) {
          state.bookmarks = []
          state.bookmarks = bookmarks
+      },
+      setBills(state, bills) {
+         state.bills = bills
       }
    },
 
@@ -163,6 +167,17 @@ const user = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
+            ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })
+      },
+      getBillDetails(ctx) {
+         ctx.commit('setLookingUp', true)
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         axios.get(`/api/users/${ctx.state.signedInUser}/bills`).then((response) => {
+            ctx.commit('setBills', response.data)
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })

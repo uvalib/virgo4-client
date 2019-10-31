@@ -2,7 +2,7 @@
    <main class="account">
       <h1>My Account</h1>
       <div class="account-content">
-         <div class="working" v-if="lookingUp || !hasAccountInfo" >
+         <div class="working" v-if="!expandBilling && (lookingUp || !hasAccountInfo)" >
             <div>Looking up account details...</div>
             <img src="../assets/spinner2.gif">
          </div>
@@ -14,7 +14,36 @@
             <div class="status-info">
                <div><b>Standing:</b> {{info.standing}}</div>
                <div v-if="isBillOwed" class="outstanding-bill">
-                  <b>AMOUNT OWED:</b> ${{info.amountOwed}}
+                  <b>AMOUNT OWED:</b>
+                  <span>${{info.amountOwed}}</span>
+                  <i v-if="!expandBilling" @click="getBillDetail" class="bills fas fa-info-circle"></i>
+               </div>
+            </div>
+            <div v-if="expandBilling" class="bills">
+               <div class="detail-head">
+                  Billing Details
+               </div>
+               <div class="working" v-if="lookingUp">
+                  <div>Looking up billing details...</div>
+               </div>
+               <div class="bill" v-for="(bill,idx) in bills" :key="idx">
+                  <table>
+                     <tr>
+                        <td class="label">Date:</td> 
+                        <td>{{bill.date}}</td>
+                     </tr>
+                     <tr>
+                        <td class="label">Amount:</td> 
+                        <td>${{bill.amount}}</td>
+                     </tr>
+                     <tr>
+                        <td class="label">Reason:</td> 
+                        <td>{{bill.reason}}</td>
+                     </tr>
+                     <tr><td class="label">Item:</td><td>{{bill.item.title}}</td></tr>
+                     <tr><td/><td>{{bill.item.author}}</td></tr>
+                     <tr><td/><td>{{bill.item.callNumber}}</td></tr>
+                  </table>  
                </div>
             </div>
          </div>
@@ -29,6 +58,11 @@ import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "account",
+   data: function() {
+      return {
+         expandBilling: false 
+      };
+   },
    components: {
       AccountActivities
    },
@@ -36,6 +70,7 @@ export default {
       ...mapState({
          info: state => state.user.accountInfo,
          lookingUp: state => state.user.lookingUp,
+         bills: state => state.user.bills,
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
@@ -44,6 +79,12 @@ export default {
          let amtStr = this.info['amountOwed']
          return parseFloat(amtStr) > 0
       },
+   },
+   methods: {
+      getBillDetail() {
+         this.expandBilling = true
+         this.$store.dispatch("user/getBillDetails") 
+      }
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
@@ -88,6 +129,42 @@ export default {
 }
 .status-info {
    margin: 15px 0;
+}
+.outstanding-bill {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+}
+.outstanding-bill b {
+   margin-right: 5px;
+}
+i.bills {
+   font-size: 1.25em;
+   cursor: pointer;
+   color: var(--color-lighter-blue);
+   margin-left: 10px;
+}
+div.bills {
+   font-size: 0.8em;
+   margin-left: 25px;
+}
+.detail-head {
+   padding: 5px;
+   background: var(--color-lightest-blue);
+   font-weight: bold;
+}
+div.bill {
+   border: 1px solid #ccc;
+   margin: 0;
+   padding: 5px;
+   border-top: 0;
+}
+table td {
+   padding: 0 5px;
+}
+td.label {
+   text-align: right;
+   font-weight: bold;
 }
 </style>
 

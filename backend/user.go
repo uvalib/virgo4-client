@@ -148,6 +148,25 @@ type User struct {
 	Preferences string       `json:"preferences"`
 }
 
+// GetUserBills uses ILS Connector user billing details
+func (svc *ServiceContext) GetUserBills(c *gin.Context) {
+	userID := c.Param("uid")
+	log.Printf("Get bils for user %s with ILS Connector...", userID)
+	userURL := fmt.Sprintf("%s/v4/users/%s/bills", svc.ILSAPI, userID)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	if ilsErr != nil {
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	var bills interface{}
+	if err := json.Unmarshal(bodyBytes, &bills); err != nil {
+		log.Printf("ERROR: unable to parse bills response: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, bills)
+}
+
 // GetUserCheckouts uses ILS Connector V2 API /users to get checked out items
 func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
