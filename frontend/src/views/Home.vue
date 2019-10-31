@@ -11,25 +11,22 @@
             {{translateMessage}}
           </div>
           <div class="basic-search">
-            <div class="dropdown-wrapped">
-              <div @click="sourcesClick" class="select">
-                <span class="selection">
-                  {{selectedSource.name}}
-                  <i class="sources-arrow fas fa-angle-down" :style="{ transform: rotation }"></i>
-                </span>
-                <transition name="grow"
-                  v-on:before-enter="beforeEnter" v-on:enter="enter"
-                  v-on:before-leave="beforeLeave" v-on:leave="leave">
-                  <div class="options" v-if="sourcesExpanded">
-                    <div @click="sourceClicked({name: 'All Sources', value: 'all'})" class="option">
-                      All Sources
-                    </div>
-                    <div @click="sourceClicked(src)" class="option" v-for="src in sources" :key="src.id">
-                      {{src.name}}
-                    </div>
+            <div @click="sourcesClick" class="select">
+              <span class="selection">
+                {{selectedSource.name}}
+                <i class="sources-arrow fas fa-angle-down" :style="{ transform: rotation }"></i>
+              </span>
+              <transition name="grow"
+                v-on:before-enter="beforeEnter" v-on:enter="enter"
+                v-on:before-leave="beforeLeave" v-on:leave="leave">
+                <div class="options" v-if="sourcesExpanded">
+                  <div @click="sourceClicked({name: 'All Sources', value: 'all'})" 
+                    class="option">All Sources</div>
+                  <div @click="sourceClicked(src)" class="option" v-for="src in sources" :key="src.id">
+                    {{src.name}}
                   </div>
-                </transition>
-              </div>
+                </div>
+              </transition>
             </div>
             <input class="basic"
                 @keyup.enter="searchClicked"
@@ -231,9 +228,10 @@ p.fatal, p.error {
 .basic-search {
   display: flex;
   flex-flow: row nowrap;
-  align-items: stretch;
+  align-items: flex-start;
+  height: 100%;
 }
-.basic-search  input.basic {
+#app .pure-form div.basic-search  input[type=text].basic {
   font-size: 1.15em;
   padding: 0.5vw 0.75vw;
   outline: none;
@@ -242,10 +240,12 @@ p.fatal, p.error {
   flex: 1 1 auto;
   border-left: 0;
   border-radius: 0 5px 5px 0;
+  align-self: stretch;
 }
 .select {
-  font-size: 1.15em;
-  padding: 0.5vw 0.75vw;
+  display: inline-block;
+  font-size: 0.9em;
+  padding: 0.5vw 5px;
   outline: none;
   border: 1px solid var(--color-brand-blue);
   border-radius: 5px 0 0 5px;
@@ -254,13 +254,21 @@ p.fatal, p.error {
   color: white;
   position: relative;
   text-align: left;
+  align-self: stretch;
+}
+.selection {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 .sources-arrow {
-  margin: 0 5px;
+  margin: 0 0 0 5px;
   cursor: pointer;
   color: white;
   transform: rotate(0deg);
   transition-duration: 250ms;
+  display: inline-block;
+  vertical-align: middle;
 }
 .options {
   text-align: left;
@@ -270,7 +278,6 @@ p.fatal, p.error {
   padding: 10px 0;
   border-radius: 0 0 5px 5px;
   position: absolute;
-  /* top: 35px; */
   left: -1px;
   right: -1px;
   border: 1px solid var(--color-brand-blue);
