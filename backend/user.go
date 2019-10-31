@@ -128,12 +128,16 @@ type ILSUserInfo struct {
 
 // CheckoutInfo has sumary info for a checked out item
 type CheckoutInfo struct {
-	ID         int    `json:"id"`
+	ID         string `json:"id"`
 	Title      string `json:"title"`
 	Author     string `json:"author"`
 	CallNumber string `json:"callNumber"`
 	Library    string `json:"library"`
 	DueDate    string `json:"due"`
+	OverDue    bool   `json:"overdue"`
+	Fee        string `json:"overdueFee"`
+	RecallDate string `json:"recallDate"`
+	RenewDate  string `json:"renewDate"`
 }
 
 // User contains all user data collected from ILS and Virgo4 sources

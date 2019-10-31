@@ -18,22 +18,7 @@
                </div>
             </div>
          </div>
-         <div class="controls">
-            <p><b>Activities</b></p>
-            <div class="actions">
-               <router-link to="/">Search</router-link>
-               <span class="sep">|</span>
-               <router-link to="/course-reserves">Course Reserves</router-link>
-               <span class="sep">|</span>
-               <router-link to="/bookmarks">Bookmarks</router-link>
-               <span class="sep">|</span>
-               <router-link to="/checkouts">Checked Out Items</router-link>
-               <span class="sep">|</span>
-               <router-link to="/preferences">Preferences</router-link>
-               <span class="sep">|</span>
-               <div  @click="signOut" class="text-button">Sign Out</div>
-            </div>
-         </div>
+         <AccountActivities/>
       </div>
    </main>
 </template>
@@ -41,9 +26,11 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "account",
    components: {
+      AccountActivities
    },
    computed: {
       ...mapState({
@@ -54,14 +41,8 @@ export default {
         hasAccountInfo: 'user/hasAccountInfo',
       }),
       isBillOwed() {
-         console.log("woof")
          let amtStr = this.info['amountOwed']
          return parseFloat(amtStr) > 0
-      },
-   },
-   methods: {
-      signOut() {
-         this.$store.dispatch("user/signout")
       },
    },
    created() {
@@ -76,21 +57,6 @@ export default {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-}
-.sep {
-   margin: 0 10px;
-}
-.controls {
-   text-align: left;
-}
-.controls p {
-   border-bottom: 4px solid var(--color-brand-orange);
-   padding-bottom: 5px;
-}
-.controls .action {
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: center;
 }
 .working {
    text-align: center;

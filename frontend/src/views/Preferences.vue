@@ -35,6 +35,7 @@
                </div>   
             </div>
          </div>
+         <AccountActivities />
       </div>
    </main>
 </template>
@@ -42,9 +43,11 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "preferences",
    components: {
+      AccountActivities
    },
    computed: {
       ...mapState({

@@ -8,12 +8,13 @@
          </div>
          <div v-else class="details">
             <table v-if="checkouts.length > 0">
-               <tr><th>Title</th><th>Author</th><th>Due</th><th>Library</th><th>Call Number</th></tr>
+               <tr><th>Title</th><th>Author</th><th>Due</th><th>Fee</th><th>Library</th><th>Call Number</th></tr>
                <tr v-for="(checkout,idx) in checkouts" :key="checkout.id" v-bind:class="{shade: idx%2}" >
                   <td>{{checkout.title}}</td>
                   <td>{{checkout.author}}</td>
-                  <td class="date">{{formatDate(checkout.due)}}</td>
-                  <td>{{checkout.library}}</td>
+                  <td class="nowrap" v-html="formatDueInfo(checkout)"></td>
+                  <td class="nowrap">${{checkout.overdueFee}}</td>
+                  <td class="nowrap">{{checkout.library}}</td>
                   <td>{{checkout.callNumber}}</td>
                </tr>
             </table>
@@ -21,14 +22,19 @@
                You currently have no items checked out
             </div>
          </div>
+         <AccountActivities />
       </div>
    </main>
 </template>
 
 <script>
 import { mapState } from "vuex"
+import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "checkouts",
+   components: {
+      AccountActivities
+   },
    computed: {
       ...mapState({
          checkouts: state => state.user.checkouts,
@@ -36,8 +42,15 @@ export default {
       }),
    },
    methods: {
-      formatDate(dateStr) {
-         return dateStr.split("T")[0]
+      formatDueInfo(checkout) {
+         let out =  `<div>${checkout.due.split("T")[0]}</div>`
+         if (checkout.overdue) {
+            out += "<div class='overdue'>Overdue</div>"
+         }
+         if ( checkout.recallDate != "") {
+             out += `<div class='recall'>Recalled ${checkout.recallDate}</div>`
+         }
+         return out
       }
    },
    created() {
@@ -45,7 +58,18 @@ export default {
    }
 }
 </script>
-
+<style>
+.details div.overdue {
+   font-size: 0.85em;
+   font-weight: bold;
+   color: firebrick;
+}
+.details div.recall {
+   font-size: 0.85em;
+   font-weight: bold;
+   color: var(--color-brand-orange);
+}
+</style>
 <style scoped>
 .checkout {
    min-height: 400px;
@@ -86,7 +110,10 @@ export default {
    font-size: 1.1em;
    font-weight: bold;
 }
-table tr th, td.date {
+table {
+   width:100%;
+}
+table tr th, td.nowrap {
    white-space: nowrap;
 }
 table tr th {

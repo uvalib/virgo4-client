@@ -24,9 +24,15 @@ const preferences = {
 
    mutations: {
       setPreferences(state, prefsStr) {
+         state.targetPoolURL = ""
+         state.excludePoolURLs = []
          let json = JSON.parse(prefsStr)
-         state.targetPoolURL = json.targetPoolURL
-         state.excludePoolURLs = json.excludePoolURLs
+         if (json.targetPoolURL ) {
+            state.targetPoolURL = json.targetPoolURL
+         }
+         if (json.excludePoolURLs ) {
+            state.excludePoolURLs = json.excludePoolURLs
+         }
       },
       clear(state) {
          state.targetPoolURL = ""

@@ -49,6 +49,7 @@
                </div>
             </template>
          </div>
+         <AccountActivities />
       </div>
    </main>
 </template>
@@ -58,10 +59,11 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import ConfirmDelete from "@/components/popovers/ConfirmDelete"
 import AccordionContent from "@/components/AccordionContent"
+import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "bookmarks",
    components: {
-      AccordionContent,ConfirmDelete
+      AccordionContent,ConfirmDelete,AccountActivities
    },
    computed: {
       ...mapState({
