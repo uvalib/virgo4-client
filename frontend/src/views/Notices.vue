@@ -1,15 +1,15 @@
 <template>
-   <main class="checkout">
-      <h1>Checked-Out Items</h1>
-      <div class="checkout-content">
+   <main class="notices">
+      <h1>Notices</h1>
+      <div class="notices-content">
          <div class="working" v-if="lookingUp" >
-            <div>Looking up checked-out item details...</div>
+            <div>Looking up notices...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
-            <table v-if="checkouts.length > 0">
+            <table v-if="itemsOnNotice.length > 0">
                <tr><th>Title</th><th>Author</th><th>Due</th><th>Fee</th><th>Library</th><th>Call Number</th></tr>
-               <tr v-for="(checkout,idx) in checkouts" :key="checkout.id" v-bind:class="{shade: idx%2}" >
+               <tr v-for="(checkout,idx) in itemsOnNotice" :key="checkout.id" v-bind:class="{shade: idx%2}" >
                   <td>{{checkout.title}}</td>
                   <td>{{checkout.author}}</td>
                   <td class="nowrap" v-html="formatDueInfo(checkout)"></td>
@@ -19,7 +19,7 @@
                </tr>
             </table>
             <div v-else class="none">
-               You currently have no items checked out
+               You have no items on notice
             </div>
          </div>
          <AccountActivities />
@@ -29,17 +29,20 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 export default {
-   name: "checkouts",
+   name: "notices",
    components: {
       AccountActivities
    },
    computed: {
       ...mapState({
-         checkouts: state => state.user.checkouts,
          lookingUp: state => state.user.lookingUp,
       }),
+      ...mapGetters({
+         itemsOnNotice: 'user/itemsOnNotice',
+      })
    },
    methods: {
       formatDueInfo(checkout) {
@@ -72,7 +75,7 @@ export default {
 }
 </style>
 <style scoped>
-.checkout {
+.notices {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
@@ -85,17 +88,17 @@ export default {
 .working img {
    margin: 30px 0;
 }
-.checkout-content {
+.notices-content {
    width: 80%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
-   div.checkout-content  {
+   div.notices-content  {
        width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.checkout-content  {
+   div.notices-content  {
        width: 95%;
    }
 }
@@ -106,10 +109,6 @@ export default {
 }
 .details {
    text-align: left;
-}
-.user-name {
-   font-size: 1.1em;
-   font-weight: bold;
 }
 table {
    width:100%;
@@ -133,4 +132,3 @@ tr.shade td {
 }
 
 </style>
-

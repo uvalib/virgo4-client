@@ -9,6 +9,7 @@ import Preferences from './views/Preferences.vue'
 import SignIn from './views/SignIn.vue'
 import Account from './views/Account.vue'
 import Checkouts from './views/Checkouts.vue'
+import Notices from './views/Notices.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
 import Forbidden from './views/Forbidden.vue'
@@ -87,6 +88,11 @@ const router = new Router({
       path: '/checkouts',
       name: 'checkouts',
       component: Checkouts
+    },
+    {
+      path: '/notices',
+      name: 'notices',
+      component: Notices
     },
     {
       path: '/signedout',

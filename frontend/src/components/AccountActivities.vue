@@ -1,21 +1,16 @@
 <template>
    <div class="activities">
-      <p><b>Activities</b></p>
-      <div class="actions">
-         <router-link to="/search">Search</router-link>
-         <span class="sep">|</span>
-         <router-link to="/course-reserves">Course Reserves</router-link>
-         <span class="sep">|</span>
-         <router-link to="/account">My Account</router-link>
-         <span class="sep">|</span>
-         <router-link to="/bookmarks">Bookmarks</router-link>
-         <span class="sep">|</span>
-         <router-link to="/checkouts">Checked Out Items</router-link>
-         <span class="sep">|</span>
-         <router-link to="/preferences">Preferences</router-link>
-         <span class="sep">|</span>
-         <div  @click="signOut" class="text-button">Sign Out</div>
-      </div>
+      <router-link to="/account">My Account</router-link>
+      <span class="sep">|</span>
+      <router-link to="/bookmarks">Bookmarks</router-link>
+      <span class="sep">|</span>
+      <router-link to="/checkouts">Checked Out Items</router-link>
+      <span class="sep">|</span>
+      <router-link to="/notices">Notices</router-link>
+      <span class="sep">|</span>
+      <router-link to="/preferences">Preferences</router-link>
+      <span class="sep">|</span>
+      <div  @click="signOut" class="text-button">Sign Out</div>
    </div>
 </template>
 
@@ -35,12 +30,10 @@ export default {
 }
 .activities {
    text-align: left;
-   margin-top: 35px;
+   margin-top: 20px;
    margin-bottom: 35px;
-}
-.activities p {
-   border-bottom: 4px solid var(--color-brand-orange);
-   padding-bottom: 5px;
+   padding-top: 15px;
+   border-top: 4px solid var(--color-brand-blue);
 }
 .activities .action {
    display: flex;

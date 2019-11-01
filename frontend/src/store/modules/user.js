@@ -39,6 +39,9 @@ const user = {
 
          return true
       },
+      itemsOnNotice: state => {
+         return state.checkouts.filter( co=> co.overdue || co.recallDate != "")
+      },
       hasAuthToken: state => {
         return state.authToken.length > 0
       },
@@ -150,7 +153,8 @@ const user = {
       },
       getAccountInfo(ctx) {
          if ( ctx.state.signedInUser == ""  ) return
-
+         if ( ctx.state.signedInUser == ctx.state.accountInfo.id) return
+         
          ctx.commit('setLookingUp', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
@@ -163,7 +167,11 @@ const user = {
           })
       },
       getCheckouts(ctx) {
-         ctx.commit('setLookingUp', true)
+         if ( ctx.state.checkouts.length > 0) {
+            ctx.commit('setLookingUp', false)
+            return
+         }
+
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
@@ -174,6 +182,8 @@ const user = {
           })
       },
       getBillDetails(ctx) {
+         if ( ctx.state.bills.length > 0) return
+
          ctx.commit('setLookingUp', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.get(`/api/users/${ctx.state.signedInUser}/bills`).then((response) => {

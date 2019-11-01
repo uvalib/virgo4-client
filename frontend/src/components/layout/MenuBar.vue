@@ -27,7 +27,10 @@
                         <div class="submenu">Bookmarks</div>
                      </router-link>
                      <router-link to="/checkouts">
-                        <div class="submenu">Checked-Out Items</div>
+                        <div class="submenu">Checked Out Items</div>
+                     </router-link>
+                     <router-link to="/notices">
+                        <div class="submenu">Notices</div>
                      </router-link>
                      <router-link to="/preferences">
                         <div class="submenu">Preferences</div>

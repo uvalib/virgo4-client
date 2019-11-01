@@ -88,6 +88,7 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
+      this.$store.dispatch("user/getCheckouts")
    }
 }
 </script>
