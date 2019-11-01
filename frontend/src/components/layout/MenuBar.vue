@@ -27,10 +27,7 @@
                         <div class="submenu">Bookmarks</div>
                      </router-link>
                      <router-link to="/checkouts">
-                        <div class="submenu">Checked Out Items</div>
-                     </router-link>
-                     <router-link to="/notices">
-                        <div class="submenu">Notices</div>
+                        <div class="submenu">Checkouts</div>
                      </router-link>
                      <router-link to="/preferences">
                         <div class="submenu">Preferences</div>
@@ -41,6 +38,11 @@
                   </div>
                </transition>
             </span>
+            <router-link v-if="itemsOnNotice.length > 0" to="/checkouts?notices=1">
+               <span  class="menu-item notice">
+                  <i class="notice fas fa-exclamation-triangle"></i>{{itemsOnNotice.length}}
+               </span>
+            </router-link>
          </template>   
          <template v-else>
             <router-link to="/signin">
@@ -66,6 +68,7 @@ export default {
       }),
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
+        itemsOnNotice: 'user/itemsOnNotice'
       }),
       rotation() {
          if (this.userMenuOpen) {
@@ -186,6 +189,10 @@ export default {
 }
 .menu-right {
    margin-left: auto;
+}
+i.notice {
+   color: var(--color-light-orange);
+   margin-right: 5px;
 }
 </style>
 

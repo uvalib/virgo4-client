@@ -1,12 +1,13 @@
 <template>
    <main class="preferences">
-      <h1>Preferences</h1>
+      <h1>My Account</h1>
       <div class="preferences-content">
          <div class="working" v-if="lookingUpPools || lookingUpAccount" >
             <div>Loading preferences...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else>
+            <AccountActivities/>
             <p>
                Select which sources you want to include in your search results,
                and which source you prefer to see results from most.
@@ -35,7 +36,6 @@
                </div>   
             </div>
          </div>
-         <AccountActivities />
       </div>
    </main>
 </template>

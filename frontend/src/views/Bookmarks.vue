@@ -1,12 +1,13 @@
 <template>
    <main class="bookmarks">
-      <h1>Bookmarks</h1>
+      <h1>My Account</h1>
       <div class="bookmarks-content">
          <div class="working" v-if="lookingUp" >
             <div>Looking up account details...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else>
+            <AccountActivities/>
             <p v-if="hasBookmarks == false">
                You have no bookmarked items.
             </p>
@@ -49,7 +50,6 @@
                </div>
             </template>
          </div>
-         <AccountActivities />
       </div>
    </main>
 </template>
@@ -134,12 +134,12 @@ div.accordion {
    margin: 30px 0;
 }
 .bookmarks-content {
-   width: 60%;
+   width: 80%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    div.bookmarks-content  {
-       width: 60%;
+       width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {

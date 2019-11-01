@@ -1,12 +1,10 @@
 <template>
    <div class="activities">
-      <router-link to="/account">My Account</router-link>
+      <router-link to="/account">Overview</router-link>
       <span class="sep">|</span>
       <router-link to="/bookmarks">Bookmarks</router-link>
       <span class="sep">|</span>
-      <router-link to="/checkouts">Checked Out Items</router-link>
-      <span class="sep">|</span>
-      <router-link to="/notices">Notices</router-link>
+      <router-link to="/checkouts">Checkouts</router-link>
       <span class="sep">|</span>
       <router-link to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
@@ -30,10 +28,10 @@ export default {
 }
 .activities {
    text-align: left;
-   margin-top: 20px;
-   margin-bottom: 35px;
-   padding-top: 15px;
-   border-top: 4px solid var(--color-brand-blue);
+   margin-bottom: 15px;
+   padding-bottom: 5px;
+   margin-top: 0;
+   border-bottom: 2px solid var(--color-brand-blue);
 }
 .activities .action {
    display: flex;

@@ -1,14 +1,15 @@
 <template>
    <main class="checkout">
-      <h1>Checked-Out Items</h1>
+      <h1>My Account</h1>
       <div class="checkout-content">
          <div class="working" v-if="lookingUp" >
             <div>Looking up checked-out item details...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
+            <AccountActivities/>
             <table v-if="checkouts.length > 0">
-               <tr><th>Title</th><th>Author</th><th>Due</th><th>Fee</th><th>Library</th><th>Call Number</th></tr>
+               <tr><th>Title</th><th>Author</th><th>Due</th><th>Fine</th><th>Library</th><th>Call Number</th></tr>
                <tr v-for="(checkout,idx) in checkouts" :key="checkout.id" v-bind:class="{shade: idx%2}" >
                   <td>{{checkout.title}}</td>
                   <td>{{checkout.author}}</td>
@@ -22,7 +23,6 @@
                You currently have no items checked out
             </div>
          </div>
-         <AccountActivities />
       </div>
    </main>
 </template>

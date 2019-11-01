@@ -72,12 +72,12 @@ export default {
    margin: 30px 0;
 }
 .reserves-content {
-   width: 60%;
+   width: 80%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    div.reserves-content  {
-       width: 60%;
+       width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {

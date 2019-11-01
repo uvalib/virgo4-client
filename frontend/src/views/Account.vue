@@ -7,6 +7,7 @@
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
+            <AccountActivities/>
             <div class="user-name">{{info.displayName}} ({{info.id}})</div>   
             <div>{{info.department}} - {{info.profile}}</div>
             <div>{{info.address}}</div>
@@ -16,12 +17,13 @@
                <div v-if="isBillOwed" class="outstanding-bill">
                   <b>AMOUNT OWED:</b>
                   <span>${{info.amountOwed}}</span>
-                  <i v-if="!expandBilling" @click="getBillDetail" class="bills fas fa-info-circle"></i>
+                  <i v-if="!expandBilling" @click="getBillDetail" class="bills fas fa-file-invoice-dollar"></i>
                </div>
             </div>
             <div v-if="expandBilling" class="bills">
                <div class="detail-head">
-                  Billing Details
+                  <span>Billing Details</span>
+                  <i @click="closeBillDetail" class="close fas fa-times-circle"></i>
                </div>
                <div class="working" v-if="lookingUp">
                   <div>Looking up billing details...</div>
@@ -47,7 +49,6 @@
                </div>
             </div>
          </div>
-         <AccountActivities/>
       </div>
    </main>
 </template>
@@ -84,6 +85,9 @@ export default {
       getBillDetail() {
          this.expandBilling = true
          this.$store.dispatch("user/getBillDetails") 
+      },
+      closeBillDetail() {
+         this.expandBilling = false
       }
    },
    created() {
@@ -108,12 +112,12 @@ export default {
    margin: 30px 0;
 }
 .account-content {
-   width: 60%;
+   width: 80%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    div.account-content  {
-       width: 60%;
+       width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {
@@ -142,7 +146,7 @@ export default {
 i.bills {
    font-size: 1.25em;
    cursor: pointer;
-   color: var(--color-lighter-blue);
+   color: var(--color-light-blue);
    margin-left: 10px;
 }
 div.bills {
@@ -153,6 +157,14 @@ div.bills {
    padding: 5px;
    background: var(--color-lightest-blue);
    font-weight: bold;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+}
+i.close {
+   margin-left: auto;
+   font-size: 1.5em;
+   color: white;
 }
 div.bill {
    border: 1px solid #ccc;
