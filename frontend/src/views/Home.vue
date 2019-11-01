@@ -13,7 +13,7 @@
           <div class="basic-search">
             <div @click="sourcesClick" class="select">
               <span class="selection">
-                {{selectedSource.name}}
+                {{basicSearchScope.name}}
                 <i class="sources-arrow fas fa-angle-down" :style="{ transform: rotation }"></i>
               </span>
               <transition name="grow"
@@ -72,7 +72,6 @@ export default {
    },
    data: function()  {
       return {
-         selectedSource: {name: "All Sources", value: "all"},
          sourcesExpanded: false,
       }
    },
@@ -83,6 +82,7 @@ export default {
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
+         basicSearchScope: state => state.query.basicSearchScope,
          translateMessage: state => state.system.translateMessage
       }),
       ...mapGetters({
@@ -106,7 +106,7 @@ export default {
       },
    },
    created: function() {
-      this.$store.dispatch("system/getConfig").then(_response => {
+      this.$store.dispatch("system/getConfig").then(() => {
         // once cfg is available, get pools. they may be needed 
         // to populate the pool selector for non-signed in users
         this.$store.dispatch('pools/getPools')
@@ -115,15 +115,6 @@ export default {
    methods: {
       searchClicked() {
         if (this.queryEntered ) {
-          let tgtID = this.selectedSource.id
-          this.$store.commit('preferences/clear')
-          if (this.selectedSource.value != "all") {
-            this.sources.forEach( src=> {
-              if (src.id != tgtID) {
-                this.$store.commit('preferences/toggleExcludePool', src.url)
-              }
-            })
-          }
           this.$store.dispatch("searchAllPools")
         } else {
           this.$store.commit('system/setError', "Please enter a search query")
@@ -133,8 +124,7 @@ export default {
         this.$store.commit("query/setAdvancedSearch")
       },
       sourceClicked(src) {
-         this.sourcesExpanded
-         this.selectedSource = src
+         this.$store.commit("query/setBasicSearchScope", src)
       },
       sourcesClick(e) {
         e.stopPropagation()

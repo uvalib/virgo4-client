@@ -152,8 +152,7 @@ const user = {
         })
       },
       getAccountInfo(ctx) {
-         if ( ctx.state.signedInUser == ""  ) return
-         if ( ctx.state.signedInUser == ctx.state.accountInfo.id) return
+         if (ctx.rootGetters["user/hasAccountInfo"] ) return
          
          ctx.commit('setLookingUp', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken

@@ -5,6 +5,7 @@ const query = {
    state: {
       mode: "basic",
       basic: "",
+      basicSearchScope: {name: 'All Sources', value: 'all'},
       advanced: [
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
@@ -66,6 +67,9 @@ const query = {
    },
    mutations: {
       updateField,
+      setBasicSearchScope(state, scope) {
+         state.basicSearchScope = scope
+       },
       setAdvancedSearch(state) {
          state.mode = "advanced"
          state.advanced = [
@@ -84,6 +88,7 @@ const query = {
       clear(state) {
          state.mode = "basic"
          state.basic = ""
+         state.basicSearchScope = {name: 'All Sources', value: 'all'},
          state.advanced = [
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""}]

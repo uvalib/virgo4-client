@@ -270,6 +270,16 @@ export default new Vuex.Store({
         filters: rootGetters['filters/globalFilter']
       }
 
+      if (rootState.query.basicSearchScope.value != "all") {
+        let tgtID = rootState.query.basicSearchScope.id
+        req.preferences.exclude_pool = []
+        rootState.pools.list.forEach( src=> {
+          if (src.id != tgtID) {
+            req.preferences.exclude_pool.push(src.url)
+          }
+        })
+      }
+
       // If a user is signed in, make sure bookmarks are up to date when 
       // searching so the UI can show the correct status per item
       if ( rootGetters["user/isSignedIn"]) {
