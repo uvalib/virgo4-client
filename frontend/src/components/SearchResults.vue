@@ -18,7 +18,7 @@
 
          <div class="pool-buttons">
             <template  v-for="(r,idx) in results">
-               <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: r.show}">
+               <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: idx == selectedResultsIdx}">
                   <span>
                      <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
                      <span>{{r.pool.name}}&nbsp;</span>
@@ -26,19 +26,12 @@
                      <span v-else-if="wasPoolSkipped(r)" class="total">(not searched)</span>
                      <span v-else class="total">({{r.total}})</span>
                   </span>
-                  <template v-if="!poolFailed(r) && results.length > 0">
-                     <i v-if="r.show" class="showing fas fa-external-link-alt"></i>
-                     <i v-else-if="r.total>0" class="showing fa fa-arrow-down"></i>
-                  </template>
                </div>
             </template>
          </div>
       </div>
 
-      <PoolResultsPreview v-if="results.length>0"/>
-      <div v-else>
-         <PoolResultDetail v-if="hasSinglePoolResults" />
-      </div>
+      <PoolResultDetail v-if="selectedResultsIdx > -1" />
 
    </div>
 </template>
@@ -47,15 +40,13 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import PoolResultDetail from "@/components/PoolResultDetail"
-import PoolResultsPreview from "@/components/PoolResultsPreview"
 import AvailabilitySelector from '@/components/AvailabilitySelector'
 export default {
    components: {
-      AvailabilitySelector,PoolResultsPreview,PoolResultDetail
+      AvailabilitySelector,PoolResultDetail
    },
    computed: {
       ...mapGetters({
-         visibleResultIdx: 'visibleResultIdx',
          rawQueryString: 'query/string',
          hitPoolCount: 'hitPoolCount',
          skippedPoolCount: 'skippedPoolCount',
@@ -65,6 +56,7 @@ export default {
          isTargetPool: "preferences/isTargetPool",
       }),
       ...mapState({
+         selectedResultsIdx: state=>state.selectedResultsIdx,
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
@@ -72,10 +64,6 @@ export default {
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
-      hasSinglePoolResults() {
-         if (this.results.length == 0 || this.results.length > 1) return false 
-         return this.results[0].total > 0
-      }
    },
    
    methods: {
@@ -97,27 +85,7 @@ export default {
       resultsButtonClicked(resultIdx) {
          let r = this.results[resultIdx]
          if ( this.poolFailed(r)) return
-
-         if (this.results[resultIdx].show == false) {
-            // if ( this.results.length == 1) {
-            //    this.$store.commit("toggleResultVisibility", 0)
-            //    this.$store.commit("selectPoolResults", 0)
-            //    this.$store.dispatch("searchSelectedPool")
-            // } else {
-               this.$store.commit("toggleResultVisibility", resultIdx)
-               if ( this.results[resultIdx].show && this.results[resultIdx].statusCode == 408) {
-                  let visibleIdx = this.visibleResultIdx(resultIdx)
-                  this.selectPool(visibleIdx)
-               }
-            // }
-         } else {
-            let visibleIdx = this.visibleResultIdx(resultIdx)
-            if (visibleIdx > -1) {
-               this.selectPool(visibleIdx)
-            } else {
-                this.$store.commit("toggleResultVisibility", resultIdx)
-            }
-         }
+         this.$store.commit("selectPoolResults", resultIdx)
       },
    }
 }
@@ -140,13 +108,10 @@ export default {
    margin-right: 10px;
 }
 .pool-buttons {
-   margin: 5px 0;
+   margin: 5px 0 0 0;
    display: flex;
    flex-flow: row wrap;
    align-items: center;
-}
-i.showing {
-   font-size:1.15em;
 }
 div.right-indent {
    margin-left: 5px;

@@ -53,6 +53,12 @@ export default {
          return this.poolFilter(this.selectedResultsIdx, 'raw').length
       }
    },
+   watch: {
+      selectedResultsIdx () {
+         console.log("RESET!")
+         this.$refs.infiniteLoader.stateChanger.reset()
+      }
+   },
    methods: {
       loadMoreResults($state) {
          if ( this.searching) return
@@ -66,31 +72,28 @@ export default {
             $state.complete() 
          }
       },
-   },
-   created() {
-      // this is only shown when there is one result. auto pick that result
-      this.$store.commit("selectPoolResults", 0)
-   },
+   }
 }
 </script>
 
 <style>
 div.infinite-status-prompt {
-   background-color: var(--color-lightest-blue); 
-   color: black;
-   font-weight: 500;
-   padding: 5px;
-   border-radius: 5px;
-}
-div.infinite-status-prompt  .loading-default {
+   background-color: var(--color-brand-blue);
    color: white;
-   border: 1px solid white;
+   font-weight: bold;
+   padding: 5px;
+   border-radius: 0;
 }
 </style>
 
 <style scoped>
 .filters {
+   border-radius: 5px 5px 0 0;
+}
+.pool-results {
+   border: 1px solid #ccc;
    border-radius: 5px;
+   background-color: var(--color-brand-blue);
 }
 div.results-header {
    font-size: 1em;
@@ -98,9 +101,9 @@ div.results-header {
    background: var(--color-brand-blue);
    margin:0;
    text-align: left;
-   padding: 5px;
-   border-radius: 5px;
-   margin-bottom: 10px;
+   padding: 5px 5px 0 5px;
+   border-radius: 5px 5px 0 0;
+   margin-bottom: 0px;
 }
 .pool-name {
    font-weight: bold;
@@ -110,9 +113,11 @@ div.results-header {
    margin: 0;
 }
 .hit-wrapper {
-   margin: 10px;
-   border:1px solid #ccc;
-   /* flex: 1 1 0; */
-   border-radius: 5px;
+   margin: 5px;
+   /* border:1px solid #ccc;
+   border-radius: 5px; */
+}
+.hit-wrapper:last-child {
+   margin-bottom: 0;
 }
 </style>

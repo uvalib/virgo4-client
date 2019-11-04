@@ -72,6 +72,7 @@ i.more-icon {
 }
 .details {
    padding: 10px;
+   background-color: white;
 }
 #app .details span.pure-button.pure-button-primary.all {
    margin: 10px 0 0 0;

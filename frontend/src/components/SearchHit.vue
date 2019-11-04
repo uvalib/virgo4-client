@@ -91,7 +91,6 @@ div.basic {
 }
 .hit {
    width: 100%;
-   border-radius: 5px;
    padding: 10px;
    box-sizing: border-box;
    text-align: left;
