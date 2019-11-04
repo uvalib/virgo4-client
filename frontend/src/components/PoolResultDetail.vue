@@ -54,8 +54,13 @@ export default {
    },
    watch: {
       selectedResultsIdx () {
-         console.log("RESET!")
-         this.$refs.infiniteLoader.stateChanger.reset()
+         if ( this.$refs.infiniteLoader ) {
+            this.$refs.infiniteLoader.stateChanger.reset()
+         }
+         if (this.selectedResults.statusCode == 408 && this.selectedResults.total == 0) {
+            alert("GET")
+            this.$store.dispatch("searchSelectedPool")
+         }
       }
    },
    methods: {

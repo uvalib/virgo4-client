@@ -82,7 +82,7 @@ export default {
 }
 .expanded {
    overflow: hidden;
-   transition: 500ms ease-out;
+   transition: 250ms ease-out;
 }
 .summary {
    padding-bottom: 5px;

@@ -176,7 +176,7 @@ export default new Vuex.Store({
 
         // track best result (or preferred pool)
         let confidenceIdx = confidence.indexOf(pr.confidence)
-        if (tgtPoolURL == pool.url) {
+        if (tgtPoolURL == pool.url && result.total > 0) {
           confidenceIdx = 100
         }
         if (confidenceIdx > best.confidence ) {
