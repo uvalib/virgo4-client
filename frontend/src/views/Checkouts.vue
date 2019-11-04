@@ -8,17 +8,30 @@
          </div>
          <div v-else class="details">
             <AccountActivities/>
-            <table v-if="checkouts.length > 0">
-               <tr><th>Title</th><th>Author</th><th>Due</th><th>Fine</th><th>Library</th><th>Call Number</th></tr>
-               <tr v-for="(checkout,idx) in checkouts" :key="checkout.id" v-bind:class="{shade: idx%2}" >
-                  <td>{{checkout.title}}</td>
-                  <td>{{checkout.author}}</td>
-                  <td class="nowrap" v-html="formatDueInfo(checkout)"></td>
-                  <td class="nowrap">${{checkout.overdueFee}}</td>
-                  <td class="nowrap">{{checkout.library}}</td>
-                  <td>{{checkout.callNumber}}</td>
-               </tr>
-            </table>
+            <template v-if="checkouts.length > 0">
+               <div class="item" v-for="co in sortedCheckouts" :key="co.id">
+                  <div class="item-title">
+                     <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
+                     {{co.title}}
+                  </div>
+                  <div>{{co.author}}</div>
+                  <div>{{co.callNumber}}</div>
+                  <table>
+                     <tr>
+                        <td class="label">Library:</td> 
+                        <td>{{co.library}}</td>
+                     </tr>
+                     <tr>
+                        <td class="label">Due Date:</td> 
+                        <td v-html="formatDueInfo(co)"></td>
+                     </tr>
+                     <tr v-if="parseFloat(co.overdueFee)>0">
+                        <td class="label fine">Fine:</td> 
+                        <td class="fine-value">${{co.overdueFee}}</td>
+                     </tr>
+                  </table>  
+               </div>
+            </template>
             <div v-else class="none">
                You currently have no items checked out
             </div>
@@ -29,6 +42,7 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "checkouts",
@@ -40,6 +54,9 @@ export default {
          checkouts: state => state.user.checkouts,
          lookingUp: state => state.user.lookingUp,
       }),
+      ...mapGetters({
+        sortedCheckouts: 'user/sortedCheckouts',
+      })
    },
    methods: {
       formatDueInfo(checkout) {
@@ -51,6 +68,9 @@ export default {
              out += `<div class='recall'>Recalled ${checkout.recallDate}</div>`
          }
          return out
+      },
+      itemOnNotice(co) {
+         return co.overdue || co.recallDate != ""
       }
    },
    created() {
@@ -107,30 +127,37 @@ export default {
 .details {
    text-align: left;
 }
-.user-name {
-   font-size: 1.1em;
+.item {
+   font-size: 0.9em;
+   color: #444;
+   border-bottom: 1px solid #ccc;
+   margin-bottom: 15px;
+   padding-bottom: 10px;
+}
+.item-title {
    font-weight: bold;
 }
-table {
-   width:100%;
+td.label {
+   font-weight: bold;
+   text-align: right;
+   vertical-align: text-top;
 }
-table tr th, td.nowrap {
-   white-space: nowrap;
+td.label.fine {
+   color: firebrick;
 }
-table tr th {
-   background-color: #e5e5e5;
-   padding: 4px 8px;
-   color: #444;
-   border-top: 1px solid #ccc;
-   border-bottom: 1px solid #ccc;
+td.fine-value {
+   background: firebrick;
+   color: white;
+   border-radius: 5px;
+   font-weight: bold;
 }
-table td {
-   padding: 2px 8px;
-   border-bottom: 1px solid #ccc;
+td {
+   padding: 2px 5px;
 }
-tr.shade td {
-   background-color: #fafafa;
+i.notice {
+   color: var(--color-brand-orange);
+   margin-right: 5px;
+   font-size: 1.25em;
 }
-
 </style>
 

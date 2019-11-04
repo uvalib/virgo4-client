@@ -38,7 +38,7 @@
                   </div>
                </transition>
             </span>
-            <router-link v-if="itemsOnNotice.length > 0" to="/checkouts?notices=1">
+            <router-link v-if="itemsOnNotice.length > 0" to="/checkouts">
                <span  class="menu-item notice">
                   <i class="notice fas fa-exclamation-triangle"></i>{{itemsOnNotice.length}}
                </span>
@@ -191,7 +191,7 @@ export default {
    margin-left: auto;
 }
 i.notice {
-   color: var(--color-light-orange);
+   color: var(--color-brand-orange);
    margin-right: 5px;
 }
 </style>

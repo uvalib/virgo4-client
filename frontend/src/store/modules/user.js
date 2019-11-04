@@ -39,6 +39,19 @@ const user = {
 
          return true
       },
+      sortedCheckouts: state => {
+         return state.checkouts.sort( (a,b) => {
+            let d1 = a.due.split("T")[0] 
+            let d2 = b.due.split("T")[0] 
+            if (d1 < d2) return -1 
+            if (d1 > d2) return 1 
+            if (parseFloat(a.overdueFee) < parseFloat(b.overdueFee)) return 1 
+            if (parseFloat(a.overdueFee) > parseFloat(b.overdueFee)) return -1 
+            if (a.overdue == false && b.overdue == true) return 1
+            if (a.overdue == true && b.overdue == false) return -1
+            return 0
+         })
+      },
       itemsOnNotice: state => {
          return state.checkouts.filter( co=> co.overdue || co.recallDate != "")
       },
