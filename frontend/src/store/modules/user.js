@@ -42,6 +42,17 @@ const user = {
       itemsOnNotice: state => {
          return state.checkouts.filter( co=> co.overdue || co.recallDate != "")
       },
+      itemsWithFines: state => {
+         return state.checkouts.filter( co=> parseFloat(co.overdueFee) > 0 )
+      },
+      totalFines: state => {
+         let total = 0.00
+         state.checkouts.forEach( co=> {
+            let f = parseFloat(co.overdueFee)
+            total += f
+         })
+         return total.toFixed(2)
+      },
       hasAuthToken: state => {
         return state.authToken.length > 0
       },

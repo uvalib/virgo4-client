@@ -33,7 +33,7 @@ export default {
    margin-top: 0;
    border-bottom: 2px solid var(--color-brand-blue);
 }
-.activities .action {
+.activities {
    display: flex;
    flex-flow: row wrap;
    justify-content: center;

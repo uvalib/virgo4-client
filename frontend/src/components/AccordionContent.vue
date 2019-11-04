@@ -2,7 +2,7 @@
    <div class="accordion">
       <div class="title" @click="accordionClicked" :class="align"
          :style="{ background: background, color: color }">
-         <span class="text">{{title}}</span>
+         <span class="text" v-html="title"></span>
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
       </div>
        <transition name="accordion"
@@ -103,6 +103,7 @@ export default {
    background: white;
    margin:0;
    padding:0;
+   text-align: left;
 }
 div.title.right {
    text-align: right;
@@ -141,5 +142,6 @@ div.title  .accordion-icon {
    cursor: pointer;
    transform: rotate(0deg);
    transition-duration: 250ms;
+   margin-left:10px;
 }
 </style>

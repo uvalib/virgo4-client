@@ -14,38 +14,63 @@
             <div>{{info.email}}</div>
             <div class="status-info">
                <div><b>Standing:</b> {{info.standing}}</div>
-               <div v-if="isBillOwed" class="outstanding-bill">
-                  <b>AMOUNT OWED:</b>
-                  <span>${{info.amountOwed}}</span>
-                  <i v-if="!expandBilling" @click="getBillDetail" class="bills fas fa-file-invoice-dollar"></i>
-               </div>
-            </div>
-            <div v-if="expandBilling" class="bills">
-               <div class="detail-head">
-                  <span>Billing Details</span>
-                  <i @click="closeBillDetail" class="close fas fa-times-circle"></i>
-               </div>
-               <div class="working" v-if="lookingUp">
-                  <div>Looking up billing details...</div>
-               </div>
-               <div class="bill" v-for="(bill,idx) in bills" :key="idx">
-                  <table>
-                     <tr>
-                        <td class="label">Date:</td> 
-                        <td>{{bill.date}}</td>
-                     </tr>
-                     <tr>
-                        <td class="label">Amount:</td> 
-                        <td>${{bill.amount}}</td>
-                     </tr>
-                     <tr>
-                        <td class="label">Reason:</td> 
-                        <td>{{bill.reason}}</td>
-                     </tr>
-                     <tr><td class="label">Item:</td><td>{{bill.item.title}}</td></tr>
-                     <tr><td/><td>{{bill.item.author}}</td></tr>
-                     <tr><td/><td>{{bill.item.callNumber}}</td></tr>
-                  </table>  
+               
+               <div v-if="isBillOwed || totalFines>0" class="outstanding-bill">
+                  <div class="fines-head">Fines / Bills</div>
+                  <div class="fines-content">
+                     <div class="notes">
+                        <p>Your account will be billed for items that are lost or damaged.</p>
+                        <p>Fines are added to your account for overdue items.</p>
+                        <p>Placeholder text for information about paying fines/bills.</p>
+                     </div>
+                     <div v-if="isBillOwed">
+                        <AccordionContent :title="billsLabel" align="left-narrow">
+                           <div class="bills">  
+                              <div class="bill" v-for="(bill,idx) in bills" :key="idx">
+                                 <table>
+                                    <tr>
+                                       <td class="label">Date:</td> 
+                                       <td>{{bill.date}}</td>
+                                    </tr>
+                                    <tr>
+                                       <td class="label">Amount:</td> 
+                                       <td>${{bill.amount}}</td>
+                                    </tr>
+                                    <tr>
+                                       <td class="label">Reason:</td> 
+                                       <td>{{bill.reason}}</td>
+                                    </tr>
+                                    <tr><td class="label">Item:</td><td>{{bill.item.title}}</td></tr>
+                                    <tr><td/><td>{{bill.item.author}}</td></tr>
+                                    <tr><td/><td>{{bill.item.callNumber}}</td></tr>
+                                 </table>  
+                              </div>
+                           </div>
+                        </AccordionContent>
+                     </div>
+
+                     <div v-if="totalFines>0">
+                        <AccordionContent :title="finesLabel" align="left-narrow">
+                           <div class="fines">
+                              <div class="fine" v-for="(fine,idx) in itemsWithFines" :key="idx">
+                                 <table>
+                                    <tr>
+                                       <td class="label">Due Date:</td> 
+                                       <td>{{fine.due.split("T")[0]}}</td>
+                                    </tr>
+                                    <tr>
+                                       <td class="label">Amount:</td> 
+                                       <td>${{fine.overdueFee}}</td>
+                                    </tr>
+                                    <tr><td class="label">Item:</td><td>{{fine.title}}</td></tr>
+                                    <tr><td/><td>{{fine.author}}</td></tr>
+                                    <tr><td/><td>{{fine.callNumber}}</td></tr>
+                                 </table>  
+                              </div>
+                           </div>
+                        </AccordionContent>
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
@@ -57,6 +82,7 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
+import AccordionContent from '@/components/AccordionContent'
 export default {
    name: "account",
    data: function() {
@@ -65,7 +91,7 @@ export default {
       };
    },
    components: {
-      AccountActivities
+      AccountActivities, AccordionContent
    },
    computed: {
       ...mapState({
@@ -75,24 +101,27 @@ export default {
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
+        totalFines:  'user/totalFines',
+        itemsWithFines: 'user/itemsWithFines'
       }),
       isBillOwed() {
          let amtStr = this.info['amountOwed']
          return parseFloat(amtStr) > 0
       },
+      finesLabel() {
+         return  `<label style='font-weight:bold;margin-right:5px'>Total Fines:</label><span>$${this.totalFines}</span>`
+      },
+      billsLabel() {
+         let bill = this.info.amountOwed
+         return  `<label style='font-weight:bold;margin-right:5px'>Total Bills:</label><span>$${bill}</span>`
+      }
    },
    methods: {
-      getBillDetail() {
-         this.expandBilling = true
-         this.$store.dispatch("user/getBillDetails") 
-      },
-      closeBillDetail() {
-         this.expandBilling = false
-      }
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
       this.$store.dispatch("user/getCheckouts")
+      this.$store.dispatch("user/getBillDetails") 
    }
 }
 </script>
@@ -136,37 +165,25 @@ export default {
    margin: 15px 0;
 }
 .outstanding-bill {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
+   margin-top: 15px;
 }
-.outstanding-bill b {
+.fines-head {
+   font-weight: bold;
+}
+.fines-content {
+   margin: 5px 15px;
+}
+.fines-content label {
+   font-weight: bold;
    margin-right: 5px;
 }
-i.bills {
-   font-size: 1.25em;
-   cursor: pointer;
-   color: var(--color-light-blue);
-   margin-left: 10px;
-}
-div.bills {
+div.bills, div.fines {
    font-size: 0.8em;
-   margin-left: 25px;
+   margin: 5px 0 15px 25px;
+   display: inline-block;
+   border-top: 1px solid #ccc;
 }
-.detail-head {
-   padding: 5px;
-   background: var(--color-lightest-blue);
-   font-weight: bold;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-}
-i.close {
-   margin-left: auto;
-   font-size: 1.5em;
-   color: white;
-}
-div.bill {
+div.bill, div.fine {
    border: 1px solid #ccc;
    margin: 0;
    padding: 5px;
@@ -178,6 +195,13 @@ table td {
 td.label {
    text-align: right;
    font-weight: bold;
+}
+div.notes {
+   font-size: 0.8em;
+   padding: 0 0 10px 0;
+}
+div.notes p {
+   margin: 2px 0;
 }
 </style>
 
