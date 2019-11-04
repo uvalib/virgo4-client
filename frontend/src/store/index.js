@@ -22,15 +22,11 @@ export default new Vuex.Store({
     results: [],
     total: -1,
     selectedResultsIdx: -1,
-    groupDetails: {header:{}, items: [], pool: ""}
   },
 
   getters: {
     hasResults: state => {
       return state.total >= 0
-    },
-    isGroupSelected: state => {
-      return state.groupDetails.items.length > 0
     },
     selectedResults: state => {
       if (state.selectedResultsIdx === -1 ) {
@@ -101,20 +97,9 @@ export default new Vuex.Store({
       state.total -= oldPoolTotal
     },
 
-    selectGroupDetails(state, {pool,hitIdx} ) {
-      let done = false
-      state.results.some( r=>{
-        if (r.pool.id == pool) {
-          state.groupDetails.items = r.hits[hitIdx].group
-          state.groupDetails.header = r.hits[hitIdx].header
-          state.groupDetails.pool = pool
-          done = true
-        }
-        return done == true
-      })
-    },
-    deselectGroupDetails(state) {
-      state.groupDetails =  {header:{}, items: [], pool: ""}
+    toggleGroupExpanded(state, hitIdx) {
+      let group = state.results[state.selectedResultsIdx].hits[hitIdx]
+      group.expanded = !group.expanded
     },
 
     addPoolSearchResults(state, poolResults) {
@@ -181,7 +166,7 @@ export default new Vuex.Store({
             hit.grouped = false
             result.hits.push(hit)
           } else {
-            let hit = {grouped: true, count: group.count, group: group.record_list}
+            let hit = {grouped: true, expanded: false, count: group.count, group: group.record_list}
             utils.getGroupHitMetadata(group, hit)
             result.hits.push(hit)
           }

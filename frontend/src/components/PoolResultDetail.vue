@@ -47,7 +47,6 @@ export default {
          selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
          poolFilter: 'filters/poolFilter',
-         isGroupSelected: 'isGroupSelected'
       }),
       filterLength() {
          return this.poolFilter(this.selectedResultsIdx, 'raw').length
