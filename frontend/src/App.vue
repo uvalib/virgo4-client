@@ -255,5 +255,6 @@ html, body {
   color: var(--color-error);
   opacity: 1;
   visibility: visible;
+  text-align: center;
 }
 </style>

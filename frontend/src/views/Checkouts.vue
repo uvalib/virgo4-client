@@ -2,12 +2,12 @@
    <main class="checkout">
       <h1>My Account</h1>
       <div class="checkout-content">
+         <AccountActivities/>
          <div class="working" v-if="lookingUp" >
             <div>Looking up checked-out item details...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else class="details">
-            <AccountActivities/>
             <template v-if="checkouts.length > 0">
                <div class="item" v-for="co in sortedCheckouts" :key="co.id">
                   <div class="item-title">
@@ -35,6 +35,11 @@
             <div v-else class="none">
                You currently have no items checked out
             </div>
+            <transition name="message-transition"
+                        enter-active-class="animated faster fadeIn"
+                        leave-active-class="animated faster fadeOut">
+               <p v-if="error" class="error">Unable to retrieve bookmarks: {{ error }}</p>
+            </transition>
          </div>
       </div>
    </main>
@@ -53,6 +58,7 @@ export default {
       ...mapState({
          checkouts: state => state.user.checkouts,
          lookingUp: state => state.user.lookingUp,
+         error: state => state.system.error,
       }),
       ...mapGetters({
         sortedCheckouts: 'user/sortedCheckouts',

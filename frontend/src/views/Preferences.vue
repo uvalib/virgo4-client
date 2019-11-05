@@ -2,12 +2,12 @@
    <main class="preferences">
       <h1>My Account</h1>
       <div class="preferences-content">
+         <AccountActivities/>
          <div class="working" v-if="lookingUpPools || lookingUpAccount" >
             <div>Loading preferences...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else>
-            <AccountActivities/>
             <p>
                Select which sources you want to include in your search results,
                and which source you prefer to see results from most.
@@ -35,6 +35,11 @@
                   </div>
                </div>   
             </div>
+            <transition name="message-transition"
+                        enter-active-class="animated faster fadeIn"
+                        leave-active-class="animated faster fadeOut">
+               <p v-if="error" class="error">Unable to retrieve bookmarks: {{ error }}</p>
+            </transition>
          </div>
       </div>
    </main>
@@ -53,7 +58,8 @@ export default {
       ...mapState({
          lookingUpPools : state => state.pools.lookingUp,
          lookingUpAccount : state => state.user.lookingUp,
-         searchAPI: state => state.system.searchAPI
+         searchAPI: state => state.system.searchAPI,
+         error: state => state.system.error,
       }),
       ...mapGetters({
          isPoolExcluded: "preferences/isPoolExcluded",

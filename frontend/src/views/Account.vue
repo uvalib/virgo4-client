@@ -2,12 +2,12 @@
    <main class="account">
       <h1>My Account</h1>
       <div class="account-content">
-         <div class="working" v-if="!expandBilling && (lookingUp || !hasAccountInfo)" >
+         <AccountActivities/>
+         <div class="working" v-if="!expandBilling && lookingUp" >
             <div>Looking up account details...</div>
             <img src="../assets/spinner2.gif">
          </div>
-         <div v-else class="details">
-            <AccountActivities/>
+         <template v-else-if="hasAccountInfo">
             <div class="user-name">{{info.displayName}} ({{info.id}})</div>   
             <div>{{info.department}} - {{info.profile}}</div>
             <div>{{info.address}}</div>
@@ -118,7 +118,12 @@
                   </div>
                </div>
             </div>
-         </div>
+         </template>
+         <transition name="message-transition"
+                     enter-active-class="animated faster fadeIn"
+                     leave-active-class="animated faster fadeOut">
+            <p v-if="error" class="error">Unable to retrieve account information: {{ error }}</p>
+         </transition>
       </div>
    </main>
 </template>
@@ -143,6 +148,7 @@ export default {
          info: state => state.user.accountInfo,
          lookingUp: state => state.user.lookingUp,
          bills: state => state.user.bills,
+         error: state => state.system.error,
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
@@ -194,8 +200,6 @@ export default {
 .account-content {
    width: 60%;
    margin: 0 auto;
-}
-.details {
    text-align: left;
 }
 .user-name {
@@ -281,6 +285,9 @@ div.notes p {
    .standing-info {
       width: 90%;
    }
+}
+.error {
+   text-align: center;
 }
 </style>
 

@@ -26,12 +26,18 @@ const preferences = {
       setPreferences(state, prefsStr) {
          state.targetPoolURL = ""
          state.excludePoolURLs = []
-         let json = JSON.parse(prefsStr)
-         if (json.targetPoolURL ) {
-            state.targetPoolURL = json.targetPoolURL
-         }
-         if (json.excludePoolURLs ) {
-            state.excludePoolURLs = json.excludePoolURLs
+         let json = ""
+         try {
+            json = JSON.parse(prefsStr)
+            if (json.targetPoolURL ) {
+               state.targetPoolURL = json.targetPoolURL
+            }
+            if (json.excludePoolURLs ) {
+               state.excludePoolURLs = json.excludePoolURLs
+            }
+         } catch(e) {
+            // NOOP; just leave preferences unset
+            console.error("PREFERENCES INVALID: [ "+prefsStr+" ]")
          }
       },
       clear(state) {

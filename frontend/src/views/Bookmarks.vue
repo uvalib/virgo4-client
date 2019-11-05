@@ -2,15 +2,15 @@
    <main class="bookmarks">
       <h1>My Account</h1>
       <div class="bookmarks-content">
+         <AccountActivities/>
          <div class="working" v-if="lookingUp" >
             <div>Looking up account details...</div>
             <img src="../assets/spinner2.gif">
          </div>
          <div v-else>
-            <AccountActivities/>
-            <p v-if="hasBookmarks == false">
+            <div class="none" v-if="hasBookmarks == false">
                You have no bookmarked items.
-            </p>
+            </div>
             <template v-else>
                <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
                   <ConfirmDelete
@@ -49,6 +49,11 @@
                   </AccordionContent>
                </div>
             </template>
+            <transition name="message-transition"
+                        enter-active-class="animated faster fadeIn"
+                        leave-active-class="animated faster fadeOut">
+               <p v-if="error" class="error">Unable to retrieve bookmarks: {{ error }}</p>
+            </transition>
          </div>
       </div>
    </main>
@@ -68,6 +73,7 @@ export default {
    computed: {
       ...mapState({
          lookingUp: state=>state.user.lookingUp,
+         error: state => state.system.error,
       }),
       ...mapGetters({
          hasBookmarks: 'user/hasBookmarks',
@@ -182,6 +188,11 @@ div.none {
 i.details {
    font-size: 1.25em;
    color: var(--color-light-blue)
+}
+.none {
+   text-align: center;
+   font-size: 1.25em;
+   margin-top: 35px;
 }
 </style>
 
