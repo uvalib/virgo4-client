@@ -19,13 +19,22 @@
                   <div class="fines-head">Fines / Bills</div>
                   <div class="fines-content">
                      <div class="notes">
-                        <p>Your account will be billed for items that are lost or damaged.</p>
-                        <p>Fines are added to your account for overdue items.</p>
-                        <p>Placeholder text for information about paying fines/bills.</p>
+                        Your account currently has an outstanding balance.
+                        Click the totals below to see more details.
                      </div>
                      <div v-if="isBillOwed">
                         <AccordionContent :title="billsLabel" align="left-narrow">
                            <div class="bills">  
+                              <div class="info">
+                                 You have been billed replacement bills for the below items. 
+                                 If you have the items, please return them and we will remove the 
+                                 replacement bills. If you pay for an item and find it within 90 days, 
+                                 you may be refunded the replacement amount. Rather than pay replacement 
+                                 bills, you may replace a lost book with one you supply the library, 
+                                 but it must be the same edition or newer and in very good condition. 
+                                 We will accept a paperback replacement copy for a hardback. 
+                                 The library reserves the right to refuse a replacement copy.
+                              </div>
                               <div class="bill" v-for="(bill,idx) in bills" :key="idx">
                                  <table>
                                     <tr>
@@ -52,6 +61,10 @@
                      <div v-if="totalFines>0">
                         <AccordionContent :title="finesLabel" align="left-narrow">
                            <div class="fines">
+                              <div class="info">
+                                 This is what you currently owe in overdue fines. 
+                                 Fines will continuing accruing until the item is returned.
+                              </div>
                               <div class="fine" v-for="(fine,idx) in itemsWithFines" :key="idx">
                                  <table>
                                     <tr>
@@ -69,6 +82,26 @@
                               </div>
                            </div>
                         </AccordionContent>
+                     </div>
+
+                     <div class="payment">
+                        <div><b>Payment Information</b></div>
+                        <div v-if="useSIS">
+                           All fines must be paid using SIS. Access the system
+                           <a target="_blank" href="https://sisuva.admin.virginia.edu/ihprd/signon.html">
+                           here</a>.
+                        </div>
+                        <div v-else> 
+                           <div>
+                              All fines must be at the Alderman Library using exact cash or personal check. 
+                              We do not take credit cards or any online payments at this time.
+                           </div>
+                           <div class="addr">
+                              <strong>Alderman Library</strong><br/>
+                              160 McCormick Road<br/>
+                              Charlottesville, VA 22904<br/>
+                           </div>
+                        </div>
                      </div>
                   </div>
                </div>
@@ -102,8 +135,14 @@ export default {
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
         totalFines:  'user/totalFines',
-        itemsWithFines: 'user/itemsWithFines'
+        itemsWithFines: 'user/itemsWithFines',
+        isUndergraduate: 'user/isUndergraduate',
+        isGraduate: 'user/isGraduate',
+        isAlumni: 'user/isAlumni',
       }),
+      useSIS() {
+         return (this.isUndergraduate || this.isGraduate || this.isAlumni)
+      },
       isBillOwed() {
          let amtStr = this.info['amountOwed']
          return parseFloat(amtStr) > 0
@@ -181,13 +220,11 @@ div.bills, div.fines {
    font-size: 0.8em;
    margin: 5px 0 15px 25px;
    display: inline-block;
-   border-top: 1px solid #ccc;
 }
 div.bill, div.fine {
    border: 1px solid #ccc;
    margin: 0;
    padding: 5px;
-   border-top: 0;
 }
 table td {
    padding: 0 5px;
@@ -202,6 +239,21 @@ div.notes {
 }
 div.notes p {
    margin: 2px 0;
+}
+.info {
+   padding: 5px;
+   margin-bottom: 10px;
+}
+.payment {
+   margin-top: 15px;
+}
+.payment b {
+   display: inline-block;
+   margin-bottom: 10px;
+}
+.addr {
+   font-size: 0.85em;
+   padding: 5px 15px;
 }
 </style>
 

@@ -19,18 +19,43 @@ const user = {
    },
 
    getters: {
-      canMakeReserves: (state, getters) => {
-         if (getters.isSignedIn == false ) return false
+      isUndergraduate: (state,getters) => {
          if (getters.hasAccountInfo == false ) return false
-
-         // can reserve if !undergraduate? && !virginia_borrower?
-         // va borrower: profile.match?(/Virginia Borrower|Other VA Faculty|Alumn/i)
+         // NOTE: profile comes from Sirsi, desc comes from LDAP
          let profile = state.accountInfo.profile.toLowerCase().trim()
          let desc = state.accountInfo.description.toLowerCase().trim()
          if (desc.indexOf("undergraduate") == 0) {
-            return false
+            return true
          }
          if (profile.indexOf("ugrad") == 0 || profile.indexOf("undergrad") == 0) {
+            return true
+         }
+         return false
+      },
+      isGraduate: (state,getters) => {
+         if (getters.hasAccountInfo == false ) return false
+         let profile = state.accountInfo.profile.toLowerCase().trim()
+         let desc = state.accountInfo.description.toLowerCase().trim()
+         if (desc.indexOf("graduate student") == 0) {
+            return true
+         }
+         if (profile.indexOf("grad") == 0 ){
+            return true
+         }
+         return false
+      },
+      isAlumni: (state,getters) => {
+         if (getters.hasAccountInfo == false ) return false
+         let profile = state.accountInfo.profile.toLowerCase().trim()
+         if (profile.match(/Alumn/i)) {
+            return true
+         }
+         return false
+      },
+      canMakeReserves: (state, getters) => {
+         if (getters.hasAccountInfo == false ) return false
+         let profile = state.accountInfo.profile.toLowerCase().trim()
+         if (getters.isGraduate || getters.isUndergraduate) {
             return false
          }
          if (profile.match(/Virginia Borrower|Other VA Faculty|Alumn/i)) {
