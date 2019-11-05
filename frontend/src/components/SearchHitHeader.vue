@@ -69,7 +69,6 @@ div.bm-control {
 }
 
 .title {
-   font-size: 1.2em;
    font-weight: bold;
    display: inline-block;
 }
@@ -77,11 +76,9 @@ div.bm-control {
    display: inline-block;
    font-weight: normal;
 }
-
 .full-title {
    font-size: 1.25em;
 }
-
 .author {
    font-size: 0.9em;
    font-weight: normal;

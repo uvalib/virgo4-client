@@ -70,21 +70,34 @@ div.details {
 }
 .top {
    display:flex;
-   flex-flow: row nowrap;
+   flex-flow: row wrap;
    align-items: flex-start;
+}
+@media only screen and (min-width: 600px) {
+   a.img-link {
+      margin-left: auto;
+   }
+}
+@media only screen and (max-width: 600px) {
+   .top {
+      justify-content: center
+   }
+   a.img-link {
+      margin-left: initial;
+   }
 }
 .author {
    margin-bottom: 10px;
+}
+a.img-link {
+   display: inline-block;
 }
 .cover-img {
    border-radius: 3px;
    margin: 5px;
    max-height: 140px;
    max-width: 140px;
-}
-a.img-link {
-   flex: 0 0 auto;
-   margin-left: auto;
+   display: inline-block;
 }
 div.basic {
    padding: 5px 10px 10px 10px;
