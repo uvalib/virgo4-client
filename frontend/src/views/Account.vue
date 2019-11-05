@@ -14,9 +14,21 @@
             <div>{{info.email}}</div>
             <div class="status-info">
                <div><b>Standing:</b> {{info.standing}}</div>
+               <div class="standing-info" v-if="info.standing=='BARRED'">
+                  Your account is suspended until all bills are paid and/or the overdue items are returned. 
+                  If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
+               </div>
+               <div class="standing-info" v-if="info.standing=='BAD-ADDRESS'">
+                  Please contact the library to update your email and/or mailing address information: 
+                  <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
+               </div>
+               <div class="standing-info" v-if="info.standing=='BARR-SUPERVISOR'">
+                  Please contact the library about your account: 
+                  <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
+               </div>
                
                <div v-if="isBillOwed || totalFines>0" class="outstanding-bill">
-                  <div class="fines-head">Fines / Bills</div>
+                  <div class="fines-head">Billing</div>
                   <div class="fines-content">
                      <div class="notes">
                         Your account currently has an outstanding balance.
@@ -87,13 +99,13 @@
                      <div class="payment">
                         <div><b>Payment Information</b></div>
                         <div v-if="useSIS">
-                           All fines must be paid using SIS. Access the system
+                           All bills must be paid using SIS. Access the system
                            <a target="_blank" href="https://sisuva.admin.virginia.edu/ihprd/signon.html">
                            here</a>.
                         </div>
                         <div v-else> 
                            <div>
-                              All fines must be at the Alderman Library using exact cash or personal check. 
+                              All fines must be paid at the Alderman Library using exact cash or personal check. 
                               We do not take credit cards or any online payments at this time.
                            </div>
                            <div class="addr">
@@ -183,16 +195,6 @@ export default {
    width: 60%;
    margin: 0 auto;
 }
-@media only screen and (min-width: 768px) {
-   div.account-content  {
-       width: 60%;
-   }
-}
-@media only screen and (max-width: 768px) {
-   div.account-content  {
-       width: 95%;
-   }
-}
 .details {
    text-align: left;
 }
@@ -208,6 +210,8 @@ export default {
 }
 .fines-head {
    font-weight: bold;
+   border-bottom: 2px solid var(--brand-blue);
+   margin-bottom: 5px;
 }
 .fines-content {
    margin: 5px 15px;
@@ -254,6 +258,29 @@ div.notes p {
 .addr {
    font-size: 0.85em;
    padding: 5px 15px;
+   margin-top: 10px;
+}
+.standing-info {
+   width: 40%;
+   font-size: 0.9em;
+   padding: 10px;
+   text-align: center;
+   border: 2px solid firebrick;
+   margin: 5px;
+   border-radius: 5px;
+}
+@media only screen and (min-width: 768px) {
+   div.account-content  {
+       width: 60%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.account-content  {
+       width: 95%;
+   }
+   .standing-info {
+      width: 90%;
+   }
 }
 </style>
 
