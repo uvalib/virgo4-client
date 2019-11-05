@@ -65,14 +65,16 @@ const filters = {
          if ( state.globalAvailability != "any" ) return true
          if (idx < 0) return false
          let defaultFacets = state.poolDefaultFacets[idx]
+         let hasDefaults = false
          if ( defaultFacets ) {
-           return defaultFacets.length > 0
+            hasDefaults =  defaultFacets.length > 0
          }
+         let hasFilter = false
          let filters = state.poolFilters[idx]
          if (filters) {
-            return filters.length > 0
+            hasFilter =  filters.length > 0
          }
-         return false
+         return (hasFilter || hasDefaults)
       },
 
       // By default the data stored for the filter is heirarchical; one facet 
