@@ -91,11 +91,9 @@ div.basic {
 }
 .hit {
    width: 100%;
-   border-radius: 5px;
    padding: 10px;
    box-sizing: border-box;
    text-align: left;
-   font-size: 0.8em;
    background-color: white;
 }
  #app td.value >>> a.pure-button.pure-button-primary.ext {

@@ -8,16 +8,6 @@
       <transition name="fade">
         <AddBookmarkModal v-if="addingBookmark"/>
       </transition>
-      <transition name="more-transition"
-            enter-active-class="animated faster slideInRight"
-            leave-active-class="animated faster slideOutRight">
-        <MoreResultsModal v-if="resultsSelected"/>
-      </transition>
-      <transition name="more-transition"
-            enter-active-class="animated faster slideInRight"
-            leave-active-class="animated faster slideOutRight">
-        <GroupedResultsModal v-if="isGroupSelected"/>
-      </transition>
       <VirgoHeader/>
       <MenuBar/>
       <router-view/>
@@ -31,8 +21,6 @@ import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
 import AuthorizePanel from "@/components/layout/AuthorizePanel"
-import MoreResultsModal from "@/components/MoreResultsModal"
-import GroupedResultsModal from "@/components/GroupedResultsModal"
 import AddBookmarkModal from "@/components/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -42,29 +30,21 @@ export default {
       LibraryFooter,
       FatalError,
       AuthorizePanel,
-      MoreResultsModal,
-      GroupedResultsModal,
       AddBookmarkModal,
       MenuBar
    },
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
-         selectedResultsIdx: state => state.selectedResultsIdx,
          authorizing: state => state.user.authorizing,
          addingBookmark: state => state.user.addingBookmark,
-         results: state=>state.results,
       }),
       ...mapGetters({
          addingBookmark: 'user/addingBookmark',
-         isGroupSelected: 'isGroupSelected',
          hasTranslateMessage: 'system/hasTranslateMessage'
       }),
-      resultsSelected() {
-        return this.selectedResultsIdx > -1 //&& this.results.length > 1
-      },
       showDimmer() {
-        return (this.resultsSelected || this.addingBookmark || this.isGroupSelected )
+        return this.addingBookmark
       }
    },
    methods: {

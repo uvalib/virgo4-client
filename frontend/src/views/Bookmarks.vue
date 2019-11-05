@@ -134,12 +134,12 @@ div.accordion {
    margin: 30px 0;
 }
 .bookmarks-content {
-   width: 80%;
+   width: 60%;
    margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    div.bookmarks-content  {
-       width: 80%;
+       width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {

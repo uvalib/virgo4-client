@@ -234,7 +234,6 @@ p.fatal, p.error {
 }
 .select {
   display: inline-block;
-  font-size: 0.9em;
   padding: 0.5vw 5px;
   outline: none;
   border: 1px solid var(--color-brand-blue);
@@ -272,7 +271,7 @@ p.fatal, p.error {
   right: -1px;
   border: 1px solid var(--color-brand-blue);
   border-top: 1px solid var(--color-lightest-blue);
-  font-size: 0.8em;
+  font-size: 0.9em;
   overflow: hidden;
   transition: 200ms ease-out;
 }

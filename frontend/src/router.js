@@ -46,12 +46,6 @@ const router = new Router({
       path: '/sources/:src/items/:id',
       name: 'details',
       component: Details,
-      beforeEnter: (_to, _from, next) => {
-        ensureAuthTokenPresent(next)
-        store.commit("deselectGroupDetails")
-        store.commit("deselectPoolResults")
-        next()
-      }
     },
     {
       path: '/preferences',
@@ -116,7 +110,7 @@ router.beforeEach((to, _from, next) => {
   store.commit("system/closeUserMenu")
 
   // Some pages just require an auth token...
-  let tokenPages = ["home", "course-reserves"]
+  let tokenPages = ["home", "course-reserves", "details"]
   if (tokenPages.includes(to.name)) {
     ensureAuthTokenPresent(next)
     return

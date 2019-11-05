@@ -21,28 +21,12 @@ export default new Vuex.Store({
     pageSize: 25,
     results: [],
     total: -1,
-    visibleResults: [],
     selectedResultsIdx: -1,
-    groupDetails: {header:{}, items: [], pool: ""}
   },
 
   getters: {
     hasResults: state => {
       return state.total >= 0
-    },
-    isGroupSelected: state => {
-      return state.groupDetails.items.length > 0
-    },
-    visibleResults: state => {
-      let out = [] 
-      state.visibleResults.forEach(function (idx) {
-        out.push(state.results[idx])
-      })
-      return out
-    },
-    visibleResultIdx: state => (resultIdx) => {
-      // convert a result index to a VISIBLE result idx
-      return state.visibleResults.indexOf(resultIdx)
     },
     selectedResults: state => {
       if (state.selectedResultsIdx === -1 ) {
@@ -95,32 +79,13 @@ export default new Vuex.Store({
         state.searching = flag
       }
     },
-    selectPoolResults(state, visiblePoolIdx) {
-      // User has selected a visible set of results to explore further. Convert
-      // the visibleIndex into a results index and set it as seleceted
-      let idx = state.visibleResults[visiblePoolIdx]
-      state.selectedResultsIdx = idx
+
+    selectPoolResults(state, resultIdx) {
+      state.selectedResultsIdx = resultIdx
     },
     deselectPoolResults(state) {
       state.selectedResultsIdx = -1
     },
-    toggleResultVisibility(state, poolResultsIdx) {
-      // Don't change visibility if there are no results to see -- unless the pool timed out
-      if (state.results[poolResultsIdx].total == 0 && state.results[poolResultsIdx].statusCode != 408) {
-        return
-      }
-      // NOTES: the result itself is tagged with show true/false for ease of detecting
-      // which results are showing. A separate visibleResults array tracks the order 
-      // that pools were selected to be seen.
-      state.results[poolResultsIdx]["show"] = !state.results[poolResultsIdx]["show"]
-      let visibleIdx = state.visibleResults.indexOf(poolResultsIdx)
-      if (visibleIdx == -1) {
-        state.visibleResults.unshift(poolResultsIdx)
-      } else {
-        state.visibleResults.splice(visibleIdx,1)
-      }
-    },
-
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool
       // total from overall total and reset pool total to 0
@@ -132,20 +97,9 @@ export default new Vuex.Store({
       state.total -= oldPoolTotal
     },
 
-    selectGroupDetails(state, {pool,hitIdx} ) {
-      let done = false
-      state.results.some( r=>{
-        if (r.pool.id == pool) {
-          state.groupDetails.items = r.hits[hitIdx].group
-          state.groupDetails.header = r.hits[hitIdx].header
-          state.groupDetails.pool = pool
-          done = true
-        }
-        return done == true
-      })
-    },
-    deselectGroupDetails(state) {
-      state.groupDetails =  {header:{}, items: [], pool: ""}
+    toggleGroupExpanded(state, hitIdx) {
+      let group = state.results[state.selectedResultsIdx].hits[hitIdx]
+      group.expanded = !group.expanded
     },
 
     addPoolSearchResults(state, poolResults) {
@@ -177,24 +131,27 @@ export default new Vuex.Store({
       // // this is called from top level search; resets results from all pools
       state.total = -1
       state.results = []
-      state.visibleResults = []
       let tgtPoolURL  = state.preferences.targetPoolURL
+      let confidence = ["low", "medium", "high", "exact"]
+      let best = {confidence: -1, idx: 0}
+      let resultIdx = 0
 
-      // Push all results into the results structure. Reset paging for each
-      // NOTE: need to have resultIdx attached to because pools are interacted with
-      // in terms of the visibleResults array. Need easy way to get original resultsIdx.
-      results.pool_results.forEach( (pr,idx) => {
-        // Find the pool the results are associated with and populate some top level response info
-        let pool = utils.findPool(results.pools, pr.pool_id)
-        let result = { pool: pool, total: pr.pagination.total, page: 0, show: false, 
-          timeMS: pr.elapsed_ms, resultIdx: idx, hits: [], 
-          statusCode: pr.status_code, statusMessage: pr.status_msg}
+      results.pool_results.forEach( pr => {
+        // Skip pools that have no results
         if (!pr.group_list) {
           pr.group_list = []
         }
+        if (pr.group_list.length == 0 && pr.status_code == 200) {
+          return
+        }
 
-        // Next, drill into group_list data. It containg a count and a record_list
-        // record list is just another list of fields in the hit. field is {name,label,type,value,visibility,display}
+        // Find the pool the results are associated with and populate some top level response info
+        let pool = utils.findPool(results.pools, pr.pool_id)
+        let result = { pool: pool, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms, 
+          hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg}
+
+        // Next, drill into group_list data. It contains a count and a record_list
+        // record list is a list of fields in the hit. field is {name,label,type,value,visibility,display}
         pr.group_list.forEach( group => {
 
           // for each hit in the list, merge repeated fields into arrays, pull out
@@ -203,33 +160,34 @@ export default new Vuex.Store({
             utils.preProcessHitFields( group.record_list )
           }
 
+          // Different handling for grouped and single items
           if (group.count == 1) {
             let hit = group.record_list[0]
             hit.grouped = false
             result.hits.push(hit)
           } else {
-            let hit = {grouped: true, count: group.count, group: group.record_list}
+            let hit = {grouped: true, expanded: false, count: group.count, group: group.record_list}
             utils.getGroupHitMetadata(group, hit)
             result.hits.push(hit)
           }
         })
 
-        // all of the grouped and non-grouped hits have been added for this result set. Add it to the results
         state.results.push(result)
-        if (result.statusCode == 200 && (tgtPoolURL == pool.url || (pr.confidence != "low" && state.visibleResults.length < 3))) {
-          result["show"] = true
-          state.visibleResults.push(state.results.length-1)
+
+        // track best result (or preferred pool)
+        let confidenceIdx = confidence.indexOf(pr.confidence)
+        if (tgtPoolURL == pool.url && result.total > 0) {
+          confidenceIdx = 100
         }
+        if (confidenceIdx > best.confidence ) {
+          best.confidence = confidenceIdx
+          best.idx  = resultIdx
+        }
+
+        resultIdx++
       })
 
-      // If nothing was flagged as visible, just pick the first valid result
-      if (state.results.length > 0) {
-        if (state.visibleResults.length == 0 && state.results[0].statusCode == 200  && state.results[0].hits.length > 0) {
-          state.results[0]["show"] = true
-          state.visibleResults.push(0)
-        }
-      }
-
+      state.selectedResultsIdx = best.idx
       state.total = results.total_hits
     },
 
@@ -241,7 +199,6 @@ export default new Vuex.Store({
     resetSearchResults(state) {
       state.results = []
       state.total = -1
-      state.visibleResults = []
       state.selectedResultsIdx = -1
     },
   },
@@ -287,7 +244,6 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
-      // commit('resetSearchResults')
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
       axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       axios.post(url, req).then((response) => {
