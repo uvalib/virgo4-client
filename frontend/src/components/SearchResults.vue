@@ -17,17 +17,17 @@
          </div>
 
          <div class="pool-buttons">
-            <template  v-for="(r,idx) in results">
+            <p class="relevant">Most Relevant</p>
+            <template  v-for="(r,idx) in results.slice(0,2)">
                <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: idx == selectedResultsIdx}">
                   <span>
-                     <i v-if="isTargetPool(r.pool.url)" class="fas fa-star"></i>
                      <span>{{r.pool.name}}&nbsp;</span>
-                     <span v-if="poolFailed(r)" class="total">(failed)</span>
-                     <span v-else-if="wasPoolSkipped(r)" class="total">(not searched)</span>
-                     <span v-else class="total">({{r.total}})</span>
                   </span>
                </div>
             </template>
+            <V4Select v-if="results.length > 2" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
+               :background="otherSrcBkg" :color="otherSrcColor" placeholder="Other Sources"
+               v-model="selectedSource"/>
          </div>
       </div>
 
@@ -39,11 +39,13 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import { mapFields } from 'vuex-map-fields'
 import PoolResultDetail from "@/components/PoolResultDetail"
 import AvailabilitySelector from '@/components/AvailabilitySelector'
+import V4Select from "@/components/V4Select"
 export default {
    components: {
-      AvailabilitySelector,PoolResultDetail
+      AvailabilitySelector,PoolResultDetail,V4Select
    },
    computed: {
       ...mapGetters({
@@ -61,11 +63,49 @@ export default {
          results: state=>state.results,
          searchMode: state=>state.query.mode,
       }),
+      ...mapFields([
+        'selectedSource'
+      ]),
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
+      otherSrcBkg() {
+         if (this.selectedSource.id == "") return "#E6E6E6"
+         return "var(--color-brand-blue)"
+      },
+      otherSrcColor() {
+         if (this.selectedSource.id == "") return "#666"
+         return "white"
+      },
+      otherSources() {
+         let opts = []
+         this.results.slice(1).forEach( r=>{
+            let name = r.pool.name 
+            if (this.poolFailed(r)) {
+               name += " (failed)"
+            } else if (this.wasPoolSkipped(r)) {
+               name += " (skipped)"
+            } else if (r.total ==0) {
+               name += ` (no matches)`
+            }
+            opts.push({id: r.pool.id, name: name})
+         })
+         return opts
+      }
    },
-   
+   watch: {
+      selectedSource (newVal,oldVal) {
+         if (newVal == "") return 
+         let found = false
+         this.results.some( (r,idx) => {
+            if ( r.pool.id == newVal.id) {
+               this.$store.commit("selectPoolResults", idx)
+               found = true
+            }
+            return found
+         })
+      }
+   },
    methods: {
       poolFailed(p) {
          return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
@@ -79,12 +119,10 @@ export default {
       refineClicked() {
          this.$store.commit("query/setAdvancedSearch")
       },
-      selectPool(visiblePoolIdx) {
-         this.$store.commit("selectPoolResults", visiblePoolIdx)
-      },
       resultsButtonClicked(resultIdx) {
          let r = this.results[resultIdx]
          if ( this.poolFailed(r)) return
+         this.selectedSource = {id:"", name:""}
          this.$store.commit("selectPoolResults", resultIdx)
       },
    }
@@ -92,50 +130,45 @@ export default {
 </script>
 
 <style scoped>
+p.relevant {
+   margin:0;
+   padding: 0 0 0 5px;
+   font-size: 0.9em;
+}
 #app .pool-buttons div.pool.pure-button:first-child {
    margin-left: 0;
 }
 #app .pool-buttons div.pool.pure-button:last-child {
    margin-right: 0;
 }
-.pool-buttons div.pool.pure-button {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: space-between;
-}
 .total {
    margin-right: 10px;
 }
+.v4-select {
+   margin-left: 3px;
+}
 .pool-buttons {
-   margin: 5px 0 0 0;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
+   margin: 15px 0 0 0;
+   text-align: left;
 }
 div.right-indent {
    margin-left: 5px;
 }
 .pool.pure-button {
-   margin: 5px;
-   padding: 5px 10px;
-   border-radius: 5px;
-   font-size: 0.85em;
-   font-weight: bold;
+   margin: 0 3px;
+   padding: 4px 8px;
+   border-radius: 5px 5px 0 0;
    color: #666;
+   border: 1px solid #e6e6e6;
+   
 }
 .pool.pure-button.showing {
    background-color: var(--color-brand-blue);
    color: #fff;
+   border: 1px solid var(--color-brand-blue);
 }
 .pool.pure-button i.fa-star {
    margin-right: 5px;
-}
-.pool.pure-button.disabled {
-   opacity: 0.3;
-   cursor:default;
-   color: #444;
-   background: #ddd;
 }
 .pool.pure-button.disabled.failed {
    background: #D33;

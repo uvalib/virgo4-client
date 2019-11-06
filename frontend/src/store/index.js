@@ -12,6 +12,8 @@ import item from './modules/item'
 import reserves from './modules/reserves'
 import preferences from './modules/preferences'
 import * as utils from './modules/utils'
+import { getField, updateField } from 'vuex-map-fields'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -22,9 +24,11 @@ export default new Vuex.Store({
     results: [],
     total: -1,
     selectedResultsIdx: -1,
+    selectedSource: {id: "", name: ""}
   },
 
   getters: {
+    getField,
     hasResults: state => {
       return state.total >= 0
     },
@@ -72,6 +76,7 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    updateField,
     setSearching(state, flag) {
       if (state.noSpinner ) {
         state.noSpinner = false
@@ -131,18 +136,9 @@ export default new Vuex.Store({
       // // this is called from top level search; resets results from all pools
       state.total = -1
       state.results = []
-      let tgtPoolURL  = state.preferences.targetPoolURL
-      let confidence = ["low", "medium", "high", "exact"]
-      let best = {confidence: -1, idx: 0}
-      let resultIdx = 0
-
       results.pool_results.forEach( pr => {
-        // Skip pools that have no results
         if (!pr.group_list) {
           pr.group_list = []
-        }
-        if (pr.group_list.length == 0 && pr.status_code == 200) {
-          return
         }
 
         // Find the pool the results are associated with and populate some top level response info
@@ -173,21 +169,9 @@ export default new Vuex.Store({
         })
 
         state.results.push(result)
-
-        // track best result (or preferred pool)
-        let confidenceIdx = confidence.indexOf(pr.confidence)
-        if (tgtPoolURL == pool.url && result.total > 0) {
-          confidenceIdx = 100
-        }
-        if (confidenceIdx > best.confidence ) {
-          best.confidence = confidenceIdx
-          best.idx  = resultIdx
-        }
-
-        resultIdx++
       })
 
-      state.selectedResultsIdx = best.idx
+      state.selectedResultsIdx = 0
       state.total = results.total_hits
     },
 
@@ -227,7 +211,7 @@ export default new Vuex.Store({
         filters: rootGetters['filters/globalFilter']
       }
 
-      if (rootState.query.basicSearchScope.value != "all") {
+      if (rootState.query.basicSearchScope.id != "all") {
         let tgtID = rootState.query.basicSearchScope.id
         req.preferences.exclude_pool = []
         rootState.pools.list.forEach( src=> {

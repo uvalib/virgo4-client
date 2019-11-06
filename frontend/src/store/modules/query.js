@@ -5,7 +5,7 @@ const query = {
    state: {
       mode: "basic",
       basic: "",
-      basicSearchScope: {name: 'All Sources', value: 'all'},
+      basicSearchScope: {name: 'All Sources', id: 'all'},
       advanced: [
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
@@ -88,7 +88,7 @@ const query = {
       clear(state) {
          state.mode = "basic"
          state.basic = ""
-         state.basicSearchScope = {name: 'All Sources', value: 'all'},
+         state.basicSearchScope = {name: 'All Sources', id: 'all'},
          state.advanced = [
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""}]

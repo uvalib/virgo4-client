@@ -5,8 +5,9 @@
                color: color, 'border-color': background }"> 
       <div class="wrap-select">
          <span class="selection">
-            <span>{{value.name}}</span>
-            <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation }"></i>
+            <span v-if="value.id">{{value.name}}</span>
+            <span v-else>{{placeholder}}</span>
+            <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
          </span>
       </div>
       <transition name="grow"
@@ -25,6 +26,10 @@
 <script>
 export default {
    props: {
+      placeholder: {
+         type: String,
+         default: "Make a selection"
+      },
       pad: {
          type: String,
          default: "0 5px"

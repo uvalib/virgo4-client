@@ -1,11 +1,9 @@
 <template>
    <div v-if="searching == false" class="pool-results">
       <div class="results-header">
-         <div class="pool-name">{{selectedResults.pool.name}}</div>
-         <AccordionContent title="Description" align="left-narrow" 
-            background="var(--color-brand-blue)" color="white">
+         <div class="desc">
             {{selectedResults.pool.description}}
-         </AccordionContent>
+         </div>
          <SearchFilters />
       </div>
       <div class="hits">
@@ -91,13 +89,21 @@ div.infinite-status-prompt {
 </style>
 
 <style scoped>
+.desc  {
+   padding: 5px;
+   font-size: 0.9em;
+}
 .filters {
    border-radius: 5px 5px 0 0;
 }
 .pool-results {
    border: 1px solid #ccc;
+   border-top: 0;
    border-radius: 5px;
    background-color: var(--color-brand-blue);
+   position: relative;
+   top: -5px;
+   left: -1px;
 }
 div.results-header {
    font-size: 1em;
