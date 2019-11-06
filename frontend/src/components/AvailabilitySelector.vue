@@ -1,7 +1,7 @@
 <template>
    <div class="availability-wrapper">
-      <span class="label">Availability</span>
-      <V4Select :selections="options" v-bind:attached="false" 
+      <span class="label">Availability:</span>
+      <V4Select :selections="options" v-bind:attached="false"  pad="0.5em 1em"
          background="var(--color-primary-blue)" color="white" 
          v-model="globalAvailability"/>
    </div>
@@ -50,16 +50,17 @@ span.pure-button.avail i {
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
-   background: var(--color-pale-blue);
+   /* background: var(--color-pale-blue);
    color: white;
-   border-radius: 5px;
+   border-radius: 5px; */
    margin: 0;
-   padding: 0.5em 0.5em;
+   /* padding: 0.5em 0.5em; */
    justify-content: space-between;
 }
 .label {
    font-weight: bold;
    margin-right: 0.5em;
+   font-size: 1.15em;
 }
 input[type=radio] {
    margin: 0 5px 0 15px;

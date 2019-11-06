@@ -174,8 +174,9 @@ div.right-indent {
 div.search-controls {
    display: flex;
    flex-flow: row wrap;
-   align-items: center;
+   font-size: 0.9em;
    justify-content: space-between;
    margin-top:10px;
+   align-items: stretch;
 }
 </style>
