@@ -14,7 +14,6 @@ const filters = {
       // IMPORTANT: Must use arrays here instead of a map from 
       // resultsIdx -> filter data as vuex cannot detect state changes 
       // in nested objects!
-      poolDefaultFacets: [],
       poolFacets: [],
       poolFilters: [],
       adding: false,
@@ -26,7 +25,6 @@ const filters = {
       availabilityValues: {"online": "Online",
          "shelf": "On shelf"},
 
-      applyDefaultFacets: []
 
    },
 
@@ -38,12 +36,6 @@ const filters = {
          }
          // Facets array contains some nested bucket info; map only facet
          return  state.poolFacets[idx].map( f => f.facet )
-      },
-      poolDefaultFacets: (state) => (idx) => {
-         if ( idx == -1 || idx >= state.poolDefaultFacets.length) {
-            return []
-         }
-         return  state.poolDefaultFacets[idx]
       },
       facetBuckets: (state,getters) => (idx, facetID) => {
          if ( idx == -1 || idx >= state.poolFacets.length) {
@@ -67,17 +59,12 @@ const filters = {
       hasFilter: (state) => (idx) => {
          if ( state.globalAvailability.id != "any" ) return true
          if (idx < 0) return false
-         let defaultFacets = state.poolDefaultFacets[idx]
-         let hasDefaults = false
-         if ( defaultFacets ) {
-            hasDefaults =  defaultFacets.length > 0
-         }
          let hasFilter = false
          let filters = state.poolFilters[idx]
          if (filters) {
             hasFilter =  filters.length > 0
          }
-         return (hasFilter || hasDefaults)
+         return hasFilter
       },
 
       // By default the data stored for the filter is heirarchical; one facet 
@@ -111,13 +98,6 @@ const filters = {
             out.push( {"facet": availFacet, "values": [globalVal]})
          }
 
-         let defaultFacets = state.poolDefaultFacets[idx]
-         if (state.applyDefaultFacets[idx] && defaultFacets) {
-           // Already formatted in setAllAvailableFacets
-           out.push(...defaultFacets)
-         }
-         state.applyDefaultFacets[idx] = false
-
          return out
       },
 
@@ -137,10 +117,8 @@ const filters = {
       setAllAvailableFacets(state, data) {
          state.poolFacets = []
          state.poolFilters = []
-         state.defaultFacets = []
          data.pool_results.forEach(function (pr, resultIdx) {
             let poolFacets = []
-            let defaultFacets = []
             state.poolFilters.push([]) // add empty filter for each pool
 
             if ( pr.available_facets) {
@@ -151,16 +129,13 @@ const filters = {
             }
             state.poolFacets[resultIdx] = poolFacets
 
-            if ( state.applyDefaultFacets && pr.default_facets) {
+            if ( pr.default_facets) {
               pr.default_facets.forEach( function(f) {
                 // Format default facets
                 let defaultFacet = {"id": f.facet_id, name: f.name}
-                defaultFacets.push( {facet: defaultFacet, values: f.values} )
+                // Push defaults into filters as soon as possible
+                state.poolFilters[resultIdx].push( {facet: defaultFacet, values: f.values} )
               })
-              state.poolDefaultFacets[resultIdx] = defaultFacets
-              state.applyDefaultFacets[resultIdx] = true
-            } else {
-              state.applyDefaultFacets[resultIdx] = false
             }
          })
       },
