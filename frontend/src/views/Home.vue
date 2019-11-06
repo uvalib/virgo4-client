@@ -1,5 +1,5 @@
 <template>
-   <main @click="closeSources" class="home">
+   <main class="home">
       <div class="tips-container">
           <SearchTips/>
       </div>
@@ -11,23 +11,8 @@
             {{translateMessage}}
           </div>
           <div class="basic-search">
-            <div @click="sourcesClick" class="select">
-              <span class="selection">
-                {{basicSearchScope.name}}
-                <i class="sources-arrow fas fa-angle-down" :style="{ transform: rotation }"></i>
-              </span>
-              <transition name="grow"
-                v-on:before-enter="beforeEnter" v-on:enter="enter"
-                v-on:before-leave="beforeLeave" v-on:leave="leave">
-                <div class="options" v-if="sourcesExpanded">
-                  <div @click="sourceClicked({name: 'All Sources', value: 'all'})" 
-                    class="option">All Sources</div>
-                  <div @click="sourceClicked(src)" class="option" v-for="src in sources" :key="src.id">
-                    {{src.name}}
-                  </div>
-                </div>
-              </transition>
-            </div>
+            <V4Select :selections="searchScopes" v-bind:attached="true" 
+              v-model="basicSearchScope"/>
             <input class="basic"
                 @keyup.enter="searchClicked"
                 v-model="basic"
@@ -64,16 +49,13 @@ import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/popovers/SearchTips"
 import AdvancedSearch from "@/components/AdvancedSearch"
 import SearchingOverlay from "@/components/layout/SearchingOverlay"
+import V4Select from "@/components/V4Select"
 export default {
    name: "home",
    components: {
      SearchResults,
-     SearchTips, AdvancedSearch,SearchingOverlay
-   },
-   data: function()  {
-      return {
-         sourcesExpanded: false,
-      }
+     SearchTips, AdvancedSearch,SearchingOverlay,
+     V4Select
    },
    computed: {
       ...mapState({
@@ -82,7 +64,6 @@ export default {
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
-         basicSearchScope: state => state.query.basicSearchScope,
          translateMessage: state => state.system.translateMessage
       }),
       ...mapGetters({
@@ -93,13 +74,11 @@ export default {
         sources: 'pools/sortedList'
       }),
       ...mapFields('query',[
-        'basic',
+        'basic','basicSearchScope'
       ]),
-      rotation() {
-         if (this.sourcesExpanded) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
+      searchScopes() {
+        let out = [{name: 'All Sources', value: 'all'}]
+        return out.concat(this.sources)
       },
       basicSearch() {
         return this.searchMode == "basic"
@@ -123,30 +102,6 @@ export default {
       advancedClicked() {
         this.$store.commit("query/setAdvancedSearch")
       },
-      sourceClicked(src) {
-         this.$store.commit("query/setBasicSearchScope", src)
-      },
-      sourcesClick(e) {
-        e.stopPropagation()
-        this.sourcesExpanded = !this.sourcesExpanded
-      },
-      closeSources() {
-        this.sourcesExpanded = false;
-      },
-      beforeEnter: function(el) {
-         el.style.height = '0'
-      },
-      enter: function(el) {
-         el.style.height = (el.scrollHeight-20) + 'px'
-         this.expandedItem = el
-      },
-      beforeLeave: function(el) {
-         el.style.height = (el.scrollHeight-20) + 'px'
-         this.expandedItem = el
-      },
-      leave: function(el) {
-         el.style.height = '0'
-      }
    }
 };
 </script>
@@ -231,55 +186,6 @@ p.fatal, p.error {
   border-left: 0;
   border-radius: 0 5px 5px 0;
   align-self: stretch;
-}
-.select {
-  display: inline-block;
-  padding: 0.5vw 5px;
-  outline: none;
-  border: 1px solid var(--color-brand-blue);
-  border-radius: 5px 0 0 5px;
-  cursor: pointer;
-  background-color: var(--color-brand-blue);
-  color: white;
-  position: relative;
-  text-align: left;
-  align-self: stretch;
-}
-.selection {
-  display: inline-block;
-  vertical-align: middle;
-  white-space: nowrap;
-}
-.sources-arrow {
-  margin: 0 0 0 5px;
-  cursor: pointer;
-  color: white;
-  transform: rotate(0deg);
-  transition-duration: 250ms;
-  display: inline-block;
-  vertical-align: middle;
-}
-.options {
-  text-align: left;
-  background-color: var(--color-brand-blue);
-  color: white;
-  cursor: pointer;
-  padding: 10px 0;
-  border-radius: 0 0 5px 5px;
-  position: absolute;
-  left: -1px;
-  right: -1px;
-  border: 1px solid var(--color-brand-blue);
-  border-top: 1px solid var(--color-lightest-blue);
-  font-size: 0.9em;
-  overflow: hidden;
-  transition: 200ms ease-out;
-}
-.option {
-  padding: 0 10px;
-}
-.option:hover {
-  background-color:  var(--color-light-blue);
 }
 .debug.pure-button.pure-button-primary {
   font-size: 0.75em;
