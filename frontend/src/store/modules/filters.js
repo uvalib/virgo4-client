@@ -24,7 +24,10 @@ const filters = {
       globalAvailability: {id: "any", name: "Any"},
       availabilityFacet: "FacetAvailability",
       availabilityValues: {"online": "Online",
-         "shelf": "On shelf"}
+         "shelf": "On shelf"},
+
+      applyDefaultFacets: []
+
    },
 
    getters: {
@@ -109,10 +112,11 @@ const filters = {
          }
 
          let defaultFacets = state.poolDefaultFacets[idx]
-         if (defaultFacets) {
+         if (state.applyDefaultFacets[idx] && defaultFacets) {
            // Already formatted in setAllAvailableFacets
            out.push(...defaultFacets)
          }
+         state.applyDefaultFacets[idx] = false
 
          return out
       },
@@ -147,14 +151,17 @@ const filters = {
             }
             state.poolFacets[resultIdx] = poolFacets
 
-            if ( pr.default_facets) {
+            if ( state.applyDefaultFacets && pr.default_facets) {
               pr.default_facets.forEach( function(f) {
                 // Format default facets
                 let defaultFacet = {"id": f.facet_id, name: f.name}
                 defaultFacets.push( {facet: defaultFacet, values: f.values} )
               })
+              state.poolDefaultFacets[resultIdx] = defaultFacets
+              state.applyDefaultFacets[resultIdx] = true
+            } else {
+              state.applyDefaultFacets[resultIdx] = false
             }
-            state.poolDefaultFacets[resultIdx] = defaultFacets
          })
       },
 

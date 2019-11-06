@@ -52,7 +52,6 @@ export default {
    methods: {
       isRemovable(filter) {
          if ( filter.facet.id == this.availabilityFacet) return false
-         if (this.poolDefaultFacets(this.poolIdx).includes(filter)) return false
          return true
       },
       formatValues(values) {
