@@ -37,8 +37,6 @@ export default {
          addingFilter: state => state.filters.adding,
          poolIdx: state => state.selectedResultsIdx,
          availabilityFacet: state => state.filters.availabilityFacet,
-         availabilityValues: state => state.filters.availabilityValues,
-         globalAvailability: state => state.filters.globalAvailability
       }),
       ...mapGetters({
          hasFilter: 'filters/hasFilter',

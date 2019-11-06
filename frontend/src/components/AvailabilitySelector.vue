@@ -1,43 +1,34 @@
 <template>
    <div class="availability-wrapper">
-      <span class="label">Availability&nbsp;</span>
-      <span @click="availClicked('any')" class="pure-button pure-button-primary avail">
-         <span class="label">Any</span>
-         <i v-if="isChecked('any')" class="far fa-check-circle"></i>
-         <i v-else class="far fa-circle"></i>
-      </span>
-      <span @click="availClicked('online')" class="pure-button pure-button-primary avail">
-         <span class="label">Online</span>
-         <i v-if="isChecked('online')" class="far fa-check-circle"></i>
-         <i v-else class="far fa-circle"></i>
-      </span>
-      <span @click="availClicked('shelf')"  class="pure-button pure-button-primary avail">
-         <span class="label">On Shelf</span>
-         <i v-if="isChecked('shelf')" class="far fa-check-circle"></i>
-         <i v-else class="far fa-circle"></i>
-      </span>
+      <span class="label">Availability</span>
+      <V4Select :selections="options" v-bind:attached="false" 
+         background="var(--color-primary-blue)" color="white" 
+         v-model="globalAvailability"/>
    </div>
 </template>
 
 <script>
 import { mapFields } from 'vuex-map-fields'
+import V4Select from "@/components/V4Select"
 export default {
+   components: {
+      V4Select
+   },
    computed: {
       ...mapFields('filters',[
          'globalAvailability',
-      ])
+      ]),
+      options() {
+         return [
+            {id: "any", name: "Any"},
+            {id: "online", name: "Online"},
+            {id: "shelf", name: "On Shelf"},
+         ]
+      }
    },
    watch: {
       globalAvailability () {
          this.$store.dispatch("searchAllPools")
-      }
-   },
-   methods: {
-      isChecked(avail) {
-         return this.globalAvailability == avail
-      },
-      availClicked( availType ) {
-         this.$store.commit("filters/setGlobalAvailability", availType)  
       }
    }
 }
@@ -57,16 +48,18 @@ span.pure-button.avail i {
 }
 .availability-wrapper {
    display: flex;
-   flex-flow: row wrap;
+   flex-flow: row nowrap;
    align-items: center;
    background: var(--color-pale-blue);
    color: white;
    border-radius: 5px;
-   margin: 10px 0 5px 0;
-   padding: 4px 4px 4px 10px;
+   margin: 0;
+   padding: 0.5em 0.5em;
+   justify-content: space-between;
 }
 .label {
    font-weight: bold;
+   margin-right: 0.5em;
 }
 input[type=radio] {
    margin: 0 5px 0 15px;

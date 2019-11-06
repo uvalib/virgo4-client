@@ -1,5 +1,8 @@
 <template>
-   <div @click="expandClick" class="v4-select" v-bind:class="{attached: attached}">
+   <div @click="expandClick" class="v4-select" 
+      :class="{attached: attached}"
+      :style="{ 'background-color': background, padding: pad,
+               color: color, 'border-color': background }"> 
       <div class="wrap-select">
          <span class="selection">
             <span>{{value.name}}</span>
@@ -9,7 +12,8 @@
       <transition name="grow"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="options" v-if="expanded">
+         <div class="options" v-if="expanded" 
+            :style="{ 'background-color': background, color: color, 'border-color': background }">
             <div @click="$emit('input', src)" class="option" v-for="src in selections" :key="src.id">
                {{src.name}}
             </div>
@@ -21,6 +25,18 @@
 <script>
 export default {
    props: {
+      pad: {
+         type: String,
+         default: "0 5px"
+      },
+      background: {
+         type: String,
+         default: "var(--color-brand-blue)"
+      },
+      color: {
+         type: String,
+         default: "white"
+      },
       selections: {
          type: Array,
          required: true
@@ -88,29 +104,35 @@ export default {
 .v4-select {
   display: inline-block;
   outline: none;
-  border: 1px solid var(--color-brand-blue);
   border-radius: 5px;
   cursor: pointer;
-  background-color: var(--color-brand-blue);
   color: white;
   position: relative;
   text-align: left;
   align-self: stretch;
   padding: 0 5px;
+  min-width: 70px;
+  text-align: left;
+  border: 1px solid var(--color-brand-blue);
 }
 .wrap-select {
    height: 100%;
    align-items: center;
-   justify-content: center;
+   justify-content: left;
    display: flex;
 }
 .v4-select.attached {
    border-radius: 5px 0 0 5px;
 }
 .v4-select .selection {
-  display: inline-block;
-  vertical-align: middle;
-  white-space: nowrap;
+   display: inline-block;
+   vertical-align: middle;
+   white-space: nowrap;
+   width: 100%;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: space-between;
 }
 .v4-select .options-arrow {
   margin: 0 0 0 5px;
@@ -126,17 +148,16 @@ export default {
   background-color: var(--color-brand-blue);
   color: white;
   cursor: pointer;
-  padding: 10px 0;
-  border-radius: 0 0 5px 5px;
+  padding: 0 0 10px 0;
+  border-radius: 0 5px 5px 5px;
   position: absolute;
   left: -1px;
-  right: -1px;
-  border: 1px solid var(--color-brand-blue);
-  border-top: 1px solid var(--color-lightest-blue);
+  border: 1px solid var(--color-light-blue);
   font-size: 0.9em;
   overflow: hidden;
   transition: 200ms ease-out;
   z-index: 5000;
+  white-space: nowrap;
 }
 .v4-select .option {
   padding: 4px 10px;

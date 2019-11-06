@@ -21,7 +21,7 @@ const filters = {
       updatingBuckets: false,
 
       // Global availability and hard-coded filter values
-      globalAvailability: "any",
+      globalAvailability: {id: "any", name: "Any"},
       availabilityFacet: "FacetAvailability",
       availabilityValues: {"online": "Online",
          "shelf": "On shelf"}
@@ -62,7 +62,7 @@ const filters = {
       },
 
       hasFilter: (state) => (idx) => {
-         if ( state.globalAvailability != "any" ) return true
+         if ( state.globalAvailability.id != "any" ) return true
          if (idx < 0) return false
          let defaultFacets = state.poolDefaultFacets[idx]
          let hasDefaults = false
@@ -84,7 +84,7 @@ const filters = {
       // This getter takes a fmt param that is either api or raw to control the response
       poolFilter: (state) => (idx, fmt) => {
          let apiFilter = []
-         let globalVal = state.availabilityValues[state.globalAvailability]
+         let globalVal = state.availabilityValues[state.globalAvailability.id]
          let out = state.poolFilters[idx].slice(0)
          let globalIncluded = false
          out.forEach(function(filterObj) {
@@ -97,13 +97,13 @@ const filters = {
          })
 
          if (fmt == "api") {
-            if (state.globalAvailability != "any" && globalIncluded == false) {
+            if (state.globalAvailability.id != "any" && globalIncluded == false) {
                apiFilter.push({facet_id: state.availabilityFacet, value: globalVal})
             }
             return apiFilter
          }
 
-         if (state.globalAvailability != "any" && globalIncluded == false) {
+         if (state.globalAvailability.id != "any" && globalIncluded == false) {
             let availFacet = {"id": state.availabilityFacet, name: "Availability"}
             out.push( {"facet": availFacet, "values": [globalVal]})
          }
@@ -120,8 +120,8 @@ const filters = {
       // This is only used to get the API-formatted filter for use in global search
       globalFilter: (state) =>  {
          let filter = []
-         if (state.globalAvailability != "any") {
-            let globalVal = state.availabilityValues[state.globalAvailability]
+         if (state.globalAvailability.id != "any") {
+            let globalVal = state.availabilityValues[state.globalAvailability.id]
             filter.push({facet_id: state.availabilityFacet, value: globalVal})
          }
          return filter
@@ -130,9 +130,6 @@ const filters = {
 
    mutations: {
       updateField,
-      setGlobalAvailability(state, status) {
-         state.globalAvailability = status
-      },
       setAllAvailableFacets(state, data) {
          state.poolFacets = []
          state.poolFilters = []

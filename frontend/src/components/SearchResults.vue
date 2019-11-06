@@ -175,8 +175,7 @@ div.search-controls {
    display: flex;
    flex-flow: row wrap;
    align-items: center;
-}
-#app span.pure-button.pure-button-primary.refine {
-   margin-left: auto;
+   justify-content: space-between;
+   margin-top:10px;
 }
 </style>
