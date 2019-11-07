@@ -5,19 +5,19 @@
                color: color, 'border-color': background }"> 
       <div class="wrap-select">
          <span class="selection">
-            <span v-if="value.id">{{value.name}}</span>
-            <span v-else>{{placeholder}}</span>
+            <span v-if="value.id" v-html="value.name"></span>
+            <span v-else v-html="placeholder"></span>
             <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
          </span>
       </div>
       <transition name="grow"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="options" v-if="expanded" 
+         <div class="options" v-if="expanded"
             :style="{ 'background-color': background, color: color, 'border-color': background }">
-            <div @click="$emit('input', src)" class="option" v-for="src in selections" :key="src.id">
-               {{src.name}}
-            </div>
+            <div v-for="src in selections" @click="optionClicked(src)"  
+               :class="{disabled: src.disabled}" class="option" 
+               :key="src.id"  v-html="src.name"></div>
          </div>
       </transition>
    </div>
@@ -77,6 +77,10 @@ export default {
       },
    },
    methods: {
+      optionClicked(src) {
+         if (src.enabled == false) return
+         this.$emit('input', src)
+      },
       globalClick() {
          this.expanded = false
       },
@@ -116,7 +120,6 @@ export default {
   text-align: left;
   align-self: stretch;
   padding: 0 5px;
-  min-width: 70px;
   text-align: left;
   border: 1px solid var(--color-brand-blue);
 }
@@ -167,7 +170,13 @@ export default {
 .v4-select .option {
   padding: 4px 10px;
 }
+.v4-select .option.disabled:hover {
+  background-color:  initial;
+  color: #444;
+  cursor: default;
+}
 .v4-select .option:hover {
-  background-color:  var(--color-light-blue);
+  background-color:  var(--color-lightest-blue);
+  color: black;
 }
 </style>

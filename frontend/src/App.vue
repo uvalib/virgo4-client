@@ -79,13 +79,6 @@ export default {
    --color-error: firebrick;
 }
 
-#app .fade-enter-active, .fade-leave-active {
-  transition: opacity .25s;
-}
-#app .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
-
 #app .pure-button.pure-button-primary {
   background-color: var(--color-primary-blue);
 }

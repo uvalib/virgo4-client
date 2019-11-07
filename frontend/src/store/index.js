@@ -24,7 +24,7 @@ export default new Vuex.Store({
     results: [],
     total: -1,
     selectedResultsIdx: -1,
-    selectedSource: {id: "", name: ""}
+    otherSrcSelection: {id: "", name: ""}
   },
 
   getters: {
