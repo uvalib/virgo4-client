@@ -3,29 +3,16 @@
       <h1>
          <span>Advanced Search</span>
       </h1>
-      <!-- <div v-if="dropdownSources" class="pools-wrapper">
-         <h2>Available Sources</h2> 
-         <multiselect :multiple="true"  v-model="selectedSources" class="sources"
-               placeholder="Select at least one source"
-               :hideSelected="true"
-               :showLabels="false" 
-               :close-on-select="false"
-               track-by="url" label="name" :searchable="false"
-               :options="sources">
-         </multiselect> 
-      </div>
-      <div v-else class="pools-wrapper">
-         <h2>Available Sources</h2>
+      <div class="pools-wrapper">
+         <h2>Search Sources</h2>
          <div class="pools">
-            <div @click="poolClicked(src.url)" class="pool pure-button" v-for="src in sources" :key="src.id">
-               <label>
-                  <i v-if="isPoolExcluded(src.url)" class="far fa-circle"></i>
-                  <i v-else class="far fa-check-circle"></i>
-                  {{src.name}}
-               </label>
+            <div @click="poolClicked(src.url)" class="pool" v-for="src in sources" :key="src.id">
+               <i v-if="isPoolExcluded(src.url)" class="far fa-square"></i>
+               <i v-else class="far fa-check-square"></i>
+               {{src.name}}
             </div>
          </div>
-      </div> -->
+      </div>
       <div class="criteria">
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <span>{{idx+1}}.</span>
@@ -79,7 +66,6 @@
             <i class="fas fa-undo-alt"></i>
          </span>
       </div>
-      <!-- <div class="basic"><label>Dropdown Soures&nbsp;<input type="checkbox" v-model="dropdownSources"/></label></div> -->
    </div>
 </template>
 
@@ -92,7 +78,6 @@ export default {
    data: function() {
       return {
          dropdownSources: true,
-         selectedSources: []
       } 
    },
    components: {
@@ -117,20 +102,6 @@ export default {
       },
       doAdvancedSearch() {
          if (this.queryEntered) {
-            // if ( this.dropdownSources) {
-            //    // convert source selections to preferences; preferece is which
-            //    // source NOT TO search, UI is pools TO search. Invert.
-            //    this.$store.commit("preferences/clear")
-            //    let picked = this.selectedSources
-            //    this.sources.forEach( src=> {
-            //       if ( picked.includes(src) == false ) {
-            //          console.log("SOURCE "+src.id+ " not selected.")
-            //          this.$store.commit("preferences/toggleExcludePool", src.url)  
-            //       } else {
-            //          console.log("SOURCE "+src.id+ " IS SEELECTED")
-            //       }
-            //    })
-            // }
             this.$store.dispatch("searchAllPools");
          } else {
             this.$store.commit(
@@ -152,7 +123,6 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
-      this.selectedSources = this.sources
    }
 };
 </script>
@@ -187,17 +157,9 @@ div.pools {
    justify-content: flex-start;
    margin: 0;
 }
-div.pool.pure-button {
-   border-radius: 5px;
-   padding: .3em 0.8em;
-   margin: .3em;
-   font-size: 0.9em;
-   border:1px solid #aaa;
-}
-div.pool input[type="checkbox"] {
-   width: 14px;
-   height: 14px;
-   margin-right: 5px;
+div.pool{
+   margin: 5px 10px;
+   cursor: pointer;
 }
 div.criteria {
    font-size: 0.9em;
