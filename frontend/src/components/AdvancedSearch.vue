@@ -15,45 +15,49 @@
       </div>
       <div class="criteria">
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
-            <span>{{idx+1}}.</span>
-            <template v-if="idx > 0">
-               <select class="search-term-op" v-model="term.op">
-                  <option value="AND">AND</option>
-                  <option value="OR">OR</option>
-                  <option value="NOT">NOT</option>
+            <div class="options">
+               <template v-if="idx > 0">
+                  <select class="search-term-op" v-model="term.op">
+                     <option value="AND">AND</option>
+                     <option value="OR">OR</option>
+                     <option value="NOT">NOT</option>
+                  </select>
+               </template>
+               <select class="field" v-model="term.field">
+                  <option
+                     v-for="fieldObj in advancedFields"
+                     :key="fieldObj.value"
+                     :value="fieldObj.value"
+                  >{{fieldObj.label}}</option>
                </select>
-            </template>
-            <select class="field" v-model="term.field">
-               <option
-                  v-for="fieldObj in advancedFields"
-                  :key="fieldObj.value"
-                  :value="fieldObj.value"
-               >{{fieldObj.label}}</option>
-            </select>
-            <template v-if="term.field != 'date'">
-               <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term" />
-            </template>
-            <template v-else>
-               <div class="date-criteria">
+               <template v-if="term.field == 'date'">
                   <select class="date-range-type" v-model="term.type">
                      <option value="EQUAL">EQUALS</option>
                      <option value="AFTER">AFTER</option>
                      <option value="BEFORE">BEFORE</option>
                      <option value="BETWEEN">BETWEEN</option>
                   </select>
-                  <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value" />
-                  <span v-if="term.type=='BETWEEN'" class="date-sep">and</span>
-                  <input
-                     v-if="term.type=='BETWEEN'"
-                     type="text"
-                     @keyup.enter="doAdvancedSearch"
-                     v-model="term.endVal"
-                  />
-               </div>
-            </template>
-            <span class="remove">
+               </template>
                <i @click="removeCriteria(idx)" class="remove fas fa-trash-alt"></i>
-            </span>
+            </div>
+
+            <div class="query">
+               <template v-if="term.field != 'date'">
+                  <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term" />
+               </template>
+               <template v-else>
+                  <div class="date-criteria">
+                     <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value" />
+                     <span v-if="term.type=='BETWEEN'" class="date-sep">and</span>
+                     <input
+                        v-if="term.type=='BETWEEN'"
+                        type="text"
+                        @keyup.enter="doAdvancedSearch"
+                        v-model="term.endVal"
+                     />
+                  </div>
+               </template>
+            </div>
          </div>
       </div>
       <div class="controls">
@@ -163,6 +167,30 @@ div.pool{
 }
 div.criteria {
    font-size: 0.9em;
+   text-align: left;
+}
+div.options {
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: space-between;
+}
+.options select {
+   margin: 0 0.8em 0 0;
+   flex-basis: content;
+}
+i.remove {
+   cursor: pointer;
+   font-size: 1.5em;
+   color: #666;
+   float: right;
+}
+
+div.query {
+   flex-flow: row nowrap;
+   align-items: flex-start;
+   justify-content: space-between;
+   width: 100%;
+   
 }
 .controls {
    font-size: 0.85em;
@@ -179,20 +207,11 @@ div.criteria {
 }
 
 div.search-term {
-   display: flex;
-   flex-flow: row wrap;
-   margin: 0;
-   padding: 0 0 10px 0;
-   align-items: center;
-   justify-content: flex-start;
-}
-div.search-term > * {
-   margin: 0 0.8em 0 0;
-   flex-basis: content;
-}
-.search-term-op {
-   display: inline-block;
-   padding: 0;
+   border: 1px solid #ccc;
+   padding: 10px;
+   margin: 0 0 10px 0;
+   border-radius: 5px;
+   background-color: #f5f5f5;
 }
 input[type="text"] {
    flex: 1 1 auto;
@@ -207,17 +226,15 @@ div.search-term .date-criteria {
    align-items: center;
    margin-right: 0;
 }
+div.query .term {
+   box-sizing: border-box;
+   width: 100%;
+}
 div.search-term .date-criteria > * {
    margin: 0 0.8em 0 0;
-   flex-basis: content;
 }
-i.remove {
-   opacity: 0.6;
-   cursor: pointer;
-   font-size: 1.5em;
-}
-i.remove:hover {
-   opacity: 1;
+div.search-term .date-criteria input:last-child {
+   margin-right: 0;
 }
 
 div.basic {
