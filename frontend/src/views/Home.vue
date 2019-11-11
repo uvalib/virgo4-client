@@ -4,7 +4,7 @@
           <SearchTips/>
       </div>
       <SearchingOverlay message="Searching..." />
-      <div class="search-panel pure-form">
+      <div class="search-panel">
         <template v-if="basicSearch">
           <h1>Basic Search</h1>
           <div v-if="hasTranslateMessage" class="translate-message">
@@ -174,22 +174,17 @@ p.fatal, p.error {
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-start;
-  height: 100%;
 }
-#app .pure-form div.basic-search  input[type=text].basic {
+div.basic-search  input[type=text].basic {
   font-size: 1.15em;
   padding: 0.5vw 0.75vw;
   outline: none;
   border: 1px solid #ccc;
   margin: 0;
-  flex: 1 1 auto;
   border-left: 0;
   border-radius: 0 5px 5px 0;
-  align-self: stretch;
-}
-.debug.pure-button.pure-button-primary {
-  font-size: 0.75em;
-  padding: 2px 12px;
+  flex: 1 1 auto;
+  min-width: 100px;
 }
 div.advanced {
   margin-top: 10px;

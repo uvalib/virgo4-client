@@ -14,6 +14,7 @@
          </div>
       </div>
       <div class="criteria">
+         <h2>Search Criteria</h2>
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <div class="options">
                <template v-if="idx > 0">

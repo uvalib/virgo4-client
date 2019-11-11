@@ -102,6 +102,9 @@ p {
   align-items: center;
   justify-content: flex-end;
 }
+#app .controls span.pure-button.pure-button-primary {
+   margin: 0 0 5px 10px;
+}
 p.error {
   font-weight: bold;
   margin: 0;
