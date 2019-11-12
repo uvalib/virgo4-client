@@ -13,13 +13,17 @@
             </div>
             <template v-else>
                <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
+                  <RenameBookmark :original="folderInfo" 
+                     v-on:rename-approved="renameFolder"/>
                   <ConfirmDelete
                      v-on:delete-approved="removeFolder(folderInfo.id)">
                      <div>Delete bookmark folder <b>{{folderInfo.folder}}</b>? All bookmarks</div>
                      <div>contained within it will also be deleted.</div> 
                      <div><br/>This cannot be reversed.</div>
                   </ConfirmDelete>
-                  <AccordionContent class="boxed" background="#f5f5f5" :title="folderInfo.folder" align="left">
+                  <AccordionContent class="boxed" background="#f5f5f5" 
+                     :title="folderInfo.folder" 
+                     align="left">
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
                      </div>
@@ -85,12 +89,14 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import ConfirmDelete from "@/components/popovers/ConfirmDelete"
 import MoveBookmark from "@/components/popovers/MoveBookmark"
+import RenameBookmark from "@/components/popovers/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"
 import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "bookmarks",
    components: {
-      AccordionContent,ConfirmDelete,AccountActivities,MoveBookmark
+      AccordionContent, ConfirmDelete, AccountActivities,
+      MoveBookmark, RenameBookmark
    },
    data: function()  {
       return {
@@ -111,6 +117,9 @@ export default {
       }),
    },
    methods: {
+      renameFolder(folderInfo) {
+         this.$store.dispatch("user/renameFolder", folderInfo)
+      },
       moveBookmark(bookmarkID, folderID) {
          let data = {bookmarkID: bookmarkID, folderID: folderID}
          this.$store.dispatch("user/moveBookmark", data)
@@ -168,14 +177,13 @@ div.accordion.boxed div.title {
 
 <style scoped>
 .remove, .remove-folder {
-   color: #999;
-   cursor: pointer;
-   font-size: 1.2em;
    padding: 2px 8px 2px 0;
 }
 i.fas {
    color: #999;
    cursor: pointer;
+   font-size: 1.2em;
+   margin-right: 10px;
 }
 div.folder {
    display: flex;

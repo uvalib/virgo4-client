@@ -54,6 +54,7 @@ func main() {
 			bookmarks.GET("/", svc.AuthMiddleware, svc.GetBookmarks)
 			bookmarks.POST("/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
 			bookmarks.DELETE("/folders/:id", svc.AuthMiddleware, svc.DeleteBookmarkFolder)
+			bookmarks.POST("/folders/:id", svc.AuthMiddleware, svc.UpdateBookmarkFolder)
 			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
 			bookmarks.DELETE("/items/:id", svc.AuthMiddleware, svc.DeleteBookmark)
 			bookmarks.POST("/items/:id/move", svc.AuthMiddleware, svc.MoveBookmark)

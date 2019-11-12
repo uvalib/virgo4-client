@@ -268,6 +268,44 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
+// UpdateBookmarkFolder will move update a folder name
+func (svc *ServiceContext) UpdateBookmarkFolder(c *gin.Context) {
+	user := NewV4User()
+	user.Virgo4ID = c.Param("uid")
+	folderID := c.Param("id")
+	log.Printf("User %s updating folderID %s", user.Virgo4ID, folderID)
+
+	// get user ID
+	log.Printf("Lookup user %s ID", user.Virgo4ID)
+	q := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	q.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	q.Row(&user.ID)
+
+	var folderInfo struct {
+		Name string
+	}
+	err := c.ShouldBindJSON(&folderInfo)
+	if err != nil {
+		log.Printf("ERROR: invalid folder rename payload: %v", err)
+		c.String(http.StatusBadRequest, "Invalid rename folder request")
+		return
+	}
+
+	uq := svc.DB.NewQuery("update bookmark_folders set name={:fn} where id={:fid}")
+	uq.Bind(dbx.Params{"fn": folderInfo.Name})
+	uq.Bind(dbx.Params{"fid": folderID})
+	_, err = uq.Execute()
+	if err != nil {
+		log.Printf("ERROR: unable to rename folder: %s", err)
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Get the new list of bookmarks and return them as JSON
+	user.GetBookmarks(svc.DB)
+	c.JSON(http.StatusOK, user.Bookmarks)
+}
+
 // DeleteBookmarkFolder will remove a folder and all of its content
 func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
 	user := NewV4User()
@@ -400,7 +438,7 @@ func (svc *ServiceContext) MoveBookmark(c *gin.Context) {
 	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
 	bookmarkID := c.Param("id")
-	log.Printf("User %s deleting bookmarkID %s", user.Virgo4ID, bookmarkID)
+	log.Printf("User %s moving bookmarkID %s", user.Virgo4ID, bookmarkID)
 
 	// get user ID
 	log.Printf("Lookup user %s ID", user.Virgo4ID)

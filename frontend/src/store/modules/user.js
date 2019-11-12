@@ -310,6 +310,15 @@ const user = {
             ctx.commit('system/setError', error, { root: true })
          })
       },
+      renameFolder(ctx, folder) {
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders/${folder.id}`
+         axios.post(url, {name: folder.name}).then((response) => {
+            ctx.commit('setBookmarks', response.data)
+         }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+         })
+      },
       removeFolder(ctx, folderID) {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders/${folderID}`

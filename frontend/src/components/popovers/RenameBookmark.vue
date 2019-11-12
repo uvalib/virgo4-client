@@ -1,27 +1,20 @@
 <template>
    <v-popover class="inline">
       <span class="trigger">
-         <i class="move fas fa-folder"></i>
+         <i @click="opened" class="edit fas fa-edit"></i>
       </span>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
-            <span>Bookmark Folder</span>
+            <span>Rename Bookmark Folder</span>
          </div>
          <div class="message pure-form">
-            <p>Select a new folder for this bookmark</p>
-            <select v-model="selectedFolder">
-               <option value="">Select a folder</option>
-               <option v-for="(folder) in folders" 
-                  :key="folder.id" :value="folder.id ">
-                  {{ folder.name }}
-               </option>
-            </select>
+            <input  @keyup.enter="enterPressed"  ref="rename" type="text" v-model="folderName"/>
          </div>
-         <div class="move-controls">
+         <div class="edit-controls">
             <span v-close-popover class="pure-button pure-button-secondary">Cancel</span>
             <span class="pure-button pure-button-primary"
-               @click="moveClicked" v-close-popover >
-               Move
+               @click="okClicked" id="ok-rename" v-close-popover >
+               OK
             </span>
          </div>
       </div>
@@ -29,45 +22,44 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
 export default {
    props: {
-      bookmark: {
+      original: {
          type: Object,
-         required: true
-      },
-      srcFolder: {
-         type: Number,
          required: true
       },
    },
    data: function()  {
       return {
-         selectedFolder: "",
+         folderName: this.original.folder,
       }
    },
    computed: {
-      ...mapGetters({
-         allFolders: 'user/folders',
-      }),
-      folders() {
-         return this.allFolders.filter(f => f.id != this.srcFolder)
-      }
    },
    methods: {
-      moveClicked() {
-         //let payload = {bookmarkID: this.bookmark.id, folderID: this.selectedFolder}
-         this.$emit('move-approved', this.bookmark.id, this.selectedFolder)
+      opened() {
+         setTimeout(()=>{
+            this.$refs.rename.focus();
+         },500);
+      },
+      enterPressed() {
+         document.getElementById("ok-rename").click()
+      },
+      okClicked() {
+         this.$emit('rename-approved', {id: this.original.id, name: this.folderName})
       }
    }
 };
 </script>
 
 <style scoped>
-i.move {
-   font-size: 1.25em; 
-   margin-right:10px;
-   color: goldenrod;
+i.fas {
+   color: #999;
+   cursor: pointer;
+   font-size: 1.2em;
+   margin-right: 10px;
+   position: relative;
+   top: 2px;
 }
 div.popover-header {
    padding: 5px 15px;
@@ -100,7 +92,7 @@ div.message {
 select {
    width: 100%;
 }
-.move-controls {
+.edit-controls {
    font-size: 0.9em;
    padding: 10px;
    text-align: right;
@@ -113,7 +105,7 @@ select {
    align-items: center;
    justify-content: flex-end;
 }
-.move-controls .pure-button {
+.edit-controls .pure-button {
    margin-left: 5px;
 }
 </style>
