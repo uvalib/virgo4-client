@@ -99,7 +99,7 @@ export default {
       }
    },
    watch: {
-      otherSrcSelection (newVal,oldVal) {
+      otherSrcSelection (newVal, _oldVal) {
          if (newVal == "") return 
          let found = false
          this.results.some( (r,idx) => {

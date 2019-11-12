@@ -37,7 +37,6 @@ const preferences = {
             }
          } catch(e) {
             // NOOP; just leave preferences unset
-            console.error("PREFERENCES INVALID: [ "+prefsStr+" ]")
          }
       },
       clear(state) {

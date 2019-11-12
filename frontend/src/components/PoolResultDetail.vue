@@ -28,10 +28,9 @@ import SearchHit from "@/components/SearchHit"
 import GroupedSearchHit from "@/components/GroupedSearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import InfiniteLoading from 'vue-infinite-loading'
-import AccordionContent from '@/components/AccordionContent'
 export default {
    components: {
-      SearchHit,SearchFilters,InfiniteLoading,AccordionContent,GroupedSearchHit
+      SearchHit,SearchFilters,InfiniteLoading,GroupedSearchHit
    },
    computed: {
       ...mapState({
