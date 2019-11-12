@@ -1,7 +1,7 @@
 <template>
    <div class="availability">
-      <div class="working" v-if="lookingUp" >
-         <div>Loading...</div>
+      <div class="working" v-if="availability.searching" >
+         <p>Loading Availability...</p>
          <img src="../assets/spinner2.gif">
       </div>
       <template v-if="availability.items.length">
@@ -29,15 +29,8 @@
 <script>
 import { mapGetters } from "vuex"
 export default {
-   components: {
-   },
    props: {
       titleId: String
-   },
-   data: function() {
-      return {
-         lookingUp: true
-      };
    },
    computed: {
       ...mapGetters({
@@ -50,10 +43,7 @@ export default {
       }
    },
    created() {
-      this.lookingUp = true
-      this.$store.dispatch("item/getAvailability", this.titleId ).then(() => {
-         this.lookingUp = false
-      })
+      this.$store.dispatch("item/getAvailability", this.titleId )
    }
 }
 </script>

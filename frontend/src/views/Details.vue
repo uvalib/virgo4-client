@@ -2,7 +2,7 @@
    <main class="details">
       <h1>Item Details</h1>
       <div class="details-content">
-         <div class="working" v-if="searching" >
+         <div class="working" v-if="details.searching" >
             <div>Looking up details...</div>
             <img src="../assets/spinner2.gif">
          </div>
@@ -45,7 +45,6 @@ export default {
    },
    computed: {
       ...mapState({
-         searching : state => state.searching,
          details : state => state.item.details,
       }),
       ...mapGetters({

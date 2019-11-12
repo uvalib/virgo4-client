@@ -4,8 +4,8 @@ import * as utils from './utils'
 const item = {
    namespaced: true,
    state: {
-      details: {source: "", identifier:"", basicFields:[], detailFields:[]},
-      availability: {titleId: '', columns: [], items: []}
+      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[]},
+      availability: {searching: true, titleId: '', columns: [], items: []}
    },
 
    getters: {
@@ -23,19 +23,23 @@ const item = {
          utils.preProcessHitFields( [fields] )
          fields.source = source
          state.details = fields
+         state.details.searching = false
       },
       clearDetails(state) {
-         state.details = {source: "", identifier:"", basicFields:[], detailFields:[]}
+         state.details = {searching: true, source: "", identifier:"", basicFields:[], detailFields:[]}
       },
       setAvailability(state, {titleId, response}) {
         state.availability.titleId = titleId
         state.availability.columns = response.columns
         state.availability.items = response.items
+        state.availability.searching = false
       },
       clearAvailability(state) {
-        state.availability.titleId = ''
-        state.availability.columns = []
-        state.availability.items = []
+        state.availability = {searching: true, titleId: '', columns: [], items: []}
+      },
+      clearSearching(state){
+        state.details.searching = false
+        state.availability.searching = false
       },
 
       setCatalogKeyDetails(state, data) {
@@ -66,7 +70,6 @@ const item = {
          } else {
             ctx.commit('clearDetails')
          }
-         ctx.commit('setSearching', true, { root: true })
 
          // get source from poolID
          let baseURL = ""
@@ -89,10 +92,9 @@ const item = {
          axios.defaults.headers.common['Authorization'] = "Bearer " + ctx.rootState.user.authToken
          axios.get(url).then((response) => {
             ctx.commit("setDetails", {source:source, fields: response.data})
-            ctx.commit('setSearching', false, { root: true })
          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setSearching', false, { root: true })
+           ctx.commit('clearSearching')
+           ctx.commit('system/setError', error, { root: true })
          })
       },
 
@@ -100,11 +102,12 @@ const item = {
         ctx.commit('clearAvailability')
         axios.defaults.headers.common['Authorization'] = "Bearer " + ctx.rootState.user.authToken
         axios.get("/api/availability/" + titleId).then((response) => {
-          ctx.commit('setSearching', false, {root: true})
           ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
         }).catch((error) => {
-          if (error.response.status != 404) ctx.commit('system/setError', error, {root: true})
-          ctx.commit('setSearching', false, { root: true })
+          ctx.commit('clearSearching')
+          if (error.response.status != 404){
+            ctx.commit('system/setError', error, {root: true})
+          }
         })
       },
 
@@ -131,10 +134,9 @@ const item = {
          let url = ctx.rootState.system.searchAPI + "/api/search?intuit=1&debug=1"
          return axios.post(url, req).then((response) => {
             ctx.commit('setCatalogKeyDetails', response.data)
-            ctx.commit('setSearching', false, { root: true })
          }).catch((error) => {
+            ctx.commit('clearSearching')
             alert(error)
-            ctx.commit('setSearching', false, { root: true })
          })
       }
    }
