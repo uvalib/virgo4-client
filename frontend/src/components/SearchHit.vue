@@ -4,29 +4,29 @@
       <div class="top">
          <div class="basic">
             <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
-            <table class="fields">
-               <tr v-for="field in hit.basicFields" :key="getKey(field)">
+            <ul class="fields">
+               <li v-for="field in hit.basicFields" :key="getKey(field)">
                   <template v-if="field.display != 'optional'">
-                     <td class="label">{{field.label}}:</td>
-                     <td class="value" v-html="fieldValueString(field)"></td>
+                     <label>{{field.label}}:</label>
+                     <span class="value" v-html="fieldValueString(field)"></span>
                   </template>
-               </tr>
-            </table>
+               </li>
+            </ul>
+            <AccordionContent v-if="details" title="More Details" align="left-narrow">
+         <div class="details">
+            <ul class="fields">
+               <li v-for="field in hit.detailFields" :key="getKey(field)">
+                  <label>{{field.label}}:</label>
+                  <span class="value" v-html="fieldValueString(field)"></span>
+               </li>
+            </ul>
+         </div>
+      </AccordionContent>
          </div>
          <router-link class="img-link" v-if="hit.grouped==false" :to="detailsURL">
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
          </router-link>
       </div>
-      <AccordionContent v-if="details" title="Details">
-         <div class="details">
-            <table class="fields">
-               <tr v-for="field in hit.detailFields" :key="getKey(field)">
-                  <td class="label">{{field.label}}:</td>
-                  <td class="value" v-html="fieldValueString(field)"></td>
-               </tr>
-            </table>
-         </div>
-      </AccordionContent>
    </div>
 </template>
 
@@ -119,25 +119,18 @@ div.basic {
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
    text-decoration: none;
 }
-.hit table {
-   table-layout: auto;
-   border-collapse: collapse;
-   width: 100%;
-}
-.hit table td.label {
-   font-weight: bold;
-   text-align: right;
-   padding: 0 7px;
-   white-space: nowrap;
-   vertical-align: text-top;
-}
-.hit table td.value {
-   width: 100%;
-   font-weight: normal;
-}
 .cover-img.small {
    max-height: 124px;
    max-width: 100px;
 }
 
+ul.fields {
+   list-style: none;
+   padding-left: 20px;
+}
+li label {
+   font-weight: bold; 
+   margin-right: 10px;
+   color: #666;
+}
 </style>
