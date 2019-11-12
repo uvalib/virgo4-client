@@ -78,7 +78,6 @@
 import { mapMultiRowFields } from "vuex-map-fields";
 import { mapGetters } from "vuex";
 import { mapState } from "vuex";
-import Multiselect from 'vue-multiselect'
 export default {
    data: function() {
       return {
@@ -86,7 +85,6 @@ export default {
       } 
    },
    components: {
-      Multiselect
    },
    computed: {
       ...mapState({

@@ -33,7 +33,7 @@
                               <td>{{bookmark.details.title}}</td>
                               <td>{{bookmark.details.author}}</td>
                               <td class="icon">
-                                 <i class="move fas fa-arrows-alt"></i>
+                                 <MoveBookmark v-on:move-approved="moveBookmark(bookmark.id, folder)"/>
                                  <router-link :to="detailsURL(bookmark)">
                                     <i class="details fas fa-info-circle"></i>
                                  </router-link>
@@ -83,12 +83,13 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import ConfirmDelete from "@/components/popovers/ConfirmDelete"
+import MoveBookmark from "@/components/popovers/MoveBookmark"
 import AccordionContent from "@/components/AccordionContent"
 import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "bookmarks",
    components: {
-      AccordionContent,ConfirmDelete,AccountActivities
+      AccordionContent,ConfirmDelete,AccountActivities,MoveBookmark
    },
    data: function()  {
       return {
@@ -109,6 +110,9 @@ export default {
       }),
    },
    methods: {
+      moveBookmark(bookmarkID, newFolder) {
+         alert("woof")
+      },
       reserve(items) {
          this.$store.commit("reserves/setRequestList", items)    
          this.$router.push("/course-reserves-request")
@@ -242,10 +246,6 @@ i.details {
    font-size: 1.25em;
    color: var(--color-light-blue)
 }
-i.move {
-   font-size: 1.25em; 
-   margin-right:10px;
-}
 .none {
    text-align: center;
    font-size: 1.25em;
@@ -254,6 +254,7 @@ i.move {
 .controls {
    font-size: 0.9em;
    text-align: right;
+   margin-bottom:15px;
 }
 .create-folder {
    color: #444;

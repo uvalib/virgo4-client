@@ -79,14 +79,23 @@ export default {
    --color-error: firebrick;
 }
 
-#app .pure-button.pure-button-primary {
+.pure-button.pure-button-primary {
   background-color: var(--color-primary-blue);
 }
 
-#app .pure-button.pure-button-secondary {
+.pure-button.pure-button-secondary {
    background-color: var(--color-pale-blue);
    color: white;
    border-radius: 5px;
+}
+
+.pure-button.pure-button-primary,  .pure-button.pure-button-secondary{
+  margin: 0 0 0 10px;
+  border-radius: 5px;
+}
+.pure-button.disabled {
+  cursor: default;
+  opacity: 0.25;
 }
 
 #app .dimmer {
@@ -121,15 +130,6 @@ html, body {
    margin-bottom: .3em;
 }
 
-#app span.pure-button {
-  margin: 0 0 0 10px;
-  border-radius: 5px;
-}
-#app .pure-button.disabled {
-  cursor: default;
-  opacity: 0.25;
-}
-
 #app h1 {
   color: var(--color-primary-orange);
   margin: 8px 0;
@@ -149,6 +149,10 @@ html, body {
 }
 
 /* for v-popover styles */
+div.v-popover.inline {
+  display: inline-block;
+  cursor: pointer;
+}
 .tooltip {
   display: block !important;
   z-index: 10000;

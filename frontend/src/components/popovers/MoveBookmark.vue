@@ -1,21 +1,20 @@
 <template>
-   <v-popover>
+   <v-popover class="inline">
       <span class="trigger">
-         <i class="trash fas fa-trash-alt"></i>
+         <i class="move fas fa-arrows-alt"></i>
       </span>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
-            <span>Confirm Delete</span>
+            <span>Move Bookmark</span>
          </div>
          <div class="message">
-            <slot/>
-            <p>Continue?</p>
+            <p>Select a new folder for this bookmark</p>
          </div>
-         <div class="confirm-controls">
+         <div class="move-controls">
             <span v-close-popover class="pure-button pure-button-secondary">Cancel</span>
             <span class="pure-button pure-button-primary"
-               @click="$emit('delete-approved')" v-close-popover >
-               OK
+               @click="$emit('move-approved')" v-close-popover >
+               Move
             </span>
          </div>
       </div>
@@ -23,18 +22,20 @@
 </template>
 
 <script>
-
+import { mapGetters } from "vuex"
 export default {
+   computed: {
+      ...mapGetters({
+         folders: 'user/folders',
+      }),
+   }
 };
 </script>
 
 <style scoped>
-i.trash {
-   color: #999;
-   cursor: pointer;
-   font-size: 1.2em;
-   padding: 2px 8px 2px 0;
-   margin-right: 5px;
+i.move {
+   font-size: 1.25em; 
+   margin-right:10px;
 }
 div.popover-header {
    padding: 5px 15px;
@@ -64,7 +65,7 @@ div.message {
    padding: 5px 0;
    text-align: right;
 }
-.confirm-controls {
+.move-controls {
    font-size: 0.9em;
    padding: 10px;
    text-align: right;
@@ -77,7 +78,7 @@ div.message {
    align-items: center;
    justify-content: flex-end;
 }
-.confirm-controls .pure-button {
+.move-controls .pure-button {
    margin-left: 5px;
 }
 </style>
