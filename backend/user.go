@@ -244,11 +244,22 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	uq.Row(&user.ID)
 
+	exist := 0
+	fq := svc.DB.NewQuery("select count(*) from bookmark_folders where user_id={:uid} and name={:fn}")
+	fq.Bind(dbx.Params{"uid": user.ID})
+	fq.Bind(dbx.Params{"fn": fp.Name})
+	fq.Row(&exist)
+	if exist != 0 {
+		log.Printf("ERROR: add folder %s:%s already exists", user.Virgo4ID, fp.Name)
+		c.String(http.StatusConflict, "Folder '%s' already exists", fp.Name)
+		return
+	}
+
 	newFolder := Folder{UserID: user.ID, Name: fp.Name, AddedAt: time.Now()}
 	err = svc.DB.Model(&newFolder).Insert()
 	if err != nil {
 		log.Printf("ERROR: add folder %s%s failed: %v", user.Virgo4ID, fp.Name, err)
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -376,6 +387,44 @@ func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
 	if err != nil {
 		log.Printf("ERROR: unable to remove item %s:%s - %v", user.Virgo4ID, bookmarkID, err)
 		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Get the new list of bookmarks and return them as JSON
+	user.GetBookmarks(svc.DB)
+	c.JSON(http.StatusOK, user.Bookmarks)
+}
+
+// MoveBookmark will move a bookmark to a new folder
+func (svc *ServiceContext) MoveBookmark(c *gin.Context) {
+	user := NewV4User()
+	user.Virgo4ID = c.Param("uid")
+	bookmarkID := c.Param("id")
+	log.Printf("User %s deleting bookmarkID %s", user.Virgo4ID, bookmarkID)
+
+	// get user ID
+	log.Printf("Lookup user %s ID", user.Virgo4ID)
+	q := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	q.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	q.Row(&user.ID)
+
+	var folderInfo struct {
+		FolderID int
+	}
+	err := c.ShouldBindJSON(&folderInfo)
+	if err != nil {
+		log.Printf("ERROR: invalid item move payload: %v", err)
+		c.String(http.StatusBadRequest, "Invalid move bookmark request")
+		return
+	}
+
+	uq := svc.DB.NewQuery("update bookmarks set folder_id={:fid} where id={:bmid}")
+	uq.Bind(dbx.Params{"fid": folderInfo.FolderID})
+	uq.Bind(dbx.Params{"bmid": bookmarkID})
+	_, err = uq.Execute()
+	if err != nil {
+		log.Printf("ERROR: unable to move bookmark: %s", err)
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 

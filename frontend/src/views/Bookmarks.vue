@@ -9,7 +9,7 @@
          </div>
          <div v-else>
             <div class="none" v-if="hasBookmarks == false">
-               You have no bookmarked items.
+               You have no bookmarks
             </div>
             <template v-else>
                <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
@@ -33,7 +33,8 @@
                               <td>{{bookmark.details.title}}</td>
                               <td>{{bookmark.details.author}}</td>
                               <td class="icon">
-                                 <MoveBookmark v-on:move-approved="moveBookmark(bookmark.id, folder)"/>
+                                 <MoveBookmark :bookmark="bookmark" :srcFolder="folderInfo.id"
+                                    v-on:move-approved="moveBookmark"/>
                                  <router-link :to="detailsURL(bookmark)">
                                     <i class="details fas fa-info-circle"></i>
                                  </router-link>
@@ -58,7 +59,7 @@
                </span>
                <div v-else  class="create-folder pure-form">
                   <label>New Folder:</label>
-                  <input @keyup.enter="createFolder" v-model="newFolder" type="text"/>
+                  <input ref="folderInput" @keyup.enter="createFolder" v-model="newFolder" type="text"/>
                   <span @click="cancelCreate" :class="{disabled: submitting}"
                      class="pure-button pure-button-secondary">
                      Cancel
@@ -110,8 +111,9 @@ export default {
       }),
    },
    methods: {
-      moveBookmark(bookmarkID, newFolder) {
-         alert("woof")
+      moveBookmark(bookmarkID, folderID) {
+         let data = {bookmarkID: bookmarkID, folderID: folderID}
+         this.$store.dispatch("user/moveBookmark", data)
       },
       reserve(items) {
          this.$store.commit("reserves/setRequestList", items)    
@@ -128,6 +130,9 @@ export default {
       },
       openCreate() {
          this.createOpen = true
+         this.$nextTick(()=>{
+            this.$refs.folderInput.focus();
+         });
       },
       cancelCreate() {
          if (this.submitting) return 
@@ -237,9 +242,9 @@ table {
    width: 100%;
 }
 div.none {
-   font-size: 1.1em;
-   text-align: left;
-   margin: 15px;
+   font-size: 1.4em;
+   text-align: center;
+   margin: 35px;
    color: #999;
 }
 i.details {

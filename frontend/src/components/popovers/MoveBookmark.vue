@@ -7,13 +7,20 @@
          <div class="popover-header">
             <span>Move Bookmark</span>
          </div>
-         <div class="message">
+         <div class="message pure-form">
             <p>Select a new folder for this bookmark</p>
+            <select v-model="selectedFolder">
+               <option value="">Select a folder</option>
+               <option v-for="(folder) in folders" 
+                  :key="folder.id" :value="folder.id ">
+                  {{ folder.name }}
+               </option>
+            </select>
          </div>
          <div class="move-controls">
             <span v-close-popover class="pure-button pure-button-secondary">Cancel</span>
             <span class="pure-button pure-button-primary"
-               @click="$emit('move-approved')" v-close-popover >
+               @click="moveClicked" v-close-popover >
                Move
             </span>
          </div>
@@ -24,10 +31,34 @@
 <script>
 import { mapGetters } from "vuex"
 export default {
+   props: {
+      bookmark: {
+         type: Object,
+         required: true
+      },
+      srcFolder: {
+         type: Number,
+         required: true
+      },
+   },
+   data: function()  {
+      return {
+         selectedFolder: "",
+      }
+   },
    computed: {
       ...mapGetters({
-         folders: 'user/folders',
+         allFolders: 'user/folders',
       }),
+      folders() {
+         return this.allFolders.filter(f => f.id != this.srcFolder)
+      }
+   },
+   methods: {
+      moveClicked() {
+         //let payload = {bookmarkID: this.bookmark.id, folderID: this.selectedFolder}
+         this.$emit('move-approved', this.bookmark.id, this.selectedFolder)
+      }
    }
 };
 </script>
@@ -64,6 +95,9 @@ div.message {
    margin: 0;
    padding: 5px 0;
    text-align: right;
+}
+select {
+   width: 100%;
 }
 .move-controls {
    font-size: 0.9em;

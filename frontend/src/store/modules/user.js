@@ -106,12 +106,7 @@ const user = {
       hasBookmarks: state => {
          if ( state.bookmarks == null ) return false 
          if ( state.bookmarks.length === 0) return false
-         let found = false
-         state.bookmarks.some( folderInfo=> {
-            found = folderInfo.bookmarks.length > 0
-            return found == true
-         })
-         return found
+         return true
       },
       bookmarks: state => {
          if ( state.bookmarks == null ) return []
@@ -311,6 +306,8 @@ const user = {
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders`
          return axios.post(url, {name: folder}).then((response) => {
             ctx.commit('setBookmarks', response.data)
+         }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
          })
       },
       removeFolder(ctx, folderID) {
@@ -326,6 +323,17 @@ const user = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items/${bmID}`
          axios.delete(url).then((response) => {
+            ctx.commit('setBookmarks', response.data)
+         }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+         })
+      },
+      moveBookmark(ctx, data) {
+         let bmID = data.bookmarkID 
+         let folderID = data.folderID
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items/${bmID}/move`
+         axios.post(url, {folderID: folderID}).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })

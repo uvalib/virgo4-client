@@ -56,6 +56,7 @@ func main() {
 			bookmarks.DELETE("/folders/:id", svc.AuthMiddleware, svc.DeleteBookmarkFolder)
 			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
 			bookmarks.DELETE("/items/:id", svc.AuthMiddleware, svc.DeleteBookmark)
+			bookmarks.POST("/items/:id/move", svc.AuthMiddleware, svc.MoveBookmark)
 		}
 		reserves := api.Group("/reserves")
 		{
