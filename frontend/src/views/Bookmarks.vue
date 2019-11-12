@@ -19,17 +19,11 @@
                      <div>contained within it will also be deleted.</div> 
                      <div><br/>This cannot be reversed.</div>
                   </ConfirmDelete>
-                  <AccordionContent background="#f5f5f5" :title="folderInfo.folder" align="left">
+                  <AccordionContent class="boxed" background="#f5f5f5" :title="folderInfo.folder" align="left">
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
                      </div>
                      <div v-else>
-                        <div v-if="canMakeReserves" class="actions">
-                           <span @click="reserve(folderInfo.bookmarks)" 
-                              class="pure-button pure-button-primary all">
-                              Place items on course reserve
-                           </span>
-                        </div>
                         <table>
                            <tr>
                               <th/><th>Title</th><th>Author</th><th/>
@@ -39,9 +33,18 @@
                               <td>{{bookmark.details.title}}</td>
                               <td>{{bookmark.details.author}}</td>
                               <td class="icon">
+                                 <i class="move fas fa-arrows-alt"></i>
                                  <router-link :to="detailsURL(bookmark)">
                                     <i class="details fas fa-info-circle"></i>
                                  </router-link>
+                              </td>
+                           </tr>
+                           <tr v-if="canMakeReserves">
+                              <td class="actions" colspan="4">
+                              <span @click="reserve(folderInfo.bookmarks)" 
+                                 class="pure-button pure-button-primary all">
+                                 Place items on course reserve
+                              </span>
                               </td>
                            </tr>
                         </table>
@@ -49,10 +52,27 @@
                   </AccordionContent>
                </div>
             </template>
-            <transition name="message-transition"
+            <div class="controls">
+               <span v-if="createOpen==false" @click="openCreate" class="pure-button pure-button-primary">
+                  Create Folder
+               </span>
+               <div v-else  class="create-folder pure-form">
+                  <label>New Folder:</label>
+                  <input @keyup.enter="createFolder" v-model="newFolder" type="text"/>
+                  <span @click="cancelCreate" :class="{disabled: submitting}"
+                     class="pure-button pure-button-secondary">
+                     Cancel
+                  </span>
+                  <span  @click="createFolder" :class="{disabled: submitting}" 
+                     class="pure-button pure-button-primary">
+                     Create
+                  </span>
+               </div>
+            </div>
+             <transition name="message-transition"
                         enter-active-class="animated faster fadeIn"
                         leave-active-class="animated faster fadeOut">
-               <p v-if="error" class="error">Unable to retrieve bookmarks: {{ error }}</p>
+               <p v-if="error" class="error">{{ error }}</p>
             </transition>
          </div>
       </div>
@@ -69,6 +89,13 @@ export default {
    name: "bookmarks",
    components: {
       AccordionContent,ConfirmDelete,AccountActivities
+   },
+   data: function()  {
+      return {
+         createOpen: false,
+         newFolder: "",
+         submitting: false
+      }
    },
    computed: {
       ...mapState({
@@ -94,6 +121,28 @@ export default {
       },
       removeFolder(folderID) {
          this.$store.dispatch("user/removeFolder", folderID)
+      },
+      openCreate() {
+         this.createOpen = true
+      },
+      cancelCreate() {
+         if (this.submitting) return 
+         this.createOpen = false
+         this.$store.commit("system/setError", "")
+      },
+      createFolder() {
+         if (this.submitting) return 
+         this.submitting = true
+         this.$store.commit("system/setError", "")
+         if ( this.newFolder == "") {
+            this.$store.commit("system/setError", "A new folder name is required")
+            return
+         }
+         this.$store.dispatch("user/addFolder", this.newFolder).then( () => {
+            this.createOpen = false
+            this.submitting = false
+            this.newFolder = ""
+         })
       }
    },
    created() {
@@ -101,6 +150,12 @@ export default {
    }
 }
 </script>
+
+<style>
+div.accordion.boxed div.title {
+   border: 1px solid #ccc;
+}
+</style>
 
 <style scoped>
 .remove, .remove-folder {
@@ -153,12 +208,10 @@ div.accordion {
        width: 95%;
    }
 }
-div.actions {
+td.actions {
    font-size: 0.8em;
-   text-align: left;
-   padding: 10px 0;
-   background: #e5e5e5;
-   border-top: 1px solid #ccc;
+   text-align: right;
+   padding: 5px;
 }
 table td, th {
   padding: 2px 8px;
@@ -189,10 +242,29 @@ i.details {
    font-size: 1.25em;
    color: var(--color-light-blue)
 }
+i.move {
+   font-size: 1.25em; 
+   margin-right:10px;
+}
 .none {
    text-align: center;
    font-size: 1.25em;
    margin-top: 35px;
+}
+.controls {
+   font-size: 0.9em;
+   text-align: right;
+}
+.create-folder {
+   color: #444;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+   justify-content: flex-end;
+}
+.create-folder label {
+   font-weight: bold; 
+   margin-right: 10px;
 }
 </style>
 

@@ -125,6 +125,10 @@ html, body {
   margin: 0 0 0 10px;
   border-radius: 5px;
 }
+#app .pure-button.disabled {
+  cursor: default;
+  opacity: 0.25;
+}
 
 #app h1 {
   color: var(--color-primary-orange);

@@ -34,6 +34,7 @@ i.trash {
    cursor: pointer;
    font-size: 1.2em;
    padding: 2px 8px 2px 0;
+   margin-right: 5px;
 }
 div.popover-header {
    padding: 5px 15px;
