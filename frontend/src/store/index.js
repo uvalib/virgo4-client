@@ -88,9 +88,6 @@ export default new Vuex.Store({
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
     },
-    deselectPoolResults(state) {
-      state.selectedResultsIdx = -1
-    },
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool
       // total from overall total and reset pool total to 0
@@ -265,6 +262,12 @@ export default new Vuex.Store({
         commit('setSearching', false)
       })
     },
+
+    // Select pool results and get all facet info for the result
+    selectPoolResults(ctx, resultIdx) {
+      ctx.commit('selectPoolResults', resultIdx) 
+      ctx.dispatch("filters/getAllFacets")
+    }
   },
 
   modules: {

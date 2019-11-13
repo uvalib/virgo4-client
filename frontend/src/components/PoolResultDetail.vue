@@ -50,7 +50,7 @@ export default {
          searching: state=>state.searching,
          selectedResultsIdx: state => state.selectedResultsIdx,
          addingFilter: state => state.filters.adding,
-         updatingBuckets: state => state.filters.updatingBuckets,
+         updatingFacets: state => state.filters.updatingFacets,
       }),
       ...mapGetters({
          selectedResults: 'selectedResults',
@@ -136,7 +136,6 @@ div.infinite-status-prompt {
    background-color: var(--color-brand-blue);
    position: relative;
    top: -5px;
-   left: -1px;
 }
 div.results-header {
    font-size: 1em;

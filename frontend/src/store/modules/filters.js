@@ -18,7 +18,7 @@ const filters = {
       poolFacets: [],
       poolFilters: [],
       adding: false,
-      updatingBuckets: false,
+      updatingFacets: false,
 
       // Global availability and hard-coded filter values
       globalAvailability: {id: "any", name: "Any"},
@@ -166,8 +166,7 @@ const filters = {
          state.adding = false
       },
 
-      setFacetBuckets(state, data) {
-         // NOTE: for all pools but EDS, the facets array is length one
+      setFacets(state, data) {
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          data.facets.forEach( function(facet) {
             let facetInfo = allPoolFacets.find(f => f.facet.id === facet.id) 
@@ -199,8 +198,8 @@ const filters = {
          state.poolFilters[idx].splice(0, state.poolFilters[idx].length)
       },
 
-      setUpdatingBuckets(state, flag) {
-         state.updatingBuckets = flag
+      setUpdatingFacets(state, flag) {
+         state.updatingFacets = flag
       },
 
       reset(state) {
@@ -210,27 +209,28 @@ const filters = {
    },
 
    actions: {
-      getBuckets(ctx, data) {
+      // Get all facets for the selected result set / query / pool
+      getAllFacets(ctx) {
          // Recreate the query for the target pool, but include a 
-         // request for facet/bucket info for the  specified facet
+         // request for ALL facet info
          let pool = ctx.rootState.results[data.poolResultsIdx].pool
          let req = {
             query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
-            facet: data.facet,
+            facet: "all",
             filters: ctx.getters.poolFilter(data.poolResultsIdx, "api")
           }
          let tgtURL = pool.url+"/api/search"
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-         ctx.commit('setUpdatingBuckets', true)
+         ctx.commit('setUpdatingFacets', true)
          axios.post(tgtURL, req).then((response) => {
-            ctx.commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, 
+            ctx.commit("setFacets", {poolResultsIdx: data.poolResultsIdx, 
                facets: response.data.facet_list})
-            ctx.commit('setUpdatingBuckets', false)
-         })/*.catch((error) => {
+            ctx.commit('setUpdatingFacets', false)
+         }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setUpdatingBuckets', false)
-          })*/
+            ctx.commit('setUpdatingFacets', false)
+          })
       }
    }
 }

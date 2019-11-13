@@ -18,18 +18,18 @@
             <tr>
                <td class="label">Value:</td>
                <td class="sel">
-                  <template v-if="selectedFacet && !updatingBuckets">
+                  <template v-if="selectedFacet && !updatingFacets">
                      <multiselect v-model="facetValues" class="buckets"  :multiple="true"  
                            placeholder="Select at least one value"
                            :block-keys="['Tab', 'Enter']" :hideSelected="true"
                            :showLabels="false" 
                            track-by="value" label="display" :searchable="false"
-                           :optionHeight="32" :loading="updatingBuckets"
+                           :optionHeight="32" :loading="updatingFacets"
                            :options="facetBuckets(resultsIdx, selectedFacet)">
                      </multiselect>
                   </template>
                   <template v-else>
-                     <label v-if="updatingBuckets">Loading facet values...</label>
+                     <label v-if="updatingFacets">Loading facet values...</label>
                      <label v-else>Select a facet to see value options</label>
                   </template>
                </td>
@@ -62,7 +62,7 @@ export default {
       ...mapState({
          resultsIdx: state => state.selectedResultsIdx,
          searching: state => state.searching,
-         updatingBuckets: state => state.filters.updatingBuckets
+         updatingFacets: state => state.filters.updatingFacets
       }),
       ...mapGetters({
          poolFacets: 'filters/poolFacets',

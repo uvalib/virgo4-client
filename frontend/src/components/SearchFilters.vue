@@ -2,9 +2,7 @@
    <div class="filters">
       <div class="filters-head clearfix">
          <span class="title">Search Filters</span>
-         <span v-if="hasFilter(poolIdx)" @click="clearClicked" class="clear">Clear</span>
-         <span v-if="!addingFilter" @click="addClicked" 
-            v-bind:class="{disabled: total==0}" class="add">Add</span>
+         <span v-if="hasFilter(poolIdx)" @click="clearClicked" class="clear">Clear All</span>
       </div>
       <template v-if="hasFilter(poolIdx)">
          <table>
@@ -20,21 +18,15 @@
       <div v-else class="no-filter">
          <span>None</span>
       </div>
-      <AddFilter v-if="addingFilter"/>
    </div>
 </template>
 
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import AddFilter from '@/components/AddFilter'
 export default {
-   components: {
-      AddFilter
-   },
    computed: {
       ...mapState({
-         addingFilter: state => state.filters.adding,
          poolIdx: state => state.selectedResultsIdx,
          availabilityFacet: state => state.filters.availabilityFacet,
       }),

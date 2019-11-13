@@ -1,39 +1,40 @@
 <template>
-   <div class="results-panel">
-      <div class="query-summary">
-         <span>Showing results for: <i>{{queryString}}</i></span>
-      </div>
-      <div class="toolbar">
-         <div class="right-indent">
-            <p class="summary">
-               <span>{{total}} matches found in {{results.length}} sources.</span>
-               <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
-               <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
-            </p>
-         </div>
-         <div class="search-controls">
-            <AvailabilitySelector/>
-            <span v-if="searchMode=='basic'" @click="refineClicked()" class="refine pure-button pure-button-primary">Refine Search</span>
-         </div>
+   <div v-if="!searching" class="search-results">
 
-         <p class="relevant">Most Relevant</p>
-         <div class="pool-buttons">
-            <template  v-for="(r,idx) in results.slice(0,2)">
-               <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: idx == selectedResultsIdx}">
-                  <span>
-                     <span class="pool">{{r.pool.name}}</span>
-                     <span class="total">{{r.total}} hits</span>
-                  </span>
-               </div>
-            </template>
-            <V4Select v-if="results.length > 2" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
-               :background="otherSrcBkg" :color="otherSrcColor" 
-               placeholder="Other<span class='total'>Sources</span>"
-               v-model="otherSrcSelection"/>
+      <div class="results-header">
+         <div class="summary">
+            <div class="query">Showing results for: <i>{{queryString}}</i></div>
+            <span>{{total}} matches found in {{results.length}} sources.</span>
+            <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
+            <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
          </div>
+         <span v-if="searchMode=='basic'" @click="refineClicked()" 
+            class="refine pure-button pure-button-primary">
+            Refine Search
+         </span>
       </div>
 
-      <PoolResultDetail v-if="selectedResultsIdx > -1" />
+      <div class="results-wrapper">
+         <FacetSidebar />
+         <div class="results-main">
+            <p class="relevant">Most Relevant</p>
+            <div class="pool-tabs">
+               <template  v-for="(r,idx) in results.slice(0,2)">
+                  <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: idx == selectedResultsIdx}">
+                     <span>
+                        <span class="pool">{{r.pool.name}}</span>
+                        <span class="total">{{r.total}} hits</span>
+                     </span>
+                  </div>
+               </template>
+               <V4Select v-if="results.length > 2" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
+                  :background="otherSrcBkg" :color="otherSrcColor" 
+                  placeholder="Other<span class='total'>Sources</span>"
+                  v-model="otherSrcSelection"/>
+            </div>
+            <PoolResultDetail v-if="selectedResultsIdx > -1" />
+         </div>
+      </div>
 
    </div>
 </template>
@@ -43,11 +44,11 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import PoolResultDetail from "@/components/PoolResultDetail"
-import AvailabilitySelector from '@/components/AvailabilitySelector'
 import V4Select from "@/components/V4Select"
+import FacetSidebar from "@/components/FacetSidebar"
 export default {
    components: {
-      AvailabilitySelector,PoolResultDetail,V4Select
+      PoolResultDetail, V4Select, FacetSidebar
    },
    computed: {
       ...mapGetters({
@@ -64,6 +65,7 @@ export default {
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
+         searching: state => state.searching,
       }),
       ...mapFields([
         'otherSrcSelection'
@@ -104,7 +106,7 @@ export default {
          let found = false
          this.results.some( (r,idx) => {
             if ( r.pool.id == newVal.id) {
-               this.$store.commit("selectPoolResults", idx)
+               this.$store.dispatch("selectPoolResults", idx)
                found = true
             }
             return found
@@ -128,14 +130,14 @@ export default {
          let r = this.results[resultIdx]
          if ( this.poolFailed(r)) return
          this.otherSrcSelection = {id:"", name:""}
-         this.$store.commit("selectPoolResults", resultIdx)
+         this.$store.dispatch("selectPoolResults", resultIdx)
       },
    }
 }
 </script>
 
 <style>
-div.pool-buttons span.total {
+div.pool-tabs span.total {
    display: block;
    font-size: 0.75em;
    margin: 0;
@@ -145,24 +147,21 @@ div.pool-buttons span.total {
 p.relevant {
    text-align: left;
    padding: 0;
-   margin: 15px 0 0 5px;
+   margin: 0 0 0 10px;
 }
 .v4-select {
    margin: 0 0 2px 0;
    border-radius: 5px 5px 0 0;
    flex: 1 1 auto;
 }
-.pool-buttons {
+.pool-tabs {
    margin: 0 0 0 0;
    text-align: left;
    font-size: 0.9em;
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
-   margin: 0 10px;
-}
-div.right-indent {
-   margin-left: 5px;
+   margin: 0 10% 0 10px;
 }
 .pool.pure-button {
    margin: 0 2px 0 0;
@@ -186,41 +185,52 @@ div.right-indent {
    color: white;
    opacity: 0.5;
 }
-.query-summary {
+.summary .query {
    text-align: left;
    margin: 0 0 0.2vw 0;
    font-weight: bold;
    font-size: 1.1em;
+}
+.results-header {
+   display: flex;
+   flex-flow: row wrap;
+   align-content: center;
+   align-items: center;
+   justify-content: space-between;
+   border-top: 2px solid var(--color-brand-blue);
+   margin-top: 10px;
+   padding-top: 10px;
+   margin-bottom: 10px;
+}
+.results-main {
+   display: inline-block;
+   flex: 1 1 70%;
 }
 .summary {
    margin: 0 0 0.2vw 0;
    font-weight: 500;
    text-align: left;
    font-size: 0.85em;
-   position: relative;
 }
 .summary .subtotal {
    display: block;
    margin: 2px 0 2px 15px;
 }
 @media only screen and (min-width: 768px) {
-   div.results-panel {
+   div.search-results {
       margin: 0 5vw 5vw 5vw;
       padding: 0;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.results-panel {
+   div.search-results {
       margin: 0 2vw 2vw 2vw;
       padding: 0;
    }
 }
-div.search-controls {
+.results-wrapper {
    display: flex;
    flex-flow: row wrap;
-   font-size: 0.9em;
-   justify-content: space-between;
-   margin-top:10px;
-   align-items: stretch;
+   justify-content: flex-start;
 }
 </style>
