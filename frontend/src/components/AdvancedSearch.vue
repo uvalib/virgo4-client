@@ -39,7 +39,7 @@
                      <option value="BETWEEN">BETWEEN</option>
                   </select>
                </template>
-               <i @click="removeCriteria(idx)" class="remove fas fa-trash-alt"></i>
+               <i @click="removeCriteria(idx)" class="remove fas fa-times-circle"></i>
             </div>
 
             <div class="query">
@@ -62,7 +62,10 @@
          </div>
       </div>
       <div class="controls">
-         <span @click="addClicked" class="add pure-button pure-button-secondary">Add Criteria</span>
+         <span @click="addClicked" class="add pure-button pure-button-secondary">
+            <i class="add fas fa-plus-circle"></i>
+            Add Criteria
+         </span>
          <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">
@@ -179,8 +182,8 @@ div.options {
 }
 i.remove {
    cursor: pointer;
-   font-size: 1.5em;
-   color: #666;
+   font-size: 1.75em;
+   color: firebrick;
    float: right;
 }
 

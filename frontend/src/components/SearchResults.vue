@@ -150,6 +150,7 @@ p.relevant {
 .v4-select {
    margin: 0 0 2px 0;
    border-radius: 5px 5px 0 0;
+   flex: 1 1 auto;
 }
 .pool-buttons {
    margin: 0 0 0 0;
@@ -158,7 +159,7 @@ p.relevant {
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
-   margin-left: 5px;
+   margin: 0 10px;
 }
 div.right-indent {
    margin-left: 5px;
@@ -170,7 +171,7 @@ div.right-indent {
    color: #666;
    border: 1px solid #e6e6e6;
    text-align: left;
-   
+   flex: 1 1 auto;
 }
 .pool.pure-button.showing {
    background-color: var(--color-brand-blue);
