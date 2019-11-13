@@ -18,6 +18,9 @@
             <tr v-for="(item,idx) in availability.items" :key="idx">
                <td class="value" v-for="(field, id) in visibleFields(item)" :key="id">
                   {{field.value}}
+                 <span class="notice" v-if="(id == visibleFields(item).length - 1) && (item.notice)">
+                   <AvailabilityNotice v-bind:message="item.notice" />
+                 </span>
                </td>
             </tr>
          </table>
@@ -28,7 +31,11 @@
 
 <script>
 import { mapGetters } from "vuex"
+import AvailabilityNotice from "@/components/popovers/AvailabilityNotice"
 export default {
+  components: {
+    AvailabilityNotice
+  },
    props: {
       titleId: String
    },

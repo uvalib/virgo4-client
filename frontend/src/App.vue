@@ -159,7 +159,7 @@ div.v-popover.inline {
 }
 .tooltip .tooltip-inner {
   border-radius: 10px;
-  padding: 0px 0px 4px;
+  padding: 0 0 0 6px;
 }
 .tooltip.popover.vue-popover-theme  {
    outline: none;
