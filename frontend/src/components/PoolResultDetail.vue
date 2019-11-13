@@ -14,6 +14,13 @@
             </div>
          </div>
       </div>
+      <transition name="message-transition"
+          enter-active-class="animated faster fadeIn"
+          leave-active-class="animated faster fadeOut">
+         <div v-if="showScrollTop" class="scroll-to-top" @click="backToTop">
+            <i class="fas fa-angle-up"></i>
+         </div>
+      </transition>
       <infinite-loading @infinite="loadMoreResults" ref="infiniteLoader" >
          <span slot="no-more">No more matches</span>
          <span slot="spinner"><img src="../assets/searching.gif"></span>
@@ -31,6 +38,11 @@ import InfiniteLoading from 'vue-infinite-loading'
 export default {
    components: {
       SearchHit,SearchFilters,InfiniteLoading,GroupedSearchHit
+   },
+   data: function() {
+      return {
+         showScrollTop: false
+      }
    },
    computed: {
       ...mapState({
@@ -55,12 +67,21 @@ export default {
             this.$refs.infiniteLoader.stateChanger.reset()
          }
          if (this.selectedResults.statusCode == 408 && this.selectedResults.total == 0) {
-            alert("GET")
             this.$store.dispatch("searchSelectedPool")
          }
       }
    },
    methods: {
+      backToTop: function() {
+         var scrollStep = -window.scrollY / (500 / 10),
+         scrollInterval = setInterval(()=> {
+            if ( window.scrollY != 0 ) {
+               window.scrollBy( 0, scrollStep ) 
+            } else {
+               clearInterval(scrollInterval)
+            }
+         },10)
+      },
       loadMoreResults($state) {
          if ( this.searching) return
 
@@ -73,6 +94,19 @@ export default {
             $state.complete() 
          }
       },
+      scrollChecker() {
+         if (window.window.scrollY > 3000) {
+            this.showScrollTop = true
+         } else {
+            this.showScrollTop = false
+         }
+      }
+   },
+   created: function() {
+      window.addEventListener("scroll", this.scrollChecker)
+   },
+   destroyed: function() {
+      window.removeEventListener("scroll", this.scrollChecker)
    }
 }
 </script>
@@ -123,10 +157,22 @@ div.results-header {
 }
 .hit-wrapper {
    margin: 5px;
-   /* border:1px solid #ccc;
-   border-radius: 5px; */
 }
 .hit-wrapper:last-child {
    margin-bottom: 0;
+}
+.scroll-to-top {
+   position: fixed;
+   background: var(--color-brand-orange);
+   color: white;
+   font-size: 2em;
+   font-weight: 100;
+   padding: 0px 12px;
+   border-radius: 5px;
+   border: 2px solid white;
+   box-shadow: 0px 0px 5px black;
+   right: 15px;
+   bottom: 15px;
+   cursor: pointer;
 }
 </style>

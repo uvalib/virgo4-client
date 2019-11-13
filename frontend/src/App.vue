@@ -79,6 +79,12 @@ export default {
    --color-error: firebrick;
 }
 
+html, body {
+   margin: 0;
+   padding: 0;
+   background-color: var(--color-dark-blue);
+}
+
 .pure-button.pure-button-primary {
   background-color: var(--color-primary-blue);
 }
@@ -106,12 +112,6 @@ export default {
   height: 100%;
   z-index: 1000;
   background:rgba(0,0,0,0.5);
-}
-
-html, body {
-   margin: 0;
-   padding: 0;
-   background-color: var(--color-dark-blue);
 }
 
 #app {
