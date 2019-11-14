@@ -17,7 +17,6 @@ const filters = {
       poolDefaultFacets: [],
       poolFacets: [],
       poolFilters: [],
-      adding: false,
       updatingFacets: false,
 
       // Global availability and hard-coded filter values
@@ -82,6 +81,7 @@ const filters = {
       // [ {name: facet, value: v1}, ...]
       // This getter takes a fmt param that is either api or raw to control the response
       poolFilter: (state) => (idx, fmt) => {
+         // FIXME THIS IS BROKEN
          let apiFilter = []
          let globalVal = state.availabilityValues[state.globalAvailability.id]
          let out = state.poolFilters[idx].slice(0)
@@ -157,14 +157,6 @@ const filters = {
          })
       },
 
-      showAdd(state) {
-         state.adding = true
-      },
-
-      closeAdd(state) {
-         state.adding = false
-      },
-
       setFacets(state, data) {
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          data.facets.forEach( function(facet) {
@@ -177,20 +169,17 @@ const filters = {
          })
       },
 
-      addFilter(state, data) {
-         // data = {poolResultsIdx: idx, facet: name, values: VALUES
-         // IMPORTANT: VALUES comes from vue-multiselect which binds 
-         // the whole json object for the option into the array. Just add value
+      toggleFilter(state, data) {
+         // data = {poolResultsIdx: idx, facet: facetID, value: facet bucket value
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          let facetInfo = allPoolFacets.find(f => f.facet.id === data.facetID) 
          let filter = state.poolFilters[data.poolResultsIdx]
-         filter.push( {facet: facetInfo.facet, values: data.values.map(f=>f.value)})
-      },
-
-      removeFilter(state, data) {
-         // data = {poolResultsIdx: idx, filterIdx: fidx}
-         let filters = state.poolFilters[data.poolResultsIdx]
-         filters.splice(data.filterIdx,1)
+         let filterIdx = filter.findIndex( f=> f.facetID == data.facetID ) 
+         if (filterIdx > -1) {
+            filter.splice(filterIdx, 1)
+         } 
+         // Add a new filter to the list. A filter is just FacetID and value
+         filter.push( {facetID: facetInfo.facet.id, value: data.value})
       },
 
       clearAllFilters(state, idx) {

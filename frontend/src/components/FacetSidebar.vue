@@ -1,32 +1,49 @@
 <template>
    <div class="facet-sidebar">
-      <div class="heading">
-         <span>Filter By</span>
-         <i class="fas fa-filter"></i>
-      </div>
-      <div class="body">
-         <div v-if="updatingFacets" class="working">
-            <div>Looking up filters...</div>
-            <img src="../assets/spinner2.gif">
+      <div class="global">
+         <div class="heading">
+            <span>Filter All Results By</span>
+            <span>
+               <i class="global fas fa-globe-americas"></i>
+               <i class="fas fa-filter"></i>
+            </span>
          </div>
-         <dl v-else>
-            <dt>Availability</dt>
-            <dd v-for="avail in availabilityOpts" :key="avail.id" @click="availSelected(avail)">
-               <i v-if="isAvailSelected(avail)" class="check far fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>                                
-               {{avail.name}}
-            </dd>
-            <template v-for="facetInfo in facets">
-               <dt :key="facetInfo.facet.id">{{facetInfo.facet.name}}</dt>
-               <dd v-for="(fv,idx) in facetValues(facetInfo)" :key="valueKey(idx, facetInfo.facet.id)">
-                  <i class="check far fa-circle"></i>                                
-                  {{fv.display}}
+         <div class="body">
+            <dl>
+               <dt>Availability</dt>
+               <dd v-for="avail in availabilityOpts" :key="avail.id" @click="availSelected(avail)">
+                  <i v-if="isAvailSelected(avail)" class="check fas fa-check-circle"></i>
+                  <i v-else class="check far fa-circle"></i>                                
+                  {{avail.name}}
                </dd>
-               <dd class="more" v-if="facetInfo.buckets && facetInfo.buckets.length > 4" :key="moreKey(facetInfo.facet.id)">
-                  <span class="more text-button">View More</span>
-               </dd>
-            </template>
-         </dl>
+            </dl>
+         </div>
+      </div>
+
+      <div class="pool">
+         <div class="heading">
+            <span>Filter {{selectedResults.pool.name}} By</span>
+            <i class="fas fa-filter"></i>
+         </div>
+         <div class="body">
+            <div v-if="updatingFacets" class="working">
+               <div>Looking up filters...</div>
+               <img src="../assets/spinner2.gif">
+            </div>
+            <dl v-else>
+               <template v-for="facetInfo in facets">
+                  <dt :key="facetInfo.facet.id">{{facetInfo.facet.name}}</dt>
+                  <dd v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.facet.id)"
+                     @click="filterClicked(facetInfo.facet.id, fv.value)" >
+                     <i class="check far fa-circle"></i>                                
+                     {{fv.display}}
+                  </dd>
+                  <dd class="more" v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.facet.id)">
+                     <span class="more text-button">View More</span>
+                  </dd>
+               </template>
+            </dl>
+         </div>
       </div>
    </div>
 </template>
@@ -49,6 +66,7 @@ export default {
       }),
        ...mapGetters({
           allFacets: 'filters/poolFacets',
+          selectedResults: 'selectedResults',
       }),
       ...mapFields('filters',[
          'globalAvailability',
@@ -68,7 +86,7 @@ export default {
    methods: {
       facetValues(facet) {
          if (!facet.buckets) return []
-         return facet.buckets.slice(0,3)
+         return facet.buckets.slice(0,5)
       },
       moreKey(id) {
          return "more"+id
@@ -82,6 +100,11 @@ export default {
       },
       isAvailSelected(avail) {
          return this.globalAvailability.id == avail.id
+      },
+      filterClicked(facetID,value) {
+         alert(facetID+" "+value)
+         let data = {poolResultsIdx: this.resultsIdx, facetID: facetID, value: value}
+         this.$store.commit("filters/toggleFilter", data)
       }
    },
    created() {
@@ -98,7 +121,7 @@ export default {
    display: inline-block;
 }
 .body {
-   border: 3px solid var(--color-brand-blue);
+   border: 5px solid var(--color-brand-blue);
    border-top: 0;
    border-radius: 0 0 5px 5px;
    text-align: left;
@@ -116,6 +139,9 @@ export default {
    flex-flow: row nowrap;
    align-items: center;
    justify-content: space-between;
+}
+i.global {
+   margin-right: 10px;
 }
 dl  {
    margin: 0;
@@ -150,6 +176,9 @@ i.check {
 }
 .working img {
    margin-top: 15px;
+}
+.global {
+   margin-bottom: 10px;
 }
 
 </style>

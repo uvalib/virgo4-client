@@ -1,5 +1,5 @@
 <template>
-   <div v-if="searching == false" class="pool-results">
+   <div class="pool-results">
       <div class="results-header">
          <div class="desc">
             {{selectedResults.pool.description}}
@@ -55,11 +55,7 @@ export default {
       ...mapGetters({
          selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
-         poolFilter: 'filters/poolFilter',
       }),
-      filterLength() {
-         return this.poolFilter(this.selectedResultsIdx, 'raw').length
-      }
    },
    watch: {
       selectedResultsIdx () {

@@ -1,5 +1,5 @@
 <template>
-   <div v-if="!searching" class="search-results">
+   <div class="search-results">
 
       <div class="results-header">
          <div class="summary">
@@ -64,7 +64,6 @@ export default {
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
-         searching: state => state.searching,
       }),
       ...mapFields([
         'otherSrcSelection'

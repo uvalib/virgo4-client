@@ -246,7 +246,7 @@ export default new Vuex.Store({
     // exploration. It is used to query for next page during infinite scroll and
     // when filters are added and removed. Pool results are APPENDED to existing during infinite 
     // scroll. If newly filtered, reset paging and re-query
-    searchSelectedPool({ state, commit, rootState, rootGetters }) {
+    searchSelectedPool({ state, commit, rootState, rootGetters,dispatch }) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtPool = rootGetters.selectedResults
