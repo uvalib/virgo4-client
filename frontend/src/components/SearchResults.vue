@@ -56,7 +56,6 @@ export default {
          skippedPoolCount: 'skippedPoolCount',
          failedPoolCount: 'failedPoolCount',
          hasFilter: 'filters/hasFilter',
-         poolFilter: 'filters/poolFilter',
          isTargetPool: "preferences/isTargetPool",
       }),
       ...mapState({

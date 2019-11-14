@@ -65,6 +65,11 @@ export default {
          if (this.selectedResults.statusCode == 408 && this.selectedResults.total == 0) {
             this.$store.dispatch("searchSelectedPool")
          }
+      },
+      searching() {
+         if ( this.$refs.infiniteLoader ) {
+            this.$refs.infiniteLoader.stateChanger.reset()
+         }   
       }
    },
    methods: {

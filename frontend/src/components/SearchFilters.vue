@@ -4,7 +4,7 @@
          <span class="title">Search Filters</span>
          <span v-if="hasFilter(poolIdx)" @click="clearClicked" class="clear">Clear All</span>
       </div>
-      <template v-if="hasFilter(poolIdx)">
+      <!-- <template v-if="hasFilter(poolIdx)">
          <table>
             <tr class="filter" v-for="(filter,i) in poolFilter(poolIdx, 'raw')" :key="i">
                <td class="label">{{filter.facet.name}}:</td>
@@ -14,8 +14,9 @@
                </td>
             </tr>
          </table>
-      </template>
-      <div v-else class="no-filter">
+      </template> 
+      <div v-else class="no-filter">-->
+      <div class="no-filter">
          <span>None</span>
       </div>
    </div>

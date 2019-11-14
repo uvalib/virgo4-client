@@ -35,7 +35,9 @@
                   <dt :key="facetInfo.facet.id">{{facetInfo.facet.name}}</dt>
                   <dd v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.facet.id)"
                      @click="filterClicked(facetInfo.facet.id, fv.value)" >
-                     <i class="check far fa-circle"></i>                                
+                     <i v-if="isFacetSelected(facetInfo.facet.id, fv.value)" 
+                        class="check fas fa-check-square"></i>
+                     <i v-else class="check far fa-square"></i>                                
                      {{fv.display}}
                   </dd>
                   <dd class="more" v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.facet.id)">
@@ -67,6 +69,7 @@ export default {
        ...mapGetters({
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
+          allFilters: 'filters/poolFilter',
       }),
       ...mapFields('filters',[
          'globalAvailability',
@@ -102,9 +105,15 @@ export default {
          return this.globalAvailability.id == avail.id
       },
       filterClicked(facetID,value) {
-         alert(facetID+" "+value)
          let data = {poolResultsIdx: this.resultsIdx, facetID: facetID, value: value}
          this.$store.commit("filters/toggleFilter", data)
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
+      },
+      isFacetSelected(facetID, value) {
+         let filter = this.allFilters(this.resultsIdx)
+         let idx = filter.findIndex( f=> f.facet_id == facetID && f.value == value ) 
+         return idx > -1
       }
    },
    created() {

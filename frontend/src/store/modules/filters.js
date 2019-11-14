@@ -75,36 +75,12 @@ const filters = {
          return (hasFilter || hasDefaults)
       },
 
-      // By default the data stored for the filter is heirarchical; one facet 
-      // owning a list of values: [ {facet: name, values: [v1,v2,...]}, ... ]
-      // The API wants a simple flat list with multiple facet/value pairs like:
-      // [ {name: facet, value: v1}, ...]
-      // This getter takes a fmt param that is either api or raw to control the response
-      poolFilter: (state) => (idx, fmt) => {
-         // FIXME THIS IS BROKEN
-         let apiFilter = []
+      poolFilter: (state) => (idx) => {
          let globalVal = state.availabilityValues[state.globalAvailability.id]
          let out = state.poolFilters[idx].slice(0)
-         let globalIncluded = false
-         out.forEach(function(filterObj) {
-            filterObj.values.forEach(function(val){
-               if (filterObj.facet.id == state.availabilityFacet && val == globalVal) {
-                  globalIncluded = true
-               }
-               apiFilter.push({facet_id: filterObj.facet.id, value: val})
-            } )
-         })
 
-         if (fmt == "api") {
-            if (state.globalAvailability.id != "any" && globalIncluded == false) {
-               apiFilter.push({facet_id: state.availabilityFacet, value: globalVal})
-            }
-            return apiFilter
-         }
-
-         if (state.globalAvailability.id != "any" && globalIncluded == false) {
-            let availFacet = {"id": state.availabilityFacet, name: "Availability"}
-            out.push( {"facet": availFacet, "values": [globalVal]})
+         if (state.globalAvailability.id != "any") {
+            out.push({facet_id: state.availabilityFacet, value: globalVal})
          }
 
          let defaultFacets = state.poolDefaultFacets[idx]
@@ -174,12 +150,13 @@ const filters = {
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          let facetInfo = allPoolFacets.find(f => f.facet.id === data.facetID) 
          let filter = state.poolFilters[data.poolResultsIdx]
-         let filterIdx = filter.findIndex( f=> f.facetID == data.facetID ) 
+         let filterIdx = filter.findIndex( f=> f.facet_id == data.facetID && f.value == data.value ) 
          if (filterIdx > -1) {
             filter.splice(filterIdx, 1)
-         } 
-         // Add a new filter to the list. A filter is just FacetID and value
-         filter.push( {facetID: facetInfo.facet.id, value: data.value})
+         } else {
+            // Add a new filter to the list. A filter is just FacetID and value
+            filter.push( {facet_id: facetInfo.facet.id, value: data.value})
+         }
       },
 
       clearAllFilters(state, idx) {
