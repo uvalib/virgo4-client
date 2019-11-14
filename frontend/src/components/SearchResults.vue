@@ -17,7 +17,6 @@
       <div class="results-wrapper">
          <FacetSidebar />
          <div class="results-main">
-            <p class="relevant">Most Relevant</p>
             <div class="pool-tabs">
                <template  v-for="(r,idx) in results.slice(0,2)">
                   <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: idx == selectedResultsIdx}">
@@ -161,7 +160,7 @@ p.relevant {
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
-   margin: 0 10% 0 10px;
+   margin: 0;
 }
 .pool.pure-button {
    margin: 0 2px 0 0;
@@ -177,13 +176,13 @@ p.relevant {
    color: #fff;
    border: 1px solid var(--color-brand-blue);
 }
-.pool.pure-button i.fa-star {
-   margin-right: 5px;
-}
 .pool.pure-button.disabled.failed {
    background: #D33;
    color: white;
    opacity: 0.5;
+}
+.pool-tabs .pool.pure-button:last-child {
+   margin-right: 0;
 }
 .summary .query {
    text-align: left;

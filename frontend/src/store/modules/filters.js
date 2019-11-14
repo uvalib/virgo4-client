@@ -33,8 +33,7 @@ const filters = {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
          }
-         // Facets array contains some nested bucket info; map only facet
-         return  state.poolFacets[idx].map( f => f.facet )
+         return  state.poolFacets[idx]
       },
       poolDefaultFacets: (state) => (idx) => {
          if ( idx == -1 || idx >= state.poolDefaultFacets.length) {
@@ -213,18 +212,19 @@ const filters = {
       getAllFacets(ctx) {
          // Recreate the query for the target pool, but include a 
          // request for ALL facet info
-         let pool = ctx.rootState.results[data.poolResultsIdx].pool
+         let resultsIdx = ctx.rootState.selectedResultsIdx
+         let pool = ctx.rootState.results[resultsIdx].pool
          let req = {
             query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
             facet: "all",
-            filters: ctx.getters.poolFilter(data.poolResultsIdx, "api")
+            filters: ctx.getters.poolFilter(resultsIdx, "api")
           }
          let tgtURL = pool.url+"/api/search"
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          ctx.commit('setUpdatingFacets', true)
          axios.post(tgtURL, req).then((response) => {
-            ctx.commit("setFacets", {poolResultsIdx: data.poolResultsIdx, 
+            ctx.commit("setFacets", {poolResultsIdx: resultsIdx, 
                facets: response.data.facet_list})
             ctx.commit('setUpdatingFacets', false)
          }).catch((error) => {

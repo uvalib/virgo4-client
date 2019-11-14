@@ -95,7 +95,7 @@ export default {
          }
       },
       scrollChecker() {
-         if (window.window.scrollY > 3000) {
+         if (window.window.scrollY > 1500) {
             this.showScrollTop = true
          } else {
             this.showScrollTop = false
@@ -130,8 +130,7 @@ div.infinite-status-prompt {
    border-radius: 5px 5px 0 0;
 }
 .pool-results {
-   border: 1px solid #ccc;
-   border-top: 0;
+   border: 0;
    border-radius: 5px;
    background-color: var(--color-brand-blue);
    position: relative;

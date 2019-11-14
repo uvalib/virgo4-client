@@ -225,6 +225,7 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
+      commit('filters/setUpdatingFacets', true)
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
       axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       axios.post(url, req).then((response) => {
@@ -233,9 +234,11 @@ export default new Vuex.Store({
         commit('filters/setAllAvailableFacets', response.data)
         commit('setSearchResults', response.data)
         commit('setSearching', false)
+        dispatch("filters/getAllFacets")
       }).catch((error) => {
          commit('system/setError', error)
          commit('setSearching', false)
+         commit('filters/setUpdatingFacets', false)
       })
     },
 
@@ -245,6 +248,7 @@ export default new Vuex.Store({
     // scroll. If newly filtered, reset paging and re-query
     searchSelectedPool({ state, commit, rootState, rootGetters }) {
       commit('setSearching', true)
+      commit('filters/setUpdatingFacets', true)
       let tgtPool = rootGetters.selectedResults
       let f = rootGetters['filters/poolFilter'](state.selectedResultsIdx, "api")
       let req = {
@@ -257,9 +261,11 @@ export default new Vuex.Store({
       return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
+        dispatch("filters/getAllFacets")
       }).catch((error) => {
         commit('system/setError', error)
         commit('setSearching', false)
+        commit('filters/setUpdatingFacets', false)
       })
     },
 

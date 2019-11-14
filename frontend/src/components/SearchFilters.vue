@@ -32,7 +32,6 @@ export default {
       }),
       ...mapGetters({
          hasFilter: 'filters/hasFilter',
-         poolFacets: 'filters/poolFacets',
          poolFilter: 'filters/poolFilter',
          poolDefaultFacets: 'filters/poolDefaultFacets',
          selectedResults: 'selectedResults',
