@@ -58,25 +58,67 @@ export default {
 <style>
 /* Color variable definitions */
 :root {
-  /*brand colors*/
-   --color-brand-blue: #232D4B;
-   --color-light-blue: #0370B7;
-   --color-lighter-blue: #3395D4;
-   --color-lightest-blue: #87B9D9;
-   --color-brand-orange: #E57200;
-   --color-light-orange: #FFC893;
-   --color-lighter-orange: #FFEAD6;
-  /* TBD */
-   --color-primary-orange: var(--color-brand-orange);
-   --color-dark-orange: #ac4400;
-   --color-link: #007ae7;
-   --color-primary-blue: #0052cc;
-   --color-pale-blue: #5d7eff;
-   --color-secondary-blue: #002359;
-   --color-primary-text: #444;
-   --color-dark-blue: #002f6c;
-   --color-hover-highight: #f5f5f4;
-   --color-error: firebrick;
+  /* OFFICIAL BRAND COLORS */
+  --uvalib-brand-blue-lightest: #87B9D9;
+  --uvalib-brand-blue-lighter: #3395D4;
+  --uvalib-brand-blue-light: #0370B7;
+  --uvalib-brand-blue: #232D4B;
+
+  --uvalib-brand-orange-lightest: #FFEAD6;
+  --uvalib-brand-orange: #E57200;
+  --uvalib-brand-orange-dark: #B35900;
+
+  --uvalib-blue-alt-light: #BFE7F7;
+  --uvalib-blue-alt: #007BAC;
+  --uvalib-blue-alt-dark: #005679;
+
+  --uvalib-teal-lightest: #C8F2F4;
+  --uvalib-teal-light: #5BD7DE;
+  --uvalib-teal: #1DA1A8;
+  --uvalib-teal-dark: #16777C;
+
+  --uvalib-green-lightest: #89CC74;
+  --uvalib-green: #62BB46;
+  --uvalib-green-dark: #4E9737;
+
+  --uvalib-red-light: #FBCFDA;
+  --uvalib-red: #EF3F6B;
+  --uvalib-red-emergency: #DF1E43;
+
+  --uvalib-yellow-light: #FEF6C8;
+  --uvalib-yellow: #ECC602;
+  --uvalib-yellow-dark: #B99C02;
+
+  --uvalib-beige: #F7EFE1;
+  --uvalib-beige-dark: #C0B298;
+
+  --uvalib-grey-lightest: #F1F1F1;
+  --uvalib-grey-light: #DADADA;
+  --uvalib-grey: #808080;
+  --uvalib-grey-dark: #565656;
+  --uvalib-grey-darkest: #2B2B2B;
+
+  /* Color Remapping */
+   --color-brand-blue: var(--uvalib-brand-blue);
+   --color-light-blue: var(--uvalib-brand-blue-light);
+   --color-lighter-blue: var(--uvalib-brand-blue-lighter);
+   --color-lightest-blue: var(--uvalib-brand-blue-lightest);
+   --color-brand-orange: var(--uvalib-brand-orange);
+   --color-light-orange: var(--uvalib-brand-orange-lightest);
+   --color-lighter-orange: var(--uvalib-brand-orange-lightest);
+   --color-primary-orange: var(--uvalib-brand-orange);
+   --color-dark-orange: var(--uvalib-brand-orange-dark);
+   --color-link: var(--uvalib-brand-blue-light);
+   --color-primary-text: var(--uvalib-grey-dark);
+   --color-error: var(--uvalib-red-emergency);
+
+    /*to be phased out*/
+     --color-primary-blue: #0052cc;
+     --color-pale-blue: #5d7eff;
+     --color-secondary-blue: #002359;
+     --color-dark-blue: #002f6c;
+   /* --color-hover-highight: #f5f5f4; */
+
 }
 
 html, body {
