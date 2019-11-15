@@ -35,4 +35,5 @@ require (
 	golang.org/x/tools v0.0.0-20190903025054-afe7f8212f0d // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
+	honnef.co/go/tools v0.0.1-2019.2.3 // indirect
 )
