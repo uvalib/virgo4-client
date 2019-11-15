@@ -31,7 +31,7 @@
 <script>
 import { mapGetters } from "vuex"
 export default {
-   name: "signin", 
+   name: "signin",
    computed: {
        ...mapGetters({
         hasAuthToken: 'user/hasAuthToken'
@@ -120,4 +120,3 @@ span.netbadge .pure-button {
    margin: 5px;
 }
 </style>
-
