@@ -1,7 +1,9 @@
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
+GOCMD = go
+GOBUILD = $(GOCMD) build
+GOCLEAN = $(GOCMD) clean
+GOTEST = $(GOCMD) test
+GOFMT = $(GOCMD) fmt
+GOVET = $(GOCMD) vet
 
 build: darwin web deploy-templates
 
@@ -32,3 +34,13 @@ linux:
 clean:
 	$(GOCLEAN)
 	rm -rf bin
+
+fmt:
+	cd backend; $(GOFMT)
+
+vet:
+	cd backend; $(GOVET)
+
+check:
+	go get honnef.co/go/tools/cmd/staticcheck
+	~/go/bin/staticcheck -checks all,-S1002,-ST1003 backend/*.go

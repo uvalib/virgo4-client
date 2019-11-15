@@ -58,25 +58,66 @@ export default {
 <style>
 /* Color variable definitions */
 :root {
-  /*brand colors*/
-   --color-brand-blue: #232D4B;
-   --color-light-blue: #0370B7;
-   --color-lighter-blue: #3395D4;
-   --color-lightest-blue: #87B9D9;
-   --color-brand-orange: #E57200;
-   --color-light-orange: #FFC893;
-   --color-lighter-orange: #FFEAD6;
-  /* TBD */
-   --color-primary-orange: var(--color-brand-orange);
-   --color-dark-orange: #ac4400;
-   --color-link: #007ae7;
+  /* OFFICIAL BRAND COLORS */
+  --uvalib-brand-blue-lightest: #87B9D9;
+  --uvalib-brand-blue-lighter: #3395D4;
+  --uvalib-brand-blue-light: #0370B7;
+  --uvalib-brand-blue: #232D4B;
+
+  --uvalib-brand-orange-lightest: #FFEAD6;
+  --uvalib-brand-orange: #E57200;
+  --uvalib-brand-orange-dark: #B35900;
+
+  --uvalib-blue-alt-light: #BFE7F7;
+  --uvalib-blue-alt: #007BAC;
+  --uvalib-blue-alt-dark: #005679;
+
+  --uvalib-teal-lightest: #C8F2F4;
+  --uvalib-teal-light: #5BD7DE;
+  --uvalib-teal: #1DA1A8;
+  --uvalib-teal-dark: #16777C;
+
+  --uvalib-green-lightest: #89CC74;
+  --uvalib-green: #62BB46;
+  --uvalib-green-dark: #4E9737;
+
+  --uvalib-red-lightest: #FBCFDA;
+  --uvalib-red: #EF3F6B;
+  --uvalib-red-emergency: #DF1E43;
+
+  --uvalib-yellow-light: #FEF6C8;
+  --uvalib-yellow: #ECC602;
+  --uvalib-yellow-dark: #B99C02;
+
+  --uvalib-beige: #F7EFE1;
+  --uvalib-beige-dark: #C0B298;
+
+  --uvalib-grey-lightest: #F1F1F1;
+  --uvalib-grey-light: #DADADA;
+  --uvalib-grey: #808080;
+  --uvalib-grey-dark: #565656;
+  --uvalib-grey-darkest: #2B2B2B;
+
+  /* Color Remapping */
+   --color-brand-blue: var(--uvalib-brand-blue);
+   --color-light-blue: var(--uvalib-brand-blue-light);
+   --color-lighter-blue: var(--uvalib-brand-blue-lighter);
+   --color-lightest-blue: var(--uvalib-brand-blue-lightest);
+   --color-brand-orange: var(--uvalib-brand-orange);
+   --color-light-orange: var(--uvalib-brand-orange-lightest);
+   --color-lighter-orange: var(--uvalib-brand-orange-lightest);
+   --color-primary-orange: var(--uvalib-brand-orange);
+   --color-dark-orange: var(--uvalib-brand-orange-dark);
+   --color-link: var(--uvalib-brand-blue-light);
+   --color-primary-text: var(--uvalib-grey-dark);
+   --color-error: var(--uvalib-red-emergency);
+
+  /*to be phased out*/
    --color-primary-blue: #0052cc;
    --color-pale-blue: #5d7eff;
    --color-secondary-blue: #002359;
-   --color-primary-text: #444;
    --color-dark-blue: #002f6c;
-   --color-hover-highight: #f5f5f4;
-   --color-error: firebrick;
+ /* --color-hover-highight: #f5f5f4; */
 }
 
 html, body {
@@ -86,16 +127,19 @@ html, body {
 }
 
 .pure-button.pure-button-primary {
-  background-color: var(--color-primary-blue);
+  background-color: var(--uvalib-brand-blue-light);
 }
-
+.pure-button.pure-button-primary:hover {
+  background-color: var(--uvalib-brand-blue-lighter);
+}
 .pure-button.pure-button-secondary {
-   background-color: var(--color-pale-blue);
-   color: white;
-   border-radius: 5px;
+   background-color: var(--uvalib-brand-blue-lighter);
+   color: black;
 }
-
-.pure-button.pure-button-primary,  .pure-button.pure-button-secondary{
+.pure-button.pure-button-secondary:hover {
+   background-color: var(--uvalib-brand-blue-lightest);
+}
+.pure-button.pure-button-primary, .pure-button.pure-button-secondary{
   margin: 0 0 0 10px;
   border-radius: 5px;
 }
@@ -115,7 +159,7 @@ html, body {
 }
 
 #app {
-   font-family: "Avenir", Helvetica, Arial, sans-serif;
+   font-family:'franklin-gothic-urw',arial,sans-serif;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    text-align: center;
@@ -131,11 +175,10 @@ html, body {
 }
 
 #app h1 {
-  color: var(--color-primary-orange);
+  color: var(--uvalib-brand-orange);
   margin: 8px 0;
   padding-bottom: 5px;
   font-weight: bold;
-  font-size: 22px;
   position: relative;
 }
 
@@ -170,7 +213,7 @@ div.v-popover.inline {
   border-style: solid;
   position: absolute;
   margin: 5px;
-  border-color: var(--color-primary-orange);
+  border-color: var(--uvalib-brand-orange);
   z-index: 1;
 }
 .tooltip[x-placement^="top"] {
@@ -253,7 +296,7 @@ div.v-popover.inline {
 .error {
   font-weight: bold;
   margin: 0;
-  color: var(--color-error);
+  color: var(--uvalib-red-emergency);
   opacity: 1;
   visibility: visible;
   text-align: center;
