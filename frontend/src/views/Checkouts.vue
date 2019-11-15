@@ -101,7 +101,8 @@ dl {
   margin-top: 0;
   margin-left: 15px;
   display: inline-grid;
-  grid-template-columns: 95px 1fr;
+  grid-template-columns: 1fr 2fr;
+  grid-column-gap: 10px;
 }
 dt {
   font-weight: bold;
