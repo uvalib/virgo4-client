@@ -74,11 +74,10 @@ const filters = {
 
       poolFilter: (state) => (idx) => {
          let globalVal = state.availabilityValues[state.globalAvailability.id]
-         if (state.poolFilters[idx].length == 0) return []
          let out = state.poolFilters[idx].slice(0)
 
          if (state.globalAvailability.id != "any") {
-            out.push({facet_id: state.availabilityFacet, value: globalVal,
+            out.unshift({facet_id: state.availabilityFacet, value: globalVal,
                display: {facet: "Availability", value: globalVal}})
          }
 

@@ -115,18 +115,20 @@ export default new Vuex.Store({
         state.total += poolResults.pagination.total
       }
 
-      poolResults.group_list.forEach( group => {
-        utils.preProcessHitFields( group.record_list )
-        if (group.count == 1) {
-          let hit = group.record_list[0]
-          hit.grouped = false
-          tgtPool.hits.push(hit)
-        } else {
-          let hit = {grouped: true, count: group.count, group: group.record_list}
-          utils.getGroupHitMetadata(group, hit)
-          tgtPool.hits.push(hit)
-        }
-      })
+      if (poolResults.group_list) {
+        poolResults.group_list.forEach( group => {
+          utils.preProcessHitFields( group.record_list )
+          if (group.count == 1) {
+            let hit = group.record_list[0]
+            hit.grouped = false
+            tgtPool.hits.push(hit)
+          } else {
+            let hit = {grouped: true, count: group.count, group: group.record_list}
+            utils.getGroupHitMetadata(group, hit)
+            tgtPool.hits.push(hit)
+          }
+        })
+      }
     },
 
     setSearchResults(state, results) {
