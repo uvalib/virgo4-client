@@ -32,15 +32,15 @@
             </div>
             <dl v-else>
                <template v-for="facetInfo in facets">
-                  <dt :key="facetInfo.facet.id">{{facetInfo.facet.name}}</dt>
-                  <dd v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.facet.id)"
-                     @click="filterClicked(facetInfo.facet.id, fv.value)" >
-                     <i v-if="isFacetSelected(facetInfo.facet.id, fv.value)" 
+                  <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
+                  <dd v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)"
+                     @click="filterClicked(facetInfo.id, fv.value)" >
+                     <i v-if="isFacetSelected(facetInfo.id, fv.value)" 
                         class="check fas fa-check-square"></i>
                      <i v-else class="check far fa-square"></i>                                
-                     {{fv.display}}
+                     {{fv.value}} ({{fv.count}})
                   </dd>
-                  <dd class="more" v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.facet.id)">
+                  <dd class="more" v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
                      <span class="more text-button">View More</span>
                   </dd>
                </template>
@@ -53,7 +53,6 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import { mapFields } from 'vuex-map-fields'
 export default {
    components: {
    },
@@ -65,18 +64,16 @@ export default {
       ...mapState({
          resultsIdx: state => state.selectedResultsIdx,
          updatingFacets: state => state.filters.updatingFacets,
+         globalAvailability: state => state.filters.globalAvailability,
       }),
        ...mapGetters({
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
           allFilters: 'filters/poolFilter',
       }),
-      ...mapFields('filters',[
-         'globalAvailability',
-      ]),
       facets() {
          let out = this.allFacets(this.resultsIdx)
-         return out.filter(f=>f.facet.id != "FacetAvailability")
+         return out.filter(f=>f.id != "FacetAvailability")
       },
       availabilityOpts() {
          return [
@@ -89,7 +86,8 @@ export default {
    methods: {
       facetValues(facet) {
          if (!facet.buckets) return []
-         return facet.buckets.slice(0,5)
+         let out = facet.buckets.slice(0,5)
+         return out
       },
       moreKey(id) {
          return "more"+id
@@ -98,8 +96,9 @@ export default {
          return facetID+"_val_"+idx
       },
       availSelected(avail) {
-         this.globalAvailability = avail
+         this.$store.commit("filters/setGlobalAvailability", avail)
          this.$store.dispatch("searchAllPools")
+         this.backToTop()
       },
       isAvailSelected(avail) {
          return this.globalAvailability.id == avail.id
@@ -109,12 +108,24 @@ export default {
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
+         this.backToTop()
       },
       isFacetSelected(facetID, value) {
          let filter = this.allFilters(this.resultsIdx)
          let idx = filter.findIndex( f=> f.facet_id == facetID && f.value == value ) 
          return idx > -1
-      }
+      },
+      backToTop: function() {
+         var scrollStep = -window.scrollY / (500 / 10),
+         scrollInterval = setInterval(()=> {
+            if ( window.scrollY != 0 ) {
+               window.scrollBy( 0, scrollStep ) 
+            } else {
+               clearInterval(scrollInterval)
+            }
+         },10)
+      },
+
    },
    created() {
    }
