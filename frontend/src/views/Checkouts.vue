@@ -10,26 +10,22 @@
          <div v-else class="details">
             <template v-if="checkouts.length > 0">
                <div class="item" v-for="co in sortedCheckouts" :key="co.id">
-                  <div class="item-title">
+                  <h3 class="item-title">
                      <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
                      {{co.title}}
-                  </div>
-                  <div>{{co.author}}</div>
-                  <div>{{co.callNumber}}</div>
-                  <table>
-                     <tr>
-                        <td class="label">Library:</td> 
-                        <td>{{co.library}}</td>
-                     </tr>
-                     <tr>
-                        <td class="label">Due Date:</td> 
-                        <td v-html="formatDueInfo(co)"></td>
-                     </tr>
-                     <tr v-if="parseFloat(co.overdueFee)>0">
-                        <td class="label fine">Fine:</td> 
-                        <td class="fine-value">${{co.overdueFee}}</td>
-                     </tr>
-                  </table>  
+                  </h3>
+                  <dl>
+                    <dt>Author:</dt>
+                      <dd>{{co.author}}</dd>
+                    <dt class="label">Library:</dt>
+                      <dd>{{co.library}}</dd>
+                    <dt class="label">Call number:</dt>
+                      <dd>{{co.callNumber}}</dd>
+                    <dt class="label">Due Date:</dt>
+                      <dd v-html="formatDueInfo(co)"></dd>
+                    <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
+                      <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
+                  </dl>
                </div>
             </template>
             <div v-else class="none">
@@ -86,18 +82,33 @@ export default {
 }
 </script>
 <style>
-.details div.overdue {
-   font-size: 0.85em;
+
+.details div.overdue, .details div.recall {
+   background: var(--uvalib-red-emergency);
+   color: white;
+   border-radius: 5px;
    font-weight: bold;
-   color: firebrick;
+   padding: 5px;
+   margin: 2px 0;
 }
 .details div.recall {
-   font-size: 0.85em;
-   font-weight: bold;
-   color: var(--color-brand-orange);
+   background-color: var(--uvalib-yellow);
+   color: var(--uvalib-grey-darkest);
 }
 </style>
 <style scoped>
+dl {
+  margin-top: 0;
+  margin-left: 15px;
+  display: inline-grid;
+  grid-template-columns: 95px 1fr;
+}
+dt {
+  font-weight: bold;
+}
+dd {
+  margin: 0 0 10px 0;
+}
 .checkout {
    min-height: 400px;
    position: relative;
@@ -149,21 +160,21 @@ td.label {
    vertical-align: text-top;
 }
 td.label.fine {
-   color: firebrick;
+   color: var(--uvalib-red-emergency);
 }
-td.fine-value {
-   background: firebrick;
-   color: white;
-   border-radius: 5px;
-   font-weight: bold;
+.fine-value {
+  background: var(--uvalib-red-emergency);
+  color: white;
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 5px;
 }
 td {
    padding: 2px 5px;
 }
 i.notice {
-   color: var(--color-brand-orange);
+   color:  var(--uvalib-yellow);
    margin-right: 5px;
    font-size: 1.25em;
 }
 </style>
-

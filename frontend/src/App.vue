@@ -81,7 +81,7 @@ export default {
   --uvalib-green: #62BB46;
   --uvalib-green-dark: #4E9737;
 
-  --uvalib-red-light: #FBCFDA;
+  --uvalib-red-lightest: #FBCFDA;
   --uvalib-red: #EF3F6B;
   --uvalib-red-emergency: #DF1E43;
 
@@ -112,13 +112,12 @@ export default {
    --color-primary-text: var(--uvalib-grey-dark);
    --color-error: var(--uvalib-red-emergency);
 
-    /*to be phased out*/
-     --color-primary-blue: #0052cc;
-     --color-pale-blue: #5d7eff;
-     --color-secondary-blue: #002359;
-     --color-dark-blue: #002f6c;
-   /* --color-hover-highight: #f5f5f4; */
-
+  /*to be phased out*/
+   --color-primary-blue: #0052cc;
+   --color-pale-blue: #5d7eff;
+   --color-secondary-blue: #002359;
+   --color-dark-blue: #002f6c;
+ /* --color-hover-highight: #f5f5f4; */
 }
 
 html, body {
@@ -128,16 +127,19 @@ html, body {
 }
 
 .pure-button.pure-button-primary {
-  background-color: var(--color-primary-blue);
+  background-color: var(--uvalib-brand-blue-light);
 }
-
+.pure-button.pure-button-primary:hover {
+  background-color: var(--uvalib-brand-blue-lighter);
+}
 .pure-button.pure-button-secondary {
-   background-color: var(--color-pale-blue);
-   color: white;
-   border-radius: 5px;
+   background-color: var(--uvalib-brand-blue-lighter);
+   color: black;
 }
-
-.pure-button.pure-button-primary,  .pure-button.pure-button-secondary{
+.pure-button.pure-button-secondary:hover {
+   background-color: var(--uvalib-brand-blue-lightest);
+}
+.pure-button.pure-button-primary, .pure-button.pure-button-secondary{
   margin: 0 0 0 10px;
   border-radius: 5px;
 }
@@ -157,7 +159,7 @@ html, body {
 }
 
 #app {
-   font-family: "Avenir", Helvetica, Arial, sans-serif;
+   font-family:'franklin-gothic-urw',arial,sans-serif;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    text-align: center;
@@ -173,11 +175,10 @@ html, body {
 }
 
 #app h1 {
-  color: var(--color-primary-orange);
+  color: var(--uvalib-brand-orange);
   margin: 8px 0;
   padding-bottom: 5px;
   font-weight: bold;
-  font-size: 22px;
   position: relative;
 }
 
@@ -201,7 +202,7 @@ div.v-popover.inline {
 }
 .tooltip .tooltip-inner {
   border-radius: 10px;
-  padding: 0px 0px 4px;
+  padding: 0 0 0 6px;
 }
 .tooltip.popover.vue-popover-theme  {
    outline: none;
@@ -212,7 +213,7 @@ div.v-popover.inline {
   border-style: solid;
   position: absolute;
   margin: 5px;
-  border-color: var(--color-primary-orange);
+  border-color: var(--uvalib-brand-orange);
   z-index: 1;
 }
 .tooltip[x-placement^="top"] {
@@ -295,7 +296,7 @@ div.v-popover.inline {
 .error {
   font-weight: bold;
   margin: 0;
-  color: var(--color-error);
+  color: var(--uvalib-red-emergency);
   opacity: 1;
   visibility: visible;
   text-align: center;
