@@ -41,7 +41,7 @@
                      {{fv.value}} ({{fv.count}})
                   </dd>
                   <dd class="more" v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                     <span class="more text-button">View More</span>
+                     <FacetList :facet="facetInfo" v-on:facet-clicked="toggleFacet" />
                   </dd>
                </template>
             </dl>
@@ -53,12 +53,10 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import FacetList from "@/components/popovers/FacetList"
 export default {
    components: {
-   },
-   data: function() {
-      return {
-      };
+      FacetList
    },
    computed: {
       ...mapState({
@@ -97,37 +95,29 @@ export default {
       },
       availSelected(avail) {
          this.$store.commit("filters/setGlobalAvailability", avail)
+         this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchAllPools")
-         this.backToTop()
       },
       isAvailSelected(avail) {
          return this.globalAvailability.id == avail.id
       },
       filterClicked(facetID,value) {
          let data = {poolResultsIdx: this.resultsIdx, facetID: facetID, value: value}
+         this.toggleFacet(data)
+      },
+      toggleFacet(data) {
          this.$store.commit("filters/toggleFilter", data)
-         this.$store.commit("clearSelectedPoolResults")
-         this.$store.dispatch("searchSelectedPool")
-         this.backToTop()
+         setTimeout( ()=> {
+            this.$store.commit("clearSelectedPoolResults")
+            this.$store.dispatch("searchSelectedPool")
+         }, 500)
       },
       isFacetSelected(facetID, value) {
          let filter = this.allFilters(this.resultsIdx)
          let idx = filter.findIndex( f=> f.facet_id == facetID && f.value == value ) 
          return idx > -1
       },
-      backToTop: function() {
-         var scrollStep = -window.scrollY / (500 / 10),
-         scrollInterval = setInterval(()=> {
-            if ( window.scrollY != 0 ) {
-               window.scrollBy( 0, scrollStep ) 
-            } else {
-               clearInterval(scrollInterval)
-            }
-         },10)
-      },
 
-   },
-   created() {
    }
 }
 </script>
@@ -182,9 +172,6 @@ dd {
    align-items: center;
    justify-content: flex-start;
    padding: 2px;
-}
-dd.more {
-   text-align:right;
 }
 i.check {
    margin-right: 10px;
