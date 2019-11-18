@@ -4,24 +4,24 @@
       <div class="top">
          <div class="basic">
             <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
-            <ul class="fields">
-               <li v-for="field in hit.basicFields" :key="getKey(field)">
+            <dl class="fields">
+               <template v-for="field in hit.basicFields">
                   <template v-if="field.display != 'optional'">
-                     <label>{{field.label}}:</label>
-                     <span class="value" v-html="fieldValueString(field)"></span>
+                     <dt :key="getKey(field)">{{field.label}}:</dt>
+                     <dd :key="getKey(field)" v-html="fieldValueString(field)"></dd>
                   </template>
-               </li>
-            </ul>
+               </template>
+            </dl>
             <AccordionContent v-if="details" title="More Details" align="left-narrow">
-         <div class="details">
-            <ul class="fields">
-               <li v-for="field in hit.detailFields" :key="getKey(field)">
-                  <label>{{field.label}}:</label>
-                  <span class="value" v-html="fieldValueString(field)"></span>
-               </li>
-            </ul>
-         </div>
-      </AccordionContent>
+               <div class="details">
+                  <ul class="fields">
+                     <li v-for="field in hit.detailFields" :key="getKey(field)">
+                        <label>{{field.label}}:</label>
+                        <span class="value" v-html="fieldValueString(field)"></span>
+                     </li>
+                  </ul>
+               </div>
+            </AccordionContent>
          </div>
          <router-link class="img-link" v-if="hit.grouped==false" :to="detailsURL">
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
@@ -123,14 +123,18 @@ div.basic {
    max-height: 124px;
    max-width: 100px;
 }
-
-ul.fields {
-   list-style: none;
-   padding-left: 20px;
+dl { 
+   margin-top: 0; 
+   margin-left: 15px; 
+   display: inline-grid; 
+   grid-template-columns: 1fr 2fr; 
+   grid-column-gap: 10px; 
 }
-li label {
-   font-weight: bold; 
-   margin-right: 10px;
-   color: #666;
+dt {
+   font-weight: bold;
+   text-align: right;
+}
+dd {
+   margin: 0 0 10px 0;
 }
 </style>
