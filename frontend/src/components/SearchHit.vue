@@ -5,23 +5,13 @@
          <div class="basic">
             <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
             <dl class="fields">
-               <template v-for="field in hit.basicFields">
+               <template v-for="(field) in hit.basicFields">
                   <template v-if="field.display != 'optional'">
-                     <dt :key="getKey(field)">{{field.label}}:</dt>
-                     <dd :key="getKey(field)" v-html="fieldValueString(field)"></dd>
+                     <dt :key="getKey(field,'k')">{{field.label}}:</dt>
+                     <dd :key="getKey(field,'v')" v-html="fieldValueString(field)"></dd>
                   </template>
                </template>
             </dl>
-            <AccordionContent v-if="details" title="More Details" align="left-narrow">
-               <div class="details">
-                  <ul class="fields">
-                     <li v-for="field in hit.detailFields" :key="getKey(field)">
-                        <label>{{field.label}}:</label>
-                        <span class="value" v-html="fieldValueString(field)"></span>
-                     </li>
-                  </ul>
-               </div>
-            </AccordionContent>
          </div>
          <router-link class="img-link" v-if="hit.grouped==false" :to="detailsURL">
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
@@ -31,16 +21,14 @@
 </template>
 
 <script>
-import AccordionContent from '@/components/AccordionContent'
 import SearchHitHeader from '@/components/SearchHitHeader'
 export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
-      details: {type: Boolean, default: true}
    },
    components: {
-      AccordionContent,SearchHitHeader
+      SearchHitHeader
    },
    computed: {
       detailsURL() {
@@ -48,8 +36,8 @@ export default {
       },
    },
    methods: {
-      getKey(field) {
-         return field.name+field.value
+      getKey(field,idx) {
+         return this.hit.identifier+field.value+idx
       },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
