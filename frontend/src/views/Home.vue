@@ -77,7 +77,7 @@ export default {
         'basic','basicSearchScope'
       ]),
       searchScopes() {
-        let out = [{name: 'All Sources', value: 'all'}]
+        let out = [{name: 'All Sources', id: 'all'}]
         return out.concat(this.sources)
       },
       basicSearch() {
