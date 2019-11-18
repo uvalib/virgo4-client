@@ -251,11 +251,12 @@ export default new Vuex.Store({
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtPool = rootGetters.selectedResults
-      let f = rootGetters['filters/poolFilter'](state.selectedResultsIdx, "api")
+      let filters = rootGetters['filters/poolFilter'](state.selectedResultsIdx)
+      let filterObj = {pool_id: tgtPool.pool.id, facets: filters}
       let req = {
         query: rootGetters['query/string'],
         pagination: { start: tgtPool.page * state.pageSize, rows: state.pageSize },
-        filters: f
+        filters: [filterObj]
       }
       let url = tgtPool.pool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken

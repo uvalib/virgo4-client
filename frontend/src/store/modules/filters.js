@@ -37,24 +37,6 @@ const filters = {
          }
          return  state.poolDefaultFacets[idx]
       },
-      facetBuckets: (state,getters) => (idx, facetID) => {
-         if ( idx == -1 || idx >= state.poolFacets.length) {
-            return []
-         }
-         // facetInfo struct:  { facet{id,name}, buckets[ {value,display} ] }
-         // filters struct: [ {facet_id, value }]
-         let facetInfo = state.poolFacets[idx].find(f => f.id === facetID) 
-         let buckets = facetInfo.buckets.slice();
-         let filters = getters.poolFilter(idx, "api")
-         filters.forEach( filter => {
-            // see if a filter already exists using the selected facet
-            if (filter.facet_id == facetInfo.id) {
-               // remove filter.value from buckets items (item.value)
-               buckets = buckets.filter(b => b.value != filter.value)
-            }
-         })
-         return buckets
-      },
 
       hasFilter: (state) => (idx) => {
          if (idx < 0) return false
@@ -74,7 +56,10 @@ const filters = {
 
       poolFilter: (state) => (idx) => {
          let globalVal = state.availabilityValues[state.globalAvailability.id]
-         let out = state.poolFilters[idx].slice(0)
+         let out = []
+         if (state.poolFilters[idx]) {
+            out = state.poolFilters[idx].slice(0)
+         }
 
          if (state.globalAvailability.id != "any") {
             out.unshift({facet_id: state.availabilityFacet, value: globalVal,
@@ -90,14 +75,16 @@ const filters = {
          return out
       },
 
-      // This is only used to get the API-formatted filter for use in global search
-      globalFilter: (state) =>  {
-         let filter = []
-         if (state.globalAvailability.id != "any") {
-            let globalVal = state.availabilityValues[state.globalAvailability.id]
-            filter.push({facet_id: state.availabilityFacet, value: globalVal})
-         }
-         return filter
+      // This is only used to get the filter map for use in global search
+      globalFilter: (_state, getters, rootState) =>  {
+         let out = []
+         rootState.results.forEach( (r,idx) => {
+            let filter = getters.poolFilter(idx)
+            let poolId = r.pool.id
+            let add = {pool_id: poolId, facets: filter}
+            out.push(add)
+         })    
+         return out  
       }
    },
 
