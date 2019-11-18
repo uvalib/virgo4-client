@@ -3,8 +3,6 @@ import axios from 'axios'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { getField, updateField } from 'vuex-map-fields'
-
 Vue.use(Vuex)
 
 const filters = {
@@ -17,8 +15,7 @@ const filters = {
       poolDefaultFacets: [],
       poolFacets: [],
       poolFilters: [],
-      adding: false,
-      updatingBuckets: false,
+      updatingFacets: false,
 
       // Global availability and hard-coded filter values
       globalAvailability: {id: "any", name: "Any"},
@@ -28,13 +25,11 @@ const filters = {
    },
 
    getters: {
-      getField,
       poolFacets: (state) => (idx) => {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
          }
-         // Facets array contains some nested bucket info; map only facet
-         return  state.poolFacets[idx].map( f => f.facet )
+         return  state.poolFacets[idx]
       },
       poolDefaultFacets: (state) => (idx) => {
          if ( idx == -1 || idx >= state.poolDefaultFacets.length) {
@@ -48,12 +43,12 @@ const filters = {
          }
          // facetInfo struct:  { facet{id,name}, buckets[ {value,display} ] }
          // filters struct: [ {facet_id, value }]
-         let facetInfo = state.poolFacets[idx].find(f => f.facet.id === facetID) 
+         let facetInfo = state.poolFacets[idx].find(f => f.id === facetID) 
          let buckets = facetInfo.buckets.slice();
          let filters = getters.poolFilter(idx, "api")
          filters.forEach( filter => {
             // see if a filter already exists using the selected facet
-            if (filter.facet_id == facetInfo.facet.id) {
+            if (filter.facet_id == facetInfo.id) {
                // remove filter.value from buckets items (item.value)
                buckets = buckets.filter(b => b.value != filter.value)
             }
@@ -62,8 +57,8 @@ const filters = {
       },
 
       hasFilter: (state) => (idx) => {
-         if ( state.globalAvailability.id != "any" ) return true
          if (idx < 0) return false
+         if ( state.globalAvailability.id != "any" ) return true
          let defaultFacets = state.poolDefaultFacets[idx]
          let hasDefaults = false
          if ( defaultFacets ) {
@@ -77,35 +72,13 @@ const filters = {
          return (hasFilter || hasDefaults)
       },
 
-      // By default the data stored for the filter is heirarchical; one facet 
-      // owning a list of values: [ {facet: name, values: [v1,v2,...]}, ... ]
-      // The API wants a simple flat list with multiple facet/value pairs like:
-      // [ {name: facet, value: v1}, ...]
-      // This getter takes a fmt param that is either api or raw to control the response
-      poolFilter: (state) => (idx, fmt) => {
-         let apiFilter = []
+      poolFilter: (state) => (idx) => {
          let globalVal = state.availabilityValues[state.globalAvailability.id]
          let out = state.poolFilters[idx].slice(0)
-         let globalIncluded = false
-         out.forEach(function(filterObj) {
-            filterObj.values.forEach(function(val){
-               if (filterObj.facet.id == state.availabilityFacet && val == globalVal) {
-                  globalIncluded = true
-               }
-               apiFilter.push({facet_id: filterObj.facet.id, value: val})
-            } )
-         })
 
-         if (fmt == "api") {
-            if (state.globalAvailability.id != "any" && globalIncluded == false) {
-               apiFilter.push({facet_id: state.availabilityFacet, value: globalVal})
-            }
-            return apiFilter
-         }
-
-         if (state.globalAvailability.id != "any" && globalIncluded == false) {
-            let availFacet = {"id": state.availabilityFacet, name: "Availability"}
-            out.push( {"facet": availFacet, "values": [globalVal]})
+         if (state.globalAvailability.id != "any") {
+            out.unshift({facet_id: state.availabilityFacet, value: globalVal,
+               display: {facet: "Availability", value: globalVal}})
          }
 
          let defaultFacets = state.poolDefaultFacets[idx]
@@ -129,20 +102,27 @@ const filters = {
    },
 
    mutations: {
-      updateField,
+      setGlobalAvailability(state, avail) {
+         state.globalAvailability = avail
+      },
       setAllAvailableFacets(state, data) {
          state.poolFacets = []
-         state.poolFilters = []
          state.defaultFacets = []
+
+         // If filters are present, don't remove them
+         let addEmptyFilters = (state.poolFilters.length == 0)
+         
          data.pool_results.forEach(function (pr, resultIdx) {
             let poolFacets = []
             let defaultFacets = []
-            state.poolFilters.push([]) // add empty filter for each pool
+            if (addEmptyFilters) {
+               state.poolFilters.push([]) // add empty filter for each pool
+            }
 
             if ( pr.available_facets) {
                // NOTE: Facet is an object with .id and .name
                pr.available_facets.forEach( function(f) {
-                  poolFacets.push( {facet: f, buckets: []} )
+                  poolFacets.push( {id: f.id, name: f.name, buckets: []} )
                })
             }
             state.poolFacets[resultIdx] = poolFacets
@@ -158,49 +138,41 @@ const filters = {
          })
       },
 
-      showAdd(state) {
-         state.adding = true
-      },
-
-      closeAdd(state) {
-         state.adding = false
-      },
-
-      setFacetBuckets(state, data) {
-         // NOTE: for all pools but EDS, the facets array is length one
+      setFacets(state, data) {
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          data.facets.forEach( function(facet) {
-            let facetInfo = allPoolFacets.find(f => f.facet.id === facet.id) 
+            let facetInfo = allPoolFacets.find(f => f.id === facet.id) 
             facetInfo.buckets = []
             facet.buckets.forEach(function (b) {
                // b = {value, count}
-               facetInfo.buckets.push( {value: b.value, display: `${b.value} (${b.count})`} )
+               facetInfo.buckets.push( {value: b.value, count: b.count} )
             })
          })
       },
 
-      addFilter(state, data) {
-         // data = {poolResultsIdx: idx, facet: name, values: VALUES
-         // IMPORTANT: VALUES comes from vue-multiselect which binds 
-         // the whole json object for the option into the array. Just add value
+      toggleFilter(state, data) {
+         // data = {poolResultsIdx: idx, facet: facetID, value: facet bucket value
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
-         let facetInfo = allPoolFacets.find(f => f.facet.id === data.facetID) 
+         let facetInfo = allPoolFacets.find(f => f.id === data.facetID) 
+         let fValue = facetInfo.buckets.find(b => b.value === data.value) 
          let filter = state.poolFilters[data.poolResultsIdx]
-         filter.push( {facet: facetInfo.facet, values: data.values.map(f=>f.value)})
-      },
-
-      removeFilter(state, data) {
-         // data = {poolResultsIdx: idx, filterIdx: fidx}
-         let filters = state.poolFilters[data.poolResultsIdx]
-         filters.splice(data.filterIdx,1)
+         let filterIdx = filter.findIndex( f=> f.facet_id == data.facetID && f.value == data.value ) 
+         if (filterIdx > -1) {
+            filter.splice(filterIdx, 1)
+         } else {
+            // Add a new filter to the list. A filter is just FacetID and value
+            // Tack on a display obect to each to facilitate filter display in UI
+            filter.push( {facet_id: facetInfo.id, value: data.value, 
+               display: {facet: facetInfo.name, value: fValue.value}})
+         }
       },
 
       clearAllFilters(state, idx) {
          state.poolFilters[idx].splice(0, state.poolFilters[idx].length)
       },
 
-      setUpdatingBuckets(state, flag) {
-         state.updatingBuckets = flag
+      setUpdatingFacets(state, flag) {
+         state.updatingFacets = flag
       },
 
       reset(state) {
@@ -210,27 +182,32 @@ const filters = {
    },
 
    actions: {
-      getBuckets(ctx, data) {
+      // Get all facets for the selected result set / query / pool
+      getAllFacets(ctx) {
          // Recreate the query for the target pool, but include a 
-         // request for facet/bucket info for the  specified facet
-         let pool = ctx.rootState.results[data.poolResultsIdx].pool
+         // request for ALL facet info
+         let resultsIdx = ctx.rootState.selectedResultsIdx
+         let pool = ctx.rootState.results[resultsIdx].pool
          let req = {
             query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
-            facet: data.facet,
-            filters: ctx.getters.poolFilter(data.poolResultsIdx, "api")
+            facet: "all",
+            filters: ctx.getters.poolFilter(resultsIdx, "api")
           }
          let tgtURL = pool.url+"/api/search"
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-         ctx.commit('setUpdatingBuckets', true)
+         ctx.commit('setUpdatingFacets', true)
          axios.post(tgtURL, req).then((response) => {
-            ctx.commit("setFacetBuckets", {poolResultsIdx: data.poolResultsIdx, 
-               facets: response.data.facet_list})
-            ctx.commit('setUpdatingBuckets', false)
-         })/*.catch((error) => {
+            let facets = response.data.facet_list 
+            if (!facets) {
+               facets = []
+            }
+            ctx.commit("setFacets", {poolResultsIdx: resultsIdx, facets: facets})
+            ctx.commit('setUpdatingFacets', false)
+         }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setUpdatingBuckets', false)
-          })*/
+            ctx.commit('setUpdatingFacets', false)
+          })
       }
    }
 }

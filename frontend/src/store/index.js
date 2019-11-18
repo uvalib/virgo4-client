@@ -88,9 +88,6 @@ export default new Vuex.Store({
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
     },
-    deselectPoolResults(state) {
-      state.selectedResultsIdx = -1
-    },
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool
       // total from overall total and reset pool total to 0
@@ -118,18 +115,20 @@ export default new Vuex.Store({
         state.total += poolResults.pagination.total
       }
 
-      poolResults.group_list.forEach( group => {
-        utils.preProcessHitFields( group.record_list )
-        if (group.count == 1) {
-          let hit = group.record_list[0]
-          hit.grouped = false
-          tgtPool.hits.push(hit)
-        } else {
-          let hit = {grouped: true, count: group.count, group: group.record_list}
-          utils.getGroupHitMetadata(group, hit)
-          tgtPool.hits.push(hit)
-        }
-      })
+      if (poolResults.group_list) {
+        poolResults.group_list.forEach( group => {
+          utils.preProcessHitFields( group.record_list )
+          if (group.count == 1) {
+            let hit = group.record_list[0]
+            hit.grouped = false
+            tgtPool.hits.push(hit)
+          } else {
+            let hit = {grouped: true, count: group.count, group: group.record_list}
+            utils.getGroupHitMetadata(group, hit)
+            tgtPool.hits.push(hit)
+          }
+        })
+      }
     },
 
     setSearchResults(state, results) {
@@ -228,17 +227,19 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
+      commit('filters/setUpdatingFacets', true)
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
       axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
-        commit('filters/reset')
         commit('filters/setAllAvailableFacets', response.data)
         commit('setSearchResults', response.data)
         commit('setSearching', false)
+        dispatch("filters/getAllFacets")
       }).catch((error) => {
          commit('system/setError', error)
          commit('setSearching', false)
+         commit('filters/setUpdatingFacets', false)
       })
     },
 
@@ -246,8 +247,9 @@ export default new Vuex.Store({
     // exploration. It is used to query for next page during infinite scroll and
     // when filters are added and removed. Pool results are APPENDED to existing during infinite 
     // scroll. If newly filtered, reset paging and re-query
-    searchSelectedPool({ state, commit, rootState, rootGetters }) {
+    searchSelectedPool({ state, commit, rootState, rootGetters, dispatch }) {
       commit('setSearching', true)
+      commit('filters/setUpdatingFacets', true)
       let tgtPool = rootGetters.selectedResults
       let f = rootGetters['filters/poolFilter'](state.selectedResultsIdx, "api")
       let req = {
@@ -260,11 +262,19 @@ export default new Vuex.Store({
       return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
+        dispatch("filters/getAllFacets")
       }).catch((error) => {
         commit('system/setError', error)
         commit('setSearching', false)
+        commit('filters/setUpdatingFacets', false)
       })
     },
+
+    // Select pool results and get all facet info for the result
+    selectPoolResults(ctx, resultIdx) {
+      ctx.commit('selectPoolResults', resultIdx) 
+      ctx.dispatch("filters/getAllFacets")
+    }
   },
 
   modules: {

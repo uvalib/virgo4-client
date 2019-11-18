@@ -94,6 +94,8 @@ export default {
    methods: {
       searchClicked() {
         if (this.queryEntered ) {
+          // this is a new search, reset filetrs
+          this.$store.commit('filters/reset')
           this.$store.dispatch("searchAllPools")
         } else {
           this.$store.commit('system/setError', "Please enter a search query")

@@ -1,5 +1,5 @@
 <template>
-   <div v-if="searching == false" class="pool-results">
+   <div class="pool-results">
       <div class="results-header">
          <div class="desc">
             {{selectedResults.pool.description}}
@@ -50,16 +50,12 @@ export default {
          searching: state=>state.searching,
          selectedResultsIdx: state => state.selectedResultsIdx,
          addingFilter: state => state.filters.adding,
-         updatingBuckets: state => state.filters.updatingBuckets,
+         updatingFacets: state => state.filters.updatingFacets,
       }),
       ...mapGetters({
          selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
-         poolFilter: 'filters/poolFilter',
       }),
-      filterLength() {
-         return this.poolFilter(this.selectedResultsIdx, 'raw').length
-      }
    },
    watch: {
       selectedResultsIdx () {
@@ -69,6 +65,11 @@ export default {
          if (this.selectedResults.statusCode == 408 && this.selectedResults.total == 0) {
             this.$store.dispatch("searchSelectedPool")
          }
+      },
+      searching() {
+         if ( this.$refs.infiniteLoader ) {
+            this.$refs.infiniteLoader.stateChanger.reset()
+         }   
       }
    },
    methods: {
@@ -95,7 +96,7 @@ export default {
          }
       },
       scrollChecker() {
-         if (window.window.scrollY > 3000) {
+         if (window.window.scrollY > 1500) {
             this.showScrollTop = true
          } else {
             this.showScrollTop = false
@@ -130,13 +131,11 @@ div.infinite-status-prompt {
    border-radius: 5px 5px 0 0;
 }
 .pool-results {
-   border: 1px solid #ccc;
-   border-top: 0;
+   border: 0;
    border-radius: 5px;
    background-color: var(--color-brand-blue);
    position: relative;
    top: -5px;
-   left: -1px;
 }
 div.results-header {
    font-size: 1em;

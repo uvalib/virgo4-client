@@ -108,7 +108,9 @@ export default {
       },
       doAdvancedSearch() {
          if (this.queryEntered) {
-            this.$store.dispatch("searchAllPools");
+            // this is a new search, reset filters
+            this.$store.commit('filters/reset')
+            this.$store.dispatch("searchAllPools")
          } else {
             this.$store.commit(
                "system/setError",
@@ -117,8 +119,9 @@ export default {
          }
       },
       basicClicked() {
-         this.$store.commit("query/clear");
-         this.$store.commit("resetSearchResults");
+         this.$store.commit("query/clear")
+         this.$store.commit('filters/reset')
+         this.$store.commit("resetSearchResults")
       },
       addClicked() {
          this.$store.commit("query/addCriteria");
