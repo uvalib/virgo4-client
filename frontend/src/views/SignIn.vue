@@ -1,29 +1,31 @@
 <template>
    <main class="signin">
       <h1>User Sign In</h1>
-      <table class="pure-form form">
+      <div class="sign-in-content">
+         <table class="pure-form form">
+            <tr>
+               <td class="label">Library ID</td>
+               <td class="value">
+                  <input v-model="user" type="text">
+                  <p class="hint">Driver's License Number, eg: A12345678</p>
+               </td>
+         </tr>
          <tr>
-            <td class="label">Library ID</td>
-            <td class="value">
-               <input v-model="user" type="text">
-               <p class="hint">Driver's License Number, eg: A12345678</p>
-            </td>
-        </tr>
-        <tr>
-            <td class="label">PIN</td>
-            <td class="value">
-               <input @keyup.enter="signinClicked" v-model="pin" type="password">
-               <p class="hint">Last four digits of your ID, unless you've updated it</p>
-            </td>
-        </tr>
-      </table>
-      <div class="controls">
-         <span @click="cancelClicked" class="pure-button pure-button-primary">Cancel</span>
-         <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
-         <span class="netbadge">
-            <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
-            <p class="hint">UVA users only</p>
-         </span>
+               <td class="label">PIN</td>
+               <td class="value">
+                  <input @keyup.enter="signinClicked" v-model="pin" type="password">
+                  <p class="hint">Last four digits of your ID, unless you've updated it</p>
+               </td>
+         </tr>
+         </table>
+         <div class="controls">
+            <span @click="cancelClicked" class="pure-button pure-button-primary">Cancel</span>
+            <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
+            <span class="netbadge">
+               <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
+               <p class="hint">UVA users only</p>
+            </span>
+         </div>
       </div>
    </main>
 </template>
@@ -59,23 +61,28 @@ export default {
 
 <style scoped>
 .signin {
+
    min-height: 400px;
    position: relative;
-   margin: 4vw auto;
-   width:40%;
-   color: #444;
-   font-size: 1.1em;
+   margin-top: 2vw;
+   color: var(--color-primary-text);
 }
 @media only screen and (min-width: 768px) {
-   .signin  {
-       width: 50%;
+   .sign-in-content  {
+       width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
-   .signin  {
+   .sign-in-content  {
        width: 95%;
    }
 }
+.sign-in-content {
+   width: 60%;
+   margin: 0 auto;
+   text-align: left;
+}
+
 td.label {
   font-weight: 500;
   text-align: right;
