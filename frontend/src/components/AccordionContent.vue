@@ -1,6 +1,6 @@
 <template>
    <div class="accordion">
-      <div class="title" @click="accordionClicked" :class="align"
+      <div class="title" @click="accordionClicked" :class="layout"
          :style="{ background: background, color: color }">
          <span class="text" v-html="title"></span>
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
@@ -20,9 +20,9 @@ export default {
    props: {
       title: String,
       subtitle: String,
-      align: {
+      layout: {
          type: String,
-         default: "right"
+         default: "normal"
       },
       background: {
          type: String,
@@ -32,22 +32,9 @@ export default {
          type: String,
          default: "#666666"
       },
-      watched: {
-         type: Array,
-         default: null
-      },
       expanded: {
          default: false,
          type: Boolean
-      }
-   },
-   watch: {
-      watchCount () {
-         if (this.isExpanded) {
-            setTimeout( () => {
-               this.expandedItem.style.height = (this.expandedItem.scrollHeight-5) + 'px'
-            }, 500)
-         }
       }
    },
    data: function() {
@@ -57,10 +44,6 @@ export default {
       };
    },
    computed: {
-      watchCount() {
-         if (this.watched == null) return 0
-         return this.watched.length
-      },
       rotation() {
          if (this.isExpanded) {
             return "rotate(180deg)"
@@ -78,6 +61,7 @@ export default {
       enter: function(el) {
          el.style.height = el.scrollHeight + 'px'
          this.expandedItem = el
+         console.log("ENTER EXP: "+this.expandedItem)
          setTimeout( ()=> {
             this.$emit('accordion-expanded')
          }, 250)
@@ -85,6 +69,7 @@ export default {
       beforeLeave: function(el) {
          el.style.height = el.scrollHeight + 'px'
          this.expandedItem = el
+         console.log("BEFORE LEAVE EXP: "+this.expandedItem)
       },
       leave: function(el) {
          el.style.height = '0'
@@ -105,22 +90,6 @@ export default {
    padding:0;
    text-align: left;
 }
-div.title.right {
-   text-align: right;
-}
-div.title.left,  div.title.left-narrow {
-   text-align: left;
-}
-div.title.left-narrow {
-   padding: 0;
-}
-div.title.left-narrow .accordion-icon {
-   float: unset;
-}
-
-div.title.left .accordion-icon {
-   float: right;
-}
 div.title {
    padding: 0px 8px;
    text-align: right;
@@ -128,6 +97,13 @@ div.title {
    margin: 0;
    background: #f5f5f5;
    padding: 3px 12px;
+   display: flex;
+   flex-flow: row nowrap;
+   align-content: center;
+   justify-content: space-between;
+}
+div.title.narrow {
+   justify-content: flex-start;
 }
 .title .text {
    padding-right: 5px;
@@ -137,11 +113,7 @@ div.title:hover {
 }
 div.title  .accordion-icon {
    font-size: 1.25em;
-   position: relative;
-   top: 2px;
-   cursor: pointer;
    transform: rotate(0deg);
    transition-duration: 250ms;
-   margin-left:10px;
 }
 </style>

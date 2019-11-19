@@ -35,7 +35,7 @@
                         Click the totals below to see more details.
                      </div>
                      <div v-if="isBillOwed">
-                        <AccordionContent :title="billsLabel" align="left-narrow">
+                        <AccordionContent :title="billsLabel" layout="narrow">
                            <div class="bills">
                               <div class="info">
                                  You have been billed replacement bills for the below items.
@@ -71,7 +71,7 @@
                      </div>
 
                      <div v-if="totalFines>0">
-                        <AccordionContent :title="finesLabel" align="left-narrow">
+                        <AccordionContent :title="finesLabel" layout="narrow">
                            <div class="fines">
                               <div class="info">
                                  This is what you currently owe in overdue fines.

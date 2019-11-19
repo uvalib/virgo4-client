@@ -22,8 +22,7 @@
                      <div><br/>This cannot be reversed.</div>
                   </ConfirmDelete>
                   <AccordionContent class="boxed" background="#f5f5f5" 
-                     :title="folderInfo.folder" 
-                     align="left">
+                     :title="folderInfo.folder">
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
                      </div>
