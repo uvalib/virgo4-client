@@ -68,7 +68,6 @@ export default {
       }),
       ...mapGetters({
         hasResults: 'hasResults',
-        queryEntered: 'query/queryEntered',
         hasTranslateMessage: 'system/hasTranslateMessage',
         isSignedIn: 'user/isSignedIn',
         sources: 'pools/sortedList'
@@ -77,7 +76,7 @@ export default {
         'basic','basicSearchScope'
       ]),
       searchScopes() {
-        let out = [{name: 'All Sources', value: 'all'}]
+        let out = [{name: 'All Sources', id: 'all'}]
         return out.concat(this.sources)
       },
       basicSearch() {
@@ -93,13 +92,8 @@ export default {
    },
    methods: {
       searchClicked() {
-        if (this.queryEntered ) {
-          // this is a new search, reset filetrs
-          this.$store.commit('filters/reset')
-          this.$store.dispatch("searchAllPools")
-        } else {
-          this.$store.commit('system/setError', "Please enter a search query")
-        }
+        this.$store.commit('filters/reset')
+        this.$store.dispatch("searchAllPools")
       },
       advancedClicked() {
         this.$store.commit("query/setAdvancedSearch")

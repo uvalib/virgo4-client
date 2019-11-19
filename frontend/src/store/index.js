@@ -134,7 +134,7 @@ export default new Vuex.Store({
     setSearchResults(state, results) {
       // // this is called from top level search; resets results from all pools
       state.total = -1
-      state.results = []
+      state.results.splice(0, state.results.length)
       results.pool_results.forEach( pr => {
         if (!pr.group_list) {
           pr.group_list = []
@@ -180,7 +180,7 @@ export default new Vuex.Store({
     },
 
     resetSearchResults(state) {
-      state.results = []
+      state.results.splice(0, state.results.length)
       state.total = -1
       state.selectedResultsIdx = -1
     },
@@ -232,10 +232,10 @@ export default new Vuex.Store({
       axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
-        commit('filters/setAllAvailableFacets', response.data)
+        commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
         commit('setSearching', false)
-        dispatch("filters/getAllFacets")
+        dispatch("filters/getSelectedResultFacets")
       }).catch((error) => {
          commit('system/setError', error)
          commit('setSearching', false)
@@ -251,18 +251,19 @@ export default new Vuex.Store({
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtPool = rootGetters.selectedResults
-      let f = rootGetters['filters/poolFilter'](state.selectedResultsIdx, "api")
+      let filters = rootGetters['filters/poolFilter'](state.selectedResultsIdx)
+      let filterObj = {pool_id: tgtPool.pool.id, facets: filters}
       let req = {
         query: rootGetters['query/string'],
         pagination: { start: tgtPool.page * state.pageSize, rows: state.pageSize },
-        filters: f
+        filters: [filterObj]
       }
       let url = tgtPool.pool.url + "/api/search?debug=1"
       axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
-        dispatch("filters/getAllFacets")
+        dispatch("filters/getSelectedResultFacets")
       }).catch((error) => {
         commit('system/setError', error)
         commit('setSearching', false)
@@ -273,7 +274,7 @@ export default new Vuex.Store({
     // Select pool results and get all facet info for the result
     selectPoolResults(ctx, resultIdx) {
       ctx.commit('selectPoolResults', resultIdx) 
-      ctx.dispatch("filters/getAllFacets")
+      ctx.dispatch("filters/getSelectedResultFacets")
     }
   },
 
