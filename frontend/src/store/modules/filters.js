@@ -12,7 +12,6 @@ const filters = {
       // IMPORTANT: Must use arrays here instead of a map from 
       // resultsIdx -> filter data as vuex cannot detect state changes 
       // in nested objects!
-      poolDefaultFacets: [],
       poolFacets: [],
       poolFilters: [],
       updatingFacets: false,
@@ -31,12 +30,6 @@ const filters = {
          }
          return  state.poolFacets[idx]
       },
-      poolDefaultFacets: (state) => (idx) => {
-         if ( idx == -1 || idx >= state.poolDefaultFacets.length) {
-            return []
-         }
-         return  state.poolDefaultFacets[idx]
-      },
 
       hasFilter: (state) => (idx) => {
          if (idx < 0) return false
@@ -46,7 +39,7 @@ const filters = {
          if (filters) {
             hasFilter =  filters.length > 0
          }
-         return (hasFilter || hasDefaults)
+         return hasFilter
       },
 
       poolFilter: (state) => (idx) => {
@@ -82,36 +75,46 @@ const filters = {
          state.globalAvailability = avail
       },
       setAllAvailableFacets(state, data) {
-         state.poolFacets = []
+         
+      //    while(state.poolFacets.length > 0) {
+      //       state.poolFacets.pop()
+      //   }
+        state.poolFacets.splice(0, state.poolFacets.length)
 
          // If filters are present, don't remove them
          let addEmptyFilters = (state.poolFilters.length == 0)
          
          data.pool_results.forEach(function (pr, resultIdx) {
-            let poolFacets = []
             if (addEmptyFilters) {
                state.poolFilters.push([]) // add empty filter for each pool
             }
 
-            if ( pr.available_facets) {
-               // NOTE: Facet is an object with .id and .name
-               pr.available_facets.forEach( function(f) {
-                  poolFacets.push( {id: f.id, name: f.name, buckets: []} )
-               })
-            }
-            state.poolFacets[resultIdx] = poolFacets
+            // if ( pr.available_facets) {
+            //    // NOTE: Facet is an object with .id and .name
+            //    pr.available_facets.forEach( function(f) {
+            //       tgtPoolFacets.push( {id: f.id, name: f.name, buckets: []} )
+            //    })
+            // }
+            state.poolFacets.push([])
          })
+         console.log("ALL SET "+JSON.stringify(state.poolFacets))
       },
 
-      setFacets(state, data) {
-         let allPoolFacets = state.poolFacets[data.poolResultsIdx]
+      setPoolFacets(state, data) {
+         let tgtFacets = state.poolFacets[data.poolResultsIdx]
+      //    while(tgtFacets.length > 0) {
+      //       tgtFacets.pop()
+      //   }
+         tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
-            let facetInfo = allPoolFacets.find(f => f.id === facet.id) 
-            facetInfo.buckets = []
+            let facetInfo = {id: facet.id, name: facet.name, buckets: []}
+            //facetInfo.buckets = []
             facet.buckets.forEach(function (b) {
-               // b = {value, count}
+               // b = {value, count,selected}
                facetInfo.buckets.push( {value: b.value, count: b.count} )
             })
+            console.log("PUSHING "+JSON.stringify(facetInfo))
+            tgtFacets.push(facetInfo)
          })
       },
 
@@ -132,23 +135,19 @@ const filters = {
          }
       },
 
-      clearAllFilters(state, idx) {
-         state.poolFilters[idx].splice(0, state.poolFilters[idx].length)
-      },
-
       setUpdatingFacets(state, flag) {
          state.updatingFacets = flag
       },
 
       reset(state) {
-         state.poolFacets = []
-         state.poolFilters = []
+         state.poolFacets.splice(0, state.poolFacets.length)
+         state.poolFilters.splice(0, state.poolFilters.length)
       }
    },
 
    actions: {
       // Get all facets for the selected result set / query / pool
-      getAllFacets(ctx) {
+      getSelectedResultFacets(ctx) {
          // Recreate the query for the target pool, but include a 
          // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
@@ -169,7 +168,7 @@ const filters = {
             if (!facets) {
                facets = []
             }
-            ctx.commit("setFacets", {poolResultsIdx: resultsIdx, facets: facets})
+            ctx.commit("setPoolFacets", {poolResultsIdx: resultsIdx, facets: facets})
             ctx.commit('setUpdatingFacets', false)
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })

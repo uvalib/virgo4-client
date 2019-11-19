@@ -235,7 +235,7 @@ export default new Vuex.Store({
         commit('filters/setAllAvailableFacets', response.data)
         commit('setSearchResults', response.data)
         commit('setSearching', false)
-        dispatch("filters/getAllFacets")
+        dispatch("filters/getSelectedResultFacets")
       }).catch((error) => {
          commit('system/setError', error)
          commit('setSearching', false)
@@ -263,7 +263,7 @@ export default new Vuex.Store({
       return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
-        dispatch("filters/getAllFacets")
+        dispatch("filters/getSelectedResultFacets")
       }).catch((error) => {
         commit('system/setError', error)
         commit('setSearching', false)
@@ -274,7 +274,7 @@ export default new Vuex.Store({
     // Select pool results and get all facet info for the result
     selectPoolResults(ctx, resultIdx) {
       ctx.commit('selectPoolResults', resultIdx) 
-      ctx.dispatch("filters/getAllFacets")
+      ctx.dispatch("filters/getSelectedResultFacets")
     }
   },
 

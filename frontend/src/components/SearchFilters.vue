@@ -30,7 +30,6 @@ export default {
       ...mapGetters({
          hasFilter: 'filters/hasFilter',
          allFilters: 'filters/poolFilter',
-         poolDefaultFacets: 'filters/poolDefaultFacets',
          selectedResults: 'selectedResults',
       }),
       total() {
@@ -55,7 +54,7 @@ export default {
          return values.join(", ")
       },
       clearClicked() {
-         this.$store.commit("filters/clearAllFilters", this.resultsIdx)
+         this.$store.commit("filters/reset", this.resultsIdx)
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
       },
