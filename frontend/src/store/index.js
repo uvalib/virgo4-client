@@ -232,7 +232,7 @@ export default new Vuex.Store({
       axios.defaults.headers.common['Authorization'] = "Bearer "+rootState.user.authToken
       axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
-        commit('filters/setAllAvailableFacets', response.data)
+        commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
         commit('setSearching', false)
         dispatch("filters/getSelectedResultFacets")

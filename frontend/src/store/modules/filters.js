@@ -74,46 +74,35 @@ const filters = {
       setGlobalAvailability(state, avail) {
          state.globalAvailability = avail
       },
-      setAllAvailableFacets(state, data) {
-         
-      //    while(state.poolFacets.length > 0) {
-      //       state.poolFacets.pop()
-      //   }
-        state.poolFacets.splice(0, state.poolFacets.length)
 
-         // If filters are present, don't remove them
+      initialize(state, numPools) {
+         // only initialize filters ONCE to preserve user changes.
+         // The only time fiters are cleared us upon a user clicking clear
+         // or starting a new search
          let addEmptyFilters = (state.poolFilters.length == 0)
-         
-         data.pool_results.forEach(function (pr, resultIdx) {
-            if (addEmptyFilters) {
-               state.poolFilters.push([]) // add empty filter for each pool
-            }
-
-            // if ( pr.available_facets) {
-            //    // NOTE: Facet is an object with .id and .name
-            //    pr.available_facets.forEach( function(f) {
-            //       tgtPoolFacets.push( {id: f.id, name: f.name, buckets: []} )
-            //    })
-            // }
+         state.poolFacets.splice(0, state.poolFacets.length)
+         for (let i=0; i<numPools; i++) {
+            // add an empty array to contain facets for each pool
             state.poolFacets.push([])
-         })
-         console.log("ALL SET "+JSON.stringify(state.poolFacets))
+            if ( addEmptyFilters) {
+               state.poolFilters.push([])    
+            }
+         }
       },
 
       setPoolFacets(state, data) {
+         // cler out all facets for the selected pool, the repopulate
+         // them with data from the response
          let tgtFacets = state.poolFacets[data.poolResultsIdx]
-      //    while(tgtFacets.length > 0) {
-      //       tgtFacets.pop()
-      //   }
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
             let facetInfo = {id: facet.id, name: facet.name, buckets: []}
-            //facetInfo.buckets = []
             facet.buckets.forEach(function (b) {
                // b = {value, count,selected}
                facetInfo.buckets.push( {value: b.value, count: b.count} )
+               // TODO if item has selected, make sure it is included 
+               // in the selecetd pool filter
             })
-            console.log("PUSHING "+JSON.stringify(facetInfo))
             tgtFacets.push(facetInfo)
          })
       },
@@ -140,8 +129,17 @@ const filters = {
       },
 
       reset(state) {
+         // NOTE: clearing array by setting it to [] breaks vuex
+         // responsiveness. Only array methods like push,pop and splice
+         // should be used as they preserve responsiveness...
+         // https://vuejs.org/v2/guide/list.html#Array-Change-Detection
+         let numPools = state.poolFacets.length
          state.poolFacets.splice(0, state.poolFacets.length)
          state.poolFilters.splice(0, state.poolFilters.length)
+         for (let i=0; i<numPools; i++) {
+            state.poolFacets.push([])
+            state.poolFilters.push([])    
+         }
       }
    },
 
