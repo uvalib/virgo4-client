@@ -40,10 +40,10 @@ export default {
          // facet_id/value pairs. Convert to display
          let out = {}
          this.allFilters(this.resultsIdx).forEach(pf=>{
-            if ( Object.prototype.hasOwnProperty.call(out, pf.display.facet) == false ) {
-               out[pf.display.facet] = [pf.display.value]
+            if ( Object.prototype.hasOwnProperty.call(out, pf.facet_name) == false ) {
+               out[pf.facet_name] = [pf.value]
             } else {
-               out[pf.display.facet].push(pf.display.value)
+               out[pf.facet_name].push(pf.value)
             }
          })
          return out

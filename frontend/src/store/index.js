@@ -134,7 +134,7 @@ export default new Vuex.Store({
     setSearchResults(state, results) {
       // // this is called from top level search; resets results from all pools
       state.total = -1
-      state.results = []
+      state.results.splice(0, state.results.length)
       results.pool_results.forEach( pr => {
         if (!pr.group_list) {
           pr.group_list = []
@@ -180,7 +180,7 @@ export default new Vuex.Store({
     },
 
     resetSearchResults(state) {
-      state.results = []
+      state.results.splice(0, state.results.length)
       state.total = -1
       state.selectedResultsIdx = -1
     },

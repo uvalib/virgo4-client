@@ -94,14 +94,20 @@ const filters = {
          // cler out all facets for the selected pool, the repopulate
          // them with data from the response
          let tgtFacets = state.poolFacets[data.poolResultsIdx]
+         let tgtFilter = state.poolFilters[data.poolResultsIdx]
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
             let facetInfo = {id: facet.id, name: facet.name, buckets: []}
             facet.buckets.forEach(function (b) {
-               // b = {value, count,selected}
                facetInfo.buckets.push( {value: b.value, count: b.count} )
-               // TODO if item has selected, make sure it is included 
-               // in the selecetd pool filter
+               if (b.selected) {
+                  let idx = tgtFilter.findIndex( f=> f.facet_id == facetInfo.id && f.value == b.value ) 
+                  if ( idx == -1) {
+                     console.log("default set, but not in filter")   
+                     tgtFilter.push( {facet_id: facetInfo.id, value: b.value, 
+                        display: {facet: facetInfo.name, facet_name: facetInfo.name, value: b.value}})
+                  }
+               }
             })
             tgtFacets.push(facetInfo)
          })
@@ -111,7 +117,6 @@ const filters = {
          // data = {poolResultsIdx: idx, facet: facetID, value: facet bucket value
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          let facetInfo = allPoolFacets.find(f => f.id === data.facetID) 
-         let fValue = facetInfo.buckets.find(b => b.value === data.value) 
          let filter = state.poolFilters[data.poolResultsIdx]
          let filterIdx = filter.findIndex( f=> f.facet_id == data.facetID && f.value == data.value ) 
          if (filterIdx > -1) {
@@ -119,8 +124,7 @@ const filters = {
          } else {
             // Add a new filter to the list. A filter is just FacetID and value
             // Tack on a display obect to each to facilitate filter display in UI
-            filter.push( {facet_id: facetInfo.id, value: data.value, 
-               display: {facet: facetInfo.name, value: fValue.value}})
+            filter.push( {facet_id: facetInfo.id, facet_name: facetInfo.name, value: data.value})
          }
       },
 
