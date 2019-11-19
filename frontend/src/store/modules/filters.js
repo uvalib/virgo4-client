@@ -83,7 +83,6 @@ const filters = {
       },
       setAllAvailableFacets(state, data) {
          state.poolFacets = []
-         Vue.set(vm.someObject, 'myArrayName', [1,2,3]);
 
          // If filters are present, don't remove them
          let addEmptyFilters = (state.poolFilters.length == 0)
