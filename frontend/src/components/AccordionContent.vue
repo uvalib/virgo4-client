@@ -8,7 +8,7 @@
        <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="accordion-content"  v-show="isExpanded" :style="{ background: background, color: color }">
+         <div :id="id" class="accordion-content"  v-show="isExpanded" :style="{ background: background, color: color }">
             <slot></slot>
          </div>
       </transition>
@@ -18,8 +18,12 @@
 <script>
 export default {
    props: {
+      id: String,
       title: String,
       subtitle: String,
+      layoutChange: {
+         default: null,
+      },
       layout: {
          type: String,
          default: "normal"
@@ -37,10 +41,19 @@ export default {
          type: Boolean
       }
    },
+   watch: {
+      layoutChange() {
+         if (this.isExpanded && this.id) {
+            setTimeout( ()=> {
+               let content = document.getElementById(this.id)
+               content.setAttribute("style", "height: inherit;")
+            })
+         }
+      }
+   },
    data: function() {
       return {
          isExpanded: this.expanded,
-         expandedItem: null
       };
    },
    computed: {
@@ -60,16 +73,12 @@ export default {
       },
       enter: function(el) {
          el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-         console.log("ENTER EXP: "+this.expandedItem)
          setTimeout( ()=> {
             this.$emit('accordion-expanded')
          }, 250)
       },
       beforeLeave: function(el) {
          el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-         console.log("BEFORE LEAVE EXP: "+this.expandedItem)
       },
       leave: function(el) {
          el.style.height = '0'

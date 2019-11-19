@@ -1,21 +1,9 @@
 <template>
    <div class="facet-sidebar">
       <div class="global">
-         <div class="heading" @click="toggleGlobal">
-            <span>
-               Filter All Results By
-               <i class="toggle fas fa-angle-down" 
-                  :style="{ transform: rotation(globalFilterExpanded) }"></i>
-            </span>
-            <span>
-               <i class="global fas fa-globe-americas"></i>
-               <i class="fas fa-filter"></i>
-            </span>
-         </div>
-         <transition name="accordion"
-            v-on:before-enter="beforeEnter" v-on:enter="enter"
-            v-on:before-leave="beforeLeave" v-on:leave="leave">
-            <div v-show="globalFilterExpanded" class="body">
+         <AccordionContent class="filter" title="Filter All Results By" background="var(--color-brand-blue)"
+            color="white" :expanded="startExpanded">
+            <div class="body">
                <dl>
                   <dt>Availability</dt>
                   <dd v-for="avail in availabilityOpts" :key="avail.id" @click="availSelected(avail)">
@@ -25,22 +13,13 @@
                   </dd>
                </dl>
             </div>
-         </transition>
+         </AccordionContent>
       </div>
 
       <div class="pool">
-         <div class="heading" @click="togglePool">
-            <span>
-               Filter {{selectedResults.pool.name}} By
-               <i class="toggle fas fa-angle-down" 
-                  :style="{ transform: rotation(poolFilterExpanded) }"></i>
-            </span>
-            <i class="fas fa-filter"></i>
-         </div>
-         <transition name="accordion"
-            v-on:before-enter="beforeEnter" v-on:enter="enter"
-            v-on:before-leave="beforeLeave" v-on:leave="leave">
-            <div v-show="poolFilterExpanded" class="body">
+          <AccordionContent id="zzz" class="filter" :title="poolFilterTitle" background="var(--color-brand-blue)"
+            color="white" :expanded="startExpanded" :layoutChange="updatingFacets">
+            <div class="body">
                <div v-if="updatingFacets" class="working">
                   <div>Looking up filters...</div>
                   <img src="../assets/spinner2.gif">
@@ -61,7 +40,7 @@
                   </template>
                </dl>
             </div>
-         </transition>
+          </AccordionContent>
       </div>
    </div>
 </template>
@@ -70,9 +49,10 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import FacetList from "@/components/popovers/FacetList"
+import AccordionContent from "@/components/AccordionContent"
 export default {
    components: {
-      FacetList
+      FacetList, AccordionContent
    },
    computed: {
       ...mapState({
@@ -81,12 +61,19 @@ export default {
          globalAvailability: state => state.filters.globalAvailability,
          globalFilterExpanded: state => state.filters.globalFilterExpanded,
          poolFilterExpanded: state => state.filters.poolFilterExpanded,
+         displayWidth: state => state.system.displayWidth,
       }),
        ...mapGetters({
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
           allFilters: 'filters/poolFilter',
       }),
+      startExpanded() {
+         return this.displayWidth > 810
+      },
+      poolFilterTitle() {
+         return `Filter ${this.selectedResults.pool.name} By`
+      },
       facets() {
          let out = this.allFacets(this.resultsIdx)
          return out.filter(f=>f.id != "FacetAvailability")
@@ -105,12 +92,6 @@ export default {
       },
       togglePool() {
          this.$store.commit("filters/togglePoolFilterExpanded")
-      },
-      rotation(flag) {
-         if (flag) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
       },
       facetValues(facet) {
          if (!facet.buckets) return []
@@ -147,20 +128,6 @@ export default {
          let idx = filter.findIndex( f=> f.facet_id == facetID && f.value == value ) 
          return idx > -1
       },
-      beforeEnter: function(el) {
-         el.style.height = '0'
-      },
-      enter: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      beforeLeave: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      leave: function(el) {
-         el.style.height = '0'
-      }
    }
 }
 </script>
@@ -181,8 +148,7 @@ export default {
    padding: 10px;
    margin: 0;
    font-size: 0.9em;
-   transition: 250ms ease-out;
-   overflow: hidden;
+   background: white;
 }
 .heading {
    background-color: var(--color-brand-blue);
@@ -219,10 +185,6 @@ dd {
    justify-content: flex-start;
    padding: 2px;
 }
-i.toggle {
-   transition: 250ms ease-out;   
-   margin-left: 10px;
-}
 i.check {
    margin-right: 10px;
    color: var(--color-brand-blue);
@@ -232,10 +194,28 @@ i.check {
    text-align: center;
 }
 .working img {
-   margin-top: 15px;
+   margin: 15px 0;
 }
 .global {
    margin-bottom: 10px;
 }
-
+@media only screen and (min-width: 925px) {
+   .filter-icons {
+      display: inline-block;
+   }
+}
+@media only screen and (max-width: 925px) {
+   .filter-icons {
+      display: none;
+   }
+}
+</style>
+<style> 
+#app .accordion.filter .title {
+   border-radius: 5px 5px 0 0;
+   padding: 5px 10px;
+}
+#app .accordion.filter .accordion-content {
+   border-radius: 0 0 5px 5px;
+}
 </style>
