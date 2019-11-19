@@ -224,10 +224,13 @@ p.relevant {
       margin: 0 2vw 2vw 2vw;
       padding: 0;
    }
+   span.refine.pure-button.pure-button-primary {
+      display: none;
+   }
 }
 .results-wrapper {
    display: flex;
    flex-flow: row wrap;
-   justify-content: flex-start;
+   justify-content: space-between;
 }
 </style>

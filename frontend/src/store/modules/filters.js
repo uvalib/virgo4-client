@@ -15,6 +15,8 @@ const filters = {
       poolFacets: [],
       poolFilters: [],
       updatingFacets: false,
+      globalFilterExpanded: true, 
+      poolFilterExpanded: true,
 
       // Global availability and hard-coded filter values
       globalAvailability: {id: "any", name: "Any"},
@@ -71,6 +73,12 @@ const filters = {
    },
 
    mutations: {
+      toggleGlobalFilterExpanded(state) {
+         state.globalFilterExpanded = !state.globalFilterExpanded
+      },
+      togglePoolFilterExpanded(state) {
+         state.poolFilterExpanded = !state.poolFilterExpanded
+      },
       setGlobalAvailability(state, avail) {
          state.globalAvailability = avail
       },
