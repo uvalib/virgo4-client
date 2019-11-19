@@ -185,10 +185,10 @@ html, body {
 #app a {
    color: var(--color-link);
    font-weight: 500;
-   text-decoration: none;
+   text-decoration: underline;
 }
 #app a:hover {
-   text-decoration: underline;
+   text-decoration: none;
 }
 
 /* for v-popover styles */

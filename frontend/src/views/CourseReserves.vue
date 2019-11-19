@@ -3,13 +3,13 @@
       <h1>Course Reserves</h1>
       <div class="reserves-content">
          <SearchingOverlay message="Looking up reserved items..."/>
-         <p>Type instructor's last name or course name in the search box and click the corresponding button to search for reserved items</p>
+         <p>Type instructor's <strong>last name</strong> or <strong>course name</strong> in the search box<br />Click the corresponding button to search for reserved items</p>
          <div class="search-panel pure-form">
             <input v-model="query" autocomplete="off" type="text">
             <div class="controls">
                <span @click="searchCourseClicked" class="pure-button pure-button-primary">Search Course Names</span>
                <span @click="searchInstructorClicked" class="pure-button pure-button-primary">Search Instructors</span>
-            </div>    
+            </div>
          </div>
          <div class="no-match" v-if="noMatch==true">
             No course reserves that match your request were be found
@@ -62,7 +62,7 @@ export default {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
-   color: var(--color-primary-text);
+   color: var(--uvalib-grey-dark);
 }
 .working {
    text-align: center;
@@ -77,7 +77,7 @@ export default {
 }
 @media only screen and (min-width: 768px) {
    div.reserves-content  {
-       width: 80%;
+       width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
@@ -90,11 +90,9 @@ input[type=text] {
    box-sizing: border-box;
 }
 p {
-   font-size: 0.9em;
-   margin: 5px 0;
+   margin: 15px 0;
 }
 .controls {
-  font-size: 0.85em;
   font-weight: bold;
   padding: 10px 0;
   display: flex;
@@ -108,15 +106,14 @@ p {
 p.error {
   font-weight: bold;
   margin: 0;
-  color: var(--color-error);
+  color: var(--uvalib-red-emergency);
   opacity: 1;
   visibility: visible;
 }
 .no-match {
    font-weight: bold;
    margin: 0;
-   color: var(--color-error);
+   color: var(--uvalib-red-emergency);
    text-align: center;
 }
 </style>
-

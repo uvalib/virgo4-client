@@ -6,13 +6,13 @@
       <div class="inset">
          <p>{{reserve.author}}</p>
          <p>{{reserve.callNumber}}</p>
-         <p>At {{reserve.reserveDesk}}, 
+         <p>At {{reserve.reserveDesk}},
             Available for: {{reserve.circulationRule}} checkout
             <span v-if="reserve.loanPeriod">for {{reserve.loanPeriod}}</span>
          </p>
-         <p>Copies Available: {{reserve.copies}}</p>
+         <p class="available">Copies Available: {{reserve.copies}}</p>
       </div>
-   </div>  
+   </div>
 </template>
 
 <script>
@@ -34,10 +34,7 @@ export default {
 <style scoped>
 .reserve-detail {
    margin: 0;
-   border-left: 1px solid #ccc;
    padding: 4px 8px;
-   border-bottom: 1px solid #ccc;
-   border-right: 1px solid #ccc;
    font-weight: normal;
 }
 p {
@@ -45,5 +42,8 @@ p {
 }
 .inset {
    margin-left: 10px;
+}
+.available {
+  margin-top: 10px;
 }
 </style>

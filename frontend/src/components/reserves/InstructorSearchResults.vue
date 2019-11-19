@@ -1,15 +1,15 @@
 <template>
    <div class="results-panel">
-      <div class="query-summary">
-         <span>Course reserves for instructor '{{query}}'</span>
-      </div>
+      <h2 class="query-summary">
+         Course reserves for instructor '{{query}}'
+      </h2>
       <div class="instructor" v-for="(inst,idx) in results" :key="idx">
-         <p class="value folder">{{inst.name}}</p>
+         <h3 class="value folder">{{inst.name}}</h3>
          <div class="course" v-for="(course,ci) in inst.courses" :key="course.id">
             <p v-if="ci>0" class="value folder">{{inst.name}}</p>
             <div class="course-name">
                <p class="value">{{course.name}}</p>
-               <p class="value">{{course.id}}</p>
+               <p class="value-id">{{course.id}}</p>
             </div>
             <div class="reserves" v-for="reserve in course.reserves" :key="reserve.catalogKey">
                <ReserveDetail :reserve="reserve" />
@@ -38,12 +38,13 @@ export default {
 <style scoped>
 .results-panel {
    margin: 15px 0;
-   color: #444;
+   color: var(--uvalib-grey-dark);
 }
 .query-summary {
-   text-align: left;
-   font-weight: bold;
-   margin-bottom: 10px;
+  text-align: left;
+  font-weight: bold;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--uvalib-grey-light);
 }
 div.instructor {
    text-align: left;
@@ -55,23 +56,37 @@ label {
    font-weight: bold;
    margin-right: 10px;
 }
-.value {
+.value, .value-id {
    margin: 0;
 }
+.value-id {
+  font-weight: normal;
+}
 div.course-name {
-   font-weight: bold;
-   color: #666;
-   border: 1px solid #ccc;
-   padding: 4px 8px;
-   background: #f5f5f5;
-   border-radius: 0 0 0px 5px;
+  font-weight: bold;
+  color: var(--uvalib-grey-darkest);
+  padding: 0;
+  padding: 8px;
+  border-top: 4px solid var(--uvalib-teal-light);
 }
 .folder {
-   background: var(--color-primary-orange);
+   background: var(--uvalib-teal-lightest);
    margin: 10px 0 0 0;
-   padding: 4px 8px;
-   color: white;
+   padding: 8px;
+   color: var(--uvalib-grey-darkest);
    font-weight: bold;
-   border-radius: 5px 5px 0 0;
+}
+.reserves::after {
+  content: " ";
+  display: block;
+  width: 100%;
+  height: 1em;
+  margin: 0 auto;
+  padding: 5px 0;
+  background: linear-gradient(to right, #FFF, var(--uvalib-grey-light), #FFF) center / 100% 2px no-repeat;
+}
+.reserves:last-of-type::after {
+  height: 0px;
+  padding: 0;
 }
 </style>
