@@ -9,7 +9,8 @@ const system = {
       userMenuOpen: false,
       searchAPI: "",
       seenTranslateMsg: false,
-      translateMessage: ""
+      translateMessage: "",
+      displayWidth: window.innerWidth,
    },
 
    getters: {
@@ -19,6 +20,9 @@ const system = {
    },
 
    mutations: {
+      setDisplayWidth(state, w) {
+         state.displayWidth = w
+      },
       closeTraslateMessage(state) {
          state.seenTranslateMsg = true
          state.translateMessage = ""
