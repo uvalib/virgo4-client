@@ -212,10 +212,6 @@ i.check {
 </style>
 <style> 
 #app .accordion.filter .title {
-   border-radius: 5px 5px 0 0;
    padding: 5px 10px;
-}
-#app .accordion.filter .accordion-content {
-   border-radius: 0 0 5px 5px;
 }
 </style>
