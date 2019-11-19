@@ -41,11 +41,6 @@ const filters = {
       hasFilter: (state) => (idx) => {
          if (idx < 0) return false
          if ( state.globalAvailability.id != "any" ) return true
-         let defaultFacets = state.poolDefaultFacets[idx]
-         let hasDefaults = false
-         if ( defaultFacets ) {
-            hasDefaults =  defaultFacets.length > 0
-         }
          let hasFilter = false
          let filters = state.poolFilters[idx]
          if (filters) {
@@ -64,12 +59,6 @@ const filters = {
          if (state.globalAvailability.id != "any") {
             out.unshift({facet_id: state.availabilityFacet, value: globalVal,
                display: {facet: "Availability", value: globalVal}})
-         }
-
-         let defaultFacets = state.poolDefaultFacets[idx]
-         if (defaultFacets) {
-           // Already formatted in setAllAvailableFacets
-           out.push(...defaultFacets)
          }
 
          return out
@@ -94,14 +83,13 @@ const filters = {
       },
       setAllAvailableFacets(state, data) {
          state.poolFacets = []
-         state.defaultFacets = []
+         Vue.set(vm.someObject, 'myArrayName', [1,2,3]);
 
          // If filters are present, don't remove them
          let addEmptyFilters = (state.poolFilters.length == 0)
          
          data.pool_results.forEach(function (pr, resultIdx) {
             let poolFacets = []
-            let defaultFacets = []
             if (addEmptyFilters) {
                state.poolFilters.push([]) // add empty filter for each pool
             }
@@ -113,15 +101,6 @@ const filters = {
                })
             }
             state.poolFacets[resultIdx] = poolFacets
-
-            if ( pr.default_facets) {
-              pr.default_facets.forEach( function(f) {
-                // Format default facets
-                let defaultFacet = {"id": f.facet_id, name: f.name}
-                defaultFacets.push( {facet: defaultFacet, values: f.values} )
-              })
-            }
-            state.poolDefaultFacets[resultIdx] = defaultFacets
          })
       },
 
@@ -175,13 +154,15 @@ const filters = {
          // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
          let pool = ctx.rootState.results[resultsIdx].pool
+         let filters = ctx.getters.poolFilter(resultsIdx)
+         let filterObj = {pool_id: pool.id, facets: filters}
+         
          let req = {
             query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
-            facet: "all",
-            filters: ctx.getters.poolFilter(resultsIdx, "api")
+            filters: [filterObj]
           }
-         let tgtURL = pool.url+"/api/search"
+         let tgtURL = pool.url+"/api/search/facets"
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          ctx.commit('setUpdatingFacets', true)
          axios.post(tgtURL, req).then((response) => {
