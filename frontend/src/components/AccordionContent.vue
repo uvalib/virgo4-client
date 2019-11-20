@@ -1,6 +1,6 @@
 <template>
    <div class="accordion">
-      <div class="title" @click="accordionClicked" :class="layout"
+      <div v-if="showHeader" class="title" @click="accordionClicked" :class="layout"
          :style="{ background: background, color: color }">
          <span class="text" v-html="title"></span>
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
@@ -10,6 +10,10 @@
          v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div :id="id" class="accordion-content"  v-show="isExpanded" :style="{ background: background, color: color }">
             <slot></slot>
+            <div v-if="closeText" @click="accordionClicked" class="footer">
+               <b>{{ closeText }}</b>
+               <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
+            </div>
          </div>
       </transition>
    </div>
@@ -23,6 +27,10 @@ export default {
       subtitle: String,
       layoutChange: {
          default: null,
+      },
+      closeText: {
+         type: String,
+         default: "",
       },
       layout: {
          type: String,
@@ -64,15 +72,18 @@ export default {
       rotation() {
          if ( this.invert) {
             if (this.isExpanded) {
-            return "rotate(0deg)"
-         }
-         return "rotate(180deg)"
+               return "rotate(0deg)"
+            }
+            return "rotate(180deg)"
          } 
          if (this.isExpanded) {
             return "rotate(180deg)"
          }
          return "rotate(0deg)"
-      }
+      },
+      showHeader() {
+         return !this.isExpanded ||  this.isExpanded && this.closeText.length == 0
+      },
    },
    methods: {
       accordionClicked() {
@@ -109,7 +120,7 @@ export default {
    padding:0;
    text-align: left;
 }
-div.title {
+div.title, div.footer {
    padding: 0px 8px;
    text-align: right;
    cursor: pointer;
@@ -120,6 +131,9 @@ div.title {
    flex-flow: row nowrap;
    align-content: center;
    justify-content: space-between;
+}
+div.title, div.footer {
+   background: white;
 }
 div.title.narrow {
    justify-content: flex-start;

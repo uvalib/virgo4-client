@@ -37,7 +37,7 @@
                         {{fv.value}} ({{fv.count}})
                      </dd>
                      <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                        <AccordionContent class="more" title="See More">
+                        <AccordionContent class="more" title="See More" closeText="See Less">
                            <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)"  
                               @click="filterClicked(facetInfo.id, fv.value)"
                               :key="valueKey(idx, facetInfo.id)"
