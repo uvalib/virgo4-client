@@ -109,6 +109,7 @@ export default {
 }
 </script>
 
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style scoped>
 div.add-bookmark {
    font-size: 0.9em;
