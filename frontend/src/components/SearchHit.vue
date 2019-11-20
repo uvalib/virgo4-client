@@ -43,7 +43,7 @@ export default {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
       groupTitle() {
-         return `Show other versions (${this.hit.group.length-1})`
+         return `Show other versions (${this.hit.group.length})`
       }
    },
    methods: {

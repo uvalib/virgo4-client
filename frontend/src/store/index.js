@@ -161,7 +161,7 @@ export default new Vuex.Store({
             hit.grouped = false
             result.hits.push(hit)
           } else {
-            let hit = {grouped: true, expanded: false, count: group.count, group: group.record_list}
+            let hit = {grouped: true, expanded: false, count: group.count}
             utils.getGroupHitMetadata(group, hit)
             result.hits.push(hit)
           }
