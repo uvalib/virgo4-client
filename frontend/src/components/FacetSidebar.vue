@@ -27,15 +27,25 @@
                <dl v-else>
                   <template v-for="facetInfo in facets">
                      <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
-                     <dd v-for="(fv,idx) in facetValues(facetInfo)"  :key="valueKey(idx, facetInfo.id)"
+                     <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)"
                         @click="filterClicked(facetInfo.id, fv.value)" >
                         <i v-if="isFacetSelected(facetInfo.id, fv.value)" 
                            class="check fas fa-check-square"></i>
                         <i v-else class="check far fa-square"></i>                                
                         {{fv.value}} ({{fv.count}})
                      </dd>
-                     <dd class="more" v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                        <FacetList :facet="facetInfo" v-on:facet-clicked="toggleFacet" />
+                     <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
+                        <AccordionContent class="more" title="See More">
+                           <div  v-for="(fv,idx) in facetValues(facetInfo,5)"  
+                              @click="filterClicked(facetInfo.id, fv.value)"
+                              :key="valueKey(idx, facetInfo.id)"
+                           >   
+                              <i v-if="isFacetSelected(facetInfo.id, fv.value)" 
+                                 class="check fas fa-check-square"></i>
+                              <i v-else class="check far fa-square"></i>  
+                              {{fv.value}} ({{fv.count}})
+                           </div>
+                        </AccordionContent>
                      </dd>
                   </template>
                </dl>
@@ -48,11 +58,10 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import FacetList from "@/components/popovers/FacetList"
 import AccordionContent from "@/components/AccordionContent"
 export default {
    components: {
-      FacetList, AccordionContent
+      AccordionContent
    },
    computed: {
       ...mapState({
@@ -93,9 +102,9 @@ export default {
       togglePool() {
          this.$store.commit("filters/togglePoolFilterExpanded")
       },
-      facetValues(facet) {
+      facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.slice(0,5)
+         let out = facet.buckets.slice(start,end)
          return out
       },
       moreKey(id) {
@@ -118,10 +127,8 @@ export default {
       },
       toggleFacet(data) {
          this.$store.commit("filters/toggleFilter", data)
-         setTimeout( ()=> {
-            this.$store.commit("clearSelectedPoolResults")
-            this.$store.dispatch("searchSelectedPool")
-         }, 500)
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
       },
       isFacetSelected(facetID, value) {
          let filter = this.allFilters(this.resultsIdx)
@@ -183,7 +190,8 @@ dd {
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
-   padding: 2px;
+   padding: 2px;  
+   margin-left: 15px;
 }
 i.check {
    margin-right: 10px;
@@ -213,5 +221,9 @@ i.check {
 <style> 
 #app .accordion.filter .title {
    padding: 5px 10px;
+}
+#app .accordion.more .title {
+   padding: 5px 10px 5px 0;
+   font-weight: bold;
 }
 </style>
