@@ -50,10 +50,8 @@ const filters = {
          }
 
          if (state.globalAvailability.id != "any") {
-            if ( out.findIndex( o=> o.facet_id != "FacetAvailability") == -1) {
-               out.unshift({facet_id: state.availabilityFacet, 
-                  facet_name: "Availability", value: globalVal})
-            }
+            out.unshift({facet_id: state.availabilityFacet, 
+               facet_name: "Availability", value: globalVal})
          }
 
          return out
