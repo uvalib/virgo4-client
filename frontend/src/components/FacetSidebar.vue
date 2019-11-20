@@ -34,7 +34,7 @@
                         <i v-if="isFacetSelected(facetInfo.id, fv.value)" 
                            class="check fas fa-check-square"></i>
                         <i v-else class="check far fa-square"></i>                                
-                        {{fv.value}} ({{fv.count}})
+                        {{fv.value}} <span v-if="fv.count">({{fv.count}})</span>
                      </dd>
                      <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
                         <AccordionContent class="more" title="See More" closeText="See Less">
