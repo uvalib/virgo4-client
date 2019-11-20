@@ -218,7 +218,7 @@ dd {
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
-   padding: 2px;  
+   padding: 3px 2px;  
    margin-left: 15px;
 }
 i.check {
@@ -236,7 +236,7 @@ i.check {
    margin-bottom: 10px;
 }
 .expanded-item {
-   padding: 2px 0;
+   padding: 3px 0;
    display: flex; 
    flex-flow: row nowrap;
    align-items: center;
@@ -293,7 +293,7 @@ span.cnt {
    padding: 5px 10px;
 }
 #app .accordion.more .title {
-   padding: 5px 10px 5px 0;
+   padding: 5px 0;
    font-weight: bold;
 }
 #app .accordion.more {
