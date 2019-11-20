@@ -2,7 +2,7 @@
    <div class="facet-sidebar" :class="{overlay: !startExpanded}">
       <div class="global" :class="{overlay: !startExpanded}">
          <AccordionContent class="filter" :title="globalTitle" :background="filterColor"
-            color="white" :expanded="startExpanded">
+            color="white" :expanded="startExpanded" :invert="!startExpanded">
             <div class="body">
                <dl>
                   <dt>Availability</dt>
@@ -19,7 +19,8 @@
       <div class="pool" :class="{overlay: !startExpanded}">
           <AccordionContent id="pool-filter" class="filter" 
             :title="poolFilterTitle" :background="filterColor"
-            color="white" :expanded="startExpanded" :layoutChange="updatingFacets">
+            color="white" :expanded="startExpanded" 
+            :layoutChange="updatingFacets"  :invert="!startExpanded">
             <div class="body">
                <div v-if="updatingFacets" class="working">
                   <div>Looking up filters...</div>

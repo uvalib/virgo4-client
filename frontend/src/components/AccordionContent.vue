@@ -39,6 +39,10 @@ export default {
       expanded: {
          default: false,
          type: Boolean
+      },
+      invert: {
+         default: false,
+         type: Boolean
       }
    },
    watch: {
@@ -58,6 +62,12 @@ export default {
    },
    computed: {
       rotation() {
+         if ( this.invert) {
+            if (this.isExpanded) {
+            return "rotate(0deg)"
+         }
+         return "rotate(180deg)"
+         } 
          if (this.isExpanded) {
             return "rotate(180deg)"
          }
