@@ -17,7 +17,7 @@
       <transition name="message-transition"
           enter-active-class="animated faster fadeIn"
           leave-active-class="animated faster fadeOut">
-         <div v-if="showScrollTop" class="scroll-to-top" @click="backToTop">
+         <div v-if="showScrollTop" class="scroll-to-top" :class="{mobile: smallScreen}" @click="backToTop">
             <i class="fas fa-angle-up"></i>
          </div>
       </transition>
@@ -51,11 +51,15 @@ export default {
          selectedResultsIdx: state => state.selectedResultsIdx,
          addingFilter: state => state.filters.adding,
          updatingFacets: state => state.filters.updatingFacets,
+         displayWidth: state => state.system.displayWidth,
       }),
       ...mapGetters({
          selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
       }),
+      smallScreen() {
+         return this.displayWidth <= 810
+      },
    },
    watch: {
       selectedResultsIdx () {
@@ -167,11 +171,21 @@ div.results-header {
    font-size: 2em;
    font-weight: 100;
    padding: 0px 12px;
-   border-radius: 5px;
-   border: 2px solid white;
-   box-shadow: 0px 0px 5px black;
+   border: 2px solid black;
    right: 15px;
    bottom: 15px;
+   cursor: pointer;
+}
+.scroll-to-top.mobile {
+   position: fixed;
+   background: var(--color-brand-orange);
+   color: white;
+   font-size: 2em;
+   font-weight: 100;
+   padding: 0px 12px;
+   border: 2px solid black;
+   right: 5px;
+   bottom: 45px;
    cursor: pointer;
 }
 </style>

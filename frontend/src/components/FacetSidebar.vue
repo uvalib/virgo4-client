@@ -1,7 +1,7 @@
 <template>
-   <div class="facet-sidebar">
-      <div class="global">
-         <AccordionContent class="filter" title="Filter All Results By" background="var(--color-brand-blue)"
+   <div class="facet-sidebar" :class="{overlay: !startExpanded}">
+      <div class="global" :class="{overlay: !startExpanded}">
+         <AccordionContent class="filter" :title="globalTitle" :background="filterColor"
             color="white" :expanded="startExpanded">
             <div class="body">
                <dl>
@@ -16,9 +16,9 @@
          </AccordionContent>
       </div>
 
-      <div class="pool">
+      <div class="pool" :class="{overlay: !startExpanded}">
           <AccordionContent id="pool-filter" class="filter" 
-            :title="poolFilterTitle" background="var(--color-brand-blue)"
+            :title="poolFilterTitle" :background="filterColor"
             color="white" :expanded="startExpanded" :layoutChange="updatingFacets">
             <div class="body">
                <div v-if="updatingFacets" class="working">
@@ -78,10 +78,25 @@ export default {
           selectedResults: 'selectedResults',
           allFilters: 'filters/poolFilter',
       }),
+      globalTitle() {
+         if ( !this.startExpanded ) {
+            return "Filter All"     
+         }
+         return "Filter All Results By"
+      },
+      filterColor() {
+         if ( !this.startExpanded ) {
+            return "var(--color-brand-orange)"     
+         }
+         return "var(--color-brand-blue)"
+      },
       startExpanded() {
          return this.displayWidth > 810
       },
       poolFilterTitle() {
+         if ( !this.startExpanded ) {
+            return `Filter ${this.selectedResults.pool.name}`
+         }
          return `Filter ${this.selectedResults.pool.name} By`
       },
       facets() {
@@ -224,6 +239,37 @@ i.check {
    .filter-icons {
       display: none;
    }
+}
+.facet-sidebar.overlay {
+   position: fixed;
+   left: 5px;
+   right: 5px;
+   z-index: 5000;
+   bottom: 5px;
+   padding: 0;
+   margin: 0;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-end;
+   justify-content: space-between;
+}
+div.global.overlay {
+   margin: 0;
+   border: 2px solid var(--color-brand-blue);
+   flex: 1 1 auto;
+   margin-right: 5px;
+}
+div.pool.overlay {
+   margin: 0;
+   border: 2px solid var(--color-brand-blue);
+   flex: 1 1 auto;
+}
+div.pool.overlay .body {
+   max-height: 450px;
+   overflow: scroll;
+}
+div.pool.overlay .body,  div.global.overlay .body {
+   border: 5px solid var(--color-brand-orange);
 }
 </style>
 <style> 
