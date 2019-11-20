@@ -13,27 +13,38 @@
                </template>
             </dl>
          </div>
-         <router-link class="img-link" v-if="hit.grouped==false" :to="detailsURL">
+         <router-link class="img-link" :to="detailsURL">
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
          </router-link>
       </div>
+      <AccordionContent v-if="hit.grouped" :title="groupTitle" 
+         class="group">
+         <div class="group-item-wrapper" v-for="(groupHit,idx) in hit.group" :key="idx">
+            <GroupedSearchHit :pool="pool" :hit="groupHit" :key="idx"/>
+         </div>
+      </AccordionContent>
    </div>
 </template>
 
 <script>
 import SearchHitHeader from '@/components/SearchHitHeader'
+import AccordionContent from '@/components/AccordionContent'
+import GroupedSearchHit from '@/components/GroupedSearchHit'
 export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
    },
    components: {
-      SearchHitHeader
+      SearchHitHeader, AccordionContent, GroupedSearchHit
    },
    computed: {
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
+      groupTitle() {
+         return `Show other versions (${this.hit.group.length-1})`
+      }
    },
    methods: {
       getKey(field,idx) {
@@ -97,16 +108,6 @@ div.basic {
    text-align: left;
    background-color: white;
 }
- #app td.value >>> a.pure-button.pure-button-primary.ext {
-   background-color:var(--color-pale-blue);
-   color: white;
-   padding: 3px 0px;
-   width: 100%;
-   border-radius: 5px;
-}
-#app td.value >>> a.pure-button.pure-button-primary.ext:hover {
-   text-decoration: none;
-}
 .cover-img.small {
    max-height: 124px;
    max-width: 100px;
@@ -124,5 +125,19 @@ dt {
 }
 dd {
    margin: 0 0 10px 0;
+}
+.group-item-wrapper {
+   padding: 15px;
+   border: 1px solid #ccc;
+   border-radius: 5px;
+   margin: 10px;
+   background: white;
+}
+</style>
+<style> 
+#app .accordion.group .title {
+   padding: 5px 10px;
+   font-weight: bold;
+   border-radius: 5px
 }
 </style>

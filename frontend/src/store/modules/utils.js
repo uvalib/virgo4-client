@@ -89,9 +89,10 @@ export function getFieldValue(fieldName, hit) {
 export function getGroupHitMetadata(group, hit) {
   hit.header = {}
   if ( group.record_list) {
-    hit.header.title = group.record_list[0].header.title
-    hit.header.subtitle = group.record_list[0].header.subtitle
-    hit.header.author = group.record_list[0].header.author
+    hit.header = group.record_list[0].header
+    hit.basicFields = group.record_list[0].basicFields
+    hit.cover_image = group.record_list[0].cover_image
+    hit.identifier = group.record_list[0].identifier
   } else {
     hit.header.title = "ERROR: Mising group data"
   }

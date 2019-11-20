@@ -152,13 +152,12 @@ p.relevant {
    flex: 1 1 auto;
 }
 .pool-tabs {
-   margin: 0 0 0 0;
+   margin: 0 15px 0 0;
    text-align: left;
    font-size: 0.9em;
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
-   margin: 0;
 }
 .pool.pure-button {
    margin: 0 2px 0 0;

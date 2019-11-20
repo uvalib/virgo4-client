@@ -1,5 +1,5 @@
 <template>
-   <span class="bookmark-container" v-if="!hit.grouped">
+   <span class="bookmark-container">
       <template v-if="isSignedIn">
          <i @click="removeBookmarkClicked" class="bookmark fas fa-bookmark" v-if="isBookmarked"></i> 
          <i @click="addBookmarkClicked" class="bookmark far fa-bookmark" v-else></i> 

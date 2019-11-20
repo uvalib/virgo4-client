@@ -9,8 +9,7 @@
       <div class="hits">
          <div class="hits-content">
             <div v-for="(hit,idx) in selectedResults.hits" class="hit-wrapper" :key="idx">
-               <SearchHit v-if="hit.grouped==false"  :pool="selectedResults.pool.id" :hit="hit" :key="idx"/>
-               <GroupedSearchHit v-else :pool="selectedResults.pool.id" :hitIdx="idx" :hit="hit" :key="idx"/>
+               <SearchHit :pool="selectedResults.pool.id" :hit="hit" :key="idx"/>
             </div>
          </div>
       </div>
