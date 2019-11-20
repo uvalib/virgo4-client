@@ -50,7 +50,6 @@ const filters = {
          }
 
          if (state.globalAvailability.id != "any") {
-            console.log("Global avail set, adding to "+JSON.stringify(out))
             if ( out.findIndex( o=> o.facet_id != "FacetAvailability") == -1) {
                out.unshift({facet_id: state.availabilityFacet, 
                   facet_name: "Availability", value: globalVal})
@@ -104,10 +103,12 @@ const filters = {
             if ( facet.id == "FacetAvailability") return
 
             let facetInfo = {id: facet.id, name: facet.name, buckets: []}
+            if ( facet.type) {
+               facetInfo.type = facet.type 
+            }
 
             // first add any facets that are part of the filter
             tgtFilter.filter(f => f.facet_id == facet.id).forEach( af=> {
-               console.log("ADD "+af.value+" TO FILTER")
                facetInfo.buckets.push( {value: af.value, count: -1} )  
             })
 
@@ -135,13 +136,26 @@ const filters = {
          let allPoolFacets = state.poolFacets[data.poolResultsIdx]
          let facetInfo = allPoolFacets.find(f => f.id === data.facetID) 
          let filter = state.poolFilters[data.poolResultsIdx]
-         let filterIdx = filter.findIndex( f=> f.facet_id == data.facetID && f.value == data.value ) 
-         if (filterIdx > -1) {
-            filter.splice(filterIdx, 1)
-         } else {
-            // Add a new filter to the list. A filter is just FacetID and value
-            // Tack on a display obect to each to facilitate filter display in UI
+
+         if ( facetInfo.type == "radio") {
+            // get a list of all filters that are not this one. Wipe out the 
+            // original filters and add the elements in the new array one at a time
+            // This ensures that filter array remains reactive
+            let others = filter.filter( f => f.facet_id != data.facetID )
+            filter.splice(0, filter.length)
+            others.forEach( f=> {
+               filter.push(f)  
+            })
             filter.push( {facet_id: facetInfo.id, facet_name: facetInfo.name, value: data.value})
+         } else {
+            let filterIdx = filter.findIndex( f=> f.facet_id == data.facetID && f.value == data.value ) 
+            if (filterIdx > -1) {
+               filter.splice(filterIdx, 1)
+            } else {
+               // Add a new filter to the list. A filter is just FacetID and value
+               // Tack on a display obect to each to facilitate filter display in UI
+               filter.push( {facet_id: facetInfo.id, facet_name: facetInfo.name, value: data.value})
+            }
          }
       },
 

@@ -31,10 +31,9 @@
                      <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)"
                         @click="filterClicked(facetInfo.id, fv.value)" >
-                        <i v-if="isFacetSelected(facetInfo.id, fv.value)" 
-                           class="check fas fa-check-square"></i>
-                        <i v-else class="check far fa-square"></i>                                
-                        {{fv.value}} <span v-if="fv.count">({{fv.count}})</span>
+                        <i :class="facetControlClass(facetInfo, fv.value)"></i>                             
+                        {{fv.value}} 
+                        <span class="cnt" v-if="fv.count">({{fv.count}})</span>
                      </dd>
                      <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
                         <AccordionContent class="more" title="See More" closeText="See Less">
@@ -42,10 +41,9 @@
                               @click="filterClicked(facetInfo.id, fv.value)"
                               :key="valueKey(idx, facetInfo.id)"
                            >   
-                              <i v-if="isFacetSelected(facetInfo.id, fv.value)" 
-                                 class="check fas fa-check-square"></i>
-                              <i v-else class="check far fa-square"></i>  
-                              {{fv.value}} ({{fv.count}})
+                              <i :class="facetControlClass(facetInfo, fv.value)"></i>                             
+                              {{fv.value}} 
+                              <span class="cnt" v-if="fv.count">({{fv.count}})</span>
                            </div>
                         </AccordionContent>
                      </dd>
@@ -113,6 +111,19 @@ export default {
       },
    },
    methods: {
+      facetControlClass(facet, value) {
+         if ( this.isFacetSelected(facet.id, value))  {
+            if ( facet.type == "radio") {
+               return "check fas fa-check-circle"   
+            }
+            return "check fas fa-check-square"
+         } else {
+            if ( facet.type == "radio") {
+               return "check far fa-circle"   
+            }
+            return "check far fa-square"
+         }  
+      },
       toggleGlobal() {
          this.$store.commit("filters/toggleGlobalFilterExpanded")
       },
@@ -271,6 +282,10 @@ div.pool.overlay .body {
 }
 div.pool.overlay .body,  div.global.overlay .body {
    border: 5px solid var(--color-brand-orange);
+}
+span.cnt {
+   margin-left: 5px; 
+   margin-left: auto;
 }
 </style>
 <style> 
