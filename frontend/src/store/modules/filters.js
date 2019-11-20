@@ -98,14 +98,26 @@ const filters = {
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
             let facetInfo = {id: facet.id, name: facet.name, buckets: []}
+
+            // first add any facets that are part of the filter
+            tgtFilter.filter(f => f.facet_id == facet.id).forEach( af=> {
+               facetInfo.buckets.push( {value: af.value, count: -1} )  
+            })
+
+            // next add the rest, without duplicating what was added above
             facet.buckets.forEach(function (b) {
-               facetInfo.buckets.push( {value: b.value, count: b.count} )
-               if (b.selected) {
-                  let idx = tgtFilter.findIndex( f=> f.facet_id == facetInfo.id && f.value == b.value ) 
-                  if ( idx == -1) {
-                     console.log("default set, but not in filter")   
-                     tgtFilter.push( {facet_id: facetInfo.id, value: b.value, 
-                        display: {facet: facetInfo.name, facet_name: facetInfo.name, value: b.value}})
+               let applied = facetInfo.buckets.find( fb => fb.value == b.value)
+               if ( applied ) {
+                  applied.count = b.count
+               } else {
+                  facetInfo.buckets.push( {value: b.value, count: b.count} )
+                  if (b.selected) {
+                     let idx = tgtFilter.findIndex( f=> f.facet_id == facetInfo.id && f.value == b.value ) 
+                     if ( idx == -1) {
+                        console.log("default set, but not in filter")   
+                        tgtFilter.push( {facet_id: facetInfo.id, value: b.value, 
+                           display: {facet: facetInfo.name, facet_name: facetInfo.name, value: b.value}})
+                     }
                   }
                }
             })

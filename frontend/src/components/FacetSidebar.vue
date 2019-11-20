@@ -17,7 +17,8 @@
       </div>
 
       <div class="pool">
-          <AccordionContent id="zzz" class="filter" :title="poolFilterTitle" background="var(--color-brand-blue)"
+          <AccordionContent id="pool-filter" class="filter" 
+            :title="poolFilterTitle" background="var(--color-brand-blue)"
             color="white" :expanded="startExpanded" :layoutChange="updatingFacets">
             <div class="body">
                <div v-if="updatingFacets" class="working">
@@ -36,7 +37,7 @@
                      </dd>
                      <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
                         <AccordionContent class="more" title="See More">
-                           <div  v-for="(fv,idx) in facetValues(facetInfo,5)"  
+                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)"  
                               @click="filterClicked(facetInfo.id, fv.value)"
                               :key="valueKey(idx, facetInfo.id)"
                            >   
@@ -207,6 +208,13 @@ i.check {
 .global {
    margin-bottom: 10px;
 }
+.expanded-item {
+   padding: 2px 0;
+   display: flex; 
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
+}
 @media only screen and (min-width: 925px) {
    .filter-icons {
       display: inline-block;
@@ -225,5 +233,8 @@ i.check {
 #app .accordion.more .title {
    padding: 5px 10px 5px 0;
    font-weight: bold;
+}
+#app .accordion.more {
+   width: 100%;
 }
 </style>
