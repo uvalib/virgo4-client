@@ -50,8 +50,11 @@ const filters = {
          }
 
          if (state.globalAvailability.id != "any") {
-            out.unshift({facet_id: state.availabilityFacet, value: globalVal,
-               display: {facet: "Availability", value: globalVal}})
+            console.log("Global avail set, adding to "+JSON.stringify(out))
+            if ( out.findIndex( o=> o.facet_id != "FacetAvailability") == -1) {
+               out.unshift({facet_id: state.availabilityFacet, 
+                  facet_name: "Availability", value: globalVal})
+            }
          }
 
          return out
@@ -97,10 +100,14 @@ const filters = {
          let tgtFilter = state.poolFilters[data.poolResultsIdx]
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
+            // Availability is global and handled differently; skip it
+            if ( facet.id == "FacetAvailability") return
+
             let facetInfo = {id: facet.id, name: facet.name, buckets: []}
 
             // first add any facets that are part of the filter
             tgtFilter.filter(f => f.facet_id == facet.id).forEach( af=> {
+               console.log("ADD "+af.value+" TO FILTER")
                facetInfo.buckets.push( {value: af.value, count: -1} )  
             })
 
@@ -114,9 +121,7 @@ const filters = {
                   if (b.selected) {
                      let idx = tgtFilter.findIndex( f=> f.facet_id == facetInfo.id && f.value == b.value ) 
                      if ( idx == -1) {
-                        console.log("default set, but not in filter")   
-                        tgtFilter.push( {facet_id: facetInfo.id, value: b.value, 
-                           display: {facet: facetInfo.name, facet_name: facetInfo.name, value: b.value}})
+                        tgtFilter.push( {facet_id: facetInfo.id, facet_name: facetInfo.name, value: b.value} )
                      }
                   }
                }
