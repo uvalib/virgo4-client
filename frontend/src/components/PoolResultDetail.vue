@@ -31,12 +31,11 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
-import GroupedSearchHit from "@/components/GroupedSearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import InfiniteLoading from 'vue-infinite-loading'
 export default {
    components: {
-      SearchHit,SearchFilters,InfiniteLoading,GroupedSearchHit
+      SearchHit, SearchFilters, InfiniteLoading
    },
    data: function() {
       return {

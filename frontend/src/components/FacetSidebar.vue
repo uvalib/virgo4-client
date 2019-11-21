@@ -23,10 +23,10 @@
             :layoutChange="updatingFacets"  :invert="!startExpanded">
             <div class="body">
                <div v-if="updatingFacets" class="working">
-                  <div>Looking up filters...</div>
+                  <div>Loading filters...</div>
                   <img src="../assets/spinner2.gif">
                </div>
-               <dl v-else>
+               <dl>
                   <template v-for="facetInfo in facets">
                      <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)"
@@ -184,6 +184,11 @@ export default {
    margin: 0;
    font-size: 0.9em;
    background: white;
+   position: relative;
+   min-height: 80px;
+}
+.pool .body {
+   min-height: 100px;
 }
 .heading {
    background-color: var(--color-brand-blue);
@@ -227,7 +232,19 @@ i.check {
    font-size: 1.25em;
 }
 .working {
+   color: var(--uvalib-grey-dark);
    text-align: center;
+   background: white;
+   position: absolute;
+   left: 0;
+   right: 0;
+   padding: 25px 15px;
+   bottom: 0;
+   top: 0;
+   z-index: 5000;
+   opacity: 0.9;
+   font-size: 1.25em;
+   font-weight: bold;
 }
 .working img {
    margin: 15px 0;

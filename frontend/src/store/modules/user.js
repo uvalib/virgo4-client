@@ -19,6 +19,10 @@ const user = {
    },
 
    getters: {
+      isCommunityUser: (state, getters) => {
+         if (getters.hasAccountInfo == false ) return false
+         return state.accountInfo.communityUser
+      },
       isUndergraduate: (state,getters) => {
          if (getters.hasAccountInfo == false ) return false
          // NOTE: profile comes from Sirsi, desc comes from LDAP

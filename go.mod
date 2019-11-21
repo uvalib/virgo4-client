@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/OneOfOne/xxhash v1.2.5 // indirect
 	github.com/aws/aws-sdk-go v1.23.13
+	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/dgryski/go-sip13 v0.0.0-20190329191031-25c5027a8c7b // indirect
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -13,7 +14,6 @@ require (
 	github.com/go-ozzo/ozzo-dbx v1.0.15
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gogo/protobuf v1.3.0 // indirect
-	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.8 // indirect
@@ -21,6 +21,7 @@ require (
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
 	github.com/prometheus/client_golang v1.2.1 // indirect
+	github.com/prometheus/procfs v0.0.7 // indirect
 	github.com/prometheus/tsdb v0.10.0 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
@@ -30,10 +31,10 @@ require (
 	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472 // indirect
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
-	golang.org/x/sys v0.0.0-20191029155521-f43be2a4598c // indirect
+	golang.org/x/sys v0.0.0-20191120155948-bd437916bb0e // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190903025054-afe7f8212f0d // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gopkg.in/yaml.v2 v2.2.4 // indirect
+	gopkg.in/yaml.v2 v2.2.7 // indirect
 	honnef.co/go/tools v0.0.1-2019.2.3 // indirect
 )

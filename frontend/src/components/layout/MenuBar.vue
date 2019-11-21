@@ -4,7 +4,7 @@
          <router-link to="/">
             <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
          </router-link>
-         <router-link to="/course-reserves">
+         <router-link to="/course-reserves" v-if="isSignedIn && !isCommunityUser">
             <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
          </router-link>
          <span class="menu-item feedback">
@@ -68,6 +68,7 @@ export default {
       }),
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
+        isCommunityUser: 'user/isCommunityUser',
         itemsOnNotice: 'user/itemsOnNotice'
       }),
       rotation() {
