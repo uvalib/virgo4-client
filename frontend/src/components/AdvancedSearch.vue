@@ -70,7 +70,7 @@
       </div>
       <div class="basic">
          <span class="text-button basic-link" @click="basicClicked">
-            Basic Search&nbsp;
+            Search&nbsp;
             <i class="fas fa-undo-alt"></i>
          </span>
       </div>

@@ -6,7 +6,7 @@
       <SearchingOverlay message="Searching..." />
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
-          <h1>Basic Search</h1>
+          <h1>Search</h1>
           <div v-if="hasTranslateMessage" class="translate-message">
             {{translateMessage}}
           </div>
