@@ -28,6 +28,9 @@ export default {
       layoutChange: {
          default: null,
       },
+      autoCollapseOn: {
+         default: null
+      },
       closeText: {
          type: String,
          default: "",
@@ -60,6 +63,11 @@ export default {
                let content = document.getElementById(this.id)
                content.setAttribute("style", "height: inherit;")
             })
+         }
+      },
+      autoCollapseOn() {
+         if (this.isExpanded) {
+            this.expanded = false
          }
       }
    },

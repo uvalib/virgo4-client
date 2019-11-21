@@ -1,7 +1,7 @@
 <template>
    <div class="header-wrapper">
       <div class="full-title">
-         <template v-if="hit.grouped || link == false">
+         <template v-if="link == false">
             <span class="title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
          </template>

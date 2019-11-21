@@ -18,7 +18,7 @@
          </router-link>
       </div>
       <AccordionContent v-if="hit.grouped" :title="groupTitle" 
-         class="group">
+         class="group" :autoCollapseOn="searching">
          <div class="group-item-wrapper" v-for="(groupHit,idx) in hit.group" :key="idx">
             <GroupedSearchHit :pool="pool" :hit="groupHit" :key="idx"/>
          </div>
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import AccordionContent from '@/components/AccordionContent'
 import GroupedSearchHit from '@/components/GroupedSearchHit'
@@ -44,7 +45,10 @@ export default {
       },
       groupTitle() {
          return `Show other versions (${this.hit.group.length})`
-      }
+      },
+      ...mapState({
+         searching: state => state.searching,
+      })
    },
    methods: {
       getKey(field,idx) {
