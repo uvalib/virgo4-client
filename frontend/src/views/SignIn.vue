@@ -2,29 +2,36 @@
    <main class="signin">
       <h1>User Sign In</h1>
       <div class="sign-in-content">
-         <table class="pure-form form">
-            <tr>
-               <td class="label">Library ID</td>
-               <td class="value">
-                  <input v-model="user" type="text">
-                  <p class="hint">Driver's License Number, eg: A12345678</p>
-               </td>
-         </tr>
-         <tr>
-               <td class="label">PIN</td>
-               <td class="value">
-                  <input @keyup.enter="signinClicked" v-model="pin" type="password">
-                  <p class="hint">Last four digits of your ID, unless you've updated it</p>
-               </td>
-         </tr>
-         </table>
-         <div class="controls">
-            <span @click="cancelClicked" class="pure-button pure-button-primary">Cancel</span>
-            <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
+         <div class="netbadge">
             <span class="netbadge">
-               <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
-               <p class="hint">UVA users only</p>
+               <label>UVA Users</label>
+               <div class="indent">
+                  <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
+               </div>
             </span>
+         </div>
+
+         <div>
+            <label>All Other Users</label>
+            <div class="indent">
+               <table class="pure-form form">
+                  <tr>
+                     <td class="label">Library ID</td>
+                     <td class="value">
+                        <input v-model="user" type="text">
+                        <p class="hint">Driver's License Number, eg: A12345678</p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="label">PIN</td>
+                     <td class="value">
+                        <input @keyup.enter="signinClicked" v-model="pin" type="password">
+                        <p class="hint">Last four digits of your ID, unless you've updated it</p>
+                     </td>
+                  </tr>
+               </table>
+               <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
+            </div>
          </div>
       </div>
    </main>
@@ -46,9 +53,6 @@ export default {
       }
    },
    methods: {
-      cancelClicked() {
-         this.$router.push("/")
-      },
       signinClicked() {
          this.$store.dispatch("user/signin", {barcode: this.user, password: this.pin})
       },
@@ -61,11 +65,11 @@ export default {
 
 <style scoped>
 .signin {
-
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
+   margin-bottom: 35px;
 }
 @media only screen and (min-width: 768px) {
    .sign-in-content  {
@@ -101,29 +105,32 @@ td.value {
    padding: 6px;
 }
 p.hint {
-   font-size: 0.8em;
-   margin: 2px 0;
-   color: #666;
+   margin: 5px 10px;
+   color: #444;
    text-align: left;
 }
-span.netbadge p.hint {
-   text-align: right;
-   margin-top: 5px;
+label {
+   color: #444;
+   margin-bottom: 15px;
+   display: block;
+   font-size: 1.25em;
 }
 span.netbadge .pure-button {
    width:100%;
 }
+#app .signin .pure-button.pure-button-primary {
+   margin: 0;
+   width: 100%;
+}
 .controls {
-   margin-top: 25px;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: flex-start;
-   justify-content: flex-end;
+   margin-top: 5px;
 }
-.controls .pure-button, span.netbadge {
-    flex: 1 1 auto;
+div.netbadge {
+   padding-bottom: 25px;
+   border-bottom: 4px solid var(--color-brand-blue);
+   margin: 25px 0;
 }
-#app .controls .pure-button {
-   margin: 5px;
+div.indent {
+   margin-left: 35px;
 }
 </style>
