@@ -14,7 +14,7 @@
          </span>
       </div>
 
-      <div class="results-wrapper">
+      <div class="results-wrapper" v-if="total > 0">
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
@@ -32,6 +32,11 @@
                   v-model="otherSrcSelection"/>
             </div>
             <PoolResultDetail v-if="selectedResultsIdx > -1" />
+         </div>
+      </div>
+      <div class="results-wrapper" v-else>
+         <div class="none">
+            No results found
          </div>
       </div>
 
@@ -231,5 +236,11 @@ p.relevant {
    display: flex;
    flex-flow: row wrap;
    justify-content: space-between;
+}
+.none {
+   flex: 1 1 auto;
+   font-size: 1.5em;
+   font-weight: 500;
+   color: #888;
 }
 </style>

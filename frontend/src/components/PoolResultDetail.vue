@@ -9,7 +9,7 @@
       <div class="hits">
          <div class="hits-content">
             <div v-for="(hit,idx) in selectedResults.hits" class="hit-wrapper" :key="idx">
-               <SearchHit :pool="selectedResults.pool.id" :hit="hit" :key="idx"/>
+               <SearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
             </div>
          </div>
       </div>

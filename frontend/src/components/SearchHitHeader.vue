@@ -1,6 +1,7 @@
 <template>
    <div class="header-wrapper">
       <div class="full-title">
+         <span v-if="count>0" class="count">{{count}}.</span>
          <template v-if="link == false">
             <span class="title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="subtitle">&nbsp;{{hit.header.subtitle}}</span>
@@ -31,6 +32,10 @@ export default {
       link: {
          type: Boolean,
          default: true
+      },
+      count: {
+         type: Number,
+         default: -1
       }
    },
    components: {
@@ -53,11 +58,6 @@ export default {
    align-items: flex-start;
 }
 
-/* #app div.header-wrapper a {
-   color: var(--color-primary-text);
-   text-decoration: underline;
-} */
-
 #app .basic a:hover {
    text-decoration: none;
    color: var(--color-link)
@@ -78,10 +78,20 @@ div.bm-control {
 }
 .full-title {
    font-size: 1.25em;
+   display:flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
 }
 .author {
    font-size: 0.9em;
    font-weight: normal;
    margin-top:4px;
+}
+.count {
+   display: inline-block;
+   font-size: 0.7em;
+   color: #888;
+   margin-right: 5px;
 }
 </style>

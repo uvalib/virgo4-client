@@ -1,6 +1,6 @@
 <template>
    <div class="hit">
-      <SearchHitHeader :hit="hit" :pool="pool"/>
+      <SearchHitHeader :count="count" :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">
             <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
@@ -35,6 +35,7 @@ export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
+      count: {type: Number, required: true}
    },
    components: {
       SearchHitHeader, AccordionContent, GroupedSearchHit

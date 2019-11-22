@@ -32,7 +32,7 @@ export default {
       },
       pad: {
          type: String,
-         default: "0 5px"
+         default: "0 10px"
       },
       background: {
          type: String,
@@ -78,7 +78,7 @@ export default {
    },
    methods: {
       optionClicked(src) {
-         if (src.enabled == false) return
+         if (src.disabled ) return
          this.$emit('input', src)
       },
       globalClick() {
@@ -119,7 +119,7 @@ export default {
   position: relative;
   text-align: left;
   align-self: stretch;
-  padding: 0 5px;
+  padding: 0 10px;
   text-align: left;
   border: 1px solid var(--color-brand-blue);
 }
@@ -168,12 +168,17 @@ export default {
   white-space: nowrap;
 }
 .v4-select .option {
-  padding: 4px 10px;
+  padding: 5px 15px 10px 15px;
+}
+.v4-select .option.disabled {
+  background-color:  initial;
+  cursor: default;
+  color: #bbb;
 }
 .v4-select .option.disabled:hover {
   background-color:  initial;
-  color: #444;
   cursor: default;
+  color: #bbb;
 }
 .v4-select .option:hover {
   background-color:  var(--color-lightest-blue);

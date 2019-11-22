@@ -14,7 +14,7 @@
          </div>
       </div>
       <div class="criteria">
-         <h2>Search Criteria</h2>
+         <h2>Search Criteria<i @click="addClicked" class="add fas fa-plus-circle"></i></h2>
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <div class="options">
                <template v-if="idx > 0">
@@ -62,10 +62,6 @@
          </div>
       </div>
       <div class="controls">
-         <span @click="addClicked" class="add pure-button pure-button-secondary">
-            <i class="add fas fa-plus-circle"></i>
-            Add Criteria
-         </span>
          <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">
@@ -138,26 +134,25 @@ export default {
 };
 </script>
 
-<style>
-#app .sources span.multiselect__tag {
-   background: var(--color-light-blue);
-   color: white;
-}
-</style>
 <style scoped>
-.pure-button.pure-button-cancel {
-   background: rgb(202, 60, 60);
-   color: white;
-}
 h2 {
    text-align: left;
    font-size: 1em;
    color: #444;
    margin: 5px 0;
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: space-between; 
+   align-items: center;
+}
+i.add {
+   font-size: 1.75em;
+   color: var(--uvalib-brand-blue-light);
+   cursor: pointer;
 }
 div.pools-wrapper {
    border-bottom: 3px solid var(--color-brand-blue);
-   margin-bottom: 15px;
+   margin-bottom: 25px;
    padding-bottom: 10px;
 }
 div.pools {
@@ -188,7 +183,7 @@ div.options {
 i.remove {
    cursor: pointer;
    font-size: 1.75em;
-   color: firebrick;
+   color: var(--uvalib-red-emergency);
    float: right;
 }
 
@@ -216,7 +211,7 @@ div.query {
 div.search-term {
    border: 1px solid #ccc;
    padding: 10px;
-   margin: 0 0 10px 0;
+   margin: 10px 0 10px 0;
    border-radius: 5px;
    background-color: #f5f5f5;
 }
@@ -253,9 +248,5 @@ div.basic {
 }
 .text-button.basic-link:hover {
    text-decoration: underline;
-}
-#app span.add.pure-button.pure-button-secondary {
-   margin-left: 0;
-   margin-right: 10px;
 }
 </style>
