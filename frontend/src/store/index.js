@@ -20,7 +20,7 @@ export default new Vuex.Store({
   state: {
     noSpinner: false,
     searching: false,
-    pageSize: 25,
+    pageSize: 20,
     results: [],
     total: -1,
     selectedResultsIdx: -1,

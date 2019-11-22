@@ -18,7 +18,7 @@
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
-               <template  v-for="(r,idx) in results.slice(0,2)">
+               <template  v-for="(r,idx) in sourceTabs">
                   <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: idx == selectedResultsIdx}">
                      <span>
                         <span class="pool">{{r.pool.name}}</span>
@@ -26,7 +26,7 @@
                      </span>
                   </div>
                </template>
-               <V4Select v-if="results.length > 2" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
+               <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                   :background="otherSrcBkg" :color="otherSrcColor" 
                   placeholder="Other<span class='total'>Sources</span>"
                   v-model="otherSrcSelection"/>
@@ -82,6 +82,12 @@ export default {
       otherSrcColor() {
          if (this.otherSrcSelection.id == "") return "#666"
          return "white"
+      },
+      sourceTabs() {
+         if (this.results.length == 3) {
+            return this.results
+         }
+         return this.results.slice(0,2)
       },
       otherSources() {
          let opts = []
