@@ -110,6 +110,7 @@ export default {
          if (this.queryEntered) {
             // this is a new search, reset filters
             this.$store.commit('filters/reset')
+            this.$store.commit('resetOtherSourceSelection')
             this.$store.dispatch("searchAllPools")
          } else {
             this.$store.commit(
@@ -121,6 +122,7 @@ export default {
       basicClicked() {
          this.$store.commit("query/clear")
          this.$store.commit('filters/reset')
+         this.$store.commit('resetOtherSourceSelection')
          this.$store.commit("resetSearchResults")
       },
       addClicked() {

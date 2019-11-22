@@ -93,6 +93,7 @@ export default {
    methods: {
       searchClicked() {
         this.$store.commit('filters/reset')
+        this.$store.commit('resetOtherSourceSelection')
         this.$store.dispatch("searchAllPools")
       },
       advancedClicked() {

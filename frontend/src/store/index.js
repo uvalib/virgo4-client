@@ -84,7 +84,9 @@ export default new Vuex.Store({
         state.searching = flag
       }
     },
-
+    resetOtherSourceSelection(state) {
+      state.otherSrcSelection = {id: "", name: ""}
+    },
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
     },
