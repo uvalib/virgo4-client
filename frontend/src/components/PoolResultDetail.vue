@@ -20,10 +20,11 @@
             <i class="fas fa-angle-up"></i>
          </div>
       </transition>
-      <infinite-loading @infinite="loadMoreResults" ref="infiniteLoader" >
-         <span slot="no-more">No more matches</span>
-         <span slot="spinner"><img src="../assets/searching.gif"></span>
-      </infinite-loading>
+      <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more">
+         <span v-if="loadingMore"><img src="../assets/searching.gif"></span>
+         <span v-else>Load More Results</span>
+      </div>
+      <div v-else class="no-more"></div>
    </div>
 </template>
 
@@ -32,14 +33,14 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import SearchFilters from "@/components/SearchFilters"
-import InfiniteLoading from 'vue-infinite-loading'
 export default {
    components: {
-      SearchHit, SearchFilters, InfiniteLoading
+      SearchHit, SearchFilters
    },
    data: function() {
       return {
-         showScrollTop: false
+         showScrollTop: false,
+         loadingMore: false
       }
    },
    computed: {
@@ -61,18 +62,10 @@ export default {
    },
    watch: {
       selectedResultsIdx () {
-         if ( this.$refs.infiniteLoader ) {
-            this.$refs.infiniteLoader.stateChanger.reset()
-         }
          if (this.selectedResults.statusCode == 408 && this.selectedResults.total == 0) {
             this.$store.dispatch("searchSelectedPool")
          }
       },
-      searching() {
-         if ( this.$refs.infiniteLoader ) {
-            this.$refs.infiniteLoader.stateChanger.reset()
-         }   
-      }
    },
    methods: {
       backToTop: function() {
@@ -85,17 +78,15 @@ export default {
             }
          },10)
       },
-      loadMoreResults($state) {
+      loadMoreResults() {
          if ( this.searching) return
 
          if (this.hasMoreHits) {
+            this.loadingMore = true
             this.$store.dispatch("moreResults").finally( ()=> {
-               $state.loaded()
+                this.loadingMore = false
             })
-         } else {
-            $state.loaded()
-            $state.complete() 
-         }
+         } 
       },
       scrollChecker() {
          if (window.window.scrollY > 1500) {
@@ -113,16 +104,6 @@ export default {
    }
 }
 </script>
-
-<style>
-div.infinite-status-prompt {
-   background-color: var(--color-brand-blue);
-   color: white;
-   font-weight: bold;
-   padding: 5px;
-   border-radius: 0;
-}
-</style>
 
 <style scoped>
 .desc  {
@@ -185,5 +166,20 @@ div.results-header {
    right: 5px;
    bottom: 45px;
    cursor: pointer;
+}
+.see-more, .no-more {
+   padding: 10px;
+   background: var(--color-brand-blue);
+   border: 5px solid var(--color-brand-blue);
+   color: white;
+   cursor: pointer;
+   font-weight: bold;
+}
+.see-more:hover {
+   text-decoration: underline;
+   color: var(--uvalib-blue-alt-light);
+}
+.no-more {
+   cursor: default;
 }
 </style>

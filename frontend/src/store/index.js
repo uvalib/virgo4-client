@@ -189,8 +189,6 @@ export default new Vuex.Store({
   },
 
   actions: {
-    // When an infinite scroll reaches the bottom of the page, call this to get the next
-    // batch of records from the currently selected pool
     moreResults(ctx) {
       ctx.commit('incrementPage')
       return ctx.dispatch("searchSelectedPool")
@@ -246,9 +244,9 @@ export default new Vuex.Store({
     },
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
-    // exploration. It is used to query for next page during infinite scroll and
-    // when filters are added and removed. Pool results are APPENDED to existing during infinite 
-    // scroll. If newly filtered, reset paging and re-query
+    // exploration. It is used to query for next page during load more and
+    // when filters are added and removed. Pool results are APPENDED to existing after load more. 
+    // If newly filtered, reset paging and re-query
     searchSelectedPool({ state, commit, rootState, rootGetters, dispatch }) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
