@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -171,7 +172,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, cfg)
 }
 
-// ILSConnectorGet returns front-end configuration data as JSON
+// ILSConnectorGet sends a GET request to the ILS connector and returns the response
 func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector request: %s", url)
 	timeout := time.Duration(20 * time.Second)
@@ -203,5 +204,39 @@ func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	// log.Printf("Raw ILS response %s", bodyBytes)
+	return bodyBytes, nil
+}
+
+// ILSConnectorPost sends a POST to the ILS connector and returns results
+func (svc *ServiceContext) ILSConnectorPost(url string, values url.Values) ([]byte, *RequestError) {
+	log.Printf("ILS Connector request: %s", url)
+	timeout := time.Duration(20 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	resp, err := client.PostForm(url, values)
+	if err != nil {
+		status := http.StatusBadRequest
+		errMsg := err.Error()
+		if strings.Contains(err.Error(), "Timeout") {
+			status = http.StatusRequestTimeout
+			errMsg = fmt.Sprintf("%s timed out", url)
+		} else if strings.Contains(err.Error(), "connection refused") {
+			status = http.StatusServiceUnavailable
+			errMsg = fmt.Sprintf("%s refused connection", url)
+		}
+		log.Printf("ERROR: %s request failed: %s", url, errMsg)
+		return nil, &RequestError{StatusCode: status, Message: errMsg}
+	} else if resp.StatusCode != http.StatusOK {
+		defer resp.Body.Close()
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		status := resp.StatusCode
+		errMsg := fmt.Sprintf("ILS Connector Error: %s", string(bodyBytes))
+		log.Printf("ERROR: %s request failed: %s", url, errMsg)
+		return nil, &RequestError{StatusCode: status, Message: errMsg}
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	return bodyBytes, nil
 }
