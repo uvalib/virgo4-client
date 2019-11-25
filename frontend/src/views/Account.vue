@@ -15,7 +15,7 @@
             <div class="status-info">
                <div><b>Standing:</b> {{info.standing}}</div>
                <div class="standing-info" v-if="info.standing=='BARRED'">
-                  Your account is suspended until all bills are paid and/or the overdue items are returned.
+                  Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
                   If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
                </div>
                <div class="standing-info" v-if="info.standing=='BAD-ADDRESS'">

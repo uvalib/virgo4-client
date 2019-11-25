@@ -106,8 +106,9 @@ const router = new Router({
 
 // This is called before every URL in the SPA is hit
 router.beforeEach((to, _from, next) => {
-  // always make sure user menu is closed
+  // always make sure user menu is closed and errors from prior page cleared
   store.commit("system/closeUserMenu")
+  store.commit('system/setError', "")
 
   // Some pages just require an auth token...
   let tokenPages = ["home", "course-reserves", "details"]

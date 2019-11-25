@@ -68,6 +68,9 @@ const user = {
 
          return true
       },
+      isBarred: state => {
+         return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
+      },
       sortedCheckouts: state => {
          return state.checkouts.sort( (a,b) => {
             let d1 = a.due.split("T")[0] 
@@ -172,10 +175,12 @@ const user = {
          state.bookmarks = data.bookmarks
       },
       signOutUser(state) {
-         state.accountInfo = null
-         state.bookmarks = null
          state.signedInUser = ""
-         state.authToken = ""
+         state.sessionType = ""
+         state.accountInfo = {}
+         state.checkouts.splice(0, state.checkouts.length)
+         state.bookmarks.splice(0, state.bookmarks.length)
+         state.bills.splice(0, state.bills.length)
          Vue.cookies.remove("v4_auth_user")
       },
       setBookmarks(state, bookmarks) {
@@ -209,6 +214,34 @@ const user = {
             ctx.commit('setAccountInfo', response.data)
             ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
             ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })
+      },
+      renewItem(ctx, barcode) {
+         if (ctx.rootGetters["user/isSignedIn"] == false) return
+         
+         ctx.commit('setLookingUp', true)
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let data = {item_barcode: barcode}
+         axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
+            ctx.commit('setCheckouts', response.data)
+            ctx.commit('setLookingUp', false) 
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })
+      },
+      renewAll(ctx) {
+         if (ctx.rootGetters["user/isSignedIn"] == false) return
+         
+         ctx.commit('setLookingUp', true)
+         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         let data = {item_barcode: "all"}
+         axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((_response) => {
+            ctx.commit('setCheckouts', response.data)
+            ctx.commit('setLookingUp', false)    
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setLookingUp', false)

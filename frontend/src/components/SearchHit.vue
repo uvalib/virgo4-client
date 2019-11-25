@@ -121,8 +121,8 @@ dl {
    margin-top: 0; 
    margin-left: 15px; 
    display: inline-grid; 
-   grid-template-columns: 1fr 2fr; 
-   grid-column-gap: 10px; 
+   grid-template-columns: max-content 2fr; 
+   grid-column-gap: 15px; 
 }
 dt {
    font-weight: bold;
