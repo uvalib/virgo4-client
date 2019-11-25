@@ -40,7 +40,9 @@ const query = {
          // title : {"susan sontag" OR music title} AND keyword:{ Maunsell } ) OR author:{ liberty }
          // Fields are joined together with AND or OR based on the fieldOp setting
          if ( state.mode == "basic") {
-            return `keyword: {${state.basic}}`
+            let qp = state.basic
+            if (qp.length == 0) qp = "*"
+            return `keyword: {${qp}}`
          }
 
          let qs = "" 
