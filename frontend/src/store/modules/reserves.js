@@ -124,12 +124,20 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
           })
       },
-      searchCourses(ctx) {
+      searchCourses(ctx, type) {
          ctx.commit('setSearching', true, { root: true })
          ctx.commit('setNoMatch',false)
          ctx.commit('setCourseSearch')
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-         axios.get(`/api/reserves/search?type=COURSE_NAME&query=${ctx.state.query}`).then((response) => {
+         let typeParam = "type=COURSE_NAME"
+         if (type == "id") {
+            typeParam = "type=COURSE_ID"
+         }
+         let qs = ctx.state.query
+         if (qs.includes(" ")) {
+            qs = `"${qs}"`
+         }
+         axios.get(`/api/reserves/search?${typeParam}&query=${qs}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
          }).catch((_error) => {
@@ -138,12 +146,22 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
           })
       },
-      searchInstructors(ctx) {
+      searchInstructors(ctx, type) {
          ctx.commit('setSearching', true, { root: true })
          ctx.commit('setNoMatch',false)
          ctx.commit('setInstructorSearch')
+         let typeParam = "type=INSTRUCTOR_NAME"
+         let qs = ctx.state.query
+         if (type == "id") {
+            typeParam = "type=INSTRUCTOR_ID"
+            qs = ctx.rootState.user.accountInfo.barcode
+         } else {
+            if (qs.includes(" ")) {
+               qs = `"${qs}"`
+            }
+         }
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-         axios.get(`/api/reserves/search?type=INSTRUCTOR_NAME&query=${ctx.state.query}`).then((response) => {
+         axios.get(`/api/reserves/search?${typeParam}&query=${qs}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
          }).catch((_error) => {
