@@ -161,14 +161,23 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
 		SearchAPI        string `json:"searchAPI"`
 		TranslateMessage string `json:"translateMessage"`
+		KioskMode        bool   `json:"kiosk"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
-	cfg := config{SearchAPI: svc.SearchAPI}
+	cfg := config{SearchAPI: svc.SearchAPI, KioskMode: false}
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg
 	}
+
+	reqURL := c.Request.URL.Path
+	log.Printf("Config request from %+v", c.Request.URL)
+	if strings.Index(reqURL, "-kiosk") > -1 {
+		log.Printf("This request is from a kiosk")
+		cfg.KioskMode = true
+	}
+
 	c.JSON(http.StatusOK, cfg)
 }
 
