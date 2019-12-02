@@ -26,8 +26,7 @@
             </div>
             <AvailabilityTable :titleId="details.identifier" />
          </template>
-         <BackToVirgo v-if="fromCourseReserves" backURL="/course-reserves"/>
-         <BackToVirgo v-else />
+         <BackToVirgo  />
       </div>
    </main>
 </template>
