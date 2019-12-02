@@ -28,6 +28,10 @@ export default {
       layoutChange: {
          default: null,
       },
+      closeOthers: {
+         type: Number,
+         default: null,
+      },
       autoCollapseOn: {
          default: null
       },
@@ -73,6 +77,12 @@ export default {
       }
    },
    watch: {
+      closeOthers() {
+         if ( this.closeOthers > -1) {
+            if ( this.closeOthers.toString() != this.id)
+            this.isExpanded = false
+         }
+      },
       layoutChange() {
          if (this.isExpanded && this.id) {
             setTimeout( ()=> {
@@ -111,6 +121,7 @@ export default {
    },
    methods: {
       accordionClicked() {
+         this.$emit('accordion-clicked')
          this.isExpanded = !this.isExpanded
       },
       beforeEnter: function(el) {
