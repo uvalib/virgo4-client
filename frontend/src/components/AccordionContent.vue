@@ -1,14 +1,14 @@
 <template>
    <div class="accordion">
       <div v-if="showHeader" class="title" @click="accordionClicked" :class="layout"
-         :style="{ background: background, color: color }">
+         :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }">
          <span class="text" v-html="title"></span>
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
       </div>
        <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div :id="id" class="accordion-content"  v-show="isExpanded" :style="{ background: background, color: color }">
+         <div :id="id" class="accordion-content"  v-show="isExpanded" :style="{ backgroundContent: backgroundContent, color: color }">
             <slot></slot>
             <div v-if="closeText" @click="accordionClicked" class="footer">
                <b>{{ closeText }}</b>
@@ -43,9 +43,25 @@ export default {
          type: String,
          default: "#fff"
       },
+      backgroundContent: {
+         type: String,
+         default: "#fff"
+      },
       color: {
          type: String,
          default: "#666666"
+      },
+      borderWidth: {
+         type: String,
+         default: "1px 1px 1px 1px"
+      },
+      borderColor: {
+         type: String,
+         default: "var(--uvalib-grey-light)"
+      },
+      borderStyle: {
+         type: String,
+         default: "solid"
       },
       expanded: {
          default: false,
@@ -83,7 +99,7 @@ export default {
                return "rotate(0deg)"
             }
             return "rotate(180deg)"
-         } 
+         }
          if (this.isExpanded) {
             return "rotate(180deg)"
          }

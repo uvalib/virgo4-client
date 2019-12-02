@@ -145,8 +145,17 @@ body {
 .pure-button.pure-button-secondary:hover {
    background-color: var(--uvalib-brand-blue-lightest);
 }
+.pure-button.pure-button-tertiary {
+   background-color: var(--uvalib-grey-lightest);
+   border: 1px solid var(--uvalib-grey);
+   color: black;
+}
+.pure-button.pure-button-tertiary:hover {
+   background-color: var(--uvalib-grey-light);
+}
 .pure-button.pure-button-primary,
-.pure-button.pure-button-secondary {
+.pure-button.pure-button-secondary,
+.pure-button.pure-button-tertiary {
    margin: 0 0 0 10px;
    border-radius: 5px;
 }
@@ -222,7 +231,7 @@ div.v-popover.inline {
    border-style: solid;
    position: absolute;
    margin: 5px;
-   border-color: var(--uvalib-brand-orange);
+   border-color: var(--uvalib-grey-dark);
    z-index: 1;
 }
 .tooltip[x-placement^="top"] {

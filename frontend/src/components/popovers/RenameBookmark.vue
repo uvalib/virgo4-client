@@ -11,7 +11,7 @@
             <input  @keyup.enter="enterPressed"  ref="rename" type="text" v-model="folderName"/>
          </div>
          <div class="edit-controls">
-            <span v-close-popover class="pure-button pure-button-secondary">Cancel</span>
+            <span v-close-popover class="pure-button pure-button-tertiary">Cancel</span>
             <span class="pure-button pure-button-primary"
                @click="okClicked" id="ok-rename" v-close-popover >
                OK
@@ -54,7 +54,7 @@ export default {
 
 <style scoped>
 i.fas {
-   color: #999;
+   color: var(--uvalib-grey-dark);
    cursor: pointer;
    font-size: 1.2em;
    margin-right: 10px;
@@ -64,7 +64,7 @@ i.fas {
 div.popover-header {
    padding: 5px 15px;
    color: white;
-   background-color: var(--color-primary-orange);
+   background-color: var(--uvalib-grey-dark);
    font-weight: 500;
    text-align: center;
    border-radius: 5px 5px 0 0;
@@ -81,8 +81,8 @@ div.popover-header {
 }
 div.message {
    padding: 10px 10px 0 10px;
-   border-left: 3px solid var(--color-primary-orange);
-   border-right: 3px solid var(--color-primary-orange);
+   border-left: 3px solid var(--uvalib-grey-dark);
+   border-right: 3px solid var(--uvalib-grey-dark);
 }
 .message p {
    margin: 0;
@@ -96,9 +96,9 @@ select {
    font-size: 0.9em;
    padding: 10px;
    text-align: right;
-   border-left: 3px solid var(--color-primary-orange);
-   border-right: 3px solid var(--color-primary-orange);
-   border-bottom: 3px solid var(--color-primary-orange);
+   border-left: 3px solid var(--uvalib-grey-dark);
+   border-right: 3px solid var(--uvalib-grey-dark);
+   border-bottom: 3px solid var(--uvalib-grey-dark);
    border-radius: 0 0 5px 5px;
    display: flex;
    flex-flow: row nowrap;
