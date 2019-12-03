@@ -6,7 +6,8 @@
          </router-link>
       </div>
       <div class="library-link">
-         <a target="_blank" href="https://library.virginia.edu">
+         <img v-if="isKiosk" alt="University of Virgina Library" class="uva-library" src="../../assets/uvalogo.png"/>
+         <a v-else target="_blank" href="https://library.virginia.edu">
             <img alt="University of Virgina Library" class="uva-library" src="../../assets/uvalogo.png"/>
          </a>
       </div>
@@ -15,7 +16,13 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
+   computed: {
+      ...mapGetters({
+         isKiosk: "system/isKiosk",
+      }),
+   },
 }
 </script>
 

@@ -27,8 +27,8 @@ func (svc *ServiceContext) Authorize(c *gin.Context) {
 func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	log.Printf("Checking authentication headers...")
 	computingID := c.GetHeader("remote_user")
-	if svc.DevAuthUser != "" {
-		computingID = svc.DevAuthUser
+	if svc.Dev.AuthUser != "" {
+		computingID = svc.Dev.AuthUser
 		log.Printf("Using dev auth user ID: %s", computingID)
 	}
 	if computingID == "" {

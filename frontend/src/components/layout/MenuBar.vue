@@ -7,7 +7,7 @@
          <router-link to="/course-reserves" v-if="isSignedIn && !isCommunityUser">
             <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
          </router-link>
-         <span class="menu-item feedback">
+         <span v-if="isKiosk==false" class="menu-item feedback">
             <Feedback icon/>
          </span>
       </span>
@@ -45,7 +45,7 @@
             </router-link>
          </template>   
          <template v-else>
-            <router-link to="/signin">
+            <router-link v-if="isKiosk==false" to="/signin">
                <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
             </router-link>
          </template>
@@ -67,6 +67,7 @@ export default {
          userMenuOpen: state => state.system.userMenuOpen
       }),
       ...mapGetters({
+        isKiosk: 'system/isKiosk',
         isSignedIn: 'user/isSignedIn',
         isCommunityUser: 'user/isCommunityUser',
         itemsOnNotice: 'user/itemsOnNotice'

@@ -95,11 +95,11 @@ export default {
          el.style.height = '0'
       },
       enter: function(el) {
-         el.style.height = (el.scrollHeight-20) + 'px'
+         el.style.height = (el.scrollHeight-10) + 'px'
          this.expandedItem = el
       },
       beforeLeave: function(el) {
-         el.style.height = (el.scrollHeight-20) + 'px'
+         el.style.height = (el.scrollHeight-10) + 'px'
          this.expandedItem = el
       },
       leave: function(el) {
