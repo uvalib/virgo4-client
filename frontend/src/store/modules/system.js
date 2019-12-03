@@ -3,6 +3,7 @@ import axios from 'axios'
 const system = {
    namespaced: true,
    state: {
+      kiosk: false,
       fatal: "",
       error: "",
       version: "unknown",
@@ -14,6 +15,9 @@ const system = {
    },
 
    getters: {
+      isKiosk: state => {
+         return state.kiosk
+      },
       hasTranslateMessage: state => {
          return state.translateMessage.length > 0 && state.seenTranslateMsg == false
       }
@@ -68,13 +72,15 @@ const system = {
       setConfig(state, cfg) {
          state.searchAPI = cfg.searchAPI
          state.translateMessage = cfg.translateMessage
+         state.kiosk = cfg.kiosk
       },
    },
 
    actions: {
       // Call getConfig at startup to get client configuration parameters
       getConfig(ctx) {
-         return axios.get("/config").then((response) => {
+         let host = window.location.hostname
+         return axios.get("/config", {headers: {V4Host:host}}).then((response) => {
             ctx.commit('setConfig', response.data)
          }).catch((error) => {
             ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)

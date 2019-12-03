@@ -38,6 +38,9 @@
                     <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
                       <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
                   </dl>
+                  <div v-if="co.message" class="co-message">
+                     {{co.message}}
+                  </div>
                </div>
             </template>
             <template v-else >
@@ -48,7 +51,7 @@
             <transition name="message-transition"
                         enter-active-class="animated faster fadeIn"
                         leave-active-class="animated faster fadeOut">
-               <p v-if="error" class="error">Unable to retrieve bookmarks: {{ error }}</p>
+               <p v-if="error" class="error">{{ error }}</p>
             </transition>
          </div>
       </div>
@@ -98,7 +101,6 @@ export default {
    },
    created() {
       this.$store.commit('user/setLookingUp', true)
-      this.$store.dispatch("user/getAccountInfo")
       this.$store.dispatch("user/getCheckouts")
    }
 }
@@ -144,10 +146,13 @@ dd {
 }
 .working {
    text-align: center;
-   position: absolute;
+   position: fixed;
    right: 0;
    left: 0;
    z-index: 1000;
+   top: 0;
+   bottom: 0;
+   background: rgba(0, 0, 0, 0.3);
 }
 .working .box {
    background: white;
@@ -157,6 +162,7 @@ dd {
    border-radius: 5px;
    box-shadow: 0 0 10px #444;
    display: inline-block;
+   margin: 10% auto;
 }
 .working img {
    margin: 15px 0;
@@ -229,5 +235,13 @@ span.renew {
    margin: 15px 0;
    border-radius: 5px;
    background-color: var(--uvalib-red-lightest);
+}
+.co-message {
+   font-size: 1em;
+   padding: 5px 10px;
+   margin-bottom: 15px;
+   background-color: var(--uvalib-red-lightest);
+   font-weight: bold;
+   border-radius: 5px;
 }
 </style>

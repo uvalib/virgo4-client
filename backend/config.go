@@ -7,12 +7,11 @@ import (
 
 // SMTPConfig wraps up all of the smpt configuration
 type SMTPConfig struct {
-	Host    string
-	Port    int
-	User    string
-	Pass    string
-	Sender  string
-	DevMode bool
+	Host   string
+	Port   int
+	User   string
+	Pass   string
+	Sender string
 }
 
 // DBConfig wraps up all of the DB configuration
@@ -31,9 +30,16 @@ type ServiceConfig struct {
 	SearchAPI          string
 	CourseReserveEmail string
 	ILSAPI             string
-	DevAuthUser        string
+	Dev                DevConfig
 	DB                 DBConfig
 	SMTP               SMTPConfig
+}
+
+// DevConfig specifies configuration params specific to development mode
+type DevConfig struct {
+	AuthUser string
+	Kiosk    bool
+	FakeSMTP bool
 }
 
 // LoadConfig will load the service configuration from env/cmdline
@@ -44,7 +50,10 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
-	flag.StringVar(&cfg.DevAuthUser, "devuser", "", "Authorized computing id for dev")
+
+	flag.StringVar(&cfg.Dev.AuthUser, "devuser", "", "Authorized computing id for dev")
+	flag.BoolVar(&cfg.Dev.Kiosk, "devkiosk", false, "Flag to torn Kiosk Mode on for dev")
+	flag.BoolVar(&cfg.Dev.FakeSMTP, "stubsmtp", false, "Log email insted of sending (dev mode)")
 
 	flag.StringVar(&cfg.DB.Host, "dbhost", "localhost", "Database host")
 	flag.IntVar(&cfg.DB.Port, "dbport", 5432, "Database port")
@@ -57,7 +66,6 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.SMTP.User, "smtpuser", "", "SMTP User")
 	flag.StringVar(&cfg.SMTP.Pass, "smtppass", "", "SMTP Password")
 	flag.StringVar(&cfg.SMTP.Sender, "smtpsender", "virgo4@virginia.edu", "SMTP sender email")
-	flag.BoolVar(&cfg.SMTP.DevMode, "stubsmtp", false, "Log email insted of sending (dev mode)")
 	flag.Parse()
 
 	if cfg.SearchAPI == "" {

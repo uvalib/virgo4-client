@@ -1,7 +1,10 @@
 <template>
    <div class="results-panel">
-      <h2 class="query-summary">
+      <h2 v-if="query" class="query-summary">
          Course reserves for instructor '{{query}}'
+      </h2>
+      <h2 v-else class="query-summary">
+         My Course Reserves
       </h2>
       <div class="instructor" v-for="(inst,idx) in results" :key="idx">
          <h3 class="value folder">{{inst.name}}</h3>

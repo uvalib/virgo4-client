@@ -6,18 +6,13 @@
          <p>
             Authentication for your account has failed.
          </p>
-         <BackToVirgo />
       </div>
    </main>
 </template>
 
 <script>
-import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "forbidden",
-   components: {
-      BackToVirgo
-   }
 }
 </script>
 

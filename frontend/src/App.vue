@@ -11,19 +11,19 @@
       <VirgoHeader />
       <MenuBar />
       <router-view />
-      <LibraryFooter />
+      <LibraryFooter v-if="isKiosk == false"/>
    </div>
 </template>
 
 <script>
-import LibraryFooter from "@/components/layout/LibraryFooter";
-import VirgoHeader from "@/components/layout/VirgoHeader";
-import MenuBar from "@/components/layout/MenuBar";
-import FatalError from "@/components/layout/FatalError";
-import AuthorizePanel from "@/components/layout/AuthorizePanel";
-import AddBookmarkModal from "@/components/AddBookmarkModal";
-import { mapState } from "vuex";
-import { mapGetters } from "vuex";
+import LibraryFooter from "@/components/layout/LibraryFooter"
+import VirgoHeader from "@/components/layout/VirgoHeader"
+import MenuBar from "@/components/layout/MenuBar"
+import FatalError from "@/components/layout/FatalError"
+import AuthorizePanel from "@/components/layout/AuthorizePanel"
+import AddBookmarkModal from "@/components/AddBookmarkModal"
+import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    components: {
       VirgoHeader,
@@ -41,7 +41,8 @@ export default {
       }),
       ...mapGetters({
          addingBookmark: "user/addingBookmark",
-         hasTranslateMessage: "system/hasTranslateMessage"
+         hasTranslateMessage: "system/hasTranslateMessage",
+         isKiosk: "system/isKiosk",
       }),
       showDimmer() {
          return this.addingBookmark;

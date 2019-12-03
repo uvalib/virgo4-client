@@ -1,5 +1,5 @@
 <template>
-   <span class="bookmark-container">
+   <span v-if="isKiosk==false" class="bookmark-container">
       <template v-if="isSignedIn">
          <i @click="removeBookmarkClicked" class="bookmark fas fa-bookmark" v-if="isBookmarked"></i> 
          <i @click="addBookmarkClicked" class="bookmark far fa-bookmark" v-else></i> 
@@ -30,6 +30,7 @@ export default {
    computed: {
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
+        isKiosk: 'system/isKiosk',
         bookmarks: 'user/bookmarks'
       }),
       isBookmarked() {

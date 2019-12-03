@@ -110,7 +110,7 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
 	msg := []byte(subject + toHdr + mime + renderedEmail.String())
 
-	if svc.SMTP.DevMode {
+	if svc.Dev.FakeSMTP {
 		log.Printf("Email is in dev mode. Logging message instead of sending")
 		log.Printf("==================================================")
 		log.Printf("%s", msg)

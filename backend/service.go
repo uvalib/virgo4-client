@@ -24,7 +24,7 @@ type ServiceContext struct {
 	SearchAPI          string
 	CourseReserveEmail string
 	ILSAPI             string
-	DevAuthUser        string
+	Dev                DevConfig
 	PendingTranslates  map[string]string
 	DB                 *dbx.DB
 	SMTP               SMTPConfig
@@ -45,7 +45,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
-		DevAuthUser:        cfg.DevAuthUser}
+		Dev:                cfg.Dev}
 
 	log.Printf("Connect to Postgres")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
@@ -57,7 +57,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	db.LogFunc = log.Printf
 	ctx.DB = db
 
-	if ctx.SMTP.DevMode {
+	if ctx.Dev.FakeSMTP {
 		log.Printf("Using dev mode for SMTP; all messages will be logged instead of delivered")
 	} else {
 		log.Printf("Using SMTP host: %s", ctx.SMTP.Host)
@@ -161,14 +161,23 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
 		SearchAPI        string `json:"searchAPI"`
 		TranslateMessage string `json:"translateMessage"`
+		KioskMode        bool   `json:"kiosk"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
-	cfg := config{SearchAPI: svc.SearchAPI}
+	cfg := config{SearchAPI: svc.SearchAPI, KioskMode: false}
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg
 	}
+
+	v4HostHeader := c.Request.Header.Get("V4Host")
+	log.Printf("Config request V4Host header: %s", v4HostHeader)
+	if strings.Index(v4HostHeader, "-kiosk") > -1 || svc.Dev.Kiosk {
+		log.Printf("This request is from a kiosk")
+		cfg.KioskMode = true
+	}
+
 	c.JSON(http.StatusOK, cfg)
 }
 

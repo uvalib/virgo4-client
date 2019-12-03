@@ -3,12 +3,18 @@
       <h1>Course Reserves</h1>
       <div class="reserves-content">
          <SearchingOverlay message="Looking up reserved items..."/>
-         <p>Type instructor's <strong>last name</strong> or <strong>course name</strong> in the search box<br />Click the corresponding button to search for reserved items</p>
+         <p>
+            Type instructor's <strong>last name</strong>, <strong>course ID</strong> or 
+            <strong>course name</strong> in the search box<br />
+            Click the corresponding button to search for reserved items
+         </p>
          <div class="search-panel pure-form">
             <input v-model="query" autocomplete="off" type="text">
             <div class="controls">
-               <span @click="searchCourseClicked" class="pure-button pure-button-primary">Search Course Names</span>
-               <span @click="searchInstructorClicked" class="pure-button pure-button-primary">Search Instructors</span>
+               <span v-if="canMakeReserves" @click="searchInstructorClicked('id')" class="pure-button pure-button-primary">View My Reserves</span>
+               <span @click="searchInstructorClicked('name')" class="pure-button pure-button-primary">Search Instructors</span>
+               <span @click="searchCourseClicked('id')" class="pure-button pure-button-primary">Search Course ID</span>
+               <span @click="searchCourseClicked('name')" class="pure-button pure-button-primary">Search Course Names</span>
             </div>
          </div>
          <div class="no-match" v-if="noMatch==true">
@@ -41,18 +47,22 @@ export default {
       ...mapGetters({
          hasCourseResults: 'reserves/hasCourseResults',
          hasInstructorResults: 'reserves/hasInstructorResults',
+         canMakeReserves: 'user/canMakeReserves',
       }),
       ...mapFields('reserves',[
         'query',
       ]),
    },
    methods: {
-      searchInstructorClicked() {
-         this.$store.dispatch("reserves/searchInstructors")
+      searchInstructorClicked(type) {
+         this.$store.dispatch("reserves/searchInstructors", type)
       },
-      searchCourseClicked() {
-         this.$store.dispatch("reserves/searchCourses")
+      searchCourseClicked(type) {
+         this.$store.dispatch("reserves/searchCourses", type)
       }
+   },
+   created() {
+      this.$store.dispatch("user/getAccountInfo")
    }
 }
 </script>
