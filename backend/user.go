@@ -113,13 +113,33 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 		renewURL = fmt.Sprintf("%s/v4/request/renew", svc.ILSAPI)
 		values.Add("item_barcode", qp.Barcode)
 	}
-	_, err := svc.ILSConnectorPost(renewURL, values)
+	rawRespBytes, err := svc.ILSConnectorPost(renewURL, values)
 	if err != nil {
 		c.String(err.StatusCode, err.Message)
 		return
 	}
 
-	svc.GetUserCheckouts(c)
+	// Get all of the user checkouts after the renew so dates/status are updated
+	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	if ilsErr != nil {
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	var checkouts []CheckoutInfo
+	if err := json.Unmarshal(bodyBytes, &checkouts); err != nil {
+		log.Printf("ERROR: unable to parse user checkouts: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	type outStruct struct {
+		Checkouts    []CheckoutInfo `json:"checkouts"`
+		RenewResults interface{}    `json:"renewResults"`
+	}
+	out := outStruct{Checkouts: checkouts}
+	json.Unmarshal(rawRespBytes, &out.RenewResults)
+	c.JSON(http.StatusOK, out)
 }
 
 // GetUserCheckouts uses ILS Connector V2 API /users to get checked out items

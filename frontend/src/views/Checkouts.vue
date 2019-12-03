@@ -38,6 +38,9 @@
                     <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
                       <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
                   </dl>
+                  <div v-if="co.message" class="co-message">
+                     {{co.message}}
+                  </div>
                </div>
             </template>
             <template v-else >
@@ -48,7 +51,7 @@
             <transition name="message-transition"
                         enter-active-class="animated faster fadeIn"
                         leave-active-class="animated faster fadeOut">
-               <p v-if="error" class="error">Unable to retrieve bookmarks: {{ error }}</p>
+               <p v-if="error" class="error">{{ error }}</p>
             </transition>
          </div>
       </div>
@@ -232,5 +235,13 @@ span.renew {
    margin: 15px 0;
    border-radius: 5px;
    background-color: var(--uvalib-red-lightest);
+}
+.co-message {
+   font-size: 1em;
+   padding: 5px 10px;
+   margin-bottom: 15px;
+   background-color: var(--uvalib-red-lightest);
+   font-weight: bold;
+   border-radius: 5px;
 }
 </style>

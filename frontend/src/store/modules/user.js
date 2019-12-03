@@ -150,6 +150,14 @@ const user = {
       setCheckouts(state, co) {
          state.checkouts = co
       },
+      setRenewResults(state, renewResults) {
+         renewResults.results.forEach( renew => {
+            if (renew.success == false) {
+               let co = state.checkouts.find( co => co.barcode == renew.barcode)
+               co.message = renew.message
+            }
+         })
+      },
       showAddBookmark(state, bookmarkData) {
          state.newBookmarkInfo = bookmarkData
       },
@@ -226,7 +234,8 @@ const user = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let data = {item_barcode: barcode}
          axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
-            ctx.commit('setCheckouts', response.data)
+            ctx.commit('setCheckouts', response.data.checkouts)
+            ctx.commit('setRenewResults', response.data.renewResults)
             ctx.commit('setLookingUp', false) 
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
@@ -239,8 +248,9 @@ const user = {
          ctx.commit('setLookingUp', true)
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let data = {item_barcode: "all"}
-         axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((_response) => {
-            ctx.commit('setCheckouts', response.data)
+         axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
+            ctx.commit('setCheckouts', response.data.checkouts)
+            ctx.commit('setRenewResults', response.data.renewResults)
             ctx.commit('setLookingUp', false)    
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
