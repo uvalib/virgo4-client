@@ -247,10 +247,15 @@ const user = {
             ctx.commit('setLookingUp', false)
           })
       },
-      getCheckouts(ctx) {
+      async getCheckouts(ctx) {
          if ( ctx.state.checkouts.length > 0) {
             ctx.commit('setLookingUp', false)
             return
+         }
+
+         if ( ctx.getters.hasAccountInfo == false) {
+            await this.dispatch("user/getAccountInfo")
+            ctx.commit('setLookingUp', true)
          }
 
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken

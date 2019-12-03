@@ -98,7 +98,6 @@ export default {
    },
    created() {
       this.$store.commit('user/setLookingUp', true)
-      this.$store.dispatch("user/getAccountInfo")
       this.$store.dispatch("user/getCheckouts")
    }
 }
@@ -144,10 +143,13 @@ dd {
 }
 .working {
    text-align: center;
-   position: absolute;
+   position: fixed;
    right: 0;
    left: 0;
    z-index: 1000;
+   top: 0;
+   bottom: 0;
+   background: rgba(0, 0, 0, 0.3);
 }
 .working .box {
    background: white;
@@ -157,6 +159,7 @@ dd {
    border-radius: 5px;
    box-shadow: 0 0 10px #444;
    display: inline-block;
+   margin: 10% auto;
 }
 .working img {
    margin: 15px 0;
