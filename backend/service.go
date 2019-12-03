@@ -28,6 +28,7 @@ type ServiceContext struct {
 	PendingTranslates  map[string]string
 	DB                 *dbx.DB
 	SMTP               SMTPConfig
+	Illiad             IlliadConfig
 }
 
 // RequestError contains http status code and message for a
@@ -45,6 +46,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
+		Illiad:             cfg.Illiad,
 		Dev:                cfg.Dev}
 
 	log.Printf("Connect to Postgres")

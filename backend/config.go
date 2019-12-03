@@ -23,6 +23,12 @@ type DBConfig struct {
 	Name string
 }
 
+// IlliadConfig contains the configuration necessary to communicate with the Illiad API
+type IlliadConfig struct {
+	URL    string
+	APIKey string
+}
+
 // ServiceConfig defines all of the v4client service configuration parameters
 type ServiceConfig struct {
 	Port               int
@@ -33,6 +39,7 @@ type ServiceConfig struct {
 	Dev                DevConfig
 	DB                 DBConfig
 	SMTP               SMTPConfig
+	Illiad             IlliadConfig
 }
 
 // DevConfig specifies configuration params specific to development mode
@@ -51,16 +58,23 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 
+	// Dev mode settings
 	flag.StringVar(&cfg.Dev.AuthUser, "devuser", "", "Authorized computing id for dev")
 	flag.BoolVar(&cfg.Dev.Kiosk, "devkiosk", false, "Flag to torn Kiosk Mode on for dev")
 	flag.BoolVar(&cfg.Dev.FakeSMTP, "stubsmtp", false, "Log email insted of sending (dev mode)")
 
+	// Illiad communications
+	flag.StringVar(&cfg.Illiad.URL, "illiad", "", "Illiad API URL")
+	flag.StringVar(&cfg.Illiad.APIKey, "illiadkey", "", "Illiad API Key")
+
+	// DB connection params
 	flag.StringVar(&cfg.DB.Host, "dbhost", "localhost", "Database host")
 	flag.IntVar(&cfg.DB.Port, "dbport", 5432, "Database port")
 	flag.StringVar(&cfg.DB.Name, "dbname", "virgo4", "Database name")
 	flag.StringVar(&cfg.DB.User, "dbuser", "v4user", "Database user")
 	flag.StringVar(&cfg.DB.Pass, "dbpass", "pass", "Database password")
 
+	// SMTP settings
 	flag.StringVar(&cfg.SMTP.Host, "smtphost", "", "SMTP Host")
 	flag.IntVar(&cfg.SMTP.Port, "smtpport", 0, "SMTP Port")
 	flag.StringVar(&cfg.SMTP.User, "smtpuser", "", "SMTP User")
