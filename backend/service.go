@@ -130,6 +130,25 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		hcMap["postgres"] = hcResp{Healthy: true}
 	}
 
+	illiad := fmt.Sprintf("%s/SystemInfo/SecurePlatformVersion", svc.Illiad.URL)
+	illReq, _ := http.NewRequest("GET", illiad, nil)
+	illReq.Header.Add("Content-Type", "application/json")
+	illReq.Header.Add("ApiKey", svc.Illiad.APIKey)
+	timeout := time.Duration(1 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	resp, err := client.Do(illReq)
+	if err != nil {
+		log.Printf("ERROR: ILLiad %s ping failed: %s", illiad, err.Error())
+		hcMap["illiad"] = hcResp{Healthy: false, Message: err.Error()}
+	} else {
+		hcMap["illiad"] = hcResp{Healthy: true}
+		defer resp.Body.Close()
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		log.Printf("ILLiad version: %s", bodyBytes)
+	}
+
 	c.JSON(http.StatusOK, hcMap)
 }
 
