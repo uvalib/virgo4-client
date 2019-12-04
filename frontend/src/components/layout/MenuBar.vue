@@ -32,6 +32,9 @@
                      <router-link to="/preferences">
                         <div class="submenu">Preferences</div>
                      </router-link>
+                     <router-link to="/requests">
+                        <div class="submenu">Requests</div>
+                     </router-link>
                      <div  @click="signOut" class="submenu">
                         <span>Sign out</span>
                      </div>

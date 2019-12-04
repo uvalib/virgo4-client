@@ -151,6 +151,9 @@ const user = {
       setCheckouts(state, co) {
          state.checkouts = co
       },
+      setRequests(state, req) {
+         state.requests = req
+      },
       setRenewResults(state, renewResults) {
          renewResults.results.forEach( renew => {
             if (renew.success == false) {
@@ -217,7 +220,14 @@ const user = {
       },
       getRequests(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
-         // ctx.commit('setLookingUp', true)
+         ctx.commit('setLookingUp', true)
+         axios.get(`/api/users/${ctx.state.signedInUser}/illiad`).then((response) => {
+            ctx.commit('setRequests', response.data)
+            ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })
       },
       getAccountInfo(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] ) return

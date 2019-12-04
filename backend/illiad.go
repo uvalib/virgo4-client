@@ -26,16 +26,16 @@ func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 	}
 
 	var resp []struct {
-		TransactionNumber int
-		TransactionStatus string
-		CreationDate      string
-		RequestType       string
-		CallNumber        string
-		ReferenceNumber   string
-		LoanTitle         string
-		LoanAuthor        string
-		WantedBy          string
-		NotWantedAfter    string
+		TransactionNumber int    `json:"transactionNumber"`
+		TransactionStatus string `json:"transactionStatus"`
+		CreationDate      string `json:"creationDate"`
+		RequestType       string `json:"requestType"`
+		CallNumber        string `json:"callNumber"`
+		ReferenceNumber   string `json:"referenceNumber"`
+		LoanTitle         string `json:"loanTitle"`
+		LoanAuthor        string `json:"loanAuthor"`
+		WantedBy          string `json:"wantedBy"`
+		NotWantedAfter    string `json:"notWantedAfter"`
 	}
 	if err := json.Unmarshal(respBytes, &resp); err != nil {
 		log.Printf("ERROR: unable to parse ILLiad response: %s", err.Error())
