@@ -39,7 +39,7 @@
                                     <div>
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                                           v-on:move-approved="moveBookmarks"/>
-                                       <span class="pure-button pure-button-primary">Delete</span>
+                                       <span @click="removeBookmarks" class="pure-button pure-button-primary">Delete</span>
                                        <span
                                           v-if="canMakeReserves"
                                           @click="reserve"
@@ -180,14 +180,18 @@ export default {
          this.$store.dispatch("user/moveBookmarks", data);
       },
       reserve(items) {
-         this.$store.commit("reserves/setRequestList", items);
-         this.$router.push("/course-reserves-request");
+         this.$store.commit("reserves/setRequestList", items)
+         this.$router.push("/course-reserves-request")
       },
       detailsURL(bookmark) {
          return `/sources/${bookmark.pool}/items/${bookmark.identifier}`;
       },
-      removeBookmark(id) {
-         this.$store.dispatch("user/removeBookmark", id);
+      removeBookmarks() {
+         if ( this.selectedItems.length == 0) {
+             this.$store.commit("system/setError", "No bookmarks have been seleceted for deletion")
+             return
+         }
+         this.$store.dispatch("user/removeBookmarks", this.selectedItems);
       },
       removeFolder(folderID) {
          this.$store.dispatch("user/removeFolder", folderID);

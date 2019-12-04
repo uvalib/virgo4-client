@@ -269,25 +269,29 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
-// DeleteBookmark will remove a bookmark by internal DB identifier
-func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
+// DeleteBookmarks will remove a list of bookmarks
+func (svc *ServiceContext) DeleteBookmarks(c *gin.Context) {
 	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
-	bookmarkID := c.Param("id")
-	log.Printf("User %s deleting bookmarkID %s", user.Virgo4ID, bookmarkID)
+	var params struct {
+		BookmarkIDs []int
+	}
+	c.ShouldBindJSON(&params)
+	log.Printf("User %s deleting bookmarks %v", user.Virgo4ID, params.BookmarkIDs)
 
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
 	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	uq.Row(&user.ID)
 
-	qStr := "delete from bookmarks where user_id={:uid} and id={:bid}"
+	qStr := fmt.Sprintf("delete from bookmarks where user_id={:uid} and id in (%s)",
+		sqlIntSeq(params.BookmarkIDs))
 	q := svc.DB.NewQuery(qStr)
 	q.Bind(dbx.Params{"uid": user.ID})
-	q.Bind(dbx.Params{"bid": bookmarkID})
 
 	_, err := q.Execute()
 	if err != nil {
-		log.Printf("ERROR: unable to remove item %s:%s - %v", user.Virgo4ID, bookmarkID, err)
+		log.Printf("ERROR: unable to remove bookmarks %s:%v - %v",
+			user.Virgo4ID, params.BookmarkIDs, err)
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
