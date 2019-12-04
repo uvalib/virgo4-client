@@ -18,7 +18,7 @@
                <table class="fields">
                   <tr v-if="details.header.author">
                      <td class="label">Author:</td>
-                     <td class="value">{{details.header.author.join(", ")}}</td>
+                     <td class="value">{{details.header.author.join("; ")}}</td>
                   </tr>
                   <tr v-for="(field,idx) in allFields" :key="idx">
                      <template v-if="field.display != 'optional'">
