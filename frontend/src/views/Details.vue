@@ -21,7 +21,7 @@
                      <td class="value">{{details.header.author.join("; ")}}</td>
                   </tr>
                   <tr v-for="(field,idx) in allFields" :key="idx">
-                     <template v-if="field.display != 'optional'">
+                     <template v-if="shouldDisplay(field)">
                         <td class="label">{{field.label}}:</td>
                         <td class="value" v-html="fieldValueString(field)"></td>
                      </template>
@@ -52,7 +52,8 @@ export default {
       }),
       ...mapGetters({
          isSignedIn: 'user/isSignedIn',
-         bookmarks: 'user/bookmarks'
+         bookmarks: 'user/bookmarks',
+         isKiosk: 'system/isKiosk',
       }),
       notFound() {
          return this.details.identifier.length == 0
@@ -65,6 +66,11 @@ export default {
       }
    },
    methods: {
+      shouldDisplay(field) {
+         if (field.display == 'optional') return false 
+         if ( this.isKiosk && field.type == "url") return false 
+         return true
+      },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
             return field.value.join(",<br>")
