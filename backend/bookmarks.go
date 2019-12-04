@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -295,12 +297,11 @@ func (svc *ServiceContext) DeleteBookmark(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
-// MoveBookmark will move a bookmark to a new folder
-func (svc *ServiceContext) MoveBookmark(c *gin.Context) {
+// MoveBookmarks will move a list bookmarks to a new folder
+func (svc *ServiceContext) MoveBookmarks(c *gin.Context) {
 	user := NewV4User()
 	user.Virgo4ID = c.Param("uid")
-	bookmarkID := c.Param("id")
-	log.Printf("User %s moving bookmarkID %s", user.Virgo4ID, bookmarkID)
+	log.Printf("User %s moving bookmarks", user.Virgo4ID)
 
 	// get user ID
 	log.Printf("Lookup user %s ID", user.Virgo4ID)
@@ -308,22 +309,24 @@ func (svc *ServiceContext) MoveBookmark(c *gin.Context) {
 	q.Bind(dbx.Params{"v4id": user.Virgo4ID})
 	q.Row(&user.ID)
 
-	var folderInfo struct {
-		FolderID int
+	var moveInfo struct {
+		FolderID    int
+		BookmarkIDs []int
 	}
-	err := c.ShouldBindJSON(&folderInfo)
+	err := c.ShouldBindJSON(&moveInfo)
 	if err != nil {
 		log.Printf("ERROR: invalid item move payload: %v", err)
 		c.String(http.StatusBadRequest, "Invalid move bookmark request")
 		return
 	}
 
-	uq := svc.DB.NewQuery("update bookmarks set folder_id={:fid} where id={:bmid}")
-	uq.Bind(dbx.Params{"fid": folderInfo.FolderID})
-	uq.Bind(dbx.Params{"bmid": bookmarkID})
+	rawQ := fmt.Sprintf("update bookmarks set folder_id={:fid} where id in (%s)",
+		sqlIntSeq(moveInfo.BookmarkIDs))
+	uq := svc.DB.NewQuery(rawQ)
+	uq.Bind(dbx.Params{"fid": moveInfo.FolderID})
 	_, err = uq.Execute()
 	if err != nil {
-		log.Printf("ERROR: unable to move bookmark: %s", err)
+		log.Printf("ERROR: unable to move bookmarks: %s", err)
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
@@ -342,4 +345,22 @@ func (svc *ServiceContext) GetBookmarks(c *gin.Context) {
 	uq.Row(&user.ID)
 	user.GetBookmarks(svc.DB)
 	c.JSON(http.StatusOK, user.Bookmarks)
+}
+
+func sqlIntSeq(ns []int) string {
+	if len(ns) == 0 {
+		return ""
+	}
+
+	// Appr. 3 chars per num plus the comma.
+	estimate := len(ns) * 4
+	b := make([]byte, 0, estimate)
+	// Or simply
+	//   b := []byte{}
+	for _, n := range ns {
+		b = strconv.AppendInt(b, int64(n), 10)
+		b = append(b, ',')
+	}
+	b = b[:len(b)-1]
+	return string(b)
 }

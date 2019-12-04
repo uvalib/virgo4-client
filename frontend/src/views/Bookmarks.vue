@@ -37,7 +37,8 @@
                                         <span @click="clearAll" class="text-button">clear all</span>
                                     </div>
                                     <div>
-                                       <span class="pure-button pure-button-primary">Move</span>
+                                       <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                                          v-on:move-approved="moveBookmarks"/>
                                        <span class="pure-button pure-button-primary">Delete</span>
                                        <span
                                           v-if="canMakeReserves"
@@ -63,9 +64,6 @@
                               <td>
                                  <router-link :to="detailsURL(bookmark)">{{bookmark.details.author}}</router-link>
                               </td>
-                              <!-- <td ><MoveBookmark :bookmark="bookmark" :srcFolder="folderInfo.id"
-                                    v-on:move-approved="moveBookmark"/><i @click="removeBookmark(bookmark.id)" class="remove fas fa-trash-alt"></i>
-                              </td>-->
                            </tr>
                         </table>
                      </div>
@@ -177,9 +175,9 @@ export default {
       renameFolder(folderInfo) {
          this.$store.dispatch("user/renameFolder", folderInfo);
       },
-      moveBookmark(bookmarkID, folderID) {
-         let data = { bookmarkID: bookmarkID, folderID: folderID };
-         this.$store.dispatch("user/moveBookmark", data);
+      moveBookmarks(folderID) {
+         let data = { bookmarks: this.selectedItems, folderID: folderID };
+         this.$store.dispatch("user/moveBookmarks", data);
       },
       reserve(items) {
          this.$store.commit("reserves/setRequestList", items);
@@ -386,5 +384,8 @@ i.details {
 .create-folder label {
    font-weight: bold;
    margin-right: 10px;
+}
+p.error {
+   margin-bottom: 15px;
 }
 </style>
