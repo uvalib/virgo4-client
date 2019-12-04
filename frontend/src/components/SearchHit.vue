@@ -6,7 +6,7 @@
             <div v-if="hit.header.author" class="author">{{hit.header.author.join("; ")}}</div>
             <dl class="fields">
                <template v-for="(field) in hit.basicFields">
-                  <template v-if="field.display != 'optional'">
+                  <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,'k')">{{field.label}}:</dt>
                      <dd :key="getKey(field,'v')" v-html="fieldValueString(field)"></dd>
                   </template>
@@ -54,6 +54,11 @@ export default {
    methods: {
       getKey(field,idx) {
          return this.hit.identifier+field.value+idx
+      },
+      shouldDisplay(field) {
+         if (field.display == 'optional') return false 
+         if ( this.isKiosk && field.type == "url") return false 
+         return true
       },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
