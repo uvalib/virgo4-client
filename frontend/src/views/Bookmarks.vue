@@ -4,7 +4,7 @@
       <div class="bookmarks-content">
          <AccountActivities />
          <div class="working" v-if="lookingUp">
-            <div>Looking up account details...</div>
+            <div>Looking up bookmark information...</div>
             <img src="../assets/spinner2.gif" />
          </div>
          <div v-else>
@@ -22,10 +22,9 @@
                      v-bind:closeOthers="expandedFolder"
                      @accordion-clicked="folderOpened(folderInfo.id)"
                   >
-                     <div
-                        class="none"
-                        v-if="folderInfo.bookmarks.length == 0"
-                     >There are no bookmarks in this folder.</div>
+                     <div class="none" v-if="folderInfo.bookmarks.length == 0">
+                        There are no bookmarks in this folder.
+                     </div>
                      <div v-else>
                         <table>
                            <tr>
@@ -40,11 +39,10 @@
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                                           v-on:move-approved="moveBookmarks"/>
                                        <span @click="removeBookmarks" class="pure-button pure-button-primary">Delete</span>
-                                       <span
-                                          v-if="canMakeReserves"
-                                          @click="reserve"
-                                          class="pure-button pure-button-primary"
-                                       >Place on course reserve</span>
+                                       <span v-if="canMakeReserves" @click="reserve"
+                                          class="pure-button pure-button-primary">
+                                          Place on course reserve
+                                       </span>
                                     </div>
                                  </div>
                               </th>
@@ -179,7 +177,18 @@ export default {
          let data = { bookmarks: this.selectedItems, folderID: folderID };
          this.$store.dispatch("user/moveBookmarks", data);
       },
-      reserve(items) {
+      reserve() {
+         if ( this.selectedItems.length == 0) {
+             this.$store.commit("system/setError", "No items have been selected to put on reserve")
+             return
+         }
+
+         let items = []
+         let folder = this.bookmarks.find( bm => bm.id == this.expandedFolder )
+         this.selectedItems.forEach( bmID => {
+            let item = folder.bookmarks.find( bm => bm.id == bmID )
+            items.push(item)
+         })
          this.$store.commit("reserves/setRequestList", items)
          this.$router.push("/course-reserves-request")
       },
@@ -188,7 +197,7 @@ export default {
       },
       removeBookmarks() {
          if ( this.selectedItems.length == 0) {
-             this.$store.commit("system/setError", "No bookmarks have been seleceted for deletion")
+             this.$store.commit("system/setError", "No bookmarks have been selected for deletion")
              return
          }
          this.$store.dispatch("user/removeBookmarks", this.selectedItems);
