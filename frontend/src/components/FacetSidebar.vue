@@ -2,6 +2,7 @@
    <div class="facet-sidebar" :class="{overlay: !startExpanded}">
       <div class="global" :class="{overlay: !startExpanded}">
          <AccordionContent class="filter" :title="globalTitle" :background="filterColor"
+            borderColor="var(--uvalib-brand-blue)"
             color="white" :expanded="startExpanded" :invert="!startExpanded">
             <div class="body">
                <dl>
@@ -20,6 +21,7 @@
           <AccordionContent id="pool-filter" class="filter" 
             :title="poolFilterTitle" :background="filterColor"
             color="white" :expanded="startExpanded" 
+            borderColor="var(--uvalib-brand-blue)"
             :layoutChange="updatingFacets"  :invert="!startExpanded">
             <div class="body">
                <div v-if="updatingFacets" class="working">
@@ -36,7 +38,8 @@
                         <span class="cnt" v-if="fv.count">({{fv.count}})</span>
                      </dd>
                      <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                        <AccordionContent class="more" title="See More" closeText="See Less">
+                        <AccordionContent class="more" title="See More" 
+                           closeText="See Less" borderWidth="0">
                            <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)"  
                               @click="filterClicked(facetInfo.id, fv.value)"
                               :key="valueKey(idx, facetInfo.id)"
