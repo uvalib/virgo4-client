@@ -234,7 +234,6 @@ const user = {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
          
          ctx.commit('setLookingUp', true)
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
             ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
@@ -248,7 +247,6 @@ const user = {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
          
          ctx.commit('setLookingUp', true)
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let data = {item_barcode: barcode}
          axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
             ctx.commit('setCheckouts', response.data.checkouts)
@@ -263,7 +261,6 @@ const user = {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
          
          ctx.commit('setLookingUp', true)
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let data = {item_barcode: "all"}
          axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
             ctx.commit('setCheckouts', response.data.checkouts)
@@ -285,7 +282,6 @@ const user = {
             ctx.commit('setLookingUp', true)
          }
 
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
             ctx.commit('setLookingUp', false)
@@ -298,7 +294,6 @@ const user = {
          if ( ctx.state.bills.length > 0) return
 
          ctx.commit('setLookingUp', true)
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.get(`/api/users/${ctx.state.signedInUser}/bills`).then((response) => {
             ctx.commit('setBills', response.data)
             ctx.commit('setLookingUp', false)
@@ -309,7 +304,6 @@ const user = {
       },
       signout(ctx) {
          ctx.commit('setAuthorizing', true)
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.post(`/api/users/${ctx.state.signedInUser}/signout`).finally(function () {
             ctx.commit('signOutUser')
             ctx.commit('setAuthorizing', false)
@@ -322,7 +316,6 @@ const user = {
       },
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          axios.post("/authenticate/public", data).then((response) => {
             ctx.commit("setSignedInUser", {userId: response.data, 
                token: ctx.state.authToken, type: "public", quiet: false} )
@@ -343,7 +336,6 @@ const user = {
             await ctx.dispatch("getAccountInfo")
          }
          ctx.commit('setLookingUp', true)
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          return axios.get(`/api/users/${ctx.state.signedInUser}/bookmarks`).then((response) => {
             ctx.commit('setBookmarks', response.data)
             ctx.commit('setLookingUp', false)
@@ -353,7 +345,6 @@ const user = {
           })
       },
       addBookmark(ctx, folder ) {
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items`
          let bm = ctx.state.newBookmarkInfo
          let data = {folder: folder, pool: bm.pool, identifier: bm.data.identifier}
@@ -371,7 +362,6 @@ const user = {
          })
       },
       addFolder(ctx, folder) {
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders`
          return axios.post(url, {name: folder}).then((response) => {
             ctx.commit('setBookmarks', response.data)
@@ -380,7 +370,6 @@ const user = {
          })
       },
       renameFolder(ctx, folder) {
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders/${folder.id}`
          axios.post(url, {name: folder.name}).then((response) => {
             ctx.commit('setBookmarks', response.data)
@@ -389,7 +378,6 @@ const user = {
          })
       },
       removeFolder(ctx, folderID) {
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders/${folderID}`
          axios.delete(url).then((response) => {
             ctx.commit('setBookmarks', response.data)
@@ -398,7 +386,6 @@ const user = {
          })
       },
       removeBookmarks(ctx, bookmarks) {
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/delete`
          axios.post(url, {bookmarkIDs: bookmarks}).then((response) => {
             ctx.commit('setBookmarks', response.data)
@@ -409,7 +396,6 @@ const user = {
       moveBookmarks(ctx, data) {
          let bookmarkIDs = data.bookmarks
          let folderID = data.folderID
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
          let url = `/api/users/${ctx.state.signedInUser}/bookmarks/move`
          axios.post(url, {folderID: folderID, bookmarkIDs: bookmarkIDs}).then((response) => {
             ctx.commit('setBookmarks', response.data)

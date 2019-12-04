@@ -70,7 +70,6 @@ const preferences = {
          let data = {targetPoolURL: ctx.state.targetPoolURL, 
             excludePoolURLs: ctx.state.excludePoolURLs
          }
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          axios.post(url, data)
       },
       toggleExcludePool(ctx, tgtURL) {
@@ -79,7 +78,6 @@ const preferences = {
          let data = {targetPoolURL: ctx.state.targetPoolURL, 
             excludePoolURLs: ctx.state.excludePoolURLs
          }
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          axios.post(url, data)
       }
    }

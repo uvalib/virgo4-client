@@ -89,7 +89,6 @@ const item = {
          }
 
          let url = baseURL + "/api/resource/" + identifier
-         axios.defaults.headers.common['Authorization'] = "Bearer " + ctx.rootState.user.authToken
          axios.get(url).then((response) => {
             ctx.commit("setDetails", {source:source, fields: response.data})
          }).catch((error) => {
@@ -100,7 +99,6 @@ const item = {
 
       async getAvailability(ctx, titleId ) {
         ctx.commit('clearAvailability')
-        axios.defaults.headers.common['Authorization'] = "Bearer " + ctx.rootState.user.authToken
         axios.get("/api/availability/" + titleId).then((response) => {
           ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
         }).catch((error) => {
@@ -129,8 +127,7 @@ const item = {
               target_pool: "",
               exclude_pool: [],
             }
-          }
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
+         }
          let url = ctx.rootState.system.searchAPI + "/api/search?intuit=1&debug=1"
          return axios.post(url, req).then((response) => {
             ctx.commit('setCatalogKeyDetails', response.data)

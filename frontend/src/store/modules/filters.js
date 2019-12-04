@@ -192,7 +192,6 @@ const filters = {
             filters: [filterObj]
           }
          let tgtURL = pool.url+"/api/search/facets"
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          ctx.commit('setUpdatingFacets', true)
          axios.post(tgtURL, req).then((response) => {
             let facets = response.data.facet_list 
