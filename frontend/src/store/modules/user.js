@@ -397,21 +397,21 @@ const user = {
             ctx.commit('system/setError', error, { root: true })
          })
       },
-      removeBookmark(ctx, bmID) {
+      removeBookmarks(ctx, bookmarks) {
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items/${bmID}`
-         axios.delete(url).then((response) => {
+         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/delete`
+         axios.post(url, {bookmarkIDs: bookmarks}).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
          })
       },
-      moveBookmark(ctx, data) {
-         let bmID = data.bookmarkID 
+      moveBookmarks(ctx, data) {
+         let bookmarkIDs = data.bookmarks
          let folderID = data.folderID
          axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.state.authToken
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items/${bmID}/move`
-         axios.post(url, {folderID: folderID}).then((response) => {
+         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/move`
+         axios.post(url, {folderID: folderID, bookmarkIDs: bookmarkIDs}).then((response) => {
             ctx.commit('setBookmarks', response.data)
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })

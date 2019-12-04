@@ -217,6 +217,7 @@ span.renew {
    font-size: 0.75em;
    float: right;
    font-weight: 500;
+   margin-top: 10px;
 }
 .toolbar {
    font-size: 0.8em;

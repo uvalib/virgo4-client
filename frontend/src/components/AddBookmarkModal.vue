@@ -11,10 +11,10 @@
          <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
          <div>{{authorText}}</div>
          <div class="select">
-            <label>Select a folder for the bookmark: </label> 
-            <multiselect v-model="selectedFolder" class="folders"  
+            <label>Select a folder for the bookmark: </label>
+            <multiselect v-model="selectedFolder" class="folders"
                   placeholder="Select or create a folder"
-                  :showLabels="false" 
+                  :showLabels="false"
                   :searchable="true"
                   :taggable="true"
                   track-by="id" label="name"
@@ -27,7 +27,7 @@
       </div>
       <div class="controls">
          <span @click="cancelBookmark" class="pure-button pure-button-secondary">Cancel</span>
-         <span @click="okBookmark" class="pure-button pure-button-primary">OK</span>  
+         <span @click="okBookmark" class="pure-button pure-button-primary">OK</span>
       </div>
    </div>
 </template>
@@ -55,7 +55,7 @@ export default {
          folders: 'user/folders',
       }),
       authorText() {
-         let author = "" 
+         let author = ""
          if ( this.newBookmark.data.header.author ) {
             author = this.newBookmark.data.header.author.join(", ")
          }
@@ -81,7 +81,7 @@ export default {
          if ( !this.selectedFolder) {
             this.bookmarkError = "A bookmark folder selection is required"
             return
-         } 
+         }
          this.$store.dispatch("user/addBookmark", this.selectedFolder.name).then( () => {
             this.$store.commit("user/closeAddBookmark")
          }).catch((error) => {
@@ -99,7 +99,7 @@ export default {
          let found = false
          this.folders.some( fobj=> {
             if (fobj.name == "General") {
-               found = true 
+               found = true
                this.selectedFolder = fobj
             }
             return found == true
@@ -146,9 +146,9 @@ div.content {
 div.modal-title {
    background: var(--color-primary-orange);
    font-size: 1.1em;
-   color:white; 
+   color:white;
    font-weight: bold;
-   padding: 4px; 
+   padding: 4px;
    border-radius: 5px 5px 0 0;
 }
 div.controls {

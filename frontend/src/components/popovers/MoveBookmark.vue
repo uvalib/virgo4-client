@@ -1,29 +1,37 @@
 <template>
    <v-popover class="inline">
-      <span class="trigger">
-         <i class="move fas fa-folder"></i>
-      </span>
+      <span class="trigger pure-button pure-button-primary">Move</span>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Bookmark Folder</span>
          </div>
-         <div class="message pure-form">
-            <p>Select a new folder for this bookmark</p>
-            <select v-model="selectedFolder">
-               <option value="">Select a folder</option>
-               <option v-for="(folder) in folders" 
-                  :key="folder.id" :value="folder.id ">
-                  {{ folder.name }}
-               </option>
-            </select>
-         </div>
-         <div class="move-controls">
-            <span v-close-popover class="pure-button pure-button-secondary">Cancel</span>
-            <span class="pure-button pure-button-primary"
-               @click="moveClicked" v-close-popover >
-               Move
-            </span>
-         </div>
+         <template v-if="bookmarks.length == 0">
+            <div class="message pure-form">
+               <p>No bookmarks have been selected to move.</p>    
+            </div>
+            <div class="move-controls">
+               <span v-close-popover class="pure-button pure-button-tertiary">OK</span>
+            </div>
+         </template>
+         <template v-else>
+            <div class="message pure-form">
+               <p>Select a new folder for the selected bookmarks</p>
+               <select v-model="selectedFolder">
+                  <option value="">Select a folder</option>
+                  <option v-for="(folder) in folders" 
+                     :key="folder.id" :value="folder.id ">
+                     {{ folder.name }}
+                  </option>
+               </select>
+            </div>
+            <div class="move-controls">
+               <span v-close-popover class="pure-button pure-button-tertiary">Cancel</span>
+               <span class="pure-button pure-button-primary"
+                  @click="moveClicked" v-close-popover >
+                  Move
+               </span>
+            </div>
+         </template>
       </div>
    </v-popover>
 </template>
@@ -32,8 +40,8 @@
 import { mapGetters } from "vuex"
 export default {
    props: {
-      bookmark: {
-         type: Object,
+      bookmarks: {
+         type: Array,
          required: true
       },
       srcFolder: {
@@ -56,8 +64,7 @@ export default {
    },
    methods: {
       moveClicked() {
-         //let payload = {bookmarkID: this.bookmark.id, folderID: this.selectedFolder}
-         this.$emit('move-approved', this.bookmark.id, this.selectedFolder)
+         this.$emit('move-approved', this.selectedFolder)
       }
    }
 };
@@ -72,7 +79,7 @@ i.move {
 div.popover-header {
    padding: 5px 15px;
    color: white;
-   background-color: var(--color-primary-orange);
+   background-color: var(--uvalib-grey-dark);
    font-weight: 500;
    text-align: center;
    border-radius: 5px 5px 0 0;
@@ -89,8 +96,8 @@ div.popover-header {
 }
 div.message {
    padding: 10px 10px 0 10px;
-   border-left: 3px solid var(--color-primary-orange);
-   border-right: 3px solid var(--color-primary-orange);
+   border-left: 3px solid var(--uvalib-grey-dark);
+   border-right: 3px solid var(--uvalib-grey-dark);
 }
 .message p {
    margin: 0;
@@ -104,9 +111,9 @@ select {
    font-size: 0.9em;
    padding: 10px;
    text-align: right;
-   border-left: 3px solid var(--color-primary-orange);
-   border-right: 3px solid var(--color-primary-orange);
-   border-bottom: 3px solid var(--color-primary-orange);
+   border-left: 3px solid var(--uvalib-grey-dark);
+   border-right: 3px solid var(--uvalib-grey-dark);
+   border-bottom: 3px solid var(--uvalib-grey-dark);
    border-radius: 0 0 5px 5px;
    display: flex;
    flex-flow: row nowrap;

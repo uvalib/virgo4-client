@@ -120,7 +120,7 @@
       </transition>
          <div class="controls">
             <router-link to="/">
-               <span class="pure-button pure-button-secondary">Cancel Request</span>
+               <span class="pure-button pure-button-tertiary">Cancel Request</span>
             </router-link>
             <span @click="submitRequest" class="pure-button pure-button-primary">
                Submit Request
