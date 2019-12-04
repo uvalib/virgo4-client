@@ -33,7 +33,7 @@ export function preProcessHitFields(hits) {
         return
       }
       if (field.type == "author") {
-        if (Array.isArray(hit.author) === false) {
+        if (Array.isArray(hit.header.author) === false) {
           hit.header.author = [field.value]
         } else {
           hit.header.author.push(field.value)
