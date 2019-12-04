@@ -14,6 +14,7 @@ const user = {
       checkouts: [],
       bookmarks: [],
       bills: [],
+      requests: [],
       newBookmarkInfo: null,
       lookingUp: false,
    },
@@ -150,6 +151,9 @@ const user = {
       setCheckouts(state, co) {
          state.checkouts = co
       },
+      setRequests(state, req) {
+         state.requests = req
+      },
       setRenewResults(state, renewResults) {
          renewResults.results.forEach( renew => {
             if (renew.success == false) {
@@ -166,6 +170,7 @@ const user = {
       },
       setAuthToken(state, token) {
          state.authToken = token
+         axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
       },
       setAuthorizing(state, auth) {
          state.authorizing = auth
@@ -174,6 +179,7 @@ const user = {
          state.signedInUser = user.userId
          state.authToken = user.token
          state.sessionType = user.type
+         axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
       },
       setAccountInfo(state, data) {
          // data content {user, authToken, bookmarks}
@@ -211,6 +217,17 @@ const user = {
           ctx.commit('system/setFatal', "Authorization failed: " + error.response.data, { root: true })
           ctx.commit('setAuthorizing', false)
         })
+      },
+      getRequests(ctx) {
+         if (ctx.rootGetters["user/isSignedIn"] == false) return
+         ctx.commit('setLookingUp', true)
+         axios.get(`/api/users/${ctx.state.signedInUser}/illiad`).then((response) => {
+            ctx.commit('setRequests', response.data)
+            ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })
       },
       getAccountInfo(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] ) return

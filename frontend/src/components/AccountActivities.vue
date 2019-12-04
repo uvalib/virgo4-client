@@ -6,6 +6,8 @@
       <span class="sep">|</span>
       <router-link to="/checkouts">Checkouts</router-link>
       <span class="sep">|</span>
+      <router-link to="/requests">Requests</router-link>
+      <span class="sep">|</span>
       <router-link to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
       <div  @click="signOut" class="text-button">Sign Out</div>

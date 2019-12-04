@@ -44,6 +44,7 @@ func main() {
 	{
 		api.GET("/authenticated/:token", svc.IsAuthenticated)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)
+		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)
 		api.GET("/users/:uid/bills", svc.AuthMiddleware, svc.GetUserBills)
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)

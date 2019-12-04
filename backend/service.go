@@ -28,6 +28,7 @@ type ServiceContext struct {
 	PendingTranslates  map[string]string
 	DB                 *dbx.DB
 	SMTP               SMTPConfig
+	Illiad             IlliadConfig
 }
 
 // RequestError contains http status code and message for a
@@ -45,6 +46,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
+		Illiad:             cfg.Illiad,
 		Dev:                cfg.Dev}
 
 	log.Printf("Connect to Postgres")
@@ -128,6 +130,15 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		hcMap["postgres"] = hcResp{Healthy: true}
 	}
 
+	respBytes, illErr := svc.ILLiadGet("SystemInfo/SecurePlatformVersion")
+	if illErr != nil {
+		log.Printf("ERROR: ILLiad ping failed: %s", illErr.Message)
+		hcMap["illiad"] = hcResp{Healthy: false, Message: illErr.Message}
+	} else {
+		hcMap["illiad"] = hcResp{Healthy: true}
+		log.Printf("ILLiad version: %s", respBytes)
+	}
+
 	c.JSON(http.StatusOK, hcMap)
 }
 
@@ -181,6 +192,20 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, cfg)
 }
 
+// ILLiadGet sends a GET request to ILLiad and returns the response
+func (svc *ServiceContext) ILLiadGet(queryURL string) ([]byte, *RequestError) {
+	illiad := fmt.Sprintf("%s/%s", svc.Illiad.URL, queryURL)
+	illReq, _ := http.NewRequest("GET", illiad, nil)
+	illReq.Header.Add("Content-Type", "application/json")
+	illReq.Header.Add("ApiKey", svc.Illiad.APIKey)
+	timeout := time.Duration(20 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	resp, err := client.Do(illReq)
+	return handleAPIResponse(illiad, resp, err)
+}
+
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
 func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector request: %s", url)
@@ -189,31 +214,7 @@ func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 		Timeout: timeout,
 	}
 	resp, err := client.Get(url)
-	if err != nil {
-		status := http.StatusBadRequest
-		errMsg := err.Error()
-		if strings.Contains(err.Error(), "Timeout") {
-			status = http.StatusRequestTimeout
-			errMsg = fmt.Sprintf("%s timed out", url)
-		} else if strings.Contains(err.Error(), "connection refused") {
-			status = http.StatusServiceUnavailable
-			errMsg = fmt.Sprintf("%s refused connection", url)
-		}
-		log.Printf("ERROR: %s request failed: %s", url, errMsg)
-		return nil, &RequestError{StatusCode: status, Message: errMsg}
-	} else if resp.StatusCode != http.StatusOK {
-		defer resp.Body.Close()
-		bodyBytes, _ := ioutil.ReadAll(resp.Body)
-		status := resp.StatusCode
-		errMsg := fmt.Sprintf("ILS Connector Error: %s", string(bodyBytes))
-		log.Printf("ERROR: %s request failed: %s", url, errMsg)
-		return nil, &RequestError{StatusCode: status, Message: errMsg}
-	}
-
-	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	// log.Printf("Raw ILS response %s", bodyBytes)
-	return bodyBytes, nil
+	return handleAPIResponse(url, resp, err)
 }
 
 // ILSConnectorPost sends a POST to the ILS connector and returns results
@@ -224,24 +225,28 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values url.Values) ([]by
 		Timeout: timeout,
 	}
 	resp, err := client.PostForm(url, values)
+	return handleAPIResponse(url, resp, err)
+}
+
+func handleAPIResponse(URL string, resp *http.Response, err error) ([]byte, *RequestError) {
 	if err != nil {
 		status := http.StatusBadRequest
 		errMsg := err.Error()
 		if strings.Contains(err.Error(), "Timeout") {
 			status = http.StatusRequestTimeout
-			errMsg = fmt.Sprintf("%s timed out", url)
+			errMsg = fmt.Sprintf("%s timed out", URL)
 		} else if strings.Contains(err.Error(), "connection refused") {
 			status = http.StatusServiceUnavailable
-			errMsg = fmt.Sprintf("%s refused connection", url)
+			errMsg = fmt.Sprintf("%s refused connection", URL)
 		}
-		log.Printf("ERROR: %s request failed: %s", url, errMsg)
+		log.Printf("ERROR: %s request failed: %s", URL, errMsg)
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	} else if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		bodyBytes, _ := ioutil.ReadAll(resp.Body)
 		status := resp.StatusCode
-		errMsg := fmt.Sprintf("ILS Connector Error: %s", string(bodyBytes))
-		log.Printf("ERROR: %s request failed: %s", url, errMsg)
+		errMsg := string(bodyBytes)
+		log.Printf("ERROR: %s request failed: %s", URL, errMsg)
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	}
 

@@ -19,7 +19,7 @@
                   <span @click="renewAll" 
                      class="renew-all pure-button pure-button-primary">Renew All</span>
                </div>
-               <div class="item" v-for="co in sortedCheckouts" :key="co.id">
+               <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
                   <h3 class="item-title">
                      <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
                      {{co.title}}
