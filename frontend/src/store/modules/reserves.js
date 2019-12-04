@@ -85,17 +85,6 @@ const reserves = {
    }, 
 
    actions: {
-      getDesks(ctx) {
-         ctx.commit('setSearching', true, { root: true })
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
-         axios.get(`/api/reserves/desks`).then((response) => {
-            ctx.commit('setDesks', response.data)
-            ctx.commit('setSearching', false, { root: true })
-          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setSearching', false, { root: true })
-          })
-      },
       createReserves(ctx) {
          ctx.commit('setSearching', true, { root: true })
          let v4UserID = ctx.rootState.user.signedInUser
@@ -154,7 +143,7 @@ const reserves = {
          let qs = ctx.state.query
          if (type == "id") {
             typeParam = "type=INSTRUCTOR_ID"
-            qs = ctx.rootState.user.accountInfo.barcode
+            qs = ctx.rootState.user.accountInfo.id
          } else {
             if (qs.includes(" ")) {
                qs = `"${qs}"`
