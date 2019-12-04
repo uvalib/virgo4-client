@@ -16,7 +16,11 @@
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="this.$route.params.src"/>
             <div class="info">
                <table class="fields">
-                  <tr v-for="(field,idx) in detailFields" :key="idx">
+                  <tr v-if="details.header.author">
+                     <td class="label">Author:</td>
+                     <td class="value">{{details.header.author.join(", ")}}</td>
+                  </tr>
+                  <tr v-for="(field,idx) in allFields" :key="idx">
                      <template v-if="field.display != 'optional'">
                         <td class="label">{{field.label}}:</td>
                         <td class="value" v-html="fieldValueString(field)"></td>
@@ -53,7 +57,7 @@ export default {
       notFound() {
          return this.details.identifier.length == 0
       },
-      detailFields() {
+      allFields() {
          return [...this.details.basicFields.concat(this.details.detailFields)]
       },
       fromCourseReserves() {
