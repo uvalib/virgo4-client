@@ -28,6 +28,7 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import AccordionContent from '@/components/AccordionContent'
 import GroupedSearchHit from '@/components/GroupedSearchHit'
@@ -49,7 +50,10 @@ export default {
       },
       ...mapState({
          searching: state => state.searching,
-      })
+      }),
+       ...mapGetters({
+         isKiosk: "system/isKiosk",
+      }),
    },
    methods: {
       getKey(field,idx) {
