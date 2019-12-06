@@ -1,5 +1,5 @@
 <template>
-   <div class="search-results">
+   <div class="search-results shady">
 
       <div class="results-header">
          <div class="summary">
@@ -8,7 +8,7 @@
             <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
             <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
          </div>
-         <span v-if="searchMode=='basic'" @click="refineClicked()" 
+         <span v-if="searchMode=='basic'" @click="refineClicked()"
             class="refine pure-button pure-button-primary">
             Refine Search
          </span>
@@ -27,7 +27,7 @@
                   </div>
                </template>
                <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
-                  :background="otherSrcBkg" :color="otherSrcColor" 
+                  :background="otherSrcBkg" :color="otherSrcColor"
                   placeholder="Other<span class='total'>Sources</span>"
                   v-model="otherSrcSelection"/>
             </div>
@@ -76,8 +76,8 @@ export default {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },
       otherSrcBkg() {
-         if (this.otherSrcSelection.id == "") return "#E6E6E6"
-         return "var(--color-brand-blue)"
+         if (this.otherSrcSelection.id == "") return "#FFF"
+         return "var(--uvalib-brand-blue)"
       },
       otherSrcColor() {
          if (this.otherSrcSelection.id == "") return "#666"
@@ -110,7 +110,7 @@ export default {
    },
    watch: {
       otherSrcSelection (newVal, _oldVal) {
-         if (newVal == "") return 
+         if (newVal == "") return
          let found = false
          this.results.some( (r,idx) => {
             if ( r.pool.id == newVal.id) {
@@ -145,11 +145,22 @@ export default {
 </script>
 
 <style>
+div.pool-tabs {
+  font-weight: bold;
+}
 div.pool-tabs span.total {
    display: block;
    font-size: 0.75em;
    margin: 0;
+   font-weight: normal;
 }
+
+.shady {
+  margin: 16px -1000px 16px -1000px;
+  padding: calc(16px*2) 1000px calc(16px*2) 1000px;
+  background-color: var(--uvalib-grey-lightest);
+}
+
 </style>
 <style scoped>
 p.relevant {
@@ -165,7 +176,6 @@ p.relevant {
 .pool-tabs {
    margin: 0 15px 0 0;
    text-align: left;
-   font-size: 0.9em;
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
@@ -174,18 +184,21 @@ p.relevant {
    margin: 0 2px 0 0;
    padding: 4px 8px;
    border-radius: 5px 5px 0 0;
-   color: #666;
-   border: 1px solid #e6e6e6;
+   color: var(--uvalib-text-dark);
+   border: 1px solid var(--uvalib-grey-lightest);
    text-align: left;
    flex: 1 1 auto;
+   background: #FFF;
+}
+.pool.pure-button:first-child {
+  margin-left: 4px;
 }
 .pool.pure-button.showing {
-   background-color: var(--color-brand-blue);
+   background-color: var(--uvalib-brand-blue);
    color: #fff;
-   border: 1px solid var(--color-brand-blue);
 }
 .pool.pure-button.disabled.failed {
-   background: #D33;
+   background: var(--uvalib-red-emergency);
    color: white;
    opacity: 0.5;
 }
@@ -204,7 +217,6 @@ p.relevant {
    align-content: center;
    align-items: center;
    justify-content: space-between;
-   border-top: 2px solid var(--color-brand-blue);
    margin-top: 10px;
    padding-top: 10px;
    margin-bottom: 10px;
@@ -217,6 +229,8 @@ p.relevant {
    margin: 0 0 0.2vw 0;
    font-weight: 500;
    text-align: left;
+}
+.summary span {
    font-size: 0.85em;
 }
 .summary .subtotal {
@@ -225,14 +239,14 @@ p.relevant {
 }
 @media only screen and (min-width: 768px) {
    div.search-results {
-      margin: 0 5vw 5vw 5vw;
-      padding: 0;
+      margin: 0;
+      padding: 0 5vw;
    }
 }
 @media only screen and (max-width: 768px) {
    div.search-results {
-      margin: 0 2vw 2vw 2vw;
-      padding: 0;
+      margin: 0;
+      padding: 0 2vw;
    }
    span.refine.pure-button.pure-button-primary {
       display: none;
@@ -247,6 +261,6 @@ p.relevant {
    flex: 1 1 auto;
    font-size: 1.5em;
    font-weight: 500;
-   color: #888;
+   color: var(--uvalib-text);
 }
 </style>

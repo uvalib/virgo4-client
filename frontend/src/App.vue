@@ -104,6 +104,10 @@ export default {
    --uvalib-grey-dark: #565656;
    --uvalib-grey-darkest: #2b2b2b;
 
+   --uvalib-text-light: #FFFFFF;
+   --uvalib-text: var(--uvalib-grey-dark);
+   --uvalib-text-dark: var(--uvalib-grey-darkest);
+
    /* Color Remapping */
    --color-brand-blue: var(--uvalib-brand-blue);
    --color-light-blue: var(--uvalib-brand-blue-light);

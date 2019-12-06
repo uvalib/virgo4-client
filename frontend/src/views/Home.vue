@@ -11,7 +11,7 @@
             {{translateMessage}}
           </div>
           <div class="basic-search">
-            <V4Select :selections="searchScopes" v-bind:attached="true" 
+            <V4Select :selections="searchScopes" v-bind:attached="true"
               v-model="basicSearchScope"/>
             <input class="basic"
                 @keyup.enter="searchClicked"
@@ -85,7 +85,7 @@ export default {
    },
    created: function() {
       this.$store.dispatch("system/getConfig").then(() => {
-        // once cfg is available, get pools. they may be needed 
+        // once cfg is available, get pools. they may be needed
         // to populate the pool selector for non-signed in users
         this.$store.dispatch('pools/getPools')
       })
@@ -122,18 +122,16 @@ export default {
     color:transparent;
   }
   :-moz-placeholder { /* Firefox 18- */
-    color:transparent; 
+    color:transparent;
   }
   ::-moz-placeholder {  /* Firefox 19+ */
-    color:transparent; 
+    color:transparent;
   }
-  :-ms-input-placeholder {  
+  :-ms-input-placeholder {
     color:transparent;
   }
 }
 .controls {
-  font-size: 0.85em;
-  font-weight: bold;
   padding: 10px 0;
   display: flex;
   flex-flow: row wrap;
@@ -194,7 +192,7 @@ div.advanced {
 div.tips-container {
   position: absolute;
   font-size: 1em;
-  top: 15px; 
+  top: 15px;
   right: 15px;
 }
 div.translate-message {
