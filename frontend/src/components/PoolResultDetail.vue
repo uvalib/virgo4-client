@@ -72,7 +72,7 @@ export default {
          var scrollStep = -window.scrollY / (500 / 10),
          scrollInterval = setInterval(()=> {
             if ( window.scrollY != 0 ) {
-               window.scrollBy( 0, scrollStep ) 
+               window.scrollBy( 0, scrollStep )
             } else {
                clearInterval(scrollInterval)
             }
@@ -86,10 +86,10 @@ export default {
             this.$store.dispatch("moreResults").finally( ()=> {
                 this.loadingMore = false
             })
-         } 
+         }
       },
       scrollChecker() {
-         if (window.window.scrollY > 1500) {
+         if (window.window.scrollY > 800) {
             this.showScrollTop = true
          } else {
             this.showScrollTop = false
@@ -144,28 +144,44 @@ div.results-header {
    margin-bottom: 0;
 }
 .scroll-to-top {
+   display: flex;
+   flex-basis: auto;
+   flex-direction: column;
    position: fixed;
-   background: var(--color-brand-orange);
-   color: white;
-   font-size: 2em;
+   background-color: white;
+   color: var(--uvalib-brand-orange);
+   font-size: 2.5em;
    font-weight: 100;
-   padding: 0px 12px;
-   border: 2px solid black;
-   right: 15px;
-   bottom: 15px;
+   border: 3px solid var(--uvalib-brand-orange);
+   border-radius: 50%;
    cursor: pointer;
+   align-items: center;
+   bottom: 30px;
+   right: 25px;
+   box-shadow: rgba(0, 0, 0, 0.14) 0px 2px 2px 0px;
+   box-sizing: border-box;
+   justify-content: center;
+   min-width: 0px;
+   padding: 0px 0px 4px 0px;
+   width: 56px;
+   height: 56px;
+   z-index: 0;
 }
 .scroll-to-top.mobile {
    position: fixed;
-   background: var(--color-brand-orange);
-   color: white;
+   background-color: white;
+   color: var(--color-brand-orange);
+   border: 3px solid var(--color-brand-orange);
    font-size: 2em;
    font-weight: 100;
    padding: 0px 12px;
-   border: 2px solid black;
    right: 5px;
    bottom: 45px;
    cursor: pointer;
+}
+.scroll-to-top:hover, .scroll-to-top.mobile:hover {
+  color: white;
+  background-color: var(--uvalib-brand-orange);
 }
 .see-more, .no-more {
    padding: 10px;
