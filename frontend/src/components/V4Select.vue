@@ -1,8 +1,8 @@
 <template>
-   <div @click="expandClick" class="v4-select" 
+   <div @click="expandClick" class="v4-select"
       :class="{attached: attached}"
       :style="{ 'background-color': background, padding: pad,
-               color: color, 'border-color': background }"> 
+               color: color, 'border-color': background }">
       <div class="wrap-select">
          <span class="selection">
             <span v-if="value.id" v-html="value.name"></span>
@@ -15,8 +15,8 @@
          v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div class="options" v-if="expanded"
             :style="{ 'background-color': background, color: color, 'border-color': background }">
-            <div v-for="src in selections" @click="optionClicked(src)"  
-               :class="{disabled: src.disabled}" class="option" 
+            <div v-for="src in selections" @click="optionClicked(src)"
+               :class="{disabled: src.disabled}" class="option"
                :key="src.id"  v-html="src.name"></div>
          </div>
       </transition>
@@ -60,7 +60,7 @@ export default {
       }
    },
    watch: {
-      expanded() {   
+      expanded() {
          if (this.expanded === false) {
             window.removeEventListener("click", this.globalClick)
          } else {
@@ -153,14 +153,14 @@ export default {
 }
 .v4-select .options {
   text-align: left;
-  background-color: var(--color-brand-blue);
+  background-color: var(--uvalib-brand-blue);
   color: white;
   cursor: pointer;
   padding: 0 0 10px 0;
   border-radius: 0 5px 5px 5px;
   position: absolute;
   left: -1px;
-  border: 1px solid var(--color-light-blue);
+  border: 1px solid var(--uvalib-light-blue);
   font-size: 0.9em;
   overflow: hidden;
   transition: 200ms ease-out;
@@ -169,19 +169,32 @@ export default {
 }
 .v4-select .option {
   padding: 5px 15px 10px 15px;
+  background-color: white;
+  border-left: 1px solid var(--uvalib-grey-light);
+  border-right: 1px solid var(--uvalib-grey-light);
+}
+.v4-select .option:last-child {
+  border-bottom: 1px solid var(--uvalib-grey-light);
 }
 .v4-select .option.disabled {
   background-color:  initial;
   cursor: default;
-  color: #bbb;
+  color: var(--uvalib-grey-light);
 }
 .v4-select .option.disabled:hover {
   background-color:  initial;
   cursor: default;
-  color: #bbb;
+  color: var(--uvalib-grey-light);
 }
 .v4-select .option:hover {
-  background-color:  var(--color-lightest-blue);
+  background-color:  var(--uvalib-brand-blue-lightest);
   color: black;
+}
+
+@media only screen and (max-width: 768px) {
+   .v4-select .options {
+     left: inherit;
+     right: -2px;
+   }
 }
 </style>

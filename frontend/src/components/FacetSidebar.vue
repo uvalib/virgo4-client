@@ -9,7 +9,7 @@
                   <dt>Availability</dt>
                   <dd v-for="avail in availabilityOpts" :key="avail.id" @click="availSelected(avail)">
                      <i v-if="isAvailSelected(avail)" class="check fas fa-check-circle"></i>
-                     <i v-else class="check far fa-circle"></i>                                
+                     <i v-else class="check far fa-circle"></i>
                      {{avail.name}}
                   </dd>
                </dl>
@@ -18,9 +18,9 @@
       </div>
 
       <div class="pool" :class="{overlay: !startExpanded}">
-          <AccordionContent id="pool-filter" class="filter" 
+          <AccordionContent id="pool-filter" class="filter"
             :title="poolFilterTitle" :background="filterColor"
-            color="white" :expanded="startExpanded" 
+            color="white" :expanded="startExpanded"
             borderColor="var(--uvalib-brand-blue)"
             :layoutChange="updatingFacets"  :invert="!startExpanded">
             <div class="body">
@@ -33,19 +33,19 @@
                      <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)"
                         @click="filterClicked(facetInfo.id, fv.value)" >
-                        <i :class="facetControlClass(facetInfo, fv.value)"></i>                             
-                        {{fv.value}} 
+                        <i :class="facetControlClass(facetInfo, fv.value)"></i>
+                        {{fv.value}}
                         <span class="cnt" v-if="fv.count">({{fv.count}})</span>
                      </dd>
                      <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                        <AccordionContent class="more" title="See More" 
+                        <AccordionContent class="more" title="See More"
                            closeText="See Less" borderWidth="0">
-                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)"  
+                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)"
                               @click="filterClicked(facetInfo.id, fv.value)"
                               :key="valueKey(idx, facetInfo.id)"
-                           >   
-                              <i :class="facetControlClass(facetInfo, fv.value)"></i>                             
-                              {{fv.value}} 
+                           >
+                              <i :class="facetControlClass(facetInfo, fv.value)"></i>
+                              {{fv.value}}
                               <span class="cnt" v-if="fv.count">({{fv.count}})</span>
                            </div>
                         </AccordionContent>
@@ -82,15 +82,15 @@ export default {
       }),
       globalTitle() {
          if ( !this.startExpanded ) {
-            return "Filter All"     
+            return "Filter All"
          }
          return "Filter All Results By"
       },
       filterColor() {
          if ( !this.startExpanded ) {
-            return "var(--color-brand-orange)"     
+            return "var(--uvalib-brand-blue)"
          }
-         return "var(--color-brand-blue)"
+         return "var(--uvalib-brand-blue)"
       },
       startExpanded() {
          return this.displayWidth > 810
@@ -117,15 +117,15 @@ export default {
       facetControlClass(facet, value) {
          if ( this.isFacetSelected(facet.id, value))  {
             if ( facet.type == "radio") {
-               return "check fas fa-check-circle"   
+               return "check fas fa-check-circle"
             }
             return "check fas fa-check-square"
          } else {
             if ( facet.type == "radio") {
-               return "check far fa-circle"   
+               return "check far fa-circle"
             }
             return "check far fa-square"
-         }  
+         }
       },
       toggleGlobal() {
          this.$store.commit("filters/toggleGlobalFilterExpanded")
@@ -163,7 +163,7 @@ export default {
       },
       isFacetSelected(facetID, value) {
          let filter = this.allFilters(this.resultsIdx)
-         let idx = filter.findIndex( f=> f.facet_id == facetID && f.value == value ) 
+         let idx = filter.findIndex( f=> f.facet_id == facetID && f.value == value )
          return idx > -1
       },
    }
@@ -178,14 +178,15 @@ export default {
    min-width: 200px;
    display: inline-block;
 }
+.facet-sidebar .global, .facet-sidebar .pool {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+  margin-bottom: 1rem;
+}
 .body {
-   border: 5px solid var(--color-brand-blue);
    border-top: 0;
-   border-radius: 0 0 5px 5px;
    text-align: left;
    padding: 10px;
    margin: 0;
-   font-size: 0.9em;
    background: white;
    position: relative;
    min-height: 80px;
@@ -194,11 +195,10 @@ export default {
    min-height: 100px;
 }
 .heading {
-   background-color: var(--color-brand-blue);
+   background-color: var(--uvalib-brand-blue);
    text-align: left;
    padding: 5px 10px;
    color: white;
-   border-radius: 5px 5px 0 0;
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
@@ -210,7 +210,7 @@ i.global {
 }
 dl  {
    margin: 0;
-   color: #444;
+   color: var(--uvalib-text-dark);
 }
 dt {
    font-weight: bold;
@@ -221,21 +221,21 @@ dt:first-child {
 }
 dd {
    cursor: pointer;
-   font-size: 0.8em;
+   font-size: 0.95em;
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
-   padding: 3px 2px;  
+   padding: 3px 2px;
    margin-left: 15px;
 }
 i.check {
    margin-right: 10px;
-   color: var(--color-brand-blue);
-   font-size: 1.25em;
+   color: var(--uvalib-text);
+   font-size: 1.2em;
 }
 .working {
-   color: var(--uvalib-grey-dark);
+   color: var(--uvalib-text);
    text-align: center;
    background: white;
    position: absolute;
@@ -257,7 +257,7 @@ i.check {
 }
 .expanded-item {
    padding: 3px 0;
-   display: flex; 
+   display: flex;
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
@@ -274,10 +274,10 @@ i.check {
 }
 .facet-sidebar.overlay {
    position: fixed;
-   left: 5px;
-   right: 5px;
+   left: 0px;
+   right: 0px;
    z-index: 5000;
-   bottom: 5px;
+   bottom: 0px;
    padding: 0;
    margin: 0;
    display: flex;
@@ -287,28 +287,29 @@ i.check {
 }
 div.global.overlay {
    margin: 0;
-   border: 2px solid var(--color-brand-blue);
    flex: 1 1 auto;
    margin-right: 5px;
+   border: none;
 }
 div.pool.overlay {
    margin: 0;
-   border: 2px solid var(--color-brand-blue);
    flex: 1 1 auto;
+   border: none;
 }
 div.pool.overlay .body {
    max-height: 450px;
    overflow: scroll;
 }
 div.pool.overlay .body,  div.global.overlay .body {
-   border: 5px solid var(--color-brand-orange);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 span.cnt {
-   margin-left: 5px; 
+   margin-left: 5px;
    margin-left: auto;
+   font-size: 0.8em;
 }
 </style>
-<style> 
+<style>
 #app .accordion.filter .title {
    padding: 5px 10px;
 }

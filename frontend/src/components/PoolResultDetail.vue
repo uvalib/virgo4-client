@@ -72,7 +72,7 @@ export default {
          var scrollStep = -window.scrollY / (500 / 10),
          scrollInterval = setInterval(()=> {
             if ( window.scrollY != 0 ) {
-               window.scrollBy( 0, scrollStep ) 
+               window.scrollBy( 0, scrollStep )
             } else {
                clearInterval(scrollInterval)
             }
@@ -86,7 +86,7 @@ export default {
             this.$store.dispatch("moreResults").finally( ()=> {
                 this.loadingMore = false
             })
-         } 
+         }
       },
       scrollChecker() {
          if (window.window.scrollY > 1500) {
@@ -107,38 +107,36 @@ export default {
 
 <style scoped>
 .desc  {
-   padding: 5px;
+   padding: 10px;
+   border-left: 1px solid var(--uvalib-brand-blue);
+   border-right: 1px solid var(--uvalib-brand-blue);
    font-size: 0.9em;
-}
-.filters {
-   border-radius: 5px 5px 0 0;
 }
 .pool-results {
    border: 0;
-   border-radius: 5px;
-   background-color: var(--color-brand-blue);
    position: relative;
    top: -5px;
 }
 div.results-header {
    font-size: 1em;
    color: white;
-   background: var(--color-brand-blue);
-   margin:0;
+   background: var(--uvalib-brand-blue);
+   margin: 0 5px;
    text-align: left;
-   padding: 5px 5px 0 5px;
-   border-radius: 5px 5px 0 0;
-   margin-bottom: 0px;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   margin-bottom: 1rem;
 }
 .pool-name {
    font-weight: bold;
 }
 .hits-content {
    text-align: left;
-   margin: 0;
+   margin: 20px 0;
 }
 .hit-wrapper {
-   margin: 5px;
+   margin: 0 5px 20px 5px;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   margin-bottom: 1rem;
 }
 .hit-wrapper:last-child {
    margin-bottom: 0;
@@ -169,8 +167,8 @@ div.results-header {
 }
 .see-more, .no-more {
    padding: 10px;
-   background: var(--color-brand-blue);
-   border: 5px solid var(--color-brand-blue);
+   background: var(--uvalib-brand-blue);
+   border: 5px solid var(--uvalib-brand-blue);
    color: white;
    cursor: pointer;
    font-weight: bold;
