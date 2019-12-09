@@ -11,6 +11,7 @@ const system = {
       searchAPI: "",
       seenTranslateMsg: false,
       translateMessage: "",
+      sessionMessage: "",
       displayWidth: window.innerWidth,
    },
 
@@ -24,6 +25,13 @@ const system = {
    },
 
    mutations: {
+      setSessionExpiredMessage(state) {
+         let link = "<a href='/signin'>here</a>"
+         state.sessionMessage = `Your Virgo session has expired. Click ${link} to sign in again.`
+      },
+      clearSessionMessage(state) {
+         state.sessionMessage = ""
+      },
       setDisplayWidth(state, w) {
          state.displayWidth = w
       },

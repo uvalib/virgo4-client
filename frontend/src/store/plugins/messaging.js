@@ -6,6 +6,9 @@ const messaging = store => {
         setTimeout(() => { store.commit('system/setError', "") }, 10000)
       }
     } 
+    if (mutation.type === "system/setSessionExpiredMessage") {
+      setTimeout(() => { store.commit('system/clearSessionMessage', "") }, 10000)
+    } 
   })
 }
 

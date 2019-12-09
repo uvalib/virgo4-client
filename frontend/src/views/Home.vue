@@ -37,6 +37,11 @@
           leave-active-class="animated faster fadeOut">
         <p v-if="error" class="error">{{ error }}</p>
       </transition>
+      <transition name="message-transition"
+          enter-active-class="animated faster fadeIn"
+          leave-active-class="animated faster fadeOut">
+        <p v-if="sessionMessage" class="session" v-html="sessionMessage"></p>
+      </transition>
       <SearchResults v-if="hasResults"/>
    </main>
 </template>
@@ -64,7 +69,8 @@ export default {
          showDebug: state => state.showDebug,
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
-         translateMessage: state => state.system.translateMessage
+         translateMessage: state => state.system.translateMessage,
+         sessionMessage: state => state.system.sessionMessage
       }),
       ...mapGetters({
         hasResults: 'hasResults',
@@ -198,5 +204,13 @@ div.tips-container {
 div.translate-message {
   margin: 5px 0 15px 0;
   font-size: 0.85em;
+}
+p.session {
+  display: inline-block;
+  background: var(--uvalib-blue-alt-light);
+  padding: 10px 35px;
+  border-radius: 5px;
+  border: 2px solid var(--color-brand-blue);
+  box-shadow: 1px 1px 5px #aaa;
 }
 </style>

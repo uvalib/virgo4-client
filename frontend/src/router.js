@@ -130,6 +130,7 @@ router.beforeEach((to, _from, next) => {
     if (getSignedInUserFromCookie()) {
       next()
     } else {
+      store.commit('system/setSessionExpiredMessage')
       next("/") 
     }
     return
