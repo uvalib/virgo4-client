@@ -12,27 +12,62 @@
          <div class="details">
             <template v-if="requests.length > 0">
                <div class="request" v-for="(req,idx) in requests" :key="idx">
-                  <h3 class="title">{{req.loanTitle}}</h3>
-                  <dl>
-                     <dt>Author:</dt>
-                     <dd>{{req.loanAuthor}}</dd>
-                     <dt>Call Number:</dt>
-                     <dd>{{req.callNumber}}</dd>
-                     <dt>Transaction Number:</dt>
-                     <dd>{{req.transactionNumber}}</dd>
-                     <dt>Date Requested:</dt>
-                     <dd>{{formatDate(req.creationDate)}}</dd>
-                     <template v-if="req.wantedBy">
-                        <dt>Wanted By:</dt>
-                        <dd>{{req.wantedBy}}</dd>
-                     </template>
-                     <template v-if="req.notWantedAfter">
-                        <dt>Not Wanted After:</dt>
-                        <dd>{{req.notWantedAfter}}</dd>
-                     </template>
-                     <dt>Status:</dt>
-                     <dd>{{req.transactionStatus}}</dd>
-                  </dl>
+                  <template v-if="req.requestType == 'Loan'">
+                     <h3 class="title">{{req.loanTitle}}</h3>
+                     <dl>
+                        <dt>Author:</dt>
+                        <dd>{{req.loanAuthor}}</dd>
+                        <dt>Call Number:</dt>
+                        <dd>{{req.callNumber}}</dd>
+                        <dt>Transaction Number:</dt>
+                        <dd>{{req.transactionNumber}}</dd>
+                        <dt>Date Requested:</dt>
+                        <dd>{{formatDate(req.creationDate)}}</dd>
+                        <dt>Status:</dt>
+                        <dd>{{req.transactionStatus}}</dd>
+                     </dl>
+                  </template>
+                  <template v-else>
+                     <h3 class="title">{{req.photoJournalTitle}}</h3>
+                     <dl>
+                        <dt>Author:</dt>
+                        <dd>{{req.photoArticleAuthor}}</dd>
+                        <template v-if="req.photoArticleTitle">
+                           <dt>Article Title:</dt>
+                           <dd>{{req.photoArticleTitle}}</dd>
+                        </template>
+                        <template v-if="req.photoJournalVolume">
+                           <dt>Volume:</dt>
+                           <dd>{{req.photoJournalVolume}}</dd>
+                        </template>
+                        <template v-if="req.photoJournalVolume">
+                           <dt>Issue:</dt>
+                           <dd>{{req.photoJournalIssue}}</dd>
+                        </template>
+                        <template v-if="req.photoJournalMonth">
+                           <dt>Month:</dt>
+                           <dd>{{req.photoJournalMonth}}</dd>
+                        </template>
+                         <template v-if="req.photoIssueYear">
+                           <dt>Year:</dt>
+                           <dd>{{req.photoIssueYear}}</dd>
+                        </template>
+                        <template v-if="req.photoJournalInclusivePages">
+                           <dt>Pages:</dt>
+                           <dd>{{req.photoJournalInclusivePages}}</dd>
+                        </template>
+                        <dt>Call Number:</dt>
+                        <dd>{{req.callNumber}}</dd>
+                        <dt>Transaction Number:</dt>
+                        <dd>{{req.transactionNumber}}</dd>
+                        <dt>Date Requested:</dt>
+                        <dd>{{formatDate(req.creationDate)}}</dd>
+                        <dt>Status:</dt>
+                        <dd>{{req.transactionStatus}}</dd>
+                        <dt>PDF Download:</dt>
+                        <dd v-html="getDownloadLink(req)"></dd>
+                     </dl>
+                  </template>
                </div>
             </template>
             <template v-else>
@@ -68,6 +103,11 @@ export default {
    methods: {
       formatDate(date) {
          return date.split("T")[0];
+      },
+      getDownloadLink( req ) {
+         let url =  `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`
+         let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`
+         return `<a href='${url}' target='_blank'>${icon}Download</a>`
       }
    },
    created() {

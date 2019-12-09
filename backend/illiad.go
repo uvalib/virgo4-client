@@ -26,16 +26,22 @@ func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 	}
 
 	var resp []struct {
-		TransactionNumber int    `json:"transactionNumber"`
-		TransactionStatus string `json:"transactionStatus"`
-		CreationDate      string `json:"creationDate"`
-		RequestType       string `json:"requestType"`
-		CallNumber        string `json:"callNumber"`
-		ReferenceNumber   string `json:"referenceNumber"`
-		LoanTitle         string `json:"loanTitle"`
-		LoanAuthor        string `json:"loanAuthor"`
-		WantedBy          string `json:"wantedBy"`
-		NotWantedAfter    string `json:"notWantedAfter"`
+		TransactionNumber          int    `json:"transactionNumber"`
+		TransactionStatus          string `json:"transactionStatus"`
+		CreationDate               string `json:"creationDate"`
+		RequestType                string `json:"requestType"`
+		CallNumber                 string `json:"callNumber"`
+		ReferenceNumber            string `json:"referenceNumber"`
+		LoanTitle                  string `json:"loanTitle,omitempty"`
+		LoanAuthor                 string `json:"loanAuthor,omitempty"`
+		PhotoJournalTitle          string `json:"photoJournalTitle,omitempty"`
+		PhotoArticleAuthor         string `json:"photoArticleAuthor,omitempty"`
+		PhotoArticleTitle          string `json:"photoArticleTitle,omitempty"`
+		PhotoJournalVolume         string `json:"photoJournalVolume,omitempty"`
+		PhotoJournalIssue          string `json:"photoJournalIssue,omitempty"`
+		PhotoJournalMonth          string `json:"photoJournalMonth,omitempty"`
+		PhotoIssueYear             string `json:"photoIssueYear,omitempty"`
+		PhotoJournalInclusivePages string `json:"photoJournalInclusivePages,omitempty"`
 	}
 	if err := json.Unmarshal(respBytes, &resp); err != nil {
 		log.Printf("ERROR: unable to parse ILLiad response: %s", err.Error())

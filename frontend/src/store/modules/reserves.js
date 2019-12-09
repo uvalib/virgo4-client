@@ -88,7 +88,6 @@ const reserves = {
       createReserves(ctx) {
          ctx.commit('setSearching', true, { root: true })
          let v4UserID = ctx.rootState.user.signedInUser
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          let data = {userID: v4UserID, request: ctx.state.request, items: []}
          ctx.state.requestList.forEach( item=>{
             let notes = item.notes
@@ -117,7 +116,6 @@ const reserves = {
          ctx.commit('setSearching', true, { root: true })
          ctx.commit('setNoMatch',false)
          ctx.commit('setCourseSearch')
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          let typeParam = "type=COURSE_NAME"
          if (type == "id") {
             typeParam = "type=COURSE_ID"
@@ -149,7 +147,6 @@ const reserves = {
                qs = `"${qs}"`
             }
          }
-         axios.defaults.headers.common['Authorization'] = "Bearer "+ctx.rootState.user.authToken
          axios.get(`/api/reserves/search?${typeParam}&query=${qs}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
