@@ -8,7 +8,6 @@ const query = {
       basicSearchScope: {name: 'All Sources', id: 'all'},
       advanced: [
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
-         {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
       ],
       advancedFields: [
          { value: "keyword", label: "Keyword"},
@@ -17,7 +16,8 @@ const query = {
          { value: "author", label: "Author"},
          { value: "subject", label: "Subject"},
          { value: "date", label: "Date"}
-      ]
+      ],
+      lastSearch: ""
    },
    getters: {
       getField,
@@ -74,9 +74,13 @@ const query = {
        },
       setAdvancedSearch(state) {
          state.mode = "advanced"
-         state.advanced = [
-            {op: "AND", value: state.basic, field: "keyword", type: "EQUAL", endVal: ""},
-            {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""}]
+         let exist = state.advanced.findIndex( f=> f.value == state.basic)
+         if (exist == -1) {
+            if (state.advanced.length == 1 && state.advanced[0].value == "") {
+               state.advanced[0].value  = state.basic   
+               state.advanced[0].field = "keyword"
+            }
+         }
        },
        setBasicSearch(state) {
          state.mode = "basic"
@@ -88,12 +92,16 @@ const query = {
          state.advanced.splice(idx,1)
        },
       clear(state) {
+         state.lastSearch = ""
          state.mode = "basic"
          state.basic = ""
          state.basicSearchScope = {name: 'All Sources', id: 'all'},
          state.advanced = [
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""}]
+      },
+      setLastSearch(state, qs) {
+         state.lastSearch = qs   
       }
    }
 }

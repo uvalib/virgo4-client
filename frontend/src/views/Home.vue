@@ -73,6 +73,7 @@ export default {
          sessionMessage: state => state.system.sessionMessage
       }),
       ...mapGetters({
+        rawQueryString: 'query/string',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
         isSignedIn: 'user/isSignedIn',
@@ -98,6 +99,7 @@ export default {
    },
    methods: {
       searchClicked() {
+        this.$store.commit('query/setLastSearch', this.rawQueryString)
         this.$store.commit('filters/reset')
         this.$store.commit('resetOtherSourceSelection')
         this.$store.dispatch("searchAllPools")

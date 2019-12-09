@@ -56,7 +56,6 @@ export default {
    },
    computed: {
       ...mapGetters({
-         rawQueryString: 'query/string',
          hitPoolCount: 'hitPoolCount',
          skippedPoolCount: 'skippedPoolCount',
          failedPoolCount: 'failedPoolCount',
@@ -68,12 +67,13 @@ export default {
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
+         lastSearch: state=>state.query.lastSearch,
       }),
       ...mapFields([
         'otherSrcSelection'
       ]),
       queryString() {
-         return this.rawQueryString.replace(/\{|\}/g, "")
+         return this.lastSearch.replace(/\{|\}/g, "")
       },
       otherSrcBkg() {
          if (this.otherSrcSelection.id == "") return "#FFF"

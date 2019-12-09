@@ -210,7 +210,7 @@ export default new Vuex.Store({
         filters: rootGetters['filters/globalFilter']
       }
 
-      if (rootState.query.basicSearchScope.id != "all") {
+      if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
         let tgtID = rootState.query.basicSearchScope.id
         req.preferences.exclude_pool = []
         rootState.pools.list.forEach( src=> {

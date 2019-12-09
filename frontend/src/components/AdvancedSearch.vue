@@ -92,7 +92,8 @@ export default {
       ...mapGetters({
          queryEntered: "query/queryEntered",
          sources: "pools/sortedList",
-         isPoolExcluded: "preferences/isPoolExcluded"
+         isPoolExcluded: "preferences/isPoolExcluded",
+         rawQueryString: 'query/string',
       }),
       ...mapMultiRowFields("query", ["advanced"])
    },
@@ -105,6 +106,7 @@ export default {
       doAdvancedSearch() {
          if (this.queryEntered) {
             // this is a new search, reset filters
+            this.$store.commit('query/setLastSearch', this.rawQueryString)
             this.$store.commit('filters/reset')
             this.$store.commit('resetOtherSourceSelection')
             this.$store.dispatch("searchAllPools")
@@ -116,10 +118,7 @@ export default {
          }
       },
       basicClicked() {
-         this.$store.commit("query/clear")
-         this.$store.commit('filters/reset')
-         this.$store.commit('resetOtherSourceSelection')
-         this.$store.commit("resetSearchResults")
+         this.$store.commit("query/setBasicSearch")
       },
       addClicked() {
          this.$store.commit("query/addCriteria");
