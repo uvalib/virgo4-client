@@ -124,7 +124,8 @@ router.beforeEach((to, _from, next) => {
   }
 
   // Some pages require a signed in user...
-  let userPages = ["preferences", "account", "bookmarks", "checkouts", "course-reserves-request"]
+  let userPages = ["preferences", "account", "bookmarks", "checkouts", 
+    "course-reserves-request", "requests"]
   if (userPages.includes(to.name)) {
     if (getSignedInUserFromCookie()) {
       next()
