@@ -172,6 +172,7 @@ export default {
   background-color: white;
   border-left: 1px solid var(--uvalib-grey-light);
   border-right: 1px solid var(--uvalib-grey-light);
+  color: var(--uvalib-text-dark);
 }
 .v4-select .option:last-child {
   border-bottom: 1px solid var(--uvalib-grey-light);
