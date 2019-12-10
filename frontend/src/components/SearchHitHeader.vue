@@ -3,12 +3,12 @@
       <div class="full-title">
          <span v-if="count>0" class="count">{{count}}.</span>
          <template v-if="link == false">
-            <span class="title">{{hit.header.title}}</span>
-            <span v-if="hit.header.subtitle" class="subtitle">{{hit.header.subtitle}}</span>
+            <span class="hit-title">{{hit.header.title}}</span>
+            <span v-if="hit.header.subtitle" class="hit-subtitle">{{hit.header.subtitle}}</span>
          </template>
          <router-link v-else :to="detailsURL">
-            <span class="title">{{hit.header.title}}</span>
-            <span v-if="hit.header.subtitle" class="subtitle">{{hit.header.subtitle}}</span>
+            <span class="hit-title">{{hit.header.title}}</span>
+            <span v-if="hit.header.subtitle" class="hit-subtitle">{{hit.header.subtitle}}</span>
          </router-link>
       </div>
       <div class="bm-control">
@@ -68,14 +68,14 @@ div.bm-control {
    padding: 5px;
 }
 
-.title {
+.hit-title {
    font-weight: bold;
    display: inline-block;
+   margin-right: 5px;
 }
-.subtitle {
+.hit-subtitle {
    display: inline-block;
    font-weight: normal;
-   margin-left: 5px;
 }
 .full-title {
    font-size: 1.25em;

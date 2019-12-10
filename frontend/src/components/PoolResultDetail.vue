@@ -24,7 +24,6 @@
          <span v-if="loadingMore"><img src="../assets/searching.gif"></span>
          <span v-else>Load More Results</span>
       </div>
-      <div v-else class="no-more"></div>
    </div>
 </template>
 

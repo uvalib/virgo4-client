@@ -75,13 +75,17 @@ export default {
          if ( Array.isArray(field.value)) {
             if (field.type == "url") {
                let out = []
-               field.value.forEach( v => {
-                  let url = `<a href="${v}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
+               field.value.forEach( (v,idx) => {
+                  let url = `<a href="${v}" target="_blank">`
+                  if ( idx === 0) {
+                     url += `<i style="margin-right: 5px;" class="more fas fa-link"></i>`
+                  }
+                  url += `External Link #${idx+1}</a>`
                   out.push( url )
                })
-               return out.join(",<br/>")
+               return out.join(",&nbsp;&nbsp;")
             }
-            return field.value.join(",<br>")
+            return field.value.join(",&nbsp;")
          }
          if (field.type == "url") {
             return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
