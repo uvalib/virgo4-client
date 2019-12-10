@@ -163,6 +163,7 @@ body {
 .pure-button.pure-button-tertiary {
    margin: 0 0 0 10px;
    border-radius: 5px;
+   font-weight: normal;
 }
 .pure-button.disabled {
    cursor: default;
