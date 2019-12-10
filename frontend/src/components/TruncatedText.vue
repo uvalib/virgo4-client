@@ -47,9 +47,6 @@ export default {
       },
       truncatedText() {
          let out =  truncate(this.text, this.limit, { ellipsis: '' })
-         if ( this.tgtURL) {
-            console.log(`ORIG [${this.text}] vs [${out}]`)
-         }
          return out
       }
    },
