@@ -1,14 +1,19 @@
 <template>
    <div class="hit">
-      <SearchHitHeader :count="count" :hit="hit" :pool="pool"/>
+      <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">
-            <div v-if="hit.header.author" class="author">{{hit.header.author.join("; ")}}</div>
+            <div v-if="hit.header.author" class="author">
+               <TruncatedText title="Author" :text="hit.header.author.join('; ')" :limit="60" />
+            </div>
             <dl class="fields">
                <template v-for="(field) in hit.basicFields">
                   <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,'k')">{{field.label}}:</dt>
-                     <dd :key="getKey(field,'v')" v-html="fieldValueString(field)"></dd>
+                     <dd :key="getKey(field,'v')" >
+                        <div v-if="field.type == 'url'" v-html="fieldValueString(field)"></div>
+                        <TruncatedText v-else :title="field.label" :text="fieldValueString(field)" :limit="60" />
+                     </dd>
                   </template>
                </template>
             </dl>
@@ -32,6 +37,7 @@ import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import AccordionContent from '@/components/AccordionContent'
 import GroupedSearchHit from '@/components/GroupedSearchHit'
+import TruncatedText from '@/components/TruncatedText'
 export default {
    props: {
       hit: { type: Object, required: true},
@@ -39,7 +45,7 @@ export default {
       count: {type: Number, required: true}
    },
    components: {
-      SearchHitHeader, AccordionContent, GroupedSearchHit
+      SearchHitHeader, AccordionContent, GroupedSearchHit, TruncatedText
    },
    computed: {
       detailsURL() {
@@ -68,13 +74,17 @@ export default {
          if ( Array.isArray(field.value)) {
             if (field.type == "url") {
                let out = []
-               field.value.forEach( v => {
-                  let url = `<a href="${v}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
+               field.value.forEach( (v,idx) => {
+                  let url = `<a href="${v}" target="_blank">`
+                  if ( idx === 0) {
+                     url += `<i style="margin-right: 5px;" class="more fas fa-link"></i>`
+                  }
+                  url += `External Link #${idx+1}</a>`
                   out.push( url )
                })
-               return out.join(",<br/>")
+               return out.join(",&nbsp;&nbsp;")
             }
-            return field.value.join(", ")
+            return field.value.join(",&nbsp;")
          }
          if (field.type == "url") {
             return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
