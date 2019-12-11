@@ -1,5 +1,5 @@
 <template>
-   <main class="details">
+   <div class="details">
       <h1>Item Details</h1>
       <div class="details-content">
          <div class="working" v-if="details.searching" >
@@ -32,7 +32,7 @@
          </template>
          <BackToVirgo  />
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

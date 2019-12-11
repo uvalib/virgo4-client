@@ -1,5 +1,5 @@
 <template>
-   <main class="not-found">
+   <div class="not-found">
       <h1>Page Not Found</h1>
       <div class="messages">
          <p><b>Sorry!</b></p>
@@ -24,7 +24,7 @@
          </div>
          <BackToVirgo />
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

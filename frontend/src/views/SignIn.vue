@@ -1,5 +1,5 @@
 <template>
-   <main class="signin">
+   <div class="signin">
       <h1>User Sign In</h1>
       <div class="sign-in-content">
          <div class="netbadge">
@@ -34,7 +34,7 @@
             </div>
          </div>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

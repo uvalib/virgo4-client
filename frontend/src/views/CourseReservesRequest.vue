@@ -1,5 +1,5 @@
 <template>
-   <main class="course-reserves-request">
+   <div class="course-reserves-request">
       <h1>Course Reserves Request</h1>
       <div v-if="requestList.length==0" class="reserves-content">
          <p>You currently have no items selected for course reserves.</p>
@@ -127,7 +127,7 @@
             </span>
          </div>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

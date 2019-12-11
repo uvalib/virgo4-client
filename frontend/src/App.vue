@@ -8,9 +8,11 @@
       <transition name="fade">
          <AddBookmarkModal v-if="addingBookmark" />
       </transition>
-      <VirgoHeader />
-      <MenuBar />
-      <router-view />
+      <VirgoHeader :id="headerID" />
+      <MenuBar :id="menuID" v-bind:style="{transform: `translateY(-${scrollPos}px)`}"/>
+      <main class="v4-content" v-bind:style="{'padding-top': menuHeight+'px'}">
+         <router-view />
+      </main>
       <LibraryFooter v-if="isKiosk == false"/>
    </div>
 </template>
@@ -25,6 +27,15 @@ import AddBookmarkModal from "@/components/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {
+   data: function() {
+      return {
+         menuHeight: 0,
+         menuID: "v4-navbar",
+         headerHeight: 0,
+         headerID: "v4-header",
+         scrollPos: 0,
+      };
+   },
    components: {
       VirgoHeader,
       LibraryFooter,
@@ -51,12 +62,27 @@ export default {
    methods: {
       closeUserMenu() {
          this.$store.commit("system/closeUserMenu");
+      },
+      scrollHandler( ) {
+         if ( window.scrollY <= this.headerHeight ) {
+            this.scrollPos = window.scrollY
+         } else {
+            this.scrollPos = this.headerHeight
+         }
       }
    },
    mounted() {
+      setTimeout( ()=>{
+         this.menuHeight = document.getElementById(this.menuID).offsetHeight
+         this.headerHeight = document.getElementById(this.headerID).offsetHeight
+      }, 250)
+      window.addEventListener("scroll", this.scrollHandler)
       window.onresize = () => {
          this.$store.commit("system/setDisplayWidth",window.innerWidth)
       };
+   },
+   destroyed: function() {
+      window.removeEventListener("scroll", this.scrollHandler)
    }
 };
 </script>
@@ -137,6 +163,14 @@ body {
    background-color: var(--color-dark-blue);
 }
 
+#v4-navbar {
+   transition-duration: 0ms;
+   position: fixed;
+   left: 0;
+   right: 0;
+   z-index: 500;
+   box-sizing: border-box;
+}
 .pure-button.pure-button-primary {
    background-color: var(--uvalib-brand-blue-light);
 }

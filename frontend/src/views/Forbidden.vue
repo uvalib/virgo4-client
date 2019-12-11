@@ -1,5 +1,5 @@
 <template>
-   <main class="forbidden">
+   <div class="forbidden">
       <h1>Authentication Failed</h1>
       <div class="messages">
          <p><b>Sorry!</b></p>
@@ -7,7 +7,7 @@
             Authentication for your account has failed.
          </p>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

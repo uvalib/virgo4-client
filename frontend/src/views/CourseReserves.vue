@@ -1,5 +1,5 @@
 <template>
-   <main class="course-reserves">
+   <div class="course-reserves">
       <h1>Course Reserves</h1>
       <div class="reserves-content">
          <SearchingOverlay message="Looking up reserved items..."/>
@@ -23,7 +23,7 @@
          <CourseSearchResults v-if="hasCourseResults"/>
          <InstructorSearchResults v-if="hasInstructorResults"/>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

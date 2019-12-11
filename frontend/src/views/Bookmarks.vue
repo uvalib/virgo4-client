@@ -1,5 +1,5 @@
 <template>
-   <main class="bookmarks">
+   <div class="bookmarks">
       <h1>My Account</h1>
       <div class="bookmarks-content">
          <AccountActivities />
@@ -116,7 +116,7 @@
             </transition>
          </div>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>
