@@ -1,5 +1,5 @@
 <template>
-   <main class="reserved">
+   <div class="reserved">
       <h1>Course Reserves Request</h1>
       <div class="messages">
          <p><b>Thank you for your course reserves request.</b><br/>A copy of your request has been emailed to you.</p>
@@ -8,7 +8,7 @@
             and clicking the Course Reserves menu option.</p>
          <BackToVirgo />
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

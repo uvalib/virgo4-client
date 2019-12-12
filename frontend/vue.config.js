@@ -52,9 +52,9 @@ module.exports = {
   },
   configureWebpack: {
     performance: {
-      // bump max sizes to 512k
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000
+      // bump max sizes to 1024
+      maxEntrypointSize: 1024000,
+      maxAssetSize: 1024000
     }
   }
 }

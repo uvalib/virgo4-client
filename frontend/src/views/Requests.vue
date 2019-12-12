@@ -1,5 +1,5 @@
 <template>
-   <main class="requests">
+   <div class="requests">
       <h1>Requests</h1>
       <div class="requests-content">
          <AccountActivities />
@@ -82,7 +82,7 @@
             </transition>
          </div>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-   <main class="checkout">
+   <div class="checkout">
       <h1>My Account</h1>
       <div class="checkout-content">
          <AccountActivities/>
@@ -55,7 +55,7 @@
             </transition>
          </div>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

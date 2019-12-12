@@ -6,8 +6,8 @@
          </router-link>
          <div v-else v-html="truncatedText"></div>
       </div>
-      <v-popover v-if="isTruncated" class="full" :show="test">
-         <i class='trigger click more'>More...</i>
+      <v-popover v-if="isTruncated" class="full">
+         <i class='trigger click more'>More</i>
          <div class="full-text-popover" slot="popover">
             <div v-if="title" class="popover-header">
                {{title}}
@@ -20,7 +20,6 @@
 </template>
 
 <script>
-const truncate = require('html-truncate')
 export default {
    props: {
       title: {
@@ -46,14 +45,13 @@ export default {
          return this.text != test
       },
       truncatedText() {
-         let out =  truncate(this.text, this.limit, { ellipsis: '' })
-         return out
+         if (this.text.length <= this.limit) return this.text
+         var trunc = this.text.substr(0, this.limit-1)
+         var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()
+         return out+"... "
       }
    },
    methods: {
-      test() {
-         alert("hey")
-      }
    }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-   <main class="home">
+   <div class="home">
       <div class="tips-container">
           <SearchTips/>
       </div>
@@ -43,7 +43,7 @@
         <p v-if="sessionMessage" class="session" v-html="sessionMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
-   </main>
+   </div>
 </template>
 
 <script>

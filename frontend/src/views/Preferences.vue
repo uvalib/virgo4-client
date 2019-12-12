@@ -1,5 +1,5 @@
 <template>
-   <main class="preferences">
+   <div class="preferences">
       <h1>My Account</h1>
       <div class="preferences-content">
          <AccountActivities/>
@@ -42,7 +42,7 @@
             </transition>
          </div>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>

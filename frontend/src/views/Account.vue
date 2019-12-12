@@ -1,5 +1,5 @@
 <template>
-   <main class="account">
+   <div class="account">
       <h1>My Account</h1>
       <div class="account-content">
          <AccountActivities/>
@@ -125,7 +125,7 @@
             <p v-if="error" class="error">Unable to retrieve account information: {{ error }}</p>
          </transition>
       </div>
-   </main>
+   </div>
 </template>
 
 <script>
