@@ -173,9 +173,11 @@ body {
 }
 .pure-button.pure-button-primary {
    background-color: var(--uvalib-brand-blue-light);
+   border: 1px solid var(--uvalib-brand-blue-light);
 }
 .pure-button.pure-button-primary:hover {
    background-color: var(--uvalib-brand-blue-lighter);
+   border: 1px solid var(--uvalib-brand-blue-lighter);
 }
 .pure-button.pure-button-secondary {
    background-color: var(--uvalib-brand-blue-lighter);
