@@ -22,7 +22,7 @@
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
          </router-link>
       </div>
-      <AccordionContent v-if="hit.grouped" :title="groupTitle" 
+      <AccordionContent v-if="hit.grouped" :title="groupTitle"
          class="group" :autoCollapseOn="searching">
          <div class="group-item-wrapper" v-for="(groupHit,idx) in hit.group" :key="idx">
             <GroupedSearchHit :pool="pool" :hit="groupHit" :key="idx"/>
@@ -66,8 +66,8 @@ export default {
          return this.hit.identifier+field.value+idx
       },
       shouldDisplay(field) {
-         if (field.display == 'optional') return false 
-         if ( this.isKiosk && field.type == "url") return false 
+         if (field.display == 'optional') return false
+         if ( this.isKiosk && field.type == "url") return false
          return true
       },
       fieldValueString( field ) {
@@ -144,12 +144,12 @@ div.basic {
    max-height: 124px;
    max-width: 100px;
 }
-dl { 
-   margin-top: 0; 
-   margin-left: 15px; 
-   display: inline-grid; 
-   grid-template-columns: max-content 2fr; 
-   grid-column-gap: 15px; 
+dl {
+   margin-top: 0;
+   margin-left: 15px;
+   display: inline-grid;
+   grid-template-columns: max-content 2fr;
+   grid-column-gap: 15px;
 }
 dt {
    font-weight: bold;
@@ -163,13 +163,12 @@ dd {
    border: 1px solid #ccc;
    border-radius: 5px;
    margin: 10px;
-   background: white;
 }
 </style>
-<style> 
+<style>
 #app .accordion.group .title {
    padding: 5px 10px;
    font-weight: bold;
-   border-radius: 5px
+   border-radius: 5px;
 }
 </style>

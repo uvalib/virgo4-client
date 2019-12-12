@@ -185,7 +185,7 @@ p.relevant {
    padding: 4px 8px;
    border-radius: 5px 5px 0 0;
    color: var(--uvalib-text-dark);
-   border: 1px solid var(--uvalib-grey-lightest);
+   border: 1px solid var(--uvalib-grey-light);
    text-align: left;
    flex: 1 1 auto;
    background: #FFF;
