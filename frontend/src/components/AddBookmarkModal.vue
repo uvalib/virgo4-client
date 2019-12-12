@@ -12,16 +12,12 @@
          <div>{{authorText}}</div>
          <div class="select">
             <label>Select a folder for the bookmark: </label>
-            <multiselect v-model="selectedFolder" class="folders"
-                  placeholder="Select or create a folder"
-                  :showLabels="false"
-                  :searchable="true"
-                  :taggable="true"
-                  track-by="id" label="name"
-                  tagPlaceholder="Press enter to create a new folder"
-                  @tag="addFolder"
-                  :options="folders">
-            </multiselect>
+               <select v-model="selectedFolder" id="folder" name="folder">
+                  <option v-for="(folder) in folders" selected=false
+                     :key="folder.id" :value="folder.name ">
+                     {{ folder.name }}
+                  </option>
+               </select>
          </div>
          <p class="error">{{bookmarkError}}</p>
       </div>
@@ -35,15 +31,11 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import Multiselect from 'vue-multiselect'
 export default {
-   components: {
-      Multiselect
-   },
    data: function() {
       return {
          lookingUp: true,
-         selectedFolder: null,
+         selectedFolder: "",
          bookmarkError: ""
       };
    },
@@ -52,7 +44,7 @@ export default {
          newBookmark: state => state.user.newBookmarkInfo,
       }),
        ...mapGetters({
-         folders: 'user/folders',
+         folders: 'user/bookmarkFolders',
       }),
       authorText() {
          let author = ""
@@ -63,26 +55,13 @@ export default {
       }
    },
    methods: {
-      addFolder(newFolder) {
-         this.$store.dispatch("user/addFolder", newFolder).then( () => {
-            this.folders.some( (f)=> {
-               if (f.name == newFolder) {
-                  this.selectedFolder = f
-                  return true
-               }
-               return false
-            })
-         }).catch((error) => {
-            this.bookmarkError = error
-         })
-      },
       okBookmark() {
          this.bookmarkError = ""
          if ( !this.selectedFolder) {
             this.bookmarkError = "A bookmark folder selection is required"
             return
          }
-         this.$store.dispatch("user/addBookmark", this.selectedFolder.name).then( () => {
+         this.$store.dispatch("user/addBookmark", this.selectedFolder).then( () => {
             this.$store.commit("user/closeAddBookmark")
          }).catch((error) => {
             this.bookmarkError = error
@@ -100,7 +79,7 @@ export default {
          this.folders.some( fobj=> {
             if (fobj.name == "General") {
                found = true
-               this.selectedFolder = fobj
+               this.selectedFolder = fobj.name
             }
             return found == true
          })
@@ -109,17 +88,6 @@ export default {
 }
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style>
-.multiselect .multiselect__option {
-  background: white;
-  color: var(--uvalib-text);
-}
-.multiselect .multiselect__option--highlight {
-  background: var(--uvalib-grey-light);
-  color: var(--uvalib-text);
-}
-</style>
 <style scoped>
 div.add-bookmark {
    color: var(--uvalib-text);
@@ -176,5 +144,8 @@ label {
    font-weight: normal;
    display: block;
    margin-bottom: 10px;
+}
+#folder {
+   width: 100%;
 }
 </style>
