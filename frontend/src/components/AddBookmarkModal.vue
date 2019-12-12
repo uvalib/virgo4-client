@@ -26,7 +26,7 @@
          <p class="error">{{bookmarkError}}</p>
       </div>
       <div class="controls">
-         <span @click="cancelBookmark" class="pure-button pure-button-secondary">Cancel</span>
+         <span @click="cancelBookmark" class="pure-button pure-button-tertiary">Cancel</span>
          <span @click="okBookmark" class="pure-button pure-button-primary">OK</span>
       </div>
    </div>
@@ -110,10 +110,19 @@ export default {
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style>
+.multiselect .multiselect__option {
+  background: white;
+  color: var(--uvalib-text);
+}
+.multiselect .multiselect__option--highlight {
+  background: var(--uvalib-grey-light);
+  color: var(--uvalib-text);
+}
+</style>
 <style scoped>
 div.add-bookmark {
-   font-size: 0.9em;
-   color: #444;
+   color: var(--uvalib-text);
    position: fixed;
    width: 40%;
    height: auto;
@@ -122,11 +131,11 @@ div.add-bookmark {
    background: white;
    left: 50%;
    transform: translate(-50%, 0%);
-   box-shadow: 1px 1px 10px #444;
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
    border-radius: 5px;
 }
 p.error {
-   color: var(--color-error);
+   color: var(--uvalib-red-emergency);
    text-align: center;
 }
 @media only screen and (min-width: 768px) {
@@ -144,11 +153,11 @@ div.content {
    text-align: left;
 }
 div.modal-title {
-   background: var(--color-primary-orange);
+   background: var(--uvalib-teal-lightest);
    font-size: 1.1em;
-   color:white;
+   color: var(--uvalib-text-dark);
    font-weight: bold;
-   padding: 4px;
+   padding: 10px;
    border-radius: 5px 5px 0 0;
 }
 div.controls {
@@ -160,7 +169,7 @@ div.controls .pure-button {
 }
 div.select {
    margin-top: 10px;
-   border-top: 5px solid var(--color-primary-orange);
+   border-top: 5px solid var(--uvalib-teal-light);
    padding-top: 25px;
 }
 label {

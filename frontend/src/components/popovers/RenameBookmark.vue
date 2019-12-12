@@ -62,7 +62,7 @@ i.fas {
    top: 2px;
 }
 div.popover-header {
-   padding: 5px 15px;
+   padding: 10px 15px;
    color: white;
    background-color: var(--uvalib-grey-dark);
    font-weight: 500;
@@ -71,18 +71,18 @@ div.popover-header {
 }
 .confirm-container {
    background: white;
-   box-shadow: 1px 1px 15px #333;
-   color: var(--color-primary-text);
-   font-size: 0.9em;
-   font-weight: 500;
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   color: var(--uvalib-text);
+   font-size: 1em;
+   font-weight: normal;
    display: inline-block;
    padding: 0;
    border-radius: 5px;
 }
 div.message {
    padding: 10px 10px 0 10px;
-   border-left: 3px solid var(--uvalib-grey-dark);
-   border-right: 3px solid var(--uvalib-grey-dark);
+   border-left: 1px solid var(--uvalib-grey-dark);
+   border-right: 1px solid var(--uvalib-grey-dark);
 }
 .message p {
    margin: 0;
@@ -93,12 +93,11 @@ select {
    width: 100%;
 }
 .edit-controls {
-   font-size: 0.9em;
    padding: 10px;
    text-align: right;
-   border-left: 3px solid var(--uvalib-grey-dark);
-   border-right: 3px solid var(--uvalib-grey-dark);
-   border-bottom: 3px solid var(--uvalib-grey-dark);
+   border-left: 1px solid var(--uvalib-grey-dark);
+   border-right: 1px solid var(--uvalib-grey-dark);
+   border-bottom: 1px solid var(--uvalib-grey-dark);
    border-radius: 0 0 5px 5px;
    display: flex;
    flex-flow: row nowrap;
