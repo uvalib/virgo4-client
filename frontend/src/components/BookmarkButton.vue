@@ -56,7 +56,7 @@ export default {
             folder.bookmarks.some( item => {
                if (item.pool == this.pool && item.identifier == this.hit.identifier) {
                   bookmarkID = item.id
-                  this.$store.dispatch("user/removeBookmark", bookmarkID)
+                  this.$store.dispatch("user/removeBookmarks", [bookmarkID])
                }
                return bookmarkID != -1
             })
