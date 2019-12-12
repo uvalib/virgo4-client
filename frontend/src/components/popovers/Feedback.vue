@@ -12,7 +12,7 @@
          <div class="message">
             <p>For now, direct all Virgo4 feedback to:</p>
             <p>
-               <a class="feedback" 
+               <a class="feedback"
                   href="mailto:lib-virgo4-feedback@virginia.edu">lib-virgo4-feedback@virginia.edu</a>
             </p>
          </div>
@@ -33,23 +33,22 @@ export default {
 div.popover-header {
    padding: 6px 0px 6px 8px;
    color: white;
-   background-color: var(--color-primary-orange);
+   background-color: var(--uvalib-grey-dark);
    font-size: 1.15em;
    font-weight: bold;
    border-radius: 5px 5px 0 0;
 }
 .feedback-container {
    background: white;
-   box-shadow: 1px 1px 15px #333;
-   color: var(--color-primary-text);
-   font-size: 0.9em;
-   font-weight: 500;
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   color: var(--uvalib-text);
+   font-size: 1em;
+   font-weight: normal;
    display: inline-block;
    padding: 0;
    border-radius: 5px;
 }
 i.fas.fa-times-circle.close {
-   opacity: 0.8;
    font-size: 1.1em;
    float:right;
    margin-right: 8px;
@@ -61,14 +60,17 @@ i.fas.fa-times-circle.close:hover {
 div.message {
    padding: 20px;
    text-align: center;
-   border-left: 5px solid var(--color-primary-orange);
-   border-right: 5px solid var(--color-primary-orange);
-   border-bottom: 5px solid var(--color-primary-orange);
+   border-left: 1px solid var(--uvalib-grey-dark);
+   border-right: 1px solid var(--uvalib-grey-dark);
+   border-bottom: 1px solid var(--uvalib-grey-dark);
    border-radius: 0 0 5px 5px;
 }
 a.feedback {
    color: var(--color-link);
    font-weight: 500;
    text-decoration: none;
+}
+a.feedback:hover {
+  text-decoration: underline;
 }
 </style>

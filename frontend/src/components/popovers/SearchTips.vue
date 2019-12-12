@@ -9,7 +9,7 @@
          <div class="tips">
             <ul>
                <li class="no-pad">
-                  <p>Use quotation marks to find exact phrases:</p> 
+                  <p>Use quotation marks to find exact phrases:</p>
                   <p class="example">"grapes of wrath"</p>
                </li>
                <li>
@@ -32,7 +32,6 @@
 export default {
 };
 </script>
-
 <style scoped>
 i.fas.fa-times-circle.close {
    opacity: 0.8;
@@ -46,32 +45,34 @@ i.fas.fa-times-circle.close:hover {
 }
 .tips-popover {
    background: white;
-   box-shadow: 1px 1px 15px #333;
-   color: var(--color-primary-text);
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   color: var(--uvalib-text);
    font-size: 1em;
    font-weight: normal;
    display: inline-block;
    border-radius: 5px;
-   border-bottom: 5px solid var(--color-primary-orange);
+   border-bottom: 1px solid var(--uvalib-grey-dark);
 }
 .tips-popover .popover-title {
    padding: 8px 0 6px 0;
    margin: 0;
    text-align: center;
-   background: var(--color-primary-orange);
+   background: var(--uvalib-grey-dark);
    color: white;
    font-weight: normal;
    border-radius: 5px 5px 0 0;
+   border-top: 1px solid var(--uvalib-grey-dark);
+   border-left: 1px solid var(--uvalib-grey-dark);
+   border-right: 1px solid var(--uvalib-grey-dark);
    font-size: 1.25em;
    font-weight: bold;
 }
 div.tips {
    margin: 0;
-   font-size: 0.9em;
    padding: 10px 20px 10px 20px;
    font-weight: normal;
-   border-right: 5px solid var(--color-primary-orange);
-   border-left: 5px solid var(--color-primary-orange);
+   border-right: 1px solid var(--uvalib-grey-dark);
+   border-left: 1px solid var(--uvalib-grey-dark);
 }
 ul {
    list-style-type: none;
