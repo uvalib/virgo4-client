@@ -7,8 +7,6 @@
           <div class="book-page"></div>
           <p>{{message}}</p>
         </div>
-         <!-- <p>{{message}}</p>
-         <img src="../../assets/searching.gif"> -->
       </div>
    </div>
 </template>
