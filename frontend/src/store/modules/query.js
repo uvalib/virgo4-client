@@ -82,9 +82,14 @@ const query = {
             }
          }
        },
-       setBasicSearch(state) {
+      setBasicSearch(state) {
          state.mode = "basic"
-       },
+      },
+      setSubjectSearch(state, subject) {
+         state.mode = "advanced"
+         state.advanced = [
+            {op: "AND", value: subject, field: "subject", type: "EQUAL", endVal: ""}]
+      },
       addCriteria(state) {
         state.advanced.push({op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""})
       },
@@ -97,7 +102,6 @@ const query = {
          state.basic = ""
          state.basicSearchScope = {name: 'All Sources', id: 'all'},
          state.advanced = [
-            {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
             {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""}]
       },
       setLastSearch(state, qs) {

@@ -23,7 +23,22 @@
                   <tr v-for="(field,idx) in allFields" :key="idx">
                      <template v-if="shouldDisplay(field)">
                         <td class="label">{{field.label}}:</td>
-                        <td class="value" v-html="fieldValueString(field)"></td>
+                        <template v-if="field.type == 'subject'" >
+                           <td class="value">
+                              <template v-if="Array.isArray(field.value)">
+                                 <template  v-for="(val,idx) in field.value">
+                                    <span v-if="idx>0" class="sep" :key="idx+'s'">|</span>
+                                    <router-link  :key="idx" :to="getSubjectLink(val)">
+                                       <span class="subject-link">{{val}}</span>
+                                    </router-link>
+                                 </template>
+                              </template>
+                              <router-link  v-else :to="getSubjectLink(field.value)">
+                                 <span class="subject-link">{{field.value}}</span>
+                              </router-link>
+                           </td>
+                        </template>
+                        <td v-else class="value" v-html="fieldValueString(field)"></td>
                      </template>
                   </tr>
                </table>
@@ -66,6 +81,9 @@ export default {
       }
    },
    methods: {
+      getSubjectLink(subj) {
+         return `/search?subject=${encodeURI(subj)}`
+      },
       shouldDisplay(field) {
          if (field.display == 'optional') return false 
          if ( this.isKiosk && field.type == "url") return false 
@@ -175,6 +193,9 @@ table td.value {
 }
 .bookmark-container {
    float:left;
+}
+.sep {
+   margin: 0 5px;
 }
 </style>
 
