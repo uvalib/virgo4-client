@@ -98,11 +98,16 @@ export default {
 
         let subj = this.$route.query.subject
         if ( subj ) {
+          // Grab the current query, then set it to match the query param
+          // do the search only if it changes something 
+          let prior = this.rawQueryString
           this.$store.commit("query/setSubjectSearch", subj)
-          this.$store.commit('query/setLastSearch', this.rawQueryString)
-          this.$store.commit('filters/reset')
-          this.$store.commit('resetOtherSourceSelection')
-          this.$store.dispatch("searchAllPools")
+          if ( prior != this.rawQueryString) {
+            this.$store.commit('query/setLastSearch', this.rawQueryString)
+            this.$store.commit('filters/reset')
+            this.$store.commit('resetOtherSourceSelection')
+            this.$store.dispatch("searchAllPools")
+          }
         }
       })
    },
