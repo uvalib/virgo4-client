@@ -53,7 +53,7 @@ export default {
       },
       color: {
          type: String,
-         default: "#666666"
+         default: "var(--uvalib-text-dark)"
       },
       borderWidth: {
          type: String,
