@@ -170,5 +170,25 @@ dd {
    padding: 5px 10px;
    font-weight: bold;
    border-radius: 5px;
+   background: var(--uvalib-beige) !important;
+   width: max-content;
+}
+/* fallback for IE */
+#app .accordion.group .title {
+   width: auto;
+}
+#app .accordion.group {
+   display: inline-block;
+}
+#app .group .title .text {
+  color: var(--uvalib-text-dark);
+}
+@media only screen and (max-width: 600px) {
+  #app .accordion.group .title {
+     width: inherit;
+  }
+  #app .accordion.group {
+     display: inherit;
+  }
 }
 </style>
