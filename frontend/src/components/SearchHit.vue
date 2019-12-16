@@ -170,7 +170,7 @@ dd {
    padding: 5px 10px;
    font-weight: bold;
    border-radius: 5px;
-   background: var(--uvalib-beige) !important;
+   border: 1px solid var(--uvalib-brand-orange) !important;
    width: max-content;
 }
 /* fallback for IE */
@@ -181,7 +181,7 @@ dd {
    display: inline-block;
 }
 #app .group .title .text {
-  color: var(--uvalib-text-dark);
+  color: var(--uvalib-text);
 }
 @media only screen and (max-width: 600px) {
   #app .accordion.group .title {
