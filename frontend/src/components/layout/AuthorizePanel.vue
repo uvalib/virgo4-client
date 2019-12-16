@@ -32,13 +32,11 @@ div.authorize {
    margin: 5vw auto;
    text-align: center;
    padding: 10px 150px 25px 150px;
-   border-radius: 5px;
    display: inline-block;
-   -webkit-box-shadow: 2px 2px 8px black;
-   box-shadow: 2px 2px 8px black;
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 div.authorize h1 {
-  color: #666;
+  color: var(--uvalib-text);
   border: none;
 }
 </style>

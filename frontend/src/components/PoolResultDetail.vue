@@ -13,13 +13,7 @@
             </div>
          </div>
       </div>
-      <transition name="message-transition"
-          enter-active-class="animated faster fadeIn"
-          leave-active-class="animated faster fadeOut">
-         <div v-if="showScrollTop" class="scroll-to-top" :class="{mobile: smallScreen}" @click="backToTop">
-            <i class="fas fa-angle-up"></i>
-         </div>
-      </transition>
+      <ScrollToTop />
       <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more">
          <span v-if="loadingMore"><img src="../assets/searching.gif"></span>
          <span v-else>Load More Results</span>
@@ -32,13 +26,13 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import SearchFilters from "@/components/SearchFilters"
+import ScrollToTop from "@/components/ScrollToTop"
 export default {
    components: {
-      SearchHit, SearchFilters
+      SearchHit, SearchFilters, ScrollToTop
    },
    data: function() {
       return {
-         showScrollTop: false,
          loadingMore: false
       }
    },
@@ -49,15 +43,11 @@ export default {
          selectedResultsIdx: state => state.selectedResultsIdx,
          addingFilter: state => state.filters.adding,
          updatingFacets: state => state.filters.updatingFacets,
-         displayWidth: state => state.system.displayWidth,
       }),
       ...mapGetters({
          selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
       }),
-      smallScreen() {
-         return this.displayWidth <= 810
-      },
    },
    watch: {
       selectedResultsIdx () {
@@ -67,16 +57,6 @@ export default {
       },
    },
    methods: {
-      backToTop: function() {
-         var scrollStep = -window.scrollY / (500 / 10),
-         scrollInterval = setInterval(()=> {
-            if ( window.scrollY != 0 ) {
-               window.scrollBy( 0, scrollStep )
-            } else {
-               clearInterval(scrollInterval)
-            }
-         },10)
-      },
       loadMoreResults() {
          if ( this.searching) return
 
@@ -86,20 +66,7 @@ export default {
                 this.loadingMore = false
             })
          }
-      },
-      scrollChecker() {
-         if (window.window.scrollY > 800) {
-            this.showScrollTop = true
-         } else {
-            this.showScrollTop = false
-         }
       }
-   },
-   created: function() {
-      window.addEventListener("scroll", this.scrollChecker)
-   },
-   destroyed: function() {
-      window.removeEventListener("scroll", this.scrollChecker)
    }
 }
 </script>
@@ -139,46 +106,6 @@ div.results-header {
 }
 .hit-wrapper:last-child {
    margin-bottom: 0;
-}
-.scroll-to-top {
-   display: flex;
-   flex-basis: auto;
-   flex-direction: column;
-   position: fixed;
-   background-color: white;
-   color: var(--uvalib-brand-orange);
-   font-size: 2.5em;
-   font-weight: 100;
-   border: 3px solid var(--uvalib-brand-orange);
-   border-radius: 50%;
-   cursor: pointer;
-   align-items: center;
-   bottom: 30px;
-   right: 25px;
-   box-shadow: rgba(0, 0, 0, 0.14) 0px 2px 2px 0px;
-   box-sizing: border-box;
-   justify-content: center;
-   min-width: 0px;
-   padding: 0px 0px 4px 0px;
-   width: 56px;
-   height: 56px;
-   z-index: 0;
-}
-.scroll-to-top.mobile {
-   position: fixed;
-   background-color: white;
-   color: var(--color-brand-orange);
-   border: 3px solid var(--color-brand-orange);
-   font-size: 2em;
-   font-weight: 100;
-   padding: 0px 12px;
-   right: 5px;
-   bottom: 45px;
-   cursor: pointer;
-}
-.scroll-to-top:hover, .scroll-to-top.mobile:hover {
-  color: white;
-  background-color: var(--uvalib-brand-orange);
 }
 .see-more, .no-more {
    padding: 10px;

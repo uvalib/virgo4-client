@@ -155,12 +155,16 @@ func (svc *ServiceContext) GetReserveDesks(c *gin.Context) {
 // The course can be querried by Course ID or course/instructor NAME
 func (svc *ServiceContext) SearchReserves(c *gin.Context) {
 	desk := c.Query("desk")
+	page := c.Query("page")
 	searchType := c.Query("type")
 	qStr := c.Query("query")
-	log.Printf("Search for %s=%s desk=[%s]", searchType, qStr, desk)
+	log.Printf("Search for %s=%s start page=%s desk=[%s]", searchType, qStr, page, desk)
 	// EX: /v4/course_reserves/search?type=COURSE_NAME&query=art
 	url := fmt.Sprintf("%s/v4/course_reserves/search?type=%s&query=%s",
 		svc.ILSAPI, searchType, url.QueryEscape(qStr))
+	if page != "" {
+		url += fmt.Sprintf("&page=%s", page)
+	}
 	if desk != "" {
 		url += fmt.Sprintf("&desk=%s", desk)
 	}

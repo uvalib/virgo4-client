@@ -17,11 +17,21 @@
                <span @click="searchCourseClicked('name')" class="pure-button pure-button-primary">Search Course Names</span>
             </div>
          </div>
-         <div class="no-match" v-if="noMatch==true">
-            No course reserves that match your request were be found
-         </div>
-         <CourseSearchResults v-if="hasCourseResults"/>
-         <InstructorSearchResults v-if="hasInstructorResults"/>
+         <template v-if="!searching && totalReserves > -1">
+            <div class="no-match" v-if="totalReserves == 0">
+               No course reserves that match your request were found
+            </div>
+            <template v-else>
+               <div class="count">{{totalReserves}} reserved items found</div>
+               <CourseSearchResults v-if="hasCourseResults"/>
+               <InstructorSearchResults v-if="hasInstructorResults"/>
+               <ScrollToTop />
+               <div v-if="hasMore" @click="loadMore" class="see-more">
+                  <span v-if="loadingMore"><img src="../assets/searching.gif"></span>
+                  <span v-else>Load More Reserves</span>
+               </div>
+            </template>
+         </template>
       </div>
    </div>
 </template>
@@ -33,16 +43,25 @@ import { mapFields } from 'vuex-map-fields'
 import SearchingOverlay from "@/components/layout/SearchingOverlay"
 import CourseSearchResults from "@/components/reserves/CourseSearchResults"
 import InstructorSearchResults from "@/components/reserves/InstructorSearchResults"
+import ScrollToTop from "@/components/ScrollToTop"
 export default {
    name: "course-reserves",
    components: {
-      CourseSearchResults, InstructorSearchResults,SearchingOverlay
+      CourseSearchResults, InstructorSearchResults,
+      SearchingOverlay, ScrollToTop
+   },
+   data: function() {
+      return {
+         showScrollTop: false,
+         loadingMore: false
+      }
    },
    computed: {
       ...mapState({
-         searchType: state => state.reserves.searchType,
-         noMatch: state => state.reserves.noMatch,
+         totalReserves: state => state.reserves.totalReserves,
+         hasMore: state => state.reserves.hasMore,
          error: state => state.error,
+         searching: state => state.searching,
       }),
       ...mapGetters({
          hasCourseResults: 'reserves/hasCourseResults',
@@ -55,14 +74,35 @@ export default {
    },
    methods: {
       searchInstructorClicked(type) {
-         this.$store.dispatch("reserves/searchInstructors", type)
+         let data = {type: type, initial: true}
+         this.$store.dispatch("reserves/searchInstructors", data)
       },
       searchCourseClicked(type) {
-         this.$store.dispatch("reserves/searchCourses", type)
+         let data = {type: type, initial: true}
+         this.$store.dispatch("reserves/searchCourses", data)
+      },
+      loadMore() {
+         if (this.hasMore) {
+            this.loadingMore = true
+            this.$store.dispatch("reserves/nextPage").finally( ()=> {
+                this.loadingMore = false
+            })
+         }
+      },
+      scrollChecker() {
+         if (window.window.scrollY > 800) {
+            this.showScrollTop = true
+         } else {
+            this.showScrollTop = false
+         }
       }
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
+      window.addEventListener("scroll", this.scrollChecker)
+   },
+   destroyed: function() {
+      window.removeEventListener("scroll", this.scrollChecker)
    }
 }
 </script>
@@ -113,17 +153,26 @@ p {
 #app .controls span.pure-button.pure-button-primary {
    margin: 0 0 5px 10px;
 }
-p.error {
-  font-weight: bold;
-  margin: 0;
-  color: var(--uvalib-red-emergency);
-  opacity: 1;
-  visibility: visible;
-}
 .no-match {
+  color: var(--uvalib-text);
+  text-align: center;
+  font-size: 1.25em;
+  margin: 15px;
+}
+.see-more, .no-more {
+   padding: 10px;
+   background: var(--uvalib-brand-blue);
+   border: 5px solid var(--uvalib-brand-blue);
+   color: white;
+   cursor: pointer;
    font-weight: bold;
-   margin: 0;
-   color: var(--uvalib-red-emergency);
-   text-align: center;
+   margin-bottom: 25px;
+}
+.see-more:hover {
+   text-decoration: underline;
+   color: var(--uvalib-blue-alt-light);
+}
+.no-more {
+   cursor: default;
 }
 </style>

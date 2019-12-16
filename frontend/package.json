@@ -16,7 +16,6 @@
     "v-tooltip": "^2.0.2",
     "vue": "^2.6.10",
     "vue-cookies": "^1.5.13",
-    "vue-multiselect": "^2.1.6",
     "vue-router": "^3.1.3",
     "vuex": "^3.1.2",
     "vuex-map-fields": "^1.3.6"

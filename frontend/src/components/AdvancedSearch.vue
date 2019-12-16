@@ -118,6 +118,10 @@ export default {
          }
       },
       basicClicked() {
+         let cr = this.$router.currentRoute
+         if ( cr.path != "/" ) {
+            this.$router.push("/")
+         }
          this.$store.commit("query/setBasicSearch")
       },
       addClicked() {

@@ -95,6 +95,20 @@ export default {
         // once cfg is available, get pools. they may be needed
         // to populate the pool selector for non-signed in users
         this.$store.dispatch('pools/getPools')
+
+        let subj = this.$route.query.subject
+        if ( subj ) {
+          // Grab the current query, then set it to match the query param
+          // do the search only if it changes something 
+          let prior = this.rawQueryString
+          this.$store.commit("query/setSubjectSearch", subj)
+          if ( prior != this.rawQueryString) {
+            this.$store.commit('query/setLastSearch', this.rawQueryString)
+            this.$store.commit('filters/reset')
+            this.$store.commit('resetOtherSourceSelection')
+            this.$store.dispatch("searchAllPools")
+          }
+        }
       })
    },
    methods: {

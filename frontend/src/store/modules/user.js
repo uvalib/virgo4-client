@@ -120,7 +120,7 @@ const user = {
          if ( state.bookmarks == null ) return []
          return state.bookmarks
       },
-      folders: state => {
+      bookmarkFolders: state => {
          if ( state.bookmarks == null ) return []
          let out = []
          let foundGeneral = false

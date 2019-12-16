@@ -7,8 +7,10 @@ const reserves = {
    state: {
       query: "",
       searchType: "",
+      totalReserves: -1,
+      hasMore: false,
+      page: 1,
       courseReserves: [],
-      noMatch: false,
       requestList: [],
       request: {
          onBehalfOf: "no",
@@ -26,10 +28,10 @@ const reserves = {
    getters: {
       getField,
       hasCourseResults: state => {
-         return state.searchType == "course" && state.courseReserves.length > 0
+         return state.searchType.includes("COURSE") && state.courseReserves.length > 0
       },
       hasInstructorResults: state => {
-         return state.searchType == "instructor" && state.courseReserves.length > 0
+         return state.searchType.includes("INSTRUCTOR") && state.courseReserves.length > 0
       },
    },
 
@@ -70,17 +72,25 @@ const reserves = {
             period: ""
          }
       },
-      setInstructorSearch(state) {
-         state.searchType="instructor"
-      },
-      setCourseSearch(state) {
-         state.searchType="course"
-      },
       setCourseReserves(state, data) {
-         state.courseReserves=data
+         data['hits'].forEach( h=>{
+            state.courseReserves.push(h)
+         })
+         state.totalReserves = data['total']
+         state.page = data['page']
+         state.hasMore = data['more']
       },
-      setNoMatch(state,flag) {
-         state.noMatch = flag
+      resetResults(state, type) {
+         state.searchType = type
+         state.courseReserves.splice(0, state.courseReserves.length)
+         state.totalReserves = 0
+         state.page = 1
+         state.hasMore = false
+      },
+      nextPage(state) {
+         if ( state.hasMore) {
+            state.page += 1
+         }
       }
    }, 
 
@@ -112,42 +122,68 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
           })
       },
-      searchCourses(ctx, type) {
+      nextPage(ctx) {
+         if (ctx.state.hasMore == false ) {
+            return
+         }
+         ctx.commit('nextPage')
+         let qs = ctx.state.query
+         if (qs.includes(" ")) {
+            qs = `"${qs}"`
+         }
+         let typeParam = "type="+ctx.state.searchType
+         let pg = ctx.state.page
+         return axios.get(`/api/reserves/search?${typeParam}&query=${qs}&page=${pg}`).then((response) => {
+            ctx.commit('setCourseReserves', response.data)
+         }).catch((error) => {
+            ctx.commit('setError', error, { root: true })
+          })
+      },
+      searchCourses(ctx, data) {
          ctx.commit('setSearching', true, { root: true })
-         ctx.commit('setNoMatch',false)
-         ctx.commit('setCourseSearch')
-         let typeParam = "type=COURSE_NAME"
-         if (type == "id") {
-            typeParam = "type=COURSE_ID"
+         let type = "COURSE_NAME"
+         if (data.type == "id") {
+            type = "COURSE_ID"
          }
          let qs = ctx.state.query
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
-         axios.get(`/api/reserves/search?${typeParam}&query=${qs}`).then((response) => {
+
+         if (data.initial === true) {
+            ctx.commit('resetResults', type)   
+         }
+         let typeParam = "type="+type
+         let pgParam = "page="+ctx.state.page
+         let url = `/api/reserves/search?${typeParam}&query=${qs}&${pgParam}`
+         axios.get(url).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
          }).catch((_error) => {
             ctx.commit('setCourseReserves', [])
             ctx.commit('setNoMatch',true)
             ctx.commit('setSearching', false, { root: true })
-          })
+         })
       },
-      searchInstructors(ctx, type) {
+      searchInstructors(ctx, data) {
          ctx.commit('setSearching', true, { root: true })
-         ctx.commit('setNoMatch',false)
-         ctx.commit('setInstructorSearch')
-         let typeParam = "type=INSTRUCTOR_NAME"
-         let qs = ctx.state.query
-         if (type == "id") {
-            typeParam = "type=INSTRUCTOR_ID"
+         let type = "INSTRUCTOR_NAME"
+         if (data.type == "id") {
+            type = "INSTRUCTOR_ID"
             qs = ctx.rootState.user.accountInfo.id
-         } else {
-            if (qs.includes(" ")) {
-               qs = `"${qs}"`
-            }
+         } 
+         let qs = ctx.state.query
+         if (qs.includes(" ")) {
+            qs = `"${qs}"`
          }
-         axios.get(`/api/reserves/search?${typeParam}&query=${qs}`).then((response) => {
+
+         if (data.initial === true) {
+            ctx.commit('resetResults', type)   
+         }
+         let typeParam = "type="+type
+         let pgParam = "page="+ctx.state.page
+         let url = `/api/reserves/search?${typeParam}&query=${qs}&${pgParam}`
+         axios.get(url).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
          }).catch((_error) => {
