@@ -125,7 +125,6 @@ export default {
   align-self: stretch;
   padding: 0 10px;
   text-align: left;
-  border: 1px solid var(--uvalib-brand-blue);
 }
 .wrap-select {
    height: 100%;
