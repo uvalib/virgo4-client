@@ -82,7 +82,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	err := q.One(&user)
 	if err != nil {
 		log.Printf("User %s does not exist, creating...", auth.Barcode)
-		user := V4User{ID: 0, Virgo4ID: auth.Barcode,
+		user := V4User{ID: 0, Virgo4ID: auth.Barcode, AuthToken: xid.New().String(),
 			AuthTries: 0, LockedOut: false, SignedIn: false, Preferences: "{}"}
 		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 		if err != nil {
@@ -90,6 +90,10 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 			resp.Message = fmt.Sprintf("Internal Error: %s", err.Error())
 			c.JSON(http.StatusInternalServerError, resp)
 			return
+		}
+	} else {
+		if user.AuthToken == "" {
+			user.AuthToken = xid.New().String()
 		}
 	}
 
