@@ -12,7 +12,6 @@ import Checkouts from './views/Checkouts.vue'
 import Requests from './views/Requests.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
-import Forbidden from './views/Forbidden.vue'
 import NotFound from './views/NotFound.vue'
 import store from './store'
 
@@ -94,11 +93,6 @@ const router = new Router({
       component: SignedOut
     },
     {
-      path: '/forbidden',
-      name: 'forbidden',
-      component: Forbidden
-    },
-    {
       path: "*",
       name: "notfound",
       component: NotFound
@@ -117,7 +111,7 @@ router.beforeEach((to, _from, next) => {
   store.commit('system/setError', "")
 
   // Some pages just require an auth token...
-  let tokenPages = ["home", "course-reserves", "details"]
+  let tokenPages = ["home", "course-reserves", "details", "search"]
   if (tokenPages.includes(to.name)) {
     ensureAuthTokenPresent(next)
     return

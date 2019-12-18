@@ -17,6 +17,9 @@ const user = {
       requests: [],
       newBookmarkInfo: null,
       lookingUp: false,
+      authTriesLeft: 5,
+      authMessage: "",
+      lockedOut: false
    },
 
    getters: {
@@ -175,7 +178,20 @@ const user = {
       setAuthorizing(state, auth) {
          state.authorizing = auth
       },
+      setAuthFailure(state, data) {
+         if (data.response && data.response.data) {
+            //barcode, signedId, message, attemptsLeft
+            let resp = data.response.data
+            state.authTriesLeft = resp.attemptsLeft
+            state.authMessage = resp.message
+            state.lockedOut =  resp.lockedOut
+         } else {
+            state.authMessage = "Sign in failed: "+data   
+         }
+      },
       setSignedInUser(state, user) {
+         state.authMessage = ""
+         state.lockedOut = false
          state.signedInUser = user.userId
          state.authToken = user.token
          state.sessionType = user.type
@@ -192,6 +208,9 @@ const user = {
          state.signedInUser = ""
          state.sessionType = ""
          state.accountInfo = {}
+         state.authTriesLeft = 5
+         state.authMessage = ""
+         state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
          state.bookmarks.splice(0, state.bookmarks.length)
          state.bills.splice(0, state.bills.length)
@@ -316,14 +335,15 @@ const user = {
       },
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
+         // response: {barcode, signedId, message, attemptsLeft}
          axios.post("/authenticate/public", data).then((response) => {
-            ctx.commit("setSignedInUser", {userId: response.data, 
+            ctx.commit("setSignedInUser", {userId: response.data.barcode, 
                token: ctx.state.authToken, type: "public", quiet: false} )
             ctx.commit('setAuthorizing', false)
             router.push("/account")
-         }).catch((_error) => {
+         }).catch((error) => {
             ctx.commit('setAuthorizing', false)
-            router.push("/forbidden")
+            ctx.commit('setAuthFailure', error)
           })
       },
       netbadge(ctx) {

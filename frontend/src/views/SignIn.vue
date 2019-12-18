@@ -29,6 +29,19 @@
                      </td>
                   </tr>
                </table>
+               <transition name="message-transition"
+                  enter-active-class="animated faster fadeIn"
+                  leave-active-class="animated faster fadeOut">
+                  <div v-if="authMessage" class="authMessage">
+                     <div v-if="lockedOut" class="locked-out">
+                        {{ authMessage }}
+                     </div>
+                     <div v-else class="tries">
+                        <div class="auth-msg">{{ authMessage }}</div>
+                        You have <b>{{authTriesLeft}}</b> more tries before your account is locked.
+                     </div>
+                  </div>
+               </transition>
                <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
             </div>
          </div>
@@ -38,10 +51,16 @@
 
 <script>
 import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 export default {
    name: "signin",
    computed: {
-       ...mapGetters({
+      ...mapState({
+         authTriesLeft: state => state.user.authTriesLeft,
+         authMessage: state => state.user.authMessage,
+         lockedOut: state => state.user.lockedOut,
+      }),
+      ...mapGetters({
         hasAuthToken: 'user/hasAuthToken'
       }),
    },
@@ -131,5 +150,27 @@ div.netbadge {
 }
 div.indent {
    margin-left: 35px;
+}
+.authMessage {
+   font-weight: bold;
+   color: var(--uvalib-red-emergency);
+   text-align: center;
+   margin: 0 0 15px 0;
+}
+.tries {
+   font-weight: normal;
+}
+.auth-msg {
+   font-weight: bold;
+}
+.locked-out {
+   color: var(--color-primary-text);
+   font-size: 1em;
+   font-weight: bold;
+   text-align: center;
+   padding: 10px;
+   margin: 15px 0;
+   border-radius: 5px;
+   background-color: var(--uvalib-red-lightest);
 }
 </style>
