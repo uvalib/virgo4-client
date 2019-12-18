@@ -189,6 +189,11 @@ const user = {
             state.authMessage = "Sign in failed: "+data   
          }
       },
+      clearAuthMessages(state) {
+         state.authMessage = ""
+         state.lockedOut = false
+         state.authTriesLeft = 5
+      },
       setSignedInUser(state, user) {
          state.authMessage = ""
          state.lockedOut = false

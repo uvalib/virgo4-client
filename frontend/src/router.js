@@ -109,6 +109,7 @@ router.beforeEach((to, _from, next) => {
   // always make sure user menu is closed and errors from prior page cleared
   store.commit("system/closeUserMenu")
   store.commit('system/setError', "")
+  store.commit('user/clearAuthMessages', "")
 
   // Some pages just require an auth token...
   let tokenPages = ["home", "course-reserves", "details", "search"]
