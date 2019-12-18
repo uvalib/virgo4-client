@@ -199,11 +199,4 @@ export default {
   background-color:  var(--uvalib-brand-blue-lightest);
   color: black;
 }
-
-@media only screen and (max-width: 768px) {
-   .v4-select .options {
-     left: inherit;
-     right: -2px;
-   }
-}
 </style>
