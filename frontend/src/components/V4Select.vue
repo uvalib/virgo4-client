@@ -2,7 +2,7 @@
    <div @click="expandClick" class="v4-select"
       :class="{attached: attached}"
       :style="{ 'background-color': background, padding: pad,
-               color: color, 'border-color': background }">
+               color: color, 'border': border }">
       <div class="wrap-select">
          <span class="selection">
             <span v-if="value.id" v-html="value.name"></span>
@@ -14,7 +14,7 @@
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div class="options" v-if="expanded"
-            :style="{ 'background-color': background, color: color, 'border-color': background }">
+            :style="{ 'background-color': background, color: color, 'border': optborder }">
             <div v-for="src in selections" @click="optionClicked(src)"
                :class="{disabled: src.disabled}" class="option"
                :key="src.id"  v-html="src.name"></div>
@@ -36,7 +36,15 @@ export default {
       },
       background: {
          type: String,
-         default: "var(--color-brand-blue)"
+         default: "var(--uvalib-brand-blue)"
+      },
+      border: {
+        type: String,
+        default: "1px solid var(--uvalib-grey-light)"
+      },
+      optborder: {
+        type: String,
+        default: "1px solid var(--uvalib-grey-light)"
       },
       color: {
          type: String,
@@ -121,7 +129,6 @@ export default {
   align-self: stretch;
   padding: 0 10px;
   text-align: left;
-  border: 1px solid var(--color-brand-blue);
 }
 .wrap-select {
    height: 100%;
@@ -157,7 +164,7 @@ export default {
   color: white;
   cursor: pointer;
   padding: 0 0 10px 0;
-  border-radius: 0 5px 5px 5px;
+  border-radius: 0 0 5px 5px;
   position: absolute;
   left: -1px;
   border: 1px solid var(--uvalib-light-blue);
@@ -166,16 +173,20 @@ export default {
   transition: 200ms ease-out;
   z-index: 5000;
   white-space: nowrap;
+  display: grid;
+  grid-auto-rows: auto;
 }
 .v4-select .option {
-  padding: 5px 15px 10px 15px;
+  align-items: stretch;
+  justify-items: stretch;
+  padding: 10px 15px;
   background-color: white;
-  border-left: 1px solid var(--uvalib-grey-light);
-  border-right: 1px solid var(--uvalib-grey-light);
+  /* border-left: 1px solid var(--uvalib-grey-light);
+  border-right: 1px solid var(--uvalib-grey-light); */
   color: var(--uvalib-text-dark);
 }
 .v4-select .option:last-child {
-  border-bottom: 1px solid var(--uvalib-grey-light);
+  /* border-bottom: 1px solid var(--uvalib-grey-light); */
 }
 .v4-select .option.disabled {
   background-color:  initial;
@@ -190,12 +201,5 @@ export default {
 .v4-select .option:hover {
   background-color:  var(--uvalib-brand-blue-lightest);
   color: black;
-}
-
-@media only screen and (max-width: 768px) {
-   .v4-select .options {
-     left: inherit;
-     right: -2px;
-   }
 }
 </style>

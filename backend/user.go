@@ -19,13 +19,17 @@ func NewV4User() *V4User {
 
 // V4User contains virgo4 user data like session token, bookmarks and preferences
 type V4User struct {
-	ID            int       `db:"id" json:"-"`
-	Virgo4ID      string    `db:"virgo4_id" json:"id"`
-	AuthToken     string    `db:"auth_token" json:"-"`
-	AuthUpdatedAt time.Time `db:"auth_updated_at" json:"-"`
-	SignedIn      bool      `db:"signed_in" json:"-"`
-	Bookmarks     []*Folder `db:"-" json:"bookmarks"`
-	Preferences   string    `db:"preferences" json:"preferences"`
+	ID             int        `db:"id" json:"-"`
+	Virgo4ID       string     `db:"virgo4_id" json:"id"`
+	AuthToken      string     `db:"auth_token" json:"-"`
+	AuthUpdatedAt  time.Time  `db:"auth_updated_at" json:"-"`
+	LockedOut      bool       `db:"locked_out" json:"-"`
+	LockedOutUntil *time.Time `db:"locked_out_until" json:"-"`
+	AuthStartedAt  *time.Time `db:"auth_started_at" json:"-"`
+	AuthTries      int        `db:"auth_tries" json:"-"`
+	SignedIn       bool       `db:"signed_in" json:"-"`
+	Bookmarks      []*Folder  `db:"-" json:"bookmarks"`
+	Preferences    string     `db:"preferences" json:"preferences"`
 }
 
 // TableName sets the name of the table in the DB that this struct binds to

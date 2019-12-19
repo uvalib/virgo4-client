@@ -43,17 +43,18 @@ func main() {
 	api := router.Group("/api")
 	{
 		api.GET("/authenticated/:token", svc.IsAuthenticated)
+		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)
 		api.GET("/users/:uid/bills", svc.AuthMiddleware, svc.GetUserBills)
+		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
-		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
+
 		bookmarks := api.Group("/users/:uid/bookmarks")
 		{
-			bookmarks.GET("/", svc.AuthMiddleware, svc.GetBookmarks)
 			bookmarks.POST("/move", svc.AuthMiddleware, svc.MoveBookmarks)
 			bookmarks.POST("/delete", svc.AuthMiddleware, svc.DeleteBookmarks)
 			bookmarks.POST("/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
@@ -61,12 +62,10 @@ func main() {
 			bookmarks.POST("/folders/:id", svc.AuthMiddleware, svc.UpdateBookmarkFolder)
 			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
 		}
-		reserves := api.Group("/reserves")
-		{
-			reserves.POST("/", svc.AuthMiddleware, svc.CreateCourseReserves)
-			reserves.GET("/desks", svc.AuthMiddleware, svc.GetReserveDesks)
-			reserves.GET("/search", svc.AuthMiddleware, svc.SearchReserves)
-		}
+
+		api.POST("/reserves", svc.AuthMiddleware, svc.CreateCourseReserves)
+		api.GET("/reserves/desks", svc.AuthMiddleware, svc.GetReserveDesks)
+		api.GET("/reserves/search", svc.AuthMiddleware, svc.SearchReserves)
 	}
 	auth := router.Group("/authenticate")
 	{

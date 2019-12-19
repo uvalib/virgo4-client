@@ -12,6 +12,7 @@
           </div>
           <div class="basic-search">
             <V4Select :selections="searchScopes" v-bind:attached="true"
+              border="1px solid var(--uvalib-brand-blue)"
               v-model="basicSearchScope"/>
             <input class="basic"
                 @keyup.enter="searchClicked"

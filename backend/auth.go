@@ -59,31 +59,113 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 		Barcode  string `json:"barcode"`
 		Password string `json:"password"`
 	}
+	var resp struct {
+		Barcode      string `json:"barcode"`
+		SignedIn     bool   `json:"signedIn"`
+		LockedOut    bool   `json:"lockedOut"`
+		Message      string `json:"message"`
+		AttemptsLeft int    `json:"attemptsLeft"`
+	}
+	resp.AttemptsLeft = 5
 	if err := c.BindJSON(&auth); err != nil {
 		log.Printf("Unable to parse params: %s", err.Error())
-		c.String(http.StatusBadRequest, err.Error())
+		resp.Message = "Invalid request"
+		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
+
+	log.Printf("Lookup user barcode %s...", auth.Barcode)
+	resp.Barcode = auth.Barcode
+	var user V4User
+	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
+	q.Bind(dbx.Params{"id": auth.Barcode})
+	err := q.One(&user)
+	if err != nil {
+		log.Printf("User %s does not exist, creating...", auth.Barcode)
+		user := V4User{ID: 0, Virgo4ID: auth.Barcode, AuthToken: xid.New().String(),
+			AuthTries: 0, LockedOut: false, SignedIn: false, Preferences: "{}"}
+		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
+		if err != nil {
+			log.Printf("Unable to create new user record %+v", err)
+			resp.Message = fmt.Sprintf("Internal Error: %s", err.Error())
+			c.JSON(http.StatusInternalServerError, resp)
+			return
+		}
+	} else {
+		if user.AuthToken == "" {
+			user.AuthToken = xid.New().String()
+		}
+	}
+
+	if user.LockedOut {
+		now := time.Now()
+		if now.After(*user.LockedOutUntil) {
+			log.Printf("User %s lockout has expired", auth.Barcode)
+			user.LockedOut = false
+			user.LockedOutUntil = nil
+			svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+		} else {
+			log.Printf("User %s is currently locked out of their account", auth.Barcode)
+			delta := user.LockedOutUntil.Sub(now)
+			resp.AttemptsLeft = 0
+			resp.LockedOut = true
+			resp.Message = fmt.Sprintf("Your account is locked for %d minutes", int(delta.Minutes()))
+			c.JSON(http.StatusForbidden, resp)
+			return
+		}
+	}
+
+	log.Printf("Track auth attempt for user %s...", auth.Barcode)
+	now := time.Now()
+	if user.AuthStartedAt == nil {
+		user.AuthStartedAt = &now
+		user.AuthTries = 1
+	} else {
+		// If this attempt is within 1 minute of the start, increment attempt
+		// counter. If not, start a new auth tracking session
+		delta := now.Sub(*user.AuthStartedAt)
+		if delta.Minutes() > 1.0 {
+			log.Printf("First auth attempt for %s", auth.Barcode)
+			user.AuthStartedAt = &now
+			user.AuthTries = 1
+		} else {
+			log.Printf("Last auth attempt for %s was %1.2f seconds ago", auth.Barcode, delta.Seconds())
+			user.AuthTries++
+		}
+	}
+	resp.AttemptsLeft = 5 - user.AuthTries
+	svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
 	authURL := fmt.Sprintf("%s/v4/users/%s/check_pin?pin=%s", svc.ILSAPI, auth.Barcode, auth.Password)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(authURL)
-	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
-		return
-	}
+	bodyBytes, _ := svc.ILSConnectorGet(authURL)
 
 	if string(bodyBytes) != "valid" {
+		// The in verification failed. If this has happened 5 times in a
+		// minute, lock out the account for one hour
 		log.Printf("ERROR: pin for %s falied authentication", auth.Barcode)
-		c.String(http.StatusForbidden, "Authentication failed")
+		if user.AuthTries >= 5 {
+			log.Printf("User %s account is now locked out for 1 hour", user.Virgo4ID)
+			resp.Message = "Authentication failed. Your account is now locked for one hour."
+			resp.LockedOut = true
+			now := time.Now()
+			later := now.Add(time.Hour)
+			user.LockedOut = true
+			user.LockedOutUntil = &later
+			svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+		} else {
+			resp.Message = "Authentication failed"
+		}
+		c.JSON(http.StatusForbidden, resp)
 		return
 	}
 
 	log.Printf("%s passed pin check", auth.Barcode)
+	resp.SignedIn = true
 
 	// Generate new auth token and ersist in v4 user storage
 	authToken := xid.New().String()
-	err := svc.updateAccessToken(auth.Barcode, authToken)
+	err = svc.updateAccessToken(auth.Barcode, authToken)
 	if err != nil {
 		log.Printf("WARN: Unable to persist user %s access token %v", auth.Barcode, err)
 	}
@@ -91,7 +173,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	// Generate a cookie with auth info
 	authStr := fmt.Sprintf("%s|%s|pin", auth.Barcode, authToken)
 	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
-	c.String(http.StatusOK, auth.Barcode)
+	c.JSON(http.StatusOK, resp)
 }
 
 // updateAccessToken checks if the user has an acces token and if it matches.
@@ -114,6 +196,9 @@ func (svc *ServiceContext) updateAccessToken(userID string, token string) error 
 	user.AuthToken = token
 	user.AuthUpdatedAt = time.Now()
 	user.SignedIn = true
+	user.LockedOut = false
+	user.LockedOutUntil = nil
+	user.AuthTries = 0
 	err = svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
 	if err != nil {
 		log.Printf("WARN: Unable to update user %s auth token: %v", userID, err)
@@ -135,7 +220,6 @@ func (svc *ServiceContext) SignoutUser(c *gin.Context) {
 	if err != nil {
 		log.Printf("WARN: attempt to sign out user %s that has no user record", userID)
 	} else {
-		user.AuthUpdatedAt = time.Now()
 		user.SignedIn = false
 		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
 		if err != nil {
@@ -158,6 +242,17 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	}
 	if token == "undefined" {
 		log.Printf("Authentication failed; bearer token is undefined")
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	// See if token is associated with a user, and if so, that the user is not locked out
+	var user V4User
+	q := svc.DB.NewQuery(`select * from users where auth_token={:t}`)
+	q.Bind(dbx.Params{"t": token})
+	q.One(&user)
+	if user.AuthToken == token && user.LockedOut {
+		log.Printf("Authentication failed; user %s is locked out", user.Virgo4ID)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

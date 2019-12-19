@@ -9,7 +9,7 @@
         <i v-close-popover class="close fas fa-times-circle"></i>
       </div>
       <div class="message">
-        <p>{{ message }}</p>
+        <p style="white-space: pre-line;" >{{ message }}</p>
       </div>
     </div>
   </v-popover>
