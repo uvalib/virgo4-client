@@ -70,6 +70,13 @@ export default {
          pin: ''
       }
    },
+   watch: {
+      authTriesLeft (newVal, oldVal) {
+         if (newVal < oldVal ) {
+            this.pin = ""   
+         }
+      }
+   },
    methods: {
       signinClicked() {
          this.$store.dispatch("user/signin", {barcode: this.user, password: this.pin})
