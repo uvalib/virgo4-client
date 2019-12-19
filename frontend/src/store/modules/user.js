@@ -347,7 +347,7 @@ const user = {
             ctx.commit('setAuthorizing', false)
             let bmCookie = Vue.cookies.get('v4_bookmark')
             if ( bmCookie) {
-               router.push("/search?restore=1")
+               router.push("/")
             } else {
                router.push("/account")
             }

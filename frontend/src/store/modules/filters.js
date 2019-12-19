@@ -182,7 +182,7 @@ const filters = {
          // to blank arrays with length numPools
          state.poolFacets.splice(0, state.poolFacets.length)
          state.poolFilters.splice(0, state.poolFilters.length)
-         for (let i=0; i< data.nuPools; i++) {
+         for (let i=0; i< data.numPools; i++) {
             state.poolFacets.push([])   
             state.poolFilters.push([])   
          }

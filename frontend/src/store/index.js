@@ -89,6 +89,16 @@ export default new Vuex.Store({
     },
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
+      if (resultIdx > 1 && state.otherSrcSelection.id == "") {
+        // this happens when a search is restored. otherSrcSelection is used 
+        // to drive the selected option in the other sources tab. Make sure it is 
+        /// set correctly  
+        let r = state.results[resultIdx]
+        let name = `<span class='pool'>${r.pool.name}</span>`
+        name += `<span class='total'>${r.total} hits</span>`
+        let sel = {id: r.pool.id, name: name, disabled: false}
+        state.otherSrcSelection = sel
+      }
     },
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool

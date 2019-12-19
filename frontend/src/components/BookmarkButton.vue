@@ -64,7 +64,7 @@ export default {
          bmData.resultsIdx = this.resultsIdx
          bmData.page = this.selectedResults.page
          bmData.filters = this.poolFilters( this.resultsIdx )
-         this.$cookies.set("v4_bookmark", JSON.stringify(bmData))//, 60)
+         this.$cookies.set("v4_bookmark", JSON.stringify(bmData), 60)
          this.$router.push("/signin")
       },
       removeBookmarkClicked() {

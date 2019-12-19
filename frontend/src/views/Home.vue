@@ -113,13 +113,13 @@ export default {
           }
         }
 
-        if ( this.$route.query.restore ) {
-          let bmCookie = this.$cookies.get('v4_bookmark')
+        let bmCookie = this.$cookies.get('v4_bookmark')
+        if ( bmCookie) {
           this.$store.commit('query/restoreSearch', bmCookie)
           this.$store.commit('filters/restoreFilters', bmCookie)
           this.$cookies.remove('v4_bookmark')
           this.$store.dispatch("searchAllPools").then(() => {
-            this.$store.commit('selectPoolResults', bmCookie.resultsIdx)
+            this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
           })
         }
       })
