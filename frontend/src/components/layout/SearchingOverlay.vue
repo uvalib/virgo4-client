@@ -93,15 +93,15 @@ div.searching-box {
 }
 .book-page:nth-child(1) {
    z-index: -1;
-   animation-delay: 1.4s;
+   animation-delay: 0s;
 }
 .book-page:nth-child(2) {
    z-index: -2;
-   animation-delay: 2.8s;
+   animation-delay: 0.5s;
 }
 .book-page:nth-child(3) {
    z-index: -3;
-   animation-delay: 4.2s;
+   animation-delay: 1s;
 }
 div.searching-box .book p {
    color: var(--color-primary-text);
