@@ -63,6 +63,22 @@ export default {
      SearchTips, AdvancedSearch,SearchingOverlay,
      V4Select
    },
+   data: function()  {
+      return {
+         restoringBookmarkSearch: false,
+      }
+   },
+   watch: {
+      updatingFacets(newVal, oldVal) {
+        if ( newVal == false && oldVal == true && this.restoringBookmarkSearch) {
+          this.restoringBookmarkSearch = false
+          this.$store.commit("clearSelectedPoolResults") 
+          this.$store.dispatch("searchSelectedPool").then(() => {
+            alert("DONE")
+          })
+        }
+      }
+   },
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
@@ -71,14 +87,16 @@ export default {
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
-         sessionMessage: state => state.system.sessionMessage
+         sessionMessage: state => state.system.sessionMessage,
+         updatingFacets: state => state.filters.updatingFacets
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
         isSignedIn: 'user/isSignedIn',
-        sources: 'pools/sortedList'
+        sources: 'pools/sortedList',
+        hasFilter: 'filters/hasFilter',
       }),
       ...mapFields('query',[
         'basic','basicSearchScope'
@@ -120,6 +138,11 @@ export default {
           this.$cookies.remove('v4_bookmark')
           this.$store.dispatch("searchAllPools").then(() => {
             this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
+            if ( this.hasFilter(bmCookie.resultsIdx)) {
+              // the pool search kicks off a request for all facets after results arrive.
+              // need to wait for that to be done before a restored filter can be applied
+              this.restoringBookmarkSearch = true
+            }
           })
         }
       })
