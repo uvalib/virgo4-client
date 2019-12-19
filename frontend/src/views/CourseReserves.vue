@@ -4,7 +4,7 @@
       <div class="reserves-content">
          <SearchingOverlay message="Looking up reserved items..."/>
          <p>
-            Type instructor's <strong>last name</strong>, <strong>course ID</strong> or 
+            Type instructor's <strong>last name</strong>, <strong>course ID</strong> or
             <strong>course name</strong> in the search box<br />
             Click the corresponding button to search for reserved items
          </p>
@@ -27,7 +27,13 @@
                <InstructorSearchResults v-if="hasInstructorResults"/>
                <ScrollToTop />
                <div v-if="hasMore" @click="loadMore" class="see-more">
-                  <span v-if="loadingMore"><img src="../assets/searching.gif"></span>
+                  <span v-if="loadingMore">
+                    <div class="spinner">
+                      <div class="bounce1"></div>
+                      <div class="bounce2"></div>
+                      <div class="bounce3"></div>
+                    </div>
+                  </span>
                   <span v-else>Load More Reserves</span>
                </div>
             </template>
@@ -174,5 +180,41 @@ p {
 }
 .no-more {
    cursor: default;
+}
+.spinner {
+  margin: 0 auto;
+  width: 80px;
+  text-align: center;
+}
+.spinner > div {
+  width: 18px;
+  height: 18px;
+  background-color: var(--uvalib-brand-orange);
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  margin: 0 2px;
+}
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 40% {
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+  }
 }
 </style>
