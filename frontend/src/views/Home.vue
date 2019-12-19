@@ -63,22 +63,6 @@ export default {
      SearchTips, AdvancedSearch,SearchingOverlay,
      V4Select
    },
-   data: function()  {
-      return {
-         restoringBookmarkSearch: false,
-      }
-   },
-   watch: {
-      updatingFacets(newVal, oldVal) {
-        if ( newVal == false && oldVal == true && this.restoringBookmarkSearch) {
-          this.restoringBookmarkSearch = false
-          this.$store.commit("clearSelectedPoolResults") 
-          this.$store.dispatch("searchSelectedPool").then(() => {
-            alert("DONE")
-          })
-        }
-      }
-   },
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
@@ -88,7 +72,6 @@ export default {
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
          sessionMessage: state => state.system.sessionMessage,
-         updatingFacets: state => state.filters.updatingFacets
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
@@ -139,9 +122,11 @@ export default {
           this.$store.dispatch("searchAllPools").then(() => {
             this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
             if ( this.hasFilter(bmCookie.resultsIdx)) {
-              // the pool search kicks off a request for all facets after results arrive.
-              // need to wait for that to be done before a restored filter can be applied
-              this.restoringBookmarkSearch = true
+              this.$store.commit("clearSelectedPoolResults") 
+              this.$store.dispatch("searchSelectedPool").then(() => {
+                // Scroll to selected hit
+                // open add bookmark popup
+              })
             }
           })
         }
