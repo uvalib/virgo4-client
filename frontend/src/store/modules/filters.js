@@ -173,6 +173,38 @@ const filters = {
             state.poolFacets.push([])
             state.poolFilters.push([])    
          }
+      },
+
+      restoreFilters(state, data) {
+         // data.filters is array of {facet_id, facet_name, value}
+         // facet_id = FacetAvailability gets moved into state.globalAvailability
+         // all others go into state.poolFilters. Init facets and filters 
+         // to blank arrays with length numPools
+         state.poolFacets.splice(0, state.poolFacets.length)
+         state.poolFilters.splice(0, state.poolFilters.length)
+         for (let i=0; i< data.nuPools; i++) {
+            state.poolFacets.push([])   
+            state.poolFilters.push([])   
+         }
+
+         // set global filter if present
+         let avail = data.filters.find( f => f.facet_id=="FacetAvailability")
+         if ( avail ) {
+            let gaID = ""
+            Object.entries(state.availabilityValues).forEach( ([key,value])=>{
+               if (value  == avail.value) {
+                  gaID = key
+               }
+            })
+            if (gaID.length > 0) {
+               state.globalAvailability = {id: gaID, name: avail.value}
+            }
+         }
+
+         // set all other filters
+         data.filters.filter(f => f.facet_id != "FacetAvailability").forEach( pf => {
+            state.poolFilters[data.resultsIdx].push(pf)
+         })
       }
    },
 

@@ -13,7 +13,7 @@
             </div>
             <div class="message">
                <p>You must be signed in to use bookmarks.</p>
-               <p>Click <router-link to="/signin">here</router-link> sign in.</p>
+               <p>Click <span @click="signInClicked" class="text-button">here</span> sign in.</p>
             </div>
          </div>
       </v-popover>
@@ -22,16 +22,24 @@
 
 <script>
 import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true}
    },
    computed: {
+      ...mapState({
+         resultsIdx: state => state.selectedResultsIdx,
+         pools: state => state.pools.list
+      }),
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
         isKiosk: 'system/isKiosk',
-        bookmarks: 'user/bookmarks'
+        bookmarks: 'user/bookmarks',
+        queryObject: 'query/queryObject',
+        selectedResults: 'selectedResults',
+        poolFilters: 'filters/poolFilter',
       }),
       isBookmarked() {
          let found = false
@@ -48,6 +56,17 @@ export default {
       }
    },
    methods: {
+      signInClicked() {
+         let bmData = this.queryObject 
+         bmData.hit = this.hit.identifier
+         bmData.numPools = this.pools.length
+         bmData.pool = this.pool
+         bmData.resultsIdx = this.resultsIdx
+         bmData.page = this.selectedResults.page
+         bmData.filters = this.poolFilters( this.resultsIdx )
+         this.$cookies.set("v4_bookmark", JSON.stringify(bmData))//, 60)
+         this.$router.push("/signin")
+      },
       removeBookmarkClicked() {
          if ( this.isSignedIn == false) return
 

@@ -229,7 +229,7 @@ export default new Vuex.Store({
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
-      axios.post(url, req).then((response) => {
+      return axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)

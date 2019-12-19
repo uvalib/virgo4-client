@@ -345,7 +345,12 @@ const user = {
             ctx.commit("setSignedInUser", {userId: response.data.barcode, 
                token: ctx.state.authToken, type: "public", quiet: false} )
             ctx.commit('setAuthorizing', false)
-            router.push("/account")
+            let bmCookie = Vue.cookies.get('v4_bookmark')
+            if ( bmCookie) {
+               router.push("/search?restore=1")
+            } else {
+               router.push("/account")
+            }
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)
             ctx.commit('setAuthFailure', error)

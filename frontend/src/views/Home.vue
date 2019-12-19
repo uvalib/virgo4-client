@@ -97,6 +97,8 @@ export default {
         // to populate the pool selector for non-signed in users
         this.$store.dispatch('pools/getPools')
 
+        // Special query parameter handling; for subject searches the 'subject' param will exist
+        // for searches to be restored from a cookie for bookmarking purposes 'restore' will be present
         let subj = this.$route.query.subject
         if ( subj ) {
           // Grab the current query, then set it to match the query param
@@ -109,6 +111,16 @@ export default {
             this.$store.commit('resetOtherSourceSelection')
             this.$store.dispatch("searchAllPools")
           }
+        }
+
+        if ( this.$route.query.restore ) {
+          let bmCookie = this.$cookies.get('v4_bookmark')
+          this.$store.commit('query/restoreSearch', bmCookie)
+          this.$store.commit('filters/restoreFilters', bmCookie)
+          this.$cookies.remove('v4_bookmark')
+          this.$store.dispatch("searchAllPools").then(() => {
+            this.$store.commit('selectPoolResults', bmCookie.resultsIdx)
+          })
         }
       })
    },
