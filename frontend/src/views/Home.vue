@@ -119,7 +119,7 @@ export default {
           this.$store.commit('query/restoreSearch', bmCookie)
           this.$store.commit('filters/restoreFilters', bmCookie)
           this.$cookies.remove('v4_bookmark')
-          this.$store.dispatch("searchAllPools").then(() => {
+          this.$store.dispatch("searchAllPools", bmCookie.page).then(() => {
             this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
             if ( this.hasFilter(bmCookie.resultsIdx)) {
               this.$store.commit("clearSelectedPoolResults") 

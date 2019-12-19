@@ -208,11 +208,20 @@ export default new Vuex.Store({
     // advanced search parameters and will always start at page 1. Filters do not apply
     // to all pools so they are not used here.
     // CTX: commit: ƒ boundCommit(type, payload, options)
-    searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
+    searchAllPools({ state, commit, rootState, rootGetters, dispatch }, tgtPage) {
       commit('system/setError', "")
+      // By default, search for 20 items. If this is a restored search with a particular target 
+      // specified, that target may not be in the first page of results. tgtPage specifes
+      // which page of results contains the hit. Make the initial request return enough results to include it.
+      let rows = state.pageSize 
+      if ( tgtPage) {
+        // target page is 0 based
+        rows = state.pageSize * (tgtPage+1)
+        alert(rows)
+      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: 0, rows: state.pageSize },
+        pagination: { start: 0, rows: rows },
         preferences: {
           target_pool: rootState.preferences.targetPoolURL,
           exclude_pool: rootState.preferences.excludePoolURLs,
