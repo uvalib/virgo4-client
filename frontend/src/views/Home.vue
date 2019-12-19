@@ -124,15 +124,22 @@ export default {
             if ( this.hasFilter(bmCookie.resultsIdx)) {
               this.$store.commit("clearSelectedPoolResults") 
               this.$store.dispatch("searchSelectedPool").then(() => {
-                // Scroll to selected hit
-                // open add bookmark popup
+                this.showBookmarkTarget(bmCookie.hit)
               })
+            } else {
+              this.showBookmarkTarget(bmCookie.hit)
             }
           })
         }
       })
    },
    methods: {
+      showBookmarkTarget(identifier) {
+        let sel = `.hit[data-identifier="${identifier}"]`
+        let tgtEle = document.body.querySelector(sel)
+        tgtEle.scrollIntoView()
+        // open add bookmark popup
+     },
       searchClicked() {
         this.$store.commit('query/setLastSearch', this.rawQueryString)
         this.$store.commit('filters/reset')

@@ -217,7 +217,6 @@ export default new Vuex.Store({
       if ( tgtPage) {
         // target page is 0 based
         rows = state.pageSize * (tgtPage+1)
-        alert(rows)
       }
       let req = {
         query: rootGetters['query/string'],

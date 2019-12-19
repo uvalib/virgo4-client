@@ -1,5 +1,5 @@
 <template>
-   <div class="hit">
+   <div class="hit" v-bind:data-identifier="hit.identifier">
       <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">
