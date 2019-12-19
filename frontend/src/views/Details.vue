@@ -4,7 +4,11 @@
       <div class="details-content">
          <div class="working" v-if="details.searching" >
             <div>Looking up details...</div>
-            <img src="../assets/spinner2.gif">
+            <div class="spinner">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
+            </div>
          </div>
          <template v-else-if="notFound">
             <div class="not-found">
@@ -85,8 +89,8 @@ export default {
          return `/search?subject=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
-         if (field.display == 'optional') return false 
-         if ( this.isKiosk && field.type == "url") return false 
+         if (field.display == 'optional') return false
+         if ( this.isKiosk && field.type == "url") return false
          return true
       },
       fieldValueString( field ) {
@@ -107,7 +111,7 @@ export default {
          }
          if (field.type == "url") {
             return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
-         } 
+         }
          return field.value
       },
    },
@@ -125,7 +129,6 @@ export default {
    }
 }
 </script>
-
 <style scoped>
 .details {
    min-height: 400px;
@@ -169,13 +172,13 @@ table {
 }
 #app td.value >>> a.pure-button.pure-button-primary.ext {
    background-color:var(--color-pale-blue);
-   color: white; 
+   color: white;
    padding: 3px 0px;
    width: 100%;
    border-radius: 5px;
 }
 #app td.value >>> a.pure-button.pure-button-primary.ext:hover {
-   text-decoration: none;  
+   text-decoration: none;
 }
 td.label {
    font-weight: bold;
@@ -197,5 +200,40 @@ table td.value {
 .sep {
    margin: 0 5px;
 }
+.spinner {
+  margin: 0 auto;
+  width: 80px;
+  text-align: center;
+}
+.spinner > div {
+  width: 18px;
+  height: 18px;
+  background-color: var(--uvalib-brand-orange);
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  margin: 0 2px;
+}
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 40% {
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+  }
+}
 </style>
-

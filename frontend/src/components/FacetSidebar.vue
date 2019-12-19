@@ -26,7 +26,11 @@
             <div class="body">
                <div v-if="updatingFacets" class="working">
                   <div>Loading filters...</div>
-                  <img src="../assets/spinner2.gif">
+                  <div class="spinner">
+                    <div class="bounce1"></div>
+                    <div class="bounce2"></div>
+                    <div class="bounce3"></div>
+                  </div>
                </div>
                <dl>
                   <template v-for="facetInfo in facets">
@@ -169,7 +173,6 @@ export default {
    }
 }
 </script>
-
 <style scoped>
 .facet-sidebar {
    margin: 0px 10px 15px 10px;
@@ -307,6 +310,42 @@ span.cnt {
    margin-left: 5px;
    margin-left: auto;
    font-size: 0.8em;
+}
+.spinner {
+  margin: 0 auto;
+  width: 80px;
+  text-align: center;
+}
+.spinner > div {
+  width: 18px;
+  height: 18px;
+  background-color: var(--uvalib-brand-orange);
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  margin: 0 2px;
+}
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 40% {
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+  }
 }
 </style>
 <style>
