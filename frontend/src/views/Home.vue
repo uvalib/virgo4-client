@@ -128,25 +128,34 @@ export default {
             if ( this.hasFilter(bmCookie.resultsIdx)) {
               this.$store.commit("clearSelectedPoolResults") 
               this.$store.dispatch("searchSelectedPool").then(() => {
-                this.showBookmarkTarget(bmCookie.pool, bmCookie.hit)
+                this.showBookmarkTarget(bmCookie)
               })
             } else {
-              this.showBookmarkTarget(bmCookie.pool, bmCookie.hit)
+              this.showBookmarkTarget(bmCookie)
             }
           })
         }
       })
    },
    methods: {
-      showBookmarkTarget(pool, identifier) {
-        let sel = `.hit[data-identifier="${identifier}"]`
-        let tgtEle = document.body.querySelector(sel)
-        tgtEle.scrollIntoView()
-
-        // find target item and open add bookmark popup
-        let hit = this.selectedResults.find( r=> r.identifier == identifier)
-        let data = {pool: pool, data: hit}
-        this.$store.commit("user/showAddBookmark", data)
+      showBookmarkTarget(bmCookie) {
+        let identifier = bmCookie.hit
+        let pool = bmCookie.pool
+        let bmData = {pool: pool, data: null}
+        if ( bmCookie.groupParent) {
+          let sel = `.hit[data-identifier="${bmCookie.groupParent}"]`
+          let tgtEle = document.body.querySelector(sel)
+          tgtEle.scrollIntoView()
+          let parent = this.selectedResults.hits.find( r=> r.identifier == bmCookie.groupParent)
+          bmData.data = parent.group.find( r=> r.identifier == identifier)
+        } else {
+          let sel = `.hit[data-identifier="${identifier}"]`
+          let tgtEle = document.body.querySelector(sel)
+          tgtEle.scrollIntoView()
+          bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
+        }
+        
+        this.$store.commit("user/showAddBookmark", bmData)
       },
 
       searchClicked() {

@@ -59,6 +59,9 @@ export default {
       signInClicked() {
          let bmData = this.queryObject 
          bmData.hit = this.hit.identifier
+         if ( this.hit.groupParent != "") {
+            bmData.groupParent =  this.hit.groupParent 
+         }
          bmData.numPools = this.pools.length
          bmData.pool = this.pool
          bmData.resultsIdx = this.resultsIdx
