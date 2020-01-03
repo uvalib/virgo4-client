@@ -93,7 +93,7 @@ export function getGroupHitMetadata(group, hit) {
     hit.basicFields = group.record_list[0].basicFields
     hit.cover_image = group.record_list[0].cover_image
     hit.identifier = group.record_list[0].identifier
-    group.record_list.pop()
+    group.record_list.shift()
     hit.group = group.record_list
   } else {
     hit.header.title = "ERROR: Mising group data"
