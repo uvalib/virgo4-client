@@ -1,17 +1,15 @@
 <template>
    <nav class="menu">
-      <span class="menu-left">
-         <router-link to="/">
-            <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
-         </router-link>
-         <router-link to="/course-reserves" v-if="isSignedIn && !isCommunityUser">
-            <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
-         </router-link>
-         <span v-if="isKiosk==false" class="menu-item feedback">
-            <Feedback icon/>
-         </span>
-      </span>
       <span class="menu-right">
+        <router-link to="/">
+           <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
+        </router-link>
+        <router-link to="/course-reserves" v-if="isSignedIn && !isCommunityUser">
+           <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
+        </router-link>
+        <span v-if="isKiosk==false" class="menu-item feedback">
+           <Feedback icon/>
+        </span>
          <template v-if="isSignedIn">
             <span @click="toggleMenu" class="menu-item account">
                <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
@@ -46,7 +44,7 @@
                   <i class="notice fas fa-exclamation-triangle"></i>{{itemsOnNotice.length}}
                </span>
             </router-link>
-         </template>   
+         </template>
          <template v-else>
             <router-link v-if="isKiosk==false" to="/signin">
                <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
@@ -119,6 +117,9 @@ export default {
    span.menu-item.feedback {
      display: none;
    }
+   span.menu-item.account {
+     padding-top: 10px;
+   }
 }
 .menu {
    text-align: right;
@@ -165,7 +166,7 @@ export default {
    color: white;
 }
 .submenu:hover {
-   background-color: var(--color-primary-blue);
+   background-color: var(--uvalib-brand-blue);
    color: white;
 }
 .submenu-arrow {
@@ -196,8 +197,7 @@ export default {
    margin-left: auto;
 }
 i.notice {
-   color: var(--color-brand-orange);
+   color: var(--uvalib-brand-orange);
    margin-right: 5px;
 }
 </style>
-
