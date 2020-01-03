@@ -146,6 +146,7 @@ export default {
           let sel = `.hit[data-identifier="${bmCookie.groupParent}"]`
           let tgtEle = document.body.querySelector(sel)
           tgtEle.scrollIntoView()
+          this.$store.commit('setAutoExpandGroupID', bmCookie.groupParent)
           let parent = this.selectedResults.hits.find( r=> r.identifier == bmCookie.groupParent)
           bmData.data = parent.group.find( r=> r.identifier == identifier)
         } else {

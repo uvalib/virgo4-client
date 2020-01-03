@@ -23,6 +23,7 @@ export default new Vuex.Store({
     pageSize: 20,
     results: [],
     total: -1,
+    autoExpandGroupID: "",
     selectedResultsIdx: -1,
     otherSrcSelection: {id: "", name: ""}
   },
@@ -77,6 +78,9 @@ export default new Vuex.Store({
 
   mutations: {
     updateField,
+    setAutoExpandGroupID(state, id) {
+      state.autoExpandGroupID = id
+    },
     setSearching(state, flag) {
       if (state.noSpinner ) {
         state.noSpinner = false
