@@ -100,7 +100,6 @@ export default {
         this.$store.dispatch('pools/getPools')
 
         // Special query parameter handling; for subject searches the 'subject' param will exist
-        // for searches to be restored from a cookie for bookmarking purposes 'restore' will be present
         let subj = this.$route.query.subject
         if ( subj ) {
           // Grab the current query, then set it to match the query param
@@ -146,9 +145,21 @@ export default {
           let sel = `.hit[data-identifier="${bmCookie.groupParent}"]`
           let tgtEle = document.body.querySelector(sel)
           tgtEle.scrollIntoView()
-          this.$store.commit('setAutoExpandGroupID', bmCookie.groupParent)
+
+          // find the item in the group that was targeted for a bookmark
           let parent = this.selectedResults.hits.find( r=> r.identifier == bmCookie.groupParent)
           bmData.data = parent.group.find( r=> r.identifier == identifier)
+
+          // The group accordion watches this value. When set, the accordion will auto-expand
+          this.$store.commit('setAutoExpandGroupID', bmCookie.groupParent)
+
+          // once the group is expanded, scroll to the target group item
+          setTimeout( ()=>{
+            sel = `.group-hit[data-identifier="${identifier}"]`
+            tgtEle = document.body.querySelector(sel)
+            tgtEle.scrollIntoView()
+          }, 300)
+
         } else {
           let sel = `.hit[data-identifier="${identifier}"]`
           let tgtEle = document.body.querySelector(sel)
