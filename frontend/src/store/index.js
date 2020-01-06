@@ -292,9 +292,9 @@ export default new Vuex.Store({
     },
 
     // Select pool results and get all facet info for the result
-    selectPoolResults(ctx, resultIdx) {
+    async selectPoolResults(ctx, resultIdx) {
       ctx.commit('selectPoolResults', resultIdx) 
-      ctx.dispatch("filters/getSelectedResultFacets")
+      await ctx.dispatch("filters/getSelectedResultFacets")
     }
   },
 

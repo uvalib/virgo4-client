@@ -225,7 +225,7 @@ const filters = {
           }
          let tgtURL = pool.url+"/api/search/facets"
          ctx.commit('setUpdatingFacets', true)
-         axios.post(tgtURL, req).then((response) => {
+         return axios.post(tgtURL, req).then((response) => {
             let facets = response.data.facet_list 
             if (!facets) {
                facets = []

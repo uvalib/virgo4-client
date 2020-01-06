@@ -114,29 +114,30 @@ export default {
           }
         }
 
-        // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
-        // an item while not signed in. If there is now a signed in user, replay the search,
-        // scroll to the target hit and open bookmark popup
+        this.restoreBookmarkTarget()
+      })
+   },
+   methods: {
+      // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
+      // an item while not signed in. If there is now a signed in user, replay the search,
+      // scroll to the target hit and open bookmark popup
+      async restoreBookmarkTarget() {
         let bmCookie = this.$cookies.get('v4_bookmark')
         if ( bmCookie && this.isSignedIn) {
           this.$store.commit('query/restoreSearch', bmCookie)
           this.$store.commit('filters/restoreFilters', bmCookie)
           this.$cookies.remove('v4_bookmark')
-          this.$store.dispatch("searchAllPools", bmCookie.page).then(() => {
-            this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
-            if ( this.hasFilter(bmCookie.resultsIdx)) {
-              this.$store.commit("clearSelectedPoolResults") 
-              this.$store.dispatch("searchSelectedPool").then(() => {
-                this.showBookmarkTarget(bmCookie)
-              })
-            } else {
-              this.showBookmarkTarget(bmCookie)
-            }
-          })
+          await this.$store.dispatch("searchAllPools", bmCookie.page)
+          await this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
+          if ( this.hasFilter(bmCookie.resultsIdx)) {
+            this.$store.commit("clearSelectedPoolResults") 
+            await this.$store.dispatch("searchSelectedPool")
+            this.showBookmarkTarget(bmCookie)
+          } else {
+            this.showBookmarkTarget(bmCookie)
+          }
         }
-      })
-   },
-   methods: {
+      },
       showBookmarkTarget(bmCookie) {
         let identifier = bmCookie.hit
         let pool = bmCookie.pool
@@ -157,17 +158,28 @@ export default {
           setTimeout( ()=>{
             sel = `.group-hit[data-identifier="${identifier}"]`
             tgtEle = document.body.querySelector(sel)
-            tgtEle.scrollIntoView()
+            this.scrollToItem(tgtEle)
           }, 300)
 
         } else {
           let sel = `.hit[data-identifier="${identifier}"]`
           let tgtEle = document.body.querySelector(sel)
-          tgtEle.scrollIntoView()
+          this.scrollToItem(tgtEle)
           bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
         }
         
         this.$store.commit("user/showAddBookmark", bmData)
+      },
+
+      scrollToItem( tgtEle ) {
+        let nav = document.getElementById("v4-navbar")
+        var headerOffset = nav.offsetHeight
+        var elementPosition = tgtEle.getBoundingClientRect().top
+        var offsetPosition = elementPosition - headerOffset
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        })
       },
 
       searchClicked() {
