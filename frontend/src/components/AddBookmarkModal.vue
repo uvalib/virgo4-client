@@ -11,9 +11,9 @@
            <div class="bounce3"></div>
          </div>
       </div>
-      <div class="content">
+      <div class="modal-content">
          <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
-         <div>{{authorText}}</div>
+         <TruncatedText title="" :text="authorText" :limit="120" ></TruncatedText>
          <div class="select">
             <label>Select a folder for the bookmark: </label>
                <select v-model="selectedFolder" id="folder" name="folder">
@@ -35,7 +35,11 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import TruncatedText from '@/components/TruncatedText'
 export default {
+   components: {
+      TruncatedText
+   },
    data: function() {
       return {
          lookingUp: true,
@@ -91,6 +95,12 @@ export default {
    }
 }
 </script>
+<style>
+#app .add-bookmark .v-popover.full {
+   width: 100%;
+   text-align: right;
+}
+</style>
 <style scoped>
 div.add-bookmark {
    color: var(--uvalib-text);
@@ -119,7 +129,7 @@ p.error {
        width: 95%;
    }
 }
-div.content {
+div.modal-content {
    padding: 10px;
    text-align: left;
 }
