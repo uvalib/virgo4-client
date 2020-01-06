@@ -35,6 +35,10 @@ export default {
       autoCollapseOn: {
          default: null
       },
+      autoExpandID: {
+         type: String,
+         default: ""
+      },
       closeText: {
          type: String,
          default: "",
@@ -93,7 +97,14 @@ export default {
       },
       autoCollapseOn() {
          if (this.isExpanded) {
-            this.expanded = false
+            this.isExpanded = false
+         }
+      },
+      autoExpandID(newVal, _oldVal) {
+         if (this.isExpanded === false && this.id && newVal != "") {
+            if (this.id == newVal) {
+               this.isExpanded = true    
+            }
          }
       }
    },

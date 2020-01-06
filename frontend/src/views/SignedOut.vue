@@ -3,26 +3,19 @@
       <h1>Signed Out</h1>
       <div class="messages">
          <p>You have successfully ended your Virgo session.</p>
-         <p v-if="sessionType=='netbadge'">
-            To prevent unauthorized access to your 
-            <a href="http://its.virginia.edu/netbadge/" target="_blank">NetBadge account</a> 
-            you may 
-            <a href="https://netbadge.virginia.edu/logout.cgi" rel="nofollow">
-               click here to turn in your NetBadge.
-            </a> 
-         </p>
       </div>
    </div>
 </template>
 
 <script>
-import { mapState } from "vuex"
 export default {
    name: "signedout",
-   computed: {
-      ...mapState({
-         sessionType: state => state.user.sessionType,
-      }),
+   created() {
+      setTimeout( ()=>{
+         if ( this.$route.name == "signedout" ) {
+            this.$router.push("/")
+         }
+      }, 5000)
    }
 }
 </script>

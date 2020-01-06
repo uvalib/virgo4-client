@@ -24,6 +24,16 @@ const query = {
       idQuery: () => id => {
          return `identifier: {${id}}`
       },
+      queryObject: state => {
+         let out = {mode: state.mode}
+         if (state.mode == "basic" ) {
+            out.scope = state.basicSearchScope
+            out.query = state.basic
+         } else {
+            out.query = state.advanced
+         }
+         return out
+      },
       queryEntered: state => {
          if ( state.mode == "basic") {
             return state.basic.length > 0
@@ -69,6 +79,15 @@ const query = {
    },
    mutations: {
       updateField,
+      restoreSearch(state, data) {
+         state.mode = data.mode 
+         if ( data.mode == "basic" ) {
+            state.basicSearchScope = data.scope
+            state.basic = data.query
+         } else {
+            state.advanced = data.query
+         }
+      },
       setBasicSearchScope(state, scope) {
          state.basicSearchScope = scope
        },

@@ -95,6 +95,9 @@ export function getGroupHitMetadata(group, hit) {
     hit.identifier = group.record_list[0].identifier
     group.record_list.shift()
     hit.group = group.record_list
+    hit.group.forEach( h=> {
+      h.groupParent = hit.identifier
+    })
   } else {
     hit.header.title = "ERROR: Mising group data"
   }

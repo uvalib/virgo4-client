@@ -1,5 +1,5 @@
 <template>
-   <div class="group-hit">
+   <div class="group-hit" v-bind:data-identifier="hit.identifier">
       <SearchHitHeader :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">

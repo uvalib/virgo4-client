@@ -23,6 +23,7 @@ export default new Vuex.Store({
     pageSize: 20,
     results: [],
     total: -1,
+    autoExpandGroupID: "",
     selectedResultsIdx: -1,
     otherSrcSelection: {id: "", name: ""}
   },
@@ -77,6 +78,9 @@ export default new Vuex.Store({
 
   mutations: {
     updateField,
+    setAutoExpandGroupID(state, id) {
+      state.autoExpandGroupID = id
+    },
     setSearching(state, flag) {
       if (state.noSpinner ) {
         state.noSpinner = false
@@ -89,6 +93,16 @@ export default new Vuex.Store({
     },
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
+      if (resultIdx > 1 && state.otherSrcSelection.id == "") {
+        // this happens when a search is restored. otherSrcSelection is used 
+        // to drive the selected option in the other sources tab. Make sure it is 
+        /// set correctly  
+        let r = state.results[resultIdx]
+        let name = `<span class='pool'>${r.pool.name}</span>`
+        name += `<span class='total'>${r.total} hits</span>`
+        let sel = {id: r.pool.id, name: name, disabled: false}
+        state.otherSrcSelection = sel
+      }
     },
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool
@@ -198,11 +212,19 @@ export default new Vuex.Store({
     // advanced search parameters and will always start at page 1. Filters do not apply
     // to all pools so they are not used here.
     // CTX: commit: ƒ boundCommit(type, payload, options)
-    searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
+    searchAllPools({ state, commit, rootState, rootGetters, dispatch }, tgtPage) {
       commit('system/setError', "")
+      // By default, search for 20 items. If this is a restored search with a particular target 
+      // specified, that target may not be in the first page of results. tgtPage specifes
+      // which page of results contains the hit. Make the initial request return enough results to include it.
+      let rows = state.pageSize 
+      if ( tgtPage) {
+        // target page is 0 based
+        rows = state.pageSize * (tgtPage+1)
+      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: 0, rows: state.pageSize },
+        pagination: { start: 0, rows: rows },
         preferences: {
           target_pool: rootState.preferences.targetPoolURL,
           exclude_pool: rootState.preferences.excludePoolURLs,
@@ -229,7 +251,7 @@ export default new Vuex.Store({
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
-      axios.post(url, req).then((response) => {
+      return axios.post(url, req).then((response) => {
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)

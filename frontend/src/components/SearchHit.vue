@@ -1,5 +1,5 @@
 <template>
-   <div class="hit">
+   <div class="hit" v-bind:data-identifier="hit.identifier">
       <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">
@@ -22,7 +22,7 @@
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
          </router-link>
       </div>
-      <AccordionContent v-if="hit.grouped" :title="groupTitle"
+      <AccordionContent v-if="hit.grouped" :title="groupTitle" :id="hit.identifier" :autoExpandID="autoExpandGroupID"
          class="group" :autoCollapseOn="searching">
          <div class="group-item-wrapper" v-for="(groupHit,idx) in hit.group" :key="idx">
             <GroupedSearchHit :pool="pool" :hit="groupHit" :key="idx"/>
@@ -56,6 +56,7 @@ export default {
       },
       ...mapState({
          searching: state => state.searching,
+         autoExpandGroupID: state => state.autoExpandGroupID
       }),
        ...mapGetters({
          isKiosk: "system/isKiosk",

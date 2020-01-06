@@ -71,14 +71,16 @@ export default {
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
-         sessionMessage: state => state.system.sessionMessage
+         sessionMessage: state => state.system.sessionMessage,
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
         isSignedIn: 'user/isSignedIn',
-        sources: 'pools/sortedList'
+        sources: 'pools/sortedList',
+        hasFilter: 'filters/hasFilter',
+        selectedResults: 'selectedResults',
       }),
       ...mapFields('query',[
         'basic','basicSearchScope'
@@ -97,6 +99,7 @@ export default {
         // to populate the pool selector for non-signed in users
         this.$store.dispatch('pools/getPools')
 
+        // Special query parameter handling; for subject searches the 'subject' param will exist
         let subj = this.$route.query.subject
         if ( subj ) {
           // Grab the current query, then set it to match the query param
@@ -110,15 +113,70 @@ export default {
             this.$store.dispatch("searchAllPools")
           }
         }
+
+        // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
+        // an item while not signed in. If there is now a signed in user, replay the search,
+        // scroll to the target hit and open bookmark popup
+        let bmCookie = this.$cookies.get('v4_bookmark')
+        if ( bmCookie && this.isSignedIn) {
+          this.$store.commit('query/restoreSearch', bmCookie)
+          this.$store.commit('filters/restoreFilters', bmCookie)
+          this.$cookies.remove('v4_bookmark')
+          this.$store.dispatch("searchAllPools", bmCookie.page).then(() => {
+            this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
+            if ( this.hasFilter(bmCookie.resultsIdx)) {
+              this.$store.commit("clearSelectedPoolResults") 
+              this.$store.dispatch("searchSelectedPool").then(() => {
+                this.showBookmarkTarget(bmCookie)
+              })
+            } else {
+              this.showBookmarkTarget(bmCookie)
+            }
+          })
+        }
       })
    },
    methods: {
+      showBookmarkTarget(bmCookie) {
+        let identifier = bmCookie.hit
+        let pool = bmCookie.pool
+        let bmData = {pool: pool, data: null}
+        if ( bmCookie.groupParent) {
+          let sel = `.hit[data-identifier="${bmCookie.groupParent}"]`
+          let tgtEle = document.body.querySelector(sel)
+          tgtEle.scrollIntoView()
+
+          // find the item in the group that was targeted for a bookmark
+          let parent = this.selectedResults.hits.find( r=> r.identifier == bmCookie.groupParent)
+          bmData.data = parent.group.find( r=> r.identifier == identifier)
+
+          // The group accordion watches this value. When set, the accordion will auto-expand
+          this.$store.commit('setAutoExpandGroupID', bmCookie.groupParent)
+
+          // once the group is expanded, scroll to the target group item
+          setTimeout( ()=>{
+            sel = `.group-hit[data-identifier="${identifier}"]`
+            tgtEle = document.body.querySelector(sel)
+            tgtEle.scrollIntoView()
+          }, 300)
+
+        } else {
+          let sel = `.hit[data-identifier="${identifier}"]`
+          let tgtEle = document.body.querySelector(sel)
+          tgtEle.scrollIntoView()
+          bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
+        }
+        
+        this.$store.commit("user/showAddBookmark", bmData)
+      },
+
       searchClicked() {
         this.$store.commit('query/setLastSearch', this.rawQueryString)
         this.$store.commit('filters/reset')
         this.$store.commit('resetOtherSourceSelection')
         this.$store.dispatch("searchAllPools")
       },
+
       advancedClicked() {
         this.$store.commit("query/setAdvancedSearch")
       },
