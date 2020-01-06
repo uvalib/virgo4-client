@@ -47,7 +47,7 @@
                   </tr>
                </table>
             </div>
-            <AvailabilityTable :titleId="details.identifier" />
+            <AvailabilityTable v-if="details.has_availability != false" :titleId="details.identifier" />
          </template>
          <BackToVirgo  />
       </div>
