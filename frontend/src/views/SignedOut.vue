@@ -12,7 +12,9 @@ export default {
    name: "signedout",
    created() {
       setTimeout( ()=>{
-         this.$router.push("/")
+         if ( this.$route.name == "signedout" ) {
+            this.$router.push("/")
+         }
       }, 5000)
    }
 }

@@ -61,7 +61,7 @@ const router = new Router({
         getSignedInUserFromCookie()
         let bmCookie = Vue.cookies.get('v4_bookmark')
         if ( bmCookie) {
-            next("/search")
+            next("/")
         } else {
             next("/account")
         }
