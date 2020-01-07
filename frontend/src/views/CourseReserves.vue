@@ -2,7 +2,7 @@
    <div class="course-reserves">
       <h1>Course Reserves</h1>
       <div class="reserves-content">
-         <SearchingOverlay message="Looking up reserved items..."/>
+         <V4Spinner v-if="searching" message="Looking up reserved items..." v-bind:overlay="true"/>
          <p>
             Type instructor's <strong>last name</strong>, <strong>course ID</strong> or
             <strong>course name</strong> in the search box<br />
@@ -22,18 +22,11 @@
                No course reserves that match your request were found
             </div>
             <template v-else>
-               <div class="count">{{totalReserves}} reserved items found</div>
                <CourseSearchResults v-if="hasCourseResults"/>
                <InstructorSearchResults v-if="hasInstructorResults"/>
                <ScrollToTop />
                <div v-if="hasMore" @click="loadMore" class="see-more">
-                  <span v-if="loadingMore">
-                    <div class="spinner">
-                      <div class="bounce1"></div>
-                      <div class="bounce2"></div>
-                      <div class="bounce3"></div>
-                    </div>
-                  </span>
+                  <V4Spinner v-if="loadingMore" color="white"/>
                   <span v-else>Load More Reserves</span>
                </div>
             </template>
@@ -46,7 +39,7 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import SearchingOverlay from "@/components/layout/SearchingOverlay"
+import V4Spinner from "@/components/V4Spinner"
 import CourseSearchResults from "@/components/reserves/CourseSearchResults"
 import InstructorSearchResults from "@/components/reserves/InstructorSearchResults"
 import ScrollToTop from "@/components/ScrollToTop"
@@ -54,7 +47,7 @@ export default {
    name: "course-reserves",
    components: {
       CourseSearchResults, InstructorSearchResults,
-      SearchingOverlay, ScrollToTop
+      V4Spinner, ScrollToTop
    },
    data: function() {
       return {
@@ -180,41 +173,5 @@ p {
 }
 .no-more {
    cursor: default;
-}
-.spinner {
-  margin: 0 auto;
-  width: 80px;
-  text-align: center;
-}
-.spinner > div {
-  width: 18px;
-  height: 18px;
-  background-color: var(--uvalib-brand-orange);
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  margin: 0 2px;
-}
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
 }
 </style>

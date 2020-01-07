@@ -9,7 +9,7 @@
          </p>
       </div>
       <div v-else class="reserves-content">
-         <SearchingOverlay message="Submitting your request..."/>
+         <V4Spinner  v-if="searching" message="Submitting your request..." v-bind:overlay="true"/>
          <div class="note">
             <div class="title">
                Please allow 14 days to process requests
@@ -134,21 +134,17 @@
 import { mapState } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import { mapMultiRowFields } from 'vuex-map-fields'
-import SearchingOverlay from "@/components/layout/SearchingOverlay"
+import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "course-reserves-request",
-   data: function() {
-      return {
-         submitting: false
-      };
-   },
    components: {
-      SearchingOverlay
+      V4Spinner
    },
    computed: {
       ...mapState({
          requestList: state => state.reserves.requestList,
-         error: state=> state.system.error
+         error: state=> state.system.error,
+         searching: state => state.searching,
       }),
       ...mapFields('reserves',[
          'request.onBehalfOf',

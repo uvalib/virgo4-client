@@ -1,12 +1,12 @@
 <template>
-   <div class="v4-spinner-overlay">
+   <div v-if="overlay" class="v4-spinner-overlay">
       <div class="v4-spinner"  :class="{border: dots}">
          <template v-if="dots">
-            <h3>{{message}}</h3>
+            <h3 v-if="message">{{message}}</h3>
             <div class="spinner-animation">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
+               <div class="bounce1" :style="{backgroundColor: color}"></div>
+               <div class="bounce2" :style="{backgroundColor: color}"></div>
+               <div class="bounce3" :style="{backgroundColor: color}"></div>
             </div>
          </template>
          <template v-else>
@@ -19,6 +19,14 @@
          </template>
       </div>
    </div>
+   <div v-else class="v4-spinner embed">
+      <h3 v-if="message">{{message}}</h3>
+      <div class="spinner-animation">
+         <div class="bounce1" :style="{backgroundColor: color}"></div>
+         <div class="bounce2" :style="{backgroundColor: color}"></div>
+         <div class="bounce3" :style="{backgroundColor: color}"></div>
+      </div>
+   </div>
 </template>
 
 <script>
@@ -27,7 +35,7 @@ export default {
    props: {
       message: {
          type: String,
-         required: true
+         default: ""
       },
       overlay: {
          type: Boolean,
@@ -36,6 +44,16 @@ export default {
       dots: {
          type: Boolean,
          default: true
+      },
+      color: {
+         type: String,
+         default: "var(--uvalib-brand-orange)"
+      }
+   },
+   computed: {
+      backgroundColor() {
+         if ( this.transparent) return "transparent"
+         return "white"
       }
    }
 }
@@ -60,6 +78,12 @@ div.v4-spinner {
    font-weight: bold;
    color: var(--uvalib-text);
    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+div.v4-spinner.embed {
+   box-shadow: none;
+   padding: 0;
+   margin: 0;
+   background: transparent;
 }
 div.v4-spinner.border {
    border: 3px solid var(--color-brand-orange);
@@ -89,7 +113,6 @@ div.v4-spinner h1 {
 .spinner-animation > div {
   width: 18px;
   height: 18px;
-  background-color: var(--uvalib-brand-orange);
   border-radius: 100%;
   display: inline-block;
   -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
