@@ -25,12 +25,7 @@
             :layoutChange="updatingFacets"  :invert="!startExpanded">
             <div class="body">
                <div v-if="updatingFacets" class="working">
-                  <div>Loading filters...</div>
-                  <div class="spinner">
-                    <div class="bounce1"></div>
-                    <div class="bounce2"></div>
-                    <div class="bounce3"></div>
-                  </div>
+                  <V4Spinner message="Loading filters..."/>
                </div>
                <dl>
                   <template v-for="facetInfo in facets">
@@ -66,9 +61,10 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import AccordionContent from "@/components/AccordionContent"
+import V4Spinner from "@/components/V4Spinner"
 export default {
    components: {
-      AccordionContent
+      AccordionContent, V4Spinner
    },
    computed: {
       ...mapState({
@@ -195,7 +191,7 @@ export default {
    min-height: 80px;
 }
 .pool .body {
-   min-height: 100px;
+   min-height: 150px;
 }
 .heading {
    background-color: var(--uvalib-brand-blue);
@@ -247,13 +243,10 @@ i.check {
    padding: 25px 15px;
    bottom: 0;
    top: 0;
-   z-index: 5000;
+   z-index: 50;
    opacity: 0.9;
    font-size: 1.25em;
    font-weight: bold;
-}
-.working img {
-   margin: 15px 0;
 }
 .global {
    margin-bottom: 10px;
@@ -310,42 +303,6 @@ span.cnt {
    margin-left: 5px;
    margin-left: auto;
    font-size: 0.8em;
-}
-.spinner {
-  margin: 0 auto;
-  width: 80px;
-  text-align: center;
-}
-.spinner > div {
-  width: 18px;
-  height: 18px;
-  background-color: var(--uvalib-brand-orange);
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  margin: 0 2px;
-}
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
 }
 </style>
 <style>
