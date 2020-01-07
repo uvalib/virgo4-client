@@ -1,7 +1,7 @@
 <template>
    <div id="app" @click="closeUserMenu">
       <FatalError v-if="fatal.length > 0" />
-      <AuthorizePanel v-if="authorizing" />
+      <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer"></div>
       </transition>
@@ -22,7 +22,7 @@ import LibraryFooter from "@/components/layout/LibraryFooter"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
-import AuthorizePanel from "@/components/layout/AuthorizePanel"
+import V4Spinner from "@/components/V4Spinner"
 import AddBookmarkModal from "@/components/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -40,7 +40,7 @@ export default {
       VirgoHeader,
       LibraryFooter,
       FatalError,
-      AuthorizePanel,
+      V4Spinner,
       AddBookmarkModal,
       MenuBar
    },

@@ -3,7 +3,7 @@
       <div class="tips-container">
           <SearchTips/>
       </div>
-      <SearchingOverlay message="Searching..." />
+      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false" />
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
           <h1>Search</h1>
@@ -54,13 +54,13 @@ import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/popovers/SearchTips"
 import AdvancedSearch from "@/components/AdvancedSearch"
-import SearchingOverlay from "@/components/layout/SearchingOverlay"
+import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
 export default {
    name: "home",
    components: {
      SearchResults,
-     SearchTips, AdvancedSearch,SearchingOverlay,
+     SearchTips, AdvancedSearch, V4Spinner,
      V4Select
    },
    computed: {
@@ -68,6 +68,7 @@ export default {
          fatal: state => state.system.fatal,
          error: state => state.system.error,
          showDebug: state => state.showDebug,
+         searching: state => state.searching,
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
