@@ -85,10 +85,6 @@ div.v4-spinner.embed {
    margin: 0;
    background: transparent;
 }
-div.v4-spinner.border {
-   border: 3px solid var(--color-brand-orange);
-   border-radius: 5px;
-}
 @media only screen and (min-width: 768px) {
    div.v4-spinner {
       padding: 40px 90px;
