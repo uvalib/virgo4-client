@@ -4,12 +4,7 @@
       <div class="bookmarks-content">
          <AccountActivities />
          <div class="working" v-if="lookingUp">
-            <div>Looking up bookmark information...</div>
-            <div class="spinner">
-              <div class="bounce1"></div>
-              <div class="bounce2"></div>
-              <div class="bounce3"></div>
-            </div>
+            <V4Spinner message="Looking up bookmark information..."/>
          </div>
          <div v-else>
             <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
@@ -124,13 +119,14 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
-import ConfirmDelete from "@/components/popovers/ConfirmDelete";
-import MoveBookmark from "@/components/popovers/MoveBookmark";
-import RenameBookmark from "@/components/popovers/RenameBookmark";
-import AccordionContent from "@/components/AccordionContent";
-import AccountActivities from "@/components/AccountActivities";
+import { mapGetters } from "vuex"
+import { mapState } from "vuex"
+import ConfirmDelete from "@/components/popovers/ConfirmDelete"
+import MoveBookmark from "@/components/popovers/MoveBookmark"
+import RenameBookmark from "@/components/popovers/RenameBookmark"
+import AccordionContent from "@/components/AccordionContent"
+import AccountActivities from "@/components/AccountActivities"
+import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "bookmarks",
    components: {
@@ -138,7 +134,8 @@ export default {
       ConfirmDelete,
       AccountActivities,
       MoveBookmark,
-      RenameBookmark
+      RenameBookmark,
+      V4Spinner
    },
    data: function() {
       return {
@@ -234,7 +231,7 @@ export default {
          this.$store.dispatch("user/addFolder", this.newFolder).then(() => {
             this.createOpen = false;
             this.submitting = false;
-            this.newFolder = "";
+            this.newFolder = ""
          });
       }
    },
@@ -404,41 +401,5 @@ i.details {
 }
 p.error {
    margin-bottom: 15px;
-}
-.spinner {
-  margin: 0 auto;
-  width: 80px;
-  text-align: center;
-}
-.spinner > div {
-  width: 18px;
-  height: 18px;
-  background-color: var(--uvalib-brand-orange);
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  margin: 0 2px;
-}
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
 }
 </style>

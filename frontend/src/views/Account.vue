@@ -4,12 +4,7 @@
       <div class="account-content">
          <AccountActivities/>
          <div class="working" v-if="!expandBilling && lookingUp" >
-            <div>Looking up account details...</div>
-            <div class="spinner">
-              <div class="bounce1"></div>
-              <div class="bounce2"></div>
-              <div class="bounce3"></div>
-            </div>
+            <V4Spinner message="Looking up account details..."/>
          </div>
          <template v-else-if="hasAccountInfo">
             <h2 class="user-name">{{info.displayName}} ({{info.id}})</h2>
@@ -137,6 +132,7 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
+import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "account",
    data: function() {
@@ -145,7 +141,7 @@ export default {
       };
    },
    components: {
-      AccountActivities, AccordionContent
+      AccountActivities, AccordionContent, V4Spinner
    },
    computed: {
       ...mapState({
@@ -297,41 +293,5 @@ div.notes p {
 }
 .error {
    text-align: center;
-}
-.spinner {
-  margin: 0 auto;
-  width: 80px;
-  text-align: center;
-}
-.spinner > div {
-  width: 18px;
-  height: 18px;
-  background-color: var(--uvalib-brand-orange);
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  margin: 0 2px;
-}
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
 }
 </style>

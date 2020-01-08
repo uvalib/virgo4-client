@@ -3,15 +3,8 @@
       <h1>Requests</h1>
       <div class="requests-content">
          <AccountActivities />
-         <div v-if="lookingUp" class="working">
-            <div class="box">
-               <div>Working...</div>
-               <div class="spinner">
-                 <div class="bounce1"></div>
-                 <div class="bounce2"></div>
-                 <div class="bounce3"></div>
-               </div>
-            </div>
+         <div class="working" v-if="lookingUp" >
+            <V4Spinner message="Loading up requests..."/>
          </div>
          <div class="details">
             <template v-if="requests.length > 0">
@@ -90,12 +83,13 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import AccountActivities from "@/components/AccountActivities";
+import { mapState } from "vuex"
+import AccountActivities from "@/components/AccountActivities"
+import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "requests",
    components: {
-      AccountActivities
+      AccountActivities, V4Spinner
    },
    computed: {
       ...mapState({
@@ -137,29 +131,6 @@ export default {
 .request .title {
    font-weight: bold;
 }
-.working {
-   text-align: center;
-   position: fixed;
-   right: 0;
-   left: 0;
-   z-index: 1000;
-   top: 0;
-   bottom: 0;
-   background: rgba(0, 0, 0, 0.3);
-}
-.working .box {
-   background: white;
-   z-index: 1000;
-   padding: 10px 100px 0 100px;
-   border: 4px solid var(--color-brand-orange);
-   border-radius: 5px;
-   box-shadow: 0 0 10px #444;
-   display: inline-block;
-   margin: 10% auto;
-}
-.working img {
-   margin: 15px 0;
-}
 .requests-content {
    width: 60%;
    margin: 0 auto;
@@ -196,41 +167,5 @@ dt {
 }
 dd {
    margin: 0 0 10px 0;
-}
-.spinner {
-  margin: 0 auto;
-  width: 80px;
-  text-align: center;
-}
-.spinner > div {
-  width: 18px;
-  height: 18px;
-  background-color: var(--uvalib-brand-orange);
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  margin: 0 2px;
-}
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
 }
 </style>
