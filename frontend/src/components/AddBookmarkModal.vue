@@ -3,26 +3,23 @@
       <div class="modal-title">
          <i class="fas fa-bookmark"></i> &nbsp;Add Bookmark
       </div>
-      <div class="working" v-if="lookingUp" >
-         <div>Loading...</div>
-         <div class="spinner">
-           <div class="bounce1"></div>
-           <div class="bounce2"></div>
-           <div class="bounce3"></div>
-         </div>
-      </div>
       <div class="modal-content">
-         <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
-         <TruncatedText title="" :text="authorText" :limit="120" ></TruncatedText>
-         <div class="select">
-            <label>Select a folder for the bookmark: </label>
-               <select v-model="selectedFolder" id="folder" name="folder">
-                  <option v-for="(folder) in folders" selected=false
-                     :key="folder.id" :value="folder.name ">
-                     {{ folder.name }}
-                  </option>
-               </select>
+         <div class="working" v-if="lookingUp">
+            <V4Spinner message="Loading bookmark data..."/>
          </div>
+         <template v-else>
+            <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
+            <TruncatedText title="" :text="authorText" :limit="120" ></TruncatedText>
+            <div class="select">
+               <label>Select a folder for the bookmark: </label>
+                  <select v-model="selectedFolder" id="folder" name="folder">
+                     <option v-for="(folder) in folders" selected=false
+                        :key="folder.id" :value="folder.name ">
+                        {{ folder.name }}
+                     </option>
+                  </select>
+            </div>
+         </template>
          <p class="error">{{bookmarkError}}</p>
       </div>
       <div class="controls">
@@ -36,9 +33,10 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import TruncatedText from '@/components/TruncatedText'
+import V4Spinner from "@/components/V4Spinner"
 export default {
    components: {
-      TruncatedText
+      TruncatedText, V4Spinner
    },
    data: function() {
       return {
@@ -161,40 +159,8 @@ label {
 #folder {
    width: 100%;
 }
-.spinner {
-  margin: 0 auto;
-  width: 80px;
-  text-align: center;
-}
-.spinner > div {
-  width: 18px;
-  height: 18px;
-  background-color: var(--uvalib-brand-orange);
-  border-radius: 100%;
-  display: inline-block;
-  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  margin: 0 2px;
-}
-.spinner .bounce1 {
-  -webkit-animation-delay: -0.32s;
-  animation-delay: -0.32s;
-}
-.spinner .bounce2 {
-  -webkit-animation-delay: -0.16s;
-  animation-delay: -0.16s;
-}
-@-webkit-keyframes sk-bouncedelay {
-  0%, 80%, 100% { -webkit-transform: scale(0) }
-  40% { -webkit-transform: scale(1.0) }
-}
-@keyframes sk-bouncedelay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  } 40% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
-  }
+.working {
+   color: var(--uvalib-text);
+   text-align: center;
 }
 </style>
