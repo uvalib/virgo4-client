@@ -109,6 +109,11 @@ div.results-header {
 .hit-wrapper:last-child {
    margin-bottom: 0;
 }
+@media only screen and (max-width: 600px) {
+   .hit-wrapper {
+     max-width: 94vw;
+   }
+}
 .see-more, .no-more {
    padding: 10px;
    background: var(--uvalib-brand-blue);
