@@ -11,6 +11,7 @@ import filters from './modules/filters'
 import item from './modules/item'
 import reserves from './modules/reserves'
 import preferences from './modules/preferences'
+import journals from './modules/journals'
 import * as utils from './modules/utils'
 import { getField, updateField } from 'vuex-map-fields'
 
@@ -311,8 +312,9 @@ export default new Vuex.Store({
   },
 
   modules: {
-    item: item,
     filters: filters,
+    item: item,
+    journals: journals,
     pools: pools,
     preferences: preferences,
     query: query,

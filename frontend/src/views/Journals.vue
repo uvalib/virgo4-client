@@ -6,7 +6,7 @@
          <div class="search">
             <input
                @keyup.enter="searchClicked"
-               v-model="journal"
+               v-model="query"
                autocomplete="off"
                type="text"
                placeholder="Browse Virgo journals by title"
@@ -44,16 +44,23 @@ export default {
    computed: {
       ...mapState({
          error: state => state.system.error,
-         searching: state => state.searching
+         searching: state => state.journals.searching
       }),
-      ...mapFields("query", ["journal"])
+      ...mapFields("journals", ["query"])
    },
    data: function() {
       return {};
    },
    methods: {
       searchClicked() {
-         
+         if ( this.query == "") {
+            this.$store.commit(
+               "system/setError",
+               "Please enter a search query"
+            )
+            return
+         }
+         this.$store.dispatch("journals/searchJournals")
       },
       basicClicked() {
          this.$store.commit("query/setBasicSearch")

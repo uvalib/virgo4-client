@@ -23,6 +23,12 @@ type DBConfig struct {
 	Name string
 }
 
+// SolrConfig wraps up the config for solr acess
+type SolrConfig struct {
+	URL  string
+	Core string
+}
+
 // IlliadConfig contains the configuration necessary to communicate with the Illiad API
 type IlliadConfig struct {
 	URL    string
@@ -40,6 +46,7 @@ type ServiceConfig struct {
 	DB                 DBConfig
 	SMTP               SMTPConfig
 	Illiad             IlliadConfig
+	Solr               SolrConfig
 }
 
 // DevConfig specifies configuration params specific to development mode
@@ -57,6 +64,10 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
+
+	// Solr config
+	flag.StringVar(&cfg.Solr.URL, "solr", "http://libsvr40.lib.virginia.edu:8986/solr", "Solr URL for journal browse")
+	flag.StringVar(&cfg.Solr.Core, "core", "test_core", "Solr core for journal browse")
 
 	// Dev mode settings
 	flag.StringVar(&cfg.Dev.AuthUser, "devuser", "", "Authorized computing id for dev")
@@ -96,6 +107,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("cremail param is required")
 	} else {
 		log.Printf("Course Reserves email recipient: %s", cfg.CourseReserveEmail)
+	}
+	if cfg.Solr.URL == "" || cfg.Solr.Core == "" {
+		log.Fatal("solr and core params are required")
+	} else {
+		log.Printf("Solr endpoint: %s/%s", cfg.Solr.URL, cfg.Solr.Core)
 	}
 
 	return &cfg

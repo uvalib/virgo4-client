@@ -29,6 +29,7 @@ type ServiceContext struct {
 	DB                 *dbx.DB
 	SMTP               SMTPConfig
 	Illiad             IlliadConfig
+	Solr               SolrConfig
 }
 
 // RequestError contains http status code and message for a
@@ -43,6 +44,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
 		VirgoURL:           cfg.VirgoURL,
 		SearchAPI:          cfg.SearchAPI,
+		Solr:               cfg.Solr,
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
