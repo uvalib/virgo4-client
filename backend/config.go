@@ -66,7 +66,7 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 
 	// Solr config
-	flag.StringVar(&cfg.Solr.URL, "solr", "http://libsvr40.lib.virginia.edu:8986/solr", "Solr URL for journal browse")
+	flag.StringVar(&cfg.Solr.URL, "solr", "", "Solr URL for journal browse")
 	flag.StringVar(&cfg.Solr.Core, "core", "test_core", "Solr core for journal browse")
 
 	// Dev mode settings
