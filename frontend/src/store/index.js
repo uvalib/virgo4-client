@@ -91,6 +91,15 @@ export default new Vuex.Store({
     resetOtherSourceSelection(state) {
       state.otherSrcSelection = {id: "", name: ""}
     },
+    updateOtherPoolLabel(state) {
+      // when a pool is selected from the 'Other' tab and a filter has been applied
+      // this method method is used to update the count in the tab label
+      if ( state.otherSrcSelection.id == "") return
+      let res = state.results.find( r => r.pool.id == state.otherSrcSelection.id )
+      let name = `<span class='pool'>${res.pool.name}</span>`
+      name += `<span class='total'>${res.total} hits</span>`
+      state.otherSrcSelection.name = name
+    },
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
       if (resultIdx > 1 && state.otherSrcSelection.id == "") {
@@ -284,6 +293,9 @@ export default new Vuex.Store({
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
         dispatch("filters/getSelectedResultFacets")
+        if ( state.otherSrcSelection.id != "") {
+          commit('updateOtherPoolLabel')
+        }
       }).catch((error) => {
         commit('system/setError', error)
         commit('setSearching', false)
