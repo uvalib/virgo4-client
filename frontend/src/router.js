@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
+import Journals from './views/Journals.vue'
 import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
@@ -26,6 +27,11 @@ const router = new Router({
       alias: '/search',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/journals',
+      name: 'journals',
+      component: Journals
     },
     {
       path: '/course-reserves',
@@ -117,7 +123,7 @@ router.beforeEach((to, _from, next) => {
   store.commit('user/clearAuthMessages', "")
 
   // Some pages just require an auth token...
-  let tokenPages = ["home", "course-reserves", "details", "search"]
+  let tokenPages = ["home", "course-reserves", "details", "search", "journals"]
   if (tokenPages.includes(to.name)) {
     ensureAuthTokenPresent(next)
     return

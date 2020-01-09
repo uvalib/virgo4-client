@@ -26,6 +26,11 @@
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
           </div>
           <div class="advanced">
+            <router-link to="/journals">
+              Browse Journals&nbsp;<i class="far fa-newspaper"></i>
+            </router-link>
+          </div>
+          <div class="advanced">
             <span class="text-button advanced-link" @click="advancedClicked">
               Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
             </span>

@@ -65,8 +65,13 @@
          <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">
+         <router-link to="/journals">
+            Browse Journals&nbsp;<i class="far fa-newspaper"></i>
+         </router-link>
+      </div>
+      <div class="basic">
          <span class="text-button basic-link" @click="basicClicked">
-            Search&nbsp;
+            Basic Search&nbsp;
             <i class="fas fa-undo-alt"></i>
          </span>
       </div>
@@ -205,6 +210,7 @@ div.query {
    flex-flow: row wrap;
    align-items: center;
    justify-content: flex-end;
+   margin-bottom: 10px;
 }
 
 .controls > * {

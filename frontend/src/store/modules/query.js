@@ -6,6 +6,7 @@ const query = {
       mode: "basic",
       basic: "",
       basicSearchScope: {name: 'All Sources', id: 'all'},
+      journal: "",
       advanced: [
          {op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""},
       ],
