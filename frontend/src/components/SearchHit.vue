@@ -4,7 +4,8 @@
       <div class="top">
          <div class="basic">
             <div v-if="hit.header.author" class="author">
-               <TruncatedText title="Author" :text="hit.header.author.join('; ')" :limit="60" />
+               <TruncatedText :title="hit.header.author.label" 
+                  :text="hit.header.author.value.join('; ')" :limit="60" />
             </div>
             <dl class="fields">
                <template v-for="(field) in hit.basicFields">

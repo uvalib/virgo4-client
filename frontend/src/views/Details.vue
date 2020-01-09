@@ -16,8 +16,8 @@
             <div class="info">
                <table class="fields">
                   <tr v-if="details.header.author">
-                     <td class="label">Author:</td>
-                     <td class="value">{{details.header.author.join("; ")}}</td>
+                     <td class="label">{{details.header.author.label}}:</td>
+                     <td class="value">{{details.header.author.value.join("; ")}}</td>
                   </tr>
                   <tr v-for="(field,idx) in allFields" :key="idx">
                      <template v-if="shouldDisplay(field)">

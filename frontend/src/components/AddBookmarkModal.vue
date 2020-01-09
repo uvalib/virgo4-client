@@ -55,7 +55,7 @@ export default {
       authorText() {
          let author = ""
          if ( this.newBookmark.data.header.author ) {
-            author = this.newBookmark.data.header.author.join(", ")
+            author = this.newBookmark.data.header.author.value.join(", ")
          }
          return author
       }

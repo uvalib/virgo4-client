@@ -381,7 +381,7 @@ const user = {
 
          // required details: title, author, call number, location, library, availability
          data['details'] = {title :bm.data.header.title, 
-            author: bm.data.header.author.join(", "),
+            author: bm.data.header.author.value.join(", "),
             callNumber: utils.getFieldValue("call_number", bm.data),
             location: utils.getFieldValue("location", bm.data),
             library: utils.getFieldValue("library", bm.data),

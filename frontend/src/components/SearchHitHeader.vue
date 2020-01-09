@@ -84,11 +84,6 @@ div.bm-control {
    align-items: center;
    justify-content: flex-start;
 }
-.author {
-   font-size: 0.9em;
-   font-weight: normal;
-   margin-top:4px;
-}
 .count {
    display: inline-block;
    font-size: 0.7em;

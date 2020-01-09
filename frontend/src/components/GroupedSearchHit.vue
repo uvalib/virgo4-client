@@ -3,7 +3,7 @@
       <SearchHitHeader :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">
-            <div v-if="hit.header.author" class="author">{{hit.header.author.join(", ")}}</div>
+            <div v-if="hit.header.author" class="author">{{hit.header.author.value.join(", ")}}</div>
             <dl class="fields">
                <template v-for="(field) in hit.basicFields">
                   <template v-if="field.display != 'optional'">
