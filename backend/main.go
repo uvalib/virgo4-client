@@ -44,7 +44,7 @@ func main() {
 	{
 		api.GET("/authenticated/:token", svc.IsAuthenticated)
 		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
-		api.GET("/journals/browse", svc.BrowseJournals)
+		api.GET("/journals/browse", svc.AuthMiddleware, svc.BrowseJournals)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)
 		api.GET("/users/:uid/bills", svc.AuthMiddleware, svc.GetUserBills)

@@ -230,6 +230,17 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values url.Values) ([]by
 	return handleAPIResponse(url, resp, err)
 }
 
+// SolrGet sends a GET request to solr and returns the response
+func (svc *ServiceContext) SolrGet(url string) ([]byte, *RequestError) {
+	log.Printf("Solr request: %s", url)
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	resp, err := client.Get(url)
+	return handleAPIResponse(url, resp, err)
+}
+
 func handleAPIResponse(URL string, resp *http.Response, err error) ([]byte, *RequestError) {
 	if err != nil {
 		status := http.StatusBadRequest
