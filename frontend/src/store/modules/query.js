@@ -107,7 +107,18 @@ const query = {
       setSubjectSearch(state, subject) {
          state.mode = "advanced"
          state.advanced = [
-            {op: "AND", value: subject, field: "subject", type: "EQUAL", endVal: ""}]
+            {op: "AND", value: `"${subject}"`, field: "subject", type: "EQUAL", endVal: ""}]
+      },
+      setTitleSearch(state, title) {
+         state.mode = "advanced"
+         let bits = title.split(" : ")
+         if (bits.length > 2) {
+            bits.splice(0,2)
+         }
+         state.advanced.splice(0, state.advanced.length)
+         bits.forEach( t=> {
+            state.advanced.push({op: "AND", value: `"${t}"`, field: "title", type: "EQUAL", endVal: ""})    
+         })
       },
       addCriteria(state) {
         state.advanced.push({op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: ""})

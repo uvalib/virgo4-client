@@ -41,7 +41,7 @@ const preferences = {
       },
       clear(state) {
          state.targetPoolURL = ""
-         state.excludePoolURLs = []
+         state.excludePoolURLs.splice(0, state.excludePoolURLs.length)
       },
       toggleExcludePool(state, poolURL) {
          let idx = state.excludePoolURLs.indexOf(poolURL)

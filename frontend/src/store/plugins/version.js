@@ -11,7 +11,9 @@ const versionChecker = (store) => {
                // load without cache
                window.location.reload(true)
             } else {
-               store.commit('system/setFatal', "")
+               if (store.state.system.fatal != "") {
+                  store.commit('system/setFatal', "")
+               }
             }
          }).catch((_error) => {
             store.commit('system/setFatal', "Lost connection to Virgo backend services")

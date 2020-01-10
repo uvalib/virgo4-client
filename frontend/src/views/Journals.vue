@@ -32,7 +32,7 @@
          <div v-else class="browse">
             <ol>
                <li v-for="(t,idx) in titles" :key="idx">
-                  <span class="title">{{t.title}}</span>
+                  <span class="title"><router-link :to="journalLink(t)">{{t.title}}</router-link></span>
                   <span class="count">{{t.count}}</span>
                </li>
             </ol>
@@ -70,6 +70,9 @@ export default {
       return {};
    },
    methods: {
+      journalLink(info) {
+         return `/search?journal=${encodeURI(info.title)}`
+      },
       searchClicked() {
          if ( this.query == "") {
             this.$store.commit(
