@@ -22,6 +22,22 @@
             </span>
          </div>
       </div>
+      <div v-if="!searching && browseTotal >= 0" class="browse-results shady">
+         <div class="summary">
+            Browse by journal title "{{query}}"
+         </div>
+         <div v-if="browseTotal==0" class="browse none">
+            No matching journals found
+         </div>
+         <div v-else class="browse">
+            <ol>
+               <li v-for="(t,idx) in titles" :key="idx">
+                  <span class="title">{{t.title}}</span>
+                  <span class="count">{{t.count}}</span>
+               </li>
+            </ol>
+         </div>
+      </div>
       <transition
          name="message-transition"
          enter-active-class="animated faster fadeIn"
@@ -44,7 +60,9 @@ export default {
    computed: {
       ...mapState({
          error: state => state.system.error,
-         searching: state => state.journals.searching
+         searching: state => state.journals.searching,
+         titles: state => state.journals.titles,
+         browseTotal: state => state.journals.browseTotal
       }),
       ...mapFields("journals", ["query"])
    },
@@ -118,5 +136,70 @@ div.basic {
 }
 .text-button.basic-link:hover {
    text-decoration: underline;
+}
+.shady {
+   margin: 0;
+   padding: 10px 25px;
+   background-color: var(--uvalib-grey-lightest);
+}
+.summary {
+   font-weight: 700;
+   font-size: 1.1em;
+}
+.browse {
+   text-align: left;
+   color: var(--color-primary-text);
+   margin: 10px auto 30px auto;
+   background: white;
+   box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.12);
+}
+@media only screen and (min-width: 768px) {
+   div.browse {
+      width: 60%;
+      padding: 10px  5vw;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.browse {
+      padding: 10px  2vw;
+      width: 95%;
+   }
+}
+ol {
+  list-style: none;
+  counter-reset: title-counter;
+  font-size: 1.15em;
+  padding:0;
+}
+ol li {
+   counter-increment: title-counter;
+   display: flex;
+   flex-flow: row nowrap;
+   border-bottom: 1px solid var(--uvalib-grey-lightest);
+   margin-bottom: 3px;
+   padding-bottom: 3px;
+   align-items: flex-start;
+}
+ol li:first-of-type {
+    border-top: 1px solid var(--uvalib-grey-lightest);
+    padding-top: 3px;
+}
+li span.count {
+   margin-left: auto;
+   font-size: 0.8em;
+   color:  var(--uvalib-grey);
+}
+li span {
+   align-self: center;
+   text-transform: capitalize;
+}
+ol li::before {
+  content: counter(title-counter) ". ";
+  font-weight: bold;
+  margin-right: 15px;
+  display: inline-block;
+  width: 30px;
+  text-align: right;
+  line-height: 1.5em;
 }
 </style>
