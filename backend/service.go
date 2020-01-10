@@ -29,6 +29,7 @@ type ServiceContext struct {
 	DB                 *dbx.DB
 	SMTP               SMTPConfig
 	Illiad             IlliadConfig
+	Solr               SolrConfig
 }
 
 // RequestError contains http status code and message for a
@@ -43,6 +44,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
 		VirgoURL:           cfg.VirgoURL,
 		SearchAPI:          cfg.SearchAPI,
+		Solr:               cfg.Solr,
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
@@ -225,6 +227,17 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values url.Values) ([]by
 		Timeout: timeout,
 	}
 	resp, err := client.PostForm(url, values)
+	return handleAPIResponse(url, resp, err)
+}
+
+// SolrGet sends a GET request to solr and returns the response
+func (svc *ServiceContext) SolrGet(url string) ([]byte, *RequestError) {
+	log.Printf("Solr request: %s", url)
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	resp, err := client.Get(url)
 	return handleAPIResponse(url, resp, err)
 }
 
