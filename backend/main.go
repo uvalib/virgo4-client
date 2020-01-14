@@ -11,7 +11,7 @@ import (
 )
 
 // Version of the service
-const version = "0.8.0"
+const version = "0.9.0"
 
 /**
  * MAIN
@@ -44,6 +44,7 @@ func main() {
 	{
 		api.GET("/authenticated/:token", svc.IsAuthenticated)
 		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
+		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
 		api.GET("/journals/browse", svc.AuthMiddleware, svc.BrowseJournals)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)
