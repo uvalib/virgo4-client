@@ -26,6 +26,10 @@
                   <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
                </div>
 
+               <div class="pin">
+                  <ChangePin />
+               </div>
+
                <div v-if="isBillOwed || totalFines>0" class="outstanding-bill">
                   <h2 class="fines-head">Billing</h2>
                   <div class="fines-content">
@@ -132,6 +136,7 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
+import ChangePin from '@/components/popovers/ChangePin'
 import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "account",
@@ -141,7 +146,7 @@ export default {
       };
    },
    components: {
-      AccountActivities, AccordionContent, V4Spinner
+      AccountActivities, AccordionContent, V4Spinner, ChangePin
    },
    computed: {
       ...mapState({
@@ -277,7 +282,9 @@ div.notes p {
     border-radius: 5px;
     background-color: var(--uvalib-red-lightest);
 }
-
+.pin {
+   margin-top: 15px;
+}
 @media only screen and (min-width: 768px) {
    div.account-content  {
        width: 60%;

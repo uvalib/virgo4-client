@@ -76,6 +76,37 @@ type User struct {
 	Preferences string       `json:"preferences"`
 }
 
+// ChangePin takes current_pin and new_pin as params in the json POST payload.
+// It changes the pin to new_pin.
+func (svc *ServiceContext) ChangePin(c *gin.Context) {
+	var qp struct {
+		CurrPin     string `json:"current_pin"`
+		NewPin      string `json:"new_pin"`
+		UserBarcode string `json:"barcode"`
+	}
+
+	qpErr := c.ShouldBindJSON(&qp)
+	if qpErr != nil {
+		log.Printf("ERROR: invalid change_pin payload: %v", qpErr)
+		c.String(http.StatusBadRequest, "Invalid request")
+		return
+	}
+	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
+
+	values := url.Values{}
+	values.Add("current_pin", qp.CurrPin)
+	values.Add("new_pin", qp.NewPin)
+
+	pinURL := fmt.Sprintf("%s/v4/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
+	_, ilsErr := svc.ILSConnectorPost(pinURL, values)
+	if ilsErr != nil {
+		log.Printf("User %s pin change failed", qp.UserBarcode)
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	c.String(http.StatusOK, "pin changed")
+}
+
 // GetUserBills uses ILS Connector user billing details
 func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userID := c.Param("uid")

@@ -188,9 +188,9 @@ img.uva-library {
   #library_logo_primary { display: inline-block; }
   #library_logo_primary_mobile { display: none; }
   svg {
-    max-height: 100%;
+    max-height: 68px;
     width: 100%;
-    min-height: 20px;
+    min-height: 30px;
   }
 }
 @media only screen and (max-width: 600px) {
