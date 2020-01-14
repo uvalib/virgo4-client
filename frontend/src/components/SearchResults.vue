@@ -9,24 +9,7 @@
             <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
          </div>
          <span class="buttons">
-            <template v-if="isSignedIn">
-               <span @click="saveClicked()"
-                  class="save-search pure-button pure-button-primary">
-                  Save Search
-               </span>
-               <div v-if="showSavePrompt" class="save-dimmer">
-                  <div  class="pure-form save-box">
-                     <div class="title-bar">Saved Search Name</div>
-                     <div class="save-body">
-                        <input  @keyup.enter="saveSearch"  ref="savename" type="text" v-model="searchName"/>
-                        <div class="save-controls">
-                           <span class="pure-button pure-button-tertiary" @click="cancelSave">Cancel</span>
-                           <span class="pure-button pure-button-primary" @click="saveSearch">Save</span>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-            </template>
+            <SaveSearch v-if="isSignedIn" />
             <span v-if="searchMode=='basic'" @click="refineClicked()"
                class="refine pure-button pure-button-primary">
                Refine Search
@@ -70,24 +53,16 @@ import { mapFields } from 'vuex-map-fields'
 import PoolResultDetail from "@/components/PoolResultDetail"
 import V4Select from "@/components/V4Select"
 import FacetSidebar from "@/components/FacetSidebar"
+import SaveSearch from "@/components/popovers/SaveSearch"
 export default {
    components: {
-      PoolResultDetail, V4Select, FacetSidebar
-   },
-   data: function()  {
-      return {
-         showSavePrompt: false,
-         searchName: ""
-      }
+      PoolResultDetail, V4Select, FacetSidebar, SaveSearch
    },
    computed: {
       ...mapGetters({
          hitPoolCount: 'hitPoolCount',
          skippedPoolCount: 'skippedPoolCount',
          failedPoolCount: 'failedPoolCount',
-         hasFilter: 'filters/hasFilter',
-         isTargetPool: "preferences/isTargetPool",
-         queryObject: 'query/queryObject',
          isSignedIn: 'user/isSignedIn'
       }),
       ...mapState({
@@ -168,22 +143,6 @@ export default {
          this.otherSrcSelection = {id:"", name:""}
          this.$store.dispatch("selectPoolResults", resultIdx)
       },
-      saveClicked() {
-         this.showSavePrompt = true
-         setTimeout(()=>{
-            this.$refs.savename.focus()
-         }, 100)
-      },
-      cancelSave() {
-         this.showSavePrompt = false
-      },
-      saveSearch() {
-         let bmData = this.queryObject 
-         bmData.pool = this.pool
-         bmData.filters = this.poolFilters( this.resultsIdx )
-         //this.$store.dispatch("user/saveSearch", this.searchName)   
-         this.showSavePrompt = false
-      }
    }
 }
 </script>
@@ -313,43 +272,5 @@ p.relevant {
    font-weight: 500;
    padding-bottom: 150px;
    color: var(--uvalib-text);
-}
-span.save-search.pure-button.pure-button-primary {
-   margin: 0;
-}
-.save-dimmer {
-   position: absolute;
-   left: 0;
-   top: 0;
-   right: 0;
-   bottom: 0;
-   background: rgba(0,0,0,0.15);
-   z-index: 1000;
-}
-.save-box{ 
-   background: white;
-   padding: 0;
-   display: inline-block;
-   border-radius: 5px;
-   margin: 10vw auto;
-   border:1px solid #555;
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-}
-.save-box .save-body {
-   padding: 15px;
-}
-.save-box input[type=text] {
-   width: 100%;
-}
-.save-box .title-bar {
-   padding: 10px 15px;
-   color: white;
-   background-color: var(--uvalib-grey-dark);
-   font-weight: 500;
-   text-align: center;
-}
-.save-controls {
-   text-align: right;
-   margin-top: 15px;
 }
 </style>

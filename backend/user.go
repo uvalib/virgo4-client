@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
+	"github.com/rs/xid"
 )
 
 // NewV4User creates a new instance of user settings with internal data initialzied
@@ -105,6 +106,69 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, "pin changed")
+}
+
+// SaveSearch will save a named search in that saved_searches table along with an access token
+func (svc *ServiceContext) SaveSearch(c *gin.Context) {
+	user := NewV4User()
+	user.Virgo4ID = c.Param("uid")
+
+	// init a reqponse object
+	var resp struct {
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+		Token   string `json:"token"`
+	}
+
+	// Find the requesting user...
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": user.Virgo4ID})
+	userErr := uq.Row(&user.ID)
+	if userErr != nil {
+		log.Printf("ERROR: coubdn't find user %s: %v", user.Virgo4ID, userErr)
+		resp.Message = "Invalid Virgo user"
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+	log.Printf("User %s save search request...", user.Virgo4ID)
+
+	// Make sure the passed request object is well formed JSON
+	var reqObj struct {
+		Name   string                 `json:"name"`
+		Search map[string]interface{} `json:"search"`
+	}
+	qpErr := c.ShouldBindJSON(&reqObj)
+	if qpErr != nil {
+		log.Printf("ERROR: invalid saved search payload: %v", qpErr)
+		resp.Message = qpErr.Error()
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	// Generate an access token and save it to the saved searches table
+	token := xid.New().String()
+	q := svc.DB.NewQuery(`insert into saved_searches (user_id,token,name,created_at,search)
+		values ({:uid}, {:token}, {:name}, {:added}, {:search})`)
+	json, _ := json.Marshal(reqObj.Search)
+	q.Bind(dbx.Params{"uid": user.ID})
+	q.Bind(dbx.Params{"token": token})
+	q.Bind(dbx.Params{"name": reqObj.Name})
+	q.Bind(dbx.Params{"added": time.Now()})
+	q.Bind(dbx.Params{"search": json})
+	_, err := q.Execute()
+	if err != nil {
+		log.Printf("ERROR: User %s unable to add saved search %+v: %v", user.Virgo4ID, reqObj, err)
+		resp.Message = err.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	log.Printf("User %s search %s saved as %s", user.Virgo4ID, reqObj.Name, token)
+	resp.Token = token
+	resp.Success = true
+	resp.Message = "Search saved"
+
+	c.JSON(http.StatusOK, resp)
 }
 
 // GetUserBills uses ILS Connector user billing details

@@ -1,16 +1,24 @@
+
+
+<div class="save-controls">
+   <span class="pure-button pure-button-tertiary" @click="cancelSave">Cancel</span>
+   <span class="pure-button pure-button-primary" @click="saveSearch">Save</span>
+</div>
+
+
 <template>
-   <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false"  class="inline">
+   <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false" class="inline">
       <span>
-         <span @click="openPopover" class="pin pure-button pure-button-primary">Change PIN</span>
+         <span @click="openPopover" class="save pure-button pure-button-primary">Save Search</span>
       </span>
-      <div class="pin-container" slot="popover">
+      <div class="save-container" slot="popover">
          <div class="popover-header">
-            <span>Change PIN</span>
+            <span>Save Search</span>
          </div>
-         <template v-if="pinChanged">
+         <template v-if="saved">
             <div class="message pure-form">
                <p>
-                  Your PIN has been changed
+                  Your search has been saved
                </p>
             </div>
             <div class="edit-controls">
@@ -20,24 +28,15 @@
          <template v-else>
             <div class="message pure-form">
                <div>
-                  <span class="label">Current PIN</span>
-                  <input ref="currpin" type="password" v-model="currPin"/>
-               </div>
-               <div>
-                  <span class="label">New PIN</span>
-                  <input ref="newpin" type="password" v-model="newPin"/>
-               </div>
-               <div>
-                  <span class="label">Confirm PIN</span>
-                  <input ref="confirm" type="password" v-model="newPinConfirm"/>
+                  <span class="label">Saved Search Name</span>
+                  <input ref="savename" type="text" v-model="searchName" @keyup.enter="saveClicked" />
                </div>
                <p class="error">{{error}}</p>
             </div>
             <div class="edit-controls">
                <span @click="cancelClicked" class="pure-button pure-button-tertiary">Cancel</span>
-               <span class="pure-button pure-button-primary"
-                  @click="okClicked" id="ok-rename">
-                  OK
+               <span class="pure-button pure-button-primary" @click="saveClicked">
+                  Save
                </span>
             </div>
          </template>
@@ -46,53 +45,54 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
+import { mapState } from "vuex"
 export default {
+   computed: {
+      ...mapState({
+         resultsIdx: state => state.selectedResultsIdx,
+      }),
+      ...mapGetters({
+         queryObject: 'query/queryObject',
+         poolFilters: 'filters/poolFilter',
+         selectedResults: 'selectedResults'
+      }),
+   },
    data: function()  {
       return {
-         currPin: "",
-         newPin: "",
-         newPinConfirm: "",
+         searchName: "",
          error: "",
          isOpen: false,
-         pinChanged: false
+         saved: false
       }
-   },
-   computed: {
    },
    methods: {
       cancelClicked() {
          this.isOpen = false
       },
       openPopover() {
-         this.pinChanged = false
          this.isOpen = true
-         this.error = ""
-         this.currPin = ""
-         this.newPin = ""
-         this.newPinConfirm = ""
+         this.searchName = "",
+         this.error = "",
          setTimeout(()=>{
-            this.$refs.currpin.focus()
-         },100)
+            this.$refs.savename.focus()
+         }, 250)
       },
-      okClicked() {
-         this.error = ""
-         if ( this.currPin == "" || this.newPin == "" || this.newPinConfirm == "")  {
-            this.error = "All three fields are required"
+      saveClicked() {
+         if ( this.searchName == "") {
+             this.error = "A name is required"
             return
-         } 
-         if ( this.newPin != this.newPinConfirm)  {
-            this.error = "New PIN confirmation mismatch"
-            return
-         } 
-         if ( this.newPin.length != 4) {
-            this.error = "New PIN must be 4 digits"
-            return   
          }
-         let data  = {current_pin: this.currPin, new_pin: this.newPin}
-         this.$store.dispatch("user/changePIN", data).then(() => {
-            this.pinChanged = true
-         }).catch(() => {
-            this.error = "PIN change failed"
+         let bmData = this.queryObject 
+         bmData.pool = this.selectedResults.pool.id
+         bmData.filters = this.poolFilters( this.resultsIdx )
+         let req = {name: this.searchName, search: bmData}
+         this.$store.dispatch("user/saveSearch", req).then(() => {
+            this.saved = true
+            this.showSavePrompt = false
+         }).catch((err) => {
+            let resp = err.response.data
+            this.error = "Save failed: "+resp.message
          })
       }
    }
@@ -100,7 +100,7 @@ export default {
 </script>
 
 <style scoped>
-span.pin.pure-button.pure-button-primary {
+span.save.pure-button.pure-button-primary {
    margin: 0;
 }
 div.popover-header {
@@ -111,7 +111,7 @@ div.popover-header {
    text-align: center;
    border-radius: 5px 5px 0 0;
 }
-.pin-container {
+.save-container {
    background: white;
    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
    color: var(--uvalib-text);
@@ -120,14 +120,14 @@ div.popover-header {
    display: inline-block;
    padding: 0;
    border-radius: 5px;
-   min-width: 275px;
+   min-width: 350px;
 }
 div.message {
    padding: 10px 10px 0 10px;
    border-left: 1px solid var(--uvalib-grey-dark);
    border-right: 1px solid var(--uvalib-grey-dark);
 }
-input[type=password] {
+input[type=text] {
    width: 100%;
 }
 span.label {
@@ -150,9 +150,6 @@ span.label {
 p.error {
    padding: 10px;
    font-size: 0.8em;
-}
-.edit-controls .pure-button {
-   margin-left: 5px;
 }
 p {
    text-align: center;

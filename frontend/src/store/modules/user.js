@@ -364,7 +364,9 @@ const user = {
          data['barcode'] = ctx.state.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },
-
+      saveSearch(ctx, data) {
+         return axios.post(`/api/users/${ctx.state.signedInUser}/save_search`, data)
+      },
       async getBookmarks(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] == false) {
             await ctx.dispatch("getAccountInfo")

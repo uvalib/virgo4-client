@@ -53,6 +53,7 @@ func main() {
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
+		api.POST("/users/:uid/save_search", svc.AuthMiddleware, svc.SaveSearch)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 
 		bookmarks := api.Group("/users/:uid/bookmarks")
