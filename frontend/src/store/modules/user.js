@@ -360,6 +360,10 @@ const user = {
          ctx.commit('setAuthorizing', true)
          window.location.href = "/authenticate/netbadge"
       },
+      changePIN(ctx, data) {
+         data['barcode'] = ctx.state.accountInfo['barcode']
+         return axios.post("/api/change_pin", data)
+      },
 
       async getBookmarks(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] == false) {
