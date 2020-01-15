@@ -50,22 +50,17 @@ export default {
   props: {
     icon: Boolean
   },
-  mounted() {
-    if(this.userId.length > 0) {
-      this.email = this.userId + "@virginia.edu"
-    }
-  },
+
   computed: {
     ...mapState({
       feedback: state => state.feedback,
-      userId: state => state.user.signedInUser
     }),
     ...mapFields(['feedback',
                  'feedback.wantedTo',
                  'feedback.explanation',
                  'feedback.email',
                  'feedback.status'
-    ])
+    ]),
   },
   methods: {
     submit() {
@@ -75,6 +70,9 @@ export default {
     },
     clear() {
       this.$store.commit('feedback/clearFeedback')
+      var userId = this.$store.state.user.signedInUser
+      if (userId && (this.$store.state.user.sessionType == "netbadge"))
+        this.feedback.email = userId + "@virginia.edu"
     },
     validate() {
 
