@@ -31,7 +31,6 @@ const feedback = {
         success: false,
         message: ''
       }
-
     }
   },
   actions: {
@@ -49,13 +48,9 @@ const feedback = {
         if(error.response.status == 400) {
           ctx.state.status.message = "Please fill out all of the fields."
         }else {
-          console.log(error)
+          //console.log(error)
           ctx.state.status.message = 'There was a problem sending your feedback.<br/>Please try again later or send an email to <a  href="mailto:lib-virgo4-feedback@virginia.edu" class="feedback">lib-virgo4-feedback@virginia.edu</a>'
         }
-
-
-
-       // ctx.commit('system/setError', error, { root: true })
       })
     }
   }
