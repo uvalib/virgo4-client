@@ -105,6 +105,11 @@ export default {
         // to populate the pool selector for non-signed in users
         this.$store.dispatch('pools/getPools')
 
+        if ( this.$route.params !== undefined && this.$route.params.id != "") {
+           this.restoreSavedSearch(this.$route.params.id)
+           return
+        }
+
         // Check for a bookmark cookie and restore search if present
         this.restoreBookmarkTarget()
       
@@ -149,6 +154,9 @@ export default {
       })
    },
    methods: {
+       async restoreSavedSearch( token ) {
+       },
+
       // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
       // an item while not signed in. If there is now a signed in user, replay the search,
       // scroll to the target hit and open bookmark popup
