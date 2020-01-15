@@ -155,6 +155,7 @@ export default {
    },
    methods: {
        async restoreSavedSearch( token ) {
+          this.$store.dispatch("query/loadSearch", token)
        },
 
       // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark

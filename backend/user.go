@@ -10,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
-	"github.com/rs/xid"
 )
 
 // NewV4User creates a new instance of user settings with internal data initialzied
@@ -36,22 +35,6 @@ type V4User struct {
 // TableName sets the name of the table in the DB that this struct binds to
 func (u V4User) TableName() string {
 	return "users"
-}
-
-// SavedSearch contains details about a user saved seatch
-type SavedSearch struct {
-	ID        int       `db:"id" json:"-"`
-	UserID    int       `db:"user_id" json:"-"`
-	Token     string    `db:"token" json:"token"`
-	Name      string    `db:"name" json:"name"`
-	Public    bool      `db:"is_public" json:"public"`
-	CreatedAt time.Time `db:"created_at" json:"created"`
-	Search    string    `db:"search" json:"search"`
-}
-
-// TableName sets the name of the table in the DB that this struct binds to
-func (s SavedSearch) TableName() string {
-	return "saved_searches"
 }
 
 // ILSUserInfo contains ILS connector details for a user
@@ -122,81 +105,6 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, "pin changed")
-}
-
-// GetSavedSearches will get all of the searches saved by the specified user
-func (svc *ServiceContext) GetSavedSearches(c *gin.Context) {
-	uid := c.Param("uid")
-	log.Printf("Get saved searches for %s", uid)
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("User %s not found", uid)
-		c.JSON(http.StatusNotFound, make([]SavedSearch, 0))
-		return
-	}
-
-	var searches []SavedSearch
-	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).All(&searches)
-	c.JSON(http.StatusOK, searches)
-
-}
-
-// SaveSearch will save a named search in that saved_searches table along with an access token
-func (svc *ServiceContext) SaveSearch(c *gin.Context) {
-	uid := c.Param("uid")
-	log.Printf("User %s save search request...", uid)
-
-	// init a reqponse object
-	var resp struct {
-		Success bool   `json:"success"`
-		Message string `json:"message"`
-		Token   string `json:"token"`
-	}
-
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("ERROR: coubdn't find user %s: %v", uid, uErr)
-		resp.Message = "Invalid Virgo user"
-		c.JSON(http.StatusBadRequest, resp)
-		return
-	}
-
-	// Make sure the passed request object is well formed JSON
-	var reqObj struct {
-		Name   string      `json:"name"`
-		Search interface{} `json:"search"`
-	}
-	qpErr := c.ShouldBindJSON(&reqObj)
-	if qpErr != nil {
-		log.Printf("ERROR: invalid saved search payload: %v", qpErr)
-		resp.Message = qpErr.Error()
-		c.JSON(http.StatusBadRequest, resp)
-		return
-	}
-
-	// Generate an access token and save it to the saved searches table
-	json, _ := json.Marshal(reqObj.Search)
-	search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name, CreatedAt: time.Now(), Search: string(json)}
-	err := svc.DB.Model(&search).Insert()
-	if err != nil {
-		log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
-		resp.Message = err.Error()
-		c.JSON(http.StatusInternalServerError, resp)
-		return
-	}
-
-	log.Printf("User %s search %s saved as %s", uid, reqObj.Name, search.Token)
-	resp.Token = search.Token
-	resp.Success = true
-	resp.Message = "Search saved"
-
-	c.JSON(http.StatusOK, resp)
 }
 
 // GetUserBills uses ILS Connector user billing details
