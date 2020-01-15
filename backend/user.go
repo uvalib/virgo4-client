@@ -38,6 +38,22 @@ func (u *V4User) TableName() string {
 	return "users"
 }
 
+// SavedSearch contains details about a user saved seatch
+type SavedSearch struct {
+	ID        int         `db:"id" json:"-"`
+	UserID    int         `db:"user_id" json:"-"`
+	Token     string      `db:"token" json:"token"`
+	Name      string      `db:"name" json:"name"`
+	Public    bool        `db:"is_public" json:"public"`
+	CreatedAt time.Time   `db:"created_at" json:"created"`
+	Search    interface{} `db:"search" json:"search"`
+}
+
+// TableName sets the name of the table in the DB that this struct binds to
+func (s *SavedSearch) TableName() string {
+	return "saved_searches"
+}
+
 // ILSUserInfo contains ILS connector details for a user
 type ILSUserInfo struct {
 	ID            string `json:"id"`
@@ -108,6 +124,13 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 	c.String(http.StatusOK, "pin changed")
 }
 
+// GetSavedSearches will get all of the searches saved by the specified user
+func (svc *ServiceContext) GetSavedSearches(c *gin.Context) {
+	user := NewV4User()
+	user.Virgo4ID = c.Param("uid")
+
+}
+
 // SaveSearch will save a named search in that saved_searches table along with an access token
 func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	user := NewV4User()
@@ -134,8 +157,8 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// Make sure the passed request object is well formed JSON
 	var reqObj struct {
-		Name   string                 `json:"name"`
-		Search map[string]interface{} `json:"search"`
+		Name   string      `json:"name"`
+		Search interface{} `json:"search"`
 	}
 	qpErr := c.ShouldBindJSON(&reqObj)
 	if qpErr != nil {

@@ -365,7 +365,7 @@ const user = {
          return axios.post("/api/change_pin", data)
       },
       saveSearch(ctx, data) {
-         return axios.post(`/api/users/${ctx.state.signedInUser}/save_search`, data)
+         return axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
       },
       async getBookmarks(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] == false) {
