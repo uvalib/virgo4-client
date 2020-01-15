@@ -54,7 +54,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 	// toAddr := mail.Address{Name: emailMap[reserveReq.Request.Library], Address: svc.CourseReserveEmail}
 	to := []string{svc.FeedbackEmail, request.Feedback.Email}
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subject := "Virgo 4 Feedback"
+	subject := "Subject: Virgo 4 Feedback\n"
 	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
 	msg := []byte(subject + toHdr + mime + renderedEmail.String())
 
