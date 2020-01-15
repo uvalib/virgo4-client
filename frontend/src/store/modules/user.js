@@ -23,6 +23,13 @@ const user = {
    },
 
    getters: {
+      canChangePIN: (state, getters) => {
+         if (getters.hasAccountInfo == false ) return false
+         if ( state.sessionType == "netbadge") return false
+         let profile = state.accountInfo.profile.toLowerCase().trim()
+         if ( profile == "vaborrower") return false
+         return true
+      },
       isCommunityUser: (state, getters) => {
          if (getters.hasAccountInfo == false ) return false
          return state.accountInfo.communityUser
