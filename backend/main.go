@@ -68,6 +68,7 @@ func main() {
 		api.POST("/reserves", svc.AuthMiddleware, svc.CreateCourseReserves)
 		api.GET("/reserves/desks", svc.AuthMiddleware, svc.GetReserveDesks)
 		api.GET("/reserves/search", svc.AuthMiddleware, svc.SearchReserves)
+		api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
 	}
 	auth := router.Group("/authenticate")
 	{

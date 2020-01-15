@@ -12,6 +12,7 @@ import item from './modules/item'
 import reserves from './modules/reserves'
 import preferences from './modules/preferences'
 import journals from './modules/journals'
+import feedback from './modules/feedback'
 import * as utils from './modules/utils'
 import { getField, updateField } from 'vuex-map-fields'
 
@@ -321,6 +322,7 @@ export default new Vuex.Store({
     reserves: reserves,
     system: system,
     user: user,
+    feedback: feedback,
   },
 
   plugins: [messaging, versionChecker]
