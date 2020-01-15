@@ -26,7 +26,7 @@
                   <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
                </div>
 
-               <div class="pin">
+               <div v-if="canChangePIN" class="pin">
                   <ChangePin />
                </div>
 
@@ -162,6 +162,7 @@ export default {
         isUndergraduate: 'user/isUndergraduate',
         isGraduate: 'user/isGraduate',
         isAlumni: 'user/isAlumni',
+        canChangePIN: 'user/canChangePIN'
       }),
       useSIS() {
          return (this.isUndergraduate || this.isGraduate || this.isAlumni)
