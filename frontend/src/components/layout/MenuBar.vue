@@ -154,11 +154,29 @@ export default {
    position: relative;
    display: inline-block;
 }
+.user-menu {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  padding: 0 0 5px 0;
+  border-radius: 0 0 5px 5px;
+  border: 1px solid var(--uvalib-grey-light);
+  border-top: none;
+  top: 30px;
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  transition: 200ms ease-out;
+  display: grid;
+  grid-auto-rows: auto;
+}
 .submenu {
    margin:0;
-   padding: 5px 10px;
-   margin: 0;
-   font-size: 1.2em;
+   font-weight: normal;
+   color: var(--uvalib-text-dark);
+   align-items: stretch;
+   justify-items: stretch;
+   padding: 10px 15px;
 }
 #app .menu .submenu a {
    color:white;
@@ -169,26 +187,12 @@ export default {
    color: white;
 }
 .submenu:hover {
-   background-color: var(--uvalib-brand-blue);
-   color: white;
+   background-color: var(--uvalib-brand-blue-lightest);
+   color: var(--uvalib-text-dark);
 }
 .submenu-arrow {
    transform: rotate(0deg);
    transition-duration: 200ms;
-}
-.user-menu {
-  position: absolute;
-  z-index: 1000;
-  background: var(--color-secondary-blue);
-  padding: 0 0 5px 0;
-  border-radius: 0 0 5px 5px;
-  border: 1px solid var(--color-secondary-blue);
-  border-top: 11px solid var(--color-secondary-blue);
-  right: 0;
-  left: 0;
-  font-size: 0.9em;
-  overflow: hidden;
-  transition: 200ms ease-out;
 }
 .menu .menu-item {
    border-bottom:1px solid var(--color-secondary-blue);

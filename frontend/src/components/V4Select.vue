@@ -168,7 +168,6 @@ export default {
   position: absolute;
   left: -1px;
   border: 1px solid var(--uvalib-light-blue);
-  font-size: 0.9em;
   overflow: hidden;
   transition: 200ms ease-out;
   z-index: 5000;
@@ -195,6 +194,6 @@ export default {
 }
 .v4-select .option:hover {
   background-color:  var(--uvalib-brand-blue-lightest);
-  color: black;
+  color: var(--uvalib-text-dark);
 }
 </style>
