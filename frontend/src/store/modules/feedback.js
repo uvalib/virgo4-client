@@ -9,6 +9,7 @@ const feedback = {
     wantedTo: "",
     explanation: "",
     status: {
+      submitting: false,
       sent: false,
       message: ''
     }
@@ -26,6 +27,7 @@ const feedback = {
       state.wantedTo = ""
       state.explanation = ""
       state.status = {
+        submitting: false,
         success: false,
         message: ''
       }
@@ -34,15 +36,16 @@ const feedback = {
   },
   actions: {
     submitFeedback(ctx) {
+      ctx.state.status.submitting = true
       let v4UserID = ctx.rootState.user.signedInUser
       ctx.state.userID = v4UserID
       let data = {feedback: ctx.state}
-      console.log(data)
       axios.post('/api/feedback', data).then((_response) => {
         ctx.state.status.success = true
         ctx.state.status.message = 'Thank you for your feedback!'
 
       }).catch((error) => {
+        ctx.state.status.submitting = false
         if(error.response.status == 400) {
           ctx.state.status.message = "Please fill out all of the fields."
         }else {

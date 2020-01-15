@@ -14,22 +14,25 @@
              <p>Virgo 4 is being developed as the next version of the library catalog.</p>
              <div class="pure-control-group">
                <label for="wantedTo">First, explain what you wanted to do.</label>
-               <textarea cols="30" rows="5" v-model="wantedTo"/>
+               <textarea cols="30" rows="5" name="wantedTo" v-model="wantedTo"/>
              </div>
              <div class="pure-control-group">
                <label for="explanation">How did it go?</label>
-               <textarea cols="30" rows="5" v-model="explanation"/>
+               <textarea cols="30" rows="5" name="explanation" v-model="explanation"/>
              </div>
              <div class="pure-control-group">
                <label for="email">Contact Email</label>
-               <input v-model="email"/>
+               <input v-model="email" type="email" name="email" />
              </div>
            </div>
 
 
            <p v-if="feedback.status.message" v-html="feedback.status.message"></p>
            <div class="action-group">
-             <button v-if="!feedback.status.success" @click="submit" class="pure-button pure-button-primary">Leave Feedback</button>
+             <button v-if="!feedback.status.success" @click="submit"
+               class="pure-button pure-button-primary"
+               :disabled="feedback.status.submitting"
+             >Leave Feedback</button>
 
              <span v-close-popover class="pure-button pure-button-tertiary">Close</span>
            </div>
@@ -56,7 +59,6 @@ export default {
     ...mapState({
       feedback: state => state.feedback,
       userId: state => state.user.signedInUser
-
     }),
     ...mapFields(['feedback',
                  'feedback.wantedTo',
@@ -67,12 +69,27 @@ export default {
   },
   methods: {
     submit() {
-      this.$store.dispatch("feedback/submitFeedback")
+      if(this.validate()) {
+        this.$store.dispatch("feedback/submitFeedback")
+      }
     },
     clear() {
       this.$store.commit('feedback/clearFeedback')
-    }
+    },
+    validate() {
 
+      var re = /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+      var invalidEmail = !re.test(this.email)
+
+      if(!(this.wantedTo && this.explanation)) {
+        this.status.message = "Please enter all of the fields."
+        return false
+      } else if (invalidEmail) {
+        this.status.message = "Please enter a valid email."
+      } else {
+        return true
+      }
+    }
   }
 };
 </script>
