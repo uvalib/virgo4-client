@@ -46,7 +46,7 @@ const reserves = {
          state.requestList = list.slice(0)
          state.requestList.forEach(item => {
             item.period = ""
-            item.notes = ""  
+            item.notes = ""
          });
          state.request = {onBehalfOf: "no",
             instructorName: "",

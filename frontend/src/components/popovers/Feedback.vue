@@ -1,20 +1,41 @@
 <template>
-   <v-popover>
+   <v-popover v-on:apply-show='clear'>
       <span class="trigger">
          <span v-if="icon"><i class="fas fa-comments"></i>&nbsp;</span>
          <span>Questions? Ask a Librarian</span>
       </span>
       <div class="feedback-container" slot="popover">
          <div class="popover-header">
-            <span>Coming in 2020!</span>
+            <span>Virgo Feedback</span>
             <i v-close-popover class="close fas fa-times-circle"></i>
          </div>
          <div class="message">
-            <p>For now, direct all Virgo4 feedback to:</p>
-            <p>
-               <a class="feedback"
-                  href="mailto:lib-virgo4-feedback@virginia.edu">lib-virgo4-feedback@virginia.edu</a>
-            </p>
+           <div v-if="!feedback.status.success" class="feedback-form pure-form pure-form-aligned">
+             <p>Virgo 4 is being developed as the next version of the library catalog.</p>
+             <div class="pure-control-group">
+               <label for="wantedTo">First, explain what you wanted to do.</label>
+               <textarea cols="30" rows="5" name="wantedTo" v-model="wantedTo"/>
+             </div>
+             <div class="pure-control-group">
+               <label for="explanation">How did it go?</label>
+               <textarea cols="30" rows="5" name="explanation" v-model="explanation"/>
+             </div>
+             <div class="pure-control-group">
+               <label for="email">Contact Email</label>
+               <input v-model="email" type="email" name="email" />
+             </div>
+           </div>
+
+
+           <p v-if="feedback.status.message" v-html="feedback.status.message"></p>
+           <div class="action-group">
+             <button v-if="!feedback.status.success" @click="submit"
+               class="pure-button pure-button-primary"
+               :disabled="feedback.status.submitting"
+             >Leave Feedback</button>
+
+             <span v-close-popover class="pure-button pure-button-tertiary">Close</span>
+           </div>
          </div>
       </div>
    </v-popover>
@@ -22,10 +43,52 @@
 
 <script>
 
+import {mapState} from "vuex"
+import { mapFields } from 'vuex-map-fields'
+
 export default {
-   props: {
-      icon: Boolean
-   }
+  props: {
+    icon: Boolean
+  },
+
+  computed: {
+    ...mapState({
+      feedback: state => state.feedback,
+    }),
+    ...mapFields(['feedback',
+                 'feedback.wantedTo',
+                 'feedback.explanation',
+                 'feedback.email',
+                 'feedback.status'
+    ]),
+  },
+  methods: {
+    submit() {
+      if(this.validate()) {
+        this.$store.dispatch("feedback/submitFeedback")
+      }
+    },
+    clear() {
+      this.$store.commit('feedback/clearFeedback')
+      var userId = this.$store.state.user.signedInUser
+      if (userId && (this.$store.state.user.sessionType == "netbadge"))
+        this.feedback.email = userId + "@virginia.edu"
+    },
+    validate() {
+
+      var re = /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+      var invalidEmail = !re.test(this.email)
+
+      if(!(this.wantedTo && this.explanation)) {
+        this.status.message = "Please enter all of the fields."
+        return false
+      } else if (invalidEmail) {
+        this.status.message = "Please enter a valid email."
+      } else {
+        return true
+      }
+    }
+  }
 };
 </script>
 
@@ -73,4 +136,11 @@ a.feedback {
 a.feedback:hover {
   text-decoration: underline;
 }
+
+.action-group {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 40px;
+}
+
 </style>

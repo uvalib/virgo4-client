@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +14,7 @@ import (
 // BrowseJournals will do the initial solr query to find journals where title starts
 // with the passed query string
 func (svc *ServiceContext) BrowseJournals(c *gin.Context) {
-	title := c.Query("title")
+	title := strings.ToLower(c.Query("title"))
 	log.Printf("Browse journals where title starts with %s", title)
 
 	url := fmt.Sprintf("%s/%s/terms?terms.fl=journal_title_sort&terms.sort=index&terms.lower=%s",

@@ -41,6 +41,7 @@ type ServiceConfig struct {
 	VirgoURL           string
 	SearchAPI          string
 	CourseReserveEmail string
+	FeedbackEmail      string
 	ILSAPI             string
 	Dev                DevConfig
 	DB                 DBConfig
@@ -63,6 +64,7 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
+	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 
 	// Solr config
@@ -107,6 +109,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("cremail param is required")
 	} else {
 		log.Printf("Course Reserves email recipient: %s", cfg.CourseReserveEmail)
+	}
+	if cfg.FeedbackEmail == "" {
+		log.Fatal("feedbackemail param is required")
+	} else {
+		log.Printf("Feedback email recipient: %s", cfg.FeedbackEmail)
 	}
 	if cfg.Solr.URL == "" || cfg.Solr.Core == "" {
 		log.Fatal("solr and core params are required")

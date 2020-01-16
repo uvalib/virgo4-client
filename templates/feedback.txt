@@ -1,0 +1,14 @@
+---------------------------------------
+Virgo 4 Feedback
+---------------------------------------
+
+Requester Email: {{.Feedback.Email}}
+Requester User ID: {{.Feedback.UserID}}
+
+First, explain what you wanted to do:
+{{.Feedback.WantedTo}}
+
+How did it go?:
+{{.Feedback.Explanation}}
+
+---------------------------------------

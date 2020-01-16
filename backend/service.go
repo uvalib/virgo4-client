@@ -23,6 +23,7 @@ type ServiceContext struct {
 	VirgoURL           string
 	SearchAPI          string
 	CourseReserveEmail string
+	FeedbackEmail      string
 	ILSAPI             string
 	Dev                DevConfig
 	PendingTranslates  map[string]string
@@ -46,6 +47,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		SearchAPI:          cfg.SearchAPI,
 		Solr:               cfg.Solr,
 		CourseReserveEmail: cfg.CourseReserveEmail,
+		FeedbackEmail:      cfg.FeedbackEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
 		Illiad:             cfg.Illiad,
