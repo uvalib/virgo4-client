@@ -100,63 +100,68 @@ export default {
       },
    },
    created: function() {
-      this.$store.dispatch("system/getConfig").then(() => {
-        // once cfg is available, get pools. they may be needed
-        // to populate the pool selector for non-signed in users
-        this.$store.dispatch('pools/getPools')
+      this.searchCreated()
+   },
+   methods: {
+      async searchCreated() {
+         // Config and pools are needed for this page. 
+         await this.$store.dispatch("system/getConfig")
+         await this.$store.dispatch('pools/getPools')
+         
+         // When restoring a saved search, the call will be /search/:token
+         if ( this.$route.params !== undefined && 
+              this.$route.params.id !== undefined && 
+              this.$route.params.id != "") {
+            this.restoreSavedSearch(this.$route.params.id)
+            return
+         }
 
-        if ( this.$route.params !== undefined && this.$route.params.id != "") {
-           this.restoreSavedSearch(this.$route.params.id)
-           return
-        }
-
-        // Check for a bookmark cookie and restore search if present
-        this.restoreBookmarkTarget()
-      
-        // === Special query parameter handling ====
-        //Subject: if subject param exists, do an advanced subject search for the value
-        let prior = this.rawQueryString
-        let subj = this.$route.query.subject
-        if ( subj ) {
-          // Update query to be a subject search matching the param.
-          // Do the search only if the new query is different from prior
-          this.$store.commit("query/setSubjectSearch", subj)
-          if ( prior != this.rawQueryString) {
+         // Check for a bookmark cookie and restore search if present
+         this.restoreBookmarkTarget()
+         
+         // === Special query parameter handling ====
+         //Subject: if subject param exists, do an advanced subject search for the value
+         let prior = this.rawQueryString
+         let subj = this.$route.query.subject
+         if ( subj ) {
+            // Update query to be a subject search matching the param.
+            // Do the search only if the new query is different from prior
+            this.$store.commit("query/setSubjectSearch", subj)
+            if ( prior != this.rawQueryString) {
             this.$store.commit('query/setLastSearch', this.rawQueryString)
             this.$store.commit('filters/reset')
             this.$store.commit('resetOtherSourceSelection')
             this.$store.dispatch("searchAllPools")
-          }
-          return
-        }
+            }
+            return
+         }
 
-        // Journals: if journal param present, it will be the journal title
-        // do an advanced search in journals only for that title
-        let journalTitle = this.$route.query.journal
-        if ( journalTitle ) {
-           // Update query to be a journal title search matching the param.
-           // Do the search only if the new query is different from prior.
-           this.$store.commit("preferences/clear")
-           this.sources.forEach( src=> {
+         // Journals: if journal param present, it will be the journal title
+         // do an advanced search in journals only for that title
+         let journalTitle = this.$route.query.journal
+         if ( journalTitle ) {
+            // Update query to be a journal title search matching the param.
+            // Do the search only if the new query is different from prior.
+            this.$store.commit("preferences/clear")
+            this.sources.forEach( src=> {
                if (src.id != "journals") {
                   this.$store.commit("preferences/toggleExcludePool", src.url)
                }
-           })
-           this.$store.commit("query/setTitleSearch", journalTitle)
-           if ( prior != this.rawQueryString) {
-             this.$store.commit('query/setLastSearch', this.rawQueryString)
-             this.$store.commit('filters/reset')
-             this.$store.commit('resetOtherSourceSelection')
-             this.$store.dispatch("searchAllPools")
-           }
-           return
-        }
-      })
-   },
-   methods: {
-       async restoreSavedSearch( token ) {
-          this.$store.dispatch("query/loadSearch", token)
-       },
+            })
+            this.$store.commit("query/setTitleSearch", journalTitle)
+            if ( prior != this.rawQueryString) {
+               this.$store.commit('query/setLastSearch', this.rawQueryString)
+               this.$store.commit('filters/reset')
+               this.$store.commit('resetOtherSourceSelection')
+               this.$store.dispatch("searchAllPools")
+            }
+            return
+         }
+      },
+
+      async restoreSavedSearch( token ) {
+         this.$store.dispatch("query/loadSearch", token)
+      },
 
       // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
       // an item while not signed in. If there is now a signed in user, replay the search,

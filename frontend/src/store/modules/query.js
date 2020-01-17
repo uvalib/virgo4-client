@@ -140,15 +140,33 @@ const query = {
       }
    },
    actions: {
-      loadSearch(ctx, token) {
+      async loadSearch(ctx, token) {
          ctx.commit('setSearching', true, { root: true })
-         axios.get(`/api/searches/${token}`).then((response) => {
-            alert(response.data)
-            ctx.commit('setSearching', false, { root: true })
-         }).catch((error) => {
+         try {
+            let response = await axios.get(`/api/searches/${token}`)
+            ctx.commit("restoreSearch", JSON.parse(response.data))
+            
+            // now that search params are restored, do the initial search
+            await ctx.dispatch("searchAllPools", null, { root: true })
+
+            // filters (if any) can now be applied.
+            // To restore filters, the saved data needs:
+            //    .numPools and .resultsIdx data sect based on current results
+            let saved = JSON.parse(response.data)
+            let results = ctx.rootState.results
+            saved.numPools = results.length
+            saved.resultsIdx = results.findIndex( r=> r.pool.id == saved.pool)
+
+            // restore the filters and search the target pool one last time to see
+            // final results of the pool with the applied filters
+            ctx.commit('filters/restoreFilters', saved, { root: true })
+            await ctx.dispatch("selectPoolResults", saved.resultsIdx, { root: true })
+            ctx.commit("clearSelectedPoolResults", null, { root: true }) 
+            ctx.dispatch("searchSelectedPool", null, { root: true }) 
+         } catch (error)  {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })
-         })
+         }
       }
    }
 }
