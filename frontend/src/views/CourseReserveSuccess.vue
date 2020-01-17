@@ -6,18 +6,13 @@
          <p>If we have questions regarding your request someone will contact you.</p>
          <p>When your request has been processed, you'll be able to see your reserves by signing into your Virgo account 
             and clicking the Course Reserves menu option.</p>
-         <BackToVirgo />
       </div>
    </div>
 </template>
 
 <script>
-import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "reserved",
-   components: {
-      BackToVirgo
-   },
 }
 </script>
 

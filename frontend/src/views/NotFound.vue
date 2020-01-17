@@ -22,18 +22,13 @@
                <p><a href="https://guides.lib.virginia.edu/az.php" target="_blank">Databases A–Z</a></p>
             </div>
          </div>
-         <BackToVirgo />
       </div>
    </div>
 </template>
 
 <script>
-import BackToVirgo from "@/components/BackToVirgo"
 export default {
    name: "notfound",
-   components: {
-      BackToVirgo
-   }
 }
 </script>
 
