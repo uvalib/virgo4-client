@@ -38,6 +38,7 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
+      <Welcome />
       <transition name="message-transition"
           enter-active-class="animated faster fadeIn"
           leave-active-class="animated faster fadeOut">
@@ -61,12 +62,13 @@ import SearchTips from "@/components/popovers/SearchTips"
 import AdvancedSearch from "@/components/AdvancedSearch"
 import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
+import Welcome from "@/components/Welcome"
 export default {
    name: "home",
    components: {
      SearchResults,
      SearchTips, AdvancedSearch, V4Spinner,
-     V4Select
+     V4Select, Welcome
    },
    computed: {
       ...mapState({
