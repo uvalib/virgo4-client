@@ -39,7 +39,6 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
-      <Welcome />
       <transition name="message-transition"
           enter-active-class="animated faster fadeIn"
           leave-active-class="animated faster fadeOut">
@@ -51,6 +50,7 @@
         <p v-if="sessionMessage" class="session" v-html="sessionMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
+      <Welcome  v-else  />
    </div>
 </template>
 
