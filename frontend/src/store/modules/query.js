@@ -161,11 +161,13 @@ const query = {
             // final results of the pool with the applied filters
             ctx.commit('filters/restoreFilters', saved, { root: true })
             await ctx.dispatch("selectPoolResults", saved.resultsIdx, { root: true })
-            ctx.commit("clearSelectedPoolResults", null, { root: true }) 
-            ctx.dispatch("searchSelectedPool", null, { root: true }) 
+            if (ctx.rootGetters["filters/hasFilter"](saved.resultsIdx )) {
+               ctx.commit("clearSelectedPoolResults", null, { root: true }) 
+               ctx.dispatch("searchSelectedPool", null, { root: true }) 
+            }
          } catch (error)  {
-            ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })
+            // TODO handle not found; show message
          }
       }
    }
