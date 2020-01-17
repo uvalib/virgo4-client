@@ -4,6 +4,7 @@ import axios from 'axios'
 const query = {
    namespaced: true,
    state: {
+      restoreMessage: "",
       mode: "basic",
       basic: "",
       basicSearchScope: { name: 'All Sources', id: 'all' },
@@ -80,7 +81,14 @@ const query = {
    },
    mutations: {
       updateField,
+      setRestoreMessage(state, msg) {
+         state.restoreMessage = msg
+         setTimeout( ()=> {
+            state.restoreMessage = ""
+         }, 10000)
+      },
       restoreSearch(state, data) {
+         state.restoreMessage = ""
          state.mode = data.mode
          if (data.mode == "basic") {
             state.basicSearchScope = data.scope
@@ -93,6 +101,7 @@ const query = {
          state.basicSearchScope = scope
       },
       setAdvancedSearch(state) {
+         state.restoreMessage = ""
          state.mode = "advanced"
          let exist = state.advanced.findIndex(f => f.value == state.basic)
          if (exist == -1) {
@@ -104,6 +113,7 @@ const query = {
       },
       setBasicSearch(state) {
          state.mode = "basic"
+         state.restoreMessage = ""
       },
       setSubjectSearch(state, subject) {
          state.mode = "advanced"
@@ -128,6 +138,7 @@ const query = {
          state.advanced.splice(idx, 1)
       },
       clear(state) {
+         state.restoreMessage = ""
          state.lastSearch = ""
          state.mode = "basic"
          state.basic = ""
@@ -167,7 +178,7 @@ const query = {
             }
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })
-            // TODO handle not found; show message
+            ctx.commit("setRestoreMessage", "The search you requested cannot be found, or has been removed by its owner")
          }
       }
    }

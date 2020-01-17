@@ -48,9 +48,10 @@
           enter-active-class="animated faster fadeIn"
           leave-active-class="animated faster fadeOut">
         <p v-if="sessionMessage" class="session" v-html="sessionMessage"></p>
+        <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
-      <Welcome  v-else  />
+      <Welcome  v-else-if="!isRestore && basicSearch"  />
    </div>
 </template>
 
@@ -82,6 +83,7 @@ export default {
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
          sessionMessage: state => state.system.sessionMessage,
+         restoreMessage: state => state.query.restoreMessage,
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
@@ -102,6 +104,11 @@ export default {
       basicSearch() {
         return this.searchMode == "basic"
       },
+      isRestore() {
+         return ( this.$route.params !== undefined && 
+              this.$route.params.id !== undefined && 
+              this.$route.params.id != "")
+      }
    },
    created: function() {
       this.searchCreated()
@@ -113,9 +120,7 @@ export default {
          await this.$store.dispatch('pools/getPools')
          
          // When restoring a saved search, the call will be /search/:token
-         if ( this.$route.params !== undefined && 
-              this.$route.params.id !== undefined && 
-              this.$route.params.id != "") {
+         if ( this.isRestore) {
             this.restoreSavedSearch(this.$route.params.id)
             return
          }
@@ -239,6 +244,10 @@ export default {
       },
 
       advancedClicked() {
+         let cr = this.$router.currentRoute
+         if ( cr.path != "/" ) {
+            this.$router.push("/")
+         }
         this.$store.commit("query/setAdvancedSearch")
       },
    }
