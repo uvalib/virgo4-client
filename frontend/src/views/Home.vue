@@ -23,7 +23,8 @@
             >
           </div>
           <div class="controls">
-            <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+            <SourceInfo />
+            <span @click="searchClicked" class="search pure-button pure-button-primary">Search</span>
           </div>
           <div class="advanced">
             <router-link to="/journals">
@@ -38,6 +39,7 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
+      <Welcome />
       <transition name="message-transition"
           enter-active-class="animated faster fadeIn"
           leave-active-class="animated faster fadeOut">
@@ -58,15 +60,17 @@ import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/popovers/SearchTips"
+import SourceInfo from "@/components/popovers/SourceInfo"
 import AdvancedSearch from "@/components/AdvancedSearch"
 import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
+import Welcome from "@/components/Welcome"
 export default {
    name: "home",
    components: {
      SearchResults,
      SearchTips, AdvancedSearch, V4Spinner,
-     V4Select
+     V4Select, Welcome, SourceInfo
    },
    computed: {
       ...mapState({
@@ -92,7 +96,7 @@ export default {
         'basic','basicSearchScope'
       ]),
       searchScopes() {
-        let out = [{name: 'All Sources', id: 'all'}]
+        let out = [{name: 'All Resources', id: 'all'}]
         return out.concat(this.sources)
       },
       basicSearch() {
@@ -274,9 +278,11 @@ export default {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
-
+.controls span.search.pure-button.pure-button-primary {
+   margin-left: auto;
+}
 .controls  > * {
   flex: 0 1 auto;
 }

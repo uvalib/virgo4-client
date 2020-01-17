@@ -44,7 +44,6 @@
             </div>
             <AvailabilityTable v-if="details.has_availability != false" :titleId="details.identifier" />
          </template>
-         <BackToVirgo  />
       </div>
    </div>
 </template>
@@ -52,14 +51,13 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import BackToVirgo from "@/components/BackToVirgo"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import AvailabilityTable from "@/components/AvailabilityTable"
 import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "sources",
    components: {
-      BackToVirgo, SearchHitHeader, AvailabilityTable, V4Spinner
+      SearchHitHeader, AvailabilityTable, V4Spinner
    },
    computed: {
       ...mapState({
