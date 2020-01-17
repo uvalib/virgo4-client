@@ -172,10 +172,10 @@ export default {
          })
       },
       renameFolder(folderInfo) {
-         this.$store.dispatch("user/renameFolder", folderInfo);
+         this.$store.dispatch("user/renameFolder", folderInfo)
       },
       moveBookmarks(folderID) {
-         let data = { bookmarks: this.selectedItems, folderID: folderID };
+         let data = { bookmarks: this.selectedItems, folderID: folderID }
          this.$store.dispatch("user/moveBookmarks", data);
       },
       reserve() {
@@ -194,33 +194,33 @@ export default {
          this.$router.push("/course-reserves-request")
       },
       detailsURL(bookmark) {
-         return `/sources/${bookmark.pool}/items/${bookmark.identifier}`;
+         return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
       },
       removeBookmarks() {
          if ( this.selectedItems.length == 0) {
              this.$store.commit("system/setError", "No bookmarks have been selected for deletion")
              return
          }
-         this.$store.dispatch("user/removeBookmarks", this.selectedItems);
+         this.$store.dispatch("user/removeBookmarks", this.selectedItems)
       },
       removeFolder(folderID) {
-         this.$store.dispatch("user/removeFolder", folderID);
+         this.$store.dispatch("user/removeFolder", folderID)
       },
       openCreate() {
          this.createOpen = true;
          this.$nextTick(() => {
-            this.$refs.folderInput.focus();
+            this.$refs.folderInput.focus()
          });
       },
       cancelCreate() {
          if (this.submitting) return;
          this.createOpen = false;
-         this.$store.commit("system/setError", "");
+         this.$store.commit("system/setError", "")
       },
       createFolder() {
          if (this.submitting) return;
          this.submitting = true;
-         this.$store.commit("system/setError", "");
+         this.$store.commit("system/setError", "")
          if (this.newFolder == "") {
             this.$store.commit(
                "system/setError",
@@ -229,14 +229,14 @@ export default {
             return;
          }
          this.$store.dispatch("user/addFolder", this.newFolder).then(() => {
-            this.createOpen = false;
-            this.submitting = false;
+            this.createOpen = false
+            this.submitting = false
             this.newFolder = ""
          });
       }
    },
    created() {
-      this.$store.dispatch("user/getBookmarks");
+      this.$store.dispatch("user/getBookmarks")
    }
 };
 </script>

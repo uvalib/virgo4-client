@@ -8,9 +8,12 @@
             <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
             <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
          </div>
-         <span v-if="searchMode=='basic'" @click="refineClicked()"
-            class="refine pure-button pure-button-primary">
-            Refine Search
+         <span class="buttons">
+            <SaveSearch v-if="isSignedIn" />
+            <span v-if="searchMode=='basic'" @click="refineClicked()"
+               class="refine pure-button pure-button-primary">
+               Refine Search
+            </span>
          </span>
       </div>
 
@@ -50,17 +53,17 @@ import { mapFields } from 'vuex-map-fields'
 import PoolResultDetail from "@/components/PoolResultDetail"
 import V4Select from "@/components/V4Select"
 import FacetSidebar from "@/components/FacetSidebar"
+import SaveSearch from "@/components/popovers/SaveSearch"
 export default {
    components: {
-      PoolResultDetail, V4Select, FacetSidebar
+      PoolResultDetail, V4Select, FacetSidebar, SaveSearch
    },
    computed: {
       ...mapGetters({
          hitPoolCount: 'hitPoolCount',
          skippedPoolCount: 'skippedPoolCount',
          failedPoolCount: 'failedPoolCount',
-         hasFilter: 'filters/hasFilter',
-         isTargetPool: "preferences/isTargetPool",
+         isSignedIn: 'user/isSignedIn'
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
@@ -242,6 +245,9 @@ p.relevant {
       margin: 0;
       padding: 0 5vw;
    }
+    .save-box{ 
+      width: 50%;
+   }
 }
 @media only screen and (max-width: 768px) {
    div.search-results {
@@ -250,6 +256,9 @@ p.relevant {
    }
    span.refine.pure-button.pure-button-primary {
       display: none;
+   }
+   .save-box{ 
+      width: 90%;
    }
 }
 .results-wrapper {

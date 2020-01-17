@@ -15,6 +15,7 @@ const user = {
       bookmarks: [],
       bills: [],
       requests: [],
+      searches: [], 
       newBookmarkInfo: null,
       lookingUp: false,
       authTriesLeft: 5,
@@ -162,6 +163,12 @@ const user = {
       setRequests(state, req) {
          state.requests = req
       },
+      setSavedSearches(state, data) {
+         state.searches.splice(0, state.searches.length)
+         data.forEach( s => {
+            state.searches.push( s ) 
+         })
+      },
       setRenewResults(state, renewResults) {
          renewResults.results.forEach( renew => {
             if (renew.success == false) {
@@ -224,6 +231,7 @@ const user = {
          state.checkouts.splice(0, state.checkouts.length)
          state.bookmarks.splice(0, state.bookmarks.length)
          state.bills.splice(0, state.bills.length)
+         state.searches.splice(0, state.searches.length)
          Vue.cookies.remove("v4_auth_user")
       },
       setBookmarks(state, bookmarks) {
@@ -246,6 +254,17 @@ const user = {
           ctx.commit('system/setFatal', "Authorization failed: " + error.response.data, { root: true })
           ctx.commit('setAuthorizing', false)
         })
+      },
+      getSavedSearches(ctx) {
+         if (ctx.rootGetters["user/isSignedIn"] == false) return  
+         ctx.commit('setLookingUp', true)
+         axios.get(`/api/users/${ctx.state.signedInUser}/searches`).then((response) => {
+            ctx.commit('setSavedSearches', response.data)
+            ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          }) 
       },
       getRequests(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
@@ -369,7 +388,9 @@ const user = {
          data['barcode'] = ctx.state.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },
-
+      saveSearch(ctx, data) {
+         return axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
+      },
       async getBookmarks(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] == false) {
             await ctx.dispatch("getAccountInfo")

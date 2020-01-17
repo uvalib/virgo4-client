@@ -11,6 +11,7 @@ import SignIn from './views/SignIn.vue'
 import Account from './views/Account.vue'
 import Checkouts from './views/Checkouts.vue'
 import Requests from './views/Requests.vue'
+import Searches from './views/Searches.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
 import NotFound from './views/NotFound.vue'
@@ -25,6 +26,11 @@ const router = new Router({
     {
       path: '/',
       alias: '/search',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/search/:id',
       name: 'home',
       component: Home
     },
@@ -99,6 +105,11 @@ const router = new Router({
       component: Requests
     },
     {
+      path: '/searches',
+      name: 'searches',
+      component: Searches
+    },
+    {
       path: '/signedout',
       name: 'signedout',
       component: SignedOut
@@ -131,7 +142,7 @@ router.beforeEach((to, _from, next) => {
 
   // Some pages require a signed in user...
   let userPages = ["preferences", "account", "bookmarks", "checkouts", 
-    "course-reserves-request", "requests"]
+    "course-reserves-request", "requests", "searches"]
   if (userPages.includes(to.name)) {
     if (getSignedInUserFromCookie()) {
       next()

@@ -22,7 +22,7 @@ type Folder struct {
 }
 
 // TableName sets the name of the table in the DB that this struct binds to
-func (u *Folder) TableName() string {
+func (f Folder) TableName() string {
 	return "bookmark_folders"
 }
 

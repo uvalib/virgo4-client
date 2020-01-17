@@ -33,7 +33,7 @@ type V4User struct {
 }
 
 // TableName sets the name of the table in the DB that this struct binds to
-func (u *V4User) TableName() string {
+func (u V4User) TableName() string {
 	return "users"
 }
 

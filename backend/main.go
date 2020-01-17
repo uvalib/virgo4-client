@@ -46,6 +46,7 @@ func main() {
 		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
 		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
 		api.GET("/journals/browse", svc.AuthMiddleware, svc.BrowseJournals)
+		api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)
 		api.GET("/users/:uid/bills", svc.AuthMiddleware, svc.GetUserBills)
@@ -53,6 +54,8 @@ func main() {
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
+		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
+		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 
 		bookmarks := api.Group("/users/:uid/bookmarks")
