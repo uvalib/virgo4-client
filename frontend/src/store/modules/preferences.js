@@ -1,10 +1,13 @@
 import axios from 'axios'
+import Vue from 'vue'
+import router from '../../router'
 
 const preferences = {
    namespaced: true,
    state: {
       targetPoolURL: "",
       excludePoolURLs: [],
+      trackingOptOut: false,
    },
 
    getters: {
@@ -23,6 +26,16 @@ const preferences = {
    },
 
    mutations: {
+      toggleOptOut(state) {
+         state.trackingOptOut = !state.trackingOptOut
+         if ( state.trackingOptOut ) {
+            let data = {v4_opt_out: true}
+            Vue.cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+         } else {
+            Vue.cookies.remove("v4_optout")
+         }
+         router.go()
+      }, 
       setPreferences(state, prefsStr) {
          state.targetPoolURL = ""
          state.excludePoolURLs = []
@@ -35,11 +48,20 @@ const preferences = {
             if (json.excludePoolURLs ) {
                state.excludePoolURLs = json.excludePoolURLs
             }
+            if ( json.trackingOptOut) {
+               state.trackingOptOut  = json.trackingOptOut 
+               let optOutCookie = Vue.cookies.get('v4_optout')
+               if ( state.trackingOptOut && !optOutCookie) {
+                  let data = {v4_opt_out: true}
+                  Vue.cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString()) 
+               }
+            }
          } catch(e) {
             // NOOP; just leave preferences unset
          }
       },
       clear(state) {
+         state.trackingOptOut = false
          state.targetPoolURL = ""
          state.excludePoolURLs.splice(0, state.excludePoolURLs.length)
       },
@@ -66,17 +88,21 @@ const preferences = {
    actions: {
       toggleTargetPool(ctx, tgtURL) {
          ctx.commit("toggleTargetPool", tgtURL)
-         let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
-         let data = {targetPoolURL: ctx.state.targetPoolURL, 
-            excludePoolURLs: ctx.state.excludePoolURLs
-         }
-         axios.post(url, data)
+         ctx.dispatch("savePreferences")
       },
       toggleExcludePool(ctx, tgtURL) {
          ctx.commit("toggleExcludePool", tgtURL)
+         ctx.dispatch("savePreferences")
+      },
+      toggleOptOut(ctx) {
+         ctx.commit("toggleOptOut")
+         ctx.dispatch("savePreferences")
+      },
+      savePreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
          let data = {targetPoolURL: ctx.state.targetPoolURL, 
-            excludePoolURLs: ctx.state.excludePoolURLs
+            excludePoolURLs: ctx.state.excludePoolURLs, 
+            trackingOptOut: ctx.state.trackingOptOut
          }
          axios.post(url, data)
       }

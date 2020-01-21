@@ -121,6 +121,7 @@
                   </div>
                </div>
             </div>
+            <V4Privacy />
          </template>
          <transition name="message-transition"
                      enter-active-class="animated faster fadeIn"
@@ -138,6 +139,7 @@ import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
 import ChangePin from '@/components/popovers/ChangePin'
 import V4Spinner from "@/components/V4Spinner"
+import V4Privacy from "@/components/V4Privacy"
 export default {
    name: "account",
    data: function() {
@@ -146,7 +148,8 @@ export default {
       };
    },
    components: {
-      AccountActivities, AccordionContent, V4Spinner, ChangePin
+      AccountActivities, AccordionContent, 
+      V4Spinner, ChangePin, V4Privacy
    },
    computed: {
       ...mapState({
