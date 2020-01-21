@@ -62,6 +62,7 @@ h2 {
 table {
    border-collapse: collapse;
    width: 100%;
+   margin-bottom: 10vh;
 }
 td, th {
    padding: 0.5rem;
