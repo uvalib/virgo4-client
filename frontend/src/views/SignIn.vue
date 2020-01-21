@@ -49,7 +49,7 @@
                   <tr>
                     <td></td>
                     <td>
-                      <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
+                      <span @click="signinClicked" class="pure-button pure-button-primary">Sign in</span>
                     </td>
                   </tr>
                </table>
