@@ -4,15 +4,16 @@
       <div class="sign-in-content">
          <div class="netbadge">
             <span class="netbadge">
-               <label>UVA Users</label>
-               <div class="indent">
+               <h2>UVA Users</h2>
+               <p class="subhead">(Current UVA students, faculty, and staff)</p>
+               <div class="indent littleextra">
                   <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
                </div>
             </span>
          </div>
-
          <div>
-            <label>All Other Users</label>
+            <h2>All Other Users</h2>
+            <p>(All other researchers, including UVA alumni or retirees)</p>
             <div class="indent">
                <table class="pure-form form">
                   <tr>
@@ -28,21 +29,30 @@
                         <input @keyup.enter="signinClicked" v-model="pin" type="password">
                      </td>
                   </tr>
+                  <tr>
+                    <td colspan="2">
+                      <transition name="message-transition"
+                         enter-active-class="animated faster fadeIn"
+                         leave-active-class="animated faster fadeOut">
+                         <div v-if="authMessage" class="authMessage">
+                            <div v-if="lockedOut" class="locked-out">
+                               {{ authMessage }}
+                            </div>
+                            <div v-else class="tries">
+                               <div class="auth-msg">{{ authMessage }}</div>
+                               You have <b>{{authTriesLeft}}</b> more tries before your account is locked.
+                            </div>
+                         </div>
+                      </transition>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td>
+                      <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
+                    </td>
+                  </tr>
                </table>
-               <transition name="message-transition"
-                  enter-active-class="animated faster fadeIn"
-                  leave-active-class="animated faster fadeOut">
-                  <div v-if="authMessage" class="authMessage">
-                     <div v-if="lockedOut" class="locked-out">
-                        {{ authMessage }}
-                     </div>
-                     <div v-else class="tries">
-                        <div class="auth-msg">{{ authMessage }}</div>
-                        You have <b>{{authTriesLeft}}</b> more tries before your account is locked.
-                     </div>
-                  </div>
-               </transition>
-               <span @click="signinClicked" class="pure-button pure-button-primary">Sign In with PIN</span>
             </div>
          </div>
       </div>
@@ -73,7 +83,7 @@ export default {
    watch: {
       authTriesLeft (newVal, oldVal) {
          if (newVal < oldVal ) {
-            this.pin = ""   
+            this.pin = ""
          }
       }
    },
@@ -92,26 +102,17 @@ export default {
 .signin {
    min-height: 400px;
    position: relative;
-   margin-top: 2vw;
-   color: var(--color-primary-text);
-   margin-bottom: 35px;
-}
-@media only screen and (min-width: 768px) {
-   .sign-in-content  {
-       width: 60%;
-   }
-}
-@media only screen and (max-width: 768px) {
-   .sign-in-content  {
-       width: 95%;
-   }
+   margin: 2vw auto 6vw;
+   color: var(--uvalib-text);
 }
 .sign-in-content {
    width: 60%;
    margin: 0 auto;
    text-align: left;
 }
-
+h2 {
+  margin-bottom: 0;
+}
 td.label {
   font-weight: 500;
   text-align: right;
@@ -131,32 +132,47 @@ td.value {
 }
 p.hint {
    margin: 5px 10px;
-   color: #444;
+   color: var(--uvalib-grey-dark);
    text-align: left;
-}
-label {
-   color: #444;
-   margin-bottom: 15px;
-   display: block;
-   font-size: 1.25em;
-}
-span.netbadge .pure-button {
-   width:100%;
 }
 #app .signin .pure-button.pure-button-primary {
    margin: 0;
-   width: 100%;
 }
 .controls {
    margin-top: 5px;
 }
 div.netbadge {
    padding-bottom: 25px;
-   border-bottom: 4px solid var(--color-brand-blue);
+   border-bottom: 1px solid var(--uvalib-grey-light);
    margin: 25px 0;
 }
 div.indent {
    margin-left: 35px;
+}
+div.indent.littleextra {
+  margin-left: 112px;
+}
+@media only screen and (min-width: 768px) {
+   .signin {
+     max-width: 55vw;
+   }
+   .sign-in-content  {
+       width: 60%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .signin {
+     max-width: 95vw;
+   }
+   .sign-in-content  {
+       width: 95%;
+   }
+   div.indent {
+     margin-left: 0;
+   }
+   div.indent.littleextra {
+     margin-left: 77px;
+   }
 }
 .authMessage {
    font-weight: bold;
@@ -171,7 +187,7 @@ div.indent {
    font-weight: bold;
 }
 .locked-out {
-   color: var(--color-primary-text);
+   color: var(--uvalib-text);
    font-size: 1em;
    font-weight: bold;
    text-align: center;
