@@ -30,9 +30,9 @@ const preferences = {
          state.trackingOptOut = !state.trackingOptOut
          if ( state.trackingOptOut ) {
             let data = {v4_opt_out: true}
-            Vue.cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+            Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
          } else {
-            Vue.cookies.remove("v4_optout")
+            Vue.$cookies.remove("v4_optout")
          }
          router.go()
       }, 
@@ -50,10 +50,10 @@ const preferences = {
             }
             if ( json.trackingOptOut) {
                state.trackingOptOut  = json.trackingOptOut 
-               let optOutCookie = Vue.cookies.get('v4_optout')
+               let optOutCookie = Vue.$cookies.get('v4_optout')
                if ( state.trackingOptOut && !optOutCookie) {
                   let data = {v4_opt_out: true}
-                  Vue.cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString()) 
+                  Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString()) 
                }
             }
          } catch(e) {

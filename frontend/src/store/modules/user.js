@@ -232,7 +232,7 @@ const user = {
          state.bookmarks.splice(0, state.bookmarks.length)
          state.bills.splice(0, state.bills.length)
          state.searches.splice(0, state.searches.length)
-         Vue.cookies.remove("v4_auth_user")
+         Vue.$cookies.remove("v4_auth_user")
       },
       setBookmarks(state, bookmarks) {
          state.bookmarks = []
@@ -369,7 +369,7 @@ const user = {
             ctx.commit("setSignedInUser", {userId: response.data.barcode, 
                token: ctx.state.authToken, type: "public", quiet: false} )
             ctx.commit('setAuthorizing', false)
-            let bmCookie = Vue.cookies.get('v4_bookmark')
+            let bmCookie = Vue.$cookies.get('v4_bookmark')
             if ( bmCookie) {
                router.push("/")
             } else {

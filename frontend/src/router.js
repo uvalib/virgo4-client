@@ -71,7 +71,7 @@ const router = new Router({
       path: '/signedin',
       beforeEnter: (_to, _from, next) => {
         getSignedInUserFromCookie()
-        let bmCookie = Vue.cookies.get('v4_bookmark')
+        let bmCookie = Vue.$cookies.get('v4_bookmark')
         if ( bmCookie) {
             next("/")
         } else {
@@ -159,7 +159,7 @@ router.beforeEach((to, _from, next) => {
 
 function getSignedInUserFromCookie() {
   store.commit("user/setSignedInUser", {userId: "", token: "", type: "", quiet: true})
-  let authInfo = Vue.cookies.get("v4_auth_user")
+  let authInfo = Vue.$cookies.get("v4_auth_user")
   if (authInfo) {
     let userId = authInfo.split("|")[0]
     let token = authInfo.split("|")[1]
@@ -180,7 +180,7 @@ function ensureAuthTokenPresent(next) {
   // see if there is an auth user cookie set from which we can retrieve
   // the auth token and logged in user info....
   // console.log("NO AUTH")
-  let authInfo = Vue.cookies.get("v4_auth_user")
+  let authInfo = Vue.$cookies.get("v4_auth_user")
   if (authInfo) {
     // console.log("IN COOKIE AUTH, signing in")
     let userId = authInfo.split("|")[0]
