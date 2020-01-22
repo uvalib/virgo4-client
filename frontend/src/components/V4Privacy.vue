@@ -8,10 +8,10 @@
       </div>
       <div class="opt-out">
          <span v-if="trackingOptOut">
-            You are opted out. Uncheck the box below to opt in.
+            You have opted out. Uncheck the box below to opt in.
          </span>
          <span v-else>
-            You are not opted out. Check the box below to opt out.
+            You have not opted out. Check the box below to opt out.
          </span>
          <div>
             <label>
