@@ -7,7 +7,12 @@
          the product.  We retain this aggregate information for a limited time.
       </div>
       <div class="opt-out">
-         You are not opted out. Check the box below to opt out.
+         <span v-if="trackingOptOut">
+            You are opted out. Uncheck the box below to opt in.
+         </span>
+         <span v-else>
+            You are not opted out. Check the box below to opt out.
+         </span>
          <div>
             <label>
                <input @change="optOutClicked" class="opt-out" :checked="trackingOptOut" type="checkbox"/>Opt out
