@@ -1,6 +1,30 @@
 import { getField, updateField } from 'vuex-map-fields'
 import axios from 'axios'
 
+function handleQueryParens( qp, field ) {
+   let out = ""
+   let done = false 
+   let startIdx = 0
+   while (!done) {
+      let p0 = qp.indexOf("(", startIdx)
+      let p1 = qp.indexOf(")", p0)
+      let parenExp = ` (${field}: {${qp.substring(p0+1,p1)}}) `
+      out += parenExp
+      startIdx = p1 
+      done = !qp.includes("(", startIdx)
+   }
+   let leftover = qp.substring(startIdx+1).trim()
+   if (leftover.startsWith("AND")) {
+      out += ` AND ${field}: {${leftover.substring(4)}}`
+   } else if (leftover.startsWith("OR")) {
+      out += ` OR ${field}: {${leftover.substring(3)}}`
+   } else if (leftover.startsWith("NOT")) {
+      out += ` NOT ${field}: {${leftover.substring(3)}}`
+   }
+   out = out.trim()
+   return out
+}
+
 const query = {
    namespaced: true,
    state: {
@@ -49,11 +73,17 @@ const query = {
       },
       string: state => {
          // convert into the standard v4 search string format. Ex:
-         // title : {"susan sontag" OR music title} AND keyword:{ Maunsell } ) OR author:{ liberty }
+         //     ( calico OR "tortoise shell" ) AND cats =>
+         //     ( keyword : {calico OR "tortoise shell")} ) AND keyword:{ cats } 
          // Fields are joined together with AND or OR based on the fieldOp setting
+         // NOTE: the position of the parens is outside of the field type, not within
          if (state.mode == "basic") {
             let qp = state.basic
             if (qp.length == 0) qp = "*"
+
+            if (qp.includes("(")) {
+               return handleQueryParens(qp, "keyword")
+            }
             return `keyword: {${qp}}`
          }
 
@@ -72,7 +102,11 @@ const query = {
                      qs += `date: {${term.type} ${term.value}}`
                   }
                } else {
-                  qs += `${term.field}: {${term.value}}`
+                  if ( term.value.includes("(")) {
+                     qs += handleQueryParens(term.value, term.field)
+                  } else {
+                     qs += `${term.field}: {${term.value}}`
+                  }
                }
             }
          })

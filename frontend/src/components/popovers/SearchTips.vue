@@ -22,6 +22,9 @@
                   <p class="example">(calico OR "tortoise shell") AND cats</p>
                </li>
             </ul>
+            <div class="note">
+               <b>NOTE: </b>Nested parentheses within a query are not supported
+            </div>
          </div>
       </div>
    </v-popover>
@@ -66,6 +69,9 @@ i.fas.fa-times-circle.close:hover {
    border-right: 1px solid var(--uvalib-grey-dark);
    font-size: 1.25em;
    font-weight: bold;
+}
+.note {
+   margin: 25px 0 10px 0;
 }
 div.tips {
    margin: 0;
