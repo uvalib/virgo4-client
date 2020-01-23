@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
+	"github.com/rs/xid"
 )
 
 // Folder contains details for a bookmark folder
@@ -18,6 +19,8 @@ type Folder struct {
 	UserID    int         `json:"-" db:"user_id"`
 	Name      string      `json:"folder" db:"name"`
 	AddedAt   time.Time   `json:"addedAt" db:"added_at"`
+	Public    bool        `json:"public" db:"is_public"`
+	Token     *string     `json:"token" db:"token"`
 	Bookmarks []*Bookmark `json:"bookmarks" db:"-"`
 }
 
@@ -39,7 +42,8 @@ type Bookmark struct {
 func (u *V4User) GetBookmarks(db *dbx.DB) {
 	log.Printf("Load bookmarks for %s", u.Virgo4ID)
 	q := db.NewQuery(`SELECT f.id as f_id, f.name as folder, b.added_at as f_added_at,
-	   s.name as pool, b.id as b_id, b.identifier, b.details, b.added_at as b_added_at
+		f.is_public as is_public, f.token as pub_token,
+		s.name as pool, b.id as b_id, b.identifier, b.details, b.added_at as b_added_at
 	 	FROM bookmark_folders f  
 			LEFT JOIN bookmarks b ON b.folder_id=f.id
 			LEFT JOIN sources s ON s.id = b.source_id 
@@ -58,6 +62,8 @@ func (u *V4User) GetBookmarks(db *dbx.DB) {
 			FolderID      int       `db:"f_id"`
 			FolderAddedAt time.Time `db:"f_added_at"`
 			Folder        string    `db:"folder"`
+			Public        bool      `db:"is_public"`
+			Token         string    `db:"pub_token"`
 			Pool          string    `db:"pool"`
 			Identifier    string    `db:"identifier"`
 			Details       string    `db:"details"`
@@ -71,7 +77,8 @@ func (u *V4User) GetBookmarks(db *dbx.DB) {
 			}
 		}
 		if tgtFolder == nil {
-			newFolder := Folder{ID: raw.FolderID, Name: raw.Folder, AddedAt: raw.FolderAddedAt}
+			newFolder := Folder{ID: raw.FolderID, Name: raw.Folder, AddedAt: raw.FolderAddedAt,
+				Public: raw.Public, Token: &raw.Token}
 			newFolder.Bookmarks = make([]*Bookmark, 0)
 			u.Bookmarks = append(u.Bookmarks, &newFolder)
 			tgtFolder = &newFolder
@@ -130,6 +137,55 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 	// get updated bookmarks and return to user
 	user.GetBookmarks(svc.DB)
 	c.JSON(http.StatusOK, user.Bookmarks)
+}
+
+// PublishBookmarkFolder will move update a folder name
+func (svc *ServiceContext) PublishBookmarkFolder(c *gin.Context) {
+	uid := c.Param("uid")
+	fid, _ := strconv.Atoi(c.Param("id"))
+	log.Printf("User %s publish folder%d", uid, fid)
+	svc.setFolderVisibility(c, uid, fid, true)
+}
+
+// UnpublishBookmarkFolder will move update a folder name
+func (svc *ServiceContext) UnpublishBookmarkFolder(c *gin.Context) {
+	uid := c.Param("uid")
+	fid, _ := strconv.Atoi(c.Param("id"))
+	log.Printf("User %s unpublish folder%d", uid, fid)
+	svc.setFolderVisibility(c, uid, fid, false)
+}
+
+func (svc *ServiceContext) setFolderVisibility(c *gin.Context, uid string, folderID int, public bool) {
+	var userID int
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": uid})
+	uErr := uq.Row(&userID)
+	if uErr != nil {
+		log.Printf("ERROR: couldn't find user %s: %v", uid, uErr)
+		c.String(http.StatusBadRequest, "Invalid user %s", uid)
+		return
+	}
+
+	var folder Folder
+	err := svc.DB.Select().Where(dbx.HashExp{"id": folderID, "user_id": userID}).One(&folder)
+	if err != nil {
+		log.Printf("Folder %d not found: %+v", folderID, err)
+		c.String(http.StatusNotFound, "folder not found")
+		return
+	}
+
+	folder.Public = public
+	if public {
+		tok := xid.New().String()
+		folder.Token = &tok
+	}
+
+	err = svc.DB.Model(&folder).Update()
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.String(http.StatusOK, "ok")
 }
 
 // UpdateBookmarkFolder will move update a folder name
