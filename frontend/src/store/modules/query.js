@@ -1,5 +1,6 @@
 import { getField, updateField } from 'vuex-map-fields'
 import axios from 'axios'
+import router from '../../router'
 
 function handleQueryParens( qp, field ) {
    let out = ""
@@ -212,7 +213,7 @@ const query = {
             }
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })
-            ctx.commit("setRestoreMessage", "The search you requested cannot be found, or has been removed by its owner")
+            router.push("/not_found")
          }
       }
    }

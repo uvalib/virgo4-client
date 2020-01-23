@@ -240,10 +240,18 @@ const user = {
       },
       setBills(state, bills) {
          state.bills = bills
-      }
+      },
    },
 
    actions: {
+      saveSearchVisibility(ctx, data) {
+         let usrID = ctx.state.signedInUser
+         if (data.public) {
+            axios.post(`/api/users/${usrID}/searches/${data.token}/publish`)
+         } else {
+            axios.delete(`/api/users/${usrID}/searches/${data.token}/publish`)
+         }
+      },
       getAuthToken(ctx) {
         ctx.commit('setAuthorizing', true)
         return axios.post("/authorize").then((response) => {

@@ -34,7 +34,7 @@
                         <div class="submenu">Requests</div>
                      </router-link>
                      <router-link to="/searches">
-                        <div class="submenu">Searches</div>
+                        <div class="submenu">Saved Searches</div>
                      </router-link>
                      <div  @click="signOut" class="submenu">
                         <span>Sign out</span>

@@ -27,6 +27,46 @@ func (s SavedSearch) TableName() string {
 	return "saved_searches"
 }
 
+// PublishSavedSearch will make a private search public
+func (svc *ServiceContext) PublishSavedSearch(c *gin.Context) {
+	uid := c.Param("uid")
+	token := c.Param("token")
+	log.Printf("User %s publish saved search %s...", uid, token)
+	svc.setSearchVisibility(c, uid, token, true)
+}
+
+func (svc *ServiceContext) setSearchVisibility(c *gin.Context, uid string, token string, public bool) {
+	var userID int
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": uid})
+	uErr := uq.Row(&userID)
+	if uErr != nil {
+		log.Printf("ERROR: couldn't find user %s: %v", uid, uErr)
+		c.String(http.StatusBadRequest, "Invalid user %s", uid)
+		return
+	}
+	log.Printf("User %s has ID %d", uid, userID)
+
+	sq := svc.DB.NewQuery("update saved_searches set is_public={:pub} where user_id={:uid} and token={:tok}")
+	sq.Bind(dbx.Params{"pub": public})
+	sq.Bind(dbx.Params{"uid": userID})
+	sq.Bind(dbx.Params{"tok": token})
+	_, err := sq.Execute()
+	if err != nil {
+		c.String(http.StatusBadRequest, "Publish failed %s", err.Error())
+		return
+	}
+	c.String(http.StatusOK, "ok")
+}
+
+// UnpublishSavedSearch will make a public search private
+func (svc *ServiceContext) UnpublishSavedSearch(c *gin.Context) {
+	uid := c.Param("uid")
+	token := c.Param("token")
+	log.Printf("User %s unpublish saved search %s...", uid, token)
+	svc.setSearchVisibility(c, uid, token, false)
+}
+
 // SaveSearch will save a named search in that saved_searches table along with an access token
 func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	uid := c.Param("uid")
@@ -138,7 +178,7 @@ func (svc *ServiceContext) GetUserSavedSearches(c *gin.Context) {
 	}
 
 	var searches []SavedSearch
-	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).All(&searches)
+	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&searches)
 	c.JSON(http.StatusOK, searches)
 
 }

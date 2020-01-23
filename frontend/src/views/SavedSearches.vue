@@ -1,6 +1,6 @@
 <template>
    <div class="searches">
-      <h1>Searches</h1>
+      <h1>Saved Searches</h1>
       <div class="searches-content">
          <AccountActivities/>
          <div class="working" v-if="lookingUp" >
@@ -13,6 +13,12 @@
             <template v-else>
                <ol>
                   <li v-for="saved in searches"  :key="saved.token">
+                     <span class="public">
+                        <label>
+                           <input v-model="saved.public" @change="publicClicked(saved)" type="checkbox"/>
+                           <span>&nbsp;Public</span>
+                        </label>
+                     </span>
                      <span><router-link :to="searchURL(saved.token)">{{saved.name}}</router-link></span>
                      <span class="icon"><router-link :to="searchURL(saved.token)"><i class="fas fa-search"></i></router-link></span>
                   </li>
@@ -47,6 +53,9 @@ export default {
       })
    },
    methods: {
+      publicClicked(saved) {
+         this.$store.dispatch("user/saveSearchVisibility", saved);
+      },
       formatDate(date) {
          return date.split("T")[0];
       },
@@ -55,12 +64,25 @@ export default {
       }
    },
    created() {
-      this.$store.dispatch("user/getSavedSearches");
+      this.$store.dispatch("user/getSavedSearches")
    }
 };
 </script>
 
 <style scoped>
+.public {
+   margin-right: 20px;
+   cursor: pointer;
+}
+.public input {
+   width: 15px;
+   height: 15px;
+   cursor: pointer;
+}
+.public label {
+   font-size: 0.85em;
+   cursor: pointer;
+}
 .searches {
    min-height: 400px;
    position: relative;

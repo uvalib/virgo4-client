@@ -56,6 +56,8 @@ func main() {
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
 		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
 		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
+		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
+		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 
 		bookmarks := api.Group("/users/:uid/bookmarks")

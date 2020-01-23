@@ -10,7 +10,7 @@
       <span class="sep">|</span>
       <router-link to="/requests">Requests</router-link>
       <span class="sep">|</span>
-      <router-link to="/searches">Searches</router-link>
+      <router-link to="/searches">Saved Searches</router-link>
       <span class="sep">|</span>
       <div  @click="signOut" class="text-button">Sign Out</div>
    </div>

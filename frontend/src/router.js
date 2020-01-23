@@ -11,7 +11,7 @@ import SignIn from './views/SignIn.vue'
 import Account from './views/Account.vue'
 import Checkouts from './views/Checkouts.vue'
 import Requests from './views/Requests.vue'
-import Searches from './views/Searches.vue'
+import SavedSearches from './views/SavedSearches.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
 import NotFound from './views/NotFound.vue'
@@ -107,7 +107,7 @@ const router = new Router({
     {
       path: '/searches',
       name: 'searches',
-      component: Searches
+      component: SavedSearches
     },
     {
       path: '/signedout',
