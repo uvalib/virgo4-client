@@ -63,7 +63,7 @@ func (u *V4User) GetBookmarks(db *dbx.DB) {
 			FolderAddedAt time.Time `db:"f_added_at"`
 			Folder        string    `db:"folder"`
 			Public        bool      `db:"is_public"`
-			Token         string    `db:"pub_token"`
+			Token         *string   `db:"pub_token"`
 			Pool          string    `db:"pool"`
 			Identifier    string    `db:"identifier"`
 			Details       string    `db:"details"`
@@ -78,7 +78,7 @@ func (u *V4User) GetBookmarks(db *dbx.DB) {
 		}
 		if tgtFolder == nil {
 			newFolder := Folder{ID: raw.FolderID, Name: raw.Folder, AddedAt: raw.FolderAddedAt,
-				Public: raw.Public, Token: &raw.Token}
+				Public: raw.Public, Token: raw.Token}
 			newFolder.Bookmarks = make([]*Bookmark, 0)
 			u.Bookmarks = append(u.Bookmarks, &newFolder)
 			tgtFolder = &newFolder
@@ -183,6 +183,10 @@ func (svc *ServiceContext) setFolderVisibility(c *gin.Context, uid string, folde
 	err = svc.DB.Model(&folder).Update()
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if public {
+		c.String(http.StatusOK, *folder.Token)
 		return
 	}
 	c.String(http.StatusOK, "ok")

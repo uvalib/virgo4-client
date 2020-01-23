@@ -40,6 +40,7 @@ func main() {
 	router.GET("/healthcheck", svc.HealthCheck)
 	router.GET("/config", svc.GetConfig)
 	router.POST("/authorize", svc.Authorize)
+
 	api := router.Group("/api")
 	{
 		api.GET("/authenticated/:token", svc.IsAuthenticated)
@@ -67,8 +68,8 @@ func main() {
 			bookmarks.POST("/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
 			bookmarks.DELETE("/folders/:id", svc.AuthMiddleware, svc.DeleteBookmarkFolder)
 			bookmarks.POST("/folders/:id", svc.AuthMiddleware, svc.UpdateBookmarkFolder)
-			bookmarks.DELETE("/folders/:id/publish", svc.UnpublishBookmarkFolder) // PUT BACK svc.AuthMiddleware
-			bookmarks.POST("/folders/:id/publish", svc.PublishBookmarkFolder)
+			bookmarks.DELETE("/folders/:id/publish", svc.AuthMiddleware, svc.UnpublishBookmarkFolder)
+			bookmarks.POST("/folders/:id/publish", svc.AuthMiddleware, svc.PublishBookmarkFolder)
 			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
 		}
 
