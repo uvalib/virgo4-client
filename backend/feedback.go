@@ -2,26 +2,24 @@ package main
 
 import (
 	"bytes"
-	//"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/smtp"
-	//"net/url"
-	//"sort"
 	"strings"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
 )
 
+// SendFeedback will generate an email based on the user submission
 func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 	log.Printf("Received feedback request")
 	type FeedbackParams struct {
 		UserID      string `json:"userID"`
 		Email       string `json:"email" binding:"required" `
 		WantedTo    string `json:"wantedTo"  binding:"required"`
-		Explanation string `json:explanation  binding:"required"`
+		Explanation string `json:"explanation"  binding:"required"`
 	}
 	type FeedbackRequest struct {
 		Feedback FeedbackParams `json:"feedback"`
