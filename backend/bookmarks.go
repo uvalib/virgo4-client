@@ -400,6 +400,42 @@ func (svc *ServiceContext) MoveBookmarks(c *gin.Context) {
 	c.JSON(http.StatusOK, user.Bookmarks)
 }
 
+// GetPublicBookmarks returns shared bookmark data identified by the passed token
+func (svc *ServiceContext) GetPublicBookmarks(c *gin.Context) {
+	token := c.Param("token")
+	log.Printf("Get public bookmarks for %s", token)
+	q := svc.DB.NewQuery(`SELECT b.*, s.name as pool
+	 	FROM bookmark_folders f  
+			LEFT JOIN bookmarks b ON b.folder_id=f.id
+			LEFT JOIN sources s ON s.id = b.source_id 
+		WHERE f.token={:tok} ORDER BY b.added_at ASC`)
+	q.Bind(dbx.Params{"tok": token})
+	rows, err := q.Rows()
+	if err != nil {
+		log.Printf("Unable to get bookmarks from %s:%v", token, err)
+		c.String(http.StatusNotFound, "%s not found", token)
+		return
+	}
+
+	// parse each bookmark row into the V4User structure
+	var bookmarks []Bookmark
+	for rows.Next() {
+		var raw struct {
+			ID         int
+			Pool       string
+			Identifier string
+			Details    string
+			AddedAt    time.Time
+		}
+		rows.ScanStruct(&raw)
+		bm := Bookmark{ID: raw.ID, Identifier: raw.Identifier,
+			Pool: raw.Pool, AddedAt: raw.AddedAt}
+		json.Unmarshal([]byte(raw.Details), &bm.Details)
+		bookmarks = append(bookmarks, bm)
+	}
+	c.JSON(http.StatusOK, bookmarks)
+}
+
 // GetBookmarks returns bookmark data for the specified user
 func (svc *ServiceContext) GetBookmarks(c *gin.Context) {
 	user := NewV4User()
