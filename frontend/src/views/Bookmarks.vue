@@ -17,7 +17,7 @@
                      borderWidth="0 0 3px 0"
                      borderColor="var(--uvalib-teal-light)"
                      :id="folderInfo.id.toString()"
-                     :title="folderInfo.folder"
+                     :title="getTitle(folderInfo)"
                      v-bind:closeOthers="expandedFolder"
                      @accordion-clicked="folderOpened(folderInfo.id)"
                   >
@@ -25,9 +25,6 @@
                         There are no bookmarks in this folder.
                      </div>
                      <div v-else>
-                        <div v-if="folderInfo.public" class="public-url">
-                           Public URL: <a :href="getPublicURL(folderInfo)" target="_blank">{{getPublicURL(folderInfo)}}</a>
-                        </div>
                         <table>
                            <tr>
                               <th colspan="3">
@@ -47,6 +44,18 @@
                                        </span>
                                     </div>
                                  </div>
+                              </th>
+                           </tr>
+                           <tr>
+                              <th colspan="3">
+                                 <span @click="publicClicked(folderInfo)" class="public">
+                                    <i v-if="folderInfo.public" class="check fas fa-check-circle"></i>
+                                    <i v-else class="check far fa-circle"></i>
+                                    <span>Public</span>
+                                    <span v-if="folderInfo.public" class="public-url">
+                                       URL: <a :href="getPublicURL(folderInfo)" target="_blank">{{getPublicURL(folderInfo)}}</a>
+                                    </span>
+                                 </span>
                               </th>
                            </tr>
                            <tr>
@@ -80,11 +89,6 @@
                            <br />This cannot be reversed.
                         </div>
                      </ConfirmDelete>
-                     <span @click="publicClicked(folderInfo)" class="public">
-                        <span>Public</span>
-                        <i v-if="folderInfo.public" class="check fas fa-check-circle"></i>
-                        <i v-else class="check far fa-circle"></i>
-                     </span>
                   </div>
                </div>
             </template>
@@ -166,6 +170,13 @@ export default {
       })
    },
    methods: {
+      getTitle(folderInfo) {
+         let out = folderInfo.folder 
+         if (folderInfo.public ){
+            out += ` <span style="font-weight:normal; font-size:0.9em;">(public)</span>`
+         }
+         return out
+      },
       async publicClicked(folder) {
          await this.$store.dispatch("user/toggleFolderVisibility", {id: folder.id, public: !folder.public})
       },
@@ -420,21 +431,21 @@ p.error {
 .public {
    display: flex;
    flex-flow: row nowrap;
-   align-content: center;
-   justify-content: center;
+   align-content: left;
+   justify-content: left;
    align-items: center;
    cursor: pointer;
+   color: var(--uvalib-grey-dark);
 }
 .public span {
-   font-size: 0.85em;
-   font-weight: 500;
+   font-weight: normal;
 }
 .public i.check {
-   margin: 0 0 0 4px;
+   margin: 0 5px 0 0;
    cursor: pointer;
    font-size: 1em;
 }
 .public-url {
-   padding: 5px 0 5px 5px;
+   margin-left: 5px;
 }
 </style>
