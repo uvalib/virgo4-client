@@ -177,6 +177,26 @@ const user = {
             }
          })
       },
+      setBookmarks(state, bookmarks) {
+         state.bookmarks.splice(0, state.bookmarks.length)
+         bookmarks.forEach( b => {
+            state.bookmarks.push(b)
+         })
+      },
+      toggleFolderVisibility(state, folderVisibility) {
+         state.bookmarks.forEach( f => {
+            if ( f.id == folderVisibility.id ) {
+               f.public = folderVisibility.public
+            }
+         })
+      },
+      setFolderToken(state, data) {
+         state.bookmarks.forEach( f => {
+            if ( f.id == data.id ) {
+               f.token = data.token
+            }
+         })
+      },
       showAddBookmark(state, bookmarkData) {
          state.newBookmarkInfo = bookmarkData
       },
@@ -233,10 +253,6 @@ const user = {
          state.bills.splice(0, state.bills.length)
          state.searches.splice(0, state.searches.length)
          Vue.$cookies.remove("v4_auth_user")
-      },
-      setBookmarks(state, bookmarks) {
-         state.bookmarks = []
-         state.bookmarks = bookmarks
       },
       setBills(state, bills) {
          state.bills = bills
@@ -471,6 +487,21 @@ const user = {
             ctx.commit('system/setError', error, { root: true })
          })
       },
+      async toggleFolderVisibility(ctx, folderVisibility) {
+         ctx.commit('toggleFolderVisibility', folderVisibility)  
+         try {
+            let usrID = ctx.state.signedInUser
+            if (folderVisibility.public) {
+               let resp = await axios.post(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
+               folderVisibility.token = resp.data
+               ctx.commit('setFolderToken', folderVisibility)  
+            } else {
+               axios.delete(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
+            } 
+         } catch (error)  {
+            ctx.commit('system/setError', error, { root: true })
+         }
+      }
    }
 }
 

@@ -25,6 +25,9 @@
                         There are no bookmarks in this folder.
                      </div>
                      <div v-else>
+                        <div v-if="folderInfo.public" class="public-url">
+                           Public URL: <a :href="getPublicURL(folderInfo)" target="_blank">{{getPublicURL(folderInfo)}}</a>
+                        </div>
                         <table>
                            <tr>
                               <th colspan="3">
@@ -77,6 +80,11 @@
                            <br />This cannot be reversed.
                         </div>
                      </ConfirmDelete>
+                     <span @click="publicClicked(folderInfo)" class="public">
+                        <span>Public</span>
+                        <i v-if="folderInfo.public" class="check fas fa-check-circle"></i>
+                        <i v-else class="check far fa-circle"></i>
+                     </span>
                   </div>
                </div>
             </template>
@@ -158,6 +166,13 @@ export default {
       })
    },
    methods: {
+      async publicClicked(folder) {
+         await this.$store.dispatch("user/toggleFolderVisibility", {id: folder.id, public: !folder.public})
+      },
+      getPublicURL(folder) {
+         let base = window.location.href 
+         return `${base}/${folder.token}`
+      },
       folderOpened(folderID) {
          this.selectedItems = []
          this.expandedFolder = folderID
@@ -401,5 +416,25 @@ i.details {
 }
 p.error {
    margin-bottom: 15px;
+}
+.public {
+   display: flex;
+   flex-flow: row nowrap;
+   align-content: center;
+   justify-content: center;
+   align-items: center;
+   cursor: pointer;
+}
+.public span {
+   font-size: 0.85em;
+   font-weight: 500;
+}
+.public i.check {
+   margin: 0 0 0 4px;
+   cursor: pointer;
+   font-size: 1em;
+}
+.public-url {
+   padding: 5px 0 5px 5px;
 }
 </style>
