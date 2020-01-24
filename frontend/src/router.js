@@ -15,6 +15,7 @@ import SavedSearches from './views/SavedSearches.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
 import NotFound from './views/NotFound.vue'
+import PublicBookmarks from './views/PublicBookmarks.vue'
 import store from './store'
 
 Vue.use(Router)
@@ -33,6 +34,11 @@ const router = new Router({
       path: '/search/:id',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/bookmarks/:key',
+      name: 'public-bookmarks',
+      component: PublicBookmarks
     },
     {
       path: '/journals',
@@ -134,7 +140,7 @@ router.beforeEach((to, _from, next) => {
   store.commit('user/clearAuthMessages', "")
 
   // Some pages just require an auth token...
-  let tokenPages = ["home", "course-reserves", "details", "search", "journals"]
+  let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks"]
   if (tokenPages.includes(to.name)) {
     ensureAuthTokenPresent(next)
     return
