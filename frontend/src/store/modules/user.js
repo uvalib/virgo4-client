@@ -180,6 +180,9 @@ const user = {
       setBookmarks(state, bookmarks) {
          state.bookmarks.splice(0, state.bookmarks.length)
          bookmarks.forEach( b => {
+            b.bookmarks.forEach( d => {
+               d.details = JSON.parse(d.details)
+            })
             state.bookmarks.push(b)
          })
       },
@@ -434,13 +437,12 @@ const user = {
          let data = {folder: folder, pool: bm.pool, identifier: bm.data.identifier}
 
          // required details: title, author, call number, location, library, availability
-         data['details'] = {title :bm.data.header.title, 
-            author: bm.data.header.author.value.join(", "),
-            callNumber: utils.getFieldValue("call_number", bm.data),
-            location: utils.getFieldValue("location", bm.data),
-            library: utils.getFieldValue("library", bm.data),
-            availability: utils.getFieldValue("availability", bm.data),
-         }
+         let detail = {title :bm.data.header.title, author: bm.data.header.author.value.join(", ")}
+         detail.callNumber = utils.getFieldValue("call_number", bm.data)
+         detail.location = utils.getFieldValue("location", bm.data)
+         detail.library = utils.getFieldValue("library", bm.data)
+         detail.availability = utils.getFieldValue("availability", bm.data)
+         data['details'] = JSON.stringify(detail)
          return axios.post(url, data).then((response) => {
             ctx.commit('setBookmarks', response.data)
          })

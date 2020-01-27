@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -31,11 +30,11 @@ func (f Folder) TableName() string {
 
 // Bookmark contains minimal details on a bookmarked item
 type Bookmark struct {
-	ID         int               `json:"id"`   // this is the unique DB key of the mark
-	Pool       string            `json:"pool"` // this is the unique, internal pool name
-	AddedAt    time.Time         `json:"addedAt"`
-	Identifier string            `json:"identifier"`
-	Details    map[string]string `json:"details"`
+	ID         int       `json:"id"`   // this is the unique DB key of the mark
+	Pool       string    `json:"pool"` // this is the unique, internal pool name
+	AddedAt    time.Time `json:"addedAt"`
+	Identifier string    `json:"identifier"`
+	Details    string    `json:"details"`
 }
 
 // GetBookmarks will load all folders and bookmarks for a user
@@ -87,13 +86,8 @@ func (u *V4User) GetBookmarks(db *dbx.DB) {
 
 		if raw.Identifier != "" {
 			bookmark := Bookmark{ID: raw.BookmarkID, Pool: raw.Pool,
-				Identifier: raw.Identifier, AddedAt: raw.AddedAt}
-			err := json.Unmarshal([]byte(raw.Details), &bookmark.Details)
-			if err != nil {
-				log.Printf("Unable to parse bookmark data %s: %v", raw.Details, err)
-			} else {
-				tgtFolder.Bookmarks = append(tgtFolder.Bookmarks, &bookmark)
-			}
+				Identifier: raw.Identifier, AddedAt: raw.AddedAt, Details: raw.Details}
+			tgtFolder.Bookmarks = append(tgtFolder.Bookmarks, &bookmark)
 		}
 	}
 }
@@ -308,14 +302,14 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 		return
 	}
 
+	log.Printf("Adding bew bookmark")
 	q = svc.DB.NewQuery(`insert into bookmarks (user_id,folder_id,source_id,identifier,details,added_at)
 		values ({:uid}, {:fid}, {:pid}, {:bid}, {:detail}, {:added})`)
-	json, _ := json.Marshal(item.Bookmark.Details)
 	q.Bind(dbx.Params{"uid": user.ID})
 	q.Bind(dbx.Params{"fid": folderObj.ID})
 	q.Bind(dbx.Params{"pid": pid})
 	q.Bind(dbx.Params{"bid": item.Identifier})
-	q.Bind(dbx.Params{"detail": json})
+	q.Bind(dbx.Params{"detail": item.Details})
 	q.Bind(dbx.Params{"added": time.Now()})
 	_, err = q.Execute()
 	if err != nil {
@@ -420,17 +414,9 @@ func (svc *ServiceContext) GetPublicBookmarks(c *gin.Context) {
 	// parse each bookmark row into the V4User structure
 	var bookmarks []Bookmark
 	for rows.Next() {
-		var raw struct {
-			ID         int
-			Pool       string
-			Identifier string
-			Details    string
-			AddedAt    time.Time
-		}
-		rows.ScanStruct(&raw)
-		bm := Bookmark{ID: raw.ID, Identifier: raw.Identifier,
-			Pool: raw.Pool, AddedAt: raw.AddedAt}
-		json.Unmarshal([]byte(raw.Details), &bm.Details)
+		var bm Bookmark
+		rows.ScanStruct(&bm)
+		log.Printf("GOT: %+v", bm)
 		bookmarks = append(bookmarks, bm)
 	}
 	c.JSON(http.StatusOK, bookmarks)

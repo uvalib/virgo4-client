@@ -18,6 +18,7 @@ const bookmarks = {
       setPublicBookmarks(state, data) {
          state.public.splice(0, state.public.length)
          data.forEach( s => {
+            s.details = JSON.parse(s.details)
             state.public.push( s ) 
          })
       },

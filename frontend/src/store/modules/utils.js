@@ -91,6 +91,7 @@ export function getGroupHitMetadata(group, hit) {
    if (group.record_list) {
       hit.header = group.record_list[0].header
       hit.basicFields = group.record_list[0].basicFields
+      hit.detailFields = group.record_list[0].detailFields
       hit.cover_image = group.record_list[0].cover_image
       hit.identifier = group.record_list[0].identifier
       group.record_list.shift()

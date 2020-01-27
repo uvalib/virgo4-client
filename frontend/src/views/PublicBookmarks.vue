@@ -8,7 +8,8 @@
          <div v-else>
             <dl class="bookmark">
                <template v-for="(bookmark,idx) in bookmarks">
-                  <dt :key="getKey(idx,'t')"><router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link></dt>
+                  <dt :key="getKey(idx,'t')" class="title">
+                     <router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link></dt>
                   <dd :key="getKey(idx,'tv')" >
                      <div class="author">
                         {{bookmark.details.author}}
@@ -99,5 +100,8 @@ dl.data dt {
    font-weight: bold;
    text-align: right;
 }
-
+dt.title {
+   font-size: 1.2em;
+   padding-bottom:5px;
+}
 </style>

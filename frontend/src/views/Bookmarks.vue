@@ -52,9 +52,9 @@
                                     <i v-if="folderInfo.public" class="check fas fa-check-circle"></i>
                                     <i v-else class="check far fa-circle"></i>
                                     <span>Public</span>
-                                    <span v-if="folderInfo.public" class="public-url">
-                                       URL: <a :href="getPublicURL(folderInfo)" target="_blank">{{getPublicURL(folderInfo)}}</a>
-                                    </span>
+                                 </span>
+                                 <span v-if="folderInfo.public" class="public-url">
+                                    :&nbsp;Click <a :href="getPublicURL(folderInfo)" target="_blank">here</a> to view
                                  </span>
                               </th>
                            </tr>
@@ -426,11 +426,6 @@ p.error {
    margin-bottom: 15px;
 }
 .public {
-   display: flex;
-   flex-flow: row nowrap;
-   align-content: left;
-   justify-content: left;
-   align-items: center;
    cursor: pointer;
    color: var(--uvalib-grey-dark);
 }
@@ -443,6 +438,8 @@ p.error {
    font-size: 1em;
 }
 .public-url {
-   margin-left: 5px;
+    font-weight: normal;
+   display: inline-block;
+   color: var(--uvalib-grey-dark);
 }
 </style>
