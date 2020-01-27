@@ -343,9 +343,6 @@ div.accordion {
    text-align: center;
    font-size: 1.25em;
 }
-.working img {
-   margin: 30px 0;
-}
 .bookmarks-content {
    width: 60%;
    margin: 0 auto;

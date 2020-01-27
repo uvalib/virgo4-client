@@ -1,46 +1,57 @@
 <template>
    <div class="public-bookmarks">
-      <h1>Bookmarks</h1>
+      <h1>Public Bookmarks</h1>
       <div class="bookmarks-content">
-         <h2>Under construction</h2>
+         <div class="working" v-if="searching">
+            <V4Spinner message="Looking up bookmark information..."/>
+         </div>
+         <div v-else>
+            <dl class="bookmark">
+               <template v-for="(bookmark,idx) in bookmarks">
+                  <dt :key="getKey(idx,'t')"><router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link></dt>
+                  <dd :key="getKey(idx,'tv')" >
+                     <div class="author">
+                        {{bookmark.details.author}}
+                     </div>
+                      <dl class="data">
+                         <dt>Call Number:</dt>
+                         <dd>{{bookmark.details.callNumber}}</dd>
+                         <dt>Library:</dt>
+                         <dd>{{bookmark.details.library}}</dd>
+                         <dt>Location:</dt>
+                         <dd>{{bookmark.details.location}}</dd>
+                      </dl>
+                  </dd>
+               </template>
+            </dl>
+         </div>
       </div>
    </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "public-bookmarks",
+   components: {
+      V4Spinner,
+   },
    computed: {
       ...mapState({
-         authTriesLeft: state => state.user.authTriesLeft,
-         authMessage: state => state.user.authMessage,
-         lockedOut: state => state.user.lockedOut,
-      }),
-      ...mapGetters({
-        hasAuthToken: 'user/hasAuthToken'
+         searching: state => state.bookmarks.searching,
+         bookmarks: state => state.bookmarks.public,
       }),
    },
-   data: function()  {
-      return {
-         user: '',
-         pin: ''
-      }
-   },
-   watch: {
-      authTriesLeft (newVal, oldVal) {
-         if (newVal < oldVal ) {
-            this.pin = ""
-         }
-      }
+   created() {
+      this.$store.dispatch("bookmarks/getPublicBookmarks", this.$route.params.key)
    },
    methods: {
-      signinClicked() {
-         this.$store.dispatch("user/signin", {barcode: this.user, password: this.pin})
+      getKey(idx,keyPrefix) {
+         return keyPrefix+idx
       },
-      netbadgeLogin() {
-         this.$store.dispatch("user/netbadge")
+      detailsURL(bookmark) {
+         return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
       },
    }
 }
@@ -54,9 +65,12 @@ export default {
    color: var(--uvalib-text);
 }
 .bookmarks-content {
-   width: 60%;
    margin: 0 auto;
    text-align: left;
+}
+.working {
+   text-align: center;
+   font-size: 1.25em;
 }
 h2 {
    text-align: center;
@@ -65,16 +79,25 @@ h2 {
    .public-bookmarks {
      max-width: 55vw;
    }
-   .bookmarks-content  {
-       width: 60%;
-   }
 }
 @media only screen and (max-width: 768px) {
    .public-bookmarks {
      max-width: 95vw;
    }
-   .bookmarks-content  {
-       width: 95%;
-   }
 }
+div.author {
+   margin-bottom: 10px;
+}
+dl.data {
+   font-size: 0.9em;
+   margin: 0 0 20px 0;
+   display: inline-grid;
+   grid-template-columns: max-content 2fr;
+   grid-column-gap: 15px;
+}
+dl.data dt {
+   font-weight: bold;
+   text-align: right;
+}
+
 </style>

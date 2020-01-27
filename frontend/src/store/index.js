@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import axios from 'axios'
 import messaging from './plugins/messaging'
 import versionChecker from './plugins/version'
+import bookmarks from './modules/bookmarks'
 import system from './modules/system'
 import pools from './modules/pools'
 import user from './modules/user'
@@ -313,6 +314,7 @@ export default new Vuex.Store({
   },
 
   modules: {
+    bookmarks: bookmarks,
     filters: filters,
     item: item,
     journals: journals,

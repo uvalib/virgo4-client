@@ -41,7 +41,7 @@ type Bookmark struct {
 // GetBookmarks will load all folders and bookmarks for a user
 func (u *V4User) GetBookmarks(db *dbx.DB) {
 	log.Printf("Load bookmarks for %s", u.Virgo4ID)
-	q := db.NewQuery(`SELECT f.id as f_id, f.name as folder, b.added_at as f_added_at,
+	q := db.NewQuery(`SELECT f.id as f_id, f.name as folder, f.added_at as f_added_at,
 		f.is_public as is_public, f.token as pub_token,
 		s.name as pool, b.id as b_id, b.identifier, b.details, b.added_at as b_added_at
 	 	FROM bookmark_folders f  
