@@ -48,7 +48,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	authStr := fmt.Sprintf("%s|%s|%s|netbadge", computingID, memberStatus, authToken)
+	authStr := fmt.Sprintf("%s|%s|netbadge", computingID, authToken)
 	log.Printf("AuthSession %s", authStr)
 	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
