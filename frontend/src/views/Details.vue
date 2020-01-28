@@ -65,7 +65,6 @@ export default {
       }),
       ...mapGetters({
          isSignedIn: 'user/isSignedIn',
-         bookmarks: 'user/bookmarks',
          isKiosk: 'system/isKiosk',
       }),
       notFound() {
@@ -117,7 +116,7 @@ export default {
       } else {
          this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          if ( this.isSignedIn) {
-            this.$store.dispatch("user/getBookmarks")
+            this.$store.dispatch("bookmarks/getBookmarks")
          }
       }
    }

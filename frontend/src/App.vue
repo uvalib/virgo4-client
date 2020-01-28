@@ -48,10 +48,9 @@ export default {
       ...mapState({
          fatal: state => state.system.fatal,
          authorizing: state => state.user.authorizing,
-         addingBookmark: state => state.user.addingBookmark
       }),
       ...mapGetters({
-         addingBookmark: "user/addingBookmark",
+         addingBookmark: "bookmarks/addingBookmark",
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
       }),

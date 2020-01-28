@@ -36,7 +36,7 @@ export default {
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
         isKiosk: 'system/isKiosk',
-        bookmarks: 'user/bookmarks',
+        bookmarks: 'bookmarks/bookmarks',
         queryObject: 'query/queryObject',
         selectedResults: 'selectedResults',
         poolFilters: 'filters/poolFilter',
@@ -78,7 +78,7 @@ export default {
             folder.bookmarks.some( item => {
                if (item.pool == this.pool && item.identifier == this.hit.identifier) {
                   bookmarkID = item.id
-                  this.$store.dispatch("user/removeBookmarks", [bookmarkID])
+                  this.$store.dispatch("bookmarks/removeBookmarks", [bookmarkID])
                }
                return bookmarkID != -1
             })
@@ -88,7 +88,7 @@ export default {
       addBookmarkClicked() {
          if ( this.isSignedIn == false) return
          let data = {pool: this.pool, data: this.hit}
-         this.$store.commit("user/showAddBookmark", data)
+         this.$store.commit("bookmarks/showAddBookmark", data)
       },
    }
 };

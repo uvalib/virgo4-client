@@ -257,7 +257,7 @@ export default new Vuex.Store({
       // If a user is signed in, make sure bookmarks are up to date when 
       // searching so the UI can show the correct status per item
       if ( rootGetters["user/isSignedIn"]) {
-        dispatch("user/getBookmarks")
+        dispatch("bookmarks/getBookmarks")
       }
 
       commit('setSearching', true)
@@ -309,7 +309,7 @@ export default new Vuex.Store({
     // Select pool results and get all facet info for the result
     async selectPoolResults(ctx, resultIdx) {
       ctx.commit('selectPoolResults', resultIdx) 
-      await ctx.dispatch("filters/getSelectedResultFacets")
+      await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
     }
   },
 

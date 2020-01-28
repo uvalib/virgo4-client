@@ -1,7 +1,6 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
-import * as utils from './utils'
 
 const user = {
    namespaced: true,
@@ -12,11 +11,9 @@ const user = {
       sessionType: "",
       accountInfo: {},
       checkouts: [],
-      bookmarks: [],
       bills: [],
       requests: [],
       searches: [], 
-      newBookmarkInfo: null,
       lookingUp: false,
       authTriesLeft: 5,
       authMessage: "",
@@ -120,37 +117,6 @@ const user = {
          if (state.accountInfo.id != state.signedInUser) return false 
          return true
       },
-      hasBookmarks: state => {
-         if ( state.bookmarks == null ) return false 
-         if ( state.bookmarks.length === 0) return false
-         return true
-      },
-      bookmarks: state => {
-         if ( state.bookmarks == null ) return []
-         return state.bookmarks
-      },
-      bookmarkFolders: state => {
-         if ( state.bookmarks == null ) return []
-         let out = []
-         let foundGeneral = false
-         state.bookmarks.forEach( (folderObj) => {
-            if ( folderObj.folder == "General") {
-               foundGeneral = true
-            }
-            out.push( {id: folderObj.id, name: folderObj.folder} )
-         })
-         if (foundGeneral == false ) {
-            out.push( {id: 0, name: "General"} )
-         }
-         return out.sort( (a,b) => {
-            if (a.name < b.name) return -1 
-            if (a.name > b.name) return 1 
-            return 0
-         })
-      },
-      addingBookmark: state => {
-         return state.newBookmarkInfo != null
-      }
    },
 
    mutations: {
@@ -176,35 +142,6 @@ const user = {
                co.message = renew.message
             }
          })
-      },
-      setBookmarks(state, bookmarks) {
-         state.bookmarks.splice(0, state.bookmarks.length)
-         bookmarks.forEach( b => {
-            b.bookmarks.forEach( d => {
-               d.details = JSON.parse(d.details)
-            })
-            state.bookmarks.push(b)
-         })
-      },
-      toggleFolderVisibility(state, folderVisibility) {
-         state.bookmarks.forEach( f => {
-            if ( f.id == folderVisibility.id ) {
-               f.public = folderVisibility.public
-            }
-         })
-      },
-      setFolderToken(state, data) {
-         state.bookmarks.forEach( f => {
-            if ( f.id == data.id ) {
-               f.token = data.token
-            }
-         })
-      },
-      showAddBookmark(state, bookmarkData) {
-         state.newBookmarkInfo = bookmarkData
-      },
-      closeAddBookmark(state) {
-         state.newBookmarkInfo = null
       },
       setAuthToken(state, token) {
          state.authToken = token
@@ -238,11 +175,8 @@ const user = {
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
       },
       setAccountInfo(state, data) {
-         // data content {user, authToken, bookmarks}
-         // bookmarks = [ {id, folder, addedAt, bookmarks: [id,pool,identifier, details{author, title}] } ] 
          state.accountInfo = data.user
          state.authToken = data.authToken
-         state.bookmarks = data.bookmarks
       },
       signOutUser(state) {
          state.signedInUser = ""
@@ -252,7 +186,6 @@ const user = {
          state.authMessage = ""
          state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
-         state.bookmarks.splice(0, state.bookmarks.length)
          state.bills.splice(0, state.bills.length)
          state.searches.splice(0, state.searches.length)
          Vue.$cookies.remove("v4_auth_user")
@@ -311,6 +244,7 @@ const user = {
          ctx.commit('setLookingUp', true)
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
+            ctx.commit('bookmarks/setBookmarks', response.data.bookmarks, { root: true })
             ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
@@ -383,6 +317,7 @@ const user = {
             ctx.commit('signOutUser')
             ctx.commit('setAuthorizing', false)
             ctx.commit('resetSearchResults', null, { root: true })
+            ctx.commit('bookmarks/clear', null, { root: true })
             ctx.commit('preferences/clear', null, { root: true })
             ctx.commit('query/clear', null, { root: true })
             ctx.commit('filters/reset', null, { root: true })
@@ -418,92 +353,6 @@ const user = {
       saveSearch(ctx, data) {
          return axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
       },
-      async getBookmarks(ctx) {
-         if (ctx.rootGetters["user/hasAccountInfo"] == false) {
-            await ctx.dispatch("getAccountInfo")
-         }
-         ctx.commit('setLookingUp', true)
-         return axios.get(`/api/users/${ctx.state.signedInUser}/bookmarks`).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-            ctx.commit('setLookingUp', false)
-          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', true)
-          })
-      },
-      addBookmark(ctx, folder ) {
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/items`
-         let bm = ctx.state.newBookmarkInfo
-         let data = {folder: folder, pool: bm.pool, identifier: bm.data.identifier}
-
-         // required details: title, author, call number, location, library, availability
-         let detail = {title :bm.data.header.title, author: bm.data.header.author.value.join(", ")}
-         detail.callNumber = utils.getFieldValue("call_number", bm.data)
-         detail.location = utils.getFieldValue("location", bm.data)
-         detail.library = utils.getFieldValue("library", bm.data)
-         detail.availability = utils.getFieldValue("availability", bm.data)
-         data['details'] = JSON.stringify(detail)
-         return axios.post(url, data).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-         })
-      },
-      addFolder(ctx, folder) {
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders`
-         return axios.post(url, {name: folder}).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-         }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-         })
-      },
-      renameFolder(ctx, folder) {
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders/${folder.id}`
-         axios.post(url, {name: folder.name}).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-         }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-         })
-      },
-      removeFolder(ctx, folderID) {
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/folders/${folderID}`
-         axios.delete(url).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-         }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-         })
-      },
-      removeBookmarks(ctx, bookmarks) {
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/delete`
-         axios.post(url, {bookmarkIDs: bookmarks}).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-         }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-         })
-      },
-      moveBookmarks(ctx, data) {
-         let bookmarkIDs = data.bookmarks
-         let folderID = data.folderID
-         let url = `/api/users/${ctx.state.signedInUser}/bookmarks/move`
-         axios.post(url, {folderID: folderID, bookmarkIDs: bookmarkIDs}).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-         }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-         })
-      },
-      async toggleFolderVisibility(ctx, folderVisibility) {
-         ctx.commit('toggleFolderVisibility', folderVisibility)  
-         try {
-            let usrID = ctx.state.signedInUser
-            if (folderVisibility.public) {
-               let resp = await axios.post(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
-               folderVisibility.token = resp.data
-               ctx.commit('setFolderToken', folderVisibility)  
-            } else {
-               axios.delete(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
-            } 
-         } catch (error)  {
-            ctx.commit('system/setError', error, { root: true })
-         }
-      }
    }
 }
 

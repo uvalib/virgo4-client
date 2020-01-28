@@ -40,17 +40,17 @@ export default {
    },
    data: function() {
       return {
-         lookingUp: true,
          selectedFolder: "",
          bookmarkError: ""
       };
    },
    computed: {
       ...mapState({
-         newBookmark: state => state.user.newBookmarkInfo,
+         newBookmark: state => state.bookmarks.newBookmarkInfo,
+         lookingUp: state => state.bookmarks.searching,
       }),
        ...mapGetters({
-         folders: 'user/bookmarkFolders',
+         folders: 'bookmarks/folders',
       }),
       authorText() {
          let author = ""
@@ -67,20 +67,18 @@ export default {
             this.bookmarkError = "A bookmark folder selection is required"
             return
          }
-         this.$store.dispatch("user/addBookmark", this.selectedFolder).then( () => {
-            this.$store.commit("user/closeAddBookmark")
+         this.$store.dispatch("bookmarks/addBookmark", this.selectedFolder).then( () => {
+            this.$store.commit("bookmarks/closeAddBookmark")
          }).catch((error) => {
             this.bookmarkError = error
          })
       },
       cancelBookmark() {
-         this.$store.commit("user/closeAddBookmark")
+         this.$store.commit("bookmarks/closeAddBookmark")
       }
    },
    created() {
-      this.lookingUp = true
-      this.$store.dispatch("user/getBookmarks").then(() => {
-         this.lookingUp = false
+      this.$store.dispatch("bookmarks/getBookmarks").then(() => {
          let found = false
          this.folders.some( fobj=> {
             if (fobj.name == "General") {

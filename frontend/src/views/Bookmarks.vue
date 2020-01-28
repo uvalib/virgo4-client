@@ -160,12 +160,12 @@ export default {
    },
    computed: {
       ...mapState({
-         lookingUp: state => state.user.lookingUp,
+         lookingUp: state => state.bookmarks.searching,
          error: state => state.system.error
       }),
       ...mapGetters({
-         hasBookmarks: "user/hasBookmarks",
-         bookmarks: "user/bookmarks",
+         hasBookmarks: "bookmarks/hasBookmarks",
+         bookmarks: "bookmarks/bookmarks",
          canMakeReserves: "user/canMakeReserves"
       })
    },
@@ -178,7 +178,7 @@ export default {
          return out
       },
       async publicClicked(folder) {
-         await this.$store.dispatch("user/toggleFolderVisibility", {id: folder.id, public: !folder.public})
+         await this.$store.dispatch("bookmarks/toggleFolderVisibility", {id: folder.id, public: !folder.public})
       },
       getPublicURL(folder) {
          let base = window.location.href 
@@ -198,11 +198,11 @@ export default {
          })
       },
       renameFolder(folderInfo) {
-         this.$store.dispatch("user/renameFolder", folderInfo)
+         this.$store.dispatch("bookmarks/renameFolder", folderInfo)
       },
       moveBookmarks(folderID) {
          let data = { bookmarks: this.selectedItems, folderID: folderID }
-         this.$store.dispatch("user/moveBookmarks", data);
+         this.$store.dispatch("bookmarks/moveBookmarks", data);
       },
       reserve() {
          if ( this.selectedItems.length == 0) {
@@ -227,10 +227,10 @@ export default {
              this.$store.commit("system/setError", "No bookmarks have been selected for deletion")
              return
          }
-         this.$store.dispatch("user/removeBookmarks", this.selectedItems)
+         this.$store.dispatch("bookmarks/removeBookmarks", this.selectedItems)
       },
       removeFolder(folderID) {
-         this.$store.dispatch("user/removeFolder", folderID)
+         this.$store.dispatch("bookmarks/removeFolder", folderID)
       },
       openCreate() {
          this.createOpen = true;
@@ -254,7 +254,7 @@ export default {
             );
             return;
          }
-         this.$store.dispatch("user/addFolder", this.newFolder).then(() => {
+         this.$store.dispatch("bookmarks/addFolder", this.newFolder).then(() => {
             this.createOpen = false
             this.submitting = false
             this.newFolder = ""
@@ -262,7 +262,7 @@ export default {
       }
    },
    created() {
-      this.$store.dispatch("user/getBookmarks")
+      this.$store.dispatch("bookmarks/getBookmarks")
    }
 };
 </script>

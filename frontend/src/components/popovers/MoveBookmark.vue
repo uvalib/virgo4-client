@@ -56,7 +56,7 @@ export default {
    },
    computed: {
       ...mapGetters({
-         allFolders: 'user/bookmarkFolders',
+         allFolders: 'bookmarks/folders',
       }),
       folders() {
          return this.allFolders.filter(f => f.id != this.srcFolder)
