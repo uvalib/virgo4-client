@@ -36,7 +36,9 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
-	log.Printf("NetBadge headers are valid. Generate new auth token for %s", computingID)
+	memberStatus := c.GetHeader("member")
+	log.Printf("NetBadge headers are valid. Generate new auth token for %s, member: %s",
+		computingID, memberStatus)
 
 	// Generate a new access token and persist it in v4 user storage
 	authToken := xid.New().String()
@@ -46,7 +48,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	authStr := fmt.Sprintf("%s|%s|netbadge", computingID, authToken)
+	authStr := fmt.Sprintf("%s|%s|%s|netbadge", computingID, memberStatus, authToken)
 	log.Printf("AuthSession %s", authStr)
 	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
