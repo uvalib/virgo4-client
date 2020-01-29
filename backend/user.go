@@ -21,6 +21,7 @@ func NewV4User() *V4User {
 type V4User struct {
 	ID             int        `db:"id" json:"-"`
 	Virgo4ID       string     `db:"virgo4_id" json:"id"`
+	Role           string     `db:"role" json:"role"`
 	AuthToken      string     `db:"auth_token" json:"-"`
 	AuthUpdatedAt  time.Time  `db:"auth_updated_at" json:"-"`
 	LockedOut      bool       `db:"locked_out" json:"-"`
@@ -70,10 +71,8 @@ type CheckoutInfo struct {
 
 // User contains all user data collected from ILS and Virgo4 sources
 type User struct {
-	UserInfo    *ILSUserInfo `json:"user"`
-	AuthToken   string       `json:"authToken"`
-	Bookmarks   []*Folder    `json:"bookmarks"`
-	Preferences string       `json:"preferences"`
+	*V4User
+	UserInfo *ILSUserInfo `json:"user"`
 }
 
 // ChangePin takes current_pin and new_pin as params in the json POST payload.
@@ -225,15 +224,10 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	if err != nil {
 		log.Printf("ERROR: No v4 user settings found for %s: %+v", userID, err)
 	} else {
-		log.Printf("USER PREFS: %+v", v4User.Preferences)
 		v4User.GetBookmarks(svc.DB)
 	}
 
-	user := User{UserInfo: &ilsUser,
-		AuthToken:   v4User.AuthToken,
-		Bookmarks:   v4User.Bookmarks,
-		Preferences: v4User.Preferences,
-	}
+	user := User{V4User: v4User, UserInfo: &ilsUser}
 	c.JSON(http.StatusOK, user)
 }
 

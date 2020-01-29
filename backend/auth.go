@@ -44,22 +44,37 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
-	memberStatus := c.GetHeader("member")
-	log.Printf("NetBadge headers are valid. Generate new auth token for %s, member: %s",
-		computingID, memberStatus)
+	membershipStr := c.GetHeader("member")
+	if svc.Dev.Role != "" {
+		membershipStr = "cn=" + svc.Dev.Role
+		log.Printf("Using dev role: %s", membershipStr)
+	}
+	role := parseMembership(membershipStr)
+	log.Printf("NetBadge headers are valid. Generate new auth token for %s:%s", computingID, role)
 
 	// Generate a new access token and persist it in v4 user storage
 	authToken := xid.New().String()
-	err := svc.updateAccessToken(computingID, authToken)
+	err := svc.updateAccessToken(computingID, authToken, role)
 	if err != nil {
 		log.Printf("WARN: Unable to persist user %s access token %v", computingID, err)
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	authStr := fmt.Sprintf("%s|%s|netbadge", computingID, authToken)
+	authStr := fmt.Sprintf("%s|%s|netbadge|%s", computingID, authToken, role)
 	log.Printf("AuthSession %s", authStr)
 	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
+}
+
+// parseMembership will parse V4 role from the mygroups membership string.
+// Membership format: cn=group_name1;cn=group_name2;...
+func parseMembership(membershipStr string) string {
+	out := "user"
+	// for now, only admins are suported. They are identified by lib-virgo4-admin
+	if strings.Contains(membershipStr, "lib-virgo4-admin") {
+		out = "admin"
+	}
+	return out
 }
 
 // PublicAuthentication aill authenticate public users of Virgo4
@@ -175,7 +190,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	// Generate new auth token and ersist in v4 user storage
 	authToken := xid.New().String()
-	err = svc.updateAccessToken(auth.Barcode, authToken)
+	err = svc.updateAccessToken(auth.Barcode, authToken, "user")
 	if err != nil {
 		log.Printf("WARN: Unable to persist user %s access token %v", auth.Barcode, err)
 	}
@@ -189,14 +204,14 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 // updateAccessToken checks if the user has an acces token and if it matches.
 // If no user found, create a new one and set access token. If token exists and
 // doesn't match fail.
-func (svc *ServiceContext) updateAccessToken(userID string, token string) error {
+func (svc *ServiceContext) updateAccessToken(userID string, token string, role string) error {
 	var user V4User
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(&user)
 	if err != nil {
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
-		user := V4User{ID: 0, Virgo4ID: userID, AuthToken: token,
+		user := V4User{ID: 0, Virgo4ID: userID, AuthToken: token, Role: role,
 			AuthUpdatedAt: time.Now(), SignedIn: true, Preferences: "{}"}
 		return svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 	}
@@ -205,6 +220,7 @@ func (svc *ServiceContext) updateAccessToken(userID string, token string) error 
 	log.Printf("Updating access token")
 	user.AuthToken = token
 	user.AuthUpdatedAt = time.Now()
+	user.Role = role
 	user.SignedIn = true
 	user.LockedOut = false
 	user.LockedOutUntil = nil

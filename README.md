@@ -36,6 +36,10 @@ Define your PSQL connection params in an environment variable, like this:
 
 `export V4DB=postgres://v4user:pass@localhost:5432/virgo4?sslmode=disable`
 
+User roles are stored in the v4_role enumerated type. To see values:
+
+`SELECT enumlabel FROM pg_enum WHERE enumtypid = 'v4_role'::regtype ORDER BY oid;`
+
 Run migrations like this:
 
 `migrate -database ${V4DB} -path backend/db/migrations up`

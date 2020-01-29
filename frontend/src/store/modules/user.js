@@ -8,6 +8,7 @@ const user = {
       authToken: "",
       authorizing: false,
       signedInUser: "",
+      role: "",
       sessionType: "",
       accountInfo: {},
       checkouts: [],
@@ -106,6 +107,7 @@ const user = {
          return total.toFixed(2)
       },
       hasAuthToken: state => {
+        if (state.authToken == null) return false
         return state.authToken.length > 0
       },
       isSignedIn: state => {
@@ -172,11 +174,13 @@ const user = {
          state.signedInUser = user.userId
          state.authToken = user.token
          state.sessionType = user.type
+         state.role = user.role
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
       },
       setAccountInfo(state, data) {
          state.accountInfo = data.user
          state.authToken = data.authToken
+         state.role = data.role
       },
       signOutUser(state) {
          state.signedInUser = ""
@@ -329,7 +333,7 @@ const user = {
          // response: {barcode, signedId, message, attemptsLeft}
          axios.post("/authenticate/public", data).then((response) => {
             ctx.commit("setSignedInUser", {userId: response.data.barcode, 
-               token: ctx.state.authToken, type: "public", quiet: false} )
+               token: ctx.state.authToken, type: "public", role: "user", quiet: false} )
             ctx.commit('setAuthorizing', false)
             let bmCookie = Vue.$cookies.get('v4_bookmark')
             if ( bmCookie) {

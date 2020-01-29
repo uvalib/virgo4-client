@@ -1,0 +1,4 @@
+BEGIN;
+ALTER TABLE users DROP role;
+DROP TYPE IF EXISTS v4_role;
+COMMIT;

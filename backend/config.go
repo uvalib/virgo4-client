@@ -53,6 +53,7 @@ type ServiceConfig struct {
 // DevConfig specifies configuration params specific to development mode
 type DevConfig struct {
 	AuthUser string
+	Role     string
 	Kiosk    bool
 	FakeSMTP bool
 }
@@ -73,6 +74,7 @@ func LoadConfig() *ServiceConfig {
 
 	// Dev mode settings
 	flag.StringVar(&cfg.Dev.AuthUser, "devuser", "", "Authorized computing id for dev")
+	flag.StringVar(&cfg.Dev.Role, "devrole", "", "User role for dev")
 	flag.BoolVar(&cfg.Dev.Kiosk, "devkiosk", false, "Flag to torn Kiosk Mode on for dev")
 	flag.BoolVar(&cfg.Dev.FakeSMTP, "stubsmtp", false, "Log email insted of sending (dev mode)")
 

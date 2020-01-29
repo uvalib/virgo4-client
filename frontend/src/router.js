@@ -164,13 +164,12 @@ router.beforeEach((to, _from, next) => {
 })
 
 function getSignedInUserFromCookie() {
-  store.commit("user/setSignedInUser", {userId: "", token: "", type: "", quiet: true})
+  store.commit("user/setSignedInUser", {userId: "", token: "", type: "", role: "", quiet: true})
   let authInfo = Vue.$cookies.get("v4_auth_user")
   if (authInfo) {
-    let userId = authInfo.split("|")[0]
-    let token = authInfo.split("|")[1]
-    let type = authInfo.split("|")[2]
-    store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: false})
+    let bits =  authInfo.split("|")
+    let user = {userId: bits[0], token: bits[1], type: bits[2], role: bits[3]}
+    store.commit("user/setSignedInUser",user)
     return true
   } 
   return false
@@ -189,10 +188,9 @@ function ensureAuthTokenPresent(next) {
   let authInfo = Vue.$cookies.get("v4_auth_user")
   if (authInfo) {
     // console.log("IN COOKIE AUTH, signing in")
-    let userId = authInfo.split("|")[0]
-    let token = authInfo.split("|")[1]
-    let type = authInfo.split("|")[2]
-    store.commit("user/setSignedInUser", {userId: userId, token: token, type: type, quiet: true})
+    let bits =  authInfo.split("|")
+    let user = {userId: bits[0], token: bits[1], type: bits[2], role: bits[3]}
+    store.commit("user/setSignedInUser", user)
     next()
     return
   }
