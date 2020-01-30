@@ -4,6 +4,8 @@ GOCLEAN = $(GOCMD) clean
 GOTEST = $(GOCMD) test
 GOFMT = $(GOCMD) fmt
 GOVET = $(GOCMD) vet
+GOGET = $(GOCMD) get
+GOMOD = $(GOCMD) mod
 
 build: darwin web deploy-templates
 
@@ -40,6 +42,12 @@ fmt:
 
 vet:
 	cd backend; $(GOVET)
+
+dep:
+	cd frontend && yarn upgrade 
+	$(GOGET) -u ./backend/...
+	$(GOMOD) tidy
+	$(GOMOD) verify
 
 check:
 	go get honnef.co/go/tools/cmd/staticcheck
