@@ -206,8 +206,19 @@ func (svc *ServiceContext) ILLiadGet(queryURL string) ([]byte, *RequestError) {
 	client := http.Client{
 		Timeout: timeout,
 	}
-	resp, err := client.Do(illReq)
-	return handleAPIResponse(illiad, resp, err)
+	startTime := time.Now()
+	rawResp, rawErr := client.Do(illReq)
+	resp, err := handleAPIResponse(illiad, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from ILLiad GET %s - %d:%s. Elapsed Time: %d (ms)",
+			queryURL, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from ILLiad GET %s. Elapsed Time: %d (ms)", queryURL, elapsedMS)
+	}
+	return resp, err
 }
 
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
@@ -217,8 +228,19 @@ func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 	client := http.Client{
 		Timeout: timeout,
 	}
-	resp, err := client.Get(url)
-	return handleAPIResponse(url, resp, err)
+	startTime := time.Now()
+	rawResp, rawErr := client.Get(url)
+	resp, err := handleAPIResponse(url, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from ILS GET %s - %d:%s. Elapsed Time: %d (ms)",
+			url, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from ILS GET %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
 }
 
 // ILSConnectorPost sends a POST to the ILS connector and returns results
@@ -228,8 +250,19 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values url.Values) ([]by
 	client := http.Client{
 		Timeout: timeout,
 	}
-	resp, err := client.PostForm(url, values)
-	return handleAPIResponse(url, resp, err)
+	startTime := time.Now()
+	rawResp, rawErr := client.PostForm(url, values)
+	resp, err := handleAPIResponse(url, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from ILS POST %s - %d:%s. Elapsed Time: %d (ms)",
+			url, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from ILS POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
 }
 
 // SolrGet sends a GET request to solr and returns the response
@@ -239,8 +272,19 @@ func (svc *ServiceContext) SolrGet(url string) ([]byte, *RequestError) {
 	client := http.Client{
 		Timeout: timeout,
 	}
-	resp, err := client.Get(url)
-	return handleAPIResponse(url, resp, err)
+	startTime := time.Now()
+	rawResp, rawErr := client.Get(url)
+	resp, err := handleAPIResponse(url, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from Solr GET %s - %d:%s. Elapsed Time: %d (ms)",
+			url, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from Solr GET %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
 }
 
 func handleAPIResponse(URL string, resp *http.Response, err error) ([]byte, *RequestError) {
@@ -254,14 +298,12 @@ func handleAPIResponse(URL string, resp *http.Response, err error) ([]byte, *Req
 			status = http.StatusServiceUnavailable
 			errMsg = fmt.Sprintf("%s refused connection", URL)
 		}
-		log.Printf("ERROR: %s request failed: %s", URL, errMsg)
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	} else if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		bodyBytes, _ := ioutil.ReadAll(resp.Body)
 		status := resp.StatusCode
 		errMsg := string(bodyBytes)
-		log.Printf("ERROR: %s request failed: %s", URL, errMsg)
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	}
 
