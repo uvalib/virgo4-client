@@ -57,18 +57,9 @@ export default {
    },
    methods: {
       signInClicked() {
-         let bmData = this.queryObject 
-         bmData.hit = this.hit.identifier
-         if ( this.hit.groupParent != "") {
-            bmData.groupParent =  this.hit.groupParent 
-         }
-         bmData.numPools = this.pools.length
-         bmData.pool = this.pool
-         bmData.resultsIdx = this.resultsIdx
-         bmData.page = this.selectedResults.page
-         bmData.filters = this.poolFilters( this.resultsIdx )
-         this.$cookies.set("v4_bookmark", JSON.stringify(bmData), 60)
-         this.$router.push("/signin")
+        this.$store.commit("restore/setBookmarkRecord", this.hit)
+
+        this.$router.push("/signin")
       },
       removeBookmarkClicked() {
          if ( this.isSignedIn == false) return
