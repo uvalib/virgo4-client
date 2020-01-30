@@ -77,9 +77,10 @@ const router = new Router({
       path: '/signedin',
       beforeEnter: (_to, _from, next) => {
         getSignedInUserFromCookie()
-        let bmCookie = Vue.$cookies.get('v4_bookmark')
-        if ( bmCookie) {
-            next("/")
+        let searchData = store.getters['restore/searchData']
+        if ( searchData &&
+            (typeof searchData.previousPath != 'undefined')) {
+            next(searchData.previousPath)
         } else {
             next("/account")
         }
@@ -88,7 +89,11 @@ const router = new Router({
     {
       path: '/signin',
       name: 'signin',
-      component: SignIn
+      component: SignIn,
+      beforeEnter(_to, from, next) {
+        store.dispatch('restore/save', from.path)
+        next()
+      }
     },
     {
       path: '/account',

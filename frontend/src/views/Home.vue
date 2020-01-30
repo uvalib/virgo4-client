@@ -84,6 +84,7 @@ export default {
          translateMessage: state => state.system.translateMessage,
          sessionMessage: state => state.system.sessionMessage,
          restoreMessage: state => state.query.restoreMessage,
+         restore: state => state.restore,
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
@@ -115,19 +116,19 @@ export default {
    },
    methods: {
       async searchCreated() {
-         // Config and pools are needed for this page. 
+         // Config and pools are needed for this page.
          await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
-         
+
          // When restoring a saved search, the call will be /search/:token
          if ( this.isRestore) {
             this.restoreSavedSearch(this.$route.params.id)
             return
+         } else if(this.$store.getters['restore/hasPreviousSearch']) {
+           this.restorePreviousSearch()
+           return
          }
 
-         // Check for a bookmark cookie and restore search if present
-         this.restoreBookmarkTarget()
-         
          // === Special query parameter handling ====
          //Subject: if subject param exists, do an advanced subject search for the value
          let prior = this.rawQueryString
@@ -175,38 +176,29 @@ export default {
       // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
       // an item while not signed in. If there is now a signed in user, replay the search,
       // scroll to the target hit and open bookmark popup
-      async restoreBookmarkTarget() {
-        let bmCookie = this.$cookies.get('v4_bookmark')
-        if ( bmCookie && this.isSignedIn) {
-          this.$store.commit('query/restoreSearch', bmCookie)
-          this.$store.commit('filters/restoreFilters', bmCookie)
-          this.$cookies.remove('v4_bookmark')
-          await this.$store.dispatch("searchAllPools", bmCookie.page)
-          await this.$store.dispatch("selectPoolResults", bmCookie.resultsIdx)
-          if ( this.hasFilter(bmCookie.resultsIdx)) {
-            this.$store.commit("clearSelectedPoolResults") 
-            await this.$store.dispatch("searchSelectedPool")
-            this.showBookmarkTarget(bmCookie)
-          } else {
-            this.showBookmarkTarget(bmCookie)
-          }
-        }
+      async restorePreviousSearch() {
+
+        await this.$store.dispatch("restore/fromStorage")
+
+        this.showBookmarkTarget()
       },
-      showBookmarkTarget(bmCookie) {
-        let identifier = bmCookie.hit
-        let pool = bmCookie.pool
+      showBookmarkTarget() {
+        if (!this.restore.recordId) {return}
+
+        let identifier = this.restore.recordId
+        let pool = this.restore.pool
         let bmData = {pool: pool, data: null}
-        if ( bmCookie.groupParent) {
-          let sel = `.hit[data-identifier="${bmCookie.groupParent}"]`
+        if ( this.restore.groupParent) {
+          let sel = `.hit[data-identifier="${this.restore.groupParent}"]`
           let tgtEle = document.body.querySelector(sel)
           tgtEle.scrollIntoView()
 
           // find the item in the group that was targeted for a bookmark
-          let parent = this.selectedResults.hits.find( r=> r.identifier == bmCookie.groupParent)
+          let parent = this.selectedResults.hits.find( r=> r.identifier == this.restore.groupParent)
           bmData.data = parent.group.find( r=> r.identifier == identifier)
 
           // The group accordion watches this value. When set, the accordion will auto-expand
-          this.$store.commit('setAutoExpandGroupID', bmCookie.groupParent)
+          this.$store.commit('setAutoExpandGroupID', this.restore.groupParent)
 
           // once the group is expanded, scroll to the target group item
           setTimeout( ()=>{
@@ -221,8 +213,8 @@ export default {
           this.scrollToItem(tgtEle)
           bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
         }
-        
-        this.$store.commit("user/showAddBookmark", bmData)
+        this.$store.commit("restore/clearBookmarkData")
+        this.$store.commit("bookmarks/showAddBookmark", bmData)
       },
 
       scrollToItem( tgtEle ) {

@@ -181,7 +181,7 @@ const query = {
             ctx.commit('setSearching', false, { root: true })
             router.push("/not_found")
          }
-      }
+      },
    }
 }
 
