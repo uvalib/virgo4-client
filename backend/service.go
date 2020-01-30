@@ -107,6 +107,7 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	type hcResp struct {
 		Healthy bool   `json:"healthy"`
 		Message string `json:"message,omitempty"`
+		Version int    `json:"version,omitempty"`
 	}
 	hcMap := make(map[string]hcResp)
 
@@ -125,13 +126,40 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		}
 	}
 
-	tq := svc.DB.NewQuery("select count(*) as total from sources")
-	var total int
-	err := tq.Row(&total)
+	if svc.ILSAPI != "" {
+		timeout := time.Duration(5 * time.Second)
+		client := http.Client{
+			Timeout: timeout,
+		}
+		apiURL := fmt.Sprintf("%s/version", svc.ILSAPI)
+		_, err := client.Get(apiURL)
+		if err != nil {
+			log.Printf("ERROR: ILS Connector %s ping failed: %s", svc.ILSAPI, err.Error())
+			hcMap["ils_connector"] = hcResp{Healthy: false, Message: err.Error()}
+		} else {
+			hcMap["ils_connector"] = hcResp{Healthy: true}
+		}
+	}
+
+	tq := svc.DB.NewQuery("select * from schema_migrations order by version desc limit 1")
+	var schema struct {
+		Version int  `db:"version"`
+		Dirty   bool `db:"dirty"`
+	}
+	err := tq.One(&schema)
 	if err != nil {
 		hcMap["postgres"] = hcResp{Healthy: false, Message: err.Error()}
 	} else {
-		hcMap["postgres"] = hcResp{Healthy: true}
+		if schema.Dirty {
+			hcMap["postgres"] = hcResp{Healthy: false, Message: fmt.Sprintf("Schema %d is marked dirty", schema.Version)}
+		} else {
+			// check that the highest numbered migration matches DB version value
+			latest := getLatestMigrationNumber()
+			if latest > 0 && latest != schema.Version {
+				hcMap["postgres"] = hcResp{Healthy: false, Message: fmt.Sprintf("Schema out of date. Reported version: %d, latest: %d", schema.Version, latest)}
+			}
+		}
+		hcMap["postgres"] = hcResp{Healthy: true, Version: schema.Version}
 	}
 
 	respBytes, illErr := svc.ILLiadGet("SystemInfo/SecurePlatformVersion")
@@ -144,6 +172,35 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, hcMap)
+}
+
+func getLatestMigrationNumber() int {
+	// on deployed systems, the migrations can be found in ../db/*.sql (we run from ./bin)
+	// on dev systems run with 'go run', they are in ./backend/db/migrations/*.sql
+	// try both; if files found return the latest number. If none found, just return 0.
+	tgts := []string{"./db", "./backend/db/migrations"}
+	migrateDir := ""
+	for _, dir := range tgts {
+		_, err := os.Stat(dir)
+		if err == nil {
+			migrateDir = dir
+			break
+		}
+	}
+
+	if migrateDir == "" {
+		log.Printf("WARN: DB Migration directory not found")
+		return 0
+	}
+
+	files, err := ioutil.ReadDir(migrateDir)
+	if err != nil {
+		log.Printf("WARN: DB Migration directory unreadable: %s", err.Error())
+		return 0
+	}
+
+	// there are up/down files for each migration
+	return len(files) / 2
 }
 
 // IsAuthenticated will return success if the specified token auth token is associated with
