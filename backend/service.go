@@ -178,7 +178,7 @@ func getLatestMigrationNumber() int {
 	// on deployed systems, the migrations can be found in ../db/*.sql (we run from ./bin)
 	// on dev systems run with 'go run', they are in ./backend/db/migrations/*.sql
 	// try both; if files found return the latest number. If none found, just return 0.
-	tgts := []string{"./db", "./backend/db/migrations"}
+	tgts := []string{"../db", "./backend/db/migrations"}
 	migrateDir := ""
 	for _, dir := range tgts {
 		_, err := os.Stat(dir)
