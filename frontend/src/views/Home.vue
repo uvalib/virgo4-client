@@ -178,15 +178,26 @@ export default {
       // scroll to the target hit and open bookmark popup
       async restorePreviousSearch() {
 
+        // clear and cancel if not signed in
+        if( !this.$store.getters['user/isSignedIn']) {
+          this.$store.commit("restore/clearBookmarkData")
+          return
+        }
+
         await this.$store.dispatch("restore/fromStorage")
 
-        this.showBookmarkTarget()
+        try {
+          this.showBookmarkTarget()
+        } finally {
+          this.$store.commit("restore/clearBookmarkData")
+        }
       },
       showBookmarkTarget() {
+
         if (!this.restore.recordId) {return}
 
         let identifier = this.restore.recordId
-        let pool = this.restore.pool
+        let pool = this.restore.poolName
         let bmData = {pool: pool, data: null}
         if ( this.restore.groupParent) {
           let sel = `.hit[data-identifier="${this.restore.groupParent}"]`

@@ -7,7 +7,8 @@ const restore = {
 
      // Record used for scrolling to bookmark
      recordId: null,
-     groupParent: null
+     groupParent: null,
+     poolName: null
    },
    getters: {
      getField,
@@ -23,8 +24,8 @@ const restore = {
      groupParent: state => {
        return state.groupParent
      },
-     pool: state => {
-       state.searchData.pool
+     poolName: state => {
+       return state.poolName
      },
      hasPreviousSearch: _state => {
        return (typeof localStorage.getItem('previousSearch')) != 'undefined'
@@ -47,25 +48,31 @@ const restore = {
        state.previousPath = value
      },
 
+     // Called from bookmark button
      setBookmarkRecord(state, value) {
        state.recordId = value.identifier
        if ( value.groupParent != "") {
          state.groupParent =  value.groupParent
        }
      },
-     setBookmarkStore(state, value) {
+     // Copies bookmark data from localstorage to state
+     loadBookmarkData(state, value) {
        state.recordId = value.recordId
        state.groupParent = value.groupParent
+       state.poolName = value.poolName
      },
+     // Cleans up localStorage, keeps bookmark data
      clearStorage(state) {
        localStorage.removeItem("previousSearch")
        state.previousPath = null
      },
+     // cleans up remaining state
      clearBookmarkData(state) {
        localStorage.removeItem("previousSearch")
        state.previousPath = null
        state.recordId = null
        state.groupParent = null
+       state.poolName = null
      },
    },
    actions: {
@@ -80,14 +87,13 @@ const restore = {
         // A specific record is set during bookmark sign in
         searchData.recordId = getters.recordId
         searchData.groupParent = getters.groupParent
-
+        searchData.poolName = rootGetters['selectedResults'].pool.id
 
         searchData.previousPath = fromPath
         searchData.pools = rootGetters['pools/sortedList']
         searchData.numPools = searchData.pools.length
         searchData.resultsIdx = rootGetters['selectedResultsIdx']
-        searchData.pool = rootGetters['selectedResults']
-        searchData.page = searchData.pool.page
+        searchData.page = rootGetters['selectedResults'].page
         searchData.filters = rootGetters['filters/poolFilter'](searchData.poolIdx)
 
 
@@ -97,13 +103,10 @@ const restore = {
       async fromStorage({ dispatch, commit, getters, rootGetters }){
         try {
           let searchData = getters.searchData
-
-
           if (!searchData || searchData.query == "") {
             return
           }
-          commit('setBookmarkStore', searchData)
-
+          commit('loadBookmarkData', searchData)
 
           commit('query/restoreSearch', searchData, {root: true})
           commit('filters/restoreFilters', searchData, {root: true})
@@ -118,6 +121,7 @@ const restore = {
           }
         } finally {
           commit('clearStorage')
+          commit('setSearching', false, {root: true})
         }
       }
    }
