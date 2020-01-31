@@ -28,7 +28,7 @@ const restore = {
        return state.poolName
      },
      hasPreviousSearch: _state => {
-       return (typeof localStorage.getItem('previousSearch')) != 'undefined'
+      return localStorage.getItem('previousSearch') != null
      },
      searchData: _state => {
        if (localStorage.getItem('previousSearch')) {
@@ -62,12 +62,12 @@ const restore = {
        state.poolName = value.poolName
      },
      // Cleans up localStorage, keeps bookmark data
-     clearStorage(state) {
+     clearLocalStorage(state) {
        localStorage.removeItem("previousSearch")
        state.previousPath = null
      },
      // cleans up remaining state
-     clearBookmarkData(state) {
+     clearAll(state) {
        localStorage.removeItem("previousSearch")
        state.previousPath = null
        state.recordId = null
@@ -96,6 +96,8 @@ const restore = {
         searchData.page = rootGetters['selectedResults'].page
         searchData.filters = rootGetters['filters/poolFilter'](searchData.poolIdx)
 
+        searchData.journalQuery = rootGetters['journals/query']
+
 
         localStorage.setItem("previousSearch", JSON.stringify(searchData))
       },
@@ -106,6 +108,7 @@ const restore = {
           if (!searchData || searchData.query == "") {
             return
           }
+
           commit('loadBookmarkData', searchData)
 
           commit('query/restoreSearch', searchData, {root: true})
@@ -120,10 +123,26 @@ const restore = {
             await dispatch("searchSelectedPool", null, {root: true})
           }
         } finally {
-          commit('clearStorage')
+          commit('clearLocalStorage')
           commit('setSearching', false, {root: true})
         }
+      },
+      loadJournals(ctx){
+        try {
+          // skip if you're not logged in, or no searchData
+          if(!ctx.rootGetters['user/isSignedIn'] || !ctx.getters.searchData) {
+            return
+          }
+
+          if (ctx.getters.searchData.journalQuery){
+            ctx.commit('journals/setQuery', ctx.getters.searchData.journalQuery, {root: true})
+            ctx.dispatch('journals/searchJournals', null, {root: true})
+          }
+        } finally {
+          ctx.commit('clearAll')
+        }
       }
+
    }
 }
 
