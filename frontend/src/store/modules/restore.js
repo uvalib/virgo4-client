@@ -113,7 +113,7 @@ const restore = {
           await dispatch("searchAllPools", searchData.page, {root: true})
           commit('setSearching', true, {root: true})
 
-          await dispatch("selectPoolResults", searchData.resultsIdx, {root: true})
+          dispatch("selectPoolResults", searchData.resultsIdx, {root: true})
 
 
           if ( rootGetters['filters/hasFilter'], searchData.resultsIdx) {
