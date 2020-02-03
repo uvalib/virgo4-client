@@ -14,7 +14,6 @@ import reserves from './modules/reserves'
 import preferences from './modules/preferences'
 import journals from './modules/journals'
 import feedback from './modules/feedback'
-import restore from './modules/restore'
 import * as utils from './modules/utils'
 import { getField, updateField } from 'vuex-map-fields'
 
@@ -36,9 +35,6 @@ export default new Vuex.Store({
     getField,
     hasResults: state => {
       return state.total >= 0
-    },
-    selectedResultsIdx: state => {
-      return state.selectedResultsIdx
     },
     selectedResults: state => {
       if (state.selectedResultsIdx === -1 ) {
@@ -329,7 +325,6 @@ export default new Vuex.Store({
     system: system,
     user: user,
     feedback: feedback,
-    restore: restore,
   },
 
   plugins: [messaging, versionChecker]
