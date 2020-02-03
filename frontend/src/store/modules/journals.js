@@ -11,9 +11,6 @@ const journals = {
    },
    getters: {
       getField,
-      query(state) {
-        return state.query
-      },
    },
    mutations: {
       updateField,
@@ -26,11 +23,7 @@ const journals = {
             state.titles.push( res )
          })
          state.browseTotal = results.length
-      },
-      setQuery(state, q) {
-        state.query = q
       }
-
    },
    actions: {
       searchJournals(ctx) {

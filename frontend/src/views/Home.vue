@@ -126,6 +126,7 @@ export default {
             return
          } else if(this.$store.getters['restore/hasPreviousSearch']) {
            this.restorePreviousSearch()
+           return
          }
 
          // === Special query parameter handling ====
@@ -179,7 +180,7 @@ export default {
 
         // clear and cancel if not signed in
         if( !this.$store.getters['user/isSignedIn']) {
-          this.$store.commit("restore/clearAll")
+          this.$store.commit("restore/clearBookmarkData")
           return
         }
 
@@ -188,7 +189,7 @@ export default {
         try {
           this.showBookmarkTarget()
         } finally {
-          this.$store.commit("restore/clearAll")
+          this.$store.commit("restore/clearBookmarkData")
         }
       },
       showBookmarkTarget() {
@@ -223,7 +224,7 @@ export default {
           this.scrollToItem(tgtEle)
           bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
         }
-        this.$store.commit("restore/clearAll")
+        this.$store.commit("restore/clearBookmarkData")
         this.$store.commit("bookmarks/showAddBookmark", bmData)
       },
 

@@ -87,9 +87,6 @@ export default {
          this.$store.commit("query/setBasicSearch")
          this.$router.push("/")
       },
-   },
-   created(){
-     this.$store.dispatch("restore/loadJournals")
    }
 };
 </script>

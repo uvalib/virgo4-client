@@ -91,7 +91,7 @@ const router = new Router({
       name: 'signin',
       component: SignIn,
       beforeEnter(_to, from, next) {
-        store.dispatch('restore/save', from.fullPath)
+        store.dispatch('restore/save', from.path)
         next()
       }
     },
