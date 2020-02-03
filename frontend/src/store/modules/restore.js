@@ -90,6 +90,7 @@ const restore = {
         searchData.page = searchData.pool.page
         searchData.filters = rootGetters['filters/poolFilter'](searchData.poolIdx)
 
+        console.log(searchData)
 
         localStorage.setItem("previousSearch", JSON.stringify(searchData))
       },
