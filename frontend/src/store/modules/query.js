@@ -69,6 +69,8 @@ const query = {
                   // special handling for date as it can include a range and a type
                   if (term.type == "BETWEEN") {
                      qs += `date: {${term.value} TO ${term.endVal}}`
+                  } else if (term.type == "EQUAL") {
+                     qs += `date: {${term.value}}`
                   } else {
                      qs += `date: {${term.type} ${term.value}}`
                   }
