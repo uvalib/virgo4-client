@@ -77,7 +77,6 @@ const router = new Router({
       path: '/signedin',
       beforeEnter: (_to, _from, next) => {
         getSignedInUserFromCookie()
-        store.dispatch('restore/loadLocalStorage')
         let searchData = store.getters['restore/searchData']
         if ( searchData &&
             (typeof searchData.previousPath != 'undefined')) {

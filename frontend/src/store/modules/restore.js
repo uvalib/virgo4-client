@@ -4,8 +4,6 @@ const restore = {
    namespaced: true,
    state: {
      previousPath: null,
-     searchData: null,
-
 
      // Record used for scrolling to bookmark
      recordId: null,
@@ -20,13 +18,6 @@ const restore = {
        }
        return state.previousPath
      },
-     bookmarkData: state => {
-       return {
-         recordId: state.recordId,
-         poolName: state.poolName,
-         groupParent: state.groupParent
-       }
-     },
      recordId: state => {
        return state.recordId
      },
@@ -36,21 +27,19 @@ const restore = {
      poolName: state => {
        return state.poolName
      },
-     hasPreviousSearch: state => {
-      return state.searchData != null
+     hasPreviousSearch: _state => {
+      return localStorage.getItem('previousSearch') != null
      },
-     searchData: state => {
-        let data = null
-        if (localStorage.getItem('previousSearch')) {
-          try {
-            data = JSON.parse(localStorage.getItem('previousSearch'))
-          } catch(e) {
-            data = null
-          }
-        } else {
-          data = null
-        }
-       return state.searchData || data
+     searchData: _state => {
+       if (localStorage.getItem('previousSearch')) {
+         try {
+           return JSON.parse(localStorage.getItem('previousSearch'));
+         } catch(e) {
+           return null
+         }
+       } else {
+         return null
+       }
      },
 
    },
@@ -76,7 +65,6 @@ const restore = {
      clearLocalStorage(state) {
        localStorage.removeItem("previousSearch")
        state.previousPath = null
-       state.searchData = null
      },
      // cleans up remaining state
      clearAll(state) {
@@ -85,11 +73,6 @@ const restore = {
        state.recordId = null
        state.groupParent = null
        state.poolName = null
-       state.searchData = null
-     },
-
-     searchData(state, value) {
-       state.searchData = value
      },
    },
    actions: {
@@ -117,19 +100,6 @@ const restore = {
 
 
         localStorage.setItem("previousSearch", JSON.stringify(searchData))
-      },
-      loadLocalStorage(ctx){
-        let data = null
-        if (localStorage.getItem('previousSearch')) {
-          try {
-            data = JSON.parse(localStorage.getItem('previousSearch'))
-          } catch(e) {
-            data = null
-          }
-        } else {
-          data = null
-        }
-        ctx.commit('searchData', data)
       },
 
       async fromStorage({ dispatch, commit, getters, rootGetters }){
@@ -171,7 +141,7 @@ const restore = {
         } finally {
           ctx.commit('clearAll')
         }
-      },
+      }
 
    }
 }

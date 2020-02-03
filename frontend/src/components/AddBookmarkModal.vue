@@ -88,7 +88,6 @@ export default {
             return found == true
          })
       })
-      this.$store.commit('restore/clearAll')
    }
 }
 </script>

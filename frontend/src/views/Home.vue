@@ -84,6 +84,7 @@ export default {
          translateMessage: state => state.system.translateMessage,
          sessionMessage: state => state.system.sessionMessage,
          restoreMessage: state => state.query.restoreMessage,
+         restore: state => state.restore,
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
@@ -176,36 +177,38 @@ export default {
       // scroll to the target hit and open bookmark popup
       async restorePreviousSearch() {
 
-        try {
-          // clear and cancel if not signed in
-          if( !this.$store.getters['user/isSignedIn']) {
-            return
-          }
-          await this.$store.dispatch("restore/fromStorage")
+        // clear and cancel if not signed in
+        if( !this.$store.getters['user/isSignedIn']) {
+          this.$store.commit("restore/clearAll")
+          return
+        }
 
+        await this.$store.dispatch("restore/fromStorage")
+
+        try {
           this.showBookmarkTarget()
         } finally {
           this.$store.commit("restore/clearAll")
         }
       },
       showBookmarkTarget() {
-        let bmRestore = this.$store.getters['restore/bookmarkData']
 
-        if (!bmRestore.recordId) {return}
+        if (!this.restore.recordId) {return}
 
-        let identifier = bmRestore.recordId
-        let bmData = {pool: bmRestore.poolName, data: null}
-        if ( bmRestore.groupParent) {
-          let sel = `.hit[data-identifier="${bmRestore.groupParent}"]`
+        let identifier = this.restore.recordId
+        let pool = this.restore.poolName
+        let bmData = {pool: pool, data: null}
+        if ( this.restore.groupParent) {
+          let sel = `.hit[data-identifier="${this.restore.groupParent}"]`
           let tgtEle = document.body.querySelector(sel)
           tgtEle.scrollIntoView()
 
           // find the item in the group that was targeted for a bookmark
-          let parent = this.selectedResults.hits.find( r=> r.identifier == bmRestore.groupParent)
+          let parent = this.selectedResults.hits.find( r=> r.identifier == this.restore.groupParent)
           bmData.data = parent.group.find( r=> r.identifier == identifier)
 
           // The group accordion watches this value. When set, the accordion will auto-expand
-          this.$store.commit('setAutoExpandGroupID', bmRestore.groupParent)
+          this.$store.commit('setAutoExpandGroupID', this.restore.groupParent)
 
           // once the group is expanded, scroll to the target group item
           setTimeout( ()=>{
