@@ -31,6 +31,13 @@ const filters = {
          return  state.poolFacets[idx]
       },
 
+      hasFacets: (state) => (idx) => {
+         if ( idx == -1 || idx >= state.poolFacets.length) {
+            return false
+         }
+         return  state.poolFacets[idx].length > 0
+      },
+
       hasFilter: (state) => (idx) => {
          if (idx < 0) return false
          if ( state.globalAvailability.id != "any" ) return true

@@ -17,7 +17,7 @@
          </AccordionContent>
       </div>
 
-      <div class="pool" :class="{overlay: !startExpanded}">
+      <div v-if="hasFacets(resultsIdx)" class="pool" :class="{overlay: !startExpanded}">
           <AccordionContent id="pool-filter" class="filter"
             :title="poolFilterTitle" :background="filterColor"
             color="white" :expanded="startExpanded"
@@ -79,6 +79,7 @@ export default {
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
           allFilters: 'filters/poolFilter',
+          hasFacets: 'filters/hasFacets'
       }),
       globalTitle() {
          if ( !this.startExpanded ) {
