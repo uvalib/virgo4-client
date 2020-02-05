@@ -186,6 +186,10 @@ table td.value {
    text-align: left;
    width: 100%;
    padding: 4px 8px;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
 }
 .bookmark-container {
    float:left;

@@ -70,6 +70,11 @@ div.popover-header {
 }
 .content {
    display: inline-block;
+   word-break: break-word;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
 }
 div.full {
    display: inline-block;
