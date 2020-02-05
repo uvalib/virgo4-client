@@ -166,7 +166,6 @@ export default {
   padding: 0 0 10px 0;
   border-radius: 0 0 5px 5px;
   position: absolute;
-  left: -1px;
   border: 1px solid var(--uvalib-light-blue);
   overflow: hidden;
   transition: 200ms ease-out;
@@ -174,6 +173,17 @@ export default {
   white-space: nowrap;
   display: grid;
   grid-auto-rows: auto;
+}
+@media only screen and (min-width: 768px) {
+   .v4-select .options {
+       left:0;
+       right:0;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .v4-select .options {
+       right:0;
+   }
 }
 .v4-select .option {
   align-items: stretch;
