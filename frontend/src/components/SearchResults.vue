@@ -30,7 +30,7 @@
                   </div>
                </template>
                <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
-                  :background="otherSrcBkg" :color="otherSrcColor"
+                  :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
                   placeholder="Other<span class='total'>Sources</span>"
                   v-model="otherSrcSelection"/>
             </div>

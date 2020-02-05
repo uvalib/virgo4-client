@@ -13,7 +13,7 @@
       <transition name="grow"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="options" v-if="expanded"
+         <div class="options" v-if="expanded" v-bind:class="{right: alignment=='right', left: alignment=='left'}"
             :style="{ 'background-color': background, color: color, 'border': optborder }">
             <div v-for="src in selections" @click="optionClicked(src)"
                :class="{disabled: src.disabled}" class="option"
@@ -26,6 +26,10 @@
 <script>
 export default {
    props: {
+      alignment: {
+         type: String,
+         default: "left"
+      },
       placeholder: {
          type: String,
          default: "Make a selection"
@@ -174,15 +178,21 @@ export default {
   display: grid;
   grid-auto-rows: auto;
 }
+
 @media only screen and (min-width: 768px) {
-   .v4-select .options {
-       left:0;
-       right:0;
+   .v4-select .options.left  {
+      left: -1px; 
+   }
+   .v4-select .options.right  {
+      left: -1px; 
    }
 }
 @media only screen and (max-width: 768px) {
-   .v4-select .options {
-       right:0;
+   .v4-select .options.left  {
+      left: -1px; 
+   }
+   .v4-select .options.right  {
+      right: 0; 
    }
 }
 .v4-select .option {
