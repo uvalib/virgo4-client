@@ -1,20 +1,28 @@
 <template>
    <div class="filters">
-      <div class="filters-head clearfix">
-         <span class="title">Applied Filters</span>
-         <span v-if="hasFilter(resultsIdx)" @click="clearClicked" class="clear pure-button pure-button-primary">Clear All</span>
-      </div>
-      <template v-if="hasFilter(resultsIdx)">
-         <dl class="filter-display">
-            <template v-for="(values,filter, idx) in displayFilter">
-               <dt :key="filter" class="label">{{filter}}:</dt>
-               <dd :key="idx" class="filter">{{formatValues(values)}}</dd>
-            </template>
-         </dl>
+      <template v-if="updatingFacets == false && hasFacets(resultsIdx) == false">
+         <div class="no filters-head clearfix">
+            <span class="title"><i class="warn fas fa-exclamation-triangle"></i>This source does not support filtering</span>
+            <p>Any changes to the Availability filter will have no impact on the results presented below</p>
+         </div>
       </template>
-      <div v-else class="no-filter">
-         <span>None</span>
-      </div>
+      <template v-else>
+         <div class="filters-head clearfix">
+            <span class="title">Applied Filters</span>
+            <span v-if="hasFilter(resultsIdx)" @click="clearClicked" class="clear pure-button pure-button-primary">Clear All</span>
+         </div>
+         <template v-if="hasFilter(resultsIdx)">
+            <dl class="filter-display">
+               <template v-for="(values,filter, idx) in displayFilter">
+                  <dt :key="filter" class="label">{{filter}}:</dt>
+                  <dd :key="idx" class="filter">{{formatValues(values)}}</dd>
+               </template>
+            </dl>
+         </template>
+         <div v-else class="no-filter">
+            <span>None</span>
+         </div>
+      </template>
    </div>
 </template>
 
@@ -25,12 +33,14 @@ export default {
    computed: {
       ...mapState({
          resultsIdx: state => state.selectedResultsIdx,
+         updatingFacets: state => state.filters.updatingFacets,
          availabilityFacet: state => state.filters.availabilityFacet,
       }),
       ...mapGetters({
          hasFilter: 'filters/hasFilter',
          allFilters: 'filters/poolFilter',
          selectedResults: 'selectedResults',
+         hasFacets: 'filters/hasFacets'
       }),
       total() {
          return this.selectedResults.total
@@ -74,6 +84,15 @@ export default {
    border-bottom: 1px solid var(--uvalib-grey-light);
    margin-bottom: 5px;
    padding-bottom: 10px;
+}
+.no.filters-head  {
+   border-bottom: 0;
+   margin-bottom: 0;
+}
+.no.filters-head p {
+   font-weight: normal;
+   margin: 15px 0 0 10px;
+   padding: 0;
 }
 @media only screen and (max-width: 768px) {
   dl.filter-display {
@@ -122,5 +141,10 @@ export default {
 }
 .remove-filter:hover {
    opacity: 1;
+}
+i.warn {
+   margin-right: 5px;
+   color: var(--uvalib-yellow);
+   font-size:1.25em;
 }
 </style>
