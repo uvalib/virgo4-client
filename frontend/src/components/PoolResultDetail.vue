@@ -4,6 +4,12 @@
          <div class="desc">
             {{selectedResults.pool.description}}
          </div>
+         <div v-if="hasLogo" class="source-logo">
+            <a v-if="selectedResults.pool.external_url" :href="selectedResults.pool.external_url" target="_blank">
+               <img class ="pure-img" :src="selectedResults.pool.logo_url">
+            </a>
+             <img v-else class ="pure-img" :src="selectedResults.pool.logo_url">
+         </div>
          <SearchFilters />
       </div>
       <div class="hits">
@@ -51,6 +57,9 @@ export default {
          selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
       }),
+      hasLogo() {
+         return this.selectedResults.pool.logo_url
+      }
    },
    watch: {
       selectedResultsIdx () {
@@ -128,5 +137,9 @@ div.results-header {
 }
 .no-more {
    cursor: default;
+}
+.source-logo {
+   background: white;
+   padding: 5px;
 }
 </style>
