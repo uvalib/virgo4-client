@@ -115,7 +115,6 @@ const item = {
          } else {
             ctx.commit('clearDetails')
          }
-         ctx.commit('setSearching', true, { root: true })
          if (ctx.rootState.system.searchAPI == "") {
             await ctx.dispatch("system/getConfig", null, {root:true})
          }

@@ -12,7 +12,7 @@
             </div>
          </template>
          <template v-else>
-            <SearchHitHeader v-bind:link="false" :hit="details" :pool="this.$route.params.src"/>
+            <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
             <div class="info">
                <table class="fields">
                   <tr v-if="details.header.author">
@@ -73,9 +73,6 @@ export default {
       allFields() {
          return [...this.details.basicFields.concat(this.details.detailFields)]
       },
-      fromCourseReserves() {
-         return this.$route.params.src == "course-reserves"
-      }
    },
    methods: {
       getSubjectLink(subj) {
