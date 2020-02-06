@@ -127,25 +127,9 @@ export default {
            this.restorePreviousSearch()
          }
 
-         // === Special query parameter handling ====
-         //Subject: if subject param exists, do an advanced subject search for the value
-         let prior = this.rawQueryString
-         let subj = this.$route.query.subject
-         if ( subj ) {
-            // Update query to be a subject search matching the param.
-            // Do the search only if the new query is different from prior
-            this.$store.commit("query/setSubjectSearch", subj)
-            if ( prior != this.rawQueryString) {
-            this.$store.commit('query/setLastSearch', this.rawQueryString)
-            this.$store.commit('filters/reset')
-            this.$store.commit('resetOtherSourceSelection')
-            this.$store.dispatch("searchAllPools")
-            }
-            return
-         }
-
          // Journals: if journal param present, it will be the journal title
          // do an advanced search in journals only for that title
+          let prior = this.rawQueryString
          let journalTitle = this.$route.query.journal
          if ( journalTitle ) {
             // Update query to be a journal title search matching the param.

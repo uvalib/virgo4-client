@@ -2,19 +2,21 @@
    <div class="search-results shady">
 
       <div class="results-header">
-         <div class="summary">
-            <div class="query">Showing results for: <i>{{queryString}}</i></div>
-            <span>{{total}} matches found in {{results.length}} sources.</span>
-            <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
-            <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
-         </div>
-         <span class="buttons">
-            <SaveSearch v-if="isSignedIn" />
-            <span v-if="searchMode=='basic'" @click="refineClicked()"
-               class="refine pure-button pure-button-primary">
-               Refine Search
+         <template v-if="showSummary">
+            <div class="summary">
+               <div class="query">Showing results for: <i>{{queryString}}</i></div>
+               <span>{{total}} matches found in {{results.length}} sources.</span>
+               <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
+               <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
+            </div>
+            <span class="buttons">
+               <SaveSearch v-if="isSignedIn" />
+               <span v-if="searchMode=='basic'" @click="refineClicked()"
+                  class="refine pure-button pure-button-primary">
+                  Refine Search
+               </span>
             </span>
-         </span>
+         </template>
       </div>
 
       <div class="results-wrapper" v-if="total > 0">
@@ -57,6 +59,9 @@ import SaveSearch from "@/components/popovers/SaveSearch"
 export default {
    components: {
       PoolResultDetail, V4Select, FacetSidebar, SaveSearch
+   },
+   props: {
+      showSummary: { type: Boolean, default: true},
    },
    computed: {
       ...mapGetters({

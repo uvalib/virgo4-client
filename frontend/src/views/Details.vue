@@ -76,7 +76,7 @@ export default {
    },
    methods: {
       getSubjectLink(subj) {
-         return `/search?subject=${encodeURI(subj)}`
+         return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
          if (field.display == 'optional') return false
