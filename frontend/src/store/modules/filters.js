@@ -35,7 +35,10 @@ const filters = {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return false
          }
-         return  state.poolFacets[idx].length > 0
+         if (state.poolFacets[idx].length == 1 && state.poolFacets[idx][0].id == "NotSupported")  {
+            return false
+         }
+         return true
       },
 
       hasFilter: (state) => (idx) => {
@@ -103,6 +106,14 @@ const filters = {
          let tgtFacets = state.poolFacets[data.poolResultsIdx]
          let tgtFilter = state.poolFilters[data.poolResultsIdx]
          tgtFacets.splice(0, tgtFacets.length)
+         
+         // If facets are not handled by a pool, the value here will be false 
+         // Handle it by placing a special NotSupported facet as the only entry
+         if (data.facets === false ) {
+            tgtFacets.push( {id: "NotSupported", name: "NotSupported", buckets: []} )
+            return
+         }
+
          data.facets.forEach( function(facet) {
             // Availability is global and handled differently; skip it
             if ( facet.id == "FacetAvailability") return
@@ -240,7 +251,9 @@ const filters = {
             ctx.commit("setPoolFacets", {poolResultsIdx: resultsIdx, facets: facets})
             ctx.commit('setUpdatingFacets', false)
          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
+            if (error.response && error.response.status == 501) {
+               ctx.commit("setPoolFacets", {poolResultsIdx: resultsIdx, facets: false})
+            }
             ctx.commit('setUpdatingFacets', false)
           })
       }

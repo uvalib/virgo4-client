@@ -27,7 +27,10 @@
                <div v-if="updatingFacets" class="working">
                   <V4Spinner message="Loading filters..."/>
                </div>
-               <dl>
+               <div v-if="facets.length == 0" class="none">
+                  Filters are not available for this search
+               </div>
+               <dl v-else>
                   <template v-for="facetInfo in facets">
                      <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)"
@@ -304,6 +307,11 @@ span.cnt {
    margin-left: 5px;
    margin-left: auto;
    font-size: 0.8em;
+}
+div.none {
+   text-align: center;
+   margin:25px 0;
+   font-size: 1.25em;
 }
 </style>
 <style>
