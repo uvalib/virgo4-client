@@ -94,7 +94,13 @@ export default {
       },
       otherSources() {
          let opts = []
-         this.results.slice(2).forEach( r=>{
+         let others = this.results.slice(2).sort( (a,b) => {
+            if (a.pool.name < b.pool.name) return -1 
+            if (a.pool.name > b.pool.name) return 1 
+            return 0
+         })
+         
+         others.forEach( r=>{
             let disabled = false
             let name = `<span class='pool'>${r.pool.name}</span>`
             if (this.poolFailed(r)) {
