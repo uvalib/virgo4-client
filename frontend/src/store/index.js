@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-import messaging from './plugins/messaging'
 import versionChecker from './plugins/version'
 import bookmarks from './modules/bookmarks'
 import system from './modules/system'
@@ -332,5 +331,5 @@ export default new Vuex.Store({
     restore: restore,
   },
 
-  plugins: [messaging, versionChecker]
+  plugins: [versionChecker]
 })

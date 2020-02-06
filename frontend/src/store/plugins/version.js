@@ -8,8 +8,7 @@ const versionChecker = (store) => {
       setInterval(() => {
          axios.get("/version").then((ckResp) => {
             if (currBuild!= ckResp.data.build) {
-               // load without cache
-               window.location.reload(true)
+               store.commit('system/newVersionDetected')   
             } else {
                if (store.state.system.fatal != "") {
                   store.commit('system/setFatal', "")

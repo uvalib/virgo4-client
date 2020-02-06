@@ -3,6 +3,7 @@ import axios from 'axios'
 const system = {
    namespaced: true,
    state: {
+      newVersion: false,
       kiosk: false,
       fatal: "",
       error: "",
@@ -25,12 +26,15 @@ const system = {
    },
 
    mutations: {
+
+      newVersionDetected(state) {
+         state.newVersion = true
+      },
+
       setSessionExpiredMessage(state) {
          let link = "<a href='/signin'>here</a>"
          state.sessionMessage = `Your Virgo session has expired. Click ${link} to sign in again.`
-      },
-      clearSessionMessage(state) {
-         state.sessionMessage = ""
+         setTimeout(() => {  state.sessionMessage = "" }, 10000)
       },
       setDisplayWidth(state, w) {
          state.displayWidth = w
@@ -60,8 +64,6 @@ const system = {
          if (error == null) {
             error = ""
          }
-         state.total = -1
-         state.results = []
          if (error.response) {
             // Server responded with a status code out of the range of 2xx
             state.error = error.response.data
@@ -74,6 +76,9 @@ const system = {
          } else {
             // likely just a string error; just set it
             state.error = error
+         }
+         if (error != "" ) {
+            setTimeout(() => {  state.error = "" }, 10000)
          }
       },
 

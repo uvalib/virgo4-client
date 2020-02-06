@@ -12,6 +12,10 @@
       <MenuBar :id="menuID" v-bind:style="{transform: `translateY(-${scrollPos}px)`}"/>
       <main class="v4-content" v-bind:style="{'padding-top': menuHeight+'px'}">
          <router-view />
+         <div v-if="newVersion" class="update-pop">
+            <div class="msg">A new version of Virgo is available.</div>
+            <span @click="updateClicked" class="pure-button pure-button-primary">Update Now</span>
+         </div>
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
    </div>
@@ -47,6 +51,7 @@ export default {
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
+         newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
       }),
       ...mapGetters({
@@ -59,6 +64,9 @@ export default {
       }
    },
    methods: {
+      updateClicked() {
+          window.location.reload(true)
+      },
       closeUserMenu() {
          this.$store.commit("system/closeUserMenu");
       },
@@ -359,5 +367,25 @@ div.v-popover.inline {
    opacity: 1;
    visibility: visible;
    text-align: center;
+}
+.update-pop {
+   position: fixed;
+   z-index: 5000;
+   top: 10px;
+   right: 10px;
+   background: white;
+   padding: 10px;
+   border: 4px solid var(--uvalib-brand-orange);
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   text-align: right;
+   font-size: 0.85em;
+}
+.update-pop .msg {
+   margin-bottom: 10px;
+   font-weight: bold;
+}
+.update-pop span.pure-button.pure-button-primary {
+   margin: 0;
+   width:100%;
 }
 </style>
