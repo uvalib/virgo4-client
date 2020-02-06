@@ -11,6 +11,19 @@
       <VirgoHeader :id="headerID" />
       <MenuBar :id="menuID" v-bind:style="{transform: `translateY(-${scrollPos}px)`}"/>
       <main class="v4-content" v-bind:style="{'padding-top': menuHeight+'px'}">
+         <div v-if="sessionExpired" class="session">
+            <div class="session-message">
+               <div class="bar">
+                  <span>Notice</span>
+                  <i @click="dismissSession" v-close-popover class="close fas fa-times-circle"></i>
+               </div>
+               <div class="message-body">
+                  Your Virgo session has expired.<br/>Click 
+                  <router-link to="/signin">here</router-link> 
+                  to sign in again.
+               </div>
+            </div>
+         </div>
          <router-view />
          <div v-if="newVersion" class="update-pop">
             <div class="msg">A new version of Virgo is available.</div>
@@ -53,6 +66,7 @@ export default {
          fatal: state => state.system.fatal,
          newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
+         sessionExpired: state => state.system.sessionExpired,
       }),
       ...mapGetters({
          addingBookmark: "bookmarks/addingBookmark",
@@ -64,11 +78,14 @@ export default {
       }
    },
    methods: {
+      dismissSession() {
+         this.$store.commit("system/clearSessionExpired")
+      },
       updateClicked() {
           window.location.reload(true)
       },
       closeUserMenu() {
-         this.$store.commit("system/closeUserMenu");
+         this.$store.commit("system/closeUserMenu")
       },
       scrollHandler( ) {
          if ( window.scrollY <= this.headerHeight ) {
@@ -387,5 +404,35 @@ div.v-popover.inline {
 .update-pop span.pure-button.pure-button-primary {
    margin: 0;
    width:100%;
+}
+div.session {
+   position: fixed;
+   left: 0; 
+   right: 0;
+   z-index: 5000;
+   top: 30%;
+}
+div.session .bar {
+   padding: 5px;
+   background-color: var(--uvalib-brand-blue-light);
+   color: white;
+   font-weight: bold;
+}
+div.session i {
+   float:right;
+   font-size: 1.3em;
+   cursor: pointer;
+   margin-left: 10px;
+}
+div.session .message-body {
+   padding: 10px 15px;
+}
+div.session-message {
+   display: inline-block;
+   text-align: center;
+   background: white;
+   padding: 0px;
+   border: 2px solid var(--uvalib-brand-blue-light);
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 </style>

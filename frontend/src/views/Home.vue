@@ -47,7 +47,6 @@
       <transition name="message-transition"
           enter-active-class="animated faster fadeIn"
           leave-active-class="animated faster fadeOut">
-        <p v-if="sessionMessage" class="session" v-html="sessionMessage"></p>
         <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
@@ -82,7 +81,6 @@ export default {
          showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
-         sessionMessage: state => state.system.sessionMessage,
          restoreMessage: state => state.query.restoreMessage,
       }),
       ...mapGetters({

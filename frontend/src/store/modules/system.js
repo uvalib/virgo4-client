@@ -12,7 +12,7 @@ const system = {
       searchAPI: "",
       seenTranslateMsg: false,
       translateMessage: "",
-      sessionMessage: "",
+      sessionExpired: false,
       displayWidth: window.innerWidth,
    },
 
@@ -31,10 +31,12 @@ const system = {
          state.newVersion = true
       },
 
-      setSessionExpiredMessage(state) {
-         let link = "<a href='/signin'>here</a>"
-         state.sessionMessage = `Your Virgo session has expired. Click ${link} to sign in again.`
-         setTimeout(() => {  state.sessionMessage = "" }, 10000)
+      setSessionExpired(state) {
+         state.sessionExpired = true
+         setTimeout(() => {  state.sessionExpired=false }, 15000)
+      },
+      clearSessionExpired(state) {
+         state.sessionExpired = false
       },
       setDisplayWidth(state, w) {
          state.displayWidth = w
