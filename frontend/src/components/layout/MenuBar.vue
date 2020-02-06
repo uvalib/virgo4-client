@@ -1,7 +1,7 @@
 <template>
    <nav class="menu">
       <span class="menu-right">
-        <router-link to="/">
+        <router-link @click.native="searchClicked" to="/">
            <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
         </router-link>
         <router-link to="/course-reserves" v-if="isSignedIn && !isCommunityUser">
@@ -84,6 +84,12 @@ export default {
       }
    },
    methods: {
+      searchClicked() {
+         this.$store.commit('resetSearchResults')
+         this.$store.commit('filters/reset')
+         this.$store.commit('query/clear')
+         this.$store.commit('restore/clearAll')
+      },
       signinClicked() {
          this.$router.push("/signin")
       },

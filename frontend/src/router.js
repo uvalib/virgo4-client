@@ -30,13 +30,6 @@ const router = new Router({
       alias: '/search',
       name: 'home',
       component: Home,
-      beforeEnter: (_to, _from, next) => {
-         store.commit('resetSearchResults')
-         store.commit('filters/reset')
-         store.commit('query/clear')
-         store.commit('restore/clearAll')
-         next()
-      }
     },
     {
       path: '/search/:id',

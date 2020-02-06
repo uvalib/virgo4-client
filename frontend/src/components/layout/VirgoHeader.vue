@@ -135,7 +135,7 @@
          </a>
       </div>
       <div class="site-link">
-         <router-link to="/">
+         <router-link to="/" @click.native="homeClicked">
             <span class="site-name">Virgo4</span>
          </router-link>
       </div>
@@ -150,6 +150,14 @@ export default {
          isKiosk: "system/isKiosk",
       }),
    },
+   methods: {
+      homeClicked() {
+         this.$store.commit('resetSearchResults')
+         this.$store.commit('filters/reset')
+         this.$store.commit('query/clear')
+         this.$store.commit('restore/clearAll')
+      }
+   }
 }
 </script>
 
@@ -178,9 +186,6 @@ div.header span.site-name {
    font-size: 2.5em;
    position: relative;
 }
-div.site-link {
-   /* float:right; */
-}
 img.uva-library {
   max-height: 50px;
 }
@@ -202,9 +207,6 @@ img.uva-library {
     width: 5rem;
     max-height: 100px;
   }
-}
-div.library-link {
-   /* float:left; */
 }
 .subtitle {
    display: inline-block;
