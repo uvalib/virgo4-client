@@ -2,8 +2,10 @@
    <div class="filters">
       <template v-if="updatingFacets == false && hasFacets(resultsIdx) == false">
          <div class="no filters-head clearfix">
-            <span class="title"><i class="warn fas fa-exclamation-triangle"></i>This source does not support filtering</span>
-            <p>Any changes to the Availability filter will have no impact on the results presented below</p>
+            <span class="title">
+               <i class="warn fas fa-exclamation-triangle"></i>
+               This source does not support filtering.
+               Changes to the Availability filter will have no impact on the results presented below.</span>
          </div>
       </template>
       <template v-else>
@@ -76,7 +78,7 @@ export default {
 .filters {
    background: white;
    color: var(--uvalib-text);
-   padding: 15px 5px;
+   padding: 5px 5px 10px 5px;
    margin-top: 5px;
 }
 .filters-head {
@@ -87,12 +89,11 @@ export default {
 }
 .no.filters-head  {
    border-bottom: 0;
-   margin-bottom: 0;
-}
-.no.filters-head p {
    font-weight: normal;
-   margin: 15px 0 0 10px;
+   margin: 0;
    padding: 0;
+   font-size: 0.9em;
+   text-align: center;
 }
 @media only screen and (max-width: 768px) {
   dl.filter-display {
@@ -104,8 +105,8 @@ export default {
 @media only screen and (min-width: 768px) {
   dl.filter-display {
     display: grid;
-    grid-template-columns: 0.5fr 1fr;
-    grid-gap: 8px;
+    grid-template-columns: 0.3fr 1fr;
+    grid-gap: 2px;
   }
 }
 .filter-display dt {
@@ -145,6 +146,5 @@ export default {
 i.warn {
    margin-right: 5px;
    color: var(--uvalib-yellow);
-   font-size:1.25em;
 }
 </style>
