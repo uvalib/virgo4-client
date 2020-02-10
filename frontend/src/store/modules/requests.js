@@ -31,7 +31,7 @@ const requests = {
             ctx.commit('alertText', response.data.hold.errors)
            )
            .catch(e =>
-             ctx.commit('alertText', "Error:" + response.data.hold.errors)
+             ctx.commit('alertText', "Error:" + e)
                  )
 
     },
