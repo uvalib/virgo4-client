@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,7 +38,9 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 
 	for _, title := range titlesReq.Titles {
 		log.Printf("Get details for journal '%s'", title)
-		url := fmt.Sprintf("%s/%s/select?q=full_serials_title_f:\"%s\"", svc.Solr.URL, svc.Solr.Core, url.QueryEscape(title))
+		escTitle := url.QueryEscape(title)
+		escTitle = strings.ReplaceAll(escTitle, "%22", "\\%22")
+		url := fmt.Sprintf("%s/%s/select?q=full_serials_title_f:\"%s\"", svc.Solr.URL, svc.Solr.Core, escTitle)
 		respBytes, solrErr := svc.SolrGet(url)
 		if solrErr != nil {
 			c.String(solrErr.StatusCode, solrErr.Message)
