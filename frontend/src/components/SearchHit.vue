@@ -173,14 +173,13 @@ dd {
    font-weight: bold;
    border-radius: 5px;
    border: 1px solid var(--uvalib-brand-orange) !important;
-   width: max-content;
-}
-/* fallback for IE */
-#app .accordion.group .title {
-   width: auto;
+   width: 100%;
+   box-sizing: border-box;
 }
 #app .accordion.group {
    display: inline-block;
+   width: 100%;
+   box-sizing: border-box;
 }
 #app .group .title .text {
   color: var(--uvalib-text);

@@ -11,6 +11,7 @@
                type="text"
                placeholder="Browse Virgo journals by title"
             />
+            <div class="note"><b>NOTE:</b> This search is case-sensitive</div>
          </div>
          <div class="controls">
             <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
@@ -32,8 +33,26 @@
          <div v-else class="browse">
             <ol>
                <li v-for="(t,idx) in titles" :key="idx">
-                  <span class="title"><router-link :to="journalLink(t)">{{t.title}}</router-link></span>
-                  <span class="count">{{t.count}}</span>
+                  <AccordionContent class="item" :title="itemTitle(t)" borderWidth="0" layout="wide" style="width:100%">
+                     <dl class="fields" v-for="(i,idx2) in t.items" :key="idx2">
+                        <dt>Details:</dt> 
+                        <dd>
+                           <router-link :to="itemURL(i)">Full Virgo details</router-link>
+                        </dd>
+                        <dt>Published:</dt> 
+                        <dd>{{i.published}}</dd>
+                        <dt>Format:</dt> 
+                        <dd>{{i.format.join(", ")}}</dd>
+                        <dt>Availability:</dt> 
+                        <dd>{{i.availability}}</dd>
+                        <template v-for="(u,uidx) in i.url">
+                           <dt :key="uidx">Online Access:</dt> 
+                           <dd :key="u">
+                              <a :href="u" target="_blank">{{u}}</a>
+                           </dd>
+                        </template>
+                     </dl>
+                  </AccordionContent>
                </li>
             </ol>
          </div>
@@ -49,13 +68,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { mapFields } from "vuex-map-fields";
-import V4Spinner from "@/components/V4Spinner";
+import { mapState } from "vuex"
+import { mapFields } from "vuex-map-fields"
+import V4Spinner from "@/components/V4Spinner"
+import AccordionContent from "@/components/AccordionContent"
 export default {
    name: "journals",
    components: {
-      V4Spinner
+      V4Spinner, AccordionContent
    },
    computed: {
       ...mapState({
@@ -70,8 +90,14 @@ export default {
       return {};
    },
    methods: {
-      journalLink(info) {
-         return `/search?journal=${encodeURI(info.title)}`
+      itemTitle(item) {
+         if (item.items.length == 1) {
+            return item.title
+         }
+         return `${item.title} <span class='cnt'>(${item.items.length} items)</span>`
+      },
+      itemURL(item) {
+         return "/sources/journals/items/"+item.id
       },
       searchClicked() {
          if ( this.query == "") {
@@ -207,5 +233,30 @@ ol li::before {
   width: 30px;
   text-align: right;
   line-height: 1.5em;
+}
+div.note {
+   text-align: left;
+   margin-top: 10px;
+   float: left;
+}
+dl {
+   font-size: 0.85em;
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   margin: 10px 0 15px 25px;
+   padding-bottom: 15px;
+   display: inline-grid;
+   grid-template-columns: max-content 2fr;
+   grid-column-gap: 10px;
+}
+dt {
+   font-weight: bold;
+   text-align: right;
+}
+dd {
+   margin: 0 0 5px 0;
+}
+.item >>> .cnt {
+   font-size: 0.8em;
+   font-style: italic;
 }
 </style>

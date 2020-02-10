@@ -126,29 +126,6 @@ export default {
          } else if(this.$store.getters['restore/hasPreviousSearch']) {
            this.restorePreviousSearch()
          }
-
-         // Journals: if journal param present, it will be the journal title
-         // do an advanced search in journals only for that title
-          let prior = this.rawQueryString
-         let journalTitle = this.$route.query.journal
-         if ( journalTitle ) {
-            // Update query to be a journal title search matching the param.
-            // Do the search only if the new query is different from prior.
-            this.$store.commit("preferences/clear")
-            this.sources.forEach( src=> {
-               if (src.id != "journals") {
-                  this.$store.commit("preferences/toggleExcludePool", src.url)
-               }
-            })
-            this.$store.commit("query/setTitleSearch", journalTitle)
-            if ( prior != this.rawQueryString) {
-               this.$store.commit('query/setLastSearch', this.rawQueryString)
-               this.$store.commit('filters/reset')
-               this.$store.commit('resetOtherSourceSelection')
-               this.$store.dispatch("searchAllPools")
-            }
-            return
-         }
       },
 
       async restoreSavedSearch( token ) {

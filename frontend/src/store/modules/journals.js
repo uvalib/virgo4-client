@@ -33,15 +33,22 @@ const journals = {
 
    },
    actions: {
-      searchJournals(ctx) {
+      async searchJournals(ctx) {
          ctx.commit("setSearching", true)
          let q = ctx.state.query
-         axios.get(`/api/journals/browse?title=${q}`).then((response) => {
+         try {
+            let response = await axios.get(`/api/journals/browse?title=${q}`)
+            let titles = []
+            response.data.forEach( res => {
+               titles.push(res.title)
+            })
+            let data = {titles: titles}
+            let details = await axios.post(`/api/journals/`, data)
+            ctx.commit("setTitleResults", details.data)
             ctx.commit("setSearching", false)
-            ctx.commit("setTitleResults", response.data)
-         }).catch((error) => {
+         } catch (error) {
             ctx.commit('system/setError', error, { root: true })
-         })
+         }
       }
    }
 }

@@ -168,7 +168,6 @@ export default {
 }
 div.title, div.footer {
    padding: 0px 8px;
-   text-align: right;
    cursor: pointer;
    margin: 0;
    background: #f5f5f5;
