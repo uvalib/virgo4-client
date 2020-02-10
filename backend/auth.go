@@ -188,7 +188,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	log.Printf("%s passed pin check", auth.Barcode)
 	resp.SignedIn = true
 
-	// Generate new auth token and ersist in v4 user storage
+	// Generate new auth token and persist in v4 user storage
 	authToken := xid.New().String()
 	err = svc.updateAccessToken(auth.Barcode, authToken, "user")
 	if err != nil {

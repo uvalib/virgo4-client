@@ -14,7 +14,7 @@ const user = {
       checkouts: [],
       bills: [],
       requests: [],
-      searches: [], 
+      searches: [],
       lookingUp: false,
       authTriesLeft: 5,
       authMessage: "",
@@ -26,6 +26,9 @@ const user = {
          if (getters.hasAccountInfo == false ) return false
          if ( state.sessionType == "netbadge") return false
          return true
+      },
+      isAdmin: (state) => {
+        return (state.role == 'admin')
       },
       isCommunityUser: (state, getters) => {
          if (getters.hasAccountInfo == false ) return false
@@ -188,6 +191,7 @@ const user = {
          state.accountInfo = {}
          state.authTriesLeft = 5
          state.authMessage = ""
+         state.role = ""
          state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
          state.bills.splice(0, state.bills.length)

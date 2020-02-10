@@ -6,21 +6,30 @@
       <template v-else>
          <template v-if="availability.items.length">
             <h2>Availability</h2>
+            <p>{{alertText}}</p>
             <table class="fields">
                <thead>
                   <tr>
                      <th v-for="(column, idx) in availability.columns" :key="idx">
                         {{column}}
                      </th>
+                     <th></th>
+                     <th></th>
                   </tr>
                </thead>
 
                <tr v-for="(item,idx) in availability.items" :key="idx">
                   <td class="value" v-for="(field, id) in visibleFields(item)" :key="id">
                      {{field.value}}
-                  <span class="notice" v-if="(id == visibleFields(item).length - 1) && (item.notice)">
-                     <AvailabilityNotice v-bind:message="item.notice" />
-                  </span>
+                  </td>
+                  <td>
+                    <span class="notice" v-if="item.notice">
+                       <AvailabilityNotice v-bind:message="item.notice" />
+                    </span>
+                  </td>
+                  <td>
+                    <PlaceHoldButton v-if="isAdmin"
+                      :titleId="titleId" :barcode="item.barcode" />
                   </td>
                </tr>
             </table>
@@ -33,16 +42,19 @@
 import { mapGetters } from "vuex"
 import AvailabilityNotice from "@/components/popovers/AvailabilityNotice"
 import V4Spinner from "@/components/V4Spinner"
+import PlaceHoldButton from "@/components/requests/PlaceHoldButton"
 export default {
   components: {
-    AvailabilityNotice, V4Spinner
+    AvailabilityNotice, V4Spinner, PlaceHoldButton
   },
    props: {
       titleId: String
    },
    computed: {
       ...mapGetters({
-         availability : 'item/availability'
+         availability: 'item/availability',
+         isAdmin: 'user/isAdmin',
+         alertText: 'requests/alertText',
       }),
    },
    methods: {

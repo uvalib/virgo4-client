@@ -63,6 +63,8 @@ func main() {
 		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 
+		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
+
 		bookmarks := api.Group("/users/:uid/bookmarks")
 		{
 			bookmarks.POST("/move", svc.AuthMiddleware, svc.MoveBookmarks)

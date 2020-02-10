@@ -14,6 +14,7 @@ import preferences from './modules/preferences'
 import journals from './modules/journals'
 import feedback from './modules/feedback'
 import restore from './modules/restore'
+import requests from './modules/requests'
 import * as utils from './modules/utils'
 import { getField, updateField } from 'vuex-map-fields'
 
@@ -329,6 +330,7 @@ export default new Vuex.Store({
     user: user,
     feedback: feedback,
     restore: restore,
+    requests: requests,
   },
 
   plugins: [versionChecker]
