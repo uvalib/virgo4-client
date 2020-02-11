@@ -26,13 +26,13 @@ func (svc *ServiceContext) Authorize(c *gin.Context) {
 // NetBadge authentication.
 func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	log.Printf("Checking authentication headers...")
-	log.Printf("Dump all request headers ==================================")
-	for name, values := range c.Request.Header {
-		for _, value := range values {
-			log.Printf("%s=%s\n", name, value)
-		}
-	}
-	log.Printf("END header dump ===========================================")
+	// log.Printf("Dump all request headers ==================================")
+	// for name, values := range c.Request.Header {
+	// 	for _, value := range values {
+	// 		log.Printf("%s=%s\n", name, value)
+	// 	}
+	// }
+	// log.Printf("END header dump ===========================================")
 
 	computingID := c.GetHeader("remote_user")
 	if svc.Dev.AuthUser != "" {
@@ -108,7 +108,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	if err != nil {
 		log.Printf("User %s does not exist, creating...", auth.Barcode)
 		user := V4User{ID: 0, Virgo4ID: auth.Barcode, AuthToken: xid.New().String(),
-			AuthTries: 0, LockedOut: false, SignedIn: false, Preferences: "{}"}
+			AuthTries: 0, LockedOut: false, SignedIn: false, Preferences: "{}", Role: "user"}
 		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 		if err != nil {
 			log.Printf("Unable to create new user record %+v", err)
