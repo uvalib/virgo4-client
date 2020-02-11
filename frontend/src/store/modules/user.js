@@ -339,6 +339,7 @@ const user = {
             ctx.commit("setSignedInUser", {userId: response.data.barcode, 
                token: ctx.state.authToken, type: "public", role: "user", quiet: false} )
             ctx.commit('setAuthorizing', false)
+            router.push("/signedin")
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)
             ctx.commit('setAuthFailure', error)

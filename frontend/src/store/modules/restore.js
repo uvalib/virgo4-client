@@ -15,10 +15,13 @@ const restore = {
    getters: {
      getField,
      previousPath: state => {
-       if( state.previousPath == '/signedout' ){
-         return null
+       let ignoredPaths = ['/signedout','/signin']
+       let redirectPath = state.searchData.previousPath
+       if( !state.searchData || !redirectPath
+         || ignoredPaths.includes(redirectPath) ){
+         return '/account'
        }
-       return state.previousPath
+       return state.searchData.previousPath
      },
      bookmarkData: state => {
        return {
@@ -107,6 +110,7 @@ const restore = {
         searchData.poolName = rootGetters['selectedResults'].pool.id
 
         searchData.previousPath = fromPath
+
         searchData.pools = rootGetters['pools/sortedList']
         searchData.numPools = searchData.pools.length
         searchData.resultsIdx = rootGetters['selectedResultsIdx']
