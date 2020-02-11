@@ -15,7 +15,7 @@ import (
 func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	// HoldRequest contains data for a new Hold
 	type HoldRequest struct {
-		TitleId string `json:"titleId"`
+		TitleID string `json:"titleId"`
 		Barcode string `json:"barcode"`
 	}
 	var holdReq HoldRequest
@@ -27,11 +27,11 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	}
 
 	authToken := c.GetString("token")
-	var userId string
+	var userID string
 	uq := svc.DB.NewQuery("select virgo4_id from users where auth_token={:t} and signed_in={:si}")
 	uq.Bind(dbx.Params{"t": authToken})
 	uq.Bind(dbx.Params{"si": true})
-	uErr := uq.Row(&userId)
+	uErr := uq.Row(&userID)
 	if uErr != nil {
 		log.Printf("Hold Request couldn't locate auth user: %s", uErr.Error())
 		c.String(http.StatusNotFound, "%s not found", authToken)
@@ -41,9 +41,9 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	log.Printf("POSTing Hold to ILS connector")
 	values := url.Values{}
 
-	values.Add("title_key", holdReq.TitleId)
+	values.Add("title_key", holdReq.TitleID)
 	values.Add("barcode", holdReq.Barcode)
-	values.Add("user_id", userId)
+	values.Add("user_id", userID)
 	values.Add("pickup_library", "CLEMONS")
 
 	createHoldURL := fmt.Sprintf("%s/v4/holds", svc.ILSAPI)
