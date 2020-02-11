@@ -114,6 +114,15 @@ const filters = {
             return
          }
 
+         // remove any filters that are no longer present in the facet list
+         tgtFilter.forEach( (filter,idx,filters) => {
+            if ( filter.id == "FacetAvailability") return
+            let existIdx = data.facets.findIndex( facet => facet.id == filter.id )
+            if (existIdx == -1) {
+               filters.splice(idx, 1);
+            }
+         })
+
          data.facets.forEach( function(facet) {
             // Availability is global and handled differently; skip it
             if ( facet.id == "FacetAvailability") return
@@ -124,7 +133,7 @@ const filters = {
             }
 
             // first add any facets that are part of the filter
-            tgtFilter.filter(f => f.facet_id == facet.id).forEach( af=> {
+            tgtFilter.filter(filter => filter.facet_id == facet.id).forEach( af=> {
                facetInfo.buckets.push( {value: af.value, count: -1} )  
             })
 
