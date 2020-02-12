@@ -70,13 +70,6 @@
             <template v-else>
                <div v-if="!lookingUp" class="none">You currently have no outstanding requests</div>
             </template>
-            <transition
-               name="message-transition"
-               enter-active-class="animated faster fadeIn"
-               leave-active-class="animated faster fadeOut"
-            >
-               <p v-if="error" class="error">{{ error }}</p>
-            </transition>
          </div>
       </div>
    </div>
@@ -95,7 +88,6 @@ export default {
       ...mapState({
          requests: state => state.user.requests,
          lookingUp: state => state.user.lookingUp,
-         error: state => state.system.error
       })
    },
    methods: {

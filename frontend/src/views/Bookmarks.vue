@@ -118,13 +118,6 @@
                   >Create</span>
                </div>
             </div>
-            <transition
-               name="message-transition"
-               enter-active-class="animated faster fadeIn"
-               leave-active-class="animated faster fadeOut"
-            >
-               <p v-if="error" class="error">{{ error }}</p>
-            </transition>
          </div>
       </div>
    </div>
@@ -161,7 +154,6 @@ export default {
    computed: {
       ...mapState({
          lookingUp: state => state.bookmarks.searching,
-         error: state => state.system.error
       }),
       ...mapGetters({
          hasBookmarks: "bookmarks/hasBookmarks",
@@ -421,9 +413,6 @@ i.details {
 .create-folder label {
    font-weight: bold;
    margin-right: 10px;
-}
-p.error {
-   margin-bottom: 15px;
 }
 .public {
    cursor: pointer;

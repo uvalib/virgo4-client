@@ -3,11 +3,6 @@
       <h1>Browse <span class="browse-type">{{type}}</span></h1>
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="true" />
       <div class="browse-content">
-         <transition name="message-transition"
-            enter-active-class="animated faster fadeIn"
-            leave-active-class="animated faster fadeOut">
-         <p v-if="error" class="error">{{ error }}</p>
-         </transition>
          <div class="target">{{this.$route.query.q}}</div>
          <SearchResults v-if="hasResults" v-bind:showSummary="false"/>
       </div>
@@ -29,8 +24,6 @@ export default {
    },
    computed: {
       ...mapState({
-         fatal: state => state.system.fatal,
-         error: state => state.system.error,
          searching: state => state.searching,
       }),
       ...mapGetters({
@@ -81,12 +74,5 @@ export default {
 }
 div.target {
    font-size: 1.4em;
-}
-p.fatal, p.error {
-  font-weight: bold;
-  margin: 0;
-  color: var(--color-error);
-  opacity: 1;
-  visibility: visible;
 }
 </style>

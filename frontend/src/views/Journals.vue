@@ -55,13 +55,6 @@
             </ol>
          </div>
       </div>
-      <transition
-         name="message-transition"
-         enter-active-class="animated faster fadeIn"
-         leave-active-class="animated faster fadeOut"
-      >
-         <p v-if="error" class="error">{{ error }}</p>
-      </transition>
    </div>
 </template>
 
@@ -77,7 +70,6 @@ export default {
    },
    computed: {
       ...mapState({
-         error: state => state.system.error,
          searching: state => state.journals.searching,
          titles: state => state.journals.titles,
          browseTotal: state => state.journals.browseTotal
@@ -145,13 +137,6 @@ export default {
 }
 .controls > * {
    flex: 0 1 auto;
-}
-p.error {
-   font-weight: bold;
-   margin: 0;
-   color: var(--color-error);
-   opacity: 1;
-   visibility: visible;
 }
 .search-journals-panel {
    margin: 0 auto 0 auto;

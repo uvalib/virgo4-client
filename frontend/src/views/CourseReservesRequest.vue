@@ -113,11 +113,6 @@
                </table>
             </div>
          </div>
-         <transition name="message-transition"
-            enter-active-class="animated faster fadeIn"
-            leave-active-class="animated faster fadeOut">
-         <p v-if="error" class="error">{{ error }}</p>
-      </transition>
          <div class="controls">
             <router-link to="/">
                <span class="pure-button pure-button-tertiary">Cancel Request</span>
@@ -143,7 +138,6 @@ export default {
    computed: {
       ...mapState({
          requestList: state => state.reserves.requestList,
-         error: state=> state.system.error,
          searching: state => state.searching,
       }),
       ...mapFields('reserves',[

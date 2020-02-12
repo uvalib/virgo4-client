@@ -123,11 +123,6 @@
             </div>
             <V4Privacy style="margin-bottom:25px;"/>
          </template>
-         <transition name="message-transition"
-                     enter-active-class="animated faster fadeIn"
-                     leave-active-class="animated faster fadeOut">
-            <p v-if="error" class="error">Unable to retrieve account information: {{ error }}</p>
-         </transition>
       </div>
    </div>
 </template>
@@ -156,7 +151,6 @@ export default {
          info: state => state.user.accountInfo,
          lookingUp: state => state.user.lookingUp,
          bills: state => state.user.bills,
-         error: state => state.system.error,
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
@@ -301,8 +295,5 @@ div.notes p {
    .standing-info {
       width: 90%;
    }
-}
-.error {
-   text-align: center;
 }
 </style>

@@ -43,11 +43,6 @@
                   You currently have no items checked out
                </div>
             </template>
-            <transition name="message-transition"
-                        enter-active-class="animated faster fadeIn"
-                        leave-active-class="animated faster fadeOut">
-               <p v-if="error" class="error">{{ error }}</p>
-            </transition>
          </div>
       </div>
    </div>
@@ -67,7 +62,6 @@ export default {
       ...mapState({
          checkouts: state => state.user.checkouts,
          lookingUp: state => state.user.lookingUp,
-         error: state => state.system.error,
       }),
       ...mapGetters({
         sortedCheckouts: 'user/sortedCheckouts',

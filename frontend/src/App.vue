@@ -29,6 +29,11 @@
             <div class="msg">A new version of Virgo is available.</div>
             <span @click="updateClicked" class="pure-button pure-button-primary">Update Now</span>
          </div>
+         <transition name="message-transition"
+            enter-active-class="animated faster fadeIn"
+            leave-active-class="animated faster fadeOut">
+            <p v-if="error" class="error">{{ error }}</p>
+         </transition>
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
    </div>
@@ -64,6 +69,7 @@ export default {
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
+         error: state => state.system.error,
          newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
          sessionExpired: state => state.system.sessionExpired,
@@ -379,7 +385,7 @@ div.v-popover.inline {
 }
 .error {
    font-weight: bold;
-   margin: 0;
+   margin: 15px 0;
    color: var(--uvalib-red-emergency);
    opacity: 1;
    visibility: visible;

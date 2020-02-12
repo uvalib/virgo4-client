@@ -34,11 +34,6 @@
                   </div>
                </div>
             </div>
-            <transition name="message-transition"
-                        enter-active-class="animated faster fadeIn"
-                        leave-active-class="animated faster fadeOut">
-               <p v-if="error" class="error">Unable to retrieve bookmarks: {{ error }}</p>
-            </transition>
          </div>
       </div>
    </div>
@@ -59,7 +54,6 @@ export default {
          lookingUpPools : state => state.pools.lookingUp,
          lookingUpAccount : state => state.user.lookingUp,
          searchAPI: state => state.system.searchAPI,
-         error: state => state.system.error,
       }),
       ...mapGetters({
          isPoolExcluded: "preferences/isPoolExcluded",

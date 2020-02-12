@@ -42,11 +42,6 @@
       <transition name="message-transition"
           enter-active-class="animated faster fadeIn"
           leave-active-class="animated faster fadeOut">
-        <p v-if="error" class="error">{{ error }}</p>
-      </transition>
-      <transition name="message-transition"
-          enter-active-class="animated faster fadeIn"
-          leave-active-class="animated faster fadeOut">
         <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
@@ -74,11 +69,7 @@ export default {
    },
    computed: {
       ...mapState({
-         fatal: state => state.system.fatal,
-         error: state => state.system.error,
-         showDebug: state => state.showDebug,
          searching: state => state.searching,
-         showWarn: state => state.showWarn,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
          restoreMessage: state => state.query.restoreMessage,
@@ -89,7 +80,6 @@ export default {
         hasTranslateMessage: 'system/hasTranslateMessage',
         isSignedIn: 'user/isSignedIn',
         sources: 'pools/sortedList',
-        hasFilter: 'filters/hasFilter',
         selectedResults: 'selectedResults',
       }),
       ...mapFields('query',[
@@ -263,13 +253,6 @@ export default {
 h2 {
   margin-top:30px;
   color: #444;
-}
-p.fatal, p.error {
-  font-weight: bold;
-  margin: 0;
-  color: var(--color-error);
-  opacity: 1;
-  visibility: visible;
 }
 .search-panel {
   margin: 0 auto 0 auto;

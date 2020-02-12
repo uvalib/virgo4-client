@@ -160,7 +160,7 @@ const reserves = {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
          }).catch((_error) => {
-            ctx.commit('system/setError', "Sirsi system erro", { root: true })
+            ctx.commit('system/setError', "Sirsi system error", { root: true })
             ctx.commit('setNoMatch', true)
             ctx.commit('setSearching', false, { root: true })
          })

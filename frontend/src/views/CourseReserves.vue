@@ -18,10 +18,7 @@
             </div>
          </div>
          <template v-if="!searching && totalReserves > -1">
-            <div class="error" v-if="error">
-               Sirsi System error
-            </div>
-            <div class="no-match" v-else-if="totalReserves == 0">
+            <div class="no-match" v-if="totalReserves == 0">
                No course reserves that match your request were found
             </div>
             <template v-else>
@@ -62,7 +59,6 @@ export default {
       ...mapState({
          totalReserves: state => state.reserves.totalReserves,
          hasMore: state => state.reserves.hasMore,
-         error: state => state.system.error,
          searching: state => state.searching,
       }),
       ...mapGetters({
