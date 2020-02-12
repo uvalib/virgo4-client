@@ -49,6 +49,14 @@ const pools = {
          if (!attr) return true
          return attr.supported
       },
+      courseReserveSupport: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return true
+         let attr = pool.attributes.find( a=> a.name=='course_reserves')
+         if (!attr) return true
+         return attr.supported
+      },
    },
 
    mutations: {

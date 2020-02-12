@@ -42,7 +42,7 @@
                   </tr>
                </table>
             </div>
-            <AvailabilityTable v-if="details.has_availability != false" :titleId="details.identifier" />
+            <AvailabilityTable v-if="hasAvailability" :titleId="details.identifier" />
          </template>
       </div>
    </div>
@@ -66,7 +66,11 @@ export default {
       ...mapGetters({
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
+         isUVA: 'pools/isUVA',
       }),
+      hasAvailability() {
+         return this.isUVA(this.details.source)
+      },
       notFound() {
          return this.details.identifier.length == 0
       },
