@@ -176,12 +176,17 @@ div.title, div.footer {
    flex-flow: row nowrap;
    align-content: center;
    justify-content: space-between;
+   position: relative;
 }
 div.title, div.footer {
    background: white;
 }
 div.title.narrow {
    justify-content: flex-start;
+}
+div.title.wide i {
+   position: absolute;
+   right: 10px;
 }
 .title .text {
    padding-right: 5px;

@@ -45,11 +45,9 @@
                         <dd>{{i.format.join(", ")}}</dd>
                         <dt>Availability:</dt> 
                         <dd>{{i.availability}}</dd>
-                        <template v-for="(u,uidx) in i.url">
-                           <dt :key="uidx">Online Access:</dt> 
-                           <dd :key="u">
-                              <a :href="u" target="_blank">{{u}}</a>
-                           </dd>
+                        <template  v-if="i.url">
+                           <dt>Online Access:</dt> 
+                           <dd v-html="urlList(i)"></dd>
                         </template>
                      </dl>
                   </AccordionContent>
@@ -84,12 +82,19 @@ export default {
          titles: state => state.journals.titles,
          browseTotal: state => state.journals.browseTotal
       }),
-      ...mapFields("journals", ["query"])
+      ...mapFields("journals", ["query"]),
    },
    data: function() {
       return {};
    },
    methods: {
+      urlList(item) {
+         let out = []
+         item.url.forEach( u=> {
+            out.push(`<a :href="${u}" target="_blank">${u}</a>`)
+         })
+         return out.join(" | ")
+      },
       itemTitle(item) {
          let title = ""
          if (item.items.length == 1) {
@@ -246,13 +251,16 @@ div.note {
    float: left;
 }
 dl {
+   border-bottom: 1px solid var(--uvalib-grey-lightest);
    font-size: 0.85em;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   margin: 10px 0 15px 25px;
+   margin: 10px 0 15px 0;
    padding-bottom: 15px;
    display: inline-grid;
    grid-template-columns: max-content 2fr;
    grid-column-gap: 10px;
+}
+dl:last-child {
+ border-bottom:0;  
 }
 dt {
    font-weight: bold;
@@ -260,6 +268,10 @@ dt {
 }
 dd {
    margin: 0 0 5px 0;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
 }
 .item >>> .cnt {
    font-size: 0.8em;
