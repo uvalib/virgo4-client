@@ -31,16 +31,6 @@ const filters = {
          return  state.poolFacets[idx]
       },
 
-      hasFacets: (state) => (idx) => {
-         if ( idx == -1 || idx >= state.poolFacets.length) {
-            return false
-         }
-         if (state.poolFacets[idx].length == 1 && state.poolFacets[idx][0].id == "NotSupported")  {
-            return false
-         }
-         return true
-      },
-
       hasFilter: (state) => (idx) => {
          if (idx < 0) return false
          if ( state.globalAvailability.id != "any" ) return true
@@ -107,10 +97,9 @@ const filters = {
          let tgtFilter = state.poolFilters[data.poolResultsIdx]
          tgtFacets.splice(0, tgtFacets.length)
          
-         // If facets are not handled by a pool, the value here will be false 
-         // Handle it by placing a special NotSupported facet as the only entry
-         if (data.facets === false ) {
-            tgtFacets.push( {id: "NotSupported", name: "NotSupported", buckets: []} )
+         // If there are no facets, wipe out all filters and bail
+         if (data.facets === false || data.facets.length == 0) {
+            tgtFilter.splice(0, tgtFilter.length)
             return
          }
 
@@ -242,6 +231,11 @@ const filters = {
          // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
          let pool = ctx.rootState.results[resultsIdx].pool
+         if (!ctx.rootGetters['pools/facetSupport'](pool.id)) {
+            // this pool doesn't support facets; nothing more to do
+            return
+         }
+
          let filters = ctx.getters.poolFilter(resultsIdx)
          let filterObj = {pool_id: pool.id, facets: filters}
          

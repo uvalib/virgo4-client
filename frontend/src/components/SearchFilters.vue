@@ -1,6 +1,6 @@
 <template>
    <div class="filters">
-      <template v-if="updatingFacets == false && hasFacets(resultsIdx) == false">
+      <template v-if="hasFacets == false">
          <div class="no filters-head clearfix">
             <span class="title">
                <i class="warn fas fa-exclamation-triangle"></i>
@@ -42,8 +42,11 @@ export default {
          hasFilter: 'filters/hasFilter',
          allFilters: 'filters/poolFilter',
          selectedResults: 'selectedResults',
-         hasFacets: 'filters/hasFacets'
+         facetSupport: 'pools/facetSupport'
       }),
+      hasFacets() {
+         return this.facetSupport(this.selectedResults.pool.id)
+      },
       total() {
          return this.selectedResults.total
       },

@@ -5,10 +5,10 @@
             {{selectedResults.pool.description}}
          </div>
          <div v-if="hasLogo" class="source-logo">
-            <a v-if="selectedResults.pool.external_url" :href="selectedResults.pool.external_url" target="_blank">
-               <img class ="pure-img" :src="selectedResults.pool.logo_url">
+            <a v-if="hasURL" :href="poolExtURL(selectedResults.pool.id)" target="_blank">
+               <img class ="pure-img" :src="poolLogo(selectedResults.pool.id)">
             </a>
-             <img v-else class ="pure-img" :src="selectedResults.pool.logo_url">
+             <img v-else class ="pure-img" :src="poolLogo(selectedResults.pool.id)">
          </div>
          <SearchFilters />
       </div>
@@ -56,9 +56,14 @@ export default {
       ...mapGetters({
          selectedResults: 'selectedResults',
          hasMoreHits: 'hasMoreHits',
+         poolLogo: 'pools/logo',
+         poolExtURL: 'pools/externalURL',
       }),
       hasLogo() {
-         return this.selectedResults.pool.logo_url
+         return this.poolLogo(this.selectedResults.pool.id) != ""
+      },
+      hasURL() {
+         return this.poolExtURL(this.selectedResults.pool.id) != ""
       }
    },
    watch: {

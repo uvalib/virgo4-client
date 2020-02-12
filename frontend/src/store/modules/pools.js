@@ -15,6 +15,40 @@ const pools = {
             return 0
          })
       },
+      facetSupport: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return true
+         let attr = pool.attributes.find( a=> a.name=='facets')
+         if (!attr) return true
+         return attr.supported
+      },
+      logo: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return ""
+         if (!pool.attributes) return ""
+         let attr = pool.attributes.find( a=> a.name=='logo_url')
+         if (!attr) return ""
+         if (attr.supported == false) return "" 
+         return attr.value
+      },
+      externalURL: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return ""
+         if (!pool.attributes) return ""
+         let attr = pool.attributes.find( a=> a.name=='external_url')
+         if (!attr) return ""
+         if (attr.supported == false) return "" 
+         return attr.value
+      },
+      isUVA: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return true
+         let attr = pool.attributes.find( a=> a.name=='uva_ils')
+         if (!attr) return true
+         return attr.supported
+      },
    },
 
    mutations: {

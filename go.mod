@@ -1,6 +1,6 @@
 module github.com/uvalib/virgo4-client
 
-go 1.12
+go 1.13
 
 require (
 	github.com/gin-contrib/cors v1.3.0
