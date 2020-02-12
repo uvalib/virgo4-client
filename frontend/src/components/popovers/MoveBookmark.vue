@@ -3,7 +3,7 @@
       <span class="trigger pure-button pure-button-primary">Move</span>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
-            <span>Bookmark Folder</span>
+            <span>Move Bookmarks</span>
          </div>
          <template v-if="bookmarks.length == 0">
             <div class="message pure-form">

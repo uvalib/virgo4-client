@@ -15,7 +15,7 @@
             <div class="session-message">
                <div class="bar">
                   <span>Notice</span>
-                  <i @click="dismissSession" v-close-popover class="close fas fa-times-circle"></i>
+                  <i @click="dismissSession" class="close fas fa-times-circle"></i>
                </div>
                <div class="message-body">
                   Your Virgo session has expired.<br/>Click 
@@ -32,7 +32,17 @@
          <transition name="message-transition"
             enter-active-class="animated faster fadeIn"
             leave-active-class="animated faster fadeOut">
-            <p v-if="error" class="error">{{ error }}</p>
+            <div v-if="error" class="error">
+               <div class="error-message">
+                  <div class="bar">
+                     <span>Error</span>
+                     <i @click="dismissError" class="close fas fa-times-circle"></i>
+                  </div>
+                  <div class="error-body">
+                     {{error}}
+                  </div>
+               </div>
+            </div>
          </transition>
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
@@ -86,6 +96,9 @@ export default {
    methods: {
       dismissSession() {
          this.$store.commit("system/clearSessionExpired")
+      },
+      dismissError() {
+         this.$store.commit("system/setError", "")
       },
       updateClicked() {
           window.location.reload(true)
@@ -383,14 +396,6 @@ div.v-popover.inline {
    opacity: 1;
    text-decoration: underline;
 }
-.error {
-   font-weight: bold;
-   margin: 15px 0;
-   color: var(--uvalib-red-emergency);
-   opacity: 1;
-   visibility: visible;
-   text-align: center;
-}
 .update-pop {
    position: fixed;
    z-index: 5000;
@@ -423,6 +428,7 @@ div.session .bar {
    background-color: var(--uvalib-brand-blue-light);
    color: white;
    font-weight: bold;
+   text-align: left;
 }
 div.session i {
    float:right;
@@ -439,6 +445,47 @@ div.session-message {
    background: white;
    padding: 0px;
    border: 2px solid var(--uvalib-brand-blue-light);
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+div.error {
+   position: fixed;
+   left: 0; 
+   right: 0;
+   z-index: 5000;
+   top: 30%;
+}
+div.error .bar {
+   padding: 5px;
+   background-color: var(--uvalib-red-emergency);
+   color: white;
+   font-weight: bold;
+   text-align: left;
+}
+div.error i.close {
+   float:right;
+   font-size: 1.3em;
+   cursor: pointer;
+   margin-left: 10px;
+}
+div.error .message-body {
+   padding: 10px 15px;
+}
+.error-body {
+   text-align: center;
+   margin: 10px 15px;
+   font-weight: normal;
+   color: var(--uvalib-red-emergency);
+   opacity: 1;
+   visibility: visible;
+   text-align: center;
+}
+div.error-message {
+   display: inline-block;
+   text-align: center;
+   background: white;
+   padding: 0px;
+   border: 2px solid var(--uvalib-red-emergency);
    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 </style>

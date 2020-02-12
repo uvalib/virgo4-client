@@ -79,9 +79,6 @@ const system = {
             // likely just a string error; just set it
             state.error = error
          }
-         if (error != "" ) {
-            setTimeout(() => {  state.error = "" }, 10000)
-         }
       },
 
       setConfig(state, cfg) {

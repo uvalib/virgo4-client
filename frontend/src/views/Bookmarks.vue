@@ -236,15 +236,16 @@ export default {
          this.$store.commit("system/setError", "")
       },
       createFolder() {
-         if (this.submitting) return;
-         this.submitting = true;
+         if (this.submitting) return
+         this.submitting = true
          this.$store.commit("system/setError", "")
          if (this.newFolder == "") {
             this.$store.commit(
                "system/setError",
                "A new folder name is required"
-            );
-            return;
+            )
+            this.submitting = false
+            return
          }
          this.$store.dispatch("bookmarks/addFolder", this.newFolder).then(() => {
             this.createOpen = false
