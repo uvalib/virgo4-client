@@ -91,10 +91,16 @@ export default {
    },
    methods: {
       itemTitle(item) {
+         let title = ""
          if (item.items.length == 1) {
-            return item.title
+            title =  item.title
+         } else {
+            title = `${item.title} <span class='cnt'>(${item.items.length} items)</span>`
          }
-         return `${item.title} <span class='cnt'>(${item.items.length} items)</span>`
+         if (item.alt_titles) {
+            title += `<span class='alt-titles'><b>Alternate Titles:</b> ${item.alt_titles.join(' | ')}</span>`
+         }
+         return title
       },
       itemURL(item) {
          return "/sources/journals/items/"+item.id
@@ -258,5 +264,11 @@ dd {
 .item >>> .cnt {
    font-size: 0.8em;
    font-style: italic;
+}
+.item >>> .alt-titles {
+   font-size: 0.85em;
+   display: block;
+   margin-top: 2px;
+   color: var(--uvalib-grey);
 }
 </style>

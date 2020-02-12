@@ -31,8 +31,9 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 		Availability string   `json:"availability"`
 	}
 	type Journal struct {
-		Title string `json:"title"`
-		Items []Item `json:"items"`
+		Title     string   `json:"title"`
+		AltTitles []string `json:"alt_titles,omitempty"`
+		Items     []Item   `json:"items"`
 	}
 	out := make([]Journal, 0)
 
@@ -52,6 +53,7 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 				Docs []struct {
 					ID           string   `json:"id"`
 					Title        []string `json:"full_title_a"`
+					AltTitles    []string `json:"journal_title_addnl_a"`
 					Published    []string `json:"published_a"`
 					URLSupp      []string `json:"url_supp_a"`
 					URL          []string `json:"url_a"`
@@ -66,9 +68,10 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 			continue
 		}
 
-		journal := Journal{Title: title, Items: make([]Item, 0)}
+		journal := Journal{Title: title, AltTitles: make([]string, 0), Items: make([]Item, 0)}
 		docs := parsed.Response.Docs
 		for _, doc := range docs {
+			journal.AltTitles = append(journal.AltTitles, doc.AltTitles...)
 			urls := make([]string, 0)
 			urls = append(urls, doc.URL...)
 			urls = append(urls, doc.URLSupp...)
@@ -77,6 +80,7 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 			if item.Availability == "Online" {
 				item.URL = urls
 			}
+			journal.AltTitles = unique(journal.AltTitles)
 			journal.Items = append(journal.Items, item)
 		}
 
@@ -84,6 +88,18 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, out)
+}
+
+func unique(values []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range values {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
 
 func getValue(raw []string) string {
