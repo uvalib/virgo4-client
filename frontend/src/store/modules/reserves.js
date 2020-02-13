@@ -27,6 +27,10 @@ const reserves = {
 
    getters: {
       getField,
+      getInvalidReserveItems: state => {
+         let out =  state.requestList.filter( r => r.valid == false)
+         return out
+      },
       hasCourseResults: state => {
          return state.searchType.includes("COURSE") && state.courseReserves.length > 0
       },
@@ -37,6 +41,12 @@ const reserves = {
 
    mutations: {
       updateField,
+      markInvalidReserveItem(state, idx) {
+         // change the value in place, but this doesn't let view know that
+         // the array has changed. Reassigning the list with the updated items will.
+         state.requestList[idx].valid = false
+         state.requestList = [...state.requestList]
+      },
       updateReservedItemsPeriod(state) {
          state.requestList.forEach(item => {
             item.period = state.request.period
@@ -47,6 +57,7 @@ const reserves = {
          state.requestList.forEach(item => {
             item.period = ""
             item.notes = ""
+            item.valid = true
          });
          state.request = {onBehalfOf: "no",
             instructorName: "",
@@ -95,6 +106,30 @@ const reserves = {
    }, 
 
    actions: {
+      async validateReservesRequest(ctx) {
+         // This could be called from a refresh or bookmark; make sure needed data is present
+         if (ctx.rootState.system.searchAPI == "") {
+            await ctx.dispatch("system/getConfig", null, {root:true})
+            await ctx.dispatch("pools/getPools", null, {root:true})
+         }
+         // pools define the ability to make a course reserve.
+         // this information is readily availble without an extra API request
+         // validate those first
+         let ok = true
+         ctx.state.requestList.forEach( (item,idx) => {
+            let tgtPool = item.pool 
+            if (ctx.rootGetters["pools/courseReserveSupport"](tgtPool)==false) {
+               ok = false
+               ctx.commit("markInvalidReserveItem", idx)
+            }
+         })
+
+         // if any failed the simple reserveable check, return now
+         if (ok == false) {
+            return
+         }
+
+      },
       createReserves(ctx) {
          ctx.commit('setSearching', true, { root: true })
          let v4UserID = ctx.rootState.user.signedInUser

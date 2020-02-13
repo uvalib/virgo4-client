@@ -38,9 +38,7 @@
                      <span>Error</span>
                      <i @click="dismissError" class="close fas fa-times-circle"></i>
                   </div>
-                  <div class="error-body">
-                     {{error}}
-                  </div>
+                  <div class="error-body" v-html="error"></div>
                </div>
             </div>
          </transition>
@@ -479,6 +477,10 @@ div.error .message-body {
    opacity: 1;
    visibility: visible;
    text-align: center;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
 }
 div.error-message {
    display: inline-block;
@@ -487,5 +489,15 @@ div.error-message {
    padding: 0px;
    border: 2px solid var(--uvalib-red-emergency);
    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+@media only screen and (min-width: 768px) {
+   div.error-message {
+      max-width: 40%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.error-message {
+      max-width: 95%;
+   }
 }
 </style>
