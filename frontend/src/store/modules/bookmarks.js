@@ -107,10 +107,10 @@ const bookmarks = {
           })
       },
       async getBookmarks(ctx) {
+         ctx.commit('setSearching', true)
          if (ctx.rootGetters["user/hasAccountInfo"] == false) {
             await ctx.dispatch("user/getAccountInfo", null, { root: true })
          }
-         ctx.commit('setSearching', true)
          let v4UID = ctx.rootState.user.signedInUser
          return axios.get(`/api/users/${v4UID}/bookmarks`).then((response) => {
             ctx.commit('setBookmarks', response.data)
