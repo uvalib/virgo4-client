@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
@@ -39,12 +38,16 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	}
 
 	log.Printf("POSTing Hold to ILS connector")
-	values := url.Values{}
-
-	values.Add("title_key", holdReq.TitleID)
-	values.Add("barcode", holdReq.Barcode)
-	values.Add("user_id", userID)
-	values.Add("pickup_library", "CLEMONS")
+	var values struct {
+		TitleKey      string `json:"title_key"`
+		Barcode       string `json:"barcode"`
+		UserID        string `json:"user_id"`
+		PickupLibrary string `json:"pickup_library"`
+	}
+	values.TitleKey = holdReq.TitleID
+	values.Barcode = holdReq.Barcode
+	values.UserID = userID
+	values.PickupLibrary = "CLEMONS"
 
 	createHoldURL := fmt.Sprintf("%s/v4/holds", svc.ILSAPI)
 	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, values)

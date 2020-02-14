@@ -91,13 +91,8 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 		return
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
-
-	values := url.Values{}
-	values.Add("current_pin", qp.CurrPin)
-	values.Add("new_pin", qp.NewPin)
-
 	pinURL := fmt.Sprintf("%s/v4/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
-	_, ilsErr := svc.ILSConnectorPost(pinURL, values)
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp)
 	if ilsErr != nil {
 		log.Printf("User %s pin change failed", qp.UserBarcode)
 		c.String(ilsErr.StatusCode, ilsErr.Message)

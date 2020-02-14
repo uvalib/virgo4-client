@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/smtp"
 	"net/url"
-	"sort"
 	"strings"
 	"text/template"
 
@@ -56,15 +55,36 @@ type RequestItem struct {
 	Notes        string `json:"notes"`
 }
 
-// var emailMap = map[string]string{"astr": "Sci Resv",
-// 	"brown":   "Sci Resv",
-// 	"math":    "Sci Resv",
-// 	"clem":    "Clemons Resv",
-// 	"arts":    "Fine Arts Resv",
-// 	"law":     "Law Resv",
-// 	"music":   "Music Resv",
-// 	"physics": "Physics Resv",
-// }
+// ValidateCourseReserves accepts an array of catalog keys and sends them off to the
+// LIS connector for validation.
+func (svc *ServiceContext) ValidateCourseReserves(c *gin.Context) {
+	var req struct {
+		Items []string `json:"items"`
+	}
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: Unable to parse request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	log.Printf("Validate %v", req.Items)
+
+	// values := url.Values{"items": req.Items}
+	url := fmt.Sprintf("%s/v4/course_reserves/validate", svc.ILSAPI)
+	bodyBytes, ilsErr := svc.ILSConnectorPost(url, req)
+	if ilsErr != nil {
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	var resp interface{}
+	if err := json.Unmarshal(bodyBytes, &resp); err != nil {
+		log.Printf("ERROR: unable to parse reserve search: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+}
 
 // CreateCourseReserves accepts a POST to create reserves for a course. Sends emails
 // to user and staff that will create the reserves
@@ -127,28 +147,6 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, "Reserve email sent")
-}
-
-// GetReserveDesks gets a list of locations where course reserves are held
-func (svc *ServiceContext) GetReserveDesks(c *gin.Context) {
-	log.Printf("Get reserve desks from ILS Connector...")
-	url := fmt.Sprintf("%s/v4/course_reserves/desks", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(url)
-	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
-		return
-	}
-	var desks []Desk
-	if err := json.Unmarshal(bodyBytes, &desks); err != nil {
-		log.Printf("ERROR: unable to parse reserve desks: %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-	desks = append(desks, Desk{ID: "ALL", Name: "ANY"})
-	sort.Slice(desks, func(i, j int) bool {
-		return desks[i].Name < desks[j].Name
-	})
-	c.JSON(http.StatusOK, desks)
 }
 
 // SearchReserves will search for reservations on the specified course.
