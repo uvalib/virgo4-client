@@ -7,7 +7,8 @@
         <V4Spinner message="Loading preferences..."/>
       </div>
       <div v-else>
-        <ExcludedPools />
+        <ExcludedPools class="section"/>
+        <PickupLibrary class="section"/>
       </div>
     </div>
   </div>
@@ -18,11 +19,12 @@
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import ExcludedPools from "@/components/preferences/ExcludedPools"
+import PickupLibrary from "@/components/preferences/PickupLibrary"
 import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "preferences",
    components: {
-      AccountActivities, V4Spinner, ExcludedPools
+      AccountActivities, V4Spinner, ExcludedPools, PickupLibrary
    },
    computed: {
       ...mapState({
@@ -47,11 +49,6 @@ export default {
 }
 </script>
 <style scoped>
-.pools {
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: center;
-}
 .preferences {
    min-height: 400px;
    position: relative;
@@ -79,74 +76,8 @@ export default {
        width: 95%;
    }
 }
-div.pool {
-   text-align: left;
-   padding: 0;
-   border-radius: 5px;
-   margin: 5px;
-   width: 400px;
-   display: inline-block;
-   font-size: 0.9em;
-}
-div.pool.excluded {
-   opacity: 0.7;
-}
-div.pool.excluded div.name {
-   background: #aaa;
-}
-div.name {
-   color: white;
-   background: var(--color-brand-blue);
-   padding: 6px 8px;
-   border-radius: 5px 5px 0 0;
-}
-div.description {
-   padding: 15px;
-   border-right: 1px solid #ccc;
-   border-left: 1px solid #ccc;
-   margin:0;
-   font-size: 0.8em;
-}
-div.source-controls {
-   font-size: 0.85em;
-   padding: 5px;
-   border: 1px solid #ccc;
-   background-color: #f5f5f5;
-   border-radius: 0 0 5px 5px;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
-   justify-content: space-between;
-}
-div.toggle {
-   cursor: pointer;
-}
-i.fas.selected {
-   color: var(--color-pale-blue);
-   margin-left: 10px;
-   cursor: pointer;
-   font-size: 1.25em;
-   position: relative;
-   top: 2px;
-}
-i.far.excluded {
-   color: #999;
-   margin-left: 10px;
-   cursor: pointer;
-   font-size: 1.25em;
-   position: relative;
-   top: 2px;
-}
-i.far.fa-star {
-   margin-right: 10px;
-   color: #999;
-   cursor: pointer;
-   font-size: 1.15em;
-}
-i.fas.fa-star {
-   color: gold;
-   margin-right: 10px;
-   cursor: pointer;
-   font-size: 1.15em;
+.section {
+   margin: 10px;
+   border: 1px solid black;
 }
 </style>

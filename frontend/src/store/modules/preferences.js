@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
+import { getField, updateField } from 'vuex-map-fields'
 
 const preferences = {
    namespaced: true,
@@ -8,9 +9,11 @@ const preferences = {
       targetPoolURL: "",
       excludePoolURLs: [],
       trackingOptOut: false,
+      pickupLibrary: "",
    },
 
    getters: {
+     getField,
       isTargetPool: state => poolURL => {
          return state.targetPoolURL == poolURL
       },
@@ -26,6 +29,10 @@ const preferences = {
    },
 
    mutations: {
+      updateField,
+      setPickupLibrary(state, lib){
+         state.pickupLibrary = lib
+      },
       toggleOptOut(state) {
          state.trackingOptOut = !state.trackingOptOut
          if ( state.trackingOptOut ) {
@@ -35,7 +42,7 @@ const preferences = {
             Vue.$cookies.remove("v4_optout")
          }
          router.go()
-      }, 
+      },
       setPreferences(state, prefsStr) {
          state.targetPoolURL = ""
          state.excludePoolURLs = []
@@ -49,12 +56,15 @@ const preferences = {
                state.excludePoolURLs = json.excludePoolURLs
             }
             if ( json.trackingOptOut) {
-               state.trackingOptOut  = json.trackingOptOut 
+               state.trackingOptOut  = json.trackingOptOut
                let optOutCookie = Vue.$cookies.get('v4_optout')
                if ( state.trackingOptOut && !optOutCookie) {
                   let data = {v4_opt_out: true}
-                  Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString()) 
+                  Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
                }
+            }
+            if (json.pickupLibrary ) {
+               state.pickupLibrary = json.pickupLibrary
             }
          } catch(e) {
             // NOOP; just leave preferences unset
@@ -100,9 +110,10 @@ const preferences = {
       },
       savePreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
-         let data = {targetPoolURL: ctx.state.targetPoolURL, 
-            excludePoolURLs: ctx.state.excludePoolURLs, 
-            trackingOptOut: ctx.state.trackingOptOut
+         let data = {targetPoolURL: ctx.state.targetPoolURL,
+            excludePoolURLs: ctx.state.excludePoolURLs,
+            trackingOptOut: ctx.state.trackingOptOut,
+            pickupLibrary: ctx.state.pickupLibrary,
          }
          axios.post(url, data)
       }

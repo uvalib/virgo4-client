@@ -6,7 +6,6 @@ const restore = {
      previousPath: null,
      searchData: null,
 
-
      // Record used for scrolling to bookmark
      recordId: null,
      groupParent: null,
