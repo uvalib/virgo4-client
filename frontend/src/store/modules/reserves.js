@@ -116,8 +116,10 @@ const reserves = {
          // this information is readily availble without an extra API request
          // validate those first
          let ok = true
+         let itemIds = []
          ctx.state.requestList.forEach( (item,idx) => {
             let tgtPool = item.pool 
+            itemIds.push(item.identifier)
             if (ctx.rootGetters["pools/courseReserveSupport"](tgtPool)==false) {
                ok = false
                ctx.commit("markInvalidReserveItem", idx)
@@ -128,6 +130,18 @@ const reserves = {
          if (ok == false) {
             return
          }
+         ctx.commit('setSearching', true, { root: true })
+         return axios.post(`/api/reserves/validate`, {items: itemIds}).then((response) => {
+            response.data.forEach( (item, idx) => {
+               if (item.reserve == false) {
+                  ctx.commit("markInvalidReserveItem", idx)   
+               }
+            })
+            ctx.commit('setSearching', false, { root: true })
+         }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setSearching', false, { root: true })
+         })
 
       },
       createReserves(ctx) {
@@ -152,10 +166,10 @@ const reserves = {
             ctx.commit('clearRequestList')
             ctx.commit('setSearching', false, { root: true })
             router.push("/reserved")
-          }).catch((error) => {
+         }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })
-          })
+         })
       },
       nextPage(ctx) {
          if (ctx.state.hasMore == false ) {

@@ -68,9 +68,7 @@ func (svc *ServiceContext) ValidateCourseReserves(c *gin.Context) {
 		return
 	}
 
-	log.Printf("Validate %v", req.Items)
-
-	// values := url.Values{"items": req.Items}
+	log.Printf("Validate course reserve items %v", req.Items)
 	url := fmt.Sprintf("%s/v4/course_reserves/validate", svc.ILSAPI)
 	bodyBytes, ilsErr := svc.ILSConnectorPost(url, req)
 	if ilsErr != nil {

@@ -114,7 +114,7 @@
             </div>
          </div>
          <div class="controls">
-            <router-link to="/">
+            <router-link to="/bookmarks">
                <span class="pure-button pure-button-tertiary">Cancel Request</span>
             </router-link>
             <span @click="submitRequest" class="pure-button pure-button-primary">

@@ -3,12 +3,13 @@
       <h1>My Account</h1>
       <div class="bookmarks-content">
          <AccountActivities />
-         <div class="working" v-if="lookingUp">
+         <div class="working" v-if="lookingUpBookmarks">
             <V4Spinner message="Looking up bookmark information..."/>
          </div>
          <div v-else>
             <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
             <template v-else>
+               <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
                <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
                   <AccordionContent
                      class="boxed"
@@ -153,7 +154,8 @@ export default {
    },
    computed: {
       ...mapState({
-         lookingUp: state => state.bookmarks.searching,
+         lookingUpBookmarks: state => state.bookmarks.searching,
+         working: state => state.searching,
       }),
       ...mapGetters({
          hasBookmarks: "bookmarks/hasBookmarks",
@@ -214,7 +216,7 @@ export default {
          // Set the list, and validate that all items in the list are able to be reserved
          this.$store.commit("reserves/setRequestList", items)
          await this.$store.dispatch("reserves/validateReservesRequest")
-         if (this.invalidReserves) {
+         if (this.invalidReserves.length > 0) {
             let msg = "The following items cannot be placed on course reserve: "
             msg += "<ul style='text-align:left;'>"
             this.invalidReserves.forEach( r => {
