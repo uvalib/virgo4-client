@@ -19,3 +19,5 @@ dev_db.sh
 dev_connect.sh
 local_db.sh
 to_aws.sh
+frontend/yarn_start.sh
+.vscode/tasks.json
