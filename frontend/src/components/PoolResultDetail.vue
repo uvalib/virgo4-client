@@ -13,7 +13,12 @@
          <SearchFilters />
       </div>
       <div class="hits">
-         <div class="hits-content">
+         <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
+            <li v-for="(hit,idx) in selectedResults.hits" class="image hit-wrapper" :key="idx">
+               <ImageSearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
+            </li>
+         </ul>
+         <div v-else class="hits-content">
             <div v-for="(hit,idx) in selectedResults.hits" class="hit-wrapper" :key="idx">
                <SearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
             </div>
@@ -33,12 +38,13 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
+import ImageSearchHit from "@/components/ImageSearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import ScrollToTop from "@/components/ScrollToTop"
 import V4Spinner from "@/components/V4Spinner"
 export default {
    components: {
-      SearchHit, SearchFilters, ScrollToTop, V4Spinner
+      ImageSearchHit, SearchHit, SearchFilters, ScrollToTop, V4Spinner
    },
    data: function() {
       return {
@@ -114,6 +120,24 @@ div.results-header {
 .hits-content {
    text-align: left;
    margin: 20px 0;
+}
+.image.hits-content {
+   text-align: left;
+   margin: 20px 0;
+   height: 100%;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: center;
+   align-items: flex-start;
+   align-content: flex-start;
+   list-style: none;
+   padding:0;
+   margin:0;
+}
+.image.hit-wrapper {
+    box-shadow: none;
+    margin:0;
+    padding:0;
 }
 .hit-wrapper {
    margin: 0 5px 20px 5px;
