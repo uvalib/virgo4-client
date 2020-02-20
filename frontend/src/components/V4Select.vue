@@ -14,7 +14,7 @@
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div class="options" v-if="expanded" v-bind:class="{right: alignment=='right', left: alignment=='left'}"
-            :style="{ 'background-color': background, color: color, 'border': optborder }">
+            :style="{ 'border': optborder }">
             <div v-for="src in selections" @click="optionClicked(src)"
                :class="{disabled: src.disabled}" class="option"
                :key="src.id"  v-html="src.name"></div>
@@ -203,7 +203,7 @@ export default {
   color: var(--uvalib-text-dark);
 }
 .v4-select .option.disabled {
-  background-color:  initial;
+  background-color:  white;
   cursor: default;
   color: var(--uvalib-grey-light);
 }

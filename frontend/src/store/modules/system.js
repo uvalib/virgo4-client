@@ -14,6 +14,7 @@ const system = {
       translateMessage: "",
       sessionExpired: false,
       displayWidth: window.innerWidth,
+      showWelcome: true
    },
 
    getters: {
@@ -26,7 +27,9 @@ const system = {
    },
 
    mutations: {
-
+      setShowWelcome(state, flag) {
+         state.showWelcome = flag
+      },
       newVersionDetected(state) {
          state.newVersion = true
       },

@@ -110,10 +110,10 @@ export default {
       },
       doAdvancedSearch() {
          if (this.queryEntered) {
-            // this is a new search, reset filters
+            // this is a new search, reset everything
+            this.$store.commit('resetSearchResults')
             this.$store.commit('query/setLastSearch', this.rawQueryString)
             this.$store.commit('filters/reset')
-            this.$store.commit('resetOtherSourceSelection')
             this.$store.dispatch("searchAllPools")
          } else {
             this.$store.commit(

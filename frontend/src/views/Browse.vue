@@ -48,9 +48,9 @@ export default {
          this.$store.commit("query/setSubjectSearch", targetQ)
          let newQ = this.rawQueryString
          if ( newQ != prior ) {
+            this.$store.commit('resetSearchResults')
             this.$store.commit('query/setLastSearch', newQ)
             this.$store.commit('filters/reset')
-            this.$store.commit('resetOtherSourceSelection')
             this.$store.dispatch("searchAllPools")
          }
       },

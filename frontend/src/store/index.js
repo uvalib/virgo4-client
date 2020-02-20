@@ -95,9 +95,6 @@ export default new Vuex.Store({
         state.searching = flag
       }
     },
-    resetOtherSourceSelection(state) {
-      state.otherSrcSelection = {id: "", name: ""}
-    },
     updateOtherPoolLabel(state) {
       // when a pool is selected from the 'Other' tab and a filter has been applied
       // this method method is used to update the count in the tab label
@@ -203,6 +200,8 @@ export default new Vuex.Store({
       })
 
       state.selectedResultsIdx = 0
+      state.otherSrcSelection = {id: "", name: ""}
+
       state.total = results.total_hits
     },
 
@@ -215,6 +214,7 @@ export default new Vuex.Store({
       state.results.splice(0, state.results.length)
       state.total = -1
       state.selectedResultsIdx = -1
+      state.otherSrcSelection = {id: "", name: ""}
     },
   },
 
@@ -268,6 +268,7 @@ export default new Vuex.Store({
       commit('filters/setUpdatingFacets', true)
       let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
       return axios.post(url, req).then((response) => {
+        commit('system/setShowWelcome', false)
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)

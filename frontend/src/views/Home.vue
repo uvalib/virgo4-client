@@ -45,7 +45,7 @@
         <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
-      <Welcome  v-else-if="!isRestore && basicSearch"  />
+      <Welcome  v-else-if="!isRestore && showWelcome && basicSearch"  />
    </div>
 </template>
 
@@ -73,6 +73,7 @@ export default {
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
          restoreMessage: state => state.query.restoreMessage,
+         showWelcome: state => state.system.showWelcome
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
@@ -187,9 +188,9 @@ export default {
       },
 
       searchClicked() {
+        this.$store.commit('resetSearchResults')
         this.$store.commit('query/setLastSearch', this.rawQueryString)
         this.$store.commit('filters/reset')
-        this.$store.commit('resetOtherSourceSelection')
         this.$store.dispatch("searchAllPools")
       },
 
