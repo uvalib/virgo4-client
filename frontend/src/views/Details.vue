@@ -45,7 +45,8 @@
                      <td class="image">
                         
                         <div class="img-view clearfix" v-viewer="{
-                           inline: false,backdrop:true, navbar:false, button:true, title:false, toolbar:false}"
+                           inline: false, backdrop:true, navbar:false, button:true, title:false, 
+                           toolbar:false, loop: false, fullScreen: false}"
                         >
                            <img :src="imageURL" class="pure-img thumb">
                            <p class="hint">Click image to zoom</p>

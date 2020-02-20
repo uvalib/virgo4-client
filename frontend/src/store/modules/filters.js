@@ -183,6 +183,7 @@ const filters = {
          // should be used as they preserve responsiveness...
          // https://vuejs.org/v2/guide/list.html#Array-Change-Detection
          let numPools = state.poolFacets.length
+         state.globalAvailability = {id: "any", name: "Any"}
          state.poolFacets.splice(0, state.poolFacets.length)
          state.poolFilters.splice(0, state.poolFilters.length)
          for (let i=0; i<numPools; i++) {
