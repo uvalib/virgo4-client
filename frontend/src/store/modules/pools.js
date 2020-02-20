@@ -8,6 +8,9 @@ const pools = {
    },
 
    getters: {
+      poolDetails: state => id => {
+         return state.list.find( p => p.id == id)
+      },
       sortedList: state => {
          return state.list.sort( (a,b) => {
             if (a.name < b.name) return -1 

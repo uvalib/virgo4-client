@@ -40,6 +40,18 @@
                         <td v-else class="value" v-html="fieldValueString(field)"></td>
                      </template>
                   </tr>
+                  <tr v-if="poolMode=='image'">
+                     <td class="label top">Image:</td> 
+                     <td class="image">
+                        
+                        <div class="img-view clearfix" v-viewer="{
+                           inline: false,backdrop:true, navbar:false, button:true, title:false, toolbar:false}"
+                        >
+                           <img :src="imageURL" class="pure-img thumb">
+                           <p class="hint">Click image to zoom</p>
+                        </div>
+                     </td>
+                  </tr>
                </table>
             </div>
             <AvailabilityTable v-if="hasAvailability" :titleId="details.identifier" />
@@ -54,6 +66,7 @@ import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import AvailabilityTable from "@/components/AvailabilityTable"
 import V4Spinner from "@/components/V4Spinner"
+
 export default {
    name: "sources",
    components: {
@@ -67,7 +80,12 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
+         poolDetails: 'pools/poolDetails'
       }),
+      poolMode() {
+         let details = this.poolDetails(this.details.source)
+         return details.mode
+      },
       hasAvailability() {
          return this.isUVA(this.details.source)
       },
@@ -77,14 +95,22 @@ export default {
       allFields() {
          return [...this.details.basicFields.concat(this.details.detailFields)]
       },
+      imageURL() {
+         let iiifField = this.allFields.find( f => f.type=="iiif-base-url")
+         return [`${iiifField.value}/full/1500,/0/default.jpg`]
+      },
+      manifestURL() {
+         let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
+         return iiifField.value
+      },
    },
    methods: {
       getSubjectLink(subj) {
          return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
-         if (field.display == 'optional') return false
-         if ( this.isKiosk && field.type == "url") return false
+         if (field.display == 'optional' || field.type=="iiif-manifest-url" || field.type=="iiif-base-url") return false
+         if ( this.isKiosk && field.type == "url" || field.type=="iiif-manifest-ur") return false
          return true
       },
       fieldValueString( field ) {
@@ -120,7 +146,7 @@ export default {
             this.$store.dispatch("bookmarks/getBookmarks")
          }
       }
-   }
+   },
 }
 </script>
 <style scoped>
@@ -181,7 +207,10 @@ td.label {
    width:1%;
    white-space: nowrap;
 }
-table td.value {
+td.label.top {
+   vertical-align: top;
+}
+table td.value, table td.image {
    width: 100%;
    font-weight: normal;
    text-align: left;
@@ -191,11 +220,39 @@ table td.value {
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
    hyphens: auto;
+   text-align: left;
 }
 .bookmark-container {
    float:left;
 }
 .sep {
    margin: 0 5px;
+}
+div.img-view {
+   text-align: left;
+   display: inline-block
+}
+p.hint {
+   margin: 0;
+   text-align: center;
+   font-size: 0.9em;
+   background: var(--uvalib-brand-blue-light);
+   padding: 5px;
+   color: white;
+   font-weight: bold;
+   border-top: 1px solid var(--uvalib-grey-darkest);
+   box-sizing: border-box;
+}
+img.pure-img.thumb {
+   border: 1px solid var(--uvalib-grey);
+   box-sizing: border-box;
+}
+img.pure-img.thumb:hover {
+   cursor:pointer;
+}
+@media only screen and (min-width: 768px) {
+   img.pure-img.thumb,p.hint {
+      max-width: 70%;
+   }
 }
 </style>
