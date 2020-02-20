@@ -50,6 +50,7 @@
                         >
                            <img :src="imageURL" class="pure-img thumb">
                         </div>
+                        
                         <div class="img-toolbar">
                            <span class="hint">Click image to zoom</span>
                            <span class="iiif">
@@ -120,7 +121,7 @@ export default {
       },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type=="iiif-manifest-url" || field.type=="iiif-base-url") return false
-         if ( this.isKiosk && field.type == "url" || field.type=="iiif-manifest-ur") return false
+         if ( this.isKiosk && field.type == "url" || field.type=="iiif-manifest-url") return false
          return true
       },
       fieldValueString( field ) {

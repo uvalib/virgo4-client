@@ -1,7 +1,10 @@
 <template>
-   <router-link class="img-link" :to="detailsURL">
+   <div class="image-container">
+      <router-link class="img-link" :to="detailsURL">
          <img :src="iiifURL(hit)">
-   </router-link>
+         <div class="group-cnt" v-if="hit.grouped">{{hit.count}} images</div>
+      </router-link>
+   </div>
 </template>
 
 <script>
@@ -43,14 +46,31 @@ export default {
    margin: 3px;
    display: inline-block;
 }
-.img-link:hover {
-   box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
-   position: relative;
-   top: -2px;
-}
 img {
    border: 0;
    padding: 0;
    margin: 0 0 -4px 0;
+}
+.image-container {
+   position: relative;
+   margin:0;
+   padding:0;
+}
+.img-link:hover {
+   box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+}
+.image-container:hover {
+   top: -2px;
+}
+.group-cnt {
+   position: absolute;
+   background: white;
+   padding: 2px 8px;
+   border-radius: 10px;
+   bottom: 8px;
+   right: 8px;
+   font-size: 0.8em;
+   color: var(--uvalib-text);
+   border: 1px solid var(--uvalib-grey-dark);
 }
 </style>
