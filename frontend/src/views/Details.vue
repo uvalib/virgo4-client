@@ -49,7 +49,15 @@
                            toolbar:false, loop: false, fullScreen: false}"
                         >
                            <img :src="imageURL" class="pure-img thumb">
-                           <p class="hint">Click image to zoom</p>
+                        </div>
+                        <div class="img-toolbar">
+                           <span class="hint">Click image to zoom</span>
+                           <span class="iiif">
+                              <a :href="manifestURL" target="_blank">
+                                 <img src="../assets/iiif_icon.png"/>
+                              </a>
+                              <IIIFInfo style="display:inline-block;margin-left: 10px;"/>
+                           </span>
                         </div>
                      </td>
                   </tr>
@@ -67,11 +75,12 @@ import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import AvailabilityTable from "@/components/AvailabilityTable"
 import V4Spinner from "@/components/V4Spinner"
+import IIIFInfo from "@/components/popovers/IIIFInfo"
 
 export default {
    name: "sources",
    components: {
-      SearchHitHeader, AvailabilityTable, V4Spinner
+      SearchHitHeader, AvailabilityTable, V4Spinner, IIIFInfo
    },
    computed: {
       ...mapState({
@@ -229,19 +238,26 @@ table td.value, table td.image {
 .sep {
    margin: 0 5px;
 }
+.iiif {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+}
 div.img-view {
    text-align: left;
    display: inline-block
 }
-p.hint {
-   margin: 0;
-   text-align: center;
+div.img-toolbar {
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: space-between;
+   padding: 5px 0;
+   box-sizing: border-box;
+}
+span.hint {
    font-size: 0.9em;
-   background: var(--uvalib-brand-blue-light);
    padding: 5px;
-   color: white;
    font-weight: bold;
-   border-top: 1px solid var(--uvalib-grey-darkest);
    box-sizing: border-box;
 }
 img.pure-img.thumb {
@@ -252,7 +268,7 @@ img.pure-img.thumb:hover {
    cursor:pointer;
 }
 @media only screen and (min-width: 768px) {
-   img.pure-img.thumb,p.hint {
+   img.pure-img.thumb,div.img-toolbar {
       max-width: 70%;
    }
 }
