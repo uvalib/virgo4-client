@@ -327,8 +327,12 @@ img.thumb {
    box-sizing: border-box;
 }
 img.thumb.small {
-   max-width: 200px;
-   max-height: 200px;
+   background-image: url('~@/assets/spinner2.gif');
+   background-repeat:no-repeat;
+   background-position: center center;
+   min-width: 175px;
+   min-height: 175px;
+   background-color: var(--uvalib-grey-lightest);
 }
 img.thumb:hover {
    cursor:pointer;

@@ -50,6 +50,12 @@ img {
    border: 0;
    padding: 0;
    margin: 0 0 -4px 0;
+   min-width: 175px;
+   min-height: 175px;
+   background-color: var(--uvalib-grey-lightest);
+   background-image: url('~@/assets/spinner2.gif');
+   background-repeat:no-repeat;
+   background-position: center center;
 }
 .image-container {
    position: relative;
