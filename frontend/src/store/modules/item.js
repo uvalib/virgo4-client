@@ -4,7 +4,7 @@ import * as utils from './utils'
 const item = {
    namespaced: true,
    state: {
-      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[]},
+      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[]},
       availability: {searching: true, titleId: '', columns: [], items: []}
    },
 
@@ -19,14 +19,14 @@ const item = {
    },
 
    mutations: {
-      setDetails(state, {source, fields}) {
-         utils.preProcessHitFields( [fields] )
-         fields.source = source
-         state.details = fields
+      setDetails(state, {source, details}) {
+         utils.preProcessHitFields( [details] )
+         details.source = source
+         state.details = details
          state.details.searching = false
       },
       clearDetails(state) {
-         state.details = {searching: true, source: "", identifier:"", basicFields:[], detailFields:[]}
+         state.details = {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[]}
       },
       setAvailability(state, {titleId, response}) {
         state.availability.titleId = titleId
@@ -90,7 +90,8 @@ const item = {
 
          let url = baseURL + "/api/resource/" + identifier
          axios.get(url).then((response) => {
-            ctx.commit("setDetails", {source:source, fields: response.data})
+            let details = response.data
+            ctx.commit("setDetails", {source:source, details: details})
          }).catch((error) => {
            ctx.commit('clearSearching')
            ctx.commit('system/setError', error, { root: true })

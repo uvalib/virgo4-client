@@ -44,22 +44,45 @@
                      <td class="label top">Image:</td> 
                      <td class="image">
                         
-                        <div class="img-view clearfix" v-viewer="{
-                           inline: false, backdrop:true, navbar:false, button:true, title:false, 
-                           toolbar:false, loop: false, fullScreen: false}"
-                        >
-                           <img :src="imageURL" class="pure-img thumb">
-                        </div>
+                        <template v-if="isGrouped">
+                           <viewer :images="details.related" class="img-view" ref="viewer" :options="viewerOpts">
+                              <template slot-scope="scope">
+                                 <template  v-for="(r,idx) in scope.images">
+                                    <div class="thumb-wrap" :key="`w${idx}`">
+                                       <img :src="relatedImageURL(r,'thumb')" :data-src="relatedImageURL(r,'full')" 
+                                          class="thumb small" >
+                                       <div class="thumb-toolbar">
+                                         <span class="iiif-small">
+                                             <a :href="manifestURL" target="_blank">
+                                                <span class="iiif-icon"></span>
+                                             </a>
+                                          </span>
+                                       </div>
+                                    </div>
+                                 </template>
+                                 <div class="iiif-help">
+                                    <span>What is IIIF</span>
+                                    <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
+                                 </div>
+                              </template>
+                           </viewer>
+                        </template>
+
+                        <template v-else>
+                           <viewer class="img-view large" ref="viewer" :options="viewerOpts">
+                              <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
+                           </viewer>
                         
-                        <div class="img-toolbar">
-                           <span class="hint">Click image to zoom</span>
-                           <span class="iiif">
-                              <a :href="manifestURL" target="_blank">
-                                 <img src="../assets/iiif_icon.png"/>
-                              </a>
-                              <IIIFInfo style="display:inline-block;margin-left: 10px;"/>
-                           </span>
-                        </div>
+                           <div class="img-toolbar">
+                              <span class="hint">Click image to zoom</span>
+                              <span class="iiif">
+                                 <a :href="manifestURL" target="_blank">
+                                    <img src="../assets/iiif_icon.png"/>
+                                 </a>
+                                 <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
+                              </span>
+                           </div>
+                        </template>
                      </td>
                   </tr>
                </table>
@@ -80,6 +103,16 @@ import IIIFInfo from "@/components/popovers/IIIFInfo"
 
 export default {
    name: "sources",
+   data: function() {
+      return {
+         viewerOpts: {
+            title: false, url: 'data-src', inline: false,
+            backdrop:true, navbar:false, button:true,
+            toolbar:false, loop: false, fullScreen: true,
+            zIndex: 9999
+         }
+      };
+   },
    components: {
       SearchHitHeader, AvailabilityTable, V4Spinner, IIIFInfo
    },
@@ -106,22 +139,39 @@ export default {
       allFields() {
          return [...this.details.basicFields.concat(this.details.detailFields)]
       },
-      imageURL() {
-         let iiifField = this.allFields.find( f => f.type=="iiif-base-url")
-         return [`${iiifField.value}/full/1500,/0/default.jpg`]
-      },
       manifestURL() {
          let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
          return iiifField.value
       },
+      isGrouped() {
+         return this.details.related && this.details.related.length > 1
+      }
    },
    methods: {
+      imageURL(size) {
+         let iiifField = this.allFields.find( f => f.type=="iiif-base-url")
+         if ( size == 'full') {
+            return [`${iiifField.value}/full/2000,/0/default.jpg`]
+         }
+         if ( size == 'med') {
+            return [`${iiifField.value}/full/750,/0/default.jpg`]
+         }
+         return [`${iiifField.value}/square/200,200/0/default.jpg`]
+      },
+      relatedImageURL( rel, size ) {
+         let baseURL = rel['iiif_base_url']
+         if (size == 'full') {
+            return [`${baseURL}/full/1200,/0/default.jpg`]
+         }
+         return [`${baseURL}/square/175,175/0/default.jpg`]
+      },
       getSubjectLink(subj) {
          return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.type=="iiif-manifest-url" || field.type=="iiif-base-url") return false
-         if ( this.isKiosk && field.type == "url" || field.type=="iiif-manifest-url") return false
+         if (field.display == 'optional' || field.type=="iiif-manifest-url" || 
+            field.type=="iiif-base-url" || field.type=="iiif-base-url") return false
+         if ( this.isKiosk && field.type == "url" || field.type=="iiif-image-url") return false
          return true
       },
       fieldValueString( field ) {
@@ -246,7 +296,9 @@ table td.value, table td.image {
 }
 div.img-view {
    text-align: left;
-   display: inline-block
+   display: inline-block;
+   position: relative;
+   vertical-align: top;
 }
 div.img-toolbar {
    display: flex;
@@ -255,21 +307,48 @@ div.img-toolbar {
    padding: 5px 0;
    box-sizing: border-box;
 }
+.thumb-wrap {
+   display: inline-block;
+   border: 1px solid var( --uvalib-grey-light);
+   margin: 5px;
+   padding: 5px 5px 0 5px;
+   border-radius: 5px;
+}
+.thumb-wrap  img {
+   border-radius: 5px;
+}
 span.hint {
    font-size: 0.9em;
    padding: 5px;
-   font-weight: bold;
    box-sizing: border-box;
 }
-img.pure-img.thumb {
+img.thumb {
    border: 1px solid var(--uvalib-grey);
    box-sizing: border-box;
 }
-img.pure-img.thumb:hover {
+img.thumb.small {
+   max-width: 200px;
+   max-height: 200px;
+}
+img.thumb:hover {
    cursor:pointer;
 }
+.iiif-help {
+   margin-top: 5px;
+   font-size: 0.9em;
+}
+.thumb-toolbar {
+   text-align: right;
+}
+.iiif-icon {
+   background-image: url('~@/assets/iiif_icon.png');
+   background-size: contain;
+   display: inline-block;
+   width: 35px;
+   height: 30px;
+}
 @media only screen and (min-width: 768px) {
-   img.pure-img.thumb,div.img-toolbar {
+   div.img-toolbar, .img-view.large {
       max-width: 70%;
    }
 }
