@@ -44,7 +44,7 @@
                      <td class="label top">Image:</td> 
                      <td class="image">
                         
-                        <template v-if="isGrouped">
+                        <template v-if="isGrouped && mode != 'single'">
                            <viewer :images="details.related" class="img-view" ref="viewer" :options="viewerOpts">
                               <template slot-scope="scope">
                                  <template  v-for="(r,idx) in scope.images">
@@ -52,7 +52,10 @@
                                        <img :src="relatedImageURL(r,'thumb')" :data-src="relatedImageURL(r,'full')" 
                                           class="thumb small" >
                                        <div class="thumb-toolbar">
-                                         <span class="iiif-small">
+                                          <router-link class="img-link" :to="detailsURL(r)">
+                                             Details
+                                          </router-link>
+                                          <span class="iiif-small">
                                              <a :href="manifestURL" target="_blank">
                                                 <span class="iiif-icon"></span>
                                              </a>
@@ -110,8 +113,14 @@ export default {
             backdrop:true, navbar:false, button:true,
             toolbar:false, loop: false, fullScreen: true,
             zIndex: 9999
-         }
+         },
+         mode: 'grouped'
       };
+   },
+   watch: {
+      $route() {
+         this.getDetails()
+      }
    },
    components: {
       SearchHitHeader, AvailabilityTable, V4Spinner, IIIFInfo
@@ -148,6 +157,19 @@ export default {
       }
    },
    methods: {
+      getDetails() {
+         this.mode = this.$route.query.mode
+         let src = this.$route.params.src
+         let id= this.$route.params.id
+         if (src == "course-reserves") {
+            this.$store.dispatch("item/lookupCatalogKeyDetail", id )
+         } else {
+            this.$store.dispatch("item/getDetails", {source:src, identifier:id})
+            if ( this.isSignedIn) {
+               this.$store.dispatch("bookmarks/getBookmarks")
+            }
+         }
+      },
       imageURL(size) {
          let iiifField = this.allFields.find( f => f.type=="iiif-base-url")
          if ( size == 'full') {
@@ -157,6 +179,9 @@ export default {
             return [`${iiifField.value}/full/750,/0/default.jpg`]
          }
          return [`${iiifField.value}/square/200,200/0/default.jpg`]
+      },
+      detailsURL( rel ) {
+         return `/sources/${this.details.source}/items/${rel.id}?mode=single`
       },
       relatedImageURL( rel, size ) {
          let baseURL = rel['iiif_base_url']
@@ -197,16 +222,7 @@ export default {
       },
    },
    created() {
-      let src = this.$route.params.src
-      let id= this.$route.params.id
-      if (src == "course-reserves") {
-         this.$store.dispatch("item/lookupCatalogKeyDetail", id )
-      } else {
-         this.$store.dispatch("item/getDetails", {source:src, identifier:id})
-         if ( this.isSignedIn) {
-            this.$store.dispatch("bookmarks/getBookmarks")
-         }
-      }
+      this.getDetails()
    },
 }
 </script>
@@ -342,7 +358,11 @@ img.thumb:hover {
    font-size: 0.9em;
 }
 .thumb-toolbar {
-   text-align: right;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+   justify-content: space-between;
+   font-size: 0.9em;
 }
 .iiif-icon {
    background-image: url('~@/assets/iiif_icon.png');
