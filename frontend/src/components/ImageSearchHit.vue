@@ -1,7 +1,14 @@
 <template>
-   <div class="image-container">
+   <div class="image-container" >
       <router-link class="img-link" :to="detailsURL">
-         <img :src="iiifURL(hit)">
+         <v-popover placement="top-center" class="metadata-info" trigger="hover" >
+            <img class="trigger" :src="iiifURL(hit)">
+            <div class="metadata-popover" slot="popover">
+               <div class="metadata-content">
+                  <div>{{hit.header.title}}</div>
+               </div>
+            </div>
+         </v-popover>
          <div class="group-cnt" v-if="hit.grouped">{{hit.count}} images</div>
       </router-link>
    </div>
@@ -24,9 +31,6 @@ export default {
       ...mapState({
          searching: state => state.searching,
       }),
-      popoverTemplate() {
-         return `<div class="img-popover">${this.hit.header.title}</div>`
-      }
    },
    methods: {
       iiifURL(item) {
@@ -78,5 +82,20 @@ img {
    font-size: 0.8em;
    color: var(--uvalib-text);
    border: 1px solid var(--uvalib-grey-dark);
+}
+
+.metadata-popover {
+   background: white;
+   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   color: var(--uvalib-text);
+   font-size: 0.9em;
+   font-weight: normal;
+   display: inline-block;
+   border-radius: 5px;
+   border: 1px solid var(--uvalib-grey-light);
+   max-width: 250px;
+}
+.metadata-content {
+   padding: 10px;
 }
 </style>

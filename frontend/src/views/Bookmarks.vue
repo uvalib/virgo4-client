@@ -30,12 +30,12 @@
                            <tr>
                               <th colspan="3">
                                  <div class="folder-menu">
-                                    <div>
+                                    <div style="margin-bottom:5px;">
                                        <span @click="selectAll(folderInfo.bookmarks)" class="text-button">select all</span>
                                        <span class="spacer">|</span>
                                         <span @click="clearAll" class="text-button">clear all</span>
                                     </div>
-                                    <div>
+                                    <div class="button-group">
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                                           v-on:move-approved="moveBookmarks"/>
                                        <span @click="removeBookmarks" class="pure-button pure-button-primary">Delete</span>
@@ -290,10 +290,8 @@ div.accordion.boxed div.title {
 }
 .folder-menu {
    display: flex;
-   flex-direction: row;
-   flex-wrap: wrap;
+   flex-flow: row wrap;
    justify-content: space-between;
-   align-content: stretch;
    align-items: flex-start;
 }
 .folder-menu div:nth-child(1) {
@@ -449,5 +447,15 @@ i.details {
     font-weight: normal;
    display: inline-block;
    color: var(--uvalib-grey-dark);
+}
+.folder-menu span.pure-button.pure-button-primary {
+   margin-bottom: 5px;
+   flex-grow: 1;
+}
+.button-group {
+   text-align: right;
+   display: flex;
+   flex-flow: row wrap;
+   margin: 0;
 }
 </style>
