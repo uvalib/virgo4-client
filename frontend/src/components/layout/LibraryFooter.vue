@@ -6,7 +6,7 @@
        ph: (434) 924-3021, fax: (434) 924-1431, <a href="mailto:library@virginia.edu">library@virginia.edu</a>
    </div>
    <div class="external_links">
-       <a href="http://www.library.virginia.edu/staff/">Staff Directory</a> | <a href="http://www.virginia.edu/">U.Va. Home</a> | 
+       <a href="http://www.library.virginia.edu/staff/">Staff Directory</a> | <a href="http://www.virginia.edu/">U.Va. Home</a> |
        <a href="http://its.virginia.edu/">ITS</a><br>
        <template v-if="showFeedbackLinks">
          <a href="mailto:site-feedback@virginia.edu?subject=U.Va.%20Library%20Site%20Feedback&amp;body=Thank%20you%20for%20your%20feedback!%20%20Are%20you%20having%20trouble%20finding%20information%20on%20the%20new%20Library%20site%20or%20have%20you%20encountered%20an%20error?%20Please%20let%20us%20know%20below.%0A%0APage%20you%20were%20on%3A%20https://tracksys.lib.virginia.edu/%0A%0AMy%20feedback%3A%20">Feedback</a>
@@ -19,7 +19,7 @@
     <div class="legal">
        <p class="gov"><a class="fdlp" href="http://guides.lib.virginia.edu/findinggovinfo"><span id="fdlp-badge"></span></a> This library is a Congressionally designated depository for <a href="http://guides.lib.virginia.edu/findinggovinfo">U.S. Government documents</a>. Public access to the Government documents is guaranteed by public law.</p>
        <p class="copy">
-          <span>© {{ new Date().getFullYear() }} by the Rector and Visitors of the 
+          <span>© {{ new Date().getFullYear() }} by the Rector and Visitors of the
              <a href="http://www.virginia.edu/">University of Virginia</a></span>
           <span class="version">&nbsp;-&nbsp;v{{version}}</span>
        </p>
@@ -54,7 +54,7 @@ footer {
    border-bottom: none;
    border-left: none;
    border-right: none;
-   background-color: var(--color-dark-blue);
+   background-color: var(--uvalib-brand-blue);
    color: white;
    padding:20px;
    font-size: 0.9em;

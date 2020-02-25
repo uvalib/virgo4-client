@@ -163,7 +163,7 @@ export default {
 
 <style scoped>
 div.header {
-   background-color: var(--color-dark-blue);
+   background-color: var(--uvalib-brand-blue);
    color: white;
    padding:20px;
    text-align: left;
