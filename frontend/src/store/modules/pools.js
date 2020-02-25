@@ -18,6 +18,14 @@ const pools = {
             return 0
          })
       },
+      hasCoverImages: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return true
+         let attr = pool.attributes.find( a=> a.name=='cover_images')
+         if (!attr) return true
+         return attr.supported
+      },
       facetSupport: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return false

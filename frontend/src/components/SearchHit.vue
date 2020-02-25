@@ -5,7 +5,7 @@
          <div class="basic">
             <div v-if="hit.header.author" class="author">
                <TruncatedText :title="hit.header.author.label" 
-                  :text="hit.header.author.value.join('; ')" :limit="60" />
+                  :text="hit.header.author.value.join('; ')" :limit="truncateLength" />
             </div>
             <dl class="fields">
                <template v-for="(field) in hit.basicFields">
@@ -13,13 +13,13 @@
                      <dt :key="getKey(field,'k')">{{field.label}}:</dt>
                      <dd :key="getKey(field,'v')" >
                         <div v-if="field.type == 'url'" v-html="fieldValueString(field)"></div>
-                        <TruncatedText v-else :title="field.label" :text="fieldValueString(field)" :limit="60" />
+                        <TruncatedText v-else :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" />
                      </dd>
                   </template>
                </template>
             </dl>
          </div>
-         <router-link class="img-link" :to="detailsURL">
+         <router-link v-if="hasCoverImages(pool)" class="img-link" :to="detailsURL">
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
          </router-link>
       </div>
@@ -61,7 +61,12 @@ export default {
       }),
        ...mapGetters({
          isKiosk: "system/isKiosk",
+         hasCoverImages: 'pools/hasCoverImages'
       }),
+      truncateLength() {
+         if ( this.hasCoverImages(this.pool)) return 60
+         return 80
+      }
    },
    methods: {
       getKey(field,idx) {
@@ -134,6 +139,7 @@ a.img-link {
 }
 div.basic {
    padding: 5px 10px 10px 10px;
+   flex-grow: 1;
 }
 .hit {
    width: 100%;
