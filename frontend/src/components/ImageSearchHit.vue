@@ -1,7 +1,13 @@
 <template>
    <div class="image-container" >
+      <div class="toolbar">
+         <span class="short-title">
+            <TruncatedText trigger="hover" :text="hit.header.title" :limit="20" />
+         </span>
+         <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
+      </div>
       <router-link class="img-link" :to="detailsURL">
-         <v-popover placement="top-center" class="metadata-info" trigger="hover" >
+         <v-popover class="metadata-info" trigger="manual" >
             <img class="trigger" :src="iiifURL(hit)">
             <div class="metadata-popover" slot="popover">
                <div class="metadata-content">
@@ -15,6 +21,8 @@
 </template>
 
 <script>
+import BookmarkButton from '@/components/BookmarkButton'
+import TruncatedText from '@/components/TruncatedText'
 import { mapState } from "vuex"
 export default {
    props: {
@@ -23,6 +31,7 @@ export default {
       count: {type: Number, required: true}
    },
    components: {
+      BookmarkButton, TruncatedText
    },
    computed: {
       detailsURL() {
@@ -46,12 +55,11 @@ export default {
 .img-link {
    padding:0;
    background-color: transparent;
-   border: 1px solid var(--uvalib-grey);
-   margin: 3px;
    display: inline-block;
 }
 img {
    border: 0;
+   border-top: 1px solid var(--uvalib-grey);
    padding: 0;
    margin: 0 0 -4px 0;
    min-width: 175px;
@@ -65,12 +73,12 @@ img {
    position: relative;
    margin:0;
    padding:0;
-}
-.img-link:hover {
-   box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+   border: 1px solid var(--uvalib-grey);
+   margin: 3px;
 }
 .image-container:hover {
    top: -2px;
+   box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
 .group-cnt {
    position: absolute;
@@ -97,5 +105,18 @@ img {
 }
 .metadata-content {
    padding: 10px;
+}
+.toolbar {
+   padding: 5px 5px 2px 5px;
+   text-align: left;
+   background: white;
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: space-between;
+   align-items: center;
+}
+.short-title {
+   font-size: 0.85em;
+   flex-grow: 1;
 }
 </style>

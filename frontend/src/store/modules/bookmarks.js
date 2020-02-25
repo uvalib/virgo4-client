@@ -127,7 +127,11 @@ const bookmarks = {
          let data = {folder: folder, pool: bm.pool, identifier: bm.data.identifier}
 
          // required details: title, author, call number, location, library, availability
-         let detail = {title :bm.data.header.title, author: bm.data.header.author.value.join(", ")}
+         let author = "" 
+         if  (bm.data.header.author) {
+            author = bm.data.header.author.value.join(", ")
+         }
+         let detail = {title :bm.data.header.title, author: author}
          detail.callNumber = utils.getFieldValue("call_number", bm.data)
          detail.location = utils.getFieldValue("location", bm.data)
          detail.library = utils.getFieldValue("library", bm.data)

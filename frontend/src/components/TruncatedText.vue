@@ -1,13 +1,15 @@
 <template>
    <div class="truncated-text">
-      <div class="content">
+      <div class="content"  @click="textClicked" @mouseover="mouseOver" @mouseleave="mouseLeave">
          <router-link v-if="tgtURL" :to="tgtURL">
             <div v-html="truncatedText"></div>
          </router-link>
          <div v-else v-html="truncatedText"></div>
       </div>
-      <v-popover v-if="isTruncated" class="full">
-         <i class='trigger click more'>More</i>
+      <v-popover v-if="isTruncated" class="full" :open="showFull">
+         <i v-if="trigger!='click'" class="icon fas fa-chevron-circle-down" 
+            @click="textClicked" @mouseover="mouseOver" @mouseleave="mouseLeave"></i>
+         <i v-else class='trigger click more'>More</i>
          <div class="full-text-popover" slot="popover">
             <div v-if="title" class="popover-header">
                {{title}}
@@ -37,6 +39,15 @@ export default {
       tgtURL: {
          type: String,
          default: ""
+      },
+      trigger: {
+         type: String,
+         default: "click"
+      }
+   },
+   data: function() {
+      return {
+         showFull: false
       }
    },
    computed: {
@@ -52,6 +63,21 @@ export default {
       }
    },
    methods: {
+      textClicked() {
+         if ( this.trigger == "hover") {
+            this.showFull = !this.showFull
+         }
+      }, 
+      mouseOver() {
+         if ( this.trigger == "hover") {
+            this.showFull = true 
+         }
+      },
+      mouseLeave() {
+         if ( this.trigger == "hover") {
+            this.showFull = false 
+         }
+      }
    }
 }
 </script>
@@ -74,6 +100,7 @@ div.popover-header {
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
    hyphens: auto;
+   cursor: default;
 }
 div.full {
    display: inline-block;
@@ -101,9 +128,16 @@ i.trigger.more:hover {
    padding: 10px;
    line-height: 1.5em;
    font-weight: 100;
+
+   max-width: 350px;
 }
 i.close {
    font-size: 1.1em;
    float:right;
+}
+i.icon {
+   font-size: 1.2em;
+   margin-left: 2px;
+   color: var(--uvalib-grey-light);
 }
 </style>
