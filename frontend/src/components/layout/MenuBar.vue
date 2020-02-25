@@ -133,7 +133,7 @@ export default {
 .menu {
    text-align: right;
    padding: 10px;
-   background-color: var(--color-secondary-blue);
+   background-color: var(--uvalib-blue-alt-darkest);
    color: white;
    display: flex;
    flex-flow: row wrap;

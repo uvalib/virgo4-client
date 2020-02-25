@@ -18,8 +18,8 @@
                   <i @click="dismissSession" class="close fas fa-times-circle"></i>
                </div>
                <div class="message-body">
-                  Your Virgo session has expired.<br/>Click 
-                  <router-link to="/signin">here</router-link> 
+                  Your Virgo session has expired.<br/>Click
+                  <router-link to="/signin">here</router-link>
                   to sign in again.
                </div>
             </div>
@@ -144,6 +144,7 @@ export default {
    --uvalib-blue-alt-light: #bfe7f7;
    --uvalib-blue-alt: #007bac;
    --uvalib-blue-alt-dark: #005679;
+   --uvalib-blue-alt-darkest: #141E3C;
 
    --uvalib-teal-lightest: #c8f2f4;
    --uvalib-teal-light: #5bd7de;
@@ -416,7 +417,7 @@ div.v-popover.inline {
 }
 div.session {
    position: fixed;
-   left: 0; 
+   left: 0;
    right: 0;
    z-index: 5000;
    top: 30%;
@@ -448,7 +449,7 @@ div.session-message {
 
 div.error {
    position: fixed;
-   left: 0; 
+   left: 0;
    right: 0;
    z-index: 5000;
    top: 30%;
