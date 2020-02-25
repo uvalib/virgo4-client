@@ -115,21 +115,15 @@ const reserves = {
          // pools define the ability to make a course reserve.
          // this information is readily availble without an extra API request
          // validate those first
-         let ok = true
          let itemIds = []
          ctx.state.requestList.forEach( (item,idx) => {
             let tgtPool = item.pool 
             itemIds.push(item.identifier)
             if (ctx.rootGetters["pools/courseReserveSupport"](tgtPool)==false) {
-               ok = false
                ctx.commit("markInvalidReserveItem", idx)
             }
          })
 
-         // if any failed the simple reserveable check, return now
-         if (ok == false) {
-            return
-         }
          ctx.commit('setSearching', true, { root: true })
          return axios.post(`/api/reserves/validate`, {items: itemIds}).then((response) => {
             response.data.forEach( (item, idx) => {
