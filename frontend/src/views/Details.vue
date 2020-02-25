@@ -215,12 +215,13 @@ export default {
          if ( Array.isArray(field.value)) {
             if (field.type == "url") {
                let out = []
-               field.value.forEach( (v,idx) => {
+               field.value.forEach( v => {
                   let url = `<a href="${v}" target="_blank">`
-                  if ( idx === 0) {
-                     url += `<i style="margin-right: 5px;" class="more fas fa-link"></i>`
+                  if (field.provider) {
+                     url += `Read online (${field.provider})</a>`
+                  } else {
+                     url += `Read online (${v})</a>`
                   }
-                  url += `External Link #${idx+1}</a>`
                   out.push( url )
                })
                return out.join(",&nbsp;&nbsp;")
@@ -228,7 +229,14 @@ export default {
             return field.value.join(",&nbsp;")
          }
          if (field.type == "url") {
-            return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
+            let url =`<a href="${field.value}" target="_blank">`
+            if (field.provider) {
+               url += `Read online (${field.provider})`
+            } else {
+               url += `Read online (${field.value})`
+            }
+            url += `</a>`
+            return url
          }
          return field.value
       },
@@ -285,6 +293,7 @@ td.label {
    padding: 4px 8px;
    width:1%;
    white-space: nowrap;
+   vertical-align: top;
 }
 td.label.top {
    vertical-align: top;
