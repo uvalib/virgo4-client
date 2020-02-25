@@ -40,6 +40,10 @@
                         <td v-else class="value" v-html="fieldValueString(field)"></td>
                      </template>
                   </tr>
+                  <tr v-if="sirsiLink">
+                     <td></td>
+                     <td class="value more"  v-html="sirsiLink"></td>
+                  </tr>
                   <tr v-if="poolMode=='image'">
                      <td class="label top">Image:</td> 
                      <td class="image">
@@ -154,7 +158,12 @@ export default {
       },
       isGrouped() {
          return this.details.related && this.details.related.length > 1
-      }
+      },
+      sirsiLink() {
+         let sl = this.allFields.find( f=> f.name=="sirsi_url")
+         if (!sl) return ""
+         return `<a href="${sl.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
+      },
    },
    methods: {
       getDetails() {
@@ -195,8 +204,11 @@ export default {
       },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type=="iiif-manifest-url" || 
-            field.type=="iiif-base-url" || field.type=="iiif-base-url") return false
-         if ( this.isKiosk && field.type == "url" || field.type=="iiif-image-url") return false
+            field.type=="iiif-base-url" || field.type=="iiif-base-url" || 
+            field.name=="sirsi_url" ) {
+            return false
+         }
+         if ( this.isKiosk && field.type == "url") return false
          return true
       },
       fieldValueString( field ) {
@@ -267,16 +279,6 @@ table {
    table-layout: auto;
    margin-top: 15px;
 }
-#app td.value >>> a.pure-button.pure-button-primary.ext {
-   background-color:var(--color-pale-blue);
-   color: white;
-   padding: 3px 0px;
-   width: 100%;
-   border-radius: 5px;
-}
-#app td.value >>> a.pure-button.pure-button-primary.ext:hover {
-   text-decoration: none;
-}
 td.label {
    font-weight: bold;
    text-align: right;
@@ -298,6 +300,9 @@ table td.value, table td.image {
    -moz-hyphens: auto;
    hyphens: auto;
    text-align: left;
+}
+table td.value.more {
+    padding: 15px 8px 4px 8px;
 }
 .bookmark-container {
    float:left;
