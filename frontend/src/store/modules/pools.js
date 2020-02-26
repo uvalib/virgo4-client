@@ -41,7 +41,12 @@ const pools = {
          let attr = pool.attributes.find( a=> a.name=='logo_url')
          if (!attr) return ""
          if (attr.supported == false) return "" 
-         return attr.value
+
+         // NOTE: this assumes all logo assets are seved by the pool and advertised with a 
+         // relative URL
+         let logo = attr.value
+         logo = logo.replace("./", "/")
+         return pool.url+logo
       },
       externalURL: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
