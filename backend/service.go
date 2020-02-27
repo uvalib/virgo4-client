@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -151,6 +152,7 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	if err != nil {
 		hcMap["postgres"] = hcResp{Healthy: false, Message: err.Error()}
 	} else {
+		log.Printf("Schema info - Version: %d, Dirty: %t", schema.Version, schema.Dirty)
 		if schema.Dirty {
 			hcMap["postgres"] = hcResp{Healthy: false, Message: fmt.Sprintf("Schema %d is marked dirty", schema.Version)}
 		} else {
@@ -200,8 +202,23 @@ func getLatestMigrationNumber() int {
 		return 0
 	}
 
+	maxNum := -1
+	maxFile := ""
+	for _, f := range files {
+		fname := f.Name()
+		if strings.Contains(fname, "up.sql") {
+			numStr := strings.Split(fname, "_")[0]
+			num, _ := strconv.Atoi(numStr)
+			if num > maxNum {
+				maxNum = num
+				maxFile = fname
+			}
+		}
+	}
+
 	// there are up/down files for each migration
-	return len(files) / 2
+	log.Printf("Last migration file found: %s, version: %d", maxFile, maxNum)
+	return maxNum
 }
 
 // IsAuthenticated will return success if the specified token auth token is associated with
