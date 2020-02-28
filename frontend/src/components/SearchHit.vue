@@ -91,17 +91,14 @@ export default {
          return field.value
       },
       accessURLs() {
-         let field = this.accessURLField
-         if ( Array.isArray(field.value)) {
-            let out = []
-            field.value.forEach( v => {
-               let url = this.generateURLCode(field.provider, v)
-               out.push( url )
-            })
-            return out.join(",&nbsp;&nbsp;")
-         } else {
-            return this.generateURLCode(field.provider, field.value)
-         }
+         // NOTE: access URLs are special. instead value being an array of strings,
+         // it is an array of objects: {url, provider}
+         let out = []
+         this.accessURLField .value.forEach( v => {
+            let url = this.generateURLCode(v.provider, v.url)
+            out.push( url )
+         })
+         return out.join(",&nbsp;&nbsp;")
       },
       generateURLCode(provider, tgtURL) {
          let url =`<a href="${tgtURL}" target="_blank">`
