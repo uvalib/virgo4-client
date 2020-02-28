@@ -14,39 +14,37 @@
          <template v-else>
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
             <div class="info">
-               <table class="fields">
-                  <tr v-if="details.header.author">
-                     <td class="label">{{details.header.author.label}}:</td>
-                     <td class="value">{{details.header.author.value.join("; ")}}</td>
-                  </tr>
-                  <tr v-for="(field,idx) in allFields" :key="idx">
-                     <template v-if="shouldDisplay(field)">
-                        <td class="label">{{field.label}}:</td>
-                        <template v-if="field.type == 'subject'" >
-                           <td class="value">
-                              <template v-if="Array.isArray(field.value)">
-                                 <template  v-for="(val,idx) in field.value">
-                                    <span v-if="idx>0" class="sep" :key="idx+'s'">|</span>
-                                    <router-link  :key="idx" :to="getSubjectLink(val)">
-                                       <span class="subject-link">{{val}}</span>
-                                    </router-link>
-                                 </template>
+               <dl class="fields">
+                  <template v-if="details.header.author">
+                     <dt class="label">{{details.header.author.label}}:</dt>
+                     <dd class="value">{{details.header.author.value.join("; ")}}</dd>
+                  </template>
+                  <template v-for="(field,idx) in allDisplayFields">
+                     <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
+                     <template v-if="field.type == 'subject'" >
+                        <dd class="value" :key="`v${idx}`">
+                           <template v-if="Array.isArray(field.value)">
+                              <template  v-for="(val,idx) in field.value">
+                                 <span v-if="idx>0" class="sep" :key="idx+'s'">|</span>
+                                 <router-link  :key="idx" :to="getSubjectLink(val)">
+                                    <span class="subject-link">{{val}}</span>
+                                 </router-link>
                               </template>
-                              <router-link  v-else :to="getSubjectLink(field.value)">
-                                 <span class="subject-link">{{field.value}}</span>
-                              </router-link>
-                           </td>
-                        </template>
-                        <td v-else class="value" v-html="fieldValueString(field)"></td>
+                           </template>
+                           <router-link  v-else :to="getSubjectLink(field.value)">
+                              <span class="subject-link">{{field.value}}</span>
+                           </router-link>
+                        </dd>
                      </template>
-                  </tr>
-                  <tr v-if="sirsiLink">
-                     <td></td>
-                     <td class="value more"  v-html="sirsiLink"></td>
-                  </tr>
-                  <tr v-if="poolMode=='image'">
-                     <td class="label top">Image:</td> 
-                     <td class="image">
+                     <dd v-else class="value" v-html="fieldValueString(field)" :key="`v${idx}`"></dd>
+                  </template>
+                  <template v-if="sirsiLink">
+                     <dd></dd>
+                     <dt class="value more"  v-html="sirsiLink"></dt>
+                  </template>
+                  <template v-if="poolMode=='image'">
+                     <dt class="label">Image:</dt> 
+                     <dd class="image">
                         
                         <template v-if="isGrouped && mode != 'single'">
                            <viewer :images="details.related" class="img-view" ref="viewer" :options="viewerOpts">
@@ -90,9 +88,9 @@
                               </span>
                            </div>
                         </template>
-                     </td>
-                  </tr>
-               </table>
+                     </dd>
+                  </template>
+               </dl>
             </div>
             <AvailabilityTable v-if="hasAvailability" :titleId="details.identifier" />
          </template>
@@ -153,6 +151,9 @@ export default {
       allFields() {
          return [...this.details.basicFields.concat(this.details.detailFields)]
       },
+      allDisplayFields() {
+         return this.allFields.filter(f => this.shouldDisplay(f))
+      },
       manifestURL() {
          let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
          return iiifField.value
@@ -206,7 +207,7 @@ export default {
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type=="iiif-manifest-url" || 
             field.type=="iiif-base-url" || field.type=="iiif-base-url" || 
-            field.name=="sirsi_url" ) {
+            field.name=="sirsi_url" || field.name=="iiif_image_url" ) {
             return false
          }
          if ( this.isKiosk && field.type == "url") return false
@@ -287,36 +288,6 @@ export default {
 .working img {
    margin: 30px 0;
 }
-table {
-   table-layout: auto;
-   margin-top: 15px;
-}
-td.label {
-   font-weight: bold;
-   text-align: right;
-   padding: 4px 8px;
-   width:1%;
-   white-space: nowrap;
-   vertical-align: top;
-}
-td.label.top {
-   vertical-align: top;
-}
-table td.value, table td.image {
-   width: 100%;
-   font-weight: normal;
-   text-align: left;
-   width: 100%;
-   padding: 4px 8px;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-   text-align: left;
-}
-table td.value.more {
-    padding: 15px 8px 4px 8px;
-}
 .bookmark-container {
    float:left;
 }
@@ -393,5 +364,33 @@ img.thumb:hover {
    div.img-toolbar, .img-view.large {
       max-width: 70%;
    }
+}
+dl {
+   margin-top: 15px;
+   display: inline-grid;
+   grid-template-columns: max-content 2fr;
+   grid-column-gap: 10px;
+   width: 100%;
+}
+dt {
+   font-weight: bold;
+   text-align: right;
+   padding: 4px 8px;
+   white-space: nowrap;
+   vertical-align: top;
+}
+dd {
+   margin: 0;
+   width: 100%;
+   text-align: left;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
+   padding: 4px 0px;
+}
+.value.more {
+    padding: 15px 0 10px 0;
+    text-align: left;
 }
 </style>
