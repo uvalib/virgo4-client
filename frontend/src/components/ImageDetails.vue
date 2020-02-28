@@ -11,7 +11,7 @@
                         <router-link class="img-link" :to="detailsURL(r)">
                            Details
                         </router-link>
-                        <span class="iiif-small">
+                        <span v-if="manifestURL" class="iiif-small">
                            <a :href="manifestURL" target="_blank">
                               <span class="iiif-icon"></span>
                            </a>
@@ -19,7 +19,7 @@
                      </div>
                   </div>
                </template>
-               <div class="iiif-help">
+               <div  v-if="manifestURL" class="iiif-help">
                   <span>What is IIIF</span>
                   <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
                </div>
@@ -34,7 +34,7 @@
       
          <div class="img-toolbar">
             <span class="hint">Click image to zoom</span>
-            <span class="iiif">
+            <span  v-if="manifestURL" class="iiif">
                <a :href="manifestURL" target="_blank">
                   <img src="../assets/iiif_icon.png"/>
                </a>
@@ -181,6 +181,9 @@ img.thumb:hover {
    display: inline-block;
    width: 35px;
    height: 30px;
+}
+.img-link {
+   padding-bottom:5px;
 }
 @media only screen and (min-width: 768px) {
    div.img-toolbar, .img-view.large {
