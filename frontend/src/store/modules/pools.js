@@ -87,6 +87,7 @@ const pools = {
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
+      
       setPools(state, data) {
          if (data.length == 0) {
             state.system.fatal = "No search pools configured"
@@ -94,14 +95,22 @@ const pools = {
             return
          }
 
+         // Copy old items to preserve providers lists for each, then wipe out list
+         let old = state.list.slice()
+         state.list.splice(0, state.list.length)
+
+         // copy new pools into list and add pre-existing providers data
          data.forEach( p => {
-            let currIdx = state.list.findIndex(curr => curr.name == p.name  )
-            if (currIdx == -1) {
-               p.providers = []
-               state.list.push(p)    
+            let prior = old.find(op => op.name == p.name  )
+            if (prior) {
+               p.providers = prior.providers.slice()
+            } else {
+               p.providers = []   
             }
+            state.list.push(p) 
          })
       },
+
       setPoolProviders(state, data) {
          let pool = state.list.find(p=> p.id == data.pool)
          pool.providers.splice(0, pool.providers.length)
