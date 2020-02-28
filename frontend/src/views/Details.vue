@@ -137,7 +137,8 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
-         poolDetails: 'pools/poolDetails'
+         poolDetails: 'pools/poolDetails',
+         findProvider: 'pools/findProvider'
       }),
       poolMode() {
          let details = this.poolDetails(this.details.source)
@@ -216,12 +217,7 @@ export default {
             if (field.type == "url") {
                let out = []
                field.value.forEach( v => {
-                  let url = `<a href="${v}" target="_blank">`
-                  if (field.provider) {
-                     url += `Read online (${field.provider})</a>`
-                  } else {
-                     url += `Read online (${v})</a>`
-                  }
+                  let url = this.generateURLCode(field.provider, v)
                   out.push( url )
                })
                return out.join(",&nbsp;&nbsp;")
@@ -229,17 +225,25 @@ export default {
             return field.value.join(",&nbsp;")
          }
          if (field.type == "url") {
-            let url =`<a href="${field.value}" target="_blank">`
-            if (field.provider) {
-               url += `Read online (${field.provider})`
-            } else {
-               url += `Read online (${field.value})`
-            }
-            url += `</a>`
-            return url
+            return this.generateURLCode(field.provider, field.value)
          }
          return field.value
       },
+      generateURLCode(provider, tgtURL) {
+         let url =`<a href="${tgtURL}" target="_blank">`
+         if (provider) {
+            let pDetail = this.findProvider(this.details.source, provider)
+            let pName = provider 
+            if (pDetail.label) {
+               pName = pDetail.label   
+            }
+            url += `${pName}`
+         } else {
+            url += `${tgtURL}`
+         }
+         url += `</a>`
+         return url
+      }
    },
    created() {
       this.getDetails()

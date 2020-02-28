@@ -61,7 +61,8 @@ export default {
       }),
        ...mapGetters({
          isKiosk: "system/isKiosk",
-         hasCoverImages: 'pools/hasCoverImages'
+         hasCoverImages: 'pools/hasCoverImages',
+         findProvider: 'pools/findProvider'
       }),
       truncateLength() {
          if ( this.hasCoverImages(this.pool)) return 60
@@ -82,12 +83,7 @@ export default {
             if (field.type == "url") {
                let out = []
                field.value.forEach( v => {
-                  let url = `<a href="${v}" target="_blank">`
-                  if (field.provider) {
-                     url += `Read online (${field.provider})</a>`
-                  } else {
-                     url += `Read online (${v})</a>`
-                  }
+                  let url =  this.generateURLCode(field.provider, v)   
                   out.push( url )
                })
                return out.join(",<br/>")
@@ -95,17 +91,25 @@ export default {
             return field.value.join(",&nbsp;")
          }
          if (field.type == "url") {
-            let url =`<a href="${field.value}" target="_blank">`
-            if (field.provider) {
-               url += `Read online (${field.provider})`
-            } else {
-               url += `Read online (${field.value})`
-            }
-            url += `</a>`
-            return url
+            return this.generateURLCode(field.provider, field.value)   
          }
          return field.value
       },
+      generateURLCode(provider, tgtURL) {
+         let url =`<a href="${tgtURL}" target="_blank">`
+         if (provider) {
+            let pDetail = this.findProvider(this.pool, provider)
+            let pName = provider 
+            if (pDetail.label) {
+               pName = pDetail.label   
+            }
+            url += `${pName}`
+         } else {
+            url += `${tgtURL}`
+         }
+         url += `</a>`
+         return url
+      }
    }
 };
 </script>

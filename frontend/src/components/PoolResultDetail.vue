@@ -6,9 +6,9 @@
          </div>
          <div v-if="hasLogo" class="source-logo">
             <a v-if="hasURL" :href="poolExtURL(selectedResults.pool.id)" target="_blank">
-               <img class ="pure-img" :src="poolLogo(selectedResults.pool.id)">
+               <img class ="logo" :src="poolLogo(selectedResults.pool.id)">
             </a>
-             <img v-else class ="pure-img" :src="poolLogo(selectedResults.pool.id)">
+             <img v-else class ="logo" :src="poolLogo(selectedResults.pool.id)">
          </div>
          <SearchFilters />
       </div>
@@ -170,5 +170,10 @@ div.results-header {
 .source-logo {
    background: white;
    padding: 5px;
+   text-align: left;
+}
+.source-logo .logo {
+   max-height:90px;
+   display: inline-block;
 }
 </style>
