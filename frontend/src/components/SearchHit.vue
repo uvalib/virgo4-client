@@ -12,10 +12,13 @@
                   <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,'k')">{{field.label}}:</dt>
                      <dd :key="getKey(field,'v')" >
-                        <div v-if="field.type == 'url'" v-html="fieldValueString(field)"></div>
-                        <TruncatedText v-else :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" />
+                        <TruncatedText :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" />
                      </dd>
                   </template>
+               </template>
+               <template v-if="accessURLField">
+                  <dt class="label">{{accessURLField.label}}</dt>
+                  <dd class="value" v-html="accessURLs()"></dd>
                </template>
             </dl>
          </div>
@@ -49,6 +52,9 @@ export default {
       SearchHitHeader, AccordionContent, GroupedSearchHit, TruncatedText
    },
    computed: {
+      accessURLField() {
+         return this.hit.basicFields.find(f => f.name=="access_url")
+      },
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
@@ -74,26 +80,28 @@ export default {
          return this.hit.identifier+field.value+idx
       },
       shouldDisplay(field) {
-         if (field.display == 'optional') return false
+         if (field.display == 'optional' || field.type == "url") return false
          if ( this.isKiosk && field.type == "url") return false
          return true
       },
-      fieldValueString( field ) {
+      fieldValueString(field) {
          if ( Array.isArray(field.value)) {
-            if (field.type == "url") {
-               let out = []
-               field.value.forEach( v => {
-                  let url =  this.generateURLCode(field.provider, v)   
-                  out.push( url )
-               })
-               return out.join(",<br/>")
-            }
             return field.value.join(",&nbsp;")
          }
-         if (field.type == "url") {
-            return this.generateURLCode(field.provider, field.value)   
-         }
          return field.value
+      },
+      accessURLs() {
+         let field = this.accessURLField
+         if ( Array.isArray(field.value)) {
+            let out = []
+            field.value.forEach( v => {
+               let url = this.generateURLCode(field.provider, v)
+               out.push( url )
+            })
+            return out.join(",&nbsp;&nbsp;")
+         } else {
+            return this.generateURLCode(field.provider, field.value)
+         }
       },
       generateURLCode(provider, tgtURL) {
          let url =`<a href="${tgtURL}" target="_blank">`
