@@ -16,6 +16,9 @@
             </div>
             <div class="body">
                <p>
+                  <b>All video reserve requests will be delivered as a streaming resource to your class’s Learning Management System.</b>
+               </p>
+               <p>
                   Note that online-only catalog entries cannot currently be included in a 
                   Virgo course reserve request.
                </p>
@@ -87,6 +90,7 @@
                   <option value="">Please select</option>
                   <option value="3h">3 hours</option>
                   <option value="2d">2 days</option>
+                  <option value="na">Not Applicable</option>
                </select>
             </div>
          </div>
@@ -103,6 +107,7 @@
                            <option value="">Please select</option>
                            <option value="3h">3 hours</option>
                            <option value="2d">2 days</option>
+                           <option value="na">Not Applicable</option>
                         </select>
                      </td>
                   </tr>

@@ -1,5 +1,9 @@
 _______________________________________________________________________
 Course Reserve Information
+
+Reminder:
+All video reserve requests will be delivered as a streaming 
+resource to your class’s Learning Management System.
 _______________________________________________________________________
 Requester Name:      {{.Request.Name}}
 Requester Email:     {{.Request.Email}}
