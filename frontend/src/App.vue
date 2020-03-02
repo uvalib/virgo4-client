@@ -42,12 +42,14 @@
                </div>
             </div>
          </transition>
+         <ScrollToTop />
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
    </div>
 </template>
 
 <script>
+import ScrollToTop from "@/components/ScrollToTop"
 import LibraryFooter from "@/components/layout/LibraryFooter"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
@@ -72,7 +74,8 @@ export default {
       FatalError,
       V4Spinner,
       AddBookmarkModal,
-      MenuBar
+      MenuBar,
+      ScrollToTop
    },
    computed: {
       ...mapState({

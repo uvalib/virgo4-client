@@ -24,7 +24,6 @@
             </div>
          </div>
       </div>
-      <ScrollToTop />
       <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more">
          <span v-if="loadingMore">
             <V4Spinner v-if="loadingMore" color="white"/>
@@ -40,11 +39,10 @@ import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import ImageSearchHit from "@/components/ImageSearchHit"
 import SearchFilters from "@/components/SearchFilters"
-import ScrollToTop from "@/components/ScrollToTop"
 import V4Spinner from "@/components/V4Spinner"
 export default {
    components: {
-      ImageSearchHit, SearchHit, SearchFilters, ScrollToTop, V4Spinner
+      ImageSearchHit, SearchHit, SearchFilters, V4Spinner
    },
    data: function() {
       return {

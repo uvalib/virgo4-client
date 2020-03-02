@@ -204,7 +204,6 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
          }).catch((_error) => {
             ctx.commit('system/setError', "Sirsi system error", { root: true })
-            ctx.commit('setNoMatch', true)
             ctx.commit('setSearching', false, { root: true })
          })
       },
@@ -216,6 +215,8 @@ const reserves = {
             qs = ctx.rootState.user.accountInfo.id
          } 
          let qs = ctx.state.query
+         qs = qs.replace(/,/g, "")
+         qs = qs.trim()
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
@@ -231,7 +232,6 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
          }).catch((_error) => {
             ctx.commit('system/setError', "Sirsi system error", { root: true })
-            ctx.commit('setNoMatch',true)
             ctx.commit('setSearching', false, { root: true })
           })
       }

@@ -24,7 +24,6 @@
             <template v-else>
                <CourseSearchResults v-if="hasCourseResults"/>
                <InstructorSearchResults v-if="hasInstructorResults"/>
-               <ScrollToTop />
                <div v-if="hasMore" @click="loadMore" class="see-more">
                   <V4Spinner v-if="loadingMore" color="white"/>
                   <span v-else>Load More Reserves</span>
@@ -42,16 +41,13 @@ import { mapFields } from 'vuex-map-fields'
 import V4Spinner from "@/components/V4Spinner"
 import CourseSearchResults from "@/components/reserves/CourseSearchResults"
 import InstructorSearchResults from "@/components/reserves/InstructorSearchResults"
-import ScrollToTop from "@/components/ScrollToTop"
 export default {
    name: "course-reserves",
    components: {
-      CourseSearchResults, InstructorSearchResults,
-      V4Spinner, ScrollToTop
+      CourseSearchResults, InstructorSearchResults,V4Spinner
    },
    data: function() {
       return {
-         showScrollTop: false,
          loadingMore: false
       }
    },
@@ -87,21 +83,10 @@ export default {
             })
          }
       },
-      scrollChecker() {
-         if (window.window.scrollY > 800) {
-            this.showScrollTop = true
-         } else {
-            this.showScrollTop = false
-         }
-      }
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
-      window.addEventListener("scroll", this.scrollChecker)
    },
-   destroyed: function() {
-      window.removeEventListener("scroll", this.scrollChecker)
-   }
 }
 </script>
 
