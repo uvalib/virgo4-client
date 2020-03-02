@@ -141,6 +141,7 @@ export default {
          return `<a href="${sl.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
       },
       marcXML() {
+         if ( this.isUVA(this.details.source) === false ) return ""
          if ( !this.isAdmin ) return ""
          let xml = this.allFields.find( f => f.type == "marc-xml")
          return beautify(xml.value).trim()
