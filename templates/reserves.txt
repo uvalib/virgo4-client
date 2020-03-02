@@ -18,14 +18,20 @@ _______________________________________________________________________
 {{ add $index 1 }}.
 {{ $item.Title}}
 {{ $item.Author}}
-Library: {{ $item.Library }}
-Location: {{ $item.Location }}
-Availability: {{ $item.Availability }}
-Call Number: {{ $item.CallNumber }}
+{{- range $aIdx, $avail := $item.Availability }}
+Library: {{ $avail.Library }}
+Location: {{ $avail.Location }}
+Availability: {{ $avail.Availability }}
+Call Number: {{ $avail.CallNumber }}
+{{- end -}}
 Reserve Library: {{ $reserveLib }}
 Loan Period: {{ $item.Period }}
 Notes: {{ $item.Notes }}
 
-Virgo URL: {{ $url }}/{{ $item.Pool }}/{{ $item.CatalogKey}}
+Virgo URL: {{ $item.VirgoURL }}
 {{ end -}}
 _______________________________________________________________________
+{{ header .MaxAvail }}
+{{- range $index, $item := .Items }}
+{{ row $index $reserveLib $item -}}
+{{ end -}}

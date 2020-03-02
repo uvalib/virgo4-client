@@ -1,6 +1,5 @@
 import axios from 'axios'
 import router from '../../router'
-import * as utils from './utils'
 
 const bookmarks = {
    namespaced: true,
@@ -132,10 +131,6 @@ const bookmarks = {
             author = bm.data.header.author.value.join(", ")
          }
          let detail = {title :bm.data.header.title, author: author}
-         detail.callNumber = utils.getFieldValue("call_number", bm.data)
-         detail.location = utils.getFieldValue("location", bm.data)
-         detail.library = utils.getFieldValue("library", bm.data)
-         detail.availability = utils.getFieldValue("availability", bm.data)
          data['details'] = JSON.stringify(detail)
          return axios.post(url, data).then((response) => {
             ctx.commit('setBookmarks', response.data)

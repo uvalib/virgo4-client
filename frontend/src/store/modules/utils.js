@@ -79,29 +79,6 @@ export function preProcessHitFields(hits) {
    })
 }
 
-// Find value for the given field name in detailed or basic hit fields
-export function getFieldValue(fieldName, hit) {
-   let out = ""
-   let fieldsSources = [hit.basicFields, hit.detailFields]
-   fieldsSources.some(fields => {
-      fields.some(f => {
-         if (f.name == fieldName) {
-            if (Array.isArray(f.value)) {
-               out = f.value.join(", ")
-            } else {
-               out = f.value
-            }
-         }
-         return out != ""
-      })
-      return out != ""
-   })
-   if (out == "") {
-      out = "Unknown"
-   }
-   return out
-}
-
 export function getGroupHitMetadata(group, hit) {
    hit.header = {}
    if (group.record_list) {

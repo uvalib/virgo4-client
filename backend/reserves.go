@@ -14,18 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Desk contains about a course reserve desk
-type Desk struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
 // ReserveRequest is the data POST'd by a client for course reserves
 type ReserveRequest struct {
 	VirgoURL string
 	UserID   string        `json:"userID"`
 	Request  RequestParams `json:"request"`
 	Items    []RequestItem `json:"items"`
+	MaxAvail int           `json:"-"`
 }
 
 // RequestParams contans the top-level request data for course reserves
@@ -43,16 +38,39 @@ type RequestParams struct {
 
 // RequestItem is the details for a particular reserve item
 type RequestItem struct {
-	Pool         string `json:"pool"`
-	CatalogKey   string `json:"catalogKey"`
-	CallNumber   string `json:"callNumber"`
-	Title        string `json:"title"`
-	Author       string `json:"author"`
-	Location     string `json:"location"`
+	Pool         string             `json:"pool"`
+	CatalogKey   string             `json:"catalogKey"`
+	CallNumber   string             `json:"callNumber"`
+	Title        string             `json:"title"`
+	Author       string             `json:"author"`
+	Period       string             `json:"period"`
+	Notes        string             `json:"notes"`
+	VirgoURL     string             `json:"-"`
+	Availability []AvailabilityInfo `json:"-"`
+}
+
+// AvailabilityInfo contains item availabilty information used to generate
+// the email footer
+type AvailabilityInfo struct {
 	Library      string `json:"library"`
+	Location     string `json:"location"`
 	Availability string `json:"availability"`
-	Period       string `json:"period"`
-	Notes        string `json:"notes"`
+	CallNumber   string `json:"callNumber"`
+}
+
+type ilsAvail struct {
+	Availability struct {
+		Items []ilsItem `json:"items"`
+	} `json:"availability"`
+}
+
+type ilsItem struct {
+	Fields []field `json:"fields"`
+}
+
+type field struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 // ValidateCourseReserves accepts an array of catalog keys and sends them off to the
@@ -97,13 +115,37 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	}
 	reserveReq.VirgoURL = svc.VirgoURL
 	log.Printf("Request: %+v", reserveReq)
+	reserveReq.MaxAvail = -1
+	for idx := range reserveReq.Items {
+		itm := reserveReq.Items[idx]
+		reserveReq.Items[idx].VirgoURL = fmt.Sprintf("%s/%s/%s", svc.VirgoURL, itm.Pool, itm.CatalogKey)
+		avail := svc.getAvailabity(reserveReq.Items[idx])
+		reserveReq.Items[idx].Availability = make([]AvailabilityInfo, len(avail))
+		copy(reserveReq.Items[idx].Availability, avail)
+		if len(avail) > reserveReq.MaxAvail {
+			reserveReq.MaxAvail = len(avail)
+		}
+	}
 
-	// TODO check LDAP user info to see if user can make a reserve
-
-	log.Printf("Rendering reserve email body")
+	log.Printf("Rendering reserve email body with %+v", reserveReq)
 	var renderedEmail bytes.Buffer
 	funcs := template.FuncMap{"add": func(x, y int) int {
 		return x + y
+	}, "header": func(cnt int) string {
+		out := "|#|Title|Reserve Library|Loan Period|Notes|Virgo URL|"
+		for i := 0; i < cnt; i++ {
+			out += fmt.Sprintf("Library%d|Location%d|Availability%d|Call Number%d|", i, i, i, i)
+		}
+		return out
+	}, "row": func(idx int, library string, item RequestItem) string {
+		out := fmt.Sprintf("|%d|%s|%s|%s|%s|%s|",
+			idx+1, item.Title, library, item.Period, item.Notes, item.VirgoURL)
+		availStr := ""
+		for _, avail := range item.Availability {
+			availStr += fmt.Sprintf("%s|%s|%s|%s|", avail.Library, avail.Location, avail.Availability, avail.CallNumber)
+		}
+		out += availStr
+		return out
 	}}
 	tpl := template.Must(template.New("reserves.txt").Funcs(funcs).ParseFiles("templates/reserves.txt"))
 	err = tpl.Execute(&renderedEmail, reserveReq)
@@ -143,8 +185,41 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 			return
 		}
 	}
-
 	c.String(http.StatusOK, "Reserve email sent")
+}
+
+func (svc *ServiceContext) getAvailabity(reqItem RequestItem) []AvailabilityInfo {
+	out := make([]AvailabilityInfo, 0)
+	availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, reqItem.CatalogKey)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL)
+	if ilsErr != nil {
+		log.Printf("WARN: Unable to get availabilty info for reserve %s: %s", reqItem.CatalogKey, ilsErr.Message)
+		return out
+	}
+
+	var availData ilsAvail
+	err := json.Unmarshal([]byte(bodyBytes), &availData)
+	if err != nil {
+		log.Printf("WARN: Invalid ILS Availabilty response for %s: %s", reqItem.CatalogKey, err.Error())
+		return out
+	}
+
+	for _, availItem := range availData.Availability.Items {
+		avail := AvailabilityInfo{}
+		for _, field := range availItem.Fields {
+			if field.Name == "Library" {
+				avail.Library = field.Value
+			} else if field.Name == "Availability" {
+				avail.Availability = field.Value
+			} else if field.Name == "Current Location" {
+				avail.Location = field.Value
+			} else if field.Name == "Call Number" {
+				avail.CallNumber = field.Value
+			}
+		}
+		out = append(out, avail)
+	}
+	return out
 }
 
 // SearchReserves will search for reservations on the specified course.
