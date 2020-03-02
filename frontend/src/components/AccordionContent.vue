@@ -183,6 +183,7 @@ div.title, div.footer {
 }
 div.title.narrow {
    justify-content: flex-start;
+   padding: 3px 12px 3px 0;
 }
 div.title.wide i {
    position: absolute;

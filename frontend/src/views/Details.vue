@@ -42,6 +42,14 @@
                      <dt class="label">{{accessURLField.label}}</dt>
                      <dd class="value" v-html="accessURLs()"></dd>
                   </template>
+                  <template v-if="marcXML">
+                     <dt class="label">MARC XML</dt>
+                     <dd class="value">
+                        <AccordionContent id="marc" class="marc" border-width="0" layout="narrow" title="View XML">
+                           <pre class="xml">{{marcXML}}</pre>
+                        </AccordionContent>
+                     </dd>
+                  </template>
                   <template v-if="sirsiLink">
                      <dd></dd>
                      <dt class="value more"  v-html="sirsiLink"></dt>
@@ -67,6 +75,8 @@ import SearchHitHeader from '@/components/SearchHitHeader'
 import ImageDetails from '@/components/ImageDetails'
 import AvailabilityTable from "@/components/AvailabilityTable"
 import V4Spinner from "@/components/V4Spinner"
+import AccordionContent from "@/components/AccordionContent"
+import beautify from 'xml-beautifier'
 
 export default {
    name: "sources",
@@ -87,13 +97,15 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable, V4Spinner, ImageDetails
+      SearchHitHeader, AvailabilityTable, V4Spinner, 
+      ImageDetails, AccordionContent
    },
    computed: {
       ...mapState({
          details : state => state.item.details,
       }),
       ...mapGetters({
+         isAdmin: 'user/isAdmin',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
@@ -128,6 +140,11 @@ export default {
          if (!sl) return ""
          return `<a href="${sl.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
       },
+      marcXML() {
+         if ( !this.isAdmin ) return ""
+         let xml = this.allFields.find( f => f.type == "marc-xml")
+         return beautify(xml.value).trim()
+      }
    },
    methods: {
       getDetails() {
@@ -262,5 +279,12 @@ dd {
 .value.more {
     padding: 15px 0 10px 0;
     text-align: left;
+}
+.xml {
+   font-weight: normal;
+   font-size: 0.8em;
+   border: 1px solid var(--uvalib-grey-light);
+   padding: 10px;
+   border-radius: 5px;
 }
 </style>
