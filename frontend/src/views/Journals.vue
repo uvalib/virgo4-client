@@ -43,9 +43,19 @@
                         <dd>{{i.published}}</dd>
                         <dt>Format:</dt> 
                         <dd>{{i.format.join(", ")}}</dd>
-                        <dt>Availability:</dt> 
-                        <dd>{{i.availability}}</dd>
-                        <template  v-if="i.url">
+                        <template v-if="i.callNumber">
+                           <dt>Call Number:</dt> 
+                           <dd>{{i.callNumber.join(", ")}}</dd>
+                        </template>
+                        <template v-if="i.location">
+                           <dt>Location:</dt> 
+                           <dd>{{i.location.join(", ")}}</dd>
+                        </template>
+                        <template v-if="i.availability">
+                           <dt>Availability:</dt> 
+                           <dd>{{i.availability}}</dd>
+                        </template>
+                        <template  v-if="i.accessURL">
                            <dt>Online Access:</dt> 
                            <dd v-html="urlList(i)"></dd>
                         </template>
@@ -60,6 +70,7 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 import { mapFields } from "vuex-map-fields"
 import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
@@ -74,6 +85,9 @@ export default {
          titles: state => state.journals.titles,
          browseTotal: state => state.journals.browseTotal
       }),
+      ...mapGetters({
+         findProvider: 'pools/findProvider'
+      }),
       ...mapFields("journals", ["query"]),
    },
    data: function() {
@@ -81,10 +95,37 @@ export default {
    },
    methods: {
       urlList(item) {
+         // all links in solr are from the same provider. Just grab first
+         let u = item.accessURL[0]
+         let linkText = u.provider
+         let hasProvider = false
+         if (linkText) {
+            hasProvider = true
+            let pDetail = this.findProvider("journals", u.provider)
+            if (pDetail.label) {
+               linkText = pDetail.label   
+            }
+         } else {
+            linkText = u.url
+         }
+
+         // if there is only 1 link, no need to deal with the item part of the data
+         if (item.accessURL.length == 1) {
+            let u = item.accessURL[0]
+            return `<a href="${u.url}" target="_blank">${linkText}</a>`   
+         } 
+
          let out = []
-         item.url.forEach( u=> {
-            out.push(`<a :href="${u}" target="_blank">${u}</a>`)
+         item.accessURL.slice(0,10).forEach( u=> {
+            let url =`<a href="${u.url}" target="_blank">${u.item}</a>`
+            out.push(url)
          })
+         if (item.accessURL.length > 10 ) {
+             out.push(`...see ${item.accessURL.length -10} more on details page`)   
+         }
+         if (hasProvider) {
+            return `<strong>${linkText}&nbsp-</strong>&nbsp${out.join(" | ")}`
+         }
          return out.join(" | ")
       },
       itemTitle(item) {
@@ -92,7 +133,7 @@ export default {
          if (item.items.length == 1) {
             title =  item.title
          } else {
-            title = `${item.title} <span class='cnt'>(${item.items.length} items)</span>`
+            title = `${item.title} <span class='cnt'>(${item.items.length} titles)</span>`
          }
          if (item.alt_titles) {
             title += `<span class='alt-titles'><b>Alternate Titles:</b> ${item.alt_titles.join(' | ')}</span>`
@@ -240,7 +281,7 @@ dl {
    font-size: 0.85em;
    margin: 10px 0 15px 0;
    padding-bottom: 15px;
-   display: inline-grid;
+   display: grid;
    grid-template-columns: max-content 2fr;
    grid-column-gap: 10px;
 }
@@ -266,6 +307,9 @@ dd {
    font-size: 0.85em;
    display: block;
    margin-top: 2px;
+   color: var(--uvalib-grey);
+}
+strong {
    color: var(--uvalib-grey);
 }
 </style>

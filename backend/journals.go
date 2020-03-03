@@ -23,12 +23,19 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 		return
 	}
 
+	type AccessURL struct {
+		URL      string `json:"url,omitempty"`
+		Item     string `json:"item,omitempty"`
+		Provider string `json:"provider,omitempty"`
+	}
 	type Item struct {
-		ID           string   `json:"id"`
-		Published    string   `json:"published,omitempty"`
-		URL          []string `json:"url,omitempty"`
-		Format       []string `json:"format,omitempty"`
-		Availability string   `json:"availability"`
+		ID           string      `json:"id"`
+		Published    string      `json:"published,omitempty"`
+		URL          []AccessURL `json:"accessURL,omitempty"`
+		Format       []string    `json:"format,omitempty"`
+		Availability string      `json:"availability"`
+		CallNumber   []string    `json:"callNumber,omitempty"`
+		Location     []string    `json:"location,omitempty"`
 	}
 	type Journal struct {
 		Title     string   `json:"title"`
@@ -47,6 +54,7 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 			c.String(solrErr.StatusCode, solrErr.Message)
 			return
 		}
+		// log.Printf("======== %s ===================", respBytes)
 
 		var parsed struct {
 			Response struct {
@@ -55,10 +63,13 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 					Title        []string `json:"full_title_a"`
 					AltTitles    []string `json:"journal_title_addnl_a"`
 					Published    []string `json:"published_a"`
-					URLSupp      []string `json:"url_supp_a"`
 					URL          []string `json:"url_a"`
+					URLLabel     []string `json:"url_label_a"`
+					URLProvider  []string `json:"data_source_a"`
+					Location     []string `json:"location_a"`
 					Format       []string `json:"format_a"`
 					Availability []string `json:"uva_availability_a"`
+					CallNumber   []string `json:"lc_call_number_a"`
 				} `json:"docs"`
 			} `json:"response"`
 		}
@@ -74,11 +85,28 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 			journal.AltTitles = append(journal.AltTitles, doc.AltTitles...)
 			urls := make([]string, 0)
 			urls = append(urls, doc.URL...)
-			urls = append(urls, doc.URLSupp...)
+			urlLabels := make([]string, 0)
+			urlLabels = append(urlLabels, doc.URLLabel...)
 			item := Item{ID: doc.ID, Published: getValue(doc.Published),
 				Format: doc.Format, Availability: getValue(doc.Availability)}
+			item.Location = make([]string, 0)
+			item.Location = append(item.Location, doc.Location...)
+			item.CallNumber = make([]string, 0)
+			item.CallNumber = append(item.CallNumber, doc.CallNumber...)
 			if item.Availability == "Online" {
-				item.URL = urls
+				if len(urlLabels) < len(urls) {
+					log.Printf("ERROR: url_label_a missing or incomplete")
+					urlLabels = make([]string, 0)
+					for idx := range urls {
+						urlLabels = append(urlLabels, fmt.Sprintf("Copy %d", idx+1))
+					}
+				}
+				provider := getValue(doc.URLProvider)
+				item.URL = make([]AccessURL, 0)
+				for idx, url := range urls {
+					newURL := AccessURL{URL: url, Item: urlLabels[idx], Provider: provider}
+					item.URL = append(item.URL, newURL)
+				}
 			}
 			journal.AltTitles = unique(journal.AltTitles)
 			journal.Items = append(journal.Items, item)
