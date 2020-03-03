@@ -42,16 +42,23 @@ export function preProcessHitFields(hits) {
          }
 
          // Access_url is a special case. Instead of just repeated value, it also
-         // has provider. Preserve both in the array
+         // has provider and item. Preserve all in the array
          if (field.name=="access_url") {
             let existing = hit.basicFields.find(f => f.name === field.name)
             if (existing) {
                let newVal = {url: field.value, provider: field.provider}
+               if ( field.item ) {
+                  newVal.item = field.item   
+               }
                existing.value.push(newVal)
             } else {
                let newF = {name: field.name, type: field.type, label: field.label,
                   visibility: "basic", value: []}
-               newF.value.push( {url: field.value, provider: field.provider})
+               let newVal = {url: field.value, provider: field.provider}
+               if ( field.item ) {
+                  newVal.item = field.item   
+               }
+               newF.value.push( newVal )
                hit.basicFields.push(newF)
             }
             return
