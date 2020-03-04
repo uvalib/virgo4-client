@@ -17,7 +17,7 @@
                   </template>
                </template>
                <template v-if="accessURLField">
-                  <dt class="label">{{accessURLField.label}}</dt>
+                  <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value" v-html="accessURLs()"></dd>
                </template>
             </dl>
@@ -65,7 +65,7 @@ export default {
          searching: state => state.searching,
          autoExpandGroupID: state => state.autoExpandGroupID
       }),
-       ...mapGetters({
+      ...mapGetters({
          isKiosk: "system/isKiosk",
          hasCoverImages: 'pools/hasCoverImages',
          findProvider: 'pools/findProvider'
@@ -86,35 +86,41 @@ export default {
       },
       fieldValueString(field) {
          if ( Array.isArray(field.value)) {
-            return field.value.join(",&nbsp;")
+            return field.value.join(", ")
          }
          return field.value
       },
       accessURLs() {
-         // NOTE: access URLs are special. instead value being an array of strings,
-         // it is an array of objects: {url, provider}
-         let out = []
-         this.accessURLField .value.forEach( v => {
-            let url = this.generateURLCode(v.provider, v.url)
-            out.push( url )
-         })
-         return out.join(",&nbsp;&nbsp;")
-      },
-      generateURLCode(provider, tgtURL) {
-         let url =`<a href="${tgtURL}" target="_blank">`
-         if (provider) {
-            let pDetail = this.findProvider(this.pool, provider)
-            let pName = provider 
-            if (pDetail.label) {
-               pName = pDetail.label   
+         // the access_url value is an array of {provider:name, links:[]}
+         let out = ""
+         let urlField = this.accessURLField
+         urlField.value.forEach( p => {
+            let pDetail = this.findProvider(this.pool, p.provider)
+            if (p.links.length == 1) {
+                out += `<div class='provider'>`
+                out += `<a href='${p.links[0].url}' target='_blank'>${pDetail.label}</a>`
+                out += `</div>`
+            } else {
+               out += `<div class='provider'><span class='provider'>${pDetail.label}</span><div class='links'>`
+               let pUrls = []
+               p.links.slice(0,10).forEach( l => {
+                  let url =`<a href="${l.url}" target="_blank">`
+                  if ( l.label ) {
+                     url += `${l.label}</a>`
+                  } else {
+                     url += `${l.url}</a>`
+                  }
+                  pUrls.push(url)
+               })   
+               if (p.links.length > 10 ) {
+                  pUrls.push(`see ${p.links.length -10} more on details page`)   
+               }
+               out += pUrls.join(" | ")
+               out += '</div></div>' 
             }
-            url += `${pName}`
-         } else {
-            url += `${tgtURL}`
-         }
-         url += `</a>`
-         return url
-      }
+         })
+         return out
+      },
    }
 };
 </script>
@@ -192,6 +198,18 @@ dd {
    border: 1px solid #ccc;
    border-radius: 5px;
    margin: 10px;
+}
+dd.value >>> span.provider {
+   color: var(--uvalib-grey);
+   font-weight:  bold;
+}
+dd.value >>> .links {
+   margin: 10px 0;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
+   max-width: 400px;
 }
 </style>
 <style>
