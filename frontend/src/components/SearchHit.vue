@@ -18,7 +18,7 @@
                </template>
                <template v-if="accessURLField">
                   <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value" v-html="accessURLs()"></dd>
+                  <dd class="value" v-html="accessURLDisplay(pool, accessURLField.value)"></dd>
                </template>
             </dl>
          </div>
@@ -42,7 +42,9 @@ import SearchHitHeader from '@/components/SearchHitHeader'
 import AccordionContent from '@/components/AccordionContent'
 import GroupedSearchHit from '@/components/GroupedSearchHit'
 import TruncatedText from '@/components/TruncatedText'
+import {links} from './mixins/links'
 export default {
+   mixins: [links],
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
@@ -68,7 +70,6 @@ export default {
       ...mapGetters({
          isKiosk: "system/isKiosk",
          hasCoverImages: 'pools/hasCoverImages',
-         findProvider: 'pools/findProvider'
       }),
       truncateLength() {
          if ( this.hasCoverImages(this.pool)) return 60
@@ -89,37 +90,6 @@ export default {
             return field.value.join(", ")
          }
          return field.value
-      },
-      accessURLs() {
-         // the access_url value is an array of {provider:name, links:[]}
-         let out = ""
-         let urlField = this.accessURLField
-         urlField.value.forEach( p => {
-            let pDetail = this.findProvider(this.pool, p.provider)
-            if (p.links.length == 1) {
-                out += `<div class='provider'>`
-                out += `<a href='${p.links[0].url}' target='_blank'>${pDetail.label}</a>`
-                out += `</div>`
-            } else {
-               out += `<div class='provider'><span class='provider'>${pDetail.label}</span><div class='links'>`
-               let pUrls = []
-               p.links.slice(0,10).forEach( l => {
-                  let url =`<a href="${l.url}" target="_blank">`
-                  if ( l.label ) {
-                     url += `${l.label}</a>`
-                  } else {
-                     url += `${l.url}</a>`
-                  }
-                  pUrls.push(url)
-               })   
-               if (p.links.length > 10 ) {
-                  pUrls.push(`see ${p.links.length -10} more on details page`)   
-               }
-               out += pUrls.join(" | ")
-               out += '</div></div>' 
-            }
-         })
-         return out
       },
    }
 };

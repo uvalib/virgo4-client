@@ -13,7 +13,7 @@
                </template>
                <template v-if="accessURLField">
                   <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value" v-html="accessURLs()"></dd>
+                  <dd class="value" v-html="accessURLDisplay(pool, accessURLField.value)"></dd>
                </template>
             </dl>
          </div>
@@ -27,7 +27,9 @@
 <script>
 import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
+import {links} from './mixins/links'
 export default {
+   mixins: [links],
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
@@ -38,7 +40,6 @@ export default {
    computed: {
       ...mapGetters({
          isKiosk: "system/isKiosk",
-         findProvider: 'pools/findProvider'
       }),
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
@@ -64,37 +65,6 @@ export default {
             return `<a href="${field.value}" target="_blank"><i style="margin-right:5px;" class="more fas fa-link"></i>External Link</a>`
          }
          return field.value
-      },
-      accessURLs() {
-         // the access_url value is an array of {provider:name, links:[]}
-         let out = ""
-         let urlField = this.accessURLField
-         urlField.value.forEach( p => {
-            let pDetail = this.findProvider(this.pool, p.provider)
-            if (p.links.length == 1) {
-                out += `<div class='provider'>`
-                out += `<a href='${p.links[0].url}' target='_blank'>${pDetail.label}</a>`
-                out += `</div>`
-            } else {
-               out += `<div class='provider'><span class='provider'>${pDetail.label}</span><div class='links'>`
-               let pUrls = []
-               p.links.slice(0,10).forEach( l => {
-                  let url =`<a href="${l.url}" target="_blank">`
-                  if ( l.label ) {
-                     url += `${l.label}</a>`
-                  } else {
-                     url += `${l.url}</a>`
-                  }
-                  pUrls.push(url)
-               })   
-               if (p.links.length > 10 ) {
-                  pUrls.push(`see ${p.links.length -10} more on details page`)   
-               }
-               out += pUrls.join(" | ")
-               out += '</div></div>' 
-            }
-         })
-         return out
       },
    }
 };
@@ -162,5 +132,16 @@ dt {
 }
 dd {
    margin: 0 0 10px 0;
+}
+dd.value >>> span.provider {
+   color: var(--uvalib-grey);
+   font-weight:  bold;
+}
+dd.value >>> .links {
+   margin: 10px 0;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
 }
 </style>
