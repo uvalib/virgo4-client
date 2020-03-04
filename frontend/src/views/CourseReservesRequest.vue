@@ -11,22 +11,7 @@
       <div v-else class="reserves-content">
          <V4Spinner  v-if="searching" message="Submitting your request..." v-bind:overlay="true"/>
          <div class="note">
-            <div class="title">
-               Please allow 14 days to process requests
-            </div>
-            <div class="body">
-               <p>
-                  <b>All video reserve requests will be delivered as a streaming resource to your class’s Learning Management System.</b>
-               </p>
-               <p>
-                  Note that online-only catalog entries cannot currently be included in a 
-                  Virgo course reserve request.
-               </p>
-               <p>
-                  If you need to recommend a purchase or have a personal copy to 
-                  place on reserve, please click "Submit" and follow the links on the next page.
-               </p>
-            </div>
+            Please allow 14 days to process requests
          </div>
          <div class="pure-form pure-form-aligned form">
             <div class="pure-control-group">
@@ -94,28 +79,63 @@
                </select>
             </div>
          </div>
-         <h3>Items to be placed on reserve</h3>
-         <div class="items">
-            <div class="card" v-for="bm in requestList" :key="bm.identifier">
-               <div class="title">{{bm.details.title}}</div>
-               <div class="author">{{bm.details.author}}</div>
-               <table>
-                  <tr>
-                     <td class="label">Loan Period</td>
-                     <td>
-                        <select v-model="bm.period" id="item-period" name="item-period">
-                           <option value="">Please select</option>
-                           <option value="3h">3 hours</option>
-                           <option value="2d">2 days</option>
-                           <option value="na">Not Applicable</option>
-                        </select>
-                     </td>
-                  </tr>
-                  <tr>
-                     <td class="label">Notes</td>
-                     <td><textarea v-model="bm.notes" name="item-notes"></textarea></td>
-                  </tr>
-               </table>
+         <div class="wrapper">
+            <h3>Items to be placed on reserve</h3>
+            <div class="wrapper-content">
+               <div class="items">
+                  <div class="card" v-for="bm in nonVideoRequests" :key="bm.identifier">
+                     <div class="title">{{bm.details.title}}</div>
+                     <div class="author">{{bm.details.author}} pool {{bm.pool}}</div>
+                     <table>
+                        <tr>
+                           <td class="label">Loan Period</td>
+                           <td>
+                              <select v-model="bm.period" id="item-period" name="item-period">
+                                 <option value="">Please select</option>
+                                 <option value="3h">3 hours</option>
+                                 <option value="2d">2 days</option>
+                                 <option value="na">Not Applicable</option>
+                              </select>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td class="label">Notes</td>
+                           <td><textarea v-model="bm.notes" name="item-notes"></textarea></td>
+                        </tr>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="wrapper" v-if="videoRequests">
+            <h3>Videos to be placed on reserve</h3>
+            <div class="wrapper-content">
+               <div class="video-note">
+                  <b>All video reserve requests will be delivered as a streaming resource to your class’s Learning Management System.</b>
+               </div>  
+               <div class="items">
+                  <div class="card" v-for="bm in videoRequests" :key="bm.identifier">
+                     <div class="title">{{bm.details.title}}</div>
+                     <div class="author">{{bm.details.author}}</div>
+                     <table>
+                        <tr>
+                           <td class="label">Loan Period</td>
+                           <td>
+                              <select v-model="bm.period" id="item-period" name="item-period">
+                                 <option value="">Please select</option>
+                                 <option value="3h">3 hours</option>
+                                 <option value="2d">2 days</option>
+                                 <option value="na">Not Applicable</option>
+                              </select>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td class="label">Notes</td>
+                           <td><textarea v-model="bm.notes" name="item-notes"></textarea></td>
+                        </tr>
+                     </table>
+                  </div>
+               </div>
             </div>
          </div>
          <div class="controls">
@@ -156,7 +176,13 @@ export default {
          'request.library',
          'request.period'
       ]),
-      ...mapMultiRowFields('reserves', ['requestList'])
+      ...mapMultiRowFields('reserves', ['requestList']),
+      videoRequests() {
+        return this.requestList.filter( r=> r.pool == "video") 
+      }, 
+      nonVideoRequests() {
+         return this.requestList.filter( r=> r.pool != "video") 
+      }
    },
    methods: {
       submitRequest() {
@@ -204,33 +230,13 @@ export default {
    }
 }
 div.note {
-   margin: 0 15px;
-   border-radius: 5px;
-   text-align: left;
-   max-width: 500px;
-   margin: 0 auto;
-}
-div.note .body {
-   padding: 10px;
-   border: 1px solid #ccc;
-   border-radius: 0 0 5px 5px;
-}
-div.note .body p {
-   font-size: 0.9em;
-   margin: 5px 0;
-}
-div.note .title {
-   padding: 5px;
-   background: var(--color-brand-orange);
-   color: white;
+   margin: 15px;
    text-align: center;
    font-weight: bold;
-   border-radius: 5px 5px 0 0;
-   border: 1px solid var(--color-brand-orange);;
-   border-bottom: 0;
+   font-size: 1.1em;
+   color: var(--uvalib-red );
 }
 .form {
-   border-top: 5px solid var(--color-dark-blue);
    margin: 15px;
    padding-top: 15px;
    text-align: left;
@@ -250,14 +256,22 @@ span.hint {
    display: block;
 }
 h3 {
-   border-bottom: 5px solid var(--color-dark-blue);
-   padding-bottom: 5px;
+   padding: 5px 10px;
+   text-align: left;
+   background-color: var(--color-brand-blue);
+   color: white;
+   margin: 0;
+}
+.video-note {
+   text-align: left; 
+   padding: 10px 10px 0 10px;
 }
 div.items {
    display: flex;
    flex-flow: row wrap;
    align-items: stretch;
-   justify-content: center;
+   justify-content: flex-start;
+   padding: 10px 15px;
 }
 div.card {
    text-align: left;
@@ -265,9 +279,10 @@ div.card {
    font-size: 0.8em;
    border: 1px solid #ccc;
    margin: 5px;
-   border-radius: 5px;
    display: inline-block;
    max-width: 275px;
+   /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12); */
+   background: white;
 }
 div.card .title {
    font-size:1.1em;
@@ -294,6 +309,13 @@ td textarea, td select  {
 div.controls {
    text-align: right;
    margin: 15px;
+}
+div.wrapper {
+   background: var(--uvalib-grey-lightest);
+   margin-bottom: 20px;
+}
+div.wrapper-content {
+ border: 1px solid var(--uvalib-grey-light); 
 }
 </style>
 
