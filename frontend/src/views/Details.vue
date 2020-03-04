@@ -39,8 +39,8 @@
                      <dd v-else class="value" v-html="fieldValueString(field)" :key="`v${idx}`"></dd>
                   </template>
                   <template v-if="accessURLField">
-                     <dt class="label">{{accessURLField.label}}</dt>
-                     <dd class="value" v-html="accessURLs()"></dd>
+                     <dt class="label">{{accessURLField.label}}:</dt>
+                     <dd class="value" v-html="accessURLDisplay(details.source, accessURLField.value, true)"></dd>
                   </template>
                   <template v-if="marcXML">
                      <dt class="label">MARC XML</dt>
@@ -77,9 +77,11 @@ import AvailabilityTable from "@/components/AvailabilityTable"
 import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
-
+import {links} from '@/components/mixins/links'
+   
 export default {
    name: "sources",
+   mixins: [links],
    data: function() {
       return {
          viewerOpts: {
@@ -287,5 +289,27 @@ dd {
    border: 1px solid var(--uvalib-grey-light);
    padding: 10px;
    border-radius: 5px;
+}
+.value >>> div.provider {
+   width: 100%;
+}
+.value >>> div.provider.logo {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
+   border-bottom: 1px solid var(--color-brand-blue);
+   border-top: 1px solid var(--color-brand-blue);
+}
+.value >>> span.provider {
+   font-size: 1.15em;
+   font-weight: bold;
+}
+.value >>> .logo {
+   width: 50px;
+   margin-right: 15px;
+}
+.value >>> .links {
+   margin: 20px;
 }
 </style>

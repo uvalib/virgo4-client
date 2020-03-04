@@ -115,6 +115,11 @@ const pools = {
          let pool = state.list.find(p=> p.id == data.pool)
          pool.providers.splice(0, pool.providers.length)
          data.providers.forEach( prov => {
+            if ( prov.logo_url ) {
+               let logo = prov.logo_url
+               logo = logo.replace("./", "/")
+               prov.logo_url= pool.url+logo
+            }
             pool.providers.push(prov)
          })
       }
