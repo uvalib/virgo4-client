@@ -55,7 +55,7 @@
                      <dt class="value more"  v-html="sirsiLink"></dt>
                   </template>
                   <template v-if="poolMode=='image'">
-                     <dt class="label">Image:</dt> 
+                     <dt class="label">Image:</dt>
                      <dd class="image">
                         <ImageDetails :mode="mode"/>
                      </dd>
@@ -78,7 +78,7 @@ import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
 import {links} from '@/components/mixins/links'
-   
+
 export default {
    name: "sources",
    mixins: [links],
@@ -99,7 +99,7 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable, V4Spinner, 
+      SearchHitHeader, AvailabilityTable, V4Spinner,
       ImageDetails, AccordionContent
    },
    computed: {
@@ -167,8 +167,8 @@ export default {
          return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.type=="iiif-manifest-url" || 
-            field.type=="iiif-base-url" || field.type=="iiif-base-url" || 
+         if (field.display == 'optional' || field.type=="iiif-manifest-url" ||
+            field.type=="iiif-base-url" || field.type=="iiif-base-url" ||
             field.name=="sirsi_url" || field.name=="iiif_image_url" || field.name == "access_url") {
             return false
          }
@@ -195,9 +195,9 @@ export default {
          let url =`<a href="${tgtURL}" target="_blank">`
          if (provider) {
             let pDetail = this.findProvider(this.details.source, provider)
-            let pName = provider 
+            let pName = provider
             if (pDetail.label) {
-               pName = pDetail.label   
+               pName = pDetail.label
             }
             url += `${pName}`
          } else {
@@ -283,12 +283,17 @@ dd {
     padding: 15px 0 10px 0;
     text-align: left;
 }
+.marc {
+   margin-left: -6em;
+}
 .xml {
    font-weight: normal;
    font-size: 0.8em;
    border: 1px solid var(--uvalib-grey-light);
    padding: 10px;
    border-radius: 5px;
+   white-space: pre-wrap;
+   max-height: 30em;
 }
 .value >>> div.provider {
    width: 100%;
