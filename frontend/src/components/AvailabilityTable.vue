@@ -14,7 +14,7 @@
                         {{column}}
                      </th>
                      <th></th>
-                     <th></th>
+                     <th v-if="isAdmin"></th>
                   </tr>
                </thead>
 
@@ -77,8 +77,15 @@ table {
    margin-bottom: 10vh;
 }
 td, th {
-   padding: 0.5rem;
+   padding: 0.5em;
    text-align: left;
+   font-size: 1rem;
+}
+@media only screen and (max-width: 768px) {
+  td, th {
+     padding: 0.5em 0.1em;
+     font-size: 0.9rem;
+  }
 }
 tr {
    border: 1px solid black;
