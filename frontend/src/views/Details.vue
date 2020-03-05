@@ -283,7 +283,7 @@ dd {
     padding: 15px 0 10px 0;
     text-align: left;
 }
-.marc {
+#marc.accordion-content {
    margin-left: -6em;
 }
 .xml {
