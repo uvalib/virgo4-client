@@ -57,6 +57,9 @@ const reserves = {
          state.requestList.forEach(item => {
             item.period = ""
             item.notes = ""
+            item.audioLanguage = "English"
+            item.subtitles= "no"
+            item.subtitleLanguage = ""
             item.valid = true
          });
          state.request = {onBehalfOf: "no",
@@ -67,7 +70,7 @@ const reserves = {
             course: "",
             semester: "",
             library: "",
-            period: ""
+            period: "",
          }
       },
       clearRequestList(state) {
@@ -80,7 +83,7 @@ const reserves = {
             course: "",
             semester: "",
             library: "",
-            period: ""
+            period: "",
          }
       },
       setCourseReserves(state, data) {
@@ -145,7 +148,7 @@ const reserves = {
          ctx.state.requestList.forEach( item=>{
             let notes = item.notes
             if (notes.length == 0) notes = "-"
-            data.items.push( {catalogKey: item.identifier, 
+            let subItem = {catalogKey: item.identifier, 
                pool: item.pool,
                title: item.details.title,
                callNumber: item.details.callNumber,
@@ -154,7 +157,13 @@ const reserves = {
                library: item.details.library,
                availability: item.details.availability,
                notes: notes, 
-               period: item.period} )    
+               period: item.period} 
+            if (item.pool == 'video') {
+               subItem.audioLanguage = item.audioLanguage 
+               subItem.subtitles = item.subtitles 
+               subItem.subtitleLanguage = item.subtitleLanguage
+            }
+            data.items.push( subItem )    
          })
          axios.post(`/api/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')

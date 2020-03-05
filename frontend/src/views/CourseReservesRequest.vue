@@ -69,7 +69,7 @@
                   <option value="physics">Physics</option>
                </select>
             </div>
-            <div class="pure-control-group">
+            <div class="pure-control-group" v-if="nonVideoRequests.length > 0">
                <label for="period">Loan Period <span class="hint">(for all items)</span></label>
                <select @change="itemsPeriodChosen" v-model="period" id="period" name="period">
                   <option value="">Please select</option>
@@ -79,36 +79,32 @@
                </select>
             </div>
          </div>
-         <div class="wrapper">
-            <h3>Items to be placed on reserve</h3>
+         <div class="wrapper" v-if="nonVideoRequests.length > 0">
+            <h3>Non-video format items to be placed on reserve</h3>
             <div class="wrapper-content">
                <div class="items">
                   <div class="card" v-for="bm in nonVideoRequests" :key="bm.identifier">
                      <div class="title">{{bm.details.title}}</div>
                      <div class="author">{{bm.details.author}} pool {{bm.pool}}</div>
-                     <table>
-                        <tr>
-                           <td class="label">Loan Period</td>
-                           <td>
-                              <select v-model="bm.period" id="item-period" name="item-period">
-                                 <option value="">Please select</option>
-                                 <option value="3h">3 hours</option>
-                                 <option value="2d">2 days</option>
-                                 <option value="na">Not Applicable</option>
-                              </select>
-                           </td>
-                        </tr>
-                        <tr>
-                           <td class="label">Notes</td>
-                           <td><textarea v-model="bm.notes" name="item-notes"></textarea></td>
-                        </tr>
-                     </table>
+                     <dl>
+                        <dt>Loan Period</dt>
+                        <dd>
+                           <select v-model="bm.period" id="item-period" name="item-period">
+                              <option value="">Please select</option>
+                              <option value="3h">3 hours</option>
+                              <option value="2d">2 days</option>
+                              <option value="na">Not Applicable</option>
+                           </select>
+                        </dd>
+                        <dt>Notes</dt>
+                        <dd><textarea v-model="bm.notes" name="item-notes"></textarea></dd>
+                     </dl>
                   </div>
                </div>
             </div>
          </div>
-         <div class="wrapper" v-if="videoRequests">
-            <h3>Videos to be placed on reserve</h3>
+         <div class="wrapper" v-if="videoRequests.length > 0">
+            <h3>Video-format items to be placed on reserve</h3>
             <div class="wrapper-content">
                <div class="video-note">
                   <b>All video reserve requests will be delivered as a streaming resource to your class’s Learning Management System.</b>
@@ -117,23 +113,19 @@
                   <div class="card" v-for="bm in videoRequests" :key="bm.identifier">
                      <div class="title">{{bm.details.title}}</div>
                      <div class="author">{{bm.details.author}}</div>
-                     <table>
-                        <tr>
-                           <td class="label">Loan Period</td>
-                           <td>
-                              <select v-model="bm.period" id="item-period" name="item-period">
-                                 <option value="">Please select</option>
-                                 <option value="3h">3 hours</option>
-                                 <option value="2d">2 days</option>
-                                 <option value="na">Not Applicable</option>
-                              </select>
-                           </td>
-                        </tr>
-                        <tr>
-                           <td class="label">Notes</td>
-                           <td><textarea v-model="bm.notes" name="item-notes"></textarea></td>
-                        </tr>
-                     </table>
+                     <dl>
+                        <dt class="label">Preferred Audio Language</dt>
+                        <dd><input v-model="bm.audioLanguage" type="text"></dd>
+                        <dt class="label">Subtitles</dt> 
+                        <dd>
+                           <select v-model="bm.subtitles">
+                              <option value="yes">Yes</option>
+                              <option value="no">No</option>
+                           </select>
+                        </dd>
+                        <dt class="label">Subtitles Language</dt> 
+                        <dd><input v-model="bm.subtitleLanguage" type="text"></dd>
+                     </dl>
                   </div>
                </div>
             </div>
@@ -174,7 +166,7 @@ export default {
          'request.course',
          'request.semester',
          'request.library',
-         'request.period'
+         'request.period',
       ]),
       ...mapMultiRowFields('reserves', ['requestList']),
       videoRequests() {
@@ -281,8 +273,8 @@ div.card {
    margin: 5px;
    display: inline-block;
    max-width: 275px;
-   /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12); */
    background: white;
+   flex-grow: 1;
 }
 div.card .title {
    font-size:1.1em;
@@ -290,21 +282,6 @@ div.card .title {
 }
 div.card .author {
    margin: 5px 0 10px 10px;
-}
-table tr td {
-   padding: 5px;
-}
-div.card table, td select, td textarea {
-   width: 100%;
-}
-td.label {
-   text-align: right;
-   font-weight: bold;
-}
-td textarea, td select  {
-   border: 1px solid #ccc;
-   border-radius: 5px;
-   box-sizing: border-box;
 }
 div.controls {
    text-align: right;
@@ -316,6 +293,32 @@ div.wrapper {
 }
 div.wrapper-content {
  border: 1px solid var(--uvalib-grey-light); 
+}
+dl {
+   margin: 0;
+   display: inline-grid;
+   grid-template-columns: 1fr 1.5fr;
+   grid-column-gap: 10px;
+}
+dt {
+   margin: 0 0 15px 0;
+   font-weight: bold;
+   text-align: right;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
+}
+dd {
+   margin: 0 0 15px 0;
+   vertical-align: top;
+}
+dd input, dd select, dd textarea  {
+   border: 1px solid #ccc;
+   padding: 3px 6px;
+   border-radius: 3px;
+   box-sizing: border-box;
+   width: 100%;
 }
 </style>
 

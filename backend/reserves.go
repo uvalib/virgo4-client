@@ -38,15 +38,18 @@ type RequestParams struct {
 
 // RequestItem is the details for a particular reserve item
 type RequestItem struct {
-	Pool         string             `json:"pool"`
-	CatalogKey   string             `json:"catalogKey"`
-	CallNumber   string             `json:"callNumber"`
-	Title        string             `json:"title"`
-	Author       string             `json:"author"`
-	Period       string             `json:"period"`
-	Notes        string             `json:"notes"`
-	VirgoURL     string             `json:"-"`
-	Availability []AvailabilityInfo `json:"-"`
+	Pool             string             `json:"pool"`
+	CatalogKey       string             `json:"catalogKey"`
+	CallNumber       string             `json:"callNumber"`
+	Title            string             `json:"title"`
+	Author           string             `json:"author"`
+	Period           string             `json:"period"`
+	Notes            string             `json:"notes"`
+	AudioLanguage    string             `json:"audioLanguage"`
+	Subtitles        string             `json:"subtitles"`
+	SubtitleLanguage string             `json:"subtitleLanguage"`
+	VirgoURL         string             `json:"-"`
+	Availability     []AvailabilityInfo `json:"-"`
 }
 
 // AvailabilityInfo contains item availabilty information used to generate

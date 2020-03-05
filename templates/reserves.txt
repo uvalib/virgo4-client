@@ -27,10 +27,19 @@ Library: {{ $avail.Library }}
 Location: {{ $avail.Location }}
 Availability: {{ $avail.Availability }}
 Call Number: {{ $avail.CallNumber }}
-{{- end -}}
+{{- end }}
 Reserve Library: {{ $reserveLib }}
+
+{{- if eq $item.Pool "video"}} 
+Audio Language: {{ $item.AudioLanguage }}
+Subtitles: {{ $item.Subtitles }}
+{{- if eq $item.Subtitles "yes"}} 
+Subtitle Language: {{ $item.SubtitleLanguage }}
+{{- end}}
+{{- else }}
 Loan Period: {{ $item.Period }}
 Notes: {{ $item.Notes }}
+{{- end }}
 
 Virgo URL: {{ $item.VirgoURL }}
 {{ end -}}
