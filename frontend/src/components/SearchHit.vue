@@ -18,7 +18,9 @@
                </template>
                <template v-if="accessURLField">
                   <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value" v-html="accessURLDisplay(pool, accessURLField.value)"></dd>
+                  <dd class="value">
+                     <AccessURLDetails mode="brief" :pool="pool" :urls="accessURLField.value" />
+                  </dd>
                </template>
             </dl>
          </div>
@@ -42,16 +44,15 @@ import SearchHitHeader from '@/components/SearchHitHeader'
 import AccordionContent from '@/components/AccordionContent'
 import GroupedSearchHit from '@/components/GroupedSearchHit'
 import TruncatedText from '@/components/TruncatedText'
-import {links} from './mixins/links'
+import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
-   mixins: [links],
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
       count: {type: Number, required: true}
    },
    components: {
-      SearchHitHeader, AccordionContent, GroupedSearchHit, TruncatedText
+      SearchHitHeader, AccordionContent, GroupedSearchHit, TruncatedText, AccessURLDetails
    },
    computed: {
       accessURLField() {
@@ -168,18 +169,6 @@ dd {
    border: 1px solid #ccc;
    border-radius: 5px;
    margin: 10px;
-}
-dd.value >>> span.provider {
-   color: var(--uvalib-grey);
-   font-weight:  bold;
-}
-dd.value >>> .links {
-   margin: 10px 0;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-   max-width: 400px;
 }
 </style>
 <style>

@@ -40,7 +40,9 @@
                   </template>
                   <template v-if="accessURLField">
                      <dt class="label">{{accessURLField.label}}:</dt>
-                     <dd class="value" v-html="accessURLDisplay(details.source, accessURLField.value, true)"></dd>
+                     <dd class="value">
+                        <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
+                     </dd>
                   </template>
                   <template v-if="marcXML">
                      <dt class="label">MARC XML</dt>
@@ -77,11 +79,10 @@ import AvailabilityTable from "@/components/AvailabilityTable"
 import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
-import {links} from '@/components/mixins/links'
+import AccessURLDetails from '@/components/AccessURLDetails'
 
 export default {
    name: "sources",
-   mixins: [links],
    data: function() {
       return {
          viewerOpts: {
@@ -100,7 +101,7 @@ export default {
    },
    components: {
       SearchHitHeader, AvailabilityTable, V4Spinner,
-      ImageDetails, AccordionContent
+      ImageDetails, AccordionContent, AccessURLDetails
    },
    computed: {
       ...mapState({
@@ -112,7 +113,6 @@ export default {
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
          poolDetails: 'pools/poolDetails',
-         findProvider: 'pools/findProvider'
       }),
       poolMode() {
          let details = this.poolDetails(this.details.source)
@@ -181,31 +181,6 @@ export default {
          }
          return field.value
       },
-      accessURLs() {
-         // NOTE: access URLs are special. instead value being an array of strings,
-         // it is an array of objects: {url, provider}
-         let out = []
-         this.accessURLField .value.forEach( v => {
-            let url = this.generateURLCode(v.provider, v.url)
-            out.push( url )
-         })
-         return out.join("<br/>")
-      },
-      generateURLCode( provider, tgtURL) {
-         let url =`<a href="${tgtURL}" target="_blank">`
-         if (provider) {
-            let pDetail = this.findProvider(this.details.source, provider)
-            let pName = provider
-            if (pDetail.label) {
-               pName = pDetail.label
-            }
-            url += `${pName}`
-         } else {
-            url += `${tgtURL}`
-         }
-         url += `</a>`
-         return url
-      }
    },
    created() {
       this.getDetails()

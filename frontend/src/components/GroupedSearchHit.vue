@@ -13,7 +13,9 @@
                </template>
                <template v-if="accessURLField">
                   <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value" v-html="accessURLDisplay(pool, accessURLField.value)"></dd>
+                  <dd class="value">
+                     <AccessURLDetails mode="brief" :pool="pool" :urls="accessURLField.value" />
+                  </dd>
                </template>
             </dl>
          </div>
@@ -27,15 +29,14 @@
 <script>
 import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
-import {links} from './mixins/links'
+import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
-   mixins: [links],
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
    },
    components: {
-      SearchHitHeader
+      SearchHitHeader, AccessURLDetails
    },
    computed: {
       ...mapGetters({
@@ -132,16 +133,5 @@ dt {
 }
 dd {
    margin: 0 0 10px 0;
-}
-dd.value >>> span.provider {
-   color: var(--uvalib-grey);
-   font-weight:  bold;
-}
-dd.value >>> .links {
-   margin: 10px 0;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
 }
 </style>

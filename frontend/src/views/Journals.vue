@@ -57,7 +57,9 @@
                         </template>
                         <template  v-if="i.accessURL">
                            <dt>Online Access:</dt> 
-                           <dd class="links" v-html="accessURLDisplay('journals', i.accessURL)"></dd>
+                           <dd>
+                              <AccessURLDetails mode="brief" pool="journals" :urls="i.accessURL" />
+                           </dd>
                         </template>
                      </dl>
                   </AccordionContent>
@@ -73,12 +75,11 @@ import { mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
 import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
-import {links} from '@/components/mixins/links'
+import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
    name: "journals",
-   mixins: [links],
    components: {
-      V4Spinner, AccordionContent
+      V4Spinner, AccordionContent, AccessURLDetails
    },
    computed: {
       ...mapState({
@@ -258,17 +259,6 @@ dt {
 }
 dd {
    margin: 0 0 5px 0;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-}
-dd.links >>> span.provider {
-   color: var(--uvalib-grey);
-   font-weight:  bold;
-}
-dd.links >>> .links {
-   margin: 5px 0;
    word-break: break-word;
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
