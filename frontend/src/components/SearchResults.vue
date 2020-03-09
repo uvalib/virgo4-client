@@ -1,6 +1,6 @@
 <template>
    <div class="search-results shady">
-
+      <SearchSuggestions />
       <div class="results-header">
          <template v-if="showSummary">
             <div class="summary">
@@ -56,9 +56,10 @@ import PoolResultDetail from "@/components/PoolResultDetail"
 import V4Select from "@/components/V4Select"
 import FacetSidebar from "@/components/FacetSidebar"
 import SaveSearch from "@/components/popovers/SaveSearch"
+import SearchSuggestions from "@/components/SearchSuggestions"
 export default {
    components: {
-      PoolResultDetail, V4Select, FacetSidebar, SaveSearch
+      PoolResultDetail, V4Select, FacetSidebar, SaveSearch, SearchSuggestions
    },
    props: {
       showSummary: { type: Boolean, default: true},
@@ -68,20 +69,20 @@ export default {
          hitPoolCount: 'hitPoolCount',
          skippedPoolCount: 'skippedPoolCount',
          failedPoolCount: 'failedPoolCount',
-         isSignedIn: 'user/isSignedIn'
+         isSignedIn: 'user/isSignedIn',
+         rawQueryString: 'query/string'
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
-         lastSearch: state=>state.query.lastSearch,
       }),
       ...mapFields([
         'otherSrcSelection'
       ]),
       queryString() {
-         return this.lastSearch.replace(/\{|\}/g, "")
+         return this.rawQueryString.replace(/\{|\}/g, "")
       },
       otherSrcBkg() {
          if (this.otherSrcSelection.id == "") return "#FFF"

@@ -112,7 +112,6 @@ export default {
          if (this.queryEntered) {
             // this is a new search, reset everything
             this.$store.commit('resetSearchResults')
-            this.$store.commit('query/setLastSearch', this.rawQueryString)
             this.$store.commit('filters/reset')
             this.$store.dispatch("searchAllPools")
          } else {

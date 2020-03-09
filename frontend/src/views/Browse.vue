@@ -42,14 +42,19 @@ export default {
 
          let prior = this.rawQueryString
          let targetQ = this.$route.query.q
+         let browseType = this.$route.params.type 
+
 
          // Update query to be a subject search matching the param.
          // Do the search only if the new query is different from prior
-         this.$store.commit("query/setSubjectSearch", targetQ)
+         if (browseType == "subjects") {
+            this.$store.commit("query/browseSubjects", targetQ)
+         } else if (browseType == "author") {
+            this.$store.commit("query/browseAuthors", targetQ)
+         }
          let newQ = this.rawQueryString
          if ( newQ != prior ) {
             this.$store.commit('resetSearchResults')
-            this.$store.commit('query/setLastSearch', newQ)
             this.$store.commit('filters/reset')
             this.$store.dispatch("searchAllPools")
          }

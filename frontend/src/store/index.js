@@ -26,6 +26,7 @@ export default new Vuex.Store({
     searching: false,
     pageSize: 20,
     results: [],
+    suggestions: [],
     total: -1,
     autoExpandGroupID: "",
     selectedResultsIdx: -1,
@@ -205,6 +206,13 @@ export default new Vuex.Store({
       state.total = results.total_hits
     },
 
+    setSuggestions(state, data) {
+      state.suggestions.splice(0, state.suggestions.length)
+      data.forEach( d=> {
+         state.suggestions.push(d)   
+      })
+    },
+
     incrementPage(state) {
       state.noSpinner = true
       state.results[state.selectedResultsIdx].page++
@@ -274,6 +282,7 @@ export default new Vuex.Store({
         commit('setSearchResults', response.data)
         commit('setSearching', false)
         dispatch("filters/getSelectedResultFacets")
+        commit('setSuggestions', response.data.suggestions)
       }).catch((error) => {
          commit('system/setError', error)
          commit('setSearching', false)

@@ -100,6 +100,12 @@ export default {
               this.$route.params.id != "")
       }
    },
+   mounted: function() {
+      // The search page has been mounted either by direct 
+      // URL access or by a browser back action. Put search mode 
+      // back to basic or advanced if it was previously browse
+      this.$store.dispatch("query/updateSearchMode")
+   },
    created: function() {
       this.searchCreated()
    },
@@ -189,7 +195,6 @@ export default {
 
       searchClicked() {
         this.$store.commit('resetSearchResults')
-        this.$store.commit('query/setLastSearch', this.rawQueryString)
         this.$store.commit('filters/reset')
         this.$store.dispatch("searchAllPools")
       },
