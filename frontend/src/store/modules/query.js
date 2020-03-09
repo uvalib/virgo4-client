@@ -147,6 +147,8 @@ const query = {
             } else {
                state.mode = "basic"  
             }  
+            state.browse = [
+               { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
          }
       },
       clear(state) {
@@ -161,10 +163,15 @@ const query = {
       },
    },
    actions: {
-      updateSearchMode(ctx) {
+      initSearchMode(ctx) {
          if (ctx.state.mode == "browse") {
             ctx.commit('updateSearchMode')
-            ctx.dispatch("searchAllPools", null, { root: true })
+            if ( ctx.state.mode == "basic" && ctx.state.basic != "" || 
+                 ctx.state.mode == "advanced" && ctx.state.advanced[0].value != "") {
+               ctx.dispatch("searchAllPools", null, { root: true })
+            } else {
+               ctx.commit("resetSearchResults", null, { root: true }) 
+            }
          }
       },
       async loadSearch(ctx, token) {

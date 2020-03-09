@@ -102,9 +102,9 @@ export default {
    },
    mounted: function() {
       // The search page has been mounted either by direct 
-      // URL access or by a browser back action. Put search mode 
-      // back to basic or advanced if it was previously browse
-      this.$store.dispatch("query/updateSearchMode")
+      // URL access or by a browser back action. Put initialize 
+      // the query module for searching (as opposed to browsing)
+      this.$store.dispatch("query/initSearchMode")
    },
    created: function() {
       this.searchCreated()
