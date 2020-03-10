@@ -1,5 +1,7 @@
 <template>
-  <button @click="placeHold" class="button">Place Hold</button>
+  <div>
+    <button @click="placeHold" class="button">Place Hold</button>
+  </div>
 </template>
 <script>
 import { mapFields } from 'vuex-map-fields';
@@ -7,14 +9,13 @@ import { mapFields } from 'vuex-map-fields';
 export default {
   props: {
     titleId: String,
-    barcode: String,
   },
   computed: {
-    ...mapFields('requests', ['hold']),
+    ...mapFields(['requests.hold', ]),
   },
   methods: {
     placeHold() {
-      this.hold = {titleId: this.titleId, barcode: this.barcode}
+      this.hold = {titleId: this.titleId}
       this.$store.dispatch('requests/createHold')
     }
   }

@@ -6,7 +6,9 @@
       <template v-else>
          <template v-if="availability.items.length">
             <h2>Availability</h2>
-            <p>{{alertText}}</p>
+
+            <RequestPanel v-if="isAdmin" :titleId="titleId" />
+
             <table class="fields">
                <thead>
                   <tr>
@@ -14,7 +16,6 @@
                         {{column}}
                      </th>
                      <th></th>
-                     <th v-if="isAdmin"></th>
                   </tr>
                </thead>
 
@@ -27,10 +28,6 @@
                        <AvailabilityNotice v-bind:message="item.notice" />
                     </span>
                   </td>
-                  <td>
-                    <PlaceHoldButton v-if="isAdmin"
-                      :titleId="titleId" :barcode="item.barcode" />
-                  </td>
                </tr>
             </table>
          </template>
@@ -42,10 +39,10 @@
 import { mapGetters } from "vuex"
 import AvailabilityNotice from "@/components/popovers/AvailabilityNotice"
 import V4Spinner from "@/components/V4Spinner"
-import PlaceHoldButton from "@/components/requests/PlaceHoldButton"
+import RequestPanel from "@/components/requests/RequestPanel"
 export default {
   components: {
-    AvailabilityNotice, V4Spinner, PlaceHoldButton
+    AvailabilityNotice, V4Spinner, RequestPanel
   },
    props: {
       titleId: String
@@ -54,7 +51,6 @@ export default {
       ...mapGetters({
          availability: 'item/availability',
          isAdmin: 'user/isAdmin',
-         alertText: 'requests/alertText',
       }),
    },
    methods: {

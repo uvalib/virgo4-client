@@ -7,14 +7,21 @@ const requests = {
     hold: {
       titleId: null,
       barcode: null,
+    },
+    steps: [
+      'SignInStep',
+      'PlaceHoldStep'
 
-    }
+    ]
 
   },
   getters: {
     getField,
     alertText(store){
       return store.alertText
+    },
+    totalSteps(store){
+      return store.steps.length
     }
   },
   mutations: {
