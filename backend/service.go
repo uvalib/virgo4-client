@@ -25,6 +25,7 @@ type ServiceContext struct {
 	VirgoURL           string
 	SearchAPI          string
 	CourseReserveEmail string
+	LawReserveEmaiil   string
 	FeedbackEmail      string
 	ILSAPI             string
 	Dev                DevConfig
@@ -49,6 +50,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		SearchAPI:          cfg.SearchAPI,
 		Solr:               cfg.Solr,
 		CourseReserveEmail: cfg.CourseReserveEmail,
+		LawReserveEmaiil:   cfg.LawReserveEmaiil,
 		FeedbackEmail:      cfg.FeedbackEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
