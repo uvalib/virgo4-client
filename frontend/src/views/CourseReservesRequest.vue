@@ -10,8 +10,11 @@
       </div>
       <div v-else class="reserves-content">
          <V4Spinner  v-if="searching" message="Submitting your request..." v-bind:overlay="true"/>
-         <div class="note">
+         <div class="note important">
             Please allow 14 days to process requests
+         </div>
+         <div class="note">
+            If you need to recommend a purchase or have a personal copy to place on reserve, please click ‘Submit Request’ and follow the links on the next page.
          </div>
          <div class="pure-form pure-form-aligned form">
             <div class="pure-control-group">
@@ -80,7 +83,7 @@
             </div>
          </div>
          <div class="wrapper" v-if="nonVideoRequests.length > 0">
-            <h3>Non-video format items to be placed on reserve</h3>
+            <h3 class="video">Non-video format items to be placed on reserve</h3>
             <div class="wrapper-content">
                <div class="items">
                   <div class="card" v-for="bm in nonVideoRequests" :key="bm.identifier">
@@ -107,7 +110,9 @@
             <h3>Video-format items to be placed on reserve</h3>
             <div class="wrapper-content">
                <div class="video-note">
-                  <b>All video reserve requests will be delivered as a streaming resource to your class’s Learning Management System.</b>
+                  <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System. 
+                     If you have questions about video reserves, please email
+                     <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.</b>
                </div>  
                <div class="items">
                   <div class="card" v-for="bm in videoRequests" :key="bm.identifier">
@@ -125,6 +130,8 @@
                         </dd>
                         <dt class="label">Subtitles Language</dt> 
                         <dd><input v-model="bm.subtitleLanguage" type="text"></dd>
+                        <dt>Notes</dt>
+                        <dd><textarea v-model="bm.notes" name="item-notes"></textarea></dd>
                      </dl>
                   </div>
                </div>
@@ -224,9 +231,11 @@ export default {
 div.note {
    margin: 15px;
    text-align: center;
-   font-weight: bold;
-   font-size: 1.1em;
+}
+.video-note, .note.important {
    color: var(--uvalib-red );
+   font-size: 1.1em;
+   font-weight: bold;
 }
 .form {
    margin: 15px;

@@ -1,5 +1,10 @@
 _______________________________________________________________________
 Course Reserve Information
+
+Reminder:
+All video reserve requests will be delivered as streaming resources to your class’s 
+Learning Management System. If you have questions about video reserves, please email
+lib-reserves@virginia.edu.
 _______________________________________________________________________
 Requester Name:      {{.Request.Name}}
 Requester Email:     {{.Request.Email}}
@@ -14,7 +19,7 @@ _______________________________________________________________________
 
 {{- $reserveLib := .Request.Library -}}
 {{- $url := .VirgoURL -}}
-{{ range $index, $item := .NonVideo }}
+{{ range $index, $item := .Video }}
 {{ add $index 1 }}.
 {{ $item.Title}}
 {{ $item.Author}}
@@ -26,7 +31,11 @@ Call Number: {{ $avail.CallNumber }}
 {{- end }}
 Reserve Library: {{ $reserveLib }}
 
-Loan Period: {{ $item.Period }}
+Audio Language: {{ $item.AudioLanguage }}
+Subtitles: {{ $item.Subtitles }}
+{{- if eq $item.Subtitles "yes"}} 
+Subtitle Language: {{ $item.SubtitleLanguage }}
+{{- end}}
 Notes: {{ $item.Notes }}
 
 Virgo URL: {{ $item.VirgoURL }}
