@@ -121,7 +121,6 @@
                   </div>
                </div>
             </div>
-            <V4Privacy style="margin-bottom:25px;"/>
          </template>
       </div>
    </div>
@@ -134,7 +133,6 @@ import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
 import ChangePin from '@/components/popovers/ChangePin'
 import V4Spinner from "@/components/V4Spinner"
-import V4Privacy from "@/components/V4Privacy"
 export default {
    name: "account",
    data: function() {
@@ -144,7 +142,7 @@ export default {
    },
    components: {
       AccountActivities, AccordionContent, 
-      V4Spinner, ChangePin, V4Privacy
+      V4Spinner, ChangePin
    },
    computed: {
       ...mapState({

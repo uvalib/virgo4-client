@@ -1,10 +1,10 @@
 <template>
    <div class="privacy">
-      <div><b>The library values your privacy.</b></div>
+      <div><b>The Library values your privacy.</b></div>
       <div>
          We collect analytics information that is not personally identifiable 
          for the purpose of evaluating trends in usage or otherwise improving 
-         the product.  We retain this aggregate information for a limited time.
+         the product.<br/>We retain this aggregate information for a limited time.
       </div>
       <div class="opt-out">
          <span v-if="trackingOptOut">

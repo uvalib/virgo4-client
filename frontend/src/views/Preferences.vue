@@ -9,6 +9,7 @@
       <div v-else>
         <ExcludedPools class="section"/>
         <PickupLibrary class="section"/>
+        <V4Privacy class="section"/>
       </div>
     </div>
   </div>
@@ -21,10 +22,11 @@ import AccountActivities from "@/components/AccountActivities"
 import ExcludedPools from "@/components/preferences/ExcludedPools"
 import PickupLibrary from "@/components/preferences/PickupLibrary"
 import V4Spinner from "@/components/V4Spinner"
+import V4Privacy from "@/components/V4Privacy"
 export default {
    name: "preferences",
    components: {
-      AccountActivities, V4Spinner, ExcludedPools, PickupLibrary
+      AccountActivities, V4Spinner, ExcludedPools, PickupLibrary, V4Privacy
    },
    computed: {
       ...mapState({
