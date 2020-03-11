@@ -114,9 +114,9 @@ export default {
       },
       availabilityOpts() {
          return [
-            {id: "any", name: "Any"},
+            {id: "any", name: "All"},
             {id: "online", name: "Online"},
-            {id: "shelf", name: "On Shelf"},
+            {id: "shelf", name: "On Shelf Now"},
          ]
       },
    },

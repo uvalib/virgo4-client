@@ -17,10 +17,10 @@ const filters = {
       updatingFacets: false,
 
       // Global availability and hard-coded filter values
-      globalAvailability: {id: "any", name: "Any"},
+      globalAvailability: {id: "any", name: "All"},
       availabilityFacet: "FacetAvailability",
       availabilityValues: {"online": "Online",
-         "shelf": "On shelf"}
+         "shelf": "On Shelf Now"}
    },
 
    getters: {
