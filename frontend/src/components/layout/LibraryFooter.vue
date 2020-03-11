@@ -106,6 +106,7 @@ footer {
    background-color: var(--uvalib-brand-blue);
    color: white;
    padding:20px 20px 0 20px;
+   margin-top: 25px;
 }
 footer p.copy, footer p.gov {
    vertical-align: middle;

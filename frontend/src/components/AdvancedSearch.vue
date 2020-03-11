@@ -65,15 +65,15 @@
          <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">
-         <router-link to="/journals">
-            Browse Journals&nbsp;<i class="far fa-newspaper"></i>
-         </router-link>
-      </div>
-      <div class="basic">
          <span class="text-button basic-link" @click="basicClicked">
             Basic Search&nbsp;
             <i class="fas fa-undo-alt"></i>
          </span>
+      </div>
+      <div class="basic">
+         <router-link to="/journals">
+            Browse Journals&nbsp;<i class="far fa-newspaper"></i>
+         </router-link>
       </div>
    </div>
 </template>
@@ -202,18 +202,17 @@ div.query {
    
 }
 .controls {
-   font-size: 0.85em;
-   font-weight: bold;
-   padding: 10px 0;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
-   justify-content: flex-end;
-   margin-bottom: 10px;
+  padding: 10px 0;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-start;
 }
-
-.controls > * {
-   flex: 0 1 auto;
+.controls .pure-button.pure-button-primary {
+   margin-left: auto;
+}
+.controls  > * {
+  flex: 0 1 auto;
 }
 
 div.search-term {
@@ -248,11 +247,9 @@ div.search-term .date-criteria input:last-child {
 }
 
 div.basic {
-   text-align: right;
-}
-.text-button.basic-link {
    margin-top: 10px;
-   font-size: 1em;
+  font-size: 1em;
+  text-align: right;
 }
 .text-button.basic-link:hover {
    text-decoration: underline;
