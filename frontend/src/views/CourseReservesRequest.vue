@@ -28,23 +28,28 @@
                <div class="pure-control-group">
                   <label for="instructor_name">Instructor Name</label>
                   <input v-model="instructorName" name="instructor_name" id="instructor_name" type="text">
+                  <span v-if="hasError('instructorName')" class="error">* instructor name is required</span>
                </div>
                <div class="pure-control-group">
                   <label for="instructor_email">Instructor Email Address</label>
                   <input v-model="instructorEmail" id="instructor_email" type="email">
+                  <span v-if="hasError('instructorEmail')" class="error">* instructor email is required</span>
                </div>
             </template>
             <div class="pure-control-group">
                <label for="name">Your Name</label>
                <input v-model="name" id="name" type="text">
+               <span v-if="hasError('name')" class="error">* name is required</span>
             </div>
             <div class="pure-control-group">
                <label for="email">Your  Email Address</label>
                <input v-model="email" id="email" type="email">
+               <span v-if="hasError('email')" class="error">* email is required</span>
             </div>
             <div class="pure-control-group">
                <label for="course">Course ID<span class="hint">(e.g. MDST 3840)</span></label>
                <input v-model="course" id="course" type="text">
+               <span v-if="hasError('course')" class="error">* course ID is required</span>
             </div>
             <div class="pure-control-group">
                <label for="semester">Semester</label>
@@ -57,6 +62,7 @@
                   <option value="Summer II">Summer II</option>
                   <option value="Summer III">Summer III</option>
                </select>
+               <span v-if="hasError('semester')" class="error">* semester is required</span>
             </div>
             <div class="pure-control-group">
                <label for="library">Reserve Library</label>
@@ -71,6 +77,7 @@
                   <option value="music">Music</option>
                   <option value="physics">Physics</option>
                </select>
+               <span v-if="hasError('library')" class="error">* library is required</span>
             </div>
             <div class="pure-control-group" v-if="nonVideoRequests.length > 0">
                <label for="period">Loan Period <span class="hint">(for all items)</span></label>
@@ -80,8 +87,10 @@
                   <option value="2d">2 days</option>
                   <option value="na">Not Applicable</option>
                </select>
+               <span v-if="hasError('period')" class="error">* load period is required</span>
             </div>
          </div>
+
          <div class="wrapper" v-if="nonVideoRequests.length > 0">
             <h3 class="video">Non-video format items to be placed on reserve</h3>
             <div class="wrapper-content">
@@ -129,7 +138,10 @@
                            </select>
                         </dd>
                         <dt class="label">Subtitles Language</dt> 
-                        <dd><input v-model="bm.subtitleLanguage" type="text"></dd>
+                        <dd>
+                           <input v-model="bm.subtitleLanguage" type="text">
+                           <span v-if="hasSubtitleError(bm)" class="error">* language is required</span>
+                        </dd>
                         <dt>Notes</dt>
                         <dd><textarea v-model="bm.notes" name="item-notes"></textarea></dd>
                      </dl>
@@ -159,10 +171,16 @@ export default {
    components: {
       V4Spinner
    },
+   data: function() {
+      return {
+         errors: [],
+      };
+   },
    computed: {
       ...mapState({
          requestList: state => state.reserves.requestList,
          searching: state => state.searching,
+         reserveRequest: state => state.reserves.request
       }),
       ...mapFields('reserves',[
          'request.onBehalfOf',
@@ -184,8 +202,45 @@ export default {
       }
    },
    methods: {
+      hasSubtitleError( item) {
+         if (this.errors.includes("subtitleLanguage") == false) return false
+         return (item.subtitles == "yes" && item.subtitleLanguage == "")
+      },
+      hasError( val) {
+         return this.errors.includes(val)
+      },
       submitRequest() {
-         this.$store.dispatch("reserves/createReserves")
+         this.errors.splice(0, this.errors.length)
+         let proxyRequest = this.reserveRequest.onBehalfOf == "yes"
+         for (let [key, value] of Object.entries(this.reserveRequest)) {
+            if ( key == "period" && this.nonVideoRequests == 0) continue 
+            if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail") ) continue
+            if (value == "") {
+               this.errors.push(key)
+            }
+         }
+         let subtitleError = false
+         this.videoRequests.forEach( r => {
+            if (r.subtitles == "yes" && r.subtitleLanguage == "") {
+               subtitleError = true
+            }
+         })
+         if (subtitleError) {
+            this.errors.push("subtitleLanguage")    
+         }
+         if ( this.errors.length == 0) {
+            this.$store.dispatch("reserves/createReserves")
+         } else {
+            this.$store.commit("system/setError", "Some required fields are missing")  
+            var scrollStep = -window.scrollY / (500 / 10),
+            scrollInterval = setInterval(()=> {
+               if ( window.scrollY != 0 ) {
+                  window.scrollBy( 0, scrollStep )
+               } else {
+                  clearInterval(scrollInterval)
+               }
+            },10)  
+         }
       },
       itemsPeriodChosen() {
          this.$store.commit("reserves/updateReservedItemsPeriod")
@@ -328,6 +383,12 @@ dd input, dd select, dd textarea  {
    border-radius: 3px;
    box-sizing: border-box;
    width: 100%;
+}
+span.error {
+   margin-left: 10px;
+   font-weight: bold;
+   font-style: italic;
+   color: var(--color-error);
 }
 </style>
 
