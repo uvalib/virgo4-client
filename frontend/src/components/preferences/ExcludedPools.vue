@@ -12,7 +12,7 @@
           <span><b>{{p.name}}</b></span>
         </div>
         <div class="description">
-          <span>{{p.description}}</span>
+          <span v-html="p.description"></span>
         </div>
         <div class="source-controls">
           <div class="toggle" @click="toggleTargetPool(p.url)">

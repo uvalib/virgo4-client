@@ -1,8 +1,7 @@
 <template>
    <div class="pool-results">
       <div class="results-header">
-         <div class="desc">
-            {{selectedResults.pool.description}}
+         <div class="desc" v-html="selectedResults.pool.description">
          </div>
          <div v-if="hasLogo" class="source-logo">
             <a v-if="hasURL" :href="poolExtURL(selectedResults.pool.id)" target="_blank">
@@ -97,6 +96,10 @@ export default {
    border-left: 1px solid var(--uvalib-brand-blue);
    border-right: 1px solid var(--uvalib-brand-blue);
    font-size: 0.9em;
+}
+.desc >>> a {
+   color: var(--color-lightest-blue) !important;
+   font-weight: bold;
 }
 .pool-results {
    border: 0;
