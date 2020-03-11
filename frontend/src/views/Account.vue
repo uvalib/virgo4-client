@@ -18,11 +18,11 @@
                   If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
                </div>
                <div class="standing-info" v-if="info.standing=='BAD-ADDRESS'">
-                  Please contact the library to update your email and/or mailing address information:
+                  Please contact the Library to update your email and/or mailing address information:
                   <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
                </div>
                <div class="standing-info" v-if="info.standing=='BARR-SUPERVISOR'">
-                  Please contact the library about your account:
+                  Please contact the Library about your account:
                   <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
                </div>
 
@@ -41,14 +41,17 @@
                         <AccordionContent :title="billsLabel" layout="narrow"  borderWidth="0">
                            <div class="bills">
                               <div class="info">
-                                 You have been billed replacement bills for the below items.
-                                 If you have the items, please return them and we will remove the
-                                 replacement bills. If you pay for an item and find it within 90 days,
-                                 you may be refunded the replacement amount. Rather than pay replacement
-                                 bills, you may replace a lost book with one you supply the library,
-                                 but it must be the same edition or newer and in very good condition.
-                                 We will accept a paperback replacement copy for a hardback.
-                                 The library reserves the right to refuse a replacement copy.
+                                 <p>
+                                 You have been billed for replacement of the items below. If you have the items, please return them 
+                                 and we will remove the replacement bills. If you pay for an item and find it within 90 days, 
+                                 you may be refunded the replacement amount.
+                                 </p>
+                                  <h3>Replacement option:</h3> 
+                                 <p>
+                                    Rather than pay replacement bills, you may replace a lost book with one you supply the Library, 
+                                    but it must be the same edition or newer and in very good condition. We will accept a paperback 
+                                    replacement copy for a hardback. The Library reserves the right to refuse a replacement copy.
+                                 </p>
                               </div>
                               <div class="bill" v-for="(bill,idx) in bills" :key="idx">
                                  <table>
@@ -77,8 +80,15 @@
                         <AccordionContent :title="finesLabel" layout="narrow" borderWidth="0">
                            <div class="fines">
                               <div class="info">
-                                 This is what you currently owe in overdue fines.
-                                 <em>Fines will continuing accruing until the item is returned</em>.
+                                 <p>
+                                    This is what you currently owe in overdue fines.
+                                    <em>Fines will continuing accruing until the item is returned</em>.
+                                 </p>
+                                 <p>
+                                    <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank">
+                                    Learn more about Library circulation and fines.
+                                    </a>
+                                 </p>
                               </div>
                               <div class="fine" v-for="(fine,idx) in itemsWithFines" :key="idx">
                                  <table>
@@ -102,19 +112,20 @@
                      <div class="payment">
                         <h3>Payment Information</h3>
                         <div v-if="useSIS">
-                           All bills must be paid using SIS. Access the system
+                           All bills must be paid using SIS. 
                            <a target="_blank" href="https://sisuva.admin.virginia.edu/ihprd/signon.html">
-                           here</a>.
+                           Access the SIS system to pay now.</a>
                         </div>
                         <div v-else>
                            <div>
-                              All fines must be paid at the Alderman Library using exact cash or personal check.
+                              All fines must be paid at Alderman Library using cash for the exact amount or personal check. 
                               We do not take credit cards or any online payments at this time.
                            </div>
                            <div class="addr">
                               <strong>Alderman Library</strong><br/>
                               160 McCormick Road<br/>
-                              Charlottesville, VA 22904<br/>
+                              Charlottesville, VA<br/>
+                              22904
                            </div>
                         </div>
                      </div>
@@ -160,7 +171,7 @@ export default {
         canChangePIN: 'user/canChangePIN'
       }),
       useSIS() {
-         return (this.isUndergraduate || this.isGraduate || this.isAlumni)
+         return ( this.isUndergraduate || this.isGraduate || this.isAlumni)
       },
       isBillOwed() {
          let amtStr = this.info['amountOwed']
@@ -293,5 +304,12 @@ div.notes p {
    .standing-info {
       width: 90%;
    }
+}
+.info h3 {
+   font-size: 1em;
+   margin: 10px 0 5px 0;
+}
+.info  p {
+   margin: 0 0 5px 0;
 }
 </style>
