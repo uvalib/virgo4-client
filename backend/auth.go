@@ -26,13 +26,13 @@ func (svc *ServiceContext) Authorize(c *gin.Context) {
 // NetBadge authentication.
 func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	log.Printf("Checking authentication headers...")
-	// log.Printf("Dump all request headers ==================================")
-	// for name, values := range c.Request.Header {
-	// 	for _, value := range values {
-	// 		log.Printf("%s=%s\n", name, value)
-	// 	}
-	// }
-	// log.Printf("END header dump ===========================================")
+	log.Printf("Dump all request headers ==================================")
+	for name, values := range c.Request.Header {
+		for _, value := range values {
+			log.Printf("%s=%s\n", name, value)
+		}
+	}
+	log.Printf("END header dump ===========================================")
 
 	computingID := c.GetHeader("remote_user")
 	if svc.Dev.AuthUser != "" {
