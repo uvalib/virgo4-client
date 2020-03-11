@@ -39,7 +39,7 @@ Subtitle Language: {{ $item.SubtitleLanguage }}
 Notes: {{ $item.Notes }}
 
 Virgo URL: {{ $item.VirgoURL }}
-{{- end }}
+{{ end -}}
 _______________________________________________________________________
 {{ header .MaxAvail }}
 {{- range $index, $item := .Items }}

@@ -168,15 +168,26 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		}
 
 		log.Printf("Generate SMTP message for %s", templateFile)
-		// Per: https://stackoverflow.com/questions/36485857/sending-emails-with-name-email-from-go
-		// sending addresses like 'user name <email.com>' does not work with the default
-		// mail package. Leaving at just email address for now. Can revisit after meetings
-		/// about functionality.
-		// toAddr := mail.Address{Name: emailMap[reserveReq.Request.Library], Address: svc.CourseReserveEmail}
-		to := []string{svc.CourseReserveEmail, reserveReq.Request.Email}
-		if reserveReq.Request.InstructorEmail != "" {
-			to = append(to, reserveReq.Request.InstructorEmail)
+		// INFO: https://stackoverflow.com/questions/36485857/sending-emails-with-name-email-from-go
+		// NOTES for recipient: For any reserve library location other than Law, the email should be sent to
+		// svc.CourseReserveEmail with the from address of the patron submitting the request.
+		// For Law it should send the email to svc.LawReserveEmail AND the patron
+		to := []string{}
+		from := svc.SMTP.Sender
+		if reserveReq.Request.Library == "law" {
+			log.Printf("The reserve library is law. Send request to law and requestor")
+			to = append(to, svc.LawReserveEmaiil)
+			to = append(to, reserveReq.Request.Email)
+			if reserveReq.Request.InstructorEmail != "" {
+				to = append(to, reserveReq.Request.InstructorEmail)
+			}
+		} else {
+			log.Printf("The reserve library is not law. Send request to %s from %s",
+				svc.CourseReserveEmail, reserveReq.Request.Email)
+			to = append(to, svc.CourseReserveEmail)
+			from = reserveReq.Request.Email
 		}
+
 		mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
 		subject := fmt.Sprintf("Subject: %s: %s\n", reserveReq.Request.Name, reserveReq.Request.Course)
 		toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
@@ -190,7 +201,7 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		} else {
 			log.Printf("Sending reserve email to %s", strings.Join(to, ","))
 			auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
-			err := smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, svc.SMTP.Sender, to, msg)
+			err := smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, from, to, msg)
 			if err != nil {
 				log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
 				c.String(http.StatusInternalServerError, err.Error())
