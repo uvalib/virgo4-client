@@ -2,26 +2,14 @@
    <div class="welcome">
       <h3>Welcome to the new Virgo discovery experience!</h3>
       <p>
-      Virgo is being revamped this spring.  
-      The existing Virgo search interface is available at 
-      <a href="https://search.lib.virginia.edu" target="_blank">https://search.lib.virginia.edu</a>
-      but will be replaced by this service to support:
+         Virgo is being revamped, and you are viewing the newest public version.
       </p>
-      <ul>
-         <li>Improved searching (coming soon)
-            <ul>
-               <li>more sources</li>
-               <li>better relevance</li>
-            </ul>
-         </li>
-         <li>Personalization
-            <ul>
-               <li>bookmarks that can be saved, managed, and shared</li>
-               <li>full control over what sources to search</li>
-               <li>powerful account features</li>
-            </ul>
-         </li>
-      </ul>
+      <p>
+         The <a href="http://search.lib.virginia.edu/" target="_blank">existing Virgo search interface remains available</a>, 
+         and will be fully replaced by this new interface later in 2020. 
+         We're currently working to ensure that the new release is easy to use, accessible, and inherently mobile-friendly. 
+         Stay tuned! 
+      </p>
    </div>
 </template>
 
