@@ -200,8 +200,14 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 			log.Printf("==================================================")
 		} else {
 			log.Printf("Sending reserve email to %s", strings.Join(to, ","))
-			auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
-			err := smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, from, to, msg)
+			var err error
+			if svc.SMTP.Pass != "" {
+				auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
+				err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, from, to, msg)
+			} else {
+				log.Printf("Using SendMail with no auth")
+				err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, from, to, msg)
+			}
 			if err != nil {
 				log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
 				c.String(http.StatusInternalServerError, err.Error())
