@@ -44,14 +44,6 @@
                         <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
-                  <template v-if="marcXML">
-                     <dt class="label">MARC XML</dt>
-                     <dd class="value">
-                        <AccordionContent id="marc" class="marc" border-width="0" layout="narrow" title="View XML">
-                           <pre class="xml">{{marcXML}}</pre>
-                        </AccordionContent>
-                     </dd>
-                  </template>
                   <template v-if="sirsiLink">
                      <dd></dd>
                      <dt class="value more"  v-html="sirsiLink"></dt>
@@ -63,6 +55,11 @@
                      </dd>
                   </template>
                </dl>
+               <template v-if="marcXML">
+                  <AccordionContent class="marc" title="MARC XML">
+                     <pre class="xml">{{marcXML}}</pre>
+                  </AccordionContent>
+               </template>
             </div>
             <AvailabilityTable v-if="hasAvailability" :titleId="details.identifier" />
          </template>
@@ -266,9 +263,8 @@ dd {
    font-size: 0.8em;
    border: 1px solid var(--uvalib-grey-light);
    padding: 10px;
-   border-radius: 5px;
-   white-space: pre-wrap;
-   max-height: 30em;
+   margin: 0;
+   border-top: 0;
 }
 .value >>> div.provider {
    width: 100%;
