@@ -180,7 +180,8 @@ export default {
       ...mapState({
          requestList: state => state.reserves.requestList,
          searching: state => state.searching,
-         reserveRequest: state => state.reserves.request
+         reserveRequest: state => state.reserves.request,
+         userInfo: state => state.user.accountInfo
       }),
       ...mapFields('reserves',[
          'request.onBehalfOf',
@@ -200,6 +201,9 @@ export default {
       nonVideoRequests() {
          return this.requestList.filter( r=> r.pool != "video") 
       }
+   },
+   created() {
+      this.$store.commit("reserves/setRequestingUser", this.userInfo)
    },
    methods: {
       hasSubtitleError( item) {

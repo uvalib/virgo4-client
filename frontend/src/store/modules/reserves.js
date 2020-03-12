@@ -52,6 +52,10 @@ const reserves = {
             item.period = state.request.period
          })
       },
+      setRequestingUser(state, userInfo) {
+         state.request.name = userInfo.displayName
+         state.request.email = userInfo.email
+      },
       setRequestList(state, list) {
          state.requestList = list.slice(0)
          state.requestList.forEach(item => {
