@@ -156,8 +156,15 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		out += availStr
 		return out
 	}}
+
 	templates := [2]string{"reserves.txt", "reserves_video.txt"}
 	for _, templateFile := range templates {
+		if templateFile == "reserves.txt" && len(reserveReq.NonVideo) == 0 {
+			continue
+		}
+		if templateFile == "reserves_video.txt" && len(reserveReq.Video) == 0 {
+			continue
+		}
 		var renderedEmail bytes.Buffer
 		tpl := template.Must(template.New(templateFile).Funcs(funcs).ParseFiles(fmt.Sprintf("templates/%s", templateFile)))
 		err = tpl.Execute(&renderedEmail, reserveReq)
