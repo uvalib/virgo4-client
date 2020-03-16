@@ -2,13 +2,11 @@
    <div v-if="suggestions.length >0" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
-         <span class="note">Releated to your last search:</span>
+         <span class="note">Authors releated to your last search</span>
          <div class="searches">
             <template v-for="(s,idx) in suggestions">
                <span class="sep" v-if="idx > 0" :key="`sep${idx}`">|</span>
-               <router-link  :key="`s${idx}`" :to="getRelatedLink(s)">
-                  <b>{{s.type}}:</b>&nbsp;{{s.value}}
-               </router-link>
+               <router-link  :key="`s${idx}`" :to="getRelatedLink(s)">{{s.value}}</router-link>
             </template>
          </div>
       </div>
@@ -30,32 +28,7 @@ export default {
    },
    methods: {
       getRelatedLink( sug ) {
-         // PROBLEM: This works, but if you navigate BACK, the old search and related 
-         // items are lost
-         // REMINDER: lastSearch was removed.... did it break stuff???
-         // :MAYBE: 
-         // use lastSearch as a actual last search and restore it a back to search navigation is detected
          return `/browse/${sug.type}?q=${encodeURI(sug.value)}`
-         /* DOES THIS HELP DETECT BACK AND RESTORE PRIOR SEARCH?
-         // This listener will execute before router.beforeEach only if registered
-// before vue-router is registered with Vue.use(VueRouter)
-
-window.popStateDetected = false
-window.addEventListener('popstate', () => {
-  window.popStateDetected = true
-})
-
-
-router.beforeEach((to, from, next) => {
-  const IsItABackButton = window.popStateDetected
-  window.popStateDetected = false
-  if (IsItABackButton && from.meta.someLogica) {
-    next(false) 
-    return ''
-  }
-  next()
-})
-*/
       }   
    }
 }
@@ -74,18 +47,19 @@ h2 {
    font-size: 1.1em;
 }
 .wrapper {
-   padding: 5px 15px;
+   padding: 10px 0 0 15px;
 }
 .note  {
    font-weight: 100;
    font-size:0.9;
-   font-style: italic;
    display: inline-block;
 }
 .searches {
    margin-top: 5px;
+   font-size: 0.9em;
+   line-height: 1.5em;
 }
 .sep {
-   margin: 0 10px;
+   margin: 0 5px;
 }
 </style>
