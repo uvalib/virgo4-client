@@ -11,7 +11,15 @@
          </div>
          <SearchFilters />
       </div>
-      <div class="hits">
+      <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
+         <span>
+            No results found
+         </span>
+         <p class="error" v-if="selectedResults.statusMessage">
+            {{selectedResults.statusMessage}}
+         </p>
+      </div>
+      <div v-else class="hits">
          <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
             <li v-for="(hit,idx) in selectedResults.hits" class="image hit-wrapper" :key="idx">
                <ImageSearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
@@ -144,6 +152,20 @@ div.results-header {
    margin: 0 5px 20px 5px;
    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
    margin-bottom: 1rem;
+}
+.hit-wrapper.none {
+   background: white;
+   padding:35px;
+   font-size: 1.5em;
+   font-weight: 500;
+   color: var(--uvalib-text);
+}
+.hit-wrapper.none .error {
+   padding: 0;
+   margin: 5px 0;
+   font-size: 0.75em;
+   font-weight: normal;
+   color: var(--uvalib-red);
 }
 .hit-wrapper:last-child {
    margin-bottom: 0;

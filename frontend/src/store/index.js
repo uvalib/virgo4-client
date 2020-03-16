@@ -165,7 +165,8 @@ export default new Vuex.Store({
       // // this is called from top level search; resets results from all pools
       state.total = -1
       state.results.splice(0, state.results.length)
-      results.pool_results.forEach( pr => {
+      let firstPoolWithHits = -1
+      results.pool_results.forEach( (pr,idx) => {
         if (!pr.group_list) {
           pr.group_list = []
         }
@@ -174,6 +175,9 @@ export default new Vuex.Store({
         let pool = utils.findPool(results.pools, pr.pool_id)
         let result = { pool: pool, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms, 
           hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg}
+        if (firstPoolWithHits == -1 &&  pr.pagination.total > 0) {
+          firstPoolWithHits = idx
+        }
 
         // Next, drill into group_list data. It contains a count and a record_list
         // record list is a list of fields in the hit. field is {name,label,type,value,visibility,display}
@@ -200,7 +204,10 @@ export default new Vuex.Store({
         state.results.push(result)
       })
 
-      state.selectedResultsIdx = 0
+      if ( firstPoolWithHits == -1) {
+         firstPoolWithHits = 0
+      }
+      state.selectedResultsIdx = firstPoolWithHits
       state.otherSrcSelection = {id: "", name: ""}
 
       state.total = results.total_hits

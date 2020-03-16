@@ -19,7 +19,7 @@
          </template>
       </div>
 
-      <div class="results-wrapper" v-if="total > 0">
+      <div class="results-wrapper" >
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
@@ -37,14 +37,11 @@
                   v-model="otherSrcSelection"/>
             </div>
             <PoolResultDetail v-if="selectedResultsIdx > -1" />
+            <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
+               No results found
+            </div>
          </div>
       </div>
-      <div class="results-wrapper" v-else>
-         <div class="none">
-            No results found
-         </div>
-      </div>
-
    </div>
 </template>
 
@@ -107,18 +104,15 @@ export default {
          })
          
          others.forEach( r=>{
-            let disabled = false
             let name = `<span class='pool'>${r.pool.name}</span>`
             if (this.poolFailed(r)) {
                name += "<span class='total'>Failed</span>"
-               disabled = true
             } else if (this.wasPoolSkipped(r)) {
                name += "<span class='total'>Skipped</span>"
             } else {
                name += `<span class='total'>${r.total} hits</span>`
-               disabled = r.total == 0
             }
-            opts.push({id: r.pool.id, name: name, disabled: disabled})
+            opts.push({id: r.pool.id, name: name})
          })
          return opts
       }
@@ -255,7 +249,7 @@ p.relevant {
 @media only screen and (min-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 5vw;
+      padding: 0 5vw 20px 5vw;
    }
     .save-box{ 
       width: 50%;
@@ -264,7 +258,7 @@ p.relevant {
 @media only screen and (max-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 2vw;
+      padding: 0 2vw 20px 5vw;
    }
    span.refine.pure-button.pure-button-primary {
       display: none;
