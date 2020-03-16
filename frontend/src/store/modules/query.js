@@ -127,7 +127,7 @@ const query = {
       browseAuthors(state, author) {
          state.mode = "browse"
          state.browse = [
-            { op: "AND", value: `"${author}"`, field: "author", type: "EQUAL", endVal: "" }]
+            { op: "AND", value: `${author}`, field: "author", type: "EQUAL", endVal: "" }]
       },
       browseSubjects(state, subject) {
          state.mode = "browse"
