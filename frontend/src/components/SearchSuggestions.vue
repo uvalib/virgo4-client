@@ -4,9 +4,21 @@
       <div class="wrapper">
          <span class="note">Authors releated to your last search</span>
          <div class="searches">
-            <template v-for="(s,idx) in suggestions">
+            <template v-for="(s,idx) in suggestions.slice(0,2)">
                <span class="sep" v-if="idx > 0" :key="`sep${idx}`">|</span>
                <router-link  :key="`s${idx}`" :to="getRelatedLink(s)">{{s.value}}</router-link>
+            </template>
+            <template v-if="suggestions.length > 2 && moreVisible == false">
+               <span class="sep">|</span>
+               <span @click="moreClicked" class="more text-button">Show More...</span>
+            </template>
+            <template  v-if="suggestions.length > 2 && moreVisible == true">
+               <template v-for="(s,idx) in suggestions.slice(2)">
+                  <span class="sep" :key="`sep${idx+2}`">|</span>
+                  <router-link  :key="`s${idx+2}`" :to="getRelatedLink(s)">{{s.value}}</router-link>
+               </template>
+               <span class="sep">|</span>
+               <span @click="lessClicked" class="more text-button">Show Less</span>
             </template>
          </div>
       </div>
@@ -18,6 +30,11 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {
    name: "SearchSuggestions",
+   data: function() {
+      return {
+         moreVisible: false
+      }
+   },
    computed: {
       ...mapState({
          suggestions: state=>state.suggestions,
@@ -29,7 +46,13 @@ export default {
    methods: {
       getRelatedLink( sug ) {
          return `/browse/${sug.type}?q=${encodeURI(sug.value)}`
-      }   
+      },
+      moreClicked() {
+         this.moreVisible = true
+      },
+      lessClicked() {
+         this.moreVisible = false
+      }
    }
 }
 </script>
@@ -61,5 +84,9 @@ h2 {
 }
 .sep {
    margin: 0 5px;
+}
+span.more.text-button {
+   font-style: italic;
+   font-weight: 100;
 }
 </style>
