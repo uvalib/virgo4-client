@@ -35,7 +35,7 @@
             <div v-if="error" class="error">
                <div class="error-message">
                   <div class="bar">
-                     <span>Error</span>
+                     <span class="title">Virgo Error</span>
                      <i @click="dismissError" class="close fas fa-times-circle"></i>
                   </div>
                   <div class="error-body" v-html="error"></div>
@@ -91,7 +91,7 @@ export default {
          isKiosk: "system/isKiosk",
       }),
       showDimmer() {
-         return this.addingBookmark;
+         return this.addingBookmark || this.error != "";
       }
    },
    methods: {
@@ -258,7 +258,7 @@ body {
    width: 100%;
    height: 100%;
    z-index: 1000;
-   background: rgba(0, 0, 0, 0.5);
+   background: rgba(0, 0, 0, 0.1);
 }
 
 #app {
@@ -455,18 +455,25 @@ div.error {
    left: 0;
    right: 0;
    z-index: 5000;
-   top: 30%;
+   top: 35%;
 }
 div.error .bar {
    padding: 5px;
    background-color: var(--uvalib-red-emergency);
    color: white;
-   font-weight: bold;
-   text-align: left;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: space-between;
+
+}
+div.error .bar .title {
+   font-size: 1.25em;
+   font-weight: normal;
 }
 div.error i.close {
    float:right;
-   font-size: 1.3em;
+   font-size: 1.4em;
    cursor: pointer;
    margin-left: 10px;
 }
@@ -474,8 +481,8 @@ div.error .message-body {
    padding: 10px 15px;
 }
 .error-body {
-   text-align: center;
-   margin: 10px 15px;
+   text-align: left;
+   padding: 20px 30px;
    font-weight: normal;
    color: var(--uvalib-red-emergency);
    opacity: 1;
@@ -491,8 +498,10 @@ div.error-message {
    text-align: center;
    background: white;
    padding: 0px;
-   border: 2px solid var(--uvalib-red-emergency);
+   border: 3px solid var(--uvalib-red-emergency);
    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   min-width: 20%;
+   border-radius: 4px;
 }
 @media only screen and (min-width: 768px) {
    div.error-message {
