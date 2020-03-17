@@ -71,6 +71,9 @@
          </span>
       </div>
       <div class="basic">
+         <V4BarcodeScanner @scanned="barcodeScanned"/>
+      </div>
+      <div class="basic">
          <router-link to="/journals">
             Browse Journals&nbsp;<i class="far fa-newspaper"></i>
          </router-link>
@@ -79,9 +82,11 @@
 </template>
 
 <script>
-import { mapMultiRowFields } from "vuex-map-fields";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
+import { mapMultiRowFields } from "vuex-map-fields"
+import { mapGetters } from "vuex"
+import { mapState } from "vuex"
+import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+
 export default {
    data: function() {
       return {
@@ -89,6 +94,7 @@ export default {
       } 
    },
    components: {
+      V4BarcodeScanner
    },
    computed: {
       ...mapState({
@@ -133,6 +139,13 @@ export default {
       },
       removeCriteria(idx) {
          this.$store.commit("query/removeCriteria", idx);
+      },
+      barcodeScanned(barcode) {
+         this.$store.commit("query/clear")
+         this.$store.commit("query/advancedBarcodeSearch", barcode)
+         this.$store.commit('resetSearchResults')
+         this.$store.commit('filters/reset')
+         this.$store.dispatch("searchAllPools")
       }
    },
    created() {

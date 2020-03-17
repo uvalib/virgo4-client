@@ -120,6 +120,10 @@ const query = {
             }
          }
       },
+      advancedBarcodeSearch(state, barcode) {
+         state.advanced.splice(0, state.advanced.length)
+         state.advanced.push({ op: "AND", value: barcode, field: "identifier", type: "EQUAL", endVal: "" })
+      },
       setBasicSearch(state) {
          state.mode = "basic"
          state.restoreMessage = ""
