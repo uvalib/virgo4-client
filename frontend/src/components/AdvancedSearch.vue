@@ -141,10 +141,9 @@ export default {
          this.$store.commit("query/removeCriteria", idx);
       },
       barcodeScanned(barcode) {
-         this.$store.commit("query/clear")
-         this.$store.commit("query/advancedBarcodeSearch", barcode)
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
+         this.$store.commit("query/advancedBarcodeSearch", barcode)
          this.$store.dispatch("searchAllPools")
       }
    },
