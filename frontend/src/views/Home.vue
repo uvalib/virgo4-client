@@ -27,6 +27,12 @@
             <span @click="searchClicked" class="search pure-button pure-button-primary">Search</span>
           </div>
           <div class="advanced">
+            <span v-if="showVideo==false" @click="videoShow" class="text-button">Scan Barcode</span>
+            <StreamBarcodeReader v-if="showVideo"
+               @decode="onBarcodeDecode"
+            ></StreamBarcodeReader>
+          </div>
+          <div class="advanced">
             <span class="text-button advanced-link" @click="advancedClicked">
               Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
             </span>
@@ -60,12 +66,19 @@ import AdvancedSearch from "@/components/AdvancedSearch"
 import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
 import Welcome from "@/components/Welcome"
+import { StreamBarcodeReader } from "vue-barcode-reader"
+
 export default {
    name: "home",
    components: {
-     SearchResults,
+     SearchResults,StreamBarcodeReader,
      SearchTips, AdvancedSearch, V4Spinner,
      V4Select, Welcome, SourceInfo
+   },
+   data: function() {
+      return {
+         showVideo: false
+      }
    },
    computed: {
       ...mapState({
@@ -206,6 +219,13 @@ export default {
          }
         this.$store.commit("query/setAdvancedSearch")
       },
+      onBarcodeDecode(result) {
+         this.showVideo =false
+         this.basic = result
+      },
+      videoShow() {
+         this.showVideo = true
+      }
    }
 };
 </script>
