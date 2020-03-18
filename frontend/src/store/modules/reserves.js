@@ -196,12 +196,20 @@ const reserves = {
           })
       },
       searchCourses(ctx, data) {
+         let qs = ctx.state.query
+         if ( qs.includes("*")) {
+            ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
+            return
+         }
+         if (qs.length < 3 ) {
+            ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
+            return 
+         }
          ctx.commit('setSearching', true, { root: true })
          let type = "COURSE_NAME"
          if (data.type == "id") {
             type = "COURSE_ID"
          }
-         let qs = ctx.state.query
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
