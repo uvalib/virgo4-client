@@ -138,7 +138,7 @@ const item = {
             ctx.commit('setCatalogKeyDetails', response.data)
          }).catch((error) => {
             ctx.commit('clearSearching')
-            await ctx.dispatch("system/setError", error, {root:true})
+            ctx.commit("system/setError", error, {root:true})
          })
       }
    }
