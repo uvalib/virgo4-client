@@ -173,7 +173,7 @@ export default {
          this.$copyText(URL).then( ()=> {
             alert('Copied')
          }, e => {
-            alert('Can not copy '+e)
+            this.$store.commit("system/setError", "Unable to copy public bookmarks URL: "+e)
          })
       },
       getTitle(folderInfo) {
