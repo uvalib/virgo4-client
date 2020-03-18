@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -135,14 +134,18 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 		return
 	}
 
+	var ilsReq struct {
+		ComputingID string `json:"computing_id"`
+		Barcode     string `json:"item_barcode"`
+	}
 	log.Printf("Renew checkouts [%s] for user %s with ILS Connector...", qp.Barcode, userID)
 	renewURL := fmt.Sprintf("%s/v4/request/renewAll", svc.ILSAPI)
-	values := url.Values{"computing_id": {userID}}
+	ilsReq.ComputingID = userID
+	ilsReq.Barcode = qp.Barcode
 	if qp.Barcode != "all" {
 		renewURL = fmt.Sprintf("%s/v4/request/renew", svc.ILSAPI)
-		values.Add("item_barcode", qp.Barcode)
 	}
-	rawRespBytes, err := svc.ILSConnectorPost(renewURL, values)
+	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq)
 	if err != nil {
 		c.String(err.StatusCode, err.Message)
 		return
