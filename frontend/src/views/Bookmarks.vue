@@ -55,7 +55,10 @@
                                     <span>Public</span>
                                  </span>
                                  <span v-if="folderInfo.public" class="public-url">
-                                    :&nbsp;Click <a :href="getPublicURL(folderInfo)" target="_blank">here</a> to view
+                                    <a :href="getPublicURL(folderInfo)" target="_blank">
+                                       <span>View</span><i class="link fas fa-external-link-alt"></i></a>                                    
+                                    <span class="sep">|</span>
+                                    <span @click="copyURL(folderInfo)" class="text-button">Copy URL to clipboard</span>
                                  </span>
                               </th>
                            </tr>
@@ -165,6 +168,14 @@ export default {
       })
    },
    methods: {
+      copyURL( folder ) {
+         let URL = this.getPublicURL(folder)
+         this.$copyText(URL).then( ()=> {
+            alert('Copied')
+         }, e => {
+            alert('Can not copy '+e)
+         })
+      },
       getTitle(folderInfo) {
          let out = folderInfo.folder 
          if (folderInfo.public ){
@@ -312,6 +323,9 @@ div.accordion.boxed div.title {
    border-bottom: 3px solid var(--uvalib-teal-light);
    margin-left: -10px;
 }
+.sep {
+   margin: 0 5px;
+}
 </style>
 
 <style scoped>
@@ -325,6 +339,11 @@ i.fas {
    font-size: 1.2em;
    top: 4px;
    margin-right: 10px;
+}
+i.link.fas {
+   margin: 0 0 0 5px;
+   font-size:0.8em;
+   color: var(   --color-link);
 }
 .accordion {
    margin-right: 10px;
@@ -444,9 +463,10 @@ i.details {
    font-size: 1em;
 }
 .public-url {
-    font-weight: normal;
+   font-weight: normal;
    display: inline-block;
    color: var(--uvalib-grey-dark);
+   margin-left: 10px;
 }
 .folder-menu span.pure-button.pure-button-primary {
    margin-bottom: 5px;
