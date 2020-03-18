@@ -105,6 +105,12 @@ const reserves = {
          state.page = 1
          state.hasMore = false
       },
+      clearReservesResults(state) {
+         state.courseReserves.splice(0, state.courseReserves.length)
+         state.totalReserves = 0
+         state.page = 1
+         state.hasMore = false
+      },
       nextPage(state) {
          if ( state.hasMore) {
             state.page += 1
@@ -199,12 +205,15 @@ const reserves = {
          let qs = ctx.state.query
          if ( qs.includes("*")) {
             ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
+            ctx.commit('clearReservesResults')
             return
          }
          if (qs.length < 3 ) {
             ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
+            ctx.commit('clearReservesResults')
             return 
          }
+
          ctx.commit('setSearching', true, { root: true })
          let type = "COURSE_NAME"
          if (data.type == "id") {
@@ -213,10 +222,9 @@ const reserves = {
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
-
          if (data.initial === true) {
             ctx.commit('resetResults', type)   
-         }
+         }         
          let typeParam = "type="+type
          let pgParam = "page="+ctx.state.page
          let url = `/api/reserves/search?${typeParam}&query=${qs}&${pgParam}`
@@ -229,19 +237,30 @@ const reserves = {
          })
       },
       searchInstructors(ctx, data) {
+         let qs = ctx.state.query
+         if ( qs.includes("*")) {
+            ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
+            ctx.commit('clearReservesResults')
+            return
+         }
+         if (qs.length < 3 ) {
+            ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
+            ctx.commit('clearReservesResults')
+            return 
+         }
+
          ctx.commit('setSearching', true, { root: true })
          let type = "INSTRUCTOR_NAME"
          if (data.type == "id") {
             type = "INSTRUCTOR_ID"
             qs = ctx.rootState.user.accountInfo.id
          } 
-         let qs = ctx.state.query
+
          qs = qs.replace(/,/g, "")
          qs = qs.trim()
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
-
          if (data.initial === true) {
             ctx.commit('resetResults', type)   
          }

@@ -131,7 +131,7 @@ p {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
 }
 #app .controls span.pure-button.pure-button-primary {
    margin: 0 0 5px 10px;
