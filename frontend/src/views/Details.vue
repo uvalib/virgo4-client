@@ -143,6 +143,7 @@ export default {
          if ( this.isUVA(this.details.source) === false ) return ""
          if ( !this.isAdmin ) return ""
          let xml = this.allFields.find( f => f.type == "marc-xml")
+         if ( !xml) return ""
          return beautify(xml.value).trim()
       }
    },

@@ -44,8 +44,12 @@ const item = {
 
       setCatalogKeyDetails(state, data) {
          // no match or multiple matches
-         if (data.total_hits == 0) return
-         if (data.total_hits > 1) return
+         // no match or multiple matches
+         if (data.total_hits == 0 || data.total_hits > 1) {
+            state.details.searching = false
+            state.availability.searching = false
+            return
+         }
          let found = false
          data.pool_results.some( pr => {
             if (pr.group_list && pr.group_list.length == 1) {
@@ -119,6 +123,7 @@ const item = {
          if (ctx.rootState.system.searchAPI == "") {
             await ctx.dispatch("system/getConfig", null, {root:true})
          }
+         await ctx.dispatch("pools/getPools", null, {root:true})
 
          let req = {
             query: `identifier: {${catalogKey}}`,
@@ -133,7 +138,7 @@ const item = {
             ctx.commit('setCatalogKeyDetails', response.data)
          }).catch((error) => {
             ctx.commit('clearSearching')
-            alert(error)
+            await ctx.dispatch("system/setError", error, {root:true})
          })
       }
    }
