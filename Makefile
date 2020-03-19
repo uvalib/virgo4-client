@@ -34,7 +34,7 @@ linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -a -installsuffix cgo -o bin/v4srv.linux backend/*.go
 	
 clean:
-	$(GOCLEAN)
+	$(GOCLEAN) ./backend/...
 	rm -rf bin
 
 fmt:
