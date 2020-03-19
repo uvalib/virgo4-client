@@ -29,19 +29,8 @@
             <div class="msg">A new version of Virgo is available.</div>
             <span @click="updateClicked" class="pure-button pure-button-primary">Update Now</span>
          </div>
-         <transition name="message-transition"
-            enter-active-class="animated faster fadeIn"
-            leave-active-class="animated faster fadeOut">
-            <div v-if="error" class="error">
-               <div class="error-message">
-                  <div class="bar">
-                     <span class="title">Virgo Error</span>
-                     <i @click="dismissError" class="close fas fa-times-circle"></i>
-                  </div>
-                  <div class="error-body" v-html="error"></div>
-               </div>
-            </div>
-         </transition>
+         <MessageBox type="error" />
+         <MessageBox type="info" />
          <ScrollToTop />
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
@@ -51,6 +40,7 @@
 <script>
 import ScrollToTop from "@/components/ScrollToTop"
 import LibraryFooter from "@/components/layout/LibraryFooter"
+import MessageBox from "@/components/layout/MessageBox"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
@@ -75,12 +65,14 @@ export default {
       V4Spinner,
       AddBookmarkModal,
       MenuBar,
-      ScrollToTop
+      ScrollToTop,
+      MessageBox
    },
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
          error: state => state.system.error,
+         message: state => state.system.message,
          newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
          sessionExpired: state => state.system.sessionExpired,
@@ -91,15 +83,12 @@ export default {
          isKiosk: "system/isKiosk",
       }),
       showDimmer() {
-         return this.addingBookmark || this.error != "";
+         return this.addingBookmark || this.error != "" || this.message != ""
       }
    },
    methods: {
       dismissSession() {
          this.$store.commit("system/clearSessionExpired")
-      },
-      dismissError() {
-         this.$store.commit("system/setError", "")
       },
       updateClicked() {
           window.location.reload(true)
@@ -448,60 +437,6 @@ div.session-message {
    padding: 0px;
    border: 2px solid var(--uvalib-brand-blue-light);
    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-}
-
-div.error {
-   position: fixed;
-   left: 0;
-   right: 0;
-   z-index: 5000;
-   top: 35%;
-}
-div.error .bar {
-   padding: 5px;
-   background-color: var(--uvalib-red-emergency);
-   color: white;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: space-between;
-
-}
-div.error .bar .title {
-   font-size: 1.25em;
-   font-weight: normal;
-}
-div.error i.close {
-   float:right;
-   font-size: 1.4em;
-   cursor: pointer;
-   margin-left: 10px;
-}
-div.error .message-body {
-   padding: 10px 15px;
-}
-.error-body {
-   text-align: left;
-   padding: 20px 30px;
-   font-weight: normal;
-   color: var(--uvalib-red-emergency);
-   opacity: 1;
-   visibility: visible;
-   text-align: center;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-}
-div.error-message {
-   display: inline-block;
-   text-align: center;
-   background: white;
-   padding: 0px;
-   border: 3px solid var(--uvalib-red-emergency);
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-   min-width: 20%;
-   border-radius: 4px;
 }
 @media only screen and (min-width: 768px) {
    div.error-message {

@@ -7,6 +7,7 @@ const system = {
       kiosk: false,
       fatal: "",
       error: "",
+      message: "",
       version: "unknown",
       userMenuOpen: false,
       searchAPI: "",
@@ -63,6 +64,9 @@ const system = {
 
       setFatal(state, err) {
          state.fatal = err
+      },
+      setMessage(state, msg) {
+         state.message = msg
       },
 
       setError(state, error) {

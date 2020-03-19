@@ -24,7 +24,7 @@
                      </a>
                   </li>
                   <li>
-                     <span @click="copyURL" class="text-button">Copy published URL to clipboard</span>
+                     <span @click="copyURL" class="text-button">Copy shared URL to clipboard</span>
                   </li>
                </ul>
             </div>
@@ -92,7 +92,7 @@ export default {
       copyURL() {
          let URL = this.publicURL()  
          this.$copyText(URL).then( ()=> {
-            alert('Copied')
+            this.$store.commit("system/setMessage", "Shared search URL copied to clipboard.")
          }, e => {
             this.$store.commit("system/setError", "Unable to copy public search URL: "+e)
          })

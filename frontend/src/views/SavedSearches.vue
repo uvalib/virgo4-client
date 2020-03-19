@@ -56,7 +56,7 @@ export default {
       copyURL(token) {
          let URL = this.publicURL(token)  
          this.$copyText(URL).then( ()=> {
-            alert('Copied')
+            this.$store.commit("system/setMessage", "Public search URL copied to clipboard.")
          }, e => {
             this.$store.commit("system/setError", "Unable to copy public search URL: "+e)
          })
