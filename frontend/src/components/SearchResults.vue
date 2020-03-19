@@ -10,7 +10,8 @@
                <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
             </div>
             <span class="buttons">
-               <SaveSearch v-if="isSignedIn" />
+               <SaveSearch v-if="isSignedIn" mode="share"/>
+               <SaveSearch v-if="isSignedIn" mode="save"/>
                <span v-if="searchMode=='basic'" @click="refineClicked()"
                   class="refine pure-button pure-button-primary">
                   Refine Search

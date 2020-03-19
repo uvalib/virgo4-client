@@ -18,7 +18,8 @@ const user = {
       lookingUp: false,
       authTriesLeft: 5,
       authMessage: "",
-      lockedOut: false
+      lockedOut: false,
+      lastSavedSearchKey: ""
    },
 
    getters: {
@@ -125,6 +126,9 @@ const user = {
    },
 
    mutations: {
+      setLastSavedSearchKey(state, key) {
+         state.lastSavedSearchKey = key
+      },
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
@@ -353,8 +357,9 @@ const user = {
          data['barcode'] = ctx.state.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },
-      saveSearch(ctx, data) {
-         return axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
+      async saveSearch(ctx, data) {
+         let resp = await axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
+         ctx.commit('setLastSavedSearchKey', resp.data.token)
       },
    }
 }
