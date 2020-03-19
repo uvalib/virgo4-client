@@ -119,11 +119,9 @@ export default {
          let req = {name: this.searchName, search: bmData}
          try { 
             await this.$store.dispatch("user/saveSearch", req)
-            console.log("SAVE DONE")
             this.saved = true
             this.showSavePrompt = false
          } catch(err) {
-            console.log("SAVE ERROR "+JSON.stringify(err))
             this.error = err.message
          }
       }
