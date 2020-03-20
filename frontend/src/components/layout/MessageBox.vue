@@ -57,8 +57,8 @@ div.messsage-box {
    position: fixed;
    left: 0;
    right: 0;
-   z-index: 5000;
-   top: 35%;
+   z-index: 9999;
+   top: 25%;
 }
 div.message {
    display: inline-block;
