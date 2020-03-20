@@ -93,6 +93,7 @@ export default {
       copyURL() {
          let URL = this.publicURL()  
          this.$copyText(URL).then( ()=> {
+            this.isOpen = false
             this.$store.commit("system/setMessage", "Shared search URL copied to clipboard.")
          }, e => {
             this.$store.commit("system/setError", "Unable to copy public search URL: "+e)
