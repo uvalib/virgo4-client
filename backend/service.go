@@ -28,6 +28,7 @@ type ServiceContext struct {
 	LawReserveEmaiil   string
 	FeedbackEmail      string
 	ILSAPI             string
+	JWTKey             []byte
 	Dev                DevConfig
 	PendingTranslates  map[string]string
 	DB                 *dbx.DB
@@ -49,6 +50,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		VirgoURL:           cfg.VirgoURL,
 		SearchAPI:          cfg.SearchAPI,
 		Solr:               cfg.Solr,
+		JWTKey:             []byte(cfg.JWTKey),
 		CourseReserveEmail: cfg.CourseReserveEmail,
 		LawReserveEmaiil:   cfg.LawReserveEmaiil,
 		FeedbackEmail:      cfg.FeedbackEmail,
