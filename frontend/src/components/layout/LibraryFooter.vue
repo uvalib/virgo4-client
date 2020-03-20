@@ -1,5 +1,8 @@
 <template>
    <footer>
+     <div class="pre-footer">
+        This is the newest version of the Library catalog. <a href="" class="alt-color-dark">Please give us your feedback.</a>
+     </div>
      <div class="footer-container">
       <div class="footer-bucket">
         <h3>Contact Us</h3>
@@ -109,6 +112,12 @@ footer {
 }
 footer p.copy, footer p.gov {
    vertical-align: middle;
+}
+.pre-footer {
+  background-color: var(--uvalib-teal-lightest);
+  color: var(--uvalib-text-dark);
+  padding: 5px 20px;
+  margin: -20px -20px 0 -20px;
 }
 .footer-container {
   display: grid;
