@@ -108,7 +108,7 @@ export default {
       setTimeout( ()=>{
          this.menuHeight = document.getElementById(this.menuID).offsetHeight
          this.headerHeight = document.getElementById(this.headerID).offsetHeight
-      }, 250)
+      }, 1)
       window.addEventListener("scroll", this.scrollHandler)
       window.onresize = () => {
          this.$store.commit("system/setDisplayWidth",window.innerWidth)

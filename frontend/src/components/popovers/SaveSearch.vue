@@ -54,6 +54,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+
 export default {
    computed: {
       ...mapState({
@@ -92,6 +93,7 @@ export default {
       copyURL() {
          let URL = this.publicURL()  
          this.$copyText(URL).then( ()=> {
+            this.isOpen = false
             this.$store.commit("system/setMessage", "Shared search URL copied to clipboard.")
          }, e => {
             this.$store.commit("system/setError", "Unable to copy public search URL: "+e)
@@ -102,7 +104,8 @@ export default {
       },
       openPopover() {
          this.isOpen = true
-         this.searchName = "",
+         let d = new Date()
+         this.searchName = `search-${this.$moment(d).format('YYYYMMDDHHmm')}`
          this.error = "",
          setTimeout(()=>{
             this.$refs.savename.focus()
@@ -119,11 +122,9 @@ export default {
          let req = {name: this.searchName, search: bmData}
          try { 
             await this.$store.dispatch("user/saveSearch", req)
-            console.log("SAVE DONE")
             this.saved = true
             this.showSavePrompt = false
          } catch(err) {
-            console.log("SAVE ERROR "+JSON.stringify(err))
             this.error = err.message
          }
       }

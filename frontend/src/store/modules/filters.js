@@ -49,7 +49,10 @@ const filters = {
             out = state.poolFilters[idx].slice(0)
          }
 
-         if (state.globalAvailability.id != "any") {
+         if (state.globalAvailability.id == "shelf") {
+            out.unshift({facet_id: state.availabilityFacet, 
+               facet_name: "Availability", value: "On shelf"})
+         } else if (state.globalAvailability.id != "any") {
             out.unshift({facet_id: state.availabilityFacet, 
                facet_name: "Availability", value: globalVal})
          }
