@@ -179,6 +179,7 @@ export default {
    --color-primary-orange: var(--uvalib-brand-orange);
    --color-dark-orange: var(--uvalib-brand-orange-dark);
    --color-link: var(--uvalib-brand-blue-light);
+   --color-link-darker: var(--uvalib-blue-alt-dark);
    --color-primary-text: var(--uvalib-grey-dark);
    --color-error: var(--uvalib-red-emergency);
 
@@ -280,6 +281,9 @@ body {
    color: var(--color-link);
    font-weight: 500;
    text-decoration: none;
+}
+#app a.alt-color-dark {
+   color: var(--color-link-darker);
 }
 #app a:hover {
    text-decoration: underline;
