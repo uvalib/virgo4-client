@@ -54,6 +54,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+
 export default {
    computed: {
       ...mapState({
@@ -102,7 +103,8 @@ export default {
       },
       openPopover() {
          this.isOpen = true
-         this.searchName = "",
+         let d = new Date()
+         this.searchName = `search-${this.$moment(d).format('YYYYMMDDHHmm')}`
          this.error = "",
          setTimeout(()=>{
             this.$refs.savename.focus()
