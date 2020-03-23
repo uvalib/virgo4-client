@@ -36,7 +36,7 @@ export default {
          },10)
       },
       scrollChecker() {
-         if (window.window.scrollY > 800) {
+         if (window.window.scrollY > 250) {
             this.showScrollTop = true
          } else {
             this.showScrollTop = false
