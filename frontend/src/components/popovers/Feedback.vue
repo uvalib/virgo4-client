@@ -46,13 +46,6 @@ import {mapState} from "vuex"
 import { mapFields } from 'vuex-map-fields'
 
 export default {
-  props: {
-    message: {
-       type: String,
-       required: true
-    }
-  },
-
   computed: {
     ...mapState({
       feedback: state => state.feedback,

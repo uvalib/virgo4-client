@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -48,6 +49,77 @@ type ILSUserInfo struct {
 	Email         string `json:"email"`
 	Standing      string `json:"standing"`
 	AmountOwed    string `json:"amountOwed"`
+	HomeLibrary   string `json:"homeLibrary"`
+}
+
+// IsGraduate returns true if this user is a graduate student
+func (u *ILSUserInfo) IsGraduate() bool {
+	match, _ := regexp.MatchString("(?i)graduate student", u.Description)
+	if match {
+		return true
+	}
+	match, _ = regexp.MatchString("(?i)grad", u.Profile)
+	return match
+}
+
+// IsUndergraduate returns true if this user is an undergraduate student
+func (u *ILSUserInfo) IsUndergraduate() bool {
+	match, _ := regexp.MatchString("(?i)undergraduate", u.Description)
+	if match {
+		return true
+	}
+	match, _ = regexp.MatchString("(?i)(ugrad)|(undergrad)", u.Profile)
+	return match
+}
+
+// IsAmumni returns true if this user is an alumni
+func (u *ILSUserInfo) IsAmumni() bool {
+	match, _ := regexp.MatchString("(?i)Alumn", u.Profile)
+	return match
+}
+
+// IsFaculty returns true if this user is faculty
+func (u *ILSUserInfo) IsFaculty() bool {
+	match, _ := regexp.MatchString("(?i)faculty", u.Description)
+	if match {
+		return true
+	}
+	match, _ = regexp.MatchString("(?i)faculty", u.Profile)
+	return match
+}
+
+// IsInstructor returns true if this user is an instructor
+func (u *ILSUserInfo) IsInstructor() bool {
+	match, _ := regexp.MatchString("(?i)instructor", u.Description)
+	if match {
+		return true
+	}
+	match, _ = regexp.MatchString("(?i)instruct", u.Profile)
+	return match
+}
+
+// IsStaff returns true if this user is staff
+func (u *ILSUserInfo) IsStaff() bool {
+	match, _ := regexp.MatchString("(?i)staff", u.Description)
+	if match {
+		return true
+	}
+	match, _ = regexp.MatchString("(?i)(employee)(staff)", u.Profile)
+	return match
+}
+
+// CanPlaceReserve returns true if this user can place an item on course reserve
+func (u *ILSUserInfo) CanPlaceReserve() bool {
+	if u.IsGraduate() || u.IsUndergraduate() || u.IsAmumni() {
+		return false
+	}
+	match, _ := regexp.MatchString("(?i)(Virginia Borrower)|(Other VA Faculty)", u.Profile)
+	return match == false
+}
+
+// CanPurchase returns true if this user can request to purchase items
+func (u *ILSUserInfo) CanPurchase() bool {
+	return u.IsGraduate() || u.IsUndergraduate() || u.IsFaculty() || u.IsInstructor() || u.IsStaff()
 }
 
 // CheckoutInfo has sumary info for a checked out item
