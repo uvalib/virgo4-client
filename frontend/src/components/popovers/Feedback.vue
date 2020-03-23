@@ -1,8 +1,7 @@
 <template>
-   <v-popover v-on:apply-show='clear'>
+   <v-popover v-on:apply-show='clear' class="inline">
       <span class="trigger">
-         <span v-if="icon"><i class="fas fa-comments"></i>&nbsp;</span>
-         <span>Questions? Ask a Librarian</span>
+         <span class="alt-color-dark">Please give us your feedback.</span>
       </span>
       <div class="feedback-container" slot="popover">
          <div class="popover-header">
@@ -48,7 +47,10 @@ import { mapFields } from 'vuex-map-fields'
 
 export default {
   props: {
-    icon: Boolean
+    message: {
+       type: String,
+       required: true
+    }
   },
 
   computed: {
@@ -141,6 +143,10 @@ a.feedback:hover {
   display: inline-grid;
   grid-template-columns: 1fr 1fr;
   grid-column-gap: 40px;
+}
+span.alt-color-dark {
+   color: var(--color-link-darker);
+   font-weight: 500;
 }
 
 </style>

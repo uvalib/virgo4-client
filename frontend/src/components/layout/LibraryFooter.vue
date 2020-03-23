@@ -1,7 +1,7 @@
 <template>
    <footer>
      <div class="pre-footer">
-        This is the newest version of the Library catalog. <a href="" class="alt-color-dark">Please give us your feedback.</a>
+        This is the newest version of the Library catalog. <Feedback />
      </div>
      <div class="footer-container">
       <div class="footer-bucket">
@@ -84,7 +84,11 @@
 
 <script>
 import { mapState } from "vuex"
+import Feedback from "@/components/popovers/Feedback"
 export default {
+   components: {
+      Feedback
+   },
    computed: {
       ...mapState({
          version: state => state.system.version

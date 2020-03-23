@@ -8,7 +8,10 @@
            <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
         </router-link>
         <span v-if="isKiosk==false" class="menu-item feedback">
-           <Feedback icon/>
+            <a href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
+               <span><i class="fas fa-comments"></i>&nbsp;</span>
+               <span>Questions? Ask a Librarian</span>
+            </a>
         </span>
          <template v-if="isSignedIn">
             <span @click="toggleMenu" class="menu-item account">
@@ -60,11 +63,8 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import Feedback from "@/components/popovers/Feedback"
+
 export default {
-   components: {
-      Feedback
-   },
    computed: {
       ...mapState({
          signedInUser: state => state.user.signedInUser,
