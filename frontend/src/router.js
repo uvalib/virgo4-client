@@ -172,25 +172,14 @@ router.beforeEach((to, _from, next) => {
 })
 
 function getSignedInUserFromCookie() {
-   store.commit("user/setSignedInUser", { userId: "", token: "", type: "", role: "", quiet: true })
    let jwtStr = Vue.$cookies.get("v4_jwt")
    if (jwtStr) {
-      let parsed = parseJwt(jwtStr)
-      let user = { userId: parsed.userId, token: jwtStr, type: parsed.authMethod, role: parsed.role }
-      store.commit("user/setSignedInUser", user)
+      store.commit("user/setUserJWT", jwtStr)
       return true
+   } else {
+      store.commit("user/signOutUser", jwtStr)
    }
    return false
-}
-
-function parseJwt(token) {
-   var base64Url = token.split('.')[1]
-   var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-   var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-   }).join(''))
-
-   return JSON.parse(jsonPayload);
 }
 
 function ensureAuthTokenPresent(next) {
@@ -206,9 +195,7 @@ function ensureAuthTokenPresent(next) {
    let jwtStr = Vue.$cookies.get("v4_jwt")
    if (jwtStr) {
       // console.log("IN COOKIE AUTH, signing in")
-      let parsed = parseJwt(jwtStr)
-      let user = { userId: parsed.userId, token: jwtStr, type: parsed.authMethod, role: parsed.role }
-      store.commit("user/setSignedInUser", user)
+      store.commit("user/setUserJWT", jwtStr)
       next()
       return
    }

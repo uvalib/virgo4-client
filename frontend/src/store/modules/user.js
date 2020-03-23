@@ -2,6 +2,16 @@ import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
 
+function parseJwt(token) {
+   var base64Url = token.split('.')[1]
+   var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+   var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+   }).join(''))
+
+   return JSON.parse(jsonPayload);
+}
+
 const user = {
    namespaced: true,
    state: {
@@ -11,6 +21,7 @@ const user = {
       role: "",
       sessionType: "",
       accountInfo: {},
+      claims: {},
       checkouts: [],
       bills: [],
       requests: [],
@@ -175,13 +186,17 @@ const user = {
          state.lockedOut = false
          state.authTriesLeft = 5
       },
-      setSignedInUser(state, user) {
+      setUserJWT(state, jwtStr) {
+         let parsed = parseJwt(jwtStr)
+         state.claims = {canPurchase: parsed.canPurchase, canLEO: parsed.canLEO, 
+            canLEOPlus: parsed.canLEOPlus, canPlaceReserve: parsed.canPlaceReserve, 
+            canBrowseReserve: parsed.canBrowseReserve }
          state.authMessage = ""
          state.lockedOut = false
-         state.signedInUser = user.userId
-         state.authToken = user.token
-         state.sessionType = user.type
-         state.role = user.role
+         state.signedInUser = parsed.userId
+         state.authToken = jwtStr
+         state.sessionType =  parsed.authMethod
+         state.role =  parsed.role
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
       },
       setAccountInfo(state, data) {
@@ -338,12 +353,13 @@ const user = {
       },
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
-         // response: {barcode, signedId, message, attemptsLeft}
-         axios.post("/authenticate/public", data).then((response) => {
-            ctx.commit("setSignedInUser", {userId: response.data.barcode, 
-               token: ctx.state.authToken, type: "public", role: "user", quiet: false} )
+         axios.post("/authenticate/public", data).then((_response) => {
+            let jwtStr = Vue.$cookies.get("v4_jwt")
+            ctx.commit("setUserJWT", jwtStr )
             ctx.commit('setAuthorizing', false)
-            router.push("/signedin")
+            ctx.dispatch('restore/loadLocalStorage', null, {root: true})
+            let redirectPath = ctx.rootGetters['restore/previousPath']
+            router.push(redirectPath)
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)
             ctx.commit('setAuthFailure', error)
