@@ -116,10 +116,10 @@ export default {
              this.error = "A name is required"
             return
          }
-         let bmData = this.queryObject 
-         bmData.pool = this.selectedResults.pool.id
-         bmData.filters = this.poolFilters( this.resultsIdx )
-         let req = {name: this.searchName, search: bmData}
+         let saveData = this.queryObject 
+         saveData.pool = this.selectedResults.pool.id
+         saveData.filters = this.poolFilters( this.resultsIdx )
+         let req = {name: this.searchName, search: saveData, isPublic: (this.mode != "save")}
          try { 
             await this.$store.dispatch("user/saveSearch", req)
             this.saved = true

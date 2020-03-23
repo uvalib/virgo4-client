@@ -92,8 +92,9 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// Make sure the passed request object is well formed JSON
 	var reqObj struct {
-		Name   string      `json:"name"`
-		Search interface{} `json:"search"`
+		Name     string      `json:"name"`
+		Search   interface{} `json:"search"`
+		IsPublic bool        `json:"isPublic"`
 	}
 	qpErr := c.ShouldBindJSON(&reqObj)
 	if qpErr != nil {
@@ -105,7 +106,8 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// Generate an access token and save it to the saved searches table
 	json, _ := json.Marshal(reqObj.Search)
-	search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name, CreatedAt: time.Now(), Search: string(json)}
+	search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
+		CreatedAt: time.Now(), Search: string(json), Public: reqObj.IsPublic}
 	err := svc.DB.Model(&search).Insert()
 	if err != nil {
 		log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
