@@ -5,9 +5,11 @@
          <template v-if="showSummary">
             <div class="summary">
                <div class="query">Showing results for: <i>{{queryString}}</i></div>
-               <span>{{total}} matches found in {{results.length}} sources.</span>
-               <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
-               <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
+               <div class="counts">
+                  <span>{{total}} matches</span>
+                  <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
+                  <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
+               </div>
             </div>
             <span class="buttons">
                <SaveSearch v-if="isSignedIn" mode="share"/>
@@ -34,7 +36,7 @@
                </template>
                <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                   :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
-                  placeholder="Other<span class='total'>Sources</span>"
+                  placeholder="Other"
                   v-model="otherSrcSelection"/>
             </div>
             <PoolResultDetail v-if="selectedResultsIdx > -1" />
@@ -155,6 +157,9 @@ export default {
 </script>
 
 <style>
+.counts {
+   margin-left: 15px;
+}
 div.pool-tabs {
   font-weight: bold;
 }
@@ -220,6 +225,9 @@ p.relevant {
    margin: 0 0 0.2vw 0;
    font-weight: bold;
    font-size: 1.1em;
+}
+.summary .query i {
+   font-weight: 100;
 }
 .results-header {
    display: flex;

@@ -4,7 +4,7 @@
          <span>Advanced Search</span>
       </h1>
       <div class="pools-wrapper">
-         <h2>Search Sources</h2>
+         <h2>Resource Types</h2>
          <div class="pools">
             <div @click="poolClicked(src.url)" class="pool" v-for="src in sources" :key="src.id">
                <i v-if="isPoolExcluded(src.url)" class="far fa-square"></i>
