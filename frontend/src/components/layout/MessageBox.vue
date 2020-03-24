@@ -6,7 +6,7 @@
          <div class="message" :class="{error: type=='error', info: type=='info'}">
             <div class="bar">
                <span v-if="type=='error'" class="title">Virgo Error</span>
-               <span v-ielse class="title">Virgo Message</span>
+               <span v-else class="title">Virgo Message</span>
                <i @click="dismiss" class="close fas fa-times-circle"></i>
             </div>
             <div class="message-body" v-html="messageContent"></div>

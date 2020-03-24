@@ -15,6 +15,7 @@ import Requests from './views/Requests.vue'
 import SavedSearches from './views/SavedSearches.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
+import Feedback from './views/Feedback.vue'
 import NotFound from './views/NotFound.vue'
 import PublicBookmarks from './views/PublicBookmarks.vue'
 import store from './store'
@@ -61,6 +62,11 @@ const router = new Router({
          path: '/course-reserves-request',
          name: 'course-reserves-request',
          component: CourseReservesRequest
+      },
+      {
+         path: '/feedback',
+         name: 'feedback',
+         component: Feedback
       },
       {
          path: '/reserved',
@@ -148,7 +154,7 @@ router.beforeEach((to, _from, next) => {
    store.commit('user/clearAuthMessages', "")
 
    // Some pages just require an auth token...
-   let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse"]
+   let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback"]
    if (tokenPages.includes(to.name)) {
       ensureAuthTokenPresent(next)
       return

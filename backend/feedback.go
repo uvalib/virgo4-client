@@ -15,14 +15,11 @@ import (
 // SendFeedback will generate an email based on the user submission
 func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 	log.Printf("Received feedback request")
-	type FeedbackParams struct {
+	type FeedbackRequest struct {
 		UserID      string `json:"userID"`
 		Email       string `json:"email" binding:"required" `
 		WantedTo    string `json:"wantedTo"  binding:"required"`
 		Explanation string `json:"explanation"  binding:"required"`
-	}
-	type FeedbackRequest struct {
-		Feedback FeedbackParams `json:"feedback"`
 	}
 
 	var request FeedbackRequest
@@ -45,12 +42,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 	}
 
 	log.Printf("Generate SMTP message")
-	// Per: https://stackoverflow.com/questions/36485857/sending-emails-with-name-email-from-go
-	// sending addresses like 'user name <email.com>' does not work with the default
-	// mail package. Leaving at just email address for now. Can revisit after meetings
-	/// about functionality.
-	// toAddr := mail.Address{Name: emailMap[reserveReq.Request.Library], Address: svc.CourseReserveEmail}
-	to := []string{svc.FeedbackEmail, request.Feedback.Email}
+	to := []string{svc.FeedbackEmail, request.Email}
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
 	subject := "Subject: Virgo 4 Feedback\n"
 	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
@@ -63,8 +55,14 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		log.Printf("==================================================")
 	} else {
 		log.Printf("Sending reserve email to %s", strings.Join(to, ","))
-		auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
-		err := smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, svc.SMTP.Sender, to, msg)
+		var err error
+		if svc.SMTP.Pass != "" {
+			auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
+			err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, svc.SMTP.Sender, to, msg)
+		} else {
+			log.Printf("Using SendMail with no auth")
+			err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, svc.SMTP.Sender, to, msg)
+		}
 		if err != nil {
 			log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
 			c.String(http.StatusInternalServerError, err.Error())

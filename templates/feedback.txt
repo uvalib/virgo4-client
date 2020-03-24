@@ -2,13 +2,13 @@
 Virgo 4 Feedback
 ---------------------------------------
 
-Requester Email: {{.Feedback.Email}}
-Requester User ID: {{.Feedback.UserID}}
+Requester Email: {{.Email}}
+Requester User ID: {{.UserID}}
 
 First, explain what you wanted to do:
-{{.Feedback.WantedTo}}
+{{.WantedTo}}
 
 How did it go?:
-{{.Feedback.Explanation}}
+{{.Explanation}}
 
 ---------------------------------------
