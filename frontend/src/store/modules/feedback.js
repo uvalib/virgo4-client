@@ -37,9 +37,7 @@ const feedback = {
          let v4UserID = ctx.rootState.user.signedInUser
          let data = { userID: v4UserID, email: ctx.state.email,   
             wantedTo: ctx.state.wantedTo,  explanation: ctx.state.explanation}
-         console.log("PPOST FB")
          return axios.post('/api/feedback', data).then((_response) => {
-            console.log("DONE POST")
             ctx.commit("setSubmitSuccess")
          }).catch((_error) => {
             ctx.commit("setSubmitFail")
