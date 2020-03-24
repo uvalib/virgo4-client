@@ -115,6 +115,18 @@ const user = {
       setLastSavedSearchKey(state, key) {
          state.lastSavedSearchKey = key
       },
+      setSavedSearches(state, data) {
+         state.searches.splice(0, state.searches.length)
+         data.forEach( s => {
+            state.searches.push( s ) 
+         })
+      },
+      deleteSavedSearch(state, token) {
+         let idx = state.searches.findIndex(s => s.token == token)  
+         if (idx > -1) {
+            state.searches.splice(idx,1)
+         }
+      },
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
@@ -123,12 +135,6 @@ const user = {
       },
       setRequests(state, req) {
          state.requests = req
-      },
-      setSavedSearches(state, data) {
-         state.searches.splice(0, state.searches.length)
-         data.forEach( s => {
-            state.searches.push( s ) 
-         })
       },
       setRenewResults(state, renewResults) {
          renewResults.results.forEach( renew => {
@@ -351,6 +357,15 @@ const user = {
       async saveSearch(ctx, data) {
          let resp = await axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
          ctx.commit('setLastSavedSearchKey', resp.data.token)
+      },
+      async deleteSavedSearch(ctx, token) {
+         try {
+            await axios.delete(`/api/users/${ctx.state.signedInUser}/searches/${token}`)
+            ctx.commit('setLastSavedSearchKey', "")
+            ctx.commit('deleteSavedSearch', token)
+         } catch (e) {
+            ctx.commit('system/setError', "Unable to delete saved search. Please try again later.", {root: true})    
+         }
       },
    }
 }

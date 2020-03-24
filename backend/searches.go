@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -65,6 +66,35 @@ func (svc *ServiceContext) UnpublishSavedSearch(c *gin.Context) {
 	token := c.Param("token")
 	log.Printf("User %s unpublish saved search %s...", uid, token)
 	svc.setSearchVisibility(c, uid, token, false)
+}
+
+// DeleteSavedSearch will delete a saved search with the matching token
+func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
+	uid := c.Param("uid")
+	token := c.Param("token")
+	log.Printf("User %s delete search %s...", uid, token)
+
+	var userID int
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": uid})
+	uErr := uq.Row(&userID)
+	if uErr != nil {
+		log.Printf("ERROR: couldn't find user %s to delete saved search %s: %v", uid, token, uErr)
+		c.JSON(http.StatusBadRequest, fmt.Sprintf("Invalid user %s", uid))
+		return
+	}
+
+	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:userID} and token={:token")
+	dq.Bind(dbx.Params{"userID": userID})
+	dq.Bind(dbx.Params{"token": token})
+	_, dErr := dq.Execute()
+	if dErr != nil {
+		log.Printf("ERROR: couldn't delete user %s saved search %s: %v", uid, token, dErr)
+		c.JSON(http.StatusInternalServerError, dErr.Error)
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
 }
 
 // SaveSearch will save a named search in that saved_searches table along with an access token
