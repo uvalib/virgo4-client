@@ -24,6 +24,7 @@ type V4Claims struct {
 	CanLEOPlus       bool   `json:"canLEOPlus"`
 	CanPlaceReserve  bool   `json:"canPlaceReserve"`
 	CanBrowseReserve bool   `json:"canBrowseReserve"`
+	UsesSIS          bool   `json:"useSIS"`
 	Role             string `json:"role"`       // user, admin or guest
 	AuthMethod       string `json:"authMethod"` // none, pin, netbadge
 	jwt.StandardClaims
@@ -324,6 +325,7 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod string) (strin
 	v4Claims.CanPurchase = ilsUser.CanPurchase()
 	v4Claims.CanBrowseReserve = (ilsUser.CommunityUser == false)
 	v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
+	v4Claims.UsesSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, v4Claims)
