@@ -42,54 +42,29 @@ const user = {
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
-      isCommunityUser: (state, getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         return state.accountInfo.communityUser
-      },
-      isUndergraduate: (state,getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         // NOTE: profile comes from Sirsi, desc comes from LDAP
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         let desc = state.accountInfo.description.toLowerCase().trim()
-         if (desc.indexOf("undergraduate") == 0) {
-            return true
-         }
-         if (profile.indexOf("ugrad") == 0 || profile.indexOf("undergrad") == 0) {
-            return true
-         }
+      canPurchase: (state) => {
+         if ( state.claims.canPurchase ) return state.claims.canPurchase
          return false
       },
-      isGraduate: (state,getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         let desc = state.accountInfo.description.toLowerCase().trim()
-         if (desc.indexOf("graduate student") == 0) {
-            return true
-         }
-         if (profile.indexOf("grad") == 0 ){
-            return true
-         }
+      canUseLEO: (state) => {
+         if ( state.claims.canLEO ) return state.claims.canLEO
          return false
       },
-      isAlumni: (state,getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         if (profile.match(/Alumn/i)) {
-            return true
-         }
+      canUseLEOPlus: (state) => {
+         if ( state.claims.canLEOPlus ) return state.claims.canLEOPlus
          return false
       },
-      canMakeReserves: (state, getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         if (getters.isGraduate || getters.isUndergraduate) {
-            return false
-         }
-         if (profile.match(/Virginia Borrower|Other VA Faculty|Alumn/i)) {
-            return false
-         }
-
-         return true
+      canSearchReserves: (state) => {
+         if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
+         return false
+      },
+      useSIS: (state) => {
+         if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
+         return false    
+      },
+      canMakeReserves: (state) => {
+         if ( state.claims.canPlaceReserve ) return state.claims.canPlaceReserve
+         return false    
       },
       isBarred: state => {
          return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
@@ -190,7 +165,7 @@ const user = {
          let parsed = parseJwt(jwtStr)
          state.claims = {canPurchase: parsed.canPurchase, canLEO: parsed.canLEO, 
             canLEOPlus: parsed.canLEOPlus, canPlaceReserve: parsed.canPlaceReserve, 
-            canBrowseReserve: parsed.canBrowseReserve }
+            canBrowseReserve: parsed.canBrowseReserve, useSIS: parsed.useSIS }
          state.authMessage = ""
          state.lockedOut = false
          state.signedInUser = parsed.userId
