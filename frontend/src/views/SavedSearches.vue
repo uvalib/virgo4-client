@@ -61,7 +61,7 @@ export default {
    },
    methods: {
       removeSavedSearch(token) {
-         this.$store.commit("user/deleteSavedSearch", token)
+         this.$store.dispatch("user/deleteSavedSearch", token)
       },
       copyURL(token) {
          let URL = this.publicURL(token)  

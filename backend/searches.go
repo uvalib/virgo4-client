@@ -84,7 +84,7 @@ func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
 		return
 	}
 
-	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:userID} and token={:token")
+	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:userID} and token={:token}")
 	dq.Bind(dbx.Params{"userID": userID})
 	dq.Bind(dbx.Params{"token": token})
 	_, dErr := dq.Execute()
