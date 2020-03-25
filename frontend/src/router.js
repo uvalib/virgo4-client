@@ -89,7 +89,7 @@ const router = new Router({
          // setup and redirects to account page
          path: '/signedin',
          beforeEnter: (_to, _from, next) => {
-            getSignedInUserFromCookie()
+            ensureSignedIn()
             store.dispatch('restore/loadLocalStorage')
             let redirectPath = store.getters['restore/previousPath']
             next(redirectPath)
@@ -150,8 +150,7 @@ const router = new Router({
 router.beforeEach((to, _from, next) => {
    // always make sure user menu is closed and errors from prior page cleared
    store.commit("system/closeUserMenu")
-   store.commit('system/setError', "")
-   store.commit('user/clearAuthMessages', "")
+
 
    // Some pages just require an auth token...
    let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback"]
@@ -164,10 +163,10 @@ router.beforeEach((to, _from, next) => {
    let userPages = ["preferences", "account", "bookmarks", "checkouts",
       "course-reserves-request", "requests", "searches"]
    if (userPages.includes(to.name)) {
-      if (getSignedInUserFromCookie()) {
+      if (ensureSignedIn()) {
          next()
       } else {
-         store.commit('system/setSessionExpiredMessage')
+         store.commit('system/setSessionExpired')
          next("/")
       }
       return
@@ -177,13 +176,13 @@ router.beforeEach((to, _from, next) => {
    next()
 })
 
-function getSignedInUserFromCookie() {
+function ensureSignedIn() {
    let jwtStr = Vue.$cookies.get("v4_jwt")
    if (jwtStr) {
       store.commit("user/setUserJWT", jwtStr)
       return true
    } else {
-      store.commit("user/signOutUser", jwtStr)
+      store.commit("user/signoutUser")   
    }
    return false
 }

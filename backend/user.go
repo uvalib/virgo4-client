@@ -21,7 +21,6 @@ func NewV4User() *V4User {
 type V4User struct {
 	ID             int        `db:"id" json:"-"`
 	Virgo4ID       string     `db:"virgo4_id" json:"id"`
-	Role           string     `db:"role" json:"role"`
 	LockedOut      bool       `db:"locked_out" json:"-"`
 	LockedOutUntil *time.Time `db:"locked_out_until" json:"-"`
 	AuthStartedAt  *time.Time `db:"auth_started_at" json:"-"`
@@ -135,12 +134,6 @@ type CheckoutInfo struct {
 	Fee        string `json:"overdueFee"`
 	RecallDate string `json:"recallDate"`
 	RenewDate  string `json:"renewDate"`
-}
-
-// User contains all user data collected from ILS and Virgo4 sources
-type User struct {
-	*V4User
-	UserInfo *ILSUserInfo `json:"user"`
 }
 
 // ChangePin takes current_pin and new_pin as params in the json POST payload.
@@ -290,11 +283,16 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	err := q.One(v4User)
 	if err != nil {
 		log.Printf("ERROR: No v4 user settings found for %s: %+v", userID, err)
-	} else {
-		v4User.GetBookmarks(svc.DB)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
 	}
 
-	user := User{V4User: v4User, UserInfo: &ilsUser}
+	// Combine local V4 database user info with ILS user info and return results to client
+	type fullUser struct {
+		*V4User
+		UserInfo *ILSUserInfo `json:"user"`
+	}
+	user := fullUser{V4User: v4User, UserInfo: &ilsUser}
 	c.JSON(http.StatusOK, user)
 }
 

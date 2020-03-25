@@ -184,7 +184,6 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
-      this.$store.dispatch("user/getCheckouts")
       this.$store.dispatch("user/getBillDetails")
    }
 }

@@ -14,30 +14,68 @@ import (
 	dbx "github.com/go-ozzo/ozzo-dbx"
 )
 
+// RoleEnum is the enumerated type for V4 user role
+type RoleEnum int
+
+const (
+	// Guest is a non-authenticated user
+	Guest RoleEnum = iota
+	// User is a standard signed in user
+	User
+	// Admin is a signed in user with admin privileges
+	Admin
+)
+
+func (r RoleEnum) String() string {
+	if r < 0 || r > 2 {
+		return "guest"
+	}
+	return [...]string{"guest", "user", "admin"}[r]
+}
+
+// AuthEnum is the enumerated type for V4 user authentication methods
+type AuthEnum int
+
+const (
+	// NoAuth indicates there as no authentication
+	NoAuth AuthEnum = iota
+	// PIN indicates authentication using a Sirsi PIN
+	PIN
+	// Netbadge indicates authentication using Netbadge
+	Netbadge
+)
+
+func (r AuthEnum) String() string {
+	if r < 0 || r > 2 {
+		return "none"
+	}
+	return [...]string{"none", "pin", "netbadge"}[r]
+}
+
 // V4Claims encapsulates all of the information about an anonymous or
 // signed in Virgo4 user
 type V4Claims struct {
-	UserID           string `json:"userId"` // v4 userID or anonymous
-	IsUVA            bool   `json:"isUva"`
-	CanPurchase      bool   `json:"canPurchase"`
-	CanLEO           bool   `json:"canLEO"`
-	CanLEOPlus       bool   `json:"canLEOPlus"`
-	CanPlaceReserve  bool   `json:"canPlaceReserve"`
-	CanBrowseReserve bool   `json:"canBrowseReserve"`
-	UseSIS           bool   `json:"useSIS"`
-	Role             string `json:"role"`       // user, admin or guest
-	AuthMethod       string `json:"authMethod"` // none, pin, netbadge
+	UserID           string   `json:"userId"` // v4 userID or anonymous
+	IsUVA            bool     `json:"isUva"`
+	CanPurchase      bool     `json:"canPurchase"`
+	CanLEO           bool     `json:"canLEO"`
+	CanLEOPlus       bool     `json:"canLEOPlus"`
+	CanPlaceReserve  bool     `json:"canPlaceReserve"`
+	CanBrowseReserve bool     `json:"canBrowseReserve"`
+	UseSIS           bool     `json:"useSIS"`
+	Role             RoleEnum `json:"role"`       // guest, user, admin
+	AuthMethod       AuthEnum `json:"authMethod"` // none, pin, netbadge
 	jwt.StandardClaims
 }
 
 // Authorize is the API for minting JWT for accessing the API as a guest
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(9 * time.Hour)
 	v4Claims := V4Claims{
 		UserID:     "anonymous",
-		AuthMethod: "none",
-		Role:       "guest",
+		AuthMethod: NoAuth,
+		Role:       Guest,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -96,14 +134,14 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("Generate JWT for %s", computingID)
-	signedStr, jwtErr := svc.generateJWT(v4User, "netbadge")
+	signedStr, jwtErr := svc.generateJWT(v4User, Netbadge, role)
 	if jwtErr != nil {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	c.SetCookie("v4_jwt", signedStr, 3600*24, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
 }
 
@@ -131,7 +169,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Lookup user barcode %s...", auth.Barcode)
 	resp.Barcode = auth.Barcode
-	v4User, uErr := svc.getUpdatedUser(auth.Barcode, "user")
+	v4User, uErr := svc.getUpdatedUser(auth.Barcode, User)
 	if uErr != nil {
 		log.Printf("ERROR: unable to find user %s: %s", auth.Barcode, uErr.Error())
 		c.JSON(http.StatusForbidden, resp)
@@ -205,7 +243,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	resp.SignedIn = true
 
 	log.Printf("Generate JWT for %s", auth.Barcode)
-	signedStr, jwtErr := svc.generateJWT(v4User, "pin")
+	signedStr, jwtErr := svc.generateJWT(v4User, PIN, User)
 	if jwtErr != nil {
 		resp.Message = jwtErr.Error()
 		c.JSON(http.StatusForbidden, resp)
@@ -213,20 +251,20 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	c.SetCookie("v4_jwt", signedStr, 3600*24, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
 	c.JSON(http.StatusOK, resp)
 }
 
 // getUpdatedUser finds an existing user and updates role if necessary.
 // If a user is not found, one is created
-func (svc *ServiceContext) getUpdatedUser(userID string, role string) (*V4User, error) {
+func (svc *ServiceContext) getUpdatedUser(userID string, role RoleEnum) (*V4User, error) {
 	var user V4User
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(&user)
 	if err != nil {
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
-		user := V4User{ID: 0, Virgo4ID: userID, Role: role, Preferences: "{}"}
+		user := V4User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 		addErr := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 		if addErr != nil {
 			log.Printf("Unable to create user %s: %s", userID, addErr.Error())
@@ -236,15 +274,6 @@ func (svc *ServiceContext) getUpdatedUser(userID string, role string) (*V4User, 
 	}
 
 	log.Printf("User found; details: %+v", user)
-	if user.Role != role {
-		user.Role = role
-		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
-		if err != nil {
-			log.Printf("WARN: not able to update user %s role from %s to %s: %s",
-				userID, user.Role, role, err.Error())
-		}
-	}
-
 	return &user, nil
 }
 
@@ -263,24 +292,27 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("Authentication failed: [%s]", err.Error())
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	if tokenStr == "undefined" {
 		log.Printf("Authentication failed; bearer token is undefined")
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	log.Printf("Validating JWT auth token...")
-	v4Claimss := &V4Claims{}
-	tkn, jwtErr := jwt.ParseWithClaims(tokenStr, v4Claimss, func(token *jwt.Token) (interface{}, error) {
+	v4Claims := &V4Claims{}
+	tkn, jwtErr := jwt.ParseWithClaims(tokenStr, v4Claims, func(token *jwt.Token) (interface{}, error) {
 		return svc.JWTKey, nil
 	})
 
 	if jwtErr != nil {
-		log.Printf("JWT signature for %s is invalid: %s", tokenStr, err.Error())
+		log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -288,17 +320,18 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	log.Printf("TOKEN %+v", tkn)
 
 	// add the V4 JWT claims to the request context so other handlers can access it.
-	c.Set("token", v4Claimss)
-	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claimss)
+	// FIXME
+	c.Set("token", v4Claims)
+	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claims)
 }
 
-func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod string) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod AuthEnum, role RoleEnum) (string, error) {
+	expirationTime := time.Now().Add(9 * time.Hour)
 	v4Claims := V4Claims{
 		UserID:     v4User.Virgo4ID,
 		AuthMethod: authMethod,
 		IsUVA:      true,
-		Role:       v4User.Role,
+		Role:       role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -340,11 +373,11 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod string) (strin
 
 // parseMembership will parse V4 role from the mygroups membership string.
 // Membership format: cn=group_name1;cn=group_name2;...
-func parseMembership(membershipStr string) string {
-	out := "user"
+func parseMembership(membershipStr string) RoleEnum {
+	out := User
 	// for now, only admins are suported. They are identified by lib-virgo4-admin
 	if strings.Contains(membershipStr, "lib-virgo4-admin") {
-		out = "admin"
+		out = Admin
 	}
 	return out
 }

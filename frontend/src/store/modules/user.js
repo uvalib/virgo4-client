@@ -101,7 +101,9 @@ const user = {
         return state.authToken.length > 0
       },
       isSignedIn: state => {
-         return state.signedInUser != ""  
+         return state.signedInUser != ""  && state.authToken != "" &&
+            state.sessionType != "" && state.sessionType != "none" && 
+            state.role != "" && state.role != "guest"
       },
       hasAccountInfo: state => {
          if (state.signedInUser.length == 0)  return false
@@ -252,7 +254,6 @@ const user = {
          ctx.commit('setLookingUp', true)
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
-            ctx.commit('bookmarks/setBookmarks', response.data.bookmarks, { root: true })
             ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
             ctx.commit('setLookingUp', false)
           }).catch((error) => {

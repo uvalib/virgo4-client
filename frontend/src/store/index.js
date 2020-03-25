@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import versionChecker from './plugins/version'
+import expiredSessionWatcher from './plugins/expired'
 import bookmarks from './modules/bookmarks'
 import system from './modules/system'
 import pools from './modules/pools'
@@ -350,5 +351,5 @@ export default new Vuex.Store({
     requests: requests,
   },
 
-  plugins: [versionChecker]
+  plugins: [versionChecker,expiredSessionWatcher]
 })
