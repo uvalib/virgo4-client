@@ -9,82 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
-
-// RoleEnum is the enumerated type for V4 user role
-type RoleEnum int
-
-const (
-	// Guest is a non-authenticated user
-	Guest RoleEnum = iota
-	// User is a standard signed in user
-	User
-	// Admin is a signed in user with admin privileges
-	Admin
-)
-
-func (r RoleEnum) String() string {
-	if r < 0 || r > 2 {
-		return "guest"
-	}
-	return [...]string{"guest", "user", "admin"}[r]
-}
-
-// AuthEnum is the enumerated type for V4 user authentication methods
-type AuthEnum int
-
-const (
-	// NoAuth indicates there as no authentication
-	NoAuth AuthEnum = iota
-	// PIN indicates authentication using a Sirsi PIN
-	PIN
-	// Netbadge indicates authentication using Netbadge
-	Netbadge
-)
-
-func (r AuthEnum) String() string {
-	if r < 0 || r > 2 {
-		return "none"
-	}
-	return [...]string{"none", "pin", "netbadge"}[r]
-}
-
-// V4Claims encapsulates all of the information about an anonymous or
-// signed in Virgo4 user
-type V4Claims struct {
-	UserID           string   `json:"userId"` // v4 userID or anonymous
-	IsUVA            bool     `json:"isUva"`
-	CanPurchase      bool     `json:"canPurchase"`
-	CanLEO           bool     `json:"canLEO"`
-	CanLEOPlus       bool     `json:"canLEOPlus"`
-	CanPlaceReserve  bool     `json:"canPlaceReserve"`
-	CanBrowseReserve bool     `json:"canBrowseReserve"`
-	UseSIS           bool     `json:"useSIS"`
-	Role             RoleEnum `json:"role"`       // guest, user, admin
-	AuthMethod       AuthEnum `json:"authMethod"` // none, pin, netbadge
-	jwt.StandardClaims
-}
 
 // Authorize is the API for minting JWT for accessing the API as a guest
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
-	expirationTime := time.Now().Add(9 * time.Hour)
-	v4Claims := V4Claims{
-		UserID:     "anonymous",
-		AuthMethod: NoAuth,
-		Role:       Guest,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "v4",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, v4Claims)
-	signedStr, err := token.SignedString(svc.JWTKey)
+	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
+	signedStr, err := v4jwt.Mint(guestClaim, 9*time.Hour, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		c.String(http.StatusInternalServerError, "unable to generate authorization")
@@ -126,7 +60,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 	role := parseMembership(membershipStr)
 	log.Printf("NetBadge headers are valid. Get user %s:%s", computingID, role)
-	v4User, uErr := svc.getUpdatedUser(computingID, role)
+	v4User, uErr := svc.getOrCreateUser(computingID)
 	if uErr != nil {
 		log.Printf("ERROR: unable to get or create user %s - %s: %s", computingID, role, uErr.Error())
 		c.Redirect(http.StatusFound, "/forbidden")
@@ -134,7 +68,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("Generate JWT for %s", computingID)
-	signedStr, jwtErr := svc.generateJWT(v4User, Netbadge, role)
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.Netbadge, role)
 	if jwtErr != nil {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
@@ -169,7 +103,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Lookup user barcode %s...", auth.Barcode)
 	resp.Barcode = auth.Barcode
-	v4User, uErr := svc.getUpdatedUser(auth.Barcode, User)
+	v4User, uErr := svc.getOrCreateUser(auth.Barcode)
 	if uErr != nil {
 		log.Printf("ERROR: unable to find user %s: %s", auth.Barcode, uErr.Error())
 		c.JSON(http.StatusForbidden, resp)
@@ -243,7 +177,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	resp.SignedIn = true
 
 	log.Printf("Generate JWT for %s", auth.Barcode)
-	signedStr, jwtErr := svc.generateJWT(v4User, PIN, User)
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.PIN, v4jwt.User)
 	if jwtErr != nil {
 		resp.Message = jwtErr.Error()
 		c.JSON(http.StatusForbidden, resp)
@@ -255,9 +189,8 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// getUpdatedUser finds an existing user and updates role if necessary.
-// If a user is not found, one is created
-func (svc *ServiceContext) getUpdatedUser(userID string, role RoleEnum) (*V4User, error) {
+// getOrCreateUser finds an existing user. If a user is not found, one is created
+func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 	var user V4User
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
@@ -305,11 +238,7 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	}
 
 	log.Printf("Validating JWT auth token...")
-	v4Claims := &V4Claims{}
-	tkn, jwtErr := jwt.ParseWithClaims(tokenStr, v4Claims, func(token *jwt.Token) (interface{}, error) {
-		return svc.JWTKey, nil
-	})
-
+	v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
 	if jwtErr != nil {
 		log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
 		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
@@ -317,26 +246,18 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	log.Printf("TOKEN %+v", tkn)
-
-	// add the V4 JWT claims to the request context so other handlers can access it.
-	// FIXME
-	c.Set("token", v4Claims)
+	// add the parsed claims and signed JWT string to the request context so other handlers can access it.
+	c.Set("jwt", tokenStr)
+	c.Set("claims", v4Claims)
 	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claims)
 }
 
-func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod AuthEnum, role RoleEnum) (string, error) {
-	expirationTime := time.Now().Add(9 * time.Hour)
-	v4Claims := V4Claims{
+func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
+	v4Claims := v4jwt.V4Claims{
 		UserID:     v4User.Virgo4ID,
 		AuthMethod: authMethod,
 		IsUVA:      true,
 		Role:       role,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "v4",
-		},
 	}
 
 	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
@@ -361,8 +282,7 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod AuthEnum, role
 	v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, v4Claims)
-	signedStr, err := token.SignedString(svc.JWTKey)
+	signedStr, err := v4jwt.Mint(v4Claims, 9*time.Hour, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
@@ -373,11 +293,11 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod AuthEnum, role
 
 // parseMembership will parse V4 role from the mygroups membership string.
 // Membership format: cn=group_name1;cn=group_name2;...
-func parseMembership(membershipStr string) RoleEnum {
-	out := User
+func parseMembership(membershipStr string) v4jwt.RoleEnum {
+	out := v4jwt.User
 	// for now, only admins are suported. They are identified by lib-virgo4-admin
 	if strings.Contains(membershipStr, "lib-virgo4-admin") {
-		out = Admin
+		out = v4jwt.Admin
 	}
 	return out
 }

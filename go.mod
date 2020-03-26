@@ -17,6 +17,7 @@ require (
 	github.com/prometheus/client_golang v1.5.1 // indirect
 	github.com/prometheus/procfs v0.0.10 // indirect
 	github.com/rs/xid v1.2.1
+	github.com/uvalib/virgo4-jwt v0.0.0-20200326162438-1657d37c097e
 	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/sys v0.0.0-20200317113312-5766fd39f98d // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect

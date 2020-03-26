@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/rs/xid"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
 // SavedSearch contains details about a user saved seatch
@@ -174,14 +175,25 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 	}
 
 	log.Printf("Search %s is private to userID %d", token, search.UserID)
-	authToken := c.GetString("token")
+	claimsIface, signedIn := c.Get("claims")
+	if signedIn == false {
+		log.Printf("Private search cannot be accessed by non-signed-in user (no claims present)")
+		c.String(http.StatusNotFound, "%s not found", token)
+		return
+	}
+	claims, ok := claimsIface.(*v4jwt.V4Claims)
+	if ok == false {
+		log.Printf("ERROR: invalid claims found")
+		c.String(http.StatusNotFound, "%s not found", token)
+		return
+	}
+
 	var userID int
-	uq := svc.DB.NewQuery("select id from users where auth_token={:t} and signed_in={:si}")
-	uq.Bind(dbx.Params{"t": authToken})
-	uq.Bind(dbx.Params{"si": true})
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": claims.UserID})
 	uErr := uq.Row(&userID)
 	if uErr != nil {
-		log.Printf("Private search couldn't locate authg user: %s", uErr.Error())
+		log.Printf("Private search couldn't locate user %s: %s", claims.UserID, uErr.Error())
 		c.String(http.StatusNotFound, "%s not found", token)
 		return
 	}
