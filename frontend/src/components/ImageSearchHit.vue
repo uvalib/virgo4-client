@@ -1,5 +1,5 @@
 <template>
-   <div class="image-container" >
+   <div class="image-container">
       <div class="toolbar">
          <span class="short-title">
             <TruncatedText trigger="hover" :text="hit.header.title" :limit="20" />
@@ -7,14 +7,12 @@
          <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
       </div>
       <router-link class="img-link" :to="detailsURL">
-         <v-popover class="metadata-info" trigger="manual" >
-            <img class="trigger" :src="iiifURL(hit)">
-            <div class="metadata-popover" slot="popover">
-               <div class="metadata-content">
-                  <div>{{hit.header.title}}</div>
-               </div>
-            </div>
-         </v-popover>
+          <img class="trigger" :src="iiifURL(hit)">
+          <div class="metadata-popover" slot="popover">
+             <div class="metadata-content">
+                <div>{{hit.header.title}}</div>
+             </div>
+          </div>
          <div class="group-cnt" v-if="hit.grouped">{{hit.count}} images</div>
       </router-link>
    </div>
@@ -57,10 +55,14 @@ export default {
    background-color: transparent;
    display: inline-block;
 }
+
 img {
    max-width: 100%;
    height: auto;
    align-self: center;
+   display: block;
+   /*background-color: var(--uvalib-grey-lightest);
+    background-image: url('~@/assets/spinner2.gif'); */
 }
 .image-container {
    display: grid;
@@ -76,13 +78,14 @@ img {
 }
 .group-cnt {
    position: absolute;
-   background: white;
+   background: var(--uvalib-teal-lightest);
    padding: 2px 8px;
    border-radius: 10px;
    bottom: 8px;
    right: 8px;
    font-size: 0.8em;
    color: var(--uvalib-text);
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 1.24);
 }
 
 .metadata-popover {
