@@ -301,14 +301,17 @@ func (svc *ServiceContext) ILLiadGet(queryURL string) ([]byte, *RequestError) {
 }
 
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
-func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
+func (svc *ServiceContext) ILSConnectorGet(url string, jwt string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector request: %s", url)
 	timeout := time.Duration(20 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+
 	startTime := time.Now()
-	rawResp, rawErr := client.Get(url)
+	rawResp, rawErr := client.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -323,7 +326,7 @@ func (svc *ServiceContext) ILSConnectorGet(url string) ([]byte, *RequestError) {
 }
 
 // ILSConnectorPost sends a POST to the ILS connector and returns results
-func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}) ([]byte, *RequestError) {
+func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector request: %s", url)
 	timeout := time.Duration(20 * time.Second)
 	client := http.Client{
@@ -333,6 +336,7 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}) ([]b
 	b, _ := json.Marshal(values)
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	req.Header.Add("Content-type", "application/json")
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
 	rawResp, rawErr := client.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)

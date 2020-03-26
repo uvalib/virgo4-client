@@ -153,7 +153,7 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
 	pinURL := fmt.Sprintf("%s/v4/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
-	_, ilsErr := svc.ILSConnectorPost(pinURL, qp)
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
 	if ilsErr != nil {
 		log.Printf("User %s pin change failed", qp.UserBarcode)
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -167,7 +167,7 @@ func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get bills for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/bills", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -207,7 +207,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	if qp.Barcode != "all" {
 		renewURL = fmt.Sprintf("%s/v4/request/renew", svc.ILSAPI)
 	}
-	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq)
+	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq, c.GetString("jwt"))
 	if err != nil {
 		c.String(err.StatusCode, err.Message)
 		return
@@ -215,7 +215,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 
 	// Get all of the user checkouts after the renew so dates/status are updated
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -241,7 +241,7 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -262,7 +262,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	log.Printf("Get info for user %s with ILS Connector...", userID)
 
 	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return

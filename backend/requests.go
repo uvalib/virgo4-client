@@ -51,7 +51,7 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	values.PickupLibrary = "CLEMONS"
 
 	createHoldURL := fmt.Sprintf("%s/v4/holds", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, values)
+	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, values, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return

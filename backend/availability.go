@@ -15,7 +15,7 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 	log.Printf("Getting availability for %s with ILS Connector...", titleID)
 
 	availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, titleID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
