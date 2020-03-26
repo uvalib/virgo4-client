@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '../../router'
 
 const system = {
    namespaced: true,
@@ -75,7 +76,15 @@ const system = {
          }
          if (error.response) {
             // Server responded with a status code out of the range of 2xx
-            state.error = error.response.data
+            if (error.response.status == 401) {
+               // If this is a 401, a session has expired when making a request. 
+               state.error = ""
+               state.sessionExpired = true
+               setTimeout(() => {  state.sessionExpired=false }, 15000) 
+               router.push("/")
+            } else {
+               state.error = error.response.data
+            }
          } else if (error.request) {
             // The request was made but no response was received
             state.error = "Search is non-responsive"

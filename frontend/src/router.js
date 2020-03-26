@@ -15,6 +15,7 @@ import Requests from './views/Requests.vue'
 import SavedSearches from './views/SavedSearches.vue'
 import Bookmarks from './views/Bookmarks.vue'
 import SignedOut from './views/SignedOut.vue'
+import Feedback from './views/Feedback.vue'
 import NotFound from './views/NotFound.vue'
 import PublicBookmarks from './views/PublicBookmarks.vue'
 import store from './store'
@@ -63,6 +64,11 @@ const router = new Router({
          component: CourseReservesRequest
       },
       {
+         path: '/feedback',
+         name: 'feedback',
+         component: Feedback
+      },
+      {
          path: '/reserved',
          name: 'reserved',
          component: CourseReserveSuccess,
@@ -83,7 +89,7 @@ const router = new Router({
          // setup and redirects to account page
          path: '/signedin',
          beforeEnter: (_to, _from, next) => {
-            getSignedInUserFromCookie()
+            ensureSignedIn()
             store.dispatch('restore/loadLocalStorage')
             let redirectPath = store.getters['restore/previousPath']
             next(redirectPath)
@@ -144,11 +150,10 @@ const router = new Router({
 router.beforeEach((to, _from, next) => {
    // always make sure user menu is closed and errors from prior page cleared
    store.commit("system/closeUserMenu")
-   store.commit('system/setError', "")
-   store.commit('user/clearAuthMessages', "")
+
 
    // Some pages just require an auth token...
-   let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse"]
+   let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback"]
    if (tokenPages.includes(to.name)) {
       ensureAuthTokenPresent(next)
       return
@@ -158,10 +163,10 @@ router.beforeEach((to, _from, next) => {
    let userPages = ["preferences", "account", "bookmarks", "checkouts",
       "course-reserves-request", "requests", "searches"]
    if (userPages.includes(to.name)) {
-      if (getSignedInUserFromCookie()) {
+      if (ensureSignedIn()) {
          next()
       } else {
-         store.commit('system/setSessionExpiredMessage')
+         store.commit('system/setSessionExpired')
          next("/")
       }
       return
@@ -171,26 +176,15 @@ router.beforeEach((to, _from, next) => {
    next()
 })
 
-function getSignedInUserFromCookie() {
-   store.commit("user/setSignedInUser", { userId: "", token: "", type: "", role: "", quiet: true })
+function ensureSignedIn() {
    let jwtStr = Vue.$cookies.get("v4_jwt")
    if (jwtStr) {
-      let parsed = parseJwt(jwtStr)
-      let user = { userId: parsed.userId, token: jwtStr, type: parsed.authMethod, role: parsed.role }
-      store.commit("user/setSignedInUser", user)
+      store.commit("user/setUserJWT", jwtStr)
       return true
+   } else {
+      store.commit("user/signoutUser")   
    }
    return false
-}
-
-function parseJwt(token) {
-   var base64Url = token.split('.')[1]
-   var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-   var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-   }).join(''))
-
-   return JSON.parse(jsonPayload);
 }
 
 function ensureAuthTokenPresent(next) {
@@ -206,9 +200,7 @@ function ensureAuthTokenPresent(next) {
    let jwtStr = Vue.$cookies.get("v4_jwt")
    if (jwtStr) {
       // console.log("IN COOKIE AUTH, signing in")
-      let parsed = parseJwt(jwtStr)
-      let user = { userId: parsed.userId, token: jwtStr, type: parsed.authMethod, role: parsed.role }
-      store.commit("user/setSignedInUser", user)
+      store.commit("user/setUserJWT", jwtStr)
       next()
       return
    }

@@ -15,7 +15,7 @@ const restore = {
      getField,
      previousPath: state => {
        let ignoredPaths = ['/signedout','/signin']
-       if( !state.searchData || !state.searchData.previousPath
+       if( !state.searchData || !state.searchData.previousPath || state.searchData.query == "" 
          || ignoredPaths.includes(state.searchData.previousPath) ){
          return '/account'
        }

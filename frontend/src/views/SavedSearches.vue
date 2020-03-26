@@ -20,7 +20,13 @@
                            <span>&nbsp;Public</span>
                         </span>
                         <span><router-link :to="searchURL(saved.token)">{{saved.name}}</router-link></span>
-                        <span class="icon"><router-link :to="searchURL(saved.token)"><i class="fas fa-search"></i></router-link></span>
+                        <span class="search-actions">
+                           <span class="icon"><router-link :to="searchURL(saved.token)"><i class="fas fa-search"></i></router-link></span>
+                           <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)">
+                              <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
+                              <div class="del-detail">This cannot be reversed.</div>
+                           </ConfirmDelete>
+                        </span>
                      </div>
                      <div v-if="saved.public" class="public-controls">
                         <a  class="view" :href="searchURL(saved.token)" target="_blank">
@@ -41,10 +47,11 @@
 import { mapState } from "vuex"
 import V4Spinner from "@/components/V4Spinner"
 import AccountActivities from "@/components/AccountActivities"
+import ConfirmDelete from "@/components/popovers/ConfirmDelete"
 export default {
    name: "requests",
    components: {
-      V4Spinner, AccountActivities
+      V4Spinner, AccountActivities,ConfirmDelete
    },
    computed: {
       ...mapState({
@@ -53,6 +60,9 @@ export default {
       })
    },
    methods: {
+      removeSavedSearch(token) {
+         this.$store.dispatch("user/deleteSavedSearch", token)
+      },
       copyURL(token) {
          let URL = this.publicURL(token)  
          this.$copyText(URL).then( ()=> {
@@ -129,15 +139,25 @@ div.row {
    margin-bottom: 5px;
    padding-bottom: 5px;
 }
-span.icon {
+span.search-actions {
    margin-left: auto;
-   display: inline-block;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
 }
 span.icon i.fas {
    color: var(--uvalib-text);
+   margin-right: 15px;
 }
 i.link {
    margin: 0 0 0 5px;
+}
+.del-detail {
+   font-weight: 100;
+   margin: 15px 0;
+}
+.details {
+   margin-bottom: 35px;
 }
 span.num {
   font-weight: bold;

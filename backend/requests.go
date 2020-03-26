@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
 // CreateHold uses ILS Connector V4 API to create a Hold
@@ -25,15 +25,16 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 		return
 	}
 
-	authToken := c.GetString("token")
-	var userID string
-	uq := svc.DB.NewQuery("select virgo4_id from users where auth_token={:t} and signed_in={:si}")
-	uq.Bind(dbx.Params{"t": authToken})
-	uq.Bind(dbx.Params{"si": true})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("Hold Request couldn't locate auth user: %s", uErr.Error())
-		c.String(http.StatusNotFound, "%s not found", authToken)
+	claimsIface, signedIn := c.Get("claims")
+	if signedIn == false {
+		log.Printf("Hold Request requires signin with JWT claims; no claims found")
+		c.String(http.StatusBadRequest, "signin required")
+		return
+	}
+	claims, ok := claimsIface.(v4jwt.V4Claims)
+	if ok == false {
+		log.Printf("ERROR: invalid claims found")
+		c.String(http.StatusBadRequest, "signin required")
 		return
 	}
 
@@ -46,11 +47,11 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	}
 	values.TitleKey = holdReq.TitleID
 	values.Barcode = holdReq.Barcode
-	values.UserID = userID
+	values.UserID = claims.UserID
 	values.PickupLibrary = "CLEMONS"
 
 	createHoldURL := fmt.Sprintf("%s/v4/holds", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, values)
+	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, values, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return

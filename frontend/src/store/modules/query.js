@@ -8,7 +8,7 @@ const query = {
       restoreMessage: "",
       mode: "basic",
       basic: "",
-      basicSearchScope: { name: 'All Sources', id: 'all' },
+      basicSearchScope: { name: 'All Resource Types', id: 'all' },
       advanced: [
          { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" },
       ],
@@ -159,7 +159,7 @@ const query = {
          state.restoreMessage = ""
          state.mode = "basic"
          state.basic = ""
-         state.basicSearchScope = { name: 'All Sources', id: 'all' },
+         state.basicSearchScope = { name: 'All Resource Types', id: 'all' },
          state.advanced = [
             { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
          state.browse = [

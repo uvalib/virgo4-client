@@ -21,7 +21,6 @@ func NewV4User() *V4User {
 type V4User struct {
 	ID             int        `db:"id" json:"-"`
 	Virgo4ID       string     `db:"virgo4_id" json:"id"`
-	Role           string     `db:"role" json:"role"`
 	LockedOut      bool       `db:"locked_out" json:"-"`
 	LockedOutUntil *time.Time `db:"locked_out_until" json:"-"`
 	AuthStartedAt  *time.Time `db:"auth_started_at" json:"-"`
@@ -72,8 +71,8 @@ func (u *ILSUserInfo) IsUndergraduate() bool {
 	return match
 }
 
-// IsAmumni returns true if this user is an alumni
-func (u *ILSUserInfo) IsAmumni() bool {
+// IsAlumni returns true if this user is an alumni
+func (u *ILSUserInfo) IsAlumni() bool {
 	match, _ := regexp.MatchString("(?i)Alumn", u.Profile)
 	return match
 }
@@ -110,7 +109,7 @@ func (u *ILSUserInfo) IsStaff() bool {
 
 // CanPlaceReserve returns true if this user can place an item on course reserve
 func (u *ILSUserInfo) CanPlaceReserve() bool {
-	if u.IsGraduate() || u.IsUndergraduate() || u.IsAmumni() {
+	if u.IsGraduate() || u.IsUndergraduate() || u.IsAlumni() {
 		return false
 	}
 	match, _ := regexp.MatchString("(?i)(Virginia Borrower)|(Other VA Faculty)", u.Profile)
@@ -137,12 +136,6 @@ type CheckoutInfo struct {
 	RenewDate  string `json:"renewDate"`
 }
 
-// User contains all user data collected from ILS and Virgo4 sources
-type User struct {
-	*V4User
-	UserInfo *ILSUserInfo `json:"user"`
-}
-
 // ChangePin takes current_pin and new_pin as params in the json POST payload.
 // It changes the pin to new_pin.
 func (svc *ServiceContext) ChangePin(c *gin.Context) {
@@ -160,7 +153,7 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
 	pinURL := fmt.Sprintf("%s/v4/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
-	_, ilsErr := svc.ILSConnectorPost(pinURL, qp)
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
 	if ilsErr != nil {
 		log.Printf("User %s pin change failed", qp.UserBarcode)
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -174,7 +167,7 @@ func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get bills for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/bills", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -214,7 +207,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	if qp.Barcode != "all" {
 		renewURL = fmt.Sprintf("%s/v4/request/renew", svc.ILSAPI)
 	}
-	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq)
+	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq, c.GetString("jwt"))
 	if err != nil {
 		c.String(err.StatusCode, err.Message)
 		return
@@ -222,7 +215,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 
 	// Get all of the user checkouts after the renew so dates/status are updated
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -248,7 +241,7 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -269,7 +262,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	log.Printf("Get info for user %s with ILS Connector...", userID)
 
 	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -290,11 +283,16 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	err := q.One(v4User)
 	if err != nil {
 		log.Printf("ERROR: No v4 user settings found for %s: %+v", userID, err)
-	} else {
-		v4User.GetBookmarks(svc.DB)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
 	}
 
-	user := User{V4User: v4User, UserInfo: &ilsUser}
+	// Combine local V4 database user info with ILS user info and return results to client
+	type fullUser struct {
+		*V4User
+		UserInfo *ILSUserInfo `json:"user"`
+	}
+	user := fullUser{V4User: v4User, UserInfo: &ilsUser}
 	c.JSON(http.StatusOK, user)
 }
 

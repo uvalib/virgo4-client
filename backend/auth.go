@@ -9,43 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
-
-// V4Claims encapsulates all of the information about an anonymous or
-// signed in Virgo4 user
-type V4Claims struct {
-	UserID           string `json:"userId"` // v4 userID or anonymous
-	IsUVA            bool   `json:"isUva"`
-	CanPurchase      bool   `json:"canPurchase"`
-	CanLEO           bool   `json:"canLEO"`
-	CanLEOPlus       bool   `json:"canLEOPlus"`
-	CanPlaceReserve  bool   `json:"canPlaceReserve"`
-	CanBrowseReserve bool   `json:"canBrowseReserve"`
-	Role             string `json:"role"`       // user, admin or guest
-	AuthMethod       string `json:"authMethod"` // none, pin, netbadge
-	jwt.StandardClaims
-}
 
 // Authorize is the API for minting JWT for accessing the API as a guest
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
-	expirationTime := time.Now().Add(24 * time.Hour)
-	v4Claims := V4Claims{
-		UserID:     "anonymous",
-		AuthMethod: "none",
-		Role:       "guest",
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "v4",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, v4Claims)
-	signedStr, err := token.SignedString(svc.JWTKey)
+	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
+	signedStr, err := v4jwt.Mint(guestClaim, 9*time.Hour, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		c.String(http.StatusInternalServerError, "unable to generate authorization")
@@ -87,7 +60,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 	role := parseMembership(membershipStr)
 	log.Printf("NetBadge headers are valid. Get user %s:%s", computingID, role)
-	v4User, uErr := svc.getUpdatedUser(computingID, role)
+	v4User, uErr := svc.getOrCreateUser(computingID)
 	if uErr != nil {
 		log.Printf("ERROR: unable to get or create user %s - %s: %s", computingID, role, uErr.Error())
 		c.Redirect(http.StatusFound, "/forbidden")
@@ -95,14 +68,14 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("Generate JWT for %s", computingID)
-	signedStr, jwtErr := svc.generateJWT(v4User, "netbadge")
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.Netbadge, role)
 	if jwtErr != nil {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	c.SetCookie("v4_jwt", signedStr, 3600*24, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
 }
 
@@ -130,7 +103,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Lookup user barcode %s...", auth.Barcode)
 	resp.Barcode = auth.Barcode
-	v4User, uErr := svc.getUpdatedUser(auth.Barcode, "user")
+	v4User, uErr := svc.getOrCreateUser(auth.Barcode)
 	if uErr != nil {
 		log.Printf("ERROR: unable to find user %s: %s", auth.Barcode, uErr.Error())
 		c.JSON(http.StatusForbidden, resp)
@@ -178,7 +151,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
 	authURL := fmt.Sprintf("%s/v4/users/%s/check_pin?pin=%s", svc.ILSAPI, auth.Barcode, auth.Password)
-	bodyBytes, _ := svc.ILSConnectorGet(authURL)
+	bodyBytes, _ := svc.ILSConnectorGet(authURL, c.GetString("jwt"))
 
 	if string(bodyBytes) != "valid" {
 		// The in verification failed. If this has happened 5 times in a
@@ -204,7 +177,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	resp.SignedIn = true
 
 	log.Printf("Generate JWT for %s", auth.Barcode)
-	signedStr, jwtErr := svc.generateJWT(v4User, "pin")
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.PIN, v4jwt.User)
 	if jwtErr != nil {
 		resp.Message = jwtErr.Error()
 		c.JSON(http.StatusForbidden, resp)
@@ -212,20 +185,19 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	c.SetCookie("v4_jwt", signedStr, 3600*24, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
 	c.JSON(http.StatusOK, resp)
 }
 
-// getUpdatedUser finds an existing user and updates role if necessary.
-// If a user is not found, one is created
-func (svc *ServiceContext) getUpdatedUser(userID string, role string) (*V4User, error) {
+// getOrCreateUser finds an existing user. If a user is not found, one is created
+func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 	var user V4User
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(&user)
 	if err != nil {
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
-		user := V4User{ID: 0, Virgo4ID: userID, Role: role, Preferences: "{}"}
+		user := V4User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 		addErr := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
 		if addErr != nil {
 			log.Printf("Unable to create user %s: %s", userID, addErr.Error())
@@ -235,15 +207,6 @@ func (svc *ServiceContext) getUpdatedUser(userID string, role string) (*V4User, 
 	}
 
 	log.Printf("User found; details: %+v", user)
-	if user.Role != role {
-		user.Role = role
-		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
-		if err != nil {
-			log.Printf("WARN: not able to update user %s role from %s to %s: %s",
-				userID, user.Role, role, err.Error())
-		}
-	}
-
 	return &user, nil
 }
 
@@ -262,52 +225,47 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("Authentication failed: [%s]", err.Error())
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	if tokenStr == "undefined" {
 		log.Printf("Authentication failed; bearer token is undefined")
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	log.Printf("Validating JWT auth token...")
-	v4Claimss := &V4Claims{}
-	tkn, jwtErr := jwt.ParseWithClaims(tokenStr, v4Claimss, func(token *jwt.Token) (interface{}, error) {
-		return svc.JWTKey, nil
-	})
-
+	v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
 	if jwtErr != nil {
-		log.Printf("JWT signature for %s is invalid: %s", tokenStr, err.Error())
+		log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	log.Printf("TOKEN %+v", tkn)
-
-	// add the V4 JWT claims to the request context so other handlers can access it.
-	c.Set("token", v4Claimss)
-	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claimss)
+	// add the parsed claims and signed JWT string to the request context so other handlers can access it.
+	c.Set("jwt", tokenStr)
+	c.Set("claims", v4Claims)
+	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claims)
 }
 
-func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod string) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
-	v4Claims := V4Claims{
+func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
+	v4Claims := v4jwt.V4Claims{
 		UserID:     v4User.Virgo4ID,
 		AuthMethod: authMethod,
 		IsUVA:      true,
-		Role:       v4User.Role,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "v4",
-		},
+		Role:       role,
 	}
+
+	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
+	guestJWT, _ := v4jwt.Mint(guestClaim, 9*time.Hour, svc.JWTKey)
 
 	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
 	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, v4User.Virgo4ID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT)
 	if ilsErr != nil {
 		return "", errors.New(ilsErr.Message)
 	}
@@ -324,10 +282,10 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod string) (strin
 	v4Claims.CanPurchase = ilsUser.CanPurchase()
 	v4Claims.CanBrowseReserve = (ilsUser.CommunityUser == false)
 	v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
+	v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, v4Claims)
-	signedStr, err := token.SignedString(svc.JWTKey)
+	signedStr, err := v4jwt.Mint(v4Claims, 9*time.Hour, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
@@ -338,11 +296,11 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod string) (strin
 
 // parseMembership will parse V4 role from the mygroups membership string.
 // Membership format: cn=group_name1;cn=group_name2;...
-func parseMembership(membershipStr string) string {
-	out := "user"
+func parseMembership(membershipStr string) v4jwt.RoleEnum {
+	out := v4jwt.User
 	// for now, only admins are suported. They are identified by lib-virgo4-admin
 	if strings.Contains(membershipStr, "lib-virgo4-admin") {
-		out = "admin"
+		out = v4jwt.Admin
 	}
 	return out
 }

@@ -165,14 +165,9 @@ export default {
         hasAccountInfo: 'user/hasAccountInfo',
         totalFines:  'user/totalFines',
         itemsWithFines: 'user/itemsWithFines',
-        isUndergraduate: 'user/isUndergraduate',
-        isGraduate: 'user/isGraduate',
-        isAlumni: 'user/isAlumni',
-        canChangePIN: 'user/canChangePIN'
+        canChangePIN: 'user/canChangePIN',
+        useSIS:  'user/useSIS',
       }),
-      useSIS() {
-         return ( this.isUndergraduate || this.isGraduate || this.isAlumni)
-      },
       isBillOwed() {
          let amtStr = this.info['amountOwed']
          return parseFloat(amtStr) > 0
@@ -189,7 +184,6 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
-      this.$store.dispatch("user/getCheckouts")
       this.$store.dispatch("user/getBillDetails")
    }
 }

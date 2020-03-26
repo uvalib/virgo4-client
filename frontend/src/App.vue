@@ -294,6 +294,10 @@ div.v-popover.inline {
    display: inline-block;
    cursor: pointer;
 }
+div.v-popover.block {
+   display: block !important;
+   cursor: pointer;
+}
 .tooltip {
    display: block !important;
    z-index: 10000;

@@ -93,7 +93,7 @@ func (svc *ServiceContext) ValidateCourseReserves(c *gin.Context) {
 
 	log.Printf("Validate course reserve items %v", req.Items)
 	url := fmt.Sprintf("%s/v4/course_reserves/validate", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(url, req)
+	bodyBytes, ilsErr := svc.ILSConnectorPost(url, req, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -125,7 +125,7 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	for idx := range reserveReq.Items {
 		itm := reserveReq.Items[idx]
 		itm.VirgoURL = fmt.Sprintf("%s/sources/%s/%s", svc.VirgoURL, itm.Pool, itm.CatalogKey)
-		avail := svc.getAvailabity(reserveReq.Items[idx])
+		avail := svc.getAvailabity(reserveReq.Items[idx], c.GetString("jwt"))
 		reserveReq.Items[idx].Availability = make([]AvailabilityInfo, len(avail))
 		copy(reserveReq.Items[idx].Availability, avail)
 		if len(avail) > reserveReq.MaxAvail {
@@ -226,10 +226,10 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	c.String(http.StatusOK, "Reserve email sent")
 }
 
-func (svc *ServiceContext) getAvailabity(reqItem RequestItem) []AvailabilityInfo {
+func (svc *ServiceContext) getAvailabity(reqItem RequestItem, jwt string) []AvailabilityInfo {
 	out := make([]AvailabilityInfo, 0)
 	availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, reqItem.CatalogKey)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, jwt)
 	if ilsErr != nil {
 		log.Printf("WARN: Unable to get availabilty info for reserve %s: %s", reqItem.CatalogKey, ilsErr.Message)
 		return out
@@ -277,7 +277,7 @@ func (svc *ServiceContext) SearchReserves(c *gin.Context) {
 	if desk != "" {
 		url += fmt.Sprintf("&desk=%s", desk)
 	}
-	bodyBytes, ilsErr := svc.ILSConnectorGet(url)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(url, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
