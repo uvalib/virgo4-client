@@ -225,31 +225,6 @@ func getLatestMigrationNumber() int {
 	return maxNum
 }
 
-// IsAuthenticated will return success if the specified token auth token is associated with
-// an authenticated user. This can be used to determine if user is UVA or not.
-func (svc *ServiceContext) IsAuthenticated(c *gin.Context) {
-	token := c.Param("token")
-	q := svc.DB.NewQuery("select id,signed_in from users where auth_token={:t}")
-	q.Bind(dbx.Params{"t": token})
-	var out struct {
-		UserID   string `db:"virgo4_id"`
-		SignedIn bool   `db:"signed_in"`
-	}
-	err := q.One(&out)
-	if err != nil {
-		log.Printf("auth token not found. Not a UVA user. Error: %+v", err)
-		c.String(http.StatusNotFound, "%s not found", token)
-		return
-	}
-	if out.SignedIn {
-		log.Printf("auth token found and signed in. This is a UVA user")
-		c.String(http.StatusOK, "%s is a UVA user", token)
-	} else {
-		log.Printf("auth token found, but not signed in. Not a UVA user")
-		c.String(http.StatusNotFound, "%s not signed in", token)
-	}
-}
-
 // GetConfig returns front-end configuration data as JSON
 func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
