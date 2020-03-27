@@ -33,18 +33,23 @@
             </div>
          </template>
          <template v-else>
-            <div class="message pure-form">
-               <div>
-                  <span class="label">Search Name</span>
-                  <input ref="savename" type="text" v-model="searchName" @keyup.enter="saveClicked" />
-               </div>
-               <p class="error">{{error}}</p>
+            <div v-if="working"  class="message working">
+               <V4Spinner message="Working..."/>
             </div>
-            <div class="edit-controls">
-               <span @click="cancelClicked" class="pure-button pure-button-tertiary">Cancel</span>
-               <span class="pure-button pure-button-primary" @click="saveClicked">
-                  Save
-               </span>
+            <div v-else>
+               <div class="message pure-form">
+                  <div>
+                     <span class="label">Search Name</span>
+                     <input ref="savename" type="text" v-model="searchName" @keyup.enter="saveClicked" />
+                  </div>
+                  <p class="error">{{error}}</p>
+               </div>
+               <div class="edit-controls">
+                  <span @click="cancelClicked" class="pure-button pure-button-tertiary">Cancel</span>
+                  <span class="pure-button pure-button-primary" @click="saveClicked">
+                     Save
+                  </span>
+               </div>
             </div>
          </template>
       </div>
@@ -54,8 +59,11 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-
+import V4Spinner from "@/components/V4Spinner"
 export default {
+   components: {
+      V4Spinner
+   },
    computed: {
       ...mapState({
          resultsIdx: state => state.selectedResultsIdx,
@@ -78,7 +86,8 @@ export default {
          searchName: "",
          error: "",
          isOpen: false,
-         saved: false
+         saved: false,
+         working: false
       }
    },
    methods: {
@@ -106,16 +115,24 @@ export default {
          this.isOpen = true
          let d = new Date()
          this.searchName = `search-${this.$moment(d).format('YYYYMMDDHHmm')}`
-         this.error = "",
-         setTimeout(()=>{
-            this.$refs.savename.focus()
-         }, 250)
+         this.error = ""
+         if (this.mode == 'share') {
+            this.working = true
+            setTimeout(()=>{
+               this.saveClicked()
+            }, 5)
+         } else {
+            setTimeout(()=>{
+               this.$refs.savename.focus()
+            }, 250)
+         }
       },
       async saveClicked() {
          if ( this.searchName == "") {
              this.error = "A name is required"
             return
          }
+         this.working = true
          let saveData = this.queryObject 
          saveData.pool = this.selectedResults.pool.id
          saveData.filters = this.poolFilters( this.resultsIdx )
@@ -124,8 +141,10 @@ export default {
             await this.$store.dispatch("user/saveSearch", req)
             this.saved = true
             this.showSavePrompt = false
+            this.working = false
          } catch(err) {
             this.error = err.message
+            this.working = false
          }
       }
    }
@@ -159,6 +178,10 @@ div.message {
    padding: 15px 20px 0 20px;
    border-left: 1px solid var(--uvalib-grey-dark);
    border-right: 1px solid var(--uvalib-grey-dark);
+}
+div.message.working {
+   text-align: center;
+   padding-bottom: 25px;
 }
 input[type=text] {
    width: 100%;
