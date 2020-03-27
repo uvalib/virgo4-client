@@ -2,7 +2,7 @@
    <div class="image-container">
       <div class="toolbar">
          <span class="short-title">
-            <TruncatedText trigger="hover" :text="hit.header.title" :limit="20" />
+            <TruncatedText trigger="hover" :text="hit.header.title" :limit="20" style="font-weight:bold;" />
          </span>
          <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
       </div>
@@ -61,8 +61,6 @@ img {
    height: auto;
    align-self: center;
    display: block;
-   /*background-color: var(--uvalib-grey-lightest);
-    background-image: url('~@/assets/spinner2.gif'); */
 }
 .image-container {
    display: grid;

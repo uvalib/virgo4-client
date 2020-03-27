@@ -5,7 +5,7 @@
             <template slot-scope="scope">
                <template  v-for="(r,idx) in scope.images">
                   <div class="thumb-wrap" :key="`w${idx}`">
-                     <img :src="relatedImageURL(r,'thumb')" :data-src="relatedImageURL(r,'full')" 
+                     <img :src="relatedImageURL(r,'thumb')" :data-src="relatedImageURL(r,'full')"
                         class="thumb small" >
                      <div class="thumb-toolbar">
                         <router-link class="img-link" :to="detailsURL(r)">
@@ -19,19 +19,19 @@
                      </div>
                   </div>
                </template>
-               <div  v-if="manifestURL" class="iiif-help">
-                  <span>What is IIIF</span>
-                  <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
-               </div>
             </template>
          </viewer>
+         <div  v-if="manifestURL" class="iiif-help">
+            <span>What is <img src="../assets/iiif_icon.png"/></span>
+            <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
+         </div>
       </template>
 
       <template v-else>
          <viewer class="img-view large" ref="viewer" :options="viewerOpts">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
          </viewer>
-      
+
          <div class="img-toolbar">
             <span class="hint">Click image to zoom</span>
             <span  v-if="manifestURL" class="iiif">
@@ -42,7 +42,7 @@
             </span>
          </div>
       </template>
-   </div>            
+   </div>
 </template>
 
 <script>
@@ -109,7 +109,7 @@ export default {
          if (size == 'full') {
             return [`${baseURL}/full/1200,/0/default.jpg`]
          }
-         return [`${baseURL}/square/175,175/0/default.jpg`]
+         return [`${baseURL}/square/250,250/0/default.jpg`]
       },
    },
 
@@ -122,10 +122,13 @@ export default {
    align-items: center;
 }
 div.img-view {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+   grid-gap: 1.5rem;
+   margin: 0 5px 20px 5px;
+   padding: 0;
+   height: 100%;
    text-align: left;
-   display: inline-block;
-   position: relative;
-   vertical-align: top;
 }
 div.img-toolbar {
    display: flex;
@@ -136,13 +139,13 @@ div.img-toolbar {
 }
 .thumb-wrap {
    display: inline-block;
-   border: 1px solid var( --uvalib-grey-light);
-   margin: 5px;
-   padding: 5px 5px 0 5px;
-   border-radius: 5px;
+   max-width: 250px;
 }
 .thumb-wrap  img {
-   border-radius: 5px;
+  max-width: 100%;
+  height: auto;
+  align-self: center;
+  display: block;
 }
 span.hint {
    font-size: 0.9em;
@@ -150,8 +153,8 @@ span.hint {
    box-sizing: border-box;
 }
 img.thumb {
-   border: 1px solid var(--uvalib-grey);
    box-sizing: border-box;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 img.thumb.small {
    background-image: url('~@/assets/spinner2.gif');
@@ -165,15 +168,15 @@ img.thumb:hover {
    cursor:pointer;
 }
 .iiif-help {
-   margin-top: 5px;
-   font-size: 0.9em;
+  border-top: 1px solid var(--uvalib-grey-light);
+  padding-top: 1rem;
 }
 .thumb-toolbar {
    display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
    justify-content: space-between;
-   font-size: 0.9em;
+   margin-top: .5em;
 }
 .iiif-icon {
    background-image: url('~@/assets/iiif_icon.png');

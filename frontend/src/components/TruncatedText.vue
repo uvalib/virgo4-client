@@ -92,7 +92,7 @@ div.popover-header {
 }
 .truncated-text {
    font-size: 1em;
-   font-weight: bold;
+   font-weight: normal;
 }
 .content {
    display: inline-block;
