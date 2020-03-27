@@ -146,6 +146,12 @@ div.img-toolbar {
   height: auto;
   align-self: center;
   display: block;
+  min-width: 175px;
+  min-height: 175px;
+  background-color: white;
+  background-image: url('~@/assets/dots.gif');
+  background-repeat:no-repeat;
+  background-position: center center;
 }
 span.hint {
    font-size: 0.9em;
@@ -157,12 +163,12 @@ img.thumb {
    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 img.thumb.small {
-   background-image: url('~@/assets/spinner2.gif');
+   background-image: url('~@/assets/dots.gif');
    background-repeat:no-repeat;
    background-position: center center;
    min-width: 175px;
    min-height: 175px;
-   background-color: var(--uvalib-grey-lightest);
+   background-color: white;
 }
 img.thumb:hover {
    cursor:pointer;
