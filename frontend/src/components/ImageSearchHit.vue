@@ -114,6 +114,8 @@ img {
    flex-flow: row nowrap;
    justify-content: space-between;
    align-items: center;
+   height: 100%;
+   z-index: 1;
 }
 .short-title {
    font-size: 0.85em;
