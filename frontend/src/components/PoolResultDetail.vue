@@ -106,8 +106,7 @@ export default {
    font-size: 0.9em;
 }
 .desc >>> a {
-   color: var(--color-lightest-blue) !important;
-   font-weight: bold;
+   color: var(--color-link) !important;
 }
 .pool-results {
    border: 0;
@@ -131,22 +130,19 @@ div.results-header {
    margin: 20px 0;
 }
 .image.hits-content {
-   text-align: left;
-   margin: 20px 0;
-   height: 100%;
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: center;
-   align-items: flex-start;
-   align-content: flex-start;
-   list-style: none;
-   padding:0;
-   margin:0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-gap: 1rem;
+  list-style: none;
+  margin: 0 5px 20px 5px;
+  padding: 0;
+  height: 100%;
 }
 .image.hit-wrapper {
     box-shadow: none;
     margin:0;
     padding:0;
+    max-width: 250px;
 }
 .hit-wrapper {
    margin: 0 5px 20px 5px;

@@ -1,20 +1,18 @@
 <template>
-   <div class="image-container" >
+   <div class="image-container">
       <div class="toolbar">
          <span class="short-title">
-            <TruncatedText trigger="hover" :text="hit.header.title" :limit="20" />
+            <TruncatedText trigger="hover" :text="hit.header.title" :limit="20" style="font-weight:bold;" />
          </span>
          <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
       </div>
       <router-link class="img-link" :to="detailsURL">
-         <v-popover class="metadata-info" trigger="manual" >
-            <img class="trigger" :src="iiifURL(hit)">
-            <div class="metadata-popover" slot="popover">
-               <div class="metadata-content">
-                  <div>{{hit.header.title}}</div>
-               </div>
-            </div>
-         </v-popover>
+          <img class="trigger" :src="iiifURL(hit)">
+          <div class="metadata-popover" slot="popover">
+             <div class="metadata-content">
+                <div>{{hit.header.title}}</div>
+             </div>
+          </div>
          <div class="group-cnt" v-if="hit.grouped">{{hit.count}} images</div>
       </router-link>
    </div>
@@ -45,7 +43,7 @@ export default {
       iiifURL(item) {
          let iiifField = item.basicFields.find( f=>f.name=="iiif_base_url")
          let iiif = iiifField.value
-         return `${iiif}/square/175,175/0/default.jpg`
+         return `${iiif}/square/250,250/0/default.jpg`
       },
    }
 };
@@ -57,44 +55,46 @@ export default {
    background-color: transparent;
    display: inline-block;
 }
+
 img {
-   border: 0;
-   border-top: 1px solid var(--uvalib-grey);
-   padding: 0;
-   margin: 0 0 -4px 0;
+   max-width: 100%;
+   height: auto;
+   align-self: center;
+   display: block;
    min-width: 175px;
    min-height: 175px;
-   background-color: var(--uvalib-grey-lightest);
-   background-image: url('~@/assets/spinner2.gif');
+   background-color: white;
+   background-image: url('~@/assets/dots.gif');
    background-repeat:no-repeat;
    background-position: center center;
 }
 .image-container {
+   display: grid;
+   grid-template-rows: 30px 1fr;
+   justify-items: stretch;
+   align-items: stretch;
    position: relative;
-   margin:0;
-   padding:0;
-   border: 1px solid var(--uvalib-grey);
-   margin: 3px;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .image-container:hover {
    top: -2px;
-   box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
 }
 .group-cnt {
    position: absolute;
-   background: white;
+   background: var(--uvalib-teal-lightest);
    padding: 2px 8px;
    border-radius: 10px;
    bottom: 8px;
    right: 8px;
    font-size: 0.8em;
    color: var(--uvalib-text);
-   border: 1px solid var(--uvalib-grey-dark);
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 1.24);
 }
 
 .metadata-popover {
    background: white;
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
    color: var(--uvalib-text);
    font-size: 0.9em;
    font-weight: normal;
@@ -107,13 +107,15 @@ img {
    padding: 10px;
 }
 .toolbar {
-   padding: 5px 5px 2px 5px;
+   padding: 5px 8px 5px 8px;
    text-align: left;
    background: white;
    display: flex;
    flex-flow: row nowrap;
    justify-content: space-between;
    align-items: center;
+   height: 100%;
+   z-index: 1;
 }
 .short-title {
    font-size: 0.85em;
