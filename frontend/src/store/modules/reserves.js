@@ -94,20 +94,20 @@ const reserves = {
          data['hits'].forEach( h=>{
             state.courseReserves.push(h)
          })
-         state.totalReserves = data['total']
+         state.totalReserves = state.courseReserves.length
          state.page = data['page']
          state.hasMore = data['more']
       },
       resetResults(state, type) {
          state.searchType = type
          state.courseReserves.splice(0, state.courseReserves.length)
-         state.totalReserves = 0
+         state.totalReserves = -1
          state.page = 1
          state.hasMore = false
       },
       clearReservesResults(state) {
          state.courseReserves.splice(0, state.courseReserves.length)
-         state.totalReserves = 0
+         state.totalReserves = -1
          state.page = 1
          state.hasMore = false
       },
@@ -188,6 +188,7 @@ const reserves = {
          if (ctx.state.hasMore == false ) {
             return
          }
+         ctx.commit('setSearching', true, { root: true })
          ctx.commit('nextPage')
          let qs = ctx.state.query
          if (qs.includes(" ")) {
@@ -197,8 +198,10 @@ const reserves = {
          let pg = ctx.state.page
          return axios.get(`/api/reserves/search?${typeParam}&query=${qs}&page=${pg}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
+            ctx.commit('setSearching', false, { root: true })
          }).catch((error) => {
             ctx.commit('setError', error, { root: true })
+            ctx.commit('setSearching', false, { root: true })
           })
       },
       searchCourses(ctx, data) {
