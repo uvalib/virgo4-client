@@ -115,6 +115,9 @@ const pools = {
             } else {
                p.providers = []   
             }
+            if (!p.sort_options) {
+               p.sort_options=[]
+            }
             state.list.push(p) 
          })
       },

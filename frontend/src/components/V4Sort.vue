@@ -1,6 +1,6 @@
 <template>
    <div class="v4-sort">
-      <label class="sort" for="sort-opt">Sort by</label>
+      <label class="sort" for="sort-opt">Sort by[{{sortIdString}}]</label>
       <select v-model="selectedSort" id="sort-opt" name="sort-opt">
          <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
             {{ option.name }}
@@ -28,13 +28,13 @@ export default {
    },
    computed: {
       sortIdString() {
-         return this.sort.sort_id+this.sort.order
+         return this.sort.sort_id+this.sort.order.toUpperCase()
       },
       sortOptions() {
          let out = [] 
          this.pool.sort_options.forEach( so => {
             if (so.id === 'SortRelevance') {
-               out.push({id: so.id, name: so.label })
+               out.push({id: so.id+"DESC", name: so.label })
             } else {
                out.push({id: so.id+"ASC", name: so.label+" (Ascending)" })   
                out.push({id: so.id+"DESC", name: so.label+" (Descending)" })     
