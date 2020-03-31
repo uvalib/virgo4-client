@@ -2,7 +2,7 @@
    <div class="image-container">
       <div class="toolbar">
          <span class="short-title">
-            <TruncatedText trigger="hover" :text="hit.header.title" :limit="20" style="font-weight:bold;" />
+            <TruncatedText trigger="hover" :text="hit.header.title" :limit="19" style="font-weight:bold;" />
          </span>
          <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
       </div>
@@ -63,7 +63,6 @@ img {
    display: block;
    min-width: 175px;
    min-height: 175px;
-   background-color: white;
    background-image: url('~@/assets/dots.gif');
    background-repeat:no-repeat;
    background-position: center center;
@@ -75,6 +74,7 @@ img {
    align-items: stretch;
    position: relative;
    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   width: fit-content;
 }
 .image-container:hover {
    top: -2px;
