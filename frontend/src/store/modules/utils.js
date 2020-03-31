@@ -116,15 +116,3 @@ export function getGroupHitMetadata(group, hit) {
    }
    delete group.fields
 }
-
-// Find a pool by internal identifier
-export function findPool(pools, id) {
-   let match = null
-   pools.some(function (p) {
-      if (p.id == id) {
-         match = p
-      }
-      return match != null
-   })
-   return match
-}

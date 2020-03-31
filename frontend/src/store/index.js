@@ -145,8 +145,8 @@ export default new Vuex.Store({
         }
 
         // Find the pool the results are associated with and populate some top level response info
-        let pool = utils.findPool(results.pools, pr.pool_id)
-        let result = { pool: pool, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms, 
+        let pool = results.pools.find( p => p.id == pr.pool_id)
+        let result = { pool: pool, sort: pr.sort, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms, 
           hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg}
         if (firstPoolWithHits == -1 &&  pr.pagination.total > 0) {
           firstPoolWithHits = idx
@@ -258,6 +258,7 @@ export default new Vuex.Store({
       return axios.post(url, req).then((response) => {
         commit('system/setShowWelcome', false)
         commit('pools/setPools', response.data.pools)
+        commit('pools/setSortOptions', response.data.pool_results)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
         commit('setSearching', false)

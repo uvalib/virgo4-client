@@ -85,10 +85,10 @@ const item = {
             }
             await ctx.dispatch("pools/getPools", null, {root:true})
             pools = ctx.rootState.pools.list
-            pool = utils.findPool(pools, source)
+            pool = pools.find( p => p.id == source)
             baseURL = pool.url
          } else {
-            pool = utils.findPool(pools, source)
+            pool = pools.find( p => p.id == source)
             baseURL = pool.url
          }
 
