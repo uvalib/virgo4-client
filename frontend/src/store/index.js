@@ -204,6 +204,10 @@ export default new Vuex.Store({
       state.selectedResultsIdx = -1
       state.otherSrcSelection = {id: "", name: ""}
     },
+
+    setSelectedResultsSort(state, sort) {
+      state.results[state.selectedResultsIdx].sort = sort   
+    }
   },
 
   actions: {
@@ -277,15 +281,16 @@ export default new Vuex.Store({
     searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
-      let tgtPool = rootGetters.selectedResults
+      let tgtResults = rootGetters.selectedResults
       let filters = rootGetters['filters/poolFilter'](state.selectedResultsIdx)
-      let filterObj = {pool_id: tgtPool.pool.id, facets: filters}
+      let filterObj = {pool_id: tgtResults.pool.id, facets: filters}
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: tgtPool.page * state.pageSize, rows: state.pageSize },
+        pagination: { start: tgtResults.page * state.pageSize, rows: state.pageSize },
+        sort: tgtResults.sort,
         filters: [filterObj]
       }
-      let url = tgtPool.pool.url + "/api/search?debug=1"
+      let url = tgtResults.pool.url + "/api/search?debug=1"
       return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)

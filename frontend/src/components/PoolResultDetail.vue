@@ -10,7 +10,7 @@
              <img v-else class ="logo" :src="poolLogo(selectedResults.pool.id)">
          </div>
          <SearchFilters />
-         <div v-if="false" class="sort-section">
+         <div v-if="sortingSupport" class="sort-section">
             <V4Sort :pool="selectedResults.pool" :sort="selectedResults.sort" />
          </div>
       </div>

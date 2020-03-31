@@ -1,7 +1,7 @@
 <template>
    <div class="v4-sort">
-      <label class="sort" for="sort-opt">Sort by[{{sortIdString}}]</label>
-      <select v-model="selectedSort" id="sort-opt" name="sort-opt">
+      <label class="sort" for="sort-opt">Sort by</label>
+      <select v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
          <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
             {{ option.name }}
          </option>
@@ -23,21 +23,34 @@ export default {
    },
    data: function()  {
       return {
-         selectedSort: this.sortIdString
+         selectedSort: this.sortIdString()
+      }
+   },
+   methods: {
+      sortIdString() {
+         return `${this.sort.sort_id}_${this.sort.order.toUpperCase()}`
+      },
+      sortChanged() {
+         let sortId = this.selectedSort.split("_")[0]
+         let order = this.selectedSort.split("_")[1].toLowerCase()
+         let s = {
+            sort_id: sortId,
+            order: order
+         }
+         this.$store.commit("setSelectedResultsSort", s)
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
       }
    },
    computed: {
-      sortIdString() {
-         return this.sort.sort_id+this.sort.order.toUpperCase()
-      },
       sortOptions() {
          let out = [] 
          this.pool.sort_options.forEach( so => {
             if (so.id === 'SortRelevance') {
-               out.push({id: so.id+"DESC", name: so.label })
+               out.push({id: so.id+"_DESC", name: so.label })
             } else {
-               out.push({id: so.id+"ASC", name: so.label+" (Ascending)" })   
-               out.push({id: so.id+"DESC", name: so.label+" (Descending)" })     
+               out.push({id: so.id+"_ASC", name: so.label+" (Ascending)" })   
+               out.push({id: so.id+"_DESC", name: so.label+" (Descending)" })     
             }
          })
          return out
