@@ -7,8 +7,6 @@
                <div class="query">Showing results for: <i>{{queryString}}</i></div>
                <div class="counts">
                   <span>{{total}} matches</span>
-                  <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
-                  <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
                </div>
             </div>
             <span class="buttons">
@@ -66,9 +64,6 @@ export default {
    },
    computed: {
       ...mapGetters({
-         hitPoolCount: 'hitPoolCount',
-         skippedPoolCount: 'skippedPoolCount',
-         failedPoolCount: 'failedPoolCount',
          isSignedIn: 'user/isSignedIn',
          rawQueryString: 'query/string'
       }),
