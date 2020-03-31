@@ -10,6 +10,9 @@
              <img v-else class ="logo" :src="poolLogo(selectedResults.pool.id)">
          </div>
          <SearchFilters />
+         <div v-if="false" class="sort-section">
+            <V4Sort :pool="selectedResults.pool" :sort="selectedResults.sort" />
+         </div>
       </div>
       <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
          <span>
@@ -47,9 +50,10 @@ import SearchHit from "@/components/SearchHit"
 import ImageSearchHit from "@/components/ImageSearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import V4Spinner from "@/components/V4Spinner"
+import V4Sort from "@/components/V4Sort"
 export default {
    components: {
-      ImageSearchHit, SearchHit, SearchFilters, V4Spinner
+      ImageSearchHit, SearchHit, SearchFilters, V4Spinner, V4Sort
    },
    data: function() {
       return {
@@ -69,6 +73,7 @@ export default {
          hasMoreHits: 'hasMoreHits',
          poolLogo: 'pools/logo',
          poolExtURL: 'pools/externalURL',
+         sortingSupport: 'pools/sortingSupport'
       }),
       hasLogo() {
          return this.poolLogo(this.selectedResults.pool.id) != ""
@@ -99,6 +104,9 @@ export default {
 }
 </script>
 <style scoped>
+.sort-section {
+   background: white;
+}
 .desc  {
    padding: 10px;
    border-left: 1px solid var(--uvalib-brand-blue);

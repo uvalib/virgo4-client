@@ -258,7 +258,6 @@ export default new Vuex.Store({
       return axios.post(url, req).then((response) => {
         commit('system/setShowWelcome', false)
         commit('pools/setPools', response.data.pools)
-        commit('pools/setSortOptions', response.data.pool_results)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
         commit('setSearching', false)

@@ -112,22 +112,10 @@ const pools = {
             let prior = old.find(op => op.name == p.name  )
             if (prior) {
                p.providers = prior.providers.slice()
-               p.sortOptions = prior.sortOptions.slice()
             } else {
                p.providers = []   
-               p.sortOptions = []
             }
             state.list.push(p) 
-         })
-      },
-
-      setSortOptions(state, data) {
-         data.forEach( r => {
-            let pool = state.list.find( p => p.id == r.pool_id)
-            let attr = pool.attributes.find( a=> a.name=='sorting')
-            if (attr && attr.supported == true) {
-               pool.sortOptions = r.sort_options.slice()
-            }
          })
       },
 
