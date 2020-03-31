@@ -55,34 +55,6 @@ export default new Vuex.Store({
       let tgtResults = state.results[state.selectedResultsIdx]
       return tgtResults.total > tgtResults.hits.length
     },
-    hitPoolCount: state => {
-      let poolCnt = 0
-      state.results.forEach(function(p) {
-        if (p.total > 0) {
-          poolCnt++
-        }
-      })
-      return poolCnt
-    },
-    skippedPoolCount: state => {
-      let poolCnt = 0
-      state.results.forEach(function(p) {
-        if (p.total == 0 && p.statusCode == 408) {
-          poolCnt++
-        }
-      })
-      return poolCnt
-    },
-    failedPoolCount: state => {
-      let poolCnt = 0
-      state.results.forEach(function(p) {
-        // no results, not OK code and not timeout code. Must be pool error
-        if (p.total == 0 && p.statusCode != 200 && p.statusCode != 408) {
-          poolCnt++
-        }
-      })
-      return poolCnt
-    },
   },
 
   mutations: {
