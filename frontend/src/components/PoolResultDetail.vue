@@ -132,7 +132,7 @@ div.results-header {
 .image.hits-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  grid-gap: 1rem;
+  grid-gap: 1.25rem;
   list-style: none;
   margin: 0 5px 20px 5px;
   padding: 0;

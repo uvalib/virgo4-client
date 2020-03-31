@@ -117,10 +117,9 @@ i.trigger.more:hover {
 }
 .full-text-popover {
    background: white;
-   border: 1px solid #999;
    border-radius: 5px;
-   box-shadow: 1px 1px 5px #999;
-   border: 4px solid var(--uvalib-grey-dark);
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   border: 1px solid var(--uvalib-grey-dark);
    margin: 0 10%
 }
 .full-text {
