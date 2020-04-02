@@ -12,10 +12,6 @@
             <span class="buttons">
                <SaveSearch v-if="isSignedIn" mode="share"/>
                <SaveSearch v-if="isSignedIn" mode="save"/>
-               <span v-if="searchMode=='basic'" @click="refineClicked()"
-                  class="refine pure-button pure-button-primary">
-                  Refine Search
-               </span>
             </span>
          </template>
       </div>
