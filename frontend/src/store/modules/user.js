@@ -184,8 +184,6 @@ const user = {
       },
       setAccountInfo(state, data) {
          state.accountInfo = data.user
-         state.authToken = data.authToken
-         state.role = data.role
       },
       signOutUser(state) {
          state.signedInUser = ""
