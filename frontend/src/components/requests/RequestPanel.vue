@@ -2,7 +2,7 @@
   <div id='stepper' >
     <p>{{requests.alertText}}</p>
     <div class="active-step" >
-      <component v-bind:is="activeComponent()" :titleId="titleId" />
+      <component v-bind:is="activeComponent()" />
     </div>
     <div class="controls">
       <button v-if="currentStep != 0 && !isLastStep()" @click="previousStep()">Previous</button>
@@ -39,6 +39,9 @@ export default {
         totalSteps: 'requests/totalSteps'
     }),
 
+  },
+  created() {
+    this.$store.commit('requests/reset')
   },
   methods: {
     activeComponent(){

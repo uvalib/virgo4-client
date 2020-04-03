@@ -5,8 +5,8 @@ const requests = {
   state: {
     alertText: '',
     hold: {
-      titleId: null,
-      barcode: null,
+      itemBarcode: null,
+      pickupLibrary: null
     },
     steps: [
       'SignInStep',
@@ -28,6 +28,13 @@ const requests = {
     updateField,
     alertText(store, text) {
       store.alertText = text
+    },
+    reset(store) {
+      store.alertText = ''
+      store.hold = {
+        itemBarcode: null,
+        pickupLibrary: null
+      }
     }
   },
   actions: {

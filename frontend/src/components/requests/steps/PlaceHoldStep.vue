@@ -5,17 +5,18 @@
 </template>
 <script>
 import { mapFields } from 'vuex-map-fields';
+import { mapGetters } from "vuex"
 
 export default {
-  props: {
-    titleId: String,
-  },
   computed: {
     ...mapFields(['requests.hold', ]),
+    ...mapGetters({ availability: 'item/availability', })
   },
   methods: {
     placeHold() {
-      this.hold = {titleId: this.titleId}
+      // First item for now
+      let barcode = this.availability.items[0].barcode
+      this.hold = {itemBarcode: barcode, pickupLibrary: 'ALDERMAN' }
       this.$store.dispatch('requests/createHold')
     }
   }
