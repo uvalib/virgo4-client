@@ -16,16 +16,16 @@
                   <span v-else class='provider'>{{ providerLabel(p.provider) }}</span>     
                </div>
                <div class="links" :class="{full: mode=='full'}">
-                  <template v-for="(l,lIdx) in providerLinks(p)">
-                     <span v-if="lIdx > 0" class="sep" :key="`sep${lIdx}`">|</span>
-                     <a :href="l.url" target="_blank" :key="l.url">
-                        <template v-if="l.label">{{l.label}}</template>
-                        <template v-else>{{l.url}}</template>
-                     </a>
+                  <template v-for="(l) in providerLinks(p)">
+                     <div :key="l.url">
+                        <a :href="l.url" target="_blank" >
+                           <template v-if="l.label">{{l.label}}</template>
+                           <template v-else>{{l.url}}</template>
+                        </a>
+                     </div>
                   </template>
                   <template v-if="mode=='brief' && remainingLinks(p)">
-                     <span class="sep">|</span>
-                     <span>see {{remainingLinks(p)}} more on details page</span>
+                     <div>see {{remainingLinks(p)}} more on details page</div>
                   </template>
                </div>
             </template>
