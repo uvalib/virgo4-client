@@ -3,7 +3,7 @@
       <h1>Browse <span class="browse-type">{{type}}</span></h1>
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="true" />
       <div class="browse-content">
-         <div class="target">{{this.$route.query.q}}</div>
+         <div class="target"><h2>{{this.$route.query.q}}</h2></div>
          <SearchResults v-if="hasResults" v-bind:showSummary="false"/>
       </div>
    </div>
@@ -42,7 +42,7 @@ export default {
 
          let prior = this.rawQueryString
          let targetQ = this.$route.query.q
-         let browseType = this.$route.params.type 
+         let browseType = this.$route.params.type
 
 
          // Update query to be a subject search matching the param.
@@ -78,6 +78,7 @@ export default {
    color: var(--color-primary-text);
 }
 div.target {
-   font-size: 1.4em;
+   padding: 0 1rem;
+   margin-bottom: 1rem;
 }
 </style>

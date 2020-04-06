@@ -92,11 +92,11 @@ export default {
       otherSources() {
          let opts = []
          let others = this.results.slice(2).sort( (a,b) => {
-            if (a.pool.name < b.pool.name) return -1 
-            if (a.pool.name > b.pool.name) return 1 
+            if (a.pool.name < b.pool.name) return -1
+            if (a.pool.name > b.pool.name) return 1
             return 0
          })
-         
+
          others.forEach( r=>{
             let name = `<span class='pool'>${r.pool.name}</span>`
             if (this.poolFailed(r)) {
@@ -226,7 +226,6 @@ p.relevant {
    align-content: center;
    align-items: center;
    justify-content: space-between;
-   margin-top: 10px;
    padding-top: 10px;
    margin-bottom: 10px;
 }
@@ -251,7 +250,7 @@ p.relevant {
       margin: 0;
       padding: 0 5vw 20px 5vw;
    }
-    .save-box{ 
+    .save-box{
       width: 50%;
    }
 }
@@ -263,7 +262,7 @@ p.relevant {
    span.refine.pure-button.pure-button-primary {
       display: none;
    }
-   .save-box{ 
+   .save-box{
       width: 90%;
    }
 }

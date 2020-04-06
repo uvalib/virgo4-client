@@ -59,18 +59,19 @@ export default {
 
 <style scoped>
 .suggestions {
-   padding: 10px 0;
+   padding: 15px 0;
    text-align: left;
    margin: 0;
-   border-bottom: 2px solid var(--uvalib-grey-light);
 }
 h2 {
-   margin: 0;
+   margin: 0 0 15px 0;
    padding: 0;
-   font-size: 1.1em;
+   font-size: 1.17em;
 }
 .wrapper {
-   padding: 10px 0 0 15px;
+   padding: 10px;
+   background-color: white;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .note  {
    font-weight: 100;
