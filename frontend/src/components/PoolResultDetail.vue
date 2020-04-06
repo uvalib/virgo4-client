@@ -10,7 +10,7 @@
              <img v-else class ="logo" :src="poolLogo(selectedResults.pool.id)">
          </div>
          <SearchFilters />
-         <div v-if="sortingSupport" class="sort-section">
+         <div class="sort-section">
             <V4Sort :pool="selectedResults.pool" :sort="selectedResults.sort" />
          </div>
       </div>
@@ -73,14 +73,13 @@ export default {
          hasMoreHits: 'hasMoreHits',
          poolLogo: 'pools/logo',
          poolExtURL: 'pools/externalURL',
-         sortingSupport: 'pools/sortingSupport'
       }),
       hasLogo() {
          return this.poolLogo(this.selectedResults.pool.id) != ""
       },
       hasURL() {
          return this.poolExtURL(this.selectedResults.pool.id) != ""
-      }
+      },
    },
    watch: {
       selectedResultsIdx () {

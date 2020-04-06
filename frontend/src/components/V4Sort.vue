@@ -1,15 +1,17 @@
 <template>
    <div class="v4-sort">
       <label class="sort" for="sort-opt">Sort by</label>
-      <select v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
+      <select v-if="canSort" v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
          <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
             {{ option.name }}
          </option>
       </select>
+      <span v-else class="sort-type">Relevance</span>
    </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
    props: {
       pool: {
@@ -43,6 +45,12 @@ export default {
       }
    },
    computed: {
+      ...mapGetters({
+         sortingSupport: 'pools/sortingSupport'
+      }),
+      canSort() {
+         return this.sortingSupport(this.pool.id)
+      },
       sortOptions() {
          let out = [] 
          this.pool.sort_options.forEach( so => {
@@ -54,12 +62,15 @@ export default {
             }
          })
          return out
-      }
+      },
    }
 }
 </script>
 
 <style scoped>
+.sort-type {
+   margin-left: 5px;
+}
 label {
    font-weight: bold;
 }
