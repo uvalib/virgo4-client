@@ -1,9 +1,9 @@
 <template>
   <div id='stepper' >
-    <p>{{requests.alertText}}</p>
     <div class="active-step" >
       <component v-bind:is="activeComponent()" />
     </div>
+    <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
     <div class="controls">
       <button v-if="currentStep != 0 && !isLastStep()" @click="previousStep()">Previous</button>
       <button v-if="!isLastStep()" @click="nextStep()" >Next</button>
@@ -71,5 +71,8 @@ export default {
 }
 .controls {
   padding: 1em;
+}
+p.error {
+   color: var(--uvalib-red-emergency);
 }
 </style>

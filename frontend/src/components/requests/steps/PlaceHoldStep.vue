@@ -1,22 +1,53 @@
 <template>
-  <div>
-    <button @click="placeHold" class="button">Place Hold</button>
+  <div class='place-hold'>
+    <div class="item-selector">
+      <h3>Select the item you want:</h3>
+      <V4Select style="height:2em;" :selections="items" :initialValue="initialItem"
+                v-model="selectedItem" v-bind:attached="false" />
+    </div>
+    <PickupLibrary />
+
+    <button @click="placeHold" class="request-button pure-button pure-button-primary">Place Hold</button>
+
   </div>
 </template>
 <script>
 import { mapFields } from 'vuex-map-fields';
-import { mapGetters } from "vuex"
+//import { mapGetters } from "vuex";
+import PickupLibrary from "@/components/preferences/PickupLibrary"
+import V4Select from "@/components/V4Select"
 
 export default {
+  components: {
+      PickupLibrary, V4Select
+   },
+  data: ()=> {
+    return {selectedItem: null}
+  },
+  watch: {
+      selectedItem (newVal, _oldVal) {
+        this.hold.itemBarcode = newVal.barcode
+      }
+  },
   computed: {
-    ...mapFields(['requests.hold', ]),
-    ...mapGetters({ availability: 'item/availability', })
+    ...mapFields({hold: 'requests.hold'}),
+    items() {
+      let items = this.$store.getters.getField('item.availability.items')
+      for(let i in items) {
+        items[i].id = items[i].barcode
+        items[i].name = items[i].call_number
+      }
+      return items
+    },
+    initialItem() {
+      return this.items[0]
+    }
+  },
+  created() {
+    this.selectedItem = this.initialItem
   },
   methods: {
     placeHold() {
-      // First item for now
-      let barcode = this.availability.items[0].barcode
-      this.hold = {itemBarcode: barcode, pickupLibrary: 'ALDERMAN' }
       this.$store.dispatch('requests/createHold')
     }
   }
@@ -24,4 +55,22 @@ export default {
 
 </script>
 <style>
+div.place-hold {
+   display: flex;
+   flex-flow: column wrap ;
+   justify-content: space-around;
+   align-items: center;
+   align-content: space-around;
+}
+.place-hold > * {
+  border-bottom: 1px solid gray;
+  margin-bottom: 20px;
+  min-height: 2em;
+}
+.item-selector {
+  padding-bottom: 20px;
+}
+.request-button {
+  padding: 10px;
+}
 </style>

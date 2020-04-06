@@ -81,9 +81,9 @@ export default new Vuex.Store({
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
       if (resultIdx > 1 && state.otherSrcSelection.id == "") {
-        // this happens when a search is restored. otherSrcSelection is used 
-        // to drive the selected option in the other sources tab. Make sure it is 
-        /// set correctly  
+        // this happens when a search is restored. otherSrcSelection is used
+        // to drive the selected option in the other sources tab. Make sure it is
+        /// set correctly
         let r = state.results[resultIdx]
         let name = `<span class='pool'>${r.pool.name}</span>`
         name += `<span class='total'>${r.total} hits</span>`
@@ -95,7 +95,7 @@ export default new Vuex.Store({
       // When the results are cleared, reset pagination, remove pool
       // total from overall total and reset pool total to 0
       let tgtPool = state.results[state.selectedResultsIdx]
-      let oldPoolTotal = tgtPool.total 
+      let oldPoolTotal = tgtPool.total
       tgtPool.total = 0
       tgtPool.page = 0
       state.results[state.selectedResultsIdx].hits = []
@@ -110,7 +110,7 @@ export default new Vuex.Store({
     addPoolSearchResults(state, poolResults) {
       let tgtPool = state.results[state.selectedResultsIdx]
       tgtPool.timeMS = poolResults.elapsed_ms
-      tgtPool.statusCode = 200 
+      tgtPool.statusCode = 200
       tgtPool.statusMessage = ""
       if (tgtPool.total == 0 ) {
         // if pool total is zero add the new results total to overall
@@ -146,7 +146,7 @@ export default new Vuex.Store({
 
         // Find the pool the results are associated with and populate some top level response info
         let pool = results.pools.find( p => p.id == pr.pool_id)
-        let result = { pool: pool, sort: pr.sort, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms, 
+        let result = { pool: pool, sort: pr.sort, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms,
           hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg}
         if (firstPoolWithHits == -1 &&  pr.pagination.total > 0) {
           firstPoolWithHits = idx
@@ -189,7 +189,7 @@ export default new Vuex.Store({
     setSuggestions(state, data) {
       state.suggestions.splice(0, state.suggestions.length)
       data.forEach( d=> {
-         state.suggestions.push(d)   
+         state.suggestions.push(d)
       })
     },
 
@@ -206,7 +206,7 @@ export default new Vuex.Store({
     },
 
     setSelectedResultsSort(state, sort) {
-      state.results[state.selectedResultsIdx].sort = sort   
+      state.results[state.selectedResultsIdx].sort = sort
     }
   },
 
@@ -215,17 +215,17 @@ export default new Vuex.Store({
       ctx.commit('incrementPage')
       return ctx.dispatch("searchSelectedPool")
     },
-    
+
     // Search ALL configured pools. This is the initial search call using only the basic or
     // advanced search parameters and will always start at page 1. Filters do not apply
     // to all pools so they are not used here.
     // CTX: commit: ƒ boundCommit(type, payload, options)
     searchAllPools({ state, commit, rootState, rootGetters, dispatch }, tgtPage) {
       commit('system/setError', "")
-      // By default, search for 20 items. If this is a restored search with a particular target 
+      // By default, search for 20 items. If this is a restored search with a particular target
       // specified, that target may not be in the first page of results. tgtPage specifes
       // which page of results contains the hit. Make the initial request return enough results to include it.
-      let rows = state.pageSize 
+      let rows = state.pageSize
       if ( tgtPage) {
         // target page is 0 based
         rows = state.pageSize * (tgtPage+1)
@@ -250,7 +250,7 @@ export default new Vuex.Store({
         })
       }
 
-      // If a user is signed in, make sure bookmarks are up to date when 
+      // If a user is signed in, make sure bookmarks are up to date when
       // searching so the UI can show the correct status per item
       if ( rootGetters["user/isSignedIn"]) {
         dispatch("bookmarks/getBookmarks")
@@ -276,7 +276,7 @@ export default new Vuex.Store({
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
     // exploration. It is used to query for next page during load more and
-    // when filters are added and removed. Pool results are APPENDED to existing after load more. 
+    // when filters are added and removed. Pool results are APPENDED to existing after load more.
     // If newly filtered, reset paging and re-query
     searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
       commit('setSearching', true)
@@ -307,7 +307,7 @@ export default new Vuex.Store({
 
     // Select pool results and get all facet info for the result
     async selectPoolResults(ctx, resultIdx) {
-      ctx.commit('selectPoolResults', resultIdx) 
+      ctx.commit('selectPoolResults', resultIdx)
       await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
     }
   },

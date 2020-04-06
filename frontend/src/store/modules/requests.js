@@ -11,7 +11,6 @@ const requests = {
     steps: [
       'SignInStep',
       'PlaceHoldStep'
-
     ]
 
   },
@@ -39,7 +38,9 @@ const requests = {
   },
   actions: {
     createHold(ctx){
+
       let hold = ctx.getters.getField('hold')
+      hold.pickupLibrary = ctx.rootGetters.getField('preferences.pickupLibrary')
       axios.post('/api/requests/hold', hold)
       .then( response =>
             ctx.commit('alertText', response.data.hold.errors)
