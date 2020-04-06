@@ -44,9 +44,9 @@
                         <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
-                  <template v-if="sirsiLink">
+                  <template v-if="extDetailLink">
                      <dd></dd>
-                     <dt class="value more"  v-html="sirsiLink"></dt>
+                     <dt class="value more"  v-html="extDetailLink"></dt>
                   </template>
                   <template v-if="poolMode=='image'">
                      <dt class="label">Image:</dt>
@@ -134,10 +134,13 @@ export default {
          let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
          return iiifField.value
       },
-      sirsiLink() {
-         let sl = this.allFields.find( f=> f.name=="sirsi_url")
-         if (!sl) return ""
-         return `<a href="${sl.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
+      extDetailLink() {
+         let extLink = this.allFields.find( f=> f.name=="sirsi_url")
+         if (!extLink) {
+             extLink = this.allFields.find( f=> f.name=="worldcat_url")
+         }
+         if (!extLink) return ""
+         return `<a href="${extLink.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
       },
       marcXML() {
          if ( this.isUVA(this.details.source) === false ) return ""
