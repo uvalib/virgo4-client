@@ -7,13 +7,15 @@
             </template>
             <template v-else>
                <div class="header" :class="{full: mode=='full'}">
-                  <img class="logo" v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)">
                   <template v-if="providerHomepage(p.provider)">
                      <a :href="providerHomepage(p.provider)" target="_blank">
-                        <span class="provider link">{{ providerLabel(p.provider) }}</span>
+                        <img class="logo" v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
+                        <span v-else class="provider link">{{ providerLabel(p.provider) }}</span>
                      </a>
                   </template>
-                  <span v-else class='provider'>{{ providerLabel(p.provider) }}</span>     
+                  <template v-else>
+                     <span class='provider'>{{ providerLabel(p.provider) }}</span>  
+                  </template>  
                </div>
                <div class="links" :class="{full: mode=='full'}">
                   <template v-for="(l) in providerLinks(p)">
@@ -88,11 +90,10 @@ export default {
 
 <style scoped>
 .header.full {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;  
+   text-align: left;
    border-bottom: 1px solid var(--color-brand-blue);
    border-top: 1px solid var(--color-brand-blue);
+   margin-bottom: 10px;
 }
 span.sep {
    margin: 0 5px;
@@ -109,7 +110,7 @@ span.provider.link {
    font-weight:  500 !important;
 }
 .links {
-   margin: 10px;
+   margin: 0 0 0 20px;
    word-break: break-word;
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
@@ -119,9 +120,11 @@ span.provider.link {
 .links.full {
    font-size: 1em;
 }
-.logo {
+img.logo {
    display: inline-block;
-   width: 50px;
-   margin-right: 15px;
+   height: 55px;
+   width: auto !important;
+   margin:0;
+   padding: 10px 0 5px 0px;
 }
 </style>

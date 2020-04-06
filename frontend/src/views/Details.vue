@@ -169,8 +169,7 @@ export default {
       },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type=="iiif-manifest-url" ||
-            field.type=="iiif-base-url" || field.type=="iiif-base-url" ||
-            field.name=="sirsi_url" || field.name=="iiif_image_url" || field.name == "access_url") {
+            field.type=="iiif-base-url" || field.type == "url") {
             return false
          }
          if ( this.isKiosk && field.type == "url") return false
@@ -256,8 +255,9 @@ dd {
    padding: 4px 0px;
 }
 .value.more {
-    padding: 15px 0 10px 0;
-    text-align: left;
+   margin-top: 15px;
+   padding: 15px 0 10px 0;
+   text-align: left;
 }
 #marc.accordion-content {
    margin-left: -6em;
@@ -269,27 +269,5 @@ dd {
    padding: 10px;
    margin: 0;
    border-top: 0;
-}
-.value >>> div.provider {
-   width: 100%;
-}
-.value >>> div.provider.logo {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: flex-start;
-   border-bottom: 1px solid var(--color-brand-blue);
-   border-top: 1px solid var(--color-brand-blue);
-}
-.value >>> span.provider {
-   font-size: 1.15em;
-   font-weight: bold;
-}
-.value >>> .logo {
-   width: 50px;
-   margin-right: 15px;
-}
-.value >>> .links {
-   margin: 20px;
 }
 </style>

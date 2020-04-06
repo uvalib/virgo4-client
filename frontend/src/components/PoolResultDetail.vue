@@ -14,32 +14,34 @@
             <V4Sort :pool="selectedResults.pool" :sort="selectedResults.sort" />
          </div>
       </div>
-      <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
-         <span>
-            No results found
-         </span>
-         <p class="error" v-if="selectedResults.statusMessage">
-            {{selectedResults.statusMessage}}
-         </p>
-      </div>
-      <div v-else class="hits">
-         <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
-            <li v-for="(hit,idx) in selectedResults.hits" class="image hit-wrapper" :key="idx">
-               <ImageSearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
-            </li>
-         </ul>
-         <div v-else class="hits-content">
-            <div v-for="(hit,idx) in selectedResults.hits" class="hit-wrapper" :key="idx">
-               <SearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
+      <template v-if="!searching">
+         <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
+            <span>
+               No results found
+            </span>
+            <p class="error" v-if="selectedResults.statusMessage">
+               {{selectedResults.statusMessage}}
+            </p>
+         </div>
+         <div v-else class="hits">
+            <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
+               <li v-for="(hit,idx) in selectedResults.hits" class="image hit-wrapper" :key="idx">
+                  <ImageSearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
+               </li>
+            </ul>
+            <div v-else class="hits-content">
+               <div v-for="(hit,idx) in selectedResults.hits" class="hit-wrapper" :key="idx">
+                  <SearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
+               </div>
             </div>
          </div>
-      </div>
-      <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more">
-         <span v-if="loadingMore">
-            <V4Spinner v-if="loadingMore" color="white"/>
-         </span>
-         <span v-else>Load More Results</span>
-      </div>
+         <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more">
+            <span v-if="loadingMore">
+               <V4Spinner v-if="loadingMore" color="white"/>
+            </span>
+            <span v-else>Load More Results</span>
+         </div>
+      </template>
    </div>
 </template>
 
