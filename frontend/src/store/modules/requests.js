@@ -42,13 +42,16 @@ const requests = {
       let hold = ctx.getters.getField('hold')
       hold.pickupLibrary = ctx.rootGetters.getField('preferences.pickupLibrary')
       axios.post('/api/requests/hold', hold)
-      .then( response =>
-            ctx.commit('alertText', response.data.hold.errors)
-           )
-           .catch(e =>
-             ctx.commit('alertText', "Error:" + e)
-                 )
-
+      .then( response => {
+        if (response.data.hold.errors) {
+          ctx.commit('alertText', response.data.hold.errors)
+        } else {
+          // Switch to confirmation page goes here
+          ctx.commit('alertText', "Hold successfully created")
+        }
+      }).catch(e =>
+        ctx.commit('alertText', e)
+      )
     },
 
   }
