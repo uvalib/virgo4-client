@@ -35,7 +35,7 @@
                </div>
             </div>
          </div>
-         <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more">
+         <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more pure-button pure-button-primary">
             <span v-if="loadingMore">
                <V4Spinner v-if="loadingMore" color="white"/>
             </span>
@@ -115,7 +115,12 @@ export default {
    font-size: 0.9em;
 }
 .desc >>> a {
-   color: var(--color-link) !important;
+   color: white !important;
+   text-decoration: underline !important;
+   font-weight: normal !important;
+}
+.desc >>> a:hover {
+  font-style: italic !important;
 }
 .pool-results {
    border: 0;
@@ -179,18 +184,6 @@ div.results-header {
    .hit-wrapper {
      max-width: 94vw;
    }
-}
-.see-more, .no-more {
-   padding: 10px;
-   background: var(--uvalib-brand-blue);
-   border: 5px solid var(--uvalib-brand-blue);
-   color: white;
-   cursor: pointer;
-   font-weight: bold;
-}
-.see-more:hover {
-   text-decoration: underline;
-   color: var(--uvalib-blue-alt-light);
 }
 .no-more {
    cursor: default;

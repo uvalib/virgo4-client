@@ -201,6 +201,7 @@ export default {
   padding: 10px 15px;
   background-color: white;
   color: var(--uvalib-text-dark);
+  font-weight: normal;
 }
 .v4-select .option.disabled {
   background-color:  white;
