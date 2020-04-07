@@ -149,7 +149,7 @@ div.img-toolbar {
   min-width: 175px;
   min-height: 175px;
   background-color: white;
-  background-image: url('~@/assets/dots.gif');
+  background-image: url('~@/assets/dots-white-bg.gif');
   background-repeat:no-repeat;
   background-position: center center;
 }
