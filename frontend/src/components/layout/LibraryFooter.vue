@@ -1,7 +1,7 @@
 <template>
    <footer>
      <div class="pre-footer" v-if="$route.name != 'feedback'">
-        This is the newest version of the Library catalog. 
+        This is the newest version of the Library catalog.
         <router-link to="/feedback">Please give us your feedback.</router-link>
      </div>
      <div class="footer-container">
@@ -157,6 +157,7 @@ address {
   text-transform: uppercase;
   background-color: var(--uvalib-brand-orange);
   color: white !important;
+  font-size: 1.2em;
 }
 .pure-button.pure-button-give:hover {
    background-color: var(--uvalib-grey-light);

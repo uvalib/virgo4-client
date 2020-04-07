@@ -175,20 +175,20 @@ p.relevant {
    margin: 0 0 0 10px;
 }
 .v4-select {
-   margin: 0 0 2px 0;
+   margin: 0 -1px 2px 0;
    border-radius: 5px 5px 0 0;
    flex: 1 1 auto;
 }
 .pool-tabs {
-   margin: 0 15px 0 0;
+   margin: 0 5px 0 0;
    text-align: left;
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
 }
 .pool.pure-button {
-   margin: 0 2px 0 0;
-   padding: 4px 8px;
+   margin: 0;
+   padding: 8px 10px;
    border-radius: 5px 5px 0 0;
    color: var(--uvalib-text-dark);
    border: 1px solid var(--uvalib-grey-light);
@@ -209,7 +209,7 @@ p.relevant {
    opacity: 0.5;
 }
 .pool-tabs .pool.pure-button:last-child {
-   margin-right: 0;
+   margin-right: -1px;
 }
 .summary .query {
    text-align: left;
@@ -257,7 +257,7 @@ p.relevant {
 @media only screen and (max-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 2vw 20px 5vw;
+      padding: 0 2vw 20px 2vw;
    }
    span.refine.pure-button.pure-button-primary {
       display: none;
