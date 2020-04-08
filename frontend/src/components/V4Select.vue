@@ -5,7 +5,7 @@
                color: color, 'border': border }">
       <div class="wrap-select">
          <span class="selection">
-            <span v-if="initialValue && initialValue.id" v-html="initialValue.name"></span>
+            <span v-if="value.id" v-html="value.name"></span>
             <span v-else v-html="placeholder"></span>
             <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
          </span>
@@ -62,7 +62,7 @@ export default {
          type: Boolean,
          default: true
       },
-      initialValue: {
+      value: {
          type: Object
       }
    },
