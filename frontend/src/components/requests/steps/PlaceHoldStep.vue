@@ -2,7 +2,7 @@
   <div class='place-hold'>
     <div class="item-selector">
       <h3>Select the item you want:</h3>
-      <V4Select style="height:2em;" :selections="items" :initialValue="initialItem"
+      <V4Select style="height:2em;" :selections="items"
                 v-model="selectedItem" v-bind:attached="false" />
     </div>
     <PickupLibrary />
@@ -39,12 +39,11 @@ export default {
       }
       return items
     },
-    initialItem() {
-      return this.items[0]
-    }
   },
   created() {
-    this.selectedItem = this.initialItem
+    if (this.items.length == 1){
+      this.selectedItem = this.items[0]
+    }
   },
   methods: {
     placeHold() {
