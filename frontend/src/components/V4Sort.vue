@@ -1,7 +1,7 @@
 <template>
    <div class="v4-sort">
       <label class="sort" for="sort-opt">Sort by</label>
-      <select v-if="canSort" v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
+      <select v-if="canSort && sortSet" v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
          <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
             {{ option.name }}
          </option>
@@ -50,6 +50,9 @@ export default {
       }),
       canSort() {
          return this.sortingSupport(this.pool.id)
+      },
+      sortSet() {
+         return this.sort.sort_id != ""
       },
       sortOptions() {
          let out = [] 
