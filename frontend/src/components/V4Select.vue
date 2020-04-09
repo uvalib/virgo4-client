@@ -5,7 +5,7 @@
                color: color, 'border': border }">
       <div class="wrap-select">
          <span class="selection">
-            <span v-if="value" v-html="value.name"></span>
+            <span v-if="value && value.id" v-html="value.name"></span>
             <span v-else v-html="placeholder"></span>
             <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
          </span>
