@@ -52,6 +52,7 @@ func main() {
 		api.GET("/users/:uid", svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)
 		api.GET("/users/:uid/bills", svc.AuthMiddleware, svc.GetUserBills)
+		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
@@ -59,18 +60,14 @@ func main() {
 
 		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
 
-		searches := api.Group("/users/:uid/searches")
-		{
-			searches.GET("/", svc.AuthMiddleware, svc.GetUserSavedSearches)
-			searches.POST("/", svc.AuthMiddleware, svc.SaveSearch)
-			searches.DELETE("/:token", svc.AuthMiddleware, svc.DeleteSavedSearch)
-			searches.POST("/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
-			searches.DELETE("/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
-		}
+		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
+		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
+		api.DELETE("/users/:uid/searches/:token", svc.AuthMiddleware, svc.DeleteSavedSearch)
+		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
+		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
 
 		bookmarks := api.Group("/users/:uid/bookmarks")
 		{
-			bookmarks.GET("/", svc.AuthMiddleware, svc.GetBookmarks)
 			bookmarks.POST("/move", svc.AuthMiddleware, svc.MoveBookmarks)
 			bookmarks.POST("/delete", svc.AuthMiddleware, svc.DeleteBookmarks)
 			bookmarks.POST("/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
