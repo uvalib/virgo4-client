@@ -1,6 +1,6 @@
 <template>
   <div >
-    <div class="active-panel" >
+    <div class="active-panel">
       <div v-if="requests.activePanel != 'OptionsPanel'" class="reset pure-button"
         @click="reset"
         >Cancel</div>
@@ -37,7 +37,10 @@ export default {
   },
   created() {
     this.$store.commit('requests/reset')
-    this.requests.activePanel = 'OptionsPanel'
+
+    if (!this.requests.activePanel){
+      this.requests.activePanel = 'OptionsPanel'
+    }
   },
   methods: {
     reset(){

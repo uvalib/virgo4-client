@@ -11,6 +11,7 @@ const requests = {
       pickupLibrary: null
     },
     activePanel: '',
+    nextPanel: '',
 
     // Map request type to panel Name
     optionMap: {
@@ -20,15 +21,28 @@ const requests = {
   },
   getters: {
     getField,
+    nextPanel(store){
+      return store.nextPanel
+    },
     alertText(store){
       return store.alertText
     },
     totalSteps(store){
       return store.steps.length
+    },
+    findOption: (store) => (panelName) => {
+      let option = store.requestOptions.find(opt =>{
+        let foundKey = Object.keys(store.optionMap).find(key => store.optionMap[key] === panelName)
+        return opt.type == foundKey
+      })
+      return option
     }
   },
   mutations: {
     updateField,
+    activePanel(store, name){
+      store.activePanel = name
+    },
     setRequestOptions(store, ro){
       store.requestOptions = ro
       for(let option of ro){
@@ -42,6 +56,8 @@ const requests = {
     },
     reset(store) {
       store.alertText = ''
+      store.activePanel = ''
+      store.nextPanel = ''
       store.hold = {
         itemBarcode: null,
         pickupLibrary: null
@@ -66,6 +82,7 @@ const requests = {
         ctx.commit('system/setError', e, {root: true})
       )
     },
+
 
   }
 }

@@ -184,6 +184,7 @@ export default {
    },
    created() {
       this.getDetails()
+      this.$store.dispatch("restore/loadDetailsPage")
    },
 }
 </script>

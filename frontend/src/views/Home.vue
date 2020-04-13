@@ -105,14 +105,14 @@ export default {
       },
       // This restore refers to a Saved Search
       isRestore() {
-         return ( this.$route.params !== undefined && 
-              this.$route.params.id !== undefined && 
+         return ( this.$route.params !== undefined &&
+              this.$route.params.id !== undefined &&
               this.$route.params.id != "")
       }
    },
    mounted: function() {
-      // The search page has been mounted either by direct 
-      // URL access or by a browser back action. Put initialize 
+      // The search page has been mounted either by direct
+      // URL access or by a browser back action. Put initialize
       // the query module for searching (as opposed to browsing)
       this.$store.dispatch("query/initSearchMode")
    },
@@ -149,7 +149,7 @@ export default {
           if( !this.$store.getters['user/isSignedIn']) {
             return
           }
-          await this.$store.dispatch("restore/fromStorage")
+          await this.$store.dispatch("restore/loadSearch")
 
           this.showBookmarkTarget()
         } finally {
