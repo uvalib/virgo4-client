@@ -106,6 +106,7 @@ const item = {
         ctx.commit('clearAvailability')
         axios.get("/api/availability/" + titleId).then((response) => {
           ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
+          ctx.commit("requests/setRequestOptions", response.data.availability.request_options, {root: true})
         }).catch((error) => {
           ctx.commit('clearSearching')
           if (error.response.status != 404){

@@ -4,14 +4,18 @@ const requests = {
   namespaced: true,
   state: {
     alertText: '',
+    requestOptions: [],
+    holdOptions: {},
     hold: {
       itemBarcode: null,
       pickupLibrary: null
     },
-    steps: [
-      'SignInStep',
-      'PlaceHoldStep'
-    ]
+    activePanel: '',
+
+    // Map request type to panel Name
+    optionMap: {
+      hold: 'PlaceHoldPanel'
+    }
 
   },
   getters: {
@@ -25,6 +29,14 @@ const requests = {
   },
   mutations: {
     updateField,
+    setRequestOptions(store, ro){
+      store.requestOptions = ro
+      for(let option of ro){
+        if(option.type == 'hold'){
+          store.holdOptions = option
+        }
+      }
+    },
     alertText(store, text) {
       store.alertText = text
     },
@@ -44,13 +56,14 @@ const requests = {
       axios.post('/api/requests/hold', hold)
       .then( response => {
         if (response.data.hold.errors) {
-          ctx.commit('alertText', response.data.hold.errors)
+          ctx.commit('system/setError', response.data.hold.errors, {root: true})
         } else {
           // Switch to confirmation page goes here
           ctx.commit('alertText', "Hold successfully created")
         }
       }).catch(e =>
-        ctx.commit('alertText', e)
+        //ctx.commit('alertText', e)
+        ctx.commit('system/setError', e, {root: true})
       )
     },
 

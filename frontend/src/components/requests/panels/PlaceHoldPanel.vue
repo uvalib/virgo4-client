@@ -30,12 +30,16 @@ export default {
       }
   },
   computed: {
-    ...mapFields({hold: 'requests.hold'}),
+    ...mapFields({
+      hold: 'requests.hold',
+      holdOptions: 'requests.holdOptions'
+
+    }),
     items() {
-      let items = this.$store.getters.getField('item.availability.items')
+      let items = this.holdOptions.item_options
       for(let i in items) {
         items[i].id = items[i].barcode
-        items[i].name = items[i].call_number
+        items[i].name = items[i].label
       }
       return items
     },

@@ -7,7 +7,7 @@
          <template v-if="availability.items.length">
             <h2>Availability</h2>
 
-            <RequestPanel v-if="isAdmin" :titleId="titleId" />
+            <RequestContainer v-if="isAdmin" :titleId="titleId" />
 
             <table class="fields">
                <thead>
@@ -39,10 +39,10 @@
 import { mapGetters } from "vuex"
 import AvailabilityNotice from "@/components/popovers/AvailabilityNotice"
 import V4Spinner from "@/components/V4Spinner"
-import RequestPanel from "@/components/requests/RequestPanel"
+import RequestContainer from "@/components/requests/RequestContainer"
 export default {
   components: {
-    AvailabilityNotice, V4Spinner, RequestPanel
+    AvailabilityNotice, V4Spinner, RequestContainer
   },
    props: {
       titleId: String
