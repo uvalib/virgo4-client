@@ -169,7 +169,7 @@ export default {
       },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type=="iiif-manifest-url" ||
-            field.type=="iiif-base-url" || field.type == "url") {
+            field.type == "iiif-image-url" || field.type=="iiif-base-url" || field.type == "url") {
             return false
          }
          if ( this.isKiosk && field.type == "url") return false
