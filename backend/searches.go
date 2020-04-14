@@ -29,6 +29,33 @@ func (s SavedSearch) TableName() string {
 	return "saved_searches"
 }
 
+// DeleteAllSavedSearches will remove all saved searches from a user account
+func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
+	uid := c.Param("uid")
+	log.Printf("Delete ALL saved searches for user %s...", uid)
+	var userID int
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": uid})
+	uErr := uq.Row(&userID)
+	if uErr != nil {
+		log.Printf("ERROR: couldn't find user %s: %v", uid, uErr)
+		c.String(http.StatusBadRequest, "Invalid user %s", uid)
+		return
+	}
+	log.Printf("User %s has ID %d", uid, userID)
+
+	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:uid}")
+	dq.Bind(dbx.Params{"uid": userID})
+	_, err := dq.Execute()
+	if err != nil {
+		log.Printf("ERROR: unable to delete saved searches for %s (%d): %s", uid, userID, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
+}
+
 // PublishSavedSearch will make a private search public
 func (svc *ServiceContext) PublishSavedSearch(c *gin.Context) {
 	uid := c.Param("uid")

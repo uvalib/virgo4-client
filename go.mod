@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-ozzo/ozzo-dbx v1.5.0
-	github.com/golang/protobuf v1.3.5 // indirect
+	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/prometheus/client_golang v1.5.1 // indirect
@@ -16,5 +16,5 @@ require (
 	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/uvalib/virgo4-jwt v0.0.0-20200401205056-c854d507c3af
 	github.com/zsais/go-gin-prometheus v0.1.0
-	golang.org/x/sys v0.0.0-20200409092240-59c9f1ba88fa // indirect
+	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
 )

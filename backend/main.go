@@ -62,6 +62,7 @@ func main() {
 
 		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
 		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
+		api.DELETE("/users/:uid/searches", svc.AuthMiddleware, svc.DeleteAllSavedSearches)
 		api.DELETE("/users/:uid/searches/:token", svc.AuthMiddleware, svc.DeleteSavedSearch)
 		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
 		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)

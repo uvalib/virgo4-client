@@ -11,32 +11,38 @@
                <div v-if="!lookingUp" class="none">You currently have no saved searches</div>
             </template>
             <template v-else>
-                  <div class="row" v-for="(saved,idx) in searches"  :key="saved.token">
-                     <div class="saved-search">
-                        <span class="num">{{idx+1}}.</span>
-                        <span class="public"  @click="publicClicked(saved)" >
-                           <i v-if="saved.public" class="check fas fa-check-circle"></i>
-                           <i v-else class="check far fa-circle"></i>
-                           <span>&nbsp;Public</span>
-                        </span>
-                        <span><router-link :to="searchURL(saved.token)">{{saved.name}}</router-link></span>
-                        <span class="search-actions">
-                           <span class="icon"><router-link :to="searchURL(saved.token)"><i class="fas fa-search"></i></router-link></span>
-                           <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)">
-                              <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
-                              <div class="del-detail">This cannot be reversed.</div>
-                           </ConfirmDelete>
-                        </span>
-                     </div>
-                     <div v-if="saved.public" class="public-controls">
-                        <a  class="view" :href="searchURL(saved.token)" target="_blank">
-                           <span>View published search</span>
-                           <i class="link fas fa-external-link-alt"></i>
-                        </a>
-                        <span class="sep">|</span>
-                        <span @click="copyURL(saved.token)" class="text-button">Copy published URL to clipboard</span>
-                     </div>
+               <div class="controls">
+                  <ConfirmDelete v-on:delete-approved="removeAllSearches" label="Delete all saved searches">
+                     <div>Delete all saved searches?</div>
+                     <div class="del-detail">This cannot be reversed.</div>
+                  </ConfirmDelete>
+               </div>
+               <div class="row" v-for="(saved,idx) in searches"  :key="saved.token">
+                  <div class="saved-search">
+                     <span class="num">{{idx+1}}.</span>
+                     <span class="public"  @click="publicClicked(saved)" >
+                        <i v-if="saved.public" class="check fas fa-check-circle"></i>
+                        <i v-else class="check far fa-circle"></i>
+                        <span>&nbsp;Public</span>
+                     </span>
+                     <span><router-link :to="searchURL(saved.token)">{{saved.name}}</router-link></span>
+                     <span class="search-actions">
+                        <span class="icon"><router-link :to="searchURL(saved.token)"><i class="fas fa-search"></i></router-link></span>
+                        <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)">
+                           <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
+                           <div class="del-detail">This cannot be reversed.</div>
+                        </ConfirmDelete>
+                     </span>
                   </div>
+                  <div v-if="saved.public" class="public-controls">
+                     <a  class="view" :href="searchURL(saved.token)" target="_blank">
+                        <span>View published search</span>
+                        <i class="link fas fa-external-link-alt"></i>
+                     </a>
+                     <span class="sep">|</span>
+                     <span @click="copyURL(saved.token)" class="text-button">Copy published URL to clipboard</span>
+                  </div>
+               </div>
             </template>
          </div>
       </div>
@@ -60,6 +66,9 @@ export default {
       })
    },
    methods: {
+      removeAllSearches() {
+         this.$store.dispatch("user/deleteAllSavedSearces")
+      },
       removeSavedSearch(token) {
          this.$store.dispatch("user/deleteSavedSearch", token)
       },
@@ -170,5 +179,9 @@ span.num {
 }
 .sep {
    margin: 0 10px;
+}
+.controls {
+   padding-bottom: 20px;
+   text-align: right;
 }
 </style>

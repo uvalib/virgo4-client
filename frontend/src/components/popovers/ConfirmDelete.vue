@@ -1,7 +1,8 @@
 <template>
    <v-popover>
       <span class="trigger">
-         <i class="trash fas fa-trash-alt"></i>
+         <span class="pure-button pure-button-primary" v-if="label">{{label}}</span>
+         <i v-else class="trash fas fa-trash-alt"></i>
       </span>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
@@ -25,7 +26,10 @@
 <script>
 
 export default {
-};
+   props: {
+      label: String,
+   }
+}
 </script>
 
 <style scoped>

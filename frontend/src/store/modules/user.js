@@ -123,6 +123,9 @@ const user = {
             state.searches.push( s ) 
          })
       },
+      clearSavedSearches(state) {
+         state.searches.splice(0, state.searches.length)   
+      },
       deleteSavedSearch(state, token) {
          let idx = state.searches.findIndex(s => s.token == token)  
          if (idx > -1) {
@@ -366,6 +369,16 @@ const user = {
             ctx.commit('system/setError', "Unable to delete saved search. Please try again later.", {root: true})    
          }
       },
+      deleteAllSavedSearces(ctx) {
+         ctx.commit('setLookingUp', true)
+         axios.delete(`/api/users/${ctx.state.signedInUser}/searches`).then((_response) => {
+            ctx.commit('clearSavedSearches')
+            ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })    
+      }
    }
 }
 
