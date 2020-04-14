@@ -1,5 +1,5 @@
 <template>
-   <div class="v4-barcode-scanner">
+   <div v-if="enableBarcodeScan" class="v4-barcode-scanner">
       <span v-if="showVideo==false" @click="videoShow" class="text-button">
          Scan Barcode&nbsp;<i class="fas fa-camera"></i>
       </span>
@@ -17,9 +17,15 @@
 
 <script>
 import { StreamBarcodeReader } from "vue-barcode-reader"
+import { mapState } from "vuex"
 export default {
    components: {
      StreamBarcodeReader
+   },
+   computed: {
+      ...mapState({
+         enableBarcodeScan: state => state.preferences.enableBarcodeScan,
+      })
    },
    data: function() {
       return {
