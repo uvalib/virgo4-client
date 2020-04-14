@@ -1,6 +1,6 @@
 <template>
   <div class='place-hold'>
-    <div class="item-selector">
+    <div v-if="items.length > 1" class="item-selector">
       <h3>Select the item you want:</h3>
       <V4Select style="height:2em;" :selections="items"
                 v-model="selectedItem" v-bind:attached="false" />
