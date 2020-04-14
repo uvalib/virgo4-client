@@ -3,7 +3,8 @@
     <div class="active-panel">
       <div v-if="requests.activePanel != 'OptionsPanel'" class="reset pure-button"
         @click="reset"
-        >Cancel</div>
+        v-text="resetLabel"
+        ></div>
 
       <component v-bind:is="requests.activePanel" />
 
@@ -18,13 +19,13 @@ import { mapGetters } from "vuex";
 import OptionsPanel from './panels/OptionsPanel'
 import SignInPanel from './panels/SignInPanel'
 import PlaceHoldPanel from './panels/PlaceHoldPanel';
-import SummaryPanel from './panels/SummaryPanel';
+import ConfirmationPanel from './panels/ConfirmationPanel';
 
 export default {
   props: {
       titleId: String,
    },
-  components: {OptionsPanel, PlaceHoldPanel, SummaryPanel, SignInPanel},
+  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, ConfirmationPanel },
 
   computed: {
     ...mapFields(['requests', 'item/availability' ]),
@@ -33,11 +34,16 @@ export default {
         isSignedIn: 'user/isSignedIn',
         isAdmin: 'user/isAdmin',
     }),
-
+    resetLabel(){
+      if(this.requests.activePanel == 'ConfirmationPanel'){
+        return "Done"
+      } else {
+        return "Reset"
+      }
+    }
   },
   created() {
     this.$store.commit('requests/reset')
-
     if (!this.requests.activePanel){
       this.requests.activePanel = 'OptionsPanel'
     }
@@ -46,9 +52,8 @@ export default {
     reset(){
       this.$store.commit('requests/reset')
       this.requests.activePanel = 'OptionsPanel'
-
-    }
-  }
+    },
+  },
 }
 </script>
 <style scoped>

@@ -7,8 +7,9 @@ const requests = {
     requestOptions: [],
     holdOptions: {},
     hold: {
-      itemBarcode: null,
-      pickupLibrary: null
+      itemBarcode: '',
+      itemLabel: '',
+      pickupLibrary: ''
     },
     activePanel: '',
     nextPanel: '',
@@ -16,7 +17,7 @@ const requests = {
     // Map request type to panel Name
     optionMap: {
       hold: 'PlaceHoldPanel'
-    }
+    },
 
   },
   getters: {
@@ -74,11 +75,10 @@ const requests = {
         if (response.data.hold.errors) {
           ctx.commit('system/setError', response.data.hold.errors, {root: true})
         } else {
-          // Switch to confirmation page goes here
-          ctx.commit('alertText', "Hold successfully created")
+          ctx.commit('activePanel', "ConfirmationPanel")
         }
       }).catch(e =>
-        //ctx.commit('alertText', e)
+        // Connenction problem
         ctx.commit('system/setError', e, {root: true})
       )
     },

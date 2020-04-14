@@ -25,13 +25,14 @@ export default {
   },
   watch: {
       selectedItem (newVal, _oldVal) {
+        this.hold.itemLabel = newVal.label
         this.hold.itemBarcode = newVal.barcode
       }
   },
   computed: {
     ...mapFields({
       hold: 'requests.hold',
-      holdOptions: 'requests.holdOptions'
+      holdOptions: 'requests.holdOptions',
 
     }),
     items() {
