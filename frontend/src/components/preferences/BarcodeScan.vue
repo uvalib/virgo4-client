@@ -6,7 +6,7 @@
          Check the box below to enable this functionality.
       </p>
       <p class="note">
-         <b>NOTE:</b>On iOS devices, this functionality can onlye be used from within the Safari browser.
+         <b>NOTE:</b>On iOS devices, this functionality can only be used from within the Safari browser.
          Other browsers will <i>NOT</i> work.
       </p>
       <div class="check">
