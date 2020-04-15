@@ -56,8 +56,8 @@ const requests = {
       store.alertText = text
     },
     reset(store) {
+      store.activePanel = 'OptionsPanel'
       store.alertText = ''
-      store.activePanel = ''
       store.nextPanel = ''
       store.hold = {
         itemBarcode: null,

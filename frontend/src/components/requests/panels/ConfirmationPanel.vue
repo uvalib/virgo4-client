@@ -15,13 +15,17 @@
         {{hold.itemLabel}}
       </dd>
       <dt>
-        Pickup Library
+        Pickup Library:
       </dt>
       <dd>
         {{hold.pickupLibrary}}
       </dd>
     </template>
   </dl>
+
+  <div class="reset pure-button" @click="reset" >
+    Done
+  </div>
 
 </div>
 </template>
@@ -33,6 +37,11 @@ export default {
       hold: state => state.requests.hold,
       userId: state => state.user.signedInUser
       })
+  },
+  methods: {
+    reset(){
+      this.$store.commit('requests/reset')
+    },
   }
 }
 </script>
@@ -40,9 +49,10 @@ export default {
 dl {
    margin-top: 15px;
    display: inline-grid;
-   grid-template-columns: max-content 2fr;
+   grid-template-columns: 1fr 1fr;
    grid-column-gap: 10px;
    width: 100%;
+
 }
 dt {
    font-weight: bold;

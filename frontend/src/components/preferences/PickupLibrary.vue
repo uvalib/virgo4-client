@@ -1,7 +1,7 @@
 <template>
   <div class="pickup-options">
     <h2>Pickup Library</h2>
-    <p>Select the library where you would like held books delivered. </p>
+    <p>Select the library where you would like items delivered. </p>
     <p>Current pickup library:
       <select v-model="pickupLibrary" @change="update">
         <option disabled selected hidden value="">Select a Location</option>

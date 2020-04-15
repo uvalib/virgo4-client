@@ -1,11 +1,10 @@
 <template>
   <div >
     <div class="active-panel">
-      <div v-if="requests.activePanel != 'OptionsPanel'" class="reset pure-button"
-        @click="reset"
-        v-text="resetLabel"
-        ></div>
 
+      <div v-if="showReset(requests.activePanel)" class="reset pure-button"
+        @click="reset"
+        >Reset</div>
       <component v-bind:is="requests.activePanel" />
 
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
@@ -34,13 +33,7 @@ export default {
         isSignedIn: 'user/isSignedIn',
         isAdmin: 'user/isAdmin',
     }),
-    resetLabel(){
-      if(this.requests.activePanel == 'ConfirmationPanel'){
-        return "Done"
-      } else {
-        return "Reset"
-      }
-    }
+
   },
   created() {
     this.$store.commit('requests/reset')
@@ -51,8 +44,11 @@ export default {
   methods: {
     reset(){
       this.$store.commit('requests/reset')
-      this.requests.activePanel = 'OptionsPanel'
     },
+    showReset(panel){
+      // Don't show reset on first and last panel
+      return !['ConfirmationPanel', 'OptionsPanel'].includes(panel)
+    }
   },
 }
 </script>
@@ -65,7 +61,7 @@ export default {
 .reset {
   position: absolute;
   right: 2vw;
-  bottom: 2vw;
+  top: 2vw;
 }
 p.error {
    color: var(--uvalib-red-emergency);
