@@ -52,7 +52,6 @@ dl {
    grid-template-columns: 1fr 1fr;
    grid-column-gap: 10px;
    width: 100%;
-
 }
 dt {
    font-weight: bold;

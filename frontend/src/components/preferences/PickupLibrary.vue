@@ -14,22 +14,24 @@
 import { mapFields } from 'vuex-map-fields';
 
 export default {
-  data: ()=> {
-    return {
-    pickupLibraries: ['ALDERMAN', 'CLEMONS', 'DARDEN', 'FINE-ARTS',
-    'HEALTHSCI', 'JAG', 'LAW', 'LEO', 'MATH', 'MUSIC', 'PHYSICS', 'SCI-ENG'
-    ]}
-  },
   computed: {
     ...mapFields({
         pickupLibrary: 'preferences.pickupLibrary',
     }),
+    pickupLibraries(){
+      return [...(this.$store.getters['user/canUseLEO'] ? ['LEO'] : []),
+        'ALDERMAN', 'CLEMONS', 'DARDEN', 'FINE-ARTS',
+        'HEALTHSCI', 'JAG', 'LAW', 'MATH', 'MUSIC', 'PHYSICS', 'SCI-ENG'
+      ]
+    }
+
   },
-    methods: {
-      update() {
-        this.$store.dispatch("preferences/savePreferences")
-      },
-  }
+  methods: {
+    update() {
+      this.$store.dispatch("preferences/savePreferences")
+    },
+  },
+
 }
 </script>
 <style scoped>
