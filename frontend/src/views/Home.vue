@@ -24,10 +24,13 @@
           </div>
           <div class="controls">
             <SourceInfo />
-            <span @click="searchClicked" class="search pure-button pure-button-primary">Search</span>
+            <button tabindex="0" v-on:keyup.enter="searchClicked" v-on:keyup.space="searchClicked" @click="searchClicked" 
+               class="search pure-button pure-button-primary">Search</button>
           </div>
           <div class="advanced">
-            <span class="text-button advanced-link" @click="advancedClicked">
+            <span tabindex="0" class="text-button advanced-link" 
+               @keyup.enter.prevent="advancedClicked" @keyup.space.prevent="advancedClicked"
+               @click="advancedClicked">
               Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
             </span>
           </div>
@@ -259,7 +262,7 @@ export default {
   align-items: center;
   justify-content: flex-start;
 }
-.controls span.search.pure-button.pure-button-primary {
+.controls .search.pure-button.pure-button-primary {
    margin-left: auto;
 }
 .controls  > * {

@@ -1,5 +1,5 @@
 <template>
-   <v-popover placement="top-end" class="source-info">
+   <v-popover tabindex="0" placement="top-end" class="source-info">
       <span class="text-button trigger">What am I searching&nbsp;<i class="fas fa-question-circle"></i></span>
       <div class="source-info-popover" slot="popover">
          <div class="popover-title">
