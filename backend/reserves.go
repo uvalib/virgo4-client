@@ -20,6 +20,8 @@ type ReserveRequest struct {
 	UserID   string        `json:"userID"`
 	Request  RequestParams `json:"request"`
 	Items    []RequestItem `json:"items"`
+	Video    []RequestItem `json:"-"`
+	NonVideo []RequestItem `json:"-"`
 	MaxAvail int           `json:"-"`
 }
 
@@ -38,15 +40,18 @@ type RequestParams struct {
 
 // RequestItem is the details for a particular reserve item
 type RequestItem struct {
-	Pool         string             `json:"pool"`
-	CatalogKey   string             `json:"catalogKey"`
-	CallNumber   string             `json:"callNumber"`
-	Title        string             `json:"title"`
-	Author       string             `json:"author"`
-	Period       string             `json:"period"`
-	Notes        string             `json:"notes"`
-	VirgoURL     string             `json:"-"`
-	Availability []AvailabilityInfo `json:"-"`
+	Pool             string             `json:"pool"`
+	CatalogKey       string             `json:"catalogKey"`
+	CallNumber       string             `json:"callNumber"`
+	Title            string             `json:"title"`
+	Author           string             `json:"author"`
+	Period           string             `json:"period"`
+	Notes            string             `json:"notes"`
+	AudioLanguage    string             `json:"audioLanguage"`
+	Subtitles        string             `json:"subtitles"`
+	SubtitleLanguage string             `json:"subtitleLanguage"`
+	VirgoURL         string             `json:"-"`
+	Availability     []AvailabilityInfo `json:"-"`
 }
 
 // AvailabilityInfo contains item availabilty information used to generate
@@ -88,7 +93,7 @@ func (svc *ServiceContext) ValidateCourseReserves(c *gin.Context) {
 
 	log.Printf("Validate course reserve items %v", req.Items)
 	url := fmt.Sprintf("%s/v4/course_reserves/validate", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(url, req)
+	bodyBytes, ilsErr := svc.ILSConnectorPost(url, req, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -114,21 +119,25 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		return
 	}
 	reserveReq.VirgoURL = svc.VirgoURL
-	log.Printf("Request: %+v", reserveReq)
 	reserveReq.MaxAvail = -1
+	reserveReq.Video = make([]RequestItem, 0)
+	reserveReq.NonVideo = make([]RequestItem, 0)
 	for idx := range reserveReq.Items {
 		itm := reserveReq.Items[idx]
-		reserveReq.Items[idx].VirgoURL = fmt.Sprintf("%s/%s/%s", svc.VirgoURL, itm.Pool, itm.CatalogKey)
-		avail := svc.getAvailabity(reserveReq.Items[idx])
+		itm.VirgoURL = fmt.Sprintf("%s/sources/%s/%s", svc.VirgoURL, itm.Pool, itm.CatalogKey)
+		avail := svc.getAvailabity(reserveReq.Items[idx], c.GetString("jwt"))
 		reserveReq.Items[idx].Availability = make([]AvailabilityInfo, len(avail))
 		copy(reserveReq.Items[idx].Availability, avail)
 		if len(avail) > reserveReq.MaxAvail {
 			reserveReq.MaxAvail = len(avail)
 		}
+		if itm.Pool == "video" {
+			reserveReq.Video = append(reserveReq.Video, itm)
+		} else {
+			reserveReq.NonVideo = append(reserveReq.NonVideo, itm)
+		}
 	}
 
-	log.Printf("Rendering reserve email body with %+v", reserveReq)
-	var renderedEmail bytes.Buffer
 	funcs := template.FuncMap{"add": func(x, y int) int {
 		return x + y
 	}, "header": func(cnt int) string {
@@ -147,51 +156,80 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		out += availStr
 		return out
 	}}
-	tpl := template.Must(template.New("reserves.txt").Funcs(funcs).ParseFiles("templates/reserves.txt"))
-	err = tpl.Execute(&renderedEmail, reserveReq)
-	if err != nil {
-		log.Printf("ERROR: Unable to render reserve email: %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
 
-	log.Printf("Generate SMTP message")
-	// Per: https://stackoverflow.com/questions/36485857/sending-emails-with-name-email-from-go
-	// sending addresses like 'user name <email.com>' does not work with the default
-	// mail package. Leaving at just email address for now. Can revisit after meetings
-	/// about functionality.
-	// toAddr := mail.Address{Name: emailMap[reserveReq.Request.Library], Address: svc.CourseReserveEmail}
-	to := []string{svc.CourseReserveEmail, reserveReq.Request.Email}
-	if reserveReq.Request.InstructorEmail != "" {
-		to = append(to, reserveReq.Request.InstructorEmail)
-	}
-	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subject := fmt.Sprintf("Subject: %s: %s\n", reserveReq.Request.Name, reserveReq.Request.Course)
-	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
-	msg := []byte(subject + toHdr + mime + renderedEmail.String())
-
-	if svc.Dev.FakeSMTP {
-		log.Printf("Email is in dev mode. Logging message instead of sending")
-		log.Printf("==================================================")
-		log.Printf("%s", msg)
-		log.Printf("==================================================")
-	} else {
-		log.Printf("Sending reserve email to %s", strings.Join(to, ","))
-		auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
-		err := smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, svc.SMTP.Sender, to, msg)
+	templates := [2]string{"reserves.txt", "reserves_video.txt"}
+	for _, templateFile := range templates {
+		if templateFile == "reserves.txt" && len(reserveReq.NonVideo) == 0 {
+			continue
+		}
+		if templateFile == "reserves_video.txt" && len(reserveReq.Video) == 0 {
+			continue
+		}
+		var renderedEmail bytes.Buffer
+		tpl := template.Must(template.New(templateFile).Funcs(funcs).ParseFiles(fmt.Sprintf("templates/%s", templateFile)))
+		err = tpl.Execute(&renderedEmail, reserveReq)
 		if err != nil {
-			log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
+			log.Printf("ERROR: Unable to render %s: %s", templateFile, err.Error())
 			c.String(http.StatusInternalServerError, err.Error())
 			return
+		}
+
+		log.Printf("Generate SMTP message for %s", templateFile)
+		// INFO: https://stackoverflow.com/questions/36485857/sending-emails-with-name-email-from-go
+		// NOTES for recipient: For any reserve library location other than Law, the email should be sent to
+		// svc.CourseReserveEmail with the from address of the patron submitting the request.
+		// For Law it should send the email to svc.LawReserveEmail AND the patron
+		to := []string{}
+		from := svc.SMTP.Sender
+		if reserveReq.Request.Library == "law" {
+			log.Printf("The reserve library is law. Send request to law %s and requestor %s from sender %s",
+				svc.LawReserveEmaiil, reserveReq.Request.Email, svc.SMTP.Sender)
+			to = append(to, svc.LawReserveEmaiil)
+			to = append(to, reserveReq.Request.Email)
+			if reserveReq.Request.InstructorEmail != "" {
+				to = append(to, reserveReq.Request.InstructorEmail)
+			}
+		} else {
+			log.Printf("The reserve library is not law. Send request to %s from %s",
+				svc.CourseReserveEmail, reserveReq.Request.Email)
+			to = append(to, svc.CourseReserveEmail)
+			from = reserveReq.Request.Email
+		}
+
+		mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
+		subject := fmt.Sprintf("Subject: %s: %s\n", reserveReq.Request.Name, reserveReq.Request.Course)
+		toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
+		msg := []byte(subject + toHdr + mime + renderedEmail.String())
+
+		if svc.Dev.FakeSMTP {
+			log.Printf("Email is in dev mode. Logging message instead of sending")
+			log.Printf("==================================================")
+			log.Printf("%s", msg)
+			log.Printf("==================================================")
+		} else {
+			log.Printf("Sending reserve email to %s", strings.Join(to, ","))
+			var err error
+			if svc.SMTP.Pass != "" {
+				auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
+				err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, from, to, msg)
+			} else {
+				log.Printf("Using SendMail with no auth")
+				err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, from, to, msg)
+			}
+			if err != nil {
+				log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
+				c.String(http.StatusInternalServerError, err.Error())
+				return
+			}
 		}
 	}
 	c.String(http.StatusOK, "Reserve email sent")
 }
 
-func (svc *ServiceContext) getAvailabity(reqItem RequestItem) []AvailabilityInfo {
+func (svc *ServiceContext) getAvailabity(reqItem RequestItem, jwt string) []AvailabilityInfo {
 	out := make([]AvailabilityInfo, 0)
 	availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, reqItem.CatalogKey)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, jwt)
 	if ilsErr != nil {
 		log.Printf("WARN: Unable to get availabilty info for reserve %s: %s", reqItem.CatalogKey, ilsErr.Message)
 		return out
@@ -239,7 +277,7 @@ func (svc *ServiceContext) SearchReserves(c *gin.Context) {
 	if desk != "" {
 		url += fmt.Sprintf("&desk=%s", desk)
 	}
-	bodyBytes, ilsErr := svc.ILSConnectorGet(url)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(url, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return

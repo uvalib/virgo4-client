@@ -3,7 +3,7 @@
       <h1>Browse <span class="browse-type">{{type}}</span></h1>
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="true" />
       <div class="browse-content">
-         <div class="target">{{this.$route.query.q}}</div>
+         <div class="target"><h2>{{this.$route.query.q}}</h2></div>
          <SearchResults v-if="hasResults" v-bind:showSummary="false"/>
       </div>
    </div>
@@ -42,14 +42,19 @@ export default {
 
          let prior = this.rawQueryString
          let targetQ = this.$route.query.q
+         let browseType = this.$route.params.type
+
 
          // Update query to be a subject search matching the param.
          // Do the search only if the new query is different from prior
-         this.$store.commit("query/setSubjectSearch", targetQ)
+         if (browseType == "subjects") {
+            this.$store.commit("query/browseSubjects", targetQ)
+         } else if (browseType == "author") {
+            this.$store.commit("query/browseAuthors", targetQ)
+         }
          let newQ = this.rawQueryString
          if ( newQ != prior ) {
             this.$store.commit('resetSearchResults')
-            this.$store.commit('query/setLastSearch', newQ)
             this.$store.commit('filters/reset')
             this.$store.dispatch("searchAllPools")
          }
@@ -73,6 +78,7 @@ export default {
    color: var(--color-primary-text);
 }
 div.target {
-   font-size: 1.4em;
+   padding: 0 1rem;
+   margin-bottom: 1rem;
 }
 </style>

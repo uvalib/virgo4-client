@@ -1,9 +1,5 @@
 _______________________________________________________________________
 Course Reserve Information
-
-Reminder:
-All video reserve requests will be delivered as a streaming 
-resource to your class’s Learning Management System.
 _______________________________________________________________________
 Requester Name:      {{.Request.Name}}
 Requester Email:     {{.Request.Email}}
@@ -18,7 +14,7 @@ _______________________________________________________________________
 
 {{- $reserveLib := .Request.Library -}}
 {{- $url := .VirgoURL -}}
-{{ range $index, $item := .Items }}
+{{ range $index, $item := .NonVideo }}
 {{ add $index 1 }}.
 {{ $item.Title}}
 {{ $item.Author}}
@@ -27,8 +23,9 @@ Library: {{ $avail.Library }}
 Location: {{ $avail.Location }}
 Availability: {{ $avail.Availability }}
 Call Number: {{ $avail.CallNumber }}
-{{- end -}}
+{{- end }}
 Reserve Library: {{ $reserveLib }}
+
 Loan Period: {{ $item.Period }}
 Notes: {{ $item.Notes }}
 

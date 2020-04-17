@@ -15,9 +15,9 @@ const restore = {
      getField,
      previousPath: state => {
        let ignoredPaths = ['/signedout','/signin']
-       let redirectPath = state.searchData.previousPath
-       if( !state.searchData || !redirectPath
-         || ignoredPaths.includes(redirectPath) ){
+       if( !state.searchData || !state.searchData.previousPath ||
+        (state.searchData.previousPath == '/' && state.searchData.query == '') // blank search
+         || ignoredPaths.includes(state.searchData.previousPath) ){
          return '/account'
        }
        return state.searchData.previousPath
@@ -118,6 +118,7 @@ const restore = {
 
         searchData.journalQuery = rootGetters['journals/query']
 
+        searchData.activeRequest = rootGetters['requests/nextPanel']
 
         localStorage.setItem("previousSearch", JSON.stringify(searchData))
       },
@@ -135,7 +136,7 @@ const restore = {
         ctx.commit('searchData', data)
       },
 
-      async fromStorage({ dispatch, commit, getters, rootGetters }){
+      async loadSearch({ dispatch, commit, getters, rootGetters }){
         try {
           let searchData = getters.searchData
           if (!searchData || searchData.query == "") {
@@ -158,6 +159,19 @@ const restore = {
         } finally {
           commit('clearLocalStorage')
           commit('setSearching', false, {root: true})
+        }
+      },
+      loadDetailsPage(ctx){
+        try {
+          // skip if you're not logged in, or no searchData
+          if(!ctx.rootGetters['user/isSignedIn'] || !ctx.getters.searchData) {
+            return
+          }
+          if (ctx.getters.searchData.activeRequest){
+            ctx.commit('requests/activePanel', ctx.getters.searchData.activeRequest, { root: true })
+          }
+        } finally {
+          ctx.commit('clearAll')
         }
       },
 

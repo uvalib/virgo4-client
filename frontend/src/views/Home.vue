@@ -24,17 +24,23 @@
           </div>
           <div class="controls">
             <SourceInfo />
-            <span @click="searchClicked" class="search pure-button pure-button-primary">Search</span>
+            <button tabindex="0" v-on:keyup.enter="searchClicked" v-on:keyup.space="searchClicked" @click="searchClicked" 
+               class="search pure-button pure-button-primary">Search</button>
+          </div>
+          <div class="advanced">
+            <span tabindex="0" class="text-button advanced-link" 
+               @keyup.enter.prevent="advancedClicked" @keyup.space.prevent="advancedClicked"
+               @click="advancedClicked">
+              Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
+            </span>
+          </div>
+          <div class="advanced">
+            <V4BarcodeScanner @scanned="barcodeScanned"/>
           </div>
           <div class="advanced">
             <router-link to="/journals">
               Browse Journals&nbsp;<i class="far fa-newspaper"></i>
             </router-link>
-          </div>
-          <div class="advanced">
-            <span class="text-button advanced-link" @click="advancedClicked">
-              Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
-            </span>
           </div>
         </template>
         <AdvancedSearch v-else/>
@@ -60,12 +66,19 @@ import AdvancedSearch from "@/components/AdvancedSearch"
 import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
 import Welcome from "@/components/Welcome"
+import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+
 export default {
    name: "home",
    components: {
-     SearchResults,
+     SearchResults,V4BarcodeScanner,
      SearchTips, AdvancedSearch, V4Spinner,
      V4Select, Welcome, SourceInfo
+   },
+   data: function() {
+      return {
+         showVideo: false
+      }
    },
    computed: {
       ...mapState({
@@ -87,7 +100,7 @@ export default {
         'basic','basicSearchScope'
       ]),
       searchScopes() {
-        let out = [{name: 'All Sources', id: 'all'}]
+        let out = [{name: 'All Resource Types', id: 'all'}]
         return out.concat(this.sources)
       },
       basicSearch() {
@@ -95,10 +108,16 @@ export default {
       },
       // This restore refers to a Saved Search
       isRestore() {
-         return ( this.$route.params !== undefined && 
-              this.$route.params.id !== undefined && 
+         return ( this.$route.params !== undefined &&
+              this.$route.params.id !== undefined &&
               this.$route.params.id != "")
       }
+   },
+   mounted: function() {
+      // The search page has been mounted either by direct
+      // URL access or by a browser back action. Put initialize
+      // the query module for searching (as opposed to browsing)
+      this.$store.dispatch("query/initSearchMode")
    },
    created: function() {
       this.searchCreated()
@@ -133,7 +152,7 @@ export default {
           if( !this.$store.getters['user/isSignedIn']) {
             return
           }
-          await this.$store.dispatch("restore/fromStorage")
+          await this.$store.dispatch("restore/loadSearch")
 
           this.showBookmarkTarget()
         } finally {
@@ -189,7 +208,6 @@ export default {
 
       searchClicked() {
         this.$store.commit('resetSearchResults')
-        this.$store.commit('query/setLastSearch', this.rawQueryString)
         this.$store.commit('filters/reset')
         this.$store.dispatch("searchAllPools")
       },
@@ -200,6 +218,10 @@ export default {
             this.$router.push("/")
          }
         this.$store.commit("query/setAdvancedSearch")
+      },
+      barcodeScanned( barcode ) {
+         this.basic = barcode
+         this.searchClicked()
       },
    }
 };
@@ -240,7 +262,7 @@ export default {
   align-items: center;
   justify-content: flex-start;
 }
-.controls span.search.pure-button.pure-button-primary {
+.controls .search.pure-button.pure-button-primary {
    margin-left: auto;
 }
 .controls  > * {

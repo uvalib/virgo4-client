@@ -6,25 +6,26 @@
             <V4Spinner message="Looking up bookmark information..."/>
          </div>
          <div v-else>
-            <dl class="bookmark">
+            <ul class="bookmarks">
                <template v-for="(bookmark,idx) in bookmarks">
-                  <dt :key="getKey(idx,'t')" class="title">
-                     <router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link></dt>
-                  <dd :key="getKey(idx,'tv')" >
-                     <div class="author">
-                        {{bookmark.details.author}}
+                  <li class="bookmark-wrapper" :key="idx">
+                     <div class="title">
+                        <router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
                      </div>
-                      <dl class="data">
-                         <dt>Call Number:</dt>
-                         <dd>{{bookmark.details.callNumber}}</dd>
-                         <dt>Library:</dt>
-                         <dd>{{bookmark.details.library}}</dd>
-                         <dt>Location:</dt>
-                         <dd>{{bookmark.details.location}}</dd>
-                      </dl>
-                  </dd>
+                     <div class="info">
+                        <div class="author">{{bookmark.details.author}}</div>
+                        <dl class="data">
+                           <dt>Call Number:</dt>
+                           <dd>{{bookmark.details.callNumber}}</dd>
+                           <dt>Library:</dt>
+                           <dd>{{bookmark.details.library}}</dd>
+                           <dt>Location:</dt>
+                           <dd>{{bookmark.details.location}}</dd>
+                        </dl>
+                     </div>
+                  </li>
                </template>
-            </dl>
+            </ul>
          </div>
       </div>
    </div>
@@ -90,18 +91,32 @@ div.author {
    margin-bottom: 10px;
 }
 dl.data {
-   font-size: 0.9em;
    margin: 0 0 20px 0;
    display: inline-grid;
    grid-template-columns: max-content 2fr;
    grid-column-gap: 15px;
+   grid-row-gap: 5px;
 }
 dl.data dt {
    font-weight: bold;
    text-align: right;
 }
-dt.title {
+div.info {
+   margin-left: 40px;
+}
+div.title {
    font-size: 1.2em;
    padding-bottom:5px;
+}
+ul.bookmarks {
+   list-style: none;
+   padding: 0;
+}
+.bookmark-wrapper {
+   margin: 10px;
+   border: 1px solid var(--uvalib-grey-light);
+   padding: 10px;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   border-radius:3px;
 }
 </style>

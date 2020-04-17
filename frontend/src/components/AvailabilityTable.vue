@@ -6,14 +6,15 @@
       <template v-else>
          <template v-if="availability.items.length">
             <h2>Availability</h2>
-            <p>{{alertText}}</p>
+
+            <RequestContainer v-if="isAdmin" :titleId="titleId" />
+
             <table class="fields">
                <thead>
                   <tr>
                      <th v-for="(column, idx) in availability.columns" :key="idx">
                         {{column}}
                      </th>
-                     <th></th>
                      <th></th>
                   </tr>
                </thead>
@@ -27,10 +28,6 @@
                        <AvailabilityNotice v-bind:message="item.notice" />
                     </span>
                   </td>
-                  <td>
-                    <PlaceHoldButton v-if="isAdmin"
-                      :titleId="titleId" :barcode="item.barcode" />
-                  </td>
                </tr>
             </table>
          </template>
@@ -42,10 +39,10 @@
 import { mapGetters } from "vuex"
 import AvailabilityNotice from "@/components/popovers/AvailabilityNotice"
 import V4Spinner from "@/components/V4Spinner"
-import PlaceHoldButton from "@/components/requests/PlaceHoldButton"
+import RequestContainer from "@/components/requests/RequestContainer"
 export default {
   components: {
-    AvailabilityNotice, V4Spinner, PlaceHoldButton
+    AvailabilityNotice, V4Spinner, RequestContainer
   },
    props: {
       titleId: String
@@ -54,7 +51,6 @@ export default {
       ...mapGetters({
          availability: 'item/availability',
          isAdmin: 'user/isAdmin',
-         alertText: 'requests/alertText',
       }),
    },
    methods: {
@@ -77,8 +73,15 @@ table {
    margin-bottom: 10vh;
 }
 td, th {
-   padding: 0.5rem;
+   padding: 0.5em;
    text-align: left;
+   font-size: 1rem;
+}
+@media only screen and (max-width: 768px) {
+  td, th {
+     padding: 0.5em 0.1em;
+     font-size: 0.9rem;
+  }
 }
 tr {
    border: 1px solid black;

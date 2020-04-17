@@ -52,11 +52,18 @@ const reserves = {
             item.period = state.request.period
          })
       },
+      setRequestingUser(state, userInfo) {
+         state.request.name = userInfo.displayName
+         state.request.email = userInfo.email
+      },
       setRequestList(state, list) {
          state.requestList = list.slice(0)
          state.requestList.forEach(item => {
             item.period = ""
             item.notes = ""
+            item.audioLanguage = "English"
+            item.subtitles= "no"
+            item.subtitleLanguage = ""
             item.valid = true
          });
          state.request = {onBehalfOf: "no",
@@ -67,7 +74,7 @@ const reserves = {
             course: "",
             semester: "",
             library: "",
-            period: ""
+            period: "",
          }
       },
       clearRequestList(state) {
@@ -80,21 +87,27 @@ const reserves = {
             course: "",
             semester: "",
             library: "",
-            period: ""
+            period: "",
          }
       },
       setCourseReserves(state, data) {
          data['hits'].forEach( h=>{
             state.courseReserves.push(h)
          })
-         state.totalReserves = data['total']
+         state.totalReserves = state.courseReserves.length
          state.page = data['page']
          state.hasMore = data['more']
       },
       resetResults(state, type) {
          state.searchType = type
          state.courseReserves.splice(0, state.courseReserves.length)
-         state.totalReserves = 0
+         state.totalReserves = -1
+         state.page = 1
+         state.hasMore = false
+      },
+      clearReservesResults(state) {
+         state.courseReserves.splice(0, state.courseReserves.length)
+         state.totalReserves = -1
          state.page = 1
          state.hasMore = false
       },
@@ -145,7 +158,7 @@ const reserves = {
          ctx.state.requestList.forEach( item=>{
             let notes = item.notes
             if (notes.length == 0) notes = "-"
-            data.items.push( {catalogKey: item.identifier, 
+            let subItem = {catalogKey: item.identifier, 
                pool: item.pool,
                title: item.details.title,
                callNumber: item.details.callNumber,
@@ -154,7 +167,13 @@ const reserves = {
                library: item.details.library,
                availability: item.details.availability,
                notes: notes, 
-               period: item.period} )    
+               period: item.period} 
+            if (item.pool == 'video') {
+               subItem.audioLanguage = item.audioLanguage 
+               subItem.subtitles = item.subtitles 
+               subItem.subtitleLanguage = item.subtitleLanguage
+            }
+            data.items.push( subItem )    
          })
          axios.post(`/api/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')
@@ -169,6 +188,7 @@ const reserves = {
          if (ctx.state.hasMore == false ) {
             return
          }
+         ctx.commit('setSearching', true, { root: true })
          ctx.commit('nextPage')
          let qs = ctx.state.query
          if (qs.includes(" ")) {
@@ -178,24 +198,36 @@ const reserves = {
          let pg = ctx.state.page
          return axios.get(`/api/reserves/search?${typeParam}&query=${qs}&page=${pg}`).then((response) => {
             ctx.commit('setCourseReserves', response.data)
+            ctx.commit('setSearching', false, { root: true })
          }).catch((error) => {
             ctx.commit('setError', error, { root: true })
+            ctx.commit('setSearching', false, { root: true })
           })
       },
       searchCourses(ctx, data) {
+         let qs = ctx.state.query
+         if ( qs.includes("*")) {
+            ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
+            ctx.commit('clearReservesResults')
+            return
+         }
+         if (qs.length < 3 ) {
+            ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
+            ctx.commit('clearReservesResults')
+            return 
+         }
+
          ctx.commit('setSearching', true, { root: true })
          let type = "COURSE_NAME"
          if (data.type == "id") {
             type = "COURSE_ID"
          }
-         let qs = ctx.state.query
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
-
          if (data.initial === true) {
             ctx.commit('resetResults', type)   
-         }
+         }         
          let typeParam = "type="+type
          let pgParam = "page="+ctx.state.page
          let url = `/api/reserves/search?${typeParam}&query=${qs}&${pgParam}`
@@ -208,19 +240,30 @@ const reserves = {
          })
       },
       searchInstructors(ctx, data) {
+         let qs = ctx.state.query
+         if ( qs.includes("*")) {
+            ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
+            ctx.commit('clearReservesResults')
+            return
+         }
+         if (qs.length < 3 ) {
+            ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
+            ctx.commit('clearReservesResults')
+            return 
+         }
+
          ctx.commit('setSearching', true, { root: true })
          let type = "INSTRUCTOR_NAME"
          if (data.type == "id") {
             type = "INSTRUCTOR_ID"
             qs = ctx.rootState.user.accountInfo.id
          } 
-         let qs = ctx.state.query
+
          qs = qs.replace(/,/g, "")
          qs = qs.trim()
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
-
          if (data.initial === true) {
             ctx.commit('resetResults', type)   
          }

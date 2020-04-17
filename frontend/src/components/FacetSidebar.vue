@@ -17,7 +17,7 @@
          </AccordionContent>
       </div>
 
-      <div v-if="hasFacets" class="pool" :class="{overlay: !startExpanded}">
+      <div v-if="hasFacets && selectedResults.hits.length > 0" class="pool" :class="{overlay: !startExpanded}">
           <AccordionContent id="pool-filter" class="filter"
             :title="poolFilterTitle" :background="filterColor"
             color="white" :expanded="startExpanded"
@@ -114,9 +114,9 @@ export default {
       },
       availabilityOpts() {
          return [
-            {id: "any", name: "Any"},
+            {id: "any", name: "All"},
             {id: "online", name: "Online"},
-            {id: "shelf", name: "On Shelf"},
+            {id: "shelf", name: "On Shelf Now"},
          ]
       },
    },

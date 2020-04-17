@@ -34,6 +34,14 @@ const pools = {
          if (!attr) return true
          return attr.supported
       },
+      sortingSupport: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return false
+         let attr = pool.attributes.find( a=> a.name=='sorting')
+         if (!attr) return false
+         return attr.supported
+      },
       logo: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return ""
@@ -107,6 +115,9 @@ const pools = {
             } else {
                p.providers = []   
             }
+            if (!p.sort_options) {
+               p.sort_options=[]
+            }
             state.list.push(p) 
          })
       },
@@ -115,6 +126,11 @@ const pools = {
          let pool = state.list.find(p=> p.id == data.pool)
          pool.providers.splice(0, pool.providers.length)
          data.providers.forEach( prov => {
+            if ( prov.logo_url ) {
+               let logo = prov.logo_url
+               logo = logo.replace("./", "/")
+               prov.logo_url= pool.url+logo
+            }
             pool.providers.push(prov)
          })
       }

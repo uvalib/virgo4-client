@@ -1,9 +1,9 @@
 <template>
   <div class="pool-options">
-    <h2>Source Preferences</h2>
+    <h2>Search Preferences</h2>
     <p>
-        Select which sources you want to include in your search results,
-        and which source you prefer to see results from most.
+        Select which Resource Types you want to include in your search results,
+        and which Resource Type you prefer to see results from most.
     </p>
     <div class="pools">
       <div class="pool" v-for="p in pools" :key="p.id"
@@ -12,16 +12,16 @@
           <span><b>{{p.name}}</b></span>
         </div>
         <div class="description">
-          <span>{{p.description}}</span>
+          <span v-html="p.description"></span>
         </div>
         <div class="source-controls">
           <div class="toggle" @click="toggleTargetPool(p.url)">
             <i v-if="isTargetPool(p.url)" class="fas fa-star"></i>
             <i v-else class="far fa-star"></i>
-            <span class="label">Preferred Source</span>
+            <span class="label">Preferred</span>
           </div>
           <div class="toggle"  @click="toggleExcludePool(p.url)">
-            <span class="label">Search this Source</span>
+            <span class="label">Include</span>
             <i v-if="isPoolExcluded(p.url)" class="excluded far fa-circle"></i>
             <i v-else class="selected fas fa-check-circle"></i>
           </div>

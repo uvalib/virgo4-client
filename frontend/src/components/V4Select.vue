@@ -5,7 +5,7 @@
                color: color, 'border': border }">
       <div class="wrap-select">
          <span class="selection">
-            <span v-if="value.id" v-html="value.name"></span>
+            <span v-if="value && value.id" v-html="value.name"></span>
             <span v-else v-html="placeholder"></span>
             <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
          </span>
@@ -181,18 +181,18 @@ export default {
 
 @media only screen and (min-width: 768px) {
    .v4-select .options.left  {
-      left: -1px; 
+      left: -1px;
    }
    .v4-select .options.right  {
-      left: -1px; 
+      left: -1px;
    }
 }
 @media only screen and (max-width: 768px) {
    .v4-select .options.left  {
-      left: -1px; 
+      left: -1px;
    }
    .v4-select .options.right  {
-      right: 0; 
+      right: 0;
    }
 }
 .v4-select .option {
@@ -201,6 +201,7 @@ export default {
   padding: 10px 15px;
   background-color: white;
   color: var(--uvalib-text-dark);
+  font-weight: normal;
 }
 .v4-select .option.disabled {
   background-color:  white;

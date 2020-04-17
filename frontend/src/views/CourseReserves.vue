@@ -2,7 +2,7 @@
    <div class="course-reserves">
       <h1>Course Reserves</h1>
       <div class="reserves-content">
-         <V4Spinner v-if="searching" message="Looking up reserved items..." v-bind:overlay="true"/>
+         <V4Spinner v-if="searching && totalReserves == -1" message="Looking up reserved items..." v-bind:overlay="true"/>
          <p>
             Type instructor's <strong>last name</strong>, <strong>course ID</strong> or
             <strong>course name</strong> in the search box<br />
@@ -17,17 +17,14 @@
                <span @click="searchCourseClicked('name')" class="pure-button pure-button-primary">Search Course Names</span>
             </div>
          </div>
-         <template v-if="!searching && totalReserves > -1">
+         <template v-if="totalReserves > -1">
             <div class="no-match" v-if="totalReserves == 0">
                No course reserves that match your request were found
             </div>
             <template v-else>
                <CourseSearchResults v-if="hasCourseResults"/>
                <InstructorSearchResults v-if="hasInstructorResults"/>
-               <div v-if="hasMore" @click="loadMore" class="see-more">
-                  <V4Spinner v-if="loadingMore" color="white"/>
-                  <span v-else>Load More Reserves</span>
-               </div>
+               <V4Spinner v-if="hasMore" style="padding:20px 20px"/>
             </template>
          </template>
       </div>
@@ -54,8 +51,8 @@ export default {
    computed: {
       ...mapState({
          totalReserves: state => state.reserves.totalReserves,
-         hasMore: state => state.reserves.hasMore,
          searching: state => state.searching,
+         hasMore: state => state.reserves.hasMore,
       }),
       ...mapGetters({
          hasCourseResults: 'reserves/hasCourseResults',
@@ -66,6 +63,18 @@ export default {
         'query',
       ]),
    },
+   watch: {
+      searching() {
+         if (this.searching === false) {
+            if (this.hasMore) {
+               this.loadingMore = true
+               this.$store.dispatch("reserves/nextPage").finally( ()=> {
+                  this.loadingMore = false
+               })   
+            } 
+         } 
+      }
+   },
    methods: {
       searchInstructorClicked(type) {
          let data = {type: type, initial: true}
@@ -74,14 +83,6 @@ export default {
       searchCourseClicked(type) {
          let data = {type: type, initial: true}
          this.$store.dispatch("reserves/searchCourses", data)
-      },
-      loadMore() {
-         if (this.hasMore) {
-            this.loadingMore = true
-            this.$store.dispatch("reserves/nextPage").finally( ()=> {
-                this.loadingMore = false
-            })
-         }
       },
    },
    created() {
@@ -131,7 +132,7 @@ p {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
 }
 #app .controls span.pure-button.pure-button-primary {
    margin: 0 0 5px 10px;
@@ -142,7 +143,7 @@ p {
   font-size: 1.25em;
   margin: 15px;
 }
-.see-more, .no-more {
+.total {
    padding: 10px;
    background: var(--uvalib-brand-blue);
    border: 5px solid var(--uvalib-brand-blue);
@@ -150,12 +151,6 @@ p {
    cursor: pointer;
    font-weight: bold;
    margin-bottom: 25px;
-}
-.see-more:hover {
-   text-decoration: underline;
-   color: var(--uvalib-blue-alt-light);
-}
-.no-more {
    cursor: default;
 }
 </style>

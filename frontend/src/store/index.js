@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import versionChecker from './plugins/version'
+import expiredSessionWatcher from './plugins/expired'
 import bookmarks from './modules/bookmarks'
 import system from './modules/system'
 import pools from './modules/pools'
@@ -26,6 +27,7 @@ export default new Vuex.Store({
     searching: false,
     pageSize: 20,
     results: [],
+    suggestions: [],
     total: -1,
     autoExpandGroupID: "",
     selectedResultsIdx: -1,
@@ -53,34 +55,6 @@ export default new Vuex.Store({
       let tgtResults = state.results[state.selectedResultsIdx]
       return tgtResults.total > tgtResults.hits.length
     },
-    hitPoolCount: state => {
-      let poolCnt = 0
-      state.results.forEach(function(p) {
-        if (p.total > 0) {
-          poolCnt++
-        }
-      })
-      return poolCnt
-    },
-    skippedPoolCount: state => {
-      let poolCnt = 0
-      state.results.forEach(function(p) {
-        if (p.total == 0 && p.statusCode == 408) {
-          poolCnt++
-        }
-      })
-      return poolCnt
-    },
-    failedPoolCount: state => {
-      let poolCnt = 0
-      state.results.forEach(function(p) {
-        // no results, not OK code and not timeout code. Must be pool error
-        if (p.total == 0 && p.statusCode != 200 && p.statusCode != 408) {
-          poolCnt++
-        }
-      })
-      return poolCnt
-    },
   },
 
   mutations: {
@@ -107,9 +81,9 @@ export default new Vuex.Store({
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
       if (resultIdx > 1 && state.otherSrcSelection.id == "") {
-        // this happens when a search is restored. otherSrcSelection is used 
-        // to drive the selected option in the other sources tab. Make sure it is 
-        /// set correctly  
+        // this happens when a search is restored. otherSrcSelection is used
+        // to drive the selected option in the other sources tab. Make sure it is
+        /// set correctly
         let r = state.results[resultIdx]
         let name = `<span class='pool'>${r.pool.name}</span>`
         name += `<span class='total'>${r.total} hits</span>`
@@ -121,7 +95,7 @@ export default new Vuex.Store({
       // When the results are cleared, reset pagination, remove pool
       // total from overall total and reset pool total to 0
       let tgtPool = state.results[state.selectedResultsIdx]
-      let oldPoolTotal = tgtPool.total 
+      let oldPoolTotal = tgtPool.total
       tgtPool.total = 0
       tgtPool.page = 0
       state.results[state.selectedResultsIdx].hits = []
@@ -136,7 +110,7 @@ export default new Vuex.Store({
     addPoolSearchResults(state, poolResults) {
       let tgtPool = state.results[state.selectedResultsIdx]
       tgtPool.timeMS = poolResults.elapsed_ms
-      tgtPool.statusCode = 200 
+      tgtPool.statusCode = 200
       tgtPool.statusMessage = ""
       if (tgtPool.total == 0 ) {
         // if pool total is zero add the new results total to overall
@@ -164,15 +138,19 @@ export default new Vuex.Store({
       // // this is called from top level search; resets results from all pools
       state.total = -1
       state.results.splice(0, state.results.length)
-      results.pool_results.forEach( pr => {
+      let firstPoolWithHits = -1
+      results.pool_results.forEach( (pr,idx) => {
         if (!pr.group_list) {
           pr.group_list = []
         }
 
         // Find the pool the results are associated with and populate some top level response info
-        let pool = utils.findPool(results.pools, pr.pool_id)
-        let result = { pool: pool, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms, 
+        let pool = results.pools.find( p => p.id == pr.pool_id)
+        let result = { pool: pool, sort: pr.sort, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms,
           hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg}
+        if (firstPoolWithHits == -1 &&  pr.pagination.total > 0) {
+          firstPoolWithHits = idx
+        }
 
         // Next, drill into group_list data. It contains a count and a record_list
         // record list is a list of fields in the hit. field is {name,label,type,value,visibility,display}
@@ -199,10 +177,20 @@ export default new Vuex.Store({
         state.results.push(result)
       })
 
-      state.selectedResultsIdx = 0
+      if ( firstPoolWithHits == -1) {
+         firstPoolWithHits = 0
+      }
+      state.selectedResultsIdx = firstPoolWithHits
       state.otherSrcSelection = {id: "", name: ""}
 
       state.total = results.total_hits
+    },
+
+    setSuggestions(state, data) {
+      state.suggestions.splice(0, state.suggestions.length)
+      data.forEach( d=> {
+         state.suggestions.push(d)
+      })
     },
 
     incrementPage(state) {
@@ -216,6 +204,10 @@ export default new Vuex.Store({
       state.selectedResultsIdx = -1
       state.otherSrcSelection = {id: "", name: ""}
     },
+
+    setSelectedResultsSort(state, sort) {
+      state.results[state.selectedResultsIdx].sort = sort
+    }
   },
 
   actions: {
@@ -223,17 +215,17 @@ export default new Vuex.Store({
       ctx.commit('incrementPage')
       return ctx.dispatch("searchSelectedPool")
     },
-    
+
     // Search ALL configured pools. This is the initial search call using only the basic or
     // advanced search parameters and will always start at page 1. Filters do not apply
     // to all pools so they are not used here.
     // CTX: commit: ƒ boundCommit(type, payload, options)
     searchAllPools({ state, commit, rootState, rootGetters, dispatch }, tgtPage) {
       commit('system/setError', "")
-      // By default, search for 20 items. If this is a restored search with a particular target 
+      // By default, search for 20 items. If this is a restored search with a particular target
       // specified, that target may not be in the first page of results. tgtPage specifes
       // which page of results contains the hit. Make the initial request return enough results to include it.
-      let rows = state.pageSize 
+      let rows = state.pageSize
       if ( tgtPage) {
         // target page is 0 based
         rows = state.pageSize * (tgtPage+1)
@@ -258,7 +250,7 @@ export default new Vuex.Store({
         })
       }
 
-      // If a user is signed in, make sure bookmarks are up to date when 
+      // If a user is signed in, make sure bookmarks are up to date when
       // searching so the UI can show the correct status per item
       if ( rootGetters["user/isSignedIn"]) {
         dispatch("bookmarks/getBookmarks")
@@ -274,6 +266,7 @@ export default new Vuex.Store({
         commit('setSearchResults', response.data)
         commit('setSearching', false)
         dispatch("filters/getSelectedResultFacets")
+        commit('setSuggestions', response.data.suggestions)
       }).catch((error) => {
          commit('system/setError', error)
          commit('setSearching', false)
@@ -283,20 +276,21 @@ export default new Vuex.Store({
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
     // exploration. It is used to query for next page during load more and
-    // when filters are added and removed. Pool results are APPENDED to existing after load more. 
+    // when filters are added and removed. Pool results are APPENDED to existing after load more.
     // If newly filtered, reset paging and re-query
     searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
-      let tgtPool = rootGetters.selectedResults
+      let tgtResults = rootGetters.selectedResults
       let filters = rootGetters['filters/poolFilter'](state.selectedResultsIdx)
-      let filterObj = {pool_id: tgtPool.pool.id, facets: filters}
+      let filterObj = {pool_id: tgtResults.pool.id, facets: filters}
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: tgtPool.page * state.pageSize, rows: state.pageSize },
+        pagination: { start: tgtResults.page * state.pageSize, rows: state.pageSize },
+        sort: tgtResults.sort,
         filters: [filterObj]
       }
-      let url = tgtPool.pool.url + "/api/search?debug=1"
+      let url = tgtResults.pool.url + "/api/search?debug=1"
       return axios.post(url, req).then((response) => {
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
@@ -313,7 +307,7 @@ export default new Vuex.Store({
 
     // Select pool results and get all facet info for the result
     async selectPoolResults(ctx, resultIdx) {
-      ctx.commit('selectPoolResults', resultIdx) 
+      ctx.commit('selectPoolResults', resultIdx)
       await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
     }
   },
@@ -334,5 +328,5 @@ export default new Vuex.Store({
     requests: requests,
   },
 
-  plugins: [versionChecker]
+  plugins: [versionChecker,expiredSessionWatcher]
 })

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,14 +11,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
-	"github.com/rs/xid"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
-// Authorize is the API for minting API access tokens.
+// Authorize is the API for minting JWT for accessing the API as a guest
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
-	token := xid.New().String()
-	c.String(http.StatusOK, token)
+	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
+	signedStr, err := v4jwt.Mint(guestClaim, 9*time.Hour, svc.JWTKey)
+	if err != nil {
+		log.Printf("Unable to generate signed JWT token: %s", err.Error())
+		c.String(http.StatusInternalServerError, "unable to generate authorization")
+		return
+	}
+
+	c.String(http.StatusOK, signedStr)
 }
 
 // NetbadgeAuthentication checks headers for NetBadge authentication
@@ -26,13 +35,13 @@ func (svc *ServiceContext) Authorize(c *gin.Context) {
 // NetBadge authentication.
 func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	log.Printf("Checking authentication headers...")
-	// log.Printf("Dump all request headers ==================================")
-	// for name, values := range c.Request.Header {
-	// 	for _, value := range values {
-	// 		log.Printf("%s=%s\n", name, value)
-	// 	}
-	// }
-	// log.Printf("END header dump ===========================================")
+	log.Printf("Dump all request headers ==================================")
+	for name, values := range c.Request.Header {
+		for _, value := range values {
+			log.Printf("%s=%s\n", name, value)
+		}
+	}
+	log.Printf("END header dump ===========================================")
 
 	computingID := c.GetHeader("remote_user")
 	if svc.Dev.AuthUser != "" {
@@ -50,31 +59,24 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 		log.Printf("Using dev role: %s", membershipStr)
 	}
 	role := parseMembership(membershipStr)
-	log.Printf("NetBadge headers are valid. Generate new auth token for %s:%s", computingID, role)
+	log.Printf("NetBadge headers are valid. Get user %s:%s", computingID, role)
+	v4User, uErr := svc.getOrCreateUser(computingID)
+	if uErr != nil {
+		log.Printf("ERROR: unable to get or create user %s - %s: %s", computingID, role, uErr.Error())
+		c.Redirect(http.StatusFound, "/forbidden")
+		return
+	}
 
-	// Generate a new access token and persist it in v4 user storage
-	authToken := xid.New().String()
-	err := svc.updateAccessToken(computingID, authToken, role)
-	if err != nil {
-		log.Printf("WARN: Unable to persist user %s access token %v", computingID, err)
+	log.Printf("Generate JWT for %s", computingID)
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.Netbadge, role)
+	if jwtErr != nil {
+		c.Redirect(http.StatusFound, "/forbidden")
+		return
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	authStr := fmt.Sprintf("%s|%s|netbadge|%s", computingID, authToken, role)
-	log.Printf("AuthSession %s", authStr)
-	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
 	c.Redirect(http.StatusFound, "/signedin")
-}
-
-// parseMembership will parse V4 role from the mygroups membership string.
-// Membership format: cn=group_name1;cn=group_name2;...
-func parseMembership(membershipStr string) string {
-	out := "user"
-	// for now, only admins are suported. They are identified by lib-virgo4-admin
-	if strings.Contains(membershipStr, "lib-virgo4-admin") {
-		out = "admin"
-	}
-	return out
 }
 
 // PublicAuthentication aill authenticate public users of Virgo4
@@ -101,37 +103,23 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Lookup user barcode %s...", auth.Barcode)
 	resp.Barcode = auth.Barcode
-	var user V4User
-	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
-	q.Bind(dbx.Params{"id": auth.Barcode})
-	err := q.One(&user)
-	if err != nil {
-		log.Printf("User %s does not exist, creating...", auth.Barcode)
-		user := V4User{ID: 0, Virgo4ID: auth.Barcode, AuthToken: xid.New().String(),
-			AuthTries: 0, LockedOut: false, SignedIn: false, Preferences: "{}", Role: "user"}
-		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
-		if err != nil {
-			log.Printf("Unable to create new user record %+v", err)
-			resp.Message = fmt.Sprintf("Internal Error: %s", err.Error())
-			c.JSON(http.StatusInternalServerError, resp)
-			return
-		}
-	} else {
-		if user.AuthToken == "" {
-			user.AuthToken = xid.New().String()
-		}
+	v4User, uErr := svc.getOrCreateUser(auth.Barcode)
+	if uErr != nil {
+		log.Printf("ERROR: unable to find user %s: %s", auth.Barcode, uErr.Error())
+		c.JSON(http.StatusForbidden, resp)
+		return
 	}
 
-	if user.LockedOut {
+	if v4User.LockedOut {
 		now := time.Now()
-		if now.After(*user.LockedOutUntil) {
+		if now.After(*v4User.LockedOutUntil) {
 			log.Printf("User %s lockout has expired", auth.Barcode)
-			user.LockedOut = false
-			user.LockedOutUntil = nil
-			svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+			v4User.LockedOut = false
+			v4User.LockedOutUntil = nil
+			svc.DB.Model(&v4User).Exclude("BookMarkFolders").Update()
 		} else {
 			log.Printf("User %s is currently locked out of their account", auth.Barcode)
-			delta := user.LockedOutUntil.Sub(now)
+			delta := v4User.LockedOutUntil.Sub(now)
 			resp.AttemptsLeft = 0
 			resp.LockedOut = true
 			resp.Message = fmt.Sprintf("Your account is locked for %d minutes", int(delta.Minutes()))
@@ -142,42 +130,42 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Track auth attempt for user %s...", auth.Barcode)
 	now := time.Now()
-	if user.AuthStartedAt == nil {
-		user.AuthStartedAt = &now
-		user.AuthTries = 1
+	if v4User.AuthStartedAt == nil {
+		v4User.AuthStartedAt = &now
+		v4User.AuthTries = 1
 	} else {
 		// If this attempt is within 1 minute of the start, increment attempt
 		// counter. If not, start a new auth tracking session
-		delta := now.Sub(*user.AuthStartedAt)
+		delta := now.Sub(*v4User.AuthStartedAt)
 		if delta.Minutes() > 1.0 {
 			log.Printf("First auth attempt for %s", auth.Barcode)
-			user.AuthStartedAt = &now
-			user.AuthTries = 1
+			v4User.AuthStartedAt = &now
+			v4User.AuthTries = 1
 		} else {
 			log.Printf("Last auth attempt for %s was %1.2f seconds ago", auth.Barcode, delta.Seconds())
-			user.AuthTries++
+			v4User.AuthTries++
 		}
 	}
-	resp.AttemptsLeft = 5 - user.AuthTries
-	svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+	resp.AttemptsLeft = 5 - v4User.AuthTries
+	svc.DB.Model(&v4User).Exclude("BookMarkFolders").Update()
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
 	authURL := fmt.Sprintf("%s/v4/users/%s/check_pin?pin=%s", svc.ILSAPI, auth.Barcode, auth.Password)
-	bodyBytes, _ := svc.ILSConnectorGet(authURL)
+	bodyBytes, _ := svc.ILSConnectorGet(authURL, c.GetString("jwt"))
 
 	if string(bodyBytes) != "valid" {
 		// The in verification failed. If this has happened 5 times in a
 		// minute, lock out the account for one hour
 		log.Printf("ERROR: pin for %s falied authentication", auth.Barcode)
-		if user.AuthTries >= 5 {
-			log.Printf("User %s account is now locked out for 1 hour", user.Virgo4ID)
+		if v4User.AuthTries >= 5 {
+			log.Printf("User %s account is now locked out for 1 hour", v4User.Virgo4ID)
 			resp.Message = "Authentication failed. Your account is now locked for one hour."
 			resp.LockedOut = true
 			now := time.Now()
 			later := now.Add(time.Hour)
-			user.LockedOut = true
-			user.LockedOutUntil = &later
-			svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
+			v4User.LockedOut = true
+			v4User.LockedOutUntil = &later
+			svc.DB.Model(&v4User).Exclude("BookMarkFolders").Update()
 		} else {
 			resp.Message = "Authentication failed"
 		}
@@ -188,49 +176,38 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	log.Printf("%s passed pin check", auth.Barcode)
 	resp.SignedIn = true
 
-	// Generate new auth token and persist in v4 user storage
-	authToken := xid.New().String()
-	err = svc.updateAccessToken(auth.Barcode, authToken, "user")
-	if err != nil {
-		log.Printf("WARN: Unable to persist user %s access token %v", auth.Barcode, err)
+	log.Printf("Generate JWT for %s", auth.Barcode)
+	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.PIN, v4jwt.User)
+	if jwtErr != nil {
+		resp.Message = jwtErr.Error()
+		c.JSON(http.StatusForbidden, resp)
+		return
 	}
 
-	// Generate a cookie with auth info
-	authStr := fmt.Sprintf("%s|%s|pin", auth.Barcode, authToken)
-	c.SetCookie("v4_auth_user", authStr, 3600*24, "/", "", false, false)
+	// Set auth info in a cookie the client can read and pass along in future requests
+	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
 	c.JSON(http.StatusOK, resp)
 }
 
-// updateAccessToken checks if the user has an acces token and if it matches.
-// If no user found, create a new one and set access token. If token exists and
-// doesn't match fail.
-func (svc *ServiceContext) updateAccessToken(userID string, token string, role string) error {
+// getOrCreateUser finds an existing user. If a user is not found, one is created
+func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 	var user V4User
 	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(&user)
 	if err != nil {
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
-		user := V4User{ID: 0, Virgo4ID: userID, AuthToken: token, Role: role,
-			AuthUpdatedAt: time.Now(), SignedIn: true, Preferences: "{}"}
-		return svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
+		user := V4User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
+		addErr := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
+		if addErr != nil {
+			log.Printf("Unable to create user %s: %s", userID, addErr.Error())
+			return nil, addErr
+		}
+		return &user, nil
 	}
 
 	log.Printf("User found; details: %+v", user)
-	log.Printf("Updating access token")
-	user.AuthToken = token
-	user.AuthUpdatedAt = time.Now()
-	user.Role = role
-	user.SignedIn = true
-	user.LockedOut = false
-	user.LockedOutUntil = nil
-	user.AuthTries = 0
-	err = svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
-	if err != nil {
-		log.Printf("WARN: Unable to update user %s auth token: %v", userID, err)
-	}
-
-	return nil
+	return &user, nil
 }
 
 // SignoutUser ends the auth session for the target user. All session tracking
@@ -238,54 +215,94 @@ func (svc *ServiceContext) updateAccessToken(userID string, token string, role s
 func (svc *ServiceContext) SignoutUser(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Sign out user %s", userID)
-
-	var user V4User
-	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
-	q.Bind(dbx.Params{"id": userID})
-	err := q.One(&user)
-	if err != nil {
-		log.Printf("WARN: attempt to sign out user %s that has no user record", userID)
-	} else {
-		user.SignedIn = false
-		err := svc.DB.Model(&user).Exclude("BookMarkFolders").Update()
-		if err != nil {
-			log.Printf("WARN: Unable to update users table for %s: %v", userID, err)
-		}
-	}
-
-	c.SetCookie("v4_auth_user", "invalid", -1, "/", "", false, false)
+	c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 	c.String(http.StatusOK, "signedout")
 }
 
 // AuthMiddleware is middleware that checks for a user auth token in the
 // Authorization header. For now, it does nothing but ensure token presence.
 func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
-	token, err := getBearerToken(c.Request.Header.Get("Authorization"))
+	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("Authentication failed: [%s]", err.Error())
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	if token == "undefined" {
+
+	if tokenStr == "undefined" {
 		log.Printf("Authentication failed; bearer token is undefined")
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	// See if token is associated with a user, and if so, that the user is not locked out
-	var user V4User
-	q := svc.DB.NewQuery(`select * from users where auth_token={:t}`)
-	q.Bind(dbx.Params{"t": token})
-	q.One(&user)
-	if user.AuthToken == token && user.LockedOut {
-		log.Printf("Authentication failed; user %s is locked out", user.Virgo4ID)
+	log.Printf("Validating JWT auth token...")
+	v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
+	if jwtErr != nil {
+		log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
+		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	// add the cookie to the request context so other handlers can access it.
-	c.Set("token", token)
-	log.Printf("got bearer token: [%s]", token)
+	// add the parsed claims and signed JWT string to the request context so other handlers can access it.
+	c.Set("jwt", tokenStr)
+	c.Set("claims", v4Claims)
+	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claims)
+}
+
+func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
+	v4Claims := v4jwt.V4Claims{
+		UserID:     v4User.Virgo4ID,
+		AuthMethod: authMethod,
+		IsUVA:      true,
+		Role:       role,
+	}
+
+	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
+	guestJWT, _ := v4jwt.Mint(guestClaim, 9*time.Hour, svc.JWTKey)
+
+	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
+	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, v4User.Virgo4ID)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT)
+	if ilsErr != nil {
+		return "", errors.New(ilsErr.Message)
+	}
+
+	var ilsUser ILSUserInfo
+	if err := json.Unmarshal(bodyBytes, &ilsUser); err != nil {
+		log.Printf("ERROR: unable to parse ILS user response: %s", err.Error())
+		return "", err
+	}
+
+	log.Printf("Adding %s claims based on ILS response", v4User.Virgo4ID)
+	v4Claims.CanLEO = (ilsUser.HomeLibrary == "LEO")
+	v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
+	v4Claims.CanPurchase = ilsUser.CanPurchase()
+	v4Claims.CanBrowseReserve = (ilsUser.CommunityUser == false)
+	v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
+	v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
+	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
+
+	signedStr, err := v4jwt.Mint(v4Claims, 9*time.Hour, svc.JWTKey)
+	if err != nil {
+		log.Printf("Unable to generate signed JWT token: %s", err.Error())
+		return "", err
+	}
+
+	return signedStr, nil
+}
+
+// parseMembership will parse V4 role from the mygroups membership string.
+// Membership format: cn=group_name1;cn=group_name2;...
+func parseMembership(membershipStr string) v4jwt.RoleEnum {
+	out := v4jwt.User
+	// for now, only admins are suported. They are identified by lib-virgo4-admin
+	if strings.Contains(membershipStr, "lib-virgo4-admin") {
+		out = v4jwt.Admin
+	}
+	return out
 }
 
 // getBearerToken is a helper to extract the token from headers

@@ -39,28 +39,27 @@
                      <dd v-else class="value" v-html="fieldValueString(field)" :key="`v${idx}`"></dd>
                   </template>
                   <template v-if="accessURLField">
-                     <dt class="label">{{accessURLField.label}}</dt>
-                     <dd class="value" v-html="accessURLs()"></dd>
-                  </template>
-                  <template v-if="marcXML">
-                     <dt class="label">MARC XML</dt>
+                     <dt class="label">{{accessURLField.label}}:</dt>
                      <dd class="value">
-                        <AccordionContent id="marc" class="marc" border-width="0" layout="narrow" title="View XML">
-                           <pre class="xml">{{marcXML}}</pre>
-                        </AccordionContent>
+                        <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
-                  <template v-if="sirsiLink">
+                  <template v-if="extDetailLink">
                      <dd></dd>
-                     <dt class="value more"  v-html="sirsiLink"></dt>
+                     <dt class="value more"  v-html="extDetailLink"></dt>
                   </template>
                   <template v-if="poolMode=='image'">
-                     <dt class="label">Image:</dt> 
+                     <dt class="label">Image:</dt>
                      <dd class="image">
                         <ImageDetails :mode="mode"/>
                      </dd>
                   </template>
                </dl>
+               <template v-if="marcXML">
+                  <AccordionContent class="marc" title="MARC XML">
+                     <pre class="xml">{{marcXML}}</pre>
+                  </AccordionContent>
+               </template>
             </div>
             <AvailabilityTable v-if="hasAvailability" :titleId="details.identifier" />
          </template>
@@ -77,6 +76,7 @@ import AvailabilityTable from "@/components/AvailabilityTable"
 import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
+import AccessURLDetails from '@/components/AccessURLDetails'
 
 export default {
    name: "sources",
@@ -97,8 +97,8 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable, V4Spinner, 
-      ImageDetails, AccordionContent
+      SearchHitHeader, AvailabilityTable, V4Spinner,
+      ImageDetails, AccordionContent, AccessURLDetails
    },
    computed: {
       ...mapState({
@@ -110,7 +110,6 @@ export default {
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
          poolDetails: 'pools/poolDetails',
-         findProvider: 'pools/findProvider'
       }),
       poolMode() {
          let details = this.poolDetails(this.details.source)
@@ -135,15 +134,19 @@ export default {
          let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
          return iiifField.value
       },
-      sirsiLink() {
-         let sl = this.allFields.find( f=> f.name=="sirsi_url")
-         if (!sl) return ""
-         return `<a href="${sl.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
+      extDetailLink() {
+         let extLink = this.allFields.find( f=> f.name=="sirsi_url")
+         if (!extLink) {
+             extLink = this.allFields.find( f=> f.name=="worldcat_url")
+         }
+         if (!extLink) return ""
+         return `<a href="${extLink.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
       },
       marcXML() {
          if ( this.isUVA(this.details.source) === false ) return ""
          if ( !this.isAdmin ) return ""
          let xml = this.allFields.find( f => f.type == "marc-xml")
+         if ( !xml) return ""
          return beautify(xml.value).trim()
       }
    },
@@ -165,9 +168,8 @@ export default {
          return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.type=="iiif-manifest-url" || 
-            field.type=="iiif-base-url" || field.type=="iiif-base-url" || 
-            field.name=="sirsi_url" || field.name=="iiif_image_url" || field.name == "access_url") {
+         if (field.display == 'optional' || field.type=="iiif-manifest-url" ||
+            field.type == "iiif-image-url" || field.type=="iiif-base-url" || field.type == "url") {
             return false
          }
          if ( this.isKiosk && field.type == "url") return false
@@ -179,34 +181,10 @@ export default {
          }
          return field.value
       },
-      accessURLs() {
-         // NOTE: access URLs are special. instead value being an array of strings,
-         // it is an array of objects: {url, provider}
-         let out = []
-         this.accessURLField .value.forEach( v => {
-            let url = this.generateURLCode(v.provider, v.url)
-            out.push( url )
-         })
-         return out.join("<br/>")
-      },
-      generateURLCode( provider, tgtURL) {
-         let url =`<a href="${tgtURL}" target="_blank">`
-         if (provider) {
-            let pDetail = this.findProvider(this.details.source, provider)
-            let pName = provider 
-            if (pDetail.label) {
-               pName = pDetail.label   
-            }
-            url += `${pName}`
-         } else {
-            url += `${tgtURL}`
-         }
-         url += `</a>`
-         return url
-      }
    },
    created() {
       this.getDetails()
+      this.$store.dispatch("restore/loadDetailsPage")
    },
 }
 </script>
@@ -278,14 +256,19 @@ dd {
    padding: 4px 0px;
 }
 .value.more {
-    padding: 15px 0 10px 0;
-    text-align: left;
+   margin-top: 15px;
+   padding: 15px 0 10px 0;
+   text-align: left;
+}
+#marc.accordion-content {
+   margin-left: -6em;
 }
 .xml {
    font-weight: normal;
    font-size: 0.8em;
    border: 1px solid var(--uvalib-grey-light);
    padding: 10px;
-   border-radius: 5px;
+   margin: 0;
+   border-top: 0;
 }
 </style>

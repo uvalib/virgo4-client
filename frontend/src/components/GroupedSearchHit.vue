@@ -6,10 +6,16 @@
             <div v-if="hit.header.author" class="author">{{hit.header.author.value.join(", ")}}</div>
             <dl class="fields">
                <template v-for="(field) in hit.basicFields">
-                  <template v-if="field.display != 'optional'">
+                  <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,'k')">{{field.label}}:</dt>
                      <dd :key="getKey(field,'v')" v-html="fieldValueString(field)"></dd>
                   </template>
+               </template>
+               <template v-if="accessURLField">
+                  <dt class="label">{{accessURLField.label}}:</dt>
+                  <dd class="value">
+                     <AccessURLDetails mode="brief" :pool="pool" :urls="accessURLField.value" />
+                  </dd>
                </template>
             </dl>
          </div>
@@ -21,23 +27,36 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
+import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
    },
    components: {
-      SearchHitHeader
+      SearchHitHeader, AccessURLDetails
    },
    computed: {
+      ...mapGetters({
+         isKiosk: "system/isKiosk",
+      }),
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
+      },
+      accessURLField() {
+         return this.hit.basicFields.find(f => f.name=="access_url")
       },
    },
    methods: {
       getKey(field,idx) {
          return this.hit.identifier+field.value+idx
+      },
+      shouldDisplay(field) {
+         if (field.display == 'optional' || field.type == "url") return false
+         if ( this.isKiosk && field.type == "url") return false
+         return true
       },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {

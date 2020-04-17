@@ -2,6 +2,16 @@ import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
 
+function parseJwt(token) {
+   var base64Url = token.split('.')[1]
+   var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+   var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+   }).join(''))
+
+   return JSON.parse(jsonPayload);
+}
+
 const user = {
    namespaced: true,
    state: {
@@ -11,6 +21,7 @@ const user = {
       role: "",
       sessionType: "",
       accountInfo: {},
+      claims: {},
       checkouts: [],
       bills: [],
       requests: [],
@@ -18,7 +29,8 @@ const user = {
       lookingUp: false,
       authTriesLeft: 5,
       authMessage: "",
-      lockedOut: false
+      lockedOut: false,
+      lastSavedSearchKey: ""
    },
 
    getters: {
@@ -30,54 +42,29 @@ const user = {
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
-      isCommunityUser: (state, getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         return state.accountInfo.communityUser
-      },
-      isUndergraduate: (state,getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         // NOTE: profile comes from Sirsi, desc comes from LDAP
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         let desc = state.accountInfo.description.toLowerCase().trim()
-         if (desc.indexOf("undergraduate") == 0) {
-            return true
-         }
-         if (profile.indexOf("ugrad") == 0 || profile.indexOf("undergrad") == 0) {
-            return true
-         }
+      canPurchase: (state) => {
+         if ( state.claims.canPurchase ) return state.claims.canPurchase
          return false
       },
-      isGraduate: (state,getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         let desc = state.accountInfo.description.toLowerCase().trim()
-         if (desc.indexOf("graduate student") == 0) {
-            return true
-         }
-         if (profile.indexOf("grad") == 0 ){
-            return true
-         }
+      canUseLEO: (state) => {
+         if ( state.claims.canLEO ) return state.claims.canLEO
          return false
       },
-      isAlumni: (state,getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         if (profile.match(/Alumn/i)) {
-            return true
-         }
+      canUseLEOPlus: (state) => {
+         if ( state.claims.canLEOPlus ) return state.claims.canLEOPlus
          return false
       },
-      canMakeReserves: (state, getters) => {
-         if (getters.hasAccountInfo == false ) return false
-         let profile = state.accountInfo.profile.toLowerCase().trim()
-         if (getters.isGraduate || getters.isUndergraduate) {
-            return false
-         }
-         if (profile.match(/Virginia Borrower|Other VA Faculty|Alumn/i)) {
-            return false
-         }
-
-         return true
+      canSearchReserves: (state) => {
+         if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
+         return false
+      },
+      useSIS: (state) => {
+         if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
+         return false    
+      },
+      canMakeReserves: (state) => {
+         if ( state.claims.canPlaceReserve ) return state.claims.canPlaceReserve
+         return false    
       },
       isBarred: state => {
          return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
@@ -114,7 +101,9 @@ const user = {
         return state.authToken.length > 0
       },
       isSignedIn: state => {
-         return state.signedInUser != ""  
+         return state.signedInUser != ""  && state.authToken != "" &&
+            state.sessionType != "" && state.sessionType != "none" && 
+            state.role != "" && state.role != "guest"
       },
       hasAccountInfo: state => {
          if (state.signedInUser.length == 0)  return false
@@ -125,6 +114,24 @@ const user = {
    },
 
    mutations: {
+      setLastSavedSearchKey(state, key) {
+         state.lastSavedSearchKey = key
+      },
+      setSavedSearches(state, data) {
+         state.searches.splice(0, state.searches.length)
+         data.forEach( s => {
+            state.searches.push( s ) 
+         })
+      },
+      clearSavedSearches(state) {
+         state.searches.splice(0, state.searches.length)   
+      },
+      deleteSavedSearch(state, token) {
+         let idx = state.searches.findIndex(s => s.token == token)  
+         if (idx > -1) {
+            state.searches.splice(idx,1)
+         }
+      },
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
@@ -133,12 +140,6 @@ const user = {
       },
       setRequests(state, req) {
          state.requests = req
-      },
-      setSavedSearches(state, data) {
-         state.searches.splice(0, state.searches.length)
-         data.forEach( s => {
-            state.searches.push( s ) 
-         })
       },
       setRenewResults(state, renewResults) {
          renewResults.results.forEach( renew => {
@@ -171,19 +172,21 @@ const user = {
          state.lockedOut = false
          state.authTriesLeft = 5
       },
-      setSignedInUser(state, user) {
+      setUserJWT(state, jwtStr) {
+         let parsed = parseJwt(jwtStr)
+         state.claims = {canPurchase: parsed.canPurchase, canLEO: parsed.canLEO, 
+            canLEOPlus: parsed.canLEOPlus, canPlaceReserve: parsed.canPlaceReserve, 
+            canBrowseReserve: parsed.canBrowseReserve, useSIS: parsed.useSIS }
          state.authMessage = ""
          state.lockedOut = false
-         state.signedInUser = user.userId
-         state.authToken = user.token
-         state.sessionType = user.type
-         state.role = user.role
+         state.signedInUser = parsed.userId
+         state.authToken = jwtStr
+         state.sessionType =  parsed.authMethod
+         state.role =  parsed.role
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
       },
       setAccountInfo(state, data) {
          state.accountInfo = data.user
-         state.authToken = data.authToken
-         state.role = data.role
       },
       signOutUser(state) {
          state.signedInUser = ""
@@ -196,7 +199,7 @@ const user = {
          state.checkouts.splice(0, state.checkouts.length)
          state.bills.splice(0, state.bills.length)
          state.searches.splice(0, state.searches.length)
-         Vue.$cookies.remove("v4_auth_user")
+         Vue.$cookies.remove("v4_jwt")
       },
       setBills(state, bills) {
          state.bills = bills
@@ -252,7 +255,6 @@ const user = {
          ctx.commit('setLookingUp', true)
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
-            ctx.commit('bookmarks/setBookmarks', response.data.bookmarks, { root: true })
             ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
@@ -334,12 +336,13 @@ const user = {
       },
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
-         // response: {barcode, signedId, message, attemptsLeft}
-         axios.post("/authenticate/public", data).then((response) => {
-            ctx.commit("setSignedInUser", {userId: response.data.barcode, 
-               token: ctx.state.authToken, type: "public", role: "user", quiet: false} )
+         axios.post("/authenticate/public", data).then((_response) => {
+            let jwtStr = Vue.$cookies.get("v4_jwt")
+            ctx.commit("setUserJWT", jwtStr )
             ctx.commit('setAuthorizing', false)
-            router.push("/signedin")
+            ctx.dispatch('restore/loadLocalStorage', null, {root: true})
+            let redirectPath = ctx.rootGetters['restore/previousPath']
+            router.push(redirectPath)
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)
             ctx.commit('setAuthFailure', error)
@@ -353,9 +356,29 @@ const user = {
          data['barcode'] = ctx.state.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },
-      saveSearch(ctx, data) {
-         return axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
+      async saveSearch(ctx, data) {
+         let resp = await axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
+         ctx.commit('setLastSavedSearchKey', resp.data.token)
       },
+      async deleteSavedSearch(ctx, token) {
+         try {
+            await axios.delete(`/api/users/${ctx.state.signedInUser}/searches/${token}`)
+            ctx.commit('setLastSavedSearchKey', "")
+            ctx.commit('deleteSavedSearch', token)
+         } catch (e) {
+            ctx.commit('system/setError', "Unable to delete saved search. Please try again later.", {root: true})    
+         }
+      },
+      deleteAllSavedSearces(ctx) {
+         ctx.commit('setLookingUp', true)
+         axios.delete(`/api/users/${ctx.state.signedInUser}/searches`).then((_response) => {
+            ctx.commit('clearSavedSearches')
+            ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })    
+      }
    }
 }
 

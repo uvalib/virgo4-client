@@ -10,23 +10,11 @@
       </div>
       <div v-else class="reserves-content">
          <V4Spinner  v-if="searching" message="Submitting your request..." v-bind:overlay="true"/>
+         <div class="note important">
+            Please allow 14 days to process requests
+         </div>
          <div class="note">
-            <div class="title">
-               Please allow 14 days to process requests
-            </div>
-            <div class="body">
-               <p>
-                  <b>All video reserve requests will be delivered as a streaming resource to your class’s Learning Management System.</b>
-               </p>
-               <p>
-                  Note that online-only catalog entries cannot currently be included in a 
-                  Virgo course reserve request.
-               </p>
-               <p>
-                  If you need to recommend a purchase or have a personal copy to 
-                  place on reserve, please click "Submit" and follow the links on the next page.
-               </p>
-            </div>
+            If you need to recommend a purchase or have a personal copy to place on reserve, please click ‘Submit Request’ and follow the links on the next page.
          </div>
          <div class="pure-form pure-form-aligned form">
             <div class="pure-control-group">
@@ -40,23 +28,28 @@
                <div class="pure-control-group">
                   <label for="instructor_name">Instructor Name</label>
                   <input v-model="instructorName" name="instructor_name" id="instructor_name" type="text">
+                  <span v-if="hasError('instructorName')" class="error">* instructor name is required</span>
                </div>
                <div class="pure-control-group">
                   <label for="instructor_email">Instructor Email Address</label>
                   <input v-model="instructorEmail" id="instructor_email" type="email">
+                  <span v-if="hasError('instructorEmail')" class="error">* instructor email is required</span>
                </div>
             </template>
             <div class="pure-control-group">
                <label for="name">Your Name</label>
                <input v-model="name" id="name" type="text">
+               <span v-if="hasError('name')" class="error">* name is required</span>
             </div>
             <div class="pure-control-group">
                <label for="email">Your  Email Address</label>
                <input v-model="email" id="email" type="email">
+               <span v-if="hasError('email')" class="error">* email is required</span>
             </div>
             <div class="pure-control-group">
                <label for="course">Course ID<span class="hint">(e.g. MDST 3840)</span></label>
                <input v-model="course" id="course" type="text">
+               <span v-if="hasError('course')" class="error">* course ID is required</span>
             </div>
             <div class="pure-control-group">
                <label for="semester">Semester</label>
@@ -69,6 +62,7 @@
                   <option value="Summer II">Summer II</option>
                   <option value="Summer III">Summer III</option>
                </select>
+               <span v-if="hasError('semester')" class="error">* semester is required</span>
             </div>
             <div class="pure-control-group">
                <label for="library">Reserve Library</label>
@@ -83,8 +77,9 @@
                   <option value="music">Music</option>
                   <option value="physics">Physics</option>
                </select>
+               <span v-if="hasError('library')" class="error">* library is required</span>
             </div>
-            <div class="pure-control-group">
+            <div class="pure-control-group" v-if="nonVideoRequests.length > 0">
                <label for="period">Loan Period <span class="hint">(for all items)</span></label>
                <select @change="itemsPeriodChosen" v-model="period" id="period" name="period">
                   <option value="">Please select</option>
@@ -92,30 +87,66 @@
                   <option value="2d">2 days</option>
                   <option value="na">Not Applicable</option>
                </select>
+               <span v-if="hasError('period')" class="error">* load period is required</span>
             </div>
          </div>
-         <h3>Items to be placed on reserve</h3>
-         <div class="items">
-            <div class="card" v-for="bm in requestList" :key="bm.identifier">
-               <div class="title">{{bm.details.title}}</div>
-               <div class="author">{{bm.details.author}}</div>
-               <table>
-                  <tr>
-                     <td class="label">Loan Period</td>
-                     <td>
-                        <select v-model="bm.period" id="item-period" name="item-period">
-                           <option value="">Please select</option>
-                           <option value="3h">3 hours</option>
-                           <option value="2d">2 days</option>
-                           <option value="na">Not Applicable</option>
-                        </select>
-                     </td>
-                  </tr>
-                  <tr>
-                     <td class="label">Notes</td>
-                     <td><textarea v-model="bm.notes" name="item-notes"></textarea></td>
-                  </tr>
-               </table>
+
+         <div class="wrapper" v-if="nonVideoRequests.length > 0">
+            <h3 class="video">Non-video format items to be placed on reserve</h3>
+            <div class="wrapper-content">
+               <div class="items">
+                  <div class="card" v-for="bm in nonVideoRequests" :key="bm.identifier">
+                     <div class="title">{{bm.details.title}}</div>
+                     <div class="author">{{bm.details.author}} pool {{bm.pool}}</div>
+                     <dl>
+                        <dt>Loan Period</dt>
+                        <dd>
+                           <select v-model="bm.period" id="item-period" name="item-period">
+                              <option value="">Please select</option>
+                              <option value="3h">3 hours</option>
+                              <option value="2d">2 days</option>
+                              <option value="na">Not Applicable</option>
+                           </select>
+                        </dd>
+                        <dt>Notes</dt>
+                        <dd><textarea v-model="bm.notes" name="item-notes"></textarea></dd>
+                     </dl>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="wrapper" v-if="videoRequests.length > 0">
+            <h3>Video-format items to be placed on reserve</h3>
+            <div class="wrapper-content">
+               <div class="video-note">
+                  <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System. 
+                     If you have questions about video reserves, please email
+                     <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.</b>
+               </div>  
+               <div class="items">
+                  <div class="card" v-for="bm in videoRequests" :key="bm.identifier">
+                     <div class="title">{{bm.details.title}}</div>
+                     <div class="author">{{bm.details.author}}</div>
+                     <dl>
+                        <dt class="label">Preferred Audio Language</dt>
+                        <dd><input v-model="bm.audioLanguage" type="text"></dd>
+                        <dt class="label">Subtitles</dt> 
+                        <dd>
+                           <select v-model="bm.subtitles">
+                              <option value="yes">Yes</option>
+                              <option value="no">No</option>
+                           </select>
+                        </dd>
+                        <dt class="label">Subtitles Language</dt> 
+                        <dd>
+                           <input v-model="bm.subtitleLanguage" type="text">
+                           <span v-if="hasSubtitleError(bm)" class="error">* language is required</span>
+                        </dd>
+                        <dt>Notes</dt>
+                        <dd><textarea v-model="bm.notes" name="item-notes"></textarea></dd>
+                     </dl>
+                  </div>
+               </div>
             </div>
          </div>
          <div class="controls">
@@ -140,10 +171,17 @@ export default {
    components: {
       V4Spinner
    },
+   data: function() {
+      return {
+         errors: [],
+      };
+   },
    computed: {
       ...mapState({
          requestList: state => state.reserves.requestList,
          searching: state => state.searching,
+         reserveRequest: state => state.reserves.request,
+         userInfo: state => state.user.accountInfo
       }),
       ...mapFields('reserves',[
          'request.onBehalfOf',
@@ -154,13 +192,59 @@ export default {
          'request.course',
          'request.semester',
          'request.library',
-         'request.period'
+         'request.period',
       ]),
-      ...mapMultiRowFields('reserves', ['requestList'])
+      ...mapMultiRowFields('reserves', ['requestList']),
+      videoRequests() {
+        return this.requestList.filter( r=> r.pool == "video") 
+      }, 
+      nonVideoRequests() {
+         return this.requestList.filter( r=> r.pool != "video") 
+      }
+   },
+   created() {
+      this.$store.commit("reserves/setRequestingUser", this.userInfo)
    },
    methods: {
+      hasSubtitleError( item) {
+         if (this.errors.includes("subtitleLanguage") == false) return false
+         return (item.subtitles == "yes" && item.subtitleLanguage == "")
+      },
+      hasError( val) {
+         return this.errors.includes(val)
+      },
       submitRequest() {
-         this.$store.dispatch("reserves/createReserves")
+         this.errors.splice(0, this.errors.length)
+         let proxyRequest = this.reserveRequest.onBehalfOf == "yes"
+         for (let [key, value] of Object.entries(this.reserveRequest)) {
+            if ( key == "period" && this.nonVideoRequests == 0) continue 
+            if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail") ) continue
+            if (value == "") {
+               this.errors.push(key)
+            }
+         }
+         let subtitleError = false
+         this.videoRequests.forEach( r => {
+            if (r.subtitles == "yes" && r.subtitleLanguage == "") {
+               subtitleError = true
+            }
+         })
+         if (subtitleError) {
+            this.errors.push("subtitleLanguage")    
+         }
+         if ( this.errors.length == 0) {
+            this.$store.dispatch("reserves/createReserves")
+         } else {
+            this.$store.commit("system/setError", "Some required fields are missing")  
+            var scrollStep = -window.scrollY / (500 / 10),
+            scrollInterval = setInterval(()=> {
+               if ( window.scrollY != 0 ) {
+                  window.scrollBy( 0, scrollStep )
+               } else {
+                  clearInterval(scrollInterval)
+               }
+            },10)  
+         }
       },
       itemsPeriodChosen() {
          this.$store.commit("reserves/updateReservedItemsPeriod")
@@ -204,33 +288,15 @@ export default {
    }
 }
 div.note {
-   margin: 0 15px;
-   border-radius: 5px;
-   text-align: left;
-   max-width: 500px;
-   margin: 0 auto;
-}
-div.note .body {
-   padding: 10px;
-   border: 1px solid #ccc;
-   border-radius: 0 0 5px 5px;
-}
-div.note .body p {
-   font-size: 0.9em;
-   margin: 5px 0;
-}
-div.note .title {
-   padding: 5px;
-   background: var(--color-brand-orange);
-   color: white;
+   margin: 15px;
    text-align: center;
+}
+.video-note, .note.important {
+   color: var(--uvalib-red );
+   font-size: 1.1em;
    font-weight: bold;
-   border-radius: 5px 5px 0 0;
-   border: 1px solid var(--color-brand-orange);;
-   border-bottom: 0;
 }
 .form {
-   border-top: 5px solid var(--color-dark-blue);
    margin: 15px;
    padding-top: 15px;
    text-align: left;
@@ -250,14 +316,22 @@ span.hint {
    display: block;
 }
 h3 {
-   border-bottom: 5px solid var(--color-dark-blue);
-   padding-bottom: 5px;
+   padding: 5px 10px;
+   text-align: left;
+   background-color: var(--color-brand-blue);
+   color: white;
+   margin: 0;
+}
+.video-note {
+   text-align: left; 
+   padding: 10px 10px 0 10px;
 }
 div.items {
    display: flex;
    flex-flow: row wrap;
    align-items: stretch;
-   justify-content: center;
+   justify-content: flex-start;
+   padding: 10px 15px;
 }
 div.card {
    text-align: left;
@@ -265,9 +339,10 @@ div.card {
    font-size: 0.8em;
    border: 1px solid #ccc;
    margin: 5px;
-   border-radius: 5px;
    display: inline-block;
    max-width: 275px;
+   background: white;
+   flex-grow: 1;
 }
 div.card .title {
    font-size:1.1em;
@@ -276,24 +351,48 @@ div.card .title {
 div.card .author {
    margin: 5px 0 10px 10px;
 }
-table tr td {
-   padding: 5px;
-}
-div.card table, td select, td textarea {
-   width: 100%;
-}
-td.label {
-   text-align: right;
-   font-weight: bold;
-}
-td textarea, td select  {
-   border: 1px solid #ccc;
-   border-radius: 5px;
-   box-sizing: border-box;
-}
 div.controls {
    text-align: right;
    margin: 15px;
+}
+div.wrapper {
+   background: var(--uvalib-grey-lightest);
+   margin-bottom: 20px;
+}
+div.wrapper-content {
+ border: 1px solid var(--uvalib-grey-light); 
+}
+dl {
+   margin: 0;
+   display: inline-grid;
+   grid-template-columns: 1fr 1.5fr;
+   grid-column-gap: 10px;
+}
+dt {
+   margin: 0 0 15px 0;
+   font-weight: bold;
+   text-align: right;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
+}
+dd {
+   margin: 0 0 15px 0;
+   vertical-align: top;
+}
+dd input, dd select, dd textarea  {
+   border: 1px solid #ccc;
+   padding: 3px 6px;
+   border-radius: 3px;
+   box-sizing: border-box;
+   width: 100%;
+}
+span.error {
+   margin-left: 10px;
+   font-weight: bold;
+   font-style: italic;
+   color: var(--color-error);
 }
 </style>
 

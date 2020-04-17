@@ -44,8 +44,12 @@ const item = {
 
       setCatalogKeyDetails(state, data) {
          // no match or multiple matches
-         if (data.total_hits == 0) return
-         if (data.total_hits > 1) return
+         // no match or multiple matches
+         if (data.total_hits == 0 || data.total_hits > 1) {
+            state.details.searching = false
+            state.availability.searching = false
+            return
+         }
          let found = false
          data.pool_results.some( pr => {
             if (pr.group_list && pr.group_list.length == 1) {
@@ -81,10 +85,10 @@ const item = {
             }
             await ctx.dispatch("pools/getPools", null, {root:true})
             pools = ctx.rootState.pools.list
-            pool = utils.findPool(pools, source)
+            pool = pools.find( p => p.id == source)
             baseURL = pool.url
          } else {
-            pool = utils.findPool(pools, source)
+            pool = pools.find( p => p.id == source)
             baseURL = pool.url
          }
 
@@ -102,6 +106,7 @@ const item = {
         ctx.commit('clearAvailability')
         axios.get("/api/availability/" + titleId).then((response) => {
           ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
+          ctx.commit("requests/setRequestOptions", response.data.availability.request_options, {root: true})
         }).catch((error) => {
           ctx.commit('clearSearching')
           if (error.response.status != 404){
@@ -119,6 +124,7 @@ const item = {
          if (ctx.rootState.system.searchAPI == "") {
             await ctx.dispatch("system/getConfig", null, {root:true})
          }
+         await ctx.dispatch("pools/getPools", null, {root:true})
 
          let req = {
             query: `identifier: {${catalogKey}}`,
@@ -133,7 +139,7 @@ const item = {
             ctx.commit('setCatalogKeyDetails', response.data)
          }).catch((error) => {
             ctx.commit('clearSearching')
-            alert(error)
+            ctx.commit("system/setError", error, {root:true})
          })
       }
    }

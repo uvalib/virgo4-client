@@ -36,7 +36,7 @@ export default {
          },10)
       },
       scrollChecker() {
-         if (window.window.scrollY > 800) {
+         if (window.window.scrollY > 150) {
             this.showScrollTop = true
          } else {
             this.showScrollTop = false
@@ -75,7 +75,7 @@ export default {
    padding: 0px 0px 4px 0px;
    width: 56px;
    height: 56px;
-   z-index: 0;
+   z-index: 2;
 }
 .scroll-to-top.mobile {
    position: fixed;

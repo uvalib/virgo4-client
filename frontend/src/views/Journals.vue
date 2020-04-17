@@ -57,7 +57,9 @@
                         </template>
                         <template  v-if="i.accessURL">
                            <dt>Online Access:</dt> 
-                           <dd v-html="urlList(i)"></dd>
+                           <dd>
+                              <AccessURLDetails mode="brief" pool="journals" :urls="i.accessURL" />
+                           </dd>
                         </template>
                      </dl>
                   </AccordionContent>
@@ -70,14 +72,14 @@
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"
 import { mapFields } from "vuex-map-fields"
 import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
+import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
    name: "journals",
    components: {
-      V4Spinner, AccordionContent
+      V4Spinner, AccordionContent, AccessURLDetails
    },
    computed: {
       ...mapState({
@@ -85,49 +87,12 @@ export default {
          titles: state => state.journals.titles,
          browseTotal: state => state.journals.browseTotal
       }),
-      ...mapGetters({
-         findProvider: 'pools/findProvider'
-      }),
       ...mapFields("journals", ["query"]),
    },
    data: function() {
       return {};
    },
    methods: {
-      urlList(item) {
-         // all links in solr are from the same provider. Just grab first
-         let u = item.accessURL[0]
-         let linkText = u.provider
-         let hasProvider = false
-         if (linkText) {
-            hasProvider = true
-            let pDetail = this.findProvider("journals", u.provider)
-            if (pDetail.label) {
-               linkText = pDetail.label   
-            }
-         } else {
-            linkText = u.url
-         }
-
-         // if there is only 1 link, no need to deal with the item part of the data
-         if (item.accessURL.length == 1) {
-            let u = item.accessURL[0]
-            return `<a href="${u.url}" target="_blank">${linkText}</a>`   
-         } 
-
-         let out = []
-         item.accessURL.slice(0,10).forEach( u=> {
-            let url =`<a href="${u.url}" target="_blank">${u.item}</a>`
-            out.push(url)
-         })
-         if (item.accessURL.length > 10 ) {
-             out.push(`...see ${item.accessURL.length -10} more on details page`)   
-         }
-         if (hasProvider) {
-            return `<strong>${linkText}&nbsp-</strong>&nbsp${out.join(" | ")}`
-         }
-         return out.join(" | ")
-      },
       itemTitle(item) {
          let title = ""
          if (item.items.length == 1) {

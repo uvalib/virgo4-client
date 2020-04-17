@@ -2,10 +2,20 @@
    <div class="reserved">
       <h1>Course Reserves Request</h1>
       <div class="messages">
-         <p><b>Thank you for your course reserves request.</b><br/>A copy of your request has been emailed to you.</p>
+         <h2>Thank you for your course reserves request!</h2>
+         <p>A copy of your request has been emailed to you.</p>
          <p>If we have questions regarding your request someone will contact you.</p>
-         <p>When your request has been processed, you'll be able to see your reserves by signing into your Virgo account 
-            and clicking the Course Reserves menu option.</p>
+         <p>When your request has been processed, you'll be able to see your non-video 
+            reserves by signing into your Virgo account and clicking the Course Reserves menu option.</p>
+         <p>
+            If the Library doesn’t own an item that you need for reserve, you may make a 
+            <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">purchase recommendation</a>.
+         </p>
+         <p>
+            If you have personal copies of items to be placed on reserve, please complete our 
+            <a href="https://www.library.virginia.edu/services/course-reserves/personal/" target="_blank">Personal Copy Form</a>
+            and bring a print out of the email confirmation with the items.
+         </p>
       </div>
    </div>
 </template>
@@ -20,7 +30,7 @@ export default {
 .reserved {
    min-height: 400px;
    position: relative;
-   margin-top: 25px;
+   margin: 25px 0 50px 0;
 }
 .messages {
    width:40%;

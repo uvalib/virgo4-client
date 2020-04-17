@@ -1,13 +1,12 @@
 <template>
-   <v-popover placement="top-end" class="source-info">
-      <span class="text-button trigger">What are sources&nbsp;<i class="fas fa-question-circle"></i></span>
+   <v-popover tabindex="0" placement="top-end" class="source-info">
+      <span class="text-button trigger">What am I searching&nbsp;<i class="fas fa-question-circle"></i></span>
       <div class="source-info-popover" slot="popover">
          <div class="popover-title">
-            Source Details
             <i v-close-popover class="close fas fa-times-circle"></i>
          </div>
          <div class="source-info">
-            Sources are collections of related items that are available to be searched by Virgo
+            Resource Types are collections of related items that are available to be searched by Virgo.
          </div>
       </div>
    </v-popover>
@@ -21,12 +20,10 @@ export default {
 <style scoped>
 i.fas.fa-times-circle.close {
    opacity: 0.8;
-   font-size: 1.1em;
+   font-size: 1.25em;
    float:right;
    margin-right: 8px;
-}
-i.fas.fa-times-circle.close:hover {
-   opacity: 1;
+   display:block;
    cursor: pointer;
 }
 .source-info-popover {
@@ -38,25 +35,20 @@ i.fas.fa-times-circle.close:hover {
    display: inline-block;
    border-radius: 5px;
    border-bottom: 1px solid var(--uvalib-grey-dark);
-    max-width: 350px;
+   max-width: 350px;
 }
 .source-info-popover .popover-title {
-   padding: 8px 0 6px 0;
+   padding: 8px 0 12px 0;
    margin: 0;
-   text-align: center;
-   background: var(--uvalib-grey-dark);
-   color: white;
-   font-weight: normal;
+   text-align: right;
+   background: white;
+   border: 1px solid var(--uvalib-grey-dark);
+   border-bottom: 0;
    border-radius: 5px 5px 0 0;
-   border-top: 1px solid var(--uvalib-grey-dark);
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   font-size: 1.25em;
-   font-weight: bold;
 }
 div.source-info {
    margin: 0;
-   padding: 10px 20px 10px 20px;
+   padding: 15px 20px 15px 20px;
    font-weight: normal;
    border-right: 1px solid var(--uvalib-grey-dark);
    border-left: 1px solid var(--uvalib-grey-dark);

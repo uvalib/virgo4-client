@@ -17,10 +17,10 @@ const filters = {
       updatingFacets: false,
 
       // Global availability and hard-coded filter values
-      globalAvailability: {id: "any", name: "Any"},
+      globalAvailability: {id: "any", name: "All"},
       availabilityFacet: "FacetAvailability",
       availabilityValues: {"online": "Online",
-         "shelf": "On shelf"}
+         "shelf": "On Shelf Now"}
    },
 
    getters: {
@@ -49,7 +49,10 @@ const filters = {
             out = state.poolFilters[idx].slice(0)
          }
 
-         if (state.globalAvailability.id != "any") {
+         if (state.globalAvailability.id == "shelf") {
+            out.unshift({facet_id: state.availabilityFacet, 
+               facet_name: "Availability", value: "On shelf"})
+         } else if (state.globalAvailability.id != "any") {
             out.unshift({facet_id: state.availabilityFacet, 
                facet_name: "Availability", value: globalVal})
          }

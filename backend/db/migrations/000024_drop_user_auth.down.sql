@@ -1,0 +1,5 @@
+BEGIN;
+ALTER TABLE users ADD COLUMN auth_token VARCHAR(80) UNIQUE;
+ALTER TABLE users ADD COLUMN auth_updated_at timestamptz;
+ALTER TABLE users ADD COLUMN signed_in BOOLEAN NOT NULL DEFAULT false;
+COMMIT;

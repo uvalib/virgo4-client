@@ -8,10 +8,12 @@ const query = {
       restoreMessage: "",
       mode: "basic",
       basic: "",
-      basicSearchScope: { name: 'All Sources', id: 'all' },
+      basicSearchScope: { name: 'All Resource Types', id: 'all' },
       advanced: [
          { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" },
       ],
+      browse: 
+         { op: "AND", value: "", field: "", type: "EQUAL", endVal: "" },
       advancedFields: [
          { value: "keyword", label: "Keyword" },
          { value: "identifier", label: "Identifier" },
@@ -20,7 +22,6 @@ const query = {
          { value: "subject", label: "Subject" },
          { value: "date", label: "Date" }
       ],
-      lastSearch: ""
    },
    getters: {
       getField,
@@ -58,8 +59,13 @@ const query = {
             return `keyword: {${qp}}`
          }
 
+         let terms = state.advanced
+         if (state.mode == "browse") {
+            terms = state.browse
+         }
+
          let qs = ""
-         state.advanced.forEach(function (term) {
+         terms.forEach(function (term) {
             if (term.value.length > 0) {
                if (qs.length > 0) {
                   // after the first term, use the search op to combine
@@ -114,25 +120,23 @@ const query = {
             }
          }
       },
+      advancedBarcodeSearch(state, barcode) {
+         state.advanced.splice(0, state.advanced.length)
+         state.advanced.push({ op: "AND", value: barcode, field: "identifier", type: "EQUAL", endVal: "" })
+      },
       setBasicSearch(state) {
          state.mode = "basic"
          state.restoreMessage = ""
       },
-      setSubjectSearch(state, subject) {
-         state.mode = "advanced"
-         state.advanced = [
-            { op: "AND", value: `"${subject}"`, field: "subject", type: "EQUAL", endVal: "" }]
+      browseAuthors(state, author) {
+         state.mode = "browse"
+         state.browse = [
+            { op: "AND", value: `${author}`, field: "author", type: "EQUAL", endVal: "" }]
       },
-      setTitleSearch(state, title) {
-         state.mode = "advanced"
-         let bits = title.split(" : ")
-         if (bits.length > 2) {
-            bits.splice(0, 2)
-         }
-         state.advanced.splice(0, state.advanced.length)
-         bits.forEach(t => {
-            state.advanced.push({ op: "AND", value: `"${t}"`, field: "title", type: "EQUAL", endVal: "" })
-         })
+      browseSubjects(state, subject) {
+         state.mode = "browse"
+         state.browse = [
+            { op: "AND", value: `"${subject}"`, field: "subject", type: "EQUAL", endVal: "" }]
       },
       addCriteria(state) {
          state.advanced.push({ op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" })
@@ -140,20 +144,40 @@ const query = {
       removeCriteria(state, idx) {
          state.advanced.splice(idx, 1)
       },
+      updateSearchMode(state) {
+         if (state.mode == "browse") {
+            if ( state.advanced[0].value != "") {
+               state.mode = "advanced"
+            } else {
+               state.mode = "basic"  
+            }  
+            state.browse = [
+               { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
+         }
+      },
       clear(state) {
          state.restoreMessage = ""
-         state.lastSearch = ""
          state.mode = "basic"
          state.basic = ""
-         state.basicSearchScope = { name: 'All Sources', id: 'all' },
-            state.advanced = [
-               { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
+         state.basicSearchScope = { name: 'All Resource Types', id: 'all' },
+         state.advanced = [
+            { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
+         state.browse = [
+            { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
       },
-      setLastSearch(state, qs) {
-         state.lastSearch = qs
-      }
    },
    actions: {
+      initSearchMode(ctx) {
+         if (ctx.state.mode == "browse") {
+            ctx.commit('updateSearchMode')
+            if ( ctx.state.mode == "basic" && ctx.state.basic != "" || 
+                 ctx.state.mode == "advanced" && ctx.state.advanced[0].value != "") {
+               ctx.dispatch("searchAllPools", null, { root: true })
+            } else {
+               ctx.commit("resetSearchResults", null, { root: true }) 
+            }
+         }
+      },
       async loadSearch(ctx, token) {
          ctx.commit('setSearching', true, { root: true })
          try {

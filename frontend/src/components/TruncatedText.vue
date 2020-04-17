@@ -7,7 +7,7 @@
          <div v-else v-html="truncatedText"></div>
       </div>
       <v-popover v-if="isTruncated" class="full" :open="showFull">
-         <i v-if="trigger!='click'" class="icon fas fa-chevron-circle-down" 
+         <i v-if="trigger!='click'" class="icon fas fa-chevron-circle-down"
             @click="textClicked" @mouseover="mouseOver" @mouseleave="mouseLeave"></i>
          <i v-else class='trigger click more'>More</i>
          <div class="full-text-popover" slot="popover">
@@ -67,15 +67,15 @@ export default {
          if ( this.trigger == "hover") {
             this.showFull = !this.showFull
          }
-      }, 
+      },
       mouseOver() {
          if ( this.trigger == "hover") {
-            this.showFull = true 
+            this.showFull = true
          }
       },
       mouseLeave() {
          if ( this.trigger == "hover") {
-            this.showFull = false 
+            this.showFull = false
          }
       }
    }
@@ -117,10 +117,9 @@ i.trigger.more:hover {
 }
 .full-text-popover {
    background: white;
-   border: 1px solid #999;
    border-radius: 5px;
-   box-shadow: 1px 1px 5px #999;
-   border: 4px solid var(--uvalib-grey-dark);
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   border: 1px solid var(--uvalib-grey-dark);
    margin: 0 10%
 }
 .full-text {

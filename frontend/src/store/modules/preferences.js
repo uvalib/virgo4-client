@@ -10,6 +10,7 @@ const preferences = {
       excludePoolURLs: [],
       trackingOptOut: false,
       pickupLibrary: "",
+      enableBarcodeScan: false,
    },
 
    getters: {
@@ -32,6 +33,9 @@ const preferences = {
       updateField,
       setPickupLibrary(state, lib){
          state.pickupLibrary = lib
+      },
+      toggleBarcodeScan(state) {
+         state.enableBarcodeScan = !state.enableBarcodeScan     
       },
       toggleOptOut(state) {
          state.trackingOptOut = !state.trackingOptOut
@@ -66,6 +70,9 @@ const preferences = {
             if (json.pickupLibrary ) {
                state.pickupLibrary = json.pickupLibrary
             }
+            if (json.enableBarcodeScan ) {
+               state.enableBarcodeScan = json.enableBarcodeScan
+            }
          } catch(e) {
             // NOOP; just leave preferences unset
          }
@@ -73,6 +80,7 @@ const preferences = {
       clear(state) {
          state.trackingOptOut = false
          state.targetPoolURL = ""
+         state.enableBarcodeScan = false
          state.excludePoolURLs.splice(0, state.excludePoolURLs.length)
       },
       toggleExcludePool(state, poolURL) {
@@ -108,12 +116,17 @@ const preferences = {
          ctx.commit("toggleOptOut")
          ctx.dispatch("savePreferences")
       },
+      toggleBarcodeScan(ctx) {
+         ctx.commit("toggleBarcodeScan")
+         ctx.dispatch("savePreferences")
+      },
       savePreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
          let data = {targetPoolURL: ctx.state.targetPoolURL,
             excludePoolURLs: ctx.state.excludePoolURLs,
             trackingOptOut: ctx.state.trackingOptOut,
             pickupLibrary: ctx.state.pickupLibrary,
+            enableBarcodeScan: ctx.state.enableBarcodeScan,
          }
          axios.post(url, data)
       }

@@ -12,7 +12,7 @@ const bookmarks = {
 
    getters: {
       hasBookmarks: state => {
-         if ( state.bookmarks == null ) return false 
+         if ( state.bookmarks == null ) return false
          if ( state.bookmarks.length === 0) return false
          return true
       },
@@ -34,8 +34,8 @@ const bookmarks = {
             out.push( {id: 0, name: "General"} )
          }
          return out.sort( (a,b) => {
-            if (a.name < b.name) return -1 
-            if (a.name > b.name) return 1 
+            if (a.name < b.name) return -1
+            if (a.name > b.name) return 1
             return 0
          })
       },
@@ -52,7 +52,7 @@ const bookmarks = {
          state.public.splice(0, state.public.length)
          data.forEach( s => {
             s.details = JSON.parse(s.details)
-            state.public.push( s ) 
+            state.public.push( s )
          })
       },
       clear: state => {
@@ -126,7 +126,7 @@ const bookmarks = {
          let data = {folder: folder, pool: bm.pool, identifier: bm.data.identifier}
 
          // required details: title, author, call number, location, library, availability
-         let author = "" 
+         let author = ""
          if  (bm.data.header.author) {
             author = bm.data.header.author.value.join(", ")
          }
@@ -184,16 +184,16 @@ const bookmarks = {
          })
       },
       async toggleFolderVisibility(ctx, folderVisibility) {
-         ctx.commit('toggleFolderVisibility', folderVisibility)  
+         ctx.commit('toggleFolderVisibility', folderVisibility)
          try {
             let usrID = ctx.rootState.user.signedInUser
             if (folderVisibility.public) {
                let resp = await axios.post(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
                folderVisibility.token = resp.data
-               ctx.commit('setFolderToken', folderVisibility)  
+               ctx.commit('setFolderToken', folderVisibility)
             } else {
                axios.delete(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
-            } 
+            }
          } catch (error)  {
             ctx.commit('system/setError', error, { root: true })
          }

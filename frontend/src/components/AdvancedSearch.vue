@@ -4,9 +4,9 @@
          <span>Advanced Search</span>
       </h1>
       <div class="pools-wrapper">
-         <h2>Search Sources</h2>
+         <h2>Resource Types</h2>
          <div class="pools">
-            <div @click="poolClicked(src.url)" class="pool" v-for="src in sources" :key="src.id">
+            <div tabindex="0" @click="poolClicked(src.url)" class="pool" v-for="src in sources" :key="src.id">
                <i v-if="isPoolExcluded(src.url)" class="far fa-square"></i>
                <i v-else class="far fa-check-square"></i>
                {{src.name}}
@@ -65,23 +65,28 @@
          <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">
-         <router-link to="/journals">
-            Browse Journals&nbsp;<i class="far fa-newspaper"></i>
-         </router-link>
-      </div>
-      <div class="basic">
          <span class="text-button basic-link" @click="basicClicked">
             Basic Search&nbsp;
             <i class="fas fa-undo-alt"></i>
          </span>
       </div>
+      <div class="basic">
+         <V4BarcodeScanner @scanned="barcodeScanned"/>
+      </div>
+      <div class="basic">
+         <router-link to="/journals">
+            Browse Journals&nbsp;<i class="far fa-newspaper"></i>
+         </router-link>
+      </div>
    </div>
 </template>
 
 <script>
-import { mapMultiRowFields } from "vuex-map-fields";
-import { mapGetters } from "vuex";
-import { mapState } from "vuex";
+import { mapMultiRowFields } from "vuex-map-fields"
+import { mapGetters } from "vuex"
+import { mapState } from "vuex"
+import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+
 export default {
    data: function() {
       return {
@@ -89,6 +94,7 @@ export default {
       } 
    },
    components: {
+      V4BarcodeScanner
    },
    computed: {
       ...mapState({
@@ -112,7 +118,6 @@ export default {
          if (this.queryEntered) {
             // this is a new search, reset everything
             this.$store.commit('resetSearchResults')
-            this.$store.commit('query/setLastSearch', this.rawQueryString)
             this.$store.commit('filters/reset')
             this.$store.dispatch("searchAllPools")
          } else {
@@ -134,6 +139,12 @@ export default {
       },
       removeCriteria(idx) {
          this.$store.commit("query/removeCriteria", idx);
+      },
+      barcodeScanned(barcode) {
+         this.$store.commit('resetSearchResults')
+         this.$store.commit('filters/reset')
+         this.$store.commit("query/advancedBarcodeSearch", barcode)
+         this.$store.dispatch("searchAllPools")
       }
    },
    created() {
@@ -203,18 +214,17 @@ div.query {
    
 }
 .controls {
-   font-size: 0.85em;
-   font-weight: bold;
-   padding: 10px 0;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
-   justify-content: flex-end;
-   margin-bottom: 10px;
+  padding: 10px 0;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-start;
 }
-
-.controls > * {
-   flex: 0 1 auto;
+.controls .pure-button.pure-button-primary {
+   margin-left: auto;
+}
+.controls  > * {
+  flex: 0 1 auto;
 }
 
 div.search-term {
@@ -249,11 +259,9 @@ div.search-term .date-criteria input:last-child {
 }
 
 div.basic {
-   text-align: right;
-}
-.text-button.basic-link {
    margin-top: 10px;
-   font-size: 1em;
+  font-size: 1em;
+  text-align: right;
 }
 .text-button.basic-link:hover {
    text-decoration: underline;

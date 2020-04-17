@@ -1,25 +1,22 @@
 <template>
    <div class="search-results shady">
-
+      <SearchSuggestions />
       <div class="results-header">
          <template v-if="showSummary">
             <div class="summary">
                <div class="query">Showing results for: <i>{{queryString}}</i></div>
-               <span>{{total}} matches found in {{results.length}} sources.</span>
-               <span class="subtotal" v-if="skippedPoolCount">&nbsp;{{skippedPoolCount}} source(s) not searched. Click source to search.</span>
-               <span class="subtotal" v-if="failedPoolCount">&nbsp;{{failedPoolCount}} source(s) failed.</span>
+               <div class="counts">
+                  <span>{{total}} matches</span>
+               </div>
             </div>
             <span class="buttons">
-               <SaveSearch v-if="isSignedIn" />
-               <span v-if="searchMode=='basic'" @click="refineClicked()"
-                  class="refine pure-button pure-button-primary">
-                  Refine Search
-               </span>
+               <SaveSearch v-if="isSignedIn" mode="share"/>
+               <SaveSearch v-if="isSignedIn" mode="save"/>
             </span>
          </template>
       </div>
 
-      <div class="results-wrapper" v-if="total > 0">
+      <div class="results-wrapper" >
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
@@ -33,18 +30,15 @@
                </template>
                <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                   :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
-                  placeholder="Other<span class='total'>Sources</span>"
+                  placeholder="Other"
                   v-model="otherSrcSelection"/>
             </div>
             <PoolResultDetail v-if="selectedResultsIdx > -1" />
+            <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
+               No results found
+            </div>
          </div>
       </div>
-      <div class="results-wrapper" v-else>
-         <div class="none">
-            No results found
-         </div>
-      </div>
-
    </div>
 </template>
 
@@ -56,32 +50,30 @@ import PoolResultDetail from "@/components/PoolResultDetail"
 import V4Select from "@/components/V4Select"
 import FacetSidebar from "@/components/FacetSidebar"
 import SaveSearch from "@/components/popovers/SaveSearch"
+import SearchSuggestions from "@/components/SearchSuggestions"
 export default {
    components: {
-      PoolResultDetail, V4Select, FacetSidebar, SaveSearch
+      PoolResultDetail, V4Select, FacetSidebar, SaveSearch, SearchSuggestions
    },
    props: {
       showSummary: { type: Boolean, default: true},
    },
    computed: {
       ...mapGetters({
-         hitPoolCount: 'hitPoolCount',
-         skippedPoolCount: 'skippedPoolCount',
-         failedPoolCount: 'failedPoolCount',
-         isSignedIn: 'user/isSignedIn'
+         isSignedIn: 'user/isSignedIn',
+         rawQueryString: 'query/string'
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
-         lastSearch: state=>state.query.lastSearch,
       }),
       ...mapFields([
         'otherSrcSelection'
       ]),
       queryString() {
-         return this.lastSearch.replace(/\{|\}/g, "")
+         return this.rawQueryString.replace(/\{|\}/g, "")
       },
       otherSrcBkg() {
          if (this.otherSrcSelection.id == "") return "#FFF"
@@ -100,24 +92,21 @@ export default {
       otherSources() {
          let opts = []
          let others = this.results.slice(2).sort( (a,b) => {
-            if (a.pool.name < b.pool.name) return -1 
-            if (a.pool.name > b.pool.name) return 1 
+            if (a.pool.name < b.pool.name) return -1
+            if (a.pool.name > b.pool.name) return 1
             return 0
          })
-         
+
          others.forEach( r=>{
-            let disabled = false
             let name = `<span class='pool'>${r.pool.name}</span>`
             if (this.poolFailed(r)) {
                name += "<span class='total'>Failed</span>"
-               disabled = true
             } else if (this.wasPoolSkipped(r)) {
                name += "<span class='total'>Skipped</span>"
             } else {
                name += `<span class='total'>${r.total} hits</span>`
-               disabled = r.total == 0
             }
-            opts.push({id: r.pool.id, name: name, disabled: disabled})
+            opts.push({id: r.pool.id, name: name})
          })
          return opts
       }
@@ -159,6 +148,9 @@ export default {
 </script>
 
 <style>
+.counts {
+   margin-left: 15px;
+}
 div.pool-tabs {
   font-weight: bold;
 }
@@ -183,20 +175,20 @@ p.relevant {
    margin: 0 0 0 10px;
 }
 .v4-select {
-   margin: 0 0 2px 0;
+   margin: 0 -1px 2px 0;
    border-radius: 5px 5px 0 0;
    flex: 1 1 auto;
 }
 .pool-tabs {
-   margin: 0 15px 0 0;
+   margin: 0 5px 0 0;
    text-align: left;
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
 }
 .pool.pure-button {
-   margin: 0 2px 0 0;
-   padding: 4px 8px;
+   margin: 0;
+   padding: 8px 10px;
    border-radius: 5px 5px 0 0;
    color: var(--uvalib-text-dark);
    border: 1px solid var(--uvalib-grey-light);
@@ -217,7 +209,7 @@ p.relevant {
    opacity: 0.5;
 }
 .pool-tabs .pool.pure-button:last-child {
-   margin-right: 0;
+   margin-right: -1px;
 }
 .summary .query {
    text-align: left;
@@ -225,13 +217,15 @@ p.relevant {
    font-weight: bold;
    font-size: 1.1em;
 }
+.summary .query i {
+   font-weight: 100;
+}
 .results-header {
    display: flex;
    flex-flow: row wrap;
    align-content: center;
    align-items: center;
    justify-content: space-between;
-   margin-top: 10px;
    padding-top: 10px;
    margin-bottom: 10px;
 }
@@ -254,21 +248,21 @@ p.relevant {
 @media only screen and (min-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 5vw;
+      padding: 0 5vw 20px 5vw;
    }
-    .save-box{ 
+    .save-box{
       width: 50%;
    }
 }
 @media only screen and (max-width: 768px) {
    div.search-results {
       margin: 0;
-      padding: 0 2vw;
+      padding: 0 2vw 20px 2vw;
    }
    span.refine.pure-button.pure-button-primary {
       display: none;
    }
-   .save-box{ 
+   .save-box{
       width: 90%;
    }
 }

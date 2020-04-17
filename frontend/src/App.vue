@@ -29,19 +29,8 @@
             <div class="msg">A new version of Virgo is available.</div>
             <span @click="updateClicked" class="pure-button pure-button-primary">Update Now</span>
          </div>
-         <transition name="message-transition"
-            enter-active-class="animated faster fadeIn"
-            leave-active-class="animated faster fadeOut">
-            <div v-if="error" class="error">
-               <div class="error-message">
-                  <div class="bar">
-                     <span>Error</span>
-                     <i @click="dismissError" class="close fas fa-times-circle"></i>
-                  </div>
-                  <div class="error-body" v-html="error"></div>
-               </div>
-            </div>
-         </transition>
+         <MessageBox type="error" />
+         <MessageBox type="info" />
          <ScrollToTop />
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
@@ -51,6 +40,7 @@
 <script>
 import ScrollToTop from "@/components/ScrollToTop"
 import LibraryFooter from "@/components/layout/LibraryFooter"
+import MessageBox from "@/components/layout/MessageBox"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
@@ -75,12 +65,14 @@ export default {
       V4Spinner,
       AddBookmarkModal,
       MenuBar,
-      ScrollToTop
+      ScrollToTop,
+      MessageBox
    },
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
          error: state => state.system.error,
+         message: state => state.system.message,
          newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
          sessionExpired: state => state.system.sessionExpired,
@@ -91,15 +83,12 @@ export default {
          isKiosk: "system/isKiosk",
       }),
       showDimmer() {
-         return this.addingBookmark;
+         return this.addingBookmark || this.error != "" || this.message != ""
       }
    },
    methods: {
       dismissSession() {
          this.$store.commit("system/clearSessionExpired")
-      },
-      dismissError() {
-         this.$store.commit("system/setError", "")
       },
       updateClicked() {
           window.location.reload(true)
@@ -119,7 +108,7 @@ export default {
       setTimeout( ()=>{
          this.menuHeight = document.getElementById(this.menuID).offsetHeight
          this.headerHeight = document.getElementById(this.headerID).offsetHeight
-      }, 250)
+      }, 1)
       window.addEventListener("scroll", this.scrollHandler)
       window.onresize = () => {
          this.$store.commit("system/setDisplayWidth",window.innerWidth)
@@ -190,6 +179,7 @@ export default {
    --color-primary-orange: var(--uvalib-brand-orange);
    --color-dark-orange: var(--uvalib-brand-orange-dark);
    --color-link: var(--uvalib-brand-blue-light);
+   --color-link-darker: var(--uvalib-blue-alt-dark);
    --color-primary-text: var(--uvalib-grey-dark);
    --color-error: var(--uvalib-red-emergency);
 
@@ -258,7 +248,7 @@ body {
    width: 100%;
    height: 100%;
    z-index: 1000;
-   background: rgba(0, 0, 0, 0.5);
+   background: rgba(0, 0, 0, 0.1);
 }
 
 #app {
@@ -292,6 +282,9 @@ body {
    font-weight: 500;
    text-decoration: none;
 }
+#app a.alt-color-dark {
+   color: var(--color-link-darker);
+}
 #app a:hover {
    text-decoration: underline;
 }
@@ -299,6 +292,10 @@ body {
 /* for v-popover styles */
 div.v-popover.inline {
    display: inline-block;
+   cursor: pointer;
+}
+div.v-popover.block {
+   display: block !important;
    cursor: pointer;
 }
 .tooltip {
@@ -447,51 +444,6 @@ div.session-message {
    background: white;
    padding: 0px;
    border: 2px solid var(--uvalib-brand-blue-light);
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-}
-
-div.error {
-   position: fixed;
-   left: 0;
-   right: 0;
-   z-index: 5000;
-   top: 30%;
-}
-div.error .bar {
-   padding: 5px;
-   background-color: var(--uvalib-red-emergency);
-   color: white;
-   font-weight: bold;
-   text-align: left;
-}
-div.error i.close {
-   float:right;
-   font-size: 1.3em;
-   cursor: pointer;
-   margin-left: 10px;
-}
-div.error .message-body {
-   padding: 10px 15px;
-}
-.error-body {
-   text-align: center;
-   margin: 10px 15px;
-   font-weight: normal;
-   color: var(--uvalib-red-emergency);
-   opacity: 1;
-   visibility: visible;
-   text-align: center;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-}
-div.error-message {
-   display: inline-block;
-   text-align: center;
-   background: white;
-   padding: 0px;
-   border: 2px solid var(--uvalib-red-emergency);
    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 @media only screen and (min-width: 768px) {

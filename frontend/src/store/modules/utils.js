@@ -42,22 +42,34 @@ export function preProcessHitFields(hits) {
          }
 
          // Access_url is a special case. Instead of just repeated value, it also
-         // has provider and item. Preserve all in the array
+         // has provider and item. preserve the data, grouped by provider. Ex:
+         // { name: access_url, label: "Online Access", value: [
+         //    {provider: "hathitrust", links: [ {url: url, label: "v4. 1988"} ] }  
+         // ]}
          if (field.name=="access_url") {
             let existing = hit.basicFields.find(f => f.name === field.name)
             if (existing) {
-               let newVal = {url: field.value, provider: field.provider}
+               let provider = field.provider 
+               let newLink = {url: field.value}
                if ( field.item ) {
-                  newVal.item = field.item   
+                  newLink.label = field.item   
                }
-               existing.value.push(newVal)
+               let provData = existing.value.find( f => f.provider == provider)
+               if (!provData) {
+                  // a provider group does not exist; create one and set it to currProvider
+                  provData = {provider: provider, links: []}
+                  existing.value.push(provData)
+               } 
+               provData.links.push(newLink)
             } else {
                let newF = {name: field.name, type: field.type, label: field.label,
                   visibility: "basic", value: []}
-               let newVal = {url: field.value, provider: field.provider}
+               let newVal = {provider: field.provider, links: []}
+               let newLink = {url: field.value}
                if ( field.item ) {
-                  newVal.item = field.item   
+                  newLink.label = field.item   
                }
+               newVal.links.push( newLink )
                newF.value.push( newVal )
                hit.basicFields.push(newF)
             }
@@ -103,16 +115,4 @@ export function getGroupHitMetadata(group, hit) {
       hit.header.title = "ERROR: Mising group data"
    }
    delete group.fields
-}
-
-// Find a pool by internal identifier
-export function findPool(pools, id) {
-   let match = null
-   pools.some(function (p) {
-      if (p.id == id) {
-         match = p
-      }
-      return match != null
-   })
-   return match
 }

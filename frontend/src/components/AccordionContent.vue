@@ -91,7 +91,9 @@ export default {
          if (this.isExpanded && this.id) {
             setTimeout( ()=> {
                let content = document.getElementById(this.id)
-               content.setAttribute("style", "height: inherit;")
+               if ( content) {
+                  content.setAttribute("style", "height: inherit;")
+               }
             })
          }
       },

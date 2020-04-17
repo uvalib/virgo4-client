@@ -135,7 +135,7 @@
          </a>
       </div>
       <div class="site-link">
-         <router-link to="/" @click.native="homeClicked">
+         <router-link to="/" @mousedown.native="homeClicked">
             <span class="site-name">Virgo4</span>
          </router-link>
       </div>

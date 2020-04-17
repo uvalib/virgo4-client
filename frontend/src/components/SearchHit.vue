@@ -17,8 +17,10 @@
                   </template>
                </template>
                <template v-if="accessURLField">
-                  <dt class="label">{{accessURLField.label}}</dt>
-                  <dd class="value" v-html="accessURLs()"></dd>
+                  <dt class="label">{{accessURLField.label}}:</dt>
+                  <dd class="value">
+                     <AccessURLDetails mode="brief" :pool="pool" :urls="accessURLField.value" />
+                  </dd>
                </template>
             </dl>
          </div>
@@ -42,6 +44,7 @@ import SearchHitHeader from '@/components/SearchHitHeader'
 import AccordionContent from '@/components/AccordionContent'
 import GroupedSearchHit from '@/components/GroupedSearchHit'
 import TruncatedText from '@/components/TruncatedText'
+import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
    props: {
       hit: { type: Object, required: true},
@@ -49,7 +52,7 @@ export default {
       count: {type: Number, required: true}
    },
    components: {
-      SearchHitHeader, AccordionContent, GroupedSearchHit, TruncatedText
+      SearchHitHeader, AccordionContent, GroupedSearchHit, TruncatedText, AccessURLDetails
    },
    computed: {
       accessURLField() {
@@ -65,10 +68,9 @@ export default {
          searching: state => state.searching,
          autoExpandGroupID: state => state.autoExpandGroupID
       }),
-       ...mapGetters({
+      ...mapGetters({
          isKiosk: "system/isKiosk",
          hasCoverImages: 'pools/hasCoverImages',
-         findProvider: 'pools/findProvider'
       }),
       truncateLength() {
          if ( this.hasCoverImages(this.pool)) return 60
@@ -86,35 +88,10 @@ export default {
       },
       fieldValueString(field) {
          if ( Array.isArray(field.value)) {
-            return field.value.join(",&nbsp;")
+            return field.value.join(", ")
          }
          return field.value
       },
-      accessURLs() {
-         // NOTE: access URLs are special. instead value being an array of strings,
-         // it is an array of objects: {url, provider}
-         let out = []
-         this.accessURLField .value.forEach( v => {
-            let url = this.generateURLCode(v.provider, v.url)
-            out.push( url )
-         })
-         return out.join(",&nbsp;&nbsp;")
-      },
-      generateURLCode(provider, tgtURL) {
-         let url =`<a href="${tgtURL}" target="_blank">`
-         if (provider) {
-            let pDetail = this.findProvider(this.pool, provider)
-            let pName = provider 
-            if (pDetail.label) {
-               pName = pDetail.label   
-            }
-            url += `${pName}`
-         } else {
-            url += `${tgtURL}`
-         }
-         url += `</a>`
-         return url
-      }
    }
 };
 </script>

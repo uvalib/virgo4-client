@@ -43,7 +43,6 @@ func main() {
 
 	api := router.Group("/api")
 	{
-		api.GET("/authenticated/:token", svc.IsAuthenticated)
 		api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
 		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
 		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
@@ -57,13 +56,16 @@ func main() {
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
-		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
-		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
-		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
-		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 
 		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
+
+		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
+		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
+		api.DELETE("/users/:uid/searches", svc.AuthMiddleware, svc.DeleteAllSavedSearches)
+		api.DELETE("/users/:uid/searches/:token", svc.AuthMiddleware, svc.DeleteSavedSearch)
+		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
+		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
 
 		bookmarks := api.Group("/users/:uid/bookmarks")
 		{

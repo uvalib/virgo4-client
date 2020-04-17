@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/rs/xid"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
 // SavedSearch contains details about a user saved seatch
@@ -25,6 +27,33 @@ type SavedSearch struct {
 // TableName sets the name of the table in the DB that this struct binds to
 func (s SavedSearch) TableName() string {
 	return "saved_searches"
+}
+
+// DeleteAllSavedSearches will remove all saved searches from a user account
+func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
+	uid := c.Param("uid")
+	log.Printf("Delete ALL saved searches for user %s...", uid)
+	var userID int
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": uid})
+	uErr := uq.Row(&userID)
+	if uErr != nil {
+		log.Printf("ERROR: couldn't find user %s: %v", uid, uErr)
+		c.String(http.StatusBadRequest, "Invalid user %s", uid)
+		return
+	}
+	log.Printf("User %s has ID %d", uid, userID)
+
+	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:uid}")
+	dq.Bind(dbx.Params{"uid": userID})
+	_, err := dq.Execute()
+	if err != nil {
+		log.Printf("ERROR: unable to delete saved searches for %s (%d): %s", uid, userID, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
 }
 
 // PublishSavedSearch will make a private search public
@@ -67,6 +96,35 @@ func (svc *ServiceContext) UnpublishSavedSearch(c *gin.Context) {
 	svc.setSearchVisibility(c, uid, token, false)
 }
 
+// DeleteSavedSearch will delete a saved search with the matching token
+func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
+	uid := c.Param("uid")
+	token := c.Param("token")
+	log.Printf("User %s delete search %s...", uid, token)
+
+	var userID int
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": uid})
+	uErr := uq.Row(&userID)
+	if uErr != nil {
+		log.Printf("ERROR: couldn't find user %s to delete saved search %s: %v", uid, token, uErr)
+		c.JSON(http.StatusBadRequest, fmt.Sprintf("Invalid user %s", uid))
+		return
+	}
+
+	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:userID} and token={:token}")
+	dq.Bind(dbx.Params{"userID": userID})
+	dq.Bind(dbx.Params{"token": token})
+	_, dErr := dq.Execute()
+	if dErr != nil {
+		log.Printf("ERROR: couldn't delete user %s saved search %s: %v", uid, token, dErr)
+		c.JSON(http.StatusInternalServerError, dErr.Error)
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
+}
+
 // SaveSearch will save a named search in that saved_searches table along with an access token
 func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	uid := c.Param("uid")
@@ -92,8 +150,9 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// Make sure the passed request object is well formed JSON
 	var reqObj struct {
-		Name   string      `json:"name"`
-		Search interface{} `json:"search"`
+		Name     string      `json:"name"`
+		Search   interface{} `json:"search"`
+		IsPublic bool        `json:"isPublic"`
 	}
 	qpErr := c.ShouldBindJSON(&reqObj)
 	if qpErr != nil {
@@ -105,7 +164,8 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// Generate an access token and save it to the saved searches table
 	json, _ := json.Marshal(reqObj.Search)
-	search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name, CreatedAt: time.Now(), Search: string(json)}
+	search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
+		CreatedAt: time.Now(), Search: string(json), Public: reqObj.IsPublic}
 	err := svc.DB.Model(&search).Insert()
 	if err != nil {
 		log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
@@ -142,14 +202,25 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 	}
 
 	log.Printf("Search %s is private to userID %d", token, search.UserID)
-	authToken := c.GetString("token")
+	claimsIface, signedIn := c.Get("claims")
+	if signedIn == false {
+		log.Printf("Private search cannot be accessed by non-signed-in user (no claims present)")
+		c.String(http.StatusNotFound, "%s not found", token)
+		return
+	}
+	claims, ok := claimsIface.(*v4jwt.V4Claims)
+	if ok == false {
+		log.Printf("ERROR: invalid claims found")
+		c.String(http.StatusNotFound, "%s not found", token)
+		return
+	}
+
 	var userID int
-	uq := svc.DB.NewQuery("select id from users where auth_token={:t} and signed_in={:si}")
-	uq.Bind(dbx.Params{"t": authToken})
-	uq.Bind(dbx.Params{"si": true})
+	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
+	uq.Bind(dbx.Params{"v4id": claims.UserID})
 	uErr := uq.Row(&userID)
 	if uErr != nil {
-		log.Printf("Private search couldn't locate authg user: %s", uErr.Error())
+		log.Printf("Private search couldn't locate user %s: %s", claims.UserID, uErr.Error())
 		c.String(http.StatusNotFound, "%s not found", token)
 		return
 	}

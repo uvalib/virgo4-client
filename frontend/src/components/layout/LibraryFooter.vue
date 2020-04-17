@@ -1,5 +1,9 @@
 <template>
    <footer>
+     <div class="pre-footer" v-if="$route.name != 'feedback'">
+        This is the newest version of the Library catalog.
+        <router-link to="/feedback">Please give us your feedback.</router-link>
+     </div>
      <div class="footer-container">
       <div class="footer-bucket">
         <h3>Contact Us</h3>
@@ -110,6 +114,12 @@ footer {
 footer p.copy, footer p.gov {
    vertical-align: middle;
 }
+.pre-footer {
+  background-color: var(--uvalib-teal-lightest);
+  color: var(--uvalib-text-dark);
+  padding: 5px 20px;
+  margin: -20px -20px 0 -20px;
+}
 .footer-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -147,6 +157,7 @@ address {
   text-transform: uppercase;
   background-color: var(--uvalib-brand-orange);
   color: white !important;
+  font-size: 1.2em;
 }
 .pure-button.pure-button-give:hover {
    background-color: var(--uvalib-grey-light);

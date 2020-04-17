@@ -41,8 +41,10 @@ type ServiceConfig struct {
 	VirgoURL           string
 	SearchAPI          string
 	CourseReserveEmail string
+	LawReserveEmaiil   string
 	FeedbackEmail      string
 	ILSAPI             string
+	JWTKey             string
 	Dev                DevConfig
 	DB                 DBConfig
 	SMTP               SMTPConfig
@@ -64,7 +66,9 @@ func LoadConfig() *ServiceConfig {
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
+	flag.StringVar(&cfg.JWTKey, "jwtkey", "", "JWT signature key")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
+	flag.StringVar(&cfg.LawReserveEmaiil, "lawemail", "", "Law Email recipient for course reserves requests")
 	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 
@@ -112,6 +116,11 @@ func LoadConfig() *ServiceConfig {
 	} else {
 		log.Printf("Course Reserves email recipient: %s", cfg.CourseReserveEmail)
 	}
+	if cfg.LawReserveEmaiil == "" {
+		log.Fatal("lawemail param is required")
+	} else {
+		log.Printf("Law Course Reserves email recipient: %s", cfg.LawReserveEmaiil)
+	}
 	if cfg.FeedbackEmail == "" {
 		log.Fatal("feedbackemail param is required")
 	} else {
@@ -121,6 +130,9 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("solr and core params are required")
 	} else {
 		log.Printf("Solr endpoint: %s/%s", cfg.Solr.URL, cfg.Solr.Core)
+	}
+	if cfg.JWTKey == "" {
+		log.Fatal("jwtkey param is required")
 	}
 
 	return &cfg
