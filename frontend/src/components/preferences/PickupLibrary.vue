@@ -20,7 +20,7 @@ export default {
     }),
     pickupLibraries(){
       return [...(this.$store.getters['user/canUseLEO'] ? ['LEO'] : []),
-        'ALDERMAN', 'CLEMONS', 'DARDEN', 'FINE-ARTS',
+        'CLEMONS', 'DARDEN', 'FINE-ARTS',
         'HEALTHSCI', 'JAG', 'LAW', 'MATH', 'MUSIC', 'PHYSICS', 'SCI-ENG'
       ]
     }
