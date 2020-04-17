@@ -14,7 +14,7 @@ const restore = {
    getters: {
      getField,
      previousPath: state => {
-       let ignoredPaths = ['/signedout','/signin']
+       let ignoredPaths = ['/signedout','/signin','/forbidden']
        if( !state.searchData || !state.searchData.previousPath ||
         (state.searchData.previousPath == '/' && state.searchData.query == '') // blank search
          || ignoredPaths.includes(state.searchData.previousPath) ){
