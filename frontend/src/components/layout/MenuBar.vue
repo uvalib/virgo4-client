@@ -1,7 +1,7 @@
 <template>
    <nav class="menu">
       <span class="menu-right">
-        <router-link @mousedown.native="searchClicked" to="/">
+        <router-link @mousedown.native="searchClicked" to="/search">
            <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
         </router-link>
         <router-link to="/course-reserves" v-if="isSignedIn && canSearchReserves">

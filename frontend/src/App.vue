@@ -213,7 +213,11 @@ body {
 .pure-button.pure-button-primary:hover {
    background-color: var(--uvalib-brand-blue-lighter);
    border: 1px solid var(--uvalib-brand-blue-lighter);
+   transition: all 0.3s ease;
 }
+.pure-button.pure-button-primary:focus {
+   box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
+} 
 .pure-button.pure-button-secondary {
    background-color: var(--uvalib-brand-blue-lighter);
    color: black;

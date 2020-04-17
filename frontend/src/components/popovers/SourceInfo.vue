@@ -1,6 +1,9 @@
 <template>
-   <v-popover tabindex="0" placement="top-end" class="source-info">
-      <span class="text-button trigger">What am I searching&nbsp;<i class="fas fa-question-circle"></i></span>
+   <v-popover placement="top-end" class="source-info" trigger="manual" :open="isOpen" @hide="hide">
+      <span class="text-button trigger" tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide">
+         What am I searching&nbsp;<i class="fas fa-question-circle"></i>
+      </span>
       <div class="source-info-popover" slot="popover">
          <div class="popover-title">
             <i v-close-popover class="close fas fa-times-circle"></i>
@@ -15,6 +18,19 @@
 <script>
 
 export default {
+   data: function() {
+      return {
+         isOpen: false
+      }
+   },
+   methods: {
+      hide() {
+         this.isOpen = false
+      },
+      toggle() {
+         this.isOpen = !this.isOpen
+      }
+   }
 };
 </script>
 <style scoped>

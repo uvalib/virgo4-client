@@ -16,7 +16,6 @@ const system = {
       translateMessage: "",
       sessionExpired: false,
       displayWidth: window.innerWidth,
-      showWelcome: true
    },
 
    getters: {
@@ -29,9 +28,6 @@ const system = {
    },
 
    mutations: {
-      setShowWelcome(state, flag) {
-         state.showWelcome = flag
-      },
       newVersionDetected(state) {
          state.newVersion = true
       },
@@ -107,6 +103,9 @@ const system = {
    actions: {
       // Call getConfig at startup to get client configuration parameters
       getConfig(ctx) {
+         if (ctx.state.searchAPI != "") {
+            return
+         }
          let host = window.location.hostname
          return axios.get("/config", {headers: {V4Host:host}}).then((response) => {
             ctx.commit('setConfig', response.data)

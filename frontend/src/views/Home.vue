@@ -28,11 +28,9 @@
                class="search pure-button pure-button-primary">Search</button>
           </div>
           <div class="advanced">
-            <span tabindex="0" class="text-button advanced-link" 
-               @keyup.enter.prevent="advancedClicked" @keyup.space.prevent="advancedClicked"
-               @click="advancedClicked">
+            <router-link to="/search?mode=advanced">
               Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
-            </span>
+            </router-link>
           </div>
           <div class="advanced">
             <V4BarcodeScanner @scanned="barcodeScanned"/>
@@ -51,7 +49,7 @@
         <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
-      <Welcome  v-else-if="!isRestore && showWelcome && basicSearch"  />
+      <Welcome  v-else-if="!isRestore && isHomePage"  />
    </div>
 </template>
 
@@ -75,6 +73,14 @@ export default {
      SearchTips, AdvancedSearch, V4Spinner,
      V4Select, Welcome, SourceInfo
    },
+   beforeRouteUpdate (to, _from, next) {
+      if (to.query.mode == 'advanced') {
+         this.$store.commit("query/setAdvancedSearch")
+      } else {
+         this.$store.commit("query/setBasicSearch")
+      }
+      next()
+   },
    data: function() {
       return {
          showVideo: false
@@ -86,7 +92,6 @@ export default {
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
          restoreMessage: state => state.query.restoreMessage,
-         showWelcome: state => state.system.showWelcome
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
@@ -105,6 +110,9 @@ export default {
       },
       basicSearch() {
         return this.searchMode == "basic"
+      },
+      isHomePage() {
+         return this.$router.currentRoute == '/'
       },
       // This restore refers to a Saved Search
       isRestore() {
@@ -212,13 +220,6 @@ export default {
         this.$store.dispatch("searchAllPools")
       },
 
-      advancedClicked() {
-         let cr = this.$router.currentRoute
-         if ( cr.path != "/" ) {
-            this.$router.push("/")
-         }
-        this.$store.commit("query/setAdvancedSearch")
-      },
       barcodeScanned( barcode ) {
          this.basic = barcode
          this.searchClicked()

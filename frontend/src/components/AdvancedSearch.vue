@@ -65,10 +65,10 @@
          <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
       </div>
       <div class="basic">
-         <span class="text-button basic-link" @click="basicClicked">
+         <router-link to="/search">
             Basic Search&nbsp;
             <i class="fas fa-undo-alt"></i>
-         </span>
+         </router-link>
       </div>
       <div class="basic">
          <V4BarcodeScanner @scanned="barcodeScanned"/>
@@ -126,13 +126,6 @@ export default {
                "Please enter a search query"
             );
          }
-      },
-      basicClicked() {
-         let cr = this.$router.currentRoute
-         if ( cr.path != "/" ) {
-            this.$router.push("/")
-         }
-         this.$store.commit("query/setBasicSearch")
       },
       addClicked() {
          this.$store.commit("query/addCriteria");
