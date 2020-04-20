@@ -55,13 +55,13 @@ export default {
          return this.sort.sort_id != ""
       },
       sortOptions() {
-         let out = [] 
+         let out = []
          this.pool.sort_options.forEach( so => {
-            if (so.id === 'SortRelevance') {
+            if (/relevance/gi.test(so.id)) {
                out.push({id: so.id+"_DESC", name: so.label })
             } else {
-               out.push({id: so.id+"_ASC", name: so.label+" (Ascending)" })   
-               out.push({id: so.id+"_DESC", name: so.label+" (Descending)" })     
+               out.push({id: so.id+"_ASC", name: so.label+" (Ascending)" })
+               out.push({id: so.id+"_DESC", name: so.label+" (Descending)" })
             }
          })
          return out
