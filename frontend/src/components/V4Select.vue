@@ -1,8 +1,8 @@
 <template>
    <div class="v4-select">
-      <button ref="v4select" @click.stop="toggleExpand" class="v4-select" tabindex="0"  
-           @keyup.up.stop="handleKeypress" 
-           @keyup.down.stop="handleKeypress" 
+      <button ref="v4select" @click.stop="toggleExpand" class="v4-select" tabindex="0"
+           @keyup.up.stop="handleKeypress"
+           @keyup.down.stop="handleKeypress"
          :class="{attached: attached}" :aria-pressed="expanded" aria-haspopup="listbox"
          :style="{ 'background-color': background, padding: pad,
                   color: color, 'border': border }">
@@ -17,12 +17,12 @@
       <transition name="grow"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <ul tabindex="-1" ref="selectOptions" class="options" role="listbox" v-show="expanded" 
+         <ul tabindex="-1" ref="selectOptions" class="options" role="listbox" v-show="expanded"
             @keyup.stop='handleKeypress'
             v-bind:class="{right: alignment=='right', left: alignment=='left'}"
             :style="{ 'border': optborder }">
-            <li v-for="src in selections" @click="optionClicked(src)" 
-               :class="{disabled: src.disabled, selected: src.id==value.id, highlighted: highlightedID == src.id}" 
+            <li v-for="src in selections" @click="optionClicked(src)"
+               :class="{disabled: src.disabled, selected: src.id==value.id, highlighted: highlightedID == src.id}"
                class="option" :ref="`O${src.id}`" tabindex="-1"
                :key="src.id">
                <span v-html="src.name"></span>
@@ -102,7 +102,7 @@ export default {
    },
    methods: {
       handleKeypress() {
-         console.log("KEY "+event.keyCode)
+         //console.log("KEY "+event.keyCode)
          if (event.keyCode == 38 && this.highlightedIdx > 0) {
             // up arrow
             this.highlightedIdx--
@@ -118,7 +118,7 @@ export default {
                this.expanded = true
             }
                this.setSelectedItem()
-            
+
          } else if (event.keyCode == 13 ) {
             // enter toggles expand
             this.toggleExpand()
@@ -148,7 +148,7 @@ export default {
          if (src.disabled ) return
          this.$emit('input', src)
          this.currVal = src
-         this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)   
+         this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)
          if (this.highlightedIdx > -1) {
             this.highlightedID = this.selections[this.highlightedIdx].id
             let item = this.$refs["O"+this.highlightedID][0]
@@ -163,13 +163,13 @@ export default {
          setTimeout(() => {
             if (this.expanded) {
                if ( this.currVal ) {
-                  this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)   
+                  this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)
                   if (this.highlightedIdx > -1) {
                      this.highlightedID = this.selections[this.highlightedIdx].id
                      let item = this.$refs["O"+this.highlightedID][0]
                      item.focus()
                   }
-               } 
+               }
             } else {
                let v4sel = this.$refs.v4select
                v4sel.focus()
@@ -219,7 +219,7 @@ button.v4-select:focus{
    outline:none;
    /* background-color: var(--color-light-blue) !important; */
    border: 2px solid var(--uvalib-brand-orange) !important;
-} 
+}
 .wrap-select {
    height: 100%;
    align-items: center;
