@@ -1,24 +1,33 @@
 <template>
-   <div @click="expandClick" class="v4-select"
-      :class="{attached: attached}"
-      :style="{ 'background-color': background, padding: pad,
-               color: color, 'border': border }">
-      <div class="wrap-select">
-         <span class="selection">
-            <span v-if="value && value.id" v-html="value.name"></span>
-            <span v-else v-html="placeholder"></span>
-            <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
-         </span>
-      </div>
+   <div class="v4-select">
+      <button ref="v4select" @click.stop="toggleExpand" class="v4-select" tabindex="0"  
+           @keyup.up.stop="handleKeypress" 
+           @keyup.down.stop="handleKeypress" 
+         :class="{attached: attached}" :aria-pressed="expanded" aria-haspopup="listbox"
+         :style="{ 'background-color': background, padding: pad,
+                  color: color, 'border': border }">
+         <div class="wrap-select">
+            <span class="selection">
+               <span v-if="value && value.id" v-html="value.name"></span>
+               <span v-else v-html="placeholder"></span>
+               <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
+            </span>
+         </div>
+      </button>
       <transition name="grow"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div class="options" v-if="expanded" v-bind:class="{right: alignment=='right', left: alignment=='left'}"
+         <ul tabindex="-1" ref="selectOptions" class="options" role="listbox" v-show="expanded" 
+            @keyup.stop='handleKeypress'
+            v-bind:class="{right: alignment=='right', left: alignment=='left'}"
             :style="{ 'border': optborder }">
-            <div v-for="src in selections" @click="optionClicked(src)"
-               :class="{disabled: src.disabled}" class="option"
-               :key="src.id"  v-html="src.name"></div>
-         </div>
+            <li v-for="src in selections" @click="optionClicked(src)" 
+               :class="{disabled: src.disabled, selected: src.id==value.id, highlighted: highlightedID == src.id}" 
+               class="option" :ref="`O${src.id}`" tabindex="-1"
+               :key="src.id">
+               <span v-html="src.name"></span>
+            </li>
+         </ul>
       </transition>
    </div>
 </template>
@@ -69,6 +78,9 @@ export default {
    data: function()  {
       return {
          expanded: false,
+         highlightedIdx: 0,
+         highlightedID: 0,
+         currVal: this.value
       }
    },
    watch: {
@@ -89,16 +101,80 @@ export default {
       },
    },
    methods: {
+      handleKeypress() {
+         console.log("KEY "+event.keyCode)
+         if (event.keyCode == 38 && this.highlightedIdx > 0) {
+            // up arrow
+            this.highlightedIdx--
+            if ( this.expanded == false ) {
+               this.toggleExpand()
+            } else {
+               this.setSelectedItem()
+            }
+         } else if (event.keyCode == 40 && this.highlightedIdx < this.selections.length-1) {
+            // down arrow
+            this.highlightedIdx++
+            if ( this.expanded == false ) {
+               this.expanded = true
+            }
+               this.setSelectedItem()
+            
+         } else if (event.keyCode == 13 ) {
+            // enter toggles expand
+            this.toggleExpand()
+         } else if ( event.keyCode == 27 && this.expanded) {
+            // esc closes
+            this.expanded = false
+            let v4sel = this.$refs.v4select
+            v4sel.focus()
+         } else if ( event.keyCode == 36  && this.expanded ) {
+            // Home selects the first
+            this.highlightedIdx = 0
+            this.setSelectedItem()
+         } else if ( event.keyCode == 35 && this.expanded ) {
+            // end selects the last
+            this.highlightedIdx = this.selections.length - 1
+            this.setSelectedItem()
+         }
+      },
+      setSelectedItem() {
+         this.highlightedID = this.selections[this.highlightedIdx].id
+         let item = this.$refs["O"+this.highlightedID][0]
+         item.focus()
+         this.currVal =  this.selections[this.highlightedIdx]
+         this.$emit('input', this.currVal)
+      },
       optionClicked(src) {
          if (src.disabled ) return
          this.$emit('input', src)
+         this.currVal = src
+         this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)   
+         if (this.highlightedIdx > -1) {
+            this.highlightedID = this.selections[this.highlightedIdx].id
+            let item = this.$refs["O"+this.highlightedID][0]
+            item.focus()
+         }
       },
       globalClick() {
          this.expanded = false
       },
-      expandClick(e) {
-         e.stopPropagation()
-        this.expanded = !this.expanded
+      toggleExpand() {
+         this.expanded = !this.expanded
+         setTimeout(() => {
+            if (this.expanded) {
+               if ( this.currVal ) {
+                  this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)   
+                  if (this.highlightedIdx > -1) {
+                     this.highlightedID = this.selections[this.highlightedIdx].id
+                     let item = this.$refs["O"+this.highlightedID][0]
+                     item.focus()
+                  }
+               } 
+            } else {
+               let v4sel = this.$refs.v4select
+               v4sel.focus()
+            }
+         }, 260)
       },
       closeSources() {
         this.expanded = false;
@@ -122,18 +198,28 @@ export default {
 </script>
 
 <style scoped>
-.v4-select {
+div.v4-select {
+   align-self: stretch;
+   position: relative;
+}
+button.v4-select {
   display: inline-block;
   outline: none;
   border-radius: 5px;
   cursor: pointer;
   color: white;
-  position: relative;
   text-align: left;
-  align-self: stretch;
   padding: 0 10px;
   text-align: left;
+  height:100%;
+  width:100%;
 }
+button.v4-select:focus{
+   /* box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4); */
+   outline:none;
+   /* background-color: var(--color-light-blue) !important; */
+   border: 2px solid var(--uvalib-brand-orange) !important;
+} 
 .wrap-select {
    height: 100%;
    align-items: center;
@@ -177,6 +263,7 @@ export default {
   white-space: nowrap;
   display: grid;
   grid-auto-rows: auto;
+  margin:0;
 }
 
 @media only screen and (min-width: 768px) {
@@ -216,5 +303,14 @@ export default {
 .v4-select .option:hover {
   background-color:  var(--uvalib-brand-blue-lightest);
   color: var(--uvalib-text-dark);
+}
+.v4-select .option.highlighted  {
+  background-color:  var(--uvalib-blue-alt-light);
+  color: var(--uvalib-text-dark);
+  outline: none;
+}
+.v4-select .option.selected {
+   background: var(--color-brand-blue);
+   color: white;
 }
 </style>
