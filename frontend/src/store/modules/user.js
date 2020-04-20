@@ -54,10 +54,6 @@ const user = {
          if ( state.claims.canLEOPlus ) return state.claims.canLEOPlus
          return false
       },
-      canSearchReserves: (state) => {
-         if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
-         return false
-      },
       useSIS: (state) => {
          if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
          return false    

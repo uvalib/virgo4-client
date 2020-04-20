@@ -16,6 +16,16 @@
                <span @click="searchCourseClicked('id')" class="pure-button pure-button-primary">Search Course ID</span>
                <span @click="searchCourseClicked('name')" class="pure-button pure-button-primary">Search Course Names</span>
             </div>
+            <div class="links">
+               <a href="https://collab.its.virginia.edu/portal" target="_blank">
+                  UVA Collab<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+               </a>
+            </div>
+            <div class="links">
+               <a href="http://www.library.virginia.edu/services/course-reserves/" target="_blank">
+                  Place a Reserve (Instructors only)<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+               </a>
+            </div>
          </div>
          <template v-if="totalReserves > -1">
             <div class="no-match" v-if="totalReserves == 0">
@@ -152,5 +162,9 @@ p {
    font-weight: bold;
    margin-bottom: 25px;
    cursor: default;
+}
+div.links {
+   text-align: right;
+   margin: 10px 0;
 }
 </style>

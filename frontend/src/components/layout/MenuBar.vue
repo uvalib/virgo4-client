@@ -4,7 +4,7 @@
         <router-link @mousedown.native="searchClicked" to="/search">
            <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
         </router-link>
-        <router-link to="/course-reserves" v-if="isSignedIn && canSearchReserves">
+        <router-link to="/course-reserves">
            <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
         </router-link>
         <span v-if="isKiosk==false" class="menu-item feedback">
@@ -73,7 +73,6 @@ export default {
       ...mapGetters({
         isKiosk: 'system/isKiosk',
         isSignedIn: 'user/isSignedIn',
-        canSearchReserves: 'user/canSearchReserves',
         itemsOnNotice: 'user/itemsOnNotice'
       }),
       rotation() {
