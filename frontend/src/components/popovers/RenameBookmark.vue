@@ -1,8 +1,7 @@
 <template>
-   <v-popover class="inline">
-      <span class="trigger">
-         <i @click="opened" class="edit fas fa-edit"></i>
-      </span>
+   <v-popover class="inline" :open="isOpen" @hide="hide" @show="opened">
+      <i class="edit fas fa-edit" tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="show" @keyup.enter="show" @keydown.space.prevent="show"></i>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Rename Bookmark Folder</span>
@@ -11,9 +10,12 @@
             <input  @keyup.enter="enterPressed"  ref="rename" type="text" v-model="folderName"/>
          </div>
          <div class="edit-controls">
-            <span v-close-popover class="pure-button pure-button-tertiary">Cancel</span>
-            <span class="pure-button pure-button-primary"
-               @click="okClicked" id="ok-rename" v-close-popover >
+            <span tabindex="0" role="button" class="pure-button pure-button-tertiary"
+                @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
+               Cancel
+            </span>
+            <span tabindex="0" role="button" class="pure-button pure-button-primary"
+               @click="okClicked" @keyup.enter="okClicked" @keydown.space.prevent="okClicked">
                OK
             </span>
          </div>
@@ -32,6 +34,7 @@ export default {
    data: function()  {
       return {
          folderName: this.original.folder,
+         isOpen: false
       }
    },
    computed: {
@@ -43,11 +46,18 @@ export default {
          },500);
       },
       enterPressed() {
-         document.getElementById("ok-rename").click()
+         this.okClicked()
       },
       okClicked() {
          this.$emit('rename-approved', {id: this.original.id, name: this.folderName})
-      }
+         this.hide()
+      },
+      show() {
+         this.isOpen = true
+      },
+      hide() {
+         this.isOpen = false
+      },
    }
 };
 </script>

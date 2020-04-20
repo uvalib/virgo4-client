@@ -1,6 +1,7 @@
 <template>
-   <v-popover placement="top-end" class="iiif-info">
-      <span class="text-button trigger"><i class="fas fa-question-circle"></i></span>
+   <v-popover placement="top-end" class="iiif-info" trigger="manual" :open="isOpen" @hide="hide">
+      <i tabindex="0" role="button" :aria-pressed="isOpen" class="fas fa-question-circle"
+         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide"></i>
       <div class="iiif-info-popover" slot="popover">
          <div class="popover-title">
             What is IIIF?
@@ -20,7 +21,21 @@
 <script>
 
 export default {
-};
+   data: function() {
+      return {
+         isOpen: false
+      }
+   },
+   methods: {
+      hide() {
+         this.isOpen = false
+      },
+      toggle() {
+         this.isOpen = !this.isOpen
+      }
+   }
+}
+
 </script>
 <style scoped>
 i.fas.fa-times-circle.close {

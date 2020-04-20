@@ -1,8 +1,12 @@
 <template>
    <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false" class="inline">
-      <span>
-         <span v-if="mode=='save'" @click="openPopover" class="save pure-button pure-button-primary">Save Search</span>
-         <span v-else @click="openPopover" class="save pure-button pure-button-primary">Share Search</span>
+      <span v-if="mode=='save'" class="save pure-button pure-button-primary"  tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="openPopover" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="cancelClicked">
+         Save Search
+      </span>
+      <span v-else class="save pure-button pure-button-primary" tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="openPopover" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="cancelClicked">
+         Share Search
       </span>
       <div class="save-container" slot="popover">
          <div class="popover-header">
@@ -11,8 +15,8 @@
          </div>
          <template v-if="saved">
             <div v-if="mode=='save'" class="message">
-               Your search has been saved as '{{searchName}}'.<br/>
-               Manage your saved searches <router-link to="/bookmarks">here</router-link>.
+               <p class="saved">Your search has been saved as '{{searchName}}'.</p>
+               <p class="saved">Manage your saved searches <router-link tabindex="0" to="/bookmarks">here</router-link>.</p>
             </div>
             <div v-else class="message">
                Your search has been shared as '{{searchName}}'.
@@ -29,7 +33,10 @@
                </ul>
             </div>
             <div class="edit-controls">
-               <span v-close-popover class="pure-button pure-button-primary">OK</span>
+               <span class="pure-button pure-button-primary" tabindex="0" role="button"
+                  @click="cancelClicked" @keyup.enter="cancelClicked" @keydown.space.prevent="cancelClicked">
+                  OK
+               </span>
             </div>
          </template>
          <template v-else>
@@ -45,8 +52,12 @@
                   <p class="error">{{error}}</p>
                </div>
                <div class="edit-controls">
-                  <span @click="cancelClicked" class="pure-button pure-button-tertiary">Cancel</span>
-                  <span class="pure-button pure-button-primary" @click="saveClicked">
+                  <span class="pure-button pure-button-tertiary" tabindex="0" role="button"
+                     @click="cancelClicked" @keyup.enter="cancelClicked" @keydown.space.prevent="cancelClicked">
+                     Cancel
+                  </span>
+                  <span class="pure-button pure-button-primary" tabindex="0" role="button"
+                     @click="saveClicked"  @keyup.enter="saveClicked" @keydown.space.prevent="saveClicked">
                      Save
                   </span>
                </div>
@@ -110,6 +121,13 @@ export default {
       },
       cancelClicked() {
          this.isOpen = false
+      },
+      toggle() {
+         if (this.isOpen ) {
+            this.cancelClicked()
+         } else {
+            this.openPopover()
+         }
       },
       openPopover() {
          this.isOpen = true
@@ -227,7 +245,7 @@ p.error {
 } 
 p {
    margin: 0;
-   padding: 10px 0;
+   padding: 5px 0;
    text-align: center;
 }
 </style>

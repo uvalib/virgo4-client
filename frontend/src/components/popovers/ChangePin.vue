@@ -1,7 +1,8 @@
 <template>
-   <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false"  class="inline">
-      <span>
-         <span @click="openPopover" class="pin pure-button pure-button-primary">Change PIN</span>
+   <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false"  class="inline" @hide="hide">
+      <span class="pin pure-button pure-button-primary"  tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="openPopover" @keyup.enter="openPopover" @keydown.space.prevent="openPopover" @keyup.esc="hide">
+         Change PIN
       </span>
       <div class="pin-container" slot="popover">
          <div class="popover-header">
@@ -14,7 +15,10 @@
                </p>
             </div>
             <div class="edit-controls">
-               <span v-close-popover class="pure-button pure-button-primary">OK</span>
+               <span tabindex="0" role="button" class="pure-button pure-button-primary"
+                  @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
+                  OK
+               </span>
             </div>
          </template>
          <template v-else>
@@ -34,9 +38,12 @@
                <p class="error">{{error}}</p>
             </div>
             <div class="edit-controls">
-               <span @click="cancelClicked" class="pure-button pure-button-tertiary">Cancel</span>
-               <span class="pure-button pure-button-primary"
-                  @click="okClicked" id="ok-rename">
+               <span tabindex="0" role="button" class="pure-button pure-button-tertiary"
+                  @click="cancelClicked" @keyup.enter="cancelClicked" @keydown.space.prevent="cancelClicked">
+                  Cancel
+               </span>
+               <span tabindex="0" role="button" class="pure-button pure-button-primary"
+                  @click="okClicked" @keyup.enter="okClicked" @keydown.space.prevent="okClicked">
                   OK
                </span>
             </div>
@@ -60,6 +67,9 @@ export default {
    computed: {
    },
    methods: {
+      hide() {
+         this.isOpen = false
+      },
       cancelClicked() {
          this.isOpen = false
       },
@@ -72,19 +82,22 @@ export default {
          this.newPinConfirm = ""
          setTimeout(()=>{
             this.$refs.currpin.focus()
-         },100)
+         },200)
       },
       okClicked() {
          this.error = ""
          if ( this.currPin == "" || this.newPin == "" || this.newPinConfirm == "")  {
+            this.$refs.currpin.focus()
             this.error = "All three fields are required"
             return
          } 
          if ( this.newPin != this.newPinConfirm)  {
+            this.$refs.newpin.focus()
             this.error = "New PIN confirmation mismatch"
             return
          } 
          if ( this.newPin.length != 4) {
+            this.$refs.newpin.focus()
             this.error = "New PIN must be 4 digits"
             return   
          }
@@ -92,6 +105,7 @@ export default {
          this.$store.dispatch("user/changePIN", data).then(() => {
             this.pinChanged = true
          }).catch(() => {
+            this.$refs.currpin.focus()
             this.error = "PIN change failed"
          })
       }
@@ -150,6 +164,7 @@ span.label {
 p.error {
    padding: 10px;
    font-size: 0.8em;
+   color: var(  --uvalib-red-emergency);
 }
 .edit-controls .pure-button {
    margin-left: 5px;

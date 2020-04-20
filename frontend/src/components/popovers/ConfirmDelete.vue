@@ -1,9 +1,11 @@
 <template>
-   <v-popover>
-      <span class="trigger">
-         <span class="pure-button pure-button-primary" v-if="label">{{label}}</span>
-         <i v-else class="trash fas fa-trash-alt"></i>
+   <v-popover  trigger="manual" :open="isOpen" @hide="hide" @show="opened">
+      <span class="pure-button pure-button-primary" v-if="label" tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide">
+         {{label}}
       </span>
+      <i v-else class="trash fas fa-trash-alt" tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide"></i>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Confirm Delete</span>
@@ -13,9 +15,12 @@
             <p>Continue?</p>
          </div>
          <div class="confirm-controls">
-            <span v-close-popover class="pure-button pure-button-tertiary">Cancel</span>
-            <span class="pure-button pure-button-primary"
-               @click="$emit('delete-approved')" v-close-popover >
+            <span tabindex="0" role="button" ref="cancelbtn" class="pure-button pure-button-tertiary"
+               @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
+               Cancel
+            </span>
+            <span tabindex="0" role="button" class="pure-button pure-button-primary"
+               @click="okClicked" @keyup.enter="okClicked" @keydown.space.prevent="okClicked">
                OK
             </span>
          </div>
@@ -28,6 +33,28 @@
 export default {
    props: {
       label: String,
+   },
+   data: function() {
+      return {
+         isOpen: false
+      }
+   },
+   methods: {
+      okClicked() {
+         this.$emit('delete-approved')
+         this.isOpen = false
+      },
+      hide() {
+         this.isOpen = false
+      },
+      toggle() {
+         this.isOpen = !this.isOpen
+      },
+      opened() {
+         setTimeout(()=>{
+            this.$refs.cancelbtn.focus()
+         },250);
+      },
    }
 }
 </script>

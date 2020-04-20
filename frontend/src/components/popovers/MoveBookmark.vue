@@ -1,6 +1,7 @@
 <template>
-   <v-popover class="inline">
-      <span class="trigger pure-button pure-button-primary">Move</span>
+   <v-popover class="inline" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
+      <span class="trigger pure-button pure-button-primary" tabindex="0" role="button" :aria-pressed="isOpen"
+         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle">Move</span>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Move Bookmarks</span>
@@ -16,7 +17,7 @@
          <template v-else>
             <div class="message pure-form">
                <p>Select a new folder for the selected bookmarks</p>
-               <select v-model="selectedFolder">
+               <select tabindex="0" ref="foldersel" v-model="selectedFolder">
                   <option value="">Select a folder</option>
                   <option v-for="(folder) in folders"
                      :key="folder.id" :value="folder.id ">
@@ -25,9 +26,12 @@
                </select>
             </div>
             <div class="move-controls">
-               <span v-close-popover class="pure-button pure-button-tertiary">Cancel</span>
-               <span class="pure-button pure-button-primary"
-                  @click="moveClicked" v-close-popover >
+               <span tabindex="0" role="button" class="pure-button pure-button-tertiary"
+                  @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
+                  Cancel
+               </span>
+               <span tabindex="0" role="button" class="pure-button pure-button-primary"
+                  @click="moveClicked" @keyup.enter="moveClicked" @keydown.space.prevent="moveClicked">
                   Move
                </span>
             </div>
@@ -52,6 +56,7 @@ export default {
    data: function()  {
       return {
          selectedFolder: "",
+         isOpen: false
       }
    },
    computed: {
@@ -63,8 +68,20 @@ export default {
       }
    },
    methods: {
+      opened() {
+         setTimeout(()=>{
+            this.$refs.foldersel.focus()
+         },500);
+      },
       moveClicked() {
          this.$emit('move-approved', this.selectedFolder)
+         this.isOpen = false
+      },
+      hide() {
+         this.isOpen = false
+      },
+      toggle() {
+         this.isOpen = !this.isOpen
       }
    }
 };
