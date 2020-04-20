@@ -280,7 +280,6 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum
 	v4Claims.CanLEO = (ilsUser.HomeLibrary == "LEO")
 	v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
 	v4Claims.CanPurchase = ilsUser.CanPurchase()
-	v4Claims.CanBrowseReserve = (ilsUser.CommunityUser == false)
 	v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
 	v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
