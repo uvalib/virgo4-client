@@ -24,8 +24,7 @@
           </div>
           <div class="controls">
             <SourceInfo />
-            <button tabindex="0" v-on:keyup.enter="searchClicked" v-on:keyup.space="searchClicked" @click="searchClicked" 
-               class="search pure-button pure-button-primary">Search</button>
+            <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
             <router-link to="/search?mode=advanced">
@@ -65,13 +64,14 @@ import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
 import Welcome from "@/components/Welcome"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+import V4Button from "@/components/V4Button"
 
 export default {
    name: "home",
    components: {
      SearchResults,V4BarcodeScanner,
      SearchTips, AdvancedSearch, V4Spinner,
-     V4Select, Welcome, SourceInfo
+     V4Select, Welcome, SourceInfo, V4Button
    },
    beforeRouteUpdate (to, _from, next) {
       if (to.query.mode == 'advanced') {
