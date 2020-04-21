@@ -1,7 +1,6 @@
 <template>
    <v-popover class="inline" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <span class="trigger pure-button pure-button-primary" tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle">Move</span>
+      <V4Button mode="primary" :aria-pressed="isOpen" @click="toggle" @esc="hide">Move</V4Button>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Move Bookmarks</span>
@@ -11,7 +10,7 @@
                <p>No bookmarks have been selected to move.</p>
             </div>
             <div class="move-controls">
-               <span v-close-popover class="pure-button pure-button-tertiary">OK</span>
+               <V4Button mode="tertiary" @click="hide">OK</V4Button>
             </div>
          </template>
          <template v-else>
@@ -26,14 +25,8 @@
                </select>
             </div>
             <div class="move-controls">
-               <span tabindex="0" role="button" class="pure-button pure-button-tertiary"
-                  @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
-                  Cancel
-               </span>
-               <span tabindex="0" role="button" class="pure-button pure-button-primary"
-                  @click="moveClicked" @keyup.enter="moveClicked" @keydown.space.prevent="moveClicked">
-                  Move
-               </span>
+               <V4Button mode="tertiary" @click="hide">Cancel</V4Button>
+               <V4Button mode="primary" @click="moveClicked">Move</V4Button>
             </div>
          </template>
       </div>
@@ -42,7 +35,11 @@
 
 <script>
 import { mapGetters } from "vuex"
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    props: {
       bookmarks: {
          type: Array,

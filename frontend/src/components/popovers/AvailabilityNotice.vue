@@ -1,9 +1,8 @@
 <template>
    <v-popover class="popover" trigger="manual" :open="isOpen" @hide="hide">
-      <span tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide">
-         &nbsp;<i class="fas fa-exclamation-triangle"></i>
-      </span>
+      <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+         <i class="fas fa-exclamation-triangle"></i>
+      </V4Button>
       <div class="container" slot="popover">
          <div class="popover-header">
             <span>Availability Notice</span>
@@ -17,7 +16,11 @@
 </template>
 
 <script>
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    props: {
       message: String
    },

@@ -1,9 +1,8 @@
 <template>
-   <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false"  class="inline" @hide="hide">
-      <span class="pin pure-button pure-button-primary"  tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="openPopover" @keyup.enter="openPopover" @keydown.space.prevent="openPopover" @keyup.esc="hide">
+   <v-popover trigger="manual" :open="isOpen" class="inline" @hide="hide">
+      <V4Button mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="hide">
          Change PIN
-      </span>
+      </V4Button>
       <div class="pin-container" slot="popover">
          <div class="popover-header">
             <span>Change PIN</span>
@@ -38,14 +37,8 @@
                <p class="error">{{error}}</p>
             </div>
             <div class="edit-controls">
-               <span tabindex="0" role="button" class="pure-button pure-button-tertiary"
-                  @click="cancelClicked" @keyup.enter="cancelClicked" @keydown.space.prevent="cancelClicked">
-                  Cancel
-               </span>
-               <span tabindex="0" role="button" class="pure-button pure-button-primary"
-                  @click="okClicked" @keyup.enter="okClicked" @keydown.space.prevent="okClicked">
-                  OK
-               </span>
+               <V4Button mode="tertiary" @click="cancelClicked">Cancel</V4Button>
+               <V4Button mode="primary" @click="okClicked">OK</V4Button>
             </div>
          </template>
       </div>
@@ -53,7 +46,11 @@
 </template>
 
 <script>
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    data: function()  {
       return {
          currPin: "",

@@ -1,13 +1,11 @@
 <template>
    <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false" class="inline">
-      <span v-if="mode=='save'" class="save pure-button pure-button-primary"  tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="openPopover" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="cancelClicked">
+      <V4Button v-if="mode=='save'" mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="cancelClicked">
          Save Search
-      </span>
-      <span v-else class="save pure-button pure-button-primary" tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="openPopover" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="cancelClicked">
+      </V4Button>
+      <V4Button v-else mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="cancelClicked">
          Share Search
-      </span>
+      </V4Button>
       <div class="save-container" slot="popover">
          <div class="popover-header">
             <span v-if="mode=='save'">Save Search</span>
@@ -22,21 +20,18 @@
                Your search has been shared as '{{searchName}}'.
                <ul class="public-controls">
                   <li>
-                     <a  :href="publicURL()" target="_blank">
+                     <a :href="publicURL()" target="_blank">
                         <span>View shared search</span>
                         <i class="link fas fa-external-link-alt"></i>
                      </a>
                   </li>
                   <li>
-                     <span @click="copyURL" class="text-button">Copy shared URL to clipboard</span>
+                     <V4Button mode="text" @click="copyURL">Copy shared URL to clipboard</V4Button>
                   </li>
                </ul>
             </div>
             <div class="edit-controls">
-               <span class="pure-button pure-button-primary" tabindex="0" role="button"
-                  @click="cancelClicked" @keyup.enter="cancelClicked" @keydown.space.prevent="cancelClicked">
-                  OK
-               </span>
+               <V4Button mode="primary" @click="cancelClicked">OK</V4Button>
             </div>
          </template>
          <template v-else>
@@ -52,14 +47,8 @@
                   <p class="error">{{error}}</p>
                </div>
                <div class="edit-controls">
-                  <span class="pure-button pure-button-tertiary" tabindex="0" role="button"
-                     @click="cancelClicked" @keyup.enter="cancelClicked" @keydown.space.prevent="cancelClicked">
-                     Cancel
-                  </span>
-                  <span class="pure-button pure-button-primary" tabindex="0" role="button"
-                     @click="saveClicked"  @keyup.enter="saveClicked" @keydown.space.prevent="saveClicked">
-                     Save
-                  </span>
+                  <V4Button mode="tertiary" @click="cancelClicked">Cancel</V4Button>
+                  <V4Button mode="primary" @click="saveClicked">Save</V4Button>
                </div>
             </div>
          </template>
@@ -71,9 +60,10 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import V4Spinner from "@/components/V4Spinner"
+import V4Button from "@/components/V4Button"
 export default {
    components: {
-      V4Spinner
+      V4Button, V4Spinner
    },
    computed: {
       ...mapState({
