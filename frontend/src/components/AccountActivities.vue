@@ -12,12 +12,16 @@
       <span class="sep">|</span>
       <router-link to="/searches">Saved Searches</router-link>
       <span class="sep">|</span>
-      <div  @click="signOut" class="text-button">Sign Out</div>
+      <V4Button mode="text"  @click="signOut">Sign Out</V4Button>
    </div>
 </template>
 
 <script>
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    methods: {
       signOut() {
          this.$store.dispatch("user/signout")

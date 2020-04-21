@@ -7,7 +7,7 @@
                <h2>UVA Users</h2>
                <p class="subhead">(Current UVA students, faculty, and staff)</p>
                <div class="indent littleextra">
-                  <span @click="netbadgeLogin" class="pure-button pure-button-primary">Sign In with Netbadge</span>
+                  <V4Button mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
                </div>
             </span>
          </div>
@@ -49,7 +49,7 @@
                   <tr>
                     <td></td>
                     <td>
-                      <span @click="signinClicked" class="pure-button pure-button-primary">Sign in</span>
+                      <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
                     </td>
                   </tr>
                </table>
@@ -62,7 +62,11 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    name: "signin",
    computed: {
       ...mapState({
