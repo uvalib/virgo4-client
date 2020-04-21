@@ -22,6 +22,21 @@
                      v-bind:closeOthers="expandedFolder"
                      @accordion-clicked="folderOpened(folderInfo.id)"
                   >
+                     <template v-slot:controls>
+                        <div class="folder-settings" @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
+                           <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" />
+                           <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)">
+                              <div>
+                                 Delete bookmark folder
+                                 <b>{{folderInfo.folder}}</b>? All bookmarks
+                              </div>
+                              <div>contained within it will also be deleted.</div>
+                              <div>
+                                 <br />This cannot be reversed.
+                              </div>
+                           </ConfirmDelete>
+                        </div>
+                     </template>
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
                      </div>
@@ -31,18 +46,15 @@
                               <th colspan="3">
                                  <div class="folder-menu">
                                     <div style="margin-bottom:5px;">
-                                       <span @click="selectAll(folderInfo.bookmarks)" class="text-button">select all</span>
+                                       <V4Button mode="text" @click="selectAll(folderInfo.bookmarks)">select all</V4Button>
                                        <span class="spacer">|</span>
-                                        <span @click="clearAll" class="text-button">clear all</span>
+                                       <V4Button mode="text" @click="clearAll">clear all</V4Button>
                                     </div>
                                     <div class="button-group">
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                                           v-on:move-approved="moveBookmarks"/>
-                                       <span @click="removeBookmarks" class="pure-button pure-button-primary">Delete</span>
-                                       <span v-if="canMakeReserves" @click="reserve"
-                                          class="pure-button pure-button-primary">
-                                          Place on course reserve
-                                       </span>
+                                       <V4Button @click="removeBookmarks" mode="primary">Delete</V4Button>
+                                       <V4Button v-if="canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
                                     </div>
                                  </div>
                               </th>
@@ -81,27 +93,10 @@
                         </table>
                      </div>
                   </AccordionContent>
-                  <div class="folder-settings">
-                     <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" />
-                     <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)">
-                        <div>
-                           Delete bookmark folder
-                           <b>{{folderInfo.folder}}</b>? All bookmarks
-                        </div>
-                        <div>contained within it will also be deleted.</div>
-                        <div>
-                           <br />This cannot be reversed.
-                        </div>
-                     </ConfirmDelete>
-                  </div>
                </div>
             </template>
             <div class="controls">
-               <span
-                  v-if="createOpen==false"
-                  @click="openCreate"
-                  class="pure-button pure-button-primary"
-               >Create Folder</span>
+               <V4Button v-if="createOpen==false" @click="openCreate" mode="primary">Create Folder</V4Button>
                <div v-else class="create-folder pure-form">
                   <label>New Folder:</label>
                   <input
@@ -110,16 +105,8 @@
                      v-model="newFolder"
                      type="text"
                   />
-                  <span
-                     @click="cancelCreate"
-                     :class="{disabled: submitting}"
-                     class="pure-button pure-button-tertiary"
-                  >Cancel</span>
-                  <span
-                     @click="createFolder"
-                     :class="{disabled: submitting}"
-                     class="pure-button pure-button-primary"
-                  >Create</span>
+                  <V4Button @click="cancelCreate" :class="{disabled: submitting}" mode="primary">Cancel</V4Button>
+                  <V4Button @click="createFolder" class="{disabled: submitting}" mode="primary">Create</V4Button>
                </div>
             </div>
          </div>
@@ -136,6 +123,7 @@ import RenameBookmark from "@/components/popovers/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"
 import AccountActivities from "@/components/AccountActivities"
 import V4Spinner from "@/components/V4Spinner"
+import V4Button from "@/components/V4Button"
 export default {
    name: "bookmarks",
    components: {
@@ -144,7 +132,8 @@ export default {
       AccountActivities,
       MoveBookmark,
       RenameBookmark,
-      V4Spinner
+      V4Spinner,
+      V4Button
    },
    data: function() {
       return {
@@ -290,7 +279,7 @@ export default {
 </script>
 
 <style>
-div.accordion.boxed div.title {
+.accordion.boxed div.title {
    border: 1px solid #ccc;
    font-weight: bold;
    padding: 10px;
@@ -318,10 +307,7 @@ div.accordion.boxed div.title {
 }
 .folder-settings {
    display: flex;
-   padding: 10px 5px 7px 5px;
-   background-color: var(--uvalib-teal-lightest);
-   border-bottom: 3px solid var(--uvalib-teal-light);
-   margin-left: -10px;
+   margin-left: 15px;
 }
 .sep {
    margin: 0 5px;
@@ -329,10 +315,6 @@ div.accordion.boxed div.title {
 </style>
 
 <style scoped>
-.remove,
-.remove-folder {
-   padding: 2px 8px 2px 0;
-}
 i.fas {
    color: var(--uvalib-grey-dark);
    cursor: pointer;
@@ -345,9 +327,6 @@ i.link.fas {
    font-size:0.8em;
    color: var(   --color-link);
 }
-.accordion {
-   margin-right: 10px;
-}
 div.folder {
    display: flex;
    flex-flow: row nowrap;
@@ -358,7 +337,7 @@ div.folder .remove-folder {
    flex: 0 0 auto;
    padding-top: 4px;
 }
-div.accordion {
+.accordion {
    flex: 1 1 auto;
 }
 .bookmarks {

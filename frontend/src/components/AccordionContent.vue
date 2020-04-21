@@ -1,14 +1,20 @@
 <template>
-   <div class="accordion">
-      <div v-if="showHeader" class="title" @click="accordionClicked" :class="layout"
+   <h3 tabindex="0" class="accordion" v-bind:aria-expanded="isExpanded" role="button" 
+      @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
+      <div  v-if="showHeader" class="title" :class="layout"
          :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }">
          <span class="text" v-html="title"></span>
-         <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
+         <span class="accordion-buttons">
+            <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
+            <slot name="controls">
+            </slot>
+         </span>
       </div>
        <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div :id="id" class="accordion-content"  v-show="isExpanded" :style="{ backgroundContent: backgroundContent, color: color }">
+         <div :id="id" class="accordion-content" v-show="isExpanded" :style="{ backgroundContent: backgroundContent, color: color }" 
+            @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
             <slot></slot>
             <div v-if="closeText" @click="accordionClicked" class="footer">
                <b>{{ closeText }}</b>
@@ -16,7 +22,7 @@
             </div>
          </div>
       </transition>
-   </div>
+   </h3>
 </template>
 
 <script>
@@ -160,6 +166,10 @@ export default {
 </script>
 
 <style scoped>
+.accordion {
+   margin:0;
+   font-size: 1em;
+}
 .accordion-content {
    overflow: hidden;
    transition: 250ms ease-out;
@@ -172,16 +182,20 @@ div.title, div.footer {
    padding: 0px 8px;
    cursor: pointer;
    margin: 0;
-   background: #f5f5f5;
+   background: white;
    padding: 3px 12px;
    display: flex;
    flex-flow: row nowrap;
    align-content: center;
    justify-content: space-between;
    position: relative;
+   outline: none;
 }
-div.title, div.footer {
-   background: white;
+.accordion {
+   outline: none;
+}
+.accordion:focus {
+   box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
 }
 div.title.narrow {
    justify-content: flex-start;
@@ -201,5 +215,9 @@ div.title  .accordion-icon {
    font-size: 1.25em;
    transform: rotate(0deg);
    transition-duration: 250ms;
+}
+.accordion-buttons {
+   display: flex;
+   flex-flow: row nowrap;
 }
 </style>
