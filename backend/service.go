@@ -231,6 +231,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		SearchAPI        string `json:"searchAPI"`
 		TranslateMessage string `json:"translateMessage"`
 		KioskMode        bool   `json:"kiosk"`
+		DevServer        bool   `json:"devServer"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
@@ -245,6 +246,10 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	if strings.Index(v4HostHeader, "-kiosk") > -1 || svc.Dev.Kiosk {
 		log.Printf("This request is from a kiosk")
 		cfg.KioskMode = true
+	}
+	if strings.Index(v4HostHeader, "-dev") > -1 || svc.Dev.AuthUser != "" {
+		log.Printf("This request is from a dev server")
+		cfg.DevServer = true
 	}
 
 	c.JSON(http.StatusOK, cfg)

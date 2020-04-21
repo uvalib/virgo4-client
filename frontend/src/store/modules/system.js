@@ -6,6 +6,7 @@ const system = {
    state: {
       newVersion: false,
       kiosk: false,
+      devServer: false,
       fatal: "",
       error: "",
       message: "",
@@ -21,6 +22,9 @@ const system = {
    getters: {
       isKiosk: state => {
          return state.kiosk
+      },
+      isDevServer: state => {
+         return state.devServer
       },
       hasTranslateMessage: state => {
          return state.translateMessage.length > 0 && state.seenTranslateMsg == false
@@ -97,6 +101,7 @@ const system = {
          state.searchAPI = cfg.searchAPI
          state.translateMessage = cfg.translateMessage
          state.kiosk = cfg.kiosk
+         state.devServer = cfg.devServer
       },
    },
 
