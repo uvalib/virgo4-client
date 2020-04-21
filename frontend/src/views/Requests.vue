@@ -1,6 +1,6 @@
 <template>
    <div class="requests">
-      <h1>Requests</h1>
+      <h1>My Account</h1>
       <div class="requests-content">
          <AccountActivities />
          <div class="working" v-if="lookingUp" >

@@ -1,6 +1,6 @@
 <template>
    <div class="searches">
-      <h1>Saved Searches</h1>
+      <h1>My Account</h1>
       <div class="searches-content">
          <AccountActivities/>
          <div class="working" v-if="lookingUp" >

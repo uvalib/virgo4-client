@@ -1,6 +1,7 @@
 <template>
    <button tabindex="0" role="button" class="v4-button" 
-      :class="{'text-button': mode=='text', 'pure-button': mode!='text', 
+      :class="{'text-button': mode=='text', 'icon-button': mode=='icon', 
+               'pure-button': isButton, 
                'pure-button-primary': mode == 'primary',
                'pure-button-secondary': mode == 'secondary',
                'pure-button-tertiary': mode == 'tertiary'}" 
@@ -17,6 +18,11 @@ export default {
          required: true
       },
    },
+   computed: {
+      isButton() {
+         return this.mode != 'text' && this.mode!='icon'
+      }
+   },
    methods: {
       clicked() {
          this.$emit('click')
@@ -29,5 +35,11 @@ export default {
 button.text-button {
    border: none;
    background: none;
+}
+button.v4-button.icon-button {
+   border: none;
+   background: none;
+   padding: 0;
+   margin:0;
 }
 </style>

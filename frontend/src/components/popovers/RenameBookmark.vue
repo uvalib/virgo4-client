@@ -1,7 +1,6 @@
 <template>
    <v-popover class="inline" :open="isOpen" @hide="hide" @show="opened">
-      <i class="edit fas fa-edit" tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="show" @keyup.enter="show" @keydown.space.prevent="show"></i>
+      <V4Button mode="icon" :aria-pressed="isOpen" @click="show"><i class="fas fa-edit"></i></V4Button>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Rename Bookmark Folder</span>
@@ -14,17 +13,18 @@
                 @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
                Cancel
             </span>
-            <span tabindex="0" role="button" class="pure-button pure-button-primary"
-               @click="okClicked" @keyup.enter="okClicked" @keydown.space.prevent="okClicked">
-               OK
-            </span>
+            <V4Button mode="primary" @click="okClicked">OK</V4Button>
          </div>
       </div>
    </v-popover>
 </template>
 
 <script>
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    props: {
       original: {
          type: Object,

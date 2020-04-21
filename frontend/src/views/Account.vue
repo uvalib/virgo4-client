@@ -1,6 +1,6 @@
 <template>
    <div class="account">
-      <h1>Account</h1>
+      <h1>My Account</h1>
       <div class="account-content">
          <AccountActivities/>
          <div class="working" v-if="!expandBilling && lookingUp" >

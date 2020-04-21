@@ -1,11 +1,11 @@
 <template>
    <v-popover  trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <span class="pure-button pure-button-primary" v-if="label" tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide">
+      <V4Button mode="primary" v-if="label" :aria-pressed="isOpen" @click="toggle" @keyup.esc="hide">
          {{label}}
-      </span>
-      <i v-else class="trash fas fa-trash-alt" tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide"></i>
+      </V4Button>
+      <V4Button v-else mode="icon" :aria-pressed="isOpen" @click="toggle" @keyup.esc="hide">
+         <i class="trash fas fa-trash-alt"></i>
+      </V4Button>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Confirm Delete</span>
@@ -19,18 +19,18 @@
                @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
                Cancel
             </span>
-            <span tabindex="0" role="button" class="pure-button pure-button-primary"
-               @click="okClicked" @keyup.enter="okClicked" @keydown.space.prevent="okClicked">
-               OK
-            </span>
+            <V4Button mode="primary" @click="okClicked">OK</V4Button>
          </div>
       </div>
    </v-popover>
 </template>
 
 <script>
-
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    props: {
       label: String,
    },
