@@ -5,7 +5,7 @@
                'pure-button-primary': mode == 'primary',
                'pure-button-secondary': mode == 'secondary',
                'pure-button-tertiary': mode == 'tertiary'}" 
-      @click.stop="clicked" @keyup.stop.enter="clicked" @keydown.space.prevent.stop="clicked" >
+      @click.stop="clicked" @keyup.stop.enter="clicked" @keydown.space.prevent.stop="clicked" @keyup.stop.esc="escClicked">
       <slot></slot>
    </button>
 </template>
@@ -24,6 +24,9 @@ export default {
       }
    },
    methods: {
+      escClicked() {
+         this.$emit('esc')
+      },
       clicked() {
          this.$emit('click')
       }

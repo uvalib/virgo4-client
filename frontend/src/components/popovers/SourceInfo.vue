@@ -1,9 +1,8 @@
 <template>
    <v-popover placement="top-end" class="source-info" trigger="manual" :open="isOpen" @hide="hide">
-      <span class="text-button trigger" tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide">
+      <V4Button mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
          What am I searching&nbsp;<i class="fas fa-question-circle"></i>
-      </span>
+      </V4Button>
       <div class="source-info-popover" slot="popover">
          <div class="popover-title">
             <i v-close-popover class="close fas fa-times-circle"></i>
@@ -16,8 +15,11 @@
 </template>
 
 <script>
-
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    data: function() {
       return {
          isOpen: false

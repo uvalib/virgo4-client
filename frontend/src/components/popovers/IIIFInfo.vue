@@ -1,7 +1,8 @@
 <template>
    <v-popover placement="top-end" class="iiif-info" trigger="manual" :open="isOpen" @hide="hide">
-      <i tabindex="0" role="button" :aria-pressed="isOpen" class="fas fa-question-circle"
-         @click="toggle" @keyup.enter="toggle" @keydown.space.prevent="toggle" @keyup.esc="hide"></i>
+      <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+         <i class="fas fa-question-circle"></i>
+      </V4Button>
       <div class="iiif-info-popover" slot="popover">
          <div class="popover-title">
             What is IIIF?
@@ -19,8 +20,11 @@
 </template>
 
 <script>
-
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    data: function() {
       return {
          isOpen: false

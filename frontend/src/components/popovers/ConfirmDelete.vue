@@ -1,9 +1,9 @@
 <template>
    <v-popover  trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button mode="primary" v-if="label" :aria-pressed="isOpen" @click="toggle" @keyup.esc="hide">
+      <V4Button mode="primary" v-if="label" :aria-pressed="isOpen" @click="toggle" @esc="hide">
          {{label}}
       </V4Button>
-      <V4Button v-else mode="icon" :aria-pressed="isOpen" @click="toggle" @keyup.esc="hide">
+      <V4Button v-else mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide">
          <i class="trash fas fa-trash-alt"></i>
       </V4Button>
       <div class="confirm-container" slot="popover">
@@ -15,10 +15,7 @@
             <p>Continue?</p>
          </div>
          <div class="confirm-controls">
-            <span tabindex="0" role="button" ref="cancelbtn" class="pure-button pure-button-tertiary"
-               @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
-               Cancel
-            </span>
+            <V4Button mode="tertiary" @click="hide">Cancel</V4Button>
             <V4Button mode="primary" @click="okClicked">OK</V4Button>
          </div>
       </div>

@@ -1,8 +1,8 @@
 <template>
    <v-popover placement="top-end" class="tips"  trigger="manual" :open="isOpen" @hide="hide">
-      <span class="text-button trigger" tabindex="0" role="button" :aria-pressed="isOpen"
-         @click="toggle" @keyup.enter="toggle" @keyup.space.prevent="toggle" @keyup.esc="hide">
-         Search Tips&nbsp;<i class="fas fa-info-circle"></i></span>
+      <V4Button mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+         Search Tips&nbsp;<i class="fas fa-info-circle"></i>
+      </V4Button>
       <div class="tips-popover" slot="popover">
          <div class="popover-title">
             Search Tips
@@ -33,8 +33,11 @@
 </template>
 
 <script>
-
+import V4Button from "@/components/V4Button"
 export default {
+   components: {
+     V4Button
+   },
    data: function() {
       return {
          isOpen: false

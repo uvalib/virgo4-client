@@ -1,6 +1,6 @@
 <template>
    <v-popover class="inline" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button mode="icon" :aria-pressed="isOpen" @click="show"><i class="fas fa-edit"></i></V4Button>
+      <V4Button mode="icon" :aria-pressed="isOpen" @click="show" @esc="hide"><i class="fas fa-edit"></i></V4Button>
       <div class="confirm-container" slot="popover">
          <div class="popover-header">
             <span>Rename Bookmark Folder</span>
@@ -9,10 +9,7 @@
             <input  @keyup.enter="enterPressed"  ref="rename" type="text" v-model="folderName"/>
          </div>
          <div class="edit-controls">
-            <span tabindex="0" role="button" class="pure-button pure-button-tertiary"
-                @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
-               Cancel
-            </span>
+            <V4Button mode="tertiary" @click="hide">Cancel</V4Button>
             <V4Button mode="primary" @click="okClicked">OK</V4Button>
          </div>
       </div>
