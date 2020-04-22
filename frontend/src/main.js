@@ -5,7 +5,8 @@ import store from './store'
 import VueCookies from 'vue-cookies'
 import VTooltip from 'v-tooltip'
 import VueClipboard from 'vue-clipboard2'
-
+import V4Button from "@/components/V4Button"
+Vue.component('V4Button', V4Button)
 
 import VueMoment from 'vue-moment';
 Vue.use(VueMoment)
