@@ -15,7 +15,7 @@
         </span>
          <template v-if="isSignedIn">
             <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen"
-               @click="toggleMenu" @keyup.stop.enter="toggleMenu" @keydown.space.prevent.stop="toggleMenu" @keyup.stop.esc="closeMenu">
+               @click.stop="toggleMenu" @keyup.stop.enter="toggleMenu" @keydown.space.prevent.stop="toggleMenu" @keyup.stop.esc="closeMenu">
                <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
                <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
                <transition name="grow"
@@ -98,7 +98,6 @@ export default {
          let tgtID =  event.target.id 
          this.menuIdx = this.menuBar.findIndex( m => m==tgtID)
          this.subMenuIdx = 0
-         this.closeMenu()
       },
       nextMenu() {
          this.closeMenu()

@@ -9,7 +9,7 @@ require (
 	github.com/go-ozzo/ozzo-dbx v1.5.0
 	github.com/golang/protobuf v1.4.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/lib/pq v1.3.0
+	github.com/lib/pq v1.4.0
 	github.com/prometheus/client_golang v1.5.1 // indirect
 	github.com/prometheus/procfs v0.0.11 // indirect
 	github.com/rs/xid v1.2.1
