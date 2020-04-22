@@ -304,9 +304,6 @@ div.advanced {
   font-size: 1em;
   text-align: right;
 }
-.text-button.advanced-link:hover {
-  text-decoration: underline;
-}
 div.tips-container {
   position: absolute;
   font-size: 1em;

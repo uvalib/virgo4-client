@@ -67,13 +67,6 @@ div.source-info {
    border-right: 1px solid var(--uvalib-grey-dark);
    border-left: 1px solid var(--uvalib-grey-dark);
 }
-span.trigger:hover {
-   text-decoration: underline;
-}
-span.text-button.trigger {
-   opacity: 1;
-   font-weight: normal;
-}
 div.v-popover.source-info {
    margin:0;
    padding:0;

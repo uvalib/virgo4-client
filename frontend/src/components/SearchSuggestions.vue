@@ -10,7 +10,7 @@
             </template>
             <template v-if="suggestions.length > 2 && moreVisible == false">
                <span class="sep">|</span>
-               <span @click="moreClicked" class="more text-button">Show More...</span>
+               <V4Button mode="text" @click="moreClicked" class="more">Show More...</V4Button>
             </template>
             <template  v-if="suggestions.length > 2 && moreVisible == true">
                <template v-for="(s,idx) in suggestions.slice(2)">
@@ -18,7 +18,7 @@
                   <router-link  :key="`s${idx+2}`" :to="getRelatedLink(s)">{{s.value}}</router-link>
                </template>
                <span class="sep">|</span>
-               <span @click="lessClicked" class="more text-button">Show Less</span>
+               <V4Button mpde="text" @click="lessClicked" class="more">Show Less</V4Button>
             </template>
          </div>
       </div>
@@ -86,7 +86,7 @@ h2 {
 .sep {
    margin: 0 5px;
 }
-span.more.text-button {
+.more.v4-button {
    font-style: italic;
    font-weight: 100;
 }

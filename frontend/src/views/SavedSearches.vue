@@ -40,7 +40,7 @@
                         <i class="link fas fa-external-link-alt"></i>
                      </a>
                      <span class="sep">|</span>
-                     <span @click="copyURL(saved.token)" class="text-button">Copy published URL to clipboard</span>
+                     <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
                   </div>
                </div>
             </template>

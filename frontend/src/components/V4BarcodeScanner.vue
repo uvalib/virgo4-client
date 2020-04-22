@@ -1,8 +1,8 @@
 <template>
    <div v-if="enableBarcodeScan" class="v4-barcode-scanner">
-      <span v-if="showVideo==false" @click="videoShow" class="text-button">
+      <V4Button v-if="showVideo==false" @click="videoShow" mode="text">
          Scan Barcode&nbsp;<i class="fas fa-camera"></i>
-      </span>
+      </V4Button>
       <div class="scan-wrapper" v-if="showVideo">
          <span>Scan a barcode with the camera on your device</span>
          <StreamBarcodeReader 

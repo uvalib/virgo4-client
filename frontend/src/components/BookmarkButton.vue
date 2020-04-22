@@ -13,7 +13,7 @@
             </div>
             <div class="message">
                <p>You must be signed in to use bookmarks.</p>
-               <p>Click <span @click="signInClicked" class="text-button">here</span> sign in.</p>
+               <p>Click<V4Button mode="text" @click="signInClicked">here</V4Button>to sign in.</p>
             </div>
          </div>
       </v-popover>
@@ -58,7 +58,6 @@ export default {
    methods: {
       signInClicked() {
         this.$store.commit("restore/setBookmarkRecord", this.hit)
-
         this.$router.push("/signin")
       },
       removeBookmarkClicked() {

@@ -10,7 +10,7 @@
                <p>No bookmarks have been selected to move.</p>
             </div>
             <div class="move-controls">
-               <V4Button mode="tertiary" @click="hide">OK</V4Button>
+               <V4Button mode="tertiary" id="okbtn" @click="hide">OK</V4Button>
             </div>
          </template>
          <template v-else>
@@ -63,8 +63,12 @@ export default {
    methods: {
       opened() {
          setTimeout(()=>{
-            this.$refs.foldersel.focus()
-         },500);
+            if ( this.bookmarks.length > 0) {
+               this.$refs.foldersel.focus()
+            } else {
+               document.getElementById("okbtn").focus()
+            }
+         },150);
       },
       moveClicked() {
          this.$emit('move-approved', this.selectedFolder)

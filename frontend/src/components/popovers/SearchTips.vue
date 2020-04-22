@@ -113,13 +113,6 @@ p.example {
    font-family: monospace;
    font-size: 1.2em;
 }
-span.trigger:hover {
-   text-decoration: underline;
-}
-span.text-button.trigger {
-   opacity: 1;
-   font-weight: normal;
-}
 div.v-popover.tips {
    margin:0;
    padding:0;

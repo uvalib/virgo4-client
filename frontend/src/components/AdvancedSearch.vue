@@ -213,7 +213,7 @@ div.query {
   align-items: center;
   justify-content: flex-start;
 }
-.controls .v4-button {
+.controls button.v4-button {
    margin-left: auto;
 }
 .controls  > * {
@@ -255,8 +255,5 @@ div.basic {
    margin-top: 10px;
   font-size: 1em;
   text-align: right;
-}
-.text-button.basic-link:hover {
-   text-decoration: underline;
 }
 </style>

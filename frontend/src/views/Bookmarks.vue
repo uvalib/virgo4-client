@@ -70,7 +70,7 @@
                                     <a :href="getPublicURL(folderInfo)" target="_blank">
                                        <span>View</span><i class="link fas fa-external-link-alt"></i></a>                                    
                                     <span class="sep">|</span>
-                                    <span @click="copyURL(folderInfo)" class="text-button">Copy URL to clipboard</span>
+                                    <V4Button mode="text" @click="copyURL(folderInfo)">Copy URL to clipboard</V4Button>
                                  </span>
                               </th>
                            </tr>
@@ -105,7 +105,7 @@
                      v-model="newFolder"
                      type="text"
                   />
-                  <V4Button @click="cancelCreate" :class="{disabled: submitting}" mode="primary">Cancel</V4Button>
+                  <V4Button @click="cancelCreate" :class="{disabled: submitting}" mode="tertiary">Cancel</V4Button>
                   <V4Button @click="createFolder" class="{disabled: submitting}" mode="primary">Create</V4Button>
                </div>
             </div>
@@ -229,8 +229,6 @@ export default {
       },
       removeBookmarks() {
          if ( this.selectedItems.length == 0) {
-             this.$store.commit("system/setError", 
-               "No bookmarks have been selected for deletion.<br/>Please select one or more and try again.")
              return
          }
          this.$store.dispatch("bookmarks/removeBookmarks", this.selectedItems)

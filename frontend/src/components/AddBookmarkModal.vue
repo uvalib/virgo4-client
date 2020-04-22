@@ -141,7 +141,7 @@ div.controls {
    padding: 10px;
    text-align: right;
 }
-div.controls .pure-button {
+div.controls .v4-button {
    padding: 4px 16px;
 }
 div.select {

@@ -15,7 +15,7 @@
             <p>Continue?</p>
          </div>
          <div class="confirm-controls">
-            <V4Button mode="tertiary" @click="hide">Cancel</V4Button>
+            <V4Button mode="tertiary" id="cancelbtn" @click="hide">Cancel</V4Button>
             <V4Button mode="primary" @click="okClicked">OK</V4Button>
          </div>
       </div>
@@ -45,8 +45,8 @@ export default {
       },
       opened() {
          setTimeout(()=>{
-            this.$refs.cancelbtn.focus()
-         },250);
+            document.getElementById("cancelbtn").focus()
+         },260);
       },
    }
 }

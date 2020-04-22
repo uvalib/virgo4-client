@@ -163,13 +163,6 @@ export default {
 div.basic {
    text-align: right;
 }
-.text-button.basic-link {
-   margin-top: 10px;
-   font-size: 1em;
-}
-.text-button.basic-link:hover {
-   text-decoration: underline;
-}
 .shady {
    margin: 0;
    padding: 10px 25px;
