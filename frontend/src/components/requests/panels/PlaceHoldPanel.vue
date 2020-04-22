@@ -7,7 +7,7 @@
     </div>
     <PickupLibrary />
 
-    <button @click="placeHold" class="request-button pure-button pure-button-primary">Place Hold</button>
+    <V4Button mode="primary" class="request-button" @click="placeHold">Place Hold</V4Button>
 
   </div>
 </template>

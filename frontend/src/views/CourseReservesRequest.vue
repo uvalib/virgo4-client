@@ -151,11 +151,9 @@
          </div>
          <div class="controls">
             <router-link to="/bookmarks">
-               <span class="pure-button pure-button-tertiary">Cancel Request</span>
+               <V4Button mode="tertiary">Cancel Request</V4Button>
             </router-link>
-            <span @click="submitRequest" class="pure-button pure-button-primary">
-               Submit Request
-            </span>
+            <V4Button mode="primary" @click="submitRequest">Submit Request</V4Button>
          </div>
       </div>
    </div>

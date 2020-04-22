@@ -23,8 +23,8 @@
          <p class="error">{{bookmarkError}}</p>
       </div>
       <div class="controls">
-         <span @click="cancelBookmark" class="pure-button pure-button-tertiary">Cancel</span>
-         <span @click="okBookmark" class="pure-button pure-button-primary">OK</span>
+         <V4Button mode="tertiary" @click="cancelBookmark">Cancel</V4Button>
+         <V4Button mode="primary" @click="okBookmark">OK</V4Button>
       </div>
    </div>
 </template>

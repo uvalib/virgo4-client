@@ -215,10 +215,11 @@ button.v4-select {
   width:100%;
 }
 button.v4-select:focus{
-   /* box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4); */
+   box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
    outline:none;
+   z-index: 10;
    /* background-color: var(--color-light-blue) !important; */
-   border: 2px solid var(--uvalib-brand-orange) !important;
+   /* border: 2px solid var(--uvalib-brand-orange) !important; */
 }
 .wrap-select {
    height: 100%;

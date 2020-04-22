@@ -155,7 +155,7 @@ export default {
 </script>
 
 <style scoped>
-span.save.pure-button.pure-button-primary {
+span.save.v4-button {
    margin: 0 0 0 10px;
 }
 div.popover-header {

@@ -2,7 +2,7 @@
    <div class="translate-msg">
       <h2>{{message}}</h2>
       <div class="controls">
-         <span @click="ackMessage" class="pure-button pure-button-primary">OK</span>  
+         <V4Button mode="primary" @click="ackMessage">OK</V4Button>
       </div>
    </div>
 </template>

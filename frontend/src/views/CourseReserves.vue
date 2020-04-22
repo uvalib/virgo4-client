@@ -11,10 +11,10 @@
          <div class="search-panel pure-form">
             <input v-model="query" autocomplete="off" type="text">
             <div class="controls">
-               <span v-if="canMakeReserves" @click="searchInstructorClicked('id')" class="pure-button pure-button-primary">View My Reserves</span>
-               <span @click="searchInstructorClicked('name')" class="pure-button pure-button-primary">Search Instructors</span>
-               <span @click="searchCourseClicked('id')" class="pure-button pure-button-primary">Search Course ID</span>
-               <span @click="searchCourseClicked('name')" class="pure-button pure-button-primary">Search Course Names</span>
+               <V4Button v-if="canMakeReserves" mode="primary" @click="searchInstructorClicked('id')">View My Reserves</V4Button>
+               <V4Button @click="searchInstructorClicked('name')" mode="primary">Search Instructors</V4Button>
+               <V4Button @click="searchCourseClicked('id')" mode="primary">Search Course ID</V4Button>
+               <V4Button @click="searchCourseClicked('name')" mode="primary">Search Course Names</V4Button>
             </div>
             <div class="links">
                <a href="https://collab.its.virginia.edu/portal" target="_blank">
@@ -141,9 +141,9 @@ p {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
-#app .controls span.pure-button.pure-button-primary {
+#app .controls span.v4-button {
    margin: 0 0 5px 10px;
 }
 .no-match {

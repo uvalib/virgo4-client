@@ -11,15 +11,13 @@
                      If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
                </div>
                <div v-else class="toolbar">
-                  <span @click="renewAll"
-                     class="renew-all pure-button pure-button-primary">Renew All</span>
+                  <V4Button mode="primary" @click="renewAll">Renew All</V4Button>
                </div>
                <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
                   <h3 class="item-title">
                      <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
                      {{co.title}}
-                     <span @click="renewItem(co.barcode)" v-if="!isBarred"
-                        class="renew pure-button pure-button-primary">Renew</span>
+                     <V4Button v-if="!isBarred" mode="primary" @click="renewItem(co.barcode)" class="renew">Renew</V4Button>
                   </h3>
                   <dl>
                     <dt>Author:</dt>
@@ -179,7 +177,7 @@ i.notice {
    margin-right: 5px;
    font-size: 1.25em;
 }
-span.renew {
+v4-button.renew {
    font-size: 0.75em;
    float: right;
    font-weight: 500;

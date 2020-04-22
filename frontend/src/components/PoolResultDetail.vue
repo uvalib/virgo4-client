@@ -35,12 +35,12 @@
                </div>
             </div>
          </div>
-         <div v-if="hasMoreHits" @click="loadMoreResults" class="see-more pure-button pure-button-primary">
+         <V4Button v-if="hasMoreHits" mode="primary" @click="loadMoreResults">
             <span v-if="loadingMore">
                <V4Spinner v-if="loadingMore" color="white"/>
             </span>
             <span v-else>Load More Results</span>
-         </div>
+         </V4Button>
       </template>
    </div>
 </template>

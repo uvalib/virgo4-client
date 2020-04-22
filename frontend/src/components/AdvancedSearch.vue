@@ -62,7 +62,7 @@
          </div>
       </div>
       <div class="controls">
-         <span @click="doAdvancedSearch" class="pure-button pure-button-primary">Search</span>
+         <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
       </div>
       <div class="basic">
          <router-link to="/search">
@@ -213,7 +213,7 @@ div.query {
   align-items: center;
   justify-content: flex-start;
 }
-.controls .pure-button.pure-button-primary {
+.controls .v4-button {
    margin-left: auto;
 }
 .controls  > * {

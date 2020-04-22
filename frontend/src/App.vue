@@ -27,7 +27,7 @@
          <router-view />
          <div v-if="newVersion" class="update-pop">
             <div class="msg">A new version of Virgo is available.</div>
-            <span @click="updateClicked" class="pure-button pure-button-primary">Update Now</span>
+            <V4Button mode="primary" @click="updateClicked">Update Now</V4Button>
          </div>
          <MessageBox type="error" />
          <MessageBox type="info" />

@@ -11,7 +11,7 @@
       <template v-else>
          <div class="filters-head clearfix">
             <span class="title">Applied Filters</span>
-            <span v-if="hasFilter(resultsIdx)" @click="clearClicked" class="clear pure-button pure-button-primary">Clear All</span>
+            <V4Button v-if="hasFilter(resultsIdx)" mode="primary" @click="clearClicked">Clear All</V4Button>
          </div>
          <template v-if="hasFilter(resultsIdx)">
             <dl class="filter-display">

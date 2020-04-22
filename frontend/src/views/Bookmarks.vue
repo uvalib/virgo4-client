@@ -40,7 +40,7 @@
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
                      </div>
-                     <div v-else>
+                     <div v-else class="bookmark-folder-details">
                         <table>
                            <tr>
                               <th colspan="3">
@@ -443,7 +443,7 @@ i.details {
    color: var(--uvalib-grey-dark);
    margin-left: 10px;
 }
-.folder-menu span.pure-button.pure-button-primary {
+.folder-menu .v4-button {
    margin-bottom: 5px;
    flex-grow: 1;
 }
@@ -452,5 +452,8 @@ i.details {
    display: flex;
    flex-flow: row wrap;
    margin: 0;
+}
+.bookmark-folder-details {
+   padding: 0 5px 10px 10px;
 }
 </style>

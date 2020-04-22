@@ -66,7 +66,7 @@ export default {
    padding:0;
    color:white;
 }
-.scan-wrapper .scan.controls .pure-button.pure-button-primary {
+.scan-wrapper .scan.controls .v4-button {
    margin: 5px 0 0 0;
 }
 </style>

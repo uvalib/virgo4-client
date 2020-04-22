@@ -21,12 +21,12 @@
          <div class="results-main">
             <div class="pool-tabs">
                <template  v-for="(r,idx) in sourceTabs">
-                  <div @click="resultsButtonClicked(idx)" :key="idx" class="pool pure-button" v-bind:class="{showing: idx == selectedResultsIdx}">
+                  <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
                      <span>
                         <span class="pool">{{r.pool.name}}</span>
                         <span class="total">{{r.total}} hits</span>
                      </span>
-                  </div>
+                  </V4Button>
                </template>
                <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                   :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
@@ -134,9 +134,6 @@ export default {
       formatFilterValues(values) {
          return values.join(", ")
       },
-      refineClicked() {
-         this.$store.commit("query/setAdvancedSearch")
-      },
       resultsButtonClicked(resultIdx) {
          let r = this.results[resultIdx]
          if ( this.poolFailed(r)) return
@@ -186,7 +183,7 @@ p.relevant {
    flex-flow: row wrap;
    justify-content: flex-start;
 }
-.pool.pure-button {
+.pool-tabs .pool.v4-button {
    margin: 0;
    padding: 8px 10px;
    border-radius: 5px 5px 0 0;
@@ -195,20 +192,30 @@ p.relevant {
    text-align: left;
    flex: 1 1 auto;
    background: #FFF;
+   outline: none;
 }
-.pool.pure-button:first-child {
+.pool-tabs .pool.v4-button:focus {
+    /* border: 2px solid var(--uvalib-brand-orange) !important; */
+    border-bottom: none;
+    box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
+    z-index: 10;
+}
+.pool-results {
+   z-index: 11;
+}
+.pool.v4-button:first-child {
   margin-left: 4px;
 }
-.pool.pure-button.showing {
+.pool.v4-button.showing {
    background-color: var(--uvalib-brand-blue);
    color: #fff;
 }
-.pool.pure-button.disabled.failed {
+.pool.v4-button.disabled.failed {
    background: var(--uvalib-red-emergency);
    color: white;
    opacity: 0.5;
 }
-.pool-tabs .pool.pure-button:last-child {
+.pool-tabs .pool.v4-button:last-child {
    margin-right: -1px;
 }
 .summary .query {
@@ -258,9 +265,6 @@ p.relevant {
    div.search-results {
       margin: 0;
       padding: 0 2vw 20px 2vw;
-   }
-   span.refine.pure-button.pure-button-primary {
-      display: none;
    }
    .save-box{
       width: 90%;
