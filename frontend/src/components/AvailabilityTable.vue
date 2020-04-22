@@ -21,7 +21,7 @@
 
                <tr v-for="(item,idx) in availability.items" :key="idx">
                   <td class="value" v-for="(field, id) in visibleFields(item)" :key="id">
-                     {{field.value}}
+                     {{formatValue(field.value)}}
                   </td>
                   <td>
                     <span class="notice" v-if="item.notice">
@@ -53,6 +53,12 @@ export default {
       }),
    },
    methods: {
+      formatValue(val) {
+         if ( val == "On Shelf" ) {
+            return "On Shelf Now"
+         }
+         return val
+      },
       visibleFields: function(item) {
          return item.fields.filter(h => h.visible)
       }
