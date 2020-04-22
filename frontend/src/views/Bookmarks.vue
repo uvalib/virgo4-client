@@ -122,8 +122,6 @@ import MoveBookmark from "@/components/popovers/MoveBookmark"
 import RenameBookmark from "@/components/popovers/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"
 import AccountActivities from "@/components/AccountActivities"
-import V4Spinner from "@/components/V4Spinner"
-import V4Button from "@/components/V4Button"
 export default {
    name: "bookmarks",
    components: {
@@ -132,8 +130,6 @@ export default {
       AccountActivities,
       MoveBookmark,
       RenameBookmark,
-      V4Spinner,
-      V4Button
    },
    data: function() {
       return {

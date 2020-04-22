@@ -165,12 +165,8 @@
 import { mapState } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import { mapMultiRowFields } from 'vuex-map-fields'
-import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "course-reserves-request",
-   components: {
-      V4Spinner
-   },
    data: function() {
       return {
          errors: [],

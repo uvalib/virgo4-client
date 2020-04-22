@@ -29,9 +29,7 @@
          </div>
 
          <div class="action-group">
-            <button @click="submit" class="pure-button pure-button-primary">
-               Leave Feedback
-            </button>
+            <V4Button mode="primary" @click="submit">Leave Feedback</V4Button>
          </div>
       </div>
       <div v-else>
@@ -45,12 +43,8 @@
 <script>
 import { mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
-import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "feedback",
-   components: {
-      V4Spinner
-   },
    data: function() {
       return {
          errors: [],

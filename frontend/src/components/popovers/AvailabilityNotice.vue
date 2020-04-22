@@ -16,11 +16,7 @@
 </template>
 
 <script>
-import V4Button from "@/components/V4Button"
 export default {
-   components: {
-     V4Button
-   },
    props: {
       message: String
    },

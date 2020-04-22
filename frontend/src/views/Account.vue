@@ -143,7 +143,6 @@ import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
 import ChangePin from '@/components/popovers/ChangePin'
-import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "account",
    data: function() {
@@ -152,8 +151,7 @@ export default {
       };
    },
    components: {
-      AccountActivities, AccordionContent, 
-      V4Spinner, ChangePin
+      AccountActivities, AccordionContent, ChangePin
    },
    computed: {
       ...mapState({

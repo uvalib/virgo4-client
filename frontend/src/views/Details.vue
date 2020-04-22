@@ -73,7 +73,6 @@ import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import ImageDetails from '@/components/ImageDetails'
 import AvailabilityTable from "@/components/AvailabilityTable"
-import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from '@/components/AccessURLDetails'
@@ -97,7 +96,7 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable, V4Spinner,
+      SearchHitHeader, AvailabilityTable,
       ImageDetails, AccordionContent, AccessURLDetails
    },
    computed: {

@@ -45,13 +45,12 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import V4Spinner from "@/components/V4Spinner"
 import CourseSearchResults from "@/components/reserves/CourseSearchResults"
 import InstructorSearchResults from "@/components/reserves/InstructorSearchResults"
 export default {
    name: "course-reserves",
    components: {
-      CourseSearchResults, InstructorSearchResults,V4Spinner
+      CourseSearchResults, InstructorSearchResults 
    },
    data: function() {
       return {

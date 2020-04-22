@@ -38,11 +38,10 @@
 <script>
 import { mapGetters } from "vuex"
 import AvailabilityNotice from "@/components/popovers/AvailabilityNotice"
-import V4Spinner from "@/components/V4Spinner"
 import RequestContainer from "@/components/requests/RequestContainer"
 export default {
   components: {
-    AvailabilityNotice, V4Spinner, RequestContainer
+    AvailabilityNotice, RequestContainer
   },
    props: {
       titleId: String

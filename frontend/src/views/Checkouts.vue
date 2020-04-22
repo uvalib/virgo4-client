@@ -52,11 +52,10 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
-import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "checkouts",
    components: {
-      AccountActivities, V4Spinner
+      AccountActivities
    },
    computed: {
       ...mapState({

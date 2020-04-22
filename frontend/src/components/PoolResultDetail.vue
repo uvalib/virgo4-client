@@ -51,11 +51,10 @@ import { mapGetters } from "vuex"
 import SearchHit from "@/components/SearchHit"
 import ImageSearchHit from "@/components/ImageSearchHit"
 import SearchFilters from "@/components/SearchFilters"
-import V4Spinner from "@/components/V4Spinner"
 import V4Sort from "@/components/V4Sort"
 export default {
    components: {
-      ImageSearchHit, SearchHit, SearchFilters, V4Spinner, V4Sort
+      ImageSearchHit, SearchHit, SearchFilters, V4Sort
    },
    data: function() {
       return {

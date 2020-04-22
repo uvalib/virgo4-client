@@ -59,12 +59,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import V4Spinner from "@/components/V4Spinner"
-import V4Button from "@/components/V4Button"
 export default {
-   components: {
-      V4Button, V4Spinner
-   },
    computed: {
       ...mapState({
          resultsIdx: state => state.selectedResultsIdx,

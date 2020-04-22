@@ -6,7 +6,9 @@ import VueCookies from 'vue-cookies'
 import VTooltip from 'v-tooltip'
 import VueClipboard from 'vue-clipboard2'
 import V4Button from "@/components/V4Button"
+import V4Spinner from "@/components/V4Spinner"
 Vue.component('V4Button', V4Button)
+Vue.component('V4Spinner', V4Spinner)
 
 import VueMoment from 'vue-moment';
 Vue.use(VueMoment)

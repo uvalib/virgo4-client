@@ -35,11 +35,7 @@
 
 <script>
 import { mapGetters } from "vuex"
-import V4Button from "@/components/V4Button"
 export default {
-   components: {
-     V4Button
-   },
    props: {
       bookmarks: {
          type: Array,

@@ -9,7 +9,7 @@
             @decode="onBarcodeDecode"
          ></StreamBarcodeReader>
          <div class="scan controls">
-            <span @click="cancelScan" class="pure-button pure-button-primary">Cancel</span>
+            <V4Button mode="primary" @click="cancelScan">Cancel</V4Button>
          </div>
       </div>
    </div>

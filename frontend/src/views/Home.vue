@@ -60,18 +60,16 @@ import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/popovers/SearchTips"
 import SourceInfo from "@/components/popovers/SourceInfo"
 import AdvancedSearch from "@/components/AdvancedSearch"
-import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
 import Welcome from "@/components/Welcome"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
-import V4Button from "@/components/V4Button"
 
 export default {
    name: "home",
    components: {
-     SearchResults,V4BarcodeScanner,
-     SearchTips, AdvancedSearch, V4Spinner,
-     V4Select, Welcome, SourceInfo, V4Button
+     SearchResults, V4BarcodeScanner,
+     SearchTips, AdvancedSearch,
+     V4Select, Welcome, SourceInfo
    },
    beforeRouteUpdate (to, _from, next) {
       if (to.query.mode == 'advanced') {
@@ -263,7 +261,7 @@ export default {
   align-items: center;
   justify-content: flex-start;
 }
-.controls .search.pure-button.pure-button-primary {
+.controls .search.v4-button {
    margin-left: auto;
 }
 .controls  > * {

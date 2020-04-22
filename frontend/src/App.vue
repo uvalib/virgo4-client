@@ -44,7 +44,6 @@ import MessageBox from "@/components/layout/MessageBox"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import FatalError from "@/components/layout/FatalError"
-import V4Spinner from "@/components/V4Spinner"
 import AddBookmarkModal from "@/components/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -62,7 +61,6 @@ export default {
       VirgoHeader,
       LibraryFooter,
       FatalError,
-      V4Spinner,
       AddBookmarkModal,
       MenuBar,
       ScrollToTop,

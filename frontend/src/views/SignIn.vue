@@ -62,11 +62,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import V4Button from "@/components/V4Button"
 export default {
-   components: {
-     V4Button
-   },
    name: "signin",
    computed: {
       ...mapState({
@@ -138,9 +134,6 @@ p.hint {
    margin: 5px 10px;
    color: var(--uvalib-grey-dark);
    text-align: left;
-}
-#app .signin .pure-button.pure-button-primary {
-   margin: 0;
 }
 .controls {
    margin-top: 5px;

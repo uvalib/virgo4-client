@@ -14,10 +14,7 @@
                </p>
             </div>
             <div class="edit-controls">
-               <span tabindex="0" role="button" class="pure-button pure-button-primary"
-                  @click="hide" @keyup.enter="hide" @keydown.space.prevent="hide">
-                  OK
-               </span>
+               <V4Button mode="primary" @click="hide">OK</V4Button>
             </div>
          </template>
          <template v-else>
@@ -46,11 +43,7 @@
 </template>
 
 <script>
-import V4Button from "@/components/V4Button"
 export default {
-   components: {
-     V4Button
-   },
    data: function()  {
       return {
          currPin: "",
@@ -111,7 +104,7 @@ export default {
 </script>
 
 <style scoped>
-span.pin.pure-button.pure-button-primary {
+span.pin.v4-button {
    margin: 0;
 }
 div.popover-header {

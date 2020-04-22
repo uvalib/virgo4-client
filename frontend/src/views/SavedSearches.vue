@@ -51,13 +51,12 @@
 
 <script>
 import { mapState } from "vuex"
-import V4Spinner from "@/components/V4Spinner"
 import AccountActivities from "@/components/AccountActivities"
 import ConfirmDelete from "@/components/popovers/ConfirmDelete"
 export default {
    name: "requests",
    components: {
-      V4Spinner, AccountActivities,ConfirmDelete
+      AccountActivities,ConfirmDelete
    },
    computed: {
       ...mapState({

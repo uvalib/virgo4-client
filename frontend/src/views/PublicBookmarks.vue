@@ -33,12 +33,8 @@
 
 <script>
 import { mapState } from "vuex"
-import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "public-bookmarks",
-   components: {
-      V4Spinner,
-   },
    computed: {
       ...mapState({
          searching: state => state.bookmarks.searching,

@@ -17,18 +17,16 @@
 </template>
 
 <script>
-//import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import ExcludedPools from "@/components/preferences/ExcludedPools"
 import PickupLibrary from "@/components/preferences/PickupLibrary"
-import V4Spinner from "@/components/V4Spinner"
 import V4Privacy from "@/components/preferences/V4Privacy"
 import BarcodeScan from "@/components/preferences/BarcodeScan"
 export default {
    name: "preferences",
    components: {
-      AccountActivities, V4Spinner, ExcludedPools, PickupLibrary, V4Privacy, BarcodeScan
+      AccountActivities, ExcludedPools, PickupLibrary, V4Privacy, BarcodeScan
    },
    computed: {
       ...mapState({

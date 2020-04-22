@@ -64,10 +64,9 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import AccordionContent from "@/components/AccordionContent"
-import V4Spinner from "@/components/V4Spinner"
 export default {
    components: {
-      AccordionContent, V4Spinner
+      AccordionContent
    },
    computed: {
       ...mapState({

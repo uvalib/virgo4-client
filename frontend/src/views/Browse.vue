@@ -13,14 +13,13 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchResults from "@/components/SearchResults"
-import V4Spinner from "@/components/V4Spinner"
 export default {
    name: "browse",
    props: {
       type: String
    },
    components: {
-     SearchResults, V4Spinner
+     SearchResults
    },
    computed: {
       ...mapState({

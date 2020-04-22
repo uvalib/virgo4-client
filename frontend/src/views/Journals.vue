@@ -14,13 +14,13 @@
             <div class="note"><b>NOTE:</b> This search is case-sensitive</div>
          </div>
          <div class="controls">
-            <span @click="searchClicked" class="pure-button pure-button-primary">Search</span>
+            <V4Button mode="primary" @click="searchClicked">Search</V4Button>
          </div>
          <div class="basic">
-            <span class="text-button basic-link" @click="basicClicked">
+            <router-link to="/search">
                Basic Search&nbsp;
                <i class="fas fa-undo-alt"></i>
-            </span>
+            </router-link>
          </div>
       </div>
       <div v-if="!searching && browseTotal >= 0" class="browse-results shady">
@@ -73,13 +73,12 @@
 <script>
 import { mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
-import V4Spinner from "@/components/V4Spinner"
 import AccordionContent from "@/components/AccordionContent"
 import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
    name: "journals",
    components: {
-      V4Spinner, AccordionContent, AccessURLDetails
+      AccordionContent, AccessURLDetails
    },
    computed: {
       ...mapState({

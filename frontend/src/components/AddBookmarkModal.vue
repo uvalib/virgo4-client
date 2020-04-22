@@ -33,10 +33,9 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import TruncatedText from '@/components/TruncatedText'
-import V4Spinner from "@/components/V4Spinner"
 export default {
    components: {
-      TruncatedText, V4Spinner
+      TruncatedText
    },
    data: function() {
       return {

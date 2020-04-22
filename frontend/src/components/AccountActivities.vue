@@ -17,11 +17,7 @@
 </template>
 
 <script>
-import V4Button from "@/components/V4Button"
 export default {
-   components: {
-     V4Button
-   },
    methods: {
       signOut() {
          this.$store.dispatch("user/signout")
