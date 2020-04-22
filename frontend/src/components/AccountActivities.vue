@@ -1,6 +1,6 @@
 <template>
    <div class="activities">
-      <router-link to="/account">Account</router-link>
+      <router-link to="/account">My Information</router-link>
       <span class="sep">|</span>
       <router-link to="/bookmarks">Bookmarks</router-link>
       <span class="sep">|</span>

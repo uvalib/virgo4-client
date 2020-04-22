@@ -55,6 +55,10 @@
                </table>
             </div>
          </div>
+         <div class="community">
+            Members of our community are welcome to use many UVA Library resources. 
+            <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank">Learn about creating an account and accessing materials.</a>
+         </div>
       </div>
    </div>
 </template>
@@ -142,6 +146,11 @@ div.netbadge {
    padding-bottom: 25px;
    border-bottom: 1px solid var(--uvalib-grey-light);
    margin: 25px 0;
+}
+.community {
+   padding-top: 25px;
+   border-top: 1px solid var(--uvalib-grey-light);
+   margin: 25px 0;   
 }
 div.indent {
    margin-left: 35px;

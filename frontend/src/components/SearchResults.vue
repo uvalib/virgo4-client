@@ -4,10 +4,8 @@
       <div class="results-header">
          <template v-if="showSummary">
             <div class="summary">
-               <div class="query">Showing results for: <i>{{queryString}}</i></div>
-               <div class="counts">
-                  <span>{{total}} matches</span>
-               </div>
+               <div class="query">Showing {{formatNum(total)}} results for:</div>
+               <div class="qs">{{queryString}}</div>
             </div>
             <span class="buttons">
                <SaveSearch v-if="isSignedIn" mode="share"/>
@@ -24,7 +22,7 @@
                   <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
                      <span>
                         <span class="pool">{{r.pool.name}}</span>
-                        <span class="total">{{r.total}} hits</span>
+                        <span class="total">({{formatNum(r.total)}})</span>
                      </span>
                   </V4Button>
                </template>
@@ -104,7 +102,8 @@ export default {
             } else if (this.wasPoolSkipped(r)) {
                name += "<span class='total'>Skipped</span>"
             } else {
-               name += `<span class='total'>${r.total} hits</span>`
+               let t = this.formatNum(r.total)
+               name += `<span class='total'>(${t})</span>`
             }
             opts.push({id: r.pool.id, name: name})
          })
@@ -125,6 +124,9 @@ export default {
       }
    },
    methods: {
+      formatNum(num) {
+         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      },
       poolFailed(p) {
          return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
       },
@@ -145,9 +147,6 @@ export default {
 </script>
 
 <style>
-.counts {
-   margin-left: 15px;
-}
 div.pool-tabs {
   font-weight: bold;
 }
@@ -166,6 +165,11 @@ div.pool-tabs span.total {
 
 </style>
 <style scoped>
+.qs {
+   margin-left:15px;
+   font-style: italic;
+   font-weight: 100;
+}
 p.relevant {
    text-align: left;
    padding: 0;
@@ -223,9 +227,6 @@ p.relevant {
    margin: 0 0 0.2vw 0;
    font-weight: bold;
    font-size: 1.1em;
-}
-.summary .query i {
-   font-weight: 100;
 }
 .results-header {
    display: flex;

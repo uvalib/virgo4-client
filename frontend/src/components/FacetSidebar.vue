@@ -48,7 +48,7 @@
                            >
                               <i :class="facetControlClass(facetInfo, fv.value)"></i>
                               {{fv.value}}
-                              <span class="cnt" v-if="fv.count">({{fv.count}})</span>
+                              <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
                            </div>
                         </AccordionContent>
                      </dd>
@@ -88,9 +88,9 @@ export default {
       },
       globalTitle() {
          if ( !this.startExpanded ) {
-            return "Filter All"
+            return "Filter Results"
          }
-         return "Filter All Results By"
+         return "Filter Results By"
       },
       filterColor() {
          if ( !this.startExpanded ) {
@@ -120,6 +120,9 @@ export default {
       },
    },
    methods: {
+      formatNum(num) {
+         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      },
       facetControlClass(facet, value) {
          if ( this.isFacetSelected(facet.id, value))  {
             if ( facet.type == "radio") {

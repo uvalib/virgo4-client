@@ -24,7 +24,7 @@
                   <div v-if="userMenuOpen" class="user-menu" 
                      @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
                      <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
-                        <div class="submenu">Account</div>
+                        <div class="submenu">My Information</div>
                      </router-link>
                      <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub">
                         <div class="submenu">Bookmarks</div>
