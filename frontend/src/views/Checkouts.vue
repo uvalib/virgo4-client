@@ -22,8 +22,6 @@
                   <dl>
                     <dt>Author:</dt>
                       <dd>{{co.author}}</dd>
-                    <dt class="label">Library:</dt>
-                      <dd>{{co.library}}</dd>
                     <dt class="label">Call number:</dt>
                       <dd>{{co.callNumber}}</dd>
                     <dt class="label">Due Date:</dt>
