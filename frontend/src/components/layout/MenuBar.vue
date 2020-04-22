@@ -1,45 +1,48 @@
 <template>
-   <nav class="menu">
+   <nav class="menu" role="menubar" aria-label="Virgo Menu" @keyup.right="nextMenu" @keyup.left="prevMenu"  @keyup.down="nextSubMenu" @keyup.up="prevSubMenu">
       <span class="menu-right">
-        <router-link @mousedown.native="searchClicked" to="/search">
+        <router-link tabindex="0" role="menuitem" id="searchmenu" @mousedown.native="searchClicked" to="/search" v-on:focus.native="onMenuFocus">
            <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
         </router-link>
-        <router-link to="/course-reserves">
+        <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves">
            <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
         </router-link>
-        <span v-if="isKiosk==false" class="menu-item feedback">
-            <a href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
+        <span v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback">
+            <a tabindex="-1" href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
                <span><i class="fas fa-comments"></i>&nbsp;</span>
                <span>Questions? Ask a Librarian</span>
             </a>
         </span>
          <template v-if="isSignedIn">
-            <span @click="toggleMenu" class="menu-item account">
+            <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen"
+               @click="toggleMenu" @keyup.stop.enter="toggleMenu" @keydown.space.prevent.stop="toggleMenu" @keyup.stop.esc="closeMenu">
                <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
                <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
                <transition name="grow"
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
-                  <div @click="blockToggle" v-if="userMenuOpen" class="user-menu" >
-                     <router-link to="/account">
+                  <div v-if="userMenuOpen" class="user-menu" 
+                     @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
+                     <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
                         <div class="submenu">Account</div>
                      </router-link>
-                     <router-link to="/bookmarks">
+                     <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub">
                         <div class="submenu">Bookmarks</div>
                      </router-link>
-                     <router-link to="/checkouts">
+                     <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub">
                         <div class="submenu">Checkouts</div>
                      </router-link>
-                     <router-link to="/preferences">
+                     <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub">
                         <div class="submenu">Preferences</div>
                      </router-link>
-                     <router-link to="/requests">
+                     <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub">
                         <div class="submenu">Requests</div>
                      </router-link>
-                     <router-link to="/searches">
+                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub">
                         <div class="submenu">Saved Searches</div>
                      </router-link>
-                     <div  @click="signOut" class="submenu">
+                     <div role="menuitem" tabindex="-1"  id="outsub" class="submenu"
+                        @click="signOut" @keyup.stop.enter="signOut" @keydown.space.prevent.stop="signOut" >
                         <span>Sign out</span>
                      </div>
                   </div>
@@ -52,7 +55,7 @@
             </router-link>
          </template>
          <template v-else>
-            <router-link v-if="isKiosk==false" to="/signin">
+            <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin" >
                <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
             </router-link>
          </template>
@@ -65,6 +68,14 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 
 export default {
+   data: function() {
+      return {
+         subMenu: ["accountsub", "bookmarksub", "checkoutsub", "prefsub", "requestsub", "savesub", "outsub"],
+         subMenuIdx: 0,
+         menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "accountmenu"],
+         menuIdx: 0
+      }
+   },
    computed: {
       ...mapState({
          signedInUser: state => state.user.signedInUser,
@@ -83,6 +94,58 @@ export default {
       }
    },
    methods: {
+      onMenuFocus() {
+         let tgtID =  event.target.id 
+         this.menuIdx = this.menuBar.findIndex( m => m==tgtID)
+         this.subMenuIdx = 0
+         this.closeMenu()
+      },
+      nextMenu() {
+         this.closeMenu()
+         this.subMenuIdx = 0
+         this.menuIdx++
+         if (this.menuIdx == this.menuBar.length) {
+            this.menuIdx = 0
+         }
+         let menu = document.getElementById(this.menuBar[this.menuIdx])
+         menu.focus()
+      },
+      nextSubMenu() {
+         if ( this.userMenuOpen) {
+            this.subMenuIdx++
+            if (this.subMenuIdx == this.subMenu.length) {
+               this.subMenuIdx = 0
+            }
+            let menu = document.getElementById(this.subMenu[this.subMenuIdx])
+            menu.focus()
+         } else {
+            this.subMenuIdx = 0
+            this.toggleMenu()
+         }
+      },
+      prevMenu() {
+         this.closeMenu()
+         this.subMenuIdx = 0
+         this.menuIdx--
+         if (this.menuIdx < 0) {
+            this.menuIdx = this.menuBar.length-1
+         }
+         let menu = document.getElementById(this.menuBar[this.menuIdx])
+         menu.focus()
+      },
+      prevSubMenu() {
+         if ( this.userMenuOpen) {
+            this.subMenuIdx--
+            if (this.subMenuIdx < 0) {
+               this.subMenuIdx = this.subMenu.length-1
+            }
+            let menu = document.getElementById(this.subMenu[this.subMenuIdx])
+            menu.focus()
+         } else {
+            this.subMenuIdx = this.subMenu.length-1
+            this.toggleMenu()
+         }
+      },
       searchClicked() {
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
@@ -92,12 +155,15 @@ export default {
       signinClicked() {
          this.$router.push("/signin")
       },
-      blockToggle(e) {
-         e.stopPropagation()
-      },
-      toggleMenu(e) {
-         e.stopPropagation()
+      toggleMenu() {
          this.$store.commit("system/toggleUserMenu")
+         setTimeout( () => {
+            let menu = document.getElementById(this.subMenu[this.subMenuIdx])
+            menu.focus()
+         },100)
+      },
+      closeMenu() {
+         this.$store.commit("system/closeUserMenu")
       },
       signOut() {
          this.$store.dispatch("user/signout")
@@ -175,6 +241,13 @@ export default {
   display: grid;
   grid-auto-rows: auto;
 }
+#app .user-menu a {
+   outline: none;
+}
+#app .user-menu a:focus div.submenu, #app .user-menu div.submenu:focus {
+   background-color: var(--uvalib-brand-blue-lightest);
+   color: var(--uvalib-text-dark);
+}
 .submenu {
    margin:0;
    font-weight: normal;
@@ -182,6 +255,7 @@ export default {
    align-items: stretch;
    justify-items: stretch;
    padding: 10px 15px;
+   outline: none;
 }
 #app .menu .submenu a {
    color:white;
