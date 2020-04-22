@@ -189,6 +189,43 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// SetAdminClaims sets claims and regenerates the auth token
+func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
+	// Admin only
+	claimsIface, _ := c.Get("claims")
+	originalClaims, ok := claimsIface.(*v4jwt.V4Claims)
+	if !ok || (originalClaims.Role != v4jwt.Admin) {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	var claims map[string]interface{}
+	// Take the claims received as-is. Expecting admins to not screw this up.
+	if err := c.BindJSON(&claims); err != nil {
+		log.Printf("Unable to parse claims: %s", err.Error())
+		c.JSON(http.StatusBadRequest, "Invalid Claims")
+		return
+	}
+
+	claims["role"] = v4jwt.RoleFromString(claims["role"].(string))
+	claims["authMethod"] = v4jwt.AuthFromString(claims["authMethod"].(string))
+
+	claimBytes, err := json.Marshal(claims)
+	v4Claims := v4jwt.V4Claims{}
+
+	err = json.Unmarshal(claimBytes, &v4Claims)
+
+	signedStr, err := v4jwt.Mint(v4Claims, 9*time.Hour, svc.JWTKey)
+	if err != nil {
+		log.Printf("Unable to generate signed JWT token: %s", err.Error())
+		c.JSON(http.StatusBadRequest, "Invalid Claims")
+		return
+	}
+
+	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
+	c.String(http.StatusOK, "Success")
+}
+
 // getOrCreateUser finds an existing user. If a user is not found, one is created
 func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 	var user V4User

@@ -30,7 +30,8 @@ const user = {
       authTriesLeft: 5,
       authMessage: "",
       lockedOut: false,
-      lastSavedSearchKey: ""
+      lastSavedSearchKey: "",
+      parsedJWT: {},
    },
 
    getters: {
@@ -56,23 +57,23 @@ const user = {
       },
       useSIS: (state) => {
          if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
-         return false    
+         return false
       },
       canMakeReserves: (state) => {
          if ( state.claims.canPlaceReserve ) return state.claims.canPlaceReserve
-         return false    
+         return false
       },
       isBarred: state => {
          return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
       },
       sortedCheckouts: state => {
          return state.checkouts.sort( (a,b) => {
-            let d1 = a.due.split("T")[0] 
-            let d2 = b.due.split("T")[0] 
-            if (d1 < d2) return -1 
-            if (d1 > d2) return 1 
-            if (parseFloat(a.overdueFee) < parseFloat(b.overdueFee)) return 1 
-            if (parseFloat(a.overdueFee) > parseFloat(b.overdueFee)) return -1 
+            let d1 = a.due.split("T")[0]
+            let d2 = b.due.split("T")[0]
+            if (d1 < d2) return -1
+            if (d1 > d2) return 1
+            if (parseFloat(a.overdueFee) < parseFloat(b.overdueFee)) return 1
+            if (parseFloat(a.overdueFee) > parseFloat(b.overdueFee)) return -1
             if (a.overdue == false && b.overdue == true) return 1
             if (a.overdue == true && b.overdue == false) return -1
             return 0
@@ -98,13 +99,13 @@ const user = {
       },
       isSignedIn: state => {
          return state.signedInUser != ""  && state.authToken != "" &&
-            state.sessionType != "" && state.sessionType != "none" && 
+            state.sessionType != "" && state.sessionType != "none" &&
             state.role != "" && state.role != "guest"
       },
       hasAccountInfo: state => {
          if (state.signedInUser.length == 0)  return false
-         if (state.accountInfo == null) return false 
-         if (state.accountInfo.id != state.signedInUser) return false 
+         if (state.accountInfo == null) return false
+         if (state.accountInfo.id != state.signedInUser) return false
          return true
       },
    },
@@ -116,14 +117,14 @@ const user = {
       setSavedSearches(state, data) {
          state.searches.splice(0, state.searches.length)
          data.forEach( s => {
-            state.searches.push( s ) 
+            state.searches.push( s )
          })
       },
       clearSavedSearches(state) {
-         state.searches.splice(0, state.searches.length)   
+         state.searches.splice(0, state.searches.length)
       },
       deleteSavedSearch(state, token) {
-         let idx = state.searches.findIndex(s => s.token == token)  
+         let idx = state.searches.findIndex(s => s.token == token)
          if (idx > -1) {
             state.searches.splice(idx,1)
          }
@@ -160,7 +161,7 @@ const user = {
             state.authMessage = resp.message
             state.lockedOut =  resp.lockedOut
          } else {
-            state.authMessage = "Sign in failed: "+data   
+            state.authMessage = "Sign in failed: "+data
          }
       },
       clearAuthMessages(state) {
@@ -170,8 +171,12 @@ const user = {
       },
       setUserJWT(state, jwtStr) {
          let parsed = parseJwt(jwtStr)
-         state.claims = {canPurchase: parsed.canPurchase, canLEO: parsed.canLEO, 
-            canLEOPlus: parsed.canLEOPlus, canPlaceReserve: parsed.canPlaceReserve, 
+         if( parsed.role === "admin" ) {
+            state.parsedJWT = JSON.stringify(parsed,undefined, 2);
+         }
+
+         state.claims = {canPurchase: parsed.canPurchase, canLEO: parsed.canLEO,
+            canLEOPlus: parsed.canLEOPlus, canPlaceReserve: parsed.canPlaceReserve,
             canBrowseReserve: parsed.canBrowseReserve, useSIS: parsed.useSIS }
          state.authMessage = ""
          state.lockedOut = false
@@ -222,8 +227,26 @@ const user = {
           ctx.commit('setAuthorizing', false)
         })
       },
+
+      overrideClaims(ctx) {
+         if (ctx.getters.isAdmin){
+            ctx.commit('setAuthorizing', true)
+            let claims = ctx.state.parsedJWT
+            return axios.post("api/admin/claims", claims).then((_response) => {
+               let jwtStr = Vue.$cookies.get("v4_jwt")
+               ctx.commit('setAuthToken', jwtStr)
+               ctx.commit("setUserJWT", jwtStr )
+               setTimeout(() => {
+                  ctx.commit('setAuthorizing', false)
+               },200);
+             }).catch((error) => {
+               ctx.commit('system/setError', error + '<br/>' + error.response.data, { root: true })
+               ctx.commit('setAuthorizing', false)
+             })
+         }
+      },
       getSavedSearches(ctx) {
-         if (ctx.rootGetters["user/isSignedIn"] == false) return  
+         if (ctx.rootGetters["user/isSignedIn"] == false) return
          ctx.commit('setLookingUp', true)
          axios.get(`/api/users/${ctx.state.signedInUser}/searches`).then((response) => {
             ctx.commit('setSavedSearches', response.data)
@@ -231,7 +254,7 @@ const user = {
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setLookingUp', false)
-          }) 
+          })
       },
       getRequests(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
@@ -247,7 +270,7 @@ const user = {
       getAccountInfo(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] ) return
          if (ctx.rootGetters["user/isSignedIn"] == false) return
-         
+
          ctx.commit('setLookingUp', true)
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
@@ -260,13 +283,13 @@ const user = {
       },
       renewItem(ctx, barcode) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
-         
+
          ctx.commit('setLookingUp', true)
          let data = {item_barcode: barcode}
          axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
             ctx.commit('setCheckouts', response.data.checkouts)
             ctx.commit('setRenewResults', response.data.renewResults)
-            ctx.commit('setLookingUp', false) 
+            ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setLookingUp', false)
@@ -274,13 +297,13 @@ const user = {
       },
       renewAll(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
-         
+
          ctx.commit('setLookingUp', true)
          let data = {item_barcode: "all"}
          axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
             ctx.commit('setCheckouts', response.data.checkouts)
             ctx.commit('setRenewResults', response.data.renewResults)
-            ctx.commit('setLookingUp', false)    
+            ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setLookingUp', false)
@@ -362,7 +385,7 @@ const user = {
             ctx.commit('setLastSavedSearchKey', "")
             ctx.commit('deleteSavedSearch', token)
          } catch (e) {
-            ctx.commit('system/setError', "Unable to delete saved search. Please try again later.", {root: true})    
+            ctx.commit('system/setError', "Unable to delete saved search. Please try again later.", {root: true})
          }
       },
       deleteAllSavedSearces(ctx) {
@@ -373,7 +396,7 @@ const user = {
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setLookingUp', false)
-          })    
+          })
       }
    }
 }

@@ -11,6 +11,7 @@
         <PickupLibrary class="section"/>
         <BarcodeScan class="section"/>
         <V4Privacy class="section"/>
+        <JWTAdmin class="section"/>
       </div>
     </div>
   </div>
@@ -23,10 +24,11 @@ import ExcludedPools from "@/components/preferences/ExcludedPools"
 import PickupLibrary from "@/components/preferences/PickupLibrary"
 import V4Privacy from "@/components/preferences/V4Privacy"
 import BarcodeScan from "@/components/preferences/BarcodeScan"
+import JWTAdmin from "@/components/preferences/JWTAdmin"
 export default {
    name: "preferences",
    components: {
-      AccountActivities, ExcludedPools, PickupLibrary, V4Privacy, BarcodeScan
+      AccountActivities, ExcludedPools, PickupLibrary, V4Privacy, BarcodeScan, JWTAdmin
    },
    computed: {
       ...mapState({
