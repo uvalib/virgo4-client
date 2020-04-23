@@ -109,7 +109,7 @@ export default {
       },
       facets() {
          let out = this.allFacets(this.resultsIdx)
-         return out.filter(f=>f.id != "FacetAvailability")
+         return out.filter(f=>f.id != "FacetAvailability" && f.type != "boolean")
       },
       availabilityOpts() {
          return [
@@ -144,8 +144,7 @@ export default {
       },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.filter( b => b.type != 'boolean')
-         out = out.slice(start,end)
+         let out = facet.buckets.slice(start,end)
          return out
       },
       moreKey(id) {
