@@ -144,7 +144,7 @@ export default {
       },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facets.buckets.filter( b => b.type != 'boolean')
+         let out = facet.buckets.filter( b => b.type != 'boolean')
          out = out.slice(start,end)
          return out
       },
