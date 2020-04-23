@@ -55,10 +55,14 @@ export default {
          // facet_id/value pairs. Convert to display
          let out = {}
          this.allFilters(this.resultsIdx).forEach(pf=>{
+            let val = pf.value
+            if (pf.facet_id == "FacetCirculating") {
+               val = "Yes"
+            }
             if ( Object.prototype.hasOwnProperty.call(out, pf.facet_name) == false ) {
-               out[pf.facet_name] = [pf.value]
+               out[pf.facet_name] = [val]
             } else {
-               out[pf.facet_name].push(pf.value)
+               out[pf.facet_name].push(val)
             }
          })
          return out
@@ -117,6 +121,7 @@ export default {
 }
 .filter-display dd {
   margin-inline-start: 0px;
+  align-self: center;
 }
 .filter-display {
    margin-left: 10px;

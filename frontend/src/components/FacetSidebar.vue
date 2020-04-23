@@ -13,6 +13,9 @@
                      {{avail.name}}
                   </dd>
                </dl>
+               <div class="circulate">
+                  <V4Checkbox v-model="globalCirculating" @click="circFacetClicked">{{circulatingFacet.name}}</V4Checkbox>
+               </div>
             </div>
          </AccordionContent>
       </div>
@@ -63,6 +66,7 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import { mapFields } from "vuex-map-fields"
 import AccordionContent from "@/components/AccordionContent"
 export default {
    components: {
@@ -73,11 +77,14 @@ export default {
          resultsIdx: state => state.selectedResultsIdx,
          updatingFacets: state => state.filters.updatingFacets,
          globalAvailability: state => state.filters.globalAvailability,
-         globalFilterExpanded: state => state.filters.globalFilterExpanded,
-         poolFilterExpanded: state => state.filters.poolFilterExpanded,
+         circulatingFacet: state => state.filters.circulatingFacet,
+         globalCirculating: state => state.filters.globalCirculating,
          displayWidth: state => state.system.displayWidth,
       }),
-       ...mapGetters({
+      ...mapFields("filters", [
+         "globalCirculating", 
+      ]),
+      ...mapGetters({
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
           allFilters: 'filters/poolFilter',
@@ -164,6 +171,10 @@ export default {
       filterClicked(facetID,value) {
          let data = {poolResultsIdx: this.resultsIdx, facetID: facetID, value: value}
          this.toggleFacet(data)
+      },
+      circFacetClicked() {
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
       },
       toggleFacet(data) {
          this.$store.commit("filters/toggleFilter", data)
@@ -319,6 +330,12 @@ div.none {
    margin:25px 0;
    font-size: 1.25em;
    color: var(--uvalib-text);
+}
+div.circulate {
+   border-top: 1px solid var(--uvalib-grey-light);
+   padding-top: 15px;
+   color: var(--uvalib-text);
+   margin: 15px 0 10px 15px;
 }
 </style>
 <style>
