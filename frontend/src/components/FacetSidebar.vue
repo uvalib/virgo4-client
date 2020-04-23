@@ -278,6 +278,7 @@ i.check {
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
+   font-weight: normal;
 }
 @media only screen and (min-width: 925px) {
    .filter-icons {
