@@ -7,7 +7,7 @@
          <template v-if="availability.items.length">
             <h2>Availability</h2>
 
-            <RequestContainer v-if="isAdmin" :titleId="titleId" />
+            <RequestContainer v-if="isDevServer" :titleId="titleId" />
 
             <table class="fields">
                <thead>
@@ -49,7 +49,7 @@ export default {
    computed: {
       ...mapGetters({
          availability: 'item/availability',
-         isAdmin: 'user/isAdmin',
+         isDevServer: 'system/isDevServer',
       }),
    },
    methods: {

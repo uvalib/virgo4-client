@@ -191,6 +191,12 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 // SetAdminClaims sets claims and regenerates the auth token
 func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
+	//Dev server only
+	v4HostHeader := c.Request.Header.Get("V4Host")
+	if strings.Index(v4HostHeader, "-dev") == 0 && svc.Dev.AuthUser == "" {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
 	// Admin only
 	claimsIface, _ := c.Get("claims")
 	originalClaims, ok := claimsIface.(*v4jwt.V4Claims)

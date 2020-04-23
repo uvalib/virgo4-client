@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAdmin" class="jwt-admin">
+  <div v-if="isDevServer" class="jwt-admin">
     <h2>Admin JWT Token Management</h2>
     <p>Modify your jwt token. This could break your session and you may have to log in again.</p>
     <div class="form">
@@ -10,6 +10,7 @@
 </template>
 <script>
 import { mapFields } from 'vuex-map-fields';
+import { mapGetters } from 'vuex';
 
 export default {
   computed: {
@@ -17,9 +18,9 @@ export default {
         parsedJWT: 'user.parsedJWT',
         authorizing: 'user.authorizing',
     }),
-    isAdmin(){
-      return this.$store.getters['user/isAdmin']
-    },
+    ...mapGetters({
+      isDevServer: 'system/isDevServer'
+    }),
   },
   methods: {
     update() {
