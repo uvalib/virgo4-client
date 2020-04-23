@@ -144,7 +144,8 @@ export default {
       },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.slice(start,end)
+         let out = facets.buckets.filter( b => b.type != 'boolean')
+         out = out.slice(start,end)
          return out
       },
       moreKey(id) {
@@ -229,13 +230,14 @@ dt:first-child {
 }
 dd {
    cursor: pointer;
-   font-size: 0.95em;
+   font-size: 1em;
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
    padding: 3px 2px;
    margin-left: 15px;
+   font-weight: normal;
 }
 i.check {
    margin-right: 10px;

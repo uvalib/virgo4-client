@@ -14,7 +14,10 @@
          </div>
       </div>
       <div class="criteria">
-         <h2>Search Criteria<i @click="addClicked" class="add fas fa-plus-circle"></i></h2>
+         <h2>
+            <span>Search Criteria</span>
+            <V4Button mode="primary" @click="addClicked">Add Criteria</V4Button>
+         </h2>
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <div class="options">
                <template v-if="idx > 0">
@@ -39,7 +42,9 @@
                      <option value="BETWEEN">BETWEEN</option>
                   </select>
                </template>
-               <i @click="removeCriteria(idx)" class="remove fas fa-times-circle"></i>
+               <V4Button mode="icon" class="remove" @click="removeCriteria(idx)">
+                  <i class="fas fa-times-circle"></i>
+               </V4Button>
             </div>
 
             <div class="query">
@@ -192,8 +197,7 @@ div.options {
    margin: 0 0.8em 0 0;
    flex-basis: content;
 }
-i.remove {
-   cursor: pointer;
+.v4-button.remove {
    font-size: 1.75em;
    color: var(--uvalib-red-emergency);
    float: right;
