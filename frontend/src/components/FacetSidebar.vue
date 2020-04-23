@@ -36,22 +36,22 @@
                <dl v-else>
                   <template v-for="facetInfo in facets">
                      <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
-                     <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)"
-                        @click="filterClicked(facetInfo.id, fv.value)" >
-                        <i :class="facetControlClass(facetInfo, fv.value)"></i>
-                        {{fv.value}}
+                     <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+                        <V4Checkbox :checked="fv.selected" 
+                           @click="filterClicked(facetInfo.id, fv.value)">
+                           {{fv.value}}
+                        </V4Checkbox>
                         <span class="cnt" v-if="fv.count">({{fv.count}})</span>
                      </dd>
                      <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
                         <AccordionContent class="more" title="See More"
                            closeText="See Less" borderWidth="0">
-                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)"
-                              @click="filterClicked(facetInfo.id, fv.value)"
-                              :key="valueKey(idx, facetInfo.id)"
-                           >
-                              <i :class="facetControlClass(facetInfo, fv.value)"></i>
-                              {{fv.value}}
-                              <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
+                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
+                              <V4Checkbox :checked="fv.selected" 
+                                 @click="filterClicked(facetInfo.id, fv.value)">
+                                 {{fv.value}}
+                              </V4Checkbox>
+                              <span class="cnt" v-if="fv.count">({{fv.count}})</span>
                            </div>
                         </AccordionContent>
                      </dd>
@@ -130,19 +130,6 @@ export default {
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
-      facetControlClass(facet, value) {
-         if ( this.isFacetSelected(facet.id, value))  {
-            if ( facet.type == "radio") {
-               return "check fas fa-check-circle"
-            }
-            return "check fas fa-check-square"
-         } else {
-            if ( facet.type == "radio") {
-               return "check far fa-circle"
-            }
-            return "check far fa-square"
-         }
-      },
       toggleGlobal() {
          this.$store.commit("filters/toggleGlobalFilterExpanded")
       },
@@ -180,11 +167,6 @@ export default {
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
-      },
-      isFacetSelected(facetID, value) {
-         let filter = this.allFilters(this.resultsIdx)
-         let idx = filter.findIndex( f=> f.facet_id == facetID && f.value == value )
-         return idx > -1
       },
    }
 }

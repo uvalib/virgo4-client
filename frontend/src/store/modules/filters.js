@@ -141,7 +141,7 @@ const filters = {
 
             // first add any facets that are part of the filter
             tgtFilter.filter(filter => filter.facet_id == facet.id).forEach( af=> {
-               facetInfo.buckets.push( {value: af.value, count: -1} )  
+               facetInfo.buckets.push( {value: af.value, count: -1, selected: true} )  
             })
 
             // next add the rest, without duplicating what was added above
@@ -150,7 +150,7 @@ const filters = {
                if ( applied ) {
                   applied.count = b.count
                } else {
-                  facetInfo.buckets.push( {value: b.value, count: b.count} )
+                  facetInfo.buckets.push( {value: b.value, count: b.count, selected: b.selected} )
                   if (b.selected) {
                      let idx = tgtFilter.findIndex( f=> f.facet_id == facetInfo.id && f.value == b.value ) 
                      if ( idx == -1) {

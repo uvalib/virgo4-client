@@ -1,5 +1,5 @@
 <template>
-   <div tabindex="0" role="checkbox" class="v4-checkbox" :aria-checked="value"
+   <div tabindex="0" role="checkbox" class="v4-checkbox" :aria-checked="isChecked"
       @click.stop="clicked" @keyup.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <i class="box" :class="checkClass"></i>
       <label>
@@ -11,25 +11,40 @@
 <script>
 export default {
    props: {
-      value: Boolean
+      // If the component is passed a v-model, value non-null 
+      // otherwise use the checked property
+      value: {
+         type: Boolean,
+         default: null
+      },
+      checked: {
+         type: Boolean,
+         default: false
+      },
    },
    computed: {
       checkClass() {
-         if ( this.value )  {
+         if ( this.isChecked )  {
             return "fas fa-check-square"
          } else {
             return "far fa-square"
          }
       },
+      isChecked() {
+         if ( this.value != null ) {
+            return this.value
+         }
+         return this.checked
+      }
    },
    methods: {
       clicked() {
-         let state = !this.value
-         this.$emit('input', state)
-         this.$nextTick( () =>{
-            this.$emit('click')
-         })
-      }
+         if ( this.value != null ) {
+            let state = !this.value
+            this.$emit('input', state)
+         } 
+         this.$emit('click')
+      },
    },
 }
 </script>
