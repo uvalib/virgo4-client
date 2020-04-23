@@ -14,14 +14,6 @@
                      </div>
                      <div class="info">
                         <div class="author">{{bookmark.details.author}}</div>
-                        <dl class="data">
-                           <dt>Call Number:</dt>
-                           <dd>{{bookmark.details.callNumber}}</dd>
-                           <dt>Library:</dt>
-                           <dd>{{bookmark.details.library}}</dd>
-                           <dt>Location:</dt>
-                           <dd>{{bookmark.details.location}}</dd>
-                        </dl>
                      </div>
                   </li>
                </template>

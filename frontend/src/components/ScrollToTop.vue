@@ -75,7 +75,7 @@ export default {
    padding: 0px 0px 4px 0px;
    width: 56px;
    height: 56px;
-   z-index: 2;
+   z-index: 9999;
 }
 .scroll-to-top.mobile {
    position: fixed;

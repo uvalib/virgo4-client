@@ -10,8 +10,8 @@
          <template v-else>
             <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
             <TruncatedText title="" :text="authorText" :limit="120" ></TruncatedText>
-            <div class="select">
-               <label>Select a folder for the bookmark: </label>
+            <div class="select pure-form">
+               <label>Select a folder for the bookmark</label>
                   <select v-model="selectedFolder" id="folder" name="folder">
                      <option v-for="(folder) in folders" selected=false
                         :key="folder.id" :value="folder.name ">
@@ -22,9 +22,17 @@
          </template>
          <p class="error">{{bookmarkError}}</p>
       </div>
-      <div class="controls">
-         <V4Button mode="tertiary" @click="cancelBookmark">Cancel</V4Button>
-         <V4Button mode="primary" @click="okBookmark">OK</V4Button>
+      <div class="create add pure-form" v-if="showAdd">
+         <input id="new-folder" type="text" v-model="newFolder" @keyup.enter="confirmAdd">
+         <V4Button mode="tertiary" @click="cancelAdd">Cancel</V4Button>
+         <V4Button mode="primary" @click="confirmAdd">Add</V4Button>
+      </div>
+      <div class="controls" v-else>
+         <V4Button class="left" mode="primary" @click="addFolder">New Folder</V4Button>
+         <span class="right">
+            <V4Button mode="tertiary" @click="cancelBookmark">Cancel</V4Button>
+            <V4Button mode="primary" @click="okBookmark">OK</V4Button>
+         </span>
       </div>
    </div>
 </template>
@@ -40,7 +48,9 @@ export default {
    data: function() {
       return {
          selectedFolder: "",
-         bookmarkError: ""
+         bookmarkError: "",
+         showAdd: false,
+         newFolder: ""
       };
    },
    computed: {
@@ -60,6 +70,27 @@ export default {
       }
    },
    methods: {
+      addFolder() {
+         this.showAdd = true
+         this.$nextTick(()=>{
+            document.getElementById("new-folder").focus()
+         })
+      },
+      cancelAdd() {
+         this.showAdd = false
+      },
+      confirmAdd() {
+         this.bookmarkError = ""
+         if ( !this.newFolder) {
+            this.bookmarkError = "A bookmark folder name is required"
+            return
+         }
+         this.$store.dispatch("bookmarks/addBookmark", this.newFolder).then( () => {
+            this.$store.commit("bookmarks/closeAddBookmark")
+         }).catch((error) => {
+            this.bookmarkError = error
+         })
+      },
       okBookmark() {
          this.bookmarkError = ""
          if ( !this.selectedFolder) {
@@ -86,6 +117,7 @@ export default {
             }
             return found == true
          })
+         document.getElementById("folder").focus()
       })
       this.$store.commit('restore/clearAll')
    }
@@ -126,7 +158,7 @@ p.error {
    }
 }
 div.modal-content {
-   padding: 10px;
+   padding: 10px 10px 0 10px;
    text-align: left;
 }
 div.modal-title {
@@ -138,11 +170,27 @@ div.modal-title {
    border-radius: 5px 5px 0 0;
 }
 div.controls {
-   padding: 10px;
-   text-align: right;
+   padding: 0 10px 10px 10px;
+   text-align: left;
 }
-div.controls .v4-button {
-   padding: 4px 16px;
+.controls .right {
+   float: right;
+}
+.controls .v4-button.left {
+   margin: 0;
+}
+div.create.add {
+   display: flex;
+   flex-flow: row nowrap;
+   align-content: center;
+   padding: 0 10px 10px 10px;
+}
+div.create.add input {
+   margin: 0 5px 0 0 !important;
+   flex-grow: 1;
+}
+div.create.add .v4-button:first-of-type {
+   margin-right: 5px;
 }
 div.select {
    margin-top: 10px;
@@ -152,7 +200,7 @@ div.select {
 label {
    font-weight: normal;
    display: block;
-   margin-bottom: 10px;
+   padding-bottom: 5px;
 }
 #folder {
    width: 100%;
