@@ -11,9 +11,9 @@
       <template v-else>
          <div class="filters-head clearfix">
             <span class="title">Applied Filters</span>
-            <V4Button v-if="hasFilter(resultsIdx)" mode="primary" @click="clearClicked">Clear All</V4Button>
+            <V4Button v-if="hasFilter" mode="primary" @click="clearClicked">Clear All</V4Button>
          </div>
-         <template v-if="hasFilter(resultsIdx)">
+         <template v-if="hasFilter">
             <dl class="filter-display">
                <template v-for="(values,filter, idx) in displayFilter">
                   <dt :key="filter" class="label">{{filter}}:</dt>
@@ -39,11 +39,13 @@ export default {
          availabilityFacet: state => state.filters.availabilityFacet,
       }),
       ...mapGetters({
-         hasFilter: 'filters/hasFilter',
          allFilters: 'filters/poolFilter',
          selectedResults: 'selectedResults',
          facetSupport: 'pools/facetSupport'
       }),
+      hasFilter() {
+         return this.allFilters(this.resultsIdx).length > 0
+      },
       hasFacets() {
          return this.facetSupport(this.selectedResults.pool.id)
       },
