@@ -50,5 +50,7 @@ dep:
 	$(GOMOD) verify
 
 check:
-	go get honnef.co/go/tools/cmd/staticcheck
-	~/go/bin/staticcheck -checks all,-S1002,-ST1003 backend/*.go
+	go install honnef.co/go/tools/cmd/staticcheck
+	$(HOME)/go/bin/staticcheck -checks all,-S1002,-ST1003 backend/*.go
+	go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
+	$(GOVET) -vettool=$(HOME)/go/bin/shadow ./backend/...
