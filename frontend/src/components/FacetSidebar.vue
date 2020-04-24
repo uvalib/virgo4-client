@@ -5,12 +5,14 @@
             borderColor="var(--uvalib-brand-blue)"
             color="white" :expanded="startExpanded" :invert="!startExpanded">
             <div class="body">
-               <dl>
-                  <dt>Availability</dt>
-                  <dd v-for="avail in availabilityOpts" :key="avail.id" @click="availSelected(avail)">
-                     <i v-if="isAvailSelected(avail)" class="check fas fa-check-circle"></i>
-                     <i v-else class="check far fa-circle"></i>
-                     {{avail.name}}
+               <dl role="radiogroup" aria-labelledby="availability_label">
+                  <dt id="availability_label">Availability</dt>
+                  <dd v-for="avail in availabilityOpts" :key="avail.id">
+                     <V4Button mode="icon" @click="availSelected(avail)" role="radio" :aria-checked="isAvailSelected(avail)">
+                        <i v-if="isAvailSelected(avail)" class="check fas fa-check-circle"></i>
+                        <i v-else class="check far fa-circle"></i>
+                        {{avail.name}}
+                     </V4Button>
                   </dd>
                </dl>
                <div class="circulate">
@@ -35,26 +37,28 @@
                </div>
                <dl v-else>
                   <template v-for="facetInfo in facets">
-                     <dt :key="facetInfo.id">{{facetInfo.name}}</dt>
-                     <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                        <V4Checkbox :checked="fv.selected" 
-                           @click="filterClicked(facetInfo.id, fv.value)">
-                           {{fv.value}}
-                        </V4Checkbox>
-                        <span class="cnt" v-if="fv.count">({{fv.count}})</span>
-                     </dd>
-                     <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                        <AccordionContent class="more" title="See More"
-                           closeText="See Less" borderWidth="0">
-                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                              <V4Checkbox :checked="fv.selected" 
-                                 @click="filterClicked(facetInfo.id, fv.value)">
-                                 {{fv.value}}
-                              </V4Checkbox>
-                              <span class="cnt" v-if="fv.count">({{fv.count}})</span>
-                           </div>
-                        </AccordionContent>
-                     </dd>
+                     <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
+                     <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
+                        <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+                           <V4Checkbox :checked="fv.selected" 
+                              @click="filterClicked(facetInfo.id, fv.value)">
+                              {{fv.value}}
+                           </V4Checkbox>
+                           <span class="cnt" v-if="fv.count">({{fv.count}})</span>
+                        </dd>
+                        <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
+                           <AccordionContent class="more" title="See More"
+                              closeText="See Less" borderWidth="0">
+                              <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
+                                 <V4Checkbox :checked="fv.selected" 
+                                    @click="filterClicked(facetInfo.id, fv.value)">
+                                    {{fv.value}}
+                                 </V4Checkbox>
+                                 <span class="cnt" v-if="fv.count">({{fv.count}})</span>
+                              </div>
+                           </AccordionContent>
+                        </dd>
+                     </div>
                   </template>
                </dl>
             </div>

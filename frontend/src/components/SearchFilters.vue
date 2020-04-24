@@ -11,7 +11,7 @@
       <template v-else>
          <div class="filters-head clearfix">
             <span class="title">Applied Filters</span>
-            <V4Button v-if="hasFilter" mode="primary" @click="clearClicked">Clear All</V4Button>
+            <V4Button v-if="hasFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
          </div>
          <template v-if="hasFilter">
             <dl class="filter-display">
@@ -72,7 +72,11 @@ export default {
    },
    methods: {
       formatValues(values) {
-         return values.join(", ")
+         let out = values.join(", ")
+         if (out == "On shelf") {
+            out = "On Shelf Now"
+         }
+         return out
       },
       clearClicked() {
          this.$store.commit("filters/reset", this.resultsIdx)
