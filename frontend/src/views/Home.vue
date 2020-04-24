@@ -119,12 +119,6 @@ export default {
               this.$route.params.id != "")
       }
    },
-   mounted: function() {
-      // The search page has been mounted either by direct
-      // URL access or by a browser back action. Put initialize
-      // the query module for searching (as opposed to browsing)
-      this.$store.dispatch("query/initSearchMode")
-   },
    created: function() {
       this.searchCreated()
    },

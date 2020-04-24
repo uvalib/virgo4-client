@@ -167,41 +167,28 @@ const query = {
       },
    },
    actions: {
-      initSearchMode(ctx) {
-         if (ctx.state.mode == "browse") {
-            ctx.commit('updateSearchMode')
-            if ( ctx.state.mode == "basic" && ctx.state.basic != "" || 
-                 ctx.state.mode == "advanced" && ctx.state.advanced[0].value != "") {
-               ctx.dispatch("searchAllPools", null, { root: true })
-            } else {
-               ctx.commit("resetSearchResults", null, { root: true }) 
-            }
-         }
-      },
       async loadSearch(ctx, token) {
          ctx.commit('setSearching', true, { root: true })
          try {
+            // load the saved search info from backend
             let response = await axios.get(`/api/searches/${token}`)
-            ctx.commit("restoreSearch", JSON.parse(response.data))
-            
-            // now that search params are restored, do the initial search
-            await ctx.dispatch("searchAllPools", null, { root: true })
-
-            // filters (if any) can now be applied.
-            // To restore filters, the saved data needs:
-            //    .numPools and .resultsIdx data sect based on current results
             let saved = JSON.parse(response.data)
+
+            ctx.commit('query/restoreSearch', saved, { root: true })
+            await ctx.dispatch("searchAllPools", null, { root: true })
+            ctx.commit('setSearching', true, { root: true })
+
+            // Need the search results to get num pools and target pool
             let results = ctx.rootState.results
             saved.numPools = results.length
             saved.resultsIdx = results.findIndex( r=> r.pool.id == saved.pool)
 
-            // restore the filters and search the target pool one last time to see
-            // final results of the pool with the applied filters
-            ctx.commit('filters/restoreFilters', saved, { root: true })
             await ctx.dispatch("selectPoolResults", saved.resultsIdx, { root: true })
-            if (ctx.rootGetters["filters/hasFilter"](saved.resultsIdx )) {
-               ctx.commit("clearSelectedPoolResults", null, { root: true }) 
-               ctx.dispatch("searchSelectedPool", null, { root: true }) 
+            ctx.commit('filters/restoreFilters', saved, { root: true }) 
+            let checkFilter = ctx.rootGetters['filters/poolFilter'](saved.resultsIdx)
+            if (checkFilter.length > 0) {
+               await ctx.commit("clearSelectedPoolResults", null, {root: true})
+               await ctx.dispatch("searchSelectedPool", null, {root: true})
             }
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })
