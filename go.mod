@@ -17,4 +17,5 @@ require (
 	github.com/uvalib/virgo4-jwt v0.0.0-20200420194352-8f96499e5cc9
 	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f // indirect
+	honnef.co/go/tools v0.0.1-2020.1.3 // indirect
 )
