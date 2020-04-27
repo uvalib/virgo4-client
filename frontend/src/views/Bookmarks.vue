@@ -61,11 +61,10 @@
                            </tr>
                            <tr>
                               <th colspan="3">
-                                 <span @click="publicClicked(folderInfo)" class="public">
-                                    <i v-if="folderInfo.public" class="check fas fa-check-circle"></i>
-                                    <i v-else class="check far fa-circle"></i>
-                                    <span>Public</span>
-                                 </span>
+                                 <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
+                                    aria-label="Toggle public visibility of bookmark folder">
+                                    Public
+                                 </V4Checkbox>
                                  <span v-if="folderInfo.public" class="public-url">
                                     <a :href="getPublicURL(folderInfo)" target="_blank">
                                        <span>View</span><i class="link fas fa-external-link-alt"></i></a>                                    

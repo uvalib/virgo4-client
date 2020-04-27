@@ -20,11 +20,10 @@
                <div class="row" v-for="(saved,idx) in searches"  :key="saved.token">
                   <div class="saved-search">
                      <span class="num">{{idx+1}}.</span>
-                     <span class="public"  @click="publicClicked(saved)" >
-                        <i v-if="saved.public" class="check fas fa-check-circle"></i>
-                        <i v-else class="check far fa-circle"></i>
-                        <span>&nbsp;Public</span>
-                     </span>
+                     <V4Checkbox class="public" :checked="saved.public" @click="publicClicked(saved)"
+                        aria-label="Toggle public visibility of this search">
+                        Public
+                     </V4Checkbox>
                      <span><router-link :to="searchURL(saved.token)">{{saved.name}}</router-link></span>
                      <span class="search-actions">
                         <span class="icon"><router-link :to="searchURL(saved.token)"><i class="fas fa-search"></i></router-link></span>
