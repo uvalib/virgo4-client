@@ -8,10 +8,10 @@
                   :text="hit.header.author.value.join('; ')" :limit="truncateLength" />
             </div>
             <dl class="fields">
-               <template v-for="(field) in hit.basicFields">
+               <template v-for="(field,idx) in hit.basicFields">
                   <template v-if="shouldDisplay(field)">
-                     <dt :key="getKey(field,'k')">{{field.label}}:</dt>
-                     <dd :key="getKey(field,'v')" >
+                     <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
+                     <dd :key="getKey(field,`v${idx}`)" >
                         <TruncatedText :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" />
                      </dd>
                   </template>

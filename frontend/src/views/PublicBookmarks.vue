@@ -8,7 +8,7 @@
          <div v-else>
             <ul class="bookmarks">
                <template v-for="(bookmark,idx) in bookmarks">
-                  <li class="bookmark-wrapper" :key="idx">
+                  <li class="bookmark-wrapper" :key="`BM${idx}`">
                      <div class="title">
                         <router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
                      </div>
@@ -37,9 +37,6 @@ export default {
       this.$store.dispatch("bookmarks/getPublicBookmarks", this.$route.params.key)
    },
    methods: {
-      getKey(idx,keyPrefix) {
-         return keyPrefix+idx
-      },
       detailsURL(bookmark) {
          return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
       },

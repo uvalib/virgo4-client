@@ -5,10 +5,10 @@
          <div class="basic">
             <div v-if="hit.header.author" class="author">{{hit.header.author.value.join(", ")}}</div>
             <dl class="fields">
-               <template v-for="(field) in hit.basicFields">
+               <template v-for="(field,idx) in hit.basicFields">
                   <template v-if="shouldDisplay(field)">
-                     <dt :key="getKey(field,'k')">{{field.label}}:</dt>
-                     <dd :key="getKey(field,'v')" v-html="fieldValueString(field)"></dd>
+                     <dt :key="getKey(field,`gk${idx}`)">{{field.label}}:</dt>
+                     <dd :key="getKey(field,`gv${idx}`)" v-html="fieldValueString(field)"></dd>
                   </template>
                </template>
                <template v-if="accessURLField">
