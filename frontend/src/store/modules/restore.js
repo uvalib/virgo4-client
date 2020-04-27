@@ -155,7 +155,7 @@ const restore = {
                await commit("clearSelectedPoolResults", null, {root: true})
                await dispatch("searchSelectedPool", null, {root: true})
             }
-            ctx.commit('setSearching', false, { root: true })
+            commit('setSearching', false, { root: true })
          } finally {
             commit('clearLocalStorage')
             commit('setSearching', false, { root: true })
