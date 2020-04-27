@@ -1,11 +1,17 @@
 <template>
    <span v-if="isKiosk==false" class="bookmark-container">
       <template v-if="isSignedIn">
-         <i @click="removeBookmarkClicked" class="bookmark fas fa-bookmark" v-if="isBookmarked"></i>
-         <i @click="addBookmarkClicked" class="bookmark far fa-bookmark" v-else></i>
+         <V4Button v-if="isBookmarked" mode="icon" @click="removeBookmarkClicked">
+            <i class="bookmark fas fa-bookmark"></i>
+         </V4Button>
+         <V4Button v-else mode="icon" @click="addBookmarkClicked">
+            <i class="bookmark far fa-bookmark"></i>
+         </V4Button>
       </template>
-      <v-popover v-if="!isSignedIn">
-         <i class="disabled bookmark far fa-bookmark trigger"></i>
+      <v-popover v-if="!isSignedIn" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
+         <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide" aria-label="Bookmark">
+            <i class="disabled bookmark far fa-bookmark trigger"></i>
+         </V4Button>
          <div class="bookmark-popover" slot="popover">
             <div class="popover-title">
                Sign In Required
@@ -13,7 +19,12 @@
             </div>
             <div class="message">
                <p>You must be signed in to use bookmarks.</p>
-               <p>Click<V4Button mode="text" @click="signInClicked">here</V4Button>to sign in.</p>
+               <p>Click
+                  <V4Button mode="text" id="link" @click="signInClicked" @esc="hide"
+                     aria-label="Sign in to bookmark item">
+                     here
+                  </V4Button>
+               to sign in.</p>
             </div>
          </div>
       </v-popover>
@@ -27,6 +38,11 @@ export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true}
+   },
+   data: function() {
+      return {
+         isOpen: false
+      }
    },
    computed: {
       ...mapState({
@@ -56,6 +72,17 @@ export default {
       }
    },
    methods: {
+      hide() {
+         this.isOpen = false
+      },
+      toggle() {
+         this.isOpen = !this.isOpen
+      },
+      opened() {
+         setTimeout(()=>{
+            document.getElementById("link").focus()
+         },260);
+      },
       signInClicked() {
         this.$store.commit("restore/setBookmarkRecord", this.hit)
         this.$router.push("/signin")
