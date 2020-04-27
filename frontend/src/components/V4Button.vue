@@ -38,6 +38,7 @@ export default {
 button.text-button {
    border: none;
    background: none;
+   padding: 0;
 }
 button.v4-button.icon-button {
    border: none;

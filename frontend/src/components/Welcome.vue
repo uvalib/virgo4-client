@@ -5,7 +5,7 @@
          Virgo is being revamped, and you are viewing the newest public version.
       </p>
       <p>
-         As of April 29, 2020, this interface replaces "Virgo Classic" as the location for Course Reserves. )
+         As of April 29, 2020, this interface replaces "Virgo Classic" as the location for Course Reserves.
       </p>
       <p>
          The <a href="http://search.lib.virginia.edu/" target="_blank">existing Virgo search interface remains available</a>, 
