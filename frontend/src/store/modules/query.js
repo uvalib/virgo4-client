@@ -190,6 +190,7 @@ const query = {
                await ctx.commit("clearSelectedPoolResults", null, {root: true})
                await ctx.dispatch("searchSelectedPool", null, {root: true})
             }
+            ctx.commit('setSearching', false, { root: true })
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })
             router.push("/not_found")

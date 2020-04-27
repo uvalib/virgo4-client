@@ -16,6 +16,12 @@
          <div class="controls">
             <V4Button mode="primary" @click="searchClicked">Search</V4Button>
          </div>
+         <div class="finder">
+            <a href="https://guides.lib.virginia.edu/journalfinder" target="_blank">
+               Journal Finder&nbsp;
+               <i class="link fas fa-external-link-alt"></i>
+            </a>
+         </div>
          <div class="basic">
             <router-link to="/search">
                Basic Search&nbsp;
@@ -268,5 +274,9 @@ dd {
 }
 strong {
    color: var(--uvalib-grey);
+}
+.finder {
+   margin:10px 0;
+   text-align: right;
 }
 </style>
