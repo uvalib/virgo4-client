@@ -37,6 +37,8 @@ const filters = {
          let globalVal = state.availabilityValues[state.globalAvailability.id]
          let facets = state.poolFacets[idx]
          let filter = [] 
+         if (!facets) return []
+         
          facets.forEach( f => {
             f.buckets.forEach( bucket => {
                if (bucket.selected == true ) {
