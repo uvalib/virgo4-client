@@ -11,19 +11,7 @@
       <VirgoHeader :id="headerID" />
       <MenuBar :id="menuID" v-bind:style="{transform: `translateY(-${scrollPos}px)`}"/>
       <main class="v4-content" v-bind:style="{'padding-top': menuHeight+'px'}">
-         <div v-if="sessionExpired" class="session">
-            <div class="session-message">
-               <div class="bar">
-                  <span>Notice</span>
-                  <i @click="dismissSession" class="close fas fa-times-circle"></i>
-               </div>
-               <div class="message-body">
-                  Your Virgo session has expired.<br/>Click
-                  <router-link to="/signin">here</router-link>
-                  to sign in again.
-               </div>
-            </div>
-         </div>
+         <SessionExpired />
          <router-view />
          <div v-if="newVersion" class="update-pop">
             <div class="msg">A new version of Virgo is available.</div>
@@ -43,6 +31,7 @@ import LibraryFooter from "@/components/layout/LibraryFooter"
 import MessageBox from "@/components/layout/MessageBox"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
+import SessionExpired from "@/components/layout/SessionExpired"
 import FatalError from "@/components/layout/FatalError"
 import AddBookmarkModal from "@/components/AddBookmarkModal"
 import { mapState } from "vuex"
@@ -64,7 +53,8 @@ export default {
       AddBookmarkModal,
       MenuBar,
       ScrollToTop,
-      MessageBox
+      MessageBox,
+      SessionExpired
    },
    computed: {
       ...mapState({
@@ -81,13 +71,10 @@ export default {
          isKiosk: "system/isKiosk",
       }),
       showDimmer() {
-         return this.addingBookmark || this.error != "" || this.message != ""
+         return this.addingBookmark || this.error != "" || this.message != "" || this.sessionExpired
       }
    },
    methods: {
-      dismissSession() {
-         this.$store.commit("system/clearSessionExpired")
-      },
       updateClicked() {
           window.location.reload(true)
       },
