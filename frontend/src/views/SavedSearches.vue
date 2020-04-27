@@ -138,7 +138,7 @@ div.saved-search {
 }
 .public-controls {
    text-align: left;
-   margin: 5px 0 5px 45px;
+   margin: 8px 0 8px 45px;
    font-size: 0.9em;
 }
 div.row {

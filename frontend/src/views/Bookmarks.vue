@@ -438,7 +438,8 @@ i.details {
    font-weight: normal;
    display: inline-block;
    color: var(--uvalib-grey-dark);
-   margin-left: 10px;
+   margin-left: 20px;
+   margin-top: 10px;
 }
 .folder-menu .v4-button {
    margin-bottom: 5px;
