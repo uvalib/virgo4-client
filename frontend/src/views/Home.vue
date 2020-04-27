@@ -48,7 +48,7 @@
         <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
       </transition>
       <SearchResults v-if="hasResults"/>
-      <Welcome  v-else-if="!isRestore && isHomePage"  />
+      <Welcome  v-else-if="isHomePage"  />
    </div>
 </template>
 
@@ -110,7 +110,7 @@ export default {
         return this.searchMode == "basic"
       },
       isHomePage() {
-         return this.$router.currentRoute == '/'
+         return this.$router.currentRoute.path == '/'
       },
       // This restore refers to a Saved Search
       isRestore() {
