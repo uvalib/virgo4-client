@@ -19,6 +19,7 @@
                 v-model="basic"
                 autocomplete="off"
                 type="text"
+                id="search"
                 placeholder="Search Virgo for books, articles and more"
             >
           </div>
@@ -121,6 +122,10 @@ export default {
    },
    created: function() {
       this.searchCreated()
+      setTimeout( ()=> {
+         let  s = document.getElementById("search")
+         if (s) s.focus()
+      },250)
    },
    methods: {
       async searchCreated() {

@@ -1,44 +1,80 @@
 <template>
-   <nav class="menu" role="menubar" aria-label="Virgo Menu" @keyup.right="nextMenu" @keyup.left="prevMenu"  @keyup.down="nextSubMenu" @keyup.up="prevSubMenu">
+   <nav class="menu" role="menubar" aria-label="Virgo Menu" @keyup.right="nextMenu" @keyup.left="prevMenu" @keyup.esc="closeSubMenus">
       <span class="menu-right">
-        <router-link tabindex="0" role="menuitem" id="searchmenu" @mousedown.native="searchClicked" to="/search" v-on:focus.native="onMenuFocus">
+        <router-link role="menuitem" id="searchmenu" @click.native="searchClicked" to="/search" v-on:focus.native="onMenuFocus">
            <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
         </router-link>
-        <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves">
+        <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
            <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
         </router-link>
-        <span v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback">
+        <div v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback" @mousedown="closeSubMenus">
             <a tabindex="-1" href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
                <span><i class="fas fa-comments"></i>&nbsp;</span>
                <span>Questions? Ask a Librarian</span>
             </a>
-        </span>
+         </div>
+         <span v-if="isKiosk==false" role="menu" id="servicemenu" class="menu-item service" tabindex="-1" :aria-expanded="svcMenuOpen"
+            @click.stop="toggleSvcMenu" @keyup.prevent.stop.enter="toggleSvcMenu" @keydown.space.prevent.stop="toggleSvcMenu"
+            @keyup.down="nextSvcMenu" @keyup.up="prevSvcMenu">
+            <span>Library Services&nbsp;</span>
+            <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('svc') }"></i>
+            <transition name="grow"
+                  v-on:before-enter="beforeEnter" v-on:enter="enter"
+                  v-on:before-leave="beforeLeave" v-on:leave="leave">
+               <div v-if="svcMenuOpen" class="user-menu" @keydown.space.prevent.stop>
+                  <a href="https://guides.lib.virginia.edu/journalfinder" target="_blank" role="menuitem" 
+                     tabindex="-1" id="journalsub">
+                     <div class="submenu">Journal&nbsp;Finder</div>
+                  </a>
+                  <a href="https://guides.lib.virginia.edu/az.php" target="_blank" role="menuitem" 
+                     tabindex="-1" id="databasesub">
+                     <div class="submenu">Databases A-Z</div>
+                  </a>
+                  <a href="https://cal.lib.virginia.edu/calendar" target="_blank" role="menuitem" 
+                     tabindex="-1" id="eventsub">
+                     <div class="submenu">Event Calendar</div>
+                  </a>
+                  <a href="https://cal.lib.virginia.edu" target="_blank" role="menuitem" 
+                     tabindex="-1" id="roomrsrvsub">
+                     <div class="submenu">Room Reservations</div>
+                  </a>
+                  <a href="https://gis.lib.virginia.edu" target="_blank" role="menuitem" 
+                     tabindex="-1" id="gissub">
+                     <div class="submenu">GIS</div>
+                  </a>
+                  <a href="https://libra.virginia.edu" target="_blank" role="menuitem" 
+                     tabindex="-1" id="librasub">
+                     <div class="submenu">Libra</div>
+                  </a>
+               </div>
+            </transition>
+         </span>
          <template v-if="isSignedIn">
             <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen"
-               @click.stop="toggleMenu" @keyup.stop.enter="toggleMenu" @keydown.space.prevent.stop="toggleMenu" @keyup.stop.esc="closeMenu">
+               @click.stop="toggleUserMenu" @keyup.prevent.stop.enter="toggleUserMenu" @keydown.space.prevent.stop="toggleUserMenu"
+               @keyup.down="nextUserMenu" @keyup.up="prevUserMenu">
                <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
-               <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
+               <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('user') }"></i>
                <transition name="grow"
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
-                  <div v-if="userMenuOpen" class="user-menu" 
-                     @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
+                  <div v-if="userMenuOpen" class="user-menu"  @keydown.space.prevent.stop>
                      <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
                         <div class="submenu">My Information</div>
                      </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub">
+                     <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Bookmarks</div>
                      </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub">
+                     <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Checkouts</div>
                      </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub">
+                     <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Preferences</div>
                      </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub">
+                     <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Requests</div>
                      </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub">
+                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Saved Searches</div>
                      </router-link>
                      <div role="menuitem" tabindex="-1"  id="outsub" class="submenu"
@@ -55,8 +91,9 @@
             </router-link>
          </template>
          <template v-else>
-            <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin" >
-               <span class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
+            <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin" 
+                @click.native="closeSubMenus">
+               <span tabindex="-1" class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
             </router-link>
          </template>
       </span>
@@ -70,99 +107,169 @@ import { mapGetters } from "vuex"
 export default {
    data: function() {
       return {
-         subMenu: ["accountsub", "bookmarksub", "checkoutsub", "prefsub", "requestsub", "savesub", "outsub"],
-         subMenuIdx: 0,
-         menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "accountmenu"],
-         menuIdx: 0
+         menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "servicemenu", "accountmenu"],
+         menuBarIdx: 0,
+         userMenu: ["accountsub", "bookmarksub", "checkoutsub", "prefsub", "requestsub", "savesub", "outsub"],
+         userMenuOpen: false,
+         userMenuIdx: 0,
+         svcMenuOpen: false,
+         svcMenuIdx: 0,
+         svcMenu: ["journalsub", "databasesub", "eventsub", "roomrsrvsub", "gissub", "librasub"],
+
       }
    },
    computed: {
       ...mapState({
          signedInUser: state => state.user.signedInUser,
-         userMenuOpen: state => state.system.userMenuOpen
       }),
       ...mapGetters({
         isKiosk: 'system/isKiosk',
         isSignedIn: 'user/isSignedIn',
         itemsOnNotice: 'user/itemsOnNotice'
       }),
-      rotation() {
-         if (this.userMenuOpen) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
-      }
    },
    methods: {
       onMenuFocus() {
-         let tgtID =  event.target.id 
-         this.menuIdx = this.menuBar.findIndex( m => m==tgtID)
-         this.subMenuIdx = 0
+         this.menuBarIdx = 0
+         this.closeSubMenus()
+      },
+      rotation( menu) {
+         let flag = this.userMenuOpen
+         if (menu == 'svc') {
+            flag = this.sveMenuOpen
+         }
+         if (flag) {
+            return "rotate(180deg)"
+         }
+         return "rotate(0deg)"
       },
       nextMenu() {
-         this.closeMenu()
-         this.subMenuIdx = 0
-         this.menuIdx++
-         if (this.menuIdx == this.menuBar.length) {
-            this.menuIdx = 0
+         this.closeSubMenus()
+         this.menuBarIdx++
+         if (this.menuBarIdx == this.menuBar.length) {
+            this.menuBarIdx = 0
          }
-         let menu = document.getElementById(this.menuBar[this.menuIdx])
+         let menu = document.getElementById(this.menuBar[this.menuBarIdx])
          menu.focus()
-      },
-      nextSubMenu() {
-         if ( this.userMenuOpen) {
-            this.subMenuIdx++
-            if (this.subMenuIdx == this.subMenu.length) {
-               this.subMenuIdx = 0
-            }
-            let menu = document.getElementById(this.subMenu[this.subMenuIdx])
-            menu.focus()
-         } else {
-            this.subMenuIdx = 0
-            this.toggleMenu()
-         }
       },
       prevMenu() {
-         this.closeMenu()
-         this.subMenuIdx = 0
-         this.menuIdx--
-         if (this.menuIdx < 0) {
-            this.menuIdx = this.menuBar.length-1
+         this.closeSubMenus()
+         this.menuBarIdx--
+         if (this.menuBarIdx < 0) {
+            this.menuBarIdx = this.menuBar.length - 1
          }
-         let menu = document.getElementById(this.menuBar[this.menuIdx])
+         let menu = document.getElementById(this.menuBar[this.menuBarIdx])
          menu.focus()
       },
-      prevSubMenu() {
+      nextUserMenu( ) {
          if ( this.userMenuOpen) {
-            this.subMenuIdx--
-            if (this.subMenuIdx < 0) {
-               this.subMenuIdx = this.subMenu.length-1
+            this.userMenuIdx++
+            if (this.userMenuIdx == this.userMenu.length) {
+               this.userMenuIdx = 0
             }
-            let menu = document.getElementById(this.subMenu[this.subMenuIdx])
-            menu.focus()
          } else {
-            this.subMenuIdx = this.subMenu.length-1
-            this.toggleMenu()
+            this.toggleUserMenu()
          }
+         this.$nextTick( () => {
+            let menu = document.getElementById(this.userMenu[this.userMenuIdx])
+            menu.focus()
+         })
+      },
+      nextSvcMenu() {
+         if ( this.svcMenuOpen) { 
+            this.svcMenuIdx++
+            if (this.svcMenuIdx == this.svcMenu.length) {
+               this.svcMenuIdx = 0
+            }
+         } else {
+            this.toggleSvcMenu()
+         }
+         this.$nextTick( () => {
+            let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
+            menu.focus()
+         })
+      },
+      prevUserMenu() {
+         if ( this.userMenuOpen) {
+            this.userMenuIdx--
+            if (this.userMenuIdx < 0) {
+               this.userMenuIdx = this.userMenu.length-1
+            }
+         } else {
+            this.toggleUserMenu()
+            this.userMenuIdx = this.userMenu.length-1
+         }
+         this.$nextTick( () => {
+            let menu = document.getElementById(this.userMenu[this.userMenuIdx])
+            menu.focus()
+         })
+      },
+      prevSvcMenu() {
+         if ( this.svcMenuOpen) { 
+            this.svcMenuIdx--
+            if (this.svcMenuIdx < 0) {
+               this.svcMenuIdx = this.svcMenu.length-1
+            }
+         } else {
+            this.toggleSvcMenu()
+            this.svcMenuIdx = this.svcMenu.length-1
+         }
+         this.$nextTick( () => {
+            let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
+            menu.focus()
+         })
       },
       searchClicked() {
+         this.closeSubMenus()
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
          this.$store.commit('query/clear')
          this.$store.commit('restore/clearAll')
       },
       signinClicked() {
+         this.closeSubMenus()
          this.$router.push("/signin")
       },
-      toggleMenu() {
-         this.$store.commit("system/toggleUserMenu")
+      toggleUserMenu() {
+         this.svcMenuOpen = false
+         this.userMenuOpen = !this.userMenuOpen
+         this.userMenuIdx = 0
+         if (this.userMenuOpen) {
+            setTimeout( () => {
+               let menu = document.getElementById(this.userMenu[this.userMenuIdx])
+               menu.focus()
+            },100)
+         }
+      },
+      toggleSvcMenu() {
+         this.closeUserMenu()
+         this.svcMenuOpen = !this.svcMenuOpen
+         this.svcMenuIdx = 0
+         if (this.svcMenuOpen) {
+            setTimeout( () => {
+               let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
+               menu.focus()
+            },100)
+         }
+      },
+      closeSubMenus() {
+         this.closeSvcMenu()
+         this.closeUserMenu()
+         this.restoreMenuBarFocus()
+      },
+      closeSvcMenu() {
+         this.svcMenuOpen = false
+         this.svcMenuIdx = 0
+      },
+      closeUserMenu() {
+         this.userMenuOpen = false
+         this.userMenuIdx = 0
+      },
+      restoreMenuBarFocus() {
          setTimeout( () => {
-            let menu = document.getElementById(this.subMenu[this.subMenuIdx])
+            let menu = document.getElementById(this.menuBar[this.menuBarIdx])
             menu.focus()
          },100)
-      },
-      closeMenu() {
-         this.$store.commit("system/closeUserMenu")
       },
       signOut() {
          this.$store.dispatch("user/signout")
@@ -220,9 +327,10 @@ export default {
    display: inline-block;
    margin-left:20px;
 }
-.menu-item.account {
+.menu-item.account, .menu-item.service {
    position: relative;
    display: inline-block;
+   font-weight: 500;
 }
 .user-menu {
   position: absolute;
@@ -239,6 +347,7 @@ export default {
   transition: 200ms ease-out;
   display: grid;
   grid-auto-rows: auto;
+  width: max-content;
 }
 #app .user-menu a {
    outline: none;

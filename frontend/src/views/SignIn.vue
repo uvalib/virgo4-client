@@ -7,7 +7,7 @@
                <h2>UVA Users</h2>
                <p class="subhead">(Current UVA students, faculty, and staff)</p>
                <div class="indent littleextra">
-                  <V4Button mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
+                  <V4Button id="netbadge" mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
                </div>
             </span>
          </div>
@@ -98,6 +98,11 @@ export default {
       netbadgeLogin() {
          this.$store.dispatch("user/netbadge")
       },
+   },
+   created() {
+      setTimeout( ()=> {
+         document.getElementById("netbadge").focus()
+      },250)
    }
 }
 </script>

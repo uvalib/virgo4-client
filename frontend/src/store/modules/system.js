@@ -11,7 +11,6 @@ const system = {
       error: "",
       message: "",
       version: "unknown",
-      userMenuOpen: false,
       searchAPI: "",
       seenTranslateMsg: false,
       translateMessage: "",
@@ -49,14 +48,6 @@ const system = {
       closeTraslateMessage(state) {
          state.seenTranslateMsg = true
          state.translateMessage = ""
-      },
-
-      toggleUserMenu(state) {
-         state.userMenuOpen = !state.userMenuOpen
-      },
-
-      closeUserMenu(state) {
-         state.userMenuOpen = false
       },
 
       setVersion(state, data) {

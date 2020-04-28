@@ -9,7 +9,7 @@
             Click the corresponding button to search for reserved items
          </p>
          <div class="search-panel pure-form">
-            <input v-model="query" autocomplete="off" type="text">
+            <input id="crsearch" v-model="query" autocomplete="off" type="text">
             <div class="controls">
                <V4Button v-if="canMakeReserves" mode="primary" @click="searchInstructorClicked('id')">View My Reserves</V4Button>
                <V4Button @click="searchInstructorClicked('name')" mode="primary">Search Instructors</V4Button>
@@ -96,6 +96,9 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
+      setTimeout( ()=> {
+         document.getElementById("crsearch").focus()
+      },250)
    },
 }
 </script>

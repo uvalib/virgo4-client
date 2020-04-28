@@ -1,5 +1,5 @@
 <template>
-   <div id="app" @click="closeUserMenu">
+   <div id="app">
       <FatalError v-if="fatal.length > 0" />
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
@@ -77,9 +77,6 @@ export default {
    methods: {
       updateClicked() {
           window.location.reload(true)
-      },
-      closeUserMenu() {
-         this.$store.commit("system/closeUserMenu")
       },
       scrollHandler( ) {
          if ( window.scrollY <= this.headerHeight ) {
