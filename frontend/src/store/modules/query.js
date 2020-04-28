@@ -121,6 +121,8 @@ const query = {
             console.log("K: "+keyOp+" VAL: "+term)
             if ( state.mode == "basic") {
                state.basic = term
+            } else {
+               let keyParts = keyOp.split(" ")
             }
          }
       },

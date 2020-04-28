@@ -141,9 +141,9 @@ export default {
          }
          if (query.q) {
             this.$store.commit("query/restoreQueryFromURL",query.q)  
-            // this.$store.commit('resetSearchResults')
-            // this.$store.commit('filters/reset')
-            // this.$store.dispatch("searchAllPools")
+            this.$store.commit('resetSearchResults')
+            this.$store.commit('filters/reset')
+            this.$store.dispatch("searchAllPools")
          }
       },
       async searchCreated() {
@@ -152,6 +152,9 @@ export default {
          await this.$store.dispatch('pools/getPools')
 
          this.stateFromQueryParams(this.$route.query)
+         
+         // TODO all of the restore stuff is broken by URL params. Needs to be redone
+
          // // When restoring a saved search, the call will be /search/:token
          // if ( this.isRestore) {
          //    let token = this.$route.params.id
