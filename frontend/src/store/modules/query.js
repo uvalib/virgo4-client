@@ -28,6 +28,15 @@ const query = {
       idQuery: () => id => {
          return `identifier: {${id}}`
       },
+      queryURLParams: (state, getters) => {
+         let qs = `mode=${state.mode}`
+         if ( state.mode == 'basic') {
+            qs += `&scope=${state.basicSearchScope.id}`
+         }
+         qs += `&q=${getters.string}`
+
+         return encodeURI(qs)
+      },
       queryObject: state => {
          let out = { mode: state.mode }
          if (state.mode == "basic") {
@@ -95,6 +104,25 @@ const query = {
          setTimeout( ()=> {
             state.restoreMessage = ""
          }, 10000)
+      },
+      restoreQueryFromURL(state, queryParams) {
+         while (queryParams.length > 0) {
+            let braceIdx = queryParams.indexOf("{")
+            if ( braceIdx == -1) {
+               break
+            }
+            let keyOp = queryParams.substring(0, braceIdx).trim()
+            let braceIdx2 = queryParams.indexOf("}")
+            if ( braceIdx2 == -1) {
+               break
+            }
+            let term = queryParams.substring(braceIdx+1, braceIdx2)
+            queryParams = queryParams.substring(braceIdx2+1).trim()
+            console.log("K: "+keyOp+" VAL: "+term)
+            if ( state.mode == "basic") {
+               state.basic = term
+            }
+         }
       },
       restoreSearch(state, data) {
          state.restoreMessage = ""

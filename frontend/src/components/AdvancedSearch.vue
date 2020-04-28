@@ -106,6 +106,7 @@ export default {
          advancedFields: state => state.query.advancedFields,
       }),
       ...mapGetters({
+         queryURLParams: 'query/queryURLParams',
          queryEntered: "query/queryEntered",
          sources: "pools/sortedList",
          isPoolExcluded: "preferences/isPoolExcluded",
@@ -121,10 +122,8 @@ export default {
       },
       doAdvancedSearch() {
          if (this.queryEntered) {
-            // this is a new search, reset everything
-            this.$store.commit('resetSearchResults')
-            this.$store.commit('filters/reset')
-            this.$store.dispatch("searchAllPools")
+            let qs = this.queryURLParams 
+            this.$router.push(`/search?${qs}`)
          } else {
             this.$store.commit(
                "system/setError",

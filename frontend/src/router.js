@@ -34,7 +34,7 @@ const router = new Router({
       },
       {
          path: '/search/:id',
-         name: 'home',
+         name: 'search',
          component: Home
       },
       {

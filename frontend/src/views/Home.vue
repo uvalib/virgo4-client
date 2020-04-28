@@ -73,16 +73,14 @@ export default {
      V4Select, Welcome, SourceInfo
    },
    beforeRouteUpdate (to, _from, next) {
-      if (to.query.mode == 'advanced') {
-         this.$store.commit("query/setAdvancedSearch")
-      } else {
-         this.$store.commit("query/setBasicSearch")
-      }
+      console.log("before update")
+      this.stateFromQueryParams(to.query)
       next()
    },
    data: function() {
       return {
-         showVideo: false
+         showVideo: false,
+         paramHandled: false
       }
    },
    computed: {
@@ -93,6 +91,7 @@ export default {
          restoreMessage: state => state.query.restoreMessage,
       }),
       ...mapGetters({
+        queryURLParams: 'query/queryURLParams',
         rawQueryString: 'query/string',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
@@ -121,6 +120,7 @@ export default {
       }
    },
    created: function() {
+       console.log("CREATED")
       this.searchCreated()
       setTimeout( ()=> {
          let  s = document.getElementById("search")
@@ -128,30 +128,42 @@ export default {
       },250)
    },
    methods: {
+      stateFromQueryParams( query) {
+         // Interrogate query params and convert them to a search in the model (if present)
+         if (query.mode == 'advanced') {
+            this.$store.commit("query/setAdvancedSearch")
+         } else {
+            this.$store.commit("query/setBasicSearch")
+            if (query.scope != "") {
+               let tgtScope = this.searchScopes.find( s => s.id == query.scope)
+               this.$store.commit("query/setBasicSearchScope", tgtScope)
+            }
+         }
+         if (query.q) {
+            this.$store.commit("query/restoreQueryFromURL",query.q)  
+            // this.$store.commit('resetSearchResults')
+            // this.$store.commit('filters/reset')
+            // this.$store.dispatch("searchAllPools")
+         }
+      },
       async searchCreated() {
          // Config and pools are needed for this page.
          await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
 
-         // When restoring a saved search, the call will be /search/:token
-         if ( this.isRestore) {
-            this.restoreSavedSearch(this.$route.params.id)
-            this.$store.commit("restore/clearAll")
-            return
-         } else if(this.$store.getters['restore/hasPreviousSearch']) {
-           this.restorePreviousSearch()
-         }
+         this.stateFromQueryParams(this.$route.query)
+         // // When restoring a saved search, the call will be /search/:token
+         // if ( this.isRestore) {
+         //    let token = this.$route.params.id
+         //    await this.$store.dispatch("query/loadSearch", token)
+         //    this.$store.commit("restore/clearAll")
+         //    return
+         // } else if(this.$store.getters['restore/hasPreviousSearch']) {
+         //   this.restorePreviousSearch()
+         // }
       },
 
-      async restoreSavedSearch( token ) {
-         this.$store.dispatch("query/loadSearch", token)
-      },
-
-      // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
-      // an item while not signed in. If there is now a signed in user, replay the search,
-      // scroll to the target hit and open bookmark popup
       async restorePreviousSearch() {
-
         try {
           // clear and cancel if not signed in
           if( !this.$store.getters['user/isSignedIn']) {
@@ -164,6 +176,7 @@ export default {
           this.$store.commit("restore/clearAll")
         }
       },
+
       showBookmarkTarget() {
         let bmRestore = this.$store.getters['restore/bookmarkData']
 
@@ -212,9 +225,8 @@ export default {
       },
 
       searchClicked() {
-        this.$store.commit('resetSearchResults')
-        this.$store.commit('filters/reset')
-        this.$store.dispatch("searchAllPools")
+         let qp =  this.queryURLParams 
+         this.$router.push(`/search?${qp}`)
       },
 
       barcodeScanned( barcode ) {
