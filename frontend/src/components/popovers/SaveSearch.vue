@@ -14,7 +14,7 @@
          <template v-if="saved">
             <div v-if="mode=='save'" class="message">
                <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-               <p class="saved">Manage your saved searches <router-link tabindex="0" to="/bookmarks">here</router-link>.</p>
+               <p class="saved">Manage your saved searches <router-link tabindex="0" to="/searches">here</router-link>.</p>
             </div>
             <div v-else class="message">
                Your search has been shared as '{{searchName}}'.
