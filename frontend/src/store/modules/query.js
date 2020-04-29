@@ -65,6 +65,17 @@ const query = {
          // Fields are joined together with AND or OR based on the fieldOp setting
          if (state.mode == "basic") {
             let qp = state.basic
+            let hasFields = false
+            state.advancedFields.some(f => {
+               let k = f.value+":"
+               if ( qp.includes(k) ) {
+                  hasFields = true
+               }
+               return hasFields == true
+            })
+            if (hasFields) {
+               return qp
+            }
             return `keyword: {${qp}}`
          }
 
@@ -106,20 +117,35 @@ const query = {
          }, 10000)
       },
       restoreQueryFromURL(state, queryParams) {
-         console.log("PARAMS: "+queryParams)
          if ( state.mode == "advanced") {
             state.advanced.splice(0, state.advanced.length)
+         } else {
+            let value = queryParams 
+            let adv = false
+            state.advancedFields.some(f => {
+               let k = f.value+":"
+               if ( value.includes(k) && f.value != "keyword") {
+                  adv = true
+               }
+               return adv == true
+            })
+            var count = (value.match(/keyword:/gi) || []).length
+            if (count == 1 && adv == false) {
+               state.basic = queryParams.replace(/^.*{/g, "").replace(/}/g, "")
+            } else {
+               state.basic = queryParams
+            }
+            return
          }
+
          while (queryParams.length > 0) {
             // A valid query has a field and term surrounded by { }. Find the braces...
             let braceIdx = queryParams.indexOf("{")
             if ( braceIdx == -1) {
-               console.error("Malformed query; missing {")
                break
             }
             let braceIdx2 = queryParams.indexOf("}")
             if ( braceIdx2 == -1) {
-               console.error("Malformed query; missing }")
                break
             }
 
@@ -130,27 +156,36 @@ const query = {
 
             // the query term is the data between the { and }. Grab it 
             // and remove this whole term from the query string
-            let term = queryParams.substring(braceIdx+1, braceIdx2)
+            let value = queryParams.substring(braceIdx+1, braceIdx2)
             queryParams = queryParams.substring(braceIdx2+1).trim()
-            console.log("K: "+keyOp+" VAL: "+term)
-            if ( state.mode == "basic") {
-               // For basic, there is only one term. End it now.
-               state.basic = term
-               break
-            } else {
-               let keyParts = keyOp.split(" ")
-               let op = "AND"
-               let field = keyOp
-               if (keyParts.length == 2 ) {
-                  op = keyParts[0].trim()
-                  field = keyParts[1].trim()
-               } else if (keyParts.length > 2) {
-                  console.error("Invalid query "+keyOp)
-                  break
-               }
-
-               state.advanced.push({ op: op, value: term, field: field, type: "EQUAL", endVal: "" })
+            let keyParts = keyOp.split(" ")
+            let term = { op: "AND", value: value, field: keyOp.toLowerCase(), type: "EQUAL", endVal: "" }
+            if (keyParts.length == 2 ) {
+               term.op = keyParts[0].trim()
+               term.field = keyParts[1].trim().toLowerCase()
+            } else if (keyParts.length > 2) {
+               continue
             }
+
+            if (state.advancedFields.findIndex( af => af.value == term.field) == -1) {
+               continue  
+            }
+            
+            if ( term.field == "date" ) {
+               // date values have 4 formats: {1988} {AFTER 1988} {BEFORE 1988} {1970 TO 2000} 
+               if ( value.includes("AFTER") || value.includes("after")  ) {
+                  term.type = "AFTER"
+                  term.value = value.replace(/AFTER/gi, "").trim()
+               } else if ( value.includes("BEFORE") || value.includes("before")  ) {
+                  term.type = "BEFORE"
+                  term.value = value.replace(/BEFORE/gi, "").trim()
+               } else if ( value.includes("TO") ) {
+                  term.type = "BETWEEN"
+                  term.value = value.split("TO")[0].trim()
+                  term.endVal = value.split("TO")[1].trim()
+               }
+            } 
+            state.advanced.push(term)
          }
       },
       restoreSearch(state, data) {

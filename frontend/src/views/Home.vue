@@ -28,7 +28,7 @@
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
-            <router-link to="/search?mode=advanced">
+            <router-link :to="advancedURL">
               Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
             </router-link>
           </div>
@@ -73,10 +73,20 @@ export default {
      V4Select, Welcome, SourceInfo
    },
    beforeRouteUpdate (to, _from, next) {
-      console.log("before update")
-      this.stateFromQueryParams(to.query)
+      // This happens any time the route or query params change.
+      // The create handler only happens on initial page load, and in that case, 
+      // beforeRouteUpdate is NOT called
+      this.restoreStateFromQueryParams(to.query)
       next()
    },
+   created: function() {
+      this.searchCreated()
+      setTimeout( ()=> {
+         let  s = document.getElementById("search")
+         if (s) s.focus()
+      },250)
+   },
+
    data: function() {
       return {
          showVideo: false,
@@ -117,33 +127,35 @@ export default {
          return ( this.$route.params !== undefined &&
               this.$route.params.id !== undefined &&
               this.$route.params.id != "")
+      },
+      advancedURL() {
+         let url = "/search?mode=advanced"
+         if (this.rawQueryString .length > 0) {
+            url += `&q=${this.rawQueryString}`
+         }
+         return url
       }
    },
-   created: function() {
-       console.log("CREATED")
-      this.searchCreated()
-      setTimeout( ()=> {
-         let  s = document.getElementById("search")
-         if (s) s.focus()
-      },250)
-   },
    methods: {
-      stateFromQueryParams( query) {
+      restoreStateFromQueryParams( query) {
          // Interrogate query params and convert them to a search in the model (if present)
+         let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
          } else {
             this.$store.commit("query/setBasicSearch")
-            if (query.scope != "") {
+            if (query.scope && query.scope != "") {
                let tgtScope = this.searchScopes.find( s => s.id == query.scope)
                this.$store.commit("query/setBasicSearchScope", tgtScope)
             }
          }
          if (query.q) {
             this.$store.commit("query/restoreQueryFromURL",query.q)  
-            this.$store.commit('resetSearchResults')
-            this.$store.commit('filters/reset')
-            this.$store.dispatch("searchAllPools")
+            if (this.rawQueryString != oldQ) {
+               this.$store.commit('resetSearchResults')
+               this.$store.commit('filters/reset')
+               this.$store.dispatch("searchAllPools")
+            }
          }
       },
       async searchCreated() {
@@ -151,7 +163,7 @@ export default {
          await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
 
-         this.stateFromQueryParams(this.$route.query)
+         this.restoreStateFromQueryParams(this.$route.query)
          
          // TODO all of the restore stuff is broken by URL params. Needs to be redone
 

@@ -70,7 +70,7 @@
          <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
       </div>
       <div class="basic">
-         <router-link to="/search">
+         <router-link :to="basicSearchURL">
             Basic Search&nbsp;
             <i class="fas fa-undo-alt"></i>
          </router-link>
@@ -102,6 +102,14 @@ export default {
       V4BarcodeScanner
    },
    computed: {
+      basicSearchURL() {
+         let url = "/search"
+         let bq = this.rawQueryString 
+         if (bq.length > 0) {
+            url += `?q=${encodeURI(bq)}`
+         }
+         return url
+      },
       ...mapState({
          advancedFields: state => state.query.advancedFields,
       }),
@@ -123,7 +131,7 @@ export default {
       doAdvancedSearch() {
          if (this.queryEntered) {
             let qs = this.queryURLParams 
-            this.$router.push(`/search?${qs}`)
+            this.$router.push(`/search?mode=basic&${qs}`)
          } else {
             this.$store.commit(
                "system/setError",
