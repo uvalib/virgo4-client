@@ -4,11 +4,33 @@
       <div class="requests-content">
          <AccountActivities />
          <div class="working" v-if="lookingUp" >
-            <V4Spinner message="Loading up requests..."/>
+            <V4Spinner message="Looking up requests..."/>
          </div>
          <div class="details">
-            <template v-if="requests.length > 0">
-               <div class="request" v-for="(req,idx) in requests" :key="idx">
+            <template v-if="requests.holds.length > 0">
+               <h2>Holds</h2>
+               <div class="request" v-for="(req,idx) in requests.holds" :key="idx">
+                  <h3 class="title">{{req.title}}</h3>
+                  <dl>
+                     <dt>Status:</dt>
+                     <dd>{{req.status}}</dd>
+                     <dt>Position</dt>
+                     <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
+                     <dt>Date Placed:</dt>
+                     <dd>{{formatDate(req.placedDate)}}</dd>
+                     <dt>Current Location:</dt>
+                     <dd>{{req.library}} {{req.currentLocation}}</dd>
+                     <dt>Author:</dt>
+                     <dd>{{req.author}}</dd>
+                     <dt>Barcode:</dt>
+                     <dd>{{req.barcode}}</dd>
+                  </dl>
+               </div>
+            </template>
+
+            <template v-if="requests.illiad.length > 0">
+               <h2>ILL Requests</h2>
+               <div class="request" v-for="(req,idx) in requests.illiad" :key="idx">
                   <template v-if="req.requestType == 'Loan'">
                      <h3 class="title">{{req.loanTitle}}</h3>
                      <dl>
@@ -67,7 +89,7 @@
                   </template>
                </div>
             </template>
-            <template v-else>
+            <template v-if="hasNoRequests()">
                <div v-if="!lookingUp" class="none">You currently have no outstanding requests</div>
             </template>
          </div>
@@ -97,6 +119,9 @@ export default {
          let url =  `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`
          let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`
          return `<a href='${url}' target='_blank'>${icon}Download</a>`
+      },
+      hasNoRequests() {
+         return !(this.requests.illiad || this.requests.holds)
       }
    },
    created() {
@@ -115,7 +140,7 @@ export default {
 .request {
    font-size: 0.9em;
    color: #444;
-   border-bottom: 1px solid #ccc;
+   border-top: 1px solid #ccc;
    margin-bottom: 15px;
    padding-bottom: 0px;
 }
@@ -123,7 +148,7 @@ export default {
    font-weight: bold;
 }
 .requests-content {
-   width: 60%;
+   width: 80%;
    margin: 0 auto;
    position: relative;
 }

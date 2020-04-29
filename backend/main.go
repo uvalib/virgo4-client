@@ -54,6 +54,7 @@ func main() {
 		api.GET("/users/:uid/bills", svc.AuthMiddleware, svc.GetUserBills)
 		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
+		api.GET("/users/:uid/holds", svc.AuthMiddleware, svc.GetUserHolds)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)

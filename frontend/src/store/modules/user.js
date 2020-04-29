@@ -24,7 +24,7 @@ const user = {
       claims: {},
       checkouts: [],
       bills: [],
-      requests: [],
+      requests: {illiad: [], holds: []},
       searches: [],
       lookingUp: false,
       authTriesLeft: 5,
@@ -135,8 +135,8 @@ const user = {
       setCheckouts(state, co) {
          state.checkouts = co
       },
-      setRequests(state, req) {
-         state.requests = req
+      setRequests(state, reqs) {
+         state.requests = reqs
       },
       setRenewResults(state, renewResults) {
          renewResults.results.forEach( renew => {
@@ -259,13 +259,17 @@ const user = {
       getRequests(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
          ctx.commit('setLookingUp', true)
-         axios.get(`/api/users/${ctx.state.signedInUser}/illiad`).then((response) => {
-            ctx.commit('setRequests', response.data)
-            ctx.commit('setLookingUp', false)
-          }).catch((error) => {
+
+         axios.all([axios.get(`/api/users/${ctx.state.signedInUser}/holds`),
+                    axios.get(`/api/users/${ctx.state.signedInUser}/illiad`),
+         ]).then(axios.spread((holdResponse, illiadResponse) => {
+            ctx.commit('setRequests', {
+               holds: holdResponse.data.holds,
+               illiad: illiadResponse.data
+            })
+         })).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', false)
-          })
+         }).finally(() => { ctx.commit('setLookingUp', false) })
       },
       getAccountInfo(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] ) return
