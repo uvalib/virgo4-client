@@ -236,7 +236,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	c.JSON(http.StatusOK, out)
 }
 
-// GetUserCheckouts uses ILS Connector V2 API /users to get checked out items
+// GetUserCheckouts uses ILS Connector V4 API /users to get checked out items
 func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
@@ -254,6 +254,29 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, checkouts)
+}
+
+// GetUserHolds uses ILS Connector V4 API /users to get checked out items
+func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
+	userID := c.Param("uid")
+	log.Printf("Get holds for user %s with ILS Connector...", userID)
+	userURL := fmt.Sprintf("%s/v4/users/%s/holds", svc.ILSAPI, userID)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	if ilsErr != nil {
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+
+	// Pass through
+	var holds map[string]interface{}
+	if err := json.Unmarshal(bodyBytes, &holds); err != nil {
+		log.Printf("ERROR: unable to parse user holds: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, holds)
+
 }
 
 // GetUser uses ILS Connector V2 API /users to get details for a user
