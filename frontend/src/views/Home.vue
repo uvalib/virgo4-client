@@ -109,9 +109,11 @@ export default {
         sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
       }),
-      ...mapFields('query',[
-        'basic','basicSearchScope'
-      ]),
+      ...mapFields({
+        selectedResultsSort: 'selectedResultsSort',
+        basicSearchScope: 'query.basicSearchScope',
+        basic: 'query.basic',
+      }),
       searchScopes() {
         let out = [{name: 'All Resource Types', id: 'all'}]
         return out.concat(this.sources)
@@ -137,7 +139,7 @@ export default {
       }
    },
    methods: {
-      restoreStateFromQueryParams( query) {
+      async restoreStateFromQueryParams( query ) {
          // Interrogate query params and convert them to a search in the model (if present)
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
@@ -154,7 +156,12 @@ export default {
             if (this.rawQueryString != oldQ) {
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
-               this.$store.dispatch("searchAllPools")
+               await this.$store.dispatch("searchAllPools")
+
+               if (query.sort) {
+                  this.selectedResultsSort = query.sort
+                  this.$store.dispatch("applySearchSort")
+               }
             }
          }
       },
@@ -240,8 +247,13 @@ export default {
       },
 
       searchClicked() {
+         // Update the query params in the URL, but since the store already
+         // contains all of the data from the URL it wont trigger the search. Do it manually
          let qp =  this.queryURLParams 
          this.$router.push(`/search?${qp}`)
+         this.$store.commit('resetSearchResults')
+         this.$store.commit('filters/reset')
+         this.$store.dispatch("searchAllPools")
       },
 
       barcodeScanned( barcode ) {

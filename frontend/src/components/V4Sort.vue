@@ -1,7 +1,7 @@
 <template>
    <div class="v4-sort">
       <label class="sort" for="sort-opt">Sort by</label>
-      <select v-if="canSort && sortSet" v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
+      <select v-if="canSort" v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
          <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
             {{ option.name }}
          </option>
@@ -12,56 +12,38 @@
 
 <script>
 import { mapGetters } from "vuex"
+import { mapFields } from "vuex-map-fields"
 export default {
    props: {
       pool: {
          type: Object,
          required: true
       },
-      sort: {
-         type: Object,
-         required: true
-      }
-   },
-   data: function()  {
-      return {
-         selectedSort: this.sortIdString()
-      }
    },
    methods: {
-      sortIdString() {
-         return `${this.sort.sort_id}_${this.sort.order.toUpperCase()}`
-      },
       sortChanged() {
-         let sortId = this.selectedSort.split("_")[0]
-         let order = this.selectedSort.split("_")[1].toLowerCase()
-         let s = {
-            sort_id: sortId,
-            order: order
-         }
-         this.$store.commit("setSelectedResultsSort", s)
-         this.$store.commit("clearSelectedPoolResults")
-         this.$store.dispatch("searchSelectedPool")
+         this.$router.push({ query: Object.assign({}, this.$route.query, { sort: this.selectedSort }) });
+         this.$store.dispatch("applySearchSort")
       }
    },
    computed: {
+      ...mapFields({
+        selectedSort: 'selectedResultsSort',
+      }),
       ...mapGetters({
          sortingSupport: 'pools/sortingSupport'
       }),
       canSort() {
          return this.sortingSupport(this.pool.id)
       },
-      sortSet() {
-         return this.sort.sort_id != ""
-      },
       sortOptions() {
          let out = []
          this.pool.sort_options.forEach( so => {
             if (/relevance/gi.test(so.id)) {
-               out.push({id: so.id+"_DESC", name: so.label })
+               out.push({id: so.id+"_desc", name: so.label })
             } else {
-               out.push({id: so.id+"_ASC", name: so.label+" (Ascending)" })
-               out.push({id: so.id+"_DESC", name: so.label+" (Descending)" })
+               out.push({id: so.id+"_asc", name: so.label+" (Ascending)" })
+               out.push({id: so.id+"_desc", name: so.label+" (Descending)" })
             }
          })
          return out

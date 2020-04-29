@@ -21,6 +21,8 @@ import { getField, updateField } from 'vuex-map-fields'
 
 Vue.use(Vuex)
 
+const DefaultSort = "SortRelevance_desc"
+
 export default new Vuex.Store({
   state: {
     noSpinner: false,
@@ -31,6 +33,7 @@ export default new Vuex.Store({
     total: -1,
     autoExpandGroupID: "",
     selectedResultsIdx: -1,
+    selectedResultsSort: DefaultSort,
     otherSrcSelection: {id: "", name: ""}
   },
 
@@ -80,6 +83,9 @@ export default new Vuex.Store({
     },
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
+      let selSort = state.results[resultIdx].sort
+      state.selectedResultsSort = `${selSort.sort_id}_${selSort.order}`
+   
       if (resultIdx > 1 && state.otherSrcSelection.id == "") {
         // this happens when a search is restored. otherSrcSelection is used
         // to drive the selected option in the other sources tab. Make sure it is
@@ -202,12 +208,9 @@ export default new Vuex.Store({
       state.results.splice(0, state.results.length)
       state.total = -1
       state.selectedResultsIdx = -1
+      state.selectedResultsSort = DefaultSort
       state.otherSrcSelection = {id: "", name: ""}
     },
-
-    setSelectedResultsSort(state, sort) {
-      state.results[state.selectedResultsIdx].sort = sort
-    }
   },
 
   actions: {
@@ -263,9 +266,9 @@ export default new Vuex.Store({
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
+        commit('setSuggestions', response.data.suggestions)
         commit('setSearching', false)
         dispatch("filters/getSelectedResultFacets")
-        commit('setSuggestions', response.data.suggestions)
       }).catch((error) => {
          commit('system/setError', error)
          commit('setSearching', false)
@@ -308,6 +311,20 @@ export default new Vuex.Store({
     async selectPoolResults(ctx, resultIdx) {
       ctx.commit('selectPoolResults', resultIdx)
       await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
+    },
+
+    applySearchSort(ctx) {
+      let sortString = ctx.state.selectedResultsSort
+      if ( sortString == "" ) {
+         sortString = DefaultSort
+      }
+      let sort = {
+         sort_id: sortString.split("_")[0],
+         order: sortString.split("_")[1]
+      }
+      ctx.state.results[ctx.state.selectedResultsIdx].sort = sort
+      ctx.commit("clearSelectedPoolResults")
+      return ctx.dispatch("searchSelectedPool")
     }
   },
 

@@ -11,7 +11,7 @@
          </div>
          <SearchFilters />
          <div class="sort-section">
-            <V4Sort :pool="selectedResults.pool" :sort="selectedResults.sort" />
+            <V4Sort :pool="selectedResults.pool" />
          </div>
       </div>
       <template v-if="!searching">
