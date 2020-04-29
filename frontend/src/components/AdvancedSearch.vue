@@ -131,7 +131,10 @@ export default {
       doAdvancedSearch() {
          if (this.queryEntered) {
             let qs = this.queryURLParams 
-            this.$router.push(`/search?mode=basic&${qs}`)
+            this.$router.push(`/search?${qs}`)
+            this.$store.commit('resetSearchResults')
+            this.$store.commit('filters/reset')
+            this.$store.dispatch("searchAllPools")
          } else {
             this.$store.commit(
                "system/setError",

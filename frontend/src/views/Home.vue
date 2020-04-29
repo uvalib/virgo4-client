@@ -101,6 +101,7 @@ export default {
          restoreMessage: state => state.query.restoreMessage,
       }),
       ...mapGetters({
+        queryEntered: 'query/queryEntered',
         queryURLParams: 'query/queryURLParams',
         rawQueryString: 'query/string',
         hasResults: 'hasResults',
@@ -132,7 +133,7 @@ export default {
       },
       advancedURL() {
          let url = "/search?mode=advanced"
-         if (this.rawQueryString .length > 0) {
+         if (this.queryEntered) {
             url += `&q=${this.rawQueryString}`
          }
          return url
