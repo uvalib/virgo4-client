@@ -106,23 +106,50 @@ const query = {
          }, 10000)
       },
       restoreQueryFromURL(state, queryParams) {
+         console.log("PARAMS: "+queryParams)
+         if ( state.mode == "advanced") {
+            state.advanced.splice(0, state.advanced.length)
+         }
          while (queryParams.length > 0) {
+            // A valid query has a field and term surrounded by { }. Find the braces...
             let braceIdx = queryParams.indexOf("{")
             if ( braceIdx == -1) {
+               console.error("Malformed query; missing {")
                break
             }
-            let keyOp = queryParams.substring(0, braceIdx).trim()
             let braceIdx2 = queryParams.indexOf("}")
             if ( braceIdx2 == -1) {
+               console.error("Malformed query; missing }")
                break
             }
+
+            // Content before the { is the keword and possibly boolean op
+            // Regardless, this part ends in : which is not needed. Remove
+            let keyOp = queryParams.substring(0, braceIdx).trim()
+            keyOp = keyOp.substring(0, keyOp.length - 1)
+
+            // the query term is the data between the { and }. Grab it 
+            // and remove this whole term from the query string
             let term = queryParams.substring(braceIdx+1, braceIdx2)
             queryParams = queryParams.substring(braceIdx2+1).trim()
             console.log("K: "+keyOp+" VAL: "+term)
             if ( state.mode == "basic") {
+               // For basic, there is only one term. End it now.
                state.basic = term
+               break
             } else {
                let keyParts = keyOp.split(" ")
+               let op = "AND"
+               let field = keyOp
+               if (keyParts.length == 2 ) {
+                  op = keyParts[0].trim()
+                  field = keyParts[1].trim()
+               } else if (keyParts.length > 2) {
+                  console.error("Invalid query "+keyOp)
+                  break
+               }
+
+               state.advanced.push({ op: op, value: term, field: field, type: "EQUAL", endVal: "" })
             }
          }
       },
