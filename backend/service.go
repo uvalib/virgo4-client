@@ -282,7 +282,7 @@ func (svc *ServiceContext) ILLiadGet(queryURL string) ([]byte, *RequestError) {
 
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
 func (svc *ServiceContext) ILSConnectorGet(url string, jwt string) ([]byte, *RequestError) {
-	log.Printf("ILS Connector request: %s", url)
+	log.Printf("ILS Connector GET request: %s", url)
 	timeout := time.Duration(20 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
@@ -307,7 +307,7 @@ func (svc *ServiceContext) ILSConnectorGet(url string, jwt string) ([]byte, *Req
 
 // ILSConnectorPost sends a POST to the ILS connector and returns results
 func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt string) ([]byte, *RequestError) {
-	log.Printf("ILS Connector request: %s", url)
+	log.Printf("ILS Connector POST request: %s", url)
 	timeout := time.Duration(20 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
@@ -327,6 +327,31 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt 
 			url, err.StatusCode, err.Message, elapsedMS)
 	} else {
 		log.Printf("Successful response from ILS POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
+}
+
+// ILSConnectorDelete sends a DELETE request to the ILS connector and returns the response
+func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *RequestError) {
+	log.Printf("ILS Connector DELETE request: %s", url)
+	timeout := time.Duration(20 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	req, _ := http.NewRequest("DELETE", url, nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+
+	startTime := time.Now()
+	rawResp, rawErr := client.Do(req)
+	resp, err := handleAPIResponse(url, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from ILS DELETE %s - %d:%s. Elapsed Time: %d (ms)",
+			url, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from ILS DELETE %s. Elapsed Time: %d (ms)", url, elapsedMS)
 	}
 	return resp, err
 }

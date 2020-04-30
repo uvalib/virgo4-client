@@ -25,6 +25,11 @@
                      <dt>Barcode:</dt>
                      <dd>{{req.barcode}}</dd>
                   </dl>
+                  <p v-if="isDevServer">
+                  <V4Button mode="icon" @click="deleteHold(req.id)" aria-label="Delete this hold" class="delete">
+                     <i class="fas fa-trash "></i>
+                  </V4Button>
+                  </p>
                </div>
             </template>
 
@@ -99,6 +104,7 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "requests",
@@ -109,7 +115,10 @@ export default {
       ...mapState({
          requests: state => state.user.requests,
          lookingUp: state => state.user.lookingUp,
-      })
+      }),
+      ...mapGetters({
+      isDevServer: 'system/isDevServer'
+    }),
    },
    methods: {
       formatDate(date) {
@@ -122,9 +131,13 @@ export default {
       },
       hasNoRequests() {
          return !(this.requests.illiad || this.requests.holds)
+      },
+      deleteHold(id) {
+         this.$store.dispatch("requests/deleteHold", id)
       }
    },
    created() {
+      this.$store.dispatch("system/getConfig")
       this.$store.dispatch("user/getRequests");
    }
 };
@@ -183,5 +196,8 @@ dt {
 }
 dd {
    margin: 0 0 10px 0;
+}
+.delete {
+   color: var(--uvalib-red);
 }
 </style>

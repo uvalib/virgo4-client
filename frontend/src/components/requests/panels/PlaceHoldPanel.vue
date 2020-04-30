@@ -21,7 +21,7 @@ export default {
       PickupLibrary, V4Select
    },
   data: ()=> {
-    return {selectedItem: null}
+    return {selectedItem: {}}
   },
   watch: {
       selectedItem (newVal, _oldVal) {

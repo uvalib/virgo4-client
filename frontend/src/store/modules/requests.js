@@ -82,6 +82,19 @@ const requests = {
         ctx.commit('system/setError', e, {root: true})
       )
     },
+    deleteHold({commit, dispatch}, holdId){
+      axios.delete('/api/requests/hold/' + holdId)
+      .then( response => {
+        if(response.status == 200){
+          dispatch("user/getRequests", null, {root: true})
+        }else{
+          commit('system/setError', response.data, {root: true})
+        }
+      }).catch(e =>
+        // Connenction problem
+        commit('system/setError', e, {root: true})
+      )
+    },
 
 
   }

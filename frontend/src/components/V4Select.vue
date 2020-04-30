@@ -250,6 +250,7 @@ button.v4-select:focus{
   vertical-align: middle;
 }
 .v4-select .options {
+  min-width: 100%;
   text-align: left;
   background-color: var(--uvalib-brand-blue);
   color: white;
