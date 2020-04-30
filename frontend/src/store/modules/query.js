@@ -116,7 +116,7 @@ const query = {
             state.restoreMessage = ""
          }, 10000)
       },
-      restoreQueryFromURL(state, queryParams) {
+      restoreFromURL(state, queryParams) {
          if ( state.mode == "advanced") {
             state.advanced.splice(0, state.advanced.length)
          } else {

@@ -152,31 +152,37 @@ export default {
             }
          }
          if (query.q) {
-            console.log("RESTORE QUERY: "+query.q)
-            this.$store.commit("query/restoreQueryFromURL",query.q)  
+            this.$store.commit("query/restoreFromURL",query.q)  
             if (this.rawQueryString != oldQ) {
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
-               console.log("DO SEARCH ALL")
-               await this.$store.dispatch("searchAllPools")
+               await this.$store.dispatch("searchAllPools", {restore: true} )
 
+               let tgtResultIdx = 0
                if (query.pool) {
-                  console.log("SELECT POOL "+query.pool)
                   let idx = this.results.findIndex( r => r.pool.id == query.pool)
                   if ( idx > -1) {
                      // set up sort ordering so search is only done once
-                     console.log("SET POOL SORT ["+query.sort+"]")
                      this.$store.commit("setResultsSort", {resultIdx: idx, sort: query.sort})
-                     console.log("SELECT TARGET POOL AND DO SEARCH")
-                     this.$store.dispatch("selectPoolResults", idx)
+                     await this.$store.dispatch("selectPoolResults", idx)
+                     tgtResultIdx = idx
                   }
                } else if (query.sort) {
-                  console.log("NO POOL SET, BUT SORT "+query.sort)
                   // if no pool was selected, the defult pool can still have a sort order set
                   this.$store.commit("setResultsSort", {resultIdx: 0, sort: query.sort})
-                  this.$store.dispatch("applySearchSort")
                }
-               console.log("DONE RESTORE")
+
+               if (query.filter) {
+                  console.log("RESTORE FILTER")
+                  this.$store.commit("filters/restoreFromURL", {filter: query.filter, resultIdx: tgtResultIdx} )  
+               }
+
+               if (query.sort || query.filter) {
+                  console.log("filter and/or sort set; REDO SEARCH on pool")
+                  this.$store.commit("clearSelectedPoolResults")
+                  await this.$store.dispatch("searchSelectedPool")
+               }
+               this.$store.commit('setSearching', false)
             }
          }
       },

@@ -140,10 +140,6 @@ const router = new Router({
          component: NotFound
       }
    ],
-   scrollBehavior(/*to, from, savedPosition*/) {
-      // each new 'page' will scroll to the top of the screen
-      return { x: 0, y: 0 }
-   },
 })
 
 // This is called before every URL in the SPA is hit

@@ -59,10 +59,12 @@ export default {
    computed: {
       ...mapGetters({
          isSignedIn: 'user/isSignedIn',
-         rawQueryString: 'query/string'
+         rawQueryString: 'query/string',
+         filterQueryParam: 'filters/asQueryParam',
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
+         selectedResultsSort: state=>state.selectedResultsSort,
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
@@ -118,7 +120,7 @@ export default {
             if ( r.pool.id == newVal.id) {
                this.$store.dispatch("selectPoolResults", idx)
                if ( this.$route.query.pool != r.pool.id ) {
-                  this.$router.push({ query: Object.assign({}, this.$route.query, { pool: r.pool.id }) });
+                  this.updateURL(idx, r.pool.id)
                }
                found = true
             }
@@ -127,6 +129,20 @@ export default {
       }
    },
    methods: {
+      updateURL(resultIdx, poolID) {
+         let query = Object.assign({}, this.$route.query)
+         query.pool = poolID
+         delete query.filter
+         delete query.sort
+         let fqp = this.filterQueryParam( resultIdx )
+         if (fqp.length > 0) {
+            query.filter = fqp
+         }
+         if (this.selectedResultsSort.length > 0) {
+            query.sort = this.selectedResultsSort
+         }
+         this.$router.push({query})
+      },
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
@@ -144,7 +160,7 @@ export default {
          if ( this.poolFailed(r)) return
          this.otherSrcSelection = {id:"", name:""}
          this.$store.dispatch("selectPoolResults", resultIdx)
-         this.$router.push({ query: Object.assign({}, this.$route.query, { pool: r.pool.id }) });
+         this.updateURL(resultIdx, r.pool.id)
       },
    }
 }

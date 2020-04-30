@@ -237,15 +237,15 @@ export default new Vuex.Store({
     // advanced search parameters and will always start at page 1. Filters do not apply
     // to all pools so they are not used here.
     // CTX: commit: ƒ boundCommit(type, payload, options)
-    searchAllPools({ state, commit, rootState, rootGetters, dispatch }, tgtPage) {
+    async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, params) {
       commit('system/setError', "")
       // By default, search for 20 items. If this is a restored search with a particular target
       // specified, that target may not be in the first page of results. tgtPage specifes
       // which page of results contains the hit. Make the initial request return enough results to include it.
       let rows = state.pageSize
-      if ( tgtPage) {
+      if ( params && params.tgtPage) {
         // target page is 0 based
-        rows = state.pageSize * (tgtPage+1)
+        rows = state.pageSize * (params.tgtPage+1)
       }
       let req = {
         query: rootGetters['query/string'],
@@ -274,27 +274,29 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
-      commit('filters/setUpdatingFacets', true)
-      let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
-      return axios.post(url, req).then((response) => {
+      let url = state.system.searchAPI + "/api/search?intuit=1"
+      try {
+        let response = await axios.post(url, req)
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
         commit('setSuggestions', response.data.suggestions)
-        commit('setSearching', false)
-        dispatch("filters/getSelectedResultFacets")
-      }).catch((error) => {
+        if (!params || !params.restore) {
+          commit('setSearching', false)
+        }
+        return dispatch("filters/getSelectedResultFacets")
+      } catch (error) {
          commit('system/setError', error)
          commit('setSearching', false)
          commit('filters/setUpdatingFacets', false)
-      })
+      }
     },
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
     // exploration. It is used to query for next page during load more and
     // when filters are added and removed. Pool results are APPENDED to existing after load more.
     // If newly filtered, reset paging and re-query
-    searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
+    async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtResults = rootGetters.selectedResults
@@ -307,18 +309,19 @@ export default new Vuex.Store({
         filters: [filterObj]
       }
       let url = tgtResults.pool.url + "/api/search?debug=1"
-      return axios.post(url, req).then((response) => {
+      try {
+        let response = await axios.post(url, req)
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
-        dispatch("filters/getSelectedResultFacets")
         if ( state.otherSrcSelection.id != "") {
-          commit('updateOtherPoolLabel')
+         commit('updateOtherPoolLabel')
         }
-      }).catch((error) => {
+        return dispatch("filters/getSelectedResultFacets")
+      } catch(error) {
         commit('system/setError', error)
         commit('setSearching', false)
         commit('filters/setUpdatingFacets', false)
-      })
+      }
     },
 
     // Select pool results and get all facet info for the result

@@ -79,6 +79,7 @@ export default {
    computed: {
       ...mapState({
          resultsIdx: state => state.selectedResultsIdx,
+         results: state => state.results,
          updatingFacets: state => state.filters.updatingFacets,
          globalAvailability: state => state.filters.globalAvailability,
          circulatingFacet: state => state.filters.circulatingFacet,
@@ -92,7 +93,8 @@ export default {
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
           allFilters: 'filters/poolFilter',
-          facetSupport: 'pools/facetSupport'
+          filterQueryParam: 'filters/asQueryParam',
+          facetSupport: 'pools/facetSupport',
       }),
       hasFacets() {
          return this.facetSupport(this.selectedResults.pool.id)
@@ -151,10 +153,35 @@ export default {
       valueKey(idx, facetID) {
          return facetID+"_val_"+idx
       },
-      availSelected(avail) {
+      async availSelected(avail) {
+         let origPoolID = this.results[this.resultsIdx].pool.id
          this.$store.commit("filters/setGlobalAvailability", avail)
+         this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         this.$store.dispatch("searchAllPools")
+         await this.$store.dispatch("searchAllPools", {restore: true})
+         let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
+         await this.$store.dispatch("selectPoolResults", resIdx)
+         this.$store.commit("setSearching", false)
+      },
+      async circFacetClicked() {
+         let origPoolID = this.results[this.resultsIdx].pool.id
+         this.addFilterToURL()
+         this.$store.commit("clearSelectedPoolResults")
+         await this.$store.dispatch("searchAllPools", {restore: true})
+         let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
+         await this.$store.dispatch("selectPoolResults", resIdx)
+         this.$store.commit("setSearching", false)
+      },
+      addFilterToURL() {
+         let fqp = this.filterQueryParam( this.resultsIdx )
+         if ( this.$route.query.filter != fqp && fqp.length > 0 ) {
+            // NOTE: this URL encodes fqp
+            this.$router.push({ query: Object.assign({}, this.$route.query, { filter: fqp }) })
+         } else if (fqp.length == 0) {
+            let query = Object.assign({}, this.$route.query)
+            delete query.filter
+            this.$router.push({ query })
+         }
       },
       isAvailSelected(avail) {
          return this.globalAvailability.id == avail.id
@@ -163,12 +190,9 @@ export default {
          let data = {poolResultsIdx: this.resultsIdx, facetID: facetID, value: value}
          this.toggleFacet(data)
       },
-      circFacetClicked() {
-         this.$store.commit("clearSelectedPoolResults")
-         this.$store.dispatch("searchSelectedPool")
-      },
       toggleFacet(data) {
          this.$store.commit("filters/toggleFilter", data)
+         this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
       },

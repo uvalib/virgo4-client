@@ -26,6 +26,22 @@ const filters = {
 
    getters: {
       getField,
+      asQueryParam:  (_state, getters) => (idx) => {
+         let filter = getters.poolFilter(idx)
+         if (filter.length == 0) {
+            return ""
+         }
+         let out = []
+         filter.forEach(f => {
+            if ( f.value.length > 0) {
+               out.push(`${f.facet_id}.${f.value}`)
+            } else {
+               out.push(f.facet_id)   
+            }
+         })
+         // string of id.val|id.val|...
+         return out.join("|")
+      },
       poolFacets: (state) => (idx) => {
          if ( idx == -1 || idx >= state.poolFacets.length) {
             return []
@@ -39,6 +55,20 @@ const filters = {
          let filter = [] 
          if (!facets) return []
          
+         if (state.globalCirculating == true ) {
+            filter.push({facet_id: state.circulatingFacet.id, 
+               // NOTE the value here is not used. Just the presense of this facet implies true
+               facet_name: state.circulatingFacet.name, value: ""})    
+         }
+
+         if (state.globalAvailability.id == "shelf") {
+            filter.push({facet_id: state.availabilityFacet.id, 
+               facet_name: state.availabilityFacet.name, value: "On shelf"})
+         } else if (state.globalAvailability.id != "any") {
+            filter.push({facet_id: state.availabilityFacet.id, 
+               facet_name: state.availabilityFacet.name, value: globalVal})
+         }
+
          facets.forEach( f => {
             f.buckets.forEach( bucket => {
                if (bucket.selected == true ) {
@@ -46,20 +76,6 @@ const filters = {
                }
             })
          })
-
-         if (state.globalCirculating == true ) {
-            filter.unshift({facet_id: state.circulatingFacet.id, 
-               // NOTE the value here is not used. Just the presense of this facet implies true
-               facet_name: state.circulatingFacet.name, value: ""})    
-         }
-
-         if (state.globalAvailability.id == "shelf") {
-            filter.unshift({facet_id: state.availabilityFacet.id, 
-               facet_name: state.availabilityFacet.name, value: "On shelf"})
-         } else if (state.globalAvailability.id != "any") {
-            filter.unshift({facet_id: state.availabilityFacet.id, 
-               facet_name: state.availabilityFacet.name, value: globalVal})
-         }
 
          return filter
       },
@@ -140,6 +156,48 @@ const filters = {
          }
       },
 
+      restoreFromURL(state, data ) {
+         // The filter URL param is just facetID.value,facetID,value,...
+         let filter = data.filter 
+         let resultIdx = data.resultIdx
+         let facets = state.poolFacets[resultIdx]
+
+         filter.split("|").forEach( fp => {
+            let facetID = fp.split(".")[0]
+            let filterVal = fp.split(".")[1]
+            console.log("RESTORE: "+fp)
+
+            if (facetID == state.availabilityFacet.id) {
+               Object.entries(state.availabilityValues).forEach( ([key,value])=>{
+                  if (value  == filterVal) {
+                     state.globalAvailability = {id: key, name: filterVal}
+                  }
+               })
+               return
+            }
+
+            if (facetID == state.circulatingFacet.id) {
+               state.globalCirculating = true
+               return
+            }
+
+            let facet = facets.find(f => f.id == facetID)
+            if ( facet != null ) {
+               let bucket = facet.buckets.find( b => b.value == filterVal)
+               if (bucket) {
+                  bucket.selected = true
+                  console.log("RESTORED "+filterVal)
+               } else {
+                  console.log("BUCKET NOT FOUND "+filterVal+" -- ADDING")    
+                  facet.buckets.push({value: filterVal, selected: true})
+               }
+            } else {
+               console.log("FACET NOT FOUND "+facetID)
+            }
+         })
+      },
+
+      // FIXME RETIRE THIS
       // Reset all fliters and add global
       // data struct: data.numPools, data.resultsIdx, data.filters
       // data.filters is array of {facet_id, facet_name, value}

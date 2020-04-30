@@ -80,6 +80,9 @@ export default {
       },
       clearClicked() {
          this.$store.commit("filters/reset", this.resultsIdx)
+         let query = Object.assign({}, this.$route.query)
+         delete query.filter
+         this.$router.push({ query })
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
       },
@@ -99,6 +102,12 @@ export default {
    border-bottom: 1px solid var(--uvalib-grey-light);
    margin-bottom: 5px;
    padding-bottom: 10px;
+   display: flex;
+   flex-flow: row wrap;
+   align-items: center;
+}
+.filters-head button.v4-button {
+   margin-left: auto;
 }
 .no.filters-head  {
    border-bottom: 0;
