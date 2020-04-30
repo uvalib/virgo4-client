@@ -117,6 +117,9 @@ export default {
          this.results.some( (r,idx) => {
             if ( r.pool.id == newVal.id) {
                this.$store.dispatch("selectPoolResults", idx)
+               if ( this.$route.query.pool != r.pool.id ) {
+                  this.$router.push({ query: Object.assign({}, this.$route.query, { pool: r.pool.id }) });
+               }
                found = true
             }
             return found
@@ -141,6 +144,7 @@ export default {
          if ( this.poolFailed(r)) return
          this.otherSrcSelection = {id:"", name:""}
          this.$store.dispatch("selectPoolResults", resultIdx)
+         this.$router.push({ query: Object.assign({}, this.$route.query, { pool: r.pool.id }) });
       },
    }
 }

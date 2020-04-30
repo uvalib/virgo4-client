@@ -76,7 +76,7 @@ export default {
       // This happens any time the route or query params change.
       // The create handler only happens on initial page load, and in that case, 
       // beforeRouteUpdate is NOT called
-      this.restoreStateFromQueryParams(to.query)
+      this.restoreSearchFromQueryParams(to.query)
       next()
    },
    created: function() {
@@ -90,7 +90,6 @@ export default {
    data: function() {
       return {
          showVideo: false,
-         paramHandled: false
       }
    },
    computed: {
@@ -99,6 +98,7 @@ export default {
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
          restoreMessage: state => state.query.restoreMessage,
+         results: state => state.results,
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
@@ -111,7 +111,6 @@ export default {
         selectedResults: 'selectedResults',
       }),
       ...mapFields({
-        selectedResultsSort: 'selectedResultsSort',
         basicSearchScope: 'query.basicSearchScope',
         basic: 'query.basic',
       }),
@@ -140,7 +139,7 @@ export default {
       }
    },
    methods: {
-      async restoreStateFromQueryParams( query ) {
+      async restoreSearchFromQueryParams( query ) {
          // Interrogate query params and convert them to a search in the model (if present)
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
@@ -153,16 +152,31 @@ export default {
             }
          }
          if (query.q) {
+            console.log("RESTORE QUERY: "+query.q)
             this.$store.commit("query/restoreQueryFromURL",query.q)  
             if (this.rawQueryString != oldQ) {
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
+               console.log("DO SEARCH ALL")
                await this.$store.dispatch("searchAllPools")
 
-               if (query.sort) {
-                  this.selectedResultsSort = query.sort
+               if (query.pool) {
+                  console.log("SELECT POOL "+query.pool)
+                  let idx = this.results.findIndex( r => r.pool.id == query.pool)
+                  if ( idx > -1) {
+                     // set up sort ordering so search is only done once
+                     console.log("SET POOL SORT ["+query.sort+"]")
+                     this.$store.commit("setResultsSort", {resultIdx: idx, sort: query.sort})
+                     console.log("SELECT TARGET POOL AND DO SEARCH")
+                     this.$store.dispatch("selectPoolResults", idx)
+                  }
+               } else if (query.sort) {
+                  console.log("NO POOL SET, BUT SORT "+query.sort)
+                  // if no pool was selected, the defult pool can still have a sort order set
+                  this.$store.commit("setResultsSort", {resultIdx: 0, sort: query.sort})
                   this.$store.dispatch("applySearchSort")
                }
+               console.log("DONE RESTORE")
             }
          }
       },
@@ -171,7 +185,7 @@ export default {
          await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
 
-         this.restoreStateFromQueryParams(this.$route.query)
+         this.restoreSearchFromQueryParams(this.$route.query)
          
          // TODO all of the restore stuff is broken by URL params. Needs to be redone
 

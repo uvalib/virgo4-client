@@ -1,6 +1,6 @@
 import { getField, updateField } from 'vuex-map-fields'
-import axios from 'axios'
-import router from '../../router'
+// import axios from 'axios'
+// import router from '../../router'
 
 const query = {
    namespaced: true,
@@ -259,34 +259,37 @@ const query = {
       },
    },
    actions: {
-      async loadSearch(ctx, token) {
-         ctx.commit('setSearching', true, { root: true })
-         try {
-            // load the saved search info from backend
-            let response = await axios.get(`/api/searches/${token}`)
-            let saved = JSON.parse(response.data)
+      async loadSearch(_ctx, _token) {
+         //
+         // FIXME this no longer applies with search params in URL
+         //
+         // ctx.commit('setSearching', true, { root: true })
+         // try {
+         //    // load the saved search info from backend
+         //    let response = await axios.get(`/api/searches/${token}`)
+         //    let saved = JSON.parse(response.data)
 
-            ctx.commit('query/restoreSearch', saved, { root: true })
-            await ctx.dispatch("searchAllPools", null, { root: true })
-            ctx.commit('setSearching', true, { root: true })
+         //    ctx.commit('query/restoreSearch', saved, { root: true })
+         //    await ctx.dispatch("searchAllPools", null, { root: true })
+         //    ctx.commit('setSearching', true, { root: true })
 
-            // Need the search results to get num pools and target pool
-            let results = ctx.rootState.results
-            saved.numPools = results.length
-            saved.resultsIdx = results.findIndex( r=> r.pool.id == saved.pool)
+         //    // Need the search results to get num pools and target pool
+         //    let results = ctx.rootState.results
+         //    saved.numPools = results.length
+         //    saved.resultsIdx = results.findIndex( r=> r.pool.id == saved.pool)
 
-            await ctx.dispatch("selectPoolResults", saved.resultsIdx, { root: true })
-            ctx.commit('filters/restoreFilters', saved, { root: true }) 
-            let checkFilter = ctx.rootGetters['filters/poolFilter'](saved.resultsIdx)
-            if (checkFilter.length > 0) {
-               await ctx.commit("clearSelectedPoolResults", null, {root: true})
-               await ctx.dispatch("searchSelectedPool", null, {root: true})
-            }
-            ctx.commit('setSearching', false, { root: true })
-         } catch (error)  {
-            ctx.commit('setSearching', false, { root: true })
-            router.push("/not_found")
-         }
+         //    await ctx.dispatch("selectPoolResults", saved.resultsIdx, { root: true })
+         //    ctx.commit('filters/restoreFilters', saved, { root: true }) 
+         //    let checkFilter = ctx.rootGetters['filters/poolFilter'](saved.resultsIdx)
+         //    if (checkFilter.length > 0) {
+         //       await ctx.commit("clearSelectedPoolResults", null, {root: true})
+         //       await ctx.dispatch("searchSelectedPool", null, {root: true})
+         //    }
+         //    ctx.commit('setSearching', false, { root: true })
+         // } catch (error)  {
+         //    ctx.commit('setSearching', false, { root: true })
+         //    router.push("/not_found")
+         // }
       },
    }
 }

@@ -72,6 +72,17 @@ export default new Vuex.Store({
         state.searching = flag
       }
     },
+    setResultsSort(state, data) {
+      let sortString = data.sort
+       if ( !sortString || sortString == "" ) {
+         sortString = DefaultSort
+      }
+      let sort = {
+         sort_id: sortString.split("_")[0],
+         order: sortString.split("_")[1]
+      }
+      state.results[data.resultIdx].sort = sort
+    },
     updateOtherPoolLabel(state) {
       // when a pool is selected from the 'Other' tab and a filter has been applied
       // this method method is used to update the count in the tab label
@@ -81,7 +92,9 @@ export default new Vuex.Store({
       name += `<span class='total'>${res.total} hits</span>`
       state.otherSrcSelection.name = name
     },
+    
     selectPoolResults(state, resultIdx) {
+      // NOTE: the sort order for te results must already be set before this call 
       state.selectedResultsIdx = resultIdx
       let selSort = state.results[resultIdx].sort
       state.selectedResultsSort = `${selSort.sort_id}_${selSort.order}`
@@ -97,9 +110,10 @@ export default new Vuex.Store({
         state.otherSrcSelection = sel
       }
     },
+
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool
-      // total from overall total and reset pool total to 0
+      // total from overal total and reset pool total to 0
       let tgtPool = state.results[state.selectedResultsIdx]
       let oldPoolTotal = tgtPool.total
       tgtPool.total = 0
@@ -315,14 +329,7 @@ export default new Vuex.Store({
 
     applySearchSort(ctx) {
       let sortString = ctx.state.selectedResultsSort
-      if ( sortString == "" ) {
-         sortString = DefaultSort
-      }
-      let sort = {
-         sort_id: sortString.split("_")[0],
-         order: sortString.split("_")[1]
-      }
-      ctx.state.results[ctx.state.selectedResultsIdx].sort = sort
+      ctx.commit('setResultsSort', {resultIdx: ctx.state.selectedResultsIdx, sort: sortString})
       ctx.commit("clearSelectedPoolResults")
       return ctx.dispatch("searchSelectedPool")
     }
