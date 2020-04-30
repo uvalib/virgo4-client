@@ -59,8 +59,6 @@ func main() {
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
 		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 
-		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
-
 		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
 		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
 		api.DELETE("/users/:uid/searches", svc.AuthMiddleware, svc.DeleteAllSavedSearches)
@@ -79,6 +77,9 @@ func main() {
 			bookmarks.POST("/folders/:id/publish", svc.AuthMiddleware, svc.PublishBookmarkFolder)
 			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
 		}
+
+		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
+		api.DELETE("/requests/hold/:holdID", svc.AuthMiddleware, svc.DeleteHold)
 
 		api.POST("/reserves", svc.AuthMiddleware, svc.CreateCourseReserves)
 		api.POST("/reserves/validate", svc.AuthMiddleware, svc.ValidateCourseReserves)
