@@ -125,7 +125,7 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		apiURL := fmt.Sprintf("%s/version", svc.SearchAPI)
 		_, err := client.Get(apiURL)
 		if err != nil {
-			log.Printf("ERROR: SearchAPI %s ping failed: %s", svc.SearchAPI, err.Error())
+			log.Printf("ERROR: Failed response from SearchAPI PING: %s - %s", err.Error(), svc.SearchAPI)
 			hcMap["v4search"] = hcResp{Healthy: false, Message: err.Error()}
 		} else {
 			hcMap["v4search"] = hcResp{Healthy: true}
@@ -140,7 +140,7 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		apiURL := fmt.Sprintf("%s/version", svc.ILSAPI)
 		_, err := client.Get(apiURL)
 		if err != nil {
-			log.Printf("ERROR: ILS Connector %s ping failed: %s", svc.ILSAPI, err.Error())
+			log.Printf("ERROR: Failed response from ILS Connector PING: %s - %s", err.Error(), svc.ILSAPI)
 			hcMap["ils_connector"] = hcResp{Healthy: false, Message: err.Error()}
 		} else {
 			hcMap["ils_connector"] = hcResp{Healthy: true}
@@ -171,7 +171,7 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 
 	respBytes, illErr := svc.ILLiadGet("SystemInfo/SecurePlatformVersion")
 	if illErr != nil {
-		log.Printf("ERROR: ILLiad ping failed: %s", illErr.Message)
+		log.Printf("ERROR: Failed response from ILLiad PING: %s", illErr.Message)
 		hcMap["illiad"] = hcResp{Healthy: false, Message: illErr.Message}
 	} else {
 		hcMap["illiad"] = hcResp{Healthy: true}
