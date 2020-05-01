@@ -1,6 +1,6 @@
 import { getField, updateField } from 'vuex-map-fields'
 import axios from 'axios'
-// import router from '../../router'
+import router from '../../router'
 
 const query = {
    namespaced: true,
@@ -248,7 +248,7 @@ const query = {
       },
    },
    actions: {
-      async loadSearch(_ctx, _token) {
+      async loadSearch(ctx, token) {
          ctx.commit('setSearching', true, { root: true })
          try {
             // load the saved search info from backend

@@ -8,8 +8,8 @@ export default {
     SignIn
   },
   created(){
-      store.commit('restore/setURL', fthis.$route.fullPath)
-      store.commit('restore/save')
+      this.$store.commit('restore/setURL', this.$route.fullPath)
+      this.$store.commit('restore/save')
   }
 }
 </script>
