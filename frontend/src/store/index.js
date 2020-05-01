@@ -254,6 +254,8 @@ export default new Vuex.Store({
         filters: rootGetters['filters/globalFilter']
       }
 
+      let manageSpinner = !(isRestore === true)
+
       if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
         let tgtID = rootState.query.basicSearchScope.id
         req.preferences.exclude_pool = []
@@ -278,7 +280,7 @@ export default new Vuex.Store({
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
         commit('setSuggestions', response.data.suggestions)
-        if (isRestore === false) {
+        if (manageSpinner) {
           commit('setSearching', false)
         }
         return dispatch("filters/getSelectedResultFacets")

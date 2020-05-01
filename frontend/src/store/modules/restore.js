@@ -1,196 +1,54 @@
-import { getField } from 'vuex-map-fields'
-
 const restore = {
    namespaced: true,
    state: {
-      previousPath: null,
-      searchData: null,
-
-      // Record used for scrolling to bookmark
-      recordId: null,
-      groupParent: null,
-      poolName: null
+      url: "/",
+      activeRequest: "",
+      bookmarkID: "",
+      bookmarkGroupParent: "",
    },
    getters: {
-      getField,
-      previousPath: state => {
-         let ignoredPaths = ['/signedout', '/signin', '/forbidden']
-         if (!state.searchData || !state.searchData.previousPath ||
-            (state.searchData.previousPath == '/' && state.searchData.query == '') // blank search
-            || ignoredPaths.includes(state.searchData.previousPath)) {
-            return '/account'
-         }
-         return state.searchData.previousPath
+      bookmarkTarget: state => {
+         return { id: state.bookmarkID, parent: state.bookmarkGroupParent}
       },
-      bookmarkData: state => {
-         return {
-            recordId: state.recordId,
-            poolName: state.poolName,
-            groupParent: state.groupParent
-         }
-      },
-      recordId: state => {
-         return state.recordId
-      },
-      groupParent: state => {
-         return state.groupParent
-      },
-      poolName: state => {
-         return state.poolName
-      },
-      hasPreviousSearch: state => {
-         return state.searchData != null
-      },
-      searchData: state => {
-         let data = null
-         if (localStorage.getItem('previousSearch')) {
-            try {
-               data = JSON.parse(localStorage.getItem('previousSearch'))
-            } catch (e) {
-               data = null
-            }
-         } else {
-            data = null
-         }
-         return state.searchData || data
-      },
-
    },
    mutations: {
-      setPreviousPath(state, value) {
-         state.previousPath = value
+      setURL(state, url) {
+         state.url = url
       },
-
-      // Called from bookmark button
-      setBookmarkRecord(state, value) {
-         state.recordId = value.identifier
-         if (value.groupParent != "") {
-            state.groupParent = value.groupParent
+      setActiveRequest(state, nextPanel) {
+         state.activeRequest = nextPanel
+      },
+      setBookmarkRecord(state, hit) {
+         state.bookmarkID = hit.identifier
+         if ( hit.groupParent ) {
+            state.bookmarkGroupParent = hit.groupParent
          }
       },
-      // Copies bookmark data from localstorage to state
-      loadBookmarkData(state, value) {
-         state.recordId = value.recordId
-         state.groupParent = value.groupParent
-         state.poolName = value.poolName
+      clear(state) {
+         state.url = "/"
+         state.activeRequest = ""
+         state.bookmarkID = ""
+         state.bookmarkGroupParent = ""
       },
-      // Cleans up localStorage, keeps bookmark data
-      clearLocalStorage(state) {
-         localStorage.removeItem("previousSearch")
-         state.previousPath = null
-         state.searchData = null
+      save( state ) {
+         let str = JSON.stringify(state)
+         localStorage.setItem("v4Cache", str)   
       },
-      // cleans up remaining state
-      clearAll(state) {
-         localStorage.removeItem("previousSearch")
-         state.previousPath = null
-         state.recordId = null
-         state.groupParent = null
-         state.poolName = null
-         state.searchData = null
-      },
-
-      searchData(state, value) {
-         state.searchData = value
-      },
-   },
-   actions: {
-      save({ _dispatch, _commit, getters, rootGetters }, fromPath) {
-
-         // skip if you're logged in
-         if (rootGetters['user/isSignedIn']) {
-            return
-         }
-         let searchData = rootGetters['query/queryObject']
-
-         // A specific record is set during bookmark sign in
-         searchData.recordId = getters.recordId
-         searchData.groupParent = getters.groupParent
-         searchData.poolName = rootGetters['selectedResults'].pool.id
-
-         searchData.previousPath = fromPath
-
-         searchData.pools = rootGetters['pools/sortedList']
-         searchData.numPools = searchData.pools.length
-         searchData.resultsIdx = rootGetters['selectedResultsIdx']
-         searchData.page = rootGetters['selectedResults'].page
-         searchData.filters = rootGetters['filters/poolFilter'](searchData.resultsIdx)
-
-         searchData.journalQuery = rootGetters['journals/query']
-
-         searchData.activeRequest = rootGetters['requests/nextPanel']
-
-         localStorage.setItem("previousSearch", JSON.stringify(searchData))
-      },
-      loadLocalStorage(ctx) {
-         let data = null
-         if (localStorage.getItem('previousSearch')) {
+      load( state ) {
+         let restored = localStorage.getItem('v4Cache')
+         if (restored ) {
             try {
-               data = JSON.parse(localStorage.getItem('previousSearch'))
+               let data = JSON.parse(restored)
+               state.url = data.url
+               state.activeRequest = data.activeRequest
+               state.bookmarkID = data.bookmarkID
+               state.bookmarkGroupParent = data.bookmarkGroupParent
             } catch (e) {
-               data = null
+               // NO-OP; just nothing to be restored
             }
-         } else {
-            data = null
          }
-         ctx.commit('searchData', data)
-      },
-
-      async loadSearch({ dispatch, commit, getters, rootGetters }) {
-         try {
-            let searchData = getters.searchData
-            if (!searchData || searchData.query == "") {
-               return
-            }
-
-            commit('loadBookmarkData', searchData)
-
-            commit('query/restoreSearch', searchData, { root: true })
-            await dispatch("searchAllPools", searchData.page, { root: true })
-            commit('setSearching', true, { root: true })
-            await dispatch("selectPoolResults", searchData.resultsIdx, { root: true })
-            commit('filters/restoreFilters', searchData, { root: true }) 
-            let checkFilter = rootGetters['filters/poolFilter'](searchData.resultsIdx)
-            if (checkFilter.length > 0) {
-               await commit("clearSelectedPoolResults", null, {root: true})
-               await dispatch("searchSelectedPool", null, {root: true})
-            }
-            commit('setSearching', false, { root: true })
-         } finally {
-            commit('clearLocalStorage')
-            commit('setSearching', false, { root: true })
-         }
-      },
-      loadDetailsPage(ctx) {
-         try {
-            // skip if you're not logged in, or no searchData
-            if (!ctx.rootGetters['user/isSignedIn'] || !ctx.getters.searchData) {
-               return
-            }
-            if (ctx.getters.searchData.activeRequest) {
-               ctx.commit('requests/activePanel', ctx.getters.searchData.activeRequest, { root: true })
-            }
-         } finally {
-            ctx.commit('clearAll')
-         }
-      },
-
-      loadJournals(ctx) {
-         try {
-            // skip if you're not logged in, or no searchData
-            if (!ctx.rootGetters['user/isSignedIn'] || !ctx.getters.searchData) {
-               return
-            }
-
-            if (ctx.getters.searchData.journalQuery) {
-               ctx.commit('journals/setQuery', ctx.getters.searchData.journalQuery, { root: true })
-               ctx.dispatch('journals/searchJournals', null, { root: true })
-            }
-         } finally {
-            ctx.commit('clearAll')
-         }
-      },
-
+         localStorage.removeItem("v4Cache")
+      }
    }
 }
 

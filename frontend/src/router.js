@@ -90,9 +90,8 @@ const router = new Router({
          path: '/signedin',
          beforeEnter: (_to, _from, next) => {
             ensureSignedIn()
-            store.dispatch('restore/loadLocalStorage')
-            let redirectPath = store.getters['restore/previousPath']
-            next(redirectPath)
+            store.commit('restore/load')
+            next( store.state.restore.url )
          }
       },
       {
@@ -100,7 +99,8 @@ const router = new Router({
          name: 'signin',
          component: SignIn,
          beforeEnter(_to, from, next) {
-            store.dispatch('restore/save', from.fullPath)
+            store.commit('restore/setURL', from.fullPath)
+            store.commit('restore/save')
             next()
          }
       },
@@ -140,6 +140,13 @@ const router = new Router({
          component: NotFound
       }
    ],
+   scrollBehavior(to, _from, savedPosition) {
+      let noScrollPages = ["home", "search"]
+      if (noScrollPages.includes(to.name)) {
+         return savedPosition
+      }
+      return { x: 0, y: 0 }
+   },
 })
 
 // This is called before every URL in the SPA is hit
@@ -188,10 +195,8 @@ function ensureAuthTokenPresent(next) {
 
    // see if there is an auth user cookie set from which we can retrieve
    // the auth token and logged in user info....
-   // console.log("NO AUTH")
    let jwtStr = Vue.$cookies.get("v4_jwt")
    if (jwtStr) {
-      // console.log("IN COOKIE AUTH, signing in")
       store.commit("user/setUserJWT", jwtStr)
       next()
       return

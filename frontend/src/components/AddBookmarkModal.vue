@@ -119,7 +119,6 @@ export default {
          })
          document.getElementById("folder").focus()
       })
-      this.$store.commit('restore/clearAll')
    }
 }
 </script>

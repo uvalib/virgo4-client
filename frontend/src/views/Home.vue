@@ -43,11 +43,6 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
-      <transition name="message-transition"
-          enter-active-class="animated faster fadeIn"
-          leave-active-class="animated faster fadeOut">
-        <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
-      </transition>
       <SearchResults v-if="hasResults"/>
       <Welcome  v-else-if="isHomePage"  />
    </div>
@@ -81,10 +76,6 @@ export default {
    },
    created: function() {
       this.searchCreated()
-      setTimeout( ()=> {
-         let  s = document.getElementById("search")
-         if (s) s.focus()
-      },250)
    },
 
    data: function() {
@@ -97,7 +88,6 @@ export default {
          searching: state => state.searching,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
-         restoreMessage: state => state.query.restoreMessage,
          results: state => state.results,
       }),
       ...mapGetters({
@@ -175,12 +165,10 @@ export default {
                }
 
                if (query.filter) {
-                  console.log("RESTORE FILTER")
                   this.$store.commit("filters/restoreFromURL", {filter: query.filter, resultIdx: tgtResultIdx} )  
                }
 
                if (query.sort || query.filter || query.page) {
-                  console.log("filter and/or sort set; REDO SEARCH on pool")
                   this.$store.commit("clearSelectedPoolResults")
                   let page = parseInt(query.page, 10)
                   await this.$store.dispatch("searchSelectedPool", page)
@@ -190,73 +178,58 @@ export default {
          }
       },
       async searchCreated() {
-         // Config and pools are needed for this page.
          await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
 
-         this.restoreSearchFromQueryParams(this.$route.query)
-         
-         // TODO all of the restore stuff is broken by URL params. Needs to be redone
-
-         // // When restoring a saved search, the call will be /search/:token
-         // if ( this.isRestore) {
-         //    let token = this.$route.params.id
-         //    await this.$store.dispatch("query/loadSearch", token)
-         //    this.$store.commit("restore/clearAll")
-         //    return
-         // } else if(this.$store.getters['restore/hasPreviousSearch']) {
-         //   this.restorePreviousSearch()
-         // }
-      },
-
-      async restorePreviousSearch() {
-        try {
-          // clear and cancel if not signed in
-          if( !this.$store.getters['user/isSignedIn']) {
+         // When restoring a saved search, the call will be /search/:token
+         if ( this.isRestore ) {
+            // Load the search from the :token and restore it
+            // TODO
+            //    let token = this.$route.params.id
+            //    await this.$store.dispatch("query/loadSearch", token)
+            //    this.$store.commit("restore/clearAll")
             return
-          }
-          await this.$store.dispatch("restore/loadSearch")
+         } else {
+            await this.restoreSearchFromQueryParams(this.$route.query)
+         }
 
-          this.showBookmarkTarget()
-        } finally {
-          this.$store.commit("restore/clearAll")
-        }
+         let bmTarget = this.$store.getters['restore/bookmarkTarget']
+         if (bmTarget.id != "") {
+            this.showAddBookmark(bmTarget)
+            this.$store.commit("restore/clear")
+         } else {
+            setTimeout( ()=> {
+               let  s = document.getElementById("search")
+               if (s) s.focus()
+            },250)
+         }
       },
 
-      showBookmarkTarget() {
-        let bmRestore = this.$store.getters['restore/bookmarkData']
+      showAddBookmark( bmRestore ) {
+         let identifier = bmRestore.id
+         let bmData = {pool: this.selectedResults.pool.id, data: null}
+         if ( bmRestore.parent && bmRestore.parent != "") {
+            // find the item in the group that was targeted for a bookmark
+            let parent = this.selectedResults.hits.find( r=> r.identifier == bmRestore.parent)
+            bmData.data = parent.group.find( r=> r.identifier == identifier)
 
-        if (!bmRestore.recordId) {return}
+            // The group accordion watches this value. When set, the accordion will auto-expand
+            this.$store.commit('setAutoExpandGroupID', bmRestore.parent)
 
-        let identifier = bmRestore.recordId
-        let bmData = {pool: bmRestore.poolName, data: null}
-        if ( bmRestore.groupParent) {
-          let sel = `.hit[data-identifier="${bmRestore.groupParent}"]`
-          let tgtEle = document.body.querySelector(sel)
-          tgtEle.scrollIntoView()
+            // once the group is expanded, scroll to the target group item
+            setTimeout( ()=>{
+               let sel = `.group-hit[data-identifier="${identifier}"]`
+               let tgtEle = document.body.querySelector(sel)
+               this.scrollToItem(tgtEle)
+               }, 500)
 
-          // find the item in the group that was targeted for a bookmark
-          let parent = this.selectedResults.hits.find( r=> r.identifier == bmRestore.groupParent)
-          bmData.data = parent.group.find( r=> r.identifier == identifier)
-
-          // The group accordion watches this value. When set, the accordion will auto-expand
-          this.$store.commit('setAutoExpandGroupID', bmRestore.groupParent)
-
-          // once the group is expanded, scroll to the target group item
-          setTimeout( ()=>{
-            sel = `.group-hit[data-identifier="${identifier}"]`
-            tgtEle = document.body.querySelector(sel)
-            this.scrollToItem(tgtEle)
-          }, 300)
-
-        } else {
-          let sel = `.hit[data-identifier="${identifier}"]`
-          let tgtEle = document.body.querySelector(sel)
-          this.scrollToItem(tgtEle)
-          bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
-        }
-        this.$store.commit("restore/clearAll")
-        this.$store.commit("bookmarks/showAddBookmark", bmData)
+         } else {
+               let sel = `.hit[data-identifier="${identifier}"]`
+               let tgtEle = document.body.querySelector(sel)
+               this.scrollToItem(tgtEle)
+               bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
+         }
+         this.$store.commit("bookmarks/showAddBookmark", bmData)
       },
 
       scrollToItem( tgtEle ) {

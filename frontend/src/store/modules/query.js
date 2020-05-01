@@ -1,11 +1,10 @@
 import { getField, updateField } from 'vuex-map-fields'
-// import axios from 'axios'
+import axios from 'axios'
 // import router from '../../router'
 
 const query = {
    namespaced: true,
    state: {
-      restoreMessage: "",
       mode: "basic",
       basic: "",
       basicSearchScope: { name: 'All Resource Types', id: 'all' },
@@ -110,12 +109,6 @@ const query = {
    },
    mutations: {
       updateField,
-      setRestoreMessage(state, msg) {
-         state.restoreMessage = msg
-         setTimeout( ()=> {
-            state.restoreMessage = ""
-         }, 10000)
-      },
       restoreFromURL(state, queryParams) {
          if ( state.mode == "advanced") {
             state.advanced.splice(0, state.advanced.length)
@@ -189,7 +182,6 @@ const query = {
          }
       },
       restoreSearch(state, data) {
-         state.restoreMessage = ""
          state.mode = data.mode
          if (data.mode == "basic") {
             state.basicSearchScope = data.scope
@@ -202,7 +194,6 @@ const query = {
          state.basicSearchScope = scope
       },
       setAdvancedSearch(state) {
-         state.restoreMessage = ""
          state.mode = "advanced"
          let exist = state.advanced.findIndex(f => f.value == state.basic)
          if (exist == -1) {
@@ -218,7 +209,6 @@ const query = {
       },
       setBasicSearch(state) {
          state.mode = "basic"
-         state.restoreMessage = ""
       },
       browseAuthors(state, author) {
          state.mode = "browse"
@@ -248,7 +238,6 @@ const query = {
          }
       },
       clear(state) {
-         state.restoreMessage = ""
          state.mode = "basic"
          state.basic = ""
          state.basicSearchScope = { name: 'All Resource Types', id: 'all' },
@@ -260,14 +249,11 @@ const query = {
    },
    actions: {
       async loadSearch(_ctx, _token) {
-         //
-         // FIXME this no longer applies with search params in URL
-         //
-         // ctx.commit('setSearching', true, { root: true })
-         // try {
-         //    // load the saved search info from backend
-         //    let response = await axios.get(`/api/searches/${token}`)
-         //    let saved = JSON.parse(response.data)
+         ctx.commit('setSearching', true, { root: true })
+         try {
+            // load the saved search info from backend
+            let response = await axios.get(`/api/searches/${token}`)
+            console.log("SAVED SEARCH: "+response.data)
 
          //    ctx.commit('query/restoreSearch', saved, { root: true })
          //    await ctx.dispatch("searchAllPools", null, { root: true })
@@ -286,10 +272,10 @@ const query = {
          //       await ctx.dispatch("searchSelectedPool", null, {root: true})
          //    }
          //    ctx.commit('setSearching', false, { root: true })
-         // } catch (error)  {
-         //    ctx.commit('setSearching', false, { root: true })
-         //    router.push("/not_found")
-         // }
+         } catch (error)  {
+            ctx.commit('setSearching', false, { root: true })
+            router.push("/not_found")
+         }
       },
    }
 }

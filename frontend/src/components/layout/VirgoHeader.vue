@@ -155,7 +155,6 @@ export default {
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
          this.$store.commit('query/clear')
-         this.$store.commit('restore/clearAll')
       }
    }
 }

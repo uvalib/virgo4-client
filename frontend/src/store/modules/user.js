@@ -363,9 +363,8 @@ const user = {
             let jwtStr = Vue.$cookies.get("v4_jwt")
             ctx.commit("setUserJWT", jwtStr )
             ctx.commit('setAuthorizing', false)
-            ctx.dispatch('restore/loadLocalStorage', null, {root: true})
-            let redirectPath = ctx.rootGetters['restore/previousPath']
-            router.push(redirectPath)
+            ctx.commit('restore/load')
+            router.push( ctx.rootState.restore.url )
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)
             ctx.commit('setAuthFailure', error)

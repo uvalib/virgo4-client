@@ -102,6 +102,7 @@ export default {
    computed: {
       ...mapState({
          details : state => state.item.details,
+         activeRequest: state => state.restore.activeRequest
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
@@ -183,7 +184,10 @@ export default {
    },
    created() {
       this.getDetails()
-      this.$store.dispatch("restore/loadDetailsPage")
+      if ( this.activeRequest ) {
+         this.$store.commit('requests/activePanel', this.activeRequest )
+         this.$store.commit('restore/clear')
+      }
    },
 }
 </script>
