@@ -218,6 +218,11 @@ export default new Vuex.Store({
       state.results[state.selectedResultsIdx].page++
     },
 
+    setPage(state, pageOveride) {
+      state.noSpinner = true
+      state.results[state.selectedResultsIdx].page = pageOveride
+    },
+
     resetSearchResults(state) {
       state.results.splice(0, state.results.length)
       state.total = -1
@@ -234,22 +239,14 @@ export default new Vuex.Store({
     },
 
     // Search ALL configured pools. This is the initial search call using only the basic or
-    // advanced search parameters and will always start at page 1. Filters do not apply
-    // to all pools so they are not used here.
+    // advanced search parameters and will always start at page 1.
+    // If isRestore is true, the spinner will not be cleared after the search
     // CTX: commit: ƒ boundCommit(type, payload, options)
-    async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, params) {
+    async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, isRestore) {
       commit('system/setError', "")
-      // By default, search for 20 items. If this is a restored search with a particular target
-      // specified, that target may not be in the first page of results. tgtPage specifes
-      // which page of results contains the hit. Make the initial request return enough results to include it.
-      let rows = state.pageSize
-      if ( params && params.tgtPage) {
-        // target page is 0 based
-        rows = state.pageSize * (params.tgtPage+1)
-      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: 0, rows: rows },
+        pagination: { start: 0, rows: state.pageSize },
         preferences: {
           target_pool: rootState.preferences.targetPoolURL,
           exclude_pool: rootState.preferences.excludePoolURLs,
@@ -281,7 +278,7 @@ export default new Vuex.Store({
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
         commit('setSuggestions', response.data.suggestions)
-        if (!params || !params.restore) {
+        if (isRestore === false) {
           commit('setSearching', false)
         }
         return dispatch("filters/getSelectedResultFacets")
@@ -295,16 +292,23 @@ export default new Vuex.Store({
     // SearchSelectedPool is called only when one specific set of pool results is selected for
     // exploration. It is used to query for next page during load more and
     // when filters are added and removed. Pool results are APPENDED to existing after load more.
-    // If newly filtered, reset paging and re-query
-    async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
+    // If newly filtered, reset paging and re-query. The oagination can be overridden with the pageOverride
+    // param. It will set the current page to the override and ask for all hits up to that page
+    async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }, pageOverride) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtResults = rootGetters.selectedResults
       let filters = rootGetters['filters/poolFilter'](state.selectedResultsIdx)
       let filterObj = {pool_id: tgtResults.pool.id, facets: filters}
+      let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize } 
+      if (pageOverride) {
+         let pageDiff = pageOverride - tgtResults.page
+         pagination.rows = state.pageSize * pageDiff
+         commit('setPage', pageOverride-1) // tracked pages are 0-based
+      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: tgtResults.page * state.pageSize, rows: state.pageSize },
+        pagination: pagination,
         sort: tgtResults.sort,
         filters: [filterObj]
       }

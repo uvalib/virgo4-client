@@ -153,10 +153,12 @@ export default {
          }
          if (query.q) {
             this.$store.commit("query/restoreFromURL",query.q)  
+
+            // Need this to prevent re-running the search when toggle between basic and advanced
             if (this.rawQueryString != oldQ) {
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
-               await this.$store.dispatch("searchAllPools", {restore: true} )
+               await this.$store.dispatch("searchAllPools", true )
 
                let tgtResultIdx = 0
                if (query.pool) {
@@ -177,10 +179,11 @@ export default {
                   this.$store.commit("filters/restoreFromURL", {filter: query.filter, resultIdx: tgtResultIdx} )  
                }
 
-               if (query.sort || query.filter) {
+               if (query.sort || query.filter || query.page) {
                   console.log("filter and/or sort set; REDO SEARCH on pool")
                   this.$store.commit("clearSelectedPoolResults")
-                  await this.$store.dispatch("searchSelectedPool")
+                  let page = parseInt(query.page, 10)
+                  await this.$store.dispatch("searchSelectedPool", page)
                }
                this.$store.commit('setSearching', false)
             }

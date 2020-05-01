@@ -97,6 +97,9 @@ export default {
             this.loadingMore = true
             this.$store.dispatch("moreResults").finally( ()=> {
                 this.loadingMore = false
+                 let query = Object.assign({}, this.$route.query)
+                 query.page = this.selectedResults.page+1 // page is 0 based internally
+                 this.$router.push({query})
             })
          }
       }

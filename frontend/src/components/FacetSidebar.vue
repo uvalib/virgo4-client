@@ -158,7 +158,7 @@ export default {
          this.$store.commit("filters/setGlobalAvailability", avail)
          this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchAllPools", {restore: true})
+         await this.$store.dispatch("searchAllPools", true)
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
@@ -167,21 +167,22 @@ export default {
          let origPoolID = this.results[this.resultsIdx].pool.id
          this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchAllPools", {restore: true})
+         await this.$store.dispatch("searchAllPools", true)
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
       },
       addFilterToURL() {
+         // changing the filter resetes paging
+         let query = Object.assign({}, this.$route.query)
+         delete query.page
          let fqp = this.filterQueryParam( this.resultsIdx )
-         if ( this.$route.query.filter != fqp && fqp.length > 0 ) {
-            // NOTE: this URL encodes fqp
-            this.$router.push({ query: Object.assign({}, this.$route.query, { filter: fqp }) })
-         } else if (fqp.length == 0) {
-            let query = Object.assign({}, this.$route.query)
+         if (fqp.length == 0) {
             delete query.filter
-            this.$router.push({ query })
-         }
+         } else if ( this.$route.query.filter != fqp ) {
+            query.filter = fqp
+         } 
+         this.$router.push({ query })
       },
       isAvailSelected(avail) {
          return this.globalAvailability.id == avail.id

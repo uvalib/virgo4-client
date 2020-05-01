@@ -61,6 +61,7 @@ export default {
          isSignedIn: 'user/isSignedIn',
          rawQueryString: 'query/string',
          filterQueryParam: 'filters/asQueryParam',
+         selectedResults: 'selectedResults',
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
@@ -134,12 +135,16 @@ export default {
          query.pool = poolID
          delete query.filter
          delete query.sort
+         delete query.page
          let fqp = this.filterQueryParam( resultIdx )
          if (fqp.length > 0) {
             query.filter = fqp
          }
          if (this.selectedResultsSort.length > 0) {
             query.sort = this.selectedResultsSort
+         }
+         if (this.selectedResults.page > 0) {
+            query.page = this.selectedResults.page +1
          }
          this.$router.push({query})
       },
