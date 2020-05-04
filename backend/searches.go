@@ -209,7 +209,7 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 
 	if search.Public {
 		log.Printf("Search %s is public", token)
-		c.JSON(http.StatusOK, search.Search)
+		c.JSON(http.StatusOK, search)
 		return
 	}
 
