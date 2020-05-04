@@ -8,8 +8,7 @@
                <div class="qs">{{queryString}}</div>
             </div>
             <span class="buttons">
-               <SaveSearch v-if="isSignedIn" mode="share"/>
-               <SaveSearch v-if="isSignedIn" mode="save"/>
+               <SaveSearch v-if="isSignedIn"/>
             </span>
          </template>
       </div>

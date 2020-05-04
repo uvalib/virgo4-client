@@ -165,7 +165,6 @@ const filters = {
          filter.split("|").forEach( fp => {
             let facetID = fp.split(".")[0]
             let filterVal = fp.split(".")[1]
-            console.log("RESTORE: "+fp)
 
             if (facetID == state.availabilityFacet.id) {
                Object.entries(state.availabilityValues).forEach( ([key,value])=>{
@@ -186,56 +185,12 @@ const filters = {
                let bucket = facet.buckets.find( b => b.value == filterVal)
                if (bucket) {
                   bucket.selected = true
-                  console.log("RESTORED "+filterVal)
                } else {
-                  console.log("BUCKET NOT FOUND "+filterVal+" -- ADDING")    
                   facet.buckets.push({value: filterVal, selected: true})
                }
-            } else {
-               console.log("FACET NOT FOUND "+facetID)
-            }
+            } 
          })
       },
-
-      // FIXME RETIRE THIS
-      // Reset all fliters and add global
-      // data struct: data.numPools, data.resultsIdx, data.filters
-      // data.filters is array of {facet_id, facet_name, value}
-      // NOTE: This must be called after search so the facet data is available
-      restoreFilters(state, data) {
-          // facet_id = FacetAvailability gets moved into state.globalAvailability
-          let avail = data.filters.find( f => f.facet_id==state.availabilityFacet.id)
-          if ( avail ) {
-             let gaID = ""
-             Object.entries(state.availabilityValues).forEach( ([key,value])=>{
-                if (value  == avail.value) {
-                   gaID = key
-                }
-             })
-             if (gaID.length > 0) {
-                state.globalAvailability = {id: gaID, name: avail.value}
-             }
-          }
- 
-          // set global circulating filter if present
-          let circ = data.filters.find( f => f.facet_id==state.circulatingFacet.id)
-          if (circ && circ.value == true) {
-             state.globalCirculating = true
-          }
-
-         // flag filters as selected
-         let facets = state.poolFacets[data.resultsIdx]
-         data.filters.forEach( filter => {
-            if ( filter.facet_id ==  state.availabilityFacet.id || filter.facet_id == state.circulatingFacet.id) return
-            let facet = facets.find(f => f.id == filter.facet_id)
-            if ( facet != null ) {
-               let bucket = facet.buckets.find( b => b.value == filter.value)
-               if (bucket) {
-                  bucket.selected = true
-               }
-            }
-         })
-      }
    },
 
    actions: {

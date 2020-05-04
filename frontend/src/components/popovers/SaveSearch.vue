@@ -1,41 +1,23 @@
 <template>
    <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false" class="inline">
-      <V4Button v-if="mode=='save'" mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="cancelClicked">
+      <V4Button mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="cancelClicked">
          Save Search
-      </V4Button>
-      <V4Button v-else mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="cancelClicked">
-         Share Search
       </V4Button>
       <div class="save-container" slot="popover">
          <div class="popover-header">
-            <span v-if="mode=='save'">Save Search</span>
-            <span v-else>Share Search</span>
+            <span>Save Search</span>
          </div>
          <template v-if="saved">
-            <div v-if="mode=='save'" class="message">
+            <div class="message">
                <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-               <p class="saved">Manage your saved searches <router-link tabindex="0" to="/searches">here</router-link>.</p>
-            </div>
-            <div v-else class="message">
-               Your search has been shared as '{{searchName}}'.
-               <ul class="public-controls">
-                  <li>
-                     <a :href="publicURL()" target="_blank">
-                        <span>View shared search</span>
-                        <i class="link fas fa-external-link-alt"></i>
-                     </a>
-                  </li>
-                  <li>
-                     <V4Button mode="text" @click="copyURL">Copy shared URL to clipboard</V4Button>
-                  </li>
-               </ul>
+               <p class="saved">Manage your saved searches <router-link id="manage" tabindex="0" to="/searches">here</router-link>.</p>
             </div>
             <div class="edit-controls">
                <V4Button mode="primary" @click="cancelClicked">OK</V4Button>
             </div>
          </template>
          <template v-else>
-            <div v-if="working"  class="message working">
+            <div v-if="working" class="message working">
                <V4Spinner message="Working..."/>
             </div>
             <div v-else>
@@ -70,12 +52,6 @@ export default {
          poolFilters: 'filters/poolFilter',
          selectedResults: 'selectedResults'
       }),
-   },
-   props: {
-      mode: {
-         type: String,
-         default: "save"
-      }
    },
    data: function()  {
       return {
@@ -119,16 +95,9 @@ export default {
          let d = new Date()
          this.searchName = `search-${this.$moment(d).format('YYYYMMDDHHmm')}`
          this.error = ""
-         if (this.mode == 'share') {
-            this.working = true
-            setTimeout(()=>{
-               this.saveClicked()
-            }, 5)
-         } else {
-            setTimeout(()=>{
-               this.$refs.savename.focus()
-            }, 250)
-         }
+         setTimeout(()=>{
+            this.$refs.savename.focus()
+         }, 250)
       },
       async saveClicked() {
          if ( this.searchName == "") {
@@ -136,15 +105,16 @@ export default {
             return
          }
          this.working = true
-         let saveData = this.queryObject 
-         saveData.pool = this.selectedResults.pool.id
-         saveData.filters = this.poolFilters( this.resultsIdx )
-         let req = {name: this.searchName, search: saveData, isPublic: (this.mode != "save")}
+         let searchURL = this.$router.currentRoute.fullPath
+         let req = {name: this.searchName, url: searchURL, isPublic: false}
          try { 
             await this.$store.dispatch("user/saveSearch", req)
             this.saved = true
             this.showSavePrompt = false
             this.working = false
+            setTimeout(()=>{
+               document.getElementById("manage").focus()
+            }, 250)
          } catch(err) {
             this.error = err.message
             this.working = false

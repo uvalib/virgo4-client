@@ -32,9 +32,8 @@ const query = {
          if ( state.mode == 'basic') {
             qs += `&scope=${state.basicSearchScope.id}`
          }
-         qs += `&q=${getters.string}`
-
-         return encodeURI(qs)
+         qs += `&q=${encodeURIComponent(getters.string)}`
+         return qs
       },
       queryObject: state => {
          let out = { mode: state.mode }
@@ -226,17 +225,6 @@ const query = {
       removeCriteria(state, idx) {
          state.advanced.splice(idx, 1)
       },
-      updateSearchMode(state) {
-         if (state.mode == "browse") {
-            if ( state.advanced[0].value != "") {
-               state.mode = "advanced"
-            } else {
-               state.mode = "basic"  
-            }  
-            state.browse = [
-               { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
-         }
-      },
       clear(state) {
          state.mode = "basic"
          state.basic = ""
@@ -253,25 +241,32 @@ const query = {
          try {
             // load the saved search info from backend
             let response = await axios.get(`/api/searches/${token}`)
-            console.log("SAVED SEARCH: "+response.data)
-
-         //    ctx.commit('query/restoreSearch', saved, { root: true })
-         //    await ctx.dispatch("searchAllPools", null, { root: true })
-         //    ctx.commit('setSearching', true, { root: true })
-
-         //    // Need the search results to get num pools and target pool
-         //    let results = ctx.rootState.results
-         //    saved.numPools = results.length
-         //    saved.resultsIdx = results.findIndex( r=> r.pool.id == saved.pool)
-
-         //    await ctx.dispatch("selectPoolResults", saved.resultsIdx, { root: true })
-         //    ctx.commit('filters/restoreFilters', saved, { root: true }) 
-         //    let checkFilter = ctx.rootGetters['filters/poolFilter'](saved.resultsIdx)
-         //    if (checkFilter.length > 0) {
-         //       await ctx.commit("clearSelectedPoolResults", null, {root: true})
-         //       await ctx.dispatch("searchSelectedPool", null, {root: true})
-         //    }
-         //    ctx.commit('setSearching', false, { root: true })
+            if (response.data.url != "") {
+               router.replace(response.data.url)    
+            } else {
+               let old = JSON.parse(response.data.search)
+               ctx.commit('restoreSearch', old )
+               let url = ctx.getters.queryURLParams
+               if (old.pool != "") {
+                  url += `&pool=${old.pool}`
+               }
+               if (old.filters && old.filters.length > 0) {
+                  url += "&filter="
+                  let filters = []
+                  old.filters.forEach(f => {
+                     if (f.value != "") {
+                        filters.push(`${f.facet_id}.${f.value}`)
+                     } else {
+                        filters.push(`${f.facet_id}`)
+                     }
+                  })
+                  url += encodeURI(filters.join("|"))
+               }
+               url = `/search?${url}`
+               router.replace( url )   
+               let req = {token: token, name: response.data.name, url: url, isPublic: response.data.public}
+               ctx.dispatch("user/saveSearch", req, {root:true})
+            }
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })
             router.push("/not_found")

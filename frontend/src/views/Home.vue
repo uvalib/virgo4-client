@@ -109,7 +109,7 @@ export default {
         return out.concat(this.sources)
       },
       basicSearch() {
-        return this.searchMode == "basic"
+        return this.searchMode != "advanced"
       },
       isHomePage() {
          return this.$router.currentRoute.path == '/'
@@ -129,7 +129,7 @@ export default {
       }
    },
    methods: {
-      async restoreSearchFromQueryParams( query ) {
+      async restoreSearchFromQueryParams( query, force ) {
          // Interrogate query params and convert them to a search in the model (if present)
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
@@ -145,7 +145,7 @@ export default {
             this.$store.commit("query/restoreFromURL",query.q)  
 
             // Need this to prevent re-running the search when toggle between basic and advanced
-            if (this.rawQueryString != oldQ) {
+            if (this.rawQueryString != oldQ || force === true) {
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
                await this.$store.dispatch("searchAllPools", true )
@@ -184,13 +184,12 @@ export default {
          // When restoring a saved search, the call will be /search/:token
          if ( this.isRestore ) {
             // Load the search from the :token and restore it
-            // TODO
-            //    let token = this.$route.params.id
-            //    await this.$store.dispatch("query/loadSearch", token)
-            //    this.$store.commit("restore/clearAll")
+            let token = this.$route.params.id
+            await this.$store.dispatch("query/loadSearch", token)
+            this.restoreSearchFromQueryParams(this.$route.query, true)
             return
          } else {
-            await this.restoreSearchFromQueryParams(this.$route.query)
+            await this.restoreSearchFromQueryParams(this.$route.query, true)
          }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
