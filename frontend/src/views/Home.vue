@@ -28,7 +28,7 @@
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
-            <router-link to="/search?mode=advanced">
+            <router-link :to="advancedURL">
               Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
             </router-link>
           </div>
@@ -43,11 +43,6 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
-      <transition name="message-transition"
-          enter-active-class="animated faster fadeIn"
-          leave-active-class="animated faster fadeOut">
-        <p v-if="restoreMessage" class="session" v-html="restoreMessage"></p>
-      </transition>
       <SearchResults v-if="hasResults"/>
       <Welcome  v-else-if="isHomePage"  />
    </div>
@@ -73,16 +68,19 @@ export default {
      V4Select, Welcome, SourceInfo
    },
    beforeRouteUpdate (to, _from, next) {
-      if (to.query.mode == 'advanced') {
-         this.$store.commit("query/setAdvancedSearch")
-      } else {
-         this.$store.commit("query/setBasicSearch")
-      }
+      // This happens any time the route or query params change.
+      // The create handler only happens on initial page load, and in that case, 
+      // beforeRouteUpdate is NOT called
+      this.restoreSearchFromQueryParams(to.query)
       next()
    },
+   created: function() {
+      this.searchCreated()
+   },
+
    data: function() {
       return {
-         showVideo: false
+         showVideo: false,
       }
    },
    computed: {
@@ -90,9 +88,11 @@ export default {
          searching: state => state.searching,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
-         restoreMessage: state => state.query.restoreMessage,
+         results: state => state.results,
       }),
       ...mapGetters({
+        queryEntered: 'query/queryEntered',
+        queryURLParams: 'query/queryURLParams',
         rawQueryString: 'query/string',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
@@ -100,15 +100,16 @@ export default {
         sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
       }),
-      ...mapFields('query',[
-        'basic','basicSearchScope'
-      ]),
+      ...mapFields({
+        basicSearchScope: 'query.basicSearchScope',
+        basic: 'query.basic',
+      }),
       searchScopes() {
         let out = [{name: 'All Resource Types', id: 'all'}]
         return out.concat(this.sources)
       },
       basicSearch() {
-        return this.searchMode == "basic"
+        return this.searchMode != "advanced"
       },
       isHomePage() {
          return this.$router.currentRoute.path == '/'
@@ -118,86 +119,116 @@ export default {
          return ( this.$route.params !== undefined &&
               this.$route.params.id !== undefined &&
               this.$route.params.id != "")
+      },
+      advancedURL() {
+         let url = "/search?mode=advanced"
+         if (this.queryEntered) {
+            url += `&q=${this.rawQueryString}`
+         }
+         return url
       }
    },
-   created: function() {
-      this.searchCreated()
-      setTimeout( ()=> {
-         let  s = document.getElementById("search")
-         if (s) s.focus()
-      },250)
-   },
    methods: {
+      async restoreSearchFromQueryParams( query, force ) {
+         // Interrogate query params and convert them to a search in the model (if present)
+         let oldQ = this.rawQueryString
+         if (query.mode == 'advanced') {
+            this.$store.commit("query/setAdvancedSearch")
+         } else {
+            this.$store.commit("query/setBasicSearch")
+            if (query.scope && query.scope != "") {
+               let tgtScope = this.searchScopes.find( s => s.id == query.scope)
+               this.$store.commit("query/setBasicSearchScope", tgtScope)
+            }
+         }
+         if (query.q) {
+            this.$store.commit("query/restoreFromURL",query.q)  
+
+            // Need this to prevent re-running the search when toggle between basic and advanced
+            if (this.rawQueryString != oldQ || force === true) {
+               this.$store.commit('resetSearchResults')
+               this.$store.commit('filters/reset')
+               await this.$store.dispatch("searchAllPools", true )
+
+               let tgtResultIdx = 0
+               if (query.pool) {
+                  let idx = this.results.findIndex( r => r.pool.id == query.pool)
+                  if ( idx > -1) {
+                     // set up sort ordering so search is only done once
+                     this.$store.commit("setResultsSort", {resultIdx: idx, sort: query.sort})
+                     await this.$store.dispatch("selectPoolResults", idx)
+                     tgtResultIdx = idx
+                  }
+               } else if (query.sort) {
+                  // if no pool was selected, the defult pool can still have a sort order set
+                  this.$store.commit("setResultsSort", {resultIdx: 0, sort: query.sort})
+               }
+
+               if (query.filter) {
+                  this.$store.commit("filters/restoreFromURL", {filter: query.filter, resultIdx: tgtResultIdx} )  
+               }
+
+               if (query.sort || query.filter || query.page) {
+                  this.$store.commit("clearSelectedPoolResults")
+                  let page = parseInt(query.page, 10)
+                  await this.$store.dispatch("searchSelectedPool", page)
+               }
+               this.$store.commit('setSearching', false)
+            }
+         }
+      },
       async searchCreated() {
-         // Config and pools are needed for this page.
          await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
 
          // When restoring a saved search, the call will be /search/:token
-         if ( this.isRestore) {
-            this.restoreSavedSearch(this.$route.params.id)
-            this.$store.commit("restore/clearAll")
+         if ( this.isRestore ) {
+            // Load the search from the :token and restore it
+            let token = this.$route.params.id
+            await this.$store.dispatch("query/loadSearch", token)
+            this.restoreSearchFromQueryParams(this.$route.query, true)
             return
-         } else if(this.$store.getters['restore/hasPreviousSearch']) {
-           this.restorePreviousSearch()
+         } else {
+            await this.restoreSearchFromQueryParams(this.$route.query, true)
+         }
+
+         let bmTarget = this.$store.getters['restore/bookmarkTarget']
+         if (bmTarget.id != "") {
+            this.showAddBookmark(bmTarget)
+            this.$store.commit("restore/clear")
+         } else {
+            setTimeout( ()=> {
+               let  s = document.getElementById("search")
+               if (s) s.focus()
+            },250)
          }
       },
 
-      async restoreSavedSearch( token ) {
-         this.$store.dispatch("query/loadSearch", token)
-      },
+      showAddBookmark( bmRestore ) {
+         let identifier = bmRestore.id
+         let bmData = {pool: this.selectedResults.pool.id, data: null}
+         if ( bmRestore.parent && bmRestore.parent != "") {
+            // find the item in the group that was targeted for a bookmark
+            let parent = this.selectedResults.hits.find( r=> r.identifier == bmRestore.parent)
+            bmData.data = parent.group.find( r=> r.identifier == identifier)
 
-      // Look for the bookmark cookie. If found, it is an indicator that a user tried to bookmark
-      // an item while not signed in. If there is now a signed in user, replay the search,
-      // scroll to the target hit and open bookmark popup
-      async restorePreviousSearch() {
+            // The group accordion watches this value. When set, the accordion will auto-expand
+            this.$store.commit('setAutoExpandGroupID', bmRestore.parent)
 
-        try {
-          // clear and cancel if not signed in
-          if( !this.$store.getters['user/isSignedIn']) {
-            return
-          }
-          await this.$store.dispatch("restore/loadSearch")
+            // once the group is expanded, scroll to the target group item
+            setTimeout( ()=>{
+               let sel = `.group-hit[data-identifier="${identifier}"]`
+               let tgtEle = document.body.querySelector(sel)
+               this.scrollToItem(tgtEle)
+               }, 500)
 
-          this.showBookmarkTarget()
-        } finally {
-          this.$store.commit("restore/clearAll")
-        }
-      },
-      showBookmarkTarget() {
-        let bmRestore = this.$store.getters['restore/bookmarkData']
-
-        if (!bmRestore.recordId) {return}
-
-        let identifier = bmRestore.recordId
-        let bmData = {pool: bmRestore.poolName, data: null}
-        if ( bmRestore.groupParent) {
-          let sel = `.hit[data-identifier="${bmRestore.groupParent}"]`
-          let tgtEle = document.body.querySelector(sel)
-          tgtEle.scrollIntoView()
-
-          // find the item in the group that was targeted for a bookmark
-          let parent = this.selectedResults.hits.find( r=> r.identifier == bmRestore.groupParent)
-          bmData.data = parent.group.find( r=> r.identifier == identifier)
-
-          // The group accordion watches this value. When set, the accordion will auto-expand
-          this.$store.commit('setAutoExpandGroupID', bmRestore.groupParent)
-
-          // once the group is expanded, scroll to the target group item
-          setTimeout( ()=>{
-            sel = `.group-hit[data-identifier="${identifier}"]`
-            tgtEle = document.body.querySelector(sel)
-            this.scrollToItem(tgtEle)
-          }, 300)
-
-        } else {
-          let sel = `.hit[data-identifier="${identifier}"]`
-          let tgtEle = document.body.querySelector(sel)
-          this.scrollToItem(tgtEle)
-          bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
-        }
-        this.$store.commit("restore/clearAll")
-        this.$store.commit("bookmarks/showAddBookmark", bmData)
+         } else {
+               let sel = `.hit[data-identifier="${identifier}"]`
+               let tgtEle = document.body.querySelector(sel)
+               this.scrollToItem(tgtEle)
+               bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
+         }
+         this.$store.commit("bookmarks/showAddBookmark", bmData)
       },
 
       scrollToItem( tgtEle ) {
@@ -212,9 +243,13 @@ export default {
       },
 
       searchClicked() {
-        this.$store.commit('resetSearchResults')
-        this.$store.commit('filters/reset')
-        this.$store.dispatch("searchAllPools")
+         // Update the query params in the URL, but since the store already
+         // contains all of the data from the URL it wont trigger the search. Do it manually
+         let qp =  this.queryURLParams 
+         this.$router.push(`/search?${qp}`)
+         this.$store.commit('resetSearchResults')
+         this.$store.commit('filters/reset')
+         this.$store.dispatch("searchAllPools")
       },
 
       barcodeScanned( barcode ) {

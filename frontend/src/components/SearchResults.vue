@@ -8,8 +8,7 @@
                <div class="qs">{{queryString}}</div>
             </div>
             <span class="buttons">
-               <SaveSearch v-if="isSignedIn" mode="share"/>
-               <SaveSearch v-if="isSignedIn" mode="save"/>
+               <SaveSearch v-if="isSignedIn"/>
             </span>
          </template>
       </div>
@@ -59,10 +58,13 @@ export default {
    computed: {
       ...mapGetters({
          isSignedIn: 'user/isSignedIn',
-         rawQueryString: 'query/string'
+         rawQueryString: 'query/string',
+         filterQueryParam: 'filters/asQueryParam',
+         selectedResults: 'selectedResults',
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
+         selectedResultsSort: state=>state.selectedResultsSort,
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
@@ -117,6 +119,9 @@ export default {
          this.results.some( (r,idx) => {
             if ( r.pool.id == newVal.id) {
                this.$store.dispatch("selectPoolResults", idx)
+               if ( this.$route.query.pool != r.pool.id ) {
+                  this.updateURL(idx, r.pool.id)
+               }
                found = true
             }
             return found
@@ -124,6 +129,24 @@ export default {
       }
    },
    methods: {
+      updateURL(resultIdx, poolID) {
+         let query = Object.assign({}, this.$route.query)
+         query.pool = poolID
+         delete query.filter
+         delete query.sort
+         delete query.page
+         let fqp = this.filterQueryParam( resultIdx )
+         if (fqp.length > 0) {
+            query.filter = fqp
+         }
+         if (this.selectedResultsSort.length > 0) {
+            query.sort = this.selectedResultsSort
+         }
+         if (this.selectedResults.page > 0) {
+            query.page = this.selectedResults.page +1
+         }
+         this.$router.push({query})
+      },
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
@@ -141,6 +164,7 @@ export default {
          if ( this.poolFailed(r)) return
          this.otherSrcSelection = {id:"", name:""}
          this.$store.dispatch("selectPoolResults", resultIdx)
+         this.updateURL(resultIdx, r.pool.id)
       },
    }
 }

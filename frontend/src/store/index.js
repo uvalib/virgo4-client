@@ -21,6 +21,8 @@ import { getField, updateField } from 'vuex-map-fields'
 
 Vue.use(Vuex)
 
+const DefaultSort = "SortRelevance_desc"
+
 export default new Vuex.Store({
   state: {
     noSpinner: false,
@@ -31,6 +33,7 @@ export default new Vuex.Store({
     total: -1,
     autoExpandGroupID: "",
     selectedResultsIdx: -1,
+    selectedResultsSort: DefaultSort,
     otherSrcSelection: {id: "", name: ""}
   },
 
@@ -69,6 +72,17 @@ export default new Vuex.Store({
         state.searching = flag
       }
     },
+    setResultsSort(state, data) {
+      let sortString = data.sort
+       if ( !sortString || sortString == "" ) {
+         sortString = DefaultSort
+      }
+      let sort = {
+         sort_id: sortString.split("_")[0],
+         order: sortString.split("_")[1]
+      }
+      state.results[data.resultIdx].sort = sort
+    },
     updateOtherPoolLabel(state) {
       // when a pool is selected from the 'Other' tab and a filter has been applied
       // this method method is used to update the count in the tab label
@@ -78,8 +92,13 @@ export default new Vuex.Store({
       name += `<span class='total'>${res.total} hits</span>`
       state.otherSrcSelection.name = name
     },
+    
     selectPoolResults(state, resultIdx) {
+      // NOTE: the sort order for te results must already be set before this call 
       state.selectedResultsIdx = resultIdx
+      let selSort = state.results[resultIdx].sort
+      state.selectedResultsSort = `${selSort.sort_id}_${selSort.order}`
+   
       if (resultIdx > 1 && state.otherSrcSelection.id == "") {
         // this happens when a search is restored. otherSrcSelection is used
         // to drive the selected option in the other sources tab. Make sure it is
@@ -91,9 +110,10 @@ export default new Vuex.Store({
         state.otherSrcSelection = sel
       }
     },
+
     clearSelectedPoolResults(state) {
       // When the results are cleared, reset pagination, remove pool
-      // total from overall total and reset pool total to 0
+      // total from overal total and reset pool total to 0
       let tgtPool = state.results[state.selectedResultsIdx]
       let oldPoolTotal = tgtPool.total
       tgtPool.total = 0
@@ -198,16 +218,18 @@ export default new Vuex.Store({
       state.results[state.selectedResultsIdx].page++
     },
 
+    setPage(state, pageOveride) {
+      state.noSpinner = true
+      state.results[state.selectedResultsIdx].page = pageOveride
+    },
+
     resetSearchResults(state) {
       state.results.splice(0, state.results.length)
       state.total = -1
       state.selectedResultsIdx = -1
+      state.selectedResultsSort = DefaultSort
       state.otherSrcSelection = {id: "", name: ""}
     },
-
-    setSelectedResultsSort(state, sort) {
-      state.results[state.selectedResultsIdx].sort = sort
-    }
   },
 
   actions: {
@@ -217,28 +239,22 @@ export default new Vuex.Store({
     },
 
     // Search ALL configured pools. This is the initial search call using only the basic or
-    // advanced search parameters and will always start at page 1. Filters do not apply
-    // to all pools so they are not used here.
+    // advanced search parameters and will always start at page 1.
+    // If isRestore is true, the spinner will not be cleared after the search
     // CTX: commit: ƒ boundCommit(type, payload, options)
-    searchAllPools({ state, commit, rootState, rootGetters, dispatch }, tgtPage) {
+    async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, isRestore) {
       commit('system/setError', "")
-      // By default, search for 20 items. If this is a restored search with a particular target
-      // specified, that target may not be in the first page of results. tgtPage specifes
-      // which page of results contains the hit. Make the initial request return enough results to include it.
-      let rows = state.pageSize
-      if ( tgtPage) {
-        // target page is 0 based
-        rows = state.pageSize * (tgtPage+1)
-      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: 0, rows: rows },
+        pagination: { start: 0, rows: state.pageSize },
         preferences: {
           target_pool: rootState.preferences.targetPoolURL,
           exclude_pool: rootState.preferences.excludePoolURLs,
         },
         filters: rootGetters['filters/globalFilter']
       }
+
+      let manageSpinner = !(isRestore === true)
 
       if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
         let tgtID = rootState.query.basicSearchScope.id
@@ -257,57 +273,74 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
-      commit('filters/setUpdatingFacets', true)
-      let url = state.system.searchAPI + "/api/search?intuit=1" // removed debug=1 to see if it helps speed
-      return axios.post(url, req).then((response) => {
+      let url = state.system.searchAPI + "/api/search?intuit=1"
+      try {
+        let response = await axios.post(url, req)
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
-        commit('setSearching', false)
-        dispatch("filters/getSelectedResultFacets")
         commit('setSuggestions', response.data.suggestions)
-      }).catch((error) => {
+        if (manageSpinner) {
+          commit('setSearching', false)
+        }
+        return dispatch("filters/getSelectedResultFacets")
+      } catch (error) {
          commit('system/setError', error)
          commit('setSearching', false)
          commit('filters/setUpdatingFacets', false)
-      })
+      }
     },
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
     // exploration. It is used to query for next page during load more and
     // when filters are added and removed. Pool results are APPENDED to existing after load more.
-    // If newly filtered, reset paging and re-query
-    searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
+    // If newly filtered, reset paging and re-query. The oagination can be overridden with the pageOverride
+    // param. It will set the current page to the override and ask for all hits up to that page
+    async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }, pageOverride) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtResults = rootGetters.selectedResults
       let filters = rootGetters['filters/poolFilter'](state.selectedResultsIdx)
       let filterObj = {pool_id: tgtResults.pool.id, facets: filters}
+      let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize } 
+      if (pageOverride) {
+         let pageDiff = pageOverride - tgtResults.page
+         pagination.rows = state.pageSize * pageDiff
+         commit('setPage', pageOverride-1) // tracked pages are 0-based
+      }
       let req = {
         query: rootGetters['query/string'],
-        pagination: { start: tgtResults.page * state.pageSize, rows: state.pageSize },
+        pagination: pagination,
         sort: tgtResults.sort,
         filters: [filterObj]
       }
       let url = tgtResults.pool.url + "/api/search?debug=1"
-      return axios.post(url, req).then((response) => {
+      try {
+        let response = await axios.post(url, req)
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
-        dispatch("filters/getSelectedResultFacets")
         if ( state.otherSrcSelection.id != "") {
-          commit('updateOtherPoolLabel')
+         commit('updateOtherPoolLabel')
         }
-      }).catch((error) => {
+        return dispatch("filters/getSelectedResultFacets")
+      } catch(error) {
         commit('system/setError', error)
         commit('setSearching', false)
         commit('filters/setUpdatingFacets', false)
-      })
+      }
     },
 
     // Select pool results and get all facet info for the result
     async selectPoolResults(ctx, resultIdx) {
       ctx.commit('selectPoolResults', resultIdx)
       await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
+    },
+
+    applySearchSort(ctx) {
+      let sortString = ctx.state.selectedResultsSort
+      ctx.commit('setResultsSort', {resultIdx: ctx.state.selectedResultsIdx, sort: sortString})
+      ctx.commit("clearSelectedPoolResults")
+      return ctx.dispatch("searchSelectedPool")
     }
   },
 

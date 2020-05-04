@@ -11,7 +11,7 @@
          </div>
          <SearchFilters />
          <div class="sort-section">
-            <V4Sort :pool="selectedResults.pool" :sort="selectedResults.sort" />
+            <V4Sort :pool="selectedResults.pool" />
          </div>
       </div>
       <template v-if="!searching">
@@ -97,6 +97,9 @@ export default {
             this.loadingMore = true
             this.$store.dispatch("moreResults").finally( ()=> {
                 this.loadingMore = false
+                 let query = Object.assign({}, this.$route.query)
+                 query.page = this.selectedResults.page+1 // page is 0 based internally
+                 this.$router.push({query})
             })
          }
       }

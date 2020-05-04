@@ -8,7 +8,8 @@ export default {
     SignIn
   },
   created(){
-      this.$store.dispatch('restore/save', this.$route.fullPath, {root: true})
+      this.$store.commit('restore/setURL', this.$route.fullPath)
+      this.$store.commit('restore/save')
   }
 }
 </script>

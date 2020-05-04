@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -22,6 +21,7 @@ type SavedSearch struct {
 	Public    bool      `db:"is_public" json:"public"`
 	CreatedAt time.Time `db:"created_at" json:"created"`
 	Search    string    `db:"search" json:"search"`
+	URL       string    `db:"search_url" json:"url"`
 }
 
 // TableName sets the name of the table in the DB that this struct binds to
@@ -150,9 +150,10 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// Make sure the passed request object is well formed JSON
 	var reqObj struct {
-		Name     string      `json:"name"`
-		Search   interface{} `json:"search"`
-		IsPublic bool        `json:"isPublic"`
+		Token    string `json:"token"`
+		Name     string `json:"name"`
+		URL      string `json:"url"`
+		IsPublic bool   `json:"isPublic"`
 	}
 	qpErr := c.ShouldBindJSON(&reqObj)
 	if qpErr != nil {
@@ -162,20 +163,31 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 		return
 	}
 
-	// Generate an access token and save it to the saved searches table
-	json, _ := json.Marshal(reqObj.Search)
-	search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
-		CreatedAt: time.Now(), Search: string(json), Public: reqObj.IsPublic}
-	err := svc.DB.Model(&search).Insert()
-	if err != nil {
-		log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
-		resp.Message = err.Error()
-		c.JSON(http.StatusInternalServerError, resp)
-		return
+	if reqObj.Token == "" {
+		// Generate an access token and save it to the saved searches table
+		search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
+			CreatedAt: time.Now(), URL: reqObj.URL, Public: reqObj.IsPublic, Search: "{}"}
+		err := svc.DB.Model(&search).Insert()
+		if err != nil {
+			log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
+			resp.Message = err.Error()
+			c.JSON(http.StatusInternalServerError, resp)
+			return
+		}
+		log.Printf("User %s search %s saved as %s", uid, reqObj.Name, search.Token)
+		resp.Token = search.Token
+	} else {
+		log.Printf("Convert old-style search %s to URL", reqObj.Token)
+		q := svc.DB.NewQuery("update saved_searches set search_url={:u}, search={:empty} where token={:tok}")
+		q.Bind(dbx.Params{"tok": reqObj.Token})
+		q.Bind(dbx.Params{"u": reqObj.URL})
+		q.Bind(dbx.Params{"empty": "{}"})
+		_, e := q.Execute()
+		if e != nil {
+			log.Printf("ERROR: unable to convert search %s: %s", reqObj.Token, e.Error())
+		}
 	}
 
-	log.Printf("User %s search %s saved as %s", uid, reqObj.Name, search.Token)
-	resp.Token = search.Token
 	resp.Success = true
 	resp.Message = "Search saved"
 
@@ -197,7 +209,7 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 
 	if search.Public {
 		log.Printf("Search %s is public", token)
-		c.JSON(http.StatusOK, search.Search)
+		c.JSON(http.StatusOK, search)
 		return
 	}
 
@@ -230,8 +242,7 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 		c.String(http.StatusNotFound, "%s not found", token)
 		return
 	}
-
-	c.JSON(http.StatusOK, search.Search)
+	c.JSON(http.StatusOK, search)
 }
 
 // GetUserSavedSearches will get all of the searches saved by the specified user

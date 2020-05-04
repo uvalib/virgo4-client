@@ -5,7 +5,6 @@ import router from '../../router'
 const query = {
    namespaced: true,
    state: {
-      restoreMessage: "",
       mode: "basic",
       basic: "",
       basicSearchScope: { name: 'All Resource Types', id: 'all' },
@@ -27,6 +26,14 @@ const query = {
       getField,
       idQuery: () => id => {
          return `identifier: {${id}}`
+      },
+      queryURLParams: (state, getters) => {
+         let qs = `mode=${state.mode}`
+         if ( state.mode == 'basic') {
+            qs += `&scope=${state.basicSearchScope.id}`
+         }
+         qs += `&q=${encodeURIComponent(getters.string)}`
+         return qs
       },
       queryObject: state => {
          let out = { mode: state.mode }
@@ -56,6 +63,17 @@ const query = {
          // Fields are joined together with AND or OR based on the fieldOp setting
          if (state.mode == "basic") {
             let qp = state.basic
+            let hasFields = false
+            state.advancedFields.some(f => {
+               let k = f.value+":"
+               if ( qp.includes(k) ) {
+                  hasFields = true
+               }
+               return hasFields == true
+            })
+            if (hasFields) {
+               return qp
+            }
             return `keyword: {${qp}}`
          }
 
@@ -90,14 +108,79 @@ const query = {
    },
    mutations: {
       updateField,
-      setRestoreMessage(state, msg) {
-         state.restoreMessage = msg
-         setTimeout( ()=> {
-            state.restoreMessage = ""
-         }, 10000)
+      restoreFromURL(state, queryParams) {
+         if ( state.mode == "advanced") {
+            state.advanced.splice(0, state.advanced.length)
+         } else {
+            let value = queryParams 
+            let adv = false
+            state.advancedFields.some(f => {
+               let k = f.value+":"
+               if ( value.includes(k) && f.value != "keyword") {
+                  adv = true
+               }
+               return adv == true
+            })
+            var count = (value.match(/keyword:/gi) || []).length
+            if (count == 1 && adv == false) {
+               state.basic = queryParams.replace(/^.*{/g, "").replace(/}/g, "")
+            } else {
+               state.basic = queryParams
+            }
+            return
+         }
+
+         while (queryParams.length > 0) {
+            // A valid query has a field and term surrounded by { }. Find the braces...
+            let braceIdx = queryParams.indexOf("{")
+            if ( braceIdx == -1) {
+               break
+            }
+            let braceIdx2 = queryParams.indexOf("}")
+            if ( braceIdx2 == -1) {
+               break
+            }
+
+            // Content before the { is the keword and possibly boolean op
+            // Regardless, this part ends in : which is not needed. Remove
+            let keyOp = queryParams.substring(0, braceIdx).trim()
+            keyOp = keyOp.substring(0, keyOp.length - 1)
+
+            // the query term is the data between the { and }. Grab it 
+            // and remove this whole term from the query string
+            let value = queryParams.substring(braceIdx+1, braceIdx2)
+            queryParams = queryParams.substring(braceIdx2+1).trim()
+            let keyParts = keyOp.split(" ")
+            let term = { op: "AND", value: value, field: keyOp.toLowerCase(), type: "EQUAL", endVal: "" }
+            if (keyParts.length == 2 ) {
+               term.op = keyParts[0].trim()
+               term.field = keyParts[1].trim().toLowerCase()
+            } else if (keyParts.length > 2) {
+               continue
+            }
+
+            if (state.advancedFields.findIndex( af => af.value == term.field) == -1) {
+               continue  
+            }
+            
+            if ( term.field == "date" ) {
+               // date values have 4 formats: {1988} {AFTER 1988} {BEFORE 1988} {1970 TO 2000} 
+               if ( value.includes("AFTER") || value.includes("after")  ) {
+                  term.type = "AFTER"
+                  term.value = value.replace(/AFTER/gi, "").trim()
+               } else if ( value.includes("BEFORE") || value.includes("before")  ) {
+                  term.type = "BEFORE"
+                  term.value = value.replace(/BEFORE/gi, "").trim()
+               } else if ( value.includes("TO") ) {
+                  term.type = "BETWEEN"
+                  term.value = value.split("TO")[0].trim()
+                  term.endVal = value.split("TO")[1].trim()
+               }
+            } 
+            state.advanced.push(term)
+         }
       },
       restoreSearch(state, data) {
-         state.restoreMessage = ""
          state.mode = data.mode
          if (data.mode == "basic") {
             state.basicSearchScope = data.scope
@@ -110,7 +193,6 @@ const query = {
          state.basicSearchScope = scope
       },
       setAdvancedSearch(state) {
-         state.restoreMessage = ""
          state.mode = "advanced"
          let exist = state.advanced.findIndex(f => f.value == state.basic)
          if (exist == -1) {
@@ -126,7 +208,6 @@ const query = {
       },
       setBasicSearch(state) {
          state.mode = "basic"
-         state.restoreMessage = ""
       },
       browseAuthors(state, author) {
          state.mode = "browse"
@@ -144,19 +225,7 @@ const query = {
       removeCriteria(state, idx) {
          state.advanced.splice(idx, 1)
       },
-      updateSearchMode(state) {
-         if (state.mode == "browse") {
-            if ( state.advanced[0].value != "") {
-               state.mode = "advanced"
-            } else {
-               state.mode = "basic"  
-            }  
-            state.browse = [
-               { op: "AND", value: "", field: "keyword", type: "EQUAL", endVal: "" }]
-         }
-      },
       clear(state) {
-         state.restoreMessage = ""
          state.mode = "basic"
          state.basic = ""
          state.basicSearchScope = { name: 'All Resource Types', id: 'all' },
@@ -172,25 +241,32 @@ const query = {
          try {
             // load the saved search info from backend
             let response = await axios.get(`/api/searches/${token}`)
-            let saved = JSON.parse(response.data)
-
-            ctx.commit('query/restoreSearch', saved, { root: true })
-            await ctx.dispatch("searchAllPools", null, { root: true })
-            ctx.commit('setSearching', true, { root: true })
-
-            // Need the search results to get num pools and target pool
-            let results = ctx.rootState.results
-            saved.numPools = results.length
-            saved.resultsIdx = results.findIndex( r=> r.pool.id == saved.pool)
-
-            await ctx.dispatch("selectPoolResults", saved.resultsIdx, { root: true })
-            ctx.commit('filters/restoreFilters', saved, { root: true }) 
-            let checkFilter = ctx.rootGetters['filters/poolFilter'](saved.resultsIdx)
-            if (checkFilter.length > 0) {
-               await ctx.commit("clearSelectedPoolResults", null, {root: true})
-               await ctx.dispatch("searchSelectedPool", null, {root: true})
+            if (response.data.url != "") {
+               router.replace(response.data.url)    
+            } else {
+               let old = JSON.parse(response.data.search)
+               ctx.commit('restoreSearch', old )
+               let url = ctx.getters.queryURLParams
+               if (old.pool != "") {
+                  url += `&pool=${old.pool}`
+               }
+               if (old.filters && old.filters.length > 0) {
+                  url += "&filter="
+                  let filters = []
+                  old.filters.forEach(f => {
+                     if (f.value != "") {
+                        filters.push(`${f.facet_id}.${f.value}`)
+                     } else {
+                        filters.push(`${f.facet_id}`)
+                     }
+                  })
+                  url += encodeURI(filters.join("|"))
+               }
+               url = `/search?${url}`
+               router.replace( url )   
+               let req = {token: token, name: response.data.name, url: url, isPublic: response.data.public}
+               ctx.dispatch("user/saveSearch", req, {root:true})
             }
-            ctx.commit('setSearching', false, { root: true })
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })
             router.push("/not_found")

@@ -84,8 +84,8 @@ export default {
          },260);
       },
       signInClicked() {
-        this.$store.commit("restore/setBookmarkRecord", this.hit)
-        this.$router.push("/signin")
+         this.$store.commit("restore/setBookmarkRecord", this.hit)
+         this.$router.push("/signin")
       },
       removeBookmarkClicked() {
          if ( this.isSignedIn == false) return

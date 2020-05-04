@@ -8,7 +8,7 @@
                @keyup.enter="searchClicked"
                v-model="query"
                autocomplete="off"
-               type="text"
+               type="text" id="search"
                placeholder="Browse Virgo journals by title"
             />
             <div class="note"><b>NOTE:</b> This search is case-sensitive</div>
@@ -129,7 +129,10 @@ export default {
       },
    },
    created(){
-     this.$store.dispatch("restore/loadJournals")
+     setTimeout( ()=> {
+         let  s = document.getElementById("search")
+         if (s) s.focus()
+      },250)
    }
 };
 </script>

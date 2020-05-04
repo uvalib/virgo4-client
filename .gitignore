@@ -18,6 +18,6 @@ backend/db/dev.sh
 dev_db.sh
 dev_connect.sh
 local_db.sh
-to_aws.sh
+to_prod_db.sh
 frontend/yarn_start.sh
 .vscode/tasks.json
