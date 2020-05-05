@@ -155,13 +155,13 @@ export default {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
          let id= this.$route.params.id
-         if (src == "course-reserves") {
-            this.$store.dispatch("item/lookupCatalogKeyDetail", id )
-         } else {
+         if (src) {
             this.$store.dispatch("item/getDetails", {source:src, identifier:id})
-            if ( this.isSignedIn) {
-               this.$store.dispatch("bookmarks/getBookmarks")
-            }
+         } else {
+            this.$store.dispatch("item/lookupCatalogKeyDetail", id )
+         }
+         if ( this.isSignedIn) {
+            this.$store.dispatch("bookmarks/getBookmarks")
          }
       },
       getSubjectLink(subj) {

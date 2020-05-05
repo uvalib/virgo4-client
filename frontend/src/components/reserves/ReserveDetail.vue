@@ -25,7 +25,7 @@ export default {
    },
    methods: {
       detailsLink(catalogKey) {
-         return `/sources/course-reserves/items/${catalogKey}`
+         return `/items/${catalogKey}`
       },
    }
 }

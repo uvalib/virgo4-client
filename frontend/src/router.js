@@ -79,6 +79,12 @@ const router = new Router({
          component: Details,
       },
       {
+         // route to details page when pool is not known
+         path: '/items/:id',
+         name: 'item',
+         component: Details,
+      },
+      {
          path: '/preferences',
          name: 'preferences',
          component: Preferences
@@ -152,7 +158,7 @@ const router = new Router({
 // This is called before every URL in the SPA is hit
 router.beforeEach((to, _from, next) => {
    // Some pages just require an auth token...
-   let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback"]
+   let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       ensureAuthTokenPresent(next)
       return

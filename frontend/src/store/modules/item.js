@@ -1,5 +1,6 @@
 import axios from 'axios'
 import * as utils from './utils'
+import router from '../../router'
 
 const item = {
    namespaced: true,
@@ -115,6 +116,7 @@ const item = {
         })
       },
 
+      // This is used to lookup a catalog key without a source. end result of this action is a redirect
       async lookupCatalogKeyDetail(ctx, catalogKey) {
          if (ctx.getters.hasDetails(catalogKey)) {
             return
@@ -136,10 +138,17 @@ const item = {
          }
          let url = ctx.rootState.system.searchAPI + "/api/search?intuit=1&debug=1"
          return axios.post(url, req).then((response) => {
-            ctx.commit('setCatalogKeyDetails', response.data)
-         }).catch((error) => {
+            if (response.data.total_hits == 0 ) {
+               ctx.commit('clearSearching')
+               router.push("/not_found")
+            } else if (response.data.total_hits == 1 ) {
+               ctx.commit('setCatalogKeyDetails', response.data)
+            } else {
+               router.push(`/search?mode=advanced&q=identifier:{${catalogKey}}`)
+            }
+         }).catch((_error) => {
             ctx.commit('clearSearching')
-            ctx.commit("system/setError", error, {root:true})
+            router.push("/not_found")
          })
       }
    }
