@@ -143,6 +143,8 @@ const item = {
                router.push("/not_found")
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
+               let redirect = `/sources/${ctx.state.details.source}/items/${catalogKey}`
+               router.replace(redirect)
             } else {
                router.push(`/search?mode=advanced&q=identifier:{${catalogKey}}`)
             }
