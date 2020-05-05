@@ -101,6 +101,16 @@ const preferences = {
             state.targetPoolURL = poolURL
          }
       },
+      clearExcluded( state ) {
+         state.excludePoolURLs.splice(0, state.excludePoolURLs.length)
+      },
+      excludeAll( state, poolURLs ) {
+         poolURLs.forEach( u => {
+            if (!state.excludePoolURLs.includes(u)) {
+               state.excludePoolURLs.push(u)
+            }    
+         })
+      }
    },
 
    actions: {

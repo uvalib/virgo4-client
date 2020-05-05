@@ -6,7 +6,6 @@
       <div class="criteria">
          <h2>
             <span>Search Criteria</span>
-            <V4Button mode="primary" @click="addClicked">Add Criteria</V4Button>
          </h2>
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <div class="options">
@@ -55,15 +54,25 @@
                </template>
             </div>
          </div>
+         <div class="criteria-control">
+            <V4Button mode="primary" @click="addClicked">Add Criteria</V4Button>
+         </div>
       </div>
       <div class="pools-wrapper">
-         <h2>Resource Types</h2>
+         <h2>
+            <span>Resource Types</span>
+            <span>
+               <V4Button mode="text" class="clear" @click="clearPoolsClicked">clear all</V4Button>
+               <span class="sep">|</span>
+               <V4Button mode="text" class="clear" @click="allPoolsClicked">select all</V4Button>
+            </span>
+         </h2>
          <div class="pools">
-            <div tabindex="0" @click="poolClicked(src.url)" class="pool" v-for="src in sources" :key="src.id">
-               <i v-if="isPoolExcluded(src.url)" class="far fa-square"></i>
-               <i v-else class="far fa-check-square"></i>
+            <V4Checkbox v-for="src in sources" :key="src.id" class="pool"
+               :checked="!isPoolExcluded(src.url)"  
+               @click="poolClicked(src.url)">
                {{src.name}}
-            </div>
+            </V4Checkbox>
          </div>
       </div>
       <div class="controls">
@@ -125,6 +134,16 @@ export default {
       ...mapMultiRowFields("query", ["advanced"])
    },
    methods: {
+      clearPoolsClicked() {
+         let urls = [] 
+         this.sources.forEach( p => {
+            urls.push(p.url)
+         })
+         this.$store.commit("preferences/excludeAll", urls)
+      },
+      allPoolsClicked() {
+         this.$store.commit("preferences/clearExcluded")
+      },
       poolClicked(url) {
         // commit instead of dispatch. Treatign changes here as override.
         // to save, go to preferences
@@ -145,13 +164,21 @@ export default {
          }
       },
       clearSearch() {
-         this.$store.commit('query/clear')
-         this.$store.commit('resetSearchResults')
-         this.$store.commit('filters/reset')
-         this.$router.push('/search?mode=advanced')
+         if (this.queryEntered) {
+            this.$store.commit('query/clear')
+            this.$store.commit('resetSearchResults')
+            this.$store.commit('filters/reset')
+            this.$router.push('/search?mode=advanced')
+         }
       },
       addClicked() {
-         this.$store.commit("query/addCriteria");
+         this.$store.commit("query/addCriteria")
+         setTimeout( () => {
+            let out = document.querySelectorAll(".field:last-of-type")
+            if (out.length > 0) {
+               out[out.length-1].focus()
+            }
+         }, 100)
       },
       removeCriteria(idx) {
          this.$store.commit("query/removeCriteria", idx);
@@ -165,6 +192,12 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
+      setTimeout( () => {
+         let out = document.querySelectorAll(".field:last-of-type")
+         if (out.length > 0) {
+            out[out.length-1].focus()
+         }
+      }, 250)
    }
 };
 </script>
@@ -180,12 +213,10 @@ h2 {
    justify-content: space-between; 
    align-items: center;
 }
-i.add {
-   font-size: 1.75em;
-   color: var(--uvalib-brand-blue-light);
-   cursor: pointer;
-}
 div.pools-wrapper {
+   border-top: 2px solid var(--uvalib-grey-light);
+   border-bottom: 2px solid var(--uvalib-grey-light);
+   margin: 15px 0 10px 0;
    padding: 10px 0;
 }
 div.pools {
@@ -196,12 +227,17 @@ div.pools {
    justify-content: flex-start;
    margin: 0;
 }
-div.pool{
+.v4-checkbox.pool {
    margin: 5px 10px;
    cursor: pointer;
 }
+.v4-checkbox.pool >>> label {
+   margin:0;
+}
+div.criteria-control {
+   text-align: right;
+}
 div.criteria {
-   font-size: 0.9em;
    text-align: left;
 }
 div.options {
@@ -237,8 +273,9 @@ div.search-term {
    border: 1px solid #ccc;
    padding: 10px;
    margin: 10px 0 10px 0;
-   border-radius: 5px;
+   border-radius: 3px;
    background-color: #f5f5f5;
+   font-size: 0.9em;
 }
 input[type="text"] {
    flex: 1 1 auto;
