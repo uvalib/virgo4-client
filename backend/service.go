@@ -255,6 +255,24 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, cfg)
 }
 
+// GetCodes will return the raw library and location codes from the ILS connector
+func (svc *ServiceContext) GetCodes(c *gin.Context) {
+	log.Printf("Get ILS connector codes")
+	userURL := fmt.Sprintf("%s/v4/availability/list", svc.ILSAPI)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	if ilsErr != nil {
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	var codes interface{}
+	if err := json.Unmarshal(bodyBytes, &codes); err != nil {
+		log.Printf("ERROR: unable to parse codes response: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, codes)
+}
+
 // ILLiadGet sends a GET request to ILLiad and returns the response
 func (svc *ServiceContext) ILLiadGet(queryURL string) ([]byte, *RequestError) {
 	illiad := fmt.Sprintf("%s/%s", svc.Illiad.URL, queryURL)

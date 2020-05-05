@@ -45,6 +45,7 @@ func main() {
 	{
 		api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
 		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
+		api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
 		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
 		api.POST("/journals", svc.GetJournalDetails)
 		api.GET("/journals/browse", svc.BrowseJournals)
@@ -65,8 +66,6 @@ func main() {
 		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
 		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
 
-		// bookmarks := api.Group("/users/:uid/bookmarks")
-		// {
 		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
 		api.POST("/users/:uid/bookmarks/move", svc.AuthMiddleware, svc.MoveBookmarks)
 		api.POST("/users/:uid/bookmarks/delete", svc.AuthMiddleware, svc.DeleteBookmarks)
@@ -76,7 +75,6 @@ func main() {
 		api.DELETE("/users/:uid/bookmarks/folders/:id/publish", svc.AuthMiddleware, svc.UnpublishBookmarkFolder)
 		api.POST("/users/:uid/bookmarks/folders/:id/publish", svc.AuthMiddleware, svc.PublishBookmarkFolder)
 		api.POST("/users/:uid/bookmarks/items", svc.AuthMiddleware, svc.AddBookmark)
-		// }
 
 		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
 		api.DELETE("/requests/hold/:holdID", svc.AuthMiddleware, svc.DeleteHold)
