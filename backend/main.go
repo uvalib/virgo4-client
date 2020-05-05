@@ -52,7 +52,6 @@ func main() {
 		api.GET("/users/:uid", svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)
 		api.GET("/users/:uid/bills", svc.AuthMiddleware, svc.GetUserBills)
-		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
 		api.GET("/users/:uid/checkouts", svc.AuthMiddleware, svc.GetUserCheckouts)
 		api.GET("/users/:uid/holds", svc.AuthMiddleware, svc.GetUserHolds)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
@@ -66,17 +65,18 @@ func main() {
 		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
 		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
 
-		bookmarks := api.Group("/users/:uid/bookmarks")
-		{
-			bookmarks.POST("/move", svc.AuthMiddleware, svc.MoveBookmarks)
-			bookmarks.POST("/delete", svc.AuthMiddleware, svc.DeleteBookmarks)
-			bookmarks.POST("/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
-			bookmarks.DELETE("/folders/:id", svc.AuthMiddleware, svc.DeleteBookmarkFolder)
-			bookmarks.POST("/folders/:id", svc.AuthMiddleware, svc.UpdateBookmarkFolder)
-			bookmarks.DELETE("/folders/:id/publish", svc.AuthMiddleware, svc.UnpublishBookmarkFolder)
-			bookmarks.POST("/folders/:id/publish", svc.AuthMiddleware, svc.PublishBookmarkFolder)
-			bookmarks.POST("/items", svc.AuthMiddleware, svc.AddBookmark)
-		}
+		// bookmarks := api.Group("/users/:uid/bookmarks")
+		// {
+		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
+		api.POST("/users/:uid/bookmarks/move", svc.AuthMiddleware, svc.MoveBookmarks)
+		api.POST("/users/:uid/bookmarks/delete", svc.AuthMiddleware, svc.DeleteBookmarks)
+		api.POST("/users/:uid/bookmarks/folders", svc.AuthMiddleware, svc.AddBookmarkFolder)
+		api.DELETE("/users/:uid/bookmarks/folders/:id", svc.AuthMiddleware, svc.DeleteBookmarkFolder)
+		api.POST("/users/:uid/bookmarks/folders/:id", svc.AuthMiddleware, svc.UpdateBookmarkFolder)
+		api.DELETE("/users/:uid/bookmarks/folders/:id/publish", svc.AuthMiddleware, svc.UnpublishBookmarkFolder)
+		api.POST("/users/:uid/bookmarks/folders/:id/publish", svc.AuthMiddleware, svc.PublishBookmarkFolder)
+		api.POST("/users/:uid/bookmarks/items", svc.AuthMiddleware, svc.AddBookmark)
+		// }
 
 		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
 		api.DELETE("/requests/hold/:holdID", svc.AuthMiddleware, svc.DeleteHold)
