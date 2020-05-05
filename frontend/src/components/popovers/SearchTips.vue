@@ -1,7 +1,7 @@
 <template>
-   <v-popover placement="top-end" class="tips"  trigger="manual" :open="isOpen" @hide="hide">
+   <v-popover placement="top-end" class="tips inline"  trigger="manual" :open="isOpen" @hide="hide">
       <V4Button mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
-         Search Tips&nbsp;<i class="fas fa-info-circle"></i>
+         Search Tips
       </V4Button>
       <div class="tips-popover" slot="popover">
          <div class="popover-title">

@@ -3,16 +3,6 @@
       <h1>
          <span>Advanced Search</span>
       </h1>
-      <div class="pools-wrapper">
-         <h2>Resource Types</h2>
-         <div class="pools">
-            <div tabindex="0" @click="poolClicked(src.url)" class="pool" v-for="src in sources" :key="src.id">
-               <i v-if="isPoolExcluded(src.url)" class="far fa-square"></i>
-               <i v-else class="far fa-check-square"></i>
-               {{src.name}}
-            </div>
-         </div>
-      </div>
       <div class="criteria">
          <h2>
             <span>Search Criteria</span>
@@ -66,7 +56,19 @@
             </div>
          </div>
       </div>
+      <div class="pools-wrapper">
+         <h2>Resource Types</h2>
+         <div class="pools">
+            <div tabindex="0" @click="poolClicked(src.url)" class="pool" v-for="src in sources" :key="src.id">
+               <i v-if="isPoolExcluded(src.url)" class="far fa-square"></i>
+               <i v-else class="far fa-check-square"></i>
+               {{src.name}}
+            </div>
+         </div>
+      </div>
       <div class="controls">
+         <V4Button mode="text" class="clear" @click="clearSearch">clear search</V4Button>
+         <span class="sep">|</span>
          <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
       </div>
       <div class="basic">
@@ -142,6 +144,12 @@ export default {
             );
          }
       },
+      clearSearch() {
+         this.$store.commit('query/clear')
+         this.$store.commit('resetSearchResults')
+         this.$store.commit('filters/reset')
+         this.$router.push('/search?mode=advanced')
+      },
       addClicked() {
          this.$store.commit("query/addCriteria");
       },
@@ -178,9 +186,7 @@ i.add {
    cursor: pointer;
 }
 div.pools-wrapper {
-   border-bottom: 3px solid var(--color-brand-blue);
-   margin-bottom: 25px;
-   padding-bottom: 10px;
+   padding: 10px 0;
 }
 div.pools {
    text-align: left;
@@ -221,19 +227,12 @@ div.query {
    
 }
 .controls {
-  padding: 10px 0;
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: flex-start;
+   padding: 10px 0;
+   text-align: right;
 }
-.controls button.v4-button {
-   margin-left: auto;
+.controls .v4-button.clear {
+   margin-right: 5px;
 }
-.controls  > * {
-  flex: 0 1 auto;
-}
-
 div.search-term {
    border: 1px solid #ccc;
    padding: 10px;

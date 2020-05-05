@@ -1,8 +1,5 @@
 <template>
    <div class="home">
-      <div class="tips-container">
-          <SearchTips/>
-      </div>
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false" />
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
@@ -28,8 +25,9 @@
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
+            <SearchTips/><span class="sep">|</span> 
             <router-link :to="advancedURL">
-              Advanced Search&nbsp;<i class="fas fa-search-plus"></i>
+              <span>Advanced Search&nbsp;<i class="fas fa-search-plus"></i></span>
             </router-link>
           </div>
           <div class="advanced">
@@ -130,6 +128,13 @@ export default {
    },
    methods: {
       async restoreSearchFromQueryParams( query, force ) {
+         // No mode or query; just reset the search 
+         if (!query.mode && !query.q) {
+            this.$store.commit('resetSearchResults')
+            this.$store.commit('filters/reset')
+            this.$store.commit('query/clear')
+         }
+         
          // Interrogate query params and convert them to a search in the model (if present)
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
@@ -175,7 +180,7 @@ export default {
                }
                this.$store.commit('setSearching', false)
             }
-         }
+         } 
       },
       async searchCreated() {
          await this.$store.dispatch("system/getConfig")
@@ -287,6 +292,9 @@ export default {
   :-ms-input-placeholder {
     color:transparent;
   }
+}
+span.sep {
+   margin: 0 5px;
 }
 .controls {
   padding: 10px 0;

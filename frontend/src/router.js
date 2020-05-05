@@ -166,6 +166,7 @@ router.beforeEach((to, _from, next) => {
          next()
       } else {
          store.commit('system/setSessionExpired')
+         store.commit("user/signoutUser")
          next("/")
       }
       return
