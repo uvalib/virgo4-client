@@ -7,6 +7,7 @@
           <div v-if="hasTranslateMessage" class="translate-message">
             {{translateMessage}}
           </div>
+          <label class="screen-reader-text" for="search">Search Virgo for books, articles and more.</label>
           <div class="basic-search">
             <V4Select :selections="searchScopes" v-bind:attached="true"
               border="1px solid var(--uvalib-brand-blue)"
@@ -134,7 +135,7 @@ export default {
             this.$store.commit('filters/reset')
             this.$store.commit('query/clear')
          }
-         
+
          // Interrogate query params and convert them to a search in the model (if present)
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {

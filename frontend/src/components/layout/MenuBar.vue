@@ -22,6 +22,10 @@
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
                <div v-if="svcMenuOpen" class="user-menu" @keydown.space.prevent.stop>
+                  <a href="https://www.library.virginia.edu/research/" target="_blank" role="menuitem" 
+                     tabindex="-1" id="guides">
+                     <div class="submenu">Subject&nbsp;Guides</div>
+                  </a>
                   <a href="https://guides.lib.virginia.edu/journalfinder" target="_blank" role="menuitem" 
                      tabindex="-1" id="journalsub">
                      <div class="submenu">Journal&nbsp;Finder</div>
@@ -114,7 +118,7 @@ export default {
          userMenuIdx: 0,
          svcMenuOpen: false,
          svcMenuIdx: 0,
-         svcMenu: ["journalsub", "databasesub", "eventsub", "roomrsrvsub", "gissub", "librasub"],
+         svcMenu: ["guides", "journalsub", "databasesub", "eventsub", "roomrsrvsub", "gissub", "librasub"],
 
       }
    },
