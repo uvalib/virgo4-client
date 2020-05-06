@@ -82,12 +82,23 @@ export default {
          showVideo: false,
       }
    },
+   watch: {
+      searching (newVal, _oldVal) {
+         if (newVal == false && this.total > 0) {
+            setTimeout( () => {  
+               let r = document.getElementById("results-container")
+               this.scrollToItem(r)
+            }, 250)
+         }
+      },
+   },
    computed: {
       ...mapState({
          searching: state => state.searching,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
          results: state => state.results,
+         total: state=>state.total,
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',

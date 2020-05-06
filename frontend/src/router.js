@@ -152,10 +152,10 @@ const router = new Router({
          component: NotFound
       }
    ],
-   scrollBehavior(to, _from, savedPosition) {
+   scrollBehavior(to, _from, _savedPosition) {
       let noScrollPages = ["home", "search"]
       if (noScrollPages.includes(to.name)) {
-         return savedPosition
+         return null
       }
       return { x: 0, y: 0 }
    },
