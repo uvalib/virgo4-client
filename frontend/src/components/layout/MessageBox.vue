@@ -11,7 +11,8 @@
             </div>
             <div class="message-body" v-html="messageContent"></div>
             <div class="controls">
-               <V4Button id="okbtn" mode="primary" @esc="dismiss" @click="dismiss">OK</V4Button>
+               <V4Button v-if="type=='error'" id="okbtn" mode="tertiary" @esc="dismiss" @click="dismiss">OK</V4Button>
+               <V4Button v-else id="okbtn" mode="primary" @esc="dismiss" @click="dismiss">OK</V4Button>
             </div>
          </div>
       </div>

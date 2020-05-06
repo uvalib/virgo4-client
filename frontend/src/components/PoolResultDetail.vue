@@ -19,7 +19,7 @@
             <span>
                No results found
             </span>
-            <p class="error" v-if="selectedResults.statusMessage">
+            <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
                {{selectedResults.statusMessage}}
             </p>
          </div>

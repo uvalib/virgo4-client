@@ -285,7 +285,9 @@ export default new Vuex.Store({
         }
         return dispatch("filters/getSelectedResultFacets")
       } catch (error) {
-         commit('system/setError', error)
+         let msg = "System error, we regret the inconvenience. If this problem persists, "
+         msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+         commit('system/setError', msg)
          commit('setSearching', false)
          commit('filters/setUpdatingFacets', false)
       }
@@ -324,9 +326,11 @@ export default new Vuex.Store({
         }
         return dispatch("filters/getSelectedResultFacets")
       } catch(error) {
-        commit('system/setError', error)
-        commit('setSearching', false)
-        commit('filters/setUpdatingFacets', false)
+         let msg = "System error, we regret the inconvenience. If this problem persists, "
+         msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+         commit('system/setError', msg)
+         commit('setSearching', false)
+         commit('filters/setUpdatingFacets', false)
       }
     },
 
