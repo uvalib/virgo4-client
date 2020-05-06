@@ -31,7 +31,7 @@
                      <option value="BETWEEN">BETWEEN</option>
                   </select>
                </template>
-               <V4Button mode="icon" class="remove" @click="removeCriteria(idx)">
+               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)">
                   <i class="fas fa-times-circle"></i>
                </V4Button>
             </div>
@@ -131,7 +131,10 @@ export default {
          isPoolExcluded: "preferences/isPoolExcluded",
          rawQueryString: 'query/string',
       }),
-      ...mapMultiRowFields("query", ["advanced"])
+      ...mapMultiRowFields("query", ["advanced"]),
+      canDeleteCriteria() {
+         return this.advanced.length > 1
+      }
    },
    methods: {
       clearPoolsClicked() {
