@@ -1,5 +1,5 @@
 <template>
-   <div class="search-results shady">
+   <div tabindex="-1" id="results-container" class="search-results shady">
       <SearchSuggestions />
       <div class="results-header">
          <template v-if="showSummary">
@@ -166,7 +166,7 @@ export default {
          this.$store.dispatch("selectPoolResults", resultIdx)
          this.updateURL(resultIdx, r.pool.id)
       },
-   }
+   },
 }
 </script>
 
