@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Browse from './views/Browse.vue'
+import Codes from './views/Codes.vue'
 import Home from './views/Home.vue'
 import Journals from './views/Journals.vue'
 import CourseReserves from './views/CourseReserves.vue'
@@ -52,6 +53,11 @@ const router = new Router({
          name: 'browse',
          component: Browse,
          props: true,
+      },
+      {
+         path: '/codes',
+         name: 'codes',
+         component: Codes
       },
       {
          path: '/course-reserves',
@@ -158,7 +164,7 @@ const router = new Router({
 // This is called before every URL in the SPA is hit
 router.beforeEach((to, _from, next) => {
    // Some pages just require an auth token...
-   let tokenPages = ["home", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
+   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       ensureAuthTokenPresent(next)
       return

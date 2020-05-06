@@ -16,6 +16,8 @@ const system = {
       translateMessage: "",
       sessionExpired: false,
       displayWidth: window.innerWidth,
+      locationCodes: [],
+      libraryCodes: []
    },
 
    getters: {
@@ -31,6 +33,27 @@ const system = {
    },
 
    mutations: {
+      setCodes( state,  codes) {
+         let locs =  codes.locations.sort( (a,b) => {
+            if (a.id < b.id) return -1 
+            if (a.id > b.id) return 1 
+            return 0
+         })
+         state.locationCodes.splice(0, state.locationCodes.length)
+         locs.forEach( c => {
+            state.locationCodes.push(c)
+         })
+
+         let libs =  codes.libraries.sort( (a,b) => {
+            if (a.id < b.id) return -1 
+            if (a.id > b.id) return 1 
+            return 0
+         })
+         state.libraryCodes.splice(0, state.libraryCodes.length)
+         libs.forEach( c => {
+            state.libraryCodes.push(c)
+         })
+      },
       newVersionDetected(state) {
          state.newVersion = true
       },
@@ -114,7 +137,18 @@ const system = {
          axios.get("/version").then((response) => {
             ctx.commit('setVersion', response.data)
          })
-      }
+      },
+
+      getCodes(ctx) {
+         ctx.commit('setSearching', true, {root: true})
+         axios.get("/api/codes").then((response) => {
+            ctx.commit('setCodes', response.data.availability_list)
+            ctx.commit('setSearching', false, {root: true})
+         }).catch((error) => {
+            ctx.commit('setFatal', "Unable to get codes: " + error.response.data)
+            ctx.commit('setSearching', false, {root: true})
+         })
+      },
    }
 }
 
