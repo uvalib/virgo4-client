@@ -345,7 +345,6 @@ export default {
   border-top: none;
   top: 30px;
   right: 0;
-  left: 0;
   overflow: hidden;
   transition: 200ms ease-out;
   display: grid;
