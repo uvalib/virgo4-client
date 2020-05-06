@@ -1,5 +1,5 @@
 <template>
-   <h3 tabindex="0" class="accordion" v-bind:aria-expanded="isExpanded" role="button" 
+   <div tabindex="0" class="accordion" v-bind:aria-expanded="isExpanded" role="button" 
       @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
       <div  v-if="showHeader" class="title" :class="layout"
          :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }">
@@ -22,7 +22,7 @@
             </div>
          </div>
       </transition>
-   </h3>
+   </div>
 </template>
 
 <script>
