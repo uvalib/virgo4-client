@@ -79,7 +79,7 @@ button.v4-button.icon-button {
 .pure-button.pure-button-primary,
 .pure-button.pure-button-secondary,
 .pure-button.pure-button-tertiary {
-   margin: 0 0 0 10px;
+   margin: 0 0 5px 10px;
    border-radius: 5px;
    font-weight: normal;
 }

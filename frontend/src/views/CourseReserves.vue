@@ -3,15 +3,18 @@
       <h1>Course Reserves</h1>
       <div class="reserves-content">
          <V4Spinner v-if="searching && totalReserves == -1" message="Looking up reserved items..." v-bind:overlay="true"/>
-         <p>
-            Type instructor's <strong>last name</strong>, <strong>course ID</strong> or
-            <strong>course name</strong> in the search box<br />
-            Click the corresponding button to search for reserved items
-         </p>
+         <div class="instructions">
+            <p>Search for Course Reserves by...</p>
+            <ul>
+               <li>Entering the beginning of the instructors name, or</li>
+               <li>Entering the full course ID (ex: MUSI 2090, LAW9-286), or</li>
+               <li>Entering the beginning of the course name (ex: "The Art of Scientific Writing", "The Parthenon", "History of England to 1688").</li>
+            </ul>
+            <p>Click the corresponding button to search for reserves.</p>
+         </div>
          <div class="search-panel pure-form">
             <input id="crsearch" v-model="query" autocomplete="off" type="text">
             <div class="controls">
-               <V4Button v-if="canMakeReserves" mode="primary" @click="searchInstructorClicked('id')">View My Reserves</V4Button>
                <V4Button @click="searchInstructorClicked('name')" mode="primary">Search Instructors</V4Button>
                <V4Button @click="searchCourseClicked('id')" mode="primary">Search Course ID</V4Button>
                <V4Button @click="searchCourseClicked('name')" mode="primary">Search Course Names</V4Button>
@@ -137,6 +140,9 @@ input[type=text] {
 }
 p {
    margin: 15px 0;
+}
+div.instructions {
+   text-align: left;
 }
 .controls {
   font-weight: bold;
