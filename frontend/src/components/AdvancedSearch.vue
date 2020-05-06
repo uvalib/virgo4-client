@@ -51,6 +51,7 @@
                         v-model="term.endVal"
                      />
                   </div>
+                  <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
                </template>
             </div>
          </div>
@@ -279,6 +280,11 @@ div.search-term {
    border-radius: 3px;
    background-color: #f5f5f5;
    font-size: 0.9em;
+}
+.date-hint {
+   font-size:0.95em;
+   font-weight: 100;
+   font-style: italic;
 }
 input[type="text"] {
    flex: 1 1 auto;
