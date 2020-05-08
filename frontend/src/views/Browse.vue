@@ -1,9 +1,8 @@
 <template>
    <div class="browse">
-      <h1>Browse <span class="browse-type">{{type}}</span></h1>
+      <h1>{{pageTitle}}</h1>
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="true" />
       <div class="browse-content">
-         <div class="target"><h2>{{this.$route.query.q}}</h2></div>
          <SearchResults v-if="hasResults" v-bind:showSummary="false"/>
       </div>
    </div>
@@ -30,6 +29,13 @@ export default {
         selectedResults: 'selectedResults',
         rawQueryString: 'query/string',
       }),
+      pageTitle() {
+         let t = this.type
+         if (t.toLowerCase() == "Subjects") {
+            t = "Subject"
+         }
+         return `Browse ${t}: ${this.$route.query.q}`
+      }
    },
    created: function() {
       this.browseCreated()
@@ -66,6 +72,9 @@ export default {
 @media only screen and (min-width: 768px) {
 }
 @media only screen and (max-width: 768px) {
+}
+h1 {
+   text-transform: capitalize;
 }
 .browse-type {
    text-transform: capitalize;

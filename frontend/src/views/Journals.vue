@@ -3,6 +3,13 @@
       <V4Spinner v-if="searching" message="Searching..." v-bind:overlay="true" />
       <div class="search-journals-panel pure-form">
          <h1>Browse Journals</h1>
+         <div class="note">
+               <div><b>NOTE:</b> This search is case-sensitive and is a "Starts with..." search. For example:</div>
+               <ul>
+                  <li>"Nat" fill find the journal "Nature" but "nat" will not.</li>
+                  <li>"PLOS g" will find “PLOS genetics” but "genetics" will not.</li>
+               </ul>
+         </div>
          <label class="screen-reader-text" for="search">Find journals starting with...</label>
          <div class="search">
             <input
@@ -12,7 +19,6 @@
                type="text" id="search"
                placeholder="Journal starts with..."
             />
-            <div class="note"><b>NOTE:</b> This search is case-sensitive</div>
          </div>
          <div class="controls">
             <V4Button mode="primary" @click="searchClicked">Search</V4Button>
@@ -26,7 +32,7 @@
       </div>
       <div v-if="!searching && browseTotal >= 0" class="browse-results shady">
          <div class="summary">
-            Browse by journal title "{{query}}"
+            Browse by journal title "{{searched}}"
          </div>
          <div v-if="browseTotal==0" class="browse none">
             No matching journals found
@@ -90,7 +96,9 @@ export default {
       ...mapFields("journals", ["query"]),
    },
    data: function() {
-      return {};
+      return {
+         searched: ""
+      };
    },
    methods: {
       itemTitle(item) {
@@ -116,11 +124,8 @@ export default {
             )
             return
          }
+         this.searched = this.query
          this.$store.dispatch("journals/searchJournals")
-      },
-      basicClicked() {
-         this.$store.commit("query/setBasicSearch")
-         this.$router.push("/")
       },
    },
    created(){
@@ -179,6 +184,9 @@ export default {
    margin: 10px auto 30px auto;
    background: white;
    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.12);
+}
+ul {
+   margin-top: 5px;
 }
 @media only screen and (min-width: 768px) {
    div.browse {
