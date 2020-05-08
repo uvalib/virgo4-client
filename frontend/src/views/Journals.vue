@@ -3,13 +3,14 @@
       <V4Spinner v-if="searching" message="Searching..." v-bind:overlay="true" />
       <div class="search-journals-panel pure-form">
          <h1>Browse Journals</h1>
+         <label class="screen-reader-text" for="search">Find journals starting with...</label>
          <div class="search">
             <input
                @keyup.enter="searchClicked"
                v-model="query"
                autocomplete="off"
                type="text" id="search"
-               placeholder="Browse Virgo journals by title"
+               placeholder="Journal starts with..."
             />
             <div class="note"><b>NOTE:</b> This search is case-sensitive</div>
          </div>
@@ -21,12 +22,6 @@
                Journal Finder&nbsp;
                <i class="link fas fa-external-link-alt"></i>
             </a>
-         </div>
-         <div class="basic">
-            <router-link to="/search">
-               Basic Search&nbsp;
-               <i class="fas fa-undo-alt"></i>
-            </router-link>
          </div>
       </div>
       <div v-if="!searching && browseTotal >= 0" class="browse-results shady">
@@ -168,9 +163,6 @@ export default {
    border-radius: 5px;
    min-width: 100px;
    width: 100%;
-}
-div.basic {
-   text-align: right;
 }
 .shady {
    margin: 0;

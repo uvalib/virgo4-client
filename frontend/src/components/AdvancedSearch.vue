@@ -90,11 +90,6 @@
       <div class="basic">
          <V4BarcodeScanner @scanned="barcodeScanned"/>
       </div>
-      <div class="basic">
-         <router-link to="/journals">
-            Browse Journals&nbsp;<i class="far fa-newspaper"></i>
-         </router-link>
-      </div>
    </div>
 </template>
 

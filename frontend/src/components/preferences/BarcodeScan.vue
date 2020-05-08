@@ -11,8 +11,9 @@
       </p>
       <div class="check">
          <label>
-            <input @change="scanClicked" class="scan" :checked="enableBarcodeScan" type="checkbox"/>Barcode Scanning Enabled
+            <input @change="scanClicked" class="scan" :checked="enableBarcodeScan" type="checkbox"/>Barcode Scanning enabled
          </label>
+         <p>Once enabled, the Barcode Scanning option will appear under the main Search bar.</p>
       </div>
    </div>
 </template>

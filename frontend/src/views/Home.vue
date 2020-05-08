@@ -34,7 +34,7 @@
           <div class="advanced">
             <V4BarcodeScanner @scanned="barcodeScanned"/>
           </div>
-          <div class="advanced">
+          <div v-if="showJournalBrowse" class="advanced">
             <router-link to="/journals">
               Browse Journals&nbsp;<i class="far fa-newspaper"></i>
             </router-link>
@@ -43,7 +43,7 @@
         <AdvancedSearch v-else/>
       </div>
       <SearchResults v-if="hasResults"/>
-      <Welcome  v-else-if="isHomePage"  />
+      <Welcome  v-else-if="showJournalBrowse"  />
    </div>
 </template>
 
@@ -70,6 +70,10 @@ export default {
       // This happens any time the route or query params change.
       // The create handler only happens on initial page load, and in that case, 
       // beforeRouteUpdate is NOT called
+      this.showJournalBrowse = false
+      if (to.path == "/") {
+         this.showJournalBrowse = true
+      }
       this.restoreSearchFromQueryParams(to.query)
       next()
    },
@@ -80,6 +84,7 @@ export default {
    data: function() {
       return {
          showVideo: false,
+         showJournalBrowse: true,
       }
    },
    watch: {
@@ -120,9 +125,6 @@ export default {
       },
       basicSearch() {
         return this.searchMode != "advanced"
-      },
-      isHomePage() {
-         return this.$router.currentRoute.path == '/'
       },
       // This restore refers to a Saved Search
       isRestore() {
