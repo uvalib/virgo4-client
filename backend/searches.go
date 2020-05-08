@@ -154,12 +154,20 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 		Name     string `json:"name"`
 		URL      string `json:"url"`
 		IsPublic bool   `json:"isPublic"`
+		History  bool   `json:"history"`
 	}
 	qpErr := c.ShouldBindJSON(&reqObj)
 	if qpErr != nil {
 		log.Printf("ERROR: invalid saved search payload: %v", qpErr)
 		resp.Message = qpErr.Error()
 		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	// If this is flagged as historic, save it in the history table (and push out old if necessary)
+	if reqObj.History == true {
+		svc.updateSearchHistory(userID, reqObj.URL)
+		c.JSON(http.StatusOK, "")
 		return
 	}
 
@@ -262,5 +270,26 @@ func (svc *ServiceContext) GetUserSavedSearches(c *gin.Context) {
 	var searches []SavedSearch
 	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&searches)
 	c.JSON(http.StatusOK, searches)
+}
+
+func (svc *ServiceContext) updateSearchHistory(userID int, url string) {
+	sq := svc.DB.NewQuery("insert into search_history (user_id, url) values ({:uid}, {:url})")
+	sq.Bind(dbx.Params{"uid": userID})
+	sq.Bind(dbx.Params{"url": url})
+	_, err := sq.Execute()
+	if err != nil {
+		log.Printf("ERROR: Unable to save search history for user %d: %s", userID, err.Error())
+		return
+	}
+
+	// now delete any saves after the 15th (ordered by date descending)
+	sel := "select id from saved_searches where user_id={:uid} order by date_created desc offset 15"
+	sq = svc.DB.NewQuery(fmt.Sprintf("delete from saved_searches where id in (%s)", sel))
+	sq.Bind(dbx.Params{"uid": userID})
+	_, err = sq.Execute()
+	if err != nil {
+		log.Printf("ERROR: Unable to limit history for user %d: %s", userID, err.Error())
+		return
+	}
 
 }
