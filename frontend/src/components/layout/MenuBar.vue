@@ -66,6 +66,9 @@
                      <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
                         <div class="submenu">My Information</div>
                      </router-link>
+                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
+                        <div class="submenu">My Searches</div>
+                     </router-link>
                      <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Bookmarks</div>
                      </router-link>
@@ -77,9 +80,6 @@
                      </router-link>
                      <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Requests</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Saved Searches</div>
                      </router-link>
                      <div role="menuitem" tabindex="-1"  id="outsub" class="submenu"
                         @click="signOut" @keyup.stop.enter="signOut" @keydown.space.prevent.stop="signOut" >

@@ -256,21 +256,38 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 
 // GetUserSavedSearches will get all of the searches saved by the specified user
 func (svc *ServiceContext) GetUserSavedSearches(c *gin.Context) {
-	uid := c.Param("uid")
-	log.Printf("Get saved searches for %s", uid)
+	v4id := c.Param("uid")
+	log.Printf("Get saved searches for %s", v4id)
 	var userID int
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
+	uq.Bind(dbx.Params{"v4id": v4id})
 	uErr := uq.Row(&userID)
 	if uErr != nil {
-		log.Printf("User %s not found", uid)
+		log.Printf("User %s not found", v4id)
 		c.JSON(http.StatusNotFound, make([]SavedSearch, 0))
 		return
 	}
 
-	var searches []SavedSearch
-	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&searches)
-	c.JSON(http.StatusOK, searches)
+	var resp struct {
+		Saved   []SavedSearch `json:"saved"`
+		History []string      `json:"history"`
+	}
+
+	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&resp.Saved)
+	q := svc.DB.NewQuery("select url from search_history where user_id={:uid} order by created_at desc")
+	q.Bind(dbx.Params{"uid": userID})
+	rows, err := q.Rows()
+	if err != nil {
+		log.Printf("ERROR: unable to get search history for %s: %s", v4id, err.Error())
+		resp.History = make([]string, 0)
+	} else {
+		for rows.Next() {
+			var url string
+			rows.Scan(&url)
+			resp.History = append(resp.History, url)
+		}
+	}
+	c.JSON(http.StatusOK, resp)
 }
 
 func (svc *ServiceContext) updateSearchHistory(userID int, url string) {

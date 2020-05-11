@@ -16,10 +16,14 @@ const searches = {
       setLastSavedSearchKey(state, key) {
          state.lastSavedSearchKey = key
       },
-      setSavedSearches(state, data) {
+      setSearches(state, data) {
          state.saved.splice(0, state.saved.length)
-         data.forEach( s => {
+         data.saved.forEach( s => {
             state.saved.push( s )
+         })
+         state.history.splice(0, state.history.length)
+         data.history.forEach( s => {
+            state.history.push( s )
          })
       },
       clear(state) {
@@ -51,7 +55,7 @@ const searches = {
       getAll(ctx, userID) {
          ctx.commit('setLookingUp', true)
          axios.get(`/api/users/${userID}/searches`).then((response) => {
-            ctx.commit('setSavedSearches', response.data)
+            ctx.commit('setSearches', response.data)
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })

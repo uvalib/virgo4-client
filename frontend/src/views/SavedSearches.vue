@@ -10,13 +10,8 @@
             <template v-if="searches.length == 0">
                <div v-if="!lookingUp" class="none">You currently have no saved searches</div>
             </template>
-            <template v-else>
-               <div class="controls">
-                  <ConfirmDelete v-on:delete-approved="removeAllSearches" label="Delete all saved searches">
-                     <div>Delete all saved searches?</div>
-                     <div class="del-detail">This cannot be reversed.</div>
-                  </ConfirmDelete>
-               </div>
+            <div class="saved" v-else>
+               <h3>Saved Searches</h3>
                <div class="row" v-for="(saved,idx) in searches"  :key="saved.token">
                   <div class="saved-search">
                      <span class="num">{{idx+1}}.</span>
@@ -42,7 +37,20 @@
                      <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
                   </div>
                </div>
-            </template>
+                <div class="controls">
+                  <ConfirmDelete v-on:delete-approved="removeAllSearches" label="Delete all saved searches">
+                     <div>Delete all saved searches?</div>
+                     <div class="del-detail">This cannot be reversed.</div>
+                  </ConfirmDelete>
+               </div>
+            </div>
+            <div v-if="history.length > 0" class="history">
+               <h3>Recent Searches <span class="info">(Newest to oldest)</span></h3>
+               <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
+                  <span class="num">{{idx+1}}.</span>
+                  <router-link :to="h">{{urlToText(h)}}</router-link>
+               </div>
+            </div>
          </div>
       </div>
    </div>
@@ -66,6 +74,23 @@ export default {
       })
    },
    methods: {
+      urlToText(url) {
+         let out = url.split("?")[1].replace(/%3a/gi, ":")
+         out = out.replace("&filter=", ", filter: ")
+         if (url.includes("=basic")) {
+            let stripped = out.replace("mode=basic&", "")
+            let i0 = stripped.indexOf("scope=")
+            let i1 = stripped.indexOf("&", i0)
+            let scope = stripped.substring(i0+6,i1)
+            stripped = stripped.substring(i1+1).replace("q=", "")
+            out = `Basic Search (${scope}) - ${decodeURI(stripped).replace("|", ", ")}`
+         } else {
+            let stripped = out.replace("mode=advanced&", "").replace("q=", "")
+            stripped = stripped.replace("&filter=", ", Filter: ")
+            out = `Advanced Search - ${decodeURI(stripped).replace("|", ", ")}`
+         }
+         return out
+      },
       removeAllSearches() {
          this.$store.dispatch("searches/deleteAll", this.signedInUser)
       },
@@ -109,6 +134,13 @@ export default {
    font-size: 0.85em;
    cursor: pointer;
    display: inline-block;
+}
+.history, .saved {
+   text-align: left;
+}
+span.info {
+   font-size: 0.85em;
+  font-weight: normal;
 }
 .searches {
    min-height: 400px;
@@ -182,7 +214,12 @@ span.num {
    margin: 0 10px;
 }
 .controls {
-   padding-bottom: 20px;
+   padding: 10px 0;
    text-align: right;
+}
+h3 {
+   background: var(--uvalib-teal-lightest);
+   padding: 4px 8px;
+   border-bottom: 3px solid var(--uvalib-teal-light);
 }
 </style>

@@ -2,6 +2,8 @@
    <div class="activities">
       <router-link to="/account">My Information</router-link>
       <span class="sep">|</span>
+      <router-link to="/searches">My Searches</router-link>
+      <span class="sep">|</span>
       <router-link to="/bookmarks">Bookmarks</router-link>
       <span class="sep">|</span>
       <router-link to="/checkouts">Checkouts</router-link>
@@ -9,8 +11,6 @@
       <router-link to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
       <router-link to="/requests">Requests</router-link>
-      <span class="sep">|</span>
-      <router-link to="/searches">Saved Searches</router-link>
       <span class="sep">|</span>
       <V4Button mode="text"  @click="signOut">Sign Out</V4Button>
    </div>
