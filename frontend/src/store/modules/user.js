@@ -25,12 +25,10 @@ const user = {
       checkouts: [],
       bills: [],
       requests: {illiad: [], holds: []},
-      searches: [],
       lookingUp: false,
       authTriesLeft: 5,
       authMessage: "",
       lockedOut: false,
-      lastSavedSearchKey: "",
       parsedJWT: {},
    },
 
@@ -111,24 +109,6 @@ const user = {
    },
 
    mutations: {
-      setLastSavedSearchKey(state, key) {
-         state.lastSavedSearchKey = key
-      },
-      setSavedSearches(state, data) {
-         state.searches.splice(0, state.searches.length)
-         data.forEach( s => {
-            state.searches.push( s )
-         })
-      },
-      clearSavedSearches(state) {
-         state.searches.splice(0, state.searches.length)
-      },
-      deleteSavedSearch(state, token) {
-         let idx = state.searches.findIndex(s => s.token == token)
-         if (idx > -1) {
-            state.searches.splice(idx,1)
-         }
-      },
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
@@ -208,14 +188,6 @@ const user = {
    },
 
    actions: {
-      saveSearchVisibility(ctx, data) {
-         let usrID = ctx.state.signedInUser
-         if (data.public) {
-            axios.post(`/api/users/${usrID}/searches/${data.token}/publish`)
-         } else {
-            axios.delete(`/api/users/${usrID}/searches/${data.token}/publish`)
-         }
-      },
       getAuthToken(ctx) {
         ctx.commit('setAuthorizing', true)
         return axios.post("/authorize").then((response) => {
@@ -245,17 +217,7 @@ const user = {
              })
          }
       },
-      getSavedSearches(ctx) {
-         if (ctx.rootGetters["user/isSignedIn"] == false) return
-         ctx.commit('setLookingUp', true)
-         axios.get(`/api/users/${ctx.state.signedInUser}/searches`).then((response) => {
-            ctx.commit('setSavedSearches', response.data)
-            ctx.commit('setLookingUp', false)
-          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', false)
-          })
-      },
+
       getRequests(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
          ctx.commit('setLookingUp', true)
@@ -271,6 +233,7 @@ const user = {
             ctx.commit('system/setError', error, { root: true })
          }).finally(() => { ctx.commit('setLookingUp', false) })
       },
+
       getAccountInfo(ctx) {
          if (ctx.rootGetters["user/hasAccountInfo"] ) return
          if (ctx.rootGetters["user/isSignedIn"] == false) return
@@ -285,6 +248,7 @@ const user = {
             ctx.commit('setLookingUp', false)
           })
       },
+
       renewItem(ctx, barcode) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
 
@@ -299,6 +263,7 @@ const user = {
             ctx.commit('setLookingUp', false)
           })
       },
+
       renewAll(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
 
@@ -313,6 +278,7 @@ const user = {
             ctx.commit('setLookingUp', false)
           })
       },
+
       async getCheckouts(ctx) {
          if ( ctx.state.checkouts.length > 0) {
             ctx.commit('setLookingUp', false)
@@ -332,6 +298,7 @@ const user = {
             ctx.commit('setLookingUp', false)
           })
       },
+
       getBillDetails(ctx) {
          if ( ctx.state.bills.length > 0) return
 
@@ -344,6 +311,7 @@ const user = {
             ctx.commit('setLookingUp', false)
           })
       },
+
       signout(ctx) {
          ctx.commit('setAuthorizing', true)
          axios.post(`/api/users/${ctx.state.signedInUser}/signout`).finally(function () {
@@ -352,11 +320,13 @@ const user = {
             ctx.commit('resetSearchResults', null, { root: true })
             ctx.commit('bookmarks/clear', null, { root: true })
             ctx.commit('preferences/clear', null, { root: true })
+            ctx.commit('search/clear', null, { root: true })
             ctx.commit('query/clear', null, { root: true })
             ctx.commit('filters/reset', null, { root: true })
             router.push("/signedout")
          })
       },
+
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
          axios.post("/authenticate/public", data).then((_response) => {
@@ -370,37 +340,16 @@ const user = {
             ctx.commit('setAuthFailure', error)
           })
       },
+
       netbadge(ctx) {
          ctx.commit('setAuthorizing', true)
          window.location.href = "/authenticate/netbadge"
       },
+
       changePIN(ctx, data) {
          data['barcode'] = ctx.state.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },
-      async saveSearch(ctx, data) {
-         let resp = await axios.post(`/api/users/${ctx.state.signedInUser}/searches`, data)
-         ctx.commit('setLastSavedSearchKey', resp.data.token)
-      },
-      async deleteSavedSearch(ctx, token) {
-         try {
-            await axios.delete(`/api/users/${ctx.state.signedInUser}/searches/${token}`)
-            ctx.commit('setLastSavedSearchKey', "")
-            ctx.commit('deleteSavedSearch', token)
-         } catch (e) {
-            ctx.commit('system/setError', "Unable to delete saved search. Please try again later.", {root: true})
-         }
-      },
-      deleteAllSavedSearces(ctx) {
-         ctx.commit('setLookingUp', true)
-         axios.delete(`/api/users/${ctx.state.signedInUser}/searches`).then((_response) => {
-            ctx.commit('clearSavedSearches')
-            ctx.commit('setLookingUp', false)
-          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', false)
-          })
-      }
    }
 }
 

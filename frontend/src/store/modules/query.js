@@ -264,8 +264,9 @@ const query = {
                }
                url = `/search?${url}`
                router.replace( url )   
-               let req = {token: token, name: response.data.name, url: url, isPublic: response.data.public}
-               ctx.dispatch("user/saveSearch", req, {root:true})
+               let req = {token: token, name: response.data.name, url: url, isPublic: response.data.public, 
+                  userID: ctx.rootState.user.signedInUser}
+               ctx.dispatch("searches/save", req, {root:true})
             }
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })

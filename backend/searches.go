@@ -166,8 +166,9 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// If this is flagged as historic, save it in the history table (and push out old if necessary)
 	if reqObj.History == true {
+		// quietly add to history; don't care if it fails, this is just an attempt to provide a history
 		svc.updateSearchHistory(userID, reqObj.URL)
-		c.JSON(http.StatusOK, "")
+		c.String(http.StatusOK, "")
 		return
 	}
 

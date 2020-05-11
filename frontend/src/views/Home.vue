@@ -104,6 +104,7 @@ export default {
          translateMessage: state => state.system.translateMessage,
          results: state => state.results,
          total: state=>state.total,
+         signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
@@ -168,7 +169,7 @@ export default {
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
                await this.$store.dispatch("searchAllPools", true )
-
+ 
                let tgtResultIdx = 0
                if (query.pool) {
                   let idx = this.results.findIndex( r => r.pool.id == query.pool)
@@ -269,6 +270,12 @@ export default {
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
          this.$store.dispatch("searchAllPools")
+
+         if ( this.isSignedIn ) {
+            let searchURL = this.$router.currentRoute.fullPath
+            let req = {url: searchURL, userID: this.signedInUser}
+            this.$store.dispatch("searches/updateHistory", req)
+         }
       },
 
       barcodeScanned( barcode ) {

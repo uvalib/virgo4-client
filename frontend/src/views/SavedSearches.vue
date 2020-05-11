@@ -59,16 +59,18 @@ export default {
    },
    computed: {
       ...mapState({
-         searches: state => state.user.searches,
-         lookingUp: state => state.user.lookingUp,
+         searches: state => state.searches.saved,
+         history: state => state.searches.history,
+         lookingUp: state => state.searches.lookingUp,
+         signedInUser: state => state.user.signedInUser
       })
    },
    methods: {
       removeAllSearches() {
-         this.$store.dispatch("user/deleteAllSavedSearces")
+         this.$store.dispatch("searches/deleteAll", this.signedInUser)
       },
       removeSavedSearch(token) {
-         this.$store.dispatch("user/deleteSavedSearch", token)
+         this.$store.dispatch("searches/delete", {userID: this.signedInUser, token: token})
       },
       copyURL(token) {
          let URL = this.publicURL(token)  
@@ -80,7 +82,8 @@ export default {
       },
       publicClicked(saved) {
          saved.public = !saved.public
-         this.$store.dispatch("user/saveSearchVisibility", saved)
+         saved.userID = this.signedInUser
+         this.$store.dispatch("searches/updateVisibility", saved)
       },
       formatDate(date) {
          return date.split("T")[0];
@@ -94,7 +97,7 @@ export default {
       }
    },
    created() {
-      this.$store.dispatch("user/getSavedSearches")
+      this.$store.dispatch("searches/getAll", this.signedInUser)
    }
 };
 </script>

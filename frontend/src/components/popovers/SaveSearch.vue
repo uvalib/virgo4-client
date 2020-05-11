@@ -45,7 +45,8 @@ export default {
    computed: {
       ...mapState({
          resultsIdx: state => state.selectedResultsIdx,
-         savedSearchKey: state => state.user.lastSavedSearchKey
+         savedSearchKey: state => state.searches.lastSavedSearchKey,
+         signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
          queryObject: 'query/queryObject',
@@ -106,9 +107,9 @@ export default {
          }
          this.working = true
          let searchURL = this.$router.currentRoute.fullPath
-         let req = {name: this.searchName, url: searchURL, isPublic: false}
+         let req = {name: this.searchName, url: searchURL, isPublic: false, userID: this.signedInUser}
          try { 
-            await this.$store.dispatch("user/saveSearch", req)
+            await this.$store.dispatch("searches/save", req)
             this.saved = true
             this.showSavePrompt = false
             this.working = false
