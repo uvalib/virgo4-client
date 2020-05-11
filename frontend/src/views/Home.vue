@@ -104,7 +104,6 @@ export default {
          translateMessage: state => state.system.translateMessage,
          results: state => state.results,
          total: state=>state.total,
-         signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
@@ -112,7 +111,6 @@ export default {
         rawQueryString: 'query/string',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
-        isSignedIn: 'user/isSignedIn',
         sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
       }),
@@ -270,12 +268,7 @@ export default {
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
          this.$store.dispatch("searchAllPools")
-
-         if ( this.isSignedIn ) {
-            let searchURL = this.$router.currentRoute.fullPath
-            let req = {url: searchURL, userID: this.signedInUser}
-            this.$store.dispatch("searches/updateHistory", req)
-         }
+         this.$store.dispatch("searches/updateHistory")
       },
 
       barcodeScanned( barcode ) {

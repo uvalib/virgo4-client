@@ -85,7 +85,6 @@ export default {
          circulatingFacet: state => state.filters.circulatingFacet,
          globalCirculating: state => state.filters.globalCirculating,
          displayWidth: state => state.system.displayWidth,
-         signedInUser: state => state.user.signedInUser
       }),
       ...mapFields("filters", [
          "globalCirculating", 
@@ -96,7 +95,6 @@ export default {
           allFilters: 'filters/poolFilter',
           filterQueryParam: 'filters/asQueryParam',
           facetSupport: 'pools/facetSupport',
-          isSignedIn: 'user/isSignedIn',
       }),
       hasFacets() {
          return this.facetSupport(this.selectedResults.pool.id)
@@ -164,7 +162,7 @@ export default {
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
-         this.saveSearch()
+         this.$store.dispatch("searches/updateHistory")
       },
       async circFacetClicked() {
          let origPoolID = this.results[this.resultsIdx].pool.id
@@ -174,7 +172,7 @@ export default {
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
-         this.saveSearch()
+         this.$store.dispatch("searches/updateHistory")
       },
       addFilterToURL() {
          // changing the filter resetes paging
@@ -200,15 +198,8 @@ export default {
          this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
          this.$store.dispatch("searchSelectedPool")
-         this.saveSearch()
+         this.$store.dispatch("searches/updateHistory")
       },
-      saveSearch() {
-         if ( this.isSignedIn ) {
-            let searchURL = this.$router.currentRoute.fullPath
-            let req = {url: searchURL, userID: this.signedInUser}
-            this.$store.dispatch("searches/updateHistory", req)
-         }
-      }
    }
 }
 </script>

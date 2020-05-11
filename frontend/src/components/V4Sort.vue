@@ -13,6 +13,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapFields } from "vuex-map-fields"
+
 export default {
    props: {
       pool: {
@@ -24,6 +25,7 @@ export default {
       sortChanged() {
          this.$router.push({ query: Object.assign({}, this.$route.query, { sort: this.selectedSort }) });
          this.$store.dispatch("applySearchSort")
+         this.$store.dispatch("searches/updateHistory")
       }
    },
    computed: {
@@ -31,7 +33,7 @@ export default {
         selectedSort: 'selectedResultsSort',
       }),
       ...mapGetters({
-         sortingSupport: 'pools/sortingSupport'
+         sortingSupport: 'pools/sortingSupport',
       }),
       canSort() {
          return this.sortingSupport(this.pool.id)

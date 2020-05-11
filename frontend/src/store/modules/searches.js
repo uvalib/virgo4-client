@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '../../router'
 
 const searches = {
    namespaced: true,
@@ -68,9 +69,13 @@ const searches = {
          ctx.commit('setLastSavedSearchKey', resp.data.token)
       },
 
-      updateHistory(_ctx, data) {
-         data.history = true
-         axios.post(`/api/users/${data.userID}/searches`, data)
+      updateHistory(ctx) {
+         if ( ctx.rootGetters['user/isSignedIn'] ) {
+            let searchURL = router.currentRoute.fullPath
+            let userID = ctx.rootState.user.signedInUser
+            let req = {url: searchURL, history: true}
+            axios.post(`/api/users/${userID}/searches`, req)
+         }
       },
 
       async delete(ctx, data) {

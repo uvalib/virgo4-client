@@ -301,8 +301,10 @@ func (svc *ServiceContext) updateSearchHistory(userID int, url string) {
 	}
 
 	// now delete any saves after the 15th (ordered by date descending)
-	sel := "select id from saved_searches where user_id={:uid} order by date_created desc offset 15"
-	sq = svc.DB.NewQuery(fmt.Sprintf("delete from saved_searches where id in (%s)", sel))
+	log.Printf("Limit saved searches for user %d to 15...", userID)
+	sel := "select id from search_history where user_id={:uid} order by created_at desc offset 15"
+	qStr := fmt.Sprintf("delete from search_history where id in (%s)", sel)
+	sq = svc.DB.NewQuery(qStr)
 	sq.Bind(dbx.Params{"uid": userID})
 	_, err = sq.Execute()
 	if err != nil {

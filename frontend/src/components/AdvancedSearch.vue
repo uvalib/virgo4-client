@@ -119,7 +119,6 @@ export default {
       },
       ...mapState({
          advancedFields: state => state.query.advancedFields,
-         signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
          queryURLParams: 'query/queryURLParams',
@@ -127,7 +126,6 @@ export default {
          sources: "pools/sortedList",
          isPoolExcluded: "preferences/isPoolExcluded",
          rawQueryString: 'query/string',
-         isSignedIn: 'user/isSignedIn',
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -157,12 +155,7 @@ export default {
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
             this.$store.dispatch("searchAllPools")
-
-            if ( this.isSignedIn ) {
-               let searchURL = this.$router.currentRoute.fullPath
-               let req = {url: searchURL, userID: this.signedInUser}
-               this.$store.dispatch("searches/updateHistory", req)
-            }
+            this.$store.dispatch("searches/updateHistory")
          } else {
             this.$store.commit(
                "system/setError",

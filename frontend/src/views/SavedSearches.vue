@@ -77,6 +77,8 @@ export default {
       urlToText(url) {
          let out = url.split("?")[1].replace(/%3a/gi, ":")
          out = out.replace("&filter=", ", filter: ")
+         out = out.replace("&pool=", ", target: ")
+         out = out.replace("&sort=", ", sort: ")
          if (url.includes("=basic")) {
             let stripped = out.replace("mode=basic&", "")
             let i0 = stripped.indexOf("scope=")

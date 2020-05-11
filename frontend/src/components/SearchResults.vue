@@ -121,6 +121,7 @@ export default {
                this.$store.dispatch("selectPoolResults", idx)
                if ( this.$route.query.pool != r.pool.id ) {
                   this.updateURL(idx, r.pool.id)
+                  this.$store.dispatch("searches/updateHistory")
                }
                found = true
             }
@@ -165,6 +166,7 @@ export default {
          this.otherSrcSelection = {id:"", name:""}
          this.$store.dispatch("selectPoolResults", resultIdx)
          this.updateURL(resultIdx, r.pool.id)
+         this.$store.dispatch("searches/updateHistory")
       },
    },
 }
