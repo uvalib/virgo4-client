@@ -179,7 +179,6 @@ const user = {
          state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
          state.bills.splice(0, state.bills.length)
-         state.searches.splice(0, state.searches.length)
          Vue.$cookies.remove("v4_jwt")
       },
       setBills(state, bills) {
