@@ -2,7 +2,7 @@
    <div class="image-container">
       <div class="toolbar">
          <span class="short-title">
-            <TruncatedText trigger="hover" :text="hit.header.title" :limit="19" style="font-weight:bold;" />
+            <TruncatedText mode="icon" :text="hit.header.title" :limit="19" style="font-weight:bold;" />
          </span>
          <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
       </div>

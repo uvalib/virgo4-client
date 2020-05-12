@@ -3,7 +3,10 @@
       <SearchHitHeader :hit="hit" :pool="pool"/>
       <div class="top">
          <div class="basic">
-            <div v-if="hit.header.author" class="author">{{hit.header.author.value.join(", ")}}</div>
+            <div v-if="hit.header.author" class="author">
+               <TruncatedText :title="hit.header.author.label" 
+                  :text="hit.header.author.value.join('; ')" :limit="80" />
+            </div>
             <dl class="fields">
                <template v-for="(field,idx) in hit.basicFields">
                   <template v-if="shouldDisplay(field)">
@@ -30,13 +33,14 @@
 import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import AccessURLDetails from '@/components/AccessURLDetails'
+import TruncatedText from '@/components/TruncatedText'
 export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
    },
    components: {
-      SearchHitHeader, AccessURLDetails
+      SearchHitHeader, AccessURLDetails, TruncatedText
    },
    computed: {
       ...mapGetters({

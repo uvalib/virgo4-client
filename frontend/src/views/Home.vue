@@ -146,6 +146,10 @@ export default {
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
             this.$store.commit('query/clear')
+            setTimeout( ()=> {
+               let  s = document.getElementById("search")
+               if (s) s.focus()
+            },250)
          }
 
          // Interrogate query params and convert them to a search in the model (if present)
@@ -207,18 +211,13 @@ export default {
             this.restoreSearchFromQueryParams(this.$route.query, true)
             return
          } else {
-            await this.restoreSearchFromQueryParams(this.$route.query, true)
+            await this.restoreSearchFromQueryParams(this.$route.query)
          }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
          if (bmTarget.id != "") {
             this.showAddBookmark(bmTarget)
             this.$store.commit("restore/clear")
-         } else {
-            setTimeout( ()=> {
-               let  s = document.getElementById("search")
-               if (s) s.focus()
-            },250)
          }
       },
 

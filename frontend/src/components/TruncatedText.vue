@@ -1,23 +1,35 @@
 <template>
    <div class="truncated-text">
-      <div class="content"  @click="textClicked" @mouseover="mouseOver" @mouseleave="mouseLeave">
+      <div v-if='isTruncated==false'>
          <router-link v-if="tgtURL" :to="tgtURL">
             <div v-html="truncatedText"></div>
          </router-link>
          <div v-else v-html="truncatedText"></div>
       </div>
-      <v-popover v-if="isTruncated" class="full" :open="showFull">
-         <i v-if="trigger!='click'" class="icon fas fa-chevron-circle-down"
-            @click="textClicked" @mouseover="mouseOver" @mouseleave="mouseLeave"></i>
-         <i v-else class='trigger click more'>More</i>
-         <div class="full-text-popover" slot="popover">
-            <div v-if="title" class="popover-header">
-               {{title}}
-               <i v-close-popover class="close fas fa-times-circle"></i>
-            </div>
-            <div class="full-text" v-html="text"></div>
+      <template v-else>
+         <div v-if="mode=='text'" class="truncated-content">
+            <router-link v-if="tgtURL" :to="tgtURL">
+               <div v-html="truncatedText"></div>
+            </router-link>
+            <div v-else v-html="truncatedText"></div>
          </div>
-      </v-popover>
+         <v-popover class="full-trigger" :open="showFull"  trigger="manual" @hide="hide"  @esc="hide">
+            <V4Button v-if="mode=='text'" mode="text" :aria-pressed="showFull" @click="textClicked" @esc="hide">
+               More
+            </V4Button>
+            <V4Button v-else mode="icon" :aria-pressed="showFull" @click="textClicked" @esc="hide">
+               <span v-html="truncatedText"></span>
+               <i class="icon fas fa-chevron-circle-down"></i>
+            </V4Button>
+            <div class="full-text-popover" slot="popover">
+               <div v-if="title" class="popover-header">
+                  {{title}}
+                  <i v-close-popover class="close fas fa-times-circle"></i>
+               </div>
+               <div class="full-text" v-html="text"></div>
+            </div>
+         </v-popover>
+      </template>
    </div>
 </template>
 
@@ -40,9 +52,9 @@ export default {
          type: String,
          default: ""
       },
-      trigger: {
-         type: String,
-         default: "click"
+      mode: {
+         type: String, 
+         default: "text"
       }
    },
    data: function() {
@@ -63,80 +75,77 @@ export default {
       }
    },
    methods: {
+      hide() {
+         this.showFull = false
+      },
       textClicked() {
-         if ( this.trigger == "hover") {
-            this.showFull = !this.showFull
-         }
+         this.showFull = !this.showFull
       },
-      mouseOver() {
-         if ( this.trigger == "hover") {
-            this.showFull = true
-         }
-      },
-      mouseLeave() {
-         if ( this.trigger == "hover") {
-            this.showFull = false
-         }
-      }
    }
 }
 </script>
 
 <style lang="scss" scoped>
-div.popover-header {
-   padding: 5px;
-   color: white;
-   background-color: var(--uvalib-grey-dark);
-   font-weight: 500;
-   text-align: center;
-}
 .truncated-text {
    font-size: 1em;
    font-weight: normal;
+
+   .truncated-content {
+      display: inline-block;
+      word-break: break-word;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+      hyphens: auto;
+      cursor: default;
+   }
 }
-.content {
+
+.full-trigger {
    display: inline-block;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-   cursor: default;
+   i.trigger.more {
+      color: var(--color-link);
+      cursor: pointer;
+      margin-left: 10px;
+      font-weight: 500;
+      font-size: 0.8em;
+   }
+   i.trigger.more:hover {
+      text-decoration: underline;
+   }
+   i.icon {
+      font-size: 1.2em;
+      margin-left: 2px;
+      color: var(--uvalib-grey);
+   }
 }
-div.full {
-   display: inline-block;
-}
-i.trigger.more {
-   color: var(--color-link);
-   cursor: pointer;
-   margin-left: 10px;
-   font-weight: 500;
-   font-size: 0.8em;
-}
-i.trigger.more:hover {
-   text-decoration: underline;
-}
+
 .full-text-popover {
    background: white;
    border-radius: 5px;
    box-shadow: $v4-box-shadow-light;
    border: 1px solid var(--uvalib-grey-dark);
-   margin: 0 10%
-}
-.full-text {
-   font-size: 0.95em;
-   padding: 10px;
-   line-height: 1.5em;
-   font-weight: 100;
+   margin: 0 10%;
 
-   max-width: 350px;
+   .popover-header {
+      padding: 5px;
+      color: white;
+      background-color: var(--uvalib-grey-dark);
+      font-weight: 500;
+      text-align: center;
+
+      i.close {
+         font-size: 1.1em;
+         float:right;
+      }
+   }
+
+   .full-text {
+      font-size: 0.95em;
+      padding: 10px;
+      line-height: 1.5em;
+      font-weight: 100;
+      max-width: 90%;
+   }
 }
-i.close {
-   font-size: 1.1em;
-   float:right;
-}
-i.icon {
-   font-size: 1.2em;
-   margin-left: 2px;
-   color: var(--uvalib-grey-light);
-}
+
 </style>

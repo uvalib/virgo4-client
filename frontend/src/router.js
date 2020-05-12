@@ -152,12 +152,21 @@ const router = new Router({
          component: NotFound
       }
    ],
-   scrollBehavior(to, _from, _savedPosition) {
+   scrollBehavior(to, _from, savedPosition) {
       let noScrollPages = ["home", "search"]
-      if (noScrollPages.includes(to.name)) {
-         return null
+      const position = {x: 0, y: 0}
+
+      // Override default with saved position (if it exists)
+      if (noScrollPages.includes(to.name) && savedPosition) {
+         position.x = savedPosition.x;
+         position.y = savedPosition.y;
       }
-      return { x: 0, y: 0 }
+
+      return new Promise(resolve => {
+         setTimeout( () => {
+            resolve(position)
+         }, 100)
+      })
    },
 })
 
