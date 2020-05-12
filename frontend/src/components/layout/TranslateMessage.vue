@@ -23,7 +23,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 div.translate-msg {
    background: white;
    position: fixed;
@@ -37,7 +37,7 @@ div.translate-msg {
    padding: 50px;
    border: 5px solid var(--color-primary-orange);
    border-radius: 5px;
-   box-shadow: 2px 2px 8px black;
+   box-shadow: $v4-box-shadow;
    color: #644;
 }
 </style>

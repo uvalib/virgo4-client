@@ -370,12 +370,4 @@ div.translate-message {
   margin: 5px 0 15px 0;
   font-size: 0.85em;
 }
-p.session {
-  display: inline-block;
-  background: var(--uvalib-blue-alt-light);
-  padding: 10px 35px;
-  border-radius: 5px;
-  border: 2px solid var(--color-brand-blue);
-  box-shadow: 1px 1px 5px #aaa;
-}
 </style>

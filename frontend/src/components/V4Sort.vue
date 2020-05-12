@@ -54,20 +54,23 @@ export default {
 }
 </script>
 
-<style scoped>
-.sort-type {
-   margin-left: 5px;
-}
-label {
-   font-weight: bold;
-}
+<style lang="scss" scoped>
+$bkgcolor: white;
+
 div.v4-sort {
-   background: white;
+   background: $bkgcolor;
    color: var(--uvalib-text);
    padding: 10px;
    margin-top: 3px;
-}
-select {
-   margin-left: 10px;
+
+   label {
+      font-weight: bold;
+   }
+   select {
+      margin-left: 10px;
+   }
+   .sort-type {
+      margin-left: 5px;
+   }
 }
 </style>

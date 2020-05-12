@@ -59,7 +59,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 div.v4-spinner-overlay {
    position: fixed;
    left: 0;
@@ -77,7 +77,7 @@ div.v4-spinner {
    display: inline-block;
    font-weight: bold;
    color: var(--uvalib-text);
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   box-shadow: $v4-box-shadow;
 }
 div.v4-spinner.embed {
    box-shadow: none;

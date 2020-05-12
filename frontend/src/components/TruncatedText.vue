@@ -82,7 +82,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 div.popover-header {
    padding: 5px;
    color: white;
@@ -118,7 +118,7 @@ i.trigger.more:hover {
 .full-text-popover {
    background: white;
    border-radius: 5px;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   box-shadow: $v4-box-shadow-light;
    border: 1px solid var(--uvalib-grey-dark);
    margin: 0 10%
 }

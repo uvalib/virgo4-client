@@ -203,7 +203,7 @@ export default {
    }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .facet-sidebar {
    margin: 0px 10px 15px 10px;
    border-radius: 5px 5px 0 0;
@@ -212,7 +212,7 @@ export default {
    display: inline-block;
 }
 .facet-sidebar .global, .facet-sidebar .pool {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow: $v4-box-shadow-light;
   margin-bottom: 1rem;
 }
 .body {
@@ -333,7 +333,7 @@ div.pool.overlay .body {
    overflow: scroll;
 }
 div.pool.overlay .body,  div.global.overlay .body {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow:  $v4-box-shadow-light;
 }
 span.cnt {
    margin-left: 5px;

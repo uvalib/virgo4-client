@@ -103,7 +103,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 span.pin.v4-button {
    margin: 0;
 }
@@ -117,7 +117,7 @@ div.popover-header {
 }
 .pin-container {
    background: white;
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   box-shadow: $v4-box-shadow;
    color: var(--uvalib-text);
    font-size: 1em;
    font-weight: normal;

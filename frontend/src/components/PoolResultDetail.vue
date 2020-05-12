@@ -106,7 +106,7 @@ export default {
    }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .sort-section {
    background: white;
 }
@@ -135,7 +135,7 @@ div.results-header {
    background: var(--uvalib-brand-blue);
    margin: 0 5px;
    text-align: left;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   box-shadow: $v4-box-shadow-light;
    margin-bottom: 1rem;
 }
 .pool-name {
@@ -162,7 +162,7 @@ div.results-header {
 }
 .hit-wrapper {
    margin: 0 5px 20px 5px;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   box-shadow:  $v4-box-shadow-light;
    margin-bottom: 1rem;
 }
 .hit-wrapper.none {

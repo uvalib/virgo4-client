@@ -44,7 +44,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .public-bookmarks {
    min-height: 400px;
    position: relative;
@@ -101,7 +101,7 @@ ul.bookmarks {
    margin: 10px;
    border: 1px solid var(--uvalib-grey-light);
    padding: 10px;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   box-shadow:  $v4-box-shadow-light;
    border-radius:3px;
 }
 </style>

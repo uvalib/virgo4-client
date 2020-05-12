@@ -39,6 +39,14 @@ button.text-button {
    border: none;
    background: none;
    padding: 0;
+   font-weight: 500;
+   color: var(--color-link);
+   cursor: pointer;
+   display: inline-block;
+}
+button.text-button:hover {
+   opacity: 1;
+   text-decoration: underline;
 }
 button.v4-button.icon-button {
    border: none;

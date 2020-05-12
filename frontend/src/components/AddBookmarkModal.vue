@@ -122,13 +122,8 @@ export default {
    }
 }
 </script>
-<style>
-#app .add-bookmark .v-popover.full {
-   width: 100%;
-   text-align: right;
-}
-</style>
-<style scoped>
+
+<style lang="scss" scoped>
 div.add-bookmark {
    color: var(--uvalib-text);
    position: fixed;
@@ -139,7 +134,7 @@ div.add-bookmark {
    background: white;
    left: 50%;
    transform: translate(-50%, 0%);
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   box-shadow: $v4-box-shadow;
    border-radius: 5px;
 }
 p.error {

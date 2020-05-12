@@ -49,7 +49,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .img-link {
    padding:0;
    background-color: transparent;
@@ -73,7 +73,7 @@ img {
    justify-items: stretch;
    align-items: stretch;
    position: relative;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   box-shadow:  $v4-box-shadow-light;
    width: fit-content;
 }
 .image-container:hover {
@@ -94,7 +94,7 @@ img {
 
 .metadata-popover {
    background: white;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   box-shadow: $v4-box-shadow-light;
    color: var(--uvalib-text);
    font-size: 0.9em;
    font-weight: normal;

@@ -18,7 +18,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 div.fatal-overlay {
    position: absolute;
    left:0;
@@ -26,16 +26,17 @@ div.fatal-overlay {
    top:0;
    bottom:0;
    z-index: 2000;
-}
-div.fatal {
-   background: white;
-   width: 50%;
-   margin: 50px auto;
-   text-align: center;
-   padding: 50px;
-   border: 5px solid var(--color-error);
-   border-radius: 5px;
-   box-shadow: 2px 2px 8px black;
-   color: #644;
+
+   .fatal {
+      background: white;
+      width: 50%;
+      margin: 50px auto;
+      text-align: center;
+      padding: 50px;
+      border: 5px solid var(--color-error);
+      border-radius: 5px;
+      box-shadow: $v4-box-shadow;
+      color: #644;
+   }  
 }
 </style>

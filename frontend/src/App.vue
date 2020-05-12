@@ -102,7 +102,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 /* Color variable definitions */
 :root {
    /* OFFICIAL BRAND COLORS */
@@ -360,17 +360,6 @@ div.v-popover.block {
    opacity: 1;
    transition: opacity 0.15s;
 }
-
-.text-button {
-   font-weight: 500;
-   color: var(--color-link);
-   cursor: pointer;
-   display: inline-block;
-}
-.text-button:hover {
-   opacity: 1;
-   text-decoration: underline;
-}
 .update-pop {
    position: fixed;
    z-index: 5000;
@@ -379,7 +368,7 @@ div.v-popover.block {
    background: white;
    padding: 10px;
    border: 4px solid var(--uvalib-brand-orange);
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+   box-shadow: $v4-box-shadow;
    text-align: right;
    font-size: 0.85em;
 }
@@ -390,37 +379,6 @@ div.v-popover.block {
 .update-pop span.pure-button.pure-button-primary {
    margin: 0;
    width:100%;
-}
-div.session {
-   position: fixed;
-   left: 0;
-   right: 0;
-   z-index: 5000;
-   top: 30%;
-}
-div.session .bar {
-   padding: 5px;
-   background-color: var(--uvalib-brand-blue-light);
-   color: white;
-   font-weight: bold;
-   text-align: left;
-}
-div.session i {
-   float:right;
-   font-size: 1.3em;
-   cursor: pointer;
-   margin-left: 10px;
-}
-div.session .message-body {
-   padding: 10px 15px;
-}
-div.session-message {
-   display: inline-block;
-   text-align: center;
-   background: white;
-   padding: 0px;
-   border: 2px solid var(--uvalib-brand-blue-light);
-   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 @media only screen and (min-width: 768px) {
    div.error-message {

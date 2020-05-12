@@ -2,6 +2,17 @@
 //    https://cli.vuejs.org/config/#devserver
 //    https://github.com/chimurai/http-proxy-middleware#proxycontext-config
 module.exports = {
+   css: {
+      loaderOptions: {
+         scss: {
+            prependData: `
+               @use 'sass:math';
+               @import "@/scss/_variables.scss";
+               @import "@/scss/_mixins.scss";
+            `
+         }
+      }
+  },
   devServer: {
     // public: process.env.BASE_URL,
     host: '0.0.0.0',

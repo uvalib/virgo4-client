@@ -57,7 +57,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .suggestions {
    padding: 15px 0;
    text-align: left;
@@ -71,7 +71,7 @@ h2 {
 .wrapper {
    padding: 10px;
    background-color: white;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+   box-shadow:  $v4-box-shadow-light;
 }
 .note  {
    font-weight: 100;
