@@ -2,6 +2,7 @@
   <div>
     <div class="option" v-for="option in requests.requestOptions" :key="option.type">
       <div class="pure-button" @click="setActive(option)">{{option.button_label}}</div>
+      <p v-if="option.description" >{{option.description}}</p>
     </div>
 
   </div>
@@ -19,12 +20,13 @@
     methods: {
       setActive(option) {
         let newActive = this.requests.optionMap[option.type]
-        if(this.findOption(newActive).sign_in_required && !this.isSignedIn ){
+        let optionSettings = this.findOption(newActive)
+        if(optionSettings.sign_in_required && !this.isSignedIn ){
           this.requests.nextPanel = newActive
           this.requests.activePanel = 'signInPanel'
         } else {
           this.requests.activePanel = newActive
-
+          this.requests.activeOption = optionSettings
         }
 
       }

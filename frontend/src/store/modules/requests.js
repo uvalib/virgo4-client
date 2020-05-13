@@ -13,10 +13,12 @@ const requests = {
     },
     activePanel: '',
     nextPanel: '',
+    activeOption: {},
 
     // Map request type to panel Name
     optionMap: {
-      hold: 'PlaceHoldPanel'
+      hold: 'PlaceHoldPanel',
+      pda: 'PDAPanel'
     },
 
   },
@@ -95,8 +97,23 @@ const requests = {
         commit('system/setError', e, {root: true})
       )
     },
+    sendDirectLink(ctx){
+      let optionSettings = ctx.getters.getField("activeOption")
+      axios.post(optionSettings.create_url)
+      .then( response => {
+        if(response.success){
 
+          ctx.commit('activePanel', "ConfirmationPanel")
 
+        }else{
+          ctx.commit('system/setError', response.data, {root: true})
+        }
+      }).catch(e => {
+        ctx.commit('activePanel', "OptionsPanel")
+        ctx.commit('system/setError', e, {root: true})
+      })
+
+    }
   }
 }
 

@@ -18,13 +18,14 @@ import { mapGetters } from "vuex";
 import OptionsPanel from './panels/OptionsPanel'
 import SignInPanel from './panels/SignInPanel'
 import PlaceHoldPanel from './panels/PlaceHoldPanel';
+import PDAPanel from './panels/PDAPanel';
 import ConfirmationPanel from './panels/ConfirmationPanel';
 
 export default {
   props: {
       titleId: String,
    },
-  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, ConfirmationPanel },
+  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel },
 
   computed: {
     ...mapFields(['requests', 'item/availability' ]),
