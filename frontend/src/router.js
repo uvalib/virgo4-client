@@ -187,7 +187,7 @@ router.beforeEach((to, _from, next) => {
          next()
       } else {
          store.commit('system/setSessionExpired')
-         store.commit("user/signoutUser")
+         store.dispatch("user/signout")
          next("/")
       }
       return
@@ -203,7 +203,7 @@ function ensureSignedIn() {
       store.commit("user/setUserJWT", jwtStr)
       return true
    } else {
-      store.commit("user/signoutUser")   
+      store.dispatch("user/signout")   
    }
    return false
 }

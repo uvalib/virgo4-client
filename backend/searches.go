@@ -272,14 +272,13 @@ func (svc *ServiceContext) GetUserSavedSearches(c *gin.Context) {
 		Saved   []SavedSearch `json:"saved"`
 		History []string      `json:"history"`
 	}
-
+	resp.History = make([]string, 0)
 	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&resp.Saved)
 	q := svc.DB.NewQuery("select url from search_history where user_id={:uid} order by created_at desc")
 	q.Bind(dbx.Params{"uid": userID})
 	rows, err := q.Rows()
 	if err != nil {
 		log.Printf("ERROR: unable to get search history for %s: %s", v4id, err.Error())
-		resp.History = make([]string, 0)
 	} else {
 		for rows.Next() {
 			var url string
