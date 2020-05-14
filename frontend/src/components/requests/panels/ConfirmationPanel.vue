@@ -7,7 +7,7 @@
     <dd>
       {{userId}}
     </dd>
-    <template v-if="hold">
+    <template v-if="hold.itemLabel">
       <dt>
         Item:
       </dt>

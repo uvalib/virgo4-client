@@ -100,17 +100,14 @@ const requests = {
     sendDirectLink(ctx){
       let optionSettings = ctx.getters.getField("activeOption")
       axios.post(optionSettings.create_url)
-      .then( response => {
-        if(response.success){
+      .then( _response => {
+        // success
 
-          ctx.commit('activePanel', "ConfirmationPanel")
-
-        }else{
-          ctx.commit('system/setError', response.data, {root: true})
-        }
+        ctx.commit('activePanel', "ConfirmationPanel")
       }).catch(e => {
         ctx.commit('activePanel', "OptionsPanel")
-        ctx.commit('system/setError', e, {root: true})
+        let message = e.response.data.error || "There was a problem sending this order. Please try again later."
+        ctx.commit('system/setError', message, {root: true})
       })
 
     }

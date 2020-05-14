@@ -2,7 +2,7 @@
   <div>
     <div class="option" v-for="option in requests.requestOptions" :key="option.type">
       <div class="pure-button" @click="setActive(option)">{{option.button_label}}</div>
-      <p v-if="option.description" >{{option.description}}</p>
+      <p v-if="option.description" v-html="option.description"></p>
     </div>
 
   </div>
