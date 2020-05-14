@@ -63,7 +63,6 @@ export default {
          }, 260)
       },
       dismiss() {
-         alert("edf")
          this.$store.commit("system/setError", "")
          this.$store.commit("system/setMessage", "")
       },
