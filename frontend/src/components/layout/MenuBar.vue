@@ -148,7 +148,7 @@ export default {
    },
    methods: {
       escAlert() {
-         //document.querySelector('#alerts').viewAllAlerts()   
+         document.querySelector('#alerts').seeAll()   
       },
       alertClicked() {
          if ( this.alertCount > 0) {
@@ -329,6 +329,11 @@ export default {
    justify-content: space-between;
    position: relative;
 
+   .menu-right {
+      margin-left: auto;
+      padding: 10px;
+   }
+
    .icon {
       font-size: 1.3em;
       margin-right: 5px;
@@ -355,6 +360,44 @@ export default {
       flex: 0 1 auto;
       display: inline-block;
       margin-left:20px;
+      border-bottom:1px solid var(--color-secondary-blue);
+
+      .notice {
+         color: var(--uvalib-brand-orange);
+         margin-right: 5px;
+      }
+   }
+
+   .menu-item:hover {
+      border-bottom:1px solid white;
+   }
+
+   .submenu {
+      margin:0;
+      font-weight: normal;
+      color: var(--uvalib-text-dark);
+      align-items: stretch;
+      justify-items: stretch;
+      padding: 10px 15px;
+      outline: none;
+
+      a {
+         color:white;
+      }
+      a:hover {
+         text-decoration: none;
+         border: none;
+         color: white;
+      }
+   }
+   .submenu:hover {
+      background-color: var(--uvalib-brand-blue-lightest);
+      color: var(--uvalib-text-dark);
+   }
+
+   .submenu-arrow {
+      transform: rotate(0deg);
+      transition-duration: 200ms;
    }
 
    .menu-item.account, .menu-item.service {
@@ -418,52 +461,14 @@ export default {
       a {
          outline: none;
       }
+
+      a:focus div.submenu, div.submenu:focus {
+         background-color: var(--uvalib-brand-blue-lightest);
+         color: var(--uvalib-text-dark); 
+      }
    }
 }
 
-#app .user-menu a:focus div.submenu, #app .user-menu div.submenu:focus {
-   background-color: var(--uvalib-brand-blue-lightest);
-   color: var(--uvalib-text-dark);
-}
-.submenu {
-   margin:0;
-   font-weight: normal;
-   color: var(--uvalib-text-dark);
-   align-items: stretch;
-   justify-items: stretch;
-   padding: 10px 15px;
-   outline: none;
-}
-#app .menu .submenu a {
-   color:white;
-}
-#app .menu .submenu a:hover {
-   text-decoration: none;
-   border: none;
-   color: white;
-}
-.submenu:hover {
-   background-color: var(--uvalib-brand-blue-lightest);
-   color: var(--uvalib-text-dark);
-}
-.submenu-arrow {
-   transform: rotate(0deg);
-   transition-duration: 200ms;
-}
-.menu .menu-item {
-   border-bottom:1px solid var(--color-secondary-blue);
-}
-.menu .menu-item:hover {
-   border-bottom:1px solid white;
-}
-.menu-right {
-   margin-left: auto;
-   padding: 10px;
-}
-i.notice {
-   color: var(--uvalib-brand-orange);
-   margin-right: 5px;
-}
 @media only screen and (max-width: 800px) {
    i.icon {
       display: none !important;

@@ -1082,23 +1082,23 @@
   integrity sha512-ce5d3q03Ex0sy4R14722Rmt6MT07Ua+k4FwDfdcToYJcMKNtRVQvJ6JCAPdAmAnbRb6CsX6aYb9m96NGod9uTw==
 
 "@uvalib/uvalib-alerts@^0.1.7":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@uvalib/uvalib-alerts/-/uvalib-alerts-0.1.9.tgz#e8bb6410f81de460f9446eb9586c573ebc285c93"
-  integrity sha512-ibHo6TsS5d2pz91dwrH7GIerMOFswyNBwEzOz4r9peWA/+6x0Dnj9uctPQ8oXBkwDDEzOcQejaLjOBy3pX/+FA==
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@uvalib/uvalib-alerts/-/uvalib-alerts-0.1.11.tgz#93615bc54336a04b2286f7e9ffdbcb0ecced67fc"
+  integrity sha512-6QJV+2bX2YHKaHcMfhCfQ9iPJbEFttbSmb3nSDO8cOCwwpLi9FyR5yCJjxPtr0FXKIWmnyOV1UpXC2AfhzG0fQ==
   dependencies:
     "@polymer/iron-collapse" "^3.0.1"
     "@polymer/marked-element" "^3.0.1"
     "@polymer/paper-button" "^3.0.1"
     "@polymer/polymer" "^3.0.0"
-    "@uvalib/uvalib-models" "^0.1.9"
+    "@uvalib/uvalib-models" "^0.1.10"
     "@uvalib/uvalib-theme" "^0.1.4"
     "@uvalib/uvalib-ui-base" "^0.1.4"
     lit-element "^2.3.1"
 
-"@uvalib/uvalib-models@^0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@uvalib/uvalib-models/-/uvalib-models-0.1.9.tgz#f02206419dfa2da98c0c2319ef5a994ca44e7ab5"
-  integrity sha512-gzOcBws3fAD43hC7Tx63HXFEOgy4ziCbKKOY8F7xxYRNhUIf7JzunVCOJjeiX3zxhYcP8KUYKo1fqhvEOyX2LQ==
+"@uvalib/uvalib-models@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@uvalib/uvalib-models/-/uvalib-models-0.1.10.tgz#43db40b2e9d0031a0f0c11aab4d1bfc818ce4b8b"
+  integrity sha512-v7nchMLOkD582UellVw3GSXWJ0OF4QclDNzXKcT9v6M/0/YaUncEJLfaYRLgy3qcwq1sF26aHHqzEZbx9lzTrw==
   dependencies:
     "@polymer/app-storage" "^3.0.3"
     "@polymer/iron-ajax" "^3.0.1"
