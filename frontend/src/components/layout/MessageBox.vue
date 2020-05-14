@@ -63,11 +63,9 @@ export default {
          }, 260)
       },
       dismiss() {
-         if (this.type == "error") {
-            this.$store.commit("system/setError", "")
-         } else {
-            this.$store.commit("system/setMessage", "")
-         }
+         alert("edf")
+         this.$store.commit("system/setError", "")
+         this.$store.commit("system/setMessage", "")
       },
    },
 };

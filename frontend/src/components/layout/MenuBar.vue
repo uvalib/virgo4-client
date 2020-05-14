@@ -2,14 +2,14 @@
    <nav class="menu" role="menubar" aria-label="Virgo Menu" @keyup.right="nextMenu" @keyup.left="prevMenu" @keyup.esc="closeSubMenus">
       <span class="menu-right">
         <router-link role="menuitem" id="searchmenu" @click.native="searchClicked" to="/search" v-on:focus.native="onMenuFocus">
-           <span class="menu-item"><i class="fas fa-search"></i>&nbsp;Search</span>
+           <span class="menu-item"><i class="icon fas fa-search"></i>Search</span>
         </router-link>
         <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
-           <span class="menu-item"><i class="fas fa-university"></i>&nbsp;Course Reserves</span>
+           <span class="menu-item"><i class="icon fas fa-university"></i>Course Reserves</span>
         </router-link>
         <div v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback" @mousedown="closeSubMenus">
             <a tabindex="-1" href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
-               <span><i class="fas fa-comments"></i>&nbsp;</span>
+               <span><i class="icon fas fa-comments"></i></span>
                <span>Questions? Ask a Librarian</span>
             </a>
          </div>
@@ -97,29 +97,40 @@
          <template v-else>
             <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin" 
                 @click.native="closeSubMenus">
-               <span tabindex="-1" class="menu-item"><i class="fas fa-user"></i>&nbsp;Sign In</span>
+               <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
             </router-link>
          </template>
+         <div class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu" 
+            v-bind:class="{dim: alertCount==0}" 
+            @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
+            @keydown.space.prevent.stop="alertClicked" @keyup.stop.esc="escAlert"
+         >
+            <div class="alert-bell icon fas fa-bell">
+               <span v-if="alertCount" class="alert-count">{{alertCount}}</span>
+            </div>
+         </div>
       </span>
+       <uvalib-alerts id="alerts"></uvalib-alerts>
    </nav>
 </template>
 
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import '@uvalib/uvalib-alerts'
 
 export default {
    data: function() {
       return {
-         menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "servicemenu", "accountmenu"],
+         menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "servicemenu", "accountmenu", "alertmenu"],
          menuBarIdx: 0,
-         userMenu: ["accountsub", "bookmarksub", "checkoutsub", "prefsub", "requestsub", "savesub", "outsub"],
+         userMenu: ["accountsub", "savesub", "bookmarksub", "checkoutsub", "prefsub", "requestsub", "outsub"],
          userMenuOpen: false,
          userMenuIdx: 0,
          svcMenuOpen: false,
          svcMenuIdx: 0,
          svcMenu: ["guides", "journalsub", "databasesub", "eventsub", "roomrsrvsub", "gissub", "librasub"],
-
+         alertCount: 0,
       }
    },
    computed: {
@@ -132,7 +143,18 @@ export default {
         itemsOnNotice: 'user/itemsOnNotice'
       }),
    },
+   created() {
+      document.addEventListener('seen-count-changed', (e)=>{ this.alertCount = e.detail.seenCount }) 
+   },
    methods: {
+      escAlert() {
+         //document.querySelector('#alerts').viewAllAlerts()   
+      },
+      alertClicked() {
+         if ( this.alertCount > 0) {
+            document.querySelector('#alerts').unseeAll()
+         }
+      },
       onMenuFocus() {
          this.menuBarIdx = 0
          this.closeSubMenus()
@@ -295,65 +317,110 @@ export default {
 }
 </script>
 
-<style scoped>
-@media only screen and (max-width: 768px) {
-   span.menu-item.feedback {
-     display: none;
-   }
-   span.menu-item.account {
-     padding-top: 10px;
-   }
-}
-.menu {
+<style lang="scss" scoped>
+#app .menu {
    text-align: right;
-   padding: 10px;
+   padding: 0px;
    background-color: var(--uvalib-blue-alt-darkest);
    color: white;
    display: flex;
    flex-flow: row wrap;
    align-items: center;
    justify-content: space-between;
-}
-#app .menu a {
-   color: white;
-}
-#app .menu a:hover {
-   text-decoration: none;
-}
-#app .menu a:first-child .menu-item {
-   margin-left:0
-}
-.menu .menu-item {
-   cursor: pointer;
-   color: white;
-   flex: 0 1 auto;
-   display: inline-block;
-   margin-left:20px;
-}
-.menu-item.account, .menu-item.service {
    position: relative;
-   display: inline-block;
-   font-weight: 500;
+
+   .icon {
+      font-size: 1.3em;
+      margin-right: 5px;
+   }
+   #alerts {
+      width: 100%;
+   }
+
+   a {
+      color: white;
+   }
+
+   a:hover {
+      text-decoration: none;
+   }
+
+   a:first-child .menu-item {
+      margin-left:0
+   }
+
+   .menu-item {
+      cursor: pointer;
+      color: white;
+      flex: 0 1 auto;
+      display: inline-block;
+      margin-left:20px;
+   }
+
+   .menu-item.account, .menu-item.service {
+      position: relative;
+      display: inline-block;
+      font-weight: 500;
+   }
+
+   .alert-bell {
+      position: relative;
+      .alert-count {
+         font-size: 0.7em;
+         font-weight: normal;
+         background: var(--uvalib-brand-orange);
+         color: white;
+         width: 15px;
+         height: 15px;
+         font-family: sans-serif;
+         display: inline-block;
+         text-align: center;
+         border-radius: 15px;
+         padding: 1px;
+         position: absolute;
+         right: -14px;
+         top: -13px;
+      }
+   }
+   .alert-wrap.dim  {
+      opacity: 0.6;
+      cursor: default;
+   }
+   .alert-wrap {
+      cursor: pointer;
+      color: white;
+      display: inline-block;
+      margin-left:20px;
+   }
+   .alert-wrap:hover {
+      border-bottom:1px solid white;
+   }
+   .alert-wrap.dim:hover {
+      border-bottom: none;
+   }
+
+   .user-menu {
+      position: absolute;
+      z-index: 1000;
+      background: white;
+      padding: 0 0 5px 0;
+      border-radius: 0 0 5px 5px;
+      border: 1px solid var(--uvalib-grey-light);
+      border-top: none;
+      top: 30px;
+      right: 0;
+      overflow: hidden;
+      transition: 200ms ease-out;
+      display: grid;
+      grid-auto-rows: auto;
+      width: max-content;
+
+      a {
+         outline: none;
+      }
+   }
 }
-.user-menu {
-  position: absolute;
-  z-index: 1000;
-  background: white;
-  padding: 0 0 5px 0;
-  border-radius: 0 0 5px 5px;
-  border: 1px solid var(--uvalib-grey-light);
-  border-top: none;
-  top: 30px;
-  right: 0;
-  overflow: hidden;
-  transition: 200ms ease-out;
-  display: grid;
-  grid-auto-rows: auto;
-  width: max-content;
-}
-#app .user-menu a {
-   outline: none;
-}
+
 #app .user-menu a:focus div.submenu, #app .user-menu div.submenu:focus {
    background-color: var(--uvalib-brand-blue-lightest);
    color: var(--uvalib-text-dark);
@@ -391,9 +458,27 @@ export default {
 }
 .menu-right {
    margin-left: auto;
+   padding: 10px;
 }
 i.notice {
    color: var(--uvalib-brand-orange);
    margin-right: 5px;
+}
+@media only screen and (max-width: 800px) {
+   i.icon {
+      display: none !important;
+   }
+   #feedbackmenu {
+      padding: 8px 0 8px 0;
+   }
+   #searchmenu {
+      margin-left: 25px !important;
+   }
+   div.alert-wrap {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      margin-left: 0 !important;
+   }
 }
 </style>

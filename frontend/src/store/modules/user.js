@@ -319,7 +319,7 @@ const user = {
             ctx.commit('resetSearchResults', null, { root: true })
             ctx.commit('bookmarks/clear', null, { root: true })
             ctx.commit('preferences/clear', null, { root: true })
-            ctx.commit('search/clear', null, { root: true })
+            ctx.commit('searches/clear', null, { root: true })
             ctx.commit('query/clear', null, { root: true })
             ctx.commit('filters/reset', null, { root: true })
             router.push("/signedout")
@@ -332,7 +332,8 @@ const user = {
             let jwtStr = Vue.$cookies.get("v4_jwt")
             ctx.commit("setUserJWT", jwtStr )
             ctx.commit('setAuthorizing', false)
-            ctx.commit('restore/load')
+            ctx.commit('restore/load', null, { root: true })
+            ctx.dispatch("getCheckouts") // needed so the alert icon can show in menubar
             router.push( ctx.rootState.restore.url )
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)

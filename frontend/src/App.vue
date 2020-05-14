@@ -3,22 +3,21 @@
       <FatalError v-if="fatal.length > 0" />
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
-         <div class="dimmer" v-if="showDimmer"></div>
-      </transition>
-      <transition name="fade">
-         <AddBookmarkModal v-if="addingBookmark" />
+         <div class="dimmer" v-if="showDimmer">
+             <MessageBox type="error" />
+             <MessageBox type="info" />
+             <AddBookmarkModal v-if="addingBookmark" />
+         </div>
       </transition>
       <VirgoHeader :id="headerID" />
-      <MenuBar :id="menuID" v-bind:style="{transform: `translateY(-${scrollPos}px)`}"/>
-      <main class="v4-content" v-bind:style="{'padding-top': menuHeight+'px'}">
+      <MenuBar :id="menuID" v-bind:style="{transform: `translateY(${menuPos}px)`}"/>
+      <main class="v4-content">
          <SessionExpired />
          <router-view />
          <div v-if="newVersion" class="update-pop">
             <div class="msg">A new version of Virgo is available.</div>
             <V4Button mode="primary" @click="updateClicked">Update Now</V4Button>
          </div>
-         <MessageBox type="error" />
-         <MessageBox type="info" />
          <ScrollToTop />
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
@@ -43,7 +42,7 @@ export default {
          menuID: "v4-navbar",
          headerHeight: 0,
          headerID: "v4-header",
-         scrollPos: 0,
+         menuPos: 0,
       };
    },
    components: {
@@ -80,9 +79,9 @@ export default {
       },
       scrollHandler( ) {
          if ( window.scrollY <= this.headerHeight ) {
-            this.scrollPos = window.scrollY
+            this.menuPos = 0
          } else {
-            this.scrollPos = this.headerHeight
+            this.menuPos = (window.scrollY - this.headerHeight)
          }
       }
    },
@@ -94,7 +93,7 @@ export default {
       window.addEventListener("scroll", this.scrollHandler)
       window.onresize = () => {
          this.$store.commit("system/setDisplayWidth",window.innerWidth)
-      };
+      }
    },
    destroyed: function() {
       window.removeEventListener("scroll", this.scrollHandler)
