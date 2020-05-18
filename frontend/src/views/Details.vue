@@ -44,6 +44,10 @@
                         <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
+                  <template v-if="details.digitalContent.length > 0">
+                     <dt class="label">Digital Content:</dt>
+                     <dd class="value" v-html="digitalContentLinks"></dd>
+                  </template>
                   <template v-if="extDetailLink">
                      <dd></dd>
                      <dt class="value more"  v-html="extDetailLink"></dt>
@@ -111,6 +115,20 @@ export default {
          isUVA: 'pools/isUVA',
          poolDetails: 'pools/poolDetails',
       }),
+      digitalContentLinks() {
+         let out = []
+         this.details.digitalContent.forEach( dc => {
+            let link = `<a href="${dc.url}">`
+            if ( dc.type == "PDF")  {
+               link += "PDF"
+            } else {
+               link += "OCR"
+            }
+            link += "</a>"
+            out.push(link)
+         })
+         return out.join(", ")
+      },
       poolMode() {
          let details = this.poolDetails(this.details.source)
          return details.mode

@@ -5,7 +5,7 @@ import router from '../../router'
 const item = {
    namespaced: true,
    state: {
-      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[]},
+      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[], digitalContent: []},
       availability: {searching: true, titleId: '', columns: [], items: []}
    },
 
@@ -22,12 +22,24 @@ const item = {
    mutations: {
       setDetails(state, {source, details}) {
          utils.preProcessHitFields( [details] )
+         details.digitalContent = []
          details.source = source
          state.details = details
          state.details.searching = false
       },
+      setDigitalContentData(state, data) {
+         state.details.digitalContent.splice(0, state.details.digitalContent.length)
+         let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status == "READY" )
+         if (pdfs.length == 1) {
+            state.details.digitalContent.push({type: "PDF", url: pdfs[0].pdf.urls.download})
+         }
+         let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
+         if (ocrs.length == 1) {
+            state.details.digitalContent.push({type: "OCR", url: ocrs[0].ocr.urls.download})
+         }
+      },
       clearDetails(state) {
-         state.details = {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[]}
+         state.details = {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[], digitalContent: []}
       },
       setAvailability(state, {titleId, response}) {
         state.availability.titleId = titleId
@@ -44,8 +56,6 @@ const item = {
       },
 
       setCatalogKeyDetails(state, data) {
-         // no match or multiple matches
-         // no match or multiple matches
          if (data.total_hits == 0 || data.total_hits > 1) {
             state.details.searching = false
             state.availability.searching = false
@@ -69,6 +79,19 @@ const item = {
    },
 
    actions: {
+      async getDigitalContentURLs(ctx, identifier) {
+         if (ctx.rootState.system.digitalContentURL == "") {
+            await ctx.dispatch("system/getConfig", null, {root:true})
+         }
+
+         let dcURL = ctx.rootState.system.digitalContentURL
+         let reqURL = `${dcURL}/api/item/${identifier}`
+         axios.get(reqURL).then((response) => {
+            ctx.commit("setDigitalContentData", response.data)
+         }).catch((_error) => {
+           // NO-OP; there just wont be any DC links
+         })
+      },
       async getDetails(ctx, { source, identifier }) {
          if (ctx.getters.hasDetails(identifier)) {
             return
@@ -97,6 +120,7 @@ const item = {
          axios.get(url).then((response) => {
             let details = response.data
             ctx.commit("setDetails", {source:source, details: details})
+            ctx.dispatch("getDigitalContentURLs", identifier)
          }).catch((error) => {
            ctx.commit('clearSearching')
            ctx.commit('system/setError', error, { root: true })
@@ -143,6 +167,7 @@ const item = {
                router.push("/not_found")
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
+               ctx.dispatch("getDigitalContentURLs", ctx.state.details.identifier)
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
                router.replace(redirect)
             } else {
