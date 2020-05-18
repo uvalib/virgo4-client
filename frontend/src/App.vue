@@ -4,8 +4,8 @@
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer">
-             <MessageBox type="error" />
-             <MessageBox type="info" />
+             <MessageBox v-if="error" type="error" />
+             <MessageBox v-if="message" type="info" />
              <AddBookmarkModal v-if="addingBookmark" />
          </div>
       </transition>

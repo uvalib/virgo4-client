@@ -5,8 +5,8 @@
       <div v-if="hasMessage" class="messsage-box">
          <div class="message" :class="{error: type=='error', info: type=='info'}" @keyup.esc="dismiss">
             <div class="bar">
-               <span v-if="type=='error'" class="title">Virgo Error</span>
-               <span v-else class="title">Virgo Message</span>
+               <span v-if="type=='error'" tabindex="-1" id="msgtitle" class="title">Virgo Error</span>
+               <span v-else tabindex="-1" id="msgtitle" class="title">Virgo Message</span>
                <i @click="dismiss" class="close fas fa-times-circle"></i>
             </div>
             <div class="message-body" v-html="messageContent"></div>
@@ -28,18 +28,6 @@ export default {
          default: "error"
       }
    },
-   watch: {
-      error (newVal, _oldVal) {
-         if ( newVal != "" ) {
-            this.focusButton()
-         }
-      },
-      message (newVal, _oldVal) {
-         if ( newVal != "" ) {
-            this.focusButton()
-         }
-      }
-   },
    computed: {
       ...mapState({
          error: state => state.system.error,
@@ -57,15 +45,21 @@ export default {
       }
    },
    methods: {
-      focusButton() {
+      setFocus(id) {
          setTimeout(()=>{
-            document.getElementById("okbtn").focus()
+            let ele = document.getElementById(id)
+            if (ele ) {
+               ele.focus()
+            }
          }, 260)
       },
       dismiss() {
          this.$store.commit("system/setError", "")
          this.$store.commit("system/setMessage", "")
       },
+   },
+   created() {
+      this.setFocus("msgtitle")
    },
 };
 </script>
