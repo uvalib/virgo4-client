@@ -23,6 +23,7 @@ import (
 type ServiceContext struct {
 	Version            string
 	VirgoURL           string
+	DigitalContentURL  string
 	SearchAPI          string
 	CourseReserveEmail string
 	LawReserveEmaiil   string
@@ -49,6 +50,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
 		VirgoURL:           cfg.VirgoURL,
 		SearchAPI:          cfg.SearchAPI,
+		DigitalContentURL:  cfg.DigitalContentURL,
 		Solr:               cfg.Solr,
 		JWTKey:             cfg.JWTKey,
 		CourseReserveEmail: cfg.CourseReserveEmail,
@@ -228,14 +230,15 @@ func getLatestMigrationNumber() int {
 // GetConfig returns front-end configuration data as JSON
 func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
-		SearchAPI        string `json:"searchAPI"`
-		TranslateMessage string `json:"translateMessage"`
-		KioskMode        bool   `json:"kiosk"`
-		DevServer        bool   `json:"devServer"`
+		SearchAPI         string `json:"searchAPI"`
+		DigitalContentURL string `json:"digitalContentURL"`
+		TranslateMessage  string `json:"translateMessage"`
+		KioskMode         bool   `json:"kiosk"`
+		DevServer         bool   `json:"devServer"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
-	cfg := config{SearchAPI: svc.SearchAPI, KioskMode: false}
+	cfg := config{SearchAPI: svc.SearchAPI, DigitalContentURL: svc.DigitalContentURL, KioskMode: false}
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg

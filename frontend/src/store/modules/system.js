@@ -11,6 +11,7 @@ const system = {
       error: "",
       message: "",
       version: "unknown",
+      digitalContentURL: "",
       searchAPI: "",
       seenTranslateMsg: false,
       translateMessage: "",
@@ -116,6 +117,7 @@ const system = {
          state.translateMessage = cfg.translateMessage
          state.kiosk = cfg.kiosk
          state.devServer = cfg.devServer
+         state.digitalContentURL = cfg.digitalContentURL
       },
    },
 
