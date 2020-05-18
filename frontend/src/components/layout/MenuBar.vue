@@ -103,7 +103,7 @@
          <div class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu" 
             v-bind:class="{dim: alertCount==0}" 
             @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
-            @keydown.space.prevent.stop="alertClicked" @keyup.stop.esc="escAlert"
+            @keydown.space.prevent.stop="alertClicked"
          >
             <div class="alert-bell icon fas fa-bell">
                <span v-if="alertCount" class="alert-count">{{alertCount}}</span>
@@ -147,9 +147,9 @@ export default {
       document.addEventListener('seen-count-changed', (e)=>{ this.alertCount = e.detail.seenCount }) 
    },
    methods: {
-      escAlert() {
-         document.querySelector('#alerts').seeAll()   
-      },
+      // escAlert() {
+      //    document.querySelector('#alerts').seeAll()   
+      // },
       alertClicked() {
          if ( this.alertCount > 0) {
             document.querySelector('#alerts').unseeAll()
