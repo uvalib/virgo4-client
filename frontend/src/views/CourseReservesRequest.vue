@@ -150,10 +150,8 @@
             </div>
          </div>
          <div class="controls">
-            <router-link to="/bookmarks">
-               <V4Button mode="tertiary">Cancel Request</V4Button>
-            </router-link>
-            <V4Button mode="primary" @click="submitRequest">Submit Request</V4Button>
+            <V4Button mode="tertiary" @click="cancelRequest">Cancel Request</V4Button>
+         <V4Button mode="primary" @click="submitRequest">Submit Request</V4Button>
          </div>
       </div>
    </div>
@@ -198,6 +196,9 @@ export default {
    },
    created() {
       this.$store.commit("reserves/setRequestingUser", this.userInfo)
+      setTimeout( ()=> {
+         document.getElementById("behalf_of").focus()
+      }, 100)
    },
    methods: {
       hasSubtitleError( item) {
@@ -206,6 +207,9 @@ export default {
       },
       hasError( val) {
          return this.errors.includes(val)
+      },
+      cancelRequest() {
+         this.$router.push("/bookmarks")
       },
       submitRequest() {
          this.errors.splice(0, this.errors.length)
