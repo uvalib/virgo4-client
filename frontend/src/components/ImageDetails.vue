@@ -84,7 +84,8 @@ export default {
       manifestURL() {
          if (this.isKiosk) return ""
          let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
-         return iiifField.value
+         if ( iiifField ) return iiifField.value
+         return ""
       },
       isGrouped() {
          return this.details.related && this.details.related.length > 1
