@@ -6,7 +6,8 @@
       <div class="inset">
          <p>{{reserve.author}}</p>
          <p>{{reserve.callNumber}}</p>
-         <p>At {{reserve.reserveDesk}},
+         <p>Location: {{reserve.reserveDesk}}</p>
+         <p>
             Available for: {{reserve.circulationRule}} checkout
             <span v-if="reserve.loanPeriod">for {{reserve.loanPeriod}}</span>
          </p>
