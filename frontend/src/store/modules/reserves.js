@@ -41,6 +41,9 @@ const reserves = {
 
    mutations: {
       updateField,
+      setQuery(state, q) {
+         state.query = q
+      },
       markInvalidReserveItem(state, idx) {
          // change the value in place, but this doesn't let view know that
          // the array has changed. Reassigning the list with the updated items will.
@@ -205,7 +208,8 @@ const reserves = {
           })
       },
       searchCourses(ctx, data) {
-         let qs = ctx.state.query
+         ctx.commit("setQuery", data.query)
+         let qs = data.query
          if ( qs.includes("*")) {
             ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
             ctx.commit('clearReservesResults')
@@ -239,8 +243,10 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
          })
       },
+
       searchInstructors(ctx, data) {
-         let qs = ctx.state.query
+         ctx.commit("setQuery", data.query)
+         let qs = data.query
          if ( qs.includes("*")) {
             ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
             ctx.commit('clearReservesResults')
