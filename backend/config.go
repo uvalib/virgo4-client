@@ -39,7 +39,7 @@ type IlliadConfig struct {
 type ServiceConfig struct {
 	Port               int
 	VirgoURL           string
-	DigitalContentURL  string
+	CitationsURL       string
 	SearchAPI          string
 	CourseReserveEmail string
 	LawReserveEmaiil   string
@@ -66,7 +66,7 @@ func LoadConfig() *ServiceConfig {
 	var cfg ServiceConfig
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
-	flag.StringVar(&cfg.DigitalContentURL, "dc", "https://digital-content-ws-dev.internal.lib.virginia.edu", "URL to the digital content service")
+	flag.StringVar(&cfg.CitationsURL, "citations", "https://citations-ws-dev.internal.lib.virginia.edu", "Citations service URL")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.JWTKey, "jwtkey", "", "JWT signature key")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
@@ -133,10 +133,10 @@ func LoadConfig() *ServiceConfig {
 	} else {
 		log.Printf("Solr endpoint: %s/%s", cfg.Solr.URL, cfg.Solr.Core)
 	}
-	if cfg.DigitalContentURL == "" {
-		log.Fatal("dc (Digital Content) url param is required")
+	if cfg.CitationsURL == "" {
+		log.Fatal("citations url param is required")
 	} else {
-		log.Printf("Digital Content URL: %s", cfg.DigitalContentURL)
+		log.Printf("Citations URL: %s", cfg.CitationsURL)
 	}
 	if cfg.JWTKey == "" {
 		log.Fatal("jwtkey param is required")

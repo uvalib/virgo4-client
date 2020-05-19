@@ -26,6 +26,7 @@
             <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
          </router-link>
       </div>
+      <div class="digital-content" v-if="hasDigitalContent" v-html="digitalContentLinks"></div>
    </div>
 </template>
 
@@ -52,6 +53,15 @@ export default {
       accessURLField() {
          return this.hit.basicFields.find(f => f.name=="access_url")
       },
+      hasDigitalContent() {
+         if (this.isKiosk) return false
+         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")   
+         return dc
+      },
+      digitalContentLinks() {
+         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")  
+         return `<a href="${dc.value}"><i class="icon far fa-file-pdf"></i><label>Download PDF</label></a>`
+      },
    },
    methods: {
       getKey(field,idx) {
@@ -75,7 +85,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 div.details {
    padding: 10px;
 }
@@ -95,6 +105,25 @@ div.details {
    }
    a.img-link {
       margin-left: initial;
+   }
+}
+.digital-content {
+   padding: 0 5px;
+   ::v-deep a {
+      text-align: center !important;
+      display: inline-block;
+   }
+   ::v-deep .icon {
+      font-size: 1.75em;
+      display: block;
+      color: var(--uvalib-text);
+   }
+   ::v-deep label {
+      font-size: 0.8em;
+      color: var(--uvalib-text);
+      display: block;
+      cursor: pointer;
+      font-weight: normal;
    }
 }
 .author {

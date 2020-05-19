@@ -117,14 +117,25 @@ export default {
       }),
       digitalContentLinks() {
          let out = []
-         this.details.digitalContent.forEach( dc => {
+         let pdfs = this.details.digitalContent.filter( dc => dc.type == "PDF")
+         pdfs.forEach( (dc,idx) => {
             let link = `<a href="${dc.url}">`
-            if ( dc.type == "PDF")  {
+            if (pdfs.length > 1) {
+                link += `PDF copy ${idx+1}`
+            } else {
                link += "PDF"
+            }
+            link += "</a>"
+            out.push(link)
+         })
+         let ocrs = this.details.digitalContent.filter( dc => dc.type == "OCR")
+         ocrs.forEach( (dc,idx) => {
+            let link = `<a href="${dc.url}">`
+            if (ocrs.length > 1) {
+                link += `OCR copy ${idx+1}`
             } else {
                link += "OCR"
             }
-            link += "</a>"
             out.push(link)
          })
          return out.join(", ")
@@ -187,7 +198,8 @@ export default {
       },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type=="iiif-manifest-url" ||
-            field.type == "iiif-image-url" || field.type=="iiif-base-url" || field.type == "url") {
+            field.type == "iiif-image-url" || field.type=="iiif-base-url" || field.type == "url" ||
+            field.name.includes("_download_url")  ) {
             return false
          }
          if ( this.isKiosk && field.type == "url") return false

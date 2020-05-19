@@ -30,13 +30,13 @@ const item = {
       setDigitalContentData(state, data) {
          state.details.digitalContent.splice(0, state.details.digitalContent.length)
          let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status == "READY" )
-         if (pdfs.length == 1) {
-            state.details.digitalContent.push({type: "PDF", url: pdfs[0].pdf.urls.download})
-         }
+         pdfs.forEach( item => {
+            state.details.digitalContent.push({type: "PDF", url: item.pdf.urls.download})
+         })
          let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
-         if (ocrs.length == 1) {
-            state.details.digitalContent.push({type: "OCR", url: ocrs[0].ocr.urls.download})
-         }
+         ocrs.forEach( item => {
+            state.details.digitalContent.push({type: "OCR", url: item.pdf.urls.download})
+         })
       },
       clearDetails(state) {
          state.details = {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[], digitalContent: []}
@@ -79,14 +79,11 @@ const item = {
    },
 
    actions: {
-      async getDigitalContentURLs(ctx, identifier) {
-         if (ctx.rootState.system.digitalContentURL == "") {
-            await ctx.dispatch("system/getConfig", null, {root:true})
-         }
+      async getDigitalContentURLs(ctx) {
+         let dcField = ctx.state.details.basicFields.find( f=>f.name=="digital_content_url")
+         if (!dcField) return 
 
-         let dcURL = ctx.rootState.system.digitalContentURL
-         let reqURL = `${dcURL}/api/item/${identifier}`
-         axios.get(reqURL).then((response) => {
+         axios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
          }).catch((_error) => {
            // NO-OP; there just wont be any DC links
@@ -120,7 +117,7 @@ const item = {
          axios.get(url).then((response) => {
             let details = response.data
             ctx.commit("setDetails", {source:source, details: details})
-            ctx.dispatch("getDigitalContentURLs", identifier)
+            ctx.dispatch("getDigitalContentURLs")
          }).catch((error) => {
            ctx.commit('clearSearching')
            ctx.commit('system/setError', error, { root: true })
@@ -167,7 +164,7 @@ const item = {
                router.push("/not_found")
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
-               ctx.dispatch("getDigitalContentURLs", ctx.state.details.identifier)
+               ctx.dispatch("getDigitalContentURLs")
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
                router.replace(redirect)
             } else {
