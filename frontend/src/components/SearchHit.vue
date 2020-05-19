@@ -1,39 +1,15 @@
 <template>
    <div class="hit" v-bind:data-identifier="hit.identifier">
       <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
-      <div class="top">
-         <div class="basic">
-            <div v-if="hit.header.author" class="author">
-               <TruncatedText :title="hit.header.author.label" 
-                  :text="hit.header.author.value.join('; ')" :limit="truncateLength" />
-            </div>
-            <dl class="fields">
-               <template v-for="(field,idx) in hit.basicFields">
-                  <template v-if="shouldDisplay(field)">
-                     <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
-                     <dd :key="getKey(field,`v${idx}`)" >
-                        <TruncatedText :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" />
-                     </dd>
-                  </template>
-               </template>
-               <template v-if="accessURLField">
-                  <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value">
-                     <AccessURLDetails mode="brief" :pool="pool" :urls="accessURLField.value" />
-                  </dd>
-               </template>
-            </dl>
-         </div>
-         <router-link v-if="hasCoverImages(pool)" class="img-link" :to="detailsURL">
-            <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
-         </router-link>
-      </div>
-      <div class="digital-content" v-if="hasDigitalContent" v-html="digitalContentLinks"></div>
+      <SearchHitDetail :hit="hit" :pool="pool"/>
       <AccordionContent v-if="hit.grouped" :title="groupTitle" :id="hit.identifier" :autoExpandID="autoExpandGroupID"
          class="group" :autoCollapseOn="searching">
-         <div class="group-item-wrapper" v-for="(groupHit,idx) in hit.group" :key="idx">
-            <GroupedSearchHit :pool="pool" :hit="groupHit" :key="idx"/>
-         </div>
+         <template v-for="(groupHit,idx) in hit.group">
+            <div class="group-item-wrapper" :key="`g${idx}`">
+               <SearchHitHeader :maxLen="60" :count="-1" :hit="hit" :pool="pool"/>
+               <SearchHitDetail :hit="groupHit" :pool="pool"/>
+            </div>
+         </template>
       </AccordionContent>
    </div>
 </template>
@@ -42,10 +18,8 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
+import SearchHitDetail from '@/components/SearchHitDetail'
 import AccordionContent from '@/components/AccordionContent'
-import GroupedSearchHit from '@/components/GroupedSearchHit'
-import TruncatedText from '@/components/TruncatedText'
-import AccessURLDetails from '@/components/AccessURLDetails'
 export default {
    props: {
       hit: { type: Object, required: true},
@@ -53,7 +27,7 @@ export default {
       count: {type: Number, required: true}
    },
    components: {
-      SearchHitHeader, AccordionContent, GroupedSearchHit, TruncatedText, AccessURLDetails
+      SearchHitHeader, SearchHitDetail, AccordionContent
    },
    computed: {
       hasDigitalContent() {
@@ -107,63 +81,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-div.details {
-   padding: 10px;
-}
-.top {
-   display:flex;
-   flex-flow: row wrap;
-   align-items: flex-start;
-}
-@media only screen and (min-width: 600px) {
-   a.img-link {
-      margin-left: auto;
-   }
-}
-@media only screen and (max-width: 600px) {
-   .top {
-      justify-content: center
-   }
-   a.img-link {
-      margin-left: initial;
-   }
-}
-.digital-content {
-   padding: 0 5px;
-   ::v-deep a {
-      text-align: center !important;
-      display: inline-block;
-   }
-   ::v-deep .icon {
-      font-size: 1.75em;
-      display: block;
-      color: var(--uvalib-text);
-   }
-   ::v-deep label {
-      font-size: 0.8em;
-      color: var(--uvalib-text);
-      display: block;
-      cursor: pointer;
-      font-weight: normal;
-   }
-}
-.author {
-   margin-bottom: 10px;
-}
-a.img-link {
-   display: inline-block;
-}
-.cover-img {
-   border-radius: 3px;
-   margin: 5px;
-   max-height: 140px;
-   max-width: 140px;
-   display: inline-block;
-}
-div.basic {
-   padding: 5px 10px 10px 10px;
-   flex-grow: 1;
-}
 .hit {
    width: 100%;
    padding: 10px;
@@ -171,33 +88,13 @@ div.basic {
    text-align: left;
    background-color: white;
 }
-.cover-img.small {
-   max-height: 124px;
-   max-width: 100px;
-}
-dl {
-   margin-top: 0;
-   margin-left: 15px;
-   display: inline-grid;
-   grid-template-columns: max-content 2fr;
-   grid-column-gap: 15px;
-}
-dt {
-   font-weight: bold;
-   text-align: right;
-}
-dd {
-   margin: 0 0 10px 0;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-}
 .group-item-wrapper {
-   padding: 15px;
-   border: 1px solid #ccc;
-   border-radius: 5px;
-   margin: 10px;
+   padding: 0;
+   margin: 10px 10px 15px 10px;
+   border-bottom: 1px solid #ccc;
+}
+.group-item-wrapper:last-of-type {
+    border-bottom: none;
 }
 </style>
 <style>
