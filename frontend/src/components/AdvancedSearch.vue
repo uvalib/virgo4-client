@@ -42,13 +42,14 @@
                </template>
                <template v-else>
                   <div class="date-criteria">
-                     <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value" />
+                     <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value" aria-label="Search for"/>
                      <span v-if="term.type=='BETWEEN'" class="date-sep">and</span>
                      <input
                         v-if="term.type=='BETWEEN'"
                         type="text"
                         @keyup.enter="doAdvancedSearch"
                         v-model="term.endVal"
+                        aria-label="Search for end date"
                      />
                   </div>
                   <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
