@@ -42,8 +42,11 @@ export default {
    methods: {
       iiifURL(item) {
          let iiifField = item.basicFields.find( f=>f.name=="iiif_image_url")
-         let iiif = iiifField.value
-         return `${iiif}/square/250,250/0/default.jpg`
+         if (iiifField) {
+            let iiif = iiifField.value
+            return `${iiif}/square/250,250/0/default.jpg`
+         }
+         return ""
       },
    }
 };

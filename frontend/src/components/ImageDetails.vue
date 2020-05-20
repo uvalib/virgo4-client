@@ -94,6 +94,7 @@ export default {
    methods: {
       imageURL(size) {
          let iiifField = this.allFields.find( f => f.name=="iiif_image_url")
+         if (!iiifField) return ""
          if ( size == 'full') {
             return [`${iiifField.value}/full/2000,/0/default.jpg`]
          }
