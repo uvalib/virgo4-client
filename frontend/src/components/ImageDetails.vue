@@ -83,7 +83,7 @@ export default {
       },
       manifestURL() {
          if (this.isKiosk) return ""
-         let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
+         let iiifField = this.allFields.find( f => f.name=="iiif_manifest_url")
          if ( iiifField ) return iiifField.value
          return ""
       },
@@ -93,7 +93,7 @@ export default {
    },
    methods: {
       imageURL(size) {
-         let iiifField = this.allFields.find( f => f.type=="iiif-base-url")
+         let iiifField = this.allFields.find( f => f.name=="iiif_image_url")
          if ( size == 'full') {
             return [`${iiifField.value}/full/2000,/0/default.jpg`]
          }
@@ -106,7 +106,7 @@ export default {
          return `/sources/${this.details.source}/items/${rel.id}?mode=single`
       },
       relatedImageURL( rel, size ) {
-         let baseURL = rel['iiif_base_url']
+         let baseURL = rel['iiif_image_url']
          if (size == 'full') {
             return [`${baseURL}/full/1200,/0/default.jpg`]
          }

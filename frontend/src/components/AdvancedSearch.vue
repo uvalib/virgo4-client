@@ -31,7 +31,7 @@
                      <option value="BETWEEN">BETWEEN</option>
                   </select>
                </template>
-               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)">
+               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)" aria-label="delete this criteria">
                   <i class="fas fa-times-circle"></i>
                </V4Button>
             </div>

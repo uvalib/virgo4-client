@@ -159,10 +159,6 @@ export default {
       accessURLField() {
          return this.allFields.find(f => f.name=="access_url")
       },
-      manifestURL() {
-         let iiifField = this.allFields.find( f => f.type=="iiif-manifest-url")
-         return iiifField.value
-      },
       extDetailLink() {
          let extLink = this.allFields.find( f=> f.name=="sirsi_url")
          if (!extLink) {
@@ -197,9 +193,9 @@ export default {
          return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.type=="iiif-manifest-url" ||
-            field.type == "iiif-image-url" || field.type=="iiif-base-url" || field.type == "url" ||
-            field.name.includes("_download_url")  ) {
+         if (field.display == 'optional' || field.name=="iiif_manifest_url" ||
+             field.name=="iiif_image_url" || field.type == "url" ||
+             field.name.includes("_download_url")  ) {
             return false
          }
          if ( this.isKiosk && field.type == "url") return false
