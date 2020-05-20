@@ -9,7 +9,8 @@ module.exports = {
   ],
   rules: {
     'no-unused-vars': [2, {"args": "all", "argsIgnorePattern": "^_.*"}], 
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+   //  'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-console': 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   },
   parserOptions: {

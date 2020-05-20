@@ -24,6 +24,7 @@ export default {
    },
    methods: {
       clicked() {
+         this.$emit('click')
          window.location.href = this.url
       }
    },

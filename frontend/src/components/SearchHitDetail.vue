@@ -30,7 +30,7 @@
       <div class="digital-content">
          <V4DownloadButton v-if="pdfDownloadURL" icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"/>
          <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt" label="Download OCR" :url="ocrDownloadURL"/>
-         <V4DownloadButton icon="fas fa-file-export" label="Export Citation" :url="risURL"/>
+         <V4DownloadButton icon="fas fa-file-export" label="Export Citation" :url="risURL" @click="triggerMatomoEvent"/>
       </div>
    </div>
 </template>
@@ -90,6 +90,13 @@ export default {
       }
    },
    methods: {
+      triggerMatomoEvent() {
+         if (window._paq ) {
+            window._paq.push(['trackEvent', 'Export', 'RIS'])
+         } else {
+            console.error("_PAQ IS NOT AVAILABLE; CANNOT TRIGGER EVENT")
+         }
+      },
       getKey(field,idx) {
          return this.hit.identifier+field.value+idx
       },
