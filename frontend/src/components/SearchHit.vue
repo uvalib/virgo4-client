@@ -1,12 +1,17 @@
 <template>
-   <div class="hit" v-bind:data-identifier="hit.identifier">
-      <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
-      <SearchHitDetail :hit="hit" :pool="pool"/>
-      <AccordionContent v-if="hit.grouped" :title="groupTitle" :id="hit.identifier" :autoExpandID="autoExpandGroupID"
+   <div class="inner-hit-wrapper">
+      <div class="hit" v-bind:data-identifier="hit.identifier">
+         <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
+         <SearchHitDetail :hit="hit" :pool="pool"/>
+      </div>
+      <AccordionContent v-if="hit.grouped" :title="groupTitle" :id="hit.identifier" 
+         :autoExpandID="autoExpandGroupID" :closeText="closeGroupTitle" 
+         backgroundContent="none" background="var(--uvalib-teal-lightest)"
+         borderColor="var(--uvalib-teal-light)"
          class="group" :autoCollapseOn="searching">
          <template v-for="(groupHit,idx) in hit.group">
-            <div class="group-item-wrapper" :key="`g${idx}`">
-               <SearchHitHeader :maxLen="60" :count="-1" :hit="hit" :pool="pool"/>
+            <div class="group-item-wrapper" :class="{last: idx==hit.group.length-1, first: idx==0}" :key="`g${idx}`">
+               <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
                <SearchHitDetail :hit="groupHit" :pool="pool"/>
             </div>
          </template>
@@ -48,6 +53,9 @@ export default {
       groupTitle() {
          return `Show other versions (${this.hit.group.length})`
       },
+      closeGroupTitle() {
+         return `Hide other versions (${this.hit.group.length})`
+      },
       ...mapState({
          searching: state => state.searching,
          autoExpandGroupID: state => state.autoExpandGroupID
@@ -87,39 +95,19 @@ export default {
    box-sizing: border-box;
    text-align: left;
    background-color: white;
+   box-shadow:  $v4-box-shadow-light;
 }
 .group-item-wrapper {
-   padding: 0;
-   margin: 10px 10px 15px 10px;
-   border-bottom: 1px solid #ccc;
+   padding: 10px;
+   margin: 10px 0px 20px 0px;
+   box-shadow:  $v4-box-shadow-light;
+   background-color: white;
 }
-.group-item-wrapper:last-of-type {
-    border-bottom: none;
+.group-item-wrapper.first {
+   margin-top: 20px;
 }
-</style>
-<style>
-#app .accordion.group .title {
-   padding: 5px 10px;
-   font-weight: bold;
-   border-radius: 5px;
-   border: 1px solid var(--uvalib-brand-orange) !important;
-   width: 100%;
-   box-sizing: border-box;
-}
-#app .accordion.group {
-   display: inline-block;
-   width: 100%;
-   box-sizing: border-box;
-}
-#app .group .title .text {
-  color: var(--uvalib-text);
-}
-@media only screen and (max-width: 600px) {
-  #app .accordion.group .title {
-     width: inherit;
-  }
-  #app .accordion.group {
-     display: inherit;
-  }
+.group-item-wrapper.last {
+   margin-bottom: 0px;
 }
 </style>
+

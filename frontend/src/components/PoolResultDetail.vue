@@ -162,8 +162,6 @@ div.results-header {
 }
 .hit-wrapper {
    margin: 0 5px 20px 5px;
-   box-shadow:  $v4-box-shadow-light;
-   margin-bottom: 1rem;
 }
 .hit-wrapper.none {
    background: white;
@@ -171,6 +169,8 @@ div.results-header {
    font-size: 1.5em;
    font-weight: 500;
    color: var(--uvalib-text);
+   box-shadow:  $v4-box-shadow-light;
+   margin-bottom: 1rem;
 }
 .hit-wrapper.none .error {
    padding: 0;
