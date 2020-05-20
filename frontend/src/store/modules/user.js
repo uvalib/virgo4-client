@@ -180,6 +180,7 @@ const user = {
          state.checkouts.splice(0, state.checkouts.length)
          state.bills.splice(0, state.bills.length)
          Vue.$cookies.remove("v4_jwt")
+         Vue.$cookies.remove("v4_optout")
       },
       setBills(state, bills) {
          state.bills = bills

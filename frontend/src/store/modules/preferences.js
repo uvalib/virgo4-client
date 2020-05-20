@@ -65,6 +65,8 @@ const preferences = {
                if ( state.trackingOptOut && !optOutCookie) {
                   let data = {v4_opt_out: true}
                   Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+               } else {
+                  Vue.$cookies.remove("v4_optout")   
                }
             }
             if (json.pickupLibrary ) {
