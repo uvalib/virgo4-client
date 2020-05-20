@@ -46,12 +46,20 @@ export default {
    computed: {
       hasDigitalContent() {
          if (this.isKiosk) return false
-         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")   
+         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url" || f.name=="ocr_download_url")   
          return dc
       },
       digitalContentLinks() {
          let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")  
-         return `<a href="${dc.value}"><i class="icon far fa-file-pdf"></i><label>Download PDF</label></a>`
+         let out = [] 
+         if ( dc ) {
+            out.push(`<a class="digitial-content-link" href="${dc.value}"><i class="icon far fa-file-pdf"></i><label>Download PDF</label></a>`)
+         }
+         dc = this.hit.basicFields.find(f => f.name=="ocr_download_url")  
+         if ( dc ) {
+            out.push(`<a class="digitial-content-link" href="${dc.value}"><i class="icon far fa-file-alt"></i><label>Download OCR</label></a>`)
+         }
+         return out.join("")
       },
       accessURLField() {
          return this.hit.basicFields.find(f => f.name=="access_url")
@@ -138,6 +146,9 @@ export default {
 
 .digital-content {
    padding: 0 5px;
+   ::v-deep .digitial-content-link {
+      margin-right: 15px;
+   }
    ::v-deep a {
       text-align: center !important;
       display: inline-block;
