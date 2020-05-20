@@ -13,7 +13,7 @@
        <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div :id="id" class="accordion-content" v-show="isExpanded" :style="{ backgroundContent: backgroundContent, color: color }" 
+         <div :id="id" class="accordion-content" v-show="isExpanded" :style="{ background: backgroundContent, color: color }" 
             @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
             <slot></slot>
             <div v-if="closeText" @click="accordionClicked" class="footer">
@@ -173,7 +173,6 @@ export default {
 .accordion-content {
    overflow: hidden;
    transition: 250ms ease-out;
-   background: white;
    margin:0;
    padding:0;
    text-align: left;
