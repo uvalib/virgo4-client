@@ -4,7 +4,7 @@
 #
 
 # run the migrations
-bin/migrate -path db -verbose -database postgres://$V4_DB_USER:$V4_DB_PASS@$V4_DB_HOST:$V4_DB_PORT/$V4_DB_NAME up
+bin/migrate -path db -verbose -database postgres://$DBUSER:$DBPASS@$DBHOST:$DBPORT/$DBNAME up
 
 # return the status
 exit $?
