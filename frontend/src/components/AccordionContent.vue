@@ -149,7 +149,6 @@ export default {
          el.style.height = '0'
       },
       enter: function(el) {
-         console.log("ENTER SCROLL H "+ el.scrollHeight+" PAD "+el.style.padding)
          el.style.height = el.scrollHeight + 'px'
          setTimeout( ()=> {
             this.$emit('accordion-expanded')
