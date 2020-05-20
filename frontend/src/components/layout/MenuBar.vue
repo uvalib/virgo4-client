@@ -422,7 +422,7 @@ export default {
          padding: 1px;
          position: absolute;
          right: -14px;
-         top: -13px;
+         top: -8px;
       }
    }
    .alert-wrap.dim  {
