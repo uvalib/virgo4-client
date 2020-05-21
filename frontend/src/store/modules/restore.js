@@ -13,7 +13,12 @@ const restore = {
    },
    mutations: {
       setURL(state, url) {
-         state.url = url
+         let ignoredPaths = ['/signedout', '/signin', '/forbidden']
+         if (ignoredPaths.includes(url)){
+           state.url = '/search'
+         } else {
+           state.url = url
+         }
       },
       setActiveRequest(state, nextPanel) {
          state.activeRequest = nextPanel
@@ -32,7 +37,7 @@ const restore = {
       },
       save( state ) {
          let str = JSON.stringify(state)
-         localStorage.setItem("v4Cache", str)   
+         localStorage.setItem("v4Cache", str)
       },
       load( state ) {
          let restored = localStorage.getItem('v4Cache')
