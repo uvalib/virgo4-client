@@ -3,7 +3,7 @@
       <V4Button  :id="`${id}trigger`" mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
         <slot name="trigger"></slot>
       </V4Button>
-      <div class="v4-popover-dialog" role="dialog" slot="popover">
+      <div class="v4-popover-dialog" role="dialog" :style="{'max-width': maxWidth}" slot="popover">
          <div tabindex="-1" :id="id" class="v4-popover-title">
            {{title}}
          </div>
@@ -30,6 +30,10 @@ export default {
       title: {
          type: String,
          required: true
+      },
+      maxWidth: {
+         type: String,
+         default: "inherit"
       }
    },
    data: function() {
@@ -38,14 +42,20 @@ export default {
       }
    },
    methods: {
+      focusTrigger() {
+         let ele = document.getElementById(`${this.id}trigger`)
+         if (ele ) {
+            ele.focus()
+         }
+      },
       hide() {
          this.isOpen = false
-         document.getElementById(`${this.id}trigger`).focus()
+         this.focusTrigger()
       },
       toggle() {
          this.isOpen = !this.isOpen
          if ( this.isOpen == false) {
-            document.getElementById(`${this.id}trigger`).focus()
+           this.focusTrigger()
          }
       },
       opened() {
@@ -64,12 +74,10 @@ export default {
    background: white;
    box-shadow: $v4-box-shadow;
    color: var(--uvalib-text);
-   font-size: 0.9em;
    font-weight: normal;
    display: inline-block;
    border-radius: 5px;
    border: 1px solid var(--uvalib-grey-dark);
-   max-width: 350px;
 
    .v4-popover-title {
       padding: 5px 10px;

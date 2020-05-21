@@ -1,13 +1,7 @@
 <template>
-   <v-popover placement="top-end" class="tips inline"  trigger="manual" :open="isOpen" @hide="hide">
-      <V4Button mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
-         Search Tips
-      </V4Button>
-      <div class="tips-popover" slot="popover">
-         <div class="popover-title">
-            Search Tips
-            <i v-close-popover class="close fas fa-times-circle"></i>
-         </div>
+   <V4Popover class="search-tips inline" id="tips" title="Search Tips">
+      <template v-slot:trigger>Search Tips</template>
+      <template v-slot:content>
          <div class="tips">
             <ul>
                <li class="no-pad">
@@ -28,94 +22,43 @@
                <b>NOTE: </b>Nested parentheses within a query are not supported
             </div>
          </div>
-      </div>
-   </v-popover>
+      </template>
+   </V4Popover>
 </template>
 
 <script>
 export default {
-   data: function() {
-      return {
-         isOpen: false
-      }
-   },
-   methods: {
-      hide() {
-         this.isOpen = false
-      },
-      toggle() {
-         this.isOpen = !this.isOpen
-      }
-   }
-};
+}
 </script>
+
 <style lang="scss" scoped>
-i.fas.fa-times-circle.close {
-   opacity: 0.8;
-   font-size: 1.1em;
-   float:right;
-   margin-right: 8px;
-}
-i.fas.fa-times-circle.close:hover {
-   opacity: 1;
-   cursor: pointer;
-}
-.tips-popover {
-   background: white;
-   box-shadow: $v4-box-shadow;
-   color: var(--uvalib-text);
-   font-size: 1em;
-   font-weight: normal;
-   display: inline-block;
-   border-radius: 5px;
-   border-bottom: 1px solid var(--uvalib-grey-dark);
-}
-.tips-popover .popover-title {
-   padding: 8px 0 6px 0;
-   margin: 0;
-   text-align: center;
-   background: var(--uvalib-grey-dark);
-   color: white;
-   font-weight: normal;
-   border-radius: 5px 5px 0 0;
-   border-top: 1px solid var(--uvalib-grey-dark);
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   font-size: 1.25em;
-   font-weight: bold;
-}
-.note {
-   margin: 25px 0 10px 0;
-}
+
 div.tips {
    margin: 0;
-   padding: 10px 20px 10px 20px;
    font-weight: normal;
-   border-right: 1px solid var(--uvalib-grey-dark);
-   border-left: 1px solid var(--uvalib-grey-dark);
-}
-ul {
-   list-style-type: none;
-   padding:0;
-   margin: 0;
-}
-ul p {
-   margin: 0;
-}
-ul li {
-   padding-top: 20px;
-}
-ul li.no-pad {
-   padding-top: 5px;
-}
-p.example {
-   margin: 5px 0 0 25px;
-   font-family: monospace;
-   font-size: 1.2em;
-}
-div.v-popover.tips {
-   margin:0;
-   padding:0;
-   border: 0;
+
+   .note {
+      margin: 25px 0 10px 0;
+   }
+
+   ul {
+      list-style-type: none;
+      padding:0;
+      margin: 0;
+   }
+   ul p {
+      margin: 0;
+   }
+   ul li {
+      padding-top: 20px;
+   }
+   ul li.no-pad {
+      padding-top: 5px;
+   }
+   p.example {
+      margin: 5px 0 0 25px;
+      font-family: monospace;
+      font-size: 1.2em;
+   }
 }
 </style>

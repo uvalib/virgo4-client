@@ -1,13 +1,9 @@
 <template>
-   <v-popover placement="top-end" class="iiif-info" trigger="manual" :open="isOpen" @hide="hide">
-      <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+   <V4Popover class="iiif-info" id="iiifpop" title="What is IIIF?" maxWidth="350px">
+      <template v-slot:trigger>
          <i class="fas fa-question-circle"></i>
-      </V4Button>
-      <div class="iiif-info-popover" slot="popover">
-         <div class="popover-title">
-            What is IIIF?
-            <i v-close-popover class="close fas fa-times-circle"></i>
-         </div>
+      </template>
+      <template v-slot:content>
          <div class="iiif-info">
             IIIF is an initialism that stands for the International Image Interoperability Framework.
             For more details, click <a href="https://iiif.io/community/faq/#what-is-iiif" target="_blank">here</a>.
@@ -15,74 +11,14 @@
                image in a variety of 3rd party viewers.
             </p>
          </div>
-      </div>
-   </v-popover>
+      </template>
+   </V4Popover>
 </template>
 
 <script>
 export default {
-   data: function() {
-      return {
-         isOpen: false
-      }
-   },
-   methods: {
-      hide() {
-         this.isOpen = false
-      },
-      toggle() {
-         this.isOpen = !this.isOpen
-      }
-   }
 }
 
 </script>
 <style lang="scss" scoped>
-i.fas.fa-times-circle.close {
-   opacity: 0.8;
-   font-size: 1.1em;
-   float:right;
-   margin-right: 8px;
-}
-i.fas.fa-times-circle.close:hover {
-   opacity: 1;
-   cursor: pointer;
-}
-.iiif-info-popover {
-   background: white;
-   box-shadow: $v4-box-shadow;
-   color: var(--uvalib-text);
-   font-size: 1em;
-   font-weight: normal;
-   display: inline-block;
-   border-radius: 5px;
-   border-bottom: 1px solid var(--uvalib-grey-dark);
-    max-width: 350px;
-}
-.iiif-info-popover .popover-title {
-   padding: 8px 0 6px 0;
-   margin: 0;
-   text-align: center;
-   background: var(--uvalib-grey-dark);
-   color: white;
-   font-weight: normal;
-   border-radius: 5px 5px 0 0;
-   border-top: 1px solid var(--uvalib-grey-dark);
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   font-size: 1.25em;
-   font-weight: bold;
-}
-div.iiif-info {
-   margin: 0;
-   padding: 10px 20px 10px 20px;
-   font-weight: normal;
-   border-right: 1px solid var(--uvalib-grey-dark);
-   border-left: 1px solid var(--uvalib-grey-dark);
-}
-div.v-popover.iiif-info {
-   margin:0;
-   padding:0;
-   border: 0;
-}
 </style>

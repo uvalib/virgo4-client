@@ -1,18 +1,14 @@
 <template>
-   <v-popover class="popover" trigger="manual" :open="isOpen" @hide="hide">
-      <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide">
-         <i class="fas fa-exclamation-triangle"></i>
-      </V4Button>
-      <div class="container" slot="popover">
-         <div class="popover-header">
-            <span>Availability Notice</span>
-            <i v-close-popover class="close fas fa-times-circle"></i>
-         </div>
+   <V4Popover id="availnotice" title="Availability Notice">
+      <template v-slot:trigger>
+         <i class="icon fas fa-exclamation-triangle"></i>
+      </template>
+      <template v-slot:content>
          <div class="message">
             <p style="white-space: pre-line;">{{ message }}</p>
          </div>
-      </div>
-   </v-popover>
+      </template>
+   </V4Popover>
 </template>
 
 <script>
@@ -20,62 +16,11 @@ export default {
    props: {
       message: String
    },
-   data: function() {
-      return {
-         isOpen: false
-      }
-   },
-   methods: {
-      hide() {
-         this.isOpen = false
-      },
-      toggle() {
-         this.isOpen = !this.isOpen
-      }
-   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
-div.popover-header {
-   padding: 6px 0px 6px 8px;
-   color: white;
-   background-color: var(--uvalib-grey-dark);
-   font-size: 1.15em;
-   font-weight: bold;
-   border-radius: 5px 5px 0 0;
-}
-.container {
-   max-width: 30em;
-   background: white;
-   box-shadow: $v4-box-shadow;
-   color: var(--uvalib-text);
-   font-size: 1em;
-   font-weight: normal;
-   display: inline-block;
-   padding: 0;
-   border-radius: 5px;
-}
-i.fas.fa-times-circle.close {
-   font-size: 1.1em;
-   float: right;
-   margin-right: 8px;
-}
-i.fas.fa-times-circle.close:hover {
-   opacity: 1;
-   cursor: pointer;
-}
-div.message {
-   padding: 20px;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   border-bottom: 1px solid var(--uvalib-grey-dark);
-   border-radius: 0 0 5px 5px;
-}
-.popover {
-   display: inline;
-}
-.trigger {
+.icon {
    color: var(--uvalib-yellow);
 }
 </style>
