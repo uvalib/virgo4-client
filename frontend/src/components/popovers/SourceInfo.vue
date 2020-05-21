@@ -1,10 +1,10 @@
 <template>
    <v-popover placement="top-end" class="source-info" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+      <V4Button  id="whatpoptrigger"  mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
          What am I searching&nbsp;<i class="fas fa-question-circle"></i>
       </V4Button>
-      <div class="source-info-popover" slot="popover">
-         <div tabindex="-1" id="what-pop" class="popover-title">
+      <div class="source-info-popover" role="dialog" slot="popover">
+         <div tabindex="-1" id="whatpop" class="popover-title">
             What am I searching?
          </div>
          <div class="source-info">
@@ -27,13 +27,17 @@ export default {
    methods: {
       hide() {
          this.isOpen = false
+         document.getElementById("whatpoptrigger").focus()
       },
       toggle() {
          this.isOpen = !this.isOpen
+         if ( this.isOpen == false) {
+            document.getElementById("whatpoptrigger").focus()
+         }
       },
       opened() {
          setTimeout(()=>{
-            document.getElementById("what-pop").focus()
+            document.getElementById("whatpop").focus()
          },300)
       },
    }
