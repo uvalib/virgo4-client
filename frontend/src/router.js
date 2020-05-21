@@ -202,13 +202,11 @@ function ensureSignedIn() {
    if (jwtStr) {
       store.commit("user/setUserJWT", jwtStr)
       return true
-   } else {
-      store.dispatch("user/signout")   
-   }
+   } 
    return false
 }
 
-function ensureAuthTokenPresent(next) {
+async function ensureAuthTokenPresent(next) {
    let getters = store.getters
    if (getters["user/hasAuthToken"]) {
       next()
@@ -225,12 +223,8 @@ function ensureAuthTokenPresent(next) {
    }
 
    // No token. Request one and WAIT FOR RESPONSE before calling next()
-   // console.log("REQUEST AUTH")
-   store.dispatch("user/getAuthToken").then(() => {
-      next()
-   }).catch((_error) => {
-      next("/")
-   })
+   await store.dispatch("user/getAuthToken")
+   next()
 }
 
 export default router

@@ -57,7 +57,6 @@ func main() {
 		api.GET("/users/:uid/holds", svc.AuthMiddleware, svc.GetUserHolds)
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
-		api.POST("/users/:uid/signout", svc.AuthMiddleware, svc.SignoutUser)
 
 		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
 		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)

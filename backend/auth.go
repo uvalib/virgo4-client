@@ -76,6 +76,7 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 
 	// Set auth info in a cookie the client can read and pass along in future requests
 	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
+	c.SetSameSite(http.SameSiteLaxMode)
 	c.Redirect(http.StatusFound, "/signedin")
 }
 
@@ -186,6 +187,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	// Set auth info in a cookie the client can read and pass along in future requests
 	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
+	c.SetSameSite(http.SameSiteLaxMode)
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -229,6 +231,7 @@ func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
 	}
 
 	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
+	c.SetSameSite(http.SameSiteLaxMode)
 	c.String(http.StatusOK, "Success")
 }
 
@@ -251,15 +254,6 @@ func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 
 	log.Printf("User found; details: %+v", user)
 	return &user, nil
-}
-
-// SignoutUser ends the auth session for the target user. All session tracking
-// data should be cleaned up
-func (svc *ServiceContext) SignoutUser(c *gin.Context) {
-	userID := c.Param("uid")
-	log.Printf("Sign out user %s", userID)
-	c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
-	c.String(http.StatusOK, "signedout")
 }
 
 // AuthMiddleware is middleware that checks for a user auth token in the

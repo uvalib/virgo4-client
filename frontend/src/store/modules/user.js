@@ -169,7 +169,7 @@ const user = {
       setAccountInfo(state, data) {
          state.accountInfo = data.user
       },
-      signOutUser(state) {
+      clear(state) {
          state.signedInUser = ""
          state.sessionType = ""
          state.accountInfo = {}
@@ -312,19 +312,16 @@ const user = {
           })
       },
 
-      signout(ctx) {
-         ctx.commit('setAuthorizing', true)
-         axios.post(`/api/users/${ctx.state.signedInUser}/signout`).finally(function () {
-            ctx.commit('signOutUser')
-            ctx.commit('setAuthorizing', false)
-            ctx.commit('resetSearchResults', null, { root: true })
-            ctx.commit('bookmarks/clear', null, { root: true })
-            ctx.commit('preferences/clear', null, { root: true })
-            ctx.commit('searches/clear', null, { root: true })
-            ctx.commit('query/clear', null, { root: true })
-            ctx.commit('filters/reset', null, { root: true })
-            router.push("/signedout")
-         })
+      async signout(ctx) {
+         ctx.commit('clear')
+         ctx.commit('resetSearchResults', null, { root: true })
+         ctx.commit('bookmarks/clear', null, { root: true })
+         ctx.commit('preferences/clear', null, { root: true })
+         ctx.commit('searches/clear', null, { root: true })
+         ctx.commit('query/clear', null, { root: true })
+         ctx.commit('filters/reset', null, { root: true })
+         await ctx.dispatch('getAuthToken')
+         router.push("/signedout")
       },
 
       signin(ctx, data) {
