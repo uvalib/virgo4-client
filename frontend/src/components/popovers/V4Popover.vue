@@ -3,18 +3,19 @@
       <V4Button  :id="`${id}trigger`" mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
         <slot name="trigger"></slot>
       </V4Button>
-      <div class="v4-popover-dialog" role="dialog" :style="{'max-width': maxWidth}" slot="popover">
-         <div tabindex="-1" :id="id" class="v4-popover-title">
-           {{title}}
-         </div>
-         <div class="v4-popover-content">
+      <div :id="id" class="v4-popover-dialog" role="dialog" :style="{'max-width': maxWidth}" slot="popover"
+          :aria-labelledby="`${id}-title`" :aria-describedby="`${id}-content`" >
+         <div class="v4-popover-title" :id="`${id}-title`">{{title}}</div>
+         <div class="v4-popover-content" :id="`${id}-content`">
             <slot name="content"></slot>
          </div>
-         <div v-if="hasControlSlot" class="ctls">
-            <slot name="controls"></slot>
-         </div>
-         <div class="ctls">
-             <V4Button mode="tertiary" class="close" @click="hide">Close</V4Button>
+         <div class="controls">
+            <slot v-if="$slots['controls']" name="controls"></slot>
+            <V4Button v-else mode="tertiary" :id="`${id}-close`" class="close" @click="hide" @esc="hide"
+               :focusNextOverride="true" @tabnext="lastFocusTabbed" 
+               :focusBackOverride="true" @tabback="lastFocusTabbed" >
+                Close
+            </V4Button>
          </div>
       </div>
    </v-popover>
@@ -26,6 +27,14 @@ export default {
       id: {
          type: String,
          required: true
+      },
+      firstFocusID: {
+         type: String,
+         default: ""
+      }, 
+      lastFocusID: {
+         type: String,
+         default: ""
       },
       title: {
          type: String,
@@ -42,29 +51,48 @@ export default {
       }
    },
    methods: {
-      focusTrigger() {
-         let ele = document.getElementById(`${this.id}trigger`)
+      lastFocusTabbed() {
+         let tgt = this.firstFocusID
+         if (tgt == "") {
+            tgt = this.id+"-close"
+         }
+         this.setFocus(tgt)
+      },
+      firstFocusBackTabbed() {
+         let tgt = this.lastFocusID
+         if (tgt == "") {
+            tgt = this.id+"-close"
+         }
+         this.setFocus(tgt)
+      },
+      setFocus(id) {
+         let ele = document.getElementById(id)
          if (ele ) {
             ele.focus()
          }
       },
       hide() {
          this.isOpen = false
-         this.focusTrigger()
+         this.setFocus(`${this.id}trigger`)
       },
       toggle() {
          this.isOpen = !this.isOpen
          if ( this.isOpen == false) {
-           this.focusTrigger()
+           this.setFocus(`${this.id}trigger`)
          }
       },
       opened() {
          setTimeout(()=>{
-            document.getElementById(this.id).focus()
-         },300)
+            let tgt = this.firstFocusID
+            if (tgt == "") {
+               tgt = this.id+"-close"
+            }
+            this.setFocus(tgt)
+         }, 260)
       },
       hasControlSlot() {
-         return !!this.$slots.controls
+         console.log("HAS CONTROLS??")
+         return this.$slots['controls']
       }
    }
 };
@@ -93,7 +121,7 @@ export default {
       font-weight: normal;
    }
 
-   .ctls {
+   .controls {
       font-size: 0.9em;
       text-align: right;
       margin: 0 5px;

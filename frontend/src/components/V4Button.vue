@@ -19,7 +19,11 @@ export default {
          type: String,
          required: true
       },
-      tabOverride: {
+      focusNextOverride: {
+         type: Boolean,
+         default: false
+      },
+      focusBackOverride: {
          type: Boolean,
          default: false
       }
@@ -37,14 +41,14 @@ export default {
          this.$emit('click')
       },
       tabBack() {
-         if (this.tabOverride ) {
+         if (this.focusBackOverride ) {
             event.stopPropagation()
             event.preventDefault()
             this.$emit('tabback')
          }
       },
       tabNext( ) {
-         if (this.tabOverride ) {
+         if (this.focusNextOverride ) {
             event.stopPropagation()
             event.preventDefault()
             this.$emit('tabnext')
