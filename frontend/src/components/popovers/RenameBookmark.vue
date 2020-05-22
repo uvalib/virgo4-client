@@ -1,24 +1,29 @@
 <template>
-   <v-popover class="inline" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button mode="icon" :aria-pressed="isOpen" @click="show" @esc="hide"><i class="fas fa-edit"></i></V4Button>
-      <div class="confirm-container" slot="popover">
-         <div class="popover-header">
-            <span>Rename Bookmark Folder</span>
-         </div>
+   <V4Popover class="confirm inline" id="renamepop" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
+      firstFocusID="rename" lastFocusID="rename-ok">
+      <template v-slot:trigger>
+         <i class="rename fas fa-edit"></i>
+      </template>
+      <template v-slot:content>
          <div class="message pure-form">
-            <input  @keyup.enter="enterPressed"  ref="rename" type="text" v-model="folderName"/>
+            <input  @keyup.enter="enterPressed"  id="rename" type="text" v-model="folderName" @keydown.shift.tab.stop.prevent="backTabInput"/>
          </div>
-         <div class="edit-controls">
-            <V4Button mode="tertiary" @click="hide">Cancel</V4Button>
-            <V4Button mode="primary" @click="okClicked">OK</V4Button>
-         </div>
-      </div>
-   </v-popover>
+      </template>
+      <template v-slot:controls>
+         <V4Button mode="tertiary" id="rename-cancel" @click="cancelClicked">
+            Cancel
+         </V4Button>
+         <V4Button mode="primary" id="rename-ok" @click="okClicked" :focusNextOverride="true" @tabnext="nextTabOK">
+            OK
+         </V4Button>
+      </template>
+   </V4Popover>
 </template>
 
 <script>
 export default {
    props: {
+      alabel: String,
       original: {
          type: Object,
          required: true
@@ -27,87 +32,35 @@ export default {
    data: function()  {
       return {
          folderName: this.original.folder,
-         isOpen: false
       }
    },
-   computed: {
-   },
    methods: {
-      opened() {
-         setTimeout(()=>{
-            this.$refs.rename.focus();
-         },500);
+      backTabInput() {
+         this.$refs.pop.firstFocusBackTabbed()
+      },
+      nextTabOK() {
+         this.$refs.pop.lastFocusTabbed()
       },
       enterPressed() {
          this.okClicked()
       },
       okClicked() {
          this.$emit('rename-approved', {id: this.original.id, name: this.folderName})
-         this.hide()
+         this.$refs.pop.hide()
       },
-      show() {
-         this.isOpen = true
-      },
-      hide() {
-         this.isOpen = false
-      },
+      cancelClicked() {
+         this.$refs.pop.hide()
+      }
    }
 };
 </script>
 
 <style lang="scss" scoped>
-i.fas {
+i.rename {
    color: var(--uvalib-grey-dark);
    cursor: pointer;
    font-size: 1.2em;
-   margin-right: 10px;
-   position: relative;
-   top: 2px;
-}
-div.popover-header {
-   padding: 10px 15px;
-   color: white;
-   background-color: var(--uvalib-grey-dark);
-   font-weight: 500;
-   text-align: center;
-   border-radius: 5px 5px 0 0;
-}
-.confirm-container {
-   background: white;
-   box-shadow: $v4-box-shadow;
-   color: var(--uvalib-text);
-   font-size: 1em;
-   font-weight: normal;
-   display: inline-block;
-   padding: 0;
-   border-radius: 5px;
-}
-div.message {
-   padding: 10px 10px 0 10px;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-}
-.message p {
-   margin: 0;
-   padding: 5px 0;
-   text-align: right;
-}
-select {
-   width: 100%;
-}
-.edit-controls {
-   padding: 10px;
-   text-align: right;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   border-bottom: 1px solid var(--uvalib-grey-dark);
-   border-radius: 0 0 5px 5px;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: flex-end;
-}
-.edit-controls .pure-button {
-   margin-left: 5px;
+   padding: 2px 8px 2px 0;
+   margin-right: 5px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-   <V4Popover class="confirm" id="pop" ref="pop" title="Confirm Delete" :alabel="alabel"
+   <V4Popover class="confirm" id="confirmpop" ref="pop" title="Confirm Delete" :alabel="alabel"
       firstFocusID="confirm-cancelbtn" lastFocusID="confirm-okbtn">
       <template v-slot:trigger>
          <span  v-if="label">{{label}}</span>
