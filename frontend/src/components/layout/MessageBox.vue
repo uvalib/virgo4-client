@@ -3,16 +3,22 @@
       enter-active-class="animated faster fadeIn"
       leave-active-class="animated faster fadeOut">
       <div v-if="hasMessage" class="messsage-box">
-         <div class="message" :class="{error: type=='error', info: type=='info'}" @keyup.esc="dismiss">
+         <div class="message" :role="msgRole" aria-modal="true" aria-labelledby="msgtitle" aria-describedby="msgbody"
+            :class="{error: type=='error', info: type=='info'}" @keyup.esc="dismiss">
             <div class="bar">
-               <span v-if="type=='error'" tabindex="-1" id="msgtitle" class="title">Virgo Error</span>
-               <span v-else tabindex="-1" id="msgtitle" class="title">Virgo Message</span>
-               <i @click="dismiss" class="close fas fa-times-circle"></i>
+               <span v-if="type=='error'" tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">Virgo Error</span>
+               <span v-else tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">Virgo Message</span>
             </div>
-            <div class="message-body" v-html="messageContent"></div>
+            <div class="message-body" id="msgbody" v-html="messageContent"></div>
             <div class="controls">
-               <V4Button v-if="type=='error'" id="okbtn" mode="tertiary" @esc="dismiss" @click="dismiss">OK</V4Button>
-               <V4Button v-else id="okbtn" mode="primary" @esc="dismiss" @click="dismiss">OK</V4Button>
+               <V4Button v-if="type=='error'" id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
+                  @click="dismiss" @tabback="btnTabBack" @tabnext="btnTabNext">
+                  OK
+               </V4Button>
+               <V4Button v-else id="okbtn" mode="primary" @esc="dismiss" :tabOverride="true" 
+                  @click="dismiss" @tabback="btnTabBack" @tabnext="btnTabNext">
+                  OK
+               </V4Button>
             </div>
          </div>
       </div>
@@ -33,6 +39,12 @@ export default {
          error: state => state.system.error,
          message: state => state.system.message,
       }),
+      msgRole() {
+         if ( this.type == "error") {
+            return "alertdialog"
+         }
+         return "dialog"
+      },
       hasMessage() {
          return (this.error != "" && this.type == "error" || 
                  this.message != "" && this.type == "info")
@@ -45,13 +57,25 @@ export default {
       }
    },
    methods: {
-      setFocus(id) {
+      btnTabNext() {
+         this.setFocus("msgtitle", 1)
+      },
+      btnTabBack() {
+         this.setFocus("msgtitle", 1)
+      },
+      shiftTab() {
+         this.setFocus("okbtn", 1)
+      },
+      setFocus(id, timeout) {
+         if (!timeout) {
+            timeout = 260
+         }
          setTimeout(()=>{
             let ele = document.getElementById(id)
             if (ele ) {
                ele.focus()
             }
-         }, 260)
+         }, timeout)
       },
       dismiss() {
          this.$store.commit("system/setError", "")

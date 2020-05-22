@@ -1,5 +1,7 @@
 <template>
    <button tabindex="0" role="button" class="v4-button" 
+      @keydown.exact.tab="tabNext" 
+      @keydown.shift.tab="tabBack"
       :class="{'text-button': mode=='text', 'icon-button': mode=='icon', 
                'pure-button': isButton, 
                'pure-button-primary': mode == 'primary',
@@ -17,6 +19,10 @@ export default {
          type: String,
          required: true
       },
+      tabOverride: {
+         type: Boolean,
+         default: false
+      }
    },
    computed: {
       isButton() {
@@ -29,6 +35,20 @@ export default {
       },
       clicked() {
          this.$emit('click')
+      },
+      tabBack() {
+         if (this.tabOverride ) {
+            event.stopPropagation()
+            event.preventDefault()
+            this.$emit('tabback')
+         }
+      },
+      tabNext( ) {
+         if (this.tabOverride ) {
+            event.stopPropagation()
+            event.preventDefault()
+            this.$emit('tabnext')
+         }
       }
    },
 }
