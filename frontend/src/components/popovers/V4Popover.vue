@@ -1,6 +1,6 @@
 <template>
    <v-popover placement="top-end" class="v4-popover" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button  :id="`${id}trigger`" mode="text" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+      <V4Button  :id="`${id}trigger`" mode="text" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
         <slot name="trigger"></slot>
       </V4Button>
       <div :id="id" class="v4-popover-dialog" role="dialog" :style="{'max-width': maxWidth}" slot="popover"
@@ -40,6 +40,7 @@ export default {
          type: String,
          required: true
       },
+      alabel: String,
       maxWidth: {
          type: String,
          default: "inherit"

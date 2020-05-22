@@ -25,7 +25,7 @@
                      <template v-slot:controls>
                         <div class="folder-settings" @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
                            <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" />
-                           <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)">
+                           <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" alabel="delete bookmark folder">
                               <div>
                                  Delete bookmark folder
                                  <b>{{folderInfo.folder}}</b>? All bookmarks
