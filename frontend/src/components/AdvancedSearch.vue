@@ -71,6 +71,7 @@
          </h2>
          <div class="pools">
             <V4Checkbox v-for="src in sources" :key="src.id" class="pool"
+               :aria-label="`toggle inclusion of ${src.name} in search results`"
                :checked="!isPoolExcluded(src.url)"  
                @click="poolClicked(src.url)">
                {{src.name}}
