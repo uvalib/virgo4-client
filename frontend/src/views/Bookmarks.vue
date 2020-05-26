@@ -80,7 +80,8 @@
                            </tr>
                            <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
                               <td>
-                                 <input type="checkbox" v-model="selectedItems" :value="bookmark.id" />
+                                 <input type="checkbox" v-model="selectedItems" :value="bookmark.id" 
+                                    :aria-label="ariaLabel(bookmark)" />
                               </td>
                               <td>
                                  <router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
@@ -153,6 +154,9 @@ export default {
       })
    },
    methods: {
+      ariaLabel(bm) {
+         return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
+      },
       copyURL( folder ) {
          let URL = this.getPublicURL(folder)
          this.$copyText(URL).then( ()=> {
