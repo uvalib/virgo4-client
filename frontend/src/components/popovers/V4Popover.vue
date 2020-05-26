@@ -78,7 +78,9 @@ export default {
             // if focus target doesn't exist, focus on the one item that is defined
             // by the basic vrpopover template; the close button
             ele = document.getElementById(this.id+"-close")
-            ele.focus()
+            if (ele) {
+               ele.focus()
+            }
          }
       },
       hide() {
@@ -98,6 +100,7 @@ export default {
                tgt = this.id+"-close"
             }
             this.setFocus(tgt)
+            this.$emit('opened')
          }, 260)
       },
       hasControlSlot() {

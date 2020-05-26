@@ -1,27 +1,18 @@
 <template>
-   <v-popover trigger="manual" :open="isOpen" class="inline" @hide="hide">
-      <V4Button mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="hide">
-         Change PIN
-      </V4Button>
-      <div class="pin-container" slot="popover">
-         <div class="popover-header">
-            <span>Change PIN</span>
-         </div>
+   <V4Popover class="pin inline" id="pinpop" ref="pop" title="Change PIN" alabel="Change PIN"
+      firstFocusID="currpin" lastFocusID="okpin" triggerType="primary" @opened="popoverOpened">
+      <template v-slot:trigger>Change PIN</template>
+      <template v-slot:content>
          <template v-if="pinChanged">
-            <div class="message pure-form">
-               <p>
-                  Your PIN has been changed
-               </p>
-            </div>
-            <div class="edit-controls">
-               <V4Button mode="primary" @click="hide">OK</V4Button>
-            </div>
+            <p>
+               Your PIN has been changed
+            </p>
          </template>
          <template v-else>
             <div class="message pure-form">
                <div>
                   <span class="label">Current PIN</span>
-                  <input ref="currpin" type="password" v-model="currPin"/>
+                  <input ref="currpin" id="currpin" type="password" v-model="currPin" @keydown.shift.tab.stop.prevent="backTabCP"/>
                </div>
                <div>
                   <span class="label">New PIN</span>
@@ -31,15 +22,15 @@
                   <span class="label">Confirm PIN</span>
                   <input ref="confirm" type="password" v-model="newPinConfirm"/>
                </div>
-               <p class="error">{{error}}</p>
-            </div>
-            <div class="edit-controls">
-               <V4Button mode="tertiary" @click="cancelClicked">Cancel</V4Button>
-               <V4Button mode="primary" @click="okClicked">OK</V4Button>
+               <p v-if="error" class="error">{{error}}</p>
             </div>
          </template>
-      </div>
-   </v-popover>
+      </template>
+      <template v-if="pinChanged == false" v-slot:controls>
+         <V4Button mode="tertiary" id="cancelpin" @click="cancelClicked">Cancel</V4Button>
+         <V4Button mode="primary" id="okpin" @click="okClicked" :focusNextOverride="true" @tabnext="nextTabOK">OK</V4Button>
+      </template>
+   </V4Popover>
 </template>
 
 <script>
@@ -50,29 +41,27 @@ export default {
          newPin: "",
          newPinConfirm: "",
          error: "",
-         isOpen: false,
          pinChanged: false
       }
    },
    computed: {
    },
    methods: {
-      hide() {
-         this.isOpen = false
-      },
-      cancelClicked() {
-         this.isOpen = false
-      },
-      openPopover() {
-         this.pinChanged = false
-         this.isOpen = true
-         this.error = ""
+      popoverOpened() {
          this.currPin = ""
          this.newPin = ""
          this.newPinConfirm = ""
-         setTimeout(()=>{
-            this.$refs.currpin.focus()
-         },200)
+         this.error = ""
+         this.pinChanged = false
+      },
+      backTabCP() {
+         this.$refs.pop.firstFocusBackTabbed()
+      },
+      nextTabOK() {
+         this.$refs.pop.lastFocusTabbed()
+      },
+      cancelClicked() {
+         this.$refs.pop.hide()
       },
       okClicked() {
          this.error = ""
@@ -104,33 +93,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-span.pin.v4-button {
-   margin: 0;
-}
-div.popover-header {
-   padding: 10px 15px;
-   color: white;
-   background-color: var(--uvalib-grey-dark);
-   font-weight: 500;
-   text-align: center;
-   border-radius: 5px 5px 0 0;
-}
-.pin-container {
-   background: white;
-   box-shadow: $v4-box-shadow;
-   color: var(--uvalib-text);
-   font-size: 1em;
-   font-weight: normal;
-   display: inline-block;
-   padding: 0;
-   border-radius: 5px;
-   min-width: 275px;
-}
-div.message {
-   padding: 10px 10px 0 10px;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-}
 input[type=password] {
    width: 100%;
 }
@@ -139,27 +101,10 @@ span.label {
    margin: 10px 0 2px 0;
    font-weight: bold;
 }
-.edit-controls {
-   padding: 10px;
-   text-align: right;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   border-bottom: 1px solid var(--uvalib-grey-dark);
-   border-radius: 0 0 5px 5px;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: flex-end;
-}
 p.error {
-   padding: 10px;
+   padding: 0;
    font-size: 0.8em;
    color: var(  --uvalib-red-emergency);
-}
-.edit-controls .pure-button {
-   margin-left: 5px;
-}
-p {
    text-align: center;
 }
 </style>

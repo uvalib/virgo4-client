@@ -1,20 +1,11 @@
 <template>
-   <v-popover trigger="manual" :open="isOpen" v-bind:autoHide="false" class="inline">
-      <V4Button mode="primary" :aria-pressed="isOpen" @click="openPopover" @esc="cancelClicked">
-         Save Search
-      </V4Button>
-      <div class="save-container" slot="popover">
-         <div class="popover-header">
-            <span>Save Search</span>
-         </div>
+   <V4Popover class="save inline" id="savepop" ref="pop" title="Save Search" alabel="save search"
+      firstFocusID="savename" lastFocusID="save-ok" triggerType="primary" @opened="popoverOpened">
+      <template v-slot:trigger>Save Search</template>
+      <template v-slot:content>
          <template v-if="saved">
-            <div class="message">
-               <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-               <p class="saved">Manage your saved searches <router-link id="manage" tabindex="0" to="/searches">here</router-link>.</p>
-            </div>
-            <div class="edit-controls">
-               <V4Button mode="primary" @click="cancelClicked">OK</V4Button>
-            </div>
+            <p class="saved">Your search has been saved as '{{searchName}}'.</p>
+            <p class="saved">Manage your saved searches <router-link id="manage" tabindex="0" to="/searches">here</router-link>.</p>
          </template>
          <template v-else>
             <div v-if="working" class="message working">
@@ -24,18 +15,20 @@
                <div class="message pure-form">
                   <div>
                      <span class="label">Search Name</span>
-                     <input ref="savename" type="text" v-model="searchName" @keyup.enter="saveClicked" />
+                     <input ref="savename" id="savename" type="text" v-model="searchName" 
+                        @keyup.enter="saveClicked" 
+                        @keydown.shift.tab.stop.prevent="backTabName"/>
                   </div>
                   <p class="error">{{error}}</p>
                </div>
-               <div class="edit-controls">
-                  <V4Button mode="tertiary" @click="cancelClicked">Cancel</V4Button>
-                  <V4Button mode="primary" @click="saveClicked">Save</V4Button>
-               </div>
             </div>
          </template>
-      </div>
-   </v-popover>
+      </template>
+      <template v-if="saved == false" v-slot:controls>
+         <V4Button mode="tertiary" @click="cancelClicked">Cancel</V4Button>
+         <V4Button mode="primary" id="save-ok" @click="saveClicked" :focusNextOverride="true" @tabnext="nextTabOK">Save</V4Button>
+      </template>
+   </V4Popover>
 </template>
 
 <script>
@@ -58,7 +51,6 @@ export default {
       return {
          searchName: "",
          error: "",
-         isOpen: false,
          saved: false,
          working: false
       }
@@ -82,23 +74,18 @@ export default {
          })
       },
       cancelClicked() {
-         this.isOpen = false
+         this.$refs.pop.hide()
       },
-      toggle() {
-         if (this.isOpen ) {
-            this.cancelClicked()
-         } else {
-            this.openPopover()
-         }
+      backTabName() {
+         this.$refs.pop.firstFocusBackTabbed()
       },
-      openPopover() {
-         this.isOpen = true
+      nextTabOK() {
+         this.$refs.pop.lastFocusTabbed()
+      },
+      popoverOpened() {
          let d = new Date()
          this.searchName = `search-${this.$moment(d).format('YYYYMMDDHHmm')}`
          this.error = ""
-         setTimeout(()=>{
-            this.$refs.savename.focus()
-         }, 250)
       },
       async saveClicked() {
          if ( this.searchName == "") {
@@ -126,37 +113,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-span.save.v4-button {
-   margin: 0 0 0 10px;
-}
-div.popover-header {
-   padding: 10px 15px;
-   color: white;
-   background-color: var(--uvalib-grey-dark);
-   font-weight: 500;
-   text-align: center;
-   border-radius: 5px 5px 0 0;
-}
-.save-container {
-   background: white;
-   box-shadow: $v4-box-shadow;
-   color: var(--uvalib-text);
-   font-size: 1em;
-   font-weight: normal;
-   display: inline-block;
-   padding: 0;
-   border-radius: 5px;
-   min-width: 350px;
-}
-div.message {
-   padding: 15px 20px 0 20px;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-}
-div.message.working {
-   text-align: center;
-   padding-bottom: 25px;
-}
 input[type=text] {
    width: 100%;
 }
@@ -167,18 +123,6 @@ span.label {
 }
 i.link {
    margin: 0 0 0 5px;
-}
-.edit-controls {
-   padding: 10px;
-   text-align: right;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   border-bottom: 1px solid var(--uvalib-grey-dark);
-   border-radius: 0 0 5px 5px;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: flex-end;
 }
 p.error {
    color: var(--uvalib-red-emergency);
