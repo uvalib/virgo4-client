@@ -97,8 +97,9 @@
             <div class="controls">
                <V4Button v-if="createOpen==false" @click="openCreate" mode="primary">Create Folder</V4Button>
                <div v-else class="create-folder pure-form">
-                  <label>New Folder:</label>
+                  <label for="newname">New Folder:</label>
                   <input
+                     id="newname"
                      ref="folderInput"
                      @keyup.enter="createFolder"
                      v-model="newFolder"
