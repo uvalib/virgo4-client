@@ -46,9 +46,15 @@
                               <th colspan="3">
                                  <div class="folder-menu">
                                     <div style="margin-bottom:5px;">
-                                       <V4Button mode="text" @click="selectAll(folderInfo.bookmarks)">select all</V4Button>
+                                       <V4Button mode="text" @click="selectAll(folderInfo.bookmarks)"
+                                          :aria-label="`select all bookmarks in folder ${folderInfo.folder}`">
+                                          select all
+                                       </V4Button>
                                        <span class="spacer">|</span>
-                                       <V4Button mode="text" @click="clearAll">clear all</V4Button>
+                                       <V4Button mode="text" @click="clearAll"
+                                          :aria-label="`deselect all bookmarks in folder ${folderInfo.folder}`">
+                                          clear all
+                                       </V4Button>
                                     </div>
                                     <div class="button-group">
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
