@@ -1,6 +1,6 @@
 <template>
    <v-popover placement="top-end" class="v4-popover" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button  :id="`${id}trigger`" mode="text" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+      <V4Button  :id="`${id}trigger`" :mode="triggerType" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
         <slot name="trigger"></slot>
       </V4Button>
       <div :id="id" class="v4-popover-dialog" role="dialog" :style="{'max-width': maxWidth}" slot="popover"
@@ -44,6 +44,10 @@ export default {
       maxWidth: {
          type: String,
          default: "inherit"
+      },
+      triggerType: {
+         type: String,
+         default: "text"
       }
    },
    data: function() {
@@ -70,6 +74,11 @@ export default {
          let ele = document.getElementById(id)
          if (ele ) {
             ele.focus()
+         } else {
+            // if focus target doesn't exist, focus on the one item that is defined
+            // by the basic vrpopover template; the close button
+            ele = document.getElementById(this.id+"-close")
+            ele.focus()
          }
       },
       hide() {
@@ -92,7 +101,6 @@ export default {
          }, 260)
       },
       hasControlSlot() {
-         console.log("HAS CONTROLS??")
          return this.$slots['controls']
       }
    }

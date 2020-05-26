@@ -1,6 +1,6 @@
 <template>
-   <V4Popover class="confirm inline" id="renamepop" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
-      firstFocusID="rename" lastFocusID="rename-ok">
+   <V4Popover class="rename inline" id="renamepop" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
+      firstFocusID="rename" lastFocusID="rename-ok" triggerType="icon">
       <template v-slot:trigger>
          <i class="rename fas fa-edit"></i>
       </template>
