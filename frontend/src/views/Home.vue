@@ -8,8 +8,9 @@
             {{translateMessage}}
           </div>
           <label class="screen-reader-text" for="search">Search Virgo for books, articles and more.</label>
+         <label class="screen-reader-text" for="source-select">Search in</label>
           <div class="basic-search">
-            <V4Select :selections="searchScopes" v-bind:attached="true"
+            <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
               border="1px solid var(--uvalib-brand-blue)"
               v-model="basicSearchScope"/>
             <input class="basic"

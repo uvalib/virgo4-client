@@ -10,13 +10,13 @@
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <div class="options">
                <template v-if="idx > 0">
-                  <select class="search-term-op" v-model="term.op">
+                  <select class="search-term-op" v-model="term.op" aria-label="boolean operator for search criteria">
                      <option value="AND">AND</option>
                      <option value="OR">OR</option>
                      <option value="NOT">NOT</option>
                   </select>
                </template>
-               <select class="field" v-model="term.field">
+               <select class="field" v-model="term.field" aria-label="search criteria field name">
                   <option
                      v-for="fieldObj in advancedFields"
                      :key="fieldObj.value"
@@ -24,7 +24,7 @@
                   >{{fieldObj.label}}</option>
                </select>
                <template v-if="term.field == 'date'">
-                  <select class="date-range-type" v-model="term.type">
+                  <select class="date-range-type" v-model="term.type" aria-label="date search mode">
                      <option value="EQUAL">EQUALS</option>
                      <option value="AFTER">AFTER</option>
                      <option value="BEFORE">BEFORE</option>
