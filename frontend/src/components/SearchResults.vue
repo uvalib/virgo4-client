@@ -1,9 +1,9 @@
 <template>
-   <div tabindex="-1" id="results-container" class="search-results shady">
+   <div tabindex="-1" id="results-container" class="search-results shady" aria-live="polite" aria-describedby="search-summary">
       <SearchSuggestions />
       <div class="results-header">
          <template v-if="showSummary">
-            <div class="summary">
+            <div id="search-summary" tabindex="0" class="summary">
                <div class="query">Showing {{formatNum(total)}} results for:</div>
                <div class="qs">{{queryString}}</div>
             </div>

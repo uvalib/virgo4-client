@@ -6,7 +6,9 @@
          <div class="searches">
             <template v-for="(s,idx) in suggestions.slice(0,2)">
                <span class="sep" v-if="idx > 0" :key="`sep${idx}`">|</span>
-               <router-link  :key="`s${idx}`" :to="getRelatedLink(s)">{{s.value}}</router-link>
+               <router-link class="suggestion" :key="`s${idx}`" :aria-label="linkLabel(s)" :to="getRelatedLink(s)">
+                  {{s.value}}
+               </router-link>
             </template>
             <template v-if="suggestions.length > 2 && moreVisible == false">
                <span class="sep">|</span>
@@ -15,7 +17,9 @@
             <template  v-if="suggestions.length > 2 && moreVisible == true">
                <template v-for="(s,idx) in suggestions.slice(2)">
                   <span class="sep" :key="`sep${idx+2}`">|</span>
-                  <router-link  :key="`s${idx+2}`" :to="getRelatedLink(s)">{{s.value}}</router-link>
+                  <router-link class="suggestion" :aria-label="linkLabel(s)" :key="`s${idx+2}`" :to="getRelatedLink(s)">
+                     {{s.value}}
+                  </router-link>
                </template>
                <span class="sep">|</span>
                <V4Button mode="text" @click="lessClicked" class="more">Show Fewer...</V4Button>
@@ -44,6 +48,9 @@ export default {
       })
    },
    methods: {
+      linkLabel(sug) {
+         return `${sug.value}, suggested author related to your search`
+      },
       getRelatedLink( sug ) {
          return `/browse/${sug.type}?q=${encodeURI(sug.value)}`
       },

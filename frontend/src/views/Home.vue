@@ -89,10 +89,32 @@ export default {
    },
    watch: {
       searching (newVal, _oldVal) {
-         if (newVal == false && this.total > 0) {
+         if (newVal == false) {
             setTimeout( () => {  
-               let r = document.getElementById("results-container")
-               this.scrollToItem(r)
+               if ( this.total > 0) {
+                  let r = document.getElementById("results-container")
+                  this.scrollToItem(r)
+                  let t =  document.getElementsByClassName("suggestion")[0]
+                  if ( t) {
+                     t.focus()
+                  } else {
+                     t = document.getElementById("search-summary")     
+                     t.focus()
+                  }
+               } else {
+                  let s= document.getElementById("search")
+                  if ( s) {
+                     s.focus()
+                     s.select()
+                  } else {
+                     s = document.getElementsByClassName("term")[0]
+                     if ( s ) {
+                        s.focus()
+                        s.select()
+                     }
+
+                  }
+               }
             }, 250)
          }
       },
