@@ -246,9 +246,9 @@ export default {
       },
       openCreate() {
          this.createOpen = true;
-         this.$nextTick(() => {
+         setTimeout( () => {
             this.$refs.folderInput.focus()
-         });
+         }, 150)
       },
       cancelCreate() {
          if (this.submitting) return;
