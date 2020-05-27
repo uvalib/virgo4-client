@@ -23,19 +23,17 @@
                      @accordion-clicked="folderOpened(folderInfo.id)"
                   >
                      <template v-slot:controls>
-                        <div class="folder-settings" @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
-                           <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" />
-                           <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" alabel="delete bookmark folder">
-                              <div>
-                                 Delete bookmark folder
-                                 <b>{{folderInfo.folder}}</b>? All bookmarks
-                              </div>
-                              <div>contained within it will also be deleted.</div>
-                              <div>
-                                 <br />This cannot be reversed.
-                              </div>
-                           </ConfirmDelete>
-                        </div>
+                        <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" style="margin-left:10px" />
+                        <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" alabel="delete bookmark folder">
+                           <div>
+                              Delete bookmark folder
+                              <b>{{folderInfo.folder}}</b>? All bookmarks
+                           </div>
+                           <div>contained within it will also be deleted.</div>
+                           <div>
+                              <br />This cannot be reversed.
+                           </div>
+                        </ConfirmDelete>
                      </template>
                      <div class="none" v-if="folderInfo.bookmarks.length == 0">
                         There are no bookmarks in this folder.
@@ -283,10 +281,9 @@ export default {
 </script>
 
 <style>
-.accordion.boxed div.title {
-   border: 1px solid #ccc;
-   font-weight: bold;
+.accordion.boxed div.header-wrap .title {
    padding: 10px;
+   font-weight: bold;
 }
 .spacer {
    margin: 0 5px;
@@ -308,10 +305,6 @@ export default {
    order: 0;
    flex: 0 1 auto;
    align-self: auto;
-}
-.folder-settings {
-   display: flex;
-   margin-left: 15px;
 }
 .sep {
    margin: 0 5px;

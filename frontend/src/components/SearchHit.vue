@@ -5,13 +5,14 @@
          <SearchHitDetail :hit="hit" :pool="pool"/>
       </div>
       <AccordionContent v-if="hit.grouped" :title="groupTitle" :id="hit.identifier" 
-         :autoExpandID="autoExpandGroupID" :closeText="closeGroupTitle" 
+         :autoExpandID="autoExpandGroupID" :closeText="closeGroupTitle" :heightOffset="20"
          backgroundContent="none" background="var(--uvalib-teal-lightest)"
          borderColor="var(--uvalib-teal-light)"
          class="group" :autoCollapseOn="searching">
          <template v-for="(groupHit,idx) in hit.group">
-            <div class="group-item-wrapper" :class="{last: idx==hit.group.length-1, first: idx==0}" :key="`g${idx}`">
-               <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
+            <div class="group-hit" v-bind:data-identifier="groupHit.identifier" 
+               :class="{last: idx==hit.group.length-1, first: idx==0}" :key="`g${idx}`">
+               <SearchHitHeader :maxLen="60" :count="count" :hit="groupHit" :pool="pool"/>
                <SearchHitDetail :hit="groupHit" :pool="pool"/>
             </div>
          </template>
@@ -97,17 +98,14 @@ export default {
    background-color: white;
    box-shadow:  $v4-box-shadow-light;
 }
-.group-item-wrapper {
+.group-hit {
    padding: 10px;
    margin: 10px 0px 20px 0px;
    box-shadow:  $v4-box-shadow-light;
    background-color: white;
 }
-.group-item-wrapper.first {
+.group-hit.first {
    margin-top: 20px;
-}
-.group-item-wrapper.last {
-   margin-bottom: 0px;
 }
 </style>
 

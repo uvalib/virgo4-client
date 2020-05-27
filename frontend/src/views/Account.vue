@@ -38,7 +38,7 @@
                         Click the totals below to see more details.
                      </div>
                      <div v-if="isBillOwed">
-                        <AccordionContent :title="billsLabel" layout="narrow"  borderWidth="0">
+                        <AccordionContent :title="billsLabel" layout="narrow"  borderWidth="0" id="bills">
                            <div class="bills">
                               <div class="info">
                                  <p>
@@ -77,7 +77,7 @@
                      </div>
 
                      <div v-if="totalFines>0">
-                        <AccordionContent :title="finesLabel" layout="narrow" borderWidth="0">
+                        <AccordionContent :title="finesLabel" layout="narrow" borderWidth="0" id="fines">
                            <div class="fines">
                               <div class="info">
                                  <p>

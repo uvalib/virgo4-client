@@ -5,7 +5,7 @@
          <div class="working" v-if="working" >
             <V4Spinner message="Looking up codes..."/>
          </div>
-         <AccordionContent title="Library Codes">
+         <AccordionContent title="Library Codes" id="lib-codes">
             <table>
                <tr>
                   <th>ID</th><th>Code</th><th>Name</th>
@@ -20,7 +20,7 @@
                </tr>
             </table>
          </AccordionContent>
-         <AccordionContent title="Location Codes">
+         <AccordionContent title="Location Codes" id="loc-codes">
             <table>
                <tr>
                   <th>ID</th><th>Code</th><th>Description</th><th>Online</th>

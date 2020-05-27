@@ -40,7 +40,7 @@
          <div v-else class="browse">
             <ol>
                <li v-for="(t,idx) in titles" :key="idx">
-                  <AccordionContent class="item" :title="itemTitle(t)" borderWidth="0" layout="wide" style="width:100%">
+                  <AccordionContent class="item" :title="itemTitle(t)" borderWidth="0" layout="wide" style="width:100%" :id="`j${idx}`">
                      <dl class="fields" v-for="(i,idx2) in t.items" :key="idx2">
                         <dt>Details:</dt> 
                         <dd>
@@ -245,8 +245,7 @@ div.note {
 dl {
    border-bottom: 1px solid var(--uvalib-grey-lightest);
    font-size: 0.85em;
-   margin: 10px 0 15px 0;
-   padding-bottom: 15px;
+   margin: 10px 0 0px 10px;
    display: grid;
    grid-template-columns: max-content 2fr;
    grid-column-gap: 10px;

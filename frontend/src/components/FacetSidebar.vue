@@ -1,7 +1,7 @@
 <template>
    <div class="facet-sidebar" :class="{overlay: !startExpanded}">
       <div class="global" :class="{overlay: !startExpanded}">
-         <AccordionContent class="filter" :title="globalTitle" :background="filterColor"
+         <AccordionContent class="filter" :title="globalTitle" :background="filterColor" id="global-filter"
             borderColor="var(--uvalib-brand-blue)"
             color="white" :expanded="startExpanded" :invert="!startExpanded">
             <div class="body">
@@ -47,8 +47,8 @@
                            <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
                         </dd>
                         <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                           <AccordionContent class="more" title="See More"
-                              closeText="See Less" borderWidth="0">
+                           <AccordionContent class="more" title="See More" :id="`${facetInfo.id}-more`"
+                              closeText="<b>See Less</b>" borderWidth="0">
                               <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
                                  <V4Checkbox :checked="fv.selected" 
                                     @click="filterClicked(facetInfo.id, fv.value)">

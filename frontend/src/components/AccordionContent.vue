@@ -1,24 +1,29 @@
 <template>
-   <div tabindex="0" class="accordion" v-bind:aria-expanded="isExpanded" role="button" 
+   <div class="accordion" tabindex="0" :id="id" 
       @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
-      <div  v-if="showHeader" class="title" :class="layout"
-         :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }">
-         <span class="text" v-html="title"></span>
-         <span class="accordion-buttons">
+      <div class="header-wrap" >
+         <div v-if="showHeader" :class="layout" class="title" role=heading
+            :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
+            v-bind:aria-expanded="isExpanded" :aria-controls="contentID">
+            <span class="text" v-html="title"></span>
             <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
+         </div>
+         <div class="accordion-buttons" v-if="hasControlSlot()"
+            :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }">
             <slot name="controls">
             </slot>
-         </span>
+         </div>
       </div>
        <transition name="accordion"
-         v-on:before-enter="beforeEnter" v-on:enter="enter"
-         v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div :id="id" class="accordion-content" v-show="isExpanded" :style="{ background: backgroundContent, color: color }" 
+            v-on:before-enter="beforeEnter" v-on:enter="enter"
+            v-on:before-leave="beforeLeave" v-on:leave="leave">
+         <div :id="contentID" class="accordion-content" v-show="isExpanded" 
+            :style="{ background: backgroundContent, color: color }" 
             @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
             <slot></slot>
             <div v-if="closeText" @click="accordionClicked" class="footer"
                :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }" >
-               <b>{{ closeText }}</b>
+               <span v-html="closeText"></span>
                <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
             </div>
          </div>
@@ -29,11 +34,18 @@
 <script>
 export default {
    props: {
-      id: String,
+      id: {
+         type: String,
+         reqired: true
+      },
       title: String,
       subtitle: String,
       layoutChange: {
          default: null,
+      },
+      heightOffset: {
+         type: Number,
+         default: 0,
       },
       closeOthers: {
          type: Number,
@@ -138,28 +150,34 @@ export default {
       showHeader() {
          return !this.isExpanded ||  this.isExpanded && this.closeText.length == 0
       },
+      contentID() {
+         return `accordion-conttent-${this.id}`
+      }
    },
    methods: {
+      hasControlSlot() {
+         return this.$slots['controls']
+      },
       accordionClicked() {
          this.$emit('accordion-clicked')
          this.isExpanded = !this.isExpanded
       },
       beforeEnter: function(el) {
-         document.getElementById(this.id).style.overflow = "hidden"
+         document.getElementById(this.contentID).style.overflow = "hidden"
          el.style.height = '0'
       },
       enter: function(el) {
-         el.style.height = el.scrollHeight + 'px'
+         el.style.height = `${el.scrollHeight - this.heightOffset}px`
          setTimeout( ()=> {
             this.$emit('accordion-expanded')
-             document.getElementById(this.id).style.overflow = "visible"
+             document.getElementById(this.contentID).style.overflow = "visible"
          }, 250)
       },
       beforeLeave: function(el) {
-         el.style.height = el.scrollHeight + 'px'
+         el.style.height = `${el.scrollHeight - this.heightOffset}px`
       },
       leave: function(el) {
-         document.getElementById(this.id).style.overflow = "hidden"
+         document.getElementById(this.contentID).style.overflow = "hidden"
          el.style.height = '0'
          setTimeout( ()=> {
             this.$emit('accordion-collapsed')
@@ -169,58 +187,76 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .accordion {
    margin:0;
    font-size: 1em;
-}
-.accordion-content {
-   overflow: hidden;
-   transition: 250ms ease-out;
-   margin:0;
-   padding:0;
-   text-align: left;
-}
-div.title, div.footer {
-   padding: 0px 8px;
-   cursor: pointer;
-   margin: 0;
-   background: white;
-   padding: 3px 12px;
-   display: flex;
-   flex-flow: row nowrap;
-   align-content: center;
-   justify-content: space-between;
-   position: relative;
-   outline: none;
+
+   .header-wrap {
+      display: flex;
+      flex-flow: row nowrap;
+      align-content: center;
+      justify-content: space-between;   
+      align-items: stretch;
+      height: 100%;
+
+      .accordion-buttons {
+         display: flex;
+         flex-flow: row nowrap;
+         justify-content: space-between;   
+         align-items: center;
+      }
+   }
+
+   .title, .footer {
+      cursor: pointer;
+      margin: 0;
+      padding: 3px 12px;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      flex-grow: 1;
+      text-align: left;
+      
+      .accordion-icon {
+         margin-left: auto;
+         font-size: 1.25em;
+         transform: rotate(0deg);
+         transition-duration: 250ms;
+      }
+   }
+
+   .footer {
+      padding: 3px 12px 3px 5px;
+      font-weight: normal;
+   }
+
+   .title.narrow {
+      justify-content: flex-start;
+      padding: 3px 12px 3px 0;
+   }
+   .title.wide i {
+      position: absolute;
+      right: 10px;
+   }
+   .title .text {
+      padding-right: 5px;
+   }
+
+   .accordion-content {
+      overflow: hidden;
+      transition: 250ms ease-out;
+      margin:0;
+      padding:0;
+      text-align: left;
+   }
 }
 .accordion {
    outline: none;
 }
 .accordion:focus {
    box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
-}
-div.title.narrow {
-   justify-content: flex-start;
-   padding: 3px 12px 3px 0;
-}
-div.title.wide i {
-   position: absolute;
-   right: 10px;
-}
-.title .text {
-   padding-right: 5px;
-}
-div.title:hover {
-   color: #333;
-}
-div.title  .accordion-icon {
-   font-size: 1.25em;
-   transform: rotate(0deg);
-   transition-duration: 250ms;
-}
-.accordion-buttons {
-   display: flex;
-   flex-flow: row nowrap;
 }
 </style>

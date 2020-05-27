@@ -90,18 +90,20 @@ export default {
    },
    watch: {
       searching (newVal, _oldVal) {
-         if (newVal == false) {
+         // If restore url is set, don't do special focus handling as it will mess up
+         // the restore focus code
+         if (newVal == false && this.restoreURL == "/") {
             setTimeout( () => {  
                if ( this.total > 0) {
                   let r = document.getElementById("results-container")
-                  this.scrollToItem(r)
                   let t =  document.getElementsByClassName("suggestion")[0]
                   if ( t) {
                      t.focus()
                   } else {
-                     t = document.getElementById("search-summary")     
+                     t = document.getElementById("global-filter")     
                      t.focus()
                   }
+                  this.scrollToItem(r)
                } else {
                   let s= document.getElementById("search")
                   if ( s) {
@@ -127,6 +129,7 @@ export default {
          translateMessage: state => state.system.translateMessage,
          results: state => state.results,
          total: state=>state.total,
+         restoreURL: state=>state.restore.url
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
@@ -259,8 +262,10 @@ export default {
             setTimeout( ()=>{
                let sel = `.group-hit[data-identifier="${identifier}"]`
                let tgtEle = document.body.querySelector(sel)
-               this.scrollToItem(tgtEle)
-               }, 500)
+               if ( tgtEle ) {
+                  this.scrollToItem(tgtEle)
+               }
+            }, 250)
 
          } else {
                let sel = `.hit[data-identifier="${identifier}"]`
