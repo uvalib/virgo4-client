@@ -1,9 +1,10 @@
 <template>
    <div class="facet-sidebar" :class="{overlay: !startExpanded}">
       <div class="global" :class="{overlay: !startExpanded}">
-         <AccordionContent class="filter" :title="globalTitle" :background="filterColor" id="global-filter"
+         <AccordionContent class="filter" :background="filterColor" id="global-filter"
             borderColor="var(--uvalib-brand-blue)"
             color="white" :expanded="startExpanded" :invert="!startExpanded">
+            <template v-slot:title>{{globalTitle}}</template>
             <div class="body">
                <dl role="radiogroup" aria-labelledby="availability_label">
                   <dt id="availability_label">Availability</dt>
@@ -24,10 +25,11 @@
 
       <div v-if="hasFacets && selectedResults.hits.length > 0" class="pool" :class="{overlay: !startExpanded}">
           <AccordionContent id="pool-filter" class="filter"
-            :title="poolFilterTitle" :background="filterColor"
+            :background="filterColor"
             color="white" :expanded="startExpanded"
             borderColor="var(--uvalib-brand-blue)"
             :layoutChange="updatingFacets"  :invert="!startExpanded">
+            <template v-slot:title>{{poolFilterTitle}}</template>
             <div class="body">
                <div v-if="updatingFacets" class="working">
                   <V4Spinner message="Loading filters..."/>
@@ -47,8 +49,10 @@
                            <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
                         </dd>
                         <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                           <AccordionContent class="more" title="See More" :id="`${facetInfo.id}-more`"
-                              closeText="<b>See Less</b>" borderWidth="0">
+                           <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
+                              <template v-slot:title>
+                                 <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
+                              </template>
                               <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
                                  <V4Checkbox :checked="fv.selected" 
                                     @click="filterClicked(facetInfo.id, fv.value)">
@@ -56,6 +60,9 @@
                                  </V4Checkbox>
                                  <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
                               </div>
+                              <template v-slot:footer>
+                                 <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
+                              </template>
                            </AccordionContent>
                         </dd>
                      </div>

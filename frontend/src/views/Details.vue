@@ -60,7 +60,8 @@
                   </template>
                </dl>
                <template v-if="marcXML">
-                  <AccordionContent class="marc" title="MARC XML" id="maxc-xml">
+                  <AccordionContent class="marc" id="maxc-xml">
+                     <template v-slot:title>MARC XML</template>
                      <pre class="xml">{{marcXML}}</pre>
                   </AccordionContent>
                </template>

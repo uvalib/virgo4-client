@@ -38,7 +38,11 @@
                         Click the totals below to see more details.
                      </div>
                      <div v-if="isBillOwed">
-                        <AccordionContent :title="billsLabel" layout="narrow"  borderWidth="0" id="bills">
+                        <AccordionContent layout="narrow"  borderWidth="0" id="bills">
+                           <template v-slot:title>
+                              <label style='font-weight:bold;margin-right:5px'>Total Bills:</label>
+                              <span>${{info.amountOwed}}</span>
+                           </template>
                            <div class="bills">
                               <div class="info">
                                  <p>
@@ -77,7 +81,11 @@
                      </div>
 
                      <div v-if="totalFines>0">
-                        <AccordionContent :title="finesLabel" layout="narrow" borderWidth="0" id="fines">
+                        <AccordionContent layout="narrow" borderWidth="0" id="fines">
+                           <template v-slot:title>
+                             <label style='font-weight:bold;margin-right:5px'>Total Fines:</label>
+                             <span>${{this.totalFines}}</span>
+                           </template>
                            <div class="fines">
                               <div class="info">
                                  <p>
@@ -170,13 +178,6 @@ export default {
          let amtStr = this.info['amountOwed']
          return parseFloat(amtStr) > 0
       },
-      finesLabel() {
-         return  `<label style='font-weight:bold;margin-right:5px'>Total Fines:</label><span>$${this.totalFines}</span>`
-      },
-      billsLabel() {
-         let bill = this.info.amountOwed
-         return  `<label style='font-weight:bold;margin-right:5px'>Total Bills:</label><span>$${bill}</span>`
-      }
    },
    methods: {
    },
@@ -231,7 +232,7 @@ export default {
   margin-left: 15px;
 }
 div.bills, div.fines {
-   margin-bottom: 25px;
+   margin-bottom: 0px;
    padding: 10px;
    display: inline-block;
 }

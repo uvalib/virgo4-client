@@ -40,7 +40,8 @@
          <div v-else class="browse">
             <ol>
                <li v-for="(t,idx) in titles" :key="idx">
-                  <AccordionContent class="item" :title="itemTitle(t)" borderWidth="0" layout="wide" style="width:100%" :id="`j${idx}`">
+                  <AccordionContent class="item" borderWidth="0" style="width:100%" :id="`j${idx}`">
+                     <template v-slot:title><span v-html="itemTitle(t)"></span></template>
                      <dl class="fields" v-for="(i,idx2) in t.items" :key="idx2">
                         <dt>Details:</dt> 
                         <dd>

@@ -1,14 +1,14 @@
 <template>
    <div class="accordion" tabindex="0" :id="id" 
       @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
-      <div class="header-wrap" >
-         <div v-if="showHeader" :class="layout" class="title" role=heading
+      <div class="header-wrap" role=heading>
+         <div v-if="showHeader" :class="layout" class="title" role="button"
             :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
             v-bind:aria-expanded="isExpanded" :aria-controls="contentID">
-            <span class="text" v-html="title"></span>
+            <slot name="title"></slot>
             <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
          </div>
-         <div class="accordion-buttons" v-if="hasControlSlot()"
+         <div class="accordion-buttons" v-if="hasControlSlot"
             :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }">
             <slot name="controls">
             </slot>
@@ -21,9 +21,9 @@
             :style="{ background: backgroundContent, color: color }" 
             @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
             <slot></slot>
-            <div v-if="closeText" @click="accordionClicked" class="footer"
+            <div v-if="hasFooterSlot" @click="accordionClicked" class="footer"
                :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }" >
-               <span v-html="closeText"></span>
+               <slot name="footer"></slot>
                <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
             </div>
          </div>
@@ -38,8 +38,6 @@ export default {
          type: String,
          reqired: true
       },
-      title: String,
-      subtitle: String,
       layoutChange: {
          default: null,
       },
@@ -57,10 +55,6 @@ export default {
       autoExpandID: {
          type: String,
          default: ""
-      },
-      closeText: {
-         type: String,
-         default: "",
       },
       layout: {
          type: String,
@@ -148,16 +142,19 @@ export default {
          return "rotate(0deg)"
       },
       showHeader() {
-         return !this.isExpanded ||  this.isExpanded && this.closeText.length == 0
+         return !this.isExpanded ||  this.isExpanded && !this.hasFooterSlot
       },
       contentID() {
          return `accordion-conttent-${this.id}`
-      }
-   },
-   methods: {
+      },
       hasControlSlot() {
          return this.$slots['controls']
       },
+      hasFooterSlot() {
+         return this.$slots['footer']
+      },
+   },
+   methods: {
       accordionClicked() {
          this.$emit('accordion-clicked')
          this.isExpanded = !this.isExpanded
@@ -211,7 +208,7 @@ export default {
    .title, .footer {
       cursor: pointer;
       margin: 0;
-      padding: 3px 12px;
+      padding: 5px 10px;
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
@@ -235,14 +232,7 @@ export default {
 
    .title.narrow {
       justify-content: flex-start;
-      padding: 3px 12px 3px 0;
-   }
-   .title.wide i {
-      position: absolute;
-      right: 10px;
-   }
-   .title .text {
-      padding-right: 5px;
+      padding: 0;
    }
 
    .accordion-content {
@@ -257,6 +247,6 @@ export default {
    outline: none;
 }
 .accordion:focus {
-   box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
+   box-shadow: 0 0 0 1px rgba(21, 156, 228, 0.4);
 }
 </style>

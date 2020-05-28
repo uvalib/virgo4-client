@@ -4,11 +4,12 @@
          <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
          <SearchHitDetail :hit="hit" :pool="pool"/>
       </div>
-      <AccordionContent v-if="hit.grouped" :title="groupTitle" :id="hit.identifier" 
-         :autoExpandID="autoExpandGroupID" :closeText="closeGroupTitle" :heightOffset="20"
+      <AccordionContent v-if="hit.grouped" :id="hit.identifier" 
+         :autoExpandID="autoExpandGroupID" :heightOffset="20"
          backgroundContent="none" background="var(--uvalib-teal-lightest)"
          borderColor="var(--uvalib-teal-light)"
          class="group" :autoCollapseOn="searching">
+         <template v-slot:title>{{groupTitle}}</template>
          <template v-for="(groupHit,idx) in hit.group">
             <div class="group-hit" v-bind:data-identifier="groupHit.identifier" 
                :class="{last: idx==hit.group.length-1, first: idx==0}" :key="`g${idx}`">
@@ -16,6 +17,7 @@
                <SearchHitDetail :hit="groupHit" :pool="pool"/>
             </div>
          </template>
+         <template v-slot:footer>{{closeGroupTitle}}</template>
       </AccordionContent>
    </div>
 </template>

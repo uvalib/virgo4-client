@@ -18,10 +18,12 @@
                      borderWidth="0 0 3px 0"
                      borderColor="var(--uvalib-teal-light)"
                      :id="folderInfo.id.toString()"
-                     :title="getTitle(folderInfo)"
                      v-bind:closeOthers="expandedFolder"
                      @accordion-clicked="folderOpened(folderInfo.id)"
                   >
+                     <template v-slot:title>
+                        <span class="folder-title" v-html="getTitle(folderInfo)"></span>
+                     </template>
                      <template v-slot:controls>
                         <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" style="margin-left:10px" />
                         <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" alabel="delete bookmark folder">
@@ -280,9 +282,9 @@ export default {
 };
 </script>
 
-<style>
-.accordion.boxed div.header-wrap .title {
-   padding: 10px;
+<style scoped>
+.folder-title {
+   padding: 5px;
    font-weight: bold;
 }
 .spacer {
@@ -309,9 +311,6 @@ export default {
 .sep {
    margin: 0 5px;
 }
-</style>
-
-<style scoped>
 i.fas {
    color: var(--uvalib-grey-dark);
    cursor: pointer;
