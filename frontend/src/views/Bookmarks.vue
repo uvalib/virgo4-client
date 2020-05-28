@@ -111,6 +111,7 @@
                      @keyup.enter="createFolder"
                      v-model="newFolder"
                      type="text"
+                     aria-required="true" required="required"
                   />
                   <V4Button @click="cancelCreate" :class="{disabled: submitting}" mode="tertiary">Cancel</V4Button>
                   <V4Button @click="createFolder" class="{disabled: submitting}" mode="primary">Create</V4Button>

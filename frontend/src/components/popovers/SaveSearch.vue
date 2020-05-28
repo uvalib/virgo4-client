@@ -17,7 +17,9 @@
                      <span class="label">Search Name</span>
                      <input ref="savename" id="savename" type="text" v-model="searchName" 
                         @keyup.enter="saveClicked" 
-                        @keydown.shift.tab.stop.prevent="backTabName"/>
+                        @keydown.shift.tab.stop.prevent="backTabName"
+                        aria-required="true" required="required"
+                     />
                   </div>
                   <p class="error">{{error}}</p>
                </div>

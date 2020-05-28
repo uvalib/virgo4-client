@@ -11,16 +11,19 @@
          <template v-else>
             <div class="message pure-form">
                <div>
-                  <span class="label">Current PIN</span>
-                  <input ref="currpin" id="currpin" type="password" v-model="currPin" @keydown.shift.tab.stop.prevent="backTabCP"/>
+                  <label for="currpin">Current PIN</label>
+                  <input ref="currpin" id="currpin" type="password" v-model="currPin" @keydown.shift.tab.stop.prevent="backTabCP"
+                     aria-required="true" required="required"/>
                </div>
                <div>
-                  <span class="label">New PIN</span>
-                  <input ref="newpin" type="password" v-model="newPin"/>
+                  <label for="newpin">New PIN</label>
+                  <input id="newpin" ref="newpin" type="password" v-model="newPin"
+                     aria-required="true" required="required"/>
                </div>
                <div>
-                  <span class="label">Confirm PIN</span>
-                  <input ref="confirm" type="password" v-model="newPinConfirm"/>
+                  <label for="confirm">Confirm PIN</label>
+                  <input id="confirm" ref="confirm" type="password" v-model="newPinConfirm"
+                     aria-required="true" required="required"/>
                </div>
                <p v-if="error" class="error">{{error}}</p>
             </div>
@@ -96,7 +99,7 @@ export default {
 input[type=password] {
    width: 100%;
 }
-span.label {
+label {
    display: block;
    margin: 10px 0 2px 0;
    font-weight: bold;

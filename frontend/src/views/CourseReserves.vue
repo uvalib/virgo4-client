@@ -14,7 +14,7 @@
          </div>
          <label class="screen-reader-text" for="crsearch">Search course reserves by instructor last name, course name or course ID.</label>
          <div class="search-panel pure-form">
-            <input id="crsearch" v-model="pendingQuery" autocomplete="off" type="text">
+            <input id="crsearch" v-model="pendingQuery" autocomplete="off" type="text" aria-required="true" required="required">
             <div class="controls">
                <V4Button @click="searchInstructorClicked('name')" mode="primary">Search Instructors</V4Button>
                <V4Button @click="searchCourseClicked('id')" mode="primary">Search Course ID</V4Button>

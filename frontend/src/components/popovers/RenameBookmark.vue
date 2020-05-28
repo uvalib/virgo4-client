@@ -1,13 +1,15 @@
 <template>
    <V4Popover class="rename inline" id="renamepop" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
-      firstFocusID="rename" lastFocusID="rename-ok" triggerType="icon">
+      firstFocusID="rename" lastFocusID="rename-ok" triggerType="icon" @opened="popoverOpened">
       <template v-slot:trigger>
          <i class="rename fas fa-edit"></i>
       </template>
       <template v-slot:content>
          <div class="message pure-form">
-            <input  @keyup.enter="enterPressed"  id="rename" type="text" v-model="folderName" @keydown.shift.tab.stop.prevent="backTabInput"/>
+            <input  @keyup.enter="enterPressed"  id="rename" type="text" v-model="folderName" @keydown.shift.tab.stop.prevent="backTabInput"
+               aria-required="true" required="required"/>
          </div>
+         <p class="error" v-if="error">{{error}}</p>
       </template>
       <template v-slot:controls>
          <V4Button mode="tertiary" id="rename-cancel" @click="cancelClicked">
@@ -32,9 +34,14 @@ export default {
    data: function()  {
       return {
          folderName: this.original.folder,
+         error: ""
       }
    },
    methods: {
+      popoverOpened() {
+         this.folderName = this.original.folder
+         this.error = ""
+      },
       backTabInput() {
          this.$refs.pop.firstFocusBackTabbed()
       },
@@ -45,8 +52,13 @@ export default {
          this.okClicked()
       },
       okClicked() {
-         this.$emit('rename-approved', {id: this.original.id, name: this.folderName})
-         this.$refs.pop.hide()
+         this.error = ""
+         if ( this.folderName == "") {
+           this.error =  "A folder name is required"
+         } else {
+            this.$emit('rename-approved', {id: this.original.id, name: this.folderName})
+            this.$refs.pop.hide()
+         }
       },
       cancelClicked() {
          this.$refs.pop.hide()
@@ -56,11 +68,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-i.rename {
-   color: var(--uvalib-grey-dark);
-   cursor: pointer;
-   font-size: 1.2em;
-   padding: 2px 8px 2px 0;
-   margin-right: 5px;
+.rename {
+   i.rename {
+      color: var(--uvalib-grey-dark);
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: 2px 8px 2px 0;
+      margin-right: 5px;
+   }
+}
+p.error {
+   font-size: 0.9em;
+   color: var(--uvalib-red-emergency);
+   text-align: center;
+   padding: 0;
+   margin: 10px 0 0 0;
 }
 </style>

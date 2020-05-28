@@ -27,33 +27,33 @@
             <template v-if="onBehalfOf=='yes'">
                <div class="pure-control-group">
                   <label for="instructor_name">Instructor Name</label>
-                  <input v-model="instructorName" name="instructor_name" id="instructor_name" type="text">
+                  <input v-model="instructorName" name="instructor_name" id="instructor_name" type="text" aria-required="true" required="required">
                   <span v-if="hasError('instructorName')" class="error">* instructor name is required</span>
                </div>
                <div class="pure-control-group">
                   <label for="instructor_email">Instructor Email Address</label>
-                  <input v-model="instructorEmail" id="instructor_email" type="email">
+                  <input v-model="instructorEmail" id="instructor_email" type="email" aria-required="true" required="required">
                   <span v-if="hasError('instructorEmail')" class="error">* instructor email is required</span>
                </div>
             </template>
             <div class="pure-control-group">
                <label for="name">Your Name</label>
-               <input v-model="name" id="name" type="text">
+               <input v-model="name" id="name" type="text" aria-required="true" required="required">
                <span v-if="hasError('name')" class="error">* name is required</span>
             </div>
             <div class="pure-control-group">
                <label for="email">Your  Email Address</label>
-               <input v-model="email" id="email" type="email">
+               <input v-model="email" id="email" type="email" aria-required="true" required="required">
                <span v-if="hasError('email')" class="error">* email is required</span>
             </div>
             <div class="pure-control-group">
                <label for="course">Course ID<span class="hint">(e.g. MDST 3840)</span></label>
-               <input v-model="course" id="course" type="text">
+               <input v-model="course" id="course" type="text" aria-required="true" required="required">
                <span v-if="hasError('course')" class="error">* course ID is required</span>
             </div>
             <div class="pure-control-group">
                <label for="semester">Semester</label>
-               <select v-model="semester" id="semester" name="semester">
+               <select v-model="semester" id="semester" name="semester" aria-required="true" required="required">
                   <option value="">Please select a semester</option>
                   <option value="Fall">Fall</option>
                   <option value="January">January</option>
@@ -66,7 +66,7 @@
             </div>
             <div class="pure-control-group">
                <label for="library">Reserve Library</label>
-               <select v-model="library" id="library" name="library">
+               <select v-model="library" id="library" name="library" aria-required="true" required="required">
                   <option value="">Please select a location</option>
                   <option value="astr">Astronomy</option>
                   <option value="brown">Brown Science &amp; Engineering</option>
@@ -81,7 +81,7 @@
             </div>
             <div class="pure-control-group" v-if="nonVideoRequests.length > 0">
                <label for="period">Loan Period <span class="hint">(for all items)</span></label>
-               <select @change="itemsPeriodChosen" v-model="period" id="period" name="period">
+               <select @change="itemsPeriodChosen" v-model="period" id="period" name="period" aria-required="true" required="required">
                   <option value="">Please select</option>
                   <option value="3h">3 hours</option>
                   <option value="2d">2 days</option>
@@ -93,7 +93,7 @@
 
          <div class="wrapper" v-if="nonVideoRequests.length > 0">
             <h3 class="video">Non-video format items to be placed on reserve</h3>
-            <div class="wrapper-content">
+            <div class="wrapper-content pure-form pure-form-aligned">
                <div class="items">
                   <div class="card" v-for="bm in nonVideoRequests" :key="bm.identifier">
                      <div class="title">{{bm.details.title}}</div>
@@ -101,7 +101,10 @@
                      <dl>
                         <dt>Loan Period</dt>
                         <dd>
-                           <select :aria-label="`loan period for ${bm.details.title}`" v-model="bm.period" id="item-period" name="item-period">
+                           <select :aria-label="`loan period for ${bm.details.title}`" 
+                              v-model="bm.period" id="item-period" name="item-period"
+                              aria-required="true" required="required"
+                           >
                               <option value="">Please select</option>
                               <option value="3h">3 hours</option>
                               <option value="2d">2 days</option>
@@ -117,7 +120,7 @@
          </div>
          <div class="wrapper" v-if="videoRequests.length > 0">
             <h3>Video-format items to be placed on reserve</h3>
-            <div class="wrapper-content">
+            <div class="wrapper-content pure-form pure-form-aligned">
                <div class="video-note">
                   <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System. 
                      If you have questions about video reserves, please email
@@ -253,7 +256,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .course-reserves {
    position: relative;
    margin-top: 2vw;
@@ -343,6 +346,7 @@ div.card {
    max-width: 275px;
    background: white;
    flex-grow: 1;
+   box-shadow: $v4-box-shadow-light;
 }
 div.card .title {
    font-size:1.1em;
