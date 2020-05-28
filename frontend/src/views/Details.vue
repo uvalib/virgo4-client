@@ -44,10 +44,14 @@
                         <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
-                  <template v-if="details.digitalContent.length > 0">
-                     <dt class="label">Digital Content:</dt>
-                     <dd class="value" v-html="digitalContentLinks"></dd>
+                  <template v-if="hasPDFContent">
+                     <dt class="label">PDF Download:</dt>
+                     <dd class="value" v-html="pdfLinks"></dd>
                   </template>
+                  <dt class="label">Citation:</dt>
+                  <dd class="value">
+                     <a :href="risURL">Export RIS Citation<i class="icon fas fa-cloud-download-alt"></i></a>
+                  </dd>
                   <template v-if="extDetailLink">
                      <dd></dd>
                      <dt class="value more"  v-html="extDetailLink"></dt>
@@ -105,9 +109,17 @@ export default {
       ImageDetails, AccordionContent, AccessURLDetails
    },
    computed: {
+      risURL() {
+         if (this.citationsURL == "") return ""
+         let poolObj = this.pools.find( p => p.id == this.details.source)
+         let itemURL = `${poolObj.url}/api/resource/${this.details.identifier}`
+         return `${this.citationsURL}/format/ris?item=${encodeURI(itemURL)}`
+      },
       ...mapState({
          details : state => state.item.details,
-         activeRequest: state => state.restore.activeRequest
+         activeRequest: state => state.restore.activeRequest,
+         citationsURL: state => state.system.citationsURL,
+         pools: state => state.pools.list
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
@@ -116,30 +128,17 @@ export default {
          isUVA: 'pools/isUVA',
          poolDetails: 'pools/poolDetails',
       }),
-      digitalContentLinks() {
+      hasPDFContent() {
+         return this.details.digitalContent.filter( dc => dc.type == "PDF").length > 0
+      },
+      pdfLinks() {
          let out = []
          let pdfs = this.details.digitalContent.filter( dc => dc.type == "PDF")
-         pdfs.forEach( (dc,idx) => {
-            let link = `<a href="${dc.url}">`
-            if (pdfs.length > 1) {
-                link += `PDF copy ${idx+1}`
-            } else {
-               link += "PDF"
-            }
-            link += "</a>"
+         pdfs.forEach( dc => {
+            let link = `<a href="${dc.url}">${dc.name}</a>`
             out.push(link)
          })
-         let ocrs = this.details.digitalContent.filter( dc => dc.type == "OCR")
-         ocrs.forEach( (dc,idx) => {
-            let link = `<a href="${dc.url}">`
-            if (ocrs.length > 1) {
-                link += `OCR copy ${idx+1}`
-            } else {
-               link += "OCR"
-            }
-            out.push(link)
-         })
-         return out.join(", ")
+         return out.join("<span class='sep'>|</span>")
       },
       poolMode() {
          let details = this.poolDetails(this.details.source)
@@ -218,16 +217,21 @@ export default {
    },
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .details {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-}
-.details-content {
-   width: 80%;
-   margin: 0 auto;
+   
+   .details-content {
+      width: 80%;
+      margin: 0 auto;
+   }
+
+   .icon {
+      margin-left: 5px;
+   }
 }
 @media only screen and (min-width: 768px) {
    div.details-content  {
@@ -258,7 +262,7 @@ export default {
 .bookmark-container {
    float:left;
 }
-.sep {
+::v-deep .sep {
    margin: 0 5px;
 }
 dl {

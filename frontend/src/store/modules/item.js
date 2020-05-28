@@ -31,7 +31,7 @@ const item = {
          state.details.digitalContent.splice(0, state.details.digitalContent.length)
          let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status == "READY" )
          pdfs.forEach( item => {
-            state.details.digitalContent.push({type: "PDF", url: item.pdf.urls.download})
+            state.details.digitalContent.push({type: "PDF", url: item.pdf.urls.download, name: item.label})
          })
          let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
          ocrs.forEach( item => {
