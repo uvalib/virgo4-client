@@ -52,7 +52,7 @@ export default {
    }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .preferences {
    min-height: 400px;
    position: relative;
@@ -81,7 +81,10 @@ export default {
    }
 }
 .section {
-   margin: 10px;
-   border: 1px solid black;
+   margin: 15px 0;
+   border: 1px solid var(--uvalib-grey);
+   padding:5px 15px 15px 15px;
+   border-radius: 5px;
+   box-shadow: $v4-box-shadow-light;
 }
 </style>

@@ -2,12 +2,12 @@
   <div class="pickup-options">
     <h2>Pickup Library</h2>
     <p>Select the library where you would like items delivered. </p>
-    <p>Current pickup library:
-      <select v-model="pickupLibrary" @change="update">
+    <label for="pickup-sel">Current pickup library:
+      <select id="pickup-sel" v-model="pickupLibrary" @change="update">
         <option disabled selected hidden value="">Select a Location</option>
         <option v-bind:key="lib" v-for="lib in pickupLibraries">{{lib}}</option>
       </select>
-    </p>
+    </label>
   </div>
 </template>
 <script>
@@ -34,5 +34,10 @@ export default {
 
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
+.pickup-options {
+   h2 {
+      margin:5px 0 10px 0;
+   }
+}
 </style>

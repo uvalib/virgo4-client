@@ -1,74 +1,104 @@
 <template>
-  <div class="pool-options">
-    <h2>Search Preferences</h2>
-    <p>
-        Select which Resource Types you want to include in your search results,
-        and which Resource Type you prefer to see results from most.
-    </p>
-    <div class="pools">
-      <div class="pool" v-for="p in pools" :key="p.id"
-        v-bind:class="{excluded: isPoolExcluded(p.url)}">
-        <div class="name">
-          <span><b>{{p.name}}</b></span>
-        </div>
-        <div class="description">
-          <span v-html="p.description"></span>
-        </div>
-        <div class="source-controls">
-          <div class="toggle" @click="toggleTargetPool(p.url)">
-            <i v-if="isTargetPool(p.url)" class="fas fa-star"></i>
-            <i v-else class="far fa-star"></i>
-            <span class="label">Preferred</span>
-          </div>
-          <div class="toggle"  @click="toggleExcludePool(p.url)">
-            <span class="label">Include</span>
-            <i v-if="isPoolExcluded(p.url)" class="excluded far fa-circle"></i>
-            <i v-else class="selected fas fa-check-circle"></i>
-          </div>
-        </div>
+   <div class="pool-options">
+      <h2>Search Preferences</h2>
+      <p>
+         Select which Resource Types you want to include in your search results,
+         and which Resource Type you prefer to see results from most.
+      </p>
+      <div class="pools">
+         <div
+            class="pool"
+            v-for="p in pools"
+            :key="p.id"
+            v-bind:class="{excluded: isPoolExcluded(p.url)}"
+         >
+            <div class="name">
+               <span>
+                  <b>{{p.name}}</b>
+               </span>
+            </div>
+            <div class="description">
+               <span v-html="p.description"></span>
+            </div>
+            <div class="source-controls">
+               <div
+                  tabindex="0"
+                  role="switch"
+                  class="toggle"
+                  :aria-label="`set ${p.name} as preferred`"
+                  :aria-checked="isTargetPool(p.url)"
+                  @click.stop="toggleTargetPool(p.url)"
+                  @keyup.stop.enter="toggleTargetPool(p.url)"
+                  @keydown.space.prevent.stop="toggleTargetPool(p.url)"
+               >
+                  <i v-if="isTargetPool(p.url)" class="fas fa-star"></i>
+                  <i v-else class="far fa-star"></i>
+                  <span class="label">Preferred</span>
+               </div>
+               <div
+                  class="toggle"
+                  tabindex="0"
+                  role="checkbox"
+                  :aria-label="`toggle inclusion of ${p.name} in search results`"
+                  :aria-checked="isPoolExcluded(p.url)"
+                  @click="toggleExcludePool(p.url)"
+                  @keyup.stop.enter="toggleExcludePool(p.url)"
+                  @keydown.space.prevent.stop="toggleExcludePool(p.url)"
+               >
+                  <span class="label">Include</span>
+                  <i v-if="isPoolExcluded(p.url)" class="excluded far fa-circle"></i>
+                  <i v-else class="selected fas fa-check-circle"></i>
+               </div>
+            </div>
+         </div>
       </div>
-    </div>
-  </div>
+   </div>
 </template>
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters } from "vuex";
 //import { mapState } from "vuex"
 export default {
-  computed: {
-    ...mapGetters({
-      isPoolExcluded: "preferences/isPoolExcluded",
-      isTargetPool: "preferences/isTargetPool",
-      pools: "pools/sortedList",
-    })
-  },
-    methods: {
+   computed: {
+      ...mapGetters({
+         isPoolExcluded: "preferences/isPoolExcluded",
+         isTargetPool: "preferences/isTargetPool",
+         pools: "pools/sortedList"
+      })
+   },
+   methods: {
       toggleTargetPool(url) {
-         this.$store.commit("resetSearchResults")
-         this.$store.dispatch("preferences/toggleTargetPool", url)
+         this.$store.commit("resetSearchResults");
+         this.$store.dispatch("preferences/toggleTargetPool", url);
       },
       toggleExcludePool(url) {
-         this.$store.commit("resetSearchResults")
-         this.$store.dispatch("preferences/toggleExcludePool", url)
+         this.$store.commit("resetSearchResults");
+         this.$store.dispatch("preferences/toggleExcludePool", url);
       }
-  }
-}
+   }
+};
 </script>
 
-<style scoped>
-.pools {
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: center;
-}
+<style lang="scss" scoped>
+.pool-options {
+   h2 {
+      margin: 5px 0 10px 0;
+   }
+   .pools {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
 
-div.pool {
-   text-align: left;
-   padding: 0;
-   border-radius: 5px;
-   margin: 5px;
-   width: 400px;
-   display: inline-block;
-   font-size: 0.9em;
+      div.pool {
+         text-align: left;
+         padding: 0;
+         border-radius: 5px;
+         margin: 5px;
+         width: 400px;
+         display: inline-block;
+         font-size: 0.9em;
+         box-shadow: $v4-box-shadow-light;
+      }
+   }
 }
 div.pool.excluded {
    opacity: 0.7;
@@ -86,7 +116,7 @@ div.description {
    padding: 15px;
    border-right: 1px solid #ccc;
    border-left: 1px solid #ccc;
-   margin:0;
+   margin: 0;
    font-size: 0.8em;
 }
 div.source-controls {

@@ -1,5 +1,6 @@
 <template>
    <div class="privacy">
+      <h2>Privacy</h2>
       <div><b>The Library values your privacy.</b></div>
       <div>
          We collect analytics information that is not personally identifiable 
@@ -15,7 +16,8 @@
          </span>
          <div>
             <label>
-               <input @change="optOutClicked" class="opt-out" :checked="trackingOptOut" type="checkbox"/>Opt out
+               <input @change="optOutClicked" class="opt-out" :checked="trackingOptOut" type="checkbox"
+                  aria-label="toggle opt out of analytics collection"/>Opt out
             </label>
          </div>
       </div>
@@ -38,23 +40,22 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 div.privacy {
-   background: var(--uvalib-grey-lightest);
-   border: 1px solid var(--uvalib-grey);
-   padding: 15px;
-   border-radius: 5px;
-}
-div.privacy b {
-   display: block;
-   margin-bottom: 10px;
-}
-div.opt-out {
-   margin-top: 10px;
-}
-input.opt-out {
-   margin: 5px 10px;
-   width: 15px;
-   height: 15px;
+   h2 {
+     margin:5px 0 10px 0;
+   }
+   div.privacy b {
+      display: block;
+      margin-bottom: 10px;
+   }
+   div.opt-out {
+      margin-top: 10px;
+   }
+   input.opt-out {
+      margin: 5px 10px;
+      width: 15px;
+      height: 15px;
+   }
 }
 </style>

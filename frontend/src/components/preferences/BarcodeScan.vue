@@ -11,7 +11,8 @@
       </p>
       <div class="check">
          <label>
-            <input @change="scanClicked" class="scan" :checked="enableBarcodeScan" type="checkbox"/>Barcode Scanning enabled
+            <input @change="scanClicked" class="scan" :checked="enableBarcodeScan" type="checkbox"
+               aria-label="toggle barcode scanning functionality"/>Barcode Scanning enabled
          </label>
          <p>Once enabled, the Barcode Scanning option will appear under the main Search bar.</p>
       </div>
@@ -34,16 +35,21 @@ export default {
 };
 </script>
 
-<style scoped>
-b {
-   margin-right: 10px;
-}
-.check {
-   padding-bottom:20px;
-}
-input.scan {
-   margin: 5px 10px;
-   width: 15px;
-   height: 15px;
+<style lang="scss" scoped>
+.barcode-scanning {
+   h2 {
+     margin:5px 0 10px 0;
+   }
+   b {
+      margin-right: 10px;
+   }
+   .check {
+      padding-bottom:20px;
+   }
+   input.scan {
+      margin: 5px 10px;
+      width: 15px;
+      height: 15px;
+   }
 }
 </style>
