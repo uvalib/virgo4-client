@@ -25,8 +25,9 @@
                         <span class="folder-title" v-html="getTitle(folderInfo)"></span>
                      </template>
                      <template v-slot:controls>
-                        <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" style="margin-left:10px" />
-                        <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" alabel="delete bookmark folder">
+                        <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" style="margin:0 10px 0 5px" />
+                        <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" 
+                           alabel="delete bookmark folder" style="margin-right: 10px">
                            <div>
                               Delete bookmark folder
                               <b>{{folderInfo.folder}}</b>? All bookmarks

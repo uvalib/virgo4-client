@@ -73,8 +73,7 @@ export default {
       color: var(--uvalib-grey-dark);
       cursor: pointer;
       font-size: 1.2em;
-      padding: 2px 8px 2px 0;
-      margin-right: 5px;
+      padding: 2px;
    }
 }
 p.error {

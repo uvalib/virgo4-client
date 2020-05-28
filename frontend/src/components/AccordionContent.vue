@@ -247,6 +247,6 @@ export default {
    outline: none;
 }
 .accordion:focus {
-   box-shadow: 0 0 0 1px rgba(21, 156, 228, 0.4);
+   box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
 }
 </style>
