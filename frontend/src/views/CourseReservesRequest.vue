@@ -101,7 +101,7 @@
                      <dl>
                         <dt>Loan Period</dt>
                         <dd>
-                           <select v-model="bm.period" id="item-period" name="item-period">
+                           <select :aria-label="`loan period for ${bm.details.title}`" v-model="bm.period" id="item-period" name="item-period">
                               <option value="">Please select</option>
                               <option value="3h">3 hours</option>
                               <option value="2d">2 days</option>
@@ -109,7 +109,7 @@
                            </select>
                         </dd>
                         <dt>Notes</dt>
-                        <dd><textarea v-model="bm.notes" name="item-notes"></textarea></dd>
+                        <dd><textarea  :aria-label="`notes for ${bm.details.title}`" v-model="bm.notes" name="item-notes"></textarea></dd>
                      </dl>
                   </div>
                </div>
@@ -129,21 +129,23 @@
                      <div class="author">{{bm.details.author}}</div>
                      <dl>
                         <dt class="label">Preferred Audio Language</dt>
-                        <dd><input v-model="bm.audioLanguage" type="text"></dd>
+                        <dd>
+                           <input :aria-label="`preferred audio language for ${bm.details.title}`" v-model="bm.audioLanguage" type="text">
+                        </dd>
                         <dt class="label">Subtitles</dt> 
                         <dd>
-                           <select v-model="bm.subtitles">
+                           <select :aria-label="`include stubtitles for ${bm.details.title}`" v-model="bm.subtitles">
                               <option value="yes">Yes</option>
                               <option value="no">No</option>
                            </select>
                         </dd>
                         <dt class="label">Subtitles Language</dt> 
                         <dd>
-                           <input v-model="bm.subtitleLanguage" type="text">
+                           <input :aria-label="`stubtitle language for ${bm.details.title}`" v-model="bm.subtitleLanguage" type="text">
                            <span v-if="hasSubtitleError(bm)" class="error">* language is required</span>
                         </dd>
                         <dt>Notes</dt>
-                        <dd><textarea v-model="bm.notes" name="item-notes"></textarea></dd>
+                        <dd><textarea :aria-label="`notes for ${bm.details.title}`" v-model="bm.notes" name="item-notes"></textarea></dd>
                      </dl>
                   </div>
                </div>
