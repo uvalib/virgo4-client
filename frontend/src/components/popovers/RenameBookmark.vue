@@ -7,7 +7,7 @@
       <template v-slot:content>
          <div class="message pure-form">
             <input  @keyup.enter="enterPressed"  id="rename" type="text" v-model="folderName" @keydown.shift.tab.stop.prevent="backTabInput"
-               aria-required="true" required="required"/>
+               aria-required="true" aria-label="new folder name" required="required"/>
          </div>
          <p class="error" v-if="error">{{error}}</p>
       </template>
