@@ -5,7 +5,7 @@
          <i class="icon" :class="icon"></i>
          <label>{{label}}</label>
       </template>
-      <span class="download-text">{{label}}</span>
+      <span v-else class="download-text">{{label}}</span>
    </button>
 </template>
 

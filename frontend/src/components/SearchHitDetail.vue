@@ -28,9 +28,18 @@
          </router-link>
       </div>
       <div class="digital-content">
-         <V4DownloadButton v-if="pdfDownloadURL" icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"/>
-         <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt" label="Download OCR" :url="ocrDownloadURL"/>
-         <V4DownloadButton icon="fas fa-file-export" label="Export Citation" :url="risURL" @click="triggerMatomoEvent"/>
+         <V4DownloadButton v-if="pdfDownloadURL" 
+            icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"
+            :aria-label="`download pdf for ${hit.header.title}`"
+         />
+         <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt" 
+            label="Download OCR" :url="ocrDownloadURL"
+            :aria-label="`download ocr for ${hit.header.title}`"
+         />
+         <V4DownloadButton icon="fas fa-file-export" label="Export Citation" 
+            :url="risURL" @click="triggerMatomoEvent"
+            :aria-label="`export citation for ${hit.header.title}`"
+         />
       </div>
    </div>
 </template>
