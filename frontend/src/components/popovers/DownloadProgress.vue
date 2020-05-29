@@ -1,6 +1,7 @@
 <template>
    <V4Popover class="download-progress" id="download" title="Download Progress" maxWidth="350px"
-      alabel="download progress" @opened="popoverOpened" @closed="popoverClosed">
+      @opened="popoverOpened" @closed="popoverClosed"
+   >
       <template v-slot:trigger>
         {{name}}
       </template>

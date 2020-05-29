@@ -49,14 +49,22 @@
                      <dd class="value">
                         <template v-for="(dc,idx) in pdfs">
                            <span class="sep" v-if="idx>0" :key="`pdfsep${idx}`">|</span>
-                           <a v-if="dc.status=='READY'" :href="dc.url" :key="`pdf${idx}`">{{dc.name}}</a>
-                           <DownloadProgress v-else :name="dc.name" :key="`pdf${idx}`" />
+                           <a v-if="dc.status=='READY'" :href="dc.url" :key="`pdf${idx}`" 
+                              :aria-label="`download pdf for ${dc.name}`"
+                           >
+                              {{dc.name}}
+                           </a>
+                           <DownloadProgress v-else :name="dc.name" :key="`pdf${idx}`" 
+                              :aria-label="`download pdf for ${dc.name}`"
+                           />
                         </template>
                      </dd>
                   </template>
                   <dt class="label">Citation:</dt>
                   <dd class="value">
-                     <V4DownloadButton label="Export RIS Citation" :url="risURL" @click="triggerMatomoEvent"/>
+                     <V4DownloadButton label="Export RIS Citation" :url="risURL" @click="triggerMatomoEvent"
+                        :aria-label="`export citation for ${details.header.title}`"
+                     />
                   </dd>
                   <template v-if="extDetailLink">
                      <dd></dd>
