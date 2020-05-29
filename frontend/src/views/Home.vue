@@ -35,11 +35,11 @@
           <div class="advanced">
             <V4BarcodeScanner @scanned="barcodeScanned"/>
           </div>
-          <div v-if="showJournalBrowse" class="advanced">
+          <!-- <div v-if="showJournalBrowse" class="advanced">
             <router-link to="/journals">
               Browse Journals&nbsp;<i class="far fa-newspaper"></i>
             </router-link>
-          </div>
+          </div> -->
         </template>
         <AdvancedSearch v-else/>
       </div>
