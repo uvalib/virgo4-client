@@ -1,8 +1,11 @@
 <template>
    <button tabindex="0" role="button" class="v4-download-button" 
       @click.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
-      <i class="icon" :class="icon"></i>
-      <label>{{label}}</label>
+      <template v-if="icon">
+         <i class="icon" :class="icon"></i>
+         <label>{{label}}</label>
+      </template>
+      <span class="download-text">{{label}}</span>
    </button>
 </template>
 
@@ -11,7 +14,7 @@ export default {
    props: {
       icon: {
          type: String,
-         required: true
+         default: ""
       },
       url: {
          type: String,
@@ -39,7 +42,8 @@ export default {
    border: none;
    outline: none;
    background: transparent;
-   margin-right: 15px;
+   margin: 0 15px 0 0;
+   padding:0;
    cursor: pointer;
 
    .icon {
@@ -53,6 +57,13 @@ export default {
       display: block;
       cursor: pointer;
       font-weight: normal;
+   }
+   .download-text {
+      color: var(--color-link);
+      font-weight: 500;
+   }
+   .download-text:hover {
+      text-decoration: underline;
    }
 }
 </style>

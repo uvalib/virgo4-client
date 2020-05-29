@@ -92,7 +92,7 @@ export default {
    methods: {
       triggerMatomoEvent() {
          if (window._paq ) {
-            window._paq.push(['trackEvent', 'Export', 'RIS', this.hit.identifier])
+            window._paq.push(['trackEvent', 'Export', 'RIS_FROM_SEARCH', this.hit.identifier])
          } else {
             console.error("_PAQ IS NOT AVAILABLE; CANNOT TRIGGER EVENT")
          }

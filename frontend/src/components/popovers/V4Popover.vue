@@ -86,6 +86,7 @@ export default {
       hide() {
          this.isOpen = false
          this.setFocus(`${this.id}trigger`)
+         this.$emit('closed')
       },
       toggle() {
          this.isOpen = !this.isOpen
