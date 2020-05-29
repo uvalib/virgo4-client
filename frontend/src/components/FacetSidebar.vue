@@ -5,7 +5,7 @@
             borderColor="var(--uvalib-brand-blue)"
             color="white" :expanded="startExpanded" :invert="!startExpanded">
             <template v-slot:title>{{globalTitle}}</template>
-            <div class="body">
+            <div v-if="hasFacets" class="body">
                <dl role="radiogroup" aria-labelledby="availability_label">
                   <dt id="availability_label">Availability</dt>
                   <dd v-for="avail in availabilityOpts" :key="avail.id">
@@ -19,6 +19,9 @@
                <div class="circulate">
                   <V4Checkbox v-model="globalCirculating" @click="circFacetClicked">{{circulatingFacet.name}}</V4Checkbox>
                </div>
+            </div>
+            <div v-else class="none">
+               {{selectedResults.pool.name}} does not support filtering
             </div>
          </AccordionContent>
       </div>
