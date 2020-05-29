@@ -14,7 +14,7 @@
             <div v-else>
                <div class="message pure-form">
                   <div>
-                     <span class="label">Search Name</span>
+                     <label for="savename">Search Name</label>
                      <input ref="savename" id="savename" type="text" v-model="searchName" 
                         @keyup.enter="saveClicked" 
                         @keydown.shift.tab.stop.prevent="backTabName"
@@ -118,36 +118,19 @@ export default {
 input[type=text] {
    width: 100%;
 }
-span.label {
+label {
    display: block;
    margin: 10px 0 2px 0;
    font-weight: bold;
 }
-i.link {
-   margin: 0 0 0 5px;
-}
-p.error {
-   color: var(--uvalib-red-emergency);
-}
-.public-controls {
-   list-style: none;
-   margin: 0;
-   line-height: 1.7em;
-   padding: 10px 0 0 0;
-}
-.message a {
+#manage {
    font-weight: 500;
    color: var(--color-link);
    cursor: pointer;
    display: inline-block;
    text-decoration:none;
 }
-.message a:hover {
+#manage:hover {
    text-decoration:underline;
 } 
-p {
-   margin: 0;
-   padding: 5px 0;
-   text-align: center;
-}
 </style>
