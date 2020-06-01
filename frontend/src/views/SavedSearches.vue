@@ -16,13 +16,21 @@
                   <div class="saved-search">
                      <span class="num">{{idx+1}}.</span>
                      <V4Checkbox class="public" :checked="saved.public" @click="publicClicked(saved)"
-                        aria-label="Toggle public visibility of this search">
+                        :aria-label="`Toggle public visibility of ${saved.name}`">
                         Public
                      </V4Checkbox>
-                     <span><router-link :to="searchURL(saved.token)">{{saved.name}}</router-link></span>
+                     <span>
+                        <router-link :aria-label="`perform search named ${saved.name}`" :to="searchURL(saved.token)">{{saved.name}}</router-link>
+                     </span>
                      <span class="search-actions">
-                        <span class="icon"><router-link :to="searchURL(saved.token)"><i class="fas fa-search"></i></router-link></span>
-                        <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)">
+                        <span class="icon">
+                           <router-link :to="searchURL(saved.token)" :aria-label="`perform search named ${saved.name}`">
+                              <i class="fas fa-search"></i>
+                           </router-link>
+                        </span>
+                        <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)"
+                           :alabel="`Delete search named ${saved.name}`"
+                        >
                            <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
                            <div class="del-detail">This cannot be reversed.</div>
                         </ConfirmDelete>
