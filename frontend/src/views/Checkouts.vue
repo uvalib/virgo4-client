@@ -17,7 +17,11 @@
                   <h3 class="item-title">
                      <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
                      {{co.title}}
-                     <V4Button v-if="!isBarred" mode="primary" @click="renewItem(co.barcode)" class="renew">Renew</V4Button>
+                     <V4Button v-if="!isBarred" mode="primary" @click="renewItem(co.barcode)" class="renew"
+                        :aria-label="`renew ${co.title}`"
+                     >
+                        Renew
+                     </V4Button>
                   </h3>
                   <dl>
                     <dt>Author:</dt>
