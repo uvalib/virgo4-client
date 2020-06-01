@@ -75,8 +75,9 @@ button.text-button:hover {
 button.v4-button.icon-button {
    border: none;
    background: none;
-   padding: 0;
+   padding:2px;
    margin:0;
+   outline: none;
 }
 .pure-button.pure-button-primary {
    background-color: var(--uvalib-brand-blue-light);
@@ -89,6 +90,9 @@ button.v4-button.icon-button {
 }
 .pure-button.pure-button-primary:focus {
    box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
+} 
+.icon-button:focus  {
+   box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
 } 
 .pure-button.pure-button-secondary {
    background-color: var(--uvalib-brand-blue-lighter);

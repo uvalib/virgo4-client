@@ -2,10 +2,12 @@
    <span v-if="isKiosk==false" class="bookmark-container">
       <template v-if="isSignedIn">
          <V4Button v-if="isBookmarked" mode="icon" @click="removeBookmarkClicked" 
+            :id="`bookmark-${hit.identifier}`"
             :aria-label="`remove bookmark for ${hit.header.title}`">
             <i class="bookmark fas fa-bookmark"></i>
          </V4Button>
          <V4Button v-else mode="icon" @click="addBookmarkClicked"
+            :id="`bookmark-${hit.identifier}`"
             :aria-label="`add bookmark for ${hit.header.title}`">
             <i class="bookmark far fa-bookmark"></i>
          </V4Button>

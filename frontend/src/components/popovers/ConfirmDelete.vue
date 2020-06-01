@@ -1,6 +1,6 @@
 <template>
    <V4Popover class="confirm" id="confirmpop" ref="pop" title="Confirm Delete" :alabel="alabel"
-      firstFocusID="confirm-cancelbtn" lastFocusID="confirm-okbtn">
+      firstFocusID="confirm-cancelbtn" lastFocusID="confirm-okbtn" :triggerType="triggerType">
       <template v-slot:trigger>
          <span  v-if="label">{{label}}</span>
          <i v-else class="trash fas fa-trash-alt"></i>
@@ -27,6 +27,14 @@ export default {
    props: {
       label: String,
       alabel: String,
+   },
+   computed: {
+      triggerType() {
+         if ( this.label ) {
+            return "text"
+         }
+         return "icon"
+      }
    },
    methods: {
       backTabCancel() {

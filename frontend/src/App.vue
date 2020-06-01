@@ -6,7 +6,7 @@
          <div class="dimmer" v-if="showDimmer">
              <MessageBox v-if="error" type="error" />
              <MessageBox v-if="message" type="info" />
-             <AddBookmarkModal v-if="addingBookmark" />
+             <AddBookmarkModal v-if="addingBookmark" @closed="addBookmarkClosed" />
          </div>
       </transition>
       <VirgoHeader :id="headerID" />
@@ -82,6 +82,12 @@ export default {
             this.menuPos = 0
          } else {
             this.menuPos = (window.scrollY - this.headerHeight)
+         }
+      },
+      addBookmarkClosed( srcID ) {
+         let tgt = document.getElementById(srcID)
+         if ( tgt ) {
+            tgt.focus()
          }
       }
    },
@@ -223,7 +229,7 @@ body {
    width: 100%;
    height: 100%;
    z-index: 1000;
-   background: rgba(0, 0, 0, 0.1);
+   background: rgba(0, 0, 0, 0.2);
 }
 
 #app {

@@ -35,15 +35,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.pure-button.pure-button-primary:focus {
-   box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
+button.v4-download-button:focus {
+   box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
 } 
 .v4-download-button {
    border: none;
    outline: none;
    background: transparent;
    margin: 0 15px 0 0;
-   padding:0;
+   padding:2px;
    cursor: pointer;
 
    .icon {
