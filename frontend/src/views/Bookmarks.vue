@@ -241,6 +241,8 @@ export default {
       },
       removeBookmarks() {
          if ( this.selectedItems.length == 0) {
+            this.$store.commit("system/setError","No bookmarks selected for deletion.<br/>Select one or more and try again."
+            )
              return
          }
          this.$store.dispatch("bookmarks/removeBookmarks", this.selectedItems)
@@ -266,7 +268,7 @@ export default {
          if (this.newFolder == "") {
             this.$store.commit(
                "system/setError",
-               "A new folder name is required.<br/>Please one and try again."
+               "A new folder name is required.<br/>Please add one and try again."
             )
             this.submitting = false
             return

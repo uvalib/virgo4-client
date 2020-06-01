@@ -12,11 +12,13 @@
             <div class="message-body" id="msgbody" v-html="messageContent"></div>
             <div class="controls">
                <V4Button v-if="type=='error'" id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
-                  @click="dismiss" @tabback="btnTabBack" @tabnext="btnTabNext">
+                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack" 
+                  :focusNextOverride="true" @tabnext="btnTabNext">
                   OK
                </V4Button>
                <V4Button v-else id="okbtn" mode="primary" @esc="dismiss" :tabOverride="true" 
-                  @click="dismiss" @tabback="btnTabBack" @tabnext="btnTabNext">
+                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack" 
+                  :focusNextOverride="true" @tabnext="btnTabNext">
                   OK
                </V4Button>
             </div>
