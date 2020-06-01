@@ -21,7 +21,7 @@
                </div>
             </div>
             <div v-else class="none">
-               {{selectedResults.pool.name}} does not support filtering
+               This resource does not support filtering
             </div>
          </AccordionContent>
       </div>
