@@ -23,8 +23,8 @@
                </template>
             </dl>
          </div>
-         <router-link v-if="hasCoverImages(pool)" class="img-link" :to="detailsURL">
-            <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
+         <router-link v-if="hasCoverImages(pool)" class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`" >
+            <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
          </router-link>
       </div>
       <div class="digital-content">
