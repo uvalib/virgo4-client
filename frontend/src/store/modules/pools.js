@@ -139,6 +139,10 @@ const pools = {
    actions: {
       async getPools(ctx) {
          ctx.commit("setLookingUp", true)
+         if ( ctx.rootState.system.searchAPI.length == 0) {
+            await ctx.dispatch('system/getConfig', null, { root: true })
+         }
+
          let url = ctx.rootState.system.searchAPI + "/api/pools"
          try {
             let response = await axios.get(url)

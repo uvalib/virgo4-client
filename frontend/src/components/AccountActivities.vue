@@ -1,16 +1,16 @@
 <template>
    <div class="activities">
-      <router-link to="/account">My Information</router-link>
+      <router-link id="info-submenu" to="/account">My Information</router-link>
       <span class="sep">|</span>
-      <router-link to="/searches">My Searches</router-link>
+      <router-link id="searches-submenu" to="/searches">My Searches</router-link>
       <span class="sep">|</span>
-      <router-link to="/bookmarks">Bookmarks</router-link>
+      <router-link id="bookmarks-submenu" to="/bookmarks">Bookmarks</router-link>
       <span class="sep">|</span>
-      <router-link to="/checkouts">Checkouts</router-link>
+      <router-link id="checkouts-submenu" to="/checkouts">Checkouts</router-link>
       <span class="sep">|</span>
-      <router-link to="/preferences">Preferences</router-link>
+      <router-link id="preferences-submenu" to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
-      <router-link to="/requests">Requests</router-link>
+      <router-link id="requests-submenu" to="/requests">Requests</router-link>
       <span class="sep">|</span>
       <V4Button mode="text"  @click="signOut">Sign Out</V4Button>
    </div>

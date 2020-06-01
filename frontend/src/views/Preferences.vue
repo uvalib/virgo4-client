@@ -41,14 +41,16 @@ export default {
 
    },
    created() {
+      this.$store.dispatch('pools/getPools')
       this.$store.dispatch("user/getAccountInfo")
-      if ( this.searchAPI.length == 0) {
-         this.$store.dispatch('system/getConfig').then(_response => {
-            this.$store.dispatch('pools/getPools')
-         })
-      } else {
-         this.$store.dispatch('pools/getPools')
-      }
+      setTimeout(()=> { 
+         let eles = document.getElementsByClassName("toggle")
+         if ( eles.length > 0 ) {
+            eles[0].focus()
+         } else {
+             document.getElementById("preferences-submenu").focus()
+         }
+      }, 500)
    }
 }
 </script>

@@ -11,7 +11,7 @@
                      If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
                </div>
                <div v-else class="toolbar">
-                  <V4Button mode="primary" @click="renewAll">Renew All</V4Button>
+                  <V4Button id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
                </div>
                <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
                   <h3 class="item-title">
@@ -91,6 +91,14 @@ export default {
    created() {
       this.$store.commit('user/setLookingUp', true)
       this.$store.dispatch("user/getCheckouts")
+      setTimeout(()=> { 
+         let ele = document.getElementById("renew-all-btn")
+         if ( ele ) {
+            ele.focus()
+         } else {
+            document.getElementById("checkouts-submenu").focus()
+         }
+      }, 250)
    }
 }
 </script>

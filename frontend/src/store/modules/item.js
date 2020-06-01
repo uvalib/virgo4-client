@@ -187,9 +187,6 @@ const item = {
          } else {
             ctx.commit('clearDetails')
          }
-         if (ctx.rootState.system.searchAPI == "") {
-            await ctx.dispatch("system/getConfig", null, {root:true})
-         }
          await ctx.dispatch("pools/getPools", null, {root:true})
 
          let req = {

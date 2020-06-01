@@ -226,7 +226,6 @@ export default {
          } 
       },
       async searchCreated() {
-         await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
 
          // When restoring a saved search, the call will be /search/:token

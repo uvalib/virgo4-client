@@ -12,7 +12,7 @@
                <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
                <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
                   <AccordionContent
-                     class="boxed"
+                     class="boxed bookmark-folder"
                      color="var(--uvalib-grey-darkest)"
                      background="var(--uvalib-teal-lightest)"
                      borderWidth="0 0 3px 0"
@@ -282,6 +282,14 @@ export default {
    },
    created() {
       this.$store.dispatch("bookmarks/getBookmarks")
+      setTimeout(()=> { 
+         let eles = document.getElementsByClassName("bookmark-folder")
+         if ( eles.length > 0) {
+            eles[0].focus()
+         } else {
+            document.getElementById("bookmarks-submenu").focus()
+         }
+      }, 250)
    }
 };
 </script>

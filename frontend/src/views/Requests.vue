@@ -138,7 +138,10 @@ export default {
    },
    created() {
       this.$store.dispatch("system/getConfig")
-      this.$store.dispatch("user/getRequests");
+      this.$store.dispatch("user/getRequests")
+      setTimeout(()=> {
+         document.getElementById("requests-submenu").focus()
+      },250)
    }
 };
 </script>

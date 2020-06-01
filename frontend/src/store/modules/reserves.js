@@ -125,7 +125,6 @@ const reserves = {
       async validateReservesRequest(ctx) {
          // This could be called from a refresh or bookmark; make sure needed data is present
          if (ctx.rootState.system.searchAPI == "") {
-            await ctx.dispatch("system/getConfig", null, {root:true})
             await ctx.dispatch("pools/getPools", null, {root:true})
          }
          // pools define the ability to make a course reserve.
