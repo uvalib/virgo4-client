@@ -66,7 +66,7 @@
                         <template  v-if="i.accessURL">
                            <dt>Online Access:</dt> 
                            <dd>
-                              <AccessURLDetails mode="brief" pool="journals" :urls="i.accessURL" />
+                              <AccessURLDetails mode="brief" :title="t.title" pool="journals" :urls="i.accessURL" />
                            </dd>
                         </template>
                      </dl>

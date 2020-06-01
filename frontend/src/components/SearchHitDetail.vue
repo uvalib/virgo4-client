@@ -18,7 +18,7 @@
                <template v-if="accessURLField">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
-                     <AccessURLDetails mode="brief" :pool="pool" :urls="accessURLField.value" />
+                     <AccessURLDetails mode="brief" :title="hit.header.title" :pool="pool" :urls="accessURLField.value" />
                   </dd>
                </template>
             </dl>

@@ -41,7 +41,7 @@
                   <template v-if="accessURLField">
                      <dt class="label">{{accessURLField.label}}:</dt>
                      <dd class="value">
-                        <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
+                        <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
                   <template v-if="hasPDFContent">
