@@ -75,12 +75,22 @@ export default {
          if (ele ) {
             ele.focus()
          } else {
-            // if focus target doesn't exist, focus on the one item that is defined
-            // by the basic vrpopover template; the close button
-            ele = document.getElementById(this.id+"-close")
-            if (ele) {
-               ele.focus()
-            }
+            setTimeout( () => {
+               // wait a bit and retry
+               ele = document.getElementById(id)
+               if (ele ) {
+                  ele.focus()
+               } else { 
+                  // retry one last time using the ID that is part of the default template
+                  let fallback = this.id+"-close"
+                  ele = document.getElementById(fallback)
+                  if (ele) {
+                     ele.focus()
+                  } else {
+                     console.log("ERROR: Couldn't set focus on target popover element "+id+" or fallback "+fallback)
+                  }
+               }
+            }, 250)
          }
       },
       hide() {
