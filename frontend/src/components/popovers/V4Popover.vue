@@ -1,5 +1,5 @@
 <template>
-   <v-popover placement="top-end" class="v4-popover" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
+   <v-popover placement="top-end" class="v4-popover" trigger="manual" :open="isOpen" @hide="hide" @apply-show="opened">
       <V4Button  :id="`${id}-trigger`" :mode="triggerType" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
         <slot name="trigger"></slot>
       </V4Button>
