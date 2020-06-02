@@ -1,8 +1,8 @@
 <template>
-   <div tabindex="0" role="checkbox" class="v4-checkbox" :aria-checked="isChecked"
+   <div tabindex="0" role="checkbox" class="v4-checkbox" :class="{inline: !hasLabelSlot()}" :aria-checked="isChecked"
       @click.stop="clicked" @keyup.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <i class="box" :class="checkClass"></i>
-      <label>
+      <label v-if="hasLabelSlot()">
          <slot></slot>
       </label>
    </div>
@@ -38,6 +38,9 @@ export default {
       }
    },
    methods: {
+      hasLabelSlot() {
+         return !(typeof this.$slots.default === 'undefined')
+      },
       clicked() {
          if ( this.value != null ) {
             let state = !this.value
@@ -49,7 +52,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+div.v4-checkbox.inline {
+   display: inline-block;
+   i.box {
+      margin-right:0 !important;
+   }
+} 
 div.v4-checkbox {
    display: flex;
    flex-flow: row nowrap;
@@ -58,18 +67,19 @@ div.v4-checkbox {
    cursor: pointer;
    outline:none;
    padding: 1px;
+
+   label {
+      font-weight: normal;
+      font-size: 1em;
+      cursor: pointer;
+   }
+   i.box {
+      margin-right: 10px;
+      color: var(--uvalib-text);
+      font-size: 1.2em;
+   }
 }
 .v4-checkbox:focus {
    box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
-}
-label {
-   font-weight: normal;
-   font-size: 1em;
-   cursor: pointer;
-}
-i.box {
-   margin-right: 10px;
-   color: var(--uvalib-text);
-   font-size: 1.2em;
 }
 </style>

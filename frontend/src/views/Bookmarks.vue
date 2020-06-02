@@ -72,7 +72,7 @@
                            <tr>
                               <th colspan="3">
                                  <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                                    aria-label="Toggle public visibility of bookmark folder">
+                                    :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder} `">
                                     Public
                                  </V4Checkbox>
                                  <span v-if="folderInfo.public" class="public-url">
@@ -90,7 +90,7 @@
                            </tr>
                            <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
                               <td>
-                                 <input type="checkbox" v-model="selectedItems" :value="bookmark.id" 
+                                 <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
                                     :aria-label="ariaLabel(bookmark)" />
                               </td>
                               <td>
@@ -165,6 +165,18 @@ export default {
       })
    },
    methods: {
+      isSelected(bm) {
+         let idx = this.selectedItems.findIndex( bmid => bmid == bm.id)
+         return idx != -1
+      },
+      toggleBookmarkSelected(bm) {
+         let idx = this.selectedItems.findIndex( bmid => bmid == bm.id)
+         if ( idx == -1 ) {
+            this.selectedItems.push(bm.id)
+         } else {
+            this.selectedItems.splice(idx,1)
+         }
+      },
       ariaLabel(bm) {
          return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
       },
