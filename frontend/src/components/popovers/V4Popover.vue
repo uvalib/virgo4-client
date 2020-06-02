@@ -1,6 +1,6 @@
 <template>
    <v-popover placement="top-end" class="v4-popover" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button  :id="`${id}trigger`" :mode="triggerType" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+      <V4Button  :id="`${id}-trigger`" :mode="triggerType" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
         <slot name="trigger"></slot>
       </V4Button>
       <div :id="id" class="v4-popover-dialog" role="dialog" :style="{'max-width': maxWidth}" slot="popover"
@@ -85,13 +85,13 @@ export default {
       },
       hide() {
          this.isOpen = false
-         this.setFocus(`${this.id}trigger`)
          this.$emit('closed')
+         this.setFocus(`${this.id}-trigger`)
       },
       toggle() {
          this.isOpen = !this.isOpen
          if ( this.isOpen == false) {
-           this.setFocus(`${this.id}trigger`)
+           this.setFocus(`${this.id}-trigger`)
          }
       },
       opened() {

@@ -1,5 +1,5 @@
 <template>
-   <V4Popover class="rename inline" id="renamepop" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
+   <V4Popover class="rename inline" :id="id" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
       firstFocusID="rename" lastFocusID="rename-ok" triggerType="icon" @opened="popoverOpened">
       <template v-slot:trigger>
          <i class="rename fas fa-edit"></i>
@@ -30,6 +30,10 @@ export default {
          type: Object,
          required: true
       },
+      id: {
+         type: String,
+         required: true
+      }
    },
    data: function()  {
       return {

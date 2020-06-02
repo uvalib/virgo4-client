@@ -25,7 +25,9 @@
                         <span class="folder-title" v-html="getTitle(folderInfo)"></span>
                      </template>
                      <template v-slot:controls>
-                        <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" style="margin:0 10px 0 5px" />
+                        <RenameBookmark :id="`rename-${folderInfo.id}`" 
+                           :original="folderInfo" v-on:rename-approved="renameFolder" style="margin:0 10px 0 5px" 
+                        />
                         <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" 
                            alabel="delete bookmark folder" style="margin-right: 10px">
                            <div>
@@ -59,6 +61,7 @@
                                     </div>
                                     <div class="button-group">
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                                          :id="`move-bookmarks-${folderInfo.id}`"
                                           v-on:move-approved="moveBookmarks"/>
                                        <V4Button @click="removeBookmarks" mode="primary">Delete</V4Button>
                                        <V4Button v-if="canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
