@@ -215,6 +215,9 @@ h2 {
    justify-content: space-between; 
    align-items: center;
 }
+.sep {
+   margin: 0 5px;
+}
 div.pools-wrapper {
    border-top: 2px solid var(--uvalib-grey-light);
    border-bottom: 2px solid var(--uvalib-grey-light);
