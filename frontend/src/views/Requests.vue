@@ -3,8 +3,8 @@
       <h1>My Account</h1>
       <div class="requests-content">
          <AccountActivities />
-         <div class="working" v-if="lookingUp" >
-            <V4Spinner message="Looking up requests..."/>
+         <div class="working" v-if="lookingUp">
+            <V4Spinner message="Looking up requests..." />
          </div>
          <div class="details">
             <template v-if="requests.holds.length > 0">
@@ -26,16 +26,21 @@
                      <dd>{{req.barcode}}</dd>
                   </dl>
                   <p v-if="isDevServer">
-                  <V4Button mode="icon" @click="deleteHold(req.id)" aria-label="Delete this hold" class="delete">
-                     <i class="fas fa-trash "></i>
-                  </V4Button>
+                     <V4Button
+                        mode="icon"
+                        @click="deleteHold(req.id)"
+                        aria-label="Delete this hold"
+                        class="delete"
+                     >
+                        <i class="fas fa-trash"></i>
+                     </V4Button>
                   </p>
                </div>
             </template>
 
-            <template v-if="requests.illiad.length > 0">
+            <template v-if="illiadRequests.length > 0">
                <h2>ILL Requests</h2>
-               <div class="request" v-for="(req,idx) in requests.illiad" :key="idx">
+               <div class="request" v-for="(req,idx) in illiadRequests" :key="idx">
                   <template v-if="req.requestType == 'Loan'">
                      <h3 class="title">{{req.loanTitle}}</h3>
                      <dl>
@@ -72,7 +77,7 @@
                            <dt>Month:</dt>
                            <dd>{{req.photoJournalMonth}}</dd>
                         </template>
-                         <template v-if="req.photoIssueYear">
+                        <template v-if="req.photoIssueYear">
                            <dt>Year:</dt>
                            <dd>{{req.photoIssueYear}}</dd>
                         </template>
@@ -103,9 +108,9 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities"
+import { mapState } from "vuex";
+import { mapGetters } from "vuex";
+import AccountActivities from "@/components/AccountActivities";
 export default {
    name: "requests",
    components: {
@@ -114,34 +119,37 @@ export default {
    computed: {
       ...mapState({
          requests: state => state.user.requests,
-         lookingUp: state => state.user.lookingUp,
+         lookingUp: state => state.user.lookingUp
       }),
       ...mapGetters({
-      isDevServer: 'system/isDevServer'
-    }),
+         isDevServer: "system/isDevServer"
+      }),
+      illiadRequests() {
+         return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer")
+      }
    },
    methods: {
       formatDate(date) {
          return date.split("T")[0];
       },
-      getDownloadLink( req ) {
-         let url =  `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`
-         let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`
-         return `<a href='${url}' target='_blank'>${icon}Download</a>`
+      getDownloadLink(req) {
+         let url = `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`;
+         let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`;
+         return `<a href='${url}' target='_blank'>${icon}Download</a>`;
       },
       hasNoRequests() {
-         return !(this.requests.illiad || this.requests.holds)
+         return !(this.requests.illiad || this.requests.holds);
       },
       deleteHold(id) {
-         this.$store.dispatch("requests/deleteHold", id)
+         this.$store.dispatch("requests/deleteHold", id);
       }
    },
    created() {
-      this.$store.dispatch("system/getConfig")
-      this.$store.dispatch("user/getRequests")
-      setTimeout(()=> {
-         document.getElementById("requests-submenu").focus()
-      },250)
+      this.$store.dispatch("system/getConfig");
+      this.$store.dispatch("user/getRequests");
+      setTimeout(() => {
+         document.getElementById("requests-submenu").focus();
+      }, 250);
    }
 };
 </script>
