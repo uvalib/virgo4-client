@@ -3,6 +3,7 @@
       @keydown.exact.tab="tabNext" 
       @keydown.shift.tab="tabBack"
       :class="{'text-button': mode=='text', 'icon-button': mode=='icon', 
+               'link-button': mode=='link', 
                'pure-button': isButton, 
                'pure-button-primary': mode == 'primary',
                'pure-button-secondary': mode == 'secondary',
@@ -26,11 +27,15 @@ export default {
       focusBackOverride: {
          type: Boolean,
          default: false
+      },
+      url: {
+         type: String,
+         default: ""
       }
    },
    computed: {
       isButton() {
-         return this.mode != 'text' && this.mode!='icon'
+         return this.mode != 'text' && this.mode!='icon' && this.mode!='link'
       }
    },
    methods: {
@@ -38,6 +43,9 @@ export default {
          this.$emit('esc')
       },
       clicked() {
+         if ( this.mode == 'link' && this.utl != "") {
+            window.location.href = this.url
+         } 
          this.$emit('click')
       },
       tabBack() {
@@ -122,5 +130,21 @@ button.v4-button.icon-button {
 .pure-button.disabled {
    cursor: default;
    opacity: 0.25;
+}
+
+.link-button {
+  margin-top: 25px;
+  border-radius: 5px;
+  font-weight: normal;
+  text-transform: uppercase;
+  background-color: var(--uvalib-brand-orange);
+  color: white;
+  font-size: 1.2em;
+  border: none;
+  padding: 10px 12px;
+}
+.link-button:hover  {
+   background-color: var(--uvalib-grey-light);
+   color: var(--uvalib-text-dark);
 }
 </style>
