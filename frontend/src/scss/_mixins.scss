@@ -1,1 +1,14 @@
 // SCSS mixin definitions for V4client
+
+// $v4-accessibility-box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
+
+@mixin be-accessible() {
+    outline: 5px auto var(--uvalib-accessibility-highlight);
+    outline-offset: -2px;
+    background-color: inherit;
+}
+
+@mixin be-accessible-button($background-color: var(--uvalib-accessibility-highlight)) {
+    outline: none;
+    background-color: $background-color;
+}

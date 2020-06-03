@@ -58,7 +58,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 button.text-button {
    border: none;
    background: none;
@@ -87,9 +87,9 @@ button.v4-button.icon-button {
    border: 1px solid var(--uvalib-brand-blue-lighter);
    transition: all 0.3s ease;
 }
-.pure-button.pure-button-primary:focus {
-   box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
-} 
+// .pure-button.pure-button-primary:focus {
+//    box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
+// } 
 .pure-button.pure-button-secondary {
    background-color: var(--uvalib-brand-blue-lighter);
    color: black;
@@ -102,9 +102,9 @@ button.v4-button.icon-button {
    border: 1px solid var(--uvalib-grey);
    color: black;
 }
-.pure-button.pure-button-tertiary:focus {
-   box-shadow: 0 0 0 4px rgba(150,150,150, 0.3); 
-}
+// .pure-button.pure-button-tertiary:focus {
+//    box-shadow: 0 0 0 4px rgba(150,150,150, 0.3); 
+// }
 .pure-button.pure-button-tertiary:hover {
    background-color: var(--uvalib-grey-light);
 }
@@ -119,4 +119,27 @@ button.v4-button.icon-button {
    cursor: default;
    opacity: 0.25;
 }
+// I'm currently trying to get this code to work for the Give button
+#give-button.pure-button.pure-button-give {
+  margin-top: 25px;
+  border-radius: 5px;
+  font-weight: normal;
+  text-transform: uppercase;
+  background-color: var(--uvalib-brand-orange);
+  color: white !important;
+  font-size: 1.2em;
+}
+#give-button.pure-button.pure-button-give:hover {
+   background-color: var(--uvalib-grey-light);
+   color: var(--uvalib-text-dark) !important;
+}
+// end Give button
+
+button, button.pure-button:focus, a.pure-button:focus {
+   @include be-accessible-button();
+}
+button.text-button:focus {
+   @include be-accessible();
+}
+
 </style>

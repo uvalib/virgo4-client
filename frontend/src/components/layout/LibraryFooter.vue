@@ -148,19 +148,7 @@ ul li {
 address {
   margin-top: 25px;
 }
-.pure-button.pure-button-give {
-  margin-top: 25px;
-  border-radius: 5px;
-  font-weight: normal;
-  text-transform: uppercase;
-  background-color: var(--uvalib-brand-orange);
-  color: white !important;
-  font-size: 1.2em;
-}
-.pure-button.pure-button-give:hover {
-   background-color: var(--uvalib-grey-light);
-   color: var(--uvalib-text-dark) !important;
-}
+
 .footer-post-container {
   background-color: var(--uvalib-blue-alt-darkest);
   color: white;
