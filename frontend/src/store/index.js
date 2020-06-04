@@ -275,7 +275,7 @@ export default new Vuex.Store({
 
       commit('setSearching', true)
       let url = state.system.searchAPI + "/api/search?intuit=1"
-      // try {
+      try {
         let response = await axios.post(url, req)
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
@@ -285,13 +285,14 @@ export default new Vuex.Store({
           commit('setSearching', false)
         }
         return dispatch("filters/getSelectedResultFacets")
-      // } catch (error) {
-      //    let msg = "System error, we regret the inconvenience. If this problem persists, "
-      //    msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-      //    commit('system/setError', msg)
-      //    commit('setSearching', false)
-      //    commit('filters/setUpdatingFacets', false)
-      // }
+      } catch (error) {
+         console.error("SEARCH FAILED: "+error)
+         let msg = "System error, we regret the inconvenience. If this problem persists, "
+         msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+         commit('system/setError', msg)
+         commit('setSearching', false)
+         commit('filters/setUpdatingFacets', false)
+      }
     },
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
@@ -318,7 +319,7 @@ export default new Vuex.Store({
         filters: [filterObj]
       }
       let url = tgtResults.pool.url + "/api/search?debug=1"
-      // try {
+      try {
         let response = await axios.post(url, req)
         commit('addPoolSearchResults', response.data)
         commit('setSearching', false)
@@ -326,13 +327,14 @@ export default new Vuex.Store({
          commit('updateOtherPoolLabel')
         }
         return dispatch("filters/getSelectedResultFacets")
-      // } catch(error) {
-      //    let msg = "System error, we regret the inconvenience. If this problem persists, "
-      //    msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-      //    commit('system/setError', msg)
-      //    commit('setSearching', false)
-      //    commit('filters/setUpdatingFacets', false)
-      // }
+      } catch(error) { 
+         console.error("SEARCH FAILED: "+error)
+         let msg = "System error, we regret the inconvenience. If this problem persists, "
+         msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+         commit('system/setError', msg)
+         commit('setSearching', false)
+         commit('filters/setUpdatingFacets', false)
+      }
     },
 
     // Select pool results and get all facet info for the result
