@@ -261,7 +261,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 // GetSearchFilters will return all available advanced search filters
 func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	log.Printf("Get advanced search filters")
-	url := "select?fl=*&q=*%3A*&rows=0&facet=true&facet.field=source_f&facet.field=data_source_f"
+	url := "select?fl=*&q=*%3A*&rows=0&facet=true&facet.field=source_f"
 	respBytes, err := svc.SolrGet(url)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Message)
@@ -271,8 +271,7 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	var solrResp struct {
 		FacetCounts struct {
 			FacetFields struct {
-				SourceF []interface{} `json:"source_f"`      // these are human-readable names
-				DataF   []interface{} `json:"data_source_f"` // these are IDs of filters
+				SourceF []interface{} `json:"source_f"` // these are human-readable names
 			} `json:"facet_fields"`
 		} `json:"facet_counts"`
 	}
@@ -283,25 +282,19 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 		return
 	}
 
-	type filterValue struct {
-		ID    string `json:"id"`
-		Label string `json:"label"`
-	}
 	type filter struct {
-		Label  string `json:"label"`
-		Field  string `json:"field"`
-		Values []filterValue
+		Label  string   `json:"label"`
+		Field  string   `json:"field"`
+		Values []string `json:"values"`
 	}
 
 	out := make([]filter, 0)
-	out = append(out, filter{Label: "Collection", Field: "data_source_f", Values: make([]filterValue, 0)})
-	for idx, dataF := range solrResp.FacetCounts.FacetFields.DataF {
-		// the data in DataF and SourceF is a mixed array. Even entries are string, odd are counts.
+	out = append(out, filter{Label: "Collection", Field: "source_f", Values: make([]string, 0)})
+	for idx, srcF := range solrResp.FacetCounts.FacetFields.SourceF {
+		// the data in SourceF is a mixed array. Even entries are string, odd are counts.
 		// In this case, only care about the string so skip all odd numbered entries
 		if idx%2 == 0 {
-			srcF := solrResp.FacetCounts.FacetFields.SourceF[idx]
-			val := filterValue{ID: dataF.(string), Label: srcF.(string)}
-			out[0].Values = append(out[0].Values, val)
+			out[0].Values = append(out[0].Values, srcF.(string))
 		}
 	}
 
