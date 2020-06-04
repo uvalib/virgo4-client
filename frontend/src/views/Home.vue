@@ -113,7 +113,6 @@ export default {
                      s = document.getElementsByClassName("term")[0]
                      if ( s ) {
                         s.focus()
-                        s.select()
                      }
 
                   }
