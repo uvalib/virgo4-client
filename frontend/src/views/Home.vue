@@ -113,7 +113,6 @@ export default {
                      s = document.getElementsByClassName("term")[0]
                      if ( s ) {
                         s.focus()
-                        s.select()
                      }
 
                   }
@@ -176,6 +175,7 @@ export default {
                let  s = document.getElementById("search")
                if (s) s.focus()
             },250)
+            return
          }
 
          // Interrogate query params and convert them to a search in the model (if present)
@@ -227,6 +227,7 @@ export default {
       },
       async searchCreated() {
          await this.$store.dispatch('pools/getPools')
+         await this.$store.dispatch("query/getAdvancedSeatchFilters")
 
          // When restoring a saved search, the call will be /search/:token
          if ( this.isRestore ) {

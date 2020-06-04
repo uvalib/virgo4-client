@@ -23,8 +23,8 @@
                      :value="fieldObj.value"
                   >{{fieldObj.label}}</option>
                </select>
-               <template v-if="term.field == 'date'">
-                  <select class="date-range-type" v-model="term.type" :aria-label="`date comparision mode for search criteria ${idx+1}`">
+               <template v-if="getTermType(term) == 'date'">
+                  <select class="date-range-type" v-model="term.comparison" :aria-label="`date comparision mode for search criteria ${idx+1}`">
                      <option value="EQUAL">EQUALS</option>
                      <option value="AFTER">AFTER</option>
                      <option value="BEFORE">BEFORE</option>
@@ -38,17 +38,13 @@
             </div>
 
             <div class="query">
-               <template v-if="term.field != 'date'">
-                  <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term" 
-                     :aria-label="`query string for search criteria number ${idx+1}`"/>
-               </template>
-               <template v-else>
-                  <div class="date-criteria">
+               <template v-if="getTermType(term) == 'date'">
+                   <div class="date-criteria">
                      <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value"
                          :aria-label="`date for search criteria number ${idx+1}`"/>
-                     <span v-if="term.type=='BETWEEN'" class="date-sep">and</span>
+                     <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
                      <input
-                        v-if="term.type=='BETWEEN'"
+                        v-if="term.comparison == 'BETWEEN'"
                         type="text"
                         @keyup.enter="doAdvancedSearch"
                         v-model="term.endVal"
@@ -56,6 +52,18 @@
                      />
                   </div>
                   <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
+               </template>
+               <template v-else-if="getTermType(term) == 'select'">
+                  <div class="select-criteria">
+                     <select class="term" :aria-label="`select ${getTermLabel(term)} for criteria number ${idx+1}`" v-model="term.value">
+                        <option value="" disabled selected>Select a {{getTermLabel(term)}}</option>
+                        <option v-for="opt in getTermChoices(term)" :key="`${opt}`" :value="opt">{{opt}}</option>
+                     </select>
+                  </div>
+               </template>
+               <template v-else>
+                   <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term" 
+                     :aria-label="`query string for search criteria number ${idx+1}`"/>
                </template>
             </div>
          </div>
@@ -138,6 +146,18 @@ export default {
       }
    },
    methods: {
+      getTermType( term ) {
+         let tgtField = this.advancedFields.find( af=> af.value == term.field)
+         return tgtField.type
+      },
+      getTermLabel( term ) {
+         let tgtField = this.advancedFields.find( af=> af.value == term.field)
+         return tgtField.label
+      },
+      getTermChoices( term ) {
+         let tgtField = this.advancedFields.find( af=> af.value == term.field)
+         return tgtField.choices
+      },
       clearPoolsClicked() {
          let urls = [] 
          this.sources.forEach( p => {
@@ -256,6 +276,9 @@ div.options {
 .options select {
    margin: 0 0.8em 0 0;
    flex-basis: content;
+}
+div.search-term select {
+   height: auto !important;
 }
 .v4-button.remove {
    font-size: 1.75em;
