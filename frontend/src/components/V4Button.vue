@@ -132,9 +132,6 @@ button.v4-button.icon-button {
    border: 1px solid var(--uvalib-grey);
    color: black;
 }
-// .pure-button.pure-button-tertiary:focus {
-//    box-shadow: 0 0 0 4px rgba(150,150,150, 0.3); 
-// }
 .pure-button.pure-button-tertiary:hover {
    background-color: var(--uvalib-grey-light);
 }

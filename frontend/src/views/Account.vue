@@ -11,6 +11,16 @@
             <div>{{info.department}} - {{info.profile}}</div>
             <div>{{info.address}}</div>
             <div>{{info.email}}</div>
+            <div class="leo-address">
+               <label>LEO Delivery Location:</label>
+               <span v-if="info.leoAddress">{{info.leoAddress}}</span>
+               <template v-else>
+                  <span>None specified</span>
+                  <div class="no-leo">
+                     Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> to set up LEO Delivery.
+                  </div>
+               </template>
+            </div>
             <div class="status-info">
                <div v-if="info.standing != 'OK'"><b>Standing:</b> {{info.standing}}</div>
                <div class="standing-info" v-if="info.standing=='BARRED'">
@@ -196,6 +206,16 @@ export default {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
+}
+.no-leo {
+   margin: 5px 00px;
+}
+.leo-address {
+   margin: 20px 0;
+}
+.leo-address label {
+   margin-right: 10px;
+   font-weight: 500;
 }
 .working {
    text-align: center;

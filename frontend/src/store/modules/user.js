@@ -168,6 +168,7 @@ const user = {
       },
       setAccountInfo(state, data) {
          state.accountInfo = data.user
+         state.accountInfo.leoAddress = data.leoLocation
       },
       clear(state) {
          state.signedInUser = ""
