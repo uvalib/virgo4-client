@@ -27,11 +27,15 @@ export default {
       focusBackOverride: {
          type: Boolean,
          default: false
+      },
+      url: {
+         type: String,
+         default: ""
       }
    },
    computed: {
       isButton() {
-         return this.mode != 'text' && this.mode!='icon'
+         return this.mode != 'text' && this.mode!='icon' && this.mode!='link'
       }
    },
    methods: {
@@ -39,6 +43,9 @@ export default {
          this.$emit('esc')
       },
       clicked() {
+         if ( this.mode == 'link' && this.utl != "") {
+            window.location.href = this.url
+         } 
          this.$emit('click')
       },
       tabBack() {
@@ -68,29 +75,54 @@ button.text-button {
    color: var(--color-link);
    cursor: pointer;
    display: inline-block;
+   &:hover {
+      opacity: 1;
+      text-decoration: underline;
+   }
+   &:focus {
+      @include be-accessible();
+   }
 }
-button.text-button:hover {
-   opacity: 1;
-   text-decoration: underline;
-}
+
 button.v4-button.icon-button {
    border: none;
    background: none;
-   padding: 0;
+   padding:2px;
    margin:0;
+   outline: none;
+   &:focus {
+      @include be-accessible();
+   } 
+}
+.link-button {
+  border-radius: 5px;
+  font-weight: normal;
+  text-transform: uppercase;
+  background-color: var(--uvalib-brand-orange);
+  color: white;
+  border: none;
+  padding: 10px 12px;
+   &:hover  {
+      background-color: var(--uvalib-grey-light);
+      color: var(--uvalib-text-dark);
+   }
+   &:focus {
+      @include be-accessible-button(var(--uvalib-accessibility-highlight-light), var(--uvalib-text-dark));
+   }
 }
 .pure-button.pure-button-primary {
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
+   &:hover {
+      background-color: var(--uvalib-brand-blue-lighter);
+      border: 1px solid var(--uvalib-brand-blue-lighter);
+      transition: all 0.3s ease;
+   }
+   &:focus {
+      @include be-accessible-button();
+   } 
 }
-.pure-button.pure-button-primary:hover {
-   background-color: var(--uvalib-brand-blue-lighter);
-   border: 1px solid var(--uvalib-brand-blue-lighter);
-   transition: all 0.3s ease;
-}
-// .pure-button.pure-button-primary:focus {
-//    box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
-// } 
+
 .pure-button.pure-button-secondary {
    background-color: var(--uvalib-brand-blue-lighter);
    color: black;
@@ -120,27 +152,6 @@ button.v4-button.icon-button {
    cursor: default;
    opacity: 0.25;
 }
-// I'm currently trying to get this code to work for the Give button
-#give-button.pure-button.pure-button-give {
-  margin-top: 25px;
-  border-radius: 5px;
-  font-weight: normal;
-  text-transform: uppercase;
-  background-color: var(--uvalib-brand-orange);
-  color: white !important;
-  font-size: 1.2em;
-}
-#give-button.pure-button.pure-button-give:hover {
-   background-color: var(--uvalib-grey-light);
-   color: var(--uvalib-text-dark) !important;
-}
-// end Give button
 
-button, button.pure-button:focus, a.pure-button:focus {
-   @include be-accessible-button();
-}
-button.text-button:focus {
-   @include be-accessible();
-}
 
 </style>

@@ -8,7 +8,13 @@
     background-color: inherit;
 }
 
-@mixin be-accessible-button($background-color: var(--uvalib-accessibility-highlight)) {
+@mixin be-accessible-button($background-color: var(--uvalib-accessibility-highlight), $color:var(--uvalib-text-dark)) {
     outline: none;
     background-color: $background-color;
+    color: $color !important;
+}
+
+@mixin apply-hover() {
+    background-color: var(--uvalib-brand-blue-lightest);
+    color: var(--uvalib-text-dark);
 }

@@ -78,8 +78,8 @@ div.v4-checkbox {
       color: var(--uvalib-text);
       font-size: 1.2em;
    }
-}
-.v4-checkbox:focus {
-   box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
+   &:focus {
+      @include be-accessible();
+   }
 }
 </style>

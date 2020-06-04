@@ -214,6 +214,9 @@ button.v4-select {
   height:100%;
   width:100%;
 }
+button.v4-select:hover {
+
+}
 button.v4-select:focus {
    @include be-accessible-button(var(--uvalib-accessibility-highlight) !important);
    z-index: 10;
@@ -300,8 +303,7 @@ button.v4-select:focus {
   color: var(--uvalib-grey-light);
 }
 .v4-select .option:hover {
-  background-color:  var(--uvalib-brand-blue-lightest);
-  color: var(--uvalib-text-dark);
+  @include apply-hover();
 }
 .v4-select .option.highlighted  {
   background-color:  var(--uvalib-blue-alt-light);
