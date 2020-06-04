@@ -118,9 +118,6 @@ button.v4-button.icon-button {
       border: 1px solid var(--uvalib-brand-blue-lighter);
       transition: all 0.3s ease;
    }
-   &:focus {
-      @include be-accessible-button();
-   } 
 }
 
 .pure-button.pure-button-secondary {
@@ -147,6 +144,9 @@ button.v4-button.icon-button {
    margin: 0 0 5px 10px;
    border-radius: 5px;
    font-weight: normal;
+   &:focus {
+      @include be-accessible-button();
+   } 
 }
 .pure-button.disabled {
    cursor: default;
