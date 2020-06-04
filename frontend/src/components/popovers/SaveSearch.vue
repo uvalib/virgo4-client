@@ -44,7 +44,6 @@ export default {
          signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
-         queryObject: 'query/queryObject',
          poolFilters: 'filters/poolFilter',
          selectedResults: 'selectedResults'
       }),

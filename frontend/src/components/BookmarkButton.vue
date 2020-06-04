@@ -57,7 +57,6 @@ export default {
         isSignedIn: 'user/isSignedIn',
         isKiosk: 'system/isKiosk',
         bookmarks: 'bookmarks/bookmarks',
-        queryObject: 'query/queryObject',
         selectedResults: 'selectedResults',
         poolFilters: 'filters/poolFilter',
       }),
