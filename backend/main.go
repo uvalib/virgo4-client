@@ -49,6 +49,7 @@ func main() {
 		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
 		api.POST("/journals", svc.GetJournalDetails)
 		api.GET("/journals/browse", svc.BrowseJournals)
+		api.GET("/search_filters", svc.AuthMiddleware, svc.GetSearchFilters)
 		api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 		api.GET("/users/:uid", svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.GetILLiadRequests)

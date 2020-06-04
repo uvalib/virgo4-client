@@ -1,5 +1,5 @@
 <template>
-   <V4Popover class="rename inline" id="renamepop" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
+   <V4Popover class="rename inline" :id="id" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
       firstFocusID="rename" lastFocusID="rename-ok" triggerType="icon" @opened="popoverOpened">
       <template v-slot:trigger>
          <i class="rename fas fa-edit"></i>
@@ -7,7 +7,7 @@
       <template v-slot:content>
          <div class="message pure-form">
             <input  @keyup.enter="enterPressed"  id="rename" type="text" v-model="folderName" @keydown.shift.tab.stop.prevent="backTabInput"
-               aria-required="true" required="required"/>
+               aria-required="true" aria-label="new folder name" required="required"/>
          </div>
          <p class="error" v-if="error">{{error}}</p>
       </template>
@@ -30,6 +30,10 @@ export default {
          type: Object,
          required: true
       },
+      id: {
+         type: String,
+         required: true
+      }
    },
    data: function()  {
       return {

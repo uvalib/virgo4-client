@@ -1,30 +1,20 @@
 <template>
-   <div class="filters">
-      <template v-if="hasFacets == false">
-         <div class="no filters-head clearfix">
-            <span class="title">
-               <i class="warn fas fa-exclamation-triangle"></i>
-               This source does not support filtering.
-               Changes to the Availability filter will have no impact on the results presented below.</span>
-         </div>
+   <div class="filters"  v-if="hasFacets">
+      <div class="filters-head clearfix">
+         <span class="title">Applied Filters</span>
+         <V4Button v-if="hasFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
+      </div>
+      <template v-if="hasFilter">
+         <dl class="filter-display">
+            <template v-for="(values,filter, idx) in displayFilter">
+               <dt :key="filter" class="label">{{filter}}:</dt>
+               <dd :key="idx" class="filter">{{formatValues(values)}}</dd>
+            </template>
+         </dl>
       </template>
-      <template v-else>
-         <div class="filters-head clearfix">
-            <span class="title">Applied Filters</span>
-            <V4Button v-if="hasFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
-         </div>
-         <template v-if="hasFilter">
-            <dl class="filter-display">
-               <template v-for="(values,filter, idx) in displayFilter">
-                  <dt :key="filter" class="label">{{filter}}:</dt>
-                  <dd :key="idx" class="filter">{{formatValues(values)}}</dd>
-               </template>
-            </dl>
-         </template>
-         <div v-else class="no-filter">
-            <span>None</span>
-         </div>
-      </template>
+      <div v-else class="no-filter">
+         <span>None</span>
+      </div>
    </div>
 </template>
 

@@ -16,7 +16,10 @@ const item = {
       availability: state => {
         if ( state.availability == null ) return []
         return state.availability
-      }
+      },
+      getPDF: state => (name) => {
+         return state.details.digitalContent.find( dc=>dc.name==name && dc.type=="PDF")
+      },
    },
 
    mutations: {
@@ -27,11 +30,25 @@ const item = {
          state.details = details
          state.details.searching = false
       },
+      setDigitalContentStatus(state, data) {
+         let dc = state.details.digitalContent.find( f=>f.name==data.name && f.type==data.type)
+         if ( dc ) {
+            dc.status = data.status
+         }
+      },
       setDigitalContentData(state, data) {
          state.details.digitalContent.splice(0, state.details.digitalContent.length)
-         let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status == "READY" )
+         let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status != "FAILED" && dc.pdf.status != "PROCESSING" && dc.pdf.status != "100%")
          pdfs.forEach( item => {
-            state.details.digitalContent.push({type: "PDF", url: item.pdf.urls.download, name: item.label})
+            if ( item.pdf.status == "READY") {
+               state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download, name: item.label})
+            } else if ( item.pdf.status.includes("%")) {
+               state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download, 
+                  statusURL: item.pdf.urls.status, name: item.label})   
+            } else {
+               state.details.digitalContent.push({type: "PDF", status: "NOT_AVAIL", url: item.pdf.urls.download, 
+                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label})     
+            }
          })
          let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
          ocrs.forEach( item => {
@@ -79,6 +96,32 @@ const item = {
    },
 
    actions: {
+      async generateDigitalContent(ctx, data ) {
+         let oldAuth = axios.defaults.headers.common['Authorization']
+         delete axios.defaults.headers.common['Authorization']
+         let dc = ctx.state.details.digitalContent.find( f=>f.name==data.name && f.type==data.type)
+         try { 
+            await axios.get(dc.generateURL)
+            ctx.dispatch("getDigitalContentStatus", data.name)
+         } catch (_err) {
+            ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
+         } finally {
+            axios.defaults.headers.common['Authorization'] = oldAuth    
+         }
+      },
+      async getDigitalContentStatus(ctx, data) {
+         let oldAuth = axios.defaults.headers.common['Authorization']
+         delete axios.defaults.headers.common['Authorization']
+         try {
+            let dc = ctx.state.details.digitalContent.find(  f=>f.name==data.name && f.type==data.type)
+            let response = await axios.get(dc.statusURL)
+            ctx.commit("setDigitalContentStatus", {name: data.name, type: data.type, status: response.data})
+         } catch(error) {
+            ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
+         } finally {
+            axios.defaults.headers.common['Authorization'] = oldAuth    
+         }
+      },
       async getDigitalContentURLs(ctx) {
          let dcField = ctx.state.details.basicFields.find( f=>f.name=="digital_content_url")
          if (!dcField) return 
@@ -143,9 +186,6 @@ const item = {
             return
          } else {
             ctx.commit('clearDetails')
-         }
-         if (ctx.rootState.system.searchAPI == "") {
-            await ctx.dispatch("system/getConfig", null, {root:true})
          }
          await ctx.dispatch("pools/getPools", null, {root:true})
 

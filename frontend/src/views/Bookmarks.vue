@@ -12,7 +12,7 @@
                <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
                <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
                   <AccordionContent
-                     class="boxed"
+                     class="boxed bookmark-folder"
                      color="var(--uvalib-grey-darkest)"
                      background="var(--uvalib-teal-lightest)"
                      borderWidth="0 0 3px 0"
@@ -25,7 +25,9 @@
                         <span class="folder-title" v-html="getTitle(folderInfo)"></span>
                      </template>
                      <template v-slot:controls>
-                        <RenameBookmark :original="folderInfo" v-on:rename-approved="renameFolder" style="margin:0 10px 0 5px" />
+                        <RenameBookmark :id="`rename-${folderInfo.id}`" 
+                           :original="folderInfo" v-on:rename-approved="renameFolder" style="margin:0 10px 0 5px" 
+                        />
                         <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" 
                            alabel="delete bookmark folder" style="margin-right: 10px">
                            <div>
@@ -59,6 +61,7 @@
                                     </div>
                                     <div class="button-group">
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                                          :id="`move-bookmarks-${folderInfo.id}`"
                                           v-on:move-approved="moveBookmarks"/>
                                        <V4Button @click="removeBookmarks" mode="primary">Delete</V4Button>
                                        <V4Button v-if="canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
@@ -69,7 +72,7 @@
                            <tr>
                               <th colspan="3">
                                  <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                                    aria-label="Toggle public visibility of bookmark folder">
+                                    :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder} `">
                                     Public
                                  </V4Checkbox>
                                  <span v-if="folderInfo.public" class="public-url">
@@ -87,7 +90,7 @@
                            </tr>
                            <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
                               <td>
-                                 <input type="checkbox" v-model="selectedItems" :value="bookmark.id" 
+                                 <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
                                     :aria-label="ariaLabel(bookmark)" />
                               </td>
                               <td>
@@ -162,6 +165,18 @@ export default {
       })
    },
    methods: {
+      isSelected(bm) {
+         let idx = this.selectedItems.findIndex( bmid => bmid == bm.id)
+         return idx != -1
+      },
+      toggleBookmarkSelected(bm) {
+         let idx = this.selectedItems.findIndex( bmid => bmid == bm.id)
+         if ( idx == -1 ) {
+            this.selectedItems.push(bm.id)
+         } else {
+            this.selectedItems.splice(idx,1)
+         }
+      },
       ariaLabel(bm) {
          return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
       },
@@ -241,6 +256,8 @@ export default {
       },
       removeBookmarks() {
          if ( this.selectedItems.length == 0) {
+            this.$store.commit("system/setError","No bookmarks selected for deletion.<br/>Select one or more and try again."
+            )
              return
          }
          this.$store.dispatch("bookmarks/removeBookmarks", this.selectedItems)
@@ -266,7 +283,7 @@ export default {
          if (this.newFolder == "") {
             this.$store.commit(
                "system/setError",
-               "A new folder name is required.<br/>Please one and try again."
+               "A new folder name is required.<br/>Please add one and try again."
             )
             this.submitting = false
             return
@@ -280,6 +297,14 @@ export default {
    },
    created() {
       this.$store.dispatch("bookmarks/getBookmarks")
+      setTimeout(()=> { 
+         let eles = document.getElementsByClassName("bookmark-folder")
+         if ( eles.length > 0) {
+            eles[0].focus()
+         } else {
+            document.getElementById("bookmarks-submenu").focus()
+         }
+      }, 250)
    }
 };
 </script>

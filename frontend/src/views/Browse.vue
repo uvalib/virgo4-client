@@ -42,7 +42,6 @@ export default {
    },
    methods: {
       async browseCreated() {
-         await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch('pools/getPools')
 
          let prior = this.rawQueryString

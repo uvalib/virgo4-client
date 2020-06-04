@@ -19,7 +19,8 @@ const query = {
          { value: "title", label: "Title" },
          { value: "author", label: "Author" },
          { value: "subject", label: "Subject" },
-         { value: "date", label: "Date" }
+         { value: "date", label: "Date" },
+         { value: "published", label: "Publisher/Place of Publication"}
       ],
    },
    getters: {

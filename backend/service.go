@@ -258,6 +258,49 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, cfg)
 }
 
+// GetSearchFilters will return all available advanced search filters
+func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
+	log.Printf("Get advanced search filters")
+	url := "select?fl=*&q=*%3A*&rows=0&facet=true&facet.field=source_f"
+	respBytes, err := svc.SolrGet(url)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Message)
+		return
+	}
+
+	var solrResp struct {
+		FacetCounts struct {
+			FacetFields struct {
+				SourceF []interface{} `json:"source_f"` // these are human-readable names
+			} `json:"facet_fields"`
+		} `json:"facet_counts"`
+	}
+
+	if err := json.Unmarshal(respBytes, &solrResp); err != nil {
+		log.Printf("ERROR: unable to parse Solr response: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	type filter struct {
+		Label  string   `json:"label"`
+		Field  string   `json:"field"`
+		Values []string `json:"values"`
+	}
+
+	out := make([]filter, 0)
+	out = append(out, filter{Label: "Collection", Field: "source_f", Values: make([]string, 0)})
+	for idx, srcF := range solrResp.FacetCounts.FacetFields.SourceF {
+		// the data in SourceF is a mixed array. Even entries are string, odd are counts.
+		// In this case, only care about the string so skip all odd numbered entries
+		if idx%2 == 0 {
+			out[0].Values = append(out[0].Values, srcF.(string))
+		}
+	}
+
+	c.JSON(http.StatusOK, out)
+}
+
 // GetCodes will return the raw library and location codes from the ILS connector
 func (svc *ServiceContext) GetCodes(c *gin.Context) {
 	log.Printf("Get ILS connector codes")
@@ -378,7 +421,8 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 }
 
 // SolrGet sends a GET request to solr and returns the response
-func (svc *ServiceContext) SolrGet(url string) ([]byte, *RequestError) {
+func (svc *ServiceContext) SolrGet(query string) ([]byte, *RequestError) {
+	url := fmt.Sprintf("%s/%s/%s", svc.Solr.URL, svc.Solr.Core, query)
 	log.Printf("Solr request: %s", url)
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{

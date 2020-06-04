@@ -5,37 +5,63 @@
          <AccountActivities/>
          <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
          <div class="details">
-            <template v-if="checkouts.length > 0">
-               <div class="barred" v-if="isBarred">
-                     Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
-                     If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
+            <div class="barred" v-if="isBarred">
+               Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
+               If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
+            </div>
+            <div class="checkouts" v-if="checkouts.length > 0">
+               <div class="checkout-header">
+                  <h2>UVA Checkouts</h2>
+                  <V4Button v-if="!isBarred" id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
                </div>
-               <div v-else class="toolbar">
-                  <V4Button mode="primary" @click="renewAll">Renew All</V4Button>
-               </div>
-               <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
-                  <h3 class="item-title">
-                     <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
-                     {{co.title}}
-                     <V4Button v-if="!isBarred" mode="primary" @click="renewItem(co.barcode)" class="renew">Renew</V4Button>
-                  </h3>
-                  <dl>
-                    <dt>Author:</dt>
-                      <dd>{{co.author}}</dd>
-                    <dt class="label">Call number:</dt>
-                      <dd>{{co.callNumber}}</dd>
-                    <dt class="label">Due Date:</dt>
-                      <dd v-html="formatDueInfo(co)"></dd>
-                    <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
-                      <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
-                  </dl>
-                  <div v-if="co.message" class="co-message">
-                     {{co.message}}
+               <div class="checkout-list">
+                  <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
+                     <h3 class="item-title">
+                        <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
+                        {{co.title}}
+                     </h3>
+                     <dl>
+                     <dt>Author:</dt>
+                        <dd>{{co.author}}</dd>
+                     <dt class="label">Call number:</dt>
+                        <dd>{{co.callNumber}}</dd>
+                     <dt class="label">Due Date:</dt>
+                        <dd v-html="formatDueInfo(co)"></dd>
+                     <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
+                        <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
+                     </dl>
+                     <div v-if="co.message" class="co-message">
+                        {{co.message}}
+                     </div>
+                     <div class="renewbar">
+                         <V4Button v-if="!isBarred" mode="primary" 
+                           @click="renewItem(co.barcode)" class="renew"
+                           :aria-label="`renew ${co.title}`"
+                        >
+                           Renew
+                        </V4Button>
+                     </div>
                   </div>
                </div>
-            </template>
-            <template v-else >
-               <div v-if="!lookingUp" class="none">
+            </div>
+            <div class="checkouts" v-if="illiadCheckouts.length > 0">
+               <div class="checkout-header">
+                  <h2>ILL Checkouts</h2>
+               </div>
+               <div class="checkout-list">
+                  <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
+                     <h3 class="item-title">{{co.loanTitle}}</h3>
+                     <dl>
+                        <dt>Author:</dt>
+                           <dd>{{co.loanAuthor}}</dd>
+                        <dt v-if="co.callNumber" class="label">Call number:</dt>
+                           <dd>{{co.callNumber}}</dd>
+                     </dl>
+                  </div>
+               </div>
+            </div>
+            <template v-if="!lookingUp && checkouts.length == 0 && illiadCheckouts.length == 0" >
+               <div class="none">
                   You currently have no items checked out
                </div>
             </template>
@@ -57,11 +83,15 @@ export default {
       ...mapState({
          checkouts: state => state.user.checkouts,
          lookingUp: state => state.user.lookingUp,
+         requests: state => state.user.requests,
       }),
       ...mapGetters({
         sortedCheckouts: 'user/sortedCheckouts',
         isBarred: 'user/isBarred',
-      })
+      }),
+      illiadCheckouts() {
+         return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
+      }
    },
    methods: {
       renewItem(barcode) {
@@ -87,12 +117,22 @@ export default {
    created() {
       this.$store.commit('user/setLookingUp', true)
       this.$store.dispatch("user/getCheckouts")
+      this.$store.dispatch("user/getRequests")
+      setTimeout(()=> { 
+         let ele = document.getElementById("renew-all-btn")
+         if ( ele ) {
+            ele.focus()
+         } else {
+            document.getElementById("checkouts-submenu").focus()
+         }
+      }, 250)
    }
 }
 </script>
-<style>
 
-.details div.overdue, .details div.recall {
+<style lang="scss" scoped>
+// v-deep allows these dynamically added classes to be styled
+::v-deep .details div.overdue, .details div.recall {
    background: var(--uvalib-red-emergency);
    color: white;
    border-radius: 5px;
@@ -101,17 +141,57 @@ export default {
    width:fit-content;
    margin: 2px 0;
 }
-.details div.recall {
+::v-deep .details div.recall {
    background-color: var(--uvalib-yellow);
    color: var(--uvalib-grey-darkest);
    padding: 5px 15px;
    width:fit-content;
 }
-</style>
-<style scoped>
+
+.checkouts {
+   margin-bottom: 25px;
+   .v4-button {
+      margin-bottom: 0 !important;
+   }
+   .checkout-header {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      background: var(--uvalib-blue-alt-light);
+      padding: 5px 5px 5px 15px;
+      border: 1px solid var(--uvalib-blue-alt);
+      border-bottom: none;
+
+      h2 {
+         margin: 0;
+      }
+
+      .v4-button {
+         margin-left: auto;
+      }
+   }
+   .checkout-list {
+      border: 1px solid var(--uvalib-grey);
+      .item {
+         font-size: 0.9em;
+         color: #444;
+         border-bottom: 1px solid var(--uvalib-grey);
+         margin: 0;
+         padding: 0 10px 10px 10px;
+      }
+      .item:last-child {
+         border-bottom: 0;
+      }
+      .item-title {
+         font-weight: bold;
+      }
+   }
+   .renewbar {
+      text-align: right;
+   }
+}
 dl {
-  margin-top: 0;
-  margin-left: 15px;
+  margin: 0 0 0 15px;
   display: inline-grid;
   grid-template-columns: max-content 2fr;
   grid-column-gap: 15px;
@@ -152,16 +232,6 @@ dd {
 .details {
    text-align: left;
 }
-.item {
-   font-size: 0.9em;
-   color: #444;
-   border-bottom: 1px solid #ccc;
-   margin-bottom: 15px;
-   padding-bottom: 0px;
-}
-.item-title {
-   font-weight: bold;
-}
 .fine-value {
   background: var(--uvalib-red-emergency);
   color: white;
@@ -184,7 +254,7 @@ v4-button.renew {
 .toolbar {
    font-size: 0.8em;
    text-align: right;
-   border-bottom: 2px solid var(--color-brand-blue);
+  
    padding-bottom: 5px;
    position: relative;
    top: -10px;

@@ -18,19 +18,28 @@
                <template v-if="accessURLField">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
-                     <AccessURLDetails mode="brief" :pool="pool" :urls="accessURLField.value" />
+                     <AccessURLDetails mode="brief" :title="hit.header.title" :pool="pool" :urls="accessURLField.value" />
                   </dd>
                </template>
             </dl>
          </div>
-         <router-link v-if="hasCoverImages(pool)" class="img-link" :to="detailsURL">
-            <img class="cover-img" v-if="hit.cover_image" :src="hit.cover_image"/>
+         <router-link v-if="hasCoverImages(pool)" class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`" >
+            <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
          </router-link>
       </div>
       <div class="digital-content">
-         <V4DownloadButton v-if="pdfDownloadURL" icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"/>
-         <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt" label="Download OCR" :url="ocrDownloadURL"/>
-         <V4DownloadButton icon="fas fa-file-export" label="Export Citation" :url="risURL" @click="triggerMatomoEvent"/>
+         <V4DownloadButton v-if="pdfDownloadURL" 
+            icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"
+            :aria-label="`download pdf for ${hit.header.title}`"
+         />
+         <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt" 
+            label="Download OCR" :url="ocrDownloadURL"
+            :aria-label="`download ocr for ${hit.header.title}`"
+         />
+         <V4DownloadButton icon="fas fa-file-export" label="Export Citation" 
+            :url="risURL" @click="triggerMatomoEvent"
+            :aria-label="`export citation for ${hit.header.title}`"
+         />
       </div>
    </div>
 </template>
@@ -92,7 +101,7 @@ export default {
    methods: {
       triggerMatomoEvent() {
          if (window._paq ) {
-            window._paq.push(['trackEvent', 'Export', 'RIS', this.hit.identifier])
+            window._paq.push(['trackEvent', 'Export', 'RIS_FROM_SEARCH', this.hit.identifier])
          } else {
             console.error("_PAQ IS NOT AVAILABLE; CANNOT TRIGGER EVENT")
          }

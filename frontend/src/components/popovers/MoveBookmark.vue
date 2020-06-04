@@ -1,5 +1,5 @@
 <template>
-   <V4Popover class="move inline" id="movepop" ref="pop" title="Move Bookmarks" alabel="move bookmarks"
+   <V4Popover class="move inline" :id="id" ref="pop" title="Move Bookmarks" alabel="move bookmarks"
       firstFocusID="foldersel" lastFocusID="move-ok" triggerType="primary">
       <template v-slot:trigger>Move</template>
       <template v-slot:content>
@@ -42,6 +42,10 @@ export default {
          type: Number,
          required: true
       },
+      id: {
+         type: String,
+         required: true
+      }
    },
    data: function()  {
       return {

@@ -59,7 +59,6 @@ const journals = {
    actions: {
       async searchJournals(ctx) {
          ctx.commit("setSearching", true)
-         await ctx.dispatch("system/getConfig", null, {root:true})
          await ctx.dispatch("pools/getPools", null, {root:true})
          
          let q = ctx.state.query

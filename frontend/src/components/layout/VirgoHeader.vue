@@ -77,7 +77,7 @@
             </svg>
             <svg id="library_logo_primary_mobile" data-name="library_logo_primary_mobile" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116.86 115.1">
               <title>University of Virginia Library</title>
-              <desc id="desc">"Stacked version of the logo"</desc>
+              <desc id="descStacked">"Stacked version of the logo"</desc>
               <g id="Layer_2" data-name="Layer 2">
                 <g id="Layer_1-2" data-name="Layer 1">
                   <g>

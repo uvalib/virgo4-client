@@ -10,13 +10,13 @@
          <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
             <div class="options">
                <template v-if="idx > 0">
-                  <select class="search-term-op" v-model="term.op" aria-label="boolean operator for search criteria">
+                  <select class="search-term-op" v-model="term.op" :aria-label="`boolean operator for search criteria number ${idx+1}`">
                      <option value="AND">AND</option>
                      <option value="OR">OR</option>
                      <option value="NOT">NOT</option>
                   </select>
                </template>
-               <select class="field" v-model="term.field" aria-label="search criteria field name">
+               <select class="field" v-model="term.field" :aria-label="` field name for search criteria number ${idx+1}`">
                   <option
                      v-for="fieldObj in advancedFields"
                      :key="fieldObj.value"
@@ -24,32 +24,35 @@
                   >{{fieldObj.label}}</option>
                </select>
                <template v-if="term.field == 'date'">
-                  <select class="date-range-type" v-model="term.type" aria-label="date search mode">
+                  <select class="date-range-type" v-model="term.type" :aria-label="`date comparision mode for search criteria ${idx+1}`">
                      <option value="EQUAL">EQUALS</option>
                      <option value="AFTER">AFTER</option>
                      <option value="BEFORE">BEFORE</option>
                      <option value="BETWEEN">BETWEEN</option>
                   </select>
                </template>
-               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)" aria-label="delete this criteria">
+               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)" 
+                  :aria-label="`delete search criteria number ${idx+1}`">
                   <i class="fas fa-times-circle"></i>
                </V4Button>
             </div>
 
             <div class="query">
                <template v-if="term.field != 'date'">
-                  <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term" />
+                  <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term" 
+                     :aria-label="`query string for search criteria number ${idx+1}`"/>
                </template>
                <template v-else>
                   <div class="date-criteria">
-                     <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value" aria-label="Search for"/>
+                     <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value"
+                         :aria-label="`date for search criteria number ${idx+1}`"/>
                      <span v-if="term.type=='BETWEEN'" class="date-sep">and</span>
                      <input
                         v-if="term.type=='BETWEEN'"
                         type="text"
                         @keyup.enter="doAdvancedSearch"
                         v-model="term.endVal"
-                        aria-label="Search for end date"
+                        :aria-label="`end date for search criteria ${idx+1}`"
                      />
                   </div>
                   <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
@@ -214,6 +217,9 @@ h2 {
    flex-flow: row nowrap;
    justify-content: space-between; 
    align-items: center;
+}
+.sep {
+   margin: 0 5px;
 }
 div.pools-wrapper {
    border-top: 2px solid var(--uvalib-grey-light);

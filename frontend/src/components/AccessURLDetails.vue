@@ -3,12 +3,16 @@
       <template v-for="(p,idx) in urls">
          <div class='provider' :key="idx">
             <template v-if="p.links.length==1">
-               <a :href="p.links[0].url" target='_blank'>{{ providerLabel(p.provider) }}</a>
+               <a :href="p.links[0].url" target='_blank'
+                  :aria-label="`access ${title} online with ${providerLabel(p.provider)}`"
+               >
+                  {{ providerLabel(p.provider) }}
+               </a>
             </template>
             <template v-else>
                <div class="header" :class="{full: mode=='full'}">
                   <template v-if="providerHomepage(p.provider)">
-                     <a :href="providerHomepage(p.provider)" target="_blank">
+                     <a :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
                         <img class="logo" v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
                         <span v-else class="provider link">{{ providerLabel(p.provider) }}</span>
                      </a>
@@ -20,7 +24,7 @@
                <div class="links" :class="{full: mode=='full'}">
                   <template v-for="(l) in providerLinks(p)">
                      <div :key="l.url">
-                        <a :href="l.url" target="_blank" >
+                        <a :href="l.url" target="_blank" :aria-label="`access ${title} ${l.label} with ${providerLabel(p.provider)}`">
                            <template v-if="l.label">{{l.label}}</template>
                            <template v-else>{{l.url}}</template>
                         </a>
@@ -44,6 +48,10 @@ export default {
       mode: {
          type: String,
          default: "brief",
+      },
+      title: {
+         type: String,
+         required: true
       },
       pool: {
          type: String,

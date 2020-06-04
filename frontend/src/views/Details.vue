@@ -41,16 +41,30 @@
                   <template v-if="accessURLField">
                      <dt class="label">{{accessURLField.label}}:</dt>
                      <dd class="value">
-                        <AccessURLDetails mode="full" :pool="details.source" :urls="accessURLField.value" />
+                        <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
                   <template v-if="hasPDFContent">
                      <dt class="label">PDF Download:</dt>
-                     <dd class="value" v-html="pdfLinks"></dd>
+                     <dd class="value">
+                        <template v-for="(dc,idx) in pdfs">
+                           <span class="sep" v-if="idx>0" :key="`pdfsep${idx}`">|</span>
+                           <a v-if="dc.status=='READY'" :href="dc.url" :key="`pdf${idx}`" 
+                              :aria-label="`download pdf for ${dc.name}`"
+                           >
+                              {{dc.name}}
+                           </a>
+                           <DownloadProgress v-else :name="dc.name" :key="`pdf${idx}`" 
+                              :aria-label="`download pdf for ${dc.name}`"
+                           />
+                        </template>
+                     </dd>
                   </template>
                   <dt class="label">Citation:</dt>
                   <dd class="value">
-                     <a :href="risURL">Export RIS Citation<i class="icon fas fa-cloud-download-alt"></i></a>
+                     <V4DownloadButton label="Export RIS Citation" :url="risURL" @click="triggerMatomoEvent"
+                        :aria-label="`export citation for ${details.header.title}`"
+                     />
                   </dd>
                   <template v-if="extDetailLink">
                      <dd></dd>
@@ -85,6 +99,8 @@ import AvailabilityTable from "@/components/AvailabilityTable"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from '@/components/AccessURLDetails'
+import DownloadProgress from '@/components/popovers/DownloadProgress'
+import V4DownloadButton from '@/components/V4DownloadButton'
 
 export default {
    name: "sources",
@@ -105,8 +121,8 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable,
-      ImageDetails, AccordionContent, AccessURLDetails
+      SearchHitHeader, AvailabilityTable, DownloadProgress,
+      ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton
    },
    computed: {
       risURL() {
@@ -131,14 +147,8 @@ export default {
       hasPDFContent() {
          return this.details.digitalContent.filter( dc => dc.type == "PDF").length > 0
       },
-      pdfLinks() {
-         let out = []
-         let pdfs = this.details.digitalContent.filter( dc => dc.type == "PDF")
-         pdfs.forEach( dc => {
-            let link = `<a href="${dc.url}">${dc.name}</a>`
-            out.push(link)
-         })
-         return out.join("<span class='sep'>|</span>")
+      pdfs() {
+         return this.details.digitalContent.filter( dc => dc.type == "PDF")
       },
       poolMode() {
          let details = this.poolDetails(this.details.source)
@@ -176,6 +186,13 @@ export default {
       }
    },
    methods: {
+      triggerMatomoEvent() {
+         if (window._paq ) {
+            window._paq.push(['trackEvent', 'Export', 'RIS_FROM_DETAIL', this.details.identifier])
+         } else {
+            console.error("_PAQ IS NOT AVAILABLE; CANNOT TRIGGER EVENT")
+         }
+      },
       getDetails() {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src

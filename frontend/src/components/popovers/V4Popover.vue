@@ -1,6 +1,6 @@
 <template>
-   <v-popover placement="top-end" class="v4-popover" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-      <V4Button  :id="`${id}trigger`" :mode="triggerType" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
+   <v-popover placement="top-end" class="v4-popover" trigger="manual" :open="isOpen" @hide="hide" @apply-show="opened">
+      <V4Button  :id="`${id}-trigger`" :mode="triggerType" :aria-label="alabel" :aria-pressed="isOpen" @click="toggle" @esc="hide">
         <slot name="trigger"></slot>
       </V4Button>
       <div :id="id" class="v4-popover-dialog" role="dialog" :style="{'max-width': maxWidth}" slot="popover"
@@ -75,22 +75,33 @@ export default {
          if (ele ) {
             ele.focus()
          } else {
-            // if focus target doesn't exist, focus on the one item that is defined
-            // by the basic vrpopover template; the close button
-            ele = document.getElementById(this.id+"-close")
-            if (ele) {
-               ele.focus()
-            }
+            setTimeout( () => {
+               // wait a bit and retry
+               ele = document.getElementById(id)
+               if (ele ) {
+                  ele.focus()
+               } else { 
+                  // retry one last time using the ID that is part of the default template
+                  let fallback = this.id+"-close"
+                  ele = document.getElementById(fallback)
+                  if (ele) {
+                     ele.focus()
+                  } else {
+                     console.log("ERROR: Couldn't set focus on target popover element "+id+" or fallback "+fallback)
+                  }
+               }
+            }, 250)
          }
       },
       hide() {
          this.isOpen = false
-         this.setFocus(`${this.id}trigger`)
+         this.$emit('closed')
+         this.setFocus(`${this.id}-trigger`)
       },
       toggle() {
          this.isOpen = !this.isOpen
          if ( this.isOpen == false) {
-           this.setFocus(`${this.id}trigger`)
+           this.setFocus(`${this.id}-trigger`)
          }
       },
       opened() {

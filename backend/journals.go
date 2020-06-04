@@ -48,7 +48,7 @@ func (svc *ServiceContext) GetJournalDetails(c *gin.Context) {
 		log.Printf("Get details for journal '%s'", title)
 		escTitle := url.QueryEscape(title)
 		escTitle = strings.ReplaceAll(escTitle, "%22", "\\%22")
-		url := fmt.Sprintf("%s/%s/select?q=full_serials_title_f:\"%s\"", svc.Solr.URL, svc.Solr.Core, escTitle)
+		url := fmt.Sprintf("select?q=full_serials_title_f:\"%s\"", escTitle)
 		respBytes, solrErr := svc.SolrGet(url)
 		if solrErr != nil {
 			c.String(solrErr.StatusCode, solrErr.Message)
@@ -144,8 +144,7 @@ func (svc *ServiceContext) BrowseJournals(c *gin.Context) {
 	log.Printf("Browse journals where title starts with %s", title)
 
 	// This is the new URL. it is case sensitive.
-	url := fmt.Sprintf("%s/%s/terms?terms.fl=full_serials_title_f&terms.sort=index&terms.lower=%s",
-		svc.Solr.URL, svc.Solr.Core, url.QueryEscape(title))
+	url := fmt.Sprintf("terms?terms.fl=full_serials_title_f&terms.sort=index&terms.lower=%s", url.QueryEscape(title))
 	respBytes, err := svc.SolrGet(url)
 	if err != nil {
 		log.Printf("ERROR: Solr request for %s failed: %s", title, err.Message)

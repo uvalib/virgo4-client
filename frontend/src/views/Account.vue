@@ -184,6 +184,9 @@ export default {
    created() {
       this.$store.dispatch("user/getAccountInfo")
       this.$store.dispatch("user/getBillDetails")
+      setTimeout(()=> {
+         document.getElementById("info-submenu").focus()
+      },250)
    }
 }
 </script>

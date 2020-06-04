@@ -3,6 +3,7 @@
       @keydown.exact.tab="tabNext" 
       @keydown.shift.tab="tabBack"
       :class="{'text-button': mode=='text', 'icon-button': mode=='icon', 
+               'link-button': mode=='link', 
                'pure-button': isButton, 
                'pure-button-primary': mode == 'primary',
                'pure-button-secondary': mode == 'secondary',
