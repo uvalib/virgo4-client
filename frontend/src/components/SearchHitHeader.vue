@@ -1,7 +1,9 @@
 <template>
    <div class="header-wrapper">
       <div class="full-title">
-         <span v-if="count>0" class="count">{{count}}.</span>
+         <span class="count-wrap" v-if="count">
+            <span class="count">{{count}}</span><span v-if="subcount" class="count sub">.{{subcount}}</span>
+         </span>
          <template v-if="link == false">
             <span class="hit-title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="hit-subtitle">{{hit.header.subtitle}}</span>
@@ -35,7 +37,11 @@ export default {
       },
       count: {
          type: Number,
-         default: -1
+         default: 0
+      },
+      subcount: {
+         type: Number,
+         default: 0
       }
    },
    components: {
@@ -49,8 +55,7 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
 .header-wrapper {
    text-align: left;
    display: flex;
@@ -84,10 +89,20 @@ div.bm-control {
    align-items: center;
    justify-content: flex-start;
 }
-.count {
-   display: inline-block;
-   font-size: 0.7em;
-   color: #888;
+
+.count-wrap {
+   display: flex; 
+   flex-flow: row nowrap;
    margin-right: 5px;
+   align-items: baseline;;
+
+   .count {
+      display: inline-block;
+      font-size: 0.7em;
+      color: var( --uvalib-grey );
+   }
+   .count.sub {
+      font-size: 0.65em;  
+   }
 }
 </style>

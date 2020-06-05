@@ -14,7 +14,10 @@
             <i class="bookmark far fa-bookmark"></i>
          </V4Button>
       </template>
-      <v-popover v-if="!isSignedIn" trigger="manual" :open="isOpen" @hide="hide"  @apply-show="opened">
+      <v-popover v-if="!isSignedIn" trigger="manual" :autoHide="true" 
+         role="dialog" aria-modal="true"
+         :open="isOpen" @hide="hide"  @apply-show="opened"
+      >
          <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide" 
             role="switch" aria-checked="false"
             :aria-label="`bookmark ${hit.header.title}`"
