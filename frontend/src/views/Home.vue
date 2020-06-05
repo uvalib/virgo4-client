@@ -79,7 +79,12 @@ export default {
       next()
    },
    created: function() {
+      this.showJournalBrowse = false
+      if (this.$route.path == "/") {
+         this.showJournalBrowse = true
+      }
       this.searchCreated()
+      
    },
 
    data: function() {
