@@ -96,9 +96,11 @@ export default {
          }
       },
       hide() {
-         this.isOpen = false
-         this.$emit('closed')
-         this.setFocus(`${this.id}-trigger`)
+         if ( this.isOpen ) {
+            this.isOpen = false
+            this.$emit('closed')
+            this.setFocus(`${this.id}-trigger`)
+         }
       },
       toggle() {
          this.isOpen = !this.isOpen

@@ -2,7 +2,11 @@
    <transition name="message-transition"
          enter-active-class="animated faster fadeIn"
          leave-active-class="animated faster fadeOut">
-      <div v-if="showScrollTop" class="scroll-to-top" :class="{mobile: smallScreen}" @click="backToTop">
+      <div v-if="showScrollTop" tabindex="0" role="button" 
+         aria-label="back to top"
+         @click.stop="backToTop" @keydown.prevent.stop.enter="backToTop" @keydown.space.prevent.stop="backToTop" 
+         class="scroll-to-top" :class="{mobile: smallScreen}"
+      >
          <i class="fas fa-angle-up"></i>
       </div>
    </transition>
