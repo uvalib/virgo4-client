@@ -3,32 +3,43 @@
       <template v-if="isSignedIn">
          <V4Button v-if="isBookmarked" mode="icon" @click="removeBookmarkClicked" 
             :id="`bookmark-${hit.identifier}`"
-            :aria-label="`remove bookmark for ${hit.header.title}`">
+            role="switch" aria-checked="true"
+            :aria-label="`bookmark ${hit.header.title}`">
             <i class="bookmark fas fa-bookmark"></i>
          </V4Button>
          <V4Button v-else mode="icon" @click="addBookmarkClicked"
             :id="`bookmark-${hit.identifier}`"
-            :aria-label="`add bookmark for ${hit.header.title}`">
+            role="switch" aria-checked="false"
+            :aria-label="`bookmark ${hit.header.title}`">
             <i class="bookmark far fa-bookmark"></i>
          </V4Button>
       </template>
-      <v-popover v-if="!isSignedIn" trigger="manual" :open="isOpen" @hide="hide" @show="opened">
-         <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide" aria-label="Bookmark">
+      <v-popover v-if="!isSignedIn" trigger="manual" :open="isOpen" @hide="hide"  @apply-show="opened">
+         <V4Button mode="icon" :aria-pressed="isOpen" @click="toggle" @esc="hide" 
+            role="switch" aria-checked="false"
+            :aria-label="`bookmark ${hit.header.title}`"
+         >
             <i class="disabled bookmark far fa-bookmark trigger"></i>
          </V4Button>
          <div class="bookmark-popover" slot="popover">
             <div class="popover-title">
                Sign In Required
-               <i v-close-popover class="close fas fa-times-circle"></i>
             </div>
             <div class="message">
                <p>You must be signed in to use bookmarks.</p>
                <p>Click
                   <V4Button mode="text" id="link" @click="signInClicked" @esc="hide"
-                     aria-label="Sign in to bookmark item">
+                     aria-label="Sign in to bookmark item" :focusBackOverride="true" @tabback="linkTabbed">
                      here
                   </V4Button>
                to sign in.</p>
+            </div>
+            <div class="controls">
+               <V4Button mode="tertiary" id="signin-close" class="hide" @click="hide" @esc="hide"
+                  :focusNextOverride="true" @tabnext="okTabbed" 
+                  :focusBackOverride="true" @tabback="okTabbed" >
+                  Close
+               </V4Button>
             </div>
          </div>
       </v-popover>
@@ -75,6 +86,12 @@ export default {
       }
    },
    methods: {
+      okTabbed() {
+         document.getElementById("link").focus()
+      },
+      linkTabbed() {
+         document.getElementById("signin-close").focus()
+      },
       hide() {
          this.isOpen = false
       },
@@ -119,32 +136,27 @@ export default {
    position: relative;
    display: inline-block;
    box-sizing: border-box;
-}
-i.bookmark.disabled {
-   color: #ccc;
-}
-i.fas.bookmark {
-   color: var(--uvalib-brand-blue-light);
-}
-i.bookmark {
-   color: #444;
-   cursor: pointer;
-   font-size: 1.4em;
-   display: inline-block;
-   box-sizing: border-box;
-   &:focus {
-      @include be-accessible();
+
+   i.bookmark {
+      color: #444;
+      cursor: pointer;
+      font-size: 1.4em;
+      display: inline-block;
+      box-sizing: border-box;
+      &:focus {
+         @include be-accessible();
+      }
+   }
+
+   i.bookmark.disabled {
+      color: #ccc;
+   }
+
+   i.fas.bookmark {
+      color: var(--uvalib-brand-blue-light);
    }
 }
-i.fas.fa-times-circle.close {
-   font-size: 1.1em;
-   float:right;
-   margin-right: 8px;
-}
-i.fas.fa-times-circle.close:hover {
-   opacity: 1;
-   cursor: pointer;
-}
+
 .bookmark-popover {
    background: white;
    box-shadow: $v4-box-shadow;
@@ -154,33 +166,32 @@ i.fas.fa-times-circle.close:hover {
    display: inline-block;
    border-radius: 5px;
    border-bottom: 1px solid var(--uvalib-grey-dark);
-}
-.bookmark-popover p {
-   padding: 3px;
-   margin: 0;
-}
-.bookmark-popover  .message {
-   padding: 10px;
-   border-left: 1px solid var(--uvalib-grey-dark);
-   border-right: 1px solid var(--uvalib-grey-dark);
-   text-align: center;
-}
-.bookmark-popover a {
-   color: var(--color-link);
-   font-weight: 500;
-   text-decoration: none;
-   font-weight: bold;
-}
-.bookmark-popover a:hover {
-   text-decoration: underline;
-}
-.bookmark-popover .popover-title {
-   padding: 8px 0 6px 0;
-   margin: 0;
-   text-align: center;
-   background: var(--uvalib-grey-dark);
-   color: white;
-   font-weight: normal;
-   border-radius: 5px 5px 0 0;
+
+   p {
+      padding: 3px;
+      margin: 0;
+   }
+   .message {
+      padding: 10px;
+      border-left: 1px solid var(--uvalib-grey-dark);
+      border-right: 1px solid var(--uvalib-grey-dark);
+      text-align: center;
+   }
+   .popover-title {
+      padding: 8px 0 6px 0;
+      margin: 0;
+      text-align: center;
+      background: var(--uvalib-grey-dark);
+      color: white;
+      font-weight: normal;
+      border-radius: 5px 5px 0 0;
+   }
+   .controls {
+      font-size: 0.8em;
+      text-align: right;
+      padding: 0 5px;
+      border-left: 1px solid var(--uvalib-grey-dark);
+      border-right: 1px solid var(--uvalib-grey-dark);
+   }
 }
 </style>
