@@ -11,6 +11,8 @@ require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/lib/pq v1.7.0
+	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/jcmturner/gokrb5/v8 v8.3.0 // indirect
 	github.com/prometheus/client_golang v1.6.0 // indirect
 	github.com/prometheus/common v0.10.0 // indirect
 	github.com/prometheus/procfs v0.1.1 // indirect
