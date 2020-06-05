@@ -33,7 +33,7 @@
          <li><a href="https://www.library.virginia.edu/press/">Press</a></li>
          <li><a href="https://www.library.virginia.edu/renovation/">Alderman Renovation</a></li>
          <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
-         <li><a href="https://www.library.virginia.edu/support-library/" class="pure-button pure-button-give" id="give-button" role="button" aria-disabled="false">Give to the Library</a></li>
+         <li class="give-library"><V4Button mode="link" url="https://www.library.virginia.edu/support-library/">Give to the Library</V4Button></li>
        </ul>
      </div>
      <div class="footer-bucket">
@@ -100,7 +100,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 footer {
    border-bottom: none;
    border-left: none;
@@ -148,18 +148,9 @@ ul li {
 address {
   margin-top: 25px;
 }
-.pure-button.pure-button-give {
-  margin-top: 25px;
-  border-radius: 5px;
-  font-weight: normal;
-  text-transform: uppercase;
-  background-color: var(--uvalib-brand-orange);
-  color: white !important;
+.give-library {
   font-size: 1.2em;
-}
-.pure-button.pure-button-give:hover {
-   background-color: var(--uvalib-grey-light);
-   color: var(--uvalib-text-dark) !important;
+  margin-top: 25px;
 }
 .footer-post-container {
   background-color: var(--uvalib-blue-alt-darkest);

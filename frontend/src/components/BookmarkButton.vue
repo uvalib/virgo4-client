@@ -126,13 +126,15 @@ i.bookmark.disabled {
 i.fas.bookmark {
    color: var(--uvalib-brand-blue-light);
 }
-
 i.bookmark {
    color: #444;
    cursor: pointer;
    font-size: 1.4em;
    display: inline-block;
    box-sizing: border-box;
+   &:focus {
+      @include be-accessible();
+   }
 }
 i.fas.fa-times-circle.close {
    font-size: 1.1em;
