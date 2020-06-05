@@ -155,6 +155,10 @@ export default {
    --uvalib-text: var(--uvalib-grey-dark);
    --uvalib-text-dark: var(--uvalib-grey-darkest);
 
+// testing out colors for focus states
+   --uvalib-accessibility-highlight: var(--uvalib-blue-alt-lightest);
+   --uvalib-accessibility-highlight-light: var(--uvalib-blue-alt-lightest);
+
    /* Color Remapping */
    --color-brand-blue: var(--uvalib-brand-blue);
    --color-light-blue: var(--uvalib-brand-blue-light);
@@ -211,6 +215,14 @@ body {
    top: 5px;
    width: auto;
    z-index: 100000;
+}
+
+//adding accessibility for keyboard focus
+#app a:focus {
+   @include be-accessible();
+}
+#app input:focus {
+   @include be-accessible-button(var(--uvalib-accessibility-highlight-light));
 }
 
 #v4-navbar {

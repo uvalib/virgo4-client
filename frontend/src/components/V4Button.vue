@@ -70,7 +70,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 button.text-button {
    border: none;
    background: none;
@@ -79,33 +79,51 @@ button.text-button {
    color: var(--color-link);
    cursor: pointer;
    display: inline-block;
+   &:hover {
+      opacity: 1;
+      text-decoration: underline;
+   }
+   &:focus {
+      @include be-accessible();
+   }
 }
-button.text-button:hover {
-   opacity: 1;
-   text-decoration: underline;
-}
+
 button.v4-button.icon-button {
    border: none;
    background: none;
    padding:2px;
    margin:0;
    outline: none;
+   &:focus {
+      @include be-accessible();
+   } 
+}
+.link-button {
+  border-radius: 5px;
+  font-weight: normal;
+  text-transform: uppercase;
+  background-color: var(--uvalib-brand-orange);
+  color: white;
+  border: none;
+  padding: 10px 12px;
+   &:hover  {
+      background-color: var(--uvalib-grey-light);
+      color: var(--uvalib-text-dark);
+   }
+   &:focus {
+      @include be-accessible-button(var(--uvalib-accessibility-highlight-light), var(--uvalib-text-dark));
+   }
 }
 .pure-button.pure-button-primary {
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
+   &:hover {
+      background-color: var(--uvalib-brand-blue-lighter);
+      border: 1px solid var(--uvalib-brand-blue-lighter);
+      transition: all 0.3s ease;
+   }
 }
-.pure-button.pure-button-primary:hover {
-   background-color: var(--uvalib-brand-blue-lighter);
-   border: 1px solid var(--uvalib-brand-blue-lighter);
-   transition: all 0.3s ease;
-}
-.pure-button.pure-button-primary:focus {
-   box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
-} 
-.icon-button:focus  {
-   box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
-} 
+
 .pure-button.pure-button-secondary {
    background-color: var(--uvalib-brand-blue-lighter);
    color: black;
@@ -118,9 +136,6 @@ button.v4-button.icon-button {
    border: 1px solid var(--uvalib-grey);
    color: black;
 }
-.pure-button.pure-button-tertiary:focus {
-   box-shadow: 0 0 0 4px rgba(150,150,150, 0.3); 
-}
 .pure-button.pure-button-tertiary:hover {
    background-color: var(--uvalib-grey-light);
 }
@@ -130,25 +145,14 @@ button.v4-button.icon-button {
    margin: 0 0 5px 10px;
    border-radius: 5px;
    font-weight: normal;
+   &:focus {
+      @include be-accessible-button();
+   } 
 }
 .pure-button.disabled {
    cursor: default;
    opacity: 0.25;
 }
 
-.link-button {
-  margin-top: 25px;
-  border-radius: 5px;
-  font-weight: normal;
-  text-transform: uppercase;
-  background-color: var(--uvalib-brand-orange);
-  color: white;
-  font-size: 1.2em;
-  border: none;
-  padding: 10px 12px;
-}
-.link-button:hover  {
-   background-color: var(--uvalib-grey-light);
-   color: var(--uvalib-text-dark);
-}
+
 </style>
