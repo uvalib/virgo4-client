@@ -1,5 +1,5 @@
 <template>
-   <button tabindex="0" role="button" class="v4-button" 
+   <button tabindex="0" :role="role" class="v4-button" 
       @keydown.exact.tab="tabNext" 
       @keydown.shift.tab="tabBack"
       :class="{'text-button': mode=='text', 'icon-button': mode=='icon', 
@@ -31,6 +31,10 @@ export default {
       url: {
          type: String,
          default: ""
+      },
+      role: {
+         type: String,
+         default: "button"
       }
    },
    computed: {
