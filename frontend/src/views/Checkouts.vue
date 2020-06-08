@@ -54,8 +54,12 @@
                      <dl>
                         <dt>Author:</dt>
                            <dd>{{co.loanAuthor}}</dd>
-                        <dt v-if="co.callNumber" class="label">Call number:</dt>
-                           <dd>{{co.callNumber}}</dd>
+                        <template  v-if="co.callNumber">
+                           <dt class="label">Call number:</dt>
+                              <dd>{{co.callNumber}}</dd>
+                        </template>
+                        <dt class="label">Due Date:</dt>
+                           <dd>{{formatILLDate(co.dueDate)}}</dd>
                      </dl>
                   </div>
                </div>
@@ -99,6 +103,9 @@ export default {
       },
       renewAll() {
          this.$store.dispatch("user/renewAll")
+      },
+      formatILLDate(dateStr) {
+         return dateStr.split("T")[0]
       },
       formatDueInfo(checkout) {
          let out =  `<div>${checkout.due.split("T")[0]}</div>`
