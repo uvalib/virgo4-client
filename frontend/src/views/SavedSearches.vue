@@ -29,6 +29,7 @@
                            </router-link>
                         </span>
                         <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)"
+                           :id="`del-saved-search-${idx+1}`"
                            :alabel="`Delete search named ${saved.name}`"
                         >
                            <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
@@ -46,7 +47,7 @@
                   </div>
                </div>
                 <div class="controls">
-                  <ConfirmDelete v-on:delete-approved="removeAllSearches" label="Delete all saved searches">
+                  <ConfirmDelete v-on:delete-approved="removeAllSearches" id="del-all-searches" label="Delete all saved searches">
                      <div>Delete all saved searches?</div>
                      <div class="del-detail">This cannot be reversed.</div>
                   </ConfirmDelete>
