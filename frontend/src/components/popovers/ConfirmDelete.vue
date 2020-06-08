@@ -1,6 +1,6 @@
 <template>
-   <V4Popover class="confirm" id="confirmpop" ref="pop" title="Confirm Delete" :alabel="alabel"
-      firstFocusID="confirm-cancelbtn" lastFocusID="confirm-okbtn" :triggerType="triggerType">
+   <V4Popover class="confirm" :id="id" ref="pop" title="Confirm Delete" :alabel="alabel"
+      :firstFocusID="`${id}-cancelbtn`" :lastFocusID="`${id}-okbtn`" :triggerType="triggerType">
       <template v-slot:trigger>
          <span  v-if="label">{{label}}</span>
          <i v-else class="trash fas fa-trash-alt"></i>
@@ -10,11 +10,11 @@
          <p>Continue?</p>
        </template>
        <template v-slot:controls>
-         <V4Button mode="tertiary" id="confirm-cancelbtn" @click="cancelClicked"
+         <V4Button mode="tertiary" :id="`${id}-cancelbtn`" @click="cancelClicked"
             :focusBackOverride="true" @tabback="backTabCancel">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="confirm-okbtn" @click="okClicked"
+         <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
             :focusNextOverride="true" @tabnext="nextTabOK">
             OK
          </V4Button>
@@ -27,6 +27,10 @@ export default {
    props: {
       label: String,
       alabel: String,
+      id: {
+         type: String,
+         required: true
+      }
    },
    computed: {
       triggerType() {

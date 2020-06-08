@@ -29,6 +29,7 @@
                            :original="folderInfo" v-on:rename-approved="renameFolder" style="margin:0 10px 0 5px" 
                         />
                         <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" 
+                           :id="`delete-${folderInfo.id}`" 
                            alabel="delete bookmark folder" style="margin-right: 10px">
                            <div>
                               Delete bookmark folder
