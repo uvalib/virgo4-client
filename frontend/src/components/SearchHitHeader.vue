@@ -86,13 +86,14 @@ div.bm-control {
    font-size: 1.25em;
    display:flex;
    flex-flow: row nowrap;
-   align-items: center;
+   align-items: flex-start;
    justify-content: flex-start;
 }
 
 .count-wrap {
    display: flex; 
    flex-flow: row nowrap;
+   margin-top: 2px;
    margin-right: 5px;
    align-items: baseline;;
 
