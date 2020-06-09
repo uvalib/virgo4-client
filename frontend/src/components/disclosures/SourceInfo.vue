@@ -41,11 +41,11 @@ export default {
 
 <style lang="scss" scoped>
 .disclosure {
+   text-align: left;
    .full-text {
       background: var(  --uvalib-teal-lightest);
       margin: 0 0 0 15px;
       padding: 10px 15px;
-      border-radius: 5px;
    }
    .arrow {
       padding-left: 2px;
@@ -64,7 +64,6 @@ export default {
       margin: 0;
       padding: 0;
       text-align: left;
-      width: 100%;
       box-sizing: border-box;
       &:focus {
          @include be-accessible();
