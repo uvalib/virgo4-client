@@ -21,9 +21,8 @@
                </template>
             </template>
          </viewer>
-         <div  v-if="manifestURL" class="iiif-help">
-            <span>What is <img src="../assets/iiif_icon.png"/></span>
-            <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
+         <div  v-if="manifestURL" class="iiif-help">          
+            <IIIFInfo />
          </div>
       </template>
 
@@ -48,7 +47,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import IIIFInfo from "@/components/popovers/IIIFInfo"
+import IIIFInfo from "@/components/disclosures/IIIFInfo"
 
 export default {
    data: function() {
@@ -190,8 +189,8 @@ img.thumb:hover {
    background-image: url('~@/assets/iiif_icon.png');
    background-size: contain;
    display: inline-block;
-   width: 35px;
-   height: 30px;
+   width: 25px;
+   height: 22px;
 }
 .img-link {
    padding-bottom:5px;

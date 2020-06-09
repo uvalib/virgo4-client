@@ -23,7 +23,7 @@
             >
           </div>
           <div class="controls">
-            <SourceInfo id="source-info"/>
+            <SourceInfo />
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
