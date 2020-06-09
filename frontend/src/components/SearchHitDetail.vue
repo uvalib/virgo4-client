@@ -131,7 +131,7 @@ export default {
    align-items: flex-start;
 
    div.basic {
-      padding: 5px 10px 10px 10px;
+      padding: 5px 10px 10px 22px;
       flex-grow: 1;
 
       dl {
