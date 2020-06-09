@@ -410,7 +410,7 @@ export default {
       position: relative;
       .alert-count {
          font-size: 0.7em;
-         font-weight: normal;
+         font-weight: bold;
          background: var(--uvalib-brand-orange);
          color: white;
          width: 15px;
