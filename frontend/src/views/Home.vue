@@ -23,7 +23,7 @@
             >
           </div>
           <div class="controls">
-            <SourceInfo />
+            <SourceInfo id="source-info"/>
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
@@ -54,7 +54,7 @@ import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/popovers/SearchTips"
-import SourceInfo from "@/components/popovers/SourceInfo"
+import SourceInfo from "@/components/disclosures/SourceInfo"
 import AdvancedSearch from "@/components/AdvancedSearch"
 import V4Select from "@/components/V4Select"
 import Welcome from "@/components/Welcome"
@@ -346,7 +346,7 @@ span.sep {
   padding: 10px 0;
   display: flex;
   flex-flow: row wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 }
 .controls .search.v4-button {
