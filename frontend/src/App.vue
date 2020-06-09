@@ -169,7 +169,7 @@ export default {
    --color-lighter-orange: var(--uvalib-brand-orange-lightest);
    --color-primary-orange: var(--uvalib-brand-orange);
    --color-dark-orange: var(--uvalib-brand-orange-dark);
-   --color-link: var(--uvalib-brand-blue-light);
+   --color-link: var(--uvalib-blue-alt-dark);
    --color-link-darker: var(--uvalib-blue-alt-dark);
    --color-primary-text: var(--uvalib-grey-dark);
    --color-error: var(--uvalib-red-emergency);
