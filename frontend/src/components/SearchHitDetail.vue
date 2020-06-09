@@ -3,7 +3,7 @@
       <div class="details">
          <div class="basic">
             <div v-if="hit.header.author" class="author">
-               <TruncatedText :title="hit.header.author.label" 
+               <TruncatedText  v-if="hit.header.author" :id="`${hit.identifier}-title`" :title="hit.header.author.label" 
                   :text="hit.header.author.value.join('; ')" :limit="truncateLength" />
             </div>
             <dl class="fields">
@@ -11,7 +11,9 @@
                   <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
                      <dd :key="getKey(field,`v${idx}`)" >
-                        <TruncatedText :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" />
+                        <TruncatedText :id="`${hit.identifier}-${field.name}`"  
+                           :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" 
+                        />
                      </dd>
                   </template>
                </template>
@@ -133,6 +135,7 @@ export default {
    div.basic {
       padding: 5px 10px 10px 10px;
       flex-grow: 1;
+      max-width:75%;
 
       dl {
          margin: 0 0 0 15px;

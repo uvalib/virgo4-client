@@ -7,7 +7,7 @@
          </div>
          <template v-else>
             <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
-            <TruncatedText title="" :text="authorText" :limit="120" ></TruncatedText>
+            <TruncatedText id="bookmark-author" :text="authorText" :limit="120" ></TruncatedText>
             <div class="select pure-form" >
                <template v-if="showAdd==false">
                   <label for="folder">Select a folder for the bookmark</label>

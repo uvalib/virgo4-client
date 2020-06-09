@@ -1,34 +1,27 @@
 <template>
-   <div class="truncated-text">
+   <div :id="id" class="truncated-text">
       <div v-if='isTruncated==false'>
-         <router-link v-if="tgtURL" :to="tgtURL">
-            <div v-html="truncatedText"></div>
-         </router-link>
-         <div v-else v-html="truncatedText"></div>
+         <div v-html="truncatedText"></div>
       </div>
       <template v-else>
-         <div v-if="mode=='text'" class="truncated-content">
-            <router-link v-if="tgtURL" :to="tgtURL">
-               <div v-html="truncatedText"></div>
-            </router-link>
-            <div v-else v-html="truncatedText"></div>
+         <button v-if="!showFull" tabindex="0" :aria-expanded="showFull" :aria-controls="`${id}-full`" 
+            @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
+            @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
+            class="truncated-content" :id="`${id}-cut`" :title="text"
+            :class="{icon: mode=='icon'}"
+         >
+            <span class="text">{{truncatedText}}</span>
+            <span  v-if="mode=='text'" class="more">...&nbsp;More</span>
+            <span  v-else class="more icon">...</span>
+         </button>
+         <div v-if="showFull" :id="`${id}-full`" class="full-text" tabindex="0" :class="{icon: mode=='icon'}"
+            @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
+            @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
+         >
+            <span class="text">{{text}}</span>
+            <span  v-if="mode=='text'" class="less" :id="`${id}-less`">Less</span>
+            <span v-else class="less icon" :id="`${id}-less`">Less</span>
          </div>
-         <v-popover class="full-trigger" :open="showFull"  trigger="manual" @hide="hide"  @esc="hide">
-            <V4Button v-if="mode=='text'" mode="text" :aria-pressed="showFull" @click="textClicked" @esc="hide">
-               More
-            </V4Button>
-            <V4Button v-else mode="icon" :aria-pressed="showFull" @click="textClicked" @esc="hide">
-               <span v-html="truncatedText"></span>
-               <i class="icon fas fa-chevron-circle-down"></i>
-            </V4Button>
-            <div class="full-text-popover" slot="popover">
-               <div v-if="title" class="popover-header">
-                  {{title}}
-                  <i v-close-popover class="close fas fa-times-circle"></i>
-               </div>
-               <div class="full-text" v-html="text"></div>
-            </div>
-         </v-popover>
       </template>
    </div>
 </template>
@@ -36,10 +29,6 @@
 <script>
 export default {
    props: {
-      title: {
-         type: String,
-         default: "",
-      },
       text: {
          type: String,
          required: true,
@@ -48,13 +37,13 @@ export default {
          type: Number,
          default: 80
       },
-      tgtURL: {
-         type: String,
-         default: ""
-      },
       mode: {
          type: String, 
          default: "text"
+      },
+      id: {
+         type: String,
+         required: true
       }
    },
    data: function() {
@@ -71,24 +60,65 @@ export default {
          if (this.text.length <= this.limit) return this.text
          var trunc = this.text.substr(0, this.limit-1)
          var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()
-         return out+"... "
+         return out
       }
    },
    methods: {
       hide() {
          this.showFull = false
+         this.$nextTick( () => {
+            let tgtID = `${this.id}-cut`
+            let ele = document.getElementById( tgtID )
+            if (ele) {
+               ele.focus()
+            }
+         })
       },
-      textClicked() {
+      toggle() {
          this.showFull = !this.showFull
+         this.$nextTick( () => {
+            let tgtID = `${this.id}-full`
+            if ( this.showFull == false) {
+               tgtID = `${this.id}-cut`
+            }
+            let ele = document.getElementById( tgtID )
+            if (ele) {
+               ele.focus()
+            }
+         })
       },
    }
 }
 </script>
 
 <style lang="scss" scoped>
+.full-text {
+   background: white;
+}
+.full-text.icon {
+   padding: 5px 18px 5px 5px;
+   position: relative;
+   top: 0px;
+   left: -5px;
+   z-index: 999;
+   width: 100%;
+   box-sizing: border-box;
+   background: white !important;
+   border: 1px solid var(--uvalib-grey);
+   box-shadow: $v4-box-shadow;
+   i {
+      position: absolute;
+      right: 5px; 
+      top: 5px;
+   }
+}
 .truncated-text {
    font-size: 1em;
    font-weight: normal;
+   display: inline-block;
+   text-align: left;
+   position: relative;
+   box-sizing: border-box;
 
    .truncated-content {
       display: inline-block;
@@ -97,54 +127,56 @@ export default {
       -moz-hyphens: auto;
       hyphens: auto;
       cursor: default;
-   }
-}
-
-.full-trigger {
-   display: inline-block;
-   i.trigger.more {
-      color: var(--color-link);
-      cursor: pointer;
-      margin-left: 10px;
-      font-weight: 500;
-      font-size: 0.8em;
-   }
-   i.trigger.more:hover {
-      text-decoration: underline;
-   }
-   i.icon {
-      font-size: 1.2em;
-      margin-left: 2px;
-      color: var(--uvalib-grey);
-   }
-}
-
-.full-text-popover {
-   background: white;
-   border-radius: 5px;
-   box-shadow: $v4-box-shadow-light;
-   border: 1px solid var(--uvalib-grey-dark);
-   margin: 0 10%;
-
-   .popover-header {
-      padding: 5px;
-      color: white;
-      background-color: var(--uvalib-grey-dark);
-      font-weight: 500;
-      text-align: center;
-
-      i.close {
-         font-size: 1.1em;
-         float:right;
+      background: transparent;
+      border: none;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+      width: 100%;
+      box-sizing: border-box;
+      &:focus {
+         @include be-accessible();
       }
+      i {
+         position: absolute;
+         right: 5px; 
+         top: 5px;
+      }
+   }
+   .truncated-content.icon:hover {
+      text-decoration: underline;
+      cursor: pointer;
    }
 
    .full-text {
-      font-size: 0.95em;
-      padding: 10px;
-      line-height: 1.5em;
-      font-weight: 100;
-      max-width: 90%;
+      text-align: left;
+      &:focus {
+         @include be-accessible();
+      }
+   }
+    .full-text.icon {
+      outline: none;
+      cursor: pointer;
+      &:focus {
+         background-color: var(--uvalib-teal-lightest)!important;
+         color: var(--uvalib-text-dark);
+      }
+   }
+
+   .more, .less {
+      color: var(--color-link);
+      cursor: pointer;
+      margin-left: 0px;
+      font-weight: 500;
+      margin-left: 5px;
+      font-size: 0.9em;
+   }
+   .more.icon  {
+       color: var( --uvalib-text);   
+       margin-left: 0px;
+   }
+   .more:hover, .less:hover {
+      text-decoration: underline;
    }
 }
 
