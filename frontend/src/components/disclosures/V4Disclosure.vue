@@ -6,7 +6,7 @@
          <i v-else class="arrow fas fa-caret-right"></i>
          <slot name="summary"></slot>
       </V4Button>
-      <div v-show="showFull" :id="`${id}-full`" class="full-text" @keyup.stop.esc="hide">
+      <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text" @keyup.stop.esc="hide">
          <slot name="content"></slot>
       </div>
    </div>
