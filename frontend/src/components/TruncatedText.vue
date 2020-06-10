@@ -14,14 +14,14 @@
             <span  v-if="mode=='text'" class="more">...&nbsp;More</span>
             <span  v-else class="more icon">...</span>
          </button>
-         <div v-if="showFull" :id="`${id}-full`" class="full-text" tabindex="0" :class="{icon: mode=='icon'}"
+         <button v-if="showFull" :id="`${id}-full`" class="full-text" tabindex="0" :class="{icon: mode=='icon'}"
             @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
             <span class="text">{{text}}</span>
-            <span  v-if="mode=='text'" class="less" :id="`${id}-less`">Less</span>
+            <span  v-if="mode=='text'" class="less" :id="`${id}-less`">...&nbsp;Less</span>
             <span v-else class="less icon" :id="`${id}-less`">Less</span>
-         </div>
+         </button>
       </template>
    </div>
 </template>
@@ -120,7 +120,7 @@ export default {
    position: relative;
    box-sizing: border-box;
 
-   .truncated-content {
+   button {
       display: inline-block;
       word-break: break-word;
       -webkit-hyphens: auto;
