@@ -4,7 +4,7 @@
          <div v-html="truncatedText"></div>
       </div>
       <template v-else>
-         <button v-if="!showFull" tabindex="0" :aria-expanded="showFull" :aria-controls="`${id}-full`" 
+         <button v-if="!showFull" tabindex="0" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`" 
             @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
             class="truncated-content" :id="`${id}-cut`" :title="text"

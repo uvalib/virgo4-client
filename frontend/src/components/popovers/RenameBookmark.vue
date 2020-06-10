@@ -1,5 +1,5 @@
 <template>
-   <V4Popover class="rename inline" :id="id" ref="pop" title="Rename Bookmark Folder" alabel="Rename bookmark folder"
+   <V4Popover class="rename inline" :id="id" ref="pop" title="Rename Bookmark Folder" :alabel="`Rename bookmark folder ${original.folder}`"
       firstFocusID="rename" lastFocusID="rename-ok" triggerType="icon" @opened="popoverOpened">
       <template v-slot:trigger>
          <i class="rename fas fa-edit"></i>

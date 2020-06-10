@@ -13,7 +13,7 @@
                <span>Questions? Ask a Librarian</span>
             </a>
          </div>
-         <span v-if="isKiosk==false" role="menu" id="servicemenu" class="menu-item service" tabindex="-1" :aria-expanded="svcMenuOpen"
+         <span v-if="isKiosk==false" role="menu" id="servicemenu" class="menu-item service" tabindex="-1" :aria-expanded="svcMenuOpen.toString()"
             @click.stop="toggleSvcMenu" @keyup.prevent.stop.enter="toggleSvcMenu" @keydown.space.prevent.stop="toggleSvcMenu"
             @keyup.down="nextSvcMenu" @keyup.up="prevSvcMenu">
             <span>Library Services&nbsp;</span>
@@ -54,7 +54,7 @@
             </transition>
          </span>
          <template v-if="isSignedIn">
-            <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen"
+            <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen.toString()"
                @click.stop="toggleUserMenu" @keyup.prevent.stop.enter="toggleUserMenu" @keydown.space.prevent.stop="toggleUserMenu"
                @keyup.down="nextUserMenu" @keyup.up="prevUserMenu">
                <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>

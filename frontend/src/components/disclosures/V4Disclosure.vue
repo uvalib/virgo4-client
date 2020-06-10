@@ -1,6 +1,6 @@
 <template>
    <div :id="id" class="disclosure">
-      <V4Button mode="text" :aria-expanded="showFull" :aria-controls="`${id}-full`" 
+      <V4Button mode="text" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`" 
          @click="toggle" @esc="hide" @blur.native="blurred">
          <i v-if="showFull" class="arrow fas fa-caret-down"></i>
          <i v-else class="arrow fas fa-caret-right"></i>

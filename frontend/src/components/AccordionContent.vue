@@ -1,23 +1,19 @@
 <template>
-   <div class="accordion" tabindex="0" :id="id" 
+   <div class="accordion" :id="id" 
       @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
-      <div class="header-wrap" role=heading>
-         <div v-if="showHeader" :class="layout" class="title" role="button"
-            :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
-            v-bind:aria-expanded="isExpanded" :aria-controls="contentID">
-            <slot name="title"></slot>
-            <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
-         </div>
-         <div class="accordion-buttons" v-if="hasControlSlot"
-            :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }">
-            <slot name="controls">
-            </slot>
-         </div>
+      <div v-if="showHeader" :id="`${id}-header`"
+         tabindex="0"
+         :class="layout" class="title" role="button"
+         :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
+         :aria-expanded="expandedStr" :aria-controls="contentID">
+         <slot name="title"></slot>
+         <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
       </div>
-       <transition name="accordion"
+      <transition name="accordion"
             v-on:before-enter="beforeEnter" v-on:enter="enter"
             v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div :id="contentID" class="accordion-content" v-show="isExpanded" 
+            :aria-labelledby="`${id}-header`" role="region" aria-live="polite"
             :style="{ background: backgroundContent, color: color }" 
             @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
             <slot></slot>
@@ -129,6 +125,12 @@ export default {
       };
    },
    computed: {
+      expandedStr() {
+         if ( this.isExpanded ) {
+            return "true"
+         }
+         return "false"
+      },
       rotation() {
          if ( this.invert) {
             if (this.isExpanded) {
@@ -196,13 +198,6 @@ export default {
       justify-content: space-between;   
       align-items: stretch;
       height: 100%;
-
-      .accordion-buttons {
-         display: flex;
-         flex-flow: row nowrap;
-         justify-content: space-between;   
-         align-items: center;
-      }
    }
 
    .title, .footer {
@@ -243,10 +238,10 @@ export default {
       text-align: left;
    }
 }
-.accordion {
+.title {
    outline: none;
 }
-.accordion:focus {
+.title:focus {
    box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
 }
 </style>
