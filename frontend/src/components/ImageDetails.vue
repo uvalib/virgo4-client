@@ -21,9 +21,6 @@
                </template>
             </template>
          </viewer>
-         <div  v-if="manifestURL" class="iiif-help">          
-            <IIIFInfo />
-         </div>
       </template>
 
       <template v-else>
@@ -37,10 +34,12 @@
                <a :href="manifestURL" target="_blank">
                   <img src="../assets/iiif_icon.png"/>
                </a>
-               <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
             </span>
          </div>
       </template>
+      <div  v-if="manifestURL" class="iiif-help">          
+         <IIIFInfo />
+      </div>
    </div>
 </template>
 

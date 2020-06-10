@@ -5,7 +5,9 @@
          <i class="fas fa-question-circle"></i>
       </template>
       <template v-slot:content>
-         Resource Types are collections of related items that are available to be searched by Virgo.
+         <p>
+            Resource Types are collections of related items that are available to be searched by Virgo.
+         </p>
        </template>
    </V4Disclosure>
 </template>
@@ -16,4 +18,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+   p {
+      margin: 15px;
+      padding: 0;
+   }
 </style>
