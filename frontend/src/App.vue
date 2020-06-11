@@ -32,7 +32,7 @@ import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import SessionExpired from "@/components/layout/SessionExpired"
 import FatalError from "@/components/layout/FatalError"
-import AddBookmarkModal from "@/components/AddBookmarkModal"
+import AddBookmarkModal from "@/components/modals/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {

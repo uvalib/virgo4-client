@@ -88,9 +88,7 @@
                      </div>
                   </AccordionContent>
                   <div class="folder-buttons">
-                     <RenameBookmark :id="`rename-${folderInfo.id}`" 
-                        :original="folderInfo" v-on:rename-approved="renameFolder" style="margin:0 10px 0 5px" 
-                     />
+                     <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo"/>
                      <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" 
                         :id="`delete-${folderInfo.id}`" 
                         :alabel="`delete bookmark folder ${folderInfo.folder}`" style="margin-right: 10px">
@@ -132,7 +130,7 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import ConfirmDelete from "@/components/popovers/ConfirmDelete"
 import MoveBookmark from "@/components/popovers/MoveBookmark"
-import RenameBookmark from "@/components/popovers/RenameBookmark"
+import RenameBookmark from "@/components/modals/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"
 import AccountActivities from "@/components/AccountActivities"
 export default {
@@ -215,9 +213,6 @@ export default {
          items.forEach(bm=>{
             this.selectedItems.push(bm.id)
          })
-      },
-      renameFolder(folderInfo) {
-         this.$store.dispatch("bookmarks/renameFolder", folderInfo)
       },
       moveBookmarks(folderID) {
          let data = { bookmarks: this.selectedItems, folderID: folderID }
