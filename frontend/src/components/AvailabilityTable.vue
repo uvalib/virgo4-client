@@ -9,7 +9,7 @@
 
             <RequestContainer v-if="isDevServer" :titleId="titleId" />
 
-            <table class="fields">
+            <table class="fields" v-if="availability.columns.length">
                <thead>
                   <tr>
                      <th v-for="(column, idx) in availability.columns" :key="idx">

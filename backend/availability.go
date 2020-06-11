@@ -25,7 +25,7 @@ type Item struct {
   OnShelf         bool                    `json:"on_shelf"`
   Unavailable     bool                    `json:"unavailable"`
   Notice          string                  `json:"notice"`
-  Field           []map[string]interface {} `json:"fields"`
+  Fields          []map[string]interface {} `json:"fields"`
   Library         string                  `json:"library"`
   CurrentLocation string                  `json:"current_location"`
   CallNumber      string                  `json:"call_number"`
@@ -167,6 +167,7 @@ func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *Availabil
   AeonOption := RequestOption{
     Type: "aeon",
     Label: "Request this in Special Collections",
+    SignInRequired: true,
     Description: "",
     CreateURL: CreateAeonURL(SolrDoc),
     ItemOptions: CreateAeonItemOptions(Result, SolrDoc),
@@ -194,7 +195,14 @@ func ProcessSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument){
   }
   //log.Printf("SCData: %+v", SCItems)
 
+  // add additional item info
+  //for _, item := range SCItems {
+  //  item.Fields = make([]map[string]interface {}, 0)
+  //}
+
   Result.Availability.Items =  SCItems
+
+  // TODO Add columns
   Result.Availability.Columns = []string{}
   return
 }
