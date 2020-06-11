@@ -1,5 +1,5 @@
 <template>
-   <V4Disclosure id="source-info">
+   <V4Disclosure id="search-tips">
       <template v-slot:summary>
          <span>Search Tips</span>
       </template>

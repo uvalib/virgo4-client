@@ -2,13 +2,14 @@
    <div :id="id" class="disclosure">
       <V4Button mode="text" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`" 
          @click="toggle" @esc="hide" @blur.native="blurred">
-         <i v-if="showFull" class="arrow fas fa-caret-down"></i>
-         <i v-else class="arrow fas fa-caret-right"></i>
+         <i class="arrow fas fa-caret-right" :style="{ transform: rotation }"></i>
          <slot name="summary"></slot>
       </V4Button>
-      <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text" @keyup.stop.esc="hide">
-         <slot name="content"></slot>
-      </div>
+      <transition name="fade">
+         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text" @keyup.stop.esc="hide">
+            <slot name="content"></slot>
+         </div>
+      </transition>
    </div>
 </template>
 
@@ -30,6 +31,12 @@ export default {
       }
    },
    computed: {
+      rotation() {
+         if (this.showFull) {
+            return "rotate(90deg)"
+         }
+         return "rotate(0deg)"
+      },
    },
    methods: {
       blurred() {
@@ -54,7 +61,7 @@ export default {
    .full-text {
       background: var(  --uvalib-blue-alt-light);
       border: 1px solid var(--uvalib-blue-alt);
-      margin: 0 0 0 15px;
+      margin: 0px 10px 5px 15px;
       padding: 0;
       position: absolute;
       box-shadow: $v4-box-shadow;
@@ -66,6 +73,8 @@ export default {
       padding-left: 2px;
       margin-right: 5px;
       width: 8px;
+      transform: rotate(0deg);
+      transition-duration: 100ms;
    }
    button {
       display: inline-block;
