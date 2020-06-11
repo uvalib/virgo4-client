@@ -12,22 +12,39 @@ import (
 )
 
 type AvailabilityData struct {
-  ID           		string          `json:"title_id"`
-  Columns    			[]string         `json:"columns,omitempty"`
-  Items   				[]string        `json:"callNumber,omitempty"`
-  RequestOptions  []RequestOption `json:"location,omitempty"`
+  Availability struct {
+    ID           		string                    `json:"title_id"`
+    Columns    			[]string                  `json:"columns"`
+    Items   				[]Item                    `json:"items"`
+    RequestOptions  []RequestOption           `json:"request_options"`
+  } `json:"availability"`
 }
+
+type Item struct {
+  Barcode         string                  `json:"barcode"`
+  OnShelf         bool                    `json:"on_shelf"`
+  Unavailable     bool                    `json:"unavailable"`
+  Notice          string                  `json:"notice"`
+  Field           []map[string]interface {} `json:"fields"`
+  Library         string                  `json:"library"`
+  CurrentLocation string                  `json:"current_location"`
+  CallNumber      string                  `json:"call_number"`
+  Volume          string                  `json:"volume"`
+  SCNotes         string                  `json:"special_collections_location"`
+}
+
 type RequestOption struct {
-  Type              string        `json:'type'`
-  Label             string        `json:'label'`
-  Description       string        `json:description`
-  CreateURL         string        `json:create_url`
-  SignInRequired    bool          `json:sign_in_required`
-  ItemOptions       []ItemOption  `json:itemOptions`
+  Type              string        `json:"type"`
+  Label             string        `json:"button_label,omitempty"`
+  Description       string        `json:"description,omitempty"`
+  CreateURL         string        `json:"create_url,omitempty"`
+  SignInRequired    bool          `json:"sign_in_required,omitempty"`
+  ItemOptions       []ItemOption  `json:"item_options,omitempty"`
 }
 type ItemOption struct {
-  label    string  `json:label`
-  barcode  string  `json:barcode`
+  Label    string  `json:"label"`
+  Barcode  string  `json:"barcode"`
+  SCNotes  string  `json:"special_collections_location"`
 }
 
 type SolrResponse struct {
@@ -39,7 +56,8 @@ type SolrResponse struct {
 
 type SolrDocument struct {
 	AlternateID         []string `json:"alternate_id_a,omitempty"`
-	AnonAvailability    []string `json:"anon_availability_a,omitempty"`
+  AeonAvailability    []string `json:"anon_availability_a,omitempty"`
+  SCAvailabilityStored string  `json:"sc_availability_stored",omitempty`
 	Author              []string `json:"author_facet_a,omitempty"`
 	AuthorAddedEntry    []string `json:"author_added_entry_a,omitempty"`
 	CallNumber          []string `json:"call_number_a,omitempty"`
@@ -88,11 +106,11 @@ type SolrDocument struct {
 	WorkPhysicalDetails []string `json:"workPhysicalDetails_a,omitempty"`
 	WorkPrimaryAuthor   []string `json:"work_primary_author_a,omitempty"`
   WorkTypes           []string `json:"workType_a,omitempty" json:"type_of_record_a,omitempty" json:"medium_a,omitempty"`
-  Barcode             string    `json:-`
-  Edition             string    `json:-`
-  Issue               string    `json:-`
-  Volume              string    `json:-`
-  Copy                string    `json:-`
+  Barcode             string    `json:"-"`
+  Edition             string    `json:"-"`
+  Issue               string    `json:"-"`
+  Volume              string    `json:"-"`
+  Copy                string    `json:"-"`
 }
 
 // GetAvailability uses ILS Connector V4 API /availability to get details for a Document
@@ -102,27 +120,30 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 
   availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, titleID)
   bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, c.GetString("jwt"))
-  if ilsErr != nil {
+  if ilsErr != nil && ilsErr.StatusCode != 404 {
     c.String(ilsErr.StatusCode, ilsErr.Message)
     return
   }
 
   // Convert from json
-  var result map[string]interface{}
-  json.Unmarshal([]byte(bodyBytes), &result)
-  log.Printf("ILS Response: %+v", result)
+  var AvailabilityResponse AvailabilityData
+  if err := json.Unmarshal(bodyBytes, &AvailabilityResponse);  err != nil {
+    // Non-Sirsi Item may be found in other places and have availability
+    AvailabilityResponse = AvailabilityData{}
+	}
+  //log.Printf("Availability Response: %+v", AvailabilityResponse)
 
+  svc.appendAeonRequestOptions(titleID, &AvailabilityResponse)
 
-  svc.appendAeonRequestOptions(titleID, result)
+  c.JSON(http.StatusOK, AvailabilityResponse)
 
-
-  c.JSON(http.StatusOK, result)
 }
 
 // Appends Aeon request to availability response
-func (svc *ServiceContext) appendAeonRequestOptions(id string, Result map[string]interface{}) {
-  url := fmt.Sprintf("%s/%s/select?q=id%%3A%s", svc.Solr.URL, svc.Solr.Core, id)
-  respBytes, solrErr := svc.SolrGet(url)
+func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *AvailabilityData) {
+  solrPath := fmt.Sprintf("select?fl=*&q=id%%3A%s", id)
+
+  respBytes, solrErr := svc.SolrGet(solrPath)
   if solrErr != nil {
     log.Printf("ERROR: Solr request for Aeon info failed: %s", solrErr.Message)
     return
@@ -132,31 +153,66 @@ func (svc *ServiceContext) appendAeonRequestOptions(id string, Result map[string
     log.Printf("ERROR: Unable to parse solr response: %s.", err.Error())
     return
   }
+  if SolrResp.Response.NumFound != 1 {
+    return
+  }
+  SolrDoc := SolrResp.Response.Docs[0]
 
-  log.Printf("Solr: %+v", SolrResp.Response)
+  if !( (SolrDoc.SCAvailabilityStored != "")|| contains(SolrDoc.Library, "Special Collections")){
+    return
+  }
 
+  ProcessSCAvailabilityStored(Result, SolrDoc)
 
   AeonOption := RequestOption{
     Type: "aeon",
     Label: "Request this in Special Collections",
     Description: "",
-    CreateURL: CreateAeonURL(SolrResp.Response.Docs[0]),
-    ItemOptions: CreateAeonItemOptions(Result, SolrResp.Response.Docs[0]),
+    CreateURL: CreateAeonURL(SolrDoc),
+    ItemOptions: CreateAeonItemOptions(Result, SolrDoc),
   }
-  // if multiple items are present, create itemOptions array with label and barcodes
+  //log.Printf("Aeon: %+v", AeonOption)
 
-  // TODO append the completed AeonOption to the request_options list
-  Result["request_options"] = append(Result["request_options"], AeonOption)
-
-  log.Printf("Request Options: %+v",Result["request_options"] )
+  Result.Availability.RequestOptions = append(Result.Availability.RequestOptions, AeonOption)
 
 }
 
-// TODO: Item options need to be created from:
-// 1) Sirsi based SC items: the item list inside the ils-connector response
-// b) ArchiveSpace items: sc_availability_stored from the solr query
-func CreateAeonItemOptions(Result map[string]interface{}, doc SolrDocument ) []ItemOption{
-  return []ItemOption{}
+// Process items stored in sc_availability_stored solr field
+func ProcessSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument){
+  // If this item has Stored SC data (ArchiveSpace)
+  if doc.SCAvailabilityStored == "" {
+    return
+  }
+
+  // Complete other availability fields
+  Result.Availability.ID = doc.ID
+
+  var SCItems []Item
+
+  if err := json.Unmarshal([]byte(doc.SCAvailabilityStored), &SCItems); err != nil {
+    log.Printf("Error parsing sc_availability_stored: %+v", err)
+  }
+  //log.Printf("SCData: %+v", SCItems)
+
+  Result.Availability.Items =  SCItems
+  Result.Availability.Columns = []string{}
+  return
+}
+
+// Creates Aeon ItemOptions based on availability aata
+func CreateAeonItemOptions(Result *AvailabilityData, doc SolrDocument ) []ItemOption{
+
+  // Sirsi Item Options
+  Options := []ItemOption{}
+  for _, item := range Result.Availability.Items {
+    if item.Library == "Special Collections" {
+
+      scItem := ItemOption{Barcode: item.Barcode, Label: item.CallNumber, SCNotes: item.SCNotes}
+      Options = append(Options, scItem)
+    }
+  }
+
+  return Options
 }
 
 // Create OpenUrl for Aeon
@@ -183,14 +239,19 @@ func CreateAeonURL(doc SolrDocument) string{
     Location    []string   `url:Location`
     Description []string   `url:ItemInfo1`
     Notes       []string   `url:Notes`
-    Tags        []string   `url:ResearcherTags`
+    Tags        []string   `url:ResearcherTags,omitempty`
     UserNote    []string   `url:SpecialRequest`
   }
 
   // Decide monograph or manuscript
   formValue := "GenericRequestMonograph"
 
-  if contains(doc.WorkTypes, "manuscript") {
+  // Determine manuscript status
+  // MANUSCRIPT_ITEM_TYPES = [
+  //  'collection', # @see Firehose::JsonAvailability#set_holdings
+  //  'manuscript'  # As seen in Sirsi holdings data.
+  // ]
+  if contains(doc.WorkTypes, "manuscript") || contains(doc.WorkTypes, "manuscript") {
     formValue = "GenericRequestManuscript"
   }
 
@@ -217,18 +278,14 @@ func CreateAeonURL(doc SolrDocument) string{
     Notes: doc.Location,
   }
 
-  // Determine manuscript status
-  // MANUSCRIPT_ITEM_TYPES = [
-  //  'collection', # @see Firehose::JsonAvailability#set_holdings
-  //  'manuscript'  # As seen in Sirsi holdings data.
-  // ]
+  // Notes, Bacode, CallNumber, UserNotes need to be added by client for the specific item!
+
 
   // arrays joined with newlines?
 
   query, _ := query.Values(req)
 
-  url := fmt.Sprintf("https://virginia.aeon.atlas-sys.com/logon/OpenURL?%s", query.Encode() )
-  log.Print(url)
+  url := fmt.Sprintf("https://virginia.aeon.atlas-sys.com/logon?%s", query.Encode() )
 
   return url
 
