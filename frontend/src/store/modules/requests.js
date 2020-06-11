@@ -5,19 +5,23 @@ const requests = {
   state: {
     alertText: '',
     requestOptions: [],
-    holdOptions: {},
+
+    // selected request option
+    activeOption: {},
+
     hold: {
       itemBarcode: '',
       itemLabel: '',
       pickupLibrary: ''
     },
+
     activePanel: '',
     nextPanel: '',
-    activeOption: {},
 
     // Map request type to panel Name
     optionMap: {
       hold: 'PlaceHoldPanel',
+      aeon: 'AeonPanel',
       pda: 'PDAPanel'
     },
 
@@ -48,11 +52,6 @@ const requests = {
     },
     setRequestOptions(store, ro){
       store.requestOptions = ro
-      for(let option of ro){
-        if(option.type == 'hold'){
-          store.holdOptions = option
-        }
-      }
     },
     alertText(store, text) {
       store.alertText = text

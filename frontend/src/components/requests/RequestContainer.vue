@@ -19,13 +19,14 @@ import OptionsPanel from './panels/OptionsPanel'
 import SignInPanel from './panels/SignInPanel'
 import PlaceHoldPanel from './panels/PlaceHoldPanel';
 import PDAPanel from './panels/PDAPanel';
+import AeonPanel from './panels/AeonPanel';
 import ConfirmationPanel from './panels/ConfirmationPanel';
 
 export default {
   props: {
       titleId: String,
    },
-  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel },
+  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel},
 
   computed: {
     ...mapFields(['requests', 'item/availability' ]),

@@ -1,5 +1,5 @@
 <template>
-  <div class='place-hold'>
+  <div class='request-aeon'>
     <div v-if="items.length > 1" class="item-selector">
       <h3>Select the item you want:</h3>
       <V4Select style="height:2em;" :selections="items"
@@ -7,7 +7,7 @@
     </div>
     <PickupLibrary />
 
-    <V4Button mode="primary" class="request-button" @click="placeHold">Place Hold</V4Button>
+    <V4Button mode="primary" class="request-button" @click="submitAeon">Request</V4Button>
 
   </div>
 </template>
@@ -25,20 +25,22 @@ export default {
   },
   watch: {
       selectedItem (newVal, _oldVal) {
+        // Change to Aeon
         this.hold.itemLabel = newVal.label
         this.hold.itemBarcode = newVal.barcode
       }
   },
   computed: {
     ...mapFields({
-      hold: 'requests.hold',
       itemOptions: 'requests.activeOption.item_options',
+
     }),
     items() {
       let items = this.itemOptions
       for(let i in items) {
         items[i].id = items[i].barcode
         items[i].name = items[i].label
+        items[i].sc_location = items[i].special_collections_locaction
       }
       return items
     },
@@ -49,8 +51,8 @@ export default {
     }
   },
   methods: {
-    placeHold() {
-      this.$store.dispatch('requests/createHold')
+    submitAeon() {
+      this.$store.dispatch('requests/submitAeon')
     }
   }
 }
