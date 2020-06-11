@@ -90,8 +90,8 @@
                   <div class="folder-buttons">
                      <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo"/>
                      <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" 
-                        :id="`delete-${folderInfo.id}`" 
-                        :alabel="`delete bookmark folder ${folderInfo.folder}`" style="margin-right: 10px">
+                        :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
+                        :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" >
                         <div>
                            Delete bookmark folder
                            <b>{{folderInfo.folder}}</b>? All bookmarks
@@ -128,7 +128,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import ConfirmDelete from "@/components/popovers/ConfirmDelete"
+import ConfirmDelete from "@/components/modals/ConfirmDelete"
 import MoveBookmark from "@/components/popovers/MoveBookmark"
 import RenameBookmark from "@/components/modals/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"

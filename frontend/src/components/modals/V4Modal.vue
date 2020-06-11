@@ -125,9 +125,11 @@ div.v4-modal {
       background: var(--uvalib-teal-lightest);
       font-size: 1.1em;
       color: var(--uvalib-text-dark);
-      font-weight: bold;
+      font-weight: 500;
       padding: 10px;
       border-radius: 5px 5px 0 0;
+      border-bottom: 2px solid var(--uvalib-teal-light);
+      text-align: left;
    }
    div.v4-modal-controls {
       padding: 0 10px 10px 10px;
