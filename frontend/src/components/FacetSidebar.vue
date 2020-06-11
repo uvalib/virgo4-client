@@ -215,7 +215,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .facet-sidebar {
-   margin: 0px 10px 15px 10px;
+   margin: 0px 10px 15px 0px;
    border-radius: 5px 5px 0 0;
    flex: 1 1 25%;
    min-width: 200px;
@@ -304,12 +304,12 @@ i.check {
    justify-content: flex-start;
    font-weight: normal;
 }
-@media only screen and (min-width: 925px) {
+@media only screen and (min-width: $breakpoint-tablet) {
    .filter-icons {
       display: inline-block;
    }
 }
-@media only screen and (max-width: 925px) {
+@media only screen and (max-width: $breakpoint-tablet) {
    .filter-icons {
       display: none;
    }

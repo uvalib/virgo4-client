@@ -133,10 +133,9 @@ div.results-header {
    font-size: 1em;
    color: white;
    background: var(--uvalib-brand-blue);
-   margin: 0 5px;
+   margin: 0 0 1rem 5px;
    text-align: left;
    box-shadow: $v4-box-shadow-light;
-   margin-bottom: 1rem;
 }
 .pool-name {
    font-weight: bold;
@@ -150,7 +149,7 @@ div.results-header {
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   grid-gap: 1.25rem;
   list-style: none;
-  margin: 0 5px 20px 5px;
+  margin: 0 0 20px 5px;
   padding: 0;
   height: 100%;
 }
@@ -161,7 +160,7 @@ div.results-header {
     max-width: 250px;
 }
 .hit-wrapper {
-   margin: 0 5px 20px 5px;
+   margin: 0 0 20px 5px;
 }
 .hit-wrapper.none {
    background: white;
@@ -185,6 +184,14 @@ div.results-header {
 @media only screen and (max-width: 600px) {
    .hit-wrapper {
      max-width: 94vw;
+     margin: 0 0px 20px 0px;
+   }
+   .image.hits-content {
+      margin: 0 0 20px 0;
+      grid-gap: .5rem;
+   }
+   div.results-header {
+      margin: 0 0 1rem 0;
    }
 }
 .no-more {

@@ -180,14 +180,18 @@ export default {
    padding: 0 5px;
 }
 
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: $breakpoint-mobile) {
    a.img-link {
       margin-left: auto;
    }
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: $breakpoint-mobile) {
    .details {
-      justify-content: center
+      justify-content: center;
+      div.basic {
+         max-width: 90%;
+         padding: 5px 0px 10px 0px;
+      }
    }
    a.img-link {
       margin-left: initial;
