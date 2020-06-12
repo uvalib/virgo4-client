@@ -111,7 +111,7 @@ button.v4-button.icon-button {
       color: var(--uvalib-text-dark);
    }
    &:focus {
-      @include be-accessible-button(var(--uvalib-accessibility-highlight-light), var(--uvalib-text-dark));
+      @include be-accessible();
    }
 }
 .pure-button.pure-button-primary {
@@ -146,13 +146,11 @@ button.v4-button.icon-button {
    border-radius: 5px;
    font-weight: normal;
    &:focus {
-      @include be-accessible-button();
+      @include be-accessible();
    } 
 }
 .pure-button.disabled {
    cursor: default;
    opacity: 0.25;
 }
-
-
 </style>
