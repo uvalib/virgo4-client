@@ -193,7 +193,7 @@ div.pool-tabs span.total {
 }
 
 </style>
-<style scoped>
+<style scoped lang="scss">
 .qs {
    margin-left:15px;
    font-style: italic;
@@ -210,7 +210,7 @@ p.relevant {
    flex: 1 1 auto;
 }
 .pool-tabs {
-   margin: 0 5px 0 0;
+   margin: 0;
    text-align: left;
    display: flex;
    flex-flow: row wrap;
@@ -228,7 +228,6 @@ p.relevant {
    outline: none;
 }
 .pool-tabs .pool.v4-button:focus {
-    /* border: 2px solid var(--uvalib-brand-orange) !important; */
     border-bottom: none;
     box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
     z-index: 10;
@@ -282,7 +281,7 @@ p.relevant {
    display: block;
    margin: 2px 0 2px 15px;
 }
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: $breakpoint-mobile) {
    div.search-results {
       margin: 0;
       padding: 0 5vw 20px 5vw;
@@ -291,13 +290,16 @@ p.relevant {
       width: 50%;
    }
 }
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: $breakpoint-mobile) {
    div.search-results {
       margin: 0;
       padding: 0 2vw 20px 2vw;
    }
    .save-box{
       width: 90%;
+   }
+   .pool.v4-button:first-child {
+      margin-left: -1px;
    }
 }
 .results-wrapper {
