@@ -411,17 +411,17 @@ export default {
       .alert-count {
          font-size: 0.7em;
          font-weight: bold;
-         background: var(--uvalib-brand-orange);
-         color: white;
-         width: 15px;
-         height: 15px;
+         background: var(--uvalib-yellow);
+         color: var(--uvalib-text-dark);
+         width: 1em;
+         height: 1em;
          font-family: sans-serif;
          display: inline-block;
          text-align: center;
          border-radius: 15px;
          padding: 1px;
          position: absolute;
-         right: -14px;
+         right: -12px;
          top: -8px;
       }
    }
