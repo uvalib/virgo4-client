@@ -18,7 +18,6 @@
             <address>
               University of Virginia Library<br />
               P.O. Box - 400109<br />
-              160 McCormick Road<br />
               Charlottesville, VA 22904<br />
             </address>
           </li>

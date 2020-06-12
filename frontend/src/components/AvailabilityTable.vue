@@ -9,24 +9,23 @@
 
             <RequestContainer v-if="isDevServer" :titleId="titleId" />
 
-            <table class="fields">
+            <table class="fields" v-if="availability.columns.length">
                <thead>
                   <tr>
                      <th v-for="(column, idx) in availability.columns" :key="idx">
                         {{column}}
                      </th>
-                     <th></th>
                   </tr>
                </thead>
 
                <tr v-for="(item,idx) in availability.items" :key="idx">
                   <td class="value" v-for="(field, id) in visibleFields(item)" :key="id">
-                     {{formatValue(field.value)}}
-                  </td>
-                  <td>
-                    <span class="notice" v-if="item.notice">
-                       <AvailabilityNotice v-bind:message="item.notice" />
-                    </span>
+                     <template v-if="id == visibleFields(item).length-1 && item.notice">
+                        <AvailabilityNotice :label="formatValue(field.value)" :message="item.notice" />
+                     </template>
+                     <template v-else>
+                        {{formatValue(field.value)}}
+                     </template>
                   </td>
                </tr>
             </table>
@@ -37,7 +36,7 @@
 
 <script>
 import { mapGetters } from "vuex"
-import AvailabilityNotice from "@/components/popovers/AvailabilityNotice"
+import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice"
 import RequestContainer from "@/components/requests/RequestContainer"
 export default {
   components: {

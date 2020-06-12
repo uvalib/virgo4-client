@@ -32,7 +32,7 @@ import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import SessionExpired from "@/components/layout/SessionExpired"
 import FatalError from "@/components/layout/FatalError"
-import AddBookmarkModal from "@/components/AddBookmarkModal"
+import AddBookmarkModal from "@/components/modals/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {
@@ -180,6 +180,13 @@ export default {
    --color-secondary-blue: #002359;
    --color-dark-blue: #002f6c;
    /* --color-hover-highight: #f5f5f4; */
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .2s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 
 html,

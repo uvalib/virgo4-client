@@ -62,9 +62,8 @@
                                  </p>
                                   <h3>Replacement option:</h3> 
                                  <p>
-                                    Rather than pay replacement bills, you may replace a lost book with one you supply the Library, 
-                                    but it must be the same edition or newer and in very good condition. We will accept a paperback 
-                                    replacement copy for a hardback. The Library reserves the right to refuse a replacement copy.
+                                    If you would like to supply a replacement copy rather than paying the bill, please contact the Library. 
+                                    The Library reserves the right to refuse a replacement copy.
                                  </p>
                               </div>
                               <div class="bill" v-for="(bill,idx) in bills" :key="idx">
@@ -136,12 +135,12 @@
                         </div>
                         <div v-else>
                            <div>
-                              All fines must be paid at Alderman Library using cash for the exact amount or personal check. 
+                              All fines must be paid at Clemons Library using cash for the exact amount or personal check. 
                               We do not take credit cards or any online payments at this time.
                            </div>
                            <div class="addr">
-                              <strong>Alderman Library</strong><br/>
-                              160 McCormick Road<br/>
+                              <strong>Clemons Library</strong><br/>
+                              164 McCormick Road<br/>
                               Charlottesville, VA<br/>
                               22904
                            </div>

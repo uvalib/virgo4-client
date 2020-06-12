@@ -1,6 +1,8 @@
 <template>
-   <V4Popover class="search-tips inline" id="tips" title="Search Tips">
-      <template v-slot:trigger>Search Tips</template>
+   <V4Disclosure id="search-tips">
+      <template v-slot:summary>
+         <span>Search Tips</span>
+      </template>
       <template v-slot:content>
          <div class="tips">
             <ul>
@@ -22,8 +24,8 @@
                <b>NOTE: </b>Nested parentheses within a query are not supported
             </div>
          </div>
-      </template>
-   </V4Popover>
+       </template>
+   </V4Disclosure>
 </template>
 
 <script>
@@ -32,9 +34,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 div.tips {
-   margin: 0;
+   margin: 5px 10px;
    font-weight: normal;
 
    .note {
@@ -48,9 +49,10 @@ div.tips {
    }
    ul p {
       margin: 0;
+      font-weight: 500;
    }
    ul li {
-      padding-top: 20px;
+      padding-top: 10px;
    }
    ul li.no-pad {
       padding-top: 5px;

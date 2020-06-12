@@ -195,6 +195,7 @@ const query = {
             }
 
             if (state.advancedFields.findIndex( af => af.value == term.field) == -1) {
+               console.error(term.field+" from URL not found in advanced fields. Skipping")
                continue  
             }
             
@@ -272,7 +273,7 @@ const query = {
    },
    actions: {
       getAdvancedSeatchFilters(ctx) {
-         axios.get(`/api/search_filters`).then((response) => {
+         return axios.get(`/api/search_filters`).then((response) => {
             ctx.commit('setAdvancedFilterFields', response.data)
          }).catch((_error) => {
             // NO-OP If the fields can't be found, they just won't be available

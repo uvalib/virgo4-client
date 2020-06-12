@@ -22,8 +22,8 @@
                   </template>  
                </div>
                <div class="links" :class="{full: mode=='full'}">
-                  <template v-for="(l) in providerLinks(p)">
-                     <div :key="l.url">
+                  <template v-for="(l,idx) in providerLinks(p)">
+                     <div :key="`${l.url}-${idx}`">
                         <a :href="l.url" target="_blank" :aria-label="`access ${title} ${l.label} with ${providerLabel(p.provider)}`">
                            <template v-if="l.label">{{l.label}}</template>
                            <template v-else>{{l.url}}</template>

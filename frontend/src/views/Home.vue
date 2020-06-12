@@ -23,19 +23,19 @@
             >
           </div>
           <div class="controls">
-            <SourceInfo id="source-info"/>
+            <SourceInfo />
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
             <SearchTips/><span class="sep">|</span> 
-            <router-link :to="advancedURL">
+            <router-link tabindex="0" :to="advancedURL">
               <span>Advanced Search&nbsp;<i class="fas fa-search-plus"></i></span>
             </router-link>
           </div>
           <div class="advanced">
             <V4BarcodeScanner @scanned="barcodeScanned"/>
           </div>
-          <!-- <div v-if="showJournalBrowse" class="advanced">
+          <!-- <div v-if="isHomePage" class="advanced">
             <router-link to="/journals">
               Browse Journals&nbsp;<i class="far fa-newspaper"></i>
             </router-link>
@@ -43,8 +43,8 @@
         </template>
         <AdvancedSearch v-else/>
       </div>
-      <SearchResults v-if="hasResults"/>
-      <Welcome  v-else-if="showJournalBrowse"  />
+      <Welcome  v-if="isHomePage && hasResults==false" />
+      <SearchResults/>
    </div>
 </template>
 
@@ -53,7 +53,7 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
-import SearchTips from "@/components/popovers/SearchTips"
+import SearchTips from "@/components/disclosures/SearchTips"
 import SourceInfo from "@/components/disclosures/SourceInfo"
 import AdvancedSearch from "@/components/AdvancedSearch"
 import V4Select from "@/components/V4Select"
@@ -71,17 +71,17 @@ export default {
       // This happens any time the route or query params change.
       // The create handler only happens on initial page load, and in that case, 
       // beforeRouteUpdate is NOT called
-      this.showJournalBrowse = false
+      this.isHomePage = false
       if (to.path == "/") {
-         this.showJournalBrowse = true
+         this.isHomePage = true
       }
       this.restoreSearchFromQueryParams(to.query)
       next()
    },
    created: function() {
-      this.showJournalBrowse = false
+      this.isHomePage = false
       if (this.$route.path == "/") {
-         this.showJournalBrowse = true
+         this.isHomePage = true
       }
       this.searchCreated()
       
@@ -90,7 +90,7 @@ export default {
    data: function() {
       return {
          showVideo: false,
-         showJournalBrowse: true,
+         isHomePage: true,
       }
    },
    watch: {

@@ -30,7 +30,7 @@
                         </span>
                         <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)"
                            :id="`del-saved-search-${idx+1}`"
-                           :alabel="`Delete search named ${saved.name}`"
+                           :ariaLabel="`Delete search named ${saved.name}`"
                         >
                            <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
                            <div class="del-detail">This cannot be reversed.</div>
@@ -47,7 +47,7 @@
                   </div>
                </div>
                 <div class="controls">
-                  <ConfirmDelete v-on:delete-approved="removeAllSearches" id="del-all-searches" label="Delete all saved searches">
+                  <ConfirmDelete v-on:delete-approved="removeAllSearches" id="del-all-searches" buttonLabel="Delete all saved searches">
                      <div>Delete all saved searches?</div>
                      <div class="del-detail">This cannot be reversed.</div>
                   </ConfirmDelete>
@@ -68,7 +68,7 @@
 <script>
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
-import ConfirmDelete from "@/components/popovers/ConfirmDelete"
+import ConfirmDelete from "@/components/modals/ConfirmDelete"
 export default {
    name: "requests",
    components: {

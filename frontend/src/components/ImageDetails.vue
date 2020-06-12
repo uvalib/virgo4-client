@@ -12,7 +12,7 @@
                            Details
                         </router-link>
                         <span v-if="manifestURL" class="iiif-small">
-                           <a :href="manifestURL" target="_blank">
+                           <a :href="manifestURL" aria-label="open IIIF manifest data for this image in a new tab" target="_blank">
                               <span class="iiif-icon"></span>
                            </a>
                         </span>
@@ -21,10 +21,6 @@
                </template>
             </template>
          </viewer>
-         <div  v-if="manifestURL" class="iiif-help">
-            <span>What is <img src="../assets/iiif_icon.png"/></span>
-            <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
-         </div>
       </template>
 
       <template v-else>
@@ -35,20 +31,22 @@
          <div class="img-toolbar">
             <span class="hint">Click image to zoom</span>
             <span  v-if="manifestURL" class="iiif">
-               <a :href="manifestURL" target="_blank">
+               <a :href="manifestURL" aria-label="open IIIF manifest data for this image in a new tab" target="_blank">
                   <img src="../assets/iiif_icon.png"/>
                </a>
-               <IIIFInfo style="display:inline-block;margin-left: 5px;"/>
             </span>
          </div>
       </template>
+      <div  v-if="manifestURL" class="iiif-help">          
+         <IIIFInfo />
+      </div>
    </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import IIIFInfo from "@/components/popovers/IIIFInfo"
+import IIIFInfo from "@/components/disclosures/IIIFInfo"
 
 export default {
    data: function() {
@@ -190,8 +188,8 @@ img.thumb:hover {
    background-image: url('~@/assets/iiif_icon.png');
    background-size: contain;
    display: inline-block;
-   width: 35px;
-   height: 30px;
+   width: 25px;
+   height: 22px;
 }
 .img-link {
    padding-bottom:5px;

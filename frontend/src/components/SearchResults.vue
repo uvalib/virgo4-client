@@ -1,38 +1,40 @@
 <template>
-   <div id="results-container" class="search-results shady" aria-live="polite" aria-describedby="search-summary">
-      <SearchSuggestions />
-      <div class="results-header">
-         <template v-if="showSummary">
-            <div id="search-summary" class="summary">
-               <div class="query">Showing {{formatNum(total)}} results for:</div>
-               <div class="qs">{{queryString}}</div>
-            </div>
-            <span class="buttons">
-               <SaveSearch v-if="isSignedIn"/>
-            </span>
-         </template>
-      </div>
+   <div class="results-wrap" aria-live="polite">
+      <div v-if="hasResults" id="results-container" class="search-results shady" aria-describedby="search-summary">
+         <SearchSuggestions />
+         <div class="results-header">
+            <template v-if="showSummary">
+               <div id="search-summary" class="summary">
+                  <div class="query">Showing {{formatNum(total)}} results for:</div>
+                  <div class="qs">{{queryString}}</div>
+               </div>
+               <span class="buttons">
+                  <SaveSearch v-if="isSignedIn"/>
+               </span>
+            </template>
+         </div>
 
-      <div class="results-wrapper" >
-         <FacetSidebar />
-         <div class="results-main">
-            <div class="pool-tabs">
-               <template  v-for="(r,idx) in sourceTabs">
-                  <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
-                     <span>
-                        <span class="pool">{{r.pool.name}}</span>
-                        <span class="total">({{formatNum(r.total)}})</span>
-                     </span>
-                  </V4Button>
-               </template>
-               <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
-                  :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
-                  placeholder="Other"
-                  v-model="otherSrcSelection"/>
-            </div>
-            <PoolResultDetail v-if="selectedResultsIdx > -1" />
-            <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
-               No results found
+         <div class="results-wrapper" >
+            <FacetSidebar />
+            <div class="results-main">
+               <div class="pool-tabs">
+                  <template  v-for="(r,idx) in sourceTabs">
+                     <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
+                        <span>
+                           <span class="pool">{{r.pool.name}}</span>
+                           <span class="total">({{formatNum(r.total)}})</span>
+                        </span>
+                     </V4Button>
+                  </template>
+                  <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
+                     :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
+                     placeholder="Other"
+                     v-model="otherSrcSelection"/>
+               </div>
+               <PoolResultDetail v-if="selectedResultsIdx > -1" />
+               <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
+                  No results found
+               </div>
             </div>
          </div>
       </div>
@@ -57,6 +59,7 @@ export default {
    },
    computed: {
       ...mapGetters({
+         hasResults: 'hasResults',
          isSignedIn: 'user/isSignedIn',
          rawQueryString: 'query/string',
          filterQueryParam: 'filters/asQueryParam',
