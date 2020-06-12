@@ -266,7 +266,7 @@ func createAeonURL(doc SolrDocument) string {
 	//  'collection', # @see Firehose::JsonAvailability#set_holdings
 	//  'manuscript'  # As seen in Sirsi holdings data.
 	// ]
-	if contains(doc.WorkTypes, "manuscript") || contains(doc.WorkTypes, "manuscript") {
+	if contains(doc.WorkTypes, "manuscript") || contains(doc.WorkTypes, "collection") {
 		formValue = "GenericRequestManuscript"
 	}
 
@@ -280,17 +280,17 @@ func createAeonURL(doc SolrDocument) string {
 		Date:        doc.PublicationDate,
 		ISBN:        doc.ISBN,
 		ISSN:        doc.ISSN,
-		CallNumber:  doc.CallNumber,
-		Barcode:     doc.Barcode,
 		Place:       doc.PublishedLocation,
 		Publisher:   doc.PublisherName,
 		Edition:     doc.Edition,
 		Issue:       doc.Issue,
 		Volume:      doc.Volume,
 		Copy:        doc.Copy,
-		Location:    doc.LocalNotes,
 		Description: doc.Description,
+		Location:    doc.LocalNotes,
 		Notes:       doc.Location,
+		CallNumber:  doc.CallNumber,
+		Barcode:     doc.Barcode,
 	}
 
 	// Notes, Bacode, CallNumber, UserNotes need to be added by client for the specific item!

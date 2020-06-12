@@ -14,6 +14,12 @@ const requests = {
       itemLabel: '',
       pickupLibrary: ''
     },
+    aeon: {
+      barcode: '',
+      notes: '',
+      callNumber: '',
+      specialRequest: ''
+    },
 
     activePanel: '',
     nextPanel: '',
