@@ -11,6 +11,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
+// AvailabilityData coming from ILS Connector
 type AvailabilityData struct {
 	Availability struct {
 		ID             string          `json:"title_id"`
@@ -20,6 +21,7 @@ type AvailabilityData struct {
 	} `json:"availability"`
 }
 
+// Item represents a single item inside availability
 type Item struct {
 	Barcode         string                   `json:"barcode"`
 	OnShelf         bool                     `json:"on_shelf"`
@@ -33,6 +35,7 @@ type Item struct {
 	SCNotes         string                   `json:"special_collections_location"`
 }
 
+// RequestOption is a category of request that a user can make
 type RequestOption struct {
 	Type           string       `json:"type"`
 	Label          string       `json:"button_label,omitempty"`
@@ -41,12 +44,15 @@ type RequestOption struct {
 	SignInRequired bool         `json:"sign_in_required,omitempty"`
 	ItemOptions    []ItemOption `json:"item_options,omitempty"`
 }
+
+// ItemOption is a selectable item in a RequestOption
 type ItemOption struct {
 	Label   string `json:"label"`
 	Barcode string `json:"barcode"`
 	SCNotes string `json:"special_collections_location"`
 }
 
+// SolrResponse container
 type SolrResponse struct {
 	Response struct {
 		Docs     []SolrDocument `json:"docs,omitempty"`
@@ -54,6 +60,7 @@ type SolrResponse struct {
 	} `json:"response,omitempty"`
 }
 
+// SolrDocument contains fields for a single solr record (borrowed from the solr pool)
 type SolrDocument struct {
 	AlternateID          []string `json:"alternate_id_a,omitempty"`
 	AeonAvailability     []string `json:"anon_availability_a,omitempty"`
@@ -162,7 +169,7 @@ func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *Availabil
 		return
 	}
 
-	ProcessSCAvailabilityStored(Result, SolrDoc)
+	processSCAvailabilityStored(Result, SolrDoc)
 
 	AeonOption := RequestOption{
 		Type:           "aeon",
@@ -170,7 +177,7 @@ func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *Availabil
 		SignInRequired: true,
 		Description:    "",
 		CreateURL:      createAeonURL(SolrDoc),
-		ItemOptions:    CreateAeonItemOptions(Result, SolrDoc),
+		ItemOptions:    createAeonItemOptions(Result, SolrDoc),
 	}
 	//log.Printf("Aeon: %+v", AeonOption)
 
@@ -178,8 +185,8 @@ func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *Availabil
 
 }
 
-// Process items stored in sc_availability_stored solr field
-func ProcessSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument) {
+// processSCAvailabilityStored adds items stored in sc_availability_stored solr field to availability
+func processSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument) {
 	// If this item has Stored SC data (ArchiveSpace)
 	if doc.SCAvailabilityStored == "" {
 		return
@@ -208,7 +215,7 @@ func ProcessSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument) {
 }
 
 // Creates Aeon ItemOptions based on availability aata
-func CreateAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOption {
+func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOption {
 
 	// Sirsi Item Options
 	Options := []ItemOption{}
