@@ -156,8 +156,9 @@ export default {
    --uvalib-text-dark: var(--uvalib-grey-darkest);
 
 // testing out colors for focus states
-   --uvalib-accessibility-highlight: var(--uvalib-blue-alt-lightest);
    --uvalib-accessibility-highlight-light: var(--uvalib-blue-alt-lightest);
+   --uvalib-accessibility-highlight: var(--uvalib-blue-alt-lightest);
+   --uvalib-accessibility-highlight-dark: var(--uvalib-blue-alt-dark);
 
    /* Color Remapping */
    --color-brand-blue: var(--uvalib-brand-blue);
@@ -222,14 +223,6 @@ body {
    top: 5px;
    width: auto;
    z-index: 100000;
-}
-
-//adding accessibility for keyboard focus
-#app a:focus {
-   @include be-accessible();
-}
-#app input:focus {
-   @include be-accessible-button(var(--uvalib-accessibility-highlight-light));
 }
 
 #v4-navbar {
@@ -412,6 +405,16 @@ div.v-popover.block {
 @media only screen and (max-width: 768px) {
    div.error-message {
       max-width: 95%;
+   }
+}
+
+//adding accessibility for keyboard focus
+#app {
+   a:focus {
+      @include be-accessible();
+   }
+   input:focus {
+      @include be-accessible();
    }
 }
 </style>

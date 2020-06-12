@@ -214,11 +214,8 @@ button.v4-select {
   height:100%;
   width:100%;
 }
-button.v4-select:hover {
-
-}
 button.v4-select:focus {
-   @include be-accessible-button(var(--uvalib-accessibility-highlight) !important);
+@include be-accessible();
    z-index: 10;
 }
 .wrap-select {
