@@ -68,6 +68,7 @@ export default {
       font-size:0.95em;
       color: var(--uvalib-text-dark);
       font-weight: normal;
+      z-index: 9999;
    }
    .arrow {
       padding-left: 2px;

@@ -159,7 +159,7 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
-import ChangePin from '@/components/popovers/ChangePin'
+import ChangePin from '@/components/modals/ChangePin'
 export default {
    name: "account",
    data: function() {
