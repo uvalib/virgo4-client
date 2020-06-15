@@ -312,29 +312,28 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	}
 
 	log.Printf("Get leo delivery address")
+	leoLocation := make([]string, 0)
 	respBytes, illErr := svc.ILLiadGet(fmt.Sprintf("/Users/%s", userID))
 	if illErr != nil {
-		c.String(http.StatusInternalServerError, illErr.Message)
-		return
-	}
-
-	log.Printf("**** LEO LOCATION: %s", respBytes)
-	leoLocation := make([]string, 0)
-	var resp map[string]interface{}
-	if err := json.Unmarshal(respBytes, &resp); err != nil {
-		log.Printf("ERROR: unable to parse ILLIAD user response: %s", err.Error())
+		log.Printf("WARN: unable to get leo address info: %s", illErr.Message)
 	} else {
-		val, ok := resp["Department"].(string)
-		if ok && val != "" {
-			leoLocation = append(leoLocation, val)
-		}
-		val, ok = resp["Organization"].(string)
-		if ok && val != "" {
-			leoLocation = append(leoLocation, val)
-		}
-		val, ok = resp["Country"].(string)
-		if ok && val != "" {
-			leoLocation = append(leoLocation, val)
+		log.Printf("**** LEO LOCATION: %s", respBytes)
+		var resp map[string]interface{}
+		if err := json.Unmarshal(respBytes, &resp); err != nil {
+			log.Printf("ERROR: unable to parse ILLIAD user response: %s", err.Error())
+		} else {
+			val, ok := resp["Department"].(string)
+			if ok && val != "" {
+				leoLocation = append(leoLocation, val)
+			}
+			val, ok = resp["Organization"].(string)
+			if ok && val != "" {
+				leoLocation = append(leoLocation, val)
+			}
+			val, ok = resp["Country"].(string)
+			if ok && val != "" {
+				leoLocation = append(leoLocation, val)
+			}
 		}
 	}
 
