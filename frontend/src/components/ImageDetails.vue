@@ -6,14 +6,14 @@
                <template  v-for="(r,idx) in scope.images">
                   <div class="thumb-wrap" :key="`w${idx}`">
                      <img :src="relatedImageURL(r,'thumb')" :data-src="relatedImageURL(r,'full')"
-                        class="thumb small" >
+                        class="thumb small" aria-label=" ">
                      <div class="thumb-toolbar">
                         <router-link class="img-link" :to="detailsURL(r)">
                            Details
                         </router-link>
                         <span v-if="manifestURL" class="iiif-small">
                            <a :href="manifestURL" aria-label="open IIIF manifest data for this image in a new tab" target="_blank">
-                              <span class="iiif-icon"></span>
+                              <span aria-label=" " class="iiif-icon"></span>
                            </a>
                         </span>
                      </div>
@@ -32,7 +32,7 @@
             <span class="hint">Click image to zoom</span>
             <span  v-if="manifestURL" class="iiif">
                <a :href="manifestURL" aria-label="open IIIF manifest data for this image in a new tab" target="_blank">
-                  <img src="../assets/iiif_icon.png"/>
+                  <img aria-label=" " src="../assets/iiif_icon.png"/>
                </a>
             </span>
          </div>

@@ -8,7 +8,7 @@
          <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
       </div>
       <router-link class="img-link" :to="detailsURL">
-          <img class="trigger" :src="iiifURL(hit)">
+          <img aria-label=" " class="trigger" :src="iiifURL(hit)">
           <div class="metadata-popover" slot="popover">
              <div class="metadata-content">
                 <div>{{hit.header.title}}</div>
