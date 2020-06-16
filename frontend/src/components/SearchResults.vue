@@ -48,7 +48,7 @@ import { mapFields } from 'vuex-map-fields'
 import PoolResultDetail from "@/components/PoolResultDetail"
 import V4Select from "@/components/V4Select"
 import FacetSidebar from "@/components/FacetSidebar"
-import SaveSearch from "@/components/popovers/SaveSearch"
+import SaveSearch from "@/components/modals/SaveSearch"
 import SearchSuggestions from "@/components/SearchSuggestions"
 export default {
    components: {
