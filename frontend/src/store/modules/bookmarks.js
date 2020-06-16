@@ -154,14 +154,15 @@ const bookmarks = {
             ctx.commit('system/setError', error, { root: true })
          })
       },
-      removeFolder(ctx, folderID) {
+      async removeFolder(ctx, folderID) {
          let v4UID = ctx.rootState.user.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}`
-         axios.delete(url).then((response) => {
+         try {
+            let response = await axios.delete(url)
             ctx.commit('setBookmarks', response.data)
-         }).catch((error) => {
+         } catch(error)  {
             ctx.commit('system/setError', error, { root: true })
-         })
+         }
       },
       removeBookmarks(ctx, bookmarks) {
          let v4UID = ctx.rootState.user.signedInUser

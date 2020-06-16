@@ -10,7 +10,7 @@
             <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
             <template v-else>
                <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
-               <div class="folder" v-for="folderInfo in bookmarks" :key="folderInfo.id">
+               <div class="folder" v-for="(folderInfo,idx) in bookmarks" :key="folderInfo.id">
                   <AccordionContent
                      class="boxed bookmark-folder"
                      color="var(--uvalib-grey-darkest)"
@@ -89,7 +89,7 @@
                   </AccordionContent>
                   <div class="folder-buttons">
                      <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo"/>
-                     <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id)" 
+                     <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id, idx)" 
                         :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
                         :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" >
                         <div>
@@ -105,7 +105,7 @@
                </div>
             </template>
             <div class="controls">
-               <V4Button v-if="createOpen==false" @click="openCreate" mode="primary">Create Folder</V4Button>
+               <V4Button v-if="createOpen==false" @click="openCreate" id="create-folder-btn" mode="primary">Create Folder</V4Button>
                <div v-else class="create-folder pure-form">
                   <label for="newname">New Folder:</label>
                   <input
@@ -258,8 +258,16 @@ export default {
          }
          this.$store.dispatch("bookmarks/removeBookmarks", this.selectedItems)
       },
-      removeFolder(folderID) {
-         this.$store.dispatch("bookmarks/removeFolder", folderID)
+      async removeFolder(folderID, folderIdx) {
+         let focusID = "create-folder-btn"
+         if ( folderIdx < this.bookmarks.length-1) {
+            focusID = this.bookmarks[folderIdx+1].id.toString()+"-header"
+         }
+         await this.$store.dispatch("bookmarks/removeFolder", folderID)
+         let ele = document.getElementById(focusID)
+         if (ele ) {
+            ele.focus()
+         } 
       },
       openCreate() {
          this.createOpen = true;
@@ -272,7 +280,7 @@ export default {
          this.createOpen = false;
          this.$store.commit("system/setError", "")
       },
-      createFolder() {
+      async createFolder() {
          if (this.submitting) return
          this.submitting = true
          this.$store.commit("system/setError", "")
@@ -284,11 +292,16 @@ export default {
             this.submitting = false
             return
          }
-         this.$store.dispatch("bookmarks/addFolder", this.newFolder).then(() => {
-            this.createOpen = false
-            this.submitting = false
-            this.newFolder = ""
-         });
+         await this.$store.dispatch("bookmarks/addFolder", this.newFolder)
+         this.createOpen = false
+         this.submitting = false
+         this.newFolder = ""
+         this.$nextTick( () => {
+            let btn = document.getElementById("create-folder-btn")
+            if (btn) {
+               btn.focus()
+            }
+         })
       }
    },
    created() {
