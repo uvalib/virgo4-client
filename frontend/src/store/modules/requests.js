@@ -135,6 +135,9 @@ const requests = {
 
       window.open(url.format(aeonLink), "_blank");
 
+
+      ctx.commit('activePanel', "ConfirmationPanel")
+
     }
   }
 }

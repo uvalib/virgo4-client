@@ -21,6 +21,21 @@
         {{hold.pickupLibrary}}
       </dd>
     </template>
+    <template v-if="aeon.callNumber">
+      <dt>
+        CallNumber:
+      </dt>
+      <dd>
+        {{aeon.callNumber}}
+      </dd>
+      <dt>
+        Request Note:
+      </dt>
+      <dd>
+        {{aeon.specialRequest}}
+      </dd>
+
+    </template>
   </dl>
 
   <div class="reset pure-button" @click="reset" >
@@ -35,6 +50,7 @@ export default {
   computed: {
     ...mapState({
       hold: state => state.requests.hold,
+      aeon: state => state.requests.aeon,
       userId: state => state.user.signedInUser
       })
   },
