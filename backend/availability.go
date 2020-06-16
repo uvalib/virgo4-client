@@ -272,9 +272,12 @@ func createAeonURL(doc SolrDocument) string {
 
 	if contains(doc.WorkTypes, "manuscript") ||
 		contains(doc.Medium, "manuscript") ||
+		contains(doc.Format, "manuscript") ||
 		contains(doc.WorkTypes, "collection") {
 		formValue = "GenericRequestManuscript"
 	}
+
+	//log.Printf("Solr: %+v", doc)
 
 	// Assign values
 	req := aeonRequest{

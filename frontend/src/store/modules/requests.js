@@ -129,15 +129,17 @@ const requests = {
       const url = require('url')
       let aeonLink = url.parse(optionSettings.create_url, true)
       aeonLink.query["CallNumber"] = selected.callNumber
+      aeonLink.query["ItemVolume"] = selected.callNumber
       aeonLink.query["ItemNumber"] = selected.barcode
       aeonLink.query["Notes"] = selected.notes
       aeonLink.query["SpecialRequest"] = selected.specialRequest
 
-      window.open(url.format(aeonLink), "_blank");
+      // needs to be null to regenerate query below
+      aeonLink.search = null
 
+      window.open(url.format(aeonLink), "_blank")
 
       ctx.commit('activePanel', "ConfirmationPanel")
-
     }
   }
 }
