@@ -65,7 +65,7 @@ type SolrDocument struct {
 	AlternateID          []string `json:"alternate_id_a,omitempty"`
 	AeonAvailability     []string `json:"anon_availability_a,omitempty"`
 	SCAvailabilityStored string   `json:"sc_availability_stored,omitempty"`
-	Author               []string `json:"author_facet_a,omitempty"`
+	Author               []string `json:"author_a,omitempty"`
 	AuthorAddedEntry     []string `json:"author_added_entry_a,omitempty"`
 	CallNumber           []string `json:"call_number_a,omitempty"`
 	CallNumberSort       string   `json:"call_number_sort,omitempty"`
@@ -214,7 +214,7 @@ func processSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument) {
 	return
 }
 
-// Creates Aeon ItemOptions based on availability aata
+// Creates Aeon ItemOptions based on availability data
 func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOption {
 
 	// Sirsi Item Options
@@ -303,7 +303,7 @@ func createAeonURL(doc SolrDocument) string {
 	if len(doc.Author) == 1 {
 		req.Author = doc.Author[0]
 	} else if len(doc.Author) > 1 {
-		req.Author += "; ..."
+		req.Author = fmt.Sprintf("%s; ...", doc.Author[0])
 	}
 
 	// Notes, Bacode, CallNumber, UserNotes need to be added by client for the specific item!
