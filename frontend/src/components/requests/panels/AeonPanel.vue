@@ -9,7 +9,7 @@
 
     <label class="special-instructions-input">
       <p>Add additional instructions if necessary:</p>
-      <textarea v-model="selectedItem.specialRequest" placeholder="250 character limit" maxlength="250" rows="5"/>
+      <textarea v-model="aeon.specialRequest" placeholder="250 character limit" maxlength="250" rows="5"/>
     </label>
 
     <p>Click "Request" to proceed to the Special Collections request system, where you will be asked to select a pickup date.</p>
@@ -39,12 +39,13 @@ export default {
       selectedItem (newVal, _oldVal) {
         this.aeon.callNumber = newVal.label
         this.aeon.barcode = newVal.barcode
-        this.aeon.notes = newVal.scLocation
+        this.aeon.notes = newVal.notes
       }
   },
   computed: {
     ...mapFields({
       itemOptions: 'requests.activeOption.item_options',
+      aeon: 'requests.aeon',
 
     }),
     items() {
@@ -52,7 +53,6 @@ export default {
       for(let i in items) {
         items[i].id = items[i].barcode
         items[i].name = items[i].label
-        items[i].scLocation = items[i].special_collections_locaction
       }
       return items
     },
@@ -78,11 +78,14 @@ div.request-aeon {
    align-items: center;
    align-content: space-around;
 
+  h2 {
+    margin-top: 2em;
+    padding-bottom: 1em
+  }
+
   h2, label, .request-button  {
-  border-bottom: 1px solid gray;
-  margin-bottom: 20px;
-  min-height: 2em;
-}
+    border-bottom: 1px solid gray;
+  }
 }
 .item-selector {
   padding-bottom: 20px;
