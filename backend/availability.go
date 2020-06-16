@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-querystring/query"
@@ -32,7 +33,6 @@ type Item struct {
 	CurrentLocation string                   `json:"current_location"`
 	CallNumber      string                   `json:"call_number"`
 	Volume          string                   `json:"volume"`
-	SCNotes         string                   `json:"special_collections_location"`
 }
 
 // RequestOption is a category of request that a user can make
@@ -49,7 +49,7 @@ type RequestOption struct {
 type ItemOption struct {
 	Label   string `json:"label"`
 	Barcode string `json:"barcode"`
-	SCNotes string `json:"special_collections_location"`
+	SCNotes string `json:"notes"`
 }
 
 // SolrResponse container
@@ -222,7 +222,11 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 	for _, item := range Result.Availability.Items {
 		if item.Library == "Special Collections" {
 
-			scItem := ItemOption{Barcode: item.Barcode, Label: item.CallNumber, SCNotes: item.SCNotes}
+			scItem := ItemOption{
+				Barcode: item.Barcode,
+				Label:   item.CallNumber,
+				SCNotes: strings.Join(doc.LocalNotes, ";\n"),
+			}
 			Options = append(Options, scItem)
 		}
 	}
@@ -234,28 +238,27 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 func createAeonURL(doc SolrDocument) string {
 
 	type aeonRequest struct {
-		Action      int      `url:"Action"`
-		Form        int      `url:"Form"`
-		Value       string   `url:"Value"` // either GenericRequestManuscript or GenericRequestMonograph
-		DocID       string   `url:"ReferenceNumber"`
-		Title       []string `url:"ItemTitle" default:"(NONE)"`
-		Author      []string `url:"ItemAuthor"`
-		Date        string   `url:"ItemDate"`
-		ISBN        []string `url:"ItemISxN"`
-		ISSN        []string `url:"ItemISxN"`
-		CallNumber  []string `url:"CallNumber" default:"(NONE)"`
-		Barcode     string   `url:"ItemNumber"`
-		Place       []string `url:"ItemPlace"`
-		Publisher   []string `url:"ItemPublisher"`
-		Edition     string   `url:"ItemEdition"`
-		Issue       string   `url:"ItemIssuesue"`
-		Volume      string   `url:"ItemVolume"` // unless manuscript
-		Copy        string   `url:"ItemInfo2"`
-		Location    []string `url:"Location"`
-		Description []string `url:"ItemInfo1"`
-		Notes       []string `url:"Notes"`
-		Tags        []string `url:"ResearcherTags,omitempty"`
-		UserNote    []string `url:"SpecialRequest"`
+		Action      int    `url:"Action"`
+		Form        int    `url:"Form"`
+		Value       string `url:"Value"` // either GenericRequestManuscript or GenericRequestMonograph
+		DocID       string `url:"ReferenceNumber"`
+		Title       string `url:"ItemTitle" default:"(NONE)"`
+		Author      string `url:"ItemAuthor"`
+		Date        string `url:"ItemDate"`
+		ISxN        string `url:"ItemISxN"`
+		CallNumber  string `url:"CallNumber" default:"(NONE)"`
+		Barcode     string `url:"ItemNumber"`
+		Place       string `url:"ItemPlace"`
+		Publisher   string `url:"ItemPublisher"`
+		Edition     string `url:"ItemEdition"`
+		Issue       string `url:"ItemIssuesue"`
+		Volume      string `url:"ItemVolume"` // unless manuscript
+		Copy        string `url:"ItemInfo2"`
+		Location    string `url:"Location"`
+		Description string `url:"ItemInfo1"`
+		Notes       string `url:"Notes"`
+		Tags        string `url:"ResearcherTags,omitempty"`
+		UserNote    string `url:"SpecialRequest"`
 	}
 
 	// Decide monograph or manuscript
@@ -266,7 +269,10 @@ func createAeonURL(doc SolrDocument) string {
 	//  'collection', # @see Firehose::JsonAvailability#set_holdings
 	//  'manuscript'  # As seen in Sirsi holdings data.
 	// ]
-	if contains(doc.WorkTypes, "manuscript") || contains(doc.WorkTypes, "manuscript") {
+
+	if contains(doc.WorkTypes, "manuscript") ||
+		contains(doc.Medium, "manuscript") ||
+		contains(doc.WorkTypes, "collection") {
 		formValue = "GenericRequestManuscript"
 	}
 
@@ -275,22 +281,26 @@ func createAeonURL(doc SolrDocument) string {
 		Action:      10,
 		Form:        20,
 		Value:       formValue,
-		Title:       doc.Title,
-		Author:      doc.Author,
+		DocID:       doc.ID,
+		Title:       strings.Join(doc.Title, "; "),
 		Date:        doc.PublicationDate,
-		ISBN:        doc.ISBN,
-		ISSN:        doc.ISSN,
-		CallNumber:  doc.CallNumber,
-		Barcode:     doc.Barcode,
-		Place:       doc.PublishedLocation,
-		Publisher:   doc.PublisherName,
+		ISxN:        strings.Join(append(doc.ISBN, doc.ISSN...), ";"),
+		Place:       strings.Join(doc.PublishedLocation, "; "),
+		Publisher:   strings.Join(doc.PublisherName, "; "),
 		Edition:     doc.Edition,
 		Issue:       doc.Issue,
 		Volume:      doc.Volume,
 		Copy:        doc.Copy,
-		Location:    doc.LocalNotes,
-		Description: doc.Description,
-		Notes:       doc.Location,
+		Description: strings.Join(doc.Description, "; "),
+		//Notes:       strings.Join(doc.LocalNotes, ";\r\n"),
+		//Location:       doc.Location,
+		//CallNumber:  doc.CallNumber,
+		//Barcode:     doc.Barcode,
+	}
+	if len(doc.Author) == 1 {
+		req.Author = doc.Author[0]
+	} else if len(doc.Author) > 1 {
+		req.Author += "; ..."
 	}
 
 	// Notes, Bacode, CallNumber, UserNotes need to be added by client for the specific item!

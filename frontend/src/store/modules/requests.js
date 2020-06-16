@@ -14,6 +14,12 @@ const requests = {
       itemLabel: '',
       pickupLibrary: ''
     },
+    aeon: {
+      barcode: '',
+      notes: '',
+      callNumber: '',
+      specialRequest: ''
+    },
 
     activePanel: '',
     nextPanel: '',
@@ -61,8 +67,15 @@ const requests = {
       store.alertText = ''
       store.nextPanel = ''
       store.hold = {
-        itemBarcode: null,
-        pickupLibrary: null
+        itemBarcode: '',
+        itemLabel: '',
+        pickupLibrary: ''
+      }
+      store.aeon = {
+        callNumber: '',
+        barcode: '',
+        notes: '',
+        specialRequest: ''
       }
     }
   },
@@ -108,6 +121,19 @@ const requests = {
         let message = e.response.data.error || "There was a problem sending this order. Please try again later."
         ctx.commit('system/setError', message, {root: true})
       })
+    },
+    submitAeon(ctx){
+      let optionSettings = ctx.getters.getField("activeOption")
+      let selected = ctx.getters.getField("aeon")
+
+      const url = require('url')
+      let aeonLink = url.parse(optionSettings.create_url, true)
+      aeonLink.query["CallNumber"] = selected.callNumber
+      aeonLink.query["ItemNumber"] = selected.barcode
+      aeonLink.query["Notes"] = selected.notes
+      aeonLink.query["SpecialRequest"] = selected.specialRequest
+
+      window.open(url.format(aeonLink), "_blank");
 
     }
   }
