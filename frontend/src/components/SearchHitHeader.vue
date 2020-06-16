@@ -14,13 +14,16 @@
          </router-link>
       </div>
       <div class="bm-control">
-         <BookmarkButton :hit="hit" :pool="pool"/>
+         <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
+         <BookmarkSignIn v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`"/>
       </div>
    </div>
 </template>
 
 <script>
-import BookmarkButton from '@/components/BookmarkButton'
+import AddBookmark from '@/components/modals/AddBookmark'
+import BookmarkSignIn from '@/components/modals/BookmarkSignIn'
+import { mapGetters } from "vuex"
 export default {
    props: {
       hit: {
@@ -45,9 +48,12 @@ export default {
       }
    },
    components: {
-      BookmarkButton
+      AddBookmark,BookmarkSignIn
    },
    computed: {
+      ...mapGetters({
+        isSignedIn: 'user/isSignedIn',
+      }),
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },

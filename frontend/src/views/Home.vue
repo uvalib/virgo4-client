@@ -278,7 +278,12 @@ export default {
                this.scrollToItem(tgtEle)
                bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
          }
-         this.$store.commit("bookmarks/showAddBookmark", bmData)
+         this.$store.commit("bookmarks/setNewBookmark", bmData)
+         let bmEle = document.getElementById(`bm-modal-${identifier}-btn`)
+         if (bmEle) {
+            bmEle.focus()
+            bmEle.click()
+         }
       },
 
       scrollToItem( tgtEle ) {

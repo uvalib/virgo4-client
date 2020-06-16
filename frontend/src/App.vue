@@ -6,7 +6,6 @@
          <div class="dimmer" v-if="showDimmer">
              <MessageBox v-if="error" type="error" />
              <MessageBox v-if="message" type="info" />
-             <AddBookmarkModal v-if="addingBookmark" @closed="addBookmarkClosed" />
          </div>
       </transition>
       <VirgoHeader :id="headerID" />
@@ -32,7 +31,6 @@ import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import SessionExpired from "@/components/layout/SessionExpired"
 import FatalError from "@/components/layout/FatalError"
-import AddBookmarkModal from "@/components/modals/AddBookmarkModal"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {
@@ -49,7 +47,6 @@ export default {
       VirgoHeader,
       LibraryFooter,
       FatalError,
-      AddBookmarkModal,
       MenuBar,
       ScrollToTop,
       MessageBox,
@@ -70,7 +67,7 @@ export default {
          isKiosk: "system/isKiosk",
       }),
       showDimmer() {
-         return this.addingBookmark || this.error != "" || this.message != "" || this.sessionExpired
+         return this.error != "" || this.message != "" || this.sessionExpired
       }
    },
    methods: {
@@ -84,12 +81,6 @@ export default {
             this.menuPos = (window.scrollY - this.headerHeight)
          }
       },
-      addBookmarkClosed( srcID ) {
-         let tgt = document.getElementById(srcID)
-         if ( tgt ) {
-            tgt.focus()
-         }
-      }
    },
    mounted() {
       setTimeout( ()=>{

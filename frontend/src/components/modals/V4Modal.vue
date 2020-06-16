@@ -109,11 +109,11 @@ div.v4-modal {
    color: var(--uvalib-text);
    position: fixed;
    height: auto;
-   top: 15%;
    z-index: 8000;
    background: white;
+   top: 50%;
    left: 50%;
-   transform: translate(-50%, 0%);
+   transform: translate(-50%, -50%);
    box-shadow: $v4-box-shadow;
    border-radius: 5px;
 
@@ -138,5 +138,14 @@ div.v4-modal {
       margin: 0 5px;
    }
 }
-
+@media only screen and (min-width: 768px) {
+   div.v4-modal {
+      max-width: 40%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.v4-modal {
+      width: 95%;
+   }
+}
 </style>

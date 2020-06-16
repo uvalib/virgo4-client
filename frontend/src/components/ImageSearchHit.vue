@@ -5,7 +5,8 @@
             <TruncatedText mode="icon" :id="`title-${hit.identifier}`" :text="hit.header.title" :limit="19" 
                style="font-weight:bold;" />
          </span>
-         <BookmarkButton :hit="hit" :pool="pool" style="font-size:0.85em;"/>
+         <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
+         <BookmarkSignIn v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`"/>
       </div>
       <router-link class="img-link" :to="detailsURL">
           <img aria-label=" " class="trigger" :src="iiifURL(hit)">
@@ -20,9 +21,11 @@
 </template>
 
 <script>
-import BookmarkButton from '@/components/BookmarkButton'
+import AddBookmark from '@/components/modals/AddBookmark'
+import BookmarkSignIn from '@/components/modals/BookmarkSignIn'
 import TruncatedText from '@/components/TruncatedText'
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    props: {
       hit: { type: Object, required: true},
@@ -30,7 +33,7 @@ export default {
       count: {type: Number, required: true}
    },
    components: {
-      BookmarkButton, TruncatedText
+      AddBookmark, TruncatedText, BookmarkSignIn
    },
    computed: {
       detailsURL() {
@@ -38,6 +41,9 @@ export default {
       },
       ...mapState({
          searching: state => state.searching,
+      }),
+      ...mapGetters({
+        isSignedIn: 'user/isSignedIn',
       }),
    },
    methods: {

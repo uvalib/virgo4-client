@@ -83,10 +83,10 @@ const bookmarks = {
             }
          })
       },
-      showAddBookmark(state, bookmarkData) {
+      setNewBookmark(state, bookmarkData) {
          state.newBookmarkInfo = bookmarkData
       },
-      closeAddBookmark(state) {
+      clearNewBookmark(state) {
          state.newBookmarkInfo = null
       },
    },
