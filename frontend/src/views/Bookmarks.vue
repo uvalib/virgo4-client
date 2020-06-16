@@ -129,7 +129,7 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import ConfirmDelete from "@/components/modals/ConfirmDelete"
-import MoveBookmark from "@/components/popovers/MoveBookmark"
+import MoveBookmark from "@/components/modals/MoveBookmark"
 import RenameBookmark from "@/components/modals/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"
 import AccountActivities from "@/components/AccountActivities"

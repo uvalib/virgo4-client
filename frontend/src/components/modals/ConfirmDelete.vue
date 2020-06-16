@@ -1,7 +1,8 @@
 <template>
    <V4Modal :id="id" title="Confirm Delete" ref="confirmdel" 
       :firstFocusID="`${id}-cancelbtn`" :lastFocusID="`${id}-okbtn`"
-      :buttonID="`${id}-open`">
+      :buttonID="`${id}-open`"
+   >
       <template v-slot:button>
          <V4Button v-if="buttonLabel" mode="text" @click="$refs.confirmdel.show()" :id="`${id}-open`"
              :aria-label="ariaLabel"
@@ -56,7 +57,11 @@ export default {
       },
       okClicked() {
          this.$emit('delete-approved')
-         this.$refs.confirmdel.hide()
+         setTimeout( () => {
+            if ( this.$refs.confirmdel ) {
+               this.$refs.confirmdel.hide()
+            }
+         }, 300)
       },
    }
 }

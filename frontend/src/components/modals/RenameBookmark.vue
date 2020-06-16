@@ -85,7 +85,7 @@ p.error {
    margin: 10px;
 }
 .message {
-   margin: 5px 5px 10px 5px;
+   margin: 10px 5px 0 5px;
    input {
       box-sizing: border-box;
       width:100%;

@@ -120,6 +120,7 @@ div.v4-modal {
    div.v4-modal-content {
       padding: 10px 10px 0 10px;
       text-align: left;
+      font-weight: normal;
    }
    div.v4-modal-title {
       background: var(--uvalib-teal-lightest);
@@ -132,10 +133,10 @@ div.v4-modal {
       text-align: left;
    }
    div.v4-modal-controls {
-      padding: 0 10px 10px 10px;
+      padding: 10px;
       font-size: 0.9em;
       text-align: right;
-      margin: 0 5px;
+      margin: 0;
    }
 }
 @media only screen and (min-width: 768px) {
