@@ -54,8 +54,8 @@
                            >
                               {{dc.name}}
                            </a>
-                           <DownloadProgress v-else :name="dc.name" :key="`pdf${idx}`" 
-                              :aria-label="`download pdf for ${dc.name}`"
+                           <DownloadProgress v-else :name="dc.name" :id="`${details.identifier}-pdf${idx}`" :key="`pdf${idx}`" 
+                              :ariaLabel="`download pdf for ${dc.name}`"
                            />
                         </template>
                      </dd>
@@ -99,7 +99,7 @@ import AvailabilityTable from "@/components/AvailabilityTable"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from '@/components/AccessURLDetails'
-import DownloadProgress from '@/components/popovers/DownloadProgress'
+import DownloadProgress from '@/components/modals/DownloadProgress'
 import V4DownloadButton from '@/components/V4DownloadButton'
 
 export default {
