@@ -35,9 +35,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-button.v4-download-button:focus {
-   box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
-} 
 .v4-download-button {
    border: none;
    outline: none;
@@ -45,6 +42,10 @@ button.v4-download-button:focus {
    margin: 0 15px 0 0;
    padding:2px;
    cursor: pointer;
+
+   &:focus {
+      @include be-accessible();
+   } 
 
    .icon {
       font-size: 1.75em;

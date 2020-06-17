@@ -239,9 +239,8 @@ export default {
    }
 }
 .title {
-   outline: none;
-}
-.title:focus {
-   box-shadow: 0 0 0 2px rgba(21, 156, 228, 0.4);
+   &:focus {
+      @include be-accessible();
+   } 
 }
 </style>

@@ -228,9 +228,12 @@ p.relevant {
    outline: none;
 }
 .pool-tabs .pool.v4-button:focus {
-    border-bottom: none;
-    box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
+   //  border-bottom: none;
+   //  box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
     z-index: 10;
+    &:focus {
+      @include be-accessible();
+   } 
 }
 .pool-results {
    z-index: 11;

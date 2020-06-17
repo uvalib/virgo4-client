@@ -3,11 +3,11 @@
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false" />
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
-          <h1>Search</h1>
-          <div v-if="hasTranslateMessage" class="translate-message">
+         <h1>Search</h1>
+         <div v-if="hasTranslateMessage" class="translate-message">
             {{translateMessage}}
-          </div>
-          <label class="screen-reader-text" for="search">Search Virgo for books, articles and more.</label>
+         </div>
+         <label class="screen-reader-text" for="search">Search Virgo for books, articles and more.</label>
          <label class="screen-reader-text" for="source-select">Search in</label>
           <div class="basic-search">
             <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
@@ -316,7 +316,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 @media only screen and (min-width: 768px) {
   div.searching-box {
     padding: 20px 90px;
@@ -384,13 +384,15 @@ h2 {
 #app .pure-form div.basic-search  input[type=text].basic {
   font-size: 1.15em;
   padding: 0.5vw 0.75vw;
-  outline: none;
   border: 1px solid #ccc;
   margin: 0;
   border-left: 0;
   border-radius: 0 5px 5px 0;
   flex: 1 1 auto;
   min-width: 100px;
+  &:focus {
+      @include be-accessible();
+   } 
 }
 div.advanced {
   margin-top: 10px;

@@ -227,7 +227,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 h2 {
    text-align: left;
    font-size: 1em;
@@ -276,9 +276,15 @@ div.options {
 .options select {
    margin: 0 0.8em 0 0;
    flex-basis: content;
+   &:focus {
+      @include be-accessible();
+   } 
 }
 div.search-term select {
    height: auto !important;
+   &:focus {
+      @include be-accessible();
+   } 
 }
 .v4-button.remove {
    font-size: 1.75em;
