@@ -61,7 +61,7 @@ export default {
          }
       },
       nextTabOK() {
-         this.$refs.pop.lastFocusTabbed()
+         this.$refs.renamemodal.lastFocusTabbed()
       },
       backTabInput() {
          this.$refs.renamemodal.firstFocusBackTabbed()

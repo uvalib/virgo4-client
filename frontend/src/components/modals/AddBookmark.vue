@@ -161,7 +161,8 @@ div.add-content {
       margin-top: 10px;
       border-top: 5px solid var(--uvalib-teal-light);
       padding-top: 25px;
-      width:100%;
+      min-width:350px;
+      width: 100%;
 
       label {
          font-weight: normal;
