@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="option" v-for="option in requests.requestOptions" :key="option.type">
-      <div class="pure-button" @click="setActive(option)">{{option.button_label}}</div>
+      <V4Button mode="tertiary" @click="setActive(option)">{{option.button_label}}</V4Button>
       <p v-if="option.description" v-html="option.description"></p>
     </div>
 

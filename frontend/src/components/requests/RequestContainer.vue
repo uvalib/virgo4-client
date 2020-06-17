@@ -2,9 +2,7 @@
   <div >
     <div class="active-panel">
 
-      <div v-if="showReset(requests.activePanel)" class="reset pure-button"
-        @click="reset"
-        >Reset</div>
+      <V4Button mode="tertiary" v-if="showReset(requests.activePanel)" class="reset" @click="reset">Reset</V4Button>
       <component v-bind:is="requests.activePanel" />
 
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
@@ -54,18 +52,20 @@ export default {
   },
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 .active-panel {
-  padding: 2vw;
-  border: 1px solid black;
-  position: relative;
-}
-.reset {
-  position: absolute;
-  right: 2vw;
-  top: 2vw;
-}
-p.error {
-   color: var(--uvalib-red-emergency);
+   padding: 15px;
+   position: relative;
+   ::v-deep .v4-button {
+      margin:0 !important;
+   }
+   .reset {
+      position: absolute;
+      right: 2vw;
+      top: 2vw;
+   }
+   p.error {
+      color: var(--uvalib-red-emergency);
+   }
 }
 </style>
