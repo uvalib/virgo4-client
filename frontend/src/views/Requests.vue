@@ -25,14 +25,14 @@
                      <dt>Barcode:</dt>
                      <dd>{{req.barcode}}</dd>
                   </dl>
-                  <p v-if="isDevServer">
+                  <p  v-if="isDevServer">
                      <V4Button
-                        mode="icon"
+                        mode="tertiary"
                         @click="deleteHold(req.id)"
-                        aria-label="Delete this hold"
+                        :aria-label="`Delete hold on ${req.title}`"
                         class="delete"
                      >
-                        <i class="fas fa-trash"></i>
+                        Delete Hold
                      </V4Button>
                   </p>
                </div>
@@ -155,6 +155,16 @@ export default {
 </script>
 
 <style scoped>
+h2 {
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   padding-bottom: 10px;
+   margin-bottom: 10px;
+}
+p {
+   margin: 5px 0;
+   padding: 0;
+   text-align: right;
+}
 .requests {
    min-height: 400px;
    position: relative;
@@ -164,8 +174,8 @@ export default {
 .request {
    font-size: 0.9em;
    color: #444;
-   border-top: 1px solid #ccc;
-   margin-bottom: 15px;
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   margin-bottom: 10px;
    padding-bottom: 0px;
 }
 .request .title {
@@ -175,6 +185,9 @@ export default {
    width: 80%;
    margin: 0 auto;
    position: relative;
+}
+.delete-hold {
+   text-align: right;
 }
 @media only screen and (min-width: 768px) {
    div.requests-content {
@@ -195,8 +208,7 @@ export default {
    text-align: left;
 }
 dl {
-   margin-top: 0;
-   margin-left: 15px;
+   margin: 0 0 0 10px;
    display: inline-grid;
    grid-template-columns: max-content 2fr;
    grid-column-gap: 15px;
@@ -207,8 +219,5 @@ dt {
 }
 dd {
    margin: 0 0 10px 0;
-}
-.delete {
-   color: var(--uvalib-red);
 }
 </style>

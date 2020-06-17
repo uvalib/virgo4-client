@@ -1,65 +1,51 @@
 <template>
-<div class="confirmation-panel">
-  <h2>We have received your request.</h2>
+   <div class="confirmation-panel">
+      <h2>We have received your request.</h2>
 
-  <dl>
-    <dt>User ID:</dt>
-    <dd>
-      {{userId}}
-    </dd>
-    <template v-if="hold.itemLabel">
-      <dt>
-        Item:
-      </dt>
-      <dd>
-        {{hold.itemLabel}}
-      </dd>
-      <dt>
-        Pickup Library:
-      </dt>
-      <dd>
-        {{hold.pickupLibrary}}
-      </dd>
-    </template>
-    <template v-if="aeon.callNumber">
-      <dt>
-        CallNumber:
-      </dt>
-      <dd>
-        {{aeon.callNumber}}
-      </dd>
-      <dt>
-        Request Note:
-      </dt>
-      <dd>
-        {{aeon.specialRequest}}
-      </dd>
+      <dl>
+         <dt>User ID:</dt>
+         <dd>{{userId}}</dd>
+         <template v-if="hold.itemLabel">
+            <dt>Item:</dt>
+            <dd>{{hold.itemLabel}}</dd>
+            <dt>Pickup Library:</dt>
+            <dd>{{hold.pickupLibrary}}</dd>
+         </template>
+         <template v-if="aeon.callNumber">
+            <dt>CallNumber:</dt>
+            <dd>{{aeon.callNumber}}</dd>
+            <dt>Request Note:</dt>
+            <dd>{{aeon.specialRequest}}</dd>
+         </template>
+      </dl>
 
-    </template>
-  </dl>
-
-  <div class="reset pure-button" @click="reset" >
-    Done
-  </div>
-
-</div>
+      <V4Button mode="primary" id="request-done" class="reset" @click="reset">Done</V4Button>
+   </div>
 </template>
 <script>
 import { mapState } from "vuex";
 export default {
-  computed: {
-    ...mapState({
-      hold: state => state.requests.hold,
-      aeon: state => state.requests.aeon,
-      userId: state => state.user.signedInUser
+   computed: {
+      ...mapState({
+         hold: state => state.requests.hold,
+         aeon: state => state.requests.aeon,
+         userId: state => state.user.signedInUser
       })
-  },
-  methods: {
-    reset(){
-      this.$store.commit('requests/reset')
-    },
-  }
-}
+   },
+   methods: {
+      reset() {
+         this.$store.commit("requests/reset");
+      }
+   },
+   created() {
+      setTimeout( () => {
+         let ele = document.getElementById("request-done")
+         if ( ele ) {
+            ele.focus()
+         } 
+      }, 150)
+   }
+};
 </script>
 <style scoped>
 dl {
