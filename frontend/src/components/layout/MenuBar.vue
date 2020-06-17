@@ -366,6 +366,10 @@ export default {
          color: var(--uvalib-brand-orange);
          margin-right: 5px;
       }
+
+      &:focus {
+         @include be-accessible();
+      } 
    }
 
    .menu-item:hover {
@@ -434,6 +438,9 @@ export default {
       color: white;
       display: inline-block;
       margin-left:20px;
+      &:focus {
+         @include be-accessible();
+      } 
    }
    .alert-wrap:hover {
       border-bottom:1px solid white;
