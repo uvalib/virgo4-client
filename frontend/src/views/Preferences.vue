@@ -88,5 +88,6 @@ export default {
    padding:5px 15px 15px 15px;
    border-radius: 5px;
    box-shadow: $v4-box-shadow-light;
+   text-align: left;
 }
 </style>

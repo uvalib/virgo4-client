@@ -1,5 +1,5 @@
 <template>
-  <div class="pickup-options">
+  <div class="pickup-options pure-form">
     <h2>Pickup Library</h2>
     <p>Select the library where you would like items delivered. </p>
     <label for="pickup-sel">Current pickup library:
@@ -37,8 +37,17 @@ export default {
 </script>
 <style lang="scss" scoped>
 .pickup-options {
+   text-align: left;
    h2 {
       margin:5px 0 10px 0;
+   }
+   label {
+      font-weight: 500;
+   }
+   select {
+      width: 100%;
+      font-weight: normal;
+      margin-top: 5px;
    }
 }
 </style>
