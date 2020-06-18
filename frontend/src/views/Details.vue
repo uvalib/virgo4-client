@@ -187,11 +187,7 @@ export default {
    },
    methods: {
       triggerMatomoEvent() {
-         if (window._paq ) {
-            window._paq.push(['trackEvent', 'Export', 'RIS_FROM_DETAIL', this.details.identifier])
-         } else {
-            console.error("_PAQ IS NOT AVAILABLE; CANNOT TRIGGER EVENT")
-         }
+         this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
       },
       getDetails() {
          this.mode = this.$route.query.mode

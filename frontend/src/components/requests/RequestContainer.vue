@@ -43,6 +43,7 @@ export default {
   },
   methods: {
     reset(){
+      this.$analytics.trigger()
       this.$store.commit('requests/reset')
       setTimeout( () => {
          let opts = document.getElementsByClassName("option-button")

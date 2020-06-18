@@ -16,6 +16,9 @@ Vue.component('V4Spinner', V4Spinner)
 Vue.component('V4Modal', V4Modal)
 Vue.component('V4Disclosure', V4Disclosure)
 
+import analytics from './analytics'
+Vue.prototype.$analytics = analytics
+
 import VueMoment from 'vue-moment';
 Vue.use(VueMoment)
 

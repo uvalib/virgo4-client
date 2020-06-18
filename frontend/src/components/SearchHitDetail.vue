@@ -102,11 +102,7 @@ export default {
    },
    methods: {
       triggerMatomoEvent() {
-         if (window._paq ) {
-            window._paq.push(['trackEvent', 'Export', 'RIS_FROM_SEARCH', this.hit.identifier])
-         } else {
-            console.error("_PAQ IS NOT AVAILABLE; CANNOT TRIGGER EVENT")
-         }
+         this.$analytics.trigger('Export', 'RIS_FROM_SEARCH', this.hit.identifier)
       },
       getKey(field,idx) {
          return this.hit.identifier+field.value+idx
