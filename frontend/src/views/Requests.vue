@@ -12,18 +12,22 @@
                <div class="request" v-for="(req,idx) in requests.holds" :key="idx">
                   <h3 class="title">{{req.title}}</h3>
                   <dl>
-                     <dt>Status:</dt>
+                     <template v-if="req.author">
+                        <dt>Author:</dt>
+                        <dd>{{req.author}}</dd>
+                     </template>
+                     <dt>Call Number:</dt>
+                     <dd>{{req.callNumber}}</dd>
+                     <dt>Hold Status:</dt>
                      <dd>{{req.status}}</dd>
-                     <dt>Position</dt>
-                     <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
+                     <dt>Delivery To:</dt>
+                     <dd>{{req.pickupLocation}}</dd>
                      <dt>Date Placed:</dt>
                      <dd>{{formatDate(req.placedDate)}}</dd>
-                     <dt>Current Location:</dt>
-                     <dd>{{req.library}} {{req.currentLocation}}</dd>
-                     <dt>Author:</dt>
-                     <dd>{{req.author}}</dd>
-                     <dt>Barcode:</dt>
-                     <dd>{{req.barcode}}</dd>
+                     <dt>Position</dt>
+                     <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
+                     <dt>Item Status:</dt>
+                     <dd>{{req.itemStatus}}</dd>
                   </dl>
                   <p  v-if="isDevServer">
                      <V4Button

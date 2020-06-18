@@ -4,12 +4,12 @@
          <V4Spinner message="Loading Availability..."/>
       </div>
       <template v-else>
-         <template v-if="availability.items.length">
+         <template v-if="availability.items">
             <h2>Availability</h2>
             <div class="availability-content">
                <RequestContainer v-if="isDevServer" :titleId="titleId" />
 
-               <table class="fields" v-if="availability.columns.length">
+               <table class="fields" v-if="availability.columns">
                   <thead>
                      <tr>
                         <th v-for="(column, idx) in availability.columns" :key="idx">
@@ -73,7 +73,7 @@ h2 {
    color: var(--color-primary-orange)
 }
 .availability-content {
-   border: 1px solid var(--uvalib-grey);  
+   border: 1px solid var(--uvalib-grey);
    margin: 0 0 10vh 0;
    table {
       width: 100%;
