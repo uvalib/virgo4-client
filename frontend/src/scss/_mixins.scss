@@ -3,9 +3,11 @@
 // $v4-accessibility-box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
 
 @mixin be-accessible(){
-    border: 1px solid var(--uvalib-accessibility-highlight-dark);
+    // border: 1px solid var(--uvalib-accessibility-highlight-dark);
     outline: 0;
-    box-shadow: 0 0 0 0.2rem var(--uvalib-accessibility-highlight-light);
+    box-shadow: 0 0 0 0.2rem var(--uvalib-accessibility-highlight);
+    
+    // outline: var(--uvalib-accessibility-highlight) solid .125rem !important;
 }
 
 @mixin apply-hover() {

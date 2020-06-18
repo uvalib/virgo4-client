@@ -147,9 +147,7 @@ export default {
    --uvalib-text-dark: var(--uvalib-grey-darkest);
 
 // testing out colors for focus states
-   --uvalib-accessibility-highlight-light: var(--uvalib-blue-alt-lightest);
-   --uvalib-accessibility-highlight: var(--uvalib-blue-alt-light);
-   --uvalib-accessibility-highlight-dark: var(--uvalib-blue-alt-dark);
+   --uvalib-accessibility-highlight: var(--uvalib-brand-blue-light);
 
    /* Color Remapping */
    --color-brand-blue: var(--uvalib-brand-blue);
