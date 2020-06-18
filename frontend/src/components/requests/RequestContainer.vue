@@ -2,9 +2,9 @@
   <div >
     <div class="active-panel">
 
-      <V4Button mode="tertiary" v-if="showReset(requests.activePanel)" class="reset" @click="reset">Reset</V4Button>
+      
       <component v-bind:is="requests.activePanel" />
-
+      <V4Button mode="tertiary" v-if="showReset(requests.activePanel)" class="reset" @click="reset">Reset</V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
     </div>
   </div>
@@ -44,6 +44,12 @@ export default {
   methods: {
     reset(){
       this.$store.commit('requests/reset')
+      setTimeout( () => {
+         let opts = document.getElementsByClassName("option-button")
+         if (opts.length > 0) {
+            opts[0].focus()
+         }
+      },150)
     },
     showReset(panel){
       // Don't show reset on first and last panel
