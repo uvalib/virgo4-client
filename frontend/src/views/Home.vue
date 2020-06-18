@@ -12,7 +12,9 @@
           <div class="basic-search">
             <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
               border="1px solid var(--uvalib-brand-blue)"
-              v-model="basicSearchScope"/>
+              v-model="basicSearchScope"
+              @changed="scopeChanged"
+            />
             <input class="basic"
                 @keyup.enter="searchClicked"
                 v-model="basic"
@@ -143,6 +145,7 @@ export default {
         hasTranslateMessage: 'system/hasTranslateMessage',
         sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
+        isSignedIn: 'user/isSignedIn',
       }),
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
@@ -297,6 +300,10 @@ export default {
         })
       },
 
+      scopeChanged( tgt ) {
+         this.$analytics.trigger('Search', 'BASIC_SEARCH_RESOURCE_SET', tgt)
+      },
+
       searchClicked() {
          // Update the query params in the URL, but since the store already
          // contains all of the data from the URL it wont trigger the search. Do it manually
@@ -306,6 +313,7 @@ export default {
          this.$store.commit('filters/reset')
          this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
+         this.$analytics.trigger('Search', 'BASIC_SEARCH', `signed_in=${this.isSignedIn}`)
       },
 
       barcodeScanned( barcode ) {

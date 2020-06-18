@@ -143,6 +143,7 @@ export default {
          item.focus()
          this.currVal =  this.selections[this.highlightedIdx]
          this.$emit('input', this.currVal)
+         this.$emit('changed', this.currVal.id)
       },
       optionClicked(src) {
          if (src.disabled ) return
@@ -154,6 +155,7 @@ export default {
             let item = this.$refs["O"+this.highlightedID][0]
             item.focus()
          }
+         this.$emit('changed', this.currVal.id)
       },
       globalClick() {
          this.expanded = false

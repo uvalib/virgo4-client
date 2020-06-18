@@ -139,6 +139,7 @@ export default {
          sources: "pools/sortedList",
          isPoolExcluded: "preferences/isPoolExcluded",
          rawQueryString: 'query/string',
+         isSignedIn: 'user/isSignedIn',
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -181,6 +182,7 @@ export default {
             this.$store.commit('filters/reset')
             this.$store.dispatch("searchAllPools")
             this.$store.dispatch("searches/updateHistory")
+            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', `signed_in=${this.isSignedIn}`)
          } else {
             this.$store.commit(
                "system/setError",
