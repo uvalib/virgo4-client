@@ -18,13 +18,14 @@ import SignInPanel from './panels/SignInPanel'
 import PlaceHoldPanel from './panels/PlaceHoldPanel';
 import PDAPanel from './panels/PDAPanel';
 import AeonPanel from './panels/AeonPanel';
+import ScanPanel from './panels/ScanPanel';
 import ConfirmationPanel from './panels/ConfirmationPanel';
 
 export default {
   props: {
       titleId: String,
    },
-  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel},
+  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel},
 
   computed: {
     ...mapFields(['requests', 'item/availability' ]),
@@ -43,7 +44,6 @@ export default {
   },
   methods: {
     reset(){
-      this.$analytics.trigger()
       this.$store.commit('requests/reset')
       setTimeout( () => {
          let opts = document.getElementsByClassName("option-button")
