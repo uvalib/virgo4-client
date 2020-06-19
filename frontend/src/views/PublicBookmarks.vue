@@ -10,7 +10,7 @@
                <template v-for="(bookmark,idx) in bookmarks">
                   <li class="bookmark-wrapper" :key="`BM${idx}`">
                      <div class="title">
-                        <router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
+                        <router-link @click.native="bookmarkFollowed(bookmark.identifier)"  :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
                      </div>
                      <div class="info">
                         <div class="author">{{bookmark.details.author}}</div>
@@ -37,6 +37,9 @@ export default {
       this.$store.dispatch("bookmarks/getPublicBookmarks", this.$route.params.key)
    },
    methods: {
+      bookmarkFollowed(identifier) {
+         this.$analytics.trigger('Bookmarks', 'FOLLOW_PUBLIC_BOOKMARK', identifier)
+      },
       detailsURL(bookmark) {
          return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
       },

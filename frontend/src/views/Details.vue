@@ -62,13 +62,17 @@
                   </template>
                   <dt class="label">Citation:</dt>
                   <dd class="value">
-                     <V4DownloadButton label="Export RIS Citation" :url="risURL" @click="triggerMatomoEvent"
+                     <V4DownloadButton label="Export RIS Citation" :url="risURL" @click="downloadRISCliecked"
                         :aria-label="`export citation for ${details.header.title}`"
                      />
                   </dd>
-                  <template v-if="extDetailLink">
+                  <template v-if="hasExtLink">
                      <dd></dd>
-                     <dt class="value more"  v-html="extDetailLink"></dt>
+                     <dt class="value more">
+                        <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
+                           More Details<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+                        </a>
+                     </dt>
                   </template>
                   <template v-if="poolMode=='image'">
                      <dt class="label">Image:</dt>
@@ -169,13 +173,19 @@ export default {
       accessURLField() {
          return this.allFields.find(f => f.name=="access_url")
       },
-      extDetailLink() {
+      hasExtLink() {
+         let idx = this.allFields.findIndex( f=> f.name=="sirsi_url")
+         if (idx == -1) {
+             idx = this.allFields.findIndex( f=> f.name=="worldcat_url")
+         } 
+         return idx > -1
+      },
+      extDetailURL() {
          let extLink = this.allFields.find( f=> f.name=="sirsi_url")
          if (!extLink) {
              extLink = this.allFields.find( f=> f.name=="worldcat_url")
          }
-         if (!extLink) return ""
-         return `<a href="${extLink.value}" target="_blank">More Details<i style="margin-left:5px;"class="fas fa-external-link-alt"></i></a>`
+         return extLink.value
       },
       marcXML() {
          if ( this.isUVA(this.details.source) === false ) return ""
@@ -186,13 +196,20 @@ export default {
       }
    },
    methods: {
-      triggerMatomoEvent() {
+      extDetailClicked() {
+         this.$analytics.trigger('Results', 'MORE_DETAILS_CLICKED', this.details.identifier)
+      },
+      downloadRISCliecked() {
          this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
       },
       getDetails() {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
          let id= this.$route.params.id
+         if (this.$route.path.includes("/catalog/")) {
+            this.$analytics.trigger('Bookmarks', 'FOLLOW_V3_BOOKMARK', id)    
+         }
+
          if (src) {
             this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {

@@ -8,7 +8,7 @@
             <span class="hit-title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="hit-subtitle">{{hit.header.subtitle}}</span>
          </template>
-         <router-link v-else :to="detailsURL">
+         <router-link @click.native="detailClicked" v-else :to="detailsURL">
             <span class="hit-title">{{hit.header.title}}</span>
             <span v-if="hit.header.subtitle" class="hit-subtitle">{{hit.header.subtitle}}</span>
          </router-link>
@@ -58,6 +58,11 @@ export default {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
    },
+   methods: {
+      detailClicked() {
+         this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
+      },
+   }
 }
 </script>
 

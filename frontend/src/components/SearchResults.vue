@@ -29,6 +29,7 @@
                   <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                      :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
                      placeholder="Other"
+                     @changed="poolSelected"
                      v-model="otherSrcSelection"/>
                </div>
                <PoolResultDetail v-if="selectedResultsIdx > -1" />
@@ -170,7 +171,12 @@ export default {
          this.$store.dispatch("selectPoolResults", resultIdx)
          this.updateURL(resultIdx, r.pool.id)
          this.$store.dispatch("searches/updateHistory")
+         this.poolSelected(r.pool.id)
       },
+
+      poolSelected( id) {
+         this.$analytics.trigger('Results', 'POOL_SELECTED', id)
+      }
    },
 }
 </script>

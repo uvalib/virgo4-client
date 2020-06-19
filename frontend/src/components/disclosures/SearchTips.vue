@@ -1,5 +1,5 @@
 <template>
-   <V4Disclosure id="search-tips">
+   <V4Disclosure id="search-tips" ref="tipsdisclose" @click="clicked">
       <template v-slot:summary>
          <span>Search Tips</span>
       </template>
@@ -30,6 +30,13 @@
 
 <script>
 export default {
+   methods: {
+      clicked() {
+         if ( this.$refs.tipsdisclose.showFull) {
+            this.$analytics.trigger('Help', 'SEARCH_TIPS')
+         }
+      }
+   }
 }
 </script>
 

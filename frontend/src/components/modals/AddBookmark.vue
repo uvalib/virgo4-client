@@ -134,6 +134,7 @@ export default {
                this.bookmarkError = "A bookmark folder selection is required"
                return
             }
+            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.hit.identifier)   
             this.$store.dispatch("bookmarks/addBookmark", this.selectedFolder).then( () => {
                this.$store.commit("bookmarks/clearNewBookmark")
                this.$refs.addbmmodal.hide()

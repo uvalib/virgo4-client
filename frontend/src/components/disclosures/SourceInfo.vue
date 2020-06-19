@@ -1,5 +1,5 @@
 <template>
-   <V4Disclosure id="source-info">
+   <V4Disclosure @click="clicked" ref="infodisclose" id="source-info">
       <template v-slot:summary>
          <span>What am I searching&nbsp;</span>
          <i class="fas fa-question-circle"></i>
@@ -14,6 +14,13 @@
 
 <script>
 export default {
+   methods: {
+      clicked() {
+         if ( this.$refs.infodisclose.showFull) {
+            this.$analytics.trigger('Help', 'WHAT_AM_I_SEARCHING')
+         }
+      }
+   }
 }
 </script>
 

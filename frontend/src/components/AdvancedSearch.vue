@@ -182,7 +182,14 @@ export default {
             this.$store.commit('filters/reset')
             this.$store.dispatch("searchAllPools")
             this.$store.dispatch("searches/updateHistory")
-            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', `signed_in=${this.isSignedIn}`)
+            let s = "SIGNED_OUT"
+            if ( this.isSignedIn ) {
+               s = "SIGNED_IN"
+            }
+            if ( decodeURI(qs).includes("UVA Library Digital Repository") ) {
+               this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')   
+            }
+            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', s)
          } else {
             this.$store.commit(
                "system/setError",

@@ -313,7 +313,11 @@ export default {
          this.$store.commit('filters/reset')
          this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
-         this.$analytics.trigger('Search', 'BASIC_SEARCH', `signed_in=${this.isSignedIn}`)
+         let s = "SIGNED_OUT"
+         if ( this.isSignedIn ) {
+            s = "SIGNED_IN"
+         }
+         this.$analytics.trigger('Search', 'BASIC_SEARCH', s)
       },
 
       barcodeScanned( barcode ) {

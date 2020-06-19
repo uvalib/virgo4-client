@@ -27,9 +27,9 @@
                   class="toggle"
                   :aria-label="`set ${p.name} as preferred`"
                   :aria-checked="isTargetPool(p.url)"
-                  @click.stop="toggleTargetPool(p.url)"
-                  @keyup.stop.enter="toggleTargetPool(p.url)"
-                  @keydown.space.prevent.stop="toggleTargetPool(p.url)"
+                  @click.stop="toggleTargetPool(p)"
+                  @keyup.stop.enter="toggleTargetPool(p)"
+                  @keydown.space.prevent.stop="toggleTargetPool(p)"
                >
                   <i v-if="isTargetPool(p.url)" class="fas fa-star"></i>
                   <i v-else class="far fa-star"></i>
@@ -41,9 +41,9 @@
                   role="checkbox"
                   :aria-label="`toggle inclusion of ${p.name} in search results`"
                   :aria-checked="isPoolExcluded(p.url)"
-                  @click="toggleExcludePool(p.url)"
-                  @keyup.stop.enter="toggleExcludePool(p.url)"
-                  @keydown.space.prevent.stop="toggleExcludePool(p.url)"
+                  @click="toggleExcludePool(p)"
+                  @keyup.stop.enter="toggleExcludePool(p)"
+                  @keydown.space.prevent.stop="toggleExcludePool(p)"
                >
                   <span class="label">Include</span>
                   <i v-if="isPoolExcluded(p.url)" class="excluded far fa-circle"></i>
@@ -66,13 +66,19 @@ export default {
       })
    },
    methods: {
-      toggleTargetPool(url) {
+      toggleTargetPool(pool) {
          this.$store.commit("resetSearchResults");
-         this.$store.dispatch("preferences/toggleTargetPool", url);
+         this.$store.dispatch("preferences/toggleTargetPool", pool.url)
+         this.$analytics.trigger('Preferences', 'SET_PREFERRED_POOL', pool.name)
       },
-      toggleExcludePool(url) {
+      async toggleExcludePool(pool) {
          this.$store.commit("resetSearchResults");
-         this.$store.dispatch("preferences/toggleExcludePool", url);
+         await this.$store.dispatch("preferences/toggleExcludePool", pool.url)
+         if (this.isPoolExcluded(pool.url)) {
+            this.$analytics.trigger('Preferences', 'IGNORE_POOL', pool.name)
+         } else {
+            this.$analytics.trigger('Preferences', 'INCLUDE_POOL', pool.name)
+         }
       }
    }
 };

@@ -51,6 +51,7 @@ export default {
             folder.bookmarks.some( item => {
                if (item.pool == this.pool && item.identifier == this.hit.identifier) {
                   bookmarkID = item.id
+                  this.$analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)   
                   this.$store.dispatch("bookmarks/removeBookmarks", [bookmarkID])
                }
                return bookmarkID != -1

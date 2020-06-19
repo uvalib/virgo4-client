@@ -25,7 +25,9 @@
                </template>
             </dl>
          </div>
-         <router-link v-if="hasCoverImages(pool)" class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`" >
+         <router-link v-if="hasCoverImages(pool)" @click.native="detailClicked" 
+            class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`" 
+         >
             <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
          </router-link>
       </div>
@@ -39,7 +41,7 @@
             :aria-label="`download ocr for ${hit.header.title}`"
          />
          <V4DownloadButton icon="fas fa-file-export" label="Export Citation" 
-            :url="risURL" @click="triggerMatomoEvent"
+            :url="risURL" @click="downloadRISClicked"
             :aria-label="`export citation for ${hit.header.title}`"
          />
       </div>
@@ -101,7 +103,10 @@ export default {
       }
    },
    methods: {
-      triggerMatomoEvent() {
+      detailClicked() {
+         this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
+      },
+      downloadRISClicked() {
          this.$analytics.trigger('Export', 'RIS_FROM_SEARCH', this.hit.identifier)
       },
       getKey(field,idx) {

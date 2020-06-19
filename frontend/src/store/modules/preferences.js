@@ -122,7 +122,7 @@ const preferences = {
       },
       toggleExcludePool(ctx, tgtURL) {
          ctx.commit("toggleExcludePool", tgtURL)
-         ctx.dispatch("savePreferences")
+         return ctx.dispatch("savePreferences")
       },
       toggleOptOut(ctx) {
          ctx.commit("toggleOptOut")

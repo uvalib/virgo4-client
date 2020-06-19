@@ -78,10 +78,14 @@
                                     :aria-label="ariaLabel(bookmark)" />
                               </td>
                               <td>
-                                 <router-link :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
+                                 <router-link @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
+                                    {{bookmark.details.title}}
+                                 </router-link>
                               </td>
                               <td>
-                                 <router-link :to="detailsURL(bookmark)">{{bookmark.details.author}}</router-link>
+                                 <router-link  @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
+                                    {{bookmark.details.author}}
+                                 </router-link>
                               </td>
                            </tr>
                         </table>
@@ -164,6 +168,9 @@ export default {
       })
    },
    methods: {
+      bookmarkFollowed(identifier) {
+         this.$analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
+      },
       isSelected(bm) {
          let idx = this.selectedItems.findIndex( bmid => bmid == bm.id)
          return idx != -1

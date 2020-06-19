@@ -8,7 +8,7 @@
          <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
          <BookmarkSignIn v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`"/>
       </div>
-      <router-link class="img-link" :to="detailsURL">
+      <router-link @click.native="detailClicked" class="img-link" :to="detailsURL">
           <img aria-label=" " class="trigger" :src="iiifURL(hit)">
           <div class="metadata-popover" slot="popover">
              <div class="metadata-content">
@@ -47,6 +47,9 @@ export default {
       }),
    },
    methods: {
+      detailClicked() {
+         this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
+      },
       iiifURL(item) {
          let iiifField = item.basicFields.find( f=>f.name=="iiif_image_url")
          if (iiifField) {

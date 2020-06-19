@@ -49,6 +49,7 @@ export default {
       },
       toggle() {
          this.showFull = !this.showFull
+         this.$emit("click")
       },
    }
 }
