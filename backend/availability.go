@@ -50,6 +50,7 @@ type ItemOption struct {
 	Label   string `json:"label"`
 	Barcode string `json:"barcode"`
 	SCNotes string `json:"notes"`
+	Library string `json:"library"`
 }
 
 // SolrResponse container
