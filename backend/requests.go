@@ -96,7 +96,6 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		PhotoJournalIssue          string
 		PhotoJournalYear           string
 		PhotoJournalInclusivePages string
-		Note                       string
 		ItemNumber                 string
 		ISSN                       string
 		TransactionStatus          string
@@ -105,7 +104,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	illadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
 		DocumentType: scanReq.IlliadType, PhotoJournalTitle: scanReq.Title, PhotoArticleTitle: scanReq.Chapter,
 		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,
-		PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages, Note: scanReq.Notes,
+		PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages,
 		ItemNumber: scanReq.ItemBarcode, ISSN: scanReq.Issn}
 	if scanReq.IlliadType == "Article" {
 		illadReq.TransactionStatus = "Awaiting Document Delivery Processing"
@@ -115,44 +114,50 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 
 	rawResp, illErr := svc.ILLiadPost("/transaction", illadReq)
 	if illErr != nil {
+		// TODO error handling
 		return
 	}
-	log.Printf("ILLiad respone: %s", rawResp)
-	// TODO Illiad request happens here:
-	/*
-		Attempt illiad first
-		pass: send ILS request with IlliadTN
-		fail: send error back to client
-		ILS next
-		pass: send success back to client
-		fail: send error to client, Illiad request goes to a different queue (or something?)
-	*/
 
-	// type ilsScanRequest struct {
-	// 	ItemBarcode   string `json:"itemBarcode"`
-	// 	PickupLibrary string `json:"pickupLibrary"`
-	// 	IlliadTN      string `json:"illiadTN"`
-	// }
+	var illadResp struct {
+		TransactionNumber int
+	}
+	json.Unmarshal([]byte(rawResp), &illadResp)
 
-	// ilsScan := ilsScanRequest{
-	// 	ItemBarcode:   scanReq.ItemBarcode,
-	// 	PickupLibrary: scanReq.PickupLibrary,
-	// 	IlliadTN:      scanReq.Notes,
-	// }
+	type illiadNote struct {
+		Note     string
+		NoteType string
+	}
+	noteReq := illiadNote{Note: scanReq.Notes, NoteType: "Staff"}
+	_, illErr = svc.ILLiadPost(fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
+	if illErr != nil {
+		log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
+	}
 
-	// createHoldURL := fmt.Sprintf("%s/v4/requests/scan", svc.ILSAPI)
-	// bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
-	// if ilsErr != nil {
-	// 	c.String(ilsErr.StatusCode, ilsErr.Message)
-	// 	return
-	// }
+	type ilsScanRequest struct {
+		ItemBarcode   string `json:"itemBarcode"`
+		PickupLibrary string `json:"pickupLibrary"`
+		IlliadTN      string `json:"illiadTN"`
+	}
 
-	// // TODO Pass back a better response?
-	// // Pass through without modification
-	// var result map[string]interface{}
-	// json.Unmarshal([]byte(bodyBytes), &result)
-	// c.JSON(http.StatusOK, result)
-	c.String(http.StatusOK, "ok")
+	ilsScan := ilsScanRequest{
+		ItemBarcode:   scanReq.ItemBarcode,
+		PickupLibrary: scanReq.PickupLibrary,
+		IlliadTN:      fmt.Sprintf("%d", illadResp.TransactionNumber),
+	}
+
+	createHoldURL := fmt.Sprintf("%s/v4/requests/scan", svc.ILSAPI)
+	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
+	if ilsErr != nil {
+		// TODO error handling
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+
+	// TODO Pass back a better response?
+	// Pass through without modification
+	var result map[string]interface{}
+	json.Unmarshal([]byte(bodyBytes), &result)
+	c.JSON(http.StatusOK, result)
 }
 
 // DeleteHold uses ILS Connector V4 API to delete a Hold

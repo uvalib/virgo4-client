@@ -483,7 +483,7 @@ func handleAPIResponse(URL string, resp *http.Response, err error) ([]byte, *Req
 			errMsg = fmt.Sprintf("%s refused connection", URL)
 		}
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
-	} else if resp.StatusCode != http.StatusOK {
+	} else if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		defer resp.Body.Close()
 		bodyBytes, _ := ioutil.ReadAll(resp.Body)
 		status := resp.StatusCode
