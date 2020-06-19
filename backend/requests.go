@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
 // CreateHold uses ILS Connector V4 API to create a Hold
@@ -68,39 +69,90 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	_, signedIn := c.Get("claims")
+	claims, signedIn := c.Get("claims")
 	if signedIn == false {
 		log.Printf("Scan Request requires signin with JWT claims; no claims found")
 		c.String(http.StatusBadRequest, "Sign in required")
 		return
 	}
-
-	// TODO Illiad request happens here:
-
-	type ilsScanRequest struct {
-		ItemBarcode   string `json:"itemBarcode"`
-		PickupLibrary string `json:"pickupLibrary"`
-		IlliadTN      string `json:"illiadTN"`
-	}
-
-	ilsScan := ilsScanRequest{
-		ItemBarcode:   scanReq.ItemBarcode,
-		PickupLibrary: scanReq.PickupLibrary,
-		IlliadTN:      scanReq.Notes,
-	}
-
-	createHoldURL := fmt.Sprintf("%s/v4/requests/scan", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
-	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
+	v4Claims, ok := claims.(*v4jwt.V4Claims)
+	if !ok {
+		log.Printf("ERROR: Scan Request with invalid JWT")
+		c.String(http.StatusBadRequest, "Sign in required")
 		return
 	}
 
-	// TODO Pass back a better response?
-	// Pass through without modification
-	var result map[string]interface{}
-	json.Unmarshal([]byte(bodyBytes), &result)
-	c.JSON(http.StatusOK, result)
+	// First, attempt the ILLiad POST... convert into required structure
+	log.Printf("Process scan request from %s for barcode %s", v4Claims.UserID, scanReq.ItemBarcode)
+	type illiadRequest struct {
+		Username                   string
+		RequestType                string
+		ProcessType                string
+		DocumentType               string
+		PhotoJournalTitle          string
+		PhotoArticleTitle          string
+		PhotoArticleAuthor         string
+		PhotoJournalVolume         string
+		PhotoJournalIssue          string
+		PhotoJournalYear           string
+		PhotoJournalInclusivePages string
+		Note                       string
+		ItemNumber                 string
+		ISSN                       string
+		TransactionStatus          string
+	}
+
+	illadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
+		DocumentType: scanReq.IlliadType, PhotoJournalTitle: scanReq.Title, PhotoArticleTitle: scanReq.Chapter,
+		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,
+		PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages, Note: scanReq.Notes,
+		ItemNumber: scanReq.ItemBarcode, ISSN: scanReq.Issn}
+	if scanReq.IlliadType == "Article" {
+		illadReq.TransactionStatus = "Awaiting Document Delivery Processing"
+	} else {
+		illadReq.TransactionStatus = "Awaiting Collab Processing"
+	}
+
+	rawResp, illErr := svc.ILLiadPost("/transaction", illadReq)
+	if illErr != nil {
+		return
+	}
+	log.Printf("ILLiad respone: %s", rawResp)
+	// TODO Illiad request happens here:
+	/*
+		Attempt illiad first
+		pass: send ILS request with IlliadTN
+		fail: send error back to client
+		ILS next
+		pass: send success back to client
+		fail: send error to client, Illiad request goes to a different queue (or something?)
+	*/
+
+	// type ilsScanRequest struct {
+	// 	ItemBarcode   string `json:"itemBarcode"`
+	// 	PickupLibrary string `json:"pickupLibrary"`
+	// 	IlliadTN      string `json:"illiadTN"`
+	// }
+
+	// ilsScan := ilsScanRequest{
+	// 	ItemBarcode:   scanReq.ItemBarcode,
+	// 	PickupLibrary: scanReq.PickupLibrary,
+	// 	IlliadTN:      scanReq.Notes,
+	// }
+
+	// createHoldURL := fmt.Sprintf("%s/v4/requests/scan", svc.ILSAPI)
+	// bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
+	// if ilsErr != nil {
+	// 	c.String(ilsErr.StatusCode, ilsErr.Message)
+	// 	return
+	// }
+
+	// // TODO Pass back a better response?
+	// // Pass through without modification
+	// var result map[string]interface{}
+	// json.Unmarshal([]byte(bodyBytes), &result)
+	// c.JSON(http.StatusOK, result)
+	c.String(http.StatusOK, "ok")
 }
 
 // DeleteHold uses ILS Connector V4 API to delete a Hold

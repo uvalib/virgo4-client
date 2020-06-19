@@ -319,6 +319,34 @@ func (svc *ServiceContext) GetCodes(c *gin.Context) {
 	c.JSON(http.StatusOK, codes)
 }
 
+// ILLiadPost sends a POST to ILLiad and returns results
+func (svc *ServiceContext) ILLiadPost(url string, data interface{}) ([]byte, *RequestError) {
+	log.Printf("ILLiad  POST request: %s, %+v", url, data)
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	b, _ := json.Marshal(data)
+	illiadURL := fmt.Sprintf("%s/%s", svc.Illiad.URL, url)
+
+	startTime := time.Now()
+	illReq, _ := http.NewRequest("POST", illiadURL, bytes.NewBuffer(b))
+	illReq.Header.Add("Content-Type", "application/json")
+	illReq.Header.Add("ApiKey", svc.Illiad.APIKey)
+	rawResp, rawErr := client.Do(illReq)
+	resp, err := handleAPIResponse(url, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from ILLiad POST %s - %d:%s. Elapsed Time: %d (ms)",
+			url, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from ILLiad POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
+}
+
 // ILLiadGet sends a GET request to ILLiad and returns the response
 func (svc *ServiceContext) ILLiadGet(queryURL string) ([]byte, *RequestError) {
 	illiad := fmt.Sprintf("%s/%s", svc.Illiad.URL, queryURL)

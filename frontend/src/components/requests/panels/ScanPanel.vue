@@ -122,7 +122,14 @@ export default {
          } else {
             document.getElementById("item-select").focus()
          }
+         this.title = this.details.header.title
+         if (this.details.header.author) {
+            this.author = this.details.header.author.value.join("; ")
+         } else {
+            this.author = "Unknown"    
+         }
          let isbn = this.details.detailFields.find( f=>f.name=="isbn")
+         console.log(JSON.stringify(isbn))
          this.issn = isbn.value.find( i => i.length == 13)
          if (this.issn == "") {
             this.issn = isbn.value[0]  
