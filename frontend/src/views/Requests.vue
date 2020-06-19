@@ -20,11 +20,11 @@
                      <dd>{{req.callNumber}}</dd>
                      <dt>Hold Status:</dt>
                      <dd>{{req.status}}</dd>
-                     <dt>Delivery To:</dt>
+                     <dt>Deliver To:</dt>
                      <dd>{{req.pickupLocation}}</dd>
                      <dt>Date Placed:</dt>
                      <dd>{{formatDate(req.placedDate)}}</dd>
-                     <dt>Position</dt>
+                     <dt>Position:</dt>
                      <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
                      <dt>Item Status:</dt>
                      <dd>{{req.itemStatus}}</dd>
