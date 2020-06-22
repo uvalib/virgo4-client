@@ -8,38 +8,48 @@
          </div>
          <div class="details">
             <template v-if="requests.holds.length > 0">
-               <h2>Holds</h2>
-               <div class="request" v-for="(req,idx) in requests.holds" :key="`ils-${idx}`">
-                  <h3 class="title">{{req.title}}</h3>
-                  <dl>
-                     <template v-if="req.author">
-                        <dt>Author:</dt>
-                        <dd>{{req.author}}</dd>
-                     </template>
-                     <dt>Call Number:</dt>
-                     <dd>{{req.callNumber}}</dd>
-                     <dt>Hold Status:</dt>
-                     <dd>{{req.status}}</dd>
-                     <dt>Deliver To:</dt>
-                     <dd>{{req.pickupLocation}}</dd>
-                     <dt>Date Placed:</dt>
-                     <dd>{{formatDate(req.placedDate)}}</dd>
-                     <dt>Position:</dt>
-                     <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
-                     <dt>Item Status:</dt>
-                     <dd>{{req.itemStatus}}</dd>
-                  </dl>
-                  <p  v-if="isDevServer">
-                     <V4Button
-                        mode="tertiary"
-                        @click="deleteHold(req.id)"
-                        :aria-label="`Delete hold on ${req.title}`"
-                        class="delete"
-                     >
-                        Delete Hold
-                     </V4Button>
-                  </p>
-               </div>
+               <AccordionContent
+                     class="boxed bookmark-folder"
+                     background="var(--uvalib-blue-alt-lightest)"
+                     borderWidth="0 0 3px 0"
+                     borderColor="var(--uvalib-blue-alt)"
+                     id="ils-holds"
+               >
+                  <template v-slot:title><span class="section-title">UVA Holds</span></template>
+                  <div class="request-list">
+                     <div class="request" v-for="(req,idx) in requests.holds" :key="`ils-${idx}`">
+                        <h3 class="title">{{req.title}}</h3>
+                        <dl>
+                           <template v-if="req.author">
+                              <dt>Author:</dt>
+                              <dd>{{req.author}}</dd>
+                           </template>
+                           <dt>Call Number:</dt>
+                           <dd>{{req.callNumber}}</dd>
+                           <dt>Hold Status:</dt>
+                           <dd>{{req.status}}</dd>
+                           <dt>Deliver To:</dt>
+                           <dd>{{req.pickupLocation}}</dd>
+                           <dt>Date Placed:</dt>
+                           <dd>{{formatDate(req.placedDate)}}</dd>
+                           <dt>Position:</dt>
+                           <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
+                           <dt>Item Status:</dt>
+                           <dd>{{req.itemStatus}}</dd>
+                        </dl>
+                        <p  v-if="isDevServer">
+                           <V4Button
+                              mode="tertiary"
+                              @click="deleteHold(req.id)"
+                              :aria-label="`Delete hold on ${req.title}`"
+                              class="delete"
+                           >
+                              Delete Hold
+                           </V4Button>
+                        </p>
+                     </div>
+                  </div>
+               </AccordionContent>
             </template>
 
             <template v-if="illiadRequests.length > 0">
@@ -116,11 +126,12 @@
 <script>
 import { mapState } from "vuex";
 import { mapGetters } from "vuex";
-import AccountActivities from "@/components/AccountActivities";
+import AccountActivities from "@/components/AccountActivities"
+import AccordionContent from "@/components/AccordionContent"
 export default {
    name: "requests",
    components: {
-      AccountActivities
+      AccountActivities,AccordionContent
    },
    computed: {
       ...mapState({
@@ -156,41 +167,52 @@ export default {
 };
 </script>
 
-<style scoped>
-h2 {
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   padding-bottom: 10px;
-   margin-bottom: 10px;
-}
-p {
-   margin: 5px 0;
-   padding: 0;
-   text-align: right;
-}
-.requests {
-   min-height: 400px;
-   position: relative;
-   margin-top: 2vw;
-   color: var(--color-primary-text);
-}
-.request {
-   font-size: 0.9em;
-   color: #444;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   margin-bottom: 10px;
-   padding-bottom: 0px;
-}
-.request .title {
-   font-weight: bold;
-}
+<style lang="scss" scoped>
+
 .requests-content {
    width: 80%;
    margin: 0 auto;
    position: relative;
+   text-align: left;
+
+   p {
+      margin: 5px 0;
+      padding: 0;
+      text-align: right;
+   }
+   .none {
+      text-align: center;
+      font-size: 1.25em;
+      margin-top: 35px;
+   }
+
+   .section-title {
+      font-weight: bold;
+      font-size:1.15em;
+      padding: 5px;
+   }
+
+   .request-list {
+      background-color: var(--uvalib-grey-lightest);
+      border: 1px solid var(--uvalib-grey-light);
+
+      .request {
+         font-size: 0.9em;
+         margin:15px;
+         border: 1px solid var(--uvalib-grey-lightest);
+         background: white;
+         padding: 5px 10px;
+         box-shadow: $v4-box-shadow-light;
+
+         h3 {
+            margin: 0 0 15px 0; 
+            padding: 10px;
+            border-bottom: 2px solid var(--uvalib-grey-light);
+         }
+      }
+   }
 }
-.delete-hold {
-   text-align: right;
-}
+
 @media only screen and (min-width: 768px) {
    div.requests-content {
       width: 60%;
@@ -201,14 +223,8 @@ p {
       width: 95%;
    }
 }
-.none {
-   text-align: center;
-   font-size: 1.25em;
-   margin-top: 35px;
-}
-.details {
-   text-align: left;
-}
+
+
 dl {
    margin: 0 0 0 10px;
    display: inline-grid;
