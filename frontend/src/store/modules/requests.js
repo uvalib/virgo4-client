@@ -113,7 +113,7 @@ const requests = {
       submitScan(ctx) {
          axios.post('/api/requests/scan', ctx.state.scan).then(response => {
             if (response.data.hold.errors) {
-               ctx.commit('system/setError', response.data.hold.errors, { root: true })
+               ctx.commit('system/setError', response.data.scan.errors, { root: true })
             } else {
                ctx.commit('activePanel', "ConfirmationPanel")
             }

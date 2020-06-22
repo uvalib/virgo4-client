@@ -313,7 +313,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 
 	log.Printf("Get leo delivery address")
 	leoLocation := make([]string, 0)
-	respBytes, illErr := svc.ILLiadGet(fmt.Sprintf("/Users/%s", userID))
+	respBytes, illErr := svc.ILLiadRequest("GET", fmt.Sprintf("/Users/%s", userID), nil)
 	if illErr != nil {
 		log.Printf("WARN: unable to get leo address info: %s", illErr.Message)
 	} else {

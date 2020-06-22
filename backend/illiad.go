@@ -18,7 +18,7 @@ func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 	// qStr := fmt.Sprintf("Transaction/UserRequests/%s?%s", v4UserID, orderBy)
 	filter := "$filter=TransactionStatus+ne+'Request+Finished'+and+not+startswith(TransactionStatus,'Cancel')"
 	qStr := fmt.Sprintf("Transaction/UserRequests/%s?%s&%s", v4UserID, orderBy, filter)
-	respBytes, illErr := svc.ILLiadGet(qStr)
+	respBytes, illErr := svc.ILLiadRequest("GET", qStr, nil)
 	if illErr != nil {
 		log.Printf("ERROR: ILLiad request for %s failed: %s", v4UserID, illErr.Message)
 		c.String(http.StatusInternalServerError, illErr.Message)

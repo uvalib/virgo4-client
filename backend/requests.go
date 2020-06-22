@@ -112,23 +112,26 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		illadReq.TransactionStatus = "Awaiting Collab Processing"
 	}
 
-	rawResp, illErr := svc.ILLiadPost("/transaction", illadReq)
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadReq)
 	if illErr != nil {
-		// TODO error handling
+		// if the first ILLiad request fails, notify user and exit
+		c.JSON(illErr.StatusCode, illErr.Message)
 		return
 	}
 
+	// parse transaction number from response
 	var illadResp struct {
 		TransactionNumber int
 	}
 	json.Unmarshal([]byte(rawResp), &illadResp)
 
+	// use transaction number to add a note to the request
 	type illiadNote struct {
 		Note     string
 		NoteType string
 	}
 	noteReq := illiadNote{Note: scanReq.Notes, NoteType: "Staff"}
-	_, illErr = svc.ILLiadPost(fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
+	_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
 	if illErr != nil {
 		log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
 	}
@@ -148,12 +151,18 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	createHoldURL := fmt.Sprintf("%s/v4/requests/scan", svc.ILSAPI)
 	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
 	if ilsErr != nil {
-		// TODO error handling
+		// The ILLiad request was successful so the item needs to be moved to a special queue
+		// then fail the response
+		type illiadMove struct{ Status string }
+		moveReq := illiadMove{Status: "Virgo Hold Error"}
+		_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", illadResp.TransactionNumber), moveReq)
+		if qErr != nil {
+			log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, qErr.Message)
+		}
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
 
-	// TODO Pass back a better response?
 	// Pass through without modification
 	var result map[string]interface{}
 	json.Unmarshal([]byte(bodyBytes), &result)

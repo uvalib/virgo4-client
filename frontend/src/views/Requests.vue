@@ -9,7 +9,7 @@
          <div class="details">
             <template v-if="requests.holds.length > 0">
                <h2>Holds</h2>
-               <div class="request" v-for="(req,idx) in requests.holds" :key="idx">
+               <div class="request" v-for="(req,idx) in requests.holds" :key="`ils-${idx}`">
                   <h3 class="title">{{req.title}}</h3>
                   <dl>
                      <template v-if="req.author">
@@ -44,7 +44,7 @@
 
             <template v-if="illiadRequests.length > 0">
                <h2>ILL Requests</h2>
-               <div class="request" v-for="(req,idx) in illiadRequests" :key="idx">
+               <div class="request" v-for="(req,idx) in illiadRequests" :key="`illiad-${idx}`">
                   <template v-if="req.requestType == 'Loan'">
                      <h3 class="title">{{req.loanTitle}}</h3>
                      <dl>
@@ -97,8 +97,10 @@
                         <dd>{{formatDate(req.creationDate)}}</dd>
                         <dt>Status:</dt>
                         <dd>{{req.transactionStatus}}</dd>
-                        <dt>PDF Download:</dt>
-                        <dd v-html="getDownloadLink(req)"></dd>
+                        <template v-if="req.transactionStatus == 'Delivered to Web'">
+                           <dt>PDF Download:</dt>
+                           <dd v-html="getDownloadLink(req)"></dd>
+                        </template>
                      </dl>
                   </template>
                </div>
