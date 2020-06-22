@@ -52,7 +52,7 @@
                </AccordionContent>
             </template>
 
-            <template v-if="illiadRequests.length > 0">
+            <template v-if="illLoans.length > 0">
                <AccordionContent
                      class="requests-accordion"
                      background="var(--uvalib-blue-alt-lightest)"
@@ -60,67 +60,79 @@
                      borderColor="var(--uvalib-blue-alt)"
                      id="ill-holds"
                >
-                  <template v-slot:title><span class="section-title">ILL Requests</span></template>
+                  <template v-slot:title><span class="section-title">ILL Loan</span></template>
                   <div class="request-list">
-                     <div class="request" v-for="(req,idx) in illiadRequests" :key="`illiad-${idx}`">
-                        <template v-if="req.requestType == 'Loan'">
-                           <h3 class="title">{{req.loanTitle}}</h3>
-                           <dl>
-                              <dt>Author:</dt>
-                              <dd>{{req.loanAuthor}}</dd>
-                              <dt>Call Number:</dt>
-                              <dd>{{req.callNumber}}</dd>
-                              <dt>Transaction Number:</dt>
-                              <dd>{{req.transactionNumber}}</dd>
-                              <dt>Date Requested:</dt>
-                              <dd>{{formatDate(req.creationDate)}}</dd>
-                              <dt>Status:</dt>
-                              <dd>{{req.transactionStatus}}</dd>
-                           </dl>
-                        </template>
-                        <template v-else>
-                           <h3 class="title">{{req.photoJournalTitle}}</h3>
-                           <dl>
-                              <dt>Author:</dt>
-                              <dd>{{req.photoArticleAuthor}}</dd>
-                              <template v-if="req.photoArticleTitle">
-                                 <dt>Article Title:</dt>
-                                 <dd>{{req.photoArticleTitle}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalVolume">
-                                 <dt>Volume:</dt>
-                                 <dd>{{req.photoJournalVolume}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalVolume">
-                                 <dt>Issue:</dt>
-                                 <dd>{{req.photoJournalIssue}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalMonth">
-                                 <dt>Month:</dt>
-                                 <dd>{{req.photoJournalMonth}}</dd>
-                              </template>
-                              <template v-if="req.photoIssueYear">
-                                 <dt>Year:</dt>
-                                 <dd>{{req.photoIssueYear}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalInclusivePages">
-                                 <dt>Pages:</dt>
-                                 <dd>{{req.photoJournalInclusivePages}}</dd>
-                              </template>
-                              <dt>Call Number:</dt>
-                              <dd>{{req.callNumber}}</dd>
-                              <dt>Transaction Number:</dt>
-                              <dd>{{req.transactionNumber}}</dd>
-                              <dt>Date Requested:</dt>
-                              <dd>{{formatDate(req.creationDate)}}</dd>
-                              <dt>Status:</dt>
-                              <dd>{{req.transactionStatus}}</dd>
-                              <template v-if="req.transactionStatus == 'Delivered to Web'">
-                                 <dt>PDF Download:</dt>
-                                 <dd v-html="getDownloadLink(req)"></dd>
-                              </template>
-                           </dl>
-                        </template>
+                     <div class="request" v-for="(req,idx) in illLoans" :key="`ill-loan-${idx}`">
+                        <h3 class="title">{{req.loanTitle}}</h3>
+                        <dl>
+                           <dt>Author:</dt>
+                           <dd>{{req.loanAuthor}}</dd>
+                           <dt>Call Number:</dt>
+                           <dd>{{req.callNumber}}</dd>
+                           <dt>Transaction Number:</dt>
+                           <dd>{{req.transactionNumber}}</dd>
+                           <dt>Date Requested:</dt>
+                           <dd>{{formatDate(req.creationDate)}}</dd>
+                           <dt>Status:</dt>
+                           <dd>{{req.transactionStatus}}</dd>
+                        </dl>
+                     </div>
+                  </div>
+               </AccordionContent>
+            </template>
+
+            <template v-if="digitalRequests.length > 0">
+               <AccordionContent
+                     class="requests-accordion"
+                     background="var(--uvalib-blue-alt-lightest)"
+                     borderWidth="0 0 3px 0"
+                     borderColor="var(--uvalib-blue-alt)"
+                     id="ill-holds"
+               >
+                  <template v-slot:title><span class="section-title">Digital Delivery Requests</span></template>
+                  <div class="request-list">
+                     <div class="request" v-for="(req,idx) in digitalRequests" :key="`digital-${idx}`">
+                        <h3 class="title">{{req.photoJournalTitle}}</h3>
+                        <dl>
+                           <dt>Author:</dt>
+                           <dd>{{req.photoArticleAuthor}}</dd>
+                           <template v-if="req.photoArticleTitle">
+                              <dt>Article Title:</dt>
+                              <dd>{{req.photoArticleTitle}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalVolume">
+                              <dt>Volume:</dt>
+                              <dd>{{req.photoJournalVolume}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalVolume">
+                              <dt>Issue:</dt>
+                              <dd>{{req.photoJournalIssue}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalMonth">
+                              <dt>Month:</dt>
+                              <dd>{{req.photoJournalMonth}}</dd>
+                           </template>
+                           <template v-if="req.photoIssueYear">
+                              <dt>Year:</dt>
+                              <dd>{{req.photoIssueYear}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalInclusivePages">
+                              <dt>Pages:</dt>
+                              <dd>{{req.photoJournalInclusivePages}}</dd>
+                           </template>
+                           <dt>Call Number:</dt>
+                           <dd>{{req.callNumber}}</dd>
+                           <dt>Transaction Number:</dt>
+                           <dd>{{req.transactionNumber}}</dd>
+                           <dt>Date Requested:</dt>
+                           <dd>{{formatDate(req.creationDate)}}</dd>
+                           <dt>Status:</dt>
+                           <dd>{{req.transactionStatus}}</dd>
+                           <template v-if="req.transactionStatus == 'Delivered to Web'">
+                              <dt>PDF Download:</dt>
+                              <dd v-html="getDownloadLink(req)"></dd>
+                           </template>
+                        </dl>
                      </div>
                   </div>
                </AccordionContent>
@@ -154,6 +166,30 @@ export default {
       illiadRequests() {
          return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" && 
           h.transactionStatus != "Request Finished" && h.transactionStatus != "Delivered to Web" )
+      },
+      illLoans() {
+         let out = []
+         this.illiadRequests.forEach( r => {
+            console.log(`PT=${r.processType} RT=${r.requestType}`)
+            if (r.processType=="Borrowing" && r.requestType=="Loan") {
+               out.push(r)
+               console.log("ADD LOAN")
+            }
+         })
+         return out
+      },
+      digitalRequests() {
+         let out = []
+         this.illiadRequests.forEach( r => {
+            console.log(`PT=${r.processType} RT=${r.requestType} DT=${r.documentType}`)
+            if ((r.processType=="Borrowing" && r.requestType=="Article") ||
+                ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article") ||
+                ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article" && r.documentType=="Collab")) {
+               out.push(r)
+               console.log("ADD DIGITAL")
+            }
+         })
+         return out
       }
    },
    methods: {

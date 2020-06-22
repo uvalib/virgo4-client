@@ -28,8 +28,10 @@ func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 	var resp []struct {
 		TransactionNumber          int    `json:"transactionNumber"`
 		TransactionStatus          string `json:"transactionStatus"`
-		CreationDate               string `json:"creationDate"`
 		RequestType                string `json:"requestType"`
+		DocumentType               string `json:"documentType"`
+		ProcessType                string `json:"processType"`
+		CreationDate               string `json:"creationDate"`
 		CallNumber                 string `json:"callNumber"`
 		ReferenceNumber            string `json:"referenceNumber"`
 		LoanTitle                  string `json:"loanTitle,omitempty"`
