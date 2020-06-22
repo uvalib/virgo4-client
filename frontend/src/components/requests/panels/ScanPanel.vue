@@ -129,10 +129,14 @@ export default {
             this.author = "Unknown"    
          }
          let isbn = this.details.detailFields.find( f=>f.name=="isbn")
-         console.log(JSON.stringify(isbn))
          this.issn = isbn.value.find( i => i.length == 13)
          if (this.issn == "") {
             this.issn = isbn.value[0]  
+         }
+
+         let pubDate = this.details.basicFields.find( f=>f.name=="published_date")
+         if (pubDate) {
+            this.year = pubDate.value
          }
       }, 150)
    },
