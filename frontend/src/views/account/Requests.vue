@@ -170,10 +170,10 @@ export default {
       illLoans() {
          let out = []
          this.illiadRequests.forEach( r => {
-            console.log(`PT=${r.processType} RT=${r.requestType}`)
+            // console.log(`PT=${r.processType} RT=${r.requestType}`)
             if (r.processType=="Borrowing" && r.requestType=="Loan") {
                out.push(r)
-               console.log("ADD LOAN")
+               // console.log("ADD LOAN")
             }
          })
          return out
@@ -181,12 +181,12 @@ export default {
       digitalRequests() {
          let out = []
          this.illiadRequests.forEach( r => {
-            console.log(`PT=${r.processType} RT=${r.requestType} DT=${r.documentType}`)
+            // console.log(`PT=${r.processType} RT=${r.requestType} DT=${r.documentType}`)
             if ((r.processType=="Borrowing" && r.requestType=="Article") ||
                 ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article") ||
                 ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article" && r.documentType=="Collab")) {
                out.push(r)
-               console.log("ADD DIGITAL")
+               // console.log("ADD DIGITAL")
             }
          })
          return out
