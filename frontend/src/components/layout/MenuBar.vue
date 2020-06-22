@@ -66,20 +66,23 @@
                      <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
                         <div class="submenu">My Information</div>
                      </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">My Searches</div>
+                     <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub" @keyup.native.enter.prevent.stop>
+                        <div class="submenu">Checkouts</div>
+                     </router-link>
+                     <router-link role="menuitem" tabindex="-1" to="/digital-deliveries" id="digitalsub" @keyup.native.enter.prevent.stop>
+                        <div class="submenu">Digital Deliveries</div>
+                     </router-link>
+                     <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub" @keyup.native.enter.prevent.stop>
+                        <div class="submenu">Requests</div>
                      </router-link>
                      <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Bookmarks</div>
                      </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Checkouts</div>
+                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
+                        <div class="submenu">Searches</div>
                      </router-link>
                      <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub" @keyup.native.enter.prevent.stop>
                         <div class="submenu">Preferences</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Requests</div>
                      </router-link>
                      <div role="menuitem" tabindex="-1"  id="outsub" class="submenu"
                         @click="signOut" @keyup.stop.enter="signOut" @keydown.space.prevent.stop="signOut" >
@@ -124,7 +127,7 @@ export default {
       return {
          menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "servicemenu", "accountmenu", "alertmenu"],
          menuBarIdx: 0,
-         userMenu: ["accountsub", "savesub", "bookmarksub", "checkoutsub", "prefsub", "requestsub", "outsub"],
+         userMenu: ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub","outsub"],
          userMenuOpen: false,
          userMenuIdx: 0,
          svcMenuOpen: false,

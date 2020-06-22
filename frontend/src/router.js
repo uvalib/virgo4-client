@@ -8,13 +8,15 @@ import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
 import Details from './views/Details.vue'
-import Preferences from './views/Preferences.vue'
 import SignIn from './views/SignIn.vue'
-import Account from './views/Account.vue'
-import Checkouts from './views/Checkouts.vue'
-import Requests from './views/Requests.vue'
-import SavedSearches from './views/SavedSearches.vue'
-import Bookmarks from './views/Bookmarks.vue'
+import Account from './views/account/Account.vue'
+import Bookmarks from './views/account/Bookmarks.vue'
+import Checkouts from './views/account/Checkouts.vue'
+import DigitalDeliveries from './views/account/DigitalDeliveries.vue'
+import Preferences from './views/account/Preferences.vue'
+import Requests from './views/account/Requests.vue'
+import SavedSearches from './views/account/SavedSearches.vue'
+
 import SignedOut from './views/SignedOut.vue'
 import Feedback from './views/Feedback.vue'
 import NotFound from './views/NotFound.vue'
@@ -133,6 +135,11 @@ const router = new Router({
          component: Checkouts
       },
       {
+         path: '/digital-deliveries',
+         name: 'digital-deliveries',
+         component: DigitalDeliveries
+      },
+      {
          path: '/requests',
          name: 'requests',
          component: Requests
@@ -179,7 +186,7 @@ router.beforeEach((to, _from, next) => {
    }
 
    // Some pages require a signed in user...
-   let userPages = ["preferences", "account", "bookmarks", "checkouts",
+   let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
       "course-reserves-request", "requests", "searches"]
    if (userPages.includes(to.name)) {
       if (ensureSignedIn()) {

@@ -2,15 +2,17 @@
    <div class="activities">
       <router-link id="info-submenu" to="/account">My Information</router-link>
       <span class="sep">|</span>
-      <router-link id="searches-submenu" to="/searches">My Searches</router-link>
+      <router-link id="checkouts-submenu" to="/checkouts">Checkouts</router-link>
+      <span class="sep">|</span>
+      <router-link id="digital-submenu" to="/digital-deliveries">Digital Deliveries</router-link>
+      <span class="sep">|</span>
+      <router-link id="requests-submenu" to="/requests">Requests</router-link>
       <span class="sep">|</span>
       <router-link id="bookmarks-submenu" to="/bookmarks">Bookmarks</router-link>
       <span class="sep">|</span>
-      <router-link id="checkouts-submenu" to="/checkouts">Checkouts</router-link>
+      <router-link id="searches-submenu" to="/searches">Searches</router-link>
       <span class="sep">|</span>
       <router-link id="preferences-submenu" to="/preferences">Preferences</router-link>
-      <span class="sep">|</span>
-      <router-link id="requests-submenu" to="/requests">Requests</router-link>
       <span class="sep">|</span>
       <V4Button mode="text"  @click="signOut">Sign Out</V4Button>
    </div>

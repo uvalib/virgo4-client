@@ -131,17 +131,13 @@ export default {
          isDevServer: "system/isDevServer"
       }),
       illiadRequests() {
-         return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer")
+         return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" && 
+          h.transactionStatus != "Request Finished" && h.transactionStatus != "Delivered to Web" )
       }
    },
    methods: {
       formatDate(date) {
          return date.split("T")[0];
-      },
-      getDownloadLink(req) {
-         let url = `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`;
-         let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`;
-         return `<a href='${url}' target='_blank'>${icon}Download</a>`;
       },
       hasNoRequests() {
          return !(this.requests.illiad || this.requests.holds);
