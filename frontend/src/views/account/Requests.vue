@@ -9,7 +9,7 @@
          <div class="details">
             <template v-if="requests.holds.length > 0">
                <AccordionContent
-                     class="boxed bookmark-folder"
+                     class="requests-accordion"
                      background="var(--uvalib-blue-alt-lightest)"
                      borderWidth="0 0 3px 0"
                      borderColor="var(--uvalib-blue-alt)"
@@ -53,67 +53,77 @@
             </template>
 
             <template v-if="illiadRequests.length > 0">
-               <h2>ILL Requests</h2>
-               <div class="request" v-for="(req,idx) in illiadRequests" :key="`illiad-${idx}`">
-                  <template v-if="req.requestType == 'Loan'">
-                     <h3 class="title">{{req.loanTitle}}</h3>
-                     <dl>
-                        <dt>Author:</dt>
-                        <dd>{{req.loanAuthor}}</dd>
-                        <dt>Call Number:</dt>
-                        <dd>{{req.callNumber}}</dd>
-                        <dt>Transaction Number:</dt>
-                        <dd>{{req.transactionNumber}}</dd>
-                        <dt>Date Requested:</dt>
-                        <dd>{{formatDate(req.creationDate)}}</dd>
-                        <dt>Status:</dt>
-                        <dd>{{req.transactionStatus}}</dd>
-                     </dl>
-                  </template>
-                  <template v-else>
-                     <h3 class="title">{{req.photoJournalTitle}}</h3>
-                     <dl>
-                        <dt>Author:</dt>
-                        <dd>{{req.photoArticleAuthor}}</dd>
-                        <template v-if="req.photoArticleTitle">
-                           <dt>Article Title:</dt>
-                           <dd>{{req.photoArticleTitle}}</dd>
+               <AccordionContent
+                     class="requests-accordion"
+                     background="var(--uvalib-blue-alt-lightest)"
+                     borderWidth="0 0 3px 0"
+                     borderColor="var(--uvalib-blue-alt)"
+                     id="ill-holds"
+               >
+                  <template v-slot:title><span class="section-title">ILL Requests</span></template>
+                  <div class="request-list">
+                     <div class="request" v-for="(req,idx) in illiadRequests" :key="`illiad-${idx}`">
+                        <template v-if="req.requestType == 'Loan'">
+                           <h3 class="title">{{req.loanTitle}}</h3>
+                           <dl>
+                              <dt>Author:</dt>
+                              <dd>{{req.loanAuthor}}</dd>
+                              <dt>Call Number:</dt>
+                              <dd>{{req.callNumber}}</dd>
+                              <dt>Transaction Number:</dt>
+                              <dd>{{req.transactionNumber}}</dd>
+                              <dt>Date Requested:</dt>
+                              <dd>{{formatDate(req.creationDate)}}</dd>
+                              <dt>Status:</dt>
+                              <dd>{{req.transactionStatus}}</dd>
+                           </dl>
                         </template>
-                        <template v-if="req.photoJournalVolume">
-                           <dt>Volume:</dt>
-                           <dd>{{req.photoJournalVolume}}</dd>
+                        <template v-else>
+                           <h3 class="title">{{req.photoJournalTitle}}</h3>
+                           <dl>
+                              <dt>Author:</dt>
+                              <dd>{{req.photoArticleAuthor}}</dd>
+                              <template v-if="req.photoArticleTitle">
+                                 <dt>Article Title:</dt>
+                                 <dd>{{req.photoArticleTitle}}</dd>
+                              </template>
+                              <template v-if="req.photoJournalVolume">
+                                 <dt>Volume:</dt>
+                                 <dd>{{req.photoJournalVolume}}</dd>
+                              </template>
+                              <template v-if="req.photoJournalVolume">
+                                 <dt>Issue:</dt>
+                                 <dd>{{req.photoJournalIssue}}</dd>
+                              </template>
+                              <template v-if="req.photoJournalMonth">
+                                 <dt>Month:</dt>
+                                 <dd>{{req.photoJournalMonth}}</dd>
+                              </template>
+                              <template v-if="req.photoIssueYear">
+                                 <dt>Year:</dt>
+                                 <dd>{{req.photoIssueYear}}</dd>
+                              </template>
+                              <template v-if="req.photoJournalInclusivePages">
+                                 <dt>Pages:</dt>
+                                 <dd>{{req.photoJournalInclusivePages}}</dd>
+                              </template>
+                              <dt>Call Number:</dt>
+                              <dd>{{req.callNumber}}</dd>
+                              <dt>Transaction Number:</dt>
+                              <dd>{{req.transactionNumber}}</dd>
+                              <dt>Date Requested:</dt>
+                              <dd>{{formatDate(req.creationDate)}}</dd>
+                              <dt>Status:</dt>
+                              <dd>{{req.transactionStatus}}</dd>
+                              <template v-if="req.transactionStatus == 'Delivered to Web'">
+                                 <dt>PDF Download:</dt>
+                                 <dd v-html="getDownloadLink(req)"></dd>
+                              </template>
+                           </dl>
                         </template>
-                        <template v-if="req.photoJournalVolume">
-                           <dt>Issue:</dt>
-                           <dd>{{req.photoJournalIssue}}</dd>
-                        </template>
-                        <template v-if="req.photoJournalMonth">
-                           <dt>Month:</dt>
-                           <dd>{{req.photoJournalMonth}}</dd>
-                        </template>
-                        <template v-if="req.photoIssueYear">
-                           <dt>Year:</dt>
-                           <dd>{{req.photoIssueYear}}</dd>
-                        </template>
-                        <template v-if="req.photoJournalInclusivePages">
-                           <dt>Pages:</dt>
-                           <dd>{{req.photoJournalInclusivePages}}</dd>
-                        </template>
-                        <dt>Call Number:</dt>
-                        <dd>{{req.callNumber}}</dd>
-                        <dt>Transaction Number:</dt>
-                        <dd>{{req.transactionNumber}}</dd>
-                        <dt>Date Requested:</dt>
-                        <dd>{{formatDate(req.creationDate)}}</dd>
-                        <dt>Status:</dt>
-                        <dd>{{req.transactionStatus}}</dd>
-                        <template v-if="req.transactionStatus == 'Delivered to Web'">
-                           <dt>PDF Download:</dt>
-                           <dd v-html="getDownloadLink(req)"></dd>
-                        </template>
-                     </dl>
-                  </template>
-               </div>
+                     </div>
+                  </div>
+               </AccordionContent>
             </template>
             <template v-if="hasNoRequests()">
                <div v-if="!lookingUp" class="none">You currently have no outstanding requests</div>
@@ -174,6 +184,10 @@ export default {
    margin: 0 auto;
    position: relative;
    text-align: left;
+
+   .requests-accordion {
+      margin-bottom: 20px;
+   }
 
    p {
       margin: 5px 0;
