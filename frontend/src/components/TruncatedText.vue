@@ -1,16 +1,16 @@
 <template>
    <div :id="id" class="truncated-text">
       <div v-if='isTruncated==false'>
-         <div v-html="truncatedText"></div>
+         <div v-html="text"></div>
       </div>
       <template v-else>
          <button v-if="!showFull" tabindex="0" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`" 
             @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
-            class="truncated-content" :id="`${id}-cut`" :title="text"
+            class="truncated-content" :id="`${id}-cut`" :title="strippedText"
             :class="{icon: mode=='icon'}"
          >
-            <span class="text">{{truncatedText}}</span>
+            <span class="text" :inner-html.prop="text | truncate(limit)"></span>
             <span  v-if="mode=='text'" class="more">...&nbsp;More</span>
             <span  v-else class="more icon">...</span>
          </button>
@@ -18,7 +18,7 @@
             @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
-            <span class="text">{{text}}</span>
+            <span class="text" v-html="text"></span>
             <span  v-if="mode=='text'" class="less" :id="`${id}-less`">...&nbsp;Less</span>
             <span v-else class="less icon" :id="`${id}-less`">Less</span>
          </button>
@@ -46,6 +46,17 @@ export default {
          required: true
       }
    },
+   filters: {
+      truncate: function (value, limit) {
+         if (!value) return "";
+         if (value.length > limit) {
+            var trunc = value.substr(0, limit-1)
+            var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()
+            return out
+         }
+         return value
+      }
+   },
    data: function() {
       return {
          showFull: false
@@ -53,17 +64,25 @@ export default {
    },
    computed: {
       isTruncated() {
-         let test = this.truncatedText
-         return this.text != test
+         let strippedFull = this.stripTags(this.text)
+         let test = this.truncateText(strippedFull)
+         return strippedFull != test
       },
-      truncatedText() {
-         if (this.text.length <= this.limit) return this.text
-         var trunc = this.text.substr(0, this.limit-1)
-         var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()
-         return out
+      strippedText() {
+         return this.stripTags(this.text)
       }
    },
    methods: {
+      truncateText(txt) {
+         if (txt.length <= this.limit) return txt
+         var trunc = txt.substr(0, this.limit-1)
+         var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()
+         return out    
+      },
+      stripTags(txt) {
+         let regex = /(<([^>]+)>)/gi;
+         return txt.replace(regex, "")
+      },
       hide() {
          this.showFull = false
          this.$nextTick( () => {

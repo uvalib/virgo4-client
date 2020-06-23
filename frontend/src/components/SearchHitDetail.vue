@@ -3,7 +3,7 @@
       <div class="details">
          <div class="basic">
             <div v-if="hit.header.author" class="author">
-               <TruncatedText  v-if="hit.header.author" :id="`${hit.identifier}-title`" :title="hit.header.author.label" 
+               <TruncatedText  v-if="hit.header.author" :id="`${hit.identifier}-author`"
                   :text="hit.header.author.value.join('; ')" :limit="truncateLength" />
             </div>
             <dl class="fields">
@@ -12,7 +12,7 @@
                      <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
                      <dd :key="getKey(field,`v${idx}`)" >
                         <TruncatedText :id="`${hit.identifier}-${field.name}`"  
-                           :title="field.label" :text="fieldValueString(field)" :limit="truncateLength" 
+                           :text="fieldValueString(field)" :limit="truncateLength" 
                         />
                      </dd>
                   </template>
