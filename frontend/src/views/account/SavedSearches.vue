@@ -59,6 +59,12 @@
                   <span class="num">{{idx+1}}.</span>
                   <router-link class="history" :to="h">{{urlToText(h)}}</router-link>
                </div>
+                <div class="controls">
+                  <ConfirmDelete v-on:delete-approved="clearHistory" id="del-history" buttonLabel="Clear search history">
+                     <div>Delete search history?</div>
+                     <div class="del-detail">This cannot be reversed.</div>
+                  </ConfirmDelete>
+               </div>
             </div>
          </div>
       </div>
@@ -104,6 +110,9 @@ export default {
       },
       removeAllSearches() {
          this.$store.dispatch("searches/deleteAll", this.signedInUser)
+      },
+      clearHistory() {
+         this.$store.dispatch("searches/clearHistory", this.signedInUser)
       },
       removeSavedSearch(token) {
          this.$store.dispatch("searches/delete", {userID: this.signedInUser, token: token})

@@ -27,6 +27,12 @@ const searches = {
             state.history.push( s )
          })
       },
+      clearSavedSearches(state) {
+         state.saved.splice(0, state.saved.length)
+      },
+      clearSearchHistory(state) {
+         state.history.splice(0, state.history.length)
+      },
       clear(state) {
          state.saved.splice(0, state.saved.length)
          state.history.splice(0, state.history.length)
@@ -90,8 +96,19 @@ const searches = {
 
       deleteAll(ctx, userID) {
          ctx.commit('setLookingUp', true)
-         axios.delete(`/api/users/${userID}/searches`).then((_response) => {
+         axios.delete(`/api/users/${userID}/searches?type=saved`).then((_response) => {
             ctx.commit('clearSavedSearches')
+            ctx.commit('setLookingUp', false)
+          }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setLookingUp', false)
+          })
+      },
+
+      clearHistory(ctx, userID) {
+         ctx.commit('setLookingUp', true)
+         axios.delete(`/api/users/${userID}/searches?type=history`).then((_response) => {
+            ctx.commit('clearSearchHistory')
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })

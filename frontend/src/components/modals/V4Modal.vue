@@ -116,6 +116,7 @@ div.v4-modal {
    transform: translate(-50%, -50%);
    box-shadow: $v4-box-shadow;
    border-radius: 5px;
+   min-width: 300px;
 
    div.v4-modal-content {
       padding: 10px 10px 0 10px;

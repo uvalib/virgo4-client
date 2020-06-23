@@ -32,7 +32,13 @@ func (s SavedSearch) TableName() string {
 // DeleteAllSavedSearches will remove all saved searches from a user account
 func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
 	uid := c.Param("uid")
-	log.Printf("Delete ALL saved searches for user %s...", uid)
+	clearType := c.Query("type")
+	log.Printf("Delete searches (%s) for user %s...", clearType, uid)
+	if clearType != "history" && clearType != "saved" {
+		log.Printf("ERROR: unsupported search type %s", clearType)
+		c.String(http.StatusBadRequest, fmt.Sprintf("'%s' is not a valid search type", clearType))
+		return
+	}
 	var userID int
 	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
 	uq.Bind(dbx.Params{"v4id": uid})
@@ -42,13 +48,16 @@ func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid user %s", uid)
 		return
 	}
-	log.Printf("User %s has ID %d", uid, userID)
 
-	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:uid}")
+	qs := "delete from saved_searches where user_id={:uid}"
+	if clearType == "history" {
+		qs = "delete from search_history where user_id={:uid}"
+	}
+	dq := svc.DB.NewQuery(qs)
 	dq.Bind(dbx.Params{"uid": userID})
 	_, err := dq.Execute()
 	if err != nil {
-		log.Printf("ERROR: unable to delete saved searches for %s (%d): %s", uid, userID, err.Error())
+		log.Printf("ERROR: unable to delete searches (%s) for %s (%d): %s", clearType, uid, userID, err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
