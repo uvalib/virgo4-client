@@ -17,7 +17,10 @@
                <dl class="fields">
                   <template v-if="details.header.author">
                      <dt class="label">{{details.header.author.label}}:</dt>
-                     <dd class="value">{{details.header.author.value.join("; ")}}</dd>
+                     <dd class="value">
+                        <TruncatedText :id="`${details.identifier}-author`"
+                           :text="details.header.author.value.join('; ')" :limit="275" />
+                     </dd>
                   </template>
                   <template v-for="(field,idx) in allDisplayFields">
                      <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
@@ -36,7 +39,10 @@
                            </router-link>
                         </dd>
                      </template>
-                     <dd v-else class="value" v-html="fieldValueString(field)" :key="`v${idx}`"></dd>
+                     <dd v-else class="value" :key="`v${idx}`">
+                        <TruncatedText :id="`${details.identifier}-${field.label}`"
+                           :text="fieldValueString(field)" :limit="fieldLimit(field)" />
+                     </dd>
                   </template>
                   <template v-if="accessURLField">
                      <dt class="label">{{accessURLField.label}}:</dt>
@@ -105,6 +111,7 @@ import beautify from 'xml-beautifier'
 import AccessURLDetails from '@/components/AccessURLDetails'
 import DownloadProgress from '@/components/modals/DownloadProgress'
 import V4DownloadButton from '@/components/V4DownloadButton'
+import TruncatedText from '@/components/TruncatedText'
 
 export default {
    name: "sources",
@@ -125,7 +132,7 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable, DownloadProgress,
+      SearchHitHeader, AvailabilityTable, DownloadProgress, TruncatedText,
       ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton
    },
    computed: {
@@ -231,9 +238,15 @@ export default {
          if ( this.isKiosk && field.type == "url") return false
          return true
       },
+      fieldLimit( field ) {
+         if (field.name == "subject_summary" ) {
+            return 900
+         }
+         return 300
+      },
       fieldValueString( field ) {
          if ( Array.isArray(field.value)) {
-            return field.value.join(",&nbsp;")
+            return field.value.join(", ")
          }
          return field.value
       },
