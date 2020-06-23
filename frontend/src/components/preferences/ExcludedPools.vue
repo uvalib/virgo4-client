@@ -99,7 +99,7 @@ export default {
          padding: 0;
          border-radius: 5px;
          margin: 5px;
-         width: 400px;
+         width: 300px;
          display: inline-block;
          font-size: 0.9em;
          box-shadow: $v4-box-shadow-light;

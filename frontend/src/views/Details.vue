@@ -24,23 +24,10 @@
                   </template>
                   <template v-for="(field,idx) in allDisplayFields">
                      <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
-                     <template v-if="field.type == 'subject'" >
-                        <dd class="value" :key="`v${idx}`">
-                           <template v-if="Array.isArray(field.value)">
-                              <template  v-for="(val,idx) in field.value">
-                                 <span v-if="idx>0" class="sep" :key="idx+'s'">|</span>
-                                 <router-link  :key="idx" :to="getSubjectLink(val)">
-                                    <span class="subject-link">{{val}}</span>
-                                 </router-link>
-                              </template>
-                           </template>
-                           <router-link  v-else :to="getSubjectLink(field.value)">
-                              <span class="subject-link">{{field.value}}</span>
-                           </router-link>
-                        </dd>
-                     </template>
-                     <dd v-else class="value" :key="`v${idx}`">
-                        <TruncatedText :id="`${details.identifier}-${field.label}`"
+                     <dd class="value" :key="`v${idx}`">
+                        <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
+                           :links="getSubjectLinks(field.value)" />                           
+                        <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
                            :text="fieldValueString(field)" :limit="fieldLimit(field)" />
                      </dd>
                   </template>
@@ -112,6 +99,7 @@ import AccessURLDetails from '@/components/AccessURLDetails'
 import DownloadProgress from '@/components/modals/DownloadProgress'
 import V4DownloadButton from '@/components/V4DownloadButton'
 import TruncatedText from '@/components/TruncatedText'
+import V4LinksList from '@/components/V4LinksList'
 
 export default {
    name: "sources",
@@ -133,7 +121,7 @@ export default {
    },
    components: {
       SearchHitHeader, AvailabilityTable, DownloadProgress, TruncatedText,
-      ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton
+      ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList
    },
    computed: {
       risURL() {
@@ -225,6 +213,14 @@ export default {
          if ( this.isSignedIn) {
             this.$store.dispatch("bookmarks/getBookmarks")
          }
+      },
+      getSubjectLinks( subjectValues ) {
+         let out = []
+         subjectValues.forEach( v => {
+            let link = {label: v, url: `/browse/subjects?q=${encodeURI(v)}`}    
+            out.push(link)
+         })
+         return out
       },
       getSubjectLink(subj) {
          return `/browse/subjects?q=${encodeURI(subj)}`

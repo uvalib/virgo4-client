@@ -90,6 +90,10 @@ export function preProcessHitFields(hits) {
             }
             existing.value.push(field.value)
          } else {
+            // subject is always an array
+            if (field.type == "subject") {
+               field.value = [field.value]
+            }
             tgtMerged.push(field)
          }
       })
