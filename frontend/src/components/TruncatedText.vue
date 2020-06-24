@@ -93,6 +93,7 @@ export default {
             let ele = document.getElementById( tgtID )
             if (ele) {
                ele.focus()
+               this.scrollToItem(ele)
             }
          })
       },
@@ -106,8 +107,18 @@ export default {
             let ele = document.getElementById( tgtID )
             if (ele) {
                ele.focus()
+               if (this.showFull == false) {
+                  this.scrollToItem(ele)
+               }
             }
          })
+      },
+      scrollToItem( tgtEle ) {
+         let nav = document.getElementById("v4-navbar")
+         var headerOffset = nav.offsetHeight
+         var elementPosition = tgtEle.getBoundingClientRect().top
+         var offsetPosition = elementPosition - (headerOffset+15)
+         window.scrollBy({top: offsetPosition})
       },
    }
 }

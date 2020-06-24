@@ -63,8 +63,8 @@ export default {
          this.showFull = false
          this.$nextTick( () => {
             let tgt = document.getElementById(this.id+"-cut")
-            tgt.scrollIntoView()
             tgt.focus()
+            this.scrollToItem(tgt)
          })
       },
       toggle() {
@@ -72,14 +72,22 @@ export default {
          if ( this.showFull == false ) {
              this.$nextTick( () => {
                let tgt = document.getElementById(this.id+"-cut")
-               tgt.scrollIntoView({behavior: "smooth"})
                tgt.focus()
+               this.scrollToItem(tgt)
             })
          } else {
             let links = document.getElementsByClassName("link")
             links[0].focus()
          }
       },
+      scrollToItem( tgtEle ) {
+         let nav = document.getElementById("v4-navbar")
+         var headerOffset = nav.offsetHeight
+         var elementPosition = tgtEle.getBoundingClientRect().top
+         var offsetPosition = elementPosition - (headerOffset+15)
+         window.scrollBy({top: offsetPosition})
+      },
+
    }
 }
 </script>
