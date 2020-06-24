@@ -28,7 +28,7 @@
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
                            :links="getSubjectLinks(field.value)" />                           
                         <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
-                           :text="fieldValueString(field)" :limit="fieldLimit(field)" />
+                           :text="$utils.fieldValueString(field)" :limit="fieldLimit(field)" />
                      </dd>
                   </template>
                   <template v-if="accessURLField">
@@ -240,12 +240,6 @@ export default {
          }
          return 300
       },
-      fieldValueString( field ) {
-         if ( Array.isArray(field.value)) {
-            return field.value.join(", ")
-         }
-         return field.value
-      },
    },
    created() {
       this.getDetails()
@@ -271,6 +265,9 @@ export default {
    .icon {
       margin-left: 5px;
    }
+   ::v-deep p {
+         margin: 8px 0;
+      }
 }
 @media only screen and (min-width: 768px) {
    div.details-content  {

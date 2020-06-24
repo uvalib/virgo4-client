@@ -34,7 +34,11 @@ export function preProcessHitFields(hits) {
          }
          if (field.type == "author") {
             if ( !hit.header.author) {
-               hit.header.author = {label: field.label, value: []}   
+               let sep = field.separator
+               if (!sep) {
+                  sep = "; "
+               }
+               hit.header.author = {label: field.label, separator: sep, value: []}   
             }
             hit.header.author.label = field.label
             hit.header.author.value.push(field.value)
@@ -100,6 +104,31 @@ export function preProcessHitFields(hits) {
 
       delete hit.fields
    })
+}
+
+export function fieldValueString(field) {
+   if ( Array.isArray(field.value)) {
+      let sep = field.separator 
+      if (sep == "paragraph") {
+         let out = "<p>"
+         field.value.forEach( (v,idx) => {
+            out += v
+            if (idx === field.value.length - 1) { 
+               out += "</p>"
+            } else {
+               out += "</p><p>"
+            }
+         })
+         return out
+      } 
+
+      if (!sep) {
+         sep = ", "
+      }
+      return field.value.join(sep)
+
+   }
+   return field.value
 }
 
 export function getGroupHitMetadata(group, hit) {

@@ -124,7 +124,7 @@ export default {
          }
          this.title = this.details.header.title
          if (this.details.header.author) {
-            this.author = this.details.header.author.value.join("; ")
+            this.author = this.details.header.author.value.join(this.details.header.author.separator)
          } else {
             this.author = "Unknown"    
          }

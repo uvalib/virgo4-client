@@ -4,7 +4,7 @@
          <div class="basic">
             <div v-if="hit.header.author" class="author">
                <TruncatedText  v-if="hit.header.author" :id="`${hit.identifier}-author`"
-                  :text="hit.header.author.value.join('; ')" :limit="truncateLength" />
+                  :text="hit.header.author.value.join(hit.header.author.separator)" :limit="truncateLength" />
             </div>
             <dl class="fields">
                <template v-for="(field,idx) in hit.basicFields">
@@ -12,7 +12,7 @@
                      <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
                      <dd :key="getKey(field,`v${idx}`)" >
                         <TruncatedText :id="`${hit.identifier}-${field.name}`"  
-                           :text="fieldValueString(field)" :limit="truncateLength" 
+                           :text="$utils.fieldValueString(field)" :limit="truncateLength" 
                         />
                      </dd>
                   </template>
@@ -116,12 +116,6 @@ export default {
          if (field.display == 'optional' || field.type == "url" || field.name.includes("_download_url") ) return false
          if ( this.isKiosk && field.type == "url") return false
          return true
-      },
-      fieldValueString(field) {
-         if ( Array.isArray(field.value)) {
-            return field.value.join(", ")
-         }
-         return field.value
       },
    }
 };

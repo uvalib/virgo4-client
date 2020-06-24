@@ -128,7 +128,7 @@ const bookmarks = {
          // required details: title, author, call number, location, library, availability
          let author = ""
          if  (bm.data.header.author) {
-            author = bm.data.header.author.value.join(", ")
+            author = bm.data.header.author.value.join(bm.data.header.author.separator)
          }
          let detail = {title :bm.data.header.title, author: author}
          data['details'] = JSON.stringify(detail)

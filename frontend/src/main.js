@@ -19,6 +19,9 @@ Vue.component('V4Disclosure', V4Disclosure)
 import analytics from './analytics'
 Vue.prototype.$analytics = analytics
 
+import * as utils from './store/modules/utils'
+Vue.prototype.$utils = utils
+
 import VueMoment from 'vue-moment';
 Vue.use(VueMoment)
 
