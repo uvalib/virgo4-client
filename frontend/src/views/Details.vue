@@ -29,6 +29,11 @@
                            :links="getSubjectLinks(field.value)" />                           
                         <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
                            :text="$utils.fieldValueString(field)" :limit="fieldLimit(field)" />
+                        <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
+                           href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
+                        >
+                           More about Rights and Permissions<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+                        </a>
                      </dd>
                   </template>
                   <template v-if="accessURLField">
@@ -324,6 +329,10 @@ dd {
    -moz-hyphens: auto;
    hyphens: auto;
    padding: 4px 0px;
+   .cr-note {
+      margin-left: 10px;
+      font-size: 0.9em;
+   }
 }
 .value.more {
    margin-top: 15px;
