@@ -170,7 +170,7 @@ export default {
 }
 
 .checkout-content {
-   .requests-accordion {
+   .checkout-accordion {
       margin-bottom: 20px;
    }
    .working  {

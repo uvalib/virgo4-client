@@ -5,10 +5,10 @@
          <AccountActivities/>
          <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
          <div class="details">
+            <div class="notice">
+               PDF links are available for 30 days after delivery
+            </div>
             <template v-if="webDeliveries.length > 0">
-               <div class="notice">
-                  PDF links are available for 30 days after delivery
-               </div>
                <div class="item" v-for="(co,idx) in webDeliveries" :key="idx">
                   <h3 class="title">{{co.photoJournalTitle}}</h3>
                   <dl>
