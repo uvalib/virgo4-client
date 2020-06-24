@@ -1,28 +1,35 @@
 <template>
    <div :id="id" class="links-list">
-      <ol v-if="links.length < 5" class="link-list">
-         <li  v-for="(val,idx) in links" :key="`${linkType}-${idx}`">
-            <router-link :to="val.url">
-               {{val.label}}
-            </router-link>
-         </li>
-      </ol>
-      <button v-else tabindex="0" :aria-expanded="showFull.toString()" :aria-controls="`${id}-list`" 
-            @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
-            @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
-      >
-         <ol :id="`${id}-list`">
-            <li  v-for="(val,idx) in truncatedLinks" :key="`${id}-${idx}`">
-               <router-link :to="val.url">
+      <div v-if="links.length < 5" class="link-list">
+         <template v-for="(val,idx) in truncatedLinks">
+            <div class="link-wrap" :key="`${id}-${idx}`">
+               <span class="number">{{idx+1}}.</span>
+               <router-link :to="val.url" class="link">
                   {{val.label}}
                </router-link>
-            </li>
-            <div class="controls">
-               <span v-if="!showFull" class="more">...More ({{links.length}} items)</span>
-               <span v-else class="less">...Less</span>
             </div>
-         </ol>
-      </button>
+         </template>
+      </div>
+      <div v-else tabindex="0" :aria-expanded="showFull.toString()" 
+            class="truncated-content" :id="`${id}-cut`"
+            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
+            @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
+      >
+         <div :id="`${id}-list`" aria-live="polite">
+            <template v-for="(val,idx) in truncatedLinks">
+               <div class="link-wrap" :key="`${id}-${idx}`">
+                  <span class="number">{{idx+1}}.</span>
+                  <router-link :to="val.url" class="link">
+                     {{val.label}}
+                  </router-link>
+               </div>
+            </template>
+            <div class="controls">
+               <span tabindex="0" role="button" v-if="!showFull" class="more" @click.prevent.stop="toggle">...More ({{links.length}} items)</span>
+               <span tabindex="0" role="button" v-else class="less" @click.prevent.stop="toggle">...Less</span>
+            </div>
+         </div>
+      </div>
    </div>
 </template>
 
@@ -55,19 +62,22 @@ export default {
       hide() {
          this.showFull = false
          this.$nextTick( () => {
-            let tgt = document.getElementById(this.id)
-            console.log("scroll to "+tgt)
+            let tgt = document.getElementById(this.id+"-cut")
             tgt.scrollIntoView()
+            tgt.focus()
          })
       },
       toggle() {
          this.showFull = !this.showFull
          if ( this.showFull == false ) {
              this.$nextTick( () => {
-               let tgt = document.getElementById(this.id)
-               console.log("scroll to "+tgt)
+               let tgt = document.getElementById(this.id+"-cut")
                tgt.scrollIntoView({behavior: "smooth"})
+               tgt.focus()
             })
+         } else {
+            let links = document.getElementsByClassName("link")
+            links[0].focus()
          }
       },
    }
@@ -76,11 +86,13 @@ export default {
 
 <style lang="scss" scoped>
 .links-list {
-   ol {
-      margin: 0;
-      padding: 0 0 0 40px;
+   .link-wrap {
+      .number {
+         margin-right: 5px;
+         display: inline-block;
+      }
    }
-   button {
+   .truncated-content {
       display: inline-block;
       word-break: break-word;
       -webkit-hyphens: auto;
@@ -108,6 +120,9 @@ export default {
          font-weight: 500;
          margin-left: 5px;
          font-size: 0.9em;
+         &:focus {
+            @include be-accessible();
+         }
          &:hover {
             text-decoration: underline;
          }
