@@ -4,24 +4,27 @@
          <div v-html="text"></div>
       </div>
       <template v-else>
-         <button v-if="!showFull" tabindex="0" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`" 
-            @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
-            @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
-            class="truncated-content" :id="`${id}-cut`" :title="strippedText"
+         <div tabindex="0" :aria-expanded="showFull.toString()"
+            class="truncated-content"
             :class="{icon: mode=='icon'}"
-         >
-            <span class="text" :inner-html.prop="text | truncate(limit)"></span>
-            <span  v-if="mode=='text'" class="more">...&nbsp;More</span>
-            <span  v-else class="more icon">...</span>
-         </button>
-         <button v-if="showFull" :id="`${id}-full`" class="full-text" tabindex="0" :class="{icon: mode=='icon'}"
-            @click.prevent.stop="toggle" @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
+            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
-            <span class="text" v-html="text"></span>
-            <span  v-if="mode=='text'" class="less" :id="`${id}-less`">...&nbsp;Less</span>
-            <span v-else class="less icon" :id="`${id}-less`">Less</span>
-         </button>
+            <div  v-if="!showFull" :id="`${id}-cut`" class="truncated"  aria-live="polite" >
+               <span class="text" :inner-html.prop="text | truncate(limit)"></span>
+               <span class="trigger" @click.prevent.stop="toggle">
+                  <span  v-if="mode=='text'" class="more">...&nbsp;More</span>
+                  <span  v-else class="more icon">...</span>
+               </span>
+            </div>
+            <div v-else class="full" :id="`${id}-full`" aria-live="polite" >
+               <span class="text" v-html="text"></span>
+               <span class="trigger" @click.prevent.stop="toggle" >
+                  <span  v-if="mode=='text'" class="less">...&nbsp;Less</span>
+                  <span v-else class="less icon">Less</span>
+               </span>
+            </div>
+         </div>
       </template>
    </div>
 </template>
@@ -139,7 +142,7 @@ export default {
    position: relative;
    box-sizing: border-box;
 
-   button {
+   .truncated-content {
       display: inline-block;
       word-break: break-word;
       -webkit-hyphens: auto;
