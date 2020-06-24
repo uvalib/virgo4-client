@@ -26,14 +26,18 @@
                      <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
                      <dd class="value" :key="`v${idx}`">
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                           :links="getSubjectLinks(field.value)" />                           
+                           :links="getSubjectLinks(field.value)" />   
+                        <span class="copyright" v-else-if="field.name=='copyright_and_permissions'">
+                           <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
+                           <a :href="field.value" target="_blank">{{field.item}}</a>
+                           <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
+                              href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
+                           >
+                              More about Rights and Permissions<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+                           </a>
+                        </span>                    
                         <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
                            :text="$utils.fieldValueString(field)" :limit="fieldLimit(field)" />
-                        <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
-                           href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
-                        >
-                           More about Rights and Permissions<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
-                        </a>
                      </dd>
                   </template>
                   <template v-if="accessURLField">
@@ -196,6 +200,10 @@ export default {
       }
    },
    methods: {
+      copyrightIconSrc( info ) {
+         let details = this.poolDetails(this.details.source)
+         return details.url+info.icon
+      },
       extDetailClicked() {
          this.$analytics.trigger('Results', 'MORE_DETAILS_CLICKED', this.details.identifier)
       },
@@ -274,6 +282,19 @@ export default {
          margin: 8px 0;
       }
 }
+.copyright {
+   display: flex;
+   flex-flow: row wrap;
+   align-content: center;
+   align-items: center;
+   img {
+      height: 20px;
+      margin-right: 5px;
+   }
+   .cr-note {
+      margin-left: 25px;
+   }
+}
 @media only screen and (min-width: 768px) {
    div.details-content  {
       width: 80%;
@@ -329,10 +350,6 @@ dd {
    -moz-hyphens: auto;
    hyphens: auto;
    padding: 4px 0px;
-   .cr-note {
-      margin-left: 10px;
-      font-size: 0.9em;
-   }
 }
 .value.more {
    margin-top: 15px;
