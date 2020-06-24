@@ -161,6 +161,11 @@ export default {
 </script>
 
 <style scoped>
+.none {
+   text-align: center;
+   font-size: 1.25em;
+   margin-top: 35px;
+}
 .public {
    margin-right: 20px;
    cursor: pointer;

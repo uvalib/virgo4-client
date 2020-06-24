@@ -294,7 +294,7 @@ export default {
         var headerOffset = nav.offsetHeight
         var elementPosition = tgtEle.getBoundingClientRect().top
         var offsetPosition = elementPosition - headerOffset
-        window.scrollTo({
+        window.scrollBy({
           top: offsetPosition,
           behavior: "smooth"
         })

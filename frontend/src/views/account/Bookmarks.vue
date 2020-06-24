@@ -450,12 +450,6 @@ table {
    border-top: 0;
    width: 100%;
 }
-div.none {
-   font-size: 1.4em;
-   text-align: center;
-   margin: 35px;
-   color: var(--uvalib-grey-dark);
-}
 i.details {
    font-size: 1.25em;
    color: var(--color-light-blue);

@@ -197,17 +197,19 @@ export default {
          return date.split("T")[0];
       },
       hasNoRequests() {
-         return !(this.requests.illiad || this.requests.holds);
+         return this.requests.illiad.length == 0 && this.requests.holds.length == 0
       },
       deleteHold(id) {
          this.$store.dispatch("requests/deleteHold", id);
       }
    },
-   created() {
-      this.$store.dispatch("system/getConfig");
-      this.$store.dispatch("user/getRequests");
+   async created() {
+      this.$store.commit('user/setLookingUp', true)
+      await this.$store.dispatch("system/getConfig")
+      await this.$store.dispatch("user/getRequests")
+      this.$store.commit('user/setLookingUp', false)
       setTimeout(() => {
-         document.getElementById("requests-submenu").focus();
+         document.getElementById("requests-submenu").focus()
       }, 250);
    }
 };
@@ -215,11 +217,23 @@ export default {
 
 <style lang="scss" scoped>
 
+.requests {
+   min-height: 400px;
+   position: relative;
+   margin-top: 2vw;
+   color: var(--color-primary-text);
+}
+
+
 .requests-content {
    width: 80%;
    margin: 0 auto;
    position: relative;
    text-align: left;
+
+   .working {
+      text-align: center;
+   }
 
    .requests-accordion {
       margin-bottom: 20px;

@@ -1,14 +1,14 @@
 <template>
-   <div class="checkout">
+   <div class="digital-deliveries">
       <h1>My Account</h1>
       <div class="digital-delivery-content">
          <AccountActivities/>
          <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
          <div class="details">
-            <div class="notice">
-               PDF links are available for 30 days after delivery
-            </div>
             <template v-if="webDeliveries.length > 0">
+               <div class="notice">
+                  PDF links are available for 30 days after delivery
+               </div>
                <div class="item" v-for="(co,idx) in webDeliveries" :key="idx">
                   <h3 class="title">{{co.photoJournalTitle}}</h3>
                   <dl>
@@ -148,6 +148,12 @@ div.notice {
          margin: 0 0 10px 0;
       }
    }
+}
+.digital-deliveries {
+   min-height: 400px;
+   position: relative;
+   margin-top: 2vw;
+   color: var(--color-primary-text);
 }
 
 .digital-delivery-content {
