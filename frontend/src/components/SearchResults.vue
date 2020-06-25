@@ -10,6 +10,7 @@
                </div>
                <span class="buttons">
                   <SaveSearch v-if="isSignedIn"/>
+                  <SignInRequired v-else id="save-signin-modal" act="save-search"/>
                </span>
             </template>
          </div>
@@ -51,9 +52,10 @@ import V4Select from "@/components/V4Select"
 import FacetSidebar from "@/components/FacetSidebar"
 import SaveSearch from "@/components/modals/SaveSearch"
 import SearchSuggestions from "@/components/SearchSuggestions"
+import SignInRequired from '@/components/modals/SignInRequired'
 export default {
    components: {
-      PoolResultDetail, V4Select, FacetSidebar, SaveSearch, SearchSuggestions
+      PoolResultDetail, V4Select, FacetSidebar, SaveSearch, SearchSuggestions, SignInRequired
    },
    props: {
       showSummary: { type: Boolean, default: true},

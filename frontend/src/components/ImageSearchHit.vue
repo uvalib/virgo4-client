@@ -6,7 +6,7 @@
                style="font-weight:bold;" />
          </span>
          <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
-         <BookmarkSignIn v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`"/>
+         <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
       </div>
       <router-link @click.native="detailClicked" class="img-link" :to="detailsURL">
           <img aria-label=" " class="trigger" :src="iiifURL(hit)">
@@ -22,7 +22,7 @@
 
 <script>
 import AddBookmark from '@/components/modals/AddBookmark'
-import BookmarkSignIn from '@/components/modals/BookmarkSignIn'
+import SignInRequired from '@/components/modals/SignInRequired'
 import TruncatedText from '@/components/TruncatedText'
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -33,7 +33,7 @@ export default {
       count: {type: Number, required: true}
    },
    components: {
-      AddBookmark, TruncatedText, BookmarkSignIn
+      AddBookmark, TruncatedText, SignInRequired
    },
    computed: {
       detailsURL() {

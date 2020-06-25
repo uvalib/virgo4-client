@@ -5,6 +5,7 @@ const restore = {
       activeRequest: "",
       bookmarkID: "",
       bookmarkGroupParent: "",
+      restoreSaveSearch: false
    },
    getters: {
       bookmarkTarget: state => {
@@ -23,6 +24,9 @@ const restore = {
       setActiveRequest(state, nextPanel) {
          state.activeRequest = nextPanel
       },
+      setRestoreSaveSearch(state) {
+         state.restoreSaveSearch = true
+      },
       setBookmarkRecord(state, hit) {
          state.bookmarkID = hit.identifier
          if ( hit.groupParent ) {
@@ -34,6 +38,7 @@ const restore = {
          state.activeRequest = ""
          state.bookmarkID = ""
          state.bookmarkGroupParent = ""
+         state.restoreSaveSearch = false
       },
       save( state ) {
          let str = JSON.stringify(state)
@@ -48,6 +53,7 @@ const restore = {
                state.activeRequest = data.activeRequest
                state.bookmarkID = data.bookmarkID
                state.bookmarkGroupParent = data.bookmarkGroupParent
+               state.restoreSaveSearch = data.restoreSaveSearch
             } catch (e) {
                // NO-OP; just nothing to be restored
             }

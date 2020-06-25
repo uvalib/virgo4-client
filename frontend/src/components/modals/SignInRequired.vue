@@ -1,21 +1,26 @@
 <template>
-   <span v-if="isKiosk==false" class="bookmark-container">
-      <V4Modal :id="id" title="Sign In Required" ref="bmsignin"
+   <span v-if="isKiosk==false" class="notice-container">
+      <V4Modal :id="id" title="Sign In Required" ref="signinmodal"
          firstFocusID="link" :buttonID="`${id}-btn`"
       >
          <template v-slot:button>
-            <V4Button mode="icon" @click="$refs.bmsignin.show()" :id="`${id}-btn`"
+            <V4Button v-if="act == 'bookmark'" mode="icon" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
                role="switch" aria-checked="false" 
                :aria-label="`bookmark ${hit.header.title}`"
             >
                <i class="disabled bookmark far fa-bookmark trigger"></i>
             </V4Button>
+            <V4Button v-else mode="primary" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
+               role="switch" aria-checked="false" aria-label="save search"
+            >
+               Save Search
+            </V4Button>
          </template>
          <template v-slot:content>
-            <p>You must be signed in to use bookmarks.</p>
+            <p>{{signInMessage}}</p>
             <p>Click
                <V4Button mode="text" id="link" @click="signInClicked"
-                  aria-label="Sign in to bookmark item" :focusBackOverride="true" @tabback="linkTabbed">
+                  :aria-label="signInAria" :focusBackOverride="true" @tabback="linkTabbed">
                   here
                </V4Button>
             to sign in.</p>
@@ -28,8 +33,9 @@
 import { mapGetters } from "vuex"
 export default {
    props: {
-      hit: { type: Object, required: true},
+      hit: { type: Object},
       id:  {type: String, required: true},
+      act: {type: String, required: true}
    },
    data: function() {
       return {
@@ -40,13 +46,29 @@ export default {
       ...mapGetters({
         isKiosk: 'system/isKiosk',
       }),
+      signInMessage() {
+         if (this.act == "bookmark") {
+            return "You must be signed in to use bookmarks."
+         } 
+         return "You must be signed in to save searches."
+      },
+      signInAria() {
+         if (this.act == "bookmark") {
+            return "Sign in to bookmark item"
+         } 
+         return "sign in to sae search"
+      }
    },
    methods: {
       linkTabbed() {
-         this.$refs.bmsignin.firstFocusBackTabbed()
+         this.$refs.signinmodal.firstFocusBackTabbed()
       },
       signInClicked() {
-         this.$store.commit("restore/setBookmarkRecord", this.hit)
+         if ( this.act == "bookmark") {
+            this.$store.commit("restore/setBookmarkRecord", this.hit)
+         } else {
+            this.$store.commit("restore/setRestoreSaveSearch")      
+         }
          this.$router.push("/signin")
       },
    }
@@ -54,7 +76,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.bookmark-container {
+.notice-container {
    position: relative;
    display: inline-block;
    box-sizing: border-box;

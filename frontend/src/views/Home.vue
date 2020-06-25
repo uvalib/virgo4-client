@@ -133,7 +133,8 @@ export default {
          translateMessage: state => state.system.translateMessage,
          results: state => state.results,
          total: state=>state.total,
-         restoreURL: state=>state.restore.url
+         restoreURL: state=>state.restore.url,
+         restoreSaveSearch: state=>state.restore.restoreSaveSearch
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
@@ -250,6 +251,16 @@ export default {
          if (bmTarget.id != "") {
             this.showAddBookmark(bmTarget)
             this.$store.commit("restore/clear")
+         } else if ( this.restoreSaveSearch ) {
+            console.log("RESTORE SEARCH")
+            let saveBtn = document.getElementById("save-modal-open")
+            if (saveBtn) {
+               saveBtn.focus()
+               saveBtn.click()
+            }   else {
+
+               console.log("NO BTN")
+            }
          }
       },
 

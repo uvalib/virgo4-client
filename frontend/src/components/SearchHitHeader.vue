@@ -15,14 +15,14 @@
       </div>
       <div class="bm-control">
          <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
-         <BookmarkSignIn v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`"/>
+         <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
       </div>
    </div>
 </template>
 
 <script>
 import AddBookmark from '@/components/modals/AddBookmark'
-import BookmarkSignIn from '@/components/modals/BookmarkSignIn'
+import SignInRequired from '@/components/modals/SignInRequired'
 import { mapGetters } from "vuex"
 export default {
    props: {
@@ -48,7 +48,7 @@ export default {
       }
    },
    components: {
-      AddBookmark,BookmarkSignIn
+      AddBookmark,SignInRequired
    },
    computed: {
       ...mapGetters({
