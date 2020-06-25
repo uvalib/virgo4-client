@@ -34,21 +34,13 @@
                      tabindex="-1" id="databasesub">
                      <div class="submenu">Databases A-Z</div>
                   </a>
-                  <a href="https://cal.lib.virginia.edu/calendar" target="_blank" role="menuitem" 
-                     tabindex="-1" id="eventsub">
-                     <div class="submenu">Event Calendar</div>
+                  <a href="https://cal.lib.virginia.edu/" target="_blank" role="menuitem" 
+                     tabindex="-1" id="spacesub">
+                     <div class="submenu">Spaces & Equipment</div>
                   </a>
-                  <a href="https://cal.lib.virginia.edu" target="_blank" role="menuitem" 
-                     tabindex="-1" id="roomrsrvsub">
-                     <div class="submenu">Room Reservations</div>
-                  </a>
-                  <a href="https://gis.lib.virginia.edu" target="_blank" role="menuitem" 
-                     tabindex="-1" id="gissub">
-                     <div class="submenu">GIS</div>
-                  </a>
-                  <a href="https://libra.virginia.edu" target="_blank" role="menuitem" 
-                     tabindex="-1" id="librasub">
-                     <div class="submenu">Libra</div>
+                  <a href="https://www.library.virginia.edu/services" target="_blank" role="menuitem" 
+                     tabindex="-1" id="moresubsub">
+                     <div class="submenu">More Library Services</div>
                   </a>
                </div>
             </transition>
@@ -132,7 +124,7 @@ export default {
          userMenuIdx: 0,
          svcMenuOpen: false,
          svcMenuIdx: 0,
-         svcMenu: ["guides", "journalsub", "databasesub", "eventsub", "roomrsrvsub", "gissub", "librasub"],
+         svcMenu: ["guides", "journalsub", "databasesub", "spacesub", "moresub"],
          alertCount: 0,
       }
    },
