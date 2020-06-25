@@ -88,6 +88,11 @@
                {{src.name}}
             </V4Checkbox>
          </div>
+         <div class="what" v-if="!isKiosk">
+            <a href="http://library.virginia.edu/virgo4/resource-types" target="_blank">
+               What am I searching?
+            </a>
+         </div>
       </div>
       <div class="controls">
          <V4Button mode="text" class="clear" @click="clearSearch">clear search</V4Button>
@@ -140,6 +145,7 @@ export default {
          isPoolExcluded: "preferences/isPoolExcluded",
          rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
+         isKiosk: 'system/isKiosk',
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -263,6 +269,10 @@ div.pools {
    align-items: center;
    justify-content: flex-start;
    margin: 0;
+}
+.what {
+   margin-top: 10px;
+   text-align: left;
 }
 .v4-checkbox.pool {
    margin: 5px 10px;

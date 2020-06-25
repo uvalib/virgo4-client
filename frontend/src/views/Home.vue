@@ -25,7 +25,6 @@
             >
           </div>
           <div class="controls">
-            <SourceInfo />
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
@@ -56,7 +55,6 @@ import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/disclosures/SearchTips"
-import SourceInfo from "@/components/disclosures/SourceInfo"
 import AdvancedSearch from "@/components/AdvancedSearch"
 import V4Select from "@/components/V4Select"
 import Welcome from "@/components/Welcome"
@@ -67,7 +65,7 @@ export default {
    components: {
      SearchResults, V4BarcodeScanner,
      SearchTips, AdvancedSearch,
-     V4Select, Welcome, SourceInfo
+     V4Select, Welcome
    },
    beforeRouteUpdate (to, _from, next) {
       // This happens any time the route or query params change.
