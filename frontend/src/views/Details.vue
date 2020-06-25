@@ -30,7 +30,7 @@
                         <span class="related" v-else-if="field.type=='related-url'"> 
                            <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
                               <label class="link-label" :for="`rl-${idx}`">{{v.label}}</label>
-                              <a :id="`rl-${idx}`" href="" target="_blank">{{v.url}}</a>
+                              <a :id="`rl-${idx}`" :href="v.url" target="_blank">{{v.url}}</a>
                            </div>
                         </span> 
                         <span class="copyright" v-else-if="field.type=='copyright'">
