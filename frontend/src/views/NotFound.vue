@@ -1,27 +1,14 @@
 <template>
    <div class="not-found">
-      <h1>Page Not Found</h1>
-      <div class="messages">
-         <p><b>Sorry!</b></p>
-         <p>
-            The page you requested cannot be found.
-         </p>
-      </div>
+      <h1>Sorry, no results found.</h1>
       <div class="info">
-         <div class="subhead">Where Else Can I Find Research Materials?</div>
-         <div class="details">
-            <div class=note>
-               <b>Not looking for the Library catalog?</b><br/>You can also explore the resources listed below to find research materials. 
-               The Library's departmental guides, comprehensive database list, and journal finder tools can help you find 
-               on-topic articles, datasets, and more.
-            </div>
-            <div class="break">Resources</div>
-            <div class="links">
-               <p><a href="https://library.virginia.edu/research" target="_blank">Subject Guides</a></p>
-               <p><a href="https://guides.lib.virginia.edu/journalfinder" target="_blank">Journal Finders</a></p>
-               <p><a href="https://guides.lib.virginia.edu/az.php" target="_blank">Databases A–Z</a></p>
-            </div>
-         </div>
+         <p>You may want to try&hellip;
+         <ul>
+            <li>Broadening your search by tweaking keywords or other filters*.</li>
+            <li>Searching <a href="https://guides.lib.virginia.edu/az.php">databases</a> or <a href="https://guides.lib.virginia.edu/?b=s">guides</a>, which cover a broad range of topics.</li>
+            <li>Contacting <a href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a> for web chat, or a <a href="https://guides.lib.virginia.edu/subjectlibrarians">Subject Liaison</a> for research assistance.</li>
+         </ul>
+         <p class="sub-note">*Very small segments of the collection have not yet been migrated into the updated Virgo interface, as the migration is still in progress. It is possible that <a href="http://v3.lib.virginia.edu/">searching the old interface</a> will yield the item(s) you’re looking for.</p>
       </div>
    </div>
 </template>
@@ -31,55 +18,33 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .not-found {
    min-height: 400px;
    position: relative;
    margin: 25px 0;
 }
-.messages, .info {
+.info {
    width:50%;
    margin: 5px auto 30px auto;
-   color: #444;
+   text-align: left;
    font-size: 1.1em;
 }
-@media only screen and (min-width: 768px) {
-   .messages, .info  {
+@media only screen and (min-width: $breakpoint-mobile) {
+   .info  {
        width: 50%;
    }
 }
-@media only screen and (max-width: 768px) {
-   .messages, .info  {
+@media only screen and (max-width: $breakpoint-mobile) {
+   .info  {
        width: 80%;
    }
 }
-.details {
-   padding : 10px;
+.sub-note {
    font-size: 0.85em;
-   color: #555;
-}
-.break {
-   margin: 5px 0;
-   font-weight: bold;
-   border-bottom: 1px solid #ccc;
-   border-top: 1px solid #ccc;
-   padding: 3px;
 }
 p {
    margin: 5px;
-}
-.links, .note {
-   padding: 5px;
-   font-weight: 500;
-}
-div.subhead {
-   background: var(--color-primary-orange);
-   color: white;
-   margin: 8px 0 0 0;
-   padding: 10px;
-   font-weight: bold;
-   position: relative;
-   border-radius: 5px;
 }
 </style>
 
