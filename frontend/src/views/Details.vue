@@ -26,8 +26,14 @@
                      <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
                      <dd class="value" :key="`v${idx}`">
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                           :links="getSubjectLinks(field.value)" />   
-                        <span class="copyright" v-else-if="field.name=='copyright_and_permissions'">
+                           :links="getSubjectLinks(field.value)" /> 
+                        <span class="related" v-else-if="field.type=='related-url'"> 
+                           <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
+                              <label class="link-label" :for="`rl-${idx}`">{{v.label}}</label>
+                              <a :id="`rl-${idx}`" href="" target="_blank">{{v.url}}</a>
+                           </div>
+                        </span> 
+                        <span class="copyright" v-else-if="field.type=='copyright'">
                            <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
                            <a :href="field.value" target="_blank">{{field.item}}</a>
                            <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
@@ -40,7 +46,7 @@
                            :text="$utils.fieldValueString(field)" :limit="fieldLimit(field)" />
                      </dd>
                   </template>
-                  <template v-if="accessURLField">
+                  <template v-if="accessURLField && !isKiosk">
                      <dt class="label">{{accessURLField.label}}:</dt>
                      <dd class="value">
                         <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
@@ -239,12 +245,14 @@ export default {
          return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.name=="iiif_manifest_url" ||
-             field.name=="iiif_image_url" || field.type == "url" ||
+         if (field.display == 'optional' || field.type == "iiif-manifest-url" ||
+             field.type == "iiif-image-url" || field.type == "url" || 
+             field.type == "access-url" || field.type == "sirsi-url" ||
              field.name.includes("_download_url")  ) {
             return false
          }
-         if ( this.isKiosk && field.type == "url") return false
+
+         if ( this.isKiosk &&  field.type == "related-url" ) return false
          return true
       },
       fieldLimit( field ) {
@@ -366,5 +374,11 @@ dd {
    padding: 10px;
    margin: 0;
    border-top: 0;
+}
+.related {
+   label {
+      display: block;
+      font-weight: 500;
+   }
 }
 </style>

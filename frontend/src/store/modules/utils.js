@@ -80,6 +80,23 @@ export function preProcessHitFields(hits) {
             return
          }
 
+         // related-url is special. it has repeated value (url) & item (label) data
+         // preserve it as an object in the field values array
+         if (field.type == "related-url") {
+            let val = {url: field.value, label: field.item}
+            let existing = hit.detailFields.find(f => f.name === field.name)
+            if (existing) {
+               existing.value.push( val )
+            } else {
+               let f = Object.assign({}, field) 
+               delete f.item
+               delete f.value
+               f.value = [val]
+               hit.detailFields.push(f)
+            }
+            return
+         }
+
          // Pick which group the fields belong to
          let tgtMerged = hit.basicFields
          if (field.visibility == "detailed" && field.name != "format") {

@@ -17,7 +17,7 @@
                      </dd>
                   </template>
                </template>
-               <template v-if="accessURLField">
+               <template v-if="accessURLField && !isKiosk">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
                      <AccessURLDetails mode="brief" :title="hit.header.title" :pool="pool" :urls="accessURLField.value" />
@@ -113,8 +113,8 @@ export default {
          return this.hit.identifier+field.value+idx
       },
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.type == "url" || field.name.includes("_download_url") ) return false
-         if ( this.isKiosk && field.type == "url") return false
+         if (field.display == 'optional' || field.type == "url" ||  
+            field.type == "access-url" || field.name.includes("_download_url") ) return false
          return true
       },
    }
