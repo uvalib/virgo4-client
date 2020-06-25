@@ -164,7 +164,7 @@ const router = new Router({
       let noScrollPages = ["home", "search"]
 
       // dont alter scroll position on search page
-      if (noScrollPages.includes(to.name) ) {
+      if (noScrollPages.includes(to.name) && to.fullPath != "/search" ) {
          return false
       } 
 

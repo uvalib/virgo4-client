@@ -137,6 +137,8 @@ export default {
       },
       ...mapState({
          advancedFields: state => state.query.advancedFields,
+         excludeURLS: state => state.preferences.excludePoolURLs,
+         pools: state => state.pools.list
       }),
       ...mapGetters({
          queryURLParams: 'query/queryURLParams',
@@ -181,6 +183,13 @@ export default {
         this.$store.commit("preferences/toggleExcludePool", url)
       },
       doAdvancedSearch() {
+         if ( this.excludeURLS.length == this.pools.length) {
+            this.$store.commit(
+               "system/setError",
+               "Please select at least one resource type before searching"
+            );
+            return
+         }
          if (this.queryEntered) {
             let qs = this.queryURLParams 
             this.$router.push(`/search?${qs}`)
@@ -200,7 +209,7 @@ export default {
             this.$store.commit(
                "system/setError",
                "Please enter a search query"
-            );
+            )
          }
       },
       clearSearch() {

@@ -53,7 +53,7 @@
                      </dd>
                   </template>
                   <template v-if="hasPDFContent">
-                     <dt class="label">PDF Download:</dt>
+                     <dt class="label">Download PDF:</dt>
                      <dd class="value">
                         <template v-for="(dc,idx) in pdfs">
                            <span class="sep" v-if="idx>0" :key="`pdfsep${idx}`">|</span>
@@ -68,7 +68,7 @@
                         </template>
                      </dd>
                   </template>
-                  <dt class="label">Citation:</dt>
+                  <dt class="label">Download Citation:</dt>
                   <dd class="value">
                      <V4DownloadButton label="Export RIS Citation" :url="risURL" @click="downloadRISCliecked"
                         :aria-label="`export citation for ${details.header.title}`"
@@ -379,6 +379,10 @@ dd {
    label {
       display: block;
       font-weight: 500;
+   }
+   a {
+      display: inline-block;
+      margin-bottom: 10px;
    }
 }
 </style>
