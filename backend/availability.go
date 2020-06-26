@@ -149,7 +149,7 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 
 // Appends Aeon request to availability response
 func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *AvailabilityData) {
-	solrPath := fmt.Sprintf("select?fl=*&q=id%%3A%s", id)
+	solrPath := fmt.Sprintf(`select?fl=*&q=id%%3A"%s"`, id)
 
 	respBytes, solrErr := svc.SolrGet(solrPath)
 	if solrErr != nil {
