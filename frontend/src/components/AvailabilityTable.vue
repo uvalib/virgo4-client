@@ -7,8 +7,8 @@
          <template v-if="availability.items">
             <h2>Availability</h2>
             <div class="availability-content">
-               <RequestContainer :titleId="titleId" />
-
+               <RequestContainer v-if="isDevServer" :titleId="titleId" />
+               
                <table class="fields" v-if="availability.columns">
                   <thead>
                      <tr>
@@ -49,6 +49,7 @@ export default {
    computed: {
       ...mapGetters({
          availability: 'item/availability',
+         isDevServer: 'system/isDevServer',
       }),
    },
    methods: {
