@@ -19,7 +19,8 @@ export default {
         pickupLibrary: 'preferences.pickupLibrary',
     }),
     pickupLibraries(){
-      return [...(this.$store.getters['user/canUseLEO'] ? ['LEO'] : []),
+      // Clemons is the only pickup library at launch
+      return [//...(this.$store.getters['user/canUseLEO'] ? ['LEO'] : []),
         'CLEMONS',
         //'DARDEN', 'FINE-ARTS',
         //'HEALTHSCI', 'JAG', 'LAW', 'LEO', 'MATH', 'MUSIC', 'PHYSICS', 'SCI-ENG'
