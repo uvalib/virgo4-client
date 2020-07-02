@@ -54,10 +54,10 @@ export default {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
       groupTitle() {
-         return `Show other versions (${this.hit.group.length})`
+         return `Show More (${this.hit.group.length})`
       },
       closeGroupTitle() {
-         return `Hide other versions (${this.hit.group.length})`
+         return `Show Fewer (${this.hit.group.length})`
       },
       ...mapState({
          searching: state => state.searching,
