@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -33,6 +35,7 @@ type Item struct {
 	CurrentLocation string                   `json:"current_location"`
 	CallNumber      string                   `json:"call_number"`
 	Volume          string                   `json:"volume"`
+	SCNotes         string                   `json:"special_collections_location"`
 }
 
 // RequestOption is a category of request that a user can make
@@ -63,62 +66,30 @@ type SolrResponse struct {
 
 // SolrDocument contains fields for a single solr record (borrowed from the solr pool)
 type SolrDocument struct {
-	AlternateID          []string `json:"alternate_id_a,omitempty"`
-	AeonAvailability     []string `json:"anon_availability_a,omitempty"`
-	SCAvailabilityStored string   `json:"sc_availability_stored,omitempty"`
-	Author               []string `json:"author_a,omitempty"`
-	AuthorAddedEntry     []string `json:"author_added_entry_a,omitempty"`
-	CallNumber           []string `json:"call_number_a,omitempty"`
-	CallNumberSort       string   `json:"call_number_sort,omitempty"`
-	Collection           []string `json:"collection_a,omitempty"`
-	DataSource           []string `json:"data_source_a,omitempty"`
-	Description          []string `json:"description_a,omitempty"`
-	Feature              []string `json:"feature_a,omitempty"`
-	Format               []string `json:"format_a,omitempty"`
-	FullRecord           string   `json:"fullrecord,omitempty"`
-	ID                   string   `json:"id,omitempty"`
-	ISBN                 []string `json:"isbn_a,omitempty"`
-	ISSN                 []string `json:"issn_a,omitempty"`
-	Identifier           []string `json:"identifier_a,omitempty"`
-	LCCN                 []string `json:"lccn_a,omitempty"`
-	Language             []string `json:"language_a,omitempty"`
-	Library              []string `json:"library_a,omitempty"`
-	Location             []string `json:"location2_a,omitempty"`
-	LocalNotes           []string `json:"local_notes_a,omitempty"`
-	MSSWorkKeySort       string   `json:"mss_work_key_sort,omitempty"`
-	Medium               []string `json:"medium_a,omitempty"`
-	Note                 []string `json:"note_a,omitempty"`
-	OCLC                 []string `json:"oclc_a,omitempty"`
-	Pool                 []string `json:"pool_a,omitempty"`
-	PublicationDate      string   `json:"published_date,omitempty"`
-	Published            []string `json:"published_a,omitempty"`
-	PublishedDisplay     []string `json:"published_display_a,omitempty"`
-	PublishedLocation    []string `json:"published_location_a,omitempty"`
-	PublisherName        []string `json:"publisher_name_a,omitempty"`
-	Region               []string `json:"region_a,omitempty"`
-	ReleaseDate          []string `json:"release_a,omitempty"`
-	Series               []string `json:"title_series_a,omitempty"`
-	Subject              []string `json:"subject_a,omitempty"`
-	SubjectSummary       []string `json:"subject_summary_a,omitempty"`
-	Subtitle             []string `json:"title_sub_a,omitempty"`
-	Title                []string `json:"title_a,omitempty"`
-	TitleAbbreviated     []string `json:"title_abbreviated_a,omitempty"`
-	TitleAlternate       []string `json:"title_alternate_a,omitempty"`
-	TitleUniform         []string `json:"title_uniform_a,omitempty"`
-	UPC                  []string `json:"upc_a,omitempty"`
-	URL                  []string `json:"url_a,omitempty"`
-	URLLabel             []string `json:"url_label_a,omitempty"`
-	UVAAvailability      []string `json:"uva_availability_a,omitempty"`
-	WorkIdentifier       []string `json:"workIdentifier_a,omitempty"`
-	WorkLocation         []string `json:"workLocation_a,omitempty"`
-	WorkPhysicalDetails  []string `json:"workPhysicalDetails_a,omitempty"`
-	WorkPrimaryAuthor    []string `json:"work_primary_author_a,omitempty"`
-	WorkTypes            []string `json:"workType_a,omitempty" json:"type_of_record_a,omitempty" json:"medium_a,omitempty"`
-	Barcode              string   `json:"-"`
-	Edition              string   `json:"-"`
-	Issue                string   `json:"-"`
-	Volume               string   `json:"-"`
-	Copy                 string   `json:"-"`
+	AnonAvailability  []string `json:"anon_availability_a,omitempty"`
+	Author            []string `json:"author_a,omitempty"`
+	Barcode           string   `json:"-"`
+	CallNumber        []string `json:"call_number_a,omitempty"`
+	Copy              string   `json:"-"`
+	Description       []string `json:"description_a,omitempty"`
+	Edition           string   `json:"-"`
+	HathiETAS         []string `json:"hathi_etas_f,omitempty"`
+	Issue             string   `json:"-"`
+	Format            []string `json:"format_a,omitempty"`
+	ID                string   `json:"id,omitempty"`
+	ISBN              []string `json:"isbn_a,omitempty"`
+	ISSN              []string `json:"issn_a,omitempty"`
+	Library           []string `json:"library_a,omitempty"`
+	Location          []string `json:"location2_a,omitempty"`
+	LocalNotes        []string `json:"local_notes_a,omitempty"`
+	Medium            []string `json:"medium_a,omitempty"`
+	PublicationDate   string   `json:"published_date,omitempty"`
+	PublishedLocation []string `json:"published_location_a,omitempty"`
+	PublisherName     []string `json:"publisher_name_a,omitempty"`
+	SCAvailability    string   `json:"sc_availability_large_single,omitempty"`
+	Title             []string `json:"title_a,omitempty"`
+	Volume            string   `json:"-"`
+	WorkTypes         []string `json:"workType_a,omitempty" json:"type_of_record_a,omitempty" json:"medium_a,omitempty"`
 }
 
 // GetAvailability uses ILS Connector V4 API /availability to get details for a Document
@@ -140,33 +111,37 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 		AvailabilityResponse = AvailabilityData{}
 	}
 	//log.Printf("Availability Response: %+v", AvailabilityResponse)
+	solrDoc := svc.getSolrDoc(titleID)
 
-	svc.appendAeonRequestOptions(titleID, &AvailabilityResponse)
+	svc.appendAeonRequestOptions(titleID, solrDoc, &AvailabilityResponse)
+
+	svc.removeETASRequestOptions(titleID, solrDoc, &AvailabilityResponse)
 
 	c.JSON(http.StatusOK, AvailabilityResponse)
 
 }
-
-// Appends Aeon request to availability response
-func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *AvailabilityData) {
-	solrPath := fmt.Sprintf(`select?fl=*&q=id%%3A"%s"`, id)
+func (svc *ServiceContext) getSolrDoc(id string) SolrDocument {
+	fields := solrFieldList()
+	solrPath := fmt.Sprintf(`select?fl=%s,&q=id%%3A"%s"`, fields, id)
 
 	respBytes, solrErr := svc.SolrGet(solrPath)
 	if solrErr != nil {
 		log.Printf("ERROR: Solr request for Aeon info failed: %s", solrErr.Message)
-		return
 	}
 	var SolrResp SolrResponse
 	if err := json.Unmarshal(respBytes, &SolrResp); err != nil {
 		log.Printf("ERROR: Unable to parse solr response: %s.", err.Error())
-		return
 	}
 	if SolrResp.Response.NumFound != 1 {
-		return
 	}
 	SolrDoc := SolrResp.Response.Docs[0]
+	return SolrDoc
+}
 
-	if !((SolrDoc.SCAvailabilityStored != "") || contains(SolrDoc.Library, "Special Collections")) {
+// Appends Aeon request to availability response
+func (svc *ServiceContext) appendAeonRequestOptions(id string, SolrDoc SolrDocument, Result *AvailabilityData) {
+
+	if !((SolrDoc.SCAvailability != "") || contains(SolrDoc.Library, "Special Collections")) {
 		return
 	}
 
@@ -189,17 +164,17 @@ func (svc *ServiceContext) appendAeonRequestOptions(id string, Result *Availabil
 // processSCAvailabilityStored adds items stored in sc_availability_stored solr field to availability
 func processSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument) {
 	// If this item has Stored SC data (ArchiveSpace)
-	if doc.SCAvailabilityStored == "" {
+	if doc.SCAvailability == "" {
 		return
 	}
 
-	// Complete other availability fields
+	// Complete required availability fields
 	Result.Availability.ID = doc.ID
 
 	var SCItems []Item
 
-	if err := json.Unmarshal([]byte(doc.SCAvailabilityStored), &SCItems); err != nil {
-		log.Printf("Error parsing sc_availability_stored: %+v", err)
+	if err := json.Unmarshal([]byte(doc.SCAvailability), &SCItems); err != nil {
+		log.Printf("Error parsing sc_availability_large_single: %+v", err)
 	}
 	//log.Printf("SCData: %+v", SCItems)
 
@@ -222,11 +197,17 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 	Options := []ItemOption{}
 	for _, item := range Result.Availability.Items {
 		if item.Library == "Special Collections" {
+			notes := ""
+			if len(item.SCNotes) > 0 {
+				notes = item.SCNotes
+			} else if len(doc.LocalNotes) > 0 {
+				notes = strings.Join(doc.LocalNotes, ";\n")
+			}
 
 			scItem := ItemOption{
 				Barcode: item.Barcode,
 				Label:   item.CallNumber,
-				SCNotes: strings.Join(doc.LocalNotes, ";\n"),
+				SCNotes: notes,
 			}
 			Options = append(Options, scItem)
 		}
@@ -318,6 +299,16 @@ func createAeonURL(doc SolrDocument) string {
 	return url
 
 }
+
+// Appends Aeon request to availability response
+func (svc *ServiceContext) removeETASRequestOptions(id string, solrDoc SolrDocument, Result *AvailabilityData) {
+
+	if len(solrDoc.HathiETAS) > 0 {
+		log.Printf("ETAS FOUND. Removing request options for %s", id)
+		Result.Availability.RequestOptions = nil
+	}
+}
+
 func contains(arr []string, str string) bool {
 
 	matcher := regexp.MustCompile("(?i)" + str)
@@ -327,4 +318,21 @@ func contains(arr []string, str string) bool {
 		}
 	}
 	return false
+}
+
+// Use json tags contained in the SolrDocument struct to create the field list for the solr query.
+func solrFieldList() string {
+	rv := reflect.ValueOf(SolrDocument{})
+	t := rv.Type()
+	matcher := regexp.MustCompile(`(\w+),`)
+	var tags []string
+	for i := 0; i < t.NumField(); i++ {
+		value := t.Field(i).Tag.Get("json")
+		matches := matcher.FindAllStringSubmatch(value, -1)
+		if len(matches) > 0 && len(matches[0]) > 0 {
+			tags = append(tags, matches[0][1])
+		}
+	}
+	fields := url.QueryEscape(strings.Join(tags, ","))
+	return fields
 }

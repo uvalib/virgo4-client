@@ -8,8 +8,8 @@
             <h2>Availability</h2>
             <div class="availability-content">
                <RequestContainer v-if="isDevServer" :titleId="titleId" />
-               
-               <table class="fields" v-if="availability.columns">
+
+               <table class="fields" v-if="availability.columns.length">
                   <thead>
                      <tr>
                         <th v-for="(column, idx) in availability.columns" :key="idx">
