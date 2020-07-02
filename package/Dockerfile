@@ -24,7 +24,7 @@ RUN make linux-full
 #
 # build the target container
 #
-FROM alpine:3.11
+FROM alpine:3.12
 
 # update the packages
 RUN apk update && apk upgrade && apk add bash tzdata ca-certificates curl && rm -rf /var/cache/apk/*
