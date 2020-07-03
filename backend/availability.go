@@ -41,11 +41,11 @@ type Item struct {
 // RequestOption is a category of request that a user can make
 type RequestOption struct {
 	Type           string       `json:"type"`
-	Label          string       `json:"button_label,omitempty"`
-	Description    string       `json:"description,omitempty"`
-	CreateURL      string       `json:"create_url,omitempty"`
-	SignInRequired bool         `json:"sign_in_required,omitempty"`
-	ItemOptions    []ItemOption `json:"item_options,omitempty"`
+	Label          string       `json:"button_label"`
+	Description    string       `json:"description"`
+	CreateURL      string       `json:"create_url"`
+	SignInRequired bool         `json:"sign_in_required"`
+	ItemOptions    []ItemOption `json:"item_options"`
 }
 
 // ItemOption is a selectable item in a RequestOption
@@ -176,7 +176,7 @@ func processSCAvailabilityStored(Result *AvailabilityData, doc SolrDocument) {
 	if err := json.Unmarshal([]byte(doc.SCAvailability), &SCItems); err != nil {
 		log.Printf("Error parsing sc_availability_large_single: %+v", err)
 	}
-	//log.Printf("SCData: %+v", SCItems)
+	log.Printf("SCData: %+v", SCItems)
 
 	// add additional item info
 	//for _, item := range SCItems {
@@ -196,7 +196,7 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 	// Sirsi Item Options
 	Options := []ItemOption{}
 	for _, item := range Result.Availability.Items {
-		if item.Library == "Special Collections" {
+		if item.Library == "Special Collections" || doc.SCAvailability != "" {
 			notes := ""
 			if len(item.SCNotes) > 0 {
 				notes = item.SCNotes
