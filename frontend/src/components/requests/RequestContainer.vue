@@ -2,7 +2,7 @@
   <div >
     <div class="active-panel">
 
-      
+
       <component v-bind:is="requests.activePanel" />
       <V4Button mode="tertiary" v-if="showReset(requests.activePanel)" class="reset" @click="reset">Reset</V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
@@ -33,11 +33,20 @@ export default {
         defaultPickupLibrary: 'preferences/pickupLibrary',
         isSignedIn: 'user/isSignedIn',
         isAdmin: 'user/isAdmin',
+        restoredPanel: 'restore/activeRequest',
+        findOption: "requests/findOption",
     }),
 
   },
   created() {
     this.$store.commit('requests/reset')
+    let restoredPanel = this.$store.state.restore.activeRequest
+    if (restoredPanel) {
+        this.requests.activePanel = restoredPanel
+        let optionSettings = this.findOption(restoredPanel)
+        this.requests.activeOption = optionSettings
+        this.$store.commit("restore/clear")
+    }
     if (!this.requests.activePanel){
       this.requests.activePanel = 'OptionsPanel'
     }

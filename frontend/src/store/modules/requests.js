@@ -35,9 +35,7 @@ const requests = {
          library: ''
       },
 
-
       activePanel: '',
-      nextPanel: '',
 
       // Map request type to panel Name
       optionMap: {
@@ -50,14 +48,8 @@ const requests = {
    },
    getters: {
       getField,
-      nextPanel(store) {
-         return store.nextPanel
-      },
       alertText(store) {
          return store.alertText
-      },
-      totalSteps(store) {
-         return store.steps.length
       },
       findOption: (store) => (panelName) => {
          let option = store.requestOptions.find(opt => {
@@ -81,7 +73,6 @@ const requests = {
       reset(store) {
          store.activePanel = 'OptionsPanel'
          store.alertText = ''
-         store.nextPanel = ''
          store.hold = {
             itemBarcode: '',
             itemLabel: '',

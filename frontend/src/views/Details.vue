@@ -26,13 +26,13 @@
                      <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
                      <dd class="value" :key="`v${idx}`">
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                           :links="getSubjectLinks(field.value)" /> 
-                        <span class="related" v-else-if="field.type=='related-url'"> 
+                           :links="getSubjectLinks(field.value)" />
+                        <span class="related" v-else-if="field.type=='related-url'">
                            <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
                               <label class="link-label" :for="`rl-${idx}`">{{v.label}}</label>
                               <a :id="`rl-${idx}`" :href="v.url" target="_blank">{{v.url}}</a>
                            </div>
-                        </span> 
+                        </span>
                         <span class="copyright" v-else-if="field.type=='copyright'">
                            <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
                            <a :href="field.value" target="_blank">{{field.item}}</a>
@@ -41,7 +41,7 @@
                            >
                               More about Rights and Permissions<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
                            </a>
-                        </span>                    
+                        </span>
                         <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
                            :text="$utils.fieldValueString(field)" :limit="fieldLimit(field)" />
                      </dd>
@@ -57,12 +57,12 @@
                      <dd class="value">
                         <template v-for="(dc,idx) in pdfs">
                            <span class="sep" v-if="idx>0" :key="`pdfsep${idx}`">|</span>
-                           <a v-if="dc.status=='READY'" :href="dc.url" :key="`pdf${idx}`" 
+                           <a v-if="dc.status=='READY'" :href="dc.url" :key="`pdf${idx}`"
                               :aria-label="`download pdf for ${dc.name}`"
                            >
                               {{dc.name}}
                            </a>
-                           <DownloadProgress v-else :name="dc.name" :id="`${details.identifier}-pdf${idx}`" :key="`pdf${idx}`" 
+                           <DownloadProgress v-else :name="dc.name" :id="`${details.identifier}-pdf${idx}`" :key="`pdf${idx}`"
                               :ariaLabel="`download pdf for ${dc.name}`"
                            />
                         </template>
@@ -187,7 +187,7 @@ export default {
          let idx = this.allFields.findIndex( f=> f.name=="sirsi_url")
          if (idx == -1) {
              idx = this.allFields.findIndex( f=> f.name=="worldcat_url")
-         } 
+         }
          return idx > -1
       },
       extDetailURL() {
@@ -221,7 +221,7 @@ export default {
          let src = this.$route.params.src
          let id= this.$route.params.id
          if (this.$route.path.includes("/catalog/")) {
-            this.$analytics.trigger('Bookmarks', 'FOLLOW_V3_BOOKMARK', id)    
+            this.$analytics.trigger('Bookmarks', 'FOLLOW_V3_BOOKMARK', id)
          }
 
          if (src) {
@@ -236,7 +236,7 @@ export default {
       getSubjectLinks( subjectValues ) {
          let out = []
          subjectValues.forEach( v => {
-            let link = {label: v, url: `/browse/subjects?q=${encodeURI(v)}`}    
+            let link = {label: v, url: `/browse/subjects?q=${encodeURI(v)}`}
             out.push(link)
          })
          return out
@@ -246,7 +246,7 @@ export default {
       },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type == "iiif-manifest-url" ||
-             field.type == "iiif-image-url" || field.type == "url" || 
+             field.type == "iiif-image-url" || field.type == "url" ||
              field.type == "access-url" || field.type == "sirsi-url" ||
              field.name.includes("_download_url")  ) {
             return false
@@ -264,10 +264,6 @@ export default {
    },
    created() {
       this.getDetails()
-      if ( this.activeRequest ) {
-         this.$store.commit('requests/activePanel', this.activeRequest )
-         this.$store.commit('restore/clear')
-      }
    },
 }
 </script>
@@ -277,7 +273,7 @@ export default {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-   
+
    .details-content {
       width: 80%;
       margin: 0 auto;
