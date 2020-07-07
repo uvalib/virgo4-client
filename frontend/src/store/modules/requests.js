@@ -5,6 +5,7 @@ const requests = {
    state: {
       alertText: '',
       requestOptions: [],
+      errors: {},
 
       // selected request option
       activeOption: {},
@@ -67,12 +68,16 @@ const requests = {
       setRequestOptions(store, ro) {
          store.requestOptions = ro
       },
+      setErrors(store, errors) {
+         store.errors = errors
+      },
       alertText(store, text) {
          store.alertText = text
       },
       reset(store) {
          store.activePanel = 'OptionsPanel'
          store.alertText = ''
+         store.errors =  {}
          store.hold = {
             itemBarcode: '',
             itemLabel: '',
@@ -118,7 +123,8 @@ const requests = {
          axios.post('/api/requests/hold', hold)
             .then(response => {
                if (response.data.hold.errors) {
-                  ctx.commit('system/setError', response.data.hold.errors, { root: true })
+                  ctx.commit('setErrors', response.data.hold.errors)
+                  //ctx.commit('system/setError', response.data.hold.errors, { root: true })
                } else {
                   ctx.commit('activePanel', "ConfirmationPanel")
                }
@@ -156,6 +162,10 @@ const requests = {
       submitAeon(ctx) {
          let optionSettings = ctx.getters.getField("activeOption")
          let selected = ctx.getters.getField("aeon")
+         if (selected.barcode == '') {
+            ctx.commit('setErrors', {barcode: 'An item must be selected.'})
+            return
+         }
 
          const url = require('url')
          let aeonLink = url.parse(optionSettings.create_url, true)

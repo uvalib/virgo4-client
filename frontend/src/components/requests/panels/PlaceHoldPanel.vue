@@ -8,7 +8,10 @@
             :selections="items"
             v-model="selectedItem"
             v-bind:attached="false"
+            placeholder="Make a selection"
+            aria-required="true" required="required"
          />
+         <p class="error" v-if="errors.item_barcode">{{errors.item_barcode.join(', ')}}</p>
       </div>
       <PickupLibrary />
 
@@ -30,12 +33,14 @@ export default {
       selectedItem(newVal, _oldVal) {
          this.hold.itemLabel = newVal.label;
          this.hold.itemBarcode = newVal.barcode;
+         this.errors.item_barcode = null;
       }
    },
    computed: {
       ...mapFields({
          hold: "requests.hold",
-         itemOptions: "requests.activeOption.item_options"
+         itemOptions: "requests.activeOption.item_options",
+         errors: "requests.errors",
       }),
       items() {
          let items = this.itemOptions;
@@ -86,5 +91,8 @@ div.place-hold {
 }
 .request-button {
    padding: 10px;
+}
+.error {
+  color: var(--color-error)
 }
 </style>

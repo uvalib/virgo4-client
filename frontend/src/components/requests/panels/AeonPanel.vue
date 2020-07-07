@@ -5,6 +5,8 @@
       <h3>Select the item you want:</h3>
       <V4Select style="height:2em;" :selections="items"
                 v-model="selectedItem" v-bind:attached="false" />
+
+      <p class="error" v-if="errors.barcode">{{errors.barcode}}</p>
     </div>
 
     <label class="special-instructions-input">
@@ -42,6 +44,7 @@ export default {
     ...mapFields({
       itemOptions: 'requests.activeOption.item_options',
       aeon: 'requests.aeon',
+      errors: 'requests.errors'
 
     }),
     items() {
