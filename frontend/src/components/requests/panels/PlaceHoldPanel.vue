@@ -18,12 +18,10 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 import PickupLibrary from "@/components/preferences/PickupLibrary";
-import V4Select from "@/components/V4Select";
 
 export default {
    components: {
       PickupLibrary,
-      V4Select
    },
    data: () => {
       return { selectedItem: {} };

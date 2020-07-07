@@ -26,12 +26,8 @@
 </template>
 <script>
 import { mapFields } from 'vuex-map-fields';
-import V4Select from "@/components/V4Select"
 
 export default {
-  components: {
-      V4Select
-   },
   data: ()=> {
     return {selectedItem: {}}
   },

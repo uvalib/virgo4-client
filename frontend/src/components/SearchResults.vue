@@ -48,14 +48,13 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import PoolResultDetail from "@/components/PoolResultDetail"
-import V4Select from "@/components/V4Select"
 import FacetSidebar from "@/components/FacetSidebar"
 import SaveSearch from "@/components/modals/SaveSearch"
 import SearchSuggestions from "@/components/SearchSuggestions"
 import SignInRequired from '@/components/modals/SignInRequired'
 export default {
    components: {
-      PoolResultDetail, V4Select, FacetSidebar, SaveSearch, SearchSuggestions, SignInRequired
+      PoolResultDetail, FacetSidebar, SaveSearch, SearchSuggestions, SignInRequired
    },
    props: {
       showSummary: { type: Boolean, default: true},
@@ -241,7 +240,7 @@ p.relevant {
     z-index: 10;
     &:focus {
       @include be-accessible();
-   } 
+   }
 }
 .pool-results {
    z-index: 11;

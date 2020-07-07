@@ -17,35 +17,35 @@
          </div>
          <div class="entry pure-control-group">
             <label for="scan-title">Book or Journal Title</label>
-            <input type="text" v-model="title" id="scan-title" aria-required="true" required="required"> 
+            <input type="text" v-model="title" id="scan-title" aria-required="true" required="required">
             <span v-if="hasError('title')" class="error">* title is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-chapter">Chapter or Article Title</label>
-            <input type="text" v-model="chapter" id="scan-chapter" aria-required="true" required="required"> 
+            <input type="text" v-model="chapter" id="scan-chapter" aria-required="true" required="required">
             <span v-if="hasError('chapter')" class="error">* chapter or article is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-author">Chapter or Article Author</label>
-            <input type="text" v-model="author" id="scan-author" aria-required="true" required="required"> 
+            <input type="text" v-model="author" id="scan-author" aria-required="true" required="required">
             <span v-if="hasError('author')" class="error">* author is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-year">Year</label>
-            <input type="text" v-model="year" id="scan-year" aria-required="true" required="required"> 
+            <input type="text" v-model="year" id="scan-year" aria-required="true" required="required">
             <span v-if="hasError('year')" class="error">* year is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-volume">Volume</label>
-            <input type="text" v-model="volume" id="scan-volume"> 
+            <input type="text" v-model="volume" id="scan-volume">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-issue">Issue</label>
-            <input type="text" v-model="issue" id="scan-issue"> 
+            <input type="text" v-model="issue" id="scan-issue">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-pages">Pages</label>
-            <input type="text" v-model="pages" id="scan-pages"> 
+            <input type="text" v-model="pages" id="scan-pages">
          </div>
          <div v-if="type=='Article'" class="entry pure-control-group">
             <label for="scan-notes">Notes</label>
@@ -65,14 +65,10 @@
 </template>
 <script>
 import { mapFields } from "vuex-map-fields"
-import V4Select from "@/components/V4Select"
 import { mapState } from "vuex"
 export default {
-   components: {
-      V4Select
-   },
    data: () => {
-      return { 
+      return {
          selectedItem: {},
          errors: [],
          required: ['title', 'chapter', 'author', 'year']
@@ -126,12 +122,12 @@ export default {
          if (this.details.header.author) {
             this.author = this.details.header.author.value.join(this.details.header.author.separator)
          } else {
-            this.author = "Unknown"    
+            this.author = "Unknown"
          }
          let isbn = this.details.detailFields.find( f=>f.name=="isbn")
          this.issn = isbn.value.find( i => i.length == 13)
          if (this.issn == "") {
-            this.issn = isbn.value[0]  
+            this.issn = isbn.value[0]
          }
 
          let pubDate = this.details.basicFields.find( f=>f.name=="published_date")
@@ -159,7 +155,7 @@ export default {
             let first = document.getElementById(tgtID)
             if ( first ) {
                first.focus()
-            } 
+            }
          } else {
             this.$store.dispatch("requests/submitScan");
          }

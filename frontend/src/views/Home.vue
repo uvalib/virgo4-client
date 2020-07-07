@@ -28,7 +28,7 @@
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
-            <SearchTips/><span class="sep">|</span> 
+            <SearchTips/><span class="sep">|</span>
             <router-link tabindex="0" :to="advancedURL">
               <span>Advanced Search&nbsp;<i class="fas fa-search-plus"></i></span>
             </router-link>
@@ -56,7 +56,6 @@ import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/disclosures/SearchTips"
 import AdvancedSearch from "@/components/AdvancedSearch"
-import V4Select from "@/components/V4Select"
 import Welcome from "@/components/Welcome"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
 
@@ -65,11 +64,11 @@ export default {
    components: {
      SearchResults, V4BarcodeScanner,
      SearchTips, AdvancedSearch,
-     V4Select, Welcome
+     Welcome
    },
    beforeRouteUpdate (to, _from, next) {
       // This happens any time the route or query params change.
-      // The create handler only happens on initial page load, and in that case, 
+      // The create handler only happens on initial page load, and in that case,
       // beforeRouteUpdate is NOT called
       this.isHomePage = false
       if (to.path == "/") {
@@ -84,7 +83,7 @@ export default {
          this.isHomePage = true
       }
       this.searchCreated()
-      
+
    },
 
    data: function() {
@@ -98,14 +97,14 @@ export default {
          // If restore url is set, don't do special focus handling as it will mess up
          // the restore focus code
          if (newVal == false && this.restoreURL == "/") {
-            setTimeout( () => {  
+            setTimeout( () => {
                if ( this.total > 0) {
                   let r = document.getElementById("results-container")
                   let t =  document.getElementsByClassName("suggestion")[0]
                   if ( t) {
                      t.focus()
                   } else {
-                     t = document.getElementById("global-filter")     
+                     t = document.getElementById("global-filter")
                      t.focus()
                   }
                   this.scrollToItem(r)
@@ -173,7 +172,7 @@ export default {
    },
    methods: {
       async restoreSearchFromQueryParams( query, force ) {
-         // No mode or query; just reset the search 
+         // No mode or query; just reset the search
          if (!query.mode && !query.q) {
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
@@ -197,14 +196,14 @@ export default {
             }
          }
          if (query.q) {
-            this.$store.commit("query/restoreFromURL",query.q)  
+            this.$store.commit("query/restoreFromURL",query.q)
 
             // Need this to prevent re-running the search when toggle between basic and advanced
             if (this.rawQueryString != oldQ || force === true) {
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
                await this.$store.dispatch("searchAllPools", true )
- 
+
                let tgtResultIdx = 0
                if (query.pool) {
                   let idx = this.results.findIndex( r => r.pool.id == query.pool)
@@ -220,7 +219,7 @@ export default {
                }
 
                if (query.filter) {
-                  this.$store.commit("filters/restoreFromURL", {filter: query.filter, resultIdx: tgtResultIdx} )  
+                  this.$store.commit("filters/restoreFromURL", {filter: query.filter, resultIdx: tgtResultIdx} )
                }
 
                if (query.sort || query.filter || query.page) {
@@ -230,7 +229,7 @@ export default {
                }
                this.$store.commit('setSearching', false)
             }
-         } 
+         }
       },
       async searchCreated() {
          await this.$store.dispatch('pools/getPools')
@@ -316,7 +315,7 @@ export default {
       searchClicked() {
          // Update the query params in the URL, but since the store already
          // contains all of the data from the URL it wont trigger the search. Do it manually
-         let qp =  this.queryURLParams 
+         let qp =  this.queryURLParams
          this.$router.push(`/search?${qp}`)
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
@@ -413,7 +412,7 @@ h2 {
   min-width: 100px;
   &:focus {
       @include be-accessible();
-   } 
+   }
 }
 div.advanced {
   margin-top: 10px;
