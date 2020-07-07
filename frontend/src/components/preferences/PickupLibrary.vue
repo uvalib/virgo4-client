@@ -9,15 +9,15 @@
       IMPORTANT: Because of safety measures during COVID-19, pickup locations may be limited. Options may change over the course of the semester — for the most up-to-date information,
       <a target="_blank" href="https://www.library.virginia.edu/news/covid-19">read our FAQ about Library services during COVID-19</a>.
     </p>
+    <p>If you cannot pick your item up at a location shown below, please
+      <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a> to request your item.
+    </p>
+
     <label for="pickup-sel">Preferred pickup location:
       <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="pickupLibraries"
         pad="5px 10px"
         @changed="update"
       />
-      <!--
-        <option disabled selected hidden value="">Select a Location</option>
-        <option v-bind:key="lib" v-for="lib in pickupLibraries">{{lib}}</option>
-        -->
     </label>
 
   </div>
