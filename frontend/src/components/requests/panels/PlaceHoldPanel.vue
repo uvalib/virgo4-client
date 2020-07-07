@@ -16,6 +16,8 @@
       <PickupLibrary />
 
       <V4Button mode="primary" class="request-button" @click="placeHold">Place Hold</V4Button>
+
+      <p class="error" v-if="errors.sirsi">{{errors.sirsi.join(', ')}}</p>
    </div>
 </template>
 <script>
