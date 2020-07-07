@@ -7,7 +7,7 @@
          <template v-if="availability.items">
             <h2>Availability</h2>
             <div class="availability-content">
-               <RequestContainer v-if="isDevServer" :titleId="titleId" />
+               <RequestContainer :titleId="titleId" />
 
                <table class="fields" v-if="availability.columns.length">
                   <thead>
