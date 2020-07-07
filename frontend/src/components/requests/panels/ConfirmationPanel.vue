@@ -42,7 +42,7 @@ export default {
          let ele = document.getElementById("request-done")
          if ( ele ) {
             ele.focus()
-         } 
+         }
       }, 150)
    }
 };

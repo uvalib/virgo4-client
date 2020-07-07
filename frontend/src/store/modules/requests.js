@@ -114,7 +114,7 @@ const requests = {
       },
       createHold(ctx) {
          let hold = ctx.getters.getField('hold')
-         hold.pickupLibrary = ctx.rootGetters.getField('preferences.pickupLibrary')
+         hold.pickupLibrary = ctx.rootGetters.getField('preferences.pickupLibrary').id
          axios.post('/api/requests/hold', hold)
             .then(response => {
                if (response.data.hold.errors) {

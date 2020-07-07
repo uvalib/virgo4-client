@@ -9,7 +9,7 @@ const preferences = {
       targetPoolURL: "",
       excludePoolURLs: [],
       trackingOptOut: false,
-      pickupLibrary: "",
+      pickupLibrary: {id: "", name: ""},
       enableBarcodeScan: false,
    },
 
@@ -35,7 +35,7 @@ const preferences = {
          state.pickupLibrary = lib
       },
       toggleBarcodeScan(state) {
-         state.enableBarcodeScan = !state.enableBarcodeScan     
+         state.enableBarcodeScan = !state.enableBarcodeScan
       },
       toggleOptOut(state) {
          state.trackingOptOut = !state.trackingOptOut
@@ -66,7 +66,7 @@ const preferences = {
                   let data = {v4_opt_out: true}
                   Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
                } else {
-                  Vue.$cookies.remove("v4_optout")   
+                  Vue.$cookies.remove("v4_optout")
                }
             }
             if (json.pickupLibrary ) {
@@ -110,7 +110,7 @@ const preferences = {
          poolURLs.forEach( u => {
             if (!state.excludePoolURLs.includes(u)) {
                state.excludePoolURLs.push(u)
-            }    
+            }
          })
       }
    },

@@ -30,7 +30,6 @@ export default {
   computed: {
     ...mapFields(['requests', 'item/availability' ]),
     ...mapGetters({
-        defaultPickupLibrary: 'preferences/pickupLibrary',
         isSignedIn: 'user/isSignedIn',
         isAdmin: 'user/isAdmin',
         restoredPanel: 'restore/activeRequest',
