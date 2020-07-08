@@ -34,7 +34,8 @@
       </div>
       <div v-else>
          <div class="feedback-form">
-            <h3>Thank you for your feedback!</h3> 
+            <h3>Thanks for your feedback!</h3>
+            <p>We have captured your feedback and will look into any issues. We appreciate you taking the time to share this information with us.</p>
          </div>
       </div>
    </div>
