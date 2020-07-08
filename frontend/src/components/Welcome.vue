@@ -1,18 +1,10 @@
 <template>
    <div class="welcome">
-      <h3>Welcome to the new Virgo discovery experience!</h3>
-      <p>
-         Virgo is being revamped, and you are viewing the newest public version.
-      </p>
-      <p>
-         As of April 29, 2020, this interface replaces "Virgo Classic" as the location for Course Reserves.
-      </p>
-      <p>
-         The <a href="http://search.lib.virginia.edu/" target="_blank">existing Virgo search interface remains available</a>, 
-         and will be fully replaced by this new interface later in 2020. 
-         We're currently working to ensure that the new release is easy to use, accessible, and inherently mobile-friendly. 
-         Stay tuned! 
-      </p>
+      <h3>Welcome to the newest version of the Virgo catalog</h3>
+      <p>Virgo delivers high-quality search results through an easy-to-use interface that works on any device.</p>
+      <p>You can use Virgo to conduct research, make requests, find and create Course Reserves, organize and share bookmarks, and set personal preferences for your own use of the system.</p>
+      <p class="alertbox alertbox-primary">The <a href="https://v3.lib.virginia.edu/">older version of Virgo</a> will remain available through fall 2020, but beginning <em>Monday, <span class="no-wrap">July 13</span></em>, request functionality is no longer available through the old interface.</p>
+      <p><b>Need assistance?</b> <a href="https://www.library.virginia.edu/askalibrarian/">Ask a Librarian</a> web chat is happy to help with questions large and small.</p>
    </div>
 </template>
 
@@ -21,7 +13,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 @media only screen and (min-width: 768px) {
   .welcome {
      width: 60%;
@@ -43,5 +35,5 @@ h3 {
    margin: 10px auto 50px auto;
    text-align: left;
    color: var(  --uvalib-text);
-}
+} 
 </style>
