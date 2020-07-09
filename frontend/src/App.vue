@@ -302,6 +302,25 @@ body {
    }
 }
 
+.alertbox {
+   position: relative;
+   padding: .75rem 1.25rem;
+   margin-bottom: 1rem;
+   border: 1px solid transparent;
+   border-radius: .25rem;
+   h2:first-of-type {
+      margin-top: .5rem;
+   }
+} 
+.alertbox-primary {
+   background-color: var(--uvalib-teal-lightest);
+   border-color: var(--uvalib-teal-light);
+   color: var(--uvalib-text-dark);
+}
+
+.no-wrap {
+   white-space: nowrap;
+}
 //adding accessibility for keyboard focus
 #app {
    a:focus {
