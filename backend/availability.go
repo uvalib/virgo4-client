@@ -150,7 +150,7 @@ func (svc *ServiceContext) appendAeonRequestOptions(id string, SolrDoc SolrDocum
 	AeonOption := RequestOption{
 		Type:           "aeon",
 		Label:          "Request this in Special Collections",
-		SignInRequired: true,
+		SignInRequired: false,
 		Description:    "",
 		CreateURL:      createAeonURL(SolrDoc),
 		ItemOptions:    createAeonItemOptions(Result, SolrDoc),
