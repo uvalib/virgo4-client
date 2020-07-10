@@ -1,7 +1,7 @@
 <template>
    <nav class="menu" role="menubar" aria-label="Virgo Menu" @keyup.right="nextMenu" @keyup.left="prevMenu" @keyup.esc="closeSubMenus">
       <span class="menu-right">
-        <router-link role="menuitem" id="searchmenu" @click.native="searchClicked" to="/search" v-on:focus.native="onMenuFocus">
+        <router-link role="menuitem" id="searchmenu" @click.native="searchClicked" to="/" v-on:focus.native="onMenuFocus">
            <span class="menu-item"><i class="icon fas fa-search"></i>Search</span>
         </router-link>
         <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
