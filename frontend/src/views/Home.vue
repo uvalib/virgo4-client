@@ -7,7 +7,7 @@
          <div v-if="hasTranslateMessage" class="translate-message">
             {{translateMessage}}
          </div>
-         <label class="screen-reader-text" for="search">Search Virgo for books, articles and more.</label>
+         <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
          <label class="screen-reader-text" for="source-select">Search in</label>
           <div class="basic-search">
             <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
@@ -21,7 +21,7 @@
                 autocomplete="off"
                 type="text"
                 id="search"
-                placeholder="Search Virgo for books, articles and more"
+                placeholder="Search Virgo for books, articles, and more"
             >
           </div>
           <div class="controls">
