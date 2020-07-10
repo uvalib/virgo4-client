@@ -14,7 +14,7 @@
       <textarea v-model="aeon.specialRequest" placeholder="250 character limit" maxlength="250" rows="5"/>
     </label>
 
-    <p>Click "Request" to proceed to the Special Collections request system, where you will be asked to select a pickup date.</p>
+    <p>Click "Request" to proceed to the Special Collections request system, where you will be asked to select a visit date.</p>
 
     <V4Button mode="primary" class="request-button" @click="submitAeon">Request</V4Button>
 
