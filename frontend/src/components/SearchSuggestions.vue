@@ -2,7 +2,7 @@
    <div v-if="suggestions.length >0" class="suggestions">
       <h2>Suggestions</h2>
       <div class="wrapper">
-         <span class="note">Authors releated to your search</span>
+         <span class="note">Authors related to your search</span>
          <div class="searches">
             <template v-for="(s,idx) in suggestions.slice(0,2)">
                <span class="sep" v-if="idx > 0" :key="`sep${idx}`">|</span>
