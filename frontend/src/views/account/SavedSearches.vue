@@ -118,7 +118,7 @@ export default {
          this.$store.dispatch("searches/delete", {userID: this.signedInUser, token: token})
       },
       copyURL(token) {
-         let URL = this.searchURL(token)
+         let URL = window.location.href + this.searchURL(token)
          this.$copyText(URL).then( ()=> {
             this.$store.commit("system/setMessage", "Public search URL copied to clipboard.")
          }, e => {
