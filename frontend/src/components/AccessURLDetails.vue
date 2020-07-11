@@ -7,6 +7,7 @@
                   :aria-label="`access ${title} online with ${providerLabel(p.provider)}`"
                >
                   {{ providerLabel(p.provider) }}
+                  <template v-if="p.links[0].label"> ({{ p.links[0].label }})</template>
                </a>
             </template>
             <template v-else>
