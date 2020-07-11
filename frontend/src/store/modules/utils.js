@@ -54,7 +54,7 @@ export function preProcessHitFields(hits) {
             let existing = hit.basicFields.find(f => f.name === field.name)
             if (existing) {
                let provider = field.provider 
-               let newLink = {url: field.value, label: "Access Online"}
+               let newLink = {url: field.value}
                if ( field.item ) {
                   newLink.label = field.item   
                }
@@ -69,7 +69,7 @@ export function preProcessHitFields(hits) {
                let newF = {name: field.name, type: field.type, label: field.label,
                   visibility: "basic", value: []}
                let newVal = {provider: field.provider, links: []}
-               let newLink = {url: field.value, label: "Access Online"}
+               let newLink = {url: field.value}
                if ( field.item ) {
                   newLink.label = field.item   
                }
