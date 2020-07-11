@@ -2,39 +2,30 @@
    <div class="access-urls">
       <template v-for="(p,idx) in urls">
          <div class='provider' :key="idx">
-            <template v-if="p.links.length==1">
-               <a :href="p.links[0].url" target='_blank'
-                  :aria-label="`access ${title} online with ${providerLabel(p.provider)}`"
-               >
-                  {{ providerLabel(p.provider) }}
-               </a>
-            </template>
-            <template v-else>
-               <div class="header" :class="{full: mode=='full'}">
-                  <template v-if="providerHomepage(p.provider)">
-                     <a :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
-                        <img class="logo" v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
-                        <span v-else class="provider link">{{ providerLabel(p.provider) }}</span>
+            <div class="header" :class="{full: mode=='full'}">
+               <template v-if="providerHomepage(p.provider)">
+                  <a :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
+                     <img class="logo" v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
+                     <span v-else class="provider link">{{ providerLabel(p.provider) }}</span>
+                  </a>
+               </template>
+               <template v-else>
+                  <span class='provider'>{{ providerLabel(p.provider) }}</span>
+               </template>
+            </div>
+            <div class="links" :class="{full: mode=='full'}">
+               <template v-for="(l,idx) in providerLinks(p)">
+                  <div :key="`${l.url}-${idx}`">
+                     <a :href="l.url" target="_blank" :aria-label="`access ${title} ${l.label} with ${providerLabel(p.provider)}`">
+                        <template v-if="l.label">{{l.label}}</template>
+                        <template v-else>{{l.url}}</template>
                      </a>
-                  </template>
-                  <template v-else>
-                     <span class='provider'>{{ providerLabel(p.provider) }}</span>  
-                  </template>  
-               </div>
-               <div class="links" :class="{full: mode=='full'}">
-                  <template v-for="(l,idx) in providerLinks(p)">
-                     <div :key="`${l.url}-${idx}`">
-                        <a :href="l.url" target="_blank" :aria-label="`access ${title} ${l.label} with ${providerLabel(p.provider)}`">
-                           <template v-if="l.label">{{l.label}}</template>
-                           <template v-else>{{l.url}}</template>
-                        </a>
-                     </div>
-                  </template>
-                  <template v-if="mode=='brief' && remainingLinks(p)">
-                     <div>see {{remainingLinks(p)}} more on details page</div>
-                  </template>
-               </div>
-            </template>
+                  </div>
+               </template>
+               <template v-if="mode=='brief' && remainingLinks(p)">
+                  <div>see {{remainingLinks(p)}} more on details page</div>
+               </template>
+            </div>
          </div>
       </template>
    </div>
