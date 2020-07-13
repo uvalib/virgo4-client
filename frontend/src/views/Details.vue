@@ -70,7 +70,7 @@
                   </template>
                   <dt class="label">Download Citation:</dt>
                   <dd class="value">
-                     <V4DownloadButton label="Export RIS Citation" :url="risURL" @click="downloadRISCliecked"
+                     <V4DownloadButton label="RIS" :url="risURL" @click="downloadRISCliecked"
                         :aria-label="`export citation for ${details.header.title}`"
                      />
                   </dd>
