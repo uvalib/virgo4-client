@@ -24,7 +24,7 @@ const requests = {
       scan: {
          barcode: '',
          issn: '',
-         type: 'Article',
+         type: 'Collab',
          title: '',
          chapter: '',
          author: '',
@@ -92,7 +92,7 @@ const requests = {
          store.scan = {
             barcode: '',
             issn: '',
-            type: 'Article',
+            type: 'Collab',
             title: '',
             chapter: '',
             author: '',
@@ -108,7 +108,7 @@ const requests = {
    actions: {
       submitScan(ctx) {
          axios.post('/api/requests/scan', ctx.state.scan).then(response => {
-            if (response.data.hold.errors) {
+            if (response.data.scan.errors) {
                ctx.commit('system/setError', response.data.scan.errors, { root: true })
             } else {
                ctx.commit('activePanel', "ConfirmationPanel")

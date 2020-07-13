@@ -11,7 +11,7 @@
          <div class="entry pure-control-group">
             <label for="scan-use">Scan Purpose</label>
             <select v-model="type" id="scan-use">
-               <option value="Article">Research</option>
+               <!-- <option value="Article">Research</option> -->
                <option value="Collab">Instruction</option>
             </select>
          </div>
@@ -125,9 +125,11 @@ export default {
             this.author = "Unknown"
          }
          let isbn = this.details.detailFields.find( f=>f.name=="isbn")
-         this.issn = isbn.value.find( i => i.length == 13)
-         if (this.issn == "") {
-            this.issn = isbn.value[0]
+         if (isbn) {
+            this.issn = isbn.value.find( i => i.length == 13)
+            if (this.issn == "") {
+               this.issn = isbn.value[0]
+            }
          }
 
          let pubDate = this.details.basicFields.find( f=>f.name=="published_date")
