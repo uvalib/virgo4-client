@@ -38,6 +38,7 @@ export default {
         this.aeon.callNumber = newVal.label
         this.aeon.barcode = newVal.barcode
         this.aeon.notes = newVal.notes
+        this.aeon.location = newVal.location
       }
   },
   computed: {
@@ -49,6 +50,7 @@ export default {
     }),
     items() {
       let items = this.itemOptions
+      // id and name are required in V4Select
       for(let i in items) {
         items[i].id = items[i].barcode
         items[i].name = items[i].label

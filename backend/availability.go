@@ -50,10 +50,11 @@ type RequestOption struct {
 
 // ItemOption is a selectable item in a RequestOption
 type ItemOption struct {
-	Label   string `json:"label"`
-	Barcode string `json:"barcode"`
-	SCNotes string `json:"notes"`
-	Library string `json:"library"`
+	Label    string `json:"label"`
+	Barcode  string `json:"barcode"`
+	SCNotes  string `json:"notes"`
+	Library  string `json:"library"`
+	Location string `json:"location"`
 }
 
 // SolrResponse container
@@ -81,7 +82,7 @@ type SolrDocument struct {
 	ISSN              []string `json:"issn_a,omitempty"`
 	Library           []string `json:"library_a,omitempty"`
 	Location          []string `json:"location2_a,omitempty"`
-	LocalNotes        []string `json:"local_notes_a,omitempty"`
+	LocalNotes        []string `json:"local_note_a,omitempty"`
 	Medium            []string `json:"medium_a,omitempty"`
 	PublicationDate   string   `json:"published_date,omitempty"`
 	PublishedLocation []string `json:"published_location_a,omitempty"`
@@ -205,9 +206,10 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 			}
 
 			scItem := ItemOption{
-				Barcode: item.Barcode,
-				Label:   item.CallNumber,
-				SCNotes: notes,
+				Barcode:  item.Barcode,
+				Label:    item.CallNumber,
+				Location: item.CurrentLocation,
+				SCNotes:  notes,
 			}
 			Options = append(Options, scItem)
 		}

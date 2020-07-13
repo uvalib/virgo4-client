@@ -19,7 +19,8 @@ const requests = {
          barcode: '',
          notes: '',
          callNumber: '',
-         specialRequest: ''
+         specialRequest: '',
+         location: ''
       },
       scan: {
          barcode: '',
@@ -87,6 +88,7 @@ const requests = {
             callNumber: '',
             barcode: '',
             notes: '',
+            location: '',
             specialRequest: ''
          }
          store.scan = {
@@ -173,6 +175,7 @@ const requests = {
          aeonLink.query["ItemVolume"] = selected.callNumber
          aeonLink.query["ItemNumber"] = selected.barcode
          aeonLink.query["Notes"] = selected.notes
+         aeonLink.query["Location"] = selected.location
          aeonLink.query["SpecialRequest"] = selected.specialRequest
 
          // needs to be null to regenerate query below
