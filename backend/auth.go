@@ -314,7 +314,8 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum
 	}
 
 	log.Printf("Adding %s claims based on ILS response", v4User.Virgo4ID)
-	v4Claims.CanLEO = (ilsUser.HomeLibrary == "LEO")
+	// Normally this is HomeLibrary == "LEO"
+	v4Claims.CanLEO = (ilsUser.HomeLibrary != "UVA-LIB")
 	v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
 	v4Claims.CanPurchase = ilsUser.CanPurchase()
 	v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
