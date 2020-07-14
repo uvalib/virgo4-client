@@ -155,7 +155,7 @@ const item = {
                   let url = `https://www.googleapis.com/books/v1/volumes?q=${name}:${v}`
                   try {
                      let response = await axInst.get(url)
-                     if (response.data.totalItems > 0) {
+                     if (response.data.totalItems > 0 && response.data.items[0].accessInfo.viewability != "NO_PAGES") {
                         ctx.commit('setGoogleBooksURL', response.data)
                         done = true
                      }
