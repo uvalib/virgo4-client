@@ -17,7 +17,7 @@
          </div>
          <div class="entry pure-control-group">
             <label for="scan-title">Book or Journal Title</label>
-            <input type="text" v-model="title" id="scan-title" aria-required="true" required="required">
+            <input readonly type="text" v-model="title" id="scan-title" aria-required="true" required="required">
             <span v-if="hasError('title')" class="error">* title is required</span>
          </div>
          <div class="entry pure-control-group">
