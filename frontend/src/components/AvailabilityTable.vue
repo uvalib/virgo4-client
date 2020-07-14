@@ -9,7 +9,7 @@
             <div class="availability-content">
                <RequestContainer :titleId="titleId" />
 
-               <table class="fields" v-if="availability.columns.length">
+               <table class="fields" v-if="availability.items.length > 0">
                   <thead>
                      <tr>
                         <th v-for="(column, idx) in availability.columns" :key="idx">
@@ -60,6 +60,9 @@ export default {
          return val
       },
       visibleFields: function(item) {
+         if (!item.fields) {
+            return []
+         }
          return item.fields.filter(h => h.visible)
       }
    },
@@ -91,10 +94,17 @@ h2 {
       border-bottom: 1px solid var(--uvalib-grey);
    }
 }
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 700px) {
   td, th {
-     padding: 0.5em 0.1em;
-     font-size: 0.9rem;
+     font-size: 2.5vw;
+     word-break: break-word;
+  }
+  .availability-content {
+   width: 100vw;
+   position: relative;
+   left: calc(-50vw + 50% );
+   border-left: none;
+   border-right: none;
   }
 }
 </style>

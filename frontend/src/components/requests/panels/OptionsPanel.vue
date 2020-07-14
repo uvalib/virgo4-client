@@ -41,15 +41,14 @@ export default {
 .options {
    display: flex;
    flex-flow: row wrap;
-   justify-content: center;
-   align-items: flex-start;
+   justify-content: space-evenly;
 
    .option {
-      max-width: 175px;
-      margin: 10px;
       text-align: left;
+      margin: 20px 0;
 
       .desc {
+         max-width: 200px;
          padding: 0;
          margin: 10px 0;
          font-size: 0.95em;
