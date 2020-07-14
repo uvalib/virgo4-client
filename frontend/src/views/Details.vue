@@ -74,6 +74,14 @@
                         :aria-label="`export citation for ${details.header.title}`"
                      />
                   </dd>
+                  <template v-if="googleBooksURL">
+                     <dt class="label">Google Preview:</dt>
+                     <dd class="value">
+                        <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
+                           <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
+                        </a>
+                     </dd>
+                  </template>
                   <template v-if="hasExtLink">
                      <dd></dd>
                      <dt class="value more">
@@ -147,6 +155,7 @@ export default {
       },
       ...mapState({
          details : state => state.item.details,
+         googleBooksURL : state => state.item.googleBooksURL,
          activeRequest: state => state.restore.activeRequest,
          citationsURL: state => state.system.citationsURL,
          pools: state => state.pools.list

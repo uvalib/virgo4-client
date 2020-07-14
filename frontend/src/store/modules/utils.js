@@ -111,8 +111,9 @@ export function preProcessHitFields(hits) {
             }
             existing.value.push(field.value)
          } else {
-            // subject is always an array
-            if (field.type == "subject") {
+            // for ease of use later, these fields are always an array
+            let arrayFields = ["subject", "oclc", "isbn", "lccn"]
+            if (arrayFields.includes(field.name) ) {
                field.value = [field.value]
             }
             tgtMerged.push(field)
