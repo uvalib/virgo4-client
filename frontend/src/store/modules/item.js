@@ -43,11 +43,11 @@ const item = {
             if ( item.pdf.status == "READY") {
                state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download, name: item.label})
             } else if ( item.pdf.status.includes("%")) {
-               state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download, 
-                  statusURL: item.pdf.urls.status, name: item.label})   
+               state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download,
+                  statusURL: item.pdf.urls.status, name: item.label})
             } else {
-               state.details.digitalContent.push({type: "PDF", status: "NOT_AVAIL", url: item.pdf.urls.download, 
-                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label})     
+               state.details.digitalContent.push({type: "PDF", status: "NOT_AVAIL", url: item.pdf.urls.download,
+                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label})
             }
          })
          let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
@@ -100,13 +100,13 @@ const item = {
          let oldAuth = axios.defaults.headers.common['Authorization']
          delete axios.defaults.headers.common['Authorization']
          let dc = ctx.state.details.digitalContent.find( f=>f.name==data.name && f.type==data.type)
-         try { 
+         try {
             await axios.get(dc.generateURL)
             ctx.dispatch("getDigitalContentStatus", data.name)
          } catch (_err) {
             ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
          } finally {
-            axios.defaults.headers.common['Authorization'] = oldAuth    
+            axios.defaults.headers.common['Authorization'] = oldAuth
          }
       },
       async getDigitalContentStatus(ctx, data) {
@@ -119,12 +119,12 @@ const item = {
          } catch(error) {
             ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
          } finally {
-            axios.defaults.headers.common['Authorization'] = oldAuth    
+            axios.defaults.headers.common['Authorization'] = oldAuth
          }
       },
       async getDigitalContentURLs(ctx) {
          let dcField = ctx.state.details.basicFields.find( f=>f.name=="digital_content_url")
-         if (!dcField) return 
+         if (!dcField) return
 
          axios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
@@ -200,8 +200,10 @@ const item = {
          let url = ctx.rootState.system.searchAPI + "/api/search?intuit=1&debug=1"
          return axios.post(url, req).then((response) => {
             if (response.data.total_hits == 0 ) {
-               ctx.commit('clearSearching')
-               router.push("/not_found")
+               //ctx.commit('clearSearching')
+               //router.push("/not_found")
+               // Redirect to V3 for now
+               window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                ctx.dispatch("getDigitalContentURLs")
