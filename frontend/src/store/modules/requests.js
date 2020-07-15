@@ -44,7 +44,8 @@ const requests = {
          hold: 'PlaceHoldPanel',
          aeon: 'AeonPanel',
          pda: 'PDAPanel',
-         scan: 'ScanPanel'
+         scan: 'ScanPanel',
+         directLink: 'directLink'
       },
 
    },

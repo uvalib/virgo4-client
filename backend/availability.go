@@ -89,6 +89,7 @@ type SolrDocument struct {
 	PublisherName     []string `json:"publisher_name_a,omitempty"`
 	SCAvailability    string   `json:"sc_availability_large_single,omitempty"`
 	Title             []string `json:"title_a,omitempty"`
+	URL               []string `json:"url_a,omitempty"`
 	Volume            string   `json:"-"`
 	WorkTypes         []string `json:"workType_a,omitempty" json:"type_of_record_a,omitempty" json:"medium_a,omitempty"`
 }
@@ -307,7 +308,16 @@ func (svc *ServiceContext) removeETASRequestOptions(id string, solrDoc SolrDocum
 
 	if len(solrDoc.HathiETAS) > 0 {
 		log.Printf("ETAS FOUND. Removing request options for %s", id)
-		Result.Availability.RequestOptions = nil
+		ETASOption := RequestOption{
+			Type:           "directLink",
+			SignInRequired: false,
+			Description:    "Currently, this item is available online as part of <a target=\"_blank\" href=\"https://news.library.virginia.edu/2020/03/31/hathitrust-provides-emergency-temporary-access-to-copyrighted-books/\">Hathi Trust Emergency Temporary Access</a> and the physical item cannot be requested.",
+		}
+		if len(solrDoc.URL) > 0 {
+			ETASOption.CreateURL = solrDoc.URL[0]
+			ETASOption.Label = "Read via HathiTrust"
+		}
+		Result.Availability.RequestOptions = []RequestOption{ETASOption}
 	}
 }
 
