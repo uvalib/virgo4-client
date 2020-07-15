@@ -18,15 +18,14 @@
                   <template v-if="details.header.author">
                      <dt class="label">{{details.header.author.label}}:</dt>
                      <dd class="value">
-                        <TruncatedText :id="`${details.identifier}-author`"
-                           :text="details.header.author.value.join('; ')" :limit="275" />
+                        <V4LinksList id="author-links" :inline="true" :links="getBrowseLinks('author', details.header.author.value)" />
                      </dd>
                   </template>
                   <template v-for="(field,idx) in allDisplayFields">
                      <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
                      <dd class="value" :key="`v${idx}`">
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                           :links="getSubjectLinks(field.value)" />
+                           :links="getBrowseLinks('subjects', field.value)" />
                         <span class="related" v-else-if="field.type=='related-url'">
                            <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
                               <label class="link-label" :for="`rl-${idx}`">{{v.label}}</label>
@@ -70,7 +69,7 @@
                   </template>
                   <dt class="label">Download Citation:</dt>
                   <dd class="value">
-                     <V4DownloadButton label="RIS" :url="risURL" @click="downloadRISCliecked"
+                     <V4DownloadButton style="padding-left:0" label="RIS" :url="risURL" @click="downloadRISCliecked"
                         :aria-label="`export citation for ${details.header.title}`"
                      />
                   </dd>
@@ -242,16 +241,13 @@ export default {
             this.$store.dispatch("bookmarks/getBookmarks")
          }
       },
-      getSubjectLinks( subjectValues ) {
+      getBrowseLinks( name, values ) {
          let out = []
-         subjectValues.forEach( v => {
-            let link = {label: v, url: `/browse/subjects?q=${encodeURI(v)}`}
+         values.forEach( v => {
+            let link = {label: v, url: `/browse/${name}?q=${encodeURI(v)}`}
             out.push(link)
          })
          return out
-      },
-      getSubjectLink(subj) {
-         return `/browse/subjects?q=${encodeURI(subj)}`
       },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type == "iiif-manifest-url" ||

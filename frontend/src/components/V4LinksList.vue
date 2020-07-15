@@ -1,12 +1,11 @@
 <template>
    <div :id="id" class="links-list">
-      <div v-if="links.length < 5" class="link-list">
+      <div v-if="links.length <= 5" class="link-list">
          <template v-for="(val,idx) in truncatedLinks">
-            <div class="link-wrap" :key="`${id}-${idx}`">
-               <span class="number">{{idx+1}}.</span>
-               <router-link :to="val.url" class="link">
-                  {{val.label}}
-               </router-link>
+            <div class="link-wrap" :class="{inline: inline}"  :key="`${id}-${idx}`">
+               <span v-if="!inline" class="number">{{idx+1}}.</span>
+               <router-link :to="val.url" class="link">{{val.label}}</router-link>
+               <span v-if="inline && idx < truncatedLinks.length-1" class="sep">{{separator}}</span>
             </div>
          </template>
       </div>
@@ -17,11 +16,10 @@
       >
          <div :id="`${id}-list`" aria-live="polite">
             <template v-for="(val,idx) in truncatedLinks">
-               <div class="link-wrap" :key="`${id}-${idx}`">
-                  <span class="number">{{idx+1}}.</span>
-                  <router-link :to="val.url" class="link">
-                     {{val.label}}
-                  </router-link>
+               <div class="link-wrap" :class="{inline: inline}" :key="`${id}-${idx}`">
+                  <span v-if="!inline" class="number">{{idx+1}}.</span>
+                  <router-link :to="val.url" class="link">{{val.label}}</router-link>
+                  <span v-if="inline && idx < truncatedLinks.length-1" class="sep">{{separator}}</span>
                </div>
             </template>
             <div class="controls">
@@ -44,6 +42,14 @@ export default {
          type: Array,
          required: true
       },
+      inline: {
+         type: Boolean,
+         default: false
+      },
+      separator: {
+         type: String,
+         default: "; "
+      }
    },
    data: function()  {
       return {
@@ -99,6 +105,13 @@ export default {
          margin-right: 5px;
          display: inline-block;
       }
+      .sep {
+         margin: 0 6px 0 2px;
+         font-weight: bold;
+      }
+   }
+   .link-wrap.inline {
+      display: inline-block;
    }
    .truncated-content {
       display: inline-block;
