@@ -94,6 +94,21 @@ const router = new Router({
          component: Details,
       },
       {
+         // this is a catchall route for catalog queries from external search boxes
+         path: '/catalog',
+         beforeEnter: (to, _from, next) => {
+            let field = to.query.search_field
+            if ( field == "journal") {
+               console.log("Detected a journal query. Converting to V4 search...")
+               let q = to.query.q
+               next(`/search?mode=basic&scope=journals&q=title%3A%20%7B${q}%7D`)
+            } else {
+               console.error("Unrecognized URL: "+to.fullPath+". Redirect to Virgo3")
+               window.location.href="https://v3.lib.virginia.edu"+to.fullPath
+            }
+         }
+      },
+      {
          path: '/preferences',
          name: 'preferences',
          component: Preferences
