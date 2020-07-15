@@ -4,12 +4,12 @@
          <V4Spinner message="Loading Availability..."/>
       </div>
       <template v-else>
-         <template v-if="availability.items">
+         <template v-if="availability.items.length > 0">
             <h2>Availability</h2>
             <div class="availability-content">
                <RequestContainer :titleId="titleId" />
 
-               <table class="fields" v-if="availability.items.length > 0">
+               <table class="fields" >
                   <thead>
                      <tr>
                         <th v-for="(column, idx) in availability.columns" :key="idx">
