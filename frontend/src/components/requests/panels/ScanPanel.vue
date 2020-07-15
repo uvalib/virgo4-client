@@ -3,8 +3,10 @@
       <h2>Scan Request</h2>
 
       <div v-if="items.length > 1" class="item-selector">
-         <h3>Select the item you want:</h3>
-         <V4Select id="item-select" style="height:2em;" :selections="items" v-model="selectedItem" v-bind:attached="false" />
+         <label for="scan-use">Select the item you want</label>
+         <V4Select id="item-select" style="height:2.5em;margin-top:5px;" :selections="items" 
+            v-model="selectedItem" :attached="false"/>
+         <span v-if="hasError('item')" class="error">* item selection is required</span>
       </div>
 
       <div class="scan pure-form">
@@ -111,7 +113,9 @@ export default {
       }
    },
    created() {
-      this.selectedItem = this.items[0]
+      if (this.items.length == 1) {
+         this.selectedItem = this.items[0]
+      }
       setTimeout( () => {
          if (this.items.length == 1) {
             document.getElementById("scan-use").focus()
@@ -151,6 +155,9 @@ export default {
          }
          if ( this.scan.type == "Collab" && this.scan.notes == "") {
             this.errors.push("course")
+         }
+         if ( JSON.stringify(this.selectedItem) === JSON.stringify({})) {
+            this.errors.push("item")    
          }
          if (this.errors.length > 0) {
             let tgtID = `scan-${this.errors[0]}`
