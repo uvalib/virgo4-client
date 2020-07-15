@@ -289,7 +289,7 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	}
 
 	// series is free-form and therefore has no pre-populated values
-	seriesFilter := filter{Label: "Series", Field: "title_series_f", Values: make([]string, 0)}
+	//seriesFilter := filter{Label: "Series", Field: "title_series_f", Values: make([]string, 0)}
 
 	collectionFilter := filter{Label: "Collection", Field: "source_f", Values: make([]string, 0)}
 	for idx, srcF := range solrResp.FacetCounts.FacetFields.SourceF {
@@ -301,7 +301,7 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	}
 
 	out := make([]filter, 0)
-	out = append(out, seriesFilter)
+	//out = append(out, seriesFilter)
 	out = append(out, collectionFilter)
 
 	c.JSON(http.StatusOK, out)
