@@ -288,15 +288,21 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 		Values []string `json:"values"`
 	}
 
-	out := make([]filter, 0)
-	out = append(out, filter{Label: "Collection", Field: "source_f", Values: make([]string, 0)})
+	// series is free-form and therefore has no pre-populated values
+	seriesFilter := filter{Label: "Series", Field: "title_series_f", Values: make([]string, 0)}
+
+	collectionFilter := filter{Label: "Collection", Field: "source_f", Values: make([]string, 0)}
 	for idx, srcF := range solrResp.FacetCounts.FacetFields.SourceF {
 		// the data in SourceF is a mixed array. Even entries are string, odd are counts.
 		// In this case, only care about the string so skip all odd numbered entries
 		if idx%2 == 0 {
-			out[0].Values = append(out[0].Values, srcF.(string))
+			collectionFilter.Values = append(collectionFilter.Values, srcF.(string))
 		}
 	}
+
+	out := make([]filter, 0)
+	out = append(out, seriesFilter)
+	out = append(out, collectionFilter)
 
 	c.JSON(http.StatusOK, out)
 }
