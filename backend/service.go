@@ -290,35 +290,17 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	// advanced search filter config
 	reqFilters := make(map[string]filterCfg)
 
-	reqFilters["Collection"] = filterCfg{
-		field: "source_f",
-		sort:  "count",
-		limit: -1,
-	}
-
-	reqFilters["Series"] = filterCfg{
-		field: "title_series_f",
-		sort:  "count",
-		limit: 500,
-	}
+	reqFilters["Collection"] = filterCfg{field: "source_f", sort: "count", limit: -1}
+	//reqFilters["Series"] = filterCfg{field: "title_series_f", sort: "count", limit: 500}
 
 	// create Solr request
 	var req solrRequest
 
-	req.Params = solrRequestParams{
-		Q:    "*:*",
-		Rows: 0,
-		Fq:   []string{"+shadowed_location_f:VISIBLE"},
-	}
+	req.Params = solrRequestParams{Q: "*:*", Rows: 0, Fq: []string{"+shadowed_location_f:VISIBLE"}}
 
 	req.Facets = make(map[string]solrRequestFacet)
 	for label, config := range reqFilters {
-		req.Facets[label] = solrRequestFacet{
-			Type:  "terms",
-			Field: config.field,
-			Sort:  config.sort,
-			Limit: config.limit,
-		}
+		req.Facets[label] = solrRequestFacet{Type: "terms", Field: config.field, Sort: config.sort, Limit: config.limit}
 	}
 
 	// send the request
@@ -359,17 +341,11 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	for label, config := range reqFilters {
 		var facet solrResponseFacet
 
-		cfg := &mapstructure.DecoderConfig{
-			Metadata:   nil,
-			Result:     &facet,
-			TagName:    "json",
-			ZeroFields: true,
-		}
-
+		cfg := &mapstructure.DecoderConfig{Metadata: nil, Result: &facet, TagName: "json", ZeroFields: true}
 		dec, _ := mapstructure.NewDecoder(cfg)
 
 		if mapDecErr := dec.Decode(solrResp.Facets[label]); mapDecErr != nil {
-			// probably want to error handle, but for now, fail gracefully
+			// probably want to error handle, but for now, just drop this field
 			continue
 		}
 
