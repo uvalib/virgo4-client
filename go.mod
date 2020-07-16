@@ -10,6 +10,7 @@ require (
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/google/go-querystring v1.0.0
 	github.com/lib/pq v1.7.0
+	github.com/mitchellh/mapstructure v1.3.2
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/sirupsen/logrus v1.6.0 // indirect

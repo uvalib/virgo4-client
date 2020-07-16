@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
 	_ "github.com/lib/pq"
+	"github.com/mitchellh/mapstructure"
 )
 
 // ServiceContext contains common data used by all handlers
@@ -258,22 +259,86 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, cfg)
 }
 
+type solrRequestParams struct {
+	Rows int      `json:"rows"`
+	Fq   []string `json:"fq,omitempty"`
+	Q    string   `json:"q,omitempty"`
+}
+
+type solrRequestFacet struct {
+	Type  string `json:"type,omitempty"`
+	Field string `json:"field,omitempty"`
+	Sort  string `json:"sort,omitempty"`
+	Limit int    `json:"limit,omitempty"`
+}
+
+type solrRequest struct {
+	Params solrRequestParams           `json:"params"`
+	Facets map[string]solrRequestFacet `json:"facet,omitempty"`
+}
+
 // GetSearchFilters will return all available advanced search filters
 func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	log.Printf("Get advanced search filters")
-	url := "select?fl=*&q=*%3A*&rows=0&facet=true&facet.field=source_f"
-	respBytes, err := svc.SolrGet(url)
+
+	type filterCfg struct {
+		field string // the Solr field to facet on
+		sort  string // "count" or "alpha"
+		limit int    // -1 for unlimited
+	}
+
+	// advanced search filter config
+	reqFilters := make(map[string]filterCfg)
+
+	reqFilters["Collection"] = filterCfg{
+		field: "source_f",
+		sort:  "count",
+		limit: -1,
+	}
+
+	reqFilters["Series"] = filterCfg{
+		field: "title_series_f",
+		sort:  "count",
+		limit: 500,
+	}
+
+	// create Solr request
+	var req solrRequest
+
+	req.Params = solrRequestParams{
+		Q:    "*:*",
+		Rows: 0,
+		Fq:   []string{"+shadowed_location_f:VISIBLE"},
+	}
+
+	req.Facets = make(map[string]solrRequestFacet)
+	for label, config := range reqFilters {
+		req.Facets[label] = solrRequestFacet{
+			Type:  "terms",
+			Field: config.field,
+			Sort:  config.sort,
+			Limit: config.limit,
+		}
+	}
+
+	// send the request
+	respBytes, err := svc.SolrPost("select", req)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Message)
 		return
 	}
 
+	// the structure of a Solr response facet
+	type solrResponseFacet struct {
+		Buckets []struct {
+			Val   string `json:"val"`
+		} `json:"buckets,omitempty"`
+	}
+
+	// the Facets field will contain the facets we want, plus additional non-facet field(s).
+	// we will parse the map for the facet labels we requested, as they will be the response labels.
 	var solrResp struct {
-		FacetCounts struct {
-			FacetFields struct {
-				SourceF []interface{} `json:"source_f"` // these are human-readable names
-			} `json:"facet_fields"`
-		} `json:"facet_counts"`
+		Facets map[string]interface{} `json:"facets"`
 	}
 
 	if err := json.Unmarshal(respBytes, &solrResp); err != nil {
@@ -282,27 +347,39 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 		return
 	}
 
+	// build response
 	type filter struct {
 		Label  string   `json:"label"`
 		Field  string   `json:"field"`
 		Values []string `json:"values"`
 	}
 
-	// series is free-form and therefore has no pre-populated values
-	//seriesFilter := filter{Label: "Series", Field: "title_series_f", Values: make([]string, 0)}
-
-	collectionFilter := filter{Label: "Collection", Field: "source_f", Values: make([]string, 0)}
-	for idx, srcF := range solrResp.FacetCounts.FacetFields.SourceF {
-		// the data in SourceF is a mixed array. Even entries are string, odd are counts.
-		// In this case, only care about the string so skip all odd numbered entries
-		if idx%2 == 0 {
-			collectionFilter.Values = append(collectionFilter.Values, srcF.(string))
-		}
-	}
-
 	out := make([]filter, 0)
-	//out = append(out, seriesFilter)
-	out = append(out, collectionFilter)
+
+	for label, config := range reqFilters {
+		var facet solrResponseFacet
+
+		cfg := &mapstructure.DecoderConfig{
+			Metadata:   nil,
+			Result:     &facet,
+			TagName:    "json",
+			ZeroFields: true,
+		}
+
+		dec, _ := mapstructure.NewDecoder(cfg)
+
+		if mapDecErr := dec.Decode(solrResp.Facets[label]); mapDecErr != nil {
+			// probably want to error handle, but for now, fail gracefully
+			continue
+		}
+
+		var buckets []string
+		for _, bucket := range facet.Buckets {
+			buckets = append(buckets, bucket.Val)
+		}
+
+		out = append(out, filter{Label: label, Field: config.field, Values: buckets})
+	}
 
 	c.JSON(http.StatusOK, out)
 }
@@ -442,7 +519,7 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 // SolrGet sends a GET request to solr and returns the response
 func (svc *ServiceContext) SolrGet(query string) ([]byte, *RequestError) {
 	url := fmt.Sprintf("%s/%s/%s", svc.Solr.URL, svc.Solr.Core, query)
-	log.Printf("Solr request: %s", url)
+	log.Printf("Solr GET request: %s", url)
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
@@ -458,6 +535,44 @@ func (svc *ServiceContext) SolrGet(query string) ([]byte, *RequestError) {
 			url, err.StatusCode, err.Message, elapsedMS)
 	} else {
 		log.Printf("Successful response from Solr GET %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
+}
+
+// SolrPost sends a json POST request to solr and returns the response
+func (svc *ServiceContext) SolrPost(query string, jsonReq interface{}) ([]byte, *RequestError) {
+	url := fmt.Sprintf("%s/%s/%s", svc.Solr.URL, svc.Solr.Core, query)
+
+	jsonBytes, jsonErr := json.Marshal(jsonReq)
+	if jsonErr != nil {
+		resp, err := handleAPIResponse(url, nil, jsonErr)
+		return resp, err
+	}
+
+	req, reqErr := http.NewRequest("POST", url, bytes.NewBuffer(jsonBytes))
+	if reqErr != nil {
+		resp, err := handleAPIResponse(url, nil, reqErr)
+		return resp, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	log.Printf("Solr POST request: %s", url)
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	startTime := time.Now()
+	rawResp, rawErr := client.Do(req)
+	resp, err := handleAPIResponse(url, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from Solr POST %s - %d:%s. Elapsed Time: %d (ms)",
+			url, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from Solr POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
 	}
 	return resp, err
 }

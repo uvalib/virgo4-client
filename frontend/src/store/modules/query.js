@@ -114,10 +114,10 @@ const query = {
             if ( idx != -1 ) {
                state.advancedFields.splice(idx, 1)
             }
-            let field = {value: `filter.${f.field}`, label: f.label, type: "select", choices: f.values}
-            if ( f.values.length == 0) {
-               field.type = "text"
+            if ( f.values.length == 0 ) {
+               return
             }
+            let field = {value: `filter.${f.field}`, label: f.label, type: "select", choices: f.values}
             state.advancedFields.push(field)
          })
       },
