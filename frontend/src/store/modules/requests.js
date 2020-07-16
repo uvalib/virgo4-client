@@ -181,7 +181,12 @@ const requests = {
 
          // needs to be null to regenerate query below
          aeonLink.search = null
-
+         let aeonUrl = url.format(aeonLink)
+         if (aeonUrl.length > 700){
+            aeonLink.query["Notes"] = selected.notes.substring(0,700) +
+               "... (Notes have been shortened. Please see them in full at " + window.location.href + " )"
+            aeonLink.search = null
+         }
          window.open(url.format(aeonLink), "_blank")
 
          ctx.commit('activePanel', "ConfirmationPanel")

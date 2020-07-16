@@ -203,7 +203,24 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 			if len(item.SCNotes) > 0 {
 				notes = item.SCNotes
 			} else if len(doc.LocalNotes) > 0 {
-				notes = strings.Join(doc.LocalNotes, ";\n")
+				// drop name
+				prefix1 := regexp.MustCompile(`^\s*SPECIAL\s+COLLECTIONS:\s+`)
+				//shorten SC name
+				prefix2 := regexp.MustCompile(`^\s*Harrison Small Special Collections,`)
+
+				for _, note := range doc.LocalNotes {
+					note = prefix1.ReplaceAllString(note, "")
+					note = prefix2.ReplaceAllString(note, "H. Small,")
+					// trim
+					notes += (strings.TrimSpace(note) + ";\n")
+				}
+				// truncate
+				if len(notes) > 999 {
+					notes = notes[:999]
+				}
+
+			} else {
+				notes = "(no location notes)"
 			}
 
 			scItem := ItemOption{
