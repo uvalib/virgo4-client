@@ -5,6 +5,7 @@
             mode="tertiary"
             class="option-button"
             @click="setActive(option)"
+            v-if="option.button_label"
          >{{option.button_label}}</V4Button>
          <p class="desc" v-if="option.description" v-html="option.description"></p>
       </div>
@@ -24,9 +25,14 @@ export default {
    },
    methods: {
       setActive(option) {
+
          let newActive = this.requests.optionMap[option.type];
          let optionSettings = this.findOption(newActive);
-         if (optionSettings.sign_in_required && !this.isSignedIn) {
+         if (option.type == "directLink"){
+            let tab = window.open(option.create_url, '_blank');
+            tab.focus();
+
+         } else if (optionSettings.sign_in_required && !this.isSignedIn) {
             this.$store.commit('restore/setActiveRequest', newActive)
             this.requests.activePanel = "signInPanel";
          } else {
@@ -41,14 +47,14 @@ export default {
 .options {
    display: flex;
    flex-flow: row wrap;
-   justify-content: space-evenly;
+   justify-content: space-between;
 
    .option {
       text-align: left;
       margin: 20px 0;
 
       .desc {
-         max-width: 200px;
+         max-width: 300px;
          padding: 0;
          margin: 10px 0;
          font-size: 0.95em;
