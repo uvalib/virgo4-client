@@ -331,7 +331,7 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 	// the structure of a Solr response facet
 	type solrResponseFacet struct {
 		Buckets []struct {
-			Val   string `json:"val"`
+			Val string `json:"val"`
 		} `json:"buckets,omitempty"`
 	}
 
