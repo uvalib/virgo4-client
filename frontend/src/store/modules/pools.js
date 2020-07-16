@@ -65,6 +65,14 @@ const pools = {
          if (attr.supported == false) return "" 
          return attr.value
       },
+      hasExternalHoldings: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return false
+         let attr = pool.attributes.find( a=> a.name=='external_hold')
+         if (!attr) return false
+         return attr.supported
+      },
       isUVA: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return false

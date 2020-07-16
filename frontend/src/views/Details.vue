@@ -14,6 +14,11 @@
          <template v-else>
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
             <div class="info">
+               <div v-if="hasExternalHoldings(details.source)" class="ext-warn">
+                  This resource is not held by UVA Libraries, 
+                  <a :href="owningInstitution" target="_blank">contact the owning institution<i style="margin:0 5px;" class="fas fa-external-link-alt"></i></a> 
+                  to determine how to gain access to them, or disable searching of these materials in your preferences.
+               </div>
                <dl class="fields">
                   <template v-if="details.header.author">
                      <dt class="label">{{details.header.author.label}}:</dt>
@@ -164,6 +169,7 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
+         hasExternalHoldings: 'pools/hasExternalHoldings',
          poolDetails: 'pools/poolDetails',
       }),
       hasPDFContent() {
@@ -175,6 +181,11 @@ export default {
       poolMode() {
          let details = this.poolDetails(this.details.source)
          return details.mode
+      },
+      owningInstitution() {
+         let details = this.poolDetails(this.details.source)
+         let attr = details.attributes.find( a=> a.name=='external_hold')
+         return attr.value
       },
       hasAvailability() {
          return this.isUVA(this.details.source)
@@ -278,6 +289,16 @@ export default {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
+
+   .ext-warn {
+      margin: 20px 10px 0 10px;
+      text-align: left;
+      padding: 10px 15px;
+      background: var(--uvalib-yellow);
+      border-radius: 5px;
+      font-weight: bold;
+      box-shadow: $v4-box-shadow-light;
+   }
 
    .details-content {
       width: 80%;
