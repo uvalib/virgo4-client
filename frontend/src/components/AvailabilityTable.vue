@@ -3,6 +3,7 @@
       <div class="working" v-if="availability.searching" >
          <V4Spinner message="Loading Availability..."/>
       </div>
+      <p class="error" v-if="availability.error" v-html="availability.error"> </p>
       <template v-else>
          <template v-if="availability.items && availability.items.length > 0">
             <h2>Availability</h2>
