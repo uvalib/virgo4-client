@@ -222,6 +222,7 @@ function ensureSignedIn() {
    let jwtStr = Vue.$cookies.get("v4_jwt")
    if (jwtStr) {
       store.commit("user/setUserJWT", jwtStr)
+      store.dispatch("user/getCheckouts") // needed so the alert icon can show in menubar
       return true
    } 
    return false
