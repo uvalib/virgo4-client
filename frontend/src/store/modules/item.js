@@ -5,9 +5,9 @@ import router from '../../router'
 const item = {
    namespaced: true,
    state: {
-      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], 
+      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[],
          related:[], digitalContent: [] },
-      availability: {searching: true, titleId: '', columns: [], items: []},
+      availability: {searching: true, titleId: "", columns: [], items: [], error: ""},
       googleBooksURL: ""
    },
 
@@ -45,11 +45,11 @@ const item = {
             if ( item.pdf.status == "READY") {
                state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download, name: item.label})
             } else if ( item.pdf.status.includes("%")) {
-               state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download, 
-                  statusURL: item.pdf.urls.status, name: item.label})   
+               state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download,
+                  statusURL: item.pdf.urls.status, name: item.label})
             } else {
-               state.details.digitalContent.push({type: "PDF", status: "NOT_AVAIL", url: item.pdf.urls.download, 
-                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label})     
+               state.details.digitalContent.push({type: "PDF", status: "NOT_AVAIL", url: item.pdf.urls.download,
+                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label})
             }
          })
          let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
@@ -61,7 +61,7 @@ const item = {
          state.googleBooksURL = data.items[0].volumeInfo.previewLink
       },
       clearDetails(state) {
-         state.details = {searching: true, source: "", identifier:"", basicFields:[], 
+         state.details = {searching: true, source: "", identifier:"", basicFields:[],
             detailFields:[], related:[], digitalContent: []}
          state.googleBooksURL = ""
       },
@@ -71,8 +71,11 @@ const item = {
         state.availability.items = response.items
         state.availability.searching = false
       },
+      setAvailabilityError(state, error) {
+         state.availability.error = error
+      },
       clearAvailability(state) {
-        state.availability = {searching: true, titleId: '', columns: [], items: []}
+        state.availability = {searching: true, titleId: '', columns: [], items: [], error: ""}
       },
       clearSearching(state){
         state.details.searching = false
@@ -105,12 +108,12 @@ const item = {
    actions: {
       async generateDigitalContent(ctx, data ) {
          let dc = ctx.state.details.digitalContent.find( f=>f.name==data.name && f.type==data.type)
-         try { 
+         try {
             await axios.get(dc.generateURL)
             ctx.dispatch("getDigitalContentStatus", data.name)
          } catch (_err) {
             ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
-         } 
+         }
       },
       async getDigitalContentStatus(ctx, data) {
          try {
@@ -121,10 +124,10 @@ const item = {
             ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
          }
       },
-      
+
       getDigitalContentURLs(ctx) {
          let dcField = ctx.state.details.basicFields.find( f=>f.name=="digital_content_url")
-         if (!dcField) return 
+         if (!dcField) return
 
          axios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
@@ -134,8 +137,8 @@ const item = {
       },
 
       async getGoogleBooksURL(ctx) {
-         // The books API must be accessed without any auth headers or it will 401. 
-         // There may be other requests going on at the same time 
+         // The books API must be accessed without any auth headers or it will 401.
+         // There may be other requests going on at the same time
          // this request is made that DO require auth, so a new axios instance must be created and have
          // the auth header stripped
          const axInst = axios.create({
@@ -167,7 +170,7 @@ const item = {
             }
             return done == true
          })
-      }, 
+      },
 
       async getDetails(ctx, { source, identifier }) {
          if (ctx.getters.hasDetails(identifier)) {
@@ -210,7 +213,7 @@ const item = {
         }).catch((error) => {
           ctx.commit('clearSearching')
           if (error.response.status != 404){
-            ctx.commit('system/setError', error, {root: true})
+            ctx.commit("setAvailabilityError", error.response.data)
           }
         })
       },
