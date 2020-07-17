@@ -10,7 +10,7 @@
             class="pool"
             v-for="p in pools"
             :key="p.id"
-            v-bind:class="{excluded: isPoolExcluded(p.url)}"
+            v-bind:class="{excluded: isPoolExcluded(p)}"
          >
             <div class="name">
                <span>
@@ -40,13 +40,13 @@
                   tabindex="0"
                   role="checkbox"
                   :aria-label="`toggle inclusion of ${p.name} in search results`"
-                  :aria-checked="(!isPoolExcluded(p.url)).toString()"
+                  :aria-checked="(!isPoolExcluded(p)).toString()"
                   @click="toggleExcludePool(p)"
                   @keyup.stop.enter="toggleExcludePool(p)"
                   @keydown.space.prevent.stop="toggleExcludePool(p)"
                >
                   <span class="label">Include</span>
-                  <i v-if="isPoolExcluded(p.url)" class="excluded far fa-circle"></i>
+                  <i v-if="isPoolExcluded(p)" class="excluded far fa-circle"></i>
                   <i v-else class="selected fas fa-check-circle"></i>
                </div>
             </div>
@@ -73,8 +73,8 @@ export default {
       },
       async toggleExcludePool(pool) {
          this.$store.commit("resetSearchResults");
-         await this.$store.dispatch("preferences/toggleExcludePool", pool.url)
-         if (this.isPoolExcluded(pool.url)) {
+         await this.$store.dispatch("preferences/toggleExcludePool", pool)
+         if (this.isPoolExcluded(pool)) {
             this.$analytics.trigger('Preferences', 'IGNORE_POOL', pool.name)
          } else {
             this.$analytics.trigger('Preferences', 'INCLUDE_POOL', pool.name)

@@ -250,7 +250,7 @@ export default new Vuex.Store({
         pagination: { start: 0, rows: state.pageSize },
         preferences: {
           target_pool: rootState.preferences.targetPoolURL,
-          exclude_pool: rootState.preferences.excludePoolURLs,
+          exclude_pool: rootGetters['preferences/excludedPoolURLs'],
         },
         filters: rootGetters['filters/globalFilter']
       }
@@ -263,6 +263,8 @@ export default new Vuex.Store({
         rootState.pools.list.forEach( src=> {
           if (src.id != tgtID) {
             req.preferences.exclude_pool.push(src.url)
+          } else {
+            req.preferences.target_pool = src.url  
           }
         })
       }

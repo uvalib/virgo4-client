@@ -83,8 +83,8 @@
          <div class="pools">
             <V4Checkbox v-for="src in sources" :key="src.id" class="pool"
                :aria-label="`toggle inclusion of ${src.name} in search results`"
-               :checked="!isPoolExcluded(src.url)"  
-               @click="poolClicked(src.url)">
+               :checked="!isPoolExcluded(src)"  
+               @click="poolClicked(src)">
                {{src.name}}
             </V4Checkbox>
          </div>
@@ -137,7 +137,6 @@ export default {
       },
       ...mapState({
          advancedFields: state => state.query.advancedFields,
-         excludeURLS: state => state.preferences.excludePoolURLs,
          pools: state => state.pools.list
       }),
       ...mapGetters({
@@ -148,6 +147,7 @@ export default {
          rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
+         excludeURLS: 'preferences/excludedPoolURLs',
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -177,10 +177,10 @@ export default {
       allPoolsClicked() {
          this.$store.commit("preferences/clearExcluded")
       },
-      poolClicked(url) {
+      poolClicked(pool) {
         // commit instead of dispatch. Treatign changes here as override.
         // to save, go to preferences
-        this.$store.commit("preferences/toggleExcludePool", url)
+        this.$store.commit("preferences/toggleExcludePool", pool)
       },
       doAdvancedSearch() {
          if ( this.excludeURLS.length == this.pools.length) {
@@ -240,7 +240,6 @@ export default {
       }
    },
    created() {
-      this.$store.dispatch("user/getAccountInfo")
       setTimeout( () => {
          let out = document.querySelectorAll(".field:last-of-type")
          if (out.length > 0) {

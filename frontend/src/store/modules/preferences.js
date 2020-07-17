@@ -3,11 +3,18 @@ import Vue from 'vue'
 import router from '../../router'
 import { getField, updateField } from 'vuex-map-fields'
 
+
+function isPoolExternal(pool) {
+   let ext = pool.attributes.find( a => a.name=='external_hold')
+   return ( ext && ext.supported )
+}
+
 const preferences = {
    namespaced: true,
    state: {
       targetPoolURL: "",
       excludePoolURLs: [],
+      optInPools: [],
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       enableBarcodeScan: false,
@@ -18,13 +25,40 @@ const preferences = {
       isTargetPool: state => poolURL => {
          return state.targetPoolURL == poolURL
       },
-      isPoolExcluded: state => pooURL => {
-         let excluded = false
-         state.excludePoolURLs.forEach(function (url) {
-            if (url == pooURL) {
-               excluded = true
+
+      excludedPoolURLs: (state, _getters, rootState) => {
+         let out = new Set()
+         rootState.pools.list.forEach( p => {
+            // all external pools that are not opted in go in the exclude list
+            if ( isPoolExternal(p) && !state.optInPools.includes(p.id)) {   
+               out.add(p.url)
             }
          })
+
+         state.excludePoolURLs.forEach( u => {
+            out.add(u)
+         })
+         return [...out] 
+      },
+
+      isPoolExcluded: state => pool => {
+         // external hold pools are excluded by default
+         if ( isPoolExternal(pool) ) {
+            // unless they are opted in...
+            let optIn = state.optInPools.includes(pool.id)
+            if ( !optIn ) {
+               return true
+            }
+         }
+
+         let excluded = false
+         state.excludePoolURLs.some( url => {
+            if (url == pool.url) {
+               excluded = true
+            }
+            return excluded == true
+         })
+
          return excluded
       },
    },
@@ -59,6 +93,9 @@ const preferences = {
             if (json.excludePoolURLs ) {
                state.excludePoolURLs = json.excludePoolURLs
             }
+            if (json.optInPools ) {
+               state.optInPools = json.optInPools
+            }
             if ( json.trackingOptOut) {
                state.trackingOptOut  = json.trackingOptOut
                let optOutCookie = Vue.$cookies.get('v4_optout')
@@ -84,15 +121,22 @@ const preferences = {
          state.targetPoolURL = ""
          state.enableBarcodeScan = false
          state.excludePoolURLs.splice(0, state.excludePoolURLs.length)
+         state.optInPools.splice(0, state.optInPools.length)
       },
-      toggleExcludePool(state, poolURL) {
-         let idx = state.excludePoolURLs.indexOf(poolURL)
-         if (idx > -1) {
-            state.excludePoolURLs.splice(idx, 1)
+      toggleExcludePool(state, pool) {
+         if ( isPoolExternal(pool) && !state.optInPools.includes(pool.id) ) {
+            // if togglining an excluded pool that is not in opt in, this is
+            // the first attempt to use it. Move it to opt in
+            state.optInPools.push(pool.id)
          } else {
-            state.excludePoolURLs.push(poolURL)
-            if (state.targetPoolURL == poolURL ) {
-               state.targetPoolURL = ""
+            let idx = state.excludePoolURLs.indexOf(pool.url)
+            if (idx > -1) {
+               state.excludePoolURLs.splice(idx, 1)
+            } else {
+               state.excludePoolURLs.push(pool.url)
+               if (state.targetPoolURL == pool.url ) {
+                  state.targetPoolURL = ""
+               }
             }
          }
       },
@@ -120,9 +164,9 @@ const preferences = {
          ctx.commit("toggleTargetPool", tgtURL)
          ctx.dispatch("savePreferences")
       },
-      toggleExcludePool(ctx, tgtURL) {
-         ctx.commit("toggleExcludePool", tgtURL)
-         return ctx.dispatch("savePreferences")
+      toggleExcludePool(ctx, pool) {
+         ctx.commit("toggleExcludePool", pool)
+         ctx.dispatch("savePreferences")
       },
       toggleOptOut(ctx) {
          ctx.commit("toggleOptOut")
@@ -139,6 +183,7 @@ const preferences = {
             trackingOptOut: ctx.state.trackingOptOut,
             pickupLibrary: ctx.state.pickupLibrary,
             enableBarcodeScan: ctx.state.enableBarcodeScan,
+            optInPools: ctx.state.optInPools
          }
          axios.post(url, data)
       }
