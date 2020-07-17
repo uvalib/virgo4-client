@@ -124,7 +124,7 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	reserveReq.NonVideo = make([]RequestItem, 0)
 	for idx := range reserveReq.Items {
 		itm := reserveReq.Items[idx]
-		itm.VirgoURL = fmt.Sprintf("%s/sources/%s/%s", svc.VirgoURL, itm.Pool, itm.CatalogKey)
+		itm.VirgoURL = fmt.Sprintf("%s/sources/%s/items/%s", svc.VirgoURL, itm.Pool, itm.CatalogKey)
 		avail := svc.getAvailabity(reserveReq.Items[idx], c.GetString("jwt"))
 		reserveReq.Items[idx].Availability = make([]AvailabilityInfo, len(avail))
 		copy(reserveReq.Items[idx].Availability, avail)
