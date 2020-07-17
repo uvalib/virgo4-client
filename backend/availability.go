@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-querystring/query"
@@ -100,7 +101,7 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 	log.Printf("Getting availability for %s with ILS Connector...", titleID)
 
 	availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, titleID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, c.GetString("jwt"), 20*time.Second)
 	if ilsErr != nil && ilsErr.StatusCode != 404 {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return

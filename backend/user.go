@@ -168,7 +168,7 @@ func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get bills for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/bills", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 20*time.Second)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -216,7 +216,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 
 	// Get all of the user checkouts after the renew so dates/status are updated
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 30*time.Second)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -242,7 +242,7 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 30*time.Second)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -262,7 +262,7 @@ func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get holds for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/holds", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 20*time.Second)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -286,7 +286,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	log.Printf("Get info for user %s with ILS Connector...", userID)
 
 	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 20*time.Second)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return

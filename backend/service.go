@@ -364,7 +364,7 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 func (svc *ServiceContext) GetCodes(c *gin.Context) {
 	log.Printf("Get ILS connector codes")
 	userURL := fmt.Sprintf("%s/v4/availability/list", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 10*time.Second)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -417,9 +417,8 @@ func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface
 }
 
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
-func (svc *ServiceContext) ILSConnectorGet(url string, jwt string) ([]byte, *RequestError) {
-	log.Printf("ILS Connector GET request: %s", url)
-	timeout := time.Duration(20 * time.Second)
+func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, timeout time.Duration) ([]byte, *RequestError) {
+	log.Printf("ILS Connector GET request: %s, timeout  %.0f sec", url, timeout.Seconds())
 	client := http.Client{
 		Timeout: timeout,
 	}

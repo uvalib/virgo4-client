@@ -152,7 +152,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
 	authURL := fmt.Sprintf("%s/v4/users/%s/check_pin?pin=%s", svc.ILSAPI, auth.Barcode, auth.Password)
-	bodyBytes, _ := svc.ILSConnectorGet(authURL, c.GetString("jwt"))
+	bodyBytes, _ := svc.ILSConnectorGet(authURL, c.GetString("jwt"), 20*time.Second)
 
 	if string(bodyBytes) != "valid" {
 		// The in verification failed. If this has happened 5 times in a
@@ -302,7 +302,7 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum
 
 	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
 	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, v4User.Virgo4ID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT, 20*time.Second)
 	if ilsErr != nil {
 		return "", errors.New(ilsErr.Message)
 	}
