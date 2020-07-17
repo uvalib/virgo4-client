@@ -17,12 +17,12 @@ import (
 // ReserveRequest is the data POST'd by a client for course reserves
 type ReserveRequest struct {
 	VirgoURL string
-	UserID   string        `json:"userID"`
-	Request  RequestParams `json:"request"`
-	Items    []RequestItem `json:"items"`
-	Video    []RequestItem `json:"-"`
-	NonVideo []RequestItem `json:"-"`
-	MaxAvail int           `json:"-"`
+	UserID   string         `json:"userID"`
+	Request  RequestParams  `json:"request"`
+	Items    []RequestItem  `json:"items"` // these are the items sent from the client
+	Video    []*RequestItem `json:"-"`     // populated during processing from Items, includes avail
+	NonVideo []*RequestItem `json:"-"`     // populated during processing from Items, includes avail
+	MaxAvail int            `json:"-"`
 }
 
 // RequestParams contans the top-level request data for course reserves
@@ -120,16 +120,17 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	}
 	reserveReq.VirgoURL = svc.VirgoURL
 	reserveReq.MaxAvail = -1
-	reserveReq.Video = make([]RequestItem, 0)
-	reserveReq.NonVideo = make([]RequestItem, 0)
+	reserveReq.Video = make([]*RequestItem, 0)
+	reserveReq.NonVideo = make([]*RequestItem, 0)
+
+	// Iterate thru all of the requested items, pull availability and stuff it into
+	// an array based on type. Separate emails will go out for video / non-video
 	for idx := range reserveReq.Items {
-		itm := reserveReq.Items[idx]
+		itm := &reserveReq.Items[idx]
 		itm.VirgoURL = fmt.Sprintf("%s/sources/%s/items/%s", svc.VirgoURL, itm.Pool, itm.CatalogKey)
-		avail := svc.getAvailabity(reserveReq.Items[idx], c.GetString("jwt"))
-		reserveReq.Items[idx].Availability = make([]AvailabilityInfo, len(avail))
-		copy(reserveReq.Items[idx].Availability, avail)
-		if len(avail) > reserveReq.MaxAvail {
-			reserveReq.MaxAvail = len(avail)
+		svc.getAvailabity(itm, c.GetString("jwt"))
+		if len(itm.Availability) > reserveReq.MaxAvail {
+			reserveReq.MaxAvail = len(itm.Availability)
 		}
 		if itm.Pool == "video" {
 			reserveReq.Video = append(reserveReq.Video, itm)
@@ -226,20 +227,20 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 	c.String(http.StatusOK, "Reserve email sent")
 }
 
-func (svc *ServiceContext) getAvailabity(reqItem RequestItem, jwt string) []AvailabilityInfo {
-	out := make([]AvailabilityInfo, 0)
+func (svc *ServiceContext) getAvailabity(reqItem *RequestItem, jwt string) {
+	reqItem.Availability = make([]AvailabilityInfo, 0)
 	availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, reqItem.CatalogKey)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, jwt)
 	if ilsErr != nil {
 		log.Printf("WARN: Unable to get availabilty info for reserve %s: %s", reqItem.CatalogKey, ilsErr.Message)
-		return out
+		return
 	}
 
 	var availData ilsAvail
 	err := json.Unmarshal([]byte(bodyBytes), &availData)
 	if err != nil {
 		log.Printf("WARN: Invalid ILS Availabilty response for %s: %s", reqItem.CatalogKey, err.Error())
-		return out
+		return
 	}
 
 	for _, availItem := range availData.Availability.Items {
@@ -255,9 +256,8 @@ func (svc *ServiceContext) getAvailabity(reqItem RequestItem, jwt string) []Avai
 				avail.CallNumber = field.Value
 			}
 		}
-		out = append(out, avail)
+		reqItem.Availability = append(reqItem.Availability, avail)
 	}
-	return out
 }
 
 // SearchReserves will search for reservations on the specified course.

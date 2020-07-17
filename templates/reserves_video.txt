@@ -42,6 +42,6 @@ Virgo URL: {{ $item.VirgoURL }}
 {{ end -}}
 _______________________________________________________________________
 {{ header .MaxAvail }}
-{{- range $index, $item := .Items }}
+{{- range $index, $item := .Video }}
 {{ row $index $reserveLib $item -}}
 {{ end -}}
