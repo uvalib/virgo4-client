@@ -223,7 +223,7 @@ const user = {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
          ctx.commit('setLookingUp', true)
 
-         axios.all([axios.get(`/api/users/${ctx.state.signedInUser}/holds`),
+         return axios.all([axios.get(`/api/users/${ctx.state.signedInUser}/holds`),
                     axios.get(`/api/users/${ctx.state.signedInUser}/illiad`),
          ]).then(axios.spread((holdResponse, illiadResponse) => {
             ctx.commit('setRequests', {
@@ -294,7 +294,7 @@ const user = {
          const axInst = axios.create({
             timeout: 30*1000,
          })
-         axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
+         return axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
             ctx.commit('setLookingUp', false)
           }).catch((error) => {

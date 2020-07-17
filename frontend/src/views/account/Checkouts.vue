@@ -3,7 +3,12 @@
       <h1>My Account</h1>
       <div class="checkout-content">
          <AccountActivities/>
-         <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
+         <div v-if="lookingUpUVA" class="working">
+            <V4Spinner message="Looking up UVA Checkouts..." />
+         </div>
+         <div v-if="lookingUpILL" class="working">
+            <V4Spinner message="Looking up ILL Checkouts..." />
+         </div>
          <div class="details">
             <div class="barred" v-if="isBarred">
                Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
@@ -52,6 +57,9 @@
                   </div>
                </AccordionContent>
             </template>
+            <div v-if="lookingUpUVA == false && checkouts.length == 0" class="none">
+               You have no UVA checkouts.
+            </div>
             <template v-if="illiadCheckouts.length > 0">
                <AccordionContent
                   class="checkout-accordion"
@@ -78,11 +86,9 @@
                   </div>
                </AccordionContent>
             </template>
-            <template v-if="!lookingUp && checkouts.length == 0 && illiadCheckouts.length == 0" >
-               <div class="none">
-                  You currently have no items checked out
-               </div>
-            </template>
+            <div v-if="lookingUpILL == false && illiadCheckouts.length == 0" class="none">
+               You have no UVA checkouts.
+            </div>
          </div>
       </div>
    </div>
@@ -98,10 +104,15 @@ export default {
    components: {
       AccountActivities,AccordionContent
    },
+   data: function() {
+      return {
+         lookingUpILL: true,
+         lookingUpUVA: true,
+      }
+   },
    computed: {
       ...mapState({
          checkouts: state => state.user.checkouts,
-         lookingUp: state => state.user.lookingUp,
          requests: state => state.user.requests,
       }),
       ...mapGetters({
@@ -140,8 +151,14 @@ export default {
       }
    },
    async created() {
-      await this.$store.dispatch("user/getCheckouts")
+      this.lookingUpILL = true
+      this.lookingUpUVA = true
       await this.$store.dispatch("user/getRequests")
+      this.lookingUpILL = false 
+
+      await this.$store.dispatch("user/getCheckouts")
+      this.lookingUpUVA = false
+
       setTimeout(()=> { 
          document.getElementById("checkouts-submenu").focus()
       }, 250)
@@ -172,6 +189,7 @@ export default {
    }
    .working  {
       text-align: center;
+      margin: 5px 0 20px 0;
    }
    .none {
       text-align: center;
