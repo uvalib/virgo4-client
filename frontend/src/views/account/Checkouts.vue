@@ -140,11 +140,8 @@ export default {
       }
    },
    async created() {
-      this.$store.commit('user/setLookingUp', true)
       await this.$store.dispatch("user/getCheckouts")
-      this.$store.commit('user/setLookingUp', true)
       await this.$store.dispatch("user/getRequests")
-      this.$store.commit('user/setLookingUp', false)
       setTimeout(()=> { 
          document.getElementById("checkouts-submenu").focus()
       }, 250)

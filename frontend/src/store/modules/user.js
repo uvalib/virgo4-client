@@ -286,12 +286,15 @@ const user = {
             return
          }
 
+         ctx.commit('setLookingUp', true)
          if ( ctx.getters.hasAccountInfo == false) {
             await this.dispatch("user/getAccountInfo")
-            ctx.commit('setLookingUp', true)
          }
 
-         axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
+         const axInst = axios.create({
+            timeout: 30*1000,
+         })
+         axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
