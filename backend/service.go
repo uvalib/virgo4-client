@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,6 +38,7 @@ type ServiceContext struct {
 	SMTP               SMTPConfig
 	Illiad             IlliadConfig
 	Solr               SolrConfig
+	HTTPClient         *http.Client
 }
 
 // RequestError contains http status code and message for a
@@ -92,6 +94,23 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		ctx.PendingTranslates[strings.TrimSpace(bits[0])] = strings.TrimSpace(bits[1])
 	}
 
+	log.Printf("Create HTTP client for external service calls")
+	keepAliveTimeout := 600 * time.Second
+	timeout := 5 * time.Second
+	defaultTransport := &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout:   2 * time.Second,
+			KeepAlive: keepAliveTimeout,
+		}).Dial,
+		TLSHandshakeTimeout: 2 * time.Second,
+		MaxIdleConns:        100,
+		MaxIdleConnsPerHost: 100,
+	}
+	ctx.HTTPClient = &http.Client{
+		Transport: defaultTransport,
+		Timeout:   timeout,
+	}
+
 	return &ctx, nil
 }
 
@@ -121,12 +140,12 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	hcMap := make(map[string]hcResp)
 
 	if svc.SearchAPI != "" {
-		timeout := time.Duration(5 * time.Second)
-		client := http.Client{
-			Timeout: timeout,
-		}
+		svc.HTTPClient.Timeout = 5 * time.Second
 		apiURL := fmt.Sprintf("%s/version", svc.SearchAPI)
-		_, err := client.Get(apiURL)
+		resp, err := svc.HTTPClient.Get(apiURL)
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 		if err != nil {
 			log.Printf("ERROR: Failed response from SearchAPI PING: %s - %s", err.Error(), svc.SearchAPI)
 			hcMap["v4search"] = hcResp{Healthy: false, Message: err.Error()}
@@ -136,12 +155,11 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	}
 
 	if svc.ILSAPI != "" {
-		timeout := time.Duration(5 * time.Second)
-		client := http.Client{
-			Timeout: timeout,
-		}
 		apiURL := fmt.Sprintf("%s/version", svc.ILSAPI)
-		_, err := client.Get(apiURL)
+		resp, err := svc.HTTPClient.Get(apiURL)
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 		if err != nil {
 			log.Printf("ERROR: Failed response from ILS Connector PING: %s - %s", err.Error(), svc.ILSAPI)
 			hcMap["ils_connector"] = hcResp{Healthy: false, Message: err.Error()}
@@ -385,9 +403,7 @@ func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface
 	if verb == "GET" {
 		timeout = time.Duration(20 * time.Second)
 	}
-	client := http.Client{
-		Timeout: timeout,
-	}
+	svc.HTTPClient.Timeout = timeout
 	illiadURL := fmt.Sprintf("%s/%s", svc.Illiad.URL, url)
 
 	var illReq *http.Request
@@ -402,7 +418,7 @@ func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface
 	illReq.Header.Add("ApiKey", svc.Illiad.APIKey)
 
 	startTime := time.Now()
-	rawResp, rawErr := client.Do(illReq)
+	rawResp, rawErr := svc.HTTPClient.Do(illReq)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -419,14 +435,12 @@ func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
 func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, timeout time.Duration) ([]byte, *RequestError) {
 	log.Printf("ILS Connector GET request: %s, timeout  %.0f sec", url, timeout.Seconds())
-	client := http.Client{
-		Timeout: timeout,
-	}
+	svc.HTTPClient.Timeout = timeout
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
 
 	startTime := time.Now()
-	rawResp, rawErr := client.Do(req)
+	rawResp, rawErr := svc.HTTPClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -444,15 +458,13 @@ func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, timeout time.
 func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector POST request: %s", url)
 	timeout := time.Duration(20 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
+	svc.HTTPClient.Timeout = timeout
 	startTime := time.Now()
 	b, _ := json.Marshal(values)
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	req.Header.Add("Content-type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
-	rawResp, rawErr := client.Do(req)
+	rawResp, rawErr := svc.HTTPClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -470,14 +482,12 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt 
 func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector DELETE request: %s", url)
 	timeout := time.Duration(20 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
+	svc.HTTPClient.Timeout = timeout
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
 
 	startTime := time.Now()
-	rawResp, rawErr := client.Do(req)
+	rawResp, rawErr := svc.HTTPClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -496,11 +506,9 @@ func (svc *ServiceContext) SolrGet(query string) ([]byte, *RequestError) {
 	url := fmt.Sprintf("%s/%s/%s", svc.Solr.URL, svc.Solr.Core, query)
 	log.Printf("Solr GET request: %s", url)
 	timeout := time.Duration(5 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
+	svc.HTTPClient.Timeout = timeout
 	startTime := time.Now()
-	rawResp, rawErr := client.Get(url)
+	rawResp, rawErr := svc.HTTPClient.Get(url)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -534,11 +542,9 @@ func (svc *ServiceContext) SolrPost(query string, jsonReq interface{}) ([]byte, 
 
 	log.Printf("Solr POST request: %s", url)
 	timeout := time.Duration(5 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
+	svc.HTTPClient.Timeout = timeout
 	startTime := time.Now()
-	rawResp, rawErr := client.Do(req)
+	rawResp, rawErr := svc.HTTPClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
