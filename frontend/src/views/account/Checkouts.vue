@@ -194,7 +194,10 @@ export default {
    .none {
       text-align: center;
       font-size: 1.25em;
-      margin-top: 35px;
+      margin: 20px 0;
+      border: 1px solid var(--uvalib-grey);
+      background: var(--uvalib-grey-lightest);
+      padding: 10px;
    }
    .section-title {
       font-weight: bold;
