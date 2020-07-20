@@ -47,7 +47,8 @@
          </div>
          <div class="entry pure-control-group">
             <label for="scan-pages">Pages</label>
-            <input type="text" v-model="pages" id="scan-pages">
+            <input type="text" v-model="pages" id="scan-pages" aria-required="true" required="required">
+            <span v-if="hasError('pages')" class="error">* pages are required</span>
          </div>
          <div v-if="type=='Article'" class="entry pure-control-group">
             <label for="scan-notes">Notes</label>
