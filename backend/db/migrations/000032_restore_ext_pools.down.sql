@@ -1,1 +1,1 @@
-DELETE from sources where name='jmrl' or name='worldcat';
+   DELETE from sources where name='jmrl' or name='worldcat';
