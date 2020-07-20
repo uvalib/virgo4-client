@@ -38,7 +38,9 @@ type ServiceContext struct {
 	SMTP               SMTPConfig
 	Illiad             IlliadConfig
 	Solr               SolrConfig
+	FastHTTPClient     *http.Client
 	HTTPClient         *http.Client
+	SlowHTTPClient     *http.Client
 }
 
 // RequestError contains http status code and message for a
@@ -95,12 +97,10 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	}
 
 	log.Printf("Create HTTP client for external service calls")
-	keepAliveTimeout := 600 * time.Second
-	timeout := 5 * time.Second
 	defaultTransport := &http.Transport{
 		Dial: (&net.Dialer{
 			Timeout:   2 * time.Second,
-			KeepAlive: keepAliveTimeout,
+			KeepAlive: 600 * time.Second,
 		}).Dial,
 		TLSHandshakeTimeout: 2 * time.Second,
 		MaxIdleConns:        100,
@@ -108,7 +108,15 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	}
 	ctx.HTTPClient = &http.Client{
 		Transport: defaultTransport,
-		Timeout:   timeout,
+		Timeout:   10 * time.Second,
+	}
+	ctx.FastHTTPClient = &http.Client{
+		Transport: defaultTransport,
+		Timeout:   5 * time.Second,
+	}
+	ctx.SlowHTTPClient = &http.Client{
+		Transport: defaultTransport,
+		Timeout:   30 * time.Second,
 	}
 
 	return &ctx, nil
@@ -140,9 +148,8 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	hcMap := make(map[string]hcResp)
 
 	if svc.SearchAPI != "" {
-		svc.HTTPClient.Timeout = 5 * time.Second
 		apiURL := fmt.Sprintf("%s/version", svc.SearchAPI)
-		resp, err := svc.HTTPClient.Get(apiURL)
+		resp, err := svc.FastHTTPClient.Get(apiURL)
 		if resp != nil {
 			defer resp.Body.Close()
 		}
@@ -156,7 +163,7 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 
 	if svc.ILSAPI != "" {
 		apiURL := fmt.Sprintf("%s/version", svc.ILSAPI)
-		resp, err := svc.HTTPClient.Get(apiURL)
+		resp, err := svc.FastHTTPClient.Get(apiURL)
 		if resp != nil {
 			defer resp.Body.Close()
 		}
@@ -382,7 +389,7 @@ func (svc *ServiceContext) GetSearchFilters(c *gin.Context) {
 func (svc *ServiceContext) GetCodes(c *gin.Context) {
 	log.Printf("Get ILS connector codes")
 	userURL := fmt.Sprintf("%s/v4/availability/list", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 10*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -399,11 +406,6 @@ func (svc *ServiceContext) GetCodes(c *gin.Context) {
 // ILLiadRequest sends a GET/PUT/POST request to ILLiad and returns results
 func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface{}) ([]byte, *RequestError) {
 	log.Printf("ILLiad  %s request: %s, %+v", verb, url, data)
-	timeout := time.Duration(5 * time.Second)
-	if verb == "GET" {
-		timeout = time.Duration(20 * time.Second)
-	}
-	svc.HTTPClient.Timeout = timeout
 	illiadURL := fmt.Sprintf("%s/%s", svc.Illiad.URL, url)
 
 	var illReq *http.Request
@@ -433,14 +435,13 @@ func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface
 }
 
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
-func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, timeout time.Duration) ([]byte, *RequestError) {
-	log.Printf("ILS Connector GET request: %s, timeout  %.0f sec", url, timeout.Seconds())
-	svc.HTTPClient.Timeout = timeout
+func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, httpClient *http.Client) ([]byte, *RequestError) {
+	log.Printf("ILS Connector GET request: %s, timeout  %.0f sec", url, httpClient.Timeout.Seconds())
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
 
 	startTime := time.Now()
-	rawResp, rawErr := svc.HTTPClient.Do(req)
+	rawResp, rawErr := httpClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -457,8 +458,6 @@ func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, timeout time.
 // ILSConnectorPost sends a POST to the ILS connector and returns results
 func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector POST request: %s", url)
-	timeout := time.Duration(20 * time.Second)
-	svc.HTTPClient.Timeout = timeout
 	startTime := time.Now()
 	b, _ := json.Marshal(values)
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
@@ -481,8 +480,6 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt 
 // ILSConnectorDelete sends a DELETE request to the ILS connector and returns the response
 func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *RequestError) {
 	log.Printf("ILS Connector DELETE request: %s", url)
-	timeout := time.Duration(20 * time.Second)
-	svc.HTTPClient.Timeout = timeout
 	req, _ := http.NewRequest("DELETE", url, nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
 
@@ -505,10 +502,8 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 func (svc *ServiceContext) SolrGet(query string) ([]byte, *RequestError) {
 	url := fmt.Sprintf("%s/%s/%s", svc.Solr.URL, svc.Solr.Core, query)
 	log.Printf("Solr GET request: %s", url)
-	timeout := time.Duration(5 * time.Second)
-	svc.HTTPClient.Timeout = timeout
 	startTime := time.Now()
-	rawResp, rawErr := svc.HTTPClient.Get(url)
+	rawResp, rawErr := svc.FastHTTPClient.Get(url)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
@@ -541,10 +536,8 @@ func (svc *ServiceContext) SolrPost(query string, jsonReq interface{}) ([]byte, 
 	req.Header.Set("Content-Type", "application/json")
 
 	log.Printf("Solr POST request: %s", url)
-	timeout := time.Duration(5 * time.Second)
-	svc.HTTPClient.Timeout = timeout
 	startTime := time.Now()
-	rawResp, rawErr := svc.HTTPClient.Do(req)
+	rawResp, rawErr := svc.FastHTTPClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)

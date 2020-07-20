@@ -7,7 +7,7 @@
             <V4Spinner message="Looking up requests..." />
          </div>
          <div class="details">
-            <template v-if="requests.holds.length > 0">
+            <template v-if="lookingUp == false && requests.holds.length > 0">
                <AccordionContent
                      class="requests-accordion"
                      background="var(--uvalib-blue-alt-lightest)"
@@ -52,7 +52,7 @@
                </AccordionContent>
             </template>
 
-            <template v-if="illLoans.length > 0">
+            <template v-if="lookingUp == false && illLoans.length > 0">
                <AccordionContent
                      class="requests-accordion"
                      background="var(--uvalib-blue-alt-lightest)"

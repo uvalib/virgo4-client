@@ -168,7 +168,7 @@ func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get bills for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/bills", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 20*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -216,7 +216,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 
 	// Get all of the user checkouts after the renew so dates/status are updated
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 30*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -242,7 +242,7 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 30*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -262,7 +262,7 @@ func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get holds for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/holds", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 20*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -286,7 +286,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	log.Printf("Get info for user %s with ILS Connector...", userID)
 
 	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), 20*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -317,7 +317,6 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	if illErr != nil {
 		log.Printf("WARN: unable to get leo address info: %s", illErr.Message)
 	} else {
-		log.Printf("**** LEO LOCATION: %s", respBytes)
 		var resp map[string]interface{}
 		if err := json.Unmarshal(respBytes, &resp); err != nil {
 			log.Printf("ERROR: unable to parse ILLIAD user response: %s", err.Error())

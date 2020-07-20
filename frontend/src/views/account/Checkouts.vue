@@ -14,7 +14,7 @@
                Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
                If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
             </div>
-            <template v-if="checkouts.length > 0">
+            <template v-if="lookingUpUVA == false && checkouts.length > 0">
                <AccordionContent
                   class="checkout-accordion"
                   background="var(--uvalib-blue-alt-lightest)"
@@ -60,7 +60,7 @@
             <div v-if="lookingUpUVA == false && checkouts.length == 0" class="none">
                You have no UVA checkouts.
             </div>
-            <template v-if="illiadCheckouts.length > 0">
+            <template v-if="lookingUpILL == false && illiadCheckouts.length > 0">
                <AccordionContent
                   class="checkout-accordion"
                   background="var(--uvalib-blue-alt-lightest)"

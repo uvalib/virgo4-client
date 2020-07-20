@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -231,7 +230,7 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 func (svc *ServiceContext) getAvailabity(reqItem *RequestItem, jwt string) {
 	reqItem.Availability = make([]AvailabilityInfo, 0)
 	availabilityURL := fmt.Sprintf("%s/v4/availability/%s", svc.ILSAPI, reqItem.CatalogKey)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, jwt, 20*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(availabilityURL, jwt, svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("WARN: Unable to get availabilty info for reserve %s: %s", reqItem.CatalogKey, ilsErr.Message)
 		return
@@ -278,7 +277,7 @@ func (svc *ServiceContext) SearchReserves(c *gin.Context) {
 	if desk != "" {
 		url += fmt.Sprintf("&desk=%s", desk)
 	}
-	bodyBytes, ilsErr := svc.ILSConnectorGet(url, c.GetString("jwt"), 20*time.Second)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(url, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
