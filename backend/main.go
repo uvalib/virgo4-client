@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
@@ -109,5 +110,6 @@ func main() {
 
 	portStr := fmt.Sprintf(":%d", cfg.Port)
 	log.Printf("Start service v%s on port %s", version, portStr)
+	pprof.Register(router)
 	log.Fatal(router.Run(portStr))
 }
