@@ -24,7 +24,16 @@
                >
                   <template v-slot:title><span class="section-title">UVA Checkouts</span></template>
                   <div class="checkout-list">
-                     <div class="renew-all" v-if="!isBarred">
+                     <div class="controls">
+                        <span class="sort">
+                           <label>Sort by</label>
+                           <select :value="checkoutsOrder" @change="sortChanged" ref="uvasort"> 
+                              <option value="AUTHOR_ASC">Author (Ascending)</option>
+                              <option value="AUTHOR_DESC">Author (Decending)</option>
+                              <option value="TITLE_ASC">Title (Ascending)</option>
+                              <option value="TITLE_DESC">Title (Decending)</option>
+                           </select>
+                        </span>
                         <V4Button v-if="!isBarred" id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
                      </div>
                      <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
@@ -113,6 +122,7 @@ export default {
    computed: {
       ...mapState({
          checkouts: state => state.user.checkouts,
+         checkoutsOrder: state => state.user.checkoutsOrder,
          requests: state => state.user.requests,
       }),
       ...mapGetters({
@@ -124,6 +134,9 @@ export default {
       }
    },
    methods: {
+      sortChanged() {
+         this.$store.commit("user/sortCheckouts", this.$refs.uvasort.value)
+      },
       renewItem(barcode) {
          this.$store.dispatch("user/renewItem", barcode)
       },
@@ -213,11 +226,25 @@ export default {
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey-light);
 
-   .renew-all {
+   .controls{
       margin: 0;
       text-align: right;
-      padding: 15px 15px 0px 0;
+      padding: 5px 5px 5px 10px;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: center;
+      border-bottom: 3px solid var(--uvalib-blue-alt);
+      background: white;
 
+      label {
+         font-weight: 500;
+         margin-right: 10px;
+      }
+
+      #renew-all-btn {
+         margin-left: auto !important;
+      }
       .v4-button {
          margin: 0!important;
       }

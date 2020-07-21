@@ -23,6 +23,7 @@ const user = {
       accountInfo: {},
       claims: {},
       checkouts: [],
+      checkoutsOrder: "AUTHOR_ASC",
       bills: [],
       requests: {illiad: [], holds: []},
       lookingUp: false,
@@ -114,6 +115,34 @@ const user = {
       },
       setCheckouts(state, co) {
          state.checkouts = co
+      },
+      sortCheckouts(state, order) {
+         state.checkoutsOrder = order
+         state.checkouts.sort( (a,b) => {
+            let keyA = a.author.toUpperCase()
+            let keyB = b.author.toUpperCase()
+            if (order.includes("TITLE")) {
+               keyA = a.title.toUpperCase()
+               keyB = b.title.toUpperCase()
+            }
+            if (order.includes("ASC")) {
+               if (keyA < keyB) {
+                  return -1
+               }
+               if (keyA > keyB) {
+                  return 1
+               }
+               return 0
+            } else {
+               if (keyA < keyB) {
+                  return 1
+               }
+               if (keyA > keyB) {
+                  return -1
+               }
+               return 0
+            }
+         })
       },
       setRequests(state, reqs) {
          state.requests = reqs
@@ -296,6 +325,7 @@ const user = {
          })
          return axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
+            ctx.commit('sortCheckouts', "AUTHOR_ASC")
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
