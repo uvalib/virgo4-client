@@ -26,6 +26,13 @@
                </label>
                <input v-model="email" type="email" name="email" />
             </div>
+            <div class="pure-control-group">
+               <label for="url">
+                  Relevant URL
+                  <span v-if="hasError('url')" class="error">Please include the URL for the relevant page</span>
+               </label>
+               <input v-model="url" name="url" />
+            </div>
          </div>
 
          <div class="action-group">
@@ -56,7 +63,7 @@ export default {
          status: state => state.feedback.status
       }),
       ...mapFields("feedback", [
-         "wantedTo", "explanation", "email"
+         "wantedTo", "explanation", "email", "url"
       ])
    },
    methods: {
@@ -84,7 +91,7 @@ export default {
             } else {
                clearInterval(scrollInterval)
             }
-         },10)  
+         },10)
       },
       validate() {
          this.errors.splice(0, this.errors.length)
@@ -97,9 +104,9 @@ export default {
          if (this.email == ""  ) {
             this.errors.push("email")
          }
-         
+
          if ( this.errors.length > 0) {
-            this.$store.commit("system/setError", "Required fields are missing or invalid. Please correct the errors and try again.")  
+            this.$store.commit("system/setError", "Required fields are missing or invalid. Please correct the errors and try again.")
             this.scrollTop()
             return false
          }
@@ -107,13 +114,18 @@ export default {
          var re = /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
          var invalidEmail = !re.test(this.email)
          if (invalidEmail) {
-            this.$store.commit("system/setError", "Please enter a valid email")  
+            this.$store.commit("system/setError", "Please enter a valid email")
             this.errors.push("email")
             return false
-         } 
+         }
          return true
       }
    },
+   beforeRouteEnter(_to, from, next) {
+        next((vm) => {
+            vm.url = document.location.origin + from.fullPath;
+        });
+    },
    mounted() {
       this.$store.commit("feedback/clearFeedback")
       var userId = this.$store.state.user.signedInUser
@@ -145,9 +157,6 @@ export default {
       width: 95%;
    }
 }
-.feedback-form {
-   text-align: left;
-}
 span.alt-color-dark {
    color: var(--color-link-darker);
    font-weight: 500;
@@ -166,7 +175,7 @@ h2 {
    text-align: right;
    margin: 15px 0 30px 0;
 }
-textarea, input[type=email] {
+textarea, input {
    box-sizing: content-box;
    width: 100%;
 }

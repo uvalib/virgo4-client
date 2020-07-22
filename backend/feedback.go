@@ -20,6 +20,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		Email       string `json:"email" binding:"required" `
 		WantedTo    string `json:"wantedTo"  binding:"required"`
 		Explanation string `json:"explanation"  binding:"required"`
+		URL         string `json:"url" binding:"required"`
 	}
 
 	var request FeedbackRequest
@@ -42,7 +43,10 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 	}
 
 	log.Printf("Generate SMTP message")
-	to := []string{svc.FeedbackEmail, request.Email}
+	to := []string{svc.FeedbackEmail}
+	if strings.HasSuffix(request.Email, "virginia.edu") {
+		to = append(to, request.Email)
+	}
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
 	subject := "Subject: Virgo 4 Feedback\n"
 	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
@@ -54,7 +58,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		log.Printf("%s", msg)
 		log.Printf("==================================================")
 	} else {
-		log.Printf("Sending reserve email to %s", strings.Join(to, ","))
+		log.Printf("Sending feedback email to %s", strings.Join(to, ","))
 		var err error
 		if svc.SMTP.Pass != "" {
 			auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
@@ -64,12 +68,11 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 			err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, svc.SMTP.Sender, to, msg)
 		}
 		if err != nil {
-			log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
+			log.Printf("ERROR: Unable to send feedback email: %s", err.Error())
 			c.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 	}
 
 	c.String(http.StatusOK, "Feedback email sent")
-
 }
