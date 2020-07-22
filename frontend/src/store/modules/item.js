@@ -236,7 +236,7 @@ const item = {
               exclude_pool: [],
             }
          }
-         let url = ctx.rootState.system.searchAPI + "/api/search?intuit=1&debug=1"
+         let url = ctx.rootState.system.searchAPI + "/api/search"
          return axios.post(url, req).then((response) => {
             if (response.data.total_hits == 0 ) {
                //ctx.commit('clearSearching')

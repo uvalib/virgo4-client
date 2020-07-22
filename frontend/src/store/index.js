@@ -270,7 +270,7 @@ export default new Vuex.Store({
       }
 
       commit('setSearching', true)
-      let url = state.system.searchAPI + "/api/search?intuit=1"
+      let url = state.system.searchAPI + "/api/search"
       try {
         let response = await axios.post(url, req)
          // If a user is signed in, make sure bookmarks are up to date when
@@ -324,7 +324,7 @@ export default new Vuex.Store({
         sort: tgtResults.sort,
         filters: [filterObj]
       }
-      let url = tgtResults.pool.url + "/api/search?debug=1"
+      let url = tgtResults.pool.url + "/api/search"
       try {
         let response = await axios.post(url, req)
         commit('addPoolSearchResults', response.data)
