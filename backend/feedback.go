@@ -54,7 +54,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		log.Printf("%s", msg)
 		log.Printf("==================================================")
 	} else {
-		log.Printf("Sending reserve email to %s", strings.Join(to, ","))
+		log.Printf("Sending feedback email to %s", strings.Join(to, ","))
 		var err error
 		if svc.SMTP.Pass != "" {
 			auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
@@ -64,12 +64,11 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 			err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, svc.SMTP.Sender, to, msg)
 		}
 		if err != nil {
-			log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
+			log.Printf("ERROR: Unable to send feedback email: %s", err.Error())
 			c.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 	}
 
 	c.String(http.StatusOK, "Feedback email sent")
-
 }
