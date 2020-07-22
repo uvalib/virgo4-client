@@ -81,7 +81,6 @@ func (u *V4User) GetBookmarks(db *dbx.DB) {
 			newFolder.Bookmarks = make([]*Bookmark, 0)
 			u.Bookmarks = append(u.Bookmarks, &newFolder)
 			tgtFolder = &newFolder
-			log.Printf("New Folder %+v", newFolder)
 		}
 
 		if raw.Identifier != "" {

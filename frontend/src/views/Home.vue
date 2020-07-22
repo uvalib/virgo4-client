@@ -251,14 +251,10 @@ export default {
             this.showAddBookmark(bmTarget)
             this.$store.commit("restore/clear")
          } else if ( this.restoreSaveSearch ) {
-            console.log("RESTORE SEARCH")
             let saveBtn = document.getElementById("save-modal-open")
             if (saveBtn) {
                saveBtn.focus()
                saveBtn.click()
-            }   else {
-
-               console.log("NO BTN")
             }
          }
       },
