@@ -126,7 +126,8 @@ const item = {
       },
 
       getDigitalContentURLs(ctx) {
-         let dcField = ctx.state.details.basicFields.find( f=>f.name=="digital_content_url")
+         let allFields = ctx.state.details.basicFields.concat(ctx.state.details.detailFields)
+         let dcField = allFields.find( f=>f.name=="digital_content_url")
          if (!dcField) return
 
          axios.get(dcField.value).then((response) => {
