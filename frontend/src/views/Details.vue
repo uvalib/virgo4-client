@@ -60,7 +60,6 @@
                      <dt class="label">Download PDF:</dt>
                      <dd class="value">
                         <template v-for="(dc,idx) in pdfs">
-                           <span class="sep" v-if="idx>0" :key="`pdfsep${idx}`">|</span>
                            <a v-if="dc.status=='READY'" :href="dc.url" :key="`pdf${idx}`"
                               :aria-label="`download pdf for ${dc.name}`"
                            >
