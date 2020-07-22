@@ -10,6 +10,10 @@ const query = {
       basicSearchScope: { name: 'All Resource Types', id: 'all' },
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
+         { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
+         { op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" },
+         { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
+         { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" },
       ],
       browse: 
          { op: "AND", value: "", field: "", comparison: "EQUAL", endVal: "" },
@@ -269,7 +273,12 @@ const query = {
          state.basic = ""
          state.basicSearchScope = { name: 'All Resource Types', id: 'all' },
          state.advanced = [
-            { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" }]
+            { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
+            { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
+            { op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" },
+            { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
+            { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" }
+         ]
          state.browse = [
             { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" }]
       },

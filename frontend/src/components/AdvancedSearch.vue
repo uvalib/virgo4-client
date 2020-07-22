@@ -68,7 +68,10 @@
             </div>
          </div>
          <div class="criteria-control">
-            <V4Button mode="primary" @click="addClicked">Add Criteria</V4Button>
+            <V4Button mode="icon" id="add-criteria" @click="addClicked">
+                <i class="fas fa-plus-circle"></i>
+                <span class="btn-label">Add criteria</span>
+            </V4Button>
          </div>
       </div>
       <div class="pools-wrapper">
@@ -241,9 +244,9 @@ export default {
    },
    created() {
       setTimeout( () => {
-         let out = document.querySelectorAll(".field:last-of-type")
+         let out = document.getElementsByClassName("term")
          if (out.length > 0) {
-            out[out.length-1].focus()
+            out[0].focus()
          }
       }, 250)
    }
@@ -265,10 +268,9 @@ h2 {
    margin: 0 5px;
 }
 div.pools-wrapper {
-   border-top: 2px solid var(--uvalib-grey-light);
-   border-bottom: 2px solid var(--uvalib-grey-light);
    margin: 15px 0 10px 0;
    padding: 10px 0;
+    border-bottom: 1px solid var(--uvalib-grey-light);
 }
 div.pools {
    text-align: left;
@@ -289,11 +291,30 @@ div.pools {
 .v4-checkbox.pool >>> label {
    margin:0;
 }
+
 div.criteria-control {
-   text-align: right;
+   display: flex;
+   flex-flow: row;
+   justify-content: center;
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   padding-bottom: 10px;
+   #add-criteria {
+      color: var(--uvalib-blue-alt);
+      font-size: 1.6em;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      .btn-label {
+         margin-left: 5px;
+         font-size: 0.7em;
+         color: var(--uvalib-text);
+      }
+   }
 }
+
 div.criteria {
    text-align: left;
+   position: relative;
 }
 div.options {
    flex-flow: row nowrap;
@@ -334,12 +355,11 @@ div.query {
    margin-right: 5px;
 }
 div.search-term {
-   border: 1px solid #ccc;
+   border: 1px solid var(--uvalib-grey-light);
    padding: 10px;
-   margin: 10px 0 10px 0;
-   border-radius: 3px;
+   margin: 10px 0;
+   box-shadow: $v4-box-shadow-light;
    background-color: #f5f5f5;
-   font-size: 0.9em;
 }
 .date-hint {
    font-size:0.95em;
