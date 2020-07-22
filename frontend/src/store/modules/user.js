@@ -31,6 +31,7 @@ const user = {
       authMessage: "",
       lockedOut: false,
       parsedJWT: {},
+      authExpiresSec: 0
    },
 
    getters: {
@@ -194,6 +195,12 @@ const user = {
          state.sessionType =  parsed.authMethod
          state.role =  parsed.role
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
+         localStorage.setItem("v4_jwt", jwtStr)
+
+         // set a timeout to refresh the token 30secs before it expires (or right now if it is expired)
+         let nowSecs = Math.round((new Date()).getTime() / 1000)
+         state.authExpiresSec = parsed.exp - nowSecs 
+
       },
       setAccountInfo(state, data) {
          state.accountInfo = data.user
@@ -204,13 +211,14 @@ const user = {
          state.sessionType = ""
          state.accountInfo = {}
          state.authTriesLeft = 5
+         state.authExpiresSec = 0
          state.authMessage = ""
          state.role = ""
          state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
          state.bills.splice(0, state.bills.length)
-         Vue.$cookies.remove("v4_jwt")
          Vue.$cookies.remove("v4_optout")
+         localStorage.removeItem("v4_jwt")
       },
       setBills(state, bills) {
          state.bills = bills
@@ -228,6 +236,19 @@ const user = {
           ctx.commit('system/setFatal', "Authorization failed: " + error.response.data, { root: true })
           ctx.commit('setAuthorizing', false)
         })
+      },
+
+      refreshAuth(ctx) {
+         axios.post("/api/reauth", null).then((response) => {
+            ctx.commit("setUserJWT", response.data )
+            let interval = ctx.state.authExpiresSec - 15 
+            setTimeout( () => {
+               ctx.dispatch("refreshAuth")
+            }, interval*1000)
+         }).catch((_error) => {
+            ctx.commit('system/setSessionExpired', null, { root: true })
+            ctx.commit('clear')
+          })
       },
 
       overrideClaims(ctx) {
@@ -346,16 +367,26 @@ const user = {
           })
       },
 
-      async signout(ctx) {
-         ctx.commit('clear')
-         ctx.commit('resetSearchResults', null, { root: true })
-         ctx.commit('bookmarks/clear', null, { root: true })
-         ctx.commit('preferences/clear', null, { root: true })
-         ctx.commit('searches/clear', null, { root: true })
-         ctx.commit('query/clear', null, { root: true })
-         ctx.commit('filters/reset', null, { root: true })
-         await ctx.dispatch('getAuthToken')
-         router.push("/signedout")
+      async signout(ctx, redirectPath) {
+         if ( ctx.state.signedInUser == "") return
+
+         try {
+            await axios.post("/signout", null)
+            ctx.commit('clear')
+            ctx.commit('resetSearchResults', null, { root: true })
+            ctx.commit('bookmarks/clear', null, { root: true })
+            ctx.commit('preferences/clear', null, { root: true })
+            ctx.commit('searches/clear', null, { root: true })
+            ctx.commit('query/clear', null, { root: true })
+            ctx.commit('filters/reset', null, { root: true })
+            await ctx.dispatch('getAuthToken')
+         } catch (e) {
+            console.error("Signout failed: "+e)
+         }
+
+         if (router.currentRoute.path != redirectPath) {
+            router.push(redirectPath)
+         }
       },
 
       signin(ctx, data) {
@@ -366,6 +397,10 @@ const user = {
             ctx.commit('setAuthorizing', false)
             ctx.commit('restore/load', null, { root: true })
             ctx.dispatch("getCheckouts") // needed so the alert icon can show in menubar
+            let to = ctx.state.authExpiresSec - 15 
+            setTimeout( () => {
+               ctx.dispatch("refreshAuth")
+            }, to*1000)
             router.push( ctx.rootState.restore.url )
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)

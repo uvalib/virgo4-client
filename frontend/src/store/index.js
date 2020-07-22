@@ -269,16 +269,15 @@ export default new Vuex.Store({
         })
       }
 
-      // If a user is signed in, make sure bookmarks are up to date when
-      // searching so the UI can show the correct status per item
-      if ( rootGetters["user/isSignedIn"]) {
-        dispatch("bookmarks/getBookmarks")
-      }
-
       commit('setSearching', true)
       let url = state.system.searchAPI + "/api/search?intuit=1"
       try {
         let response = await axios.post(url, req)
+         // If a user is signed in, make sure bookmarks are up to date when
+         // searching so the UI can show the correct status per item
+         if ( rootGetters["user/isSignedIn"]) {
+            dispatch("bookmarks/getBookmarks")
+         }
         commit('pools/setPools', response.data.pools)
         commit('filters/initialize', response.data.pools.length)
         commit('setSearchResults', response.data)
@@ -289,11 +288,16 @@ export default new Vuex.Store({
         return dispatch("filters/getSelectedResultFacets")
       } catch (error) {
          console.error("SEARCH FAILED: "+error)
-         let msg = "System error, we regret the inconvenience. If this problem persists, "
-         msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-         commit('system/setError', msg)
          commit('setSearching', false)
          commit('filters/setUpdatingFacets', false)
+         if ( error.response && error.response.status == 401) {
+            commit('system/setSessionExpired', null, { root: true })
+            dispatch("user/signout", "/", { root: true })
+         } else {
+            let msg = "System error, we regret the inconvenience. If this problem persists, "
+            msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+            commit('system/setError', msg)
+         }
       }
     },
 
@@ -330,12 +334,17 @@ export default new Vuex.Store({
         }
         return dispatch("filters/getSelectedResultFacets")
       } catch(error) { 
-         console.error("SEARCH FAILED: "+error)
-         let msg = "System error, we regret the inconvenience. If this problem persists, "
-         msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-         commit('system/setError', msg)
+         console.error("SINGLE POOL SEARCH FAILED: "+error)
          commit('setSearching', false)
          commit('filters/setUpdatingFacets', false)
+         if ( error.response && error.response.status == 401) {
+            commit('system/setSessionExpired', null, { root: true })
+            dispatch("user/signout", "/", { root: true })
+         } else {
+            let msg = "System error, we regret the inconvenience. If this problem persists, "
+            msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+            commit('system/setError', msg)
+         }
       }
     },
 

@@ -292,7 +292,7 @@ export default {
          },100)
       },
       signOut() {
-         this.$store.dispatch("user/signout")
+         this.$store.dispatch("user/signout", "/signedout")
       },
       beforeEnter: function(el) {
          el.style.height = '0'

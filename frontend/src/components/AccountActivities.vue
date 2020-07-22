@@ -22,7 +22,7 @@
 export default {
    methods: {
       signOut() {
-         this.$store.dispatch("user/signout")
+         this.$store.dispatch("user/signout", "/signedout")
       },
    },
 }

@@ -80,7 +80,12 @@ const searches = {
             let searchURL = router.currentRoute.fullPath
             let userID = ctx.rootState.user.signedInUser
             let req = {url: searchURL, history: true}
-            axios.post(`/api/users/${userID}/searches`, req)
+            try {
+               axios.post(`/api/users/${userID}/searches`, req)
+            } catch (e) {
+               console.error("Unable to save search history: "+e)
+               // NO-OP, no history will be saved
+            }
          }
       },
 

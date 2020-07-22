@@ -41,6 +41,7 @@ func main() {
 	router.GET("/healthcheck", svc.HealthCheck)
 	router.GET("/config", svc.GetConfig)
 	router.POST("/authorize", svc.Authorize)
+	router.POST("/signout", svc.SignOut)
 
 	api := router.Group("/api")
 	{
@@ -86,11 +87,14 @@ func main() {
 		api.GET("/reserves/search", svc.AuthMiddleware, svc.SearchReserves)
 		api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
 
+		api.POST("/reauth", svc.RefreshAuthentication)
+
 		admin := api.Group("/admin")
 		{
 			admin.POST("/claims", svc.AuthMiddleware, svc.SetAdminClaims)
 		}
 	}
+
 	auth := router.Group("/authenticate")
 	{
 		auth.GET("/netbadge", svc.NetbadgeAuthentication)

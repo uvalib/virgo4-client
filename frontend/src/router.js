@@ -119,8 +119,15 @@ const router = new Router({
          // setup and redirects to account page
          path: '/signedin',
          beforeEnter: (_to, _from, next) => {
-            ensureSignedIn()
+            // Grab the cookie and stuff in local storage. Cookie is short lived
+            let jwtStr = Vue.$cookies.get("v4_jwt")
+            store.commit("user/setUserJWT", jwtStr)
+            store.dispatch("user/getCheckouts") // needed so the alert icon can show in menubar
             store.commit('restore/load')
+            let to = store.state.user.authExpiresSec - 15 
+            setTimeout( () => {
+               store.dispatch("user/refreshAuth")
+            }, to*1000)
             next( store.state.restore.url )
          }
       },
@@ -208,8 +215,7 @@ router.beforeEach((to, _from, next) => {
          next()
       } else {
          store.commit('system/setSessionExpired')
-         store.dispatch("user/signout")
-         next("/")
+         store.dispatch("user/signout", "/")
       }
       return
    }
@@ -219,34 +225,38 @@ router.beforeEach((to, _from, next) => {
 })
 
 function ensureSignedIn() {
-   let jwtStr = Vue.$cookies.get("v4_jwt")
+   if ( store.getters["user/isSignedIn"]) {
+      return true
+   }
+   return restoreSessionFromLocalStorage()  
+}
+
+function restoreSessionFromLocalStorage() {
+   let jwtStr = localStorage.getItem('v4_jwt')
    if (jwtStr) {
       store.commit("user/setUserJWT", jwtStr)
-      store.dispatch("user/getCheckouts") // needed so the alert icon can show in menubar
+      let to = store.state.user.authExpiresSec - 15 
+      if (to > 0) {
+         setTimeout( () => {
+            store.dispatch("user/refreshAuth")
+         }, to*1000)
+      } else {
+         store.dispatch("user/refreshAuth")   
+      }
       return true
    } 
    return false
 }
 
 async function ensureAuthTokenPresent(next) {
-   let getters = store.getters
-   if (getters["user/hasAuthToken"]) {
+   if (store.getters["user/hasAuthToken"] || store.getters["user/isSignedIn"]) {
       next()
-      return
-   }
-
-   // see if there is an auth user cookie set from which we can retrieve
-   // the auth token and logged in user info....
-   let jwtStr = Vue.$cookies.get("v4_jwt")
-   if (jwtStr) {
-      store.commit("user/setUserJWT", jwtStr)
+   } else  if ( restoreSessionFromLocalStorage() ) {
       next()
-      return
+   } else {
+      await store.dispatch("user/getAuthToken")
+      next()
    }
-
-   // No token. Request one and WAIT FOR RESPONSE before calling next()
-   await store.dispatch("user/getAuthToken")
-   next()
 }
 
 export default router

@@ -91,12 +91,16 @@ const system = {
          }
          if (error.response) {
             // Server responded with a status code out of the range of 2xx
+            // If this is a 401, a session has expired when making a request. 
             if (error.response.status == 401) {
-               // If this is a 401, a session has expired when making a request. 
                state.error = ""
-               state.sessionExpired = true
-               setTimeout(() => {  state.sessionExpired=false }, 15000) 
-               router.push("/")
+               if (state.sessionExpired == false) {
+                  state.sessionExpired = true
+                  // NOTE: cant dispatch a signout here, so there is a plugin (expired.js) installed.
+                  // It looks for setError with a 401 and does the signout
+                  setTimeout(() => {  state.sessionExpired=false }, 15000) 
+                  router.push("/")
+               }
             } else {
                state.error = error.response.data
             }

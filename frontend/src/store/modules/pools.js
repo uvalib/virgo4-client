@@ -156,13 +156,13 @@ const pools = {
             let response = await axios.get(url)
             ctx.commit('setPools', response.data)
             ctx.commit("setLookingUp", false)
-
+            
             ctx.state.list.forEach( async p => {
                try {
                   let response = await axios.get(p.url+"/api/providers")
                   ctx.commit('setPoolProviders', {pool: p.id, providers: response.data.providers})
-               } catch (_e) {
-                  // NO-OP; this is fine as some pools don't implement providers
+               } catch (e) {
+                  console.error(`Unable to get providers for ${p.id}: ${e}`)
                }
             })
          } catch (error)  {

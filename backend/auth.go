@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
+	"github.com/rs/xid"
 	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
@@ -18,7 +19,7 @@ import (
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
-	signedStr, err := v4jwt.Mint(guestClaim, 9*time.Hour, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(guestClaim, 24*time.Hour, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		c.String(http.StatusInternalServerError, "unable to generate authorization")
@@ -68,14 +69,14 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	}
 
 	log.Printf("Generate JWT for %s", computingID)
-	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.Netbadge, role)
+	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.Netbadge, role)
 	if jwtErr != nil {
 		c.Redirect(http.StatusFound, "/forbidden")
 		return
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 10, "/", "", false, false)
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.Redirect(http.StatusFound, "/signedin")
 }
@@ -178,7 +179,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	resp.SignedIn = true
 
 	log.Printf("Generate JWT for %s", auth.Barcode)
-	signedStr, jwtErr := svc.generateJWT(v4User, v4jwt.PIN, v4jwt.User)
+	signedStr, jwtErr := svc.generateJWT(c, v4User, v4jwt.PIN, v4jwt.User)
 	if jwtErr != nil {
 		resp.Message = jwtErr.Error()
 		c.JSON(http.StatusForbidden, resp)
@@ -186,9 +187,47 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	// Set auth info in a cookie the client can read and pass along in future requests
-	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 10, "/", "", false, false)
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.JSON(http.StatusOK, resp)
+}
+
+// RefreshAuthentication will use the long-lived refresh token for a user to generate a short-lived
+// auth token, then regenerate the lon-lived token
+func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
+	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		log.Printf("Authentication failed: [%s]", err.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	refreshToken, err := c.Cookie("v4_refresh")
+	if err != nil {
+		log.Printf("ERROR: v4_refresh cookie not found %s", err.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
+	if err != nil {
+		log.Printf("Unable to refresh JWT: %s", err.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	v4Claims, _ := v4jwt.Validate(refreshed, svc.JWTKey)
+
+	log.Printf("Regenerate long-lived refresh token for %s", v4Claims.UserID)
+	refreshToken = xid.New().String()
+	c.SetCookie("v4_refresh", refreshToken, 60*60*24*7, "/", "", false, true)
+
+	c.String(http.StatusOK, refreshed)
+}
+
+// SignOut ends a user session and removes the refresh token
+func (svc *ServiceContext) SignOut(c *gin.Context) {
+	c.SetCookie("v4_refresh", "invalid", -1, "/", "", false, true)
+	c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 }
 
 // SetAdminClaims sets claims and regenerates the auth token
@@ -223,14 +262,14 @@ func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
 
 	err = json.Unmarshal(claimBytes, &v4Claims)
 
-	signedStr, err := v4jwt.Mint(v4Claims, 9*time.Hour, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		c.JSON(http.StatusBadRequest, "Invalid Claims")
 		return
 	}
 
-	c.SetCookie("v4_jwt", signedStr, 3600*9, "/", "", false, false)
+	c.SetCookie("v4_jwt", signedStr, 10, "/", "", false, false)
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.String(http.StatusOK, "Success")
 }
@@ -262,14 +301,12 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("Authentication failed: [%s]", err.Error())
-		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	if tokenStr == "undefined" {
 		log.Printf("Authentication failed; bearer token is undefined")
-		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -278,7 +315,6 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
 	if jwtErr != nil {
 		log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
-		c.SetCookie("v4_jwt", "invalid", -1, "/", "", false, false)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -289,7 +325,7 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claims)
 }
 
-func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
+func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
 	v4Claims := v4jwt.V4Claims{
 		UserID:     v4User.Virgo4ID,
 		AuthMethod: authMethod,
@@ -298,7 +334,7 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum
 	}
 
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
-	guestJWT, _ := v4jwt.Mint(guestClaim, 9*time.Hour, svc.JWTKey)
+	guestJWT, _ := v4jwt.Mint(guestClaim, 1*time.Minute, svc.JWTKey)
 
 	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
 	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, v4User.Virgo4ID)
@@ -322,11 +358,15 @@ func (svc *ServiceContext) generateJWT(v4User *V4User, authMethod v4jwt.AuthEnum
 	v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	signedStr, err := v4jwt.Mint(v4Claims, 9*time.Hour, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
 	}
+
+	log.Printf("Create long-lived refresh token for %s", v4User.Virgo4ID)
+	refreshToken := xid.New().String()
+	c.SetCookie("v4_refresh", refreshToken, 60*60*24*7, "/", "", false, true)
 
 	return signedStr, nil
 }
