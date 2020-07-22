@@ -157,7 +157,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	if string(bodyBytes) != "valid" {
 		// The in verification failed. If this has happened 5 times in a
 		// minute, lock out the account for one hour
-		log.Printf("ERROR: pin for %s falied authentication", auth.Barcode)
+		log.Printf("ERROR: pin for %s failed authentication", auth.Barcode)
 		if v4User.AuthTries >= 5 {
 			log.Printf("User %s account is now locked out for 1 hour", v4User.Virgo4ID)
 			resp.Message = "Authentication failed. Your account is now locked for one hour."
