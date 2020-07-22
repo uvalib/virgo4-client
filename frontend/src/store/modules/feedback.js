@@ -7,6 +7,7 @@ const feedback = {
       email: "",
       wantedTo: "",
       explanation: "",
+      url: "",
       status: "pending",
    },
    getters: {
@@ -19,24 +20,29 @@ const feedback = {
          state.email = ""
          state.wantedTo = ""
          state.explanation = ""
+         state.url = ""
          state.status="pending"
       },
       setSubmitting(state) {
-         state.status="submit"    
+         state.status="submit"
       },
       setSubmitSuccess(state) {
          state.status="success"
       },
       setSubmitFail(state) {
-         state.status="fail"   
+         state.status="fail"
       }
    },
    actions: {
       submitFeedback(ctx) {
          ctx.commit("setSubmitting")
          let v4UserID = ctx.rootState.user.signedInUser
-         let data = { userID: v4UserID, email: ctx.state.email,   
-            wantedTo: ctx.state.wantedTo,  explanation: ctx.state.explanation}
+         let data = { userID: v4UserID,
+            email: ctx.state.email,
+            wantedTo: ctx.state.wantedTo,
+            explanation: ctx.state.explanation,
+            url: ctx.state.url
+         }
          return axios.post('/api/feedback', data).then((_response) => {
             ctx.commit("setSubmitSuccess")
          }).catch((_error) => {

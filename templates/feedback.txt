@@ -11,4 +11,7 @@ First, explain what you wanted to do:
 How did it go?:
 {{.Explanation}}
 
+URL:
+{{.URL}}
+
 ---------------------------------------

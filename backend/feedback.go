@@ -20,6 +20,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		Email       string `json:"email" binding:"required" `
 		WantedTo    string `json:"wantedTo"  binding:"required"`
 		Explanation string `json:"explanation"  binding:"required"`
+		URL         string `json:"url" binding:"required"`
 	}
 
 	var request FeedbackRequest
@@ -42,7 +43,10 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 	}
 
 	log.Printf("Generate SMTP message")
-	to := []string{svc.FeedbackEmail, request.Email}
+	to := []string{svc.FeedbackEmail}
+	if strings.HasSuffix(request.Email, "virginia.edu") {
+		to = append(to, request.Email)
+	}
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
 	subject := "Subject: Virgo 4 Feedback\n"
 	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
