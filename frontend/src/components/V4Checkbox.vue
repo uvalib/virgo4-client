@@ -1,5 +1,8 @@
 <template>
-   <div tabindex="0" role="checkbox" class="v4-checkbox" :class="{inline: !hasLabelSlot()}" :aria-checked="isChecked"
+   <div tabindex="0" role="checkbox" class="v4-checkbox" 
+      :class="{inline: !hasLabelSlot(), disabled: disabled}" 
+      :aria-checked="isChecked"
+      :aria-disabled="disabled" 
       @click.stop="clicked" @keyup.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <i class="box" :class="checkClass"></i>
       <label v-if="hasLabelSlot()">
@@ -21,6 +24,10 @@ export default {
          type: Boolean,
          default: false
       },
+      disabled: {
+         type: Boolean, 
+         default: false
+      }
    },
    computed: {
       checkClass() {
@@ -42,6 +49,10 @@ export default {
          return !(typeof this.$slots.default === 'undefined')
       },
       clicked() {
+         if ( this.disabled) {
+            return
+         }
+
          if ( this.value != null ) {
             let state = !this.value
             this.$emit('input', state)
@@ -80,6 +91,13 @@ div.v4-checkbox {
    }
    &:focus {
       @include be-accessible();
+   }
+}
+div.v4-checkbox.disabled {
+   opacity: 0.6;
+   cursor: default;
+   label {
+      cursor: default;
    }
 }
 </style>
