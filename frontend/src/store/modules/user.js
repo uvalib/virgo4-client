@@ -239,6 +239,11 @@ const user = {
       },
 
       refreshAuth(ctx) {
+         // if the user has signed out already, don't refresh
+         if (ctx.state.signedInUser == "" ||  ctx.state.sessionType == "" || ctx.state.sessionType == "none" ) {
+            return
+         }
+
          axios.post("/api/reauth", null).then((response) => {
             ctx.commit("setUserJWT", response.data )
             let interval = ctx.state.authExpiresSec - 15 
@@ -332,11 +337,9 @@ const user = {
 
       async getCheckouts(ctx) {
          if ( ctx.state.checkouts.length > 0) {
-            ctx.commit('setLookingUp', false)
             return
          }
 
-         ctx.commit('setLookingUp', true)
          if ( ctx.getters.hasAccountInfo == false) {
             await this.dispatch("user/getAccountInfo")
          }
@@ -347,10 +350,8 @@ const user = {
          return axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
             ctx.commit('sortCheckouts', "AUTHOR_ASC")
-            ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', false)
           })
       },
 
@@ -396,7 +397,8 @@ const user = {
             ctx.commit("setUserJWT", jwtStr )
             ctx.commit('setAuthorizing', false)
             ctx.commit('restore/load', null, { root: true })
-            ctx.dispatch("getCheckouts") // needed so the alert icon can show in menubar
+            ctx.dispatch("getAccountInfo")   // needed for search preferences
+            ctx.dispatch("getCheckouts")     // needed so the alert icon can show in menubar
             let to = ctx.state.authExpiresSec - 15 
             setTimeout( () => {
                ctx.dispatch("refreshAuth")

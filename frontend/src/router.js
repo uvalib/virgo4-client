@@ -122,6 +122,7 @@ const router = new Router({
             // Grab the cookie and stuff in local storage. Cookie is short lived
             let jwtStr = Vue.$cookies.get("v4_jwt")
             store.commit("user/setUserJWT", jwtStr)
+            store.dispatch("user/getAccountInfo")  // needed for search preferences
             store.dispatch("user/getCheckouts") // needed so the alert icon can show in menubar
             store.commit('restore/load')
             let to = store.state.user.authExpiresSec - 15 
@@ -235,6 +236,9 @@ function restoreSessionFromLocalStorage() {
    let jwtStr = localStorage.getItem('v4_jwt')
    if (jwtStr) {
       store.commit("user/setUserJWT", jwtStr)
+      store.dispatch("user/getAccountInfo")  // needed for search preferences
+      store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
+      store.commit('restore/load')
       let to = store.state.user.authExpiresSec - 15 
       if (to > 0) {
          setTimeout( () => {
