@@ -232,22 +232,30 @@ function ensureSignedIn() {
    return restoreSessionFromLocalStorage()  
 }
 
-function restoreSessionFromLocalStorage() {
+async function restoreSessionFromLocalStorage() {
+   console.log("Restore session from local storage...")
    let jwtStr = localStorage.getItem('v4_jwt')
    if (jwtStr) {
       store.commit("user/setUserJWT", jwtStr)
-      store.dispatch("user/getAccountInfo")  // needed for search preferences
-      store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
+      
       let to = store.state.user.authExpiresSec - 15 
       if (to > 0) {
          setTimeout( () => {
             store.dispatch("user/refreshAuth")
          }, to*1000)
       } else {
-         store.dispatch("user/refreshAuth")   
+         console.log("refreshing expired session now...")
+         await store.dispatch("user/refreshAuth")   
+         console.log("...refresh completed")
       }
+
+      console.log("load user data into session")
+      store.dispatch("user/getAccountInfo")  // needed for search preferences
+      store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
       return true
-   } 
+   } else {
+      console.log("Nothing found in local storage")
+   }
    return false
 }
 

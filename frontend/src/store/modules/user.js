@@ -238,13 +238,14 @@ const user = {
         })
       },
 
-      refreshAuth(ctx) {
+      async refreshAuth(ctx) {
          // if the user has signed out already, don't refresh
          if (ctx.state.signedInUser == "" ||  ctx.state.sessionType == "" || ctx.state.sessionType == "none" ) {
             return
          }
 
-         axios.post("/api/reauth", null).then((response) => {
+         return axios.post("/api/reauth", null).then((response) => {
+            console.log("Session refreshed")
             ctx.commit("setUserJWT", response.data )
             let interval = ctx.state.authExpiresSec - 15 
             setTimeout( () => {
