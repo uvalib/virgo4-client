@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/pprof"
@@ -35,6 +36,25 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 	p := ginprometheus.NewPrometheus("gin")
+	p.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
+		url := c.Request.URL.Path
+		for _, p := range c.Params {
+			if p.Key == "token" {
+				url = strings.Replace(url, p.Value, ":token", 1)
+				break
+			} else if p.Key == "id" {
+				url = strings.Replace(url, p.Value, ":id", 1)
+				break
+			} else if p.Key == "uid" {
+				url = strings.Replace(url, p.Value, ":uid", 1)
+				break
+			} else if p.Key == "holdid" {
+				url = strings.Replace(url, p.Value, ":holdid", 1)
+				break
+			}
+		}
+		return url
+	}
 	p.Use(router)
 
 	router.GET("/version", svc.GetVersion)

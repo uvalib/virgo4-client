@@ -50,8 +50,8 @@
                         v-model="term.endVal"
                         :aria-label="`end date for search criteria ${idx+1}`"
                      />
+                     <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
                   </div>
-                  <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
                </template>
                <template v-else-if="getTermType(term) == 'select'">
                   <div class="select-criteria">
@@ -274,7 +274,7 @@ h2 {
 div.pools-wrapper {
    margin: 15px 0 10px 0;
    padding: 10px 0;
-    border-bottom: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid var(--uvalib-grey-light);
 }
 div.pools {
    text-align: left;
@@ -320,13 +320,16 @@ div.criteria {
    text-align: left;
    position: relative;
 }
+
 div.options {
+   display: flex;
    flex-flow: row nowrap;
    align-items: center;
    justify-content: space-between;
 }
+
 .options select {
-   margin: 0 0.8em 0 0;
+   margin: 0 5px 0 0;
    flex-basis: content;
    &:focus {
       @include be-accessible();
@@ -338,18 +341,46 @@ div.search-term select {
       @include be-accessible();
    } 
 }
-.v4-button.remove {
-   font-size: 1.75em;
-   color: var(--uvalib-red-emergency);
-   float: right;
-}
 
 div.query {
+   display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
-   justify-content: space-between;
-   width: 100%;
-   
+   align-content: center;
+
+   .term {
+      box-sizing: border-box;
+   }
+
+   input[type="text"], .select-criteria {
+      flex: 1 1 auto;
+   }
+
+   .term {
+      margin-bottom: 0;
+   }
+
+   select {
+      width: 100%;
+   }
+
+   .date-criteria {
+      display: flex;
+      flex: 1 1 auto;
+      flex-flow: row wrap;
+      align-items: center;
+      margin-right: 0;
+   }
+   .date-hint {
+      font-size:0.95em;
+      font-weight: 100;
+      font-style: italic;
+      width: 100%;
+      box-sizing: border-box;
+   }
+   .date-sep {
+      font-weight: 500;
+   }
 }
 .controls {
    padding: 10px 0;
@@ -359,36 +390,19 @@ div.query {
    margin-right: 5px;
 }
 div.search-term {
-   border: 1px solid var(--uvalib-grey-light);
    padding: 10px;
    margin: 10px 0;
-   box-shadow: $v4-box-shadow-light;
-   background-color: #f5f5f5;
+   background: var(--uvalib-grey-lightest);
+   outline: 1px solid var(--uvalib-grey-light);
+   .v4-button.remove {
+      font-size: 1.6em;
+      color: var(--uvalib-red-emergency);
+      margin-left: auto;
+   }
 }
-.date-hint {
-   font-size:0.95em;
-   font-weight: 100;
-   font-style: italic;
-}
-input[type="text"] {
-   flex: 1 1 auto;
-}
-.date-sep {
-   font-weight: 500;
-}
-div.search-term .date-criteria {
-   display: flex;
-   flex: 1 1 auto;
-   flex-flow: row wrap;
-   align-items: center;
-   margin-right: 0;
-}
-div.query .term {
-   box-sizing: border-box;
-   width: 100%;
-}
+
 div.search-term .date-criteria > * {
-   margin: 0 0.8em 0 0;
+   margin: 0 5px 0 0;
 }
 div.search-term .date-criteria input:last-child {
    margin-right: 0;
@@ -396,7 +410,7 @@ div.search-term .date-criteria input:last-child {
 
 div.basic {
    margin-top: 10px;
-  font-size: 1em;
-  text-align: right;
+   font-size: 1em;
+   text-align: right;
 }
 </style>
