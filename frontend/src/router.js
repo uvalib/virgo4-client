@@ -238,7 +238,6 @@ function restoreSessionFromLocalStorage() {
       store.commit("user/setUserJWT", jwtStr)
       store.dispatch("user/getAccountInfo")  // needed for search preferences
       store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
-      store.commit('restore/load')
       let to = store.state.user.authExpiresSec - 15 
       if (to > 0) {
          setTimeout( () => {
