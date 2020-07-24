@@ -12,8 +12,8 @@ function isPoolExternal(pool) {
 const preferences = {
    namespaced: true,
    state: {
-      targetPoolURL: "",
-      excludePoolURLs: [],
+      targetPool: "",
+      excludePools: [],
       optInPools: [],
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
@@ -22,21 +22,21 @@ const preferences = {
 
    getters: {
      getField,
-      isTargetPool: state => poolURL => {
-         return state.targetPoolURL == poolURL
+      isTargetPool: state => pool => {
+         return state.targetPool == pool.id
       },
 
-      excludedPoolURLs: (state, _getters, rootState) => {
+      excludedPools: (state, _getters, rootState) => {
          let out = new Set()
          rootState.pools.list.forEach( p => {
             // all external pools that are not opted in go in the exclude list
             if ( isPoolExternal(p) && !state.optInPools.includes(p.id)) {   
-               out.add(p.url)
+               out.add(p.id)
             }
          })
 
-         state.excludePoolURLs.forEach( u => {
-            out.add(u)
+         state.excludePools.forEach( pool => {
+            out.add(pool)
          })
          return [...out] 
       },
@@ -52,8 +52,8 @@ const preferences = {
          }
 
          let excluded = false
-         state.excludePoolURLs.some( url => {
-            if (url == pool.url) {
+         state.excludePools.some( pid => {
+            if (pid == pool.id) {
                excluded = true
             }
             return excluded == true
@@ -81,46 +81,41 @@ const preferences = {
          }
          router.go()
       },
-      setPreferences(state, prefsStr) {
-         state.targetPoolURL = ""
-         state.excludePoolURLs = []
-         let json = ""
-         try {
-            json = JSON.parse(prefsStr)
-            if (json.targetPoolURL ) {
-               state.targetPoolURL = json.targetPoolURL
+      setPreferences(state, prefsObj) {
+         state.targetPool = ""
+         state.excludePools.splice(0, state.excludePools.length)
+
+         if (prefsObj.targetPool ) {
+            state.targetPool = prefsObj.targetPool
+         }
+         if (prefsObj.excludePools ) {
+            state.excludePools = prefsObj.excludePools
+         }
+         if (prefsObj.optInPools ) {
+            state.optInPools = prefsObj.optInPools
+         }
+         if ( prefsObj.trackingOptOut) {
+            state.trackingOptOut  = prefsObj.trackingOptOut
+            let optOutCookie = Vue.$cookies.get('v4_optout')
+            if ( state.trackingOptOut && !optOutCookie) {
+               let data = {v4_opt_out: true}
+               Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+            } else {
+               Vue.$cookies.remove("v4_optout")
             }
-            if (json.excludePoolURLs ) {
-               state.excludePoolURLs = json.excludePoolURLs
-            }
-            if (json.optInPools ) {
-               state.optInPools = json.optInPools
-            }
-            if ( json.trackingOptOut) {
-               state.trackingOptOut  = json.trackingOptOut
-               let optOutCookie = Vue.$cookies.get('v4_optout')
-               if ( state.trackingOptOut && !optOutCookie) {
-                  let data = {v4_opt_out: true}
-                  Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
-               } else {
-                  Vue.$cookies.remove("v4_optout")
-               }
-            }
-            if (json.pickupLibrary ) {
-               state.pickupLibrary = json.pickupLibrary
-            }
-            if (json.enableBarcodeScan ) {
-               state.enableBarcodeScan = json.enableBarcodeScan
-            }
-         } catch(e) {
-            // NOOP; just leave preferences unset
+         }
+         if (prefsObj.pickupLibrary ) {
+            state.pickupLibrary = prefsObj.pickupLibrary
+         }
+         if (prefsObj.enableBarcodeScan ) {
+            state.enableBarcodeScan = prefsObj.enableBarcodeScan
          }
       },
       clear(state) {
          state.trackingOptOut = false
-         state.targetPoolURL = ""
+         state.targetPool = ""
          state.enableBarcodeScan = false
-         state.excludePoolURLs.splice(0, state.excludePoolURLs.length)
+         state.excludePools.splice(0, state.excludePools.length)
          state.optInPools.splice(0, state.optInPools.length)
       },
       toggleExcludePool(state, pool) {
@@ -129,39 +124,29 @@ const preferences = {
             // the first attempt to use it. Move it to opt in
             state.optInPools.push(pool.id)
          } else {
-            let idx = state.excludePoolURLs.indexOf(pool.url)
+            let idx = state.excludePools.indexOf(pool.id)
             if (idx > -1) {
-               state.excludePoolURLs.splice(idx, 1)
+               state.excludePools.splice(idx, 1)
             } else {
-               state.excludePoolURLs.push(pool.url)
-               if (state.targetPoolURL == pool.url ) {
-                  state.targetPoolURL = ""
+               state.excludePools.push(pool.id)
+               if (state.targetPool == pool.id ) {
+                  state.targetPool = ""
                }
             }
          }
       },
-      toggleTargetPool(state, poolURL) {
-         if (state.targetPoolURL == poolURL) {
-            state.targetPoolURL = ""
+      toggleTargetPool(state, pool) {
+         if (state.targetPool == pool.id) {
+            state.targetPool = ""
          } else {
-            state.targetPoolURL = poolURL
+            state.targetPool = pool.id
          }
       },
-      clearExcluded( state ) {
-         state.excludePoolURLs.splice(0, state.excludePoolURLs.length)
-      },
-      excludeAll( state, poolURLs ) {
-         poolURLs.forEach( u => {
-            if (!state.excludePoolURLs.includes(u)) {
-               state.excludePoolURLs.push(u)
-            }
-         })
-      }
    },
 
    actions: {
-      toggleTargetPool(ctx, tgtURL) {
-         ctx.commit("toggleTargetPool", tgtURL)
+      toggleTargetPool(ctx, pool) {
+         ctx.commit("toggleTargetPool", pool)
          ctx.dispatch("savePreferences")
       },
       toggleExcludePool(ctx, pool) {
@@ -178,8 +163,8 @@ const preferences = {
       },
       savePreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
-         let data = {targetPoolURL: ctx.state.targetPoolURL,
-            excludePoolURLs: ctx.state.excludePoolURLs,
+         let data = {targetPool: ctx.state.targetPool,
+            excludePools: ctx.state.excludePools,
             trackingOptOut: ctx.state.trackingOptOut,
             pickupLibrary: ctx.state.pickupLibrary,
             enableBarcodeScan: ctx.state.enableBarcodeScan,

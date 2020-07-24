@@ -26,12 +26,12 @@
                   role="switch"
                   class="toggle"
                   :aria-label="`set ${p.name} as preferred`"
-                  :aria-checked="isTargetPool(p.url).toString()"
+                  :aria-checked="isTargetPool(p).toString()"
                   @click.stop="toggleTargetPool(p)"
                   @keyup.stop.enter="toggleTargetPool(p)"
                   @keydown.space.prevent.stop="toggleTargetPool(p)"
                >
-                  <i v-if="isTargetPool(p.url)" class="fas fa-star"></i>
+                  <i v-if="isTargetPool(p)" class="fas fa-star"></i>
                   <i v-else class="far fa-star"></i>
                   <span class="label">Preferred</span>
                </div>
@@ -68,7 +68,7 @@ export default {
    methods: {
       toggleTargetPool(pool) {
          this.$store.commit("resetSearchResults");
-         this.$store.dispatch("preferences/toggleTargetPool", pool.url)
+         this.$store.dispatch("preferences/toggleTargetPool", pool)
          this.$analytics.trigger('Preferences', 'SET_PREFERRED_POOL', pool.name)
       },
       async toggleExcludePool(pool) {

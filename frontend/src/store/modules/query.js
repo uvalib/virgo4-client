@@ -26,6 +26,8 @@ const query = {
          { value: "date", label: "Date", type: "date", choices: [] },
          { value: "published", label: "Publisher/Place of Publication", type: "text", choices: []}
       ],
+      excludedPools: [],
+      preferredPool: ""
    },
    getters: {
       getField,
@@ -38,6 +40,12 @@ const query = {
             qs += `&scope=${state.basicSearchScope.id}`
          }
          qs += `&q=${encodeURIComponent(getters.string)}`
+         if (state.preferredPool != "" ) {
+            qs += `&tgt=${state.preferredPool}`
+         }
+         if ( state.excludedPools.length > 0) {
+            qs += `&exclude=${state.excludedPools.join(",")}`
+         }
          return qs
       },
       queryEntered: state => {
@@ -104,6 +112,17 @@ const query = {
             }
          })
          return qs
+      },
+      isPoolExcluded: state => pool => {
+         let excluded = false
+         state.excludedPools.some( pid => {
+            if (pid == pool.id) {
+               excluded = true
+            }
+            return excluded == true
+         })
+
+         return excluded
       },
    },
    mutations: {
@@ -245,6 +264,35 @@ const query = {
             }
          }
       },
+      setExcludePreferences(state, excludePrefs) {
+         state.excludedPools.splice(0, state.excludedPools.length)
+         excludePrefs.forEach( pid => {
+            state.excludedPools.push(pid)
+         })
+      },
+      setPreferredPreference(state, preferredPref) {
+         state.preferredPool = preferredPref
+      },
+      toggleAdvancedPoolExclusion(state, pool) {
+         let idx = state.excludedPools.indexOf(pool.id)
+         if (idx > -1) {
+            state.excludedPools.splice(idx, 1)
+         } else {
+            state.excludedPools.push(pool.id)
+         }
+      },
+      clearExcluded( state ) {
+         state.excludedPools.splice(0, state.excludedPools.length)
+      },
+      excludeAll( state, pools ) {
+         pools.forEach( p => {
+            if (!state.excludedPools.includes(p.id)) {
+               if (state.preferredPool != p.id) {
+                  state.excludedPools.push(p.id)
+               }
+            }
+         })
+      },
       advancedBarcodeSearch(state, barcode) {
          state.advanced.splice(0, state.advanced.length)
          state.advanced.push({ op: "AND", value: barcode, field: "identifier", comparison: "EQUAL", endVal: "" })
@@ -279,6 +327,8 @@ const query = {
             { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
             { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" }
          ]
+         state.excludedPools.splice(0, state.excludedPools.length)
+         state.preferredPool = ""
          state.browse = [
             { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" }]
       },

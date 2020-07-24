@@ -249,8 +249,8 @@ export default new Vuex.Store({
         query: rootGetters['query/string'],
         pagination: { start: 0, rows: state.pageSize },
         preferences: {
-          target_pool: rootState.preferences.targetPoolURL,
-          exclude_pool: rootGetters['preferences/excludedPoolURLs'],
+          target_pool: rootState.query.preferredPool,
+          exclude_pool: rootState.query.excludedPools
         },
         filters: rootGetters['filters/globalFilter']
       }
@@ -258,15 +258,15 @@ export default new Vuex.Store({
       let manageSpinner = !(isRestore === true)
 
       if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
-        let tgtID = rootState.query.basicSearchScope.id
-        req.preferences.exclude_pool = []
-        rootState.pools.list.forEach( src=> {
-          if (src.id != tgtID) {
-            req.preferences.exclude_pool.push(src.url)
-          } else {
-            req.preferences.target_pool = src.url  
-          }
-        })
+         let tgtID = rootState.query.basicSearchScope.id
+         req.preferences.exclude_pool = []
+         rootState.pools.list.forEach( src=> {
+            if (src.id != tgtID) {
+               req.preferences.exclude_pool.push(src.id)
+            } else {
+               req.preferences.target_pool = src.id  
+            }
+         })
       }
 
       commit('setSearching', true)

@@ -133,7 +133,8 @@ export default {
          results: state => state.results,
          total: state=>state.total,
          restoreURL: state=>state.restore.url,
-         restoreSaveSearch: state=>state.restore.restoreSaveSearch
+         restoreSaveSearch: state=>state.restore.restoreSaveSearch,
+         tgtPoolPref: state=>state.preferences.targetPool,
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
@@ -144,6 +145,7 @@ export default {
         sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
         isSignedIn: 'user/isSignedIn',
+        excludedPoolPrefs: 'preferences/excludedPools',
       }),
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
@@ -151,7 +153,8 @@ export default {
       }),
       searchScopes() {
         let out = [{name: 'All Resource Types', id: 'all'}]
-        return out.concat(this.sources)
+        let filtered = this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
+        return out.concat(filtered)
       },
       basicSearch() {
         return this.searchMode != "advanced"
@@ -195,6 +198,18 @@ export default {
                this.$store.commit("query/setBasicSearchScope", tgtScope)
             }
          }
+
+         if (query.exclude) {
+            this.$store.commit("query/setExcludePreferences", query.exclude.split(","))
+         } else {
+            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
+         }
+         if (query.tgt) {
+            this.$store.commit("query/setPreferredPreference", query.tgt)
+         } else {
+            this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
+         }
+
          if (query.q) {
             this.$store.commit("query/restoreFromURL",query.q)
 
@@ -311,6 +326,13 @@ export default {
       searchClicked() {
          // Update the query params in the URL, but since the store already
          // contains all of the data from the URL it wont trigger the search. Do it manually
+         if ( this.basicSearchScope.id == "all") {
+            this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
+            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)   
+         } else {
+            this.$store.commit("query/setPreferredPreference", "")
+            this.$store.commit("query/setExcludePreferences", [])   
+         }
          let qp =  this.queryURLParams
          this.$router.push(`/search?${qp}`)
          this.$store.commit('resetSearchResults')

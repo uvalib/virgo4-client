@@ -84,12 +84,17 @@
             </span>
          </h2>
          <div class="pools">
-            <V4Checkbox v-for="src in sources" :key="src.id" class="pool"
+            <V4Checkbox v-for="src in filteredSources" :key="src.id" class="pool"
+               :disabled="isTargetPool(src)"
                :aria-label="`toggle inclusion of ${src.name} in search results`"
                :checked="!isPoolExcluded(src)"  
                @click="poolClicked(src)">
                {{src.name}}
+               <span class="preferred" v-if="isTargetPool(src)">(preferred)</span>
             </V4Checkbox>
+         </div>
+         <div v-if="isSignedIn" style="text-align: left; padding-left: 10px;">
+            NOTE: Manage this list in your <router-link to="/preferences">account peferences</router-link>.
          </div>
          <div class="what" v-if="!isKiosk">
             <a href="http://library.virginia.edu/virgo4/resource-types" target="_blank">
@@ -138,19 +143,24 @@ export default {
          }
          return url
       },
+      filteredSources() {
+         return this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
+      },
       ...mapState({
          advancedFields: state => state.query.advancedFields,
+         excludedPools: state => state.query.excludedPools,
          pools: state => state.pools.list
       }),
       ...mapGetters({
          queryURLParams: 'query/queryURLParams',
          queryEntered: "query/queryEntered",
          sources: "pools/sortedList",
-         isPoolExcluded: "preferences/isPoolExcluded",
+         isTargetPool: "preferences/isTargetPool",
+         excludedPoolPrefs: "preferences/excludedPools",
+         isPoolExcluded: "query/isPoolExcluded",
          rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
-         excludeURLS: 'preferences/excludedPoolURLs',
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -171,22 +181,16 @@ export default {
          return tgtField.choices
       },
       clearPoolsClicked() {
-         let urls = [] 
-         this.sources.forEach( p => {
-            urls.push(p.url)
-         })
-         this.$store.commit("preferences/excludeAll", urls)
+         this.$store.commit("query/excludeAll", this.sources)
       },
       allPoolsClicked() {
-         this.$store.commit("preferences/clearExcluded")
+         this.$store.commit("query/clearExcluded")
       },
       poolClicked(pool) {
-        // commit instead of dispatch. Treatign changes here as override.
-        // to save, go to preferences
-        this.$store.commit("preferences/toggleExcludePool", pool)
+        this.$store.commit("query/toggleAdvancedPoolExclusion", pool)
       },
       doAdvancedSearch() {
-         if ( this.excludeURLS.length == this.pools.length) {
+         if ( this.excludedPoolPrefs.length == this.pools.length) {
             this.$store.commit(
                "system/setError",
                "Please select at least one resource type before searching"
