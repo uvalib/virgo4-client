@@ -265,7 +265,9 @@ async function ensureAuthTokenPresent(next) {
    } else  if ( restoreSessionFromLocalStorage() ) {
       next()
    } else {
+      console.log("Get new auth token...")
       await store.dispatch("user/getAuthToken")
+      console.log("...DONE. new auth token received")
       next()
    }
 }

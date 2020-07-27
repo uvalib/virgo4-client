@@ -229,6 +229,7 @@ const user = {
       getAuthToken(ctx) {
         ctx.commit('setAuthorizing', true)
         return axios.post("/authorize").then((response) => {
+          console.log("Set new auth token for user")
           ctx.commit('setAuthToken', response.data)
           ctx.commit('setAuthorizing', false)
         }).catch((error) => {
