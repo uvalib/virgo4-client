@@ -212,7 +212,7 @@ router.beforeEach((to, _from, next) => {
    let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
       "course-reserves-request", "requests", "searches"]
    if (userPages.includes(to.name)) {
-      if (ensureSignedIn()) {
+      if (ensureSignedIn() === true) {
          next()
       } else {
          store.commit('system/setSessionExpired')
@@ -253,23 +253,29 @@ async function restoreSessionFromLocalStorage() {
       store.dispatch("user/getAccountInfo")  // needed for search preferences
       store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
       return true
-   } else {
-      console.log("Nothing found in local storage")
-   }
+   } 
+
+   console.log("Nothing found in local storage")
    return false
 }
 
 async function ensureAuthTokenPresent(next) {
    if (store.getters["user/hasAuthToken"] || store.getters["user/isSignedIn"]) {
+      console.log("Auth token found in memory")
       next()
-   } else  if ( restoreSessionFromLocalStorage() ) {
+      return
+   } 
+
+   if ( restoreSessionFromLocalStorage() === true ) {
+      console.log("Session restored from local store")
       next()
-   } else {
-      console.log("Get new auth token...")
-      await store.dispatch("user/getAuthToken")
-      console.log("...DONE. new auth token received")
-      next()
-   }
+      return
+   } 
+
+   console.log("Get new auth token...")
+   await store.dispatch("user/getAuthToken")
+   console.log("...DONE. new auth token received")
+   next()
 }
 
 export default router
