@@ -13,7 +13,7 @@
          <div class="entry pure-control-group">
             <label for="scan-use">Scan Purpose</label>
             <select v-model="type" id="scan-use">
-               <!-- <option value="Article">Research</option> -->
+               <option value="Article">Research</option>
                <option value="Collab">Instruction</option>
             </select>
          </div>
