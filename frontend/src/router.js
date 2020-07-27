@@ -204,6 +204,7 @@ router.beforeEach((to, _from, next) => {
    // Some pages just require an auth token...
    let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
+      console.log(`Page ${to.name} requires auth token only`)
       ensureAuthTokenPresent(next)
       return
    }
@@ -212,9 +213,11 @@ router.beforeEach((to, _from, next) => {
    let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
       "course-reserves-request", "requests", "searches"]
    if (userPages.includes(to.name)) {
+      console.log(`Page ${to.name} requires signed in user`)
       if (ensureSignedIn() === true) {
          next()
       } else {
+         console.log("Unable to find session for page access. Flag as expired")
          store.commit('system/setSessionExpired')
          store.dispatch("user/signout", "/")
       }
@@ -260,13 +263,16 @@ async function restoreSessionFromLocalStorage() {
 }
 
 async function ensureAuthTokenPresent(next) {
+   console.log("Check memory for session...")
    if (store.getters["user/hasAuthToken"] || store.getters["user/isSignedIn"]) {
       console.log("Auth token found in memory")
       next()
       return
    } 
 
-   if ( restoreSessionFromLocalStorage() === true ) {
+   console.log("Check Local store for session...")
+   let restored = await restoreSessionFromLocalStorage()
+   if ( restored === true ) {
       console.log("Session restored from local store")
       next()
       return
@@ -274,7 +280,7 @@ async function ensureAuthTokenPresent(next) {
 
    console.log("Get new auth token...")
    await store.dispatch("user/getAuthToken")
-   console.log("...DONE. new auth token received")
+   console.log("...DONE; new auth token received")
    next()
 }
 
