@@ -93,13 +93,13 @@
                <span class="preferred" v-if="isTargetPool(src)">(preferred)</span>
             </V4Checkbox>
          </div>
-         <div v-if="isSignedIn" style="text-align: left; padding-left: 10px;">
-            NOTE: Manage this list in your <router-link to="/preferences">account peferences</router-link>.
-         </div>
          <div class="what" v-if="!isKiosk">
             <a href="http://library.virginia.edu/virgo4/resource-types" target="_blank">
                What am I searching?
             </a>
+            <span v-if="isSignedIn" style="text-align: left; padding-left: 10px;">
+               You can manage this list in <router-link to="/preferences">your preferences</router-link>.
+            </span>
          </div>
       </div>
       <div class="controls">
