@@ -10,6 +10,11 @@
             <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
             <template v-else>
                <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
+                <div v-if="canMakeReserves" class="notice">
+                   Reserve materials are currently only offered in electronic formats in order to provide access to course material 
+                   to both local and distance students. 
+                   <a href="https://www.library.virginia.edu/services/course-reserves/" targte="_blank">Click here for more information</a>.
+                </div>
                <div class="folder" v-for="(folderInfo,idx) in bookmarks" :key="folderInfo.id">
                   <AccordionContent
                      class="boxed bookmark-folder"
@@ -48,7 +53,7 @@
                                           :id="`move-bookmarks-${folderInfo.id}`"
                                           v-on:move-approved="moveBookmarks"/>
                                        <V4Button @click="removeBookmarks" mode="primary">Delete</V4Button>
-                                       <V4Button v-if="canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
+                                       <V4Button v-if="canMakeReserves" class="disabled" mode="primary" @click="reserve">Place on course reserve</V4Button>
                                     </div>
                                  </div>
                               </th>
@@ -226,33 +231,33 @@ export default {
          this.$store.dispatch("bookmarks/moveBookmarks", data);
       },
       async reserve() {
-         if ( this.selectedItems.length == 0) {
-             this.$store.commit("system/setError", 
-               "No items have been selected to put on reserve.<br/>Please select one or more and try again.")
-             return
-         }
+         // if ( this.selectedItems.length == 0) {
+         //     this.$store.commit("system/setError", 
+         //       "No items have been selected to put on reserve.<br/>Please select one or more and try again.")
+         //     return
+         // }
 
-         let items = []
-         let folder = this.bookmarks.find( bm => bm.id == this.expandedFolder )
-         this.selectedItems.forEach( bmID => {
-            let item = folder.bookmarks.find( bm => bm.id == bmID )
-            items.push(item)
-         })
+         // let items = []
+         // let folder = this.bookmarks.find( bm => bm.id == this.expandedFolder )
+         // this.selectedItems.forEach( bmID => {
+         //    let item = folder.bookmarks.find( bm => bm.id == bmID )
+         //    items.push(item)
+         // })
 
-         // Set the list, and validate that all items in the list are able to be reserved
-         this.$store.commit("reserves/setRequestList", items)
-         await this.$store.dispatch("reserves/validateReservesRequest")
-         if (this.invalidReserves.length > 0) {
-            let msg = "The following items cannot be placed on course reserve: "
-            msg += "<ul style='text-align:left;'>"
-            this.invalidReserves.forEach( r => {
-               msg += `<li>${r.details.title}</l1>`
-            })
-            msg += "</ul>Please deselect these items and try again."
-            this.$store.commit("system/setError", msg)
-         } else {
-            this.$router.push("/course-reserves-request")
-         }
+         // // Set the list, and validate that all items in the list are able to be reserved
+         // this.$store.commit("reserves/setRequestList", items)
+         // await this.$store.dispatch("reserves/validateReservesRequest")
+         // if (this.invalidReserves.length > 0) {
+         //    let msg = "The following items cannot be placed on course reserve: "
+         //    msg += "<ul style='text-align:left;'>"
+         //    this.invalidReserves.forEach( r => {
+         //       msg += `<li>${r.details.title}</l1>`
+         //    })
+         //    msg += "</ul>Please deselect these items and try again."
+         //    this.$store.commit("system/setError", msg)
+         // } else {
+         //    this.$router.push("/course-reserves-request")
+         // }
       },
       detailsURL(bookmark) {
          return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
@@ -326,6 +331,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+div.notice {
+   padding: 10px 10px;
+   background: var(--uvalib-yellow-light);
+   margin: 0 0 15px 0;
+   font-weight: bold;
+   border: 1px solid var(--uvalib-yellow);
+   text-align: center;
+}
 .folder-title {
    padding: 5px;
    font-weight: bold;
