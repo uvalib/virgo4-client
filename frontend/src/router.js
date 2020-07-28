@@ -200,36 +200,36 @@ const router = new Router({
 })
 
 // This is called before every URL in the SPA is hit
-router.beforeEach((to, _from, next) => {
+router.beforeEach( async (to, _from, next) => {
    // Some pages just require an auth token...
    let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       console.log(`Page ${to.name} requires auth token only`)
-      ensureAuthTokenPresent(next)
-      return
-   }
-
-   // Some pages require a signed in user...
-   let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
-      "course-reserves-request", "requests", "searches"]
-   if (userPages.includes(to.name)) {
-      console.log(`Page ${to.name} requires signed in user`)
-      if (ensureSignedIn() === true) {
-         next()
+      await ensureAuthTokenPresent(next)
+   } else {
+      // Some pages require a signed in user...
+      let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
+         "course-reserves-request", "requests", "searches"]
+      if (userPages.includes(to.name)) {
+         console.log(`Page ${to.name} requires signed in user`)
+         let resp = await ensureSignedIn()
+         if ( resp === true) {
+            next()
+         } else {
+            console.log("Unable to find session for page access. Flag as expired")
+            store.commit('system/setSessionExpired')
+            store.dispatch("user/signout", "/")
+         }
       } else {
-         console.log("Unable to find session for page access. Flag as expired")
-         store.commit('system/setSessionExpired')
-         store.dispatch("user/signout", "/")
+         // All others just proceed...
+         next()
       }
-      return
    }
-
-   // All others just proceed...
-   next()
 })
 
 function ensureSignedIn() {
    if ( store.getters["user/isSignedIn"]) {
+      console.log("session found in memory")
       return true
    }
    return restoreSessionFromLocalStorage()  
@@ -239,6 +239,7 @@ async function restoreSessionFromLocalStorage() {
    console.log("Restore session from local storage...")
    let jwtStr = localStorage.getItem('v4_jwt')
    if (jwtStr) {
+      console.log("Found JWT in local storage...")
       store.commit("user/setUserJWT", jwtStr)
       
       let to = store.state.user.authExpiresSec - 15 
@@ -253,8 +254,8 @@ async function restoreSessionFromLocalStorage() {
       }
 
       console.log("load user data into session")
-      store.dispatch("user/getAccountInfo")  // needed for search preferences
-      store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
+      await store.dispatch("user/getAccountInfo")  // needed for search preferences
+      store.dispatch("user/getCheckouts")          // needed so the alert icon can show in menubar
       return true
    } 
 
