@@ -102,27 +102,11 @@
             </span>
          </div>
       </div>
-      <div class="templates" v-if="isSignedIn">
+      <!-- <div class="templates" v-if="isSignedIn">
          <template v-if="!savingTemplate">
-            <SelectSearchTemplate v-if="savedTemplates.length > 0" id="select-template" :templates="savedTemplates" />
-            <V4Button mode="tertiary" @click="saveTemplateClicked">Save Search Template</V4Button>
+            <V4Button mode="tertiary" @click="saveTemplateClicked">Save Search Form</V4Button>
          </template>
-         <div v-else class="save-template pure-form">
-            <label for="newname">Template Name:</label>
-            <span class="name-wrap">
-               <input
-                  ref="templatename"
-                  @keyup.enter="saveTemplateOK"
-                  v-model="templateName"
-                  type="text"
-                  aria-required="true" required="required"
-               />
-               <p v-if="nameMissing" class="error">* A template name is required</p>
-            </span>
-            <V4Button @click="saveTemplateCancel" :class="{disabled: submittingTemplate}" mode="tertiary">Cancel</V4Button>
-            <V4Button @click="saveTemplateOK" class="{disabled: submittingTemplate}" mode="primary">Create</V4Button>
-         </div>
-      </div>
+      </div> -->
       <div class="controls">
          <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
          <span class="sep">|</span>
@@ -145,19 +129,10 @@ import { mapMultiRowFields } from "vuex-map-fields"
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
-import SelectSearchTemplate from "@/components/modals/SelectSearchTemplate"
 
 export default {
-   data: function() {
-      return {
-         savingTemplate: false,
-         submittingTemplate: false,
-         nameMissing: false,
-         templateName: ""
-      } 
-   },
    components: {
-      V4BarcodeScanner, SelectSearchTemplate
+      V4BarcodeScanner
    },
    computed: {
       basicSearchURL() {
@@ -196,30 +171,6 @@ export default {
       }
    },
    methods: {
-      saveTemplateClicked() {
-         this.savingTemplate = true
-         this.nameMissing =  false
-         this.templateName = ""
-         setTimeout( () => {
-            this.$refs.templatename.focus()
-         }, 150)
-      },
-      saveTemplateCancel() {
-         this.savingTemplate = false
-      },
-      async saveTemplateOK() {
-         this.nameMissing = false
-         if ( this.templateName == "") {
-            this.nameMissing = true
-            return
-         }
-         let tpl = this.advancedSearchTemplate
-         this.submittingTemplate = true
-         await this.$store.dispatch("searches/saveAdvancedSearchTemplate", 
-            {userID: this.signedInUser, name: this.templateName, template: tpl})
-         this.savingTemplate = false
-         this.submittingTemplate = false
-      },
       getTermType( term ) {
          let tgtField = this.advancedFields.find( af=> af.value == term.field)
          return tgtField.type

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -290,47 +289,4 @@ func (svc *ServiceContext) updateSearchHistory(userID int, url string) {
 		log.Printf("ERROR: Unable to limit history for user %d: %s", userID, err.Error())
 		return
 	}
-}
-
-func (svc *ServiceContext) getSearchTemplates(c *gin.Context) {
-	v4id := c.Param("uid")
-	userID := c.MustGet("v4id").(int)
-	log.Printf("Get search templates for %s[%d]", v4id, userID)
-
-	var templates []SearchTemplate
-	err := svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&templates)
-	if err != nil {
-		log.Printf("ERROR: unable to get saved templates for %s: %s", v4id, err.Error())
-		templates = make([]SearchTemplate, 0)
-	}
-	c.JSON(http.StatusOK, templates)
-}
-
-func (svc *ServiceContext) saveSearchTemplate(c *gin.Context) {
-	v4id := c.Param("uid")
-	userID := c.MustGet("v4id").(int)
-	log.Printf("User %s[%d] is saving an advanced search template", v4id, userID)
-
-	var req struct {
-		Name     string      `json:"name"`
-		Template interface{} `json:"template"`
-	}
-	err := c.ShouldBindJSON(&req)
-	if err != nil {
-		log.Printf("ERROR: unable to get template data from %s: %s", v4id, err)
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-
-	// Data is good. convert to json string for DB insert
-	tplString, _ := json.Marshal(req.Template)
-	tpl := SearchTemplate{ID: 0, UserID: userID, Name: req.Name, Template: string(tplString)}
-	addErr := svc.DB.Model(&tpl).Insert()
-	if addErr != nil {
-		log.Printf("Unable to save search template for user %s: %s", v4id, addErr.Error())
-		c.String(http.StatusInternalServerError, addErr.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, tpl)
 }

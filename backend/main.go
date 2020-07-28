@@ -88,9 +88,6 @@ func main() {
 		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UserMiddleware, svc.PublishSavedSearch)
 		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UserMiddleware, svc.UnpublishSavedSearch)
 
-		api.GET("/users/:uid/search_templates", svc.AuthMiddleware, svc.UserMiddleware, svc.getSearchTemplates)
-		api.POST("/users/:uid/search_templates", svc.AuthMiddleware, svc.UserMiddleware, svc.saveSearchTemplate)
-
 		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
 		api.POST("/users/:uid/bookmarks/move", svc.AuthMiddleware, svc.MoveBookmarks)
 		api.POST("/users/:uid/bookmarks/delete", svc.AuthMiddleware, svc.DeleteBookmarks)

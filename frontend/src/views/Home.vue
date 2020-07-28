@@ -192,7 +192,6 @@ export default {
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
-            this.$store.dispatch("searches/getAdvancedTemplates", this.signedInUser)
          } else {
             this.$store.commit("query/setBasicSearch")
             if (query.scope && query.scope != "") {
