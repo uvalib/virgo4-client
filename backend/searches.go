@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +12,19 @@ import (
 	"github.com/rs/xid"
 	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
+
+// SearchTemplate contains details about a user saved advanced search template
+type SearchTemplate struct {
+	ID       int    `db:"id" json:"id"`
+	UserID   int    `db:"user_id" json:"-"`
+	Name     string `db:"name" json:"name"`
+	Template string `db:"template" json:"template"`
+}
+
+// TableName sets the name of the table in the DB that this struct binds to
+func (s SearchTemplate) TableName() string {
+	return "search_templates"
+}
 
 // SavedSearch contains details about a user saved seatch
 type SavedSearch struct {
@@ -33,19 +47,11 @@ func (s SavedSearch) TableName() string {
 func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
 	uid := c.Param("uid")
 	clearType := c.Query("type")
+	userID := c.MustGet("v4id").(int)
 	log.Printf("Delete searches (%s) for user %s...", clearType, uid)
 	if clearType != "history" && clearType != "saved" {
 		log.Printf("ERROR: unsupported search type %s", clearType)
 		c.String(http.StatusBadRequest, fmt.Sprintf("'%s' is not a valid search type", clearType))
-		return
-	}
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("ERROR: couldn't find user %s: %v", uid, uErr)
-		c.String(http.StatusBadRequest, "Invalid user %s", uid)
 		return
 	}
 
@@ -74,15 +80,7 @@ func (svc *ServiceContext) PublishSavedSearch(c *gin.Context) {
 }
 
 func (svc *ServiceContext) setSearchVisibility(c *gin.Context, uid string, token string, public bool) {
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("ERROR: couldn't find user %s: %v", uid, uErr)
-		c.String(http.StatusBadRequest, "Invalid user %s", uid)
-		return
-	}
+	userID := c.MustGet("v4id").(int)
 	log.Printf("User %s has ID %d", uid, userID)
 
 	sq := svc.DB.NewQuery("update saved_searches set is_public={:pub} where user_id={:uid} and token={:tok}")
@@ -109,17 +107,8 @@ func (svc *ServiceContext) UnpublishSavedSearch(c *gin.Context) {
 func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
 	uid := c.Param("uid")
 	token := c.Param("token")
+	userID := c.MustGet("v4id").(int)
 	log.Printf("User %s delete search %s...", uid, token)
-
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("ERROR: couldn't find user %s to delete saved search %s: %v", uid, token, uErr)
-		c.JSON(http.StatusBadRequest, fmt.Sprintf("Invalid user %s", uid))
-		return
-	}
 
 	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:userID} and token={:token}")
 	dq.Bind(dbx.Params{"userID": userID})
@@ -137,24 +126,14 @@ func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
 // SaveSearch will save a named search in that saved_searches table along with an access token
 func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	uid := c.Param("uid")
-	log.Printf("User %s save search request...", uid)
+	userID := c.MustGet("v4id").(int)
+	log.Printf("User %s[%d] save search request...", uid, userID)
 
 	// init a reqponse object
 	var resp struct {
 		Success bool   `json:"success"`
 		Message string `json:"message"`
 		Token   string `json:"token"`
-	}
-
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("ERROR: coubdn't find user %s: %v", uid, uErr)
-		resp.Message = "Invalid Virgo user"
-		c.JSON(http.StatusBadRequest, resp)
-		return
 	}
 
 	// Make sure the passed request object is well formed JSON
@@ -266,16 +245,8 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 // GetUserSavedSearches will get all of the searches saved by the specified user
 func (svc *ServiceContext) GetUserSavedSearches(c *gin.Context) {
 	v4id := c.Param("uid")
-	log.Printf("Get saved searches for %s", v4id)
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": v4id})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("User %s not found", v4id)
-		c.JSON(http.StatusNotFound, make([]SavedSearch, 0))
-		return
-	}
+	userID := c.MustGet("v4id").(int)
+	log.Printf("Get saved searches for %s[%d]", v4id, userID)
 
 	var resp struct {
 		Saved   []SavedSearch `json:"saved"`
@@ -319,5 +290,47 @@ func (svc *ServiceContext) updateSearchHistory(userID int, url string) {
 		log.Printf("ERROR: Unable to limit history for user %d: %s", userID, err.Error())
 		return
 	}
+}
 
+func (svc *ServiceContext) getSearchTemplates(c *gin.Context) {
+	v4id := c.Param("uid")
+	userID := c.MustGet("v4id").(int)
+	log.Printf("Get search templates for %s[%d]", v4id, userID)
+
+	var templates []SearchTemplate
+	err := svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&templates)
+	if err != nil {
+		log.Printf("ERROR: unable to get saved templates for %s: %s", v4id, err.Error())
+		templates = make([]SearchTemplate, 0)
+	}
+	c.JSON(http.StatusOK, templates)
+}
+
+func (svc *ServiceContext) saveSearchTemplate(c *gin.Context) {
+	v4id := c.Param("uid")
+	userID := c.MustGet("v4id").(int)
+	log.Printf("User %s[%d] is saving an advanced search template", v4id, userID)
+
+	var req struct {
+		Name     string      `json:"name"`
+		Template interface{} `json:"template"`
+	}
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: unable to get template data from %s: %s", v4id, err)
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Data is good. convert to json string for DB insert
+	tplString, _ := json.Marshal(req.Template)
+	tpl := SearchTemplate{ID: 0, UserID: userID, Name: req.Name, Template: string(tplString)}
+	addErr := svc.DB.Model(&tpl).Insert()
+	if addErr != nil {
+		log.Printf("Unable to save search template for user %s: %s", v4id, addErr.Error())
+		c.String(http.StatusInternalServerError, addErr.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, tpl)
 }

@@ -167,3 +167,14 @@ export function getGroupHitMetadata(group, hit) {
    }
    delete group.fields
 }
+
+export function scrollToItem( tgtEle ) {
+   let nav = document.getElementById("v4-navbar")
+   var headerOffset = nav.offsetHeight
+   var elementPosition = tgtEle.getBoundingClientRect().top
+   var offsetPosition = elementPosition - headerOffset
+   window.scrollBy({
+     top: offsetPosition,
+     behavior: "smooth"
+   })
+ }

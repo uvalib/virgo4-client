@@ -31,6 +31,17 @@ const query = {
    },
    getters: {
       getField,
+      advancedSearchTemplate( state ) {
+         let out = { excluded: state.excludedPools, fields: []}
+         state.advanced.forEach(  af => {
+            let tpl =  {op: af.op, field: af.field, comparison: af.comparison}
+            if (tpl.field.includes("filter.")) {
+               tpl.value = af.value
+            }
+            out.fields.push( tpl )
+         })
+         return out
+      },
       idQuery: () => id => {
          return `identifier: {${id}}`
       },
@@ -127,6 +138,21 @@ const query = {
    },
    mutations: {
       updateField,
+      restoreTemplate(state, template) {
+         state.excludedPools.splice(0, state.excludedPools.length)
+         template.excluded.forEach( e => {
+            state.excludedPools.push( e )
+         })
+
+         state.advanced.splice(0, state.advanced.length)
+         template.fields.forEach( f => {
+            let newField = { op: f.op, value: "", field: f.field, comparison: f.cpmparison, endVal: "" }
+            if (f.value ) {
+               newField.value = f.value
+            }
+            state.advanced.push(newField)
+         })
+      },
       setAdvancedFilterFields( state, filters) {
          filters.forEach( f=> {
             // If the filter already exists in the fields list, remove it and replace with new
@@ -316,17 +342,24 @@ const query = {
       removeCriteria(state, idx) {
          state.advanced.splice(idx, 1)
       },
+      resetAdvanced( state ) {
+         state.advanced.splice(0, state.advanced.length)
+         state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
+      },
       clear(state) {
          state.mode = "basic"
          state.basic = ""
          state.basicSearchScope = { name: 'All Resource Types', id: 'all' },
-         state.advanced = [
-            { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
-            { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
-            { op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" },
-            { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
-            { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" }
-         ]
+         state.advanced.splice(0, state.advanced.length)
+         state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
+         state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
          state.excludedPools.splice(0, state.excludedPools.length)
          state.preferredPool = ""
          state.browse = [

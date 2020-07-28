@@ -102,8 +102,29 @@
             </span>
          </div>
       </div>
+      <div class="templates" v-if="isSignedIn">
+         <template v-if="!savingTemplate">
+            <SelectSearchTemplate v-if="savedTemplates.length > 0" id="select-template" :templates="savedTemplates" />
+            <V4Button mode="tertiary" @click="saveTemplateClicked">Save Search Template</V4Button>
+         </template>
+         <div v-else class="save-template pure-form">
+            <label for="newname">Template Name:</label>
+            <span class="name-wrap">
+               <input
+                  ref="templatename"
+                  @keyup.enter="saveTemplateOK"
+                  v-model="templateName"
+                  type="text"
+                  aria-required="true" required="required"
+               />
+               <p v-if="nameMissing" class="error">* A template name is required</p>
+            </span>
+            <V4Button @click="saveTemplateCancel" :class="{disabled: submittingTemplate}" mode="tertiary">Cancel</V4Button>
+            <V4Button @click="saveTemplateOK" class="{disabled: submittingTemplate}" mode="primary">Create</V4Button>
+         </div>
+      </div>
       <div class="controls">
-         <V4Button mode="text" class="clear" @click="clearSearch">clear search</V4Button>
+         <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
          <span class="sep">|</span>
          <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
       </div>
@@ -124,15 +145,19 @@ import { mapMultiRowFields } from "vuex-map-fields"
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+import SelectSearchTemplate from "@/components/modals/SelectSearchTemplate"
 
 export default {
    data: function() {
       return {
-         dropdownSources: true,
+         savingTemplate: false,
+         submittingTemplate: false,
+         nameMissing: false,
+         templateName: ""
       } 
    },
    components: {
-      V4BarcodeScanner
+      V4BarcodeScanner, SelectSearchTemplate
    },
    computed: {
       basicSearchURL() {
@@ -149,9 +174,12 @@ export default {
       ...mapState({
          advancedFields: state => state.query.advancedFields,
          excludedPools: state => state.query.excludedPools,
-         pools: state => state.pools.list
+         pools: state => state.pools.list,
+         savedTemplates: state => state.searches.templates,
+         signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
+         advancedSearchTemplate: 'query/advancedSearchTemplate',
          queryURLParams: 'query/queryURLParams',
          queryEntered: "query/queryEntered",
          sources: "pools/sortedList",
@@ -168,6 +196,30 @@ export default {
       }
    },
    methods: {
+      saveTemplateClicked() {
+         this.savingTemplate = true
+         this.nameMissing =  false
+         this.templateName = ""
+         setTimeout( () => {
+            this.$refs.templatename.focus()
+         }, 150)
+      },
+      saveTemplateCancel() {
+         this.savingTemplate = false
+      },
+      async saveTemplateOK() {
+         this.nameMissing = false
+         if ( this.templateName == "") {
+            this.nameMissing = true
+            return
+         }
+         let tpl = this.advancedSearchTemplate
+         this.submittingTemplate = true
+         await this.$store.dispatch("searches/saveAdvancedSearchTemplate", 
+            {userID: this.signedInUser, name: this.templateName, template: tpl})
+         this.savingTemplate = false
+         this.submittingTemplate = false
+      },
       getTermType( term ) {
          let tgtField = this.advancedFields.find( af=> af.value == term.field)
          return tgtField.type
@@ -219,12 +271,16 @@ export default {
             )
          }
       },
-      clearSearch() {
-         if (this.queryEntered) {
+      clearSearchClicked() {
+         if (this.$router.currentRoute.fullPath != "/search?mode=advanced") {
             this.$store.commit('query/clear')
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
             this.$router.push('/search?mode=advanced')
+         } else {
+            this.$store.commit('query/resetAdvanced')
+            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
+            this.focusFirstTerm(true)
          }
       },
       addClicked() {
@@ -244,15 +300,25 @@ export default {
          this.$store.commit('filters/reset')
          this.$store.commit("query/advancedBarcodeSearch", barcode)
          this.$store.dispatch("searchAllPools")
+      },
+      focusFirstTerm(scroll) {
+         setTimeout( () => {
+            let terms = document.getElementsByClassName("term")
+            if (terms.length > 0) {
+               terms[0].focus()
+               if (scroll) {
+                  this.$utils.scrollToItem(terms[0])
+                  terms = document.getElementsByClassName("search-term")
+                  if (terms.length > 0) {
+                     this.$utils.scrollToItem(terms[0])
+                  }
+               }
+            }
+         }, 250)
       }
    },
    created() {
-      setTimeout( () => {
-         let out = document.getElementsByClassName("term")
-         if (out.length > 0) {
-            out[0].focus()
-         }
-      }, 250)
+      this.focusFirstTerm(false)    
    }
 };
 </script>
@@ -412,5 +478,41 @@ div.basic {
    margin-top: 10px;
    font-size: 1em;
    text-align: right;
+}
+.templates {
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: center;
+   align-content: stretch;
+   font-size: 0.9em;
+   padding-bottom: 5px;
+   border-bottom: 1px solid var(--uvalib-grey-light);
+
+   .save-template {
+      color: var(--uvalib-grey-dark);
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: flex-start;
+      justify-content: flex-end;
+      width: 100%;
+      .name-wrap {
+         flex: 1 1 auto;
+         margin-right: 5px;
+         input, p {
+            width: 100%;
+         }
+         p.error {
+            text-align: left;
+            margin: 0;
+         }
+      }
+      button.v4-button {
+         margin-left: 5px !important;
+      }
+      label {
+         font-weight: bold;
+         margin-right: 10px;
+      }
+   }
 }
 </style>

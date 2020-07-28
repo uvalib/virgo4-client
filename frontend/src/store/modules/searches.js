@@ -4,6 +4,7 @@ import router from '../../router'
 const searches = {
    namespaced: true,
    state: {
+      templates: [],
       saved: [],
       history: [],
       lookingUp: false,
@@ -36,6 +37,7 @@ const searches = {
       clear(state) {
          state.saved.splice(0, state.saved.length)
          state.history.splice(0, state.history.length)
+         state.templates.splice(0, state.templates)
       },
       deleteSavedSearch(state, token) {
          let idx = state.saved.findIndex(s => s.token == token)
@@ -46,9 +48,36 @@ const searches = {
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
+      setAdvancedSearchTemplates(state, data) {
+         state.templates.splice(0, state.templates.length)
+         data.forEach( s => {
+            s.template = JSON.parse(s.template)
+            state.templates.push( s )
+         })
+      },
+      addAdvancedSearchTemplate(state, item) {
+         state.templates.push(item)
+      }
    },
 
    actions: {
+      getAdvancedTemplates(ctx, userID) {
+         axios.get(`/api/users/${userID}/search_templates`).then((response) => {
+            ctx.commit('setAdvancedSearchTemplates', response.data)
+          }).catch((error) => {
+            console.error(`Unable to get search templates for ${userID}: ${error}`)
+          })
+      },
+      async saveAdvancedSearchTemplate( ctx, data) {
+         let req = {name: data.name, template: data.template}
+         return axios.post(`/api/users/${data.userID}/search_templates`, req).then((response) => {
+            ctx.commit('addAdvancedSearchTemplate', response.data)
+            ctx.commit("system/setMessage", `Advanced search template '${data.name}' saved.`, { root: true })
+          }).catch((error) => {
+            console.error(`Unable to get search templates for ${data.userID}: ${error}`)
+            ctx.commit('system/setError', error, { root: true })
+          })
+      },
       async updateVisibility(ctx, data) {
          ctx.commit('setLookingUp', true)
          if (data.public) {

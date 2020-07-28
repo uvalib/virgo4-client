@@ -107,7 +107,7 @@ export default {
                      t = document.getElementById("global-filter")
                      t.focus()
                   }
-                  this.scrollToItem(r)
+                  this.$utils.scrollToItem(r)
                } else {
                   let s= document.getElementById("search")
                   if ( s) {
@@ -135,6 +135,7 @@ export default {
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
          tgtPoolPref: state=>state.preferences.targetPool,
+         signedInUser: state => state.user.signedInUser,
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
@@ -191,6 +192,7 @@ export default {
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
+            this.$store.dispatch("searches/getAdvancedTemplates", this.signedInUser)
          } else {
             this.$store.commit("query/setBasicSearch")
             if (query.scope && query.scope != "") {
@@ -290,14 +292,14 @@ export default {
                let sel = `.group-hit[data-identifier="${identifier}"]`
                let tgtEle = document.body.querySelector(sel)
                if ( tgtEle ) {
-                  this.scrollToItem(tgtEle)
+                  this.$utils.scrollToItem(tgtEle)
                }
             }, 250)
 
          } else {
                let sel = `.hit[data-identifier="${identifier}"]`
                let tgtEle = document.body.querySelector(sel)
-               this.scrollToItem(tgtEle)
+               this.$utils.scrollToItem(tgtEle)
                bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
          }
          this.$store.commit("bookmarks/setNewBookmark", bmData)
@@ -306,17 +308,6 @@ export default {
             bmEle.focus()
             bmEle.click()
          }
-      },
-
-      scrollToItem( tgtEle ) {
-        let nav = document.getElementById("v4-navbar")
-        var headerOffset = nav.offsetHeight
-        var elementPosition = tgtEle.getBoundingClientRect().top
-        var offsetPosition = elementPosition - headerOffset
-        window.scrollBy({
-          top: offsetPosition,
-          behavior: "smooth"
-        })
       },
 
       scopeChanged( tgt ) {

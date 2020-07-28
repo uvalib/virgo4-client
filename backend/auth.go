@@ -295,36 +295,6 @@ func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 	return &user, nil
 }
 
-// AuthMiddleware is middleware that checks for a user auth token in the
-// Authorization header. For now, it does nothing but ensure token presence.
-func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
-	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
-	if err != nil {
-		log.Printf("Authentication failed: [%s]", err.Error())
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	if tokenStr == "undefined" {
-		log.Printf("Authentication failed; bearer token is undefined")
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	log.Printf("Validating JWT auth token...")
-	v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
-	if jwtErr != nil {
-		log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	// add the parsed claims and signed JWT string to the request context so other handlers can access it.
-	c.Set("jwt", tokenStr)
-	c.Set("claims", v4Claims)
-	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claims)
-}
-
 func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
 	v4Claims := v4jwt.V4Claims{
 		UserID:     v4User.Virgo4ID,
@@ -380,16 +350,4 @@ func parseMembership(membershipStr string) v4jwt.RoleEnum {
 		out = v4jwt.Admin
 	}
 	return out
-}
-
-// getBearerToken is a helper to extract the token from headers
-func getBearerToken(authorization string) (string, error) {
-	components := strings.Split(strings.Join(strings.Fields(authorization), " "), " ")
-
-	// must have two components, the first of which is "Bearer", and the second a non-empty token
-	if len(components) != 2 || components[0] != "Bearer" || components[1] == "" {
-		return "", fmt.Errorf("Invalid Authorization header: [%s]", authorization)
-	}
-
-	return components[1], nil
 }

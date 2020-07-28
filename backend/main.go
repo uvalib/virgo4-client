@@ -81,12 +81,15 @@ func main() {
 		api.POST("/users/:uid/checkouts/renew", svc.AuthMiddleware, svc.RenewCheckouts)
 		api.POST("/users/:uid/preferences", svc.AuthMiddleware, svc.SavePreferences)
 
-		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.GetUserSavedSearches)
-		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.SaveSearch)
-		api.DELETE("/users/:uid/searches", svc.AuthMiddleware, svc.DeleteAllSavedSearches)
-		api.DELETE("/users/:uid/searches/:token", svc.AuthMiddleware, svc.DeleteSavedSearch)
-		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.PublishSavedSearch)
-		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UnpublishSavedSearch)
+		api.GET("/users/:uid/searches", svc.AuthMiddleware, svc.UserMiddleware, svc.GetUserSavedSearches)
+		api.POST("/users/:uid/searches", svc.AuthMiddleware, svc.UserMiddleware, svc.SaveSearch)
+		api.DELETE("/users/:uid/searches", svc.AuthMiddleware, svc.UserMiddleware, svc.DeleteAllSavedSearches)
+		api.DELETE("/users/:uid/searches/:token", svc.AuthMiddleware, svc.UserMiddleware, svc.DeleteSavedSearch)
+		api.POST("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UserMiddleware, svc.PublishSavedSearch)
+		api.DELETE("/users/:uid/searches/:token/publish", svc.AuthMiddleware, svc.UserMiddleware, svc.UnpublishSavedSearch)
+
+		api.GET("/users/:uid/search_templates", svc.AuthMiddleware, svc.UserMiddleware, svc.getSearchTemplates)
+		api.POST("/users/:uid/search_templates", svc.AuthMiddleware, svc.UserMiddleware, svc.saveSearchTemplate)
 
 		api.GET("/users/:uid/bookmarks", svc.AuthMiddleware, svc.GetBookmarks)
 		api.POST("/users/:uid/bookmarks/move", svc.AuthMiddleware, svc.MoveBookmarks)
