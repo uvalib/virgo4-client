@@ -36,21 +36,31 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 	p := ginprometheus.NewPrometheus("gin")
+	backendRoutes := []string{"/version", "/healthcheck", "/config", "/authorize", "/signout", "/api", "/authenticate"}
 	p.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
 		url := c.Request.URL.Path
+		backEndRoute := false
+		for _, tgt := range backendRoutes {
+			if strings.Index(url, tgt) == 0 {
+				backEndRoute = true
+				break
+			}
+		}
+		if backEndRoute == false {
+			return ":vue"
+		}
 		for _, p := range c.Params {
 			if p.Key == "token" {
 				url = strings.Replace(url, p.Value, ":token", 1)
-				break
-			} else if p.Key == "id" {
+			}
+			if p.Key == "id" {
 				url = strings.Replace(url, p.Value, ":id", 1)
-				break
-			} else if p.Key == "uid" {
+			}
+			if p.Key == "uid" {
 				url = strings.Replace(url, p.Value, ":uid", 1)
-				break
-			} else if p.Key == "holdid" {
+			}
+			if p.Key == "holdid" {
 				url = strings.Replace(url, p.Value, ":holdid", 1)
-				break
 			}
 		}
 		return url
