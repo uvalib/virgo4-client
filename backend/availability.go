@@ -121,7 +121,7 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 
 	svc.removeETASRequestOptions(titleID, solrDoc, &AvailabilityResponse)
 
-	claims, signedIn := c.Get("claims")
+	claims, _ := c.Get("claims")
 	v4Claims, ok := claims.(*v4jwt.V4Claims)
 	if ok && v4Claims.CanPlaceReserve {
 		svc.addCourseReserveVideoRequest(titleID, solrDoc, &AvailabilityResponse)
