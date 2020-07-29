@@ -95,7 +95,7 @@ const router = new Router({
       },
       {
          // this is a catchall route for catalog queries from external search boxes
-         path: '/catalog',
+         path: '/catalog*',
          beforeEnter: (to, _from, next) => {
             let field = to.query.search_field
             if ( field == "journal") {
