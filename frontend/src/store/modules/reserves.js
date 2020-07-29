@@ -21,8 +21,11 @@ const reserves = {
          course: "",
          semester: "",
          library: "",
-         period: ""
-      }
+         period: "",
+         // Single selected item for Video Reserve
+      },
+      selectedVideo: {}
+
    },
 
    getters: {
@@ -82,6 +85,7 @@ const reserves = {
       },
       clearRequestList(state) {
          state.requestList = []
+         state.selectedVideo = {}
          state.request = {onBehalfOf: "no",
             instructorName: "",
             instructorEmail: "",
@@ -119,7 +123,7 @@ const reserves = {
             state.page += 1
          }
       }
-   }, 
+   },
 
    actions: {
       async validateReservesRequest(ctx) {
@@ -132,7 +136,7 @@ const reserves = {
          // validate those first
          let itemIds = []
          ctx.state.requestList.forEach( (item,idx) => {
-            let tgtPool = item.pool 
+            let tgtPool = item.pool
             itemIds.push(item.identifier)
             if (ctx.rootGetters["pools/courseReserveSupport"](tgtPool)==false) {
                ctx.commit("markInvalidReserveItem", idx)
@@ -143,7 +147,7 @@ const reserves = {
          return axios.post(`/api/reserves/validate`, {items: itemIds}).then((response) => {
             response.data.forEach( (item, idx) => {
                if (item.reserve == false) {
-                  ctx.commit("markInvalidReserveItem", idx)   
+                  ctx.commit("markInvalidReserveItem", idx)
                }
             })
             ctx.commit('setSearching', false, { root: true })
@@ -160,7 +164,7 @@ const reserves = {
          ctx.state.requestList.forEach( item=>{
             let notes = item.notes
             if (notes.length == 0) notes = "-"
-            let subItem = {catalogKey: item.identifier, 
+            let subItem = {catalogKey: item.identifier,
                pool: item.pool,
                title: item.details.title,
                callNumber: item.details.callNumber,
@@ -168,15 +172,30 @@ const reserves = {
                location: item.details.location,
                library: item.details.library,
                availability: item.details.availability,
-               notes: notes, 
-               period: item.period} 
+               notes: notes,
+               period: item.period}
             if (item.pool == 'video') {
-               subItem.audioLanguage = item.audioLanguage 
-               subItem.subtitles = item.subtitles 
+               subItem.audioLanguage = item.audioLanguage
+               subItem.subtitles = item.subtitles
                subItem.subtitleLanguage = item.subtitleLanguage
             }
-            data.items.push( subItem )    
+            data.items.push( subItem )
          })
+         axios.post(`/api/reserves`, data).then((_response) => {
+            ctx.commit('clearRequestList')
+            ctx.commit('setSearching', false, { root: true })
+            router.push("/reserved")
+         }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.commit('setSearching', false, { root: true })
+         })
+      },
+      createVideoReserve(ctx){
+         ctx.commit('setSearching', true, { root: true })
+         let v4UserID = ctx.rootState.user.signedInUser
+         let data = { userID: v4UserID, request: ctx.state.request,
+            items: [ctx.state.selectedVideo]}
+
          axios.post(`/api/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')
             ctx.commit('setSearching', false, { root: true })
@@ -217,7 +236,7 @@ const reserves = {
          if (qs.length < 3 ) {
             ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
             ctx.commit('clearReservesResults')
-            return 
+            return
          }
 
          ctx.commit('setSearching', true, { root: true })
@@ -229,8 +248,8 @@ const reserves = {
             qs = `"${qs}"`
          }
          if (data.initial === true) {
-            ctx.commit('resetResults', type)   
-         }         
+            ctx.commit('resetResults', type)
+         }
          let typeParam = "type="+type
          let pgParam = "page="+ctx.state.page
          let url = `/api/reserves/search?${typeParam}&query=${qs}&${pgParam}`
@@ -254,7 +273,7 @@ const reserves = {
          if (qs.length < 3 ) {
             ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
             ctx.commit('clearReservesResults')
-            return 
+            return
          }
 
          ctx.commit('setSearching', true, { root: true })
@@ -262,7 +281,7 @@ const reserves = {
          if (data.type == "id") {
             type = "INSTRUCTOR_ID"
             qs = ctx.rootState.user.accountInfo.id
-         } 
+         }
 
          qs = qs.replace(/,/g, "")
          qs = qs.trim()
@@ -270,7 +289,7 @@ const reserves = {
             qs = `"${qs}"`
          }
          if (data.initial === true) {
-            ctx.commit('resetResults', type)   
+            ctx.commit('resetResults', type)
          }
          let typeParam = "type="+type
          let pgParam = "page="+ctx.state.page

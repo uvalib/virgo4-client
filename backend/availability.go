@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-querystring/query"
+	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
 // AvailabilityData coming from ILS Connector
@@ -120,6 +121,12 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 
 	svc.removeETASRequestOptions(titleID, solrDoc, &AvailabilityResponse)
 
+	claims, signedIn := c.Get("claims")
+	v4Claims, ok := claims.(*v4jwt.V4Claims)
+	if ok && v4Claims.CanPlaceReserve {
+		svc.addCourseReserveVideoRequest(titleID, solrDoc, &AvailabilityResponse)
+	}
+
 	c.JSON(http.StatusOK, AvailabilityResponse)
 
 }
@@ -139,6 +146,28 @@ func (svc *ServiceContext) getSolrDoc(id string) SolrDocument {
 	}
 	SolrDoc := SolrResp.Response.Docs[0]
 	return SolrDoc
+}
+
+// Replaces scan request with video course reserve request
+func (svc *ServiceContext) addCourseReserveVideoRequest(id string, SolrDoc SolrDocument, Result *AvailabilityData) {
+
+	if !contains(SolrDoc.Format, "Video") {
+		return
+	}
+	VideoOption := RequestOption{
+		Type:           "videoReserve",
+		Label:          "Video reserve request",
+		SignInRequired: true,
+		Description:    "Request a video reserve for streaming",
+	}
+
+	for i, v := range Result.Availability.RequestOptions {
+		if v.Type == "scan" {
+			VideoOption.ItemOptions = v.ItemOptions
+			Result.Availability.RequestOptions[i] = VideoOption
+			return
+		}
+	}
 }
 
 // Appends Aeon request to availability response

@@ -22,4 +22,4 @@ local_db.sh
 to_prod_db.sh
 to_dev_db.sh
 frontend/yarn_start.sh
-.vscode/tasks.json
+.vscode

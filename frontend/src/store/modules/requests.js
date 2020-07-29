@@ -45,7 +45,8 @@ const requests = {
          aeon: 'AeonPanel',
          pda: 'PDAPanel',
          scan: 'ScanPanel',
-         directLink: 'directLink'
+         directLink: 'directLink',
+         videoReserve: 'VideoReservePanel'
       },
 
    },
