@@ -102,18 +102,23 @@
             </span>
          </div>
       </div>
-      <!-- <div class="templates" v-if="isSignedIn">
-         <template v-if="!savingTemplate">
-            <V4Button mode="tertiary" @click="saveTemplateClicked">Save Search Form</V4Button>
-         </template>
-      </div> -->
+      <div class="templates" v-if="isSignedIn">
+         <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm" 
+            id="savesearch" buttonLabel="Save Form" buttonMode="tertiary">
+            <div>
+               Save the current advanced search form to your account?<br/>
+               Once saved, it will be used as the default setup for future advanced searches.<br/>
+               This can be changed at any time.
+            </div>
+         </Confirm>
+      </div>
       <div class="controls">
          <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
          <span class="sep">|</span>
          <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
       </div>
       <div class="basic">
-         <router-link :to="basicSearchURL">
+         <router-link to="/search?mode=basic">
             Basic Search&nbsp;
             <i class="fas fa-undo-alt"></i>
          </router-link>
@@ -135,14 +140,6 @@ export default {
       V4BarcodeScanner
    },
    computed: {
-      basicSearchURL() {
-         let url = "/search"
-         let bq = this.rawQueryString 
-         if (bq.length > 0) {
-            url += `?q=${encodeURI(bq)}`
-         }
-         return url
-      },
       filteredSources() {
          return this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
       },
@@ -150,7 +147,7 @@ export default {
          advancedFields: state => state.query.advancedFields,
          excludedPools: state => state.query.excludedPools,
          pools: state => state.pools.list,
-         savedTemplates: state => state.searches.templates,
+         searchTemplate: state=>state.preferences.searchTemplate,
          signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
@@ -164,6 +161,7 @@ export default {
          rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
+         hasSearchTemplate: 'preferences/hasSearchTemplate'
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -171,6 +169,9 @@ export default {
       }
    },
    methods: {
+      saveSearchForm() {
+         this.$store.dispatch("preferences/saveAdvancedSearchTemplate", this.advancedSearchTemplate)
+      },
       getTermType( term ) {
          let tgtField = this.advancedFields.find( af=> af.value == term.field)
          return tgtField.type
@@ -231,6 +232,9 @@ export default {
          } else {
             this.$store.commit('query/resetAdvanced')
             this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
+            if ( this.hasSearchTemplate ) {
+               this.$store.commit("query/restoreTemplate", this.searchTemplate)
+            }
             this.focusFirstTerm(true)
          }
       },

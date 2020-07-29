@@ -29,7 +29,7 @@
           </div>
           <div class="advanced">
             <SearchTips/><span class="sep">|</span>
-            <router-link tabindex="0" :to="advancedURL">
+            <router-link tabindex="0" to="/search?mode=advanced">
               <span>Advanced Search&nbsp;<i class="fas fa-search-plus"></i></span>
             </router-link>
           </div>
@@ -135,6 +135,7 @@ export default {
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
          tgtPoolPref: state=>state.preferences.targetPool,
+         searchTemplate: state=>state.preferences.searchTemplate,
          signedInUser: state => state.user.signedInUser,
       }),
       ...mapGetters({
@@ -147,6 +148,7 @@ export default {
         selectedResults: 'selectedResults',
         isSignedIn: 'user/isSignedIn',
         excludedPoolPrefs: 'preferences/excludedPools',
+        hasSearchTemplate: 'preferences/hasSearchTemplate'
       }),
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
@@ -166,32 +168,28 @@ export default {
               this.$route.params.id !== undefined &&
               this.$route.params.id != "")
       },
-      advancedURL() {
-         let url = "/search?mode=advanced"
-         if (this.queryEntered) {
-            url += `&q=${this.rawQueryString}`
-         }
-         return url
-      }
    },
    methods: {
       async restoreSearchFromQueryParams( query, force ) {
-         // No mode or query; just reset the search
-         if (!query.mode && !query.q) {
+         // No query, reset everything
+         if  (!query.q) {
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
             this.$store.commit('query/clear')
             setTimeout( ()=> {
                let  s = document.getElementById("search")
                if (s) s.focus()
-            },250)
-            return
+            }, 250)
          }
 
          // Interrogate query params and convert them to a search in the model (if present)
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
+            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
+            if ( this.hasSearchTemplate ) {
+               this.$store.commit("query/restoreTemplate", this.searchTemplate)
+            }
          } else {
             this.$store.commit("query/setBasicSearch")
             if (query.scope && query.scope != "") {
@@ -202,9 +200,8 @@ export default {
 
          if (query.exclude) {
             this.$store.commit("query/setExcludePreferences", query.exclude.split(","))
-         } else {
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
-         }
+         } 
+
          if (query.tgt) {
             this.$store.commit("query/setPreferredPreference", query.tgt)
          } else {

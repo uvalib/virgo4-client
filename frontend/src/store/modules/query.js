@@ -139,7 +139,6 @@ const query = {
    mutations: {
       updateField,
       restoreTemplate(state, template) {
-         state.excludedPools.splice(0, state.excludedPools.length)
          template.excluded.forEach( e => {
             state.excludedPools.push( e )
          })
@@ -282,13 +281,6 @@ const query = {
       },
       setAdvancedSearch(state) {
          state.mode = "advanced"
-         let exist = state.advanced.findIndex(f => f.value == state.basic)
-         if (exist == -1) {
-            if (state.advanced.length == 1 && state.advanced[0].value == "") {
-               state.advanced[0].value = state.basic
-               state.advanced[0].field = "keyword"
-            }
-         }
       },
       setExcludePreferences(state, excludePrefs) {
          state.excludedPools.splice(0, state.excludedPools.length)

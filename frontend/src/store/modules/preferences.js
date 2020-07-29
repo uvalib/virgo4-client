@@ -18,10 +18,17 @@ const preferences = {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       enableBarcodeScan: false,
+      searchTemplate: {
+         fields: [],
+         excluded: [],
+      }
    },
 
    getters: {
-     getField,
+      getField,
+      hasSearchTemplate: state => {
+         return state.searchTemplate && state.searchTemplate.fields.length > 0
+      },
       isTargetPool: state => pool => {
          return state.targetPool == pool.id
       },
@@ -110,6 +117,9 @@ const preferences = {
          if (prefsObj.enableBarcodeScan ) {
             state.enableBarcodeScan = prefsObj.enableBarcodeScan
          }
+         if (prefsObj.searchTemplate ) {
+            state.searchTemplate = prefsObj.searchTemplate
+         }
       },
       clear(state) {
          state.trackingOptOut = false
@@ -117,6 +127,10 @@ const preferences = {
          state.enableBarcodeScan = false
          state.excludePools.splice(0, state.excludePools.length)
          state.optInPools.splice(0, state.optInPools.length)
+         state.searchTemplate = {
+            fields: [],
+            excluded: [],
+         }
       },
       toggleExcludePool(state, pool) {
          if ( isPoolExternal(pool) && !state.optInPools.includes(pool.id) ) {
@@ -142,9 +156,16 @@ const preferences = {
             state.targetPool = pool.id
          }
       },
+      setSearchTemplate(state, tpl) {
+         state.searchTemplate = tpl
+      }
    },
 
    actions: {
+      async saveAdvancedSearchTemplate( ctx, template) {
+         ctx.commit("setSearchTemplate", template)
+         ctx.dispatch("savePreferences")
+      },
       toggleTargetPool(ctx, pool) {
          ctx.commit("toggleTargetPool", pool)
          ctx.dispatch("savePreferences")
@@ -168,7 +189,8 @@ const preferences = {
             trackingOptOut: ctx.state.trackingOptOut,
             pickupLibrary: ctx.state.pickupLibrary,
             enableBarcodeScan: ctx.state.enableBarcodeScan,
-            optInPools: ctx.state.optInPools
+            optInPools: ctx.state.optInPools,
+            searchTemplate: ctx.state.searchTemplate
          }
          axios.post(url, data)
       }
