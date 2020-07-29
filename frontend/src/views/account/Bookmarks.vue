@@ -98,7 +98,7 @@
                   </AccordionContent>
                   <div class="folder-buttons">
                      <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo"/>
-                     <ConfirmDelete v-on:delete-approved="removeFolder(folderInfo.id, idx)" 
+                     <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)" 
                         :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
                         :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" >
                         <div>
@@ -109,7 +109,7 @@
                         <div>
                            <br />This cannot be reversed.
                         </div>
-                     </ConfirmDelete>
+                     </Confirm>
                   </div>
                </div>
             </template>
@@ -137,7 +137,6 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import ConfirmDelete from "@/components/modals/ConfirmDelete"
 import MoveBookmark from "@/components/modals/MoveBookmark"
 import RenameBookmark from "@/components/modals/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"
@@ -146,7 +145,6 @@ export default {
    name: "bookmarks",
    components: {
       AccordionContent,
-      ConfirmDelete,
       AccountActivities,
       MoveBookmark,
       RenameBookmark,

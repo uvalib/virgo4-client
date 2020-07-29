@@ -10,14 +10,14 @@ require (
 	github.com/go-ozzo/ozzo-dbx v1.5.0
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/google/go-querystring v1.0.0
-	github.com/lib/pq v1.7.1
+	github.com/lib/pq v1.8.0
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/sirupsen/logrus v1.6.0 // indirect
 	github.com/uvalib/virgo4-jwt v0.0.0-20200722181137-be853a3737d4
 	github.com/zsais/go-gin-prometheus v0.1.0
-	golang.org/x/sys v0.0.0-20200722175500-76b94024e4b6 // indirect
+	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

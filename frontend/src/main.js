@@ -10,6 +10,7 @@ import V4Spinner from "@/components/V4Spinner"
 import V4Select from "@/components/V4Select"
 import V4Modal from "@/components/modals/V4Modal"
 import V4Disclosure from "@/components/disclosures/V4Disclosure"
+import Confirm from "@/components/modals/Confirm"
 
 Vue.component('V4Button', V4Button)
 Vue.component('V4Checkbox', V4Checkbox)
@@ -17,6 +18,7 @@ Vue.component('V4Spinner', V4Spinner)
 Vue.component('V4Select', V4Select)
 Vue.component('V4Modal', V4Modal)
 Vue.component('V4Disclosure', V4Disclosure)
+Vue.component('Confirm', Confirm)
 
 import analytics from './analytics'
 Vue.prototype.$analytics = analytics

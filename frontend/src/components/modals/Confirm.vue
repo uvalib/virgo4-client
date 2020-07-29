@@ -1,15 +1,15 @@
 <template>
-   <V4Modal :id="id" title="Confirm Delete" ref="confirmdel" 
+   <V4Modal :id="id" :title="title" ref="confirmdlg" 
       :firstFocusID="`${id}-cancelbtn`" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`"
    >
       <template v-slot:button>
-         <V4Button v-if="buttonLabel" mode="text" @click="$refs.confirmdel.show()" :id="`${id}-open`"
+         <V4Button v-if="buttonLabel" :mode="buttonMode" @click="$refs.confirmdlg.show()" :id="`${id}-open`"
              :aria-label="ariaLabel"
          >
             {{buttonLabel}}
          </V4Button>
-         <V4Button v-else mode="icon" @click="$refs.confirmdel.show()" :id="`${id}-open`"
+         <V4Button v-else mode="icon" @click="$refs.confirmdlg.show()" :id="`${id}-open`"
              :aria-label="ariaLabel"
          >
             <i class="trash fas fa-trash-alt"></i>
@@ -20,7 +20,7 @@
          <p>Continue?</p>
        </template>
        <template v-slot:controls>
-         <V4Button mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.confirmdel.hide()"
+         <V4Button mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.confirmdlg.hide()"
             :focusBackOverride="true" @tabback="backTabCancel">
             Cancel
          </V4Button>
@@ -35,6 +35,10 @@
 <script>
 export default {
    props: {
+      title: {
+         type: String,
+         required: true
+      },
       id: {
          type: String,
          required: true
@@ -43,6 +47,10 @@ export default {
          type: String,
          default: "" 
       },
+      buttonMode: {
+         type: String,
+         default: "text"
+      },
       ariaLabel: {
          type: String,
          default: ""    
@@ -50,16 +58,16 @@ export default {
    },
    methods: {
       backTabCancel() {
-         this.$refs.confirmdel.firstFocusBackTabbed()
+         this.$refs.confirmdlg.firstFocusBackTabbed()
       },
       nextTabOK() {
-         this.$refs.confirmdel.lastFocusTabbed()
+         this.$refs.confirmdlg.lastFocusTabbed()
       },
       okClicked() {
-         this.$emit('delete-approved')
+         this.$emit('confirmed')
          setTimeout( () => {
-            if ( this.$refs.confirmdel ) {
-               this.$refs.confirmdel.hide()
+            if ( this.$refs.confirmdlg ) {
+               this.$refs.confirmdlg.hide()
             }
          }, 300)
       },

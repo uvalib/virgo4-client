@@ -28,13 +28,13 @@
                               <i class="fas fa-search"></i>
                            </router-link>
                         </span>
-                        <ConfirmDelete v-on:delete-approved="removeSavedSearch(saved.token)"
+                        <Confirm title="Confirm Delete" v-on:confirmed="removeSavedSearch(saved.token)"
                            :id="`del-saved-search-${idx+1}`"
                            :ariaLabel="`Delete search named ${saved.name}`"
                         >
                            <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
                            <div class="del-detail">This cannot be reversed.</div>
-                        </ConfirmDelete>
+                        </Confirm>
                      </span>
                   </div>
                   <div v-if="saved.public" class="public-controls">
@@ -47,10 +47,10 @@
                   </div>
                </div>
                 <div class="controls">
-                  <ConfirmDelete v-on:delete-approved="removeAllSearches" id="del-all-searches" buttonLabel="Delete all saved searches">
+                  <Confirm title="Confirm Delete" v-on:confirmed="removeAllSearches" id="del-all-searches" buttonLabel="Delete all saved searches">
                      <div>Delete all saved searches?</div>
                      <div class="del-detail">This cannot be reversed.</div>
-                  </ConfirmDelete>
+                  </Confirm>
                </div>
             </div>
             <div v-if="history.length > 0" class="history">
@@ -60,10 +60,10 @@
                   <router-link class="history" :to="h">{{urlToText(h)}}</router-link>
                </div>
                 <div class="controls">
-                  <ConfirmDelete v-on:delete-approved="clearHistory" id="del-history" buttonLabel="Clear search history">
+                  <Confirm title="Confirm Delete" v-on:confirmed="clearHistory" id="del-history" buttonLabel="Clear search history">
                      <div>Delete search history?</div>
                      <div class="del-detail">This cannot be reversed.</div>
-                  </ConfirmDelete>
+                  </Confirm>
                </div>
             </div>
          </div>
@@ -74,11 +74,10 @@
 <script>
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
-import ConfirmDelete from "@/components/modals/ConfirmDelete"
 export default {
    name: "requests",
    components: {
-      AccountActivities,ConfirmDelete
+      AccountActivities
    },
    computed: {
       ...mapState({
