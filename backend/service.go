@@ -426,8 +426,13 @@ func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
 
 	if err != nil {
-		log.Printf("ERROR: Failed response from ILLiad %s %s - %d:%s. Elapsed Time: %d (ms)",
-			verb, url, err.StatusCode, err.Message, elapsedMS)
+		if shouldLogAsError(err.StatusCode) {
+			log.Printf("ERROR: Failed response from ILLiad %s %s - %d:%s. Elapsed Time: %d (ms)",
+				verb, url, err.StatusCode, err.Message, elapsedMS)
+		} else {
+			log.Printf("INFO: Response from ILLiad %s %s - %d:%s. Elapsed Time: %d (ms)",
+				verb, url, err.StatusCode, err.Message, elapsedMS)
+		}
 	} else {
 		log.Printf("Successful response from ILLiad %s %s. Elapsed Time: %d (ms)", verb, url, elapsedMS)
 	}
@@ -447,8 +452,13 @@ func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, httpClient *h
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
 
 	if err != nil {
-		log.Printf("ERROR: Failed response from ILS GET %s - %d:%s. Elapsed Time: %d (ms)",
-			url, err.StatusCode, err.Message, elapsedMS)
+		if shouldLogAsError(err.StatusCode) {
+			log.Printf("ERROR: Failed response from ILS GET %s - %d:%s. Elapsed Time: %d (ms)",
+				url, err.StatusCode, err.Message, elapsedMS)
+		} else {
+			log.Printf("INFO: Response from ILS GET %s - %d:%s. Elapsed Time: %d (ms)",
+				url, err.StatusCode, err.Message, elapsedMS)
+		}
 	} else {
 		log.Printf("Successful response from ILS GET %s. Elapsed Time: %d (ms)", url, elapsedMS)
 	}
@@ -575,3 +585,12 @@ func handleAPIResponse(URL string, resp *http.Response, err error) ([]byte, *Req
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	return bodyBytes, nil
 }
+
+// do we log this http response as an error or is it expected under normal circumstances
+func shouldLogAsError(httpStatus int) bool {
+	return httpStatus != http.StatusOK && httpStatus != http.StatusNotFound
+}
+
+//
+// end of file
+//
