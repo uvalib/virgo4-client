@@ -127,10 +127,8 @@ const preferences = {
          state.enableBarcodeScan = false
          state.excludePools.splice(0, state.excludePools.length)
          state.optInPools.splice(0, state.optInPools.length)
-         state.searchTemplate = {
-            fields: [],
-            excluded: [],
-         }
+         state.searchTemplate.fields.splice(0, state.searchTemplate.fields.length)
+         state.searchTemplate.excluded.splice(0, state.searchTemplate.excluded.length)
       },
       toggleExcludePool(state, pool) {
          if ( isPoolExternal(pool) && !state.optInPools.includes(pool.id) ) {
@@ -157,7 +155,14 @@ const preferences = {
          }
       },
       setSearchTemplate(state, tpl) {
-         state.searchTemplate = tpl
+         state.searchTemplate.fields.splice(0, state.searchTemplate.fields.length)
+         tpl.fields.forEach( f => {
+            state.searchTemplate.fields.push(f)    
+         })
+         state.searchTemplate.excluded.splice(0, state.searchTemplate.excluded.length)
+         tpl.excluded.forEach( e => {
+            state.searchTemplate.excluded.push(e)    
+         })
       }
    },
 

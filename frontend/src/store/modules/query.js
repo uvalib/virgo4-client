@@ -128,6 +128,7 @@ const query = {
          let excluded = false
          state.excludedPools.some( pid => {
             if (pid == pool.id) {
+               console.log(pid + " is excluded")
                excluded = true
             }
             return excluded == true
@@ -140,7 +141,9 @@ const query = {
       updateField,
       restoreTemplate(state, template) {
          template.excluded.forEach( e => {
-            state.excludedPools.push( e )
+            if ( !state.excludedPools.includes(e) ) {
+               state.excludedPools.push( e )
+            }
          })
 
          state.advanced.splice(0, state.advanced.length)
@@ -303,11 +306,10 @@ const query = {
          state.excludedPools.splice(0, state.excludedPools.length)
       },
       excludeAll( state, pools ) {
+         state.excludedPools.splice(0, state.excludedPools.length)
          pools.forEach( p => {
-            if (!state.excludedPools.includes(p.id)) {
-               if (state.preferredPool != p.id) {
-                  state.excludedPools.push(p.id)
-               }
+            if (state.preferredPool != p.id) {
+               state.excludedPools.push(p.id)
             }
          })
       },
