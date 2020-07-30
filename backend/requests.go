@@ -8,8 +8,30 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
+
+// Request structure for ILLiad POST /transaction
+type illiadRequest struct {
+	Username                   string
+	NotWantedAfter             string
+	RequestType                string
+	ProcessType                string
+	DocumentType               string
+	PhotoJournalTitle          string
+	PhotoArticleTitle          string
+	PhotoArticleAuthor         string
+	PhotoJournalVolume         string
+	PhotoJournalIssue          string
+	PhotoJournalMonth          string
+	PhotoJournalYear           string
+	PhotoJournalInclusivePages string
+	ItemNumber                 string
+	ISSN                       string
+	ESPNumber                  string
+	Location                   string
+	AcceptNonEnglish           bool
+	TransactionStatus          string
+}
 
 // CreateHold uses ILS Connector V4 API to create a Hold
 func (svc *ServiceContext) CreateHold(c *gin.Context) {
@@ -45,6 +67,69 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// CreateStandaloneScan send a request for a standalone scan to ILLiad
+func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
+	type scanRequest struct {
+		Course       string `json:"course"`
+		DateNeeded   string `json:"date"`
+		PersonalCopy string `json:"personalCopy"`
+		Title        string `json:"title"`
+		Author       string `json:"author"`
+		Work         string `json:"work"`
+		Volume       string `json:"volume"`
+		Issue        string `json:"issue"`
+		Month        string `json:"month"`
+		Year         string `json:"year"`
+		Pages        string `json:"pages"`
+		ISSN         string `json:"issn"`
+		OCLC         string `json:"oclc"`
+		AnyLanguage  string `json:"anyLanguage"`
+	}
+	var scanReq scanRequest
+	err := c.ShouldBindJSON(&scanReq)
+	if err != nil {
+		log.Printf("ERROR: Unable to parse request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	v4Claims, error := getJWTClaims(c)
+	if error != nil {
+		log.Printf("ERROR: %s", error.Error())
+		c.String(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	log.Printf("Process standalone instructional scan request from %s for  '%s'", v4Claims.UserID, scanReq.Title)
+	illadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
+		DocumentType: "Collab", PhotoJournalTitle: scanReq.Work, PhotoArticleTitle: scanReq.Title,
+		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,
+		PhotoJournalMonth: scanReq.Month, PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages,
+		ISSN: scanReq.ISSN, ESPNumber: scanReq.OCLC, TransactionStatus: "Awaiting DD Scanning Processing",
+		NotWantedAfter: scanReq.DateNeeded,
+	}
+	if scanReq.AnyLanguage == "true" {
+		illadReq.AcceptNonEnglish = true
+	}
+	if scanReq.PersonalCopy == "true" {
+		illadReq.Location = "Personal Copy"
+	}
+
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadReq)
+	if illErr != nil {
+		c.JSON(illErr.StatusCode, illErr.Message)
+		return
+	}
+
+	// parse transaction number from response
+	var illadResp struct {
+		TransactionNumber int
+	}
+	json.Unmarshal([]byte(rawResp), &illadResp)
+
+	c.JSON(http.StatusOK, illadResp)
+}
+
 // CreateScan first sends the request to Illiad, then ils-connector
 func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	// ScanRequest contains data for a new Hold
@@ -69,38 +154,16 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
-	claims, signedIn := c.Get("claims")
-	if signedIn == false {
-		log.Printf("Scan Request requires signin with JWT claims; no claims found")
-		c.String(http.StatusBadRequest, "Sign in required")
-		return
-	}
-	v4Claims, ok := claims.(*v4jwt.V4Claims)
-	if !ok {
-		log.Printf("ERROR: Scan Request with invalid JWT")
-		c.String(http.StatusBadRequest, "Sign in required")
+
+	v4Claims, error := getJWTClaims(c)
+	if error != nil {
+		log.Printf("ERROR: %s", error.Error())
+		c.String(http.StatusUnauthorized, err.Error())
 		return
 	}
 
 	// First, attempt the ILLiad POST... convert into required structure
 	log.Printf("Process scan request from %s for barcode %s", v4Claims.UserID, scanReq.ItemBarcode)
-	type illiadRequest struct {
-		Username                   string
-		RequestType                string
-		ProcessType                string
-		DocumentType               string
-		PhotoJournalTitle          string
-		PhotoArticleTitle          string
-		PhotoArticleAuthor         string
-		PhotoJournalVolume         string
-		PhotoJournalIssue          string
-		PhotoJournalYear           string
-		PhotoJournalInclusivePages string
-		ItemNumber                 string
-		ISSN                       string
-		TransactionStatus          string
-	}
-
 	illadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
 		DocumentType: scanReq.IlliadType, PhotoJournalTitle: scanReq.Title, PhotoArticleTitle: scanReq.Chapter,
 		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,

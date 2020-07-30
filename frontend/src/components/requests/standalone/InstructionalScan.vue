@@ -3,32 +3,31 @@
       <h2>Instructional Scanning Request</h2>
       <div class="scan pure-form">
          <div class="entry pure-control-group">
-            <label for="course-info">Course Information</label>
-            <textarea id="course-info" v-model="request.course"></textarea>
-            <span class="note">Please supply the Course Instructor, Course Name, Number, Section and Semester.</span>
-            <span v-if="hasError('course')" class="error">* coure information is required</span>
+            <label for="course">Course Information<span class="required">*</span></label>
+            <textarea id="course" v-model="request.course"></textarea>
+            <span class="note">Please supply the Course Instructor, Course Name, Number, Section and Semester</span>
+            <span v-if="hasError('course')" class="error">Course information is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="date">Need By Date</label>
+            <label for="date">Need By Date<span class="required">*</span></label>
             <input type="text" v-model="request.date" id="date" aria-required="true" required="required">
-            <span v-if="hasError('date')" class="error">* date is required</span>
+            <span v-if="hasError('date')" class="error">Date is required</span>
          </div>
          <div role="radiogroup" class="entry pure-control-group" aria-labelledby="personal-label">
-            <label class="inline" id="personal-label">Is this item a Personal Copy?</label>
-            <V4Button class="radio" mode="icon" @click="request.personalCopy='true'" role="radio" 
+            <label id="personal-label">Is this item a Personal Copy?<span class="required">*</span></label>
+            <V4Button id="personal-yes" class="radio" mode="icon" @click="request.personalCopy='true'" role="radio" 
                :aria-checked="(request.personalCopy=='true').toString()">
                <i v-if="request.personalCopy=='true'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
                Yes
             </V4Button>
-      
             <V4Button class="radio" mode="icon" @click="request.personalCopy='false'" role="radio" 
                :aria-checked="(request.personalCopy=='false').toString()">
                <i v-if="request.personalCopy=='false'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
                No
             </V4Button>
-            <div class="instruct">
+            <div class="instruct" v-if="request.personalCopy=='true'">
                <p>Personal copies can be dropped off at a Library Circulation Desk, deposited in a Book Drop, or sent via campus mail to:</p>
                <p class="addy">
                   Instructional Scanning Services<br/>
@@ -38,20 +37,73 @@
                   <b>** Please include a note with instructor name and course information in the item when dropping off a personal copy.</b>
                </p>
             </div>
-            <span v-if="hasError('date')" class="error">* yes or no is required</span>
+            <span v-if="hasError('personalCopy')" class="error">Personal copy choice is required</span>
          </div>
-         <!-- *
-         Article or Chapter Title* (one chapter or article per request, please)
-         Article or Chapter Author*
-         Title of work (Journal, Book, Conference Proceedings or Newspaper)*
-         Volume
-         Issue
-         Month
-         Year*
-         Pages*
-         ISBN/ISSN
-         OCLC Number
-         Will you accept the item in a language other than English? (yes or no)** -->    
+         <div class="entry pure-control-group">
+            <label for="title">Article or Chapter Title<span class="required">*</span></label>
+            <input type="text" v-model="request.title" id="title" aria-required="true" required="required">
+            <span class="note">One chapter or article per request, please</span>
+            <span v-if="hasError('title')" class="error">Title is required</span>
+         </div>
+         <div class="entry pure-control-group">
+            <label for="author">Article or Chapter Author<span class="required">*</span></label>
+            <input type="text" v-model="request.author" id="author" aria-required="true" required="required">
+            <span v-if="hasError('author')" class="error">Author is required</span>
+         </div>
+         <div class="entry pure-control-group">
+            <label for="work">Title of work</label>
+            <input type="text" v-model="request.work" id="work">
+            <span class="note">Journal, Book, Conference Proceedings or Newspaper</span>
+         </div>
+         <div class="entry pure-control-group">
+            <label for="volume">Volume</label>
+            <input type="text" v-model="request.volume" id="volume">
+         </div>
+         <div class="entry pure-control-group">
+            <label for="issue">Issue</label>
+            <input type="text" v-model="request.issue" id="issue">
+         </div>
+         <div class="entry pure-control-group">
+            <label for="month">Month</label>
+            <input type="text" v-model="request.month" id="month">
+         </div>
+         <div class="entry pure-control-group">
+            <label for="year">Year<span class="required">*</span></label>
+            <input type="text" v-model="request.year" id="year" aria-required="true" required="required">
+            <span v-if="hasError('year')" class="error">Year is required</span>
+         </div>
+         <div class="entry pure-control-group">
+            <label for="pages">Pages<span class="required">*</span></label>
+            <input type="text" v-model="request.pages" id="pages" aria-required="true" required="required">
+            <span v-if="hasError('pages')" class="error">Pages are required</span>
+         </div>
+         <div class="entry pure-control-group">
+            <label for="issn">ISBN/ISSN</label>
+            <input type="text" v-model="request.issn" id="issn">
+         </div>
+         <div class="entry pure-control-group">
+            <label for="oclc">OCLC Number</label>
+            <input type="text" v-model="request.oclc" id="oclc">
+         </div>
+         <div role="radiogroup" class="entry pure-control-group" aria-labelledby="language-label">
+            <label id="language-label">
+               Will you accept the item in a language other than English?
+               <span class="required">*</span>
+            </label>
+            <V4Button id="any-language-yes" class="radio" mode="icon" @click="request.anyLanguage='true'" role="radio" 
+               :aria-checked="(request.anyLanguage=='true').toString()">
+               <i v-if="request.anyLanguage=='true'" class="check fas fa-check-circle"></i>
+               <i v-else class="check far fa-circle"></i>
+               Yes
+            </V4Button>
+            <V4Button class="radio" mode="icon" @click="request.anyLanguage='false'" role="radio" 
+               :aria-checked="(request.anyLanguage=='false').toString()">
+               <i v-if="request.anyLanguage=='false'" class="check fas fa-check-circle"></i>
+               <i v-else class="check far fa-circle"></i>
+               No
+            </V4Button>
+            <span v-if="hasError('anyLanguage')" class="error">Language choice is required</span>
+         </div>  
       </div>
       <div class="notice">
          <p class="head">
@@ -95,12 +147,11 @@
             Instructors are responsible for compliance with copyright law.    
          </p>
       </div>
-      <p class="error" v-if="error">{{error}}</p>
       <div class="controls">
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :focusNextOverride="true" @tabnext="nextTabOK">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked">
             Submit
          </V4Button>
       </div>
@@ -113,26 +164,48 @@ export default {
       return {
          error: "",
          errors: [],
-         required: ['course', 'date'],
+         required: ['course', 'date', 'personalCopy', 'title', 'author', 'year', 'pages', 'anyLanguage'],
          request: {
             course: "",
             date: "",
             personalCopy: "",
+            title: "",
+            author: "",
+            work: "",
+            volume: "",
+            issue: "",
+            month: "",
+            year: "",
+            pages: "",
+            issn: "",
+            oclc: "",
+            anyLanguage: ""
          }
       }
    },
    methods: {
-      opened() {
-         // TODO
-      },
       async submitClicked() {
-         // TODO
-      },
-      nextTabOK() {
-         this.$refs.scanmodal.lastFocusTabbed()
-      },
-      backTabInput() {
-         this.$refs.scanmodal.firstFocusBackTabbed()
+         this.errors.splice(0, this.errors.length)
+         for (let [key, value] of Object.entries(this.request)) {
+            if ( this.required.includes(key) && value == "") {
+               this.errors.push(key)
+            }
+         }
+         if (this.errors.length > 0) {
+            let tgtID = this.errors[0]
+            if (tgtID == "personalCopy") {
+               tgtID = "personal-yes"
+            } else if (tgtID == "anyLanguage") {
+               tgtID = "any-language-yes"
+            }
+            let first = document.getElementById(tgtID)
+            if ( first ) {
+               first.focus()
+            }
+         } else {
+            await this.$store.dispatch("requests/submitStandaloneInstructionalScan", this.request)
+            this.$emit('submitted')
+         }
       },
       hasError( val) {
          return this.errors.includes(val)
@@ -154,8 +227,16 @@ h2 {
    font-size: 1.2em;
 }
 .scan {
+   margin-bottom: 25px;
+   border-bottom: 1px solid var(--uvalib-grey-light);
+
    button.v4-button.radio {
-      margin-left: 10px;
+      margin-right: 15px;
+   }
+   .required {
+      margin-left: 5px;
+      font-weight: bold;
+      color: var(--uvalib-red-emergency);
    }
    .instruct {
       margin: 0; 
@@ -170,11 +251,6 @@ h2 {
       font-weight: 500;
       display: block;
    }
-   label.inline { 
-      font-weight: 500;
-      display: inline-block;
-      margin-right: 10px;
-   }
    .note {
       font-style: italic;
    }
@@ -186,10 +262,11 @@ h2 {
       margin-bottom: 15px;
    }
    span.error {
-      margin-left: 10px;
-      font-weight: bold;
+      margin: 0px;
+      font-weight: normal;
       font-style: italic;
       color: var(--color-error);
+      display: block;
    }
 }
 .controls {
@@ -204,7 +281,7 @@ p.error {
    margin: 10px;
 }
 .notice {
-   font-size:0.9em;
+   font-size:0.95em;
    padding: 0;
    border: 1px solid var(--uvalib-red-emergency);
    p {

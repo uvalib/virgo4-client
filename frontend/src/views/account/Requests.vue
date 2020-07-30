@@ -7,7 +7,7 @@
             <V4Spinner message="Looking up requests..." />
          </div>
          <template v-if="request" class="details">
-            <component v-bind:is="request" @canceled="cancelRequest"/>
+            <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
          </template>
          <div v-else class="details">
             <h2>Issue Request</h2>
@@ -129,8 +129,10 @@
                                  <dt>Pages:</dt>
                                  <dd>{{req.photoJournalInclusivePages}}</dd>
                               </template>
-                              <dt>Call Number:</dt>
-                              <dd>{{req.callNumber}}</dd>
+                              <template v-if="req.callNumber">
+                                 <dt>Call Number:</dt>
+                                 <dd>{{req.callNumber}}</dd>
+                              </template>
                               <dt>Transaction Number:</dt>
                               <dd>{{req.transactionNumber}}</dd>
                               <dt>Date Requested:</dt>
@@ -214,6 +216,12 @@ export default {
       },
       cancelRequest() {
          this.request = ""
+      },
+      requestSubmitted() {
+         this.request = ""
+         this.$store.dispatch("user/getRequests")
+         this.$store.commit("system/setMessage", "Your request has been submitted.")
+         window.scrollTo(0,0)
       },
       formatDate(date) {
          return date.split("T")[0];
