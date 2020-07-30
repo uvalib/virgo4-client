@@ -128,7 +128,6 @@ const query = {
          let excluded = false
          state.excludedPools.some( pid => {
             if (pid == pool.id) {
-               console.log(pid + " is excluded")
                excluded = true
             }
             return excluded == true
