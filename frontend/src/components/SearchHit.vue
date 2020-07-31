@@ -4,10 +4,10 @@
          <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
          <SearchHitDetail :hit="hit" :pool="pool"/>
       </div>
-      <AccordionContent v-if="hit.grouped" :id="hit.identifier" 
-         :autoExpandID="autoExpandGroupID" :expanded="!collapseGroups" :heightOffset="20"
-         backgroundContent="none" background="var(--uvalib-teal-lightest)"
-         borderColor="var(--uvalib-teal-light)" class="group">
+      <AccordionContent v-if="hit.grouped" :id="hit.identifier"
+         :autoExpandID="autoExpandGroupID" :expanded="!collapseGroups" :heightOffset="5"
+         backgroundContent="none" background="var(--uvalib-blue-alt-light)"
+         borderColor="var(--uvalib-blue-alt)" class="group">
          <template v-slot:title>{{groupTitle}}</template>
          <template v-for="(groupHit,idx) in hit.group">
             <div class="group-hit" v-bind:data-identifier="groupHit.identifier" 
@@ -106,6 +106,9 @@ export default {
       margin: 5px 0px 5px 0px;
       background-color: white;
    }
+}
+.group {
+   margin-top: 5px;
 }
 .hit {
    width: 100%;
