@@ -18,6 +18,7 @@ const preferences = {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       enableBarcodeScan: false,
+      collapseGroups: false,
       searchTemplate: {
          fields: [],
          excluded: [],
@@ -78,6 +79,9 @@ const preferences = {
       toggleBarcodeScan(state) {
          state.enableBarcodeScan = !state.enableBarcodeScan
       },
+      toggleCollapseGroups(state) {
+         state.collapseGroups = !state.collapseGroups
+      },
       toggleOptOut(state) {
          state.trackingOptOut = !state.trackingOptOut
          if ( state.trackingOptOut ) {
@@ -97,6 +101,9 @@ const preferences = {
          }
          if (prefsObj.excludePools ) {
             state.excludePools = prefsObj.excludePools
+         }
+         if (prefsObj.collapseGroups ) {
+            state.collapseGroups = prefsObj.collapseGroups
          }
          if (prefsObj.optInPools ) {
             state.optInPools = prefsObj.optInPools
@@ -124,6 +131,7 @@ const preferences = {
       clear(state) {
          state.trackingOptOut = false
          state.targetPool = ""
+         state.collapseGroups = false
          state.enableBarcodeScan = false
          state.excludePools.splice(0, state.excludePools.length)
          state.optInPools.splice(0, state.optInPools.length)
@@ -187,6 +195,10 @@ const preferences = {
          ctx.commit("toggleBarcodeScan")
          ctx.dispatch("savePreferences")
       },
+      toggleCollapseGroups(ctx) {
+         ctx.commit("toggleCollapseGroups")
+         ctx.dispatch("savePreferences")
+      },
       savePreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
          let data = {targetPool: ctx.state.targetPool,
@@ -194,6 +206,7 @@ const preferences = {
             trackingOptOut: ctx.state.trackingOptOut,
             pickupLibrary: ctx.state.pickupLibrary,
             enableBarcodeScan: ctx.state.enableBarcodeScan,
+            collapseGroups: ctx.state.collapseGroups,
             optInPools: ctx.state.optInPools,
             searchTemplate: ctx.state.searchTemplate
          }

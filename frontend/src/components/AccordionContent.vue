@@ -6,7 +6,12 @@
          :class="layout" class="title" role="button"
          :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
          :aria-expanded="expandedStr" :aria-controls="contentID">
-         <slot name="title"></slot>
+         <template v-if="hasCollapseTitleSlot == false || (hasCollapseTitleSlot && isExpanded == false)">
+            <slot name="title"></slot>
+         </template>
+         <template v-if="isExpanded == true && hasCollapseTitleSlot == true">
+            <slot name="collapse"></slot>
+         </template>
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
       </div>
       <transition name="accordion"
@@ -44,9 +49,6 @@ export default {
       closeOthers: {
          type: Number,
          default: null,
-      },
-      autoCollapseOn: {
-         default: null
       },
       autoExpandID: {
          type: String,
@@ -106,11 +108,6 @@ export default {
             })
          }
       },
-      autoCollapseOn() {
-         if (this.isExpanded) {
-            this.isExpanded = false
-         }
-      },
       autoExpandID(newVal, _oldVal) {
          if (this.isExpanded === false && this.id && newVal != "") {
             if (this.id == newVal) {
@@ -150,10 +147,13 @@ export default {
          return `accordion-conttent-${this.id}`
       },
       hasControlSlot() {
-         return this.$slots['controls']
+         return Object.prototype.hasOwnProperty.call(this.$slots, 'controls')
       },
       hasFooterSlot() {
-         return this.$slots['footer']
+         return Object.prototype.hasOwnProperty.call(this.$slots, 'footer')
+      },
+      hasCollapseTitleSlot() {
+         return Object.prototype.hasOwnProperty.call(this.$slots, 'collapse')
       },
    },
    methods: {
