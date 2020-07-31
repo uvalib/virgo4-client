@@ -14,7 +14,7 @@
             <span v-if="hasError('date')" class="error">Date is required</span>
          </div>
          <div role="radiogroup" class="entry pure-control-group" aria-labelledby="personal-label">
-            <label id="personal-label">Is this item a Personal Copy?<span class="required">*</span></label>
+            <label id="personal-label">Will you be providing a copy of this material for the Library to scan?</label>
             <V4Button id="personal-yes" class="radio" mode="icon" @click="request.personalCopy='true'" role="radio" 
                :aria-checked="(request.personalCopy=='true').toString()">
                <i v-if="request.personalCopy=='true'" class="check fas fa-check-circle"></i>
@@ -37,12 +37,11 @@
                   <b>** Please include a note with instructor name and course information in the item when dropping off a personal copy.</b>
                </p>
             </div>
-            <span v-if="hasError('personalCopy')" class="error">Personal copy choice is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="title">Article or Chapter Title<span class="required">*</span></label>
             <input type="text" v-model="request.title" id="title" aria-required="true" required="required">
-            <span class="note">One chapter or article per request, please</span>
+            <span class="note">One article or chapter per request, please</span>
             <span v-if="hasError('title')" class="error">Title is required</span>
          </div>
          <div class="entry pure-control-group">
@@ -68,9 +67,8 @@
             <input type="text" v-model="request.month" id="month">
          </div>
          <div class="entry pure-control-group">
-            <label for="year">Year<span class="required">*</span></label>
-            <input type="text" v-model="request.year" id="year" aria-required="true" required="required">
-            <span v-if="hasError('year')" class="error">Year is required</span>
+            <label for="year">Year</label>
+            <input type="text" v-model="request.year" id="year">
          </div>
          <div class="entry pure-control-group">
             <label for="pages">Pages<span class="required">*</span></label>
@@ -164,7 +162,7 @@ export default {
       return {
          error: "",
          errors: [],
-         required: ['course', 'date', 'personalCopy', 'title', 'author', 'year', 'pages', 'anyLanguage'],
+         required: ['course', 'date', 'title', 'author', 'pages', 'anyLanguage'],
          request: {
             course: "",
             date: "",
@@ -193,9 +191,7 @@ export default {
          }
          if (this.errors.length > 0) {
             let tgtID = this.errors[0]
-            if (tgtID == "personalCopy") {
-               tgtID = "personal-yes"
-            } else if (tgtID == "anyLanguage") {
+            if (tgtID == "anyLanguage") {
                tgtID = "any-language-yes"
             }
             let first = document.getElementById(tgtID)

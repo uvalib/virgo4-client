@@ -10,11 +10,13 @@
             <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
          </template>
          <div v-else class="details">
-            <h2>Issue Request</h2>
-            <div class="subcontent">
-               <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning Request</V4Button>
-            </div>
-            <h2>Outstanding Requests</h2>
+            <template v-if="enableByDate('2020-08-10')">
+               <h2>Issue Request</h2>
+               <div class="subcontent">
+                  <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning Request</V4Button>
+               </div>
+               <h2>Outstanding Requests</h2>
+            </template>
             <div class="subcontent">
                <template v-if="lookingUp == false && requests.holds.length > 0">
                   <AccordionContent
@@ -90,7 +92,7 @@
                   </AccordionContent>
                </template>
 
-               <template v-if="digitalRequests.length > 0">
+               <template v-if="lookingUp == false && digitalRequests.length > 0">
                   <AccordionContent
                         class="requests-accordion"
                         background="var(--uvalib-blue-alt-lightest)"
@@ -176,7 +178,8 @@ export default {
    computed: {
       ...mapState({
          requests: state => state.user.requests,
-         lookingUp: state => state.user.lookingUp
+         lookingUp: state => state.user.lookingUp,
+         devServer: state => state.system.devServer
       }),
       ...mapGetters({
          isDevServer: "system/isDevServer"
@@ -211,6 +214,12 @@ export default {
       }
    },
    methods: {
+      enableByDate( dateStr) {
+         if ( this.devServer) return true
+         let today = new Date()
+         let tgtDate = new Date(dateStr)
+         return today >= tgtDate
+      },
       instructionalScanClick() {
          this.request = "InstructionalScan"
       },
@@ -227,7 +236,7 @@ export default {
          return date.split("T")[0];
       },
       hasNoRequests() {
-         return this.requests.illiad.length == 0 && this.requests.holds.length == 0
+         return this.illLoans.length == 0 && this.requests.holds.length == 0 && this.digitalRequests == 0
       },
       deleteHold(id) {
          this.$store.dispatch("requests/deleteHold", id);
