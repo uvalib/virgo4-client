@@ -36,7 +36,6 @@ type illiadRequest struct {
 type illiadNote struct {
 	Note     string
 	NoteType string
-	AddedBy  string
 }
 
 // CreateHold uses ILS Connector V4 API to create a Hold
@@ -134,7 +133,7 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	json.Unmarshal([]byte(rawResp), &illadResp)
 
 	// use transaction number to add a note to the request containing course info
-	noteReq := illiadNote{Note: scanReq.Course, NoteType: "User", AddedBy: v4Claims.UserID}
+	noteReq := illiadNote{Note: scanReq.Course, NoteType: "Staff"}
 	_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
 	if illErr != nil {
 		log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
@@ -201,7 +200,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	}
 	json.Unmarshal([]byte(rawResp), &illadResp)
 
-	noteReq := illiadNote{Note: scanReq.Notes, NoteType: "User", AddedBy: v4Claims.UserID}
+	noteReq := illiadNote{Note: scanReq.Notes, NoteType: "Staff"}
 	_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
 	if illErr != nil {
 		log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
