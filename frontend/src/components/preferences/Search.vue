@@ -8,7 +8,7 @@
          </p>
          <div class="check">
             <label>
-               <input @change="collapseGroupsClicked" class="choice" :checked="collapseGroups" type="checkbox"
+               <input id="collapse-pref" @change="collapseGroupsClicked" class="choice" :checked="collapseGroups" type="checkbox"
                   aria-label="toggle barcode group collapse functionality"/>Collpase Grouped Results
             </label>
          </div>

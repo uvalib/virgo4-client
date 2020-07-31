@@ -1,5 +1,5 @@
 <template>
-   <div class="inner-hit-wrapper">
+   <div class="inner-hit-wrapper" :class="{group: hit.grouped}">
       <div class="hit" v-bind:data-identifier="hit.identifier">
          <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
          <SearchHitDetail :hit="hit" :pool="pool"/>
@@ -9,7 +9,6 @@
          backgroundContent="none" background="var(--uvalib-teal-lightest)"
          borderColor="var(--uvalib-teal-light)" class="group">
          <template v-slot:title>{{groupTitle}}</template>
-         <template v-if="!collapseGroups" v-slot:collapse>{{closeGroupTitle}}</template>
          <template v-for="(groupHit,idx) in hit.group">
             <div class="group-hit" v-bind:data-identifier="groupHit.identifier" 
                :class="{last: idx==hit.group.length-1, first: idx==0}" :key="`g${idx}`">
@@ -17,7 +16,7 @@
                <SearchHitDetail :hit="groupHit" :pool="pool"/>
             </div> 
          </template>
-         <template v-if="collapseGroups" v-slot:footer>{{closeGroupTitle}}</template>
+         <template v-slot:footer>{{closeGroupTitle}}</template>
       </AccordionContent>
    </div>
 </template>
@@ -93,6 +92,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.inner-hit-wrapper.group {
+   padding: 5px;
+   border: 1px solid var(--uvalib-grey-light);
+   box-shadow:  $v4-box-shadow-light;
+   background: var(--uvalib-grey-light);
+   .hit {
+      box-shadow: none;
+      border: 1px solid var(--uvalib-grey-light);
+   }
+   .group-hit {
+      padding: 10px;
+      margin: 5px 0px 5px 0px;
+      background-color: white;
+   }
+}
 .hit {
    width: 100%;
    padding: 10px;
@@ -100,15 +114,6 @@ export default {
    text-align: left;
    background-color: white;
    box-shadow:  $v4-box-shadow-light;
-}
-.group-hit {
-   padding: 10px;
-   margin: 10px 0px 20px 0px;
-   box-shadow:  $v4-box-shadow-light;
-   background-color: white;
-}
-.group-hit.first {
-   margin-top: 20px;
 }
 </style>
 

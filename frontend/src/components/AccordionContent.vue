@@ -6,12 +6,7 @@
          :class="layout" class="title" role="button"
          :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
          :aria-expanded="expandedStr" :aria-controls="contentID">
-         <template v-if="hasCollapseTitleSlot == false || (hasCollapseTitleSlot && isExpanded == false)">
-            <slot name="title"></slot>
-         </template>
-         <template v-if="isExpanded == true && hasCollapseTitleSlot == true">
-            <slot name="collapse"></slot>
-         </template>
+         <slot name="title"></slot> 
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
       </div>
       <transition name="accordion"
@@ -22,7 +17,7 @@
             :style="{ background: backgroundContent, color: color }" 
             @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
             <slot></slot>
-            <div v-if="hasFooterSlot" @click="accordionClicked" class="footer"
+            <div v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
                :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }" >
                <slot name="footer"></slot>
                <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
@@ -152,14 +147,20 @@ export default {
       hasFooterSlot() {
          return Object.prototype.hasOwnProperty.call(this.$slots, 'footer')
       },
-      hasCollapseTitleSlot() {
-         return Object.prototype.hasOwnProperty.call(this.$slots, 'collapse')
-      },
    },
    methods: {
       accordionClicked() {
          this.$emit('accordion-clicked')
          this.isExpanded = !this.isExpanded
+      },
+      accordionFooterClicked() {
+         this.accordionClicked()
+         setTimeout( ()=> {
+            let hdr = document.getElementById(`${this.id}-header`)
+            if (hdr) {
+               hdr.focus()
+            }
+         }, 250)
       },
       beforeEnter: function(el) {
          document.getElementById(this.contentID).style.overflow = "hidden"

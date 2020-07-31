@@ -44,9 +44,9 @@ export default {
       this.$store.dispatch('pools/getPools')
       this.$store.dispatch("user/getAccountInfo")
       setTimeout(()=> { 
-         let eles = document.getElementsByClassName("toggle")
-         if ( eles.length > 0 ) {
-            eles[0].focus()
+         let ele = document.getElementById("collapse-pref")
+         if ( ele ) {
+            ele.focus()
          } else {
              document.getElementById("preferences-submenu").focus()
          }
