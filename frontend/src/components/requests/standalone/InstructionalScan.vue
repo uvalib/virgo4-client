@@ -42,7 +42,7 @@
             <label for="title">Article or Chapter Title<span class="required">*</span></label>
             <input type="text" v-model="request.title" id="title" aria-required="true" required="required">
             <span class="note">One article or chapter per request, please</span>
-            <span v-if="hasError('title')" class="error">Title is required</span>
+            <span v-if="hasError('title')" class="error">Article or chapter title is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="author">Article or Chapter Author<span class="required">*</span></label>
@@ -50,9 +50,10 @@
             <span v-if="hasError('author')" class="error">Author is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="work">Title of work</label>
-            <input type="text" v-model="request.work" id="work">
+            <label for="work">Title of work<span class="required">*</span></label>
+            <input type="text" v-model="request.work" id="work" aria-required="true" required="required">
             <span class="note">Journal, Book, Conference Proceedings or Newspaper</span>
+            <span v-if="hasError('title')" class="error">Title of work is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="volume">Volume</label>
@@ -162,7 +163,7 @@ export default {
       return {
          error: "",
          errors: [],
-         required: ['course', 'date', 'title', 'author', 'pages', 'anyLanguage'],
+         required: ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage'],
          request: {
             course: "",
             date: "",
