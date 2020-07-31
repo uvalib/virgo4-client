@@ -306,9 +306,8 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(v4User)
 	if err != nil {
-		log.Printf("ERROR: No v4 user settings found for %s: %+v", userID, err)
-		c.String(http.StatusInternalServerError, err.Error())
-		return
+		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err)
+		v4User = &V4User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 	}
 
 	log.Printf("Get leo delivery address")
