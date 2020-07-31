@@ -82,24 +82,26 @@ export default {
          return this.poolExtURL(this.selectedResults.pool.id) != ""
       },
    },
-   watch: {
-      selectedResultsIdx () {
-         if (this.selectedResults.statusCode == 408 && this.selectedResults.total == 0) {
-            this.$store.dispatch("searchSelectedPool")
-         }
-      },
-   },
    methods: {
       loadMoreResults() {
          if ( this.searching) return
 
          if (this.hasMoreHits) {
+            let origY = window.scrollY
             this.loadingMore = true
             this.$store.dispatch("moreResults").finally( ()=> {
                 this.loadingMore = false
                  let query = Object.assign({}, this.$route.query)
                  query.page = this.selectedResults.page+1 // page is 0 based internally
                  this.$router.push({query})
+                 let newY = window.scrollY
+                 let nav = document.getElementById("v4-navbar")
+                 let headerOffset = nav.offsetHeight
+                 let delta = origY - newY - headerOffset
+                 window.scrollBy({
+                    top: delta,
+                    behavior: "smooth"
+                 })
             })
          }
       }
