@@ -5,19 +5,19 @@
          <SearchHitDetail :hit="hit" :pool="pool"/>
       </div>
       <AccordionContent v-if="hit.grouped" :id="hit.identifier" 
-         :autoExpandID="autoExpandGroupID" :heightOffset="20"
+         :autoExpandID="autoExpandGroupID" :expanded="!collapseGroups" :heightOffset="20"
          backgroundContent="none" background="var(--uvalib-teal-lightest)"
-         borderColor="var(--uvalib-teal-light)"
-         class="group" :autoCollapseOn="searching">
+         borderColor="var(--uvalib-teal-light)" class="group">
          <template v-slot:title>{{groupTitle}}</template>
+         <template v-if="!collapseGroups" v-slot:collapse>{{closeGroupTitle}}</template>
          <template v-for="(groupHit,idx) in hit.group">
             <div class="group-hit" v-bind:data-identifier="groupHit.identifier" 
                :class="{last: idx==hit.group.length-1, first: idx==0}" :key="`g${idx}`">
                <SearchHitHeader :maxLen="60" :count="count" :subcount="idx+1" :hit="groupHit" :pool="pool"/>
                <SearchHitDetail :hit="groupHit" :pool="pool"/>
-            </div>
+            </div> 
          </template>
-         <template v-slot:footer>{{closeGroupTitle}}</template>
+         <template v-if="collapseGroups" v-slot:footer>{{closeGroupTitle}}</template>
       </AccordionContent>
    </div>
 </template>
@@ -61,7 +61,8 @@ export default {
       },
       ...mapState({
          searching: state => state.searching,
-         autoExpandGroupID: state => state.autoExpandGroupID
+         autoExpandGroupID: state => state.autoExpandGroupID,
+         collapseGroups: state => state.preferences.collapseGroups,
       }),
       ...mapGetters({
          isKiosk: "system/isKiosk",

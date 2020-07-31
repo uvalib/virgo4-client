@@ -99,10 +99,10 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	log.Printf("Create HTTP client for external service calls")
 	defaultTransport := &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout:   2 * time.Second,
+			Timeout:   5 * time.Second,
 			KeepAlive: 600 * time.Second,
 		}).Dial,
-		TLSHandshakeTimeout: 2 * time.Second,
+		TLSHandshakeTimeout: 5 * time.Second,
 		MaxIdleConns:        100,
 		MaxIdleConnsPerHost: 100,
 	}

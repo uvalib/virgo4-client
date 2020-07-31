@@ -351,3 +351,16 @@ func parseMembership(membershipStr string) v4jwt.RoleEnum {
 	}
 	return out
 }
+
+// getJWTClaims will pull JWT claims out of the gin context
+func getJWTClaims(c *gin.Context) (*v4jwt.V4Claims, error) {
+	claims, signedIn := c.Get("claims")
+	if signedIn == false {
+		return nil, errors.New("No JWT claims found")
+	}
+	v4Claims, ok := claims.(*v4jwt.V4Claims)
+	if !ok {
+		return nil, errors.New("Invalid JWT claims found")
+	}
+	return v4Claims, nil
+}

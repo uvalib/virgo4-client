@@ -1,6 +1,18 @@
 <template>
    <div class="pool-options">
       <h2>Search Preferences</h2>
+      <div class="grouping">
+         <p>
+            Related search results are grouped under a single search result. By default, these grouped results are 
+            all visible. Check the box below to collapse them by default.
+         </p>
+         <div class="check">
+            <label>
+               <input @change="collapseGroupsClicked" class="choice" :checked="collapseGroups" type="checkbox"
+                  aria-label="toggle barcode group collapse functionality"/>Collpase Grouped Results
+            </label>
+         </div>
+      </div>
       <p>
          Select which Resource Types you want to include in your search results,
          and which Resource Type you prefer to see results from most.
@@ -56,16 +68,22 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
-//import { mapState } from "vuex"
+import { mapState } from "vuex"
 export default {
    computed: {
       ...mapGetters({
          isPoolExcluded: "preferences/isPoolExcluded",
          isTargetPool: "preferences/isTargetPool",
          pools: "pools/sortedList"
+      }),
+      ...mapState({
+         collapseGroups: state => state.preferences.collapseGroups,
       })
    },
    methods: {
+      collapseGroupsClicked() {
+         this.$store.dispatch("preferences/toggleCollapseGroups")
+      },
       toggleTargetPool(pool) {
          this.$store.commit("resetSearchResults");
          this.$store.dispatch("preferences/toggleTargetPool", pool)
@@ -85,6 +103,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.grouping {
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   padding-bottom: 15px;
+   margin-bottom: 15px;
+   .choice {
+      margin: 5px 10px;
+      width: 15px;
+      height: 15px;
+   }
+}
 .pool-options {
    h2 {
       margin: 5px 0 10px 0;

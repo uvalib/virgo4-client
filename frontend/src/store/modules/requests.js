@@ -110,6 +110,11 @@ const requests = {
       }
    },
    actions: {
+      async submitStandaloneInstructionalScan(ctx, req) {
+         await axios.post('/api/requests/standalone/scan', req).catch(e =>
+            ctx.commit('system/setError', e, { root: true })
+         )
+      },
       submitScan(ctx) {
          axios.post('/api/requests/scan', ctx.state.scan).then(response => {
             if (response.data.scan.errors) {

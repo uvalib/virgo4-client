@@ -34,8 +34,7 @@
          </div>
          <div class="entry pure-control-group">
             <label for="scan-year">Year</label>
-            <input type="text" v-model="year" id="scan-year" aria-required="true" required="required">
-            <span v-if="hasError('year')" class="error">* year is required</span>
+            <input type="text" v-model="year" id="scan-year">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-volume">Volume</label>
@@ -74,7 +73,7 @@ export default {
       return {
          selectedItem: {},
          errors: [],
-         required: ['title', 'chapter', 'author', 'year']
+         required: ['title', 'chapter', 'author', 'pages']
       }
    },
    watch: {

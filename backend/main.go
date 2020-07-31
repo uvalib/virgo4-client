@@ -111,6 +111,7 @@ func main() {
 		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
 		api.DELETE("/requests/hold/:holdID", svc.AuthMiddleware, svc.DeleteHold)
 		api.POST("/requests/scan", svc.AuthMiddleware, svc.CreateScan)
+		api.POST("/requests/standalone/scan", svc.AuthMiddleware, svc.CreateStandaloneScan)
 
 		api.POST("/reserves", svc.AuthMiddleware, svc.CreateCourseReserves)
 		api.POST("/reserves/validate", svc.AuthMiddleware, svc.ValidateCourseReserves)
