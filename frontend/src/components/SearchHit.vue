@@ -92,15 +92,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.inner-hit-wrapper.group {
+.inner-hit-wrapper {
    padding: 5px;
    border: 1px solid var(--uvalib-grey-light);
    box-shadow:  $v4-box-shadow-light;
    background: var(--uvalib-grey-light);
    .hit {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      text-align: left;
+      background-color: white;
       box-shadow: none;
       border: 1px solid var(--uvalib-grey-light);
    }
+
    .group-hit {
       padding: 10px;
       margin: 5px 0px 5px 0px;
@@ -109,14 +115,6 @@ export default {
 }
 .group {
    margin-top: 5px;
-}
-.hit {
-   width: 100%;
-   padding: 10px;
-   box-sizing: border-box;
-   text-align: left;
-   background-color: white;
-   box-shadow:  $v4-box-shadow-light;
 }
 </style>
 
