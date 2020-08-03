@@ -96,7 +96,7 @@
                </AccordionContent>
             </template>
             <div v-if="lookingUpILL == false && illiadCheckouts.length == 0" class="none">
-               You have no UVA checkouts.
+               You have no ILL checkouts.
             </div>
          </div>
       </div>
