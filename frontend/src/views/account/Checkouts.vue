@@ -22,7 +22,7 @@
                   borderColor="var(--uvalib-blue-alt)"
                   id="uva-checkouts"
                >
-                  <template v-slot:title><span class="section-title">UVA Checkouts ({{checkouts.length}})</span></template>
+                  <template v-slot:title><span class="section-title">UVA Checkouts</span></template>
                   <div class="checkout-list">
                      <div class="controls">
                         <span class="sort">
@@ -77,7 +77,7 @@
                   borderColor="var(--uvalib-blue-alt)"
                   id="ill-checkouts"
                >
-                  <template v-slot:title><span class="section-title">ILL Checkouts  ({{illiadCheckouts.length}})</span></template>
+                  <template v-slot:title><span class="section-title">ILL Checkouts</span></template>
                   <div class="checkout-list">
                      <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
                         <h3 class="item-title">{{co.loanTitle}}</h3>
@@ -96,7 +96,7 @@
                </AccordionContent>
             </template>
             <div v-if="lookingUpILL == false && illiadCheckouts.length == 0" class="none">
-               You have no ILL checkouts.
+               You have no UVA checkouts.
             </div>
          </div>
       </div>

@@ -187,17 +187,12 @@ const item = {
          if (pools.length == 0) {
             await ctx.dispatch("pools/getPools", null, {root:true})
             pools = ctx.rootState.pools.list
+            pool = pools.find( p => p.id == source)
+            baseURL = pool.url
+         } else {
+            pool = pools.find( p => p.id == source)
+            baseURL = pool.url
          }
-
-         pool = pools.find( p => p.id == source)
-
-         if (!pool) {
-           ctx.commit('clearSearching')
-           ctx.commit('system/setError', `Invalid source '${source}'`, { root: true })
-           return
-         }
-
-         baseURL = pool.url
 
          let url = baseURL + "/api/resource/" + identifier
          axios.get(url).then((response) => {

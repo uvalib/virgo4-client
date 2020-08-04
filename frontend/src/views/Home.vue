@@ -221,13 +221,14 @@ export default {
                if (query.pool) {
                   let idx = this.results.findIndex( r => r.pool.id == query.pool)
                   if ( idx > -1) {
+                     // set up sort ordering so search is only done once
+                     this.$store.commit("setResultsSort", {resultIdx: idx, sort: query.sort})
                      await this.$store.dispatch("selectPoolResults", idx)
                      tgtResultIdx = idx
                   }
-               } 
-               
-               if (query.sort) {
-                  this.$store.commit("setResultsSort", {resultIdx: tgtResultIdx, sort: query.sort})
+               } else if (query.sort) {
+                  // if no pool was selected, the defult pool can still have a sort order set
+                  this.$store.commit("setResultsSort", {resultIdx: 0, sort: query.sort})
                }
 
                if (query.filter) {
@@ -255,7 +256,7 @@ export default {
             this.restoreSearchFromQueryParams(this.$route.query, true)
             return
          } else {
-            await this.restoreSearchFromQueryParams(this.$route.query, true)
+            await this.restoreSearchFromQueryParams(this.$route.query)
          }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
