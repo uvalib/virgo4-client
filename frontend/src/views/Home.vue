@@ -255,7 +255,7 @@ export default {
             this.restoreSearchFromQueryParams(this.$route.query, true)
             return
          } else {
-            await this.restoreSearchFromQueryParams(this.$route.query)
+            await this.restoreSearchFromQueryParams(this.$route.query, true)
          }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
