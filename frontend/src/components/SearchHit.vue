@@ -7,7 +7,7 @@
       <AccordionContent v-if="hit.grouped" :id="hit.identifier"
          :autoExpandID="autoExpandGroupID" :expanded="!collapseGroups" :heightOffset="5"
          backgroundContent="none" background="var(--uvalib-blue-alt-light)"
-         borderColor="var(--uvalib-blue-alt)" class="group">
+         borderColor="var(--uvalib-blue-alt-light)" class="group">
          <template v-slot:title>{{groupTitle}}</template>
          <template v-for="(groupHit,idx) in hit.group">
             <div class="group-hit" v-bind:data-identifier="groupHit.identifier" 
@@ -93,9 +93,8 @@ export default {
 
 <style lang="scss" scoped>
 .inner-hit-wrapper {
-   padding: 5px;
+   padding: 3px;
    border: 1px solid var(--uvalib-grey-light);
-   box-shadow:  $v4-box-shadow-light;
    background: var(--uvalib-grey-light);
    .hit {
       width: 100%;

@@ -83,6 +83,7 @@ export default new Vuex.Store({
          order: sortString.split("_")[1]
       }
       state.results[data.resultIdx].sort = sort
+      state.selectedResultsSort = sortString
     },
     updateOtherPoolLabel(state) {
       // when a pool is selected from the 'Other' tab and a filter has been applied
@@ -356,7 +357,8 @@ export default new Vuex.Store({
 
     applySearchSort(ctx) {
       let sortString = ctx.state.selectedResultsSort
-      ctx.commit('setResultsSort', {resultIdx: ctx.state.selectedResultsIdx, sort: sortString})
+      let sort = {resultIdx: ctx.state.selectedResultsIdx, sort: sortString}
+      ctx.commit('setResultsSort', sort)
       ctx.commit("clearSelectedPoolResults")
       return ctx.dispatch("searchSelectedPool")
     }
