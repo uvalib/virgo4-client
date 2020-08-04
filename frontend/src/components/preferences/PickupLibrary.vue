@@ -31,8 +31,11 @@ export default {
       {
         id: 'CLEMONS',
         name: 'Clemons'
+      },
+      {
+        id: 'SCI-ENG',
+        name: 'Brown Science and Engineering (Clark Hall)'
       }
-
     ]
   }},
   computed: {
