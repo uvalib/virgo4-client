@@ -47,7 +47,7 @@ const feedback = {
             ctx.commit("setSubmitSuccess")
          }).catch((_error) => {
             ctx.commit("setSubmitFail")
-            let msg = 'There was a problem sending your feedback.<br/>Please try again later or send an email to <a  href="mailto:lib-virgo4-feedback@virginia.edu" class="feedback">lib-virgo4-feedback@virginia.edu</a>'
+            let msg = 'There was a problem sending your feedback.<br/>Please send an email to <a  href="mailto:lib-virgo4-feedback@virginia.edu" class="feedback">lib-virgo4-feedback@virginia.edu</a>'
             ctx.commit("system/setError", msg, {root: true})
          })
       }
