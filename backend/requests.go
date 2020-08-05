@@ -10,13 +10,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Request structure for ILLiad POST /transaction
+// Baese request structure for ILLiad POST /transaction
 type illiadRequest struct {
-	Username                   string
-	NotWantedAfter             string
-	RequestType                string
-	ProcessType                string
-	DocumentType               string
+	Username          string
+	NotWantedAfter    string
+	RequestType       string
+	ProcessType       string
+	DocumentType      string
+	TransactionStatus string
+}
+
+// Extenstion of the basic request to include fields necessary for Scan requests
+type illiadScanRequest struct {
+	*illiadRequest
 	PhotoJournalTitle          string
 	PhotoArticleTitle          string
 	PhotoArticleAuthor         string
@@ -30,12 +36,50 @@ type illiadRequest struct {
 	ESPNumber                  string
 	Location                   string
 	AcceptNonEnglish           bool
-	TransactionStatus          string
+}
+
+// Extension of basic request to include fields necessary for Loan/Borrow requests
+type illiadBorrowRequest struct {
+	*illiadRequest
+	LoanTitle          string
+	LoanAuthor         string
+	LoanPublisher      string
+	PhotoJournalVolume string
+	LoanDate           string
+	LoanEdition        string
+	ISSN               string
+	ESPNumber          string
+	CitedIn            string
+	AcceptNonEnglish   bool
+	DeliveryMethod     string
 }
 
 type illiadNote struct {
 	Note     string
 	NoteType string
+}
+
+func illaidLibraryMapping(v4Lib string) string {
+	libs := map[string]string{
+		"ALDERMAN":  "ALDERMAN",
+		"ASTRONOMY": "ASTR",
+		"CLEMONS":   "CLEM",
+		"DARDEN":    "DARDEN",
+		"EDUCATION": "EDUC",
+		"FINE-ARTS": "FINE ARTS",
+		"HEALTHSCI": "HSL",
+		"LAW":       "LAW",
+		"LEO":       "LEO",
+		"MATH":      "MATH",
+		"MUSIC":     "MUSIC",
+		"PHYSICS":   "PHYS",
+		"SCI-ENG":   "SEL",
+	}
+	if val, ok := libs[v4Lib]; ok {
+		return val
+	}
+	log.Printf("ERROR: Unrecognized library in ILLiad request: %s", v4Lib)
+	return v4Lib
 }
 
 // CreateHold uses ILS Connector V4 API to create a Hold
@@ -72,6 +116,88 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// CreateBorrowRequest sends a borrow request to ILLiad for A/V or non-A/V-items
+func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
+	var req struct {
+		BorrowType    string `json:"borrowType"`
+		DocumentType  string `json:"doctype"`
+		DateNeeded    string `json:"date"`
+		Title         string `json:"title"`
+		Author        string `json:"author"`
+		Publisher     string `json:"publisher"`
+		Volume        string `json:"volume"`
+		Year          string `json:"year"`
+		Edition       string `json:"edition"`
+		Format        string `json:"format"`
+		Pages         string `json:"pages"`
+		ISSN          string `json:"issn"`
+		OCLC          string `json:"oclc"`
+		CitedIn       string `json:"cited"`
+		AnyLanguage   string `json:"anyLanguage"`
+		Notes         string `json:"notes"`
+		PickupLibrary string `json:"pickup"`
+	}
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: Unable to parse request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	v4Claims, error := getJWTClaims(c)
+	if error != nil {
+		log.Printf("ERROR: %s", error.Error())
+		c.String(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	log.Printf("Process borrow from %s for %s '%s'", v4Claims.UserID, req.BorrowType, req.Title)
+	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Loan", ProcessType: "Borrowing", NotWantedAfter: req.DateNeeded}
+	borrowReq := illiadBorrowRequest{LoanTitle: req.Title, LoanAuthor: req.Author, LoanDate: req.Year}
+	if req.BorrowType == "AV" {
+		log.Printf("This is an A/V request")
+		illiadReq.DocumentType = "Audio/Video"
+		illiadReq.TransactionStatus = "Awaiting Video Processing"
+		borrowReq.LoanEdition = req.Format
+		borrowReq.illiadRequest = &illiadReq
+	} else {
+		log.Printf("This is an Item request")
+		illiadReq.DocumentType = req.DocumentType
+		illiadReq.TransactionStatus = "Awaiting Request Processing"
+		borrowReq.LoanPublisher = req.Publisher
+		borrowReq.PhotoJournalVolume = req.Volume
+		borrowReq.LoanEdition = req.Edition
+		borrowReq.ESPNumber = req.OCLC
+		borrowReq.ISSN = req.ISSN
+		borrowReq.CitedIn = req.CitedIn
+		borrowReq.AcceptNonEnglish = (req.AnyLanguage == "true")
+		borrowReq.DeliveryMethod = illaidLibraryMapping(req.PickupLibrary)
+		borrowReq.illiadRequest = &illiadReq
+	}
+
+	log.Printf("BORROW REQUEST: %+v BASE: %+v", borrowReq, *borrowReq.illiadRequest)
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", borrowReq)
+	if illErr != nil {
+		c.JSON(illErr.StatusCode, illErr.Message)
+		return
+	}
+
+	// parse transaction number from response
+	var illadResp struct {
+		TransactionNumber int
+	}
+	json.Unmarshal([]byte(rawResp), &illadResp)
+	if req.Notes != "" {
+		noteReq := illiadNote{Note: req.Notes, NoteType: "Staff"}
+		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
+		if illErr != nil {
+			log.Printf("WARN: unable to add note to borrow request %d: %s", illadResp.TransactionNumber, illErr.Message)
+		}
+	}
+
+	c.JSON(http.StatusOK, illadResp)
+}
+
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
 func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	type scanRequest struct {
@@ -106,21 +232,21 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	}
 
 	log.Printf("Process standalone instructional scan request from %s for  '%s'", v4Claims.UserID, scanReq.Title)
-	illadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
-		DocumentType: "Collab", PhotoJournalTitle: scanReq.Work, PhotoArticleTitle: scanReq.Title,
+	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
+		DocumentType: "Collab", NotWantedAfter: scanReq.DateNeeded, TransactionStatus: "Awaiting DD Scanning Processing"}
+	illadScanReq := illiadScanRequest{illiadRequest: &illiadReq, PhotoJournalTitle: scanReq.Work, PhotoArticleTitle: scanReq.Title,
 		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,
 		PhotoJournalMonth: scanReq.Month, PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages,
-		ISSN: scanReq.ISSN, ESPNumber: scanReq.OCLC, TransactionStatus: "Awaiting DD Scanning Processing",
-		NotWantedAfter: scanReq.DateNeeded,
+		ISSN: scanReq.ISSN, ESPNumber: scanReq.OCLC,
 	}
 	if scanReq.AnyLanguage == "true" {
-		illadReq.AcceptNonEnglish = true
+		illadScanReq.AcceptNonEnglish = true
 	}
 	if scanReq.PersonalCopy == "true" {
-		illadReq.Location = "Personal Copy"
+		illadScanReq.Location = "Personal Copy"
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadReq)
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadScanReq)
 	if illErr != nil {
 		c.JSON(illErr.StatusCode, illErr.Message)
 		return
@@ -176,18 +302,20 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 
 	// First, attempt the ILLiad POST... convert into required structure
 	log.Printf("Process scan request from %s for barcode %s", v4Claims.UserID, scanReq.ItemBarcode)
-	illadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
-		DocumentType: scanReq.IlliadType, PhotoJournalTitle: scanReq.Title, PhotoArticleTitle: scanReq.Chapter,
+	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
+		DocumentType: scanReq.IlliadType}
+	illadScanReq := illiadScanRequest{illiadRequest: &illiadReq,
+		PhotoJournalTitle: scanReq.Title, PhotoArticleTitle: scanReq.Chapter,
 		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,
 		PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages,
 		ItemNumber: scanReq.ItemBarcode, ISSN: scanReq.Issn}
 	if scanReq.IlliadType == "Article" {
-		illadReq.TransactionStatus = "Awaiting Document Delivery Processing"
+		illadScanReq.TransactionStatus = "Awaiting Document Delivery Processing"
 	} else {
-		illadReq.TransactionStatus = "Awaiting Collab Processing"
+		illadScanReq.TransactionStatus = "Awaiting Collab Processing"
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadReq)
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadScanReq)
 	if illErr != nil {
 		// if the first ILLiad request fails, notify user and exit
 		c.JSON(illErr.StatusCode, illErr.Message)
@@ -200,10 +328,12 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	}
 	json.Unmarshal([]byte(rawResp), &illadResp)
 
-	noteReq := illiadNote{Note: scanReq.Notes, NoteType: "Staff"}
-	_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
-	if illErr != nil {
-		log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
+	if scanReq.Notes != "" {
+		noteReq := illiadNote{Note: scanReq.Notes, NoteType: "Staff"}
+		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
+		if illErr != nil {
+			log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
+		}
 	}
 
 	type ilsScanRequest struct {

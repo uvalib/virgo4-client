@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
@@ -112,6 +111,7 @@ func main() {
 		api.DELETE("/requests/hold/:holdID", svc.AuthMiddleware, svc.DeleteHold)
 		api.POST("/requests/scan", svc.AuthMiddleware, svc.CreateScan)
 		api.POST("/requests/standalone/scan", svc.AuthMiddleware, svc.CreateStandaloneScan)
+		api.POST("/requests/standalone/borrow", svc.AuthMiddleware, svc.CreateBorrowRequest)
 
 		api.POST("/reserves", svc.AuthMiddleware, svc.CreateCourseReserves)
 		api.POST("/reserves/validate", svc.AuthMiddleware, svc.ValidateCourseReserves)
@@ -145,6 +145,6 @@ func main() {
 
 	portStr := fmt.Sprintf(":%d", cfg.Port)
 	log.Printf("Start service v%s on port %s", version, portStr)
-	pprof.Register(router)
+	// pprof.Register(router)
 	log.Fatal(router.Run(portStr))
 }
