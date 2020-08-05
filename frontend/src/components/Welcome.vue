@@ -1,11 +1,16 @@
 <template>
    <div class="welcome">
-      <h3>Welcome to the newest version of the Virgo catalog</h3>
+      <h3 class="borders">Welcome to the newest version of the Virgo catalog</h3>
       <p>Virgo delivers high-quality search results through an easy-to-use interface that works on any device.</p>
       <p>You can use Virgo to conduct research, make requests, find and create Course Reserves, organize and share bookmarks, and set personal preferences for your own use of the system.</p>
       <template v-if="isKiosk == false">
-         <p class="alertbox alertbox-primary">The <a href="https://v3.lib.virginia.edu/">older version of Virgo</a> will remain available through fall 2020, but beginning Monday, <span class="no-wrap">July 13</span>, requests (LEO delivery, scan requests, recalls, etc.) are no longer available through the old interface.</p>
-         <p><b>Need assistance?</b> <a href="https://www.library.virginia.edu/askalibrarian/">Ask a Librarian</a> web chat is happy to help with questions large and small.</p>
+         <div class="alertbox alertbox-primary">
+            <h3>Services during COVID-19</h3>
+            <p>Please note that services are altered because of the University response to COVID-19. For example, course reserves are only available in electronic formats to allow for distance learning, and LEO Delivery is not currently available. <a href="https://www.library.virginia.edu/news/covid-19/">Read more about current Library resources.</a></p>
+            <h3>Access to the older version of Virgo</h3>
+            <p><a href="https://v3.lib.virginia.edu/">Virgo 3</a> will remain available through fall 2020, but requests (LEO delivery, scan requests, recalls, etc.) are no longer available through the old interface.</p>
+            <p><b>Need assistance?</b> <a href="https://www.library.virginia.edu/askalibrarian/">Ask a Librarian</a> web chat is happy to help with questions large and small.</p>
+         </div>
       </template>
    </div>
 </template>
@@ -33,7 +38,7 @@ export default {
      width: 90%;
   }
 }
-h3 {
+h3.borders {
    border-bottom: 1px solid var(--uvalib-grey-light);
    border-top: 1px solid var(--uvalib-grey-light);
    margin: 0;
@@ -43,5 +48,8 @@ h3 {
    margin: 10px auto 50px auto;
    text-align: left;
    color: var(  --uvalib-text);
-} 
+}
+.alertbox h3:last-of-type {
+   margin-top: 2em;
+}
 </style>
