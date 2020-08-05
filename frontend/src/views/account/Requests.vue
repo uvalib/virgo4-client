@@ -12,10 +12,11 @@
          <div v-else class="details">
             <template v-if="enableByDate('2020-08-10')">
                <h2>Issue Request</h2>
-               <div class="subcontent">
-                  <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning Request</V4Button>
-                  <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item Request</V4Button>
-                  <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V Request</V4Button>
+               <div class="subcontent buttons">
+                  <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
+                  <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
+                  <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
+                  <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
                </div>
                <h2>Outstanding Requests</h2>
             </template>
@@ -169,10 +170,11 @@ import AccordionContent from "@/components/AccordionContent"
 import InstructionalScan from "@/components/requests/standalone/InstructionalScan"
 import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem"
 import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV"
+import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle"
 export default {
    name: "requests",
    components: {
-      AccountActivities, AccordionContent, InstructionalScan, ILLBorrowItem, ILLBorrowAV
+      AccountActivities, AccordionContent, InstructionalScan, ILLBorrowItem, ILLBorrowAV, ILLScanArticle
    },
     data: function()  {
       return {
@@ -233,6 +235,9 @@ export default {
       illBorrowAVClick() {
          this.request = "ILLBorrowAV"
       },
+      illScanClick() {
+         this.request = "ILLScanArticle"
+      },
       cancelRequest() {
          this.request = ""
       },
@@ -288,8 +293,17 @@ export default {
    .subcontent {
       margin-bottom: 20px;
       padding: 10px;
+   }
+
+   .subcontent.buttons {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      align-content: center;
       button.v4-button.pure-button-primary {
-         margin:0 10px 0 0;
+         margin:0 10px 10px 0;
+         min-width: 275px;
+         width: 40%;
       }
    }
 

@@ -165,6 +165,7 @@ export default {
          errors: [],
          required: ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage'],
          request: {
+            scanType: "INSTRUCTIONAL", 
             course: "",
             date: "",
             personalCopy: "",
@@ -200,7 +201,7 @@ export default {
                first.focus()
             }
          } else {
-            await this.$store.dispatch("requests/submitStandaloneInstructionalScan", this.request)
+            await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
             this.$emit('submitted')
          }
       },

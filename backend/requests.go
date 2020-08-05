@@ -199,11 +199,14 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
 func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
-	type scanRequest struct {
+	var req struct {
+		ScanType     string `json:"scanType"` // ARTICLE or INSTRUCTIONAL
+		DocType      string `json:"doctype"`
 		Course       string `json:"course"`
 		DateNeeded   string `json:"date"`
 		PersonalCopy string `json:"personalCopy"`
 		Title        string `json:"title"`
+		Article      string `json:"article"`
 		Author       string `json:"author"`
 		Work         string `json:"work"`
 		Volume       string `json:"volume"`
@@ -214,9 +217,10 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		ISSN         string `json:"issn"`
 		OCLC         string `json:"oclc"`
 		AnyLanguage  string `json:"anyLanguage"`
+		Notes        string `json:"notes"`
 	}
-	var scanReq scanRequest
-	err := c.ShouldBindJSON(&scanReq)
+
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		log.Printf("ERROR: Unable to parse request: %s", err.Error())
 		c.String(http.StatusBadRequest, err.Error())
@@ -230,22 +234,36 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		return
 	}
 
-	log.Printf("Process standalone instructional scan request from %s for  '%s'", v4Claims.UserID, scanReq.Title)
-	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
-		DocumentType: "Collab", NotWantedAfter: scanReq.DateNeeded, TransactionStatus: "Awaiting DD Scanning Processing"}
-	illadScanReq := illiadScanRequest{illiadRequest: &illiadReq, PhotoJournalTitle: scanReq.Work, PhotoArticleTitle: scanReq.Title,
-		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,
-		PhotoJournalMonth: scanReq.Month, PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages,
-		ISSN: scanReq.ISSN, ESPNumber: scanReq.OCLC,
+	log.Printf("Process standalone %s scan request from %s for  '%s'", req.ScanType, v4Claims.UserID, req.Title)
+	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", NotWantedAfter: req.DateNeeded}
+	scanReq := illiadScanRequest{illiadRequest: &illiadReq, PhotoArticleAuthor: req.Author, PhotoJournalVolume: req.Volume,
+		PhotoJournalIssue: req.Issue, PhotoJournalMonth: req.Month, PhotoJournalYear: req.Year,
+		PhotoJournalInclusivePages: req.Pages, ISSN: req.ISSN, ESPNumber: req.OCLC,
 	}
-	if scanReq.AnyLanguage == "true" {
-		illadScanReq.AcceptNonEnglish = true
-	}
-	if scanReq.PersonalCopy == "true" {
-		illadScanReq.Location = "Personal Copy"
+	note := ""
+	if req.ScanType == "INSTRUCTIONAL" {
+		illiadReq.ProcessType = "DocDel"
+		illiadReq.DocumentType = "Collab"
+		illiadReq.TransactionStatus = "Awaiting DD Scanning Processing"
+		scanReq.PhotoJournalTitle = req.Work
+		scanReq.PhotoArticleTitle = req.Title
+		note = req.Course
+		if req.AnyLanguage == "true" {
+			scanReq.AcceptNonEnglish = true
+		}
+		if req.PersonalCopy == "true" {
+			scanReq.Location = "Personal Copy"
+		}
+	} else {
+		illiadReq.TransactionStatus = "Awaiting Request Processing"
+		illiadReq.ProcessType = "Borrowing"
+		illiadReq.DocumentType = req.DocType
+		scanReq.PhotoJournalTitle = req.Title
+		scanReq.PhotoArticleTitle = req.Article
+		note = req.Notes
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadScanReq)
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", scanReq)
 	if illErr != nil {
 		c.JSON(illErr.StatusCode, illErr.Message)
 		return
@@ -257,11 +275,13 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	}
 	json.Unmarshal([]byte(rawResp), &illadResp)
 
-	// use transaction number to add a note to the request containing course info
-	noteReq := illiadNote{Note: scanReq.Course, NoteType: "Staff"}
-	_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
-	if illErr != nil {
-		log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
+	if note != "" {
+		// use transaction number to add a note to the request containing course info or scanning notes
+		noteReq := illiadNote{Note: note, NoteType: "Staff"}
+		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
+		if illErr != nil {
+			log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
+		}
 	}
 
 	c.JSON(http.StatusOK, illadResp)

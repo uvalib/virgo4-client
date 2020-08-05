@@ -115,7 +115,7 @@ const requests = {
             ctx.commit('system/setError', e, { root: true })
          )
       },
-      async submitStandaloneInstructionalScan(ctx, req) {
+      async submitILLiadScanRequest(ctx, req) {
          await axios.post('/api/requests/standalone/scan', req).catch(e =>
             ctx.commit('system/setError', e, { root: true })
          )
