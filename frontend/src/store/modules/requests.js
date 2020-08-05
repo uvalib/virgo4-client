@@ -110,6 +110,11 @@ const requests = {
       }
    },
    actions: {
+      async submitILLiadBorrowRequest(ctx, req) {
+         await axios.post('/api/requests/standalone/borrow', req).catch(e =>
+            ctx.commit('system/setError', e, { root: true })
+         )
+      },
       async submitStandaloneInstructionalScan(ctx, req) {
          await axios.post('/api/requests/standalone/scan', req).catch(e =>
             ctx.commit('system/setError', e, { root: true })

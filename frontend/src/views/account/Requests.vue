@@ -14,6 +14,8 @@
                <h2>Issue Request</h2>
                <div class="subcontent">
                   <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning Request</V4Button>
+                  <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item Request</V4Button>
+                  <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V Request</V4Button>
                </div>
                <h2>Outstanding Requests</h2>
             </template>
@@ -165,10 +167,12 @@ import { mapGetters } from "vuex";
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from "@/components/AccordionContent"
 import InstructionalScan from "@/components/requests/standalone/InstructionalScan"
+import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem"
+import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV"
 export default {
    name: "requests",
    components: {
-      AccountActivities, AccordionContent, InstructionalScan
+      AccountActivities, AccordionContent, InstructionalScan, ILLBorrowItem, ILLBorrowAV
    },
     data: function()  {
       return {
@@ -222,6 +226,12 @@ export default {
       },
       instructionalScanClick() {
          this.request = "InstructionalScan"
+      },
+      illBorrowClick() {
+         this.request = "ILLBorrowItem"
+      },
+      illBorrowAVClick() {
+         this.request = "ILLBorrowAV"
       },
       cancelRequest() {
          this.request = ""
@@ -279,7 +289,7 @@ export default {
       margin-bottom: 20px;
       padding: 10px;
       button.v4-button.pure-button-primary {
-         margin:0;
+         margin:0 10px 0 0;
       }
    }
 

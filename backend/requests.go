@@ -175,7 +175,6 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 		borrowReq.illiadRequest = &illiadReq
 	}
 
-	log.Printf("BORROW REQUEST: %+v BASE: %+v", borrowReq, *borrowReq.illiadRequest)
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", borrowReq)
 	if illErr != nil {
 		c.JSON(illErr.StatusCode, illErr.Message)

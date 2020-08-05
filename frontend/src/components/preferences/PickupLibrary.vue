@@ -15,7 +15,7 @@
 
     <label for="pickup-sel">Preferred pickup location:
       <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="pickupLibraries"
-        pad="5px 10px"
+        pad="5px 10px" :attached="false"
         @changed="update"
       />
     </label>
@@ -23,34 +23,16 @@
   </div>
 </template>
 <script>
-import { mapFields } from 'vuex-map-fields';
-
+import { mapFields } from 'vuex-map-fields'
+import { mapState } from "vuex"
 export default {
-  data: function() {
-    return { pickupLibraries: [
-      {
-        id: 'CLEMONS',
-        name: 'Clemons'
-      },
-      {
-        id: 'SCI-ENG',
-        name: 'Brown Science and Engineering (Clark Hall)'
-      }
-    ]
-  }},
   computed: {
     ...mapFields({
         pickupLibrary: 'preferences.pickupLibrary',
     }),
-   //pickupLibraries(){
-   //  // Clemons is the only pickup library at launch
-   //  return [//...(this.$store.getters['user/canUseLEO'] ? ['LEO'] : []),
-   //    'CLEMONS',
-   //    //'DARDEN', 'FINE-ARTS',
-   //    //'HEALTHSCI', 'JAG', 'LAW', 'LEO', 'MATH', 'MUSIC', 'PHYSICS', 'SCI-ENG'
-   //  ]
-   //}
-
+    ...mapState({
+        pickupLibraries: state => state.system.pickupLibraries,
+    })
   },
   methods: {
     update() {
