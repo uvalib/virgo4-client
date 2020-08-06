@@ -156,18 +156,24 @@ export default new Vuex.Store({
       }
     },
 
-    setSearchResults(state, results) {
+    setSearchResults(state, data) {
       // // this is called from top level search; resets results from all pools
       state.total = -1
       state.results.splice(0, state.results.length)
       let firstPoolWithHits = -1
-      results.pool_results.forEach( (pr,idx) => {
+      let tgtPoolIdx = -1
+      data.results.pool_results.forEach( (pr,idx) => {
         if (!pr.group_list) {
           pr.group_list = []
         }
 
+        if ( pr.pool_id == data.tgtPool ) {
+           console.log("target pool set "+data.tgtPool+" results idx "+idx)
+         tgtPoolIdx = idx    
+        }
+
         // Find the pool the results are associated with and populate some top level response info
-        let pool = results.pools.find( p => p.id == pr.pool_id)
+        let pool = data.results.pools.find( p => p.id == pr.pool_id)
         let result = { pool: pool, sort: pr.sort, total: pr.pagination.total, page: 0,timeMS: pr.elapsed_ms,
           hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg}
         if (firstPoolWithHits == -1 &&  pr.pagination.total > 0) {
@@ -199,13 +205,20 @@ export default new Vuex.Store({
         state.results.push(result)
       })
 
-      if ( firstPoolWithHits == -1) {
-         firstPoolWithHits = 0
+      if ( tgtPoolIdx > -1) {
+         state.selectedResultsIdx = tgtPoolIdx
+         if ( tgtPoolIdx > 1) {
+            state.otherSrcSelection = {id: data.tgtPool, name: ""}    
+         }
+      } else {
+         if ( firstPoolWithHits == -1) {
+            firstPoolWithHits = 0
+         }
+         state.selectedResultsIdx = firstPoolWithHits
+         state.otherSrcSelection = {id: "", name: ""}
       }
-      state.selectedResultsIdx = firstPoolWithHits
-      state.otherSrcSelection = {id: "", name: ""}
 
-      state.total = results.total_hits
+      state.total = data.results.total_hits
     },
 
     setSuggestions(state, data) {
@@ -255,6 +268,8 @@ export default new Vuex.Store({
         },
         filters: rootGetters['filters/globalFilter']
       }
+      console.log("FILTERS ==========================")
+      console.log(req.filters)
 
       let manageSpinner = !(isRestore === true)
 
@@ -280,9 +295,11 @@ export default new Vuex.Store({
             dispatch("bookmarks/getBookmarks")
          }
         commit('pools/setPools', response.data.pools)
-        commit('filters/initialize', response.data.pools.length)
-        commit('setSearchResults', response.data)
+        commit('setSearchResults', {results: response.data, tgtPool: rootState.query.preferredPool})
         commit('setSuggestions', response.data.suggestions)
+        if ( state.otherSrcSelection.id != "") {
+         commit('updateOtherPoolLabel')
+        }
         if (manageSpinner) {
           commit('setSearching', false)
         }
@@ -311,7 +328,7 @@ export default new Vuex.Store({
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtResults = rootGetters.selectedResults
-      let filters = rootGetters['filters/poolFilter'](state.selectedResultsIdx)
+      let filters = rootGetters['filters/poolFilter'](tgtResults.pool.id)
       let filterObj = {pool_id: tgtResults.pool.id, facets: filters}
       let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize } 
       if (pageOverride) {

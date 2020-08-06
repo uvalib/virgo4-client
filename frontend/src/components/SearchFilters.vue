@@ -24,7 +24,6 @@ import { mapGetters } from "vuex"
 export default {
    computed: {
       ...mapState({
-         resultsIdx: state => state.selectedResultsIdx,
          updatingFacets: state => state.filters.updatingFacets,
          availabilityFacet: state => state.filters.availabilityFacet,
       }),
@@ -34,7 +33,7 @@ export default {
          facetSupport: 'pools/facetSupport'
       }),
       hasFilter() {
-         return this.allFilters(this.resultsIdx).length > 0
+         return this.allFilters(this.selectedResults.pool.id).length > 0
       },
       hasFacets() {
          return this.facetSupport(this.selectedResults.pool.id)
@@ -46,7 +45,7 @@ export default {
          // display is grouped by facet, raw data is just a series of
          // facet_id/value pairs. Convert to display
          let out = {}
-         this.allFilters(this.resultsIdx).forEach(pf=>{
+         this.allFilters(this.selectedResults.pool.id).forEach(pf=>{
             let val = pf.value
             if (pf.facet_id == "FacetCirculating") {
                val = "Yes"
@@ -69,7 +68,7 @@ export default {
          return out
       },
       clearClicked() {
-         this.$store.commit("filters/reset", this.resultsIdx)
+         this.$store.commit("filters/resetPoolFilters", this.selectedResults.pool.id)
          let query = Object.assign({}, this.$route.query)
          delete query.filter
          this.$router.push({ query })

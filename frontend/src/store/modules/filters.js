@@ -26,8 +26,8 @@ const filters = {
 
    getters: {
       getField,
-      asQueryParam:  (_state, getters) => (idx) => {
-         let filter = getters.poolFilter(idx)
+      asQueryParam:  (_state, getters) => (poolID) => {
+         let filter = getters.poolFilter(poolID)
          if (filter.length == 0) {
             return ""
          }
@@ -42,18 +42,21 @@ const filters = {
          // string of id.val|id.val|...
          return out.join("|")
       },
-      poolFacets: (state) => (idx) => {
-         if ( idx == -1 || idx >= state.poolFacets.length) {
+
+      poolFacets: (state) => (poolID) => {
+         let pfObj = state.poolFacets.find( pf => pf.pool == poolID)
+         if (!pfObj) {
             return []
          }
-         return  state.poolFacets[idx]
+         return pfObj.facets
       },
 
-      poolFilter: (state) => (idx) => {
+      poolFilter: (state) => (poolID) => {
          let globalVal = state.availabilityValues[state.globalAvailability.id]
-         let facets = state.poolFacets[idx]
+         let pfObj = state.poolFacets.find( pf => pf.pool == poolID)
          let filter = [] 
-         if (!facets) return []
+         if (!pfObj) return filter
+         if ( !pfObj.facets) return filter
          
          if (state.globalCirculating == true ) {
             filter.push({facet_id: state.circulatingFacet.id, 
@@ -69,7 +72,7 @@ const filters = {
                facet_name: state.availabilityFacet.name, value: globalVal})
          }
 
-         facets.forEach( f => {
+         pfObj.facets.forEach( f => {
             f.buckets.forEach( bucket => {
                if (bucket.selected == true ) {
                   filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value})   
@@ -83,9 +86,9 @@ const filters = {
       // This is only used to get the filter map for use in global search
       globalFilter: (_state, getters, rootState) =>  {
          let out = []
-         rootState.results.forEach( (r,idx) => {
-            let filter = getters.poolFilter(idx)
+         rootState.results.forEach( r => {
             let poolId = r.pool.id
+            let filter = getters.poolFilter(poolId)
             let add = {pool_id: poolId, facets: filter}
             out.push(add)
          })    
@@ -98,30 +101,37 @@ const filters = {
       setGlobalAvailability(state, avail) {
          state.globalAvailability = avail
       },
-      initialize(state, numPools) {
+      initialize(state, pools) {
+         // this is called once at startup to initialize ithe facets objects
          state.poolFacets.splice(0, state.poolFacets.length)
-         for (let i=0; i<numPools; i++) {
+         pools.forEach( p => {
             // add an empty array to contain facets for each pool
-            state.poolFacets.push([])
-         }
+            state.poolFacets.push({pool: p.id, facets: []})
+         })
       },
 
       setPoolFacets(state, data) {
-         // clear out all facets for the selected pool, the repopulate
-         // them with data from the response
-         let tgtFacets = state.poolFacets[data.poolResultsIdx]
+         // Get currently selected facets, then clear everything out
+         // repopulate with data from API call, and restore prior selected state
+         let tgtPFObj = state.poolFacets.find(pf => pf.pool == data.pool)
+         let tgtFacets = tgtPFObj.facets
+         let selected = tgtFacets.filter( f => f.selected == true)
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
             // Availability/Circulatin is global and handled differently; skip it
             if ( facet.id ==  state.availabilityFacet.id || facet.id == state.circulatingFacet.id) return
 
+            // if this is in the preserved selected items, select it
+            if ( selected.some( f => f.id == facet.id) ) {
+               facet.selected = true
+            }
             tgtFacets.push(facet)
          })
       },
 
       toggleFilter(state, data) {
-         let allPoolFacets = state.poolFacets[data.poolResultsIdx]
-         let facetInfo = allPoolFacets.find(f => f.id === data.facetID) 
+         let pfOj = state.poolFacets.find(pf => pf.pool == data.pool)
+         let facetInfo = pfOj.facets.find(f => f.id === data.facetID) 
 
          if ( facetInfo.type == "radio") {
             // only one value can be selected in radio buckets
@@ -142,25 +152,29 @@ const filters = {
          state.updatingFacets = flag
       },
 
+      resetPoolFilters(state, pool) {
+         let pfObj = state.setPoolFacets.find( pf => pf.pool == pool) 
+         if (pfObj ) {
+            pfObj.facets.splice(0, pfObj.facets.length)   
+         }    
+      },
+
       reset(state) {
          // NOTE: clearing array by setting it to [] breaks vuex
          // responsiveness. Only array methods like push,pop and splice
          // should be used as they preserve responsiveness...
          // https://vuejs.org/v2/guide/list.html#Array-Change-Detection
-         let numPools = state.poolFacets.length
          state.globalAvailability = {id: "any", name: "Any"}
          state.globalCirculating = false
-         state.poolFacets.splice(0, state.poolFacets.length)
-         for (let i=0; i<numPools; i++) {
-            state.poolFacets.push([])
-         }
+         state.poolFacets.forEach( pf => {
+            pf.facets.splice(0, pf.facets.length)
+         })
       },
 
       restoreFromURL(state, data ) {
          // The filter URL param is just facetID.value,facetID,value,...
          let filter = data.filter 
-         let resultIdx = data.resultIdx
-         let facets = state.poolFacets[resultIdx]
+         let pfObj = state.poolFacets.find( pf => pf.pool == data.pool)
 
          filter.split("|").forEach( fp => {
             let facetID = fp.split(".")[0]
@@ -180,7 +194,7 @@ const filters = {
                return
             }
 
-            let facet = facets.find(f => f.id == facetID)
+            let facet = pfObj.facets.find(f => f.id == facetID)
             if ( facet != null ) {
                let bucket = facet.buckets.find( b => b.value == filterVal)
                if (bucket) {
@@ -205,7 +219,7 @@ const filters = {
             return
          }
 
-         let filters = ctx.getters.poolFilter(resultsIdx)
+         let filters = ctx.getters.poolFilter(pool.id)
          let filterObj = {pool_id: pool.id, facets: filters}
          
          let req = {
@@ -220,11 +234,11 @@ const filters = {
             if (!facets) {
                facets = []
             }
-            ctx.commit("setPoolFacets", {poolResultsIdx: resultsIdx, facets: facets})
+            ctx.commit("setPoolFacets", {pool: pool.id, facets: facets})
             ctx.commit('setUpdatingFacets', false)
          }).catch((error) => {
             if (error.response && error.response.status == 501) {
-               ctx.commit("setPoolFacets", {poolResultsIdx: resultsIdx, facets: false})
+               ctx.commit("setPoolFacets", {pool: pool.id, facets: false})
             }
             ctx.commit('setUpdatingFacets', false)
           })

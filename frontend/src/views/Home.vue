@@ -148,7 +148,8 @@ export default {
         selectedResults: 'selectedResults',
         isSignedIn: 'user/isSignedIn',
         excludedPoolPrefs: 'preferences/excludedPools',
-        hasSearchTemplate: 'preferences/hasSearchTemplate'
+        hasSearchTemplate: 'preferences/hasSearchTemplate',
+        globalFilter: 'filters/globalFilter',
       }),
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
@@ -171,8 +172,10 @@ export default {
    },
    methods: {
       async restoreSearchFromQueryParams( query, force ) {
+         console.log("RESTORE FROM QUERY PARAMS")
          // No query, reset everything
          if  (!query.q) {
+            console.log("NOTHING TO DO BUT RESET")
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
             this.$store.commit('query/clear')
@@ -210,9 +213,11 @@ export default {
 
          if (query.q) {
             this.$store.commit("query/restoreFromURL",query.q)
+             console.log("HAS Q PARAM")
 
             // Need this to prevent re-running the search when toggle between basic and advanced
             if (this.rawQueryString != oldQ || force === true) {
+               console.log("DO SEARCH...")
                this.$store.commit('resetSearchResults')
                this.$store.commit('filters/reset')
                await this.$store.dispatch("searchAllPools", true )
@@ -231,7 +236,7 @@ export default {
                }
 
                if (query.filter) {
-                  this.$store.commit("filters/restoreFromURL", {filter: query.filter, resultIdx: tgtResultIdx} )
+                  this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: this.selectedResults.pool.id} )
                }
 
                if (query.sort || query.filter || query.page) {
@@ -240,11 +245,14 @@ export default {
                   await this.$store.dispatch("searchSelectedPool", page)
                }
                this.$store.commit('setSearching', false)
+            } else {
+               console.log("Query unchanged, dont search")
             }
          }
       },
       async searchCreated() {
          await this.$store.dispatch('pools/getPools')
+         this.$store.commit('filters/initialize', this.sources)
          await this.$store.dispatch("query/getAdvancedSeatchFilters")
 
          // When restoring a saved search, the call will be /search/:token
@@ -319,12 +327,22 @@ export default {
             this.$store.commit("query/setPreferredPreference", "")
             this.$store.commit("query/setExcludePreferences", [])   
          }
+
+         let priorQ = Object.assign({}, this.$route.query)
          let qp =  this.queryURLParams
-         this.$router.push(`/search?${qp}`)
-         this.$store.commit('resetSearchResults')
-         this.$store.commit('filters/reset')
+         if (priorQ.pool) {
+            qp += `&pool=${priorQ.pool}`
+         }
+         if (priorQ.filter) {
+            qp += `&filter=${priorQ.filter}`
+         }
+         console.log("Search clicked QP: "+qp)
+
+         console.log("search cliecked do search...")          
          this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
+         this.$router.push(`/search?${qp}`)       
+   
          let s = "SIGNED_OUT"
          if ( this.isSignedIn ) {
             s = "SIGNED_IN"
