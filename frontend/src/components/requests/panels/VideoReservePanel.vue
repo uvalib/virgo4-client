@@ -73,22 +73,22 @@
         </template>
         <dt class="label">Preferred audio language</dt>
         <dd>
-            <input :aria-label="`preferred audio language`" v-model="selectedVideo.audioLanguage" type="text">
+            <input id="audio_language" :aria-label="`preferred audio language`" v-model="audioLanguage" type="text">
         </dd>
         <dt class="label">Include subtitles?</dt>
         <dd>
-            <select :aria-label="`include stubtitles?`" v-model="selectedVideo.subtitles">
+            <select :aria-label="`include stubtitles?`" v-model="subtitles">
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>
         </dd>
         <dt class="label">Subtitles language</dt>
         <dd>
-            <input :aria-label="`subtitle language desired`" v-model="selectedVideo.subtitleLanguage" type="text">
+            <input :aria-label="`subtitle language desired`" id="subtitle_language" v-model="subtitleLanguage" type="text">
             <p v-if="hasError('subtitleLanguage')" class="error">* language is required</p>
         </dd>
         <dt>Notes</dt>
-        <dd><textarea :aria-label="`notes for this request`" v-model="selectedVideo.notes" name="item-notes"></textarea></dd>
+        <dd><textarea :aria-label="`notes for this request`" v-model="notes" name="item-notes"></textarea></dd>
       </dl>
 
       <div class="controls">
@@ -105,6 +105,20 @@ export default {
    data: function() {
       return {
          errors: [],
+         selectedVideo: {},
+         audioLanguage: "English" ,
+         subtitles: "no",
+         subtitleLanguage: "",
+         notes: "",
+         fieldMap: {
+            "instructorName": "instructor_name",
+            "instructorEmail": "instructor_email", 
+            "name": "name",   
+            "email": "email",   
+            "course": "course", 
+            "semester": "semester", 
+            "subtitleLanguage": "subtitle_language", 
+         }
       };
    },
    computed: {
@@ -123,13 +137,10 @@ export default {
          'request.course',
          'request.semester',
          'request.library',
-         'selectedVideo'
       ]),
    },
    created() {
       this.$store.commit("reserves/setRequestingUser", this.userInfo)
-      this.selectedVideo.subtitles = "no"
-      this.selectedVideo.audioLanguage = "English"
       if(this.items().length == 1){
         this.selectedVideo = this.items()[0]
       }
@@ -145,8 +156,6 @@ export default {
           items[i].id = items[i].barcode
           items[i].name = items[i].label
           items[i].callNumber = items[i].label
-          items[i].subtitles = "no"
-          items[i].audioLanguage = "English"
         }
         return items
       },
@@ -164,30 +173,27 @@ export default {
               this.errors.push(key)
             }
          }
-         let subtitleError = false
-        if (this.selectedVideo.subtitles == "yes" && this.selectedVideo.subtitleLanguage == "") {
-            subtitleError = true
-        }
+         if (this.subtitles == "yes" && this.subtitleLanguage == "") {
+            this.errors.push("subtitleLanguage")
+         }
 
-        if (subtitleError) {
-          this.errors.push("subtitleLanguage")
-        }
         if ( this.errors.length == 0) {
           this.selectedVideo.pool = this.itemDetails.source
           this.selectedVideo.catalogKey = this.itemDetails.identifier
           this.selectedVideo.title = this.itemDetails.header.title
+          this.selectedVideo.audioLanguage = this.audioLanguage
+          this.selectedVideo.subtitles = this.subtitles
+          this.selectedVideo.subtitleLanguage = this.subtitleLanguage
+          this.selectedVideo.notes = this.notes
 
-          this.$store.dispatch("reserves/createVideoReserve")
+          this.$store.dispatch("reserves/createVideoReserve", this.selectedVideo)
          } else {
-            this.$store.commit("system/setError", "Some required fields are missing")
-            var scrollStep = -window.scrollY / (500 / 10),
-            scrollInterval = setInterval(()=> {
-              if ( window.scrollY != 0 ) {
-                window.scrollBy( 0, scrollStep )
-              } else {
-                clearInterval(scrollInterval)
-              }
-            },10)
+            let err = this.errors[0]
+            let eleID = this.fieldMap[err]
+            let first = document.getElementById(eleID)
+            if ( first ) {
+               first.focus()
+            }   
          }
       },
    }

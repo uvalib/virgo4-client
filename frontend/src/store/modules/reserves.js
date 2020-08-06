@@ -22,10 +22,7 @@ const reserves = {
          semester: "",
          library: "",
          period: "",
-         // Single selected item for Video Reserve
       },
-      selectedVideo: {}
-
    },
 
    getters: {
@@ -85,7 +82,6 @@ const reserves = {
       },
       clearRequestList(state) {
          state.requestList = []
-         state.selectedVideo = {}
          state.request = {onBehalfOf: "no",
             instructorName: "",
             instructorEmail: "",
@@ -190,12 +186,12 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
          })
       },
-      createVideoReserve(ctx){
+      createVideoReserve(ctx, video){
          ctx.commit('setSearching', true, { root: true })
          let v4UserID = ctx.rootState.user.signedInUser
          let data = { userID: v4UserID, request: ctx.state.request,
-            items: [ctx.state.selectedVideo]}
-
+            items: [video]}
+            
          axios.post(`/api/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')
             ctx.commit('setSearching', false, { root: true })
