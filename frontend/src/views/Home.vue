@@ -212,9 +212,9 @@ export default {
          let targetPool = this.$store.state.query.preferredPool 
          if (query.pool) {
             targetPool = query.pool    
-         } 
+         }
 
-         if (query.filter) {            
+         if (query.filter) {        
             this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
          }
 
@@ -223,7 +223,6 @@ export default {
 
             // Need this to prevent re-running the search when toggle between basic and advanced
             if (this.rawQueryString != oldQ || force === true) {
-               this.$store.commit('resetSearchResults')
                await this.$store.dispatch("searchAllPools")
                let tgtResultsIdx = this.results.findIndex( r => r.pool.id == targetPool)
                if ( tgtResultsIdx > -1) {
@@ -232,7 +231,7 @@ export default {
 
                if (query.sort || query.page) {
                      this.$store.commit("clearSelectedPoolResults")
-                     this.$store.commit("setResultsSort", {resultIdx: tgtResultIdx, sort: query.sort})
+                     this.$store.commit("setResultsSort", {resultIdx: tgtResultsIdx, sort: query.sort})
                   let page = parseInt(query.page, 10)
                   await this.$store.dispatch("searchSelectedPool", page)
                }
@@ -331,7 +330,8 @@ export default {
             qp += `&sort=${priorQ.sort}`
          }
          console.log("Search clicked QP: "+qp)
-// NOTES: SORT GETS LOST IF YOU RESET
+         
+         // NOTES: SORT GETS LOST IF YOU RESET
          this.$store.commit("resetSearchResults")
          this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
