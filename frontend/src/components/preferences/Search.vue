@@ -85,12 +85,10 @@ export default {
          this.$store.dispatch("preferences/toggleCollapseGroups")
       },
       toggleTargetPool(pool) {
-         this.$store.commit("resetSearchResults");
          this.$store.dispatch("preferences/toggleTargetPool", pool)
          this.$analytics.trigger('Preferences', 'SET_PREFERRED_POOL', pool.name)
       },
       async toggleExcludePool(pool) {
-         this.$store.commit("resetSearchResults");
          await this.$store.dispatch("preferences/toggleExcludePool", pool)
          if (this.isPoolExcluded(pool)) {
             this.$analytics.trigger('Preferences', 'IGNORE_POOL', pool.name)
