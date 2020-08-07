@@ -344,7 +344,7 @@ span.cnt {
 }
 div.none {
    text-align: center;
-   margin:25px 0;
+   margin:25px 5px;
    font-size: 1.25em;
    color: var(--uvalib-text);
 }
