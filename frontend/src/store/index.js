@@ -167,8 +167,9 @@ export default new Vuex.Store({
           pr.group_list = []
         }
 
+        // if a preffered pool was set in prefs (or url) track its index in results
+        // so it can be selected after all results are updated
         if ( pr.pool_id == data.tgtPool ) {
-           console.log("target pool set "+data.tgtPool+" results idx "+idx)
          tgtPoolIdx = idx    
         }
 
@@ -266,10 +267,8 @@ export default new Vuex.Store({
           target_pool: rootState.query.preferredPool,
           exclude_pool: rootState.query.excludedPools
         },
-        filters: rootGetters['filters/globalFilter']
+        filters: rootGetters['filters/allPoolFilters']
       }
-      console.log("FILTERS ==========================")
-      console.log(req.filters)
 
       let manageSpinner = !(isRestore === true)
 

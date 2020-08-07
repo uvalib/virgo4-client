@@ -84,12 +84,11 @@ const filters = {
       },
 
       // This is only used to get the filter map for use in global search
-      globalFilter: (_state, getters, rootState) =>  {
+      allPoolFilters: (_state, getters, rootState) =>  {
          let out = []
-         rootState.results.forEach( r => {
-            let poolId = r.pool.id
-            let filter = getters.poolFilter(poolId)
-            let add = {pool_id: poolId, facets: filter}
+         rootState.pools.list.forEach( p => {
+            let filter = getters.poolFilter(p.id)
+            let add = {pool_id: p.id, facets: filter}
             out.push(add)
          })    
          return out  
@@ -174,7 +173,8 @@ const filters = {
       restoreFromURL(state, data ) {
          // The filter URL param is just facetID.value,facetID,value,...
          let filter = data.filter 
-         let pfObj = state.poolFacets.find( pf => pf.pool == data.pool)
+         let pfIdx = state.poolFacets.findIndex( pf => pf.pool == data.pool)
+         let pfObj = state.poolFacets[pfIdx]
 
          filter.split("|").forEach( fp => {
             let facetID = fp.split(".")[0]
@@ -195,15 +195,20 @@ const filters = {
             }
 
             let facet = pfObj.facets.find(f => f.id == facetID)
-            if ( facet != null ) {
+            if ( facet  ) {
                let bucket = facet.buckets.find( b => b.value == filterVal)
                if (bucket) {
                   bucket.selected = true
                } else {
                   facet.buckets.push({value: filterVal, selected: true})
                }
-            } 
+            } else {
+               let newFacet = {id: facetID, buckets: [ {selected: true, value: filterVal} ]}
+               pfObj.facets.push( newFacet )    
+            }
          })
+         state.poolFacets.splice(pfIdx,1)
+         state.poolFacets.push(pfObj)
       },
    },
 

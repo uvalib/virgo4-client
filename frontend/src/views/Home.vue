@@ -149,7 +149,6 @@ export default {
         isSignedIn: 'user/isSignedIn',
         excludedPoolPrefs: 'preferences/excludedPools',
         hasSearchTemplate: 'preferences/hasSearchTemplate',
-        globalFilter: 'filters/globalFilter',
       }),
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
@@ -172,10 +171,8 @@ export default {
    },
    methods: {
       async restoreSearchFromQueryParams( query, force ) {
-         console.log("RESTORE FROM QUERY PARAMS")
-         // No query, reset everything
          if  (!query.q) {
-            console.log("NOTHING TO DO BUT RESET")
+            // No query - reset everything
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
             this.$store.commit('query/clear')
@@ -186,6 +183,7 @@ export default {
          }
 
          // Interrogate query params and convert them to a search in the model (if present)
+         console.log("RESTORE FROM QUERY PARAMS")
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
@@ -205,49 +203,41 @@ export default {
             this.$store.commit("query/setExcludePreferences", query.exclude.split(","))
          } 
 
+         
          if (query.tgt) {
             this.$store.commit("query/setPreferredPreference", query.tgt)
          } else {
             this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
          }
+         let targetPool = this.$store.state.query.preferredPool 
+         if (query.pool) {
+            targetPool = query.pool    
+         } 
+
+         if (query.filter) {            
+            this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
+         }
 
          if (query.q) {
             this.$store.commit("query/restoreFromURL",query.q)
-             console.log("HAS Q PARAM")
 
             // Need this to prevent re-running the search when toggle between basic and advanced
             if (this.rawQueryString != oldQ || force === true) {
-               console.log("DO SEARCH...")
                this.$store.commit('resetSearchResults')
-               this.$store.commit('filters/reset')
-               await this.$store.dispatch("searchAllPools", true )
-
-               let tgtResultIdx = 0
-               if (query.pool) {
-                  let idx = this.results.findIndex( r => r.pool.id == query.pool)
-                  if ( idx > -1) {
-                     await this.$store.dispatch("selectPoolResults", idx)
-                     tgtResultIdx = idx
-                  }
-               } 
-               
-               if (query.sort) {
-                  this.$store.commit("setResultsSort", {resultIdx: tgtResultIdx, sort: query.sort})
+               await this.$store.dispatch("searchAllPools")
+               let tgtResultsIdx = this.results.findIndex( r => r.pool.id == targetPool)
+               if ( tgtResultsIdx > -1) {
+                  await this.$store.dispatch("selectPoolResults", tgtResultsIdx)
                }
 
-               if (query.filter) {
-                  this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: this.selectedResults.pool.id} )
-               }
-
-               if (query.sort || query.filter || query.page) {
-                  this.$store.commit("clearSelectedPoolResults")
+               if (query.sort || query.page) {
+                     this.$store.commit("clearSelectedPoolResults")
+                     this.$store.commit("setResultsSort", {resultIdx: tgtResultIdx, sort: query.sort})
                   let page = parseInt(query.page, 10)
                   await this.$store.dispatch("searchSelectedPool", page)
                }
                this.$store.commit('setSearching', false)
-            } else {
-               console.log("Query unchanged, dont search")
-            }
+            } 
          }
       },
       async searchCreated() {
@@ -318,8 +308,6 @@ export default {
       },
 
       searchClicked() {
-         // Update the query params in the URL, but since the store already
-         // contains all of the data from the URL it wont trigger the search. Do it manually
          if ( this.basicSearchScope.id == "all") {
             this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
             this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)   
@@ -328,6 +316,9 @@ export default {
             this.$store.commit("query/setExcludePreferences", [])   
          }
 
+         // Refine search updates: 
+         // if pool, filter or sort were specified previously, preserve them in the URL.
+         // a new search will always reset paging, so don't preserve that
          let priorQ = Object.assign({}, this.$route.query)
          let qp =  this.queryURLParams
          if (priorQ.pool) {
@@ -336,9 +327,12 @@ export default {
          if (priorQ.filter) {
             qp += `&filter=${priorQ.filter}`
          }
+         if (priorQ.sort) {
+            qp += `&sort=${priorQ.sort}`
+         }
          console.log("Search clicked QP: "+qp)
-
-         console.log("search cliecked do search...")          
+// NOTES: SORT GETS LOST IF YOU RESET
+         this.$store.commit("resetSearchResults")
          this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
          this.$router.push(`/search?${qp}`)       
