@@ -19,6 +19,7 @@ import requests from './modules/requests'
 import searches from './modules/searches'
 import * as utils from './modules/utils'
 import { getField, updateField } from 'vuex-map-fields'
+import router from '../router'
 
 Vue.use(Vuex)
 
@@ -302,6 +303,14 @@ export default new Vuex.Store({
         if (manageSpinner) {
           commit('setSearching', false)
         }
+
+        // make sure the currently selected pool is always in URL
+        let query = Object.assign({}, router.currentRoute.query)
+        if (query.pool != rootGetters.selectedResults.pool.id ) {
+           query.pool = rootGetters.selectedResults.pool.id 
+           router.push({query})
+        }
+
         return dispatch("filters/getSelectedResultFacets")
       } catch (error) {
          console.error("SEARCH FAILED: "+error)
@@ -367,8 +376,10 @@ export default new Vuex.Store({
 
     // Select pool results and get all facet info for the result
     async selectPoolResults(ctx, resultIdx) {
-      ctx.commit('selectPoolResults', resultIdx)
-      await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
+       if (ctx.state.selectedResultsIdx != resultIdx) {
+         ctx.commit('selectPoolResults', resultIdx)
+         await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
+       }
     },
 
     applySearchSort(ctx) {
