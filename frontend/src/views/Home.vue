@@ -329,10 +329,8 @@ export default {
          if (priorQ.sort) {
             qp += `&sort=${priorQ.sort}`
          }
-         console.log("Search clicked QP: "+qp)
          
          // NOTES: SORT GETS LOST IF YOU RESET
-         this.$store.commit("resetSearchResults")
          this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
          this.$router.push(`/search?${qp}`)       

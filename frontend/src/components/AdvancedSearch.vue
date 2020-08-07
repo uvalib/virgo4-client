@@ -202,17 +202,31 @@ export default {
             return
          }
          if (this.queryEntered) {
-            let qs = this.queryURLParams 
-            this.$router.push(`/search?${qs}`)
-            this.$store.commit('resetSearchResults')
-            this.$store.commit('filters/reset')
+
+            // Refine search updates: 
+            // if pool, filter or sort were specified previously, preserve them in the URL.
+            // a new search will always reset paging, so don't preserve that
+            let priorQ = Object.assign({}, this.$route.query)
+            let qp =  this.queryURLParams
+            if (priorQ.pool) {
+               qp += `&pool=${priorQ.pool}`
+            }
+            if (priorQ.filter) {
+               qp += `&filter=${priorQ.filter}`
+            }
+            if (priorQ.sort) {
+               qp += `&sort=${priorQ.sort}`
+            }
+            
             this.$store.dispatch("searchAllPools")
             this.$store.dispatch("searches/updateHistory")
+            this.$router.push(`/search?${qp}`)
+
             let s = "SIGNED_OUT"
             if ( this.isSignedIn ) {
                s = "SIGNED_IN"
             }
-            if ( decodeURI(qs).includes("UVA Library Digital Repository") ) {
+            if ( decodeURI(qp).includes("UVA Library Digital Repository") ) {
                this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')   
             }
             this.$analytics.trigger('Search', 'ADVANCED_SEARCH', s)
