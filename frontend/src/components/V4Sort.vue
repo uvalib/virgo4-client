@@ -44,8 +44,18 @@ export default {
             if (/relevance/gi.test(so.id)) {
                out.push({id: so.id+"_desc", name: so.label })
             } else {
-               out.push({id: so.id+"_asc", name: so.label+" (Ascending)" })
-               out.push({id: so.id+"_desc", name: so.label+" (Descending)" })
+               let asc_label = "ascending"
+               if (so.asc !== "") {
+                  asc_label = so.asc
+               }
+
+               let desc_label = "descending"
+               if (so.desc !== "") {
+                  desc_label = so.desc
+               }
+
+               out.push({id: so.id+"_asc", name: so.label+": "+asc_label })
+               out.push({id: so.id+"_desc", name: so.label+": "+desc_label })
             }
          })
          return out
