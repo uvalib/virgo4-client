@@ -53,10 +53,10 @@ export default {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
       groupTitle() {
-         return `Show More (${this.hit.group.length})`
+         return `Show this group (${this.hit.group.length})`
       },
       closeGroupTitle() {
-         return `Show Fewer (${this.hit.group.length})`
+         return `Collapse this group (${this.hit.group.length})`
       },
       ...mapState({
          searching: state => state.searching,
@@ -94,8 +94,8 @@ export default {
 <style lang="scss" scoped>
 .inner-hit-wrapper {
    padding: 3px;
-   border: 1px solid var(--uvalib-grey-light);
-   background: var(--uvalib-grey-light);
+   border: 2px solid var(--uvalib-blue-alt-dark);
+
    .hit {
       width: 100%;
       padding: 10px;
@@ -103,7 +103,6 @@ export default {
       text-align: left;
       background-color: white;
       box-shadow: none;
-      border: 1px solid var(--uvalib-grey-light);
    }
 
    .group-hit {
