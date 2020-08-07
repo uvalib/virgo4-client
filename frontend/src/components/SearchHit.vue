@@ -53,10 +53,10 @@ export default {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
       groupTitle() {
-         return `Show More (${this.hit.group.length})`
+         return `Show this group (${this.hit.group.length})`
       },
       closeGroupTitle() {
-         return `Show Fewer (${this.hit.group.length})`
+         return `Collapse this group (${this.hit.group.length})`
       },
       ...mapState({
          searching: state => state.searching,
