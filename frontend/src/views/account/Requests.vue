@@ -14,7 +14,7 @@
                <h2>Issue Request</h2>
                <div class="subcontent buttons">
                   <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
-                  <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
+                  <!--<V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>-->
                   <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
                   <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
                </div>
@@ -191,7 +191,7 @@ export default {
          isDevServer: "system/isDevServer"
       }),
       illiadRequests() {
-         return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" && 
+         return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&
           h.transactionStatus != "Request Finished" && h.transactionStatus != "Delivered to Web" )
       },
       illLoans() {
@@ -346,7 +346,7 @@ export default {
          box-shadow: $v4-box-shadow-light;
 
          h3 {
-            margin: 0 0 15px 0; 
+            margin: 0 0 15px 0;
             padding: 10px;
             border-bottom: 2px solid var(--uvalib-grey-light);
          }
