@@ -15,7 +15,7 @@
                <div class="subcontent buttons">
                   <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
                   <!--<V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>-->
-                  <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
+                  <!--<V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>-->
                   <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
                </div>
                <h2>Outstanding Requests</h2>
