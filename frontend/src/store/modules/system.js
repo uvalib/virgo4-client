@@ -22,8 +22,6 @@ const system = {
       pickupLibraries: [
          {id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'},
          {id: 'CLEMONS', name: 'Clemons'},
-         {id: 'HEALTHSCI', name: 'Health Sciences'},
-         {id: 'LAW', name: 'Law'},
       ]
    },
 
