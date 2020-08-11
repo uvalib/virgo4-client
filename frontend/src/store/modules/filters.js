@@ -100,24 +100,20 @@ const filters = {
       setGlobalAvailability(state, avail) {
          state.globalAvailability = avail
       },
-      initialize(state, pools) {
-         // this is called once at startup to initialize ithe facets objects
-         state.poolFacets.splice(0, state.poolFacets.length)
-         pools.forEach( p => {
-            // add an empty array to contain facets for each pool
-            state.poolFacets.push({pool: p.id, facets: []})
-         })
-      },
 
       setPoolFacets(state, data) {
          // Get currently selected facets, then clear everything out
          // repopulate with data from API call, and restore prior selected state
          let tgtPFObj = state.poolFacets.find(pf => pf.pool == data.pool)
+         if (!tgtPFObj) {
+            tgtPFObj = {pool: data.pool, facets: []}
+            state.poolFacets.push(tgtPFObj)    
+         }
          let tgtFacets = tgtPFObj.facets
          let selected = tgtFacets.filter( f => f.selected == true)
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
-            // Availability/Circulatin is global and handled differently; skip it
+            // Availability/Circulation are global and handled differently; skip 
             if ( facet.id ==  state.availabilityFacet.id || facet.id == state.circulatingFacet.id) return
 
             // if this is in the preserved selected items, select it
@@ -174,7 +170,12 @@ const filters = {
          // The filter URL param is just facetID.value,facetID,value,...
          let filter = data.filter 
          let pfIdx = state.poolFacets.findIndex( pf => pf.pool == data.pool)
-         let pfObj = state.poolFacets[pfIdx]
+         let pfObj = null
+         if (pfIdx == -1) {
+            pfObj = {pool: data.pool, facets: []}
+         } else {
+            pfObj = state.poolFacets[pfIdx]
+         }
 
          filter.split("|").forEach( fp => {
             let facetID = fp.split(".")[0]
@@ -207,7 +208,9 @@ const filters = {
                pfObj.facets.push( newFacet )    
             }
          })
-         state.poolFacets.splice(pfIdx,1)
+         if ( pfIdx > -1) {
+            state.poolFacets.splice(pfIdx,1)
+         }
          state.poolFacets.push(pfObj)
       },
    },

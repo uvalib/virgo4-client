@@ -10,7 +10,7 @@ const sort = {
 
       // activeSort is used to drive the sort dropdown on the search
       // results page. To use the sort on the selected pool dispatch
-      // applPoolSort. This will move the activeSort setting into 
+      // applyPoolSort. This will move the activeSort setting into 
       // the pools list above, and issue a search for the selected pool.
       // The search logic polls sort settings from the pools list 
       activeSort: DefaultSort

@@ -244,7 +244,6 @@ export default {
       },
       async searchCreated() {
          await this.$store.dispatch('pools/getPools')
-         this.$store.commit('filters/initialize', this.sources)
          await this.$store.dispatch("query/getAdvancedSeatchFilters")
 
          // When restoring a saved search, the call will be /search/:token
