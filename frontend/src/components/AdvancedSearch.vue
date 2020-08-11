@@ -242,6 +242,7 @@ export default {
             this.$store.commit('query/clear')
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
+            this.$store.commit('sort/reset')
             this.$router.push('/search?mode=advanced')
          } else {
             this.$store.commit('query/resetAdvanced')
@@ -267,6 +268,7 @@ export default {
       barcodeScanned(barcode) {
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
+         this.$store.commit('sort/reset')
          this.$store.commit("query/advancedBarcodeSearch", barcode)
          this.$store.dispatch("searchAllPools")
       },

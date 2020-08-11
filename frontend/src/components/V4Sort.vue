@@ -1,7 +1,7 @@
 <template>
    <div class="v4-sort">
       <label class="sort" for="sort-opt">Sort by</label>
-      <select v-if="canSort" v-model="selectedSort" id="sort-opt" name="sort-opt" @change="sortChanged">
+      <select v-if="canSort" v-model="activeSort" id="sort-opt" name="sort-opt" @change="sortChanged">
          <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
             {{ option.name }}
          </option>
@@ -12,8 +12,7 @@
 
 <script>
 import { mapGetters } from "vuex"
-import { mapFields } from "vuex-map-fields"
-
+import { mapFields } from 'vuex-map-fields'
 export default {
    props: {
       pool: {
@@ -23,21 +22,25 @@ export default {
    },
    methods: {
       sortChanged() {
-         this.$router.push({ query: Object.assign({}, this.$route.query, { sort: this.selectedSort }) });
-         this.$store.dispatch("applySearchSort")
+         let query = Object.assign({}, this.$route.query)
+         query.sort = this.activeSort
+         this.$store.dispatch("sort/applPoolSort", {poolID: this.pool.id, sort: this.activeSort})
          this.$store.dispatch("searches/updateHistory")
+         this.$router.push({query})
       }
    },
    computed: {
-      ...mapFields({
-        selectedSort: 'selectedResultsSort',
-      }),
       ...mapGetters({
          sortingSupport: 'pools/sortingSupport',
+         currentPoolSort: 'sort/currentPoolSort'
+      }),
+      ...mapFields({
+         activeSort: 'sort.activeSort',
       }),
       canSort() {
          return this.sortingSupport(this.pool.id)
       },
+      
       sortOptions() {
          let out = []
          this.pool.sort_options.forEach( so => {

@@ -32,6 +32,7 @@ export default {
       homeClicked() {
          this.$store.commit('resetSearchResults')
          this.$store.commit('filters/reset')
+         this.$store.commit('sort/reset')
          this.$store.commit('query/clear')
       }
    }

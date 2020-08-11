@@ -17,13 +17,12 @@ import feedback from './modules/feedback'
 import restore from './modules/restore'
 import requests from './modules/requests'
 import searches from './modules/searches'
+import sort from './modules/sort'
 import * as utils from './modules/utils'
 import { getField, updateField } from 'vuex-map-fields'
 import router from '../router'
 
 Vue.use(Vuex)
-
-const DefaultSort = "SortRelevance_desc"
 
 export default new Vuex.Store({
   state: {
@@ -35,7 +34,6 @@ export default new Vuex.Store({
     total: -1,
     autoExpandGroupID: "",
     selectedResultsIdx: -1,
-    selectedResultsSort: DefaultSort,
     otherSrcSelection: {id: "", name: ""}
   },
 
@@ -74,18 +72,6 @@ export default new Vuex.Store({
         state.searching = flag
       }
     },
-    setResultsSort(state, data) {
-      let sortString = data.sort
-       if ( !sortString || sortString == "" ) {
-         sortString = DefaultSort
-      }
-      let sort = {
-         sort_id: sortString.split("_")[0],
-         order: sortString.split("_")[1]
-      }
-      state.results[data.resultIdx].sort = sort
-      state.selectedResultsSort = sortString
-    },
     updateOtherPoolLabel(state) {
       // when a pool is selected from the 'Other' tab and a filter has been applied
       // this method method is used to update the count in the tab label
@@ -97,10 +83,7 @@ export default new Vuex.Store({
     },
     
     selectPoolResults(state, resultIdx) {
-      // NOTE: the sort order for te results must already be set before this call 
       state.selectedResultsIdx = resultIdx
-      let selSort = state.results[resultIdx].sort
-      state.selectedResultsSort = `${selSort.sort_id}_${selSort.order}`
    
       if (resultIdx > 1 && state.otherSrcSelection.id == "") {
         // this happens when a search is restored. otherSrcSelection is used
@@ -244,7 +227,6 @@ export default new Vuex.Store({
       state.results.splice(0, state.results.length)
       state.total = -1
       state.selectedResultsIdx = -1
-      state.selectedResultsSort = DefaultSort
       state.otherSrcSelection = {id: "", name: ""}
     },
   },
@@ -268,7 +250,8 @@ export default new Vuex.Store({
           target_pool: rootState.query.preferredPool,
           exclude_pool: rootState.query.excludedPools
         },
-        filters: rootGetters['filters/allPoolFilters']
+        filters: rootGetters['filters/allPoolFilters'],
+        pool_sorting: rootState.sort.pools
       }
 
       let manageSpinner = !(isRestore === true)
@@ -296,6 +279,7 @@ export default new Vuex.Store({
          }
         commit('pools/setPools', response.data.pools)
         commit('setSearchResults', {results: response.data, tgtPool: rootState.query.preferredPool})
+        commit('sort/setActivePool', state.results[state.selectedResultsIdx].pool.id )
         commit('setSuggestions', response.data.suggestions)
         if ( state.otherSrcSelection.id != "") {
          commit('updateOtherPoolLabel')
@@ -328,15 +312,15 @@ export default new Vuex.Store({
     },
 
     // SearchSelectedPool is called only when one specific set of pool results is selected for
-    // exploration. It is used to query for next page during load more and
-    // when filters are added and removed. Pool results are APPENDED to existing after load more.
-    // If newly filtered, reset paging and re-query. The oagination can be overridden with the pageOverride
-    // param. It will set the current page to the override and ask for all hits up to that page
+    // exploration. It is used to query for next page during load more, filter change and sort change.
+    // Pool results are APPENDED to existing after load more, and reset for other searches.
+    // The default pagination can be overridden with the pageOverride; search will ask for all hits up to that page
     async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }, pageOverride) {
       commit('setSearching', true)
       commit('filters/setUpdatingFacets', true)
       let tgtResults = rootGetters.selectedResults
       let filters = rootGetters['filters/poolFilter'](tgtResults.pool.id)
+      let sort = rootGetters['sort/poolSort'](tgtResults.pool.id)
       let filterObj = {pool_id: tgtResults.pool.id, facets: filters}
       let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize } 
       if (pageOverride) {
@@ -347,7 +331,7 @@ export default new Vuex.Store({
       let req = {
         query: rootGetters['query/string'],
         pagination: pagination,
-        sort: tgtResults.sort,
+        sort: sort,
         filters: [filterObj]
       }
       let url = tgtResults.pool.url + "/api/search"
@@ -378,17 +362,10 @@ export default new Vuex.Store({
     async selectPoolResults(ctx, resultIdx) {
        if (ctx.state.selectedResultsIdx != resultIdx) {
          ctx.commit('selectPoolResults', resultIdx)
+         ctx.commit('sort/setActivePool', ctx.state.results[ctx.state.selectedResultsIdx].pool.id )
          await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
        }
     },
-
-    applySearchSort(ctx) {
-      let sortString = ctx.state.selectedResultsSort
-      let sort = {resultIdx: ctx.state.selectedResultsIdx, sort: sortString}
-      ctx.commit('setResultsSort', sort)
-      ctx.commit("clearSelectedPoolResults")
-      return ctx.dispatch("searchSelectedPool")
-    }
   },
 
   modules: {
@@ -406,6 +383,7 @@ export default new Vuex.Store({
     restore: restore,
     requests: requests,
     searches: searches,
+    sort: sort,
   },
 
   plugins: [versionChecker,expiredSessionWatcher]

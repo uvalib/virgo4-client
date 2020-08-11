@@ -175,6 +175,7 @@ export default {
             // No query - reset everything
             this.$store.commit('resetSearchResults')
             this.$store.commit('filters/reset')
+            this.$store.commit('sort/reset')
             this.$store.commit('query/clear')
             setTimeout( ()=> {
                let  s = document.getElementById("search")
@@ -183,7 +184,6 @@ export default {
          }
 
          // Interrogate query params and convert them to a search in the model (if present)
-         console.log("RESTORE FROM QUERY PARAMS")
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
@@ -202,7 +202,6 @@ export default {
          if (query.exclude) {
             this.$store.commit("query/setExcludePreferences", query.exclude.split(","))
          } 
-
          
          if (query.tgt) {
             this.$store.commit("query/setPreferredPreference", query.tgt)
@@ -218,6 +217,11 @@ export default {
             this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
          }
 
+         if (query.sort ) {
+            this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: query.sort})
+            this.$store.commit("sort/setActivePool", targetPool)
+         }
+
          if (query.q) {
             this.$store.commit("query/restoreFromURL",query.q)
 
@@ -229,9 +233,8 @@ export default {
                   await this.$store.dispatch("selectPoolResults", tgtResultsIdx)
                }
 
-               if (query.sort || query.page) {
-                     this.$store.commit("clearSelectedPoolResults")
-                     this.$store.commit("setResultsSort", {resultIdx: tgtResultsIdx, sort: query.sort})
+               if (query.page) {
+                  this.$store.commit("clearSelectedPoolResults")
                   let page = parseInt(query.page, 10)
                   await this.$store.dispatch("searchSelectedPool", page)
                }

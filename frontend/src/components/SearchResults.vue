@@ -69,7 +69,7 @@ export default {
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
-         selectedResultsSort: state=>state.selectedResultsSort,
+         activeSort: state=>state.sort.activeSort,
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
@@ -145,8 +145,8 @@ export default {
          if (fqp.length > 0) {
             query.filter = fqp
          }
-         if (this.selectedResultsSort.length > 0) {
-            query.sort = this.selectedResultsSort
+         if (this.activeSort.length > 0) {
+            query.sort = this.activeSort
          }
          if (this.selectedResults.page > 0) {
             query.page = this.selectedResults.page +1
