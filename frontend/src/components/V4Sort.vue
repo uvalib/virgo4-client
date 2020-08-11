@@ -48,17 +48,17 @@ export default {
                out.push({id: so.id+"_desc", name: so.label })
             } else {
                let asc_label = "ascending"
-               if (so.asc !== "") {
+               if (so.asc && so.asc != "") {
                   asc_label = so.asc
                }
 
                let desc_label = "descending"
-               if (so.desc !== "") {
+               if (so.desc && so.desc != "") {
                   desc_label = so.desc
                }
 
-               out.push({id: so.id+"_asc", name: so.label+": "+asc_label })
                out.push({id: so.id+"_desc", name: so.label+": "+desc_label })
+               out.push({id: so.id+"_asc", name: so.label+": "+asc_label })
             }
          })
          return out
