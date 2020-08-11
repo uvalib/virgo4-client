@@ -2,18 +2,18 @@
 
 // $v4-accessibility-box-shadow: 0 0 0 4px rgba(21, 156, 228, 0.4);
 
-// @mixin be-accessible(){
-//    // border: 1px solid var(--uvalib-accessibility-highlight-dark);
-//    outline: 0;
-//    box-shadow: 0 0 0 0.2rem var(--uvalib-accessibility-highlight);
-   
-//    // outline: var(--uvalib-accessibility-highlight) solid .125rem !important;
-// }
-
 @mixin be-accessible(){
-   outline: 2px dotted var( --uvalib-accessibility-highlight );//var(--uvalib-accessibility-highlight);
-   outline-offset: 3px;
+   // border: 1px solid var(--uvalib-accessibility-highlight-dark);
+   outline: 0;
+   box-shadow: 0 0 0 0.2rem var(--uvalib-accessibility-highlight);
+   
+   // outline: var(--uvalib-accessibility-highlight) solid .125rem !important;
 }
+
+// @mixin be-accessible(){
+//    outline: 2px dotted var( --uvalib-accessibility-highlight );//var(--uvalib-accessibility-highlight);
+//    outline-offset: 3px;
+// }
 
 @mixin apply-hover() {
     background-color: var(--uvalib-brand-blue-lightest);
