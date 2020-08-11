@@ -33,6 +33,7 @@ type Item struct {
 	Notice          string                   `json:"notice"`
 	Fields          []map[string]interface{} `json:"fields"`
 	Library         string                   `json:"library"`
+	LibraryID       string                   `json:"library_id"`
 	CurrentLocation string                   `json:"current_location"`
 	CallNumber      string                   `json:"call_number"`
 	Volume          string                   `json:"volume"`
@@ -228,7 +229,7 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 	// Sirsi Item Options
 	Options := []ItemOption{}
 	for _, item := range Result.Availability.Items {
-		if item.Library == "Special Collections" || doc.SCAvailability != "" {
+		if item.LibraryID == "SPEC-COLL" || doc.SCAvailability != "" {
 			notes := ""
 			if len(item.SCNotes) > 0 {
 				notes = item.SCNotes

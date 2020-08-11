@@ -92,7 +92,7 @@
       </dl>
 
       <div class="controls">
-        <V4Button mode="primary" class="request-button" @click="submit">Submit Request</V4Button>
+        <V4Button mode="primary" class="request-button" @click="submit" :disabled="buttonDisabled">Submit Request</V4Button>
       </div>
 
     </div>
@@ -112,12 +112,12 @@ export default {
          notes: "",
          fieldMap: {
             "instructorName": "instructor_name",
-            "instructorEmail": "instructor_email", 
-            "name": "name",   
-            "email": "email",   
-            "course": "course", 
-            "semester": "semester", 
-            "subtitleLanguage": "subtitle_language", 
+            "instructorEmail": "instructor_email",
+            "name": "name",
+            "email": "email",
+            "course": "course",
+            "semester": "semester",
+            "subtitleLanguage": "subtitle_language",
          }
       };
    },
@@ -129,6 +129,7 @@ export default {
         itemDetails: state => state.item.details,
       }),
       ...mapFields('reserves',[
+         'buttonDisabled',
          'request.onBehalfOf',
          'request.instructorName',
          'request.instructorEmail',
@@ -193,7 +194,7 @@ export default {
             let first = document.getElementById(eleID)
             if ( first ) {
                first.focus()
-            }   
+            }
          }
       },
    }
