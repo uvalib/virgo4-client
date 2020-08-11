@@ -69,7 +69,7 @@ export default {
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
-         selectedResultsSort: state=>state.selectedResultsSort,
+         activeSort: state=>state.sort.activeSort,
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
@@ -125,7 +125,7 @@ export default {
             if ( r.pool.id == newVal.id) {
                this.$store.dispatch("selectPoolResults", idx)
                if ( this.$route.query.pool != r.pool.id ) {
-                  this.updateURL(idx, r.pool.id)
+                  this.updateURL(r.pool.id)
                   this.$store.dispatch("searches/updateHistory")
                }
                found = true
@@ -135,18 +135,18 @@ export default {
       }
    },
    methods: {
-      updateURL(resultIdx, poolID) {
+      updateURL( poolID) {
          let query = Object.assign({}, this.$route.query)
          query.pool = poolID
          delete query.filter
          delete query.sort
          delete query.page
-         let fqp = this.filterQueryParam( resultIdx )
+         let fqp = this.filterQueryParam( poolID )
          if (fqp.length > 0) {
             query.filter = fqp
          }
-         if (this.selectedResultsSort.length > 0) {
-            query.sort = this.selectedResultsSort
+         if (this.activeSort.length > 0) {
+            query.sort = this.activeSort
          }
          if (this.selectedResults.page > 0) {
             query.page = this.selectedResults.page +1
@@ -170,7 +170,7 @@ export default {
          if ( this.poolFailed(r)) return
          this.otherSrcSelection = {id:"", name:""}
          this.$store.dispatch("selectPoolResults", resultIdx)
-         this.updateURL(resultIdx, r.pool.id)
+         this.updateURL( r.pool.id)
          this.$store.dispatch("searches/updateHistory")
          this.poolSelected(r.pool.id)
       },

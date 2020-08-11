@@ -88,7 +88,6 @@ export default {
    },
    computed: {
       ...mapState({
-         resultsIdx: state => state.selectedResultsIdx,
          results: state => state.results,
          updatingFacets: state => state.filters.updatingFacets,
          globalAvailability: state => state.filters.globalAvailability,
@@ -102,7 +101,6 @@ export default {
       ...mapGetters({
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
-          allFilters: 'filters/poolFilter',
           filterQueryParam: 'filters/asQueryParam',
           facetSupport: 'pools/facetSupport',
       }),
@@ -131,7 +129,7 @@ export default {
          return `Filter ${this.selectedResults.pool.name} By`
       },
       facets() {
-         let out = this.allFacets(this.resultsIdx)
+         let out = this.allFacets(this.selectedResults.pool.id)
          return out.filter(f=>f.id != "FacetAvailability" && f.type != "boolean")
       },
       availabilityOpts() {
@@ -146,12 +144,6 @@ export default {
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
-      toggleGlobal() {
-         this.$store.commit("filters/toggleGlobalFilterExpanded")
-      },
-      togglePool() {
-         this.$store.commit("filters/togglePoolFilterExpanded")
-      },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
          let out = facet.buckets.slice(start,end)
@@ -164,21 +156,21 @@ export default {
          return facetID+"_val_"+idx
       },
       async availSelected(avail) {
-         let origPoolID = this.results[this.resultsIdx].pool.id
+         let origPoolID = this.selectedResults.pool.id
          this.$store.commit("filters/setGlobalAvailability", avail)
          this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchAllPools", true)
+         await this.$store.dispatch("searchAllPools")
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
          this.$store.dispatch("searches/updateHistory")
       },
       async circFacetClicked() {
-         let origPoolID = this.results[this.resultsIdx].pool.id
+         let origPoolID = this.selectedResults.pool.id
          this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchAllPools", true)
+         await this.$store.dispatch("searchAllPools")
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
@@ -188,7 +180,7 @@ export default {
          // changing the filter resetes paging
          let query = Object.assign({}, this.$route.query)
          delete query.page
-         let fqp = this.filterQueryParam( this.resultsIdx )
+         let fqp = this.filterQueryParam( this.selectedResults.pool.id )
          if (fqp.length == 0) {
             delete query.filter
          } else if ( this.$route.query.filter != fqp ) {
@@ -200,7 +192,7 @@ export default {
          return this.globalAvailability.id == avail.id
       },
       filterClicked(facetID,value) {
-         let data = {poolResultsIdx: this.resultsIdx, facetID: facetID, value: value}
+         let data = {pool: this.selectedResults.pool.id, facetID: facetID, value: value}
          this.toggleFacet(data)
       },
       toggleFacet(data) {
@@ -352,7 +344,7 @@ span.cnt {
 }
 div.none {
    text-align: center;
-   margin:25px 0;
+   margin:25px 5px;
    font-size: 1.25em;
    color: var(--uvalib-text);
 }
