@@ -26,7 +26,7 @@
          </AccordionContent>
       </div>
 
-      <div v-if="hasFacets && selectedResults.hits.length > 0" class="pool" :class="{overlay: !startExpanded}">
+      <div v-if="hasFacets" class="pool" :class="{overlay: !startExpanded}">
           <AccordionContent id="pool-filter" class="filter"
             :background="filterColor"
             color="white" :expanded="startExpanded"
@@ -50,6 +50,7 @@
                               {{fv.value}}
                            </V4Checkbox>
                            <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
+                           <span class="cnt" v-else>(0)</span>
                         </dd>
                         <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
                            <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">

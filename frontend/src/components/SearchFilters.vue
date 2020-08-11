@@ -13,6 +13,10 @@
                </template>
             </template>
          </dl>
+         <dl class="filter-display" v-if="naFilters.length>0">
+            <dt class="label">Not Applicable:</dt>
+            <dd class="filter">{{formatNAFilters}}</dd>
+         </dl>
       </template>
       <div v-else class="no-filter">
          <span>None</span>
@@ -31,11 +35,19 @@ export default {
       }),
       ...mapGetters({
          allFilters: 'filters/poolFilter',
+         notApplicableFilters: 'filters/notApplicableFilters',
          selectedResults: 'selectedResults',
          facetSupport: 'pools/facetSupport'
       }),
+      naFilters() {
+         return this.notApplicableFilters(this.selectedResults.pool.id)
+      },
+      formatNAFilters() {
+         return this.naFilters.join(", ")
+      },
       hasFilter() {
-         return this.allFilters(this.selectedResults.pool.id).length > 0
+         return (this.allFilters(this.selectedResults.pool.id).length > 0 || 
+                 this.naFilters.length > 0)
       },
       hasFacets() {
          return this.facetSupport(this.selectedResults.pool.id)

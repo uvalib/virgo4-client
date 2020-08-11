@@ -51,6 +51,19 @@ const filters = {
          return pfObj.facets
       },
 
+      notApplicableFilters: (state) => (poolID) => {
+         let pfObj = state.poolFacets.find( pf => pf.pool == poolID)
+         let out = [] 
+         if (!pfObj) return out
+         if ( !pfObj.facets) return out
+         pfObj.facets.filter( ff => ff.id == "NotApplicable").forEach( f => {
+            f.buckets.forEach( nab => {
+               out.push(nab.value)
+            })
+         })
+         return out
+      }, 
+
       poolFilter: (state) => (poolID) => {
          let globalVal = state.availabilityValues[state.globalAvailability.id]
          let pfObj = state.poolFacets.find( pf => pf.pool == poolID)
@@ -73,11 +86,13 @@ const filters = {
          }
 
          pfObj.facets.forEach( f => {
-            f.buckets.forEach( bucket => {
-               if (bucket.selected == true ) {
-                  filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value})   
-               }
-            })
+            if (f.id != "NotApplicable") {
+               f.buckets.forEach( bucket => {
+                  if (bucket.selected == true ) {
+                     filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value})   
+                  }
+               })
+            }
          })
 
          return filter
@@ -112,18 +127,35 @@ const filters = {
             state.poolFacets.push(tgtPFObj)    
          }
          let tgtFacets = tgtPFObj.facets
-         let selected = tgtFacets.filter( f => f.selected == true)
+         let selected = []
+         tgtFacets.forEach( f => {
+            f.buckets.filter( b => b.selected == true).forEach( sb => {
+               selected.push(sb.value)
+            })
+         })
+
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
             // Availability/Circulation are global and handled differently; skip 
             if ( facet.id ==  state.availabilityFacet.id || facet.id == state.circulatingFacet.id) return
 
-            // if this is in the preserved selected items, select it
-            if ( selected.some( f => f.id == facet.id) ) {
-               facet.selected = true
-            }
+            // if this is in the preserved selected items, select it and remove from saved list
+            facet.buckets.forEach( fb => {
+               let idx = selected.findIndex( selVal => fb.value == selVal )
+               if ( idx > -1) {
+                  fb.selected  = true
+                  selected.splice(idx,1)
+               }   
+            })
             tgtFacets.push(facet)
          })
+         if (selected.length > 0) {
+            let notApplicable = {id: "NotApplicable", name: "Not Applicable", buckets: []}
+            selected.forEach( s => {
+               notApplicable.buckets.push({value: s, selected: true, count: 0})
+            })
+            tgtFacets.push(notApplicable)
+         }
       },
 
       toggleFilter(state, data) {
@@ -216,6 +248,7 @@ const filters = {
             state.poolFacets.splice(pfIdx,1)
          }
          state.poolFacets.push(pfObj)
+         console.log("RESTORED FOM URL: "+JSON.stringify(state.poolFacets))
       },
    },
 
