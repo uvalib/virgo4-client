@@ -332,7 +332,7 @@ export default {
             qp += `&sort=${priorQ.sort}`
          }
          
-         // NOTES: SORT GETS LOST IF YOU RESET
+         this.$store.commit("resetSearchResults")
          this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
          this.$router.push(`/search?${qp}`)       

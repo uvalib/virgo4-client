@@ -88,8 +88,10 @@ const filters = {
          let out = []
          rootState.pools.list.forEach( p => {
             let filter = getters.poolFilter(p.id)
-            let add = {pool_id: p.id, facets: filter}
-            out.push(add)
+            if (filter.length > 0) {
+               let add = {pool_id: p.id, facets: filter}
+               out.push(add)
+            }
          })    
          return out  
       }
