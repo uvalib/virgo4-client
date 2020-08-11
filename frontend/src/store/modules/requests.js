@@ -6,6 +6,7 @@ const requests = {
       alertText: '',
       requestOptions: [],
       errors: {},
+      buttonDisabled: false,
 
       // selected request option
       activeOption: {},
@@ -77,9 +78,13 @@ const requests = {
       alertText(store, text) {
          store.alertText = text
       },
+      disableButton(store, isDisabled) {
+         store.buttonDisabled = isDisabled
+      },
       reset(store) {
          store.activePanel = 'OptionsPanel'
          store.alertText = ''
+         store.buttonDisabled = false
          store.errors =  {}
          store.hold = {
             itemBarcode: '',
@@ -111,16 +116,25 @@ const requests = {
    },
    actions: {
       async submitILLiadBorrowRequest(ctx, req) {
-         await axios.post('/api/requests/standalone/borrow', req).catch(e =>
+         ctx.commit('disableButton', true)
+         await axios.post('/api/requests/standalone/borrow', req
+         ).catch(e =>
             ctx.commit('system/setError', e, { root: true })
+         ).finally(()=>
+            ctx.commit('disableButton', false)
          )
       },
       async submitILLiadScanRequest(ctx, req) {
-         await axios.post('/api/requests/standalone/scan', req).catch(e =>
+         ctx.commit('disableButton', true)
+         await axios.post('/api/requests/standalone/scan', req
+         ).catch(e =>
             ctx.commit('system/setError', e, { root: true })
+         ).finally(()=>
+         ctx.commit('disableButton', false)
          )
       },
       submitScan(ctx) {
+         ctx.commit('disableButton', true)
          axios.post('/api/requests/scan', ctx.state.scan).then(response => {
             if (response.data.scan.errors) {
                ctx.commit('system/setError', response.data.scan.errors, { root: true })
@@ -129,9 +143,12 @@ const requests = {
             }
          }).catch(e =>
             ctx.commit('system/setError', e, { root: true })
+         ).finally(()=>
+            ctx.commit('disableButton', false)
          )
       },
       createHold(ctx) {
+         ctx.commit('disableButton', true)
          let hold = ctx.getters.getField('hold')
          hold.pickupLibrary = ctx.rootGetters.getField('preferences.pickupLibrary').id
          axios.post('/api/requests/hold', hold)
@@ -145,9 +162,12 @@ const requests = {
             }).catch(e =>
                // Connenction problem
                ctx.commit('system/setError', e, { root: true })
+            ).finally(()=>
+               ctx.commit('disableButton', false)
             )
       },
       deleteHold({ commit, dispatch }, holdId) {
+         commit('disableButton', true)
          axios.delete('/api/requests/hold/' + holdId)
             .then(response => {
                if (response.status == 200) {
@@ -158,9 +178,12 @@ const requests = {
             }).catch(e =>
                // Connenction problem
                commit('system/setError', e, { root: true })
+            ).finally(()=>
+               commit('disableButton', false)
             )
       },
       sendDirectLink(ctx) {
+         ctx.commit('disableButton', false)
          let optionSettings = ctx.getters.getField("activeOption")
          axios.post(optionSettings.create_url)
             .then(_response => {
@@ -171,13 +194,17 @@ const requests = {
                ctx.commit('activePanel', "OptionsPanel")
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
                ctx.commit('system/setError', message, { root: true })
+            }).finally(()=>{
+               ctx.commit('disableButton', false)
             })
       },
       submitAeon(ctx) {
+         ctx.commit('disableButton', true)
          let optionSettings = ctx.getters.getField("activeOption")
          let selected = ctx.getters.getField("aeon")
          if (selected.barcode == '') {
             ctx.commit('setErrors', {barcode: 'An item must be selected.'})
+            ctx.commit('disableButton', false)
             return
          }
 
@@ -200,6 +227,7 @@ const requests = {
          }
          window.open(url.format(aeonLink), "_blank")
 
+         ctx.commit('disableButton', false)
          ctx.commit('activePanel', "ConfirmationPanel")
       }
    }

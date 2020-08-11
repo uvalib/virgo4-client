@@ -4,7 +4,7 @@
 
       <div v-if="items.length > 1" class="item-selector">
          <label for="scan-use">Select the item you want</label>
-         <V4Select id="item-select" style="height:2.5em;margin-top:5px;" :selections="items" 
+         <V4Select id="item-select" style="height:2.5em;margin-top:5px;" :selections="items"
             v-model="selectedItem" :attached="false"/>
          <span v-if="hasError('item')" class="error">* item selection is required</span>
       </div>
@@ -61,7 +61,7 @@
          <span v-if="sysError" class="error">{{sysError}}</span>
       </div>
       <div class="controls">
-         <V4Button mode="primary" class="request-button" @click="submit">Submit Request</V4Button>
+         <V4Button mode="primary" class="request-button" @click="submit" :disabled="buttonDisabled">Submit Request</V4Button>
       </div>
    </div>
 </template>
@@ -89,6 +89,7 @@ export default {
          sysError: state => state.error
       }),
       ...mapFields('requests',[
+         'buttonDisabled',
          'scan.barcode',
          'scan.issn',
          'scan.type',
@@ -157,7 +158,7 @@ export default {
             this.errors.push("course")
          }
          if ( JSON.stringify(this.selectedItem) === JSON.stringify({})) {
-            this.errors.push("item")    
+            this.errors.push("item")
          }
          if (this.errors.length > 0) {
             let tgtID = `scan-${this.errors[0]}`

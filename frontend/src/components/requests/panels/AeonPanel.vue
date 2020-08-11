@@ -6,8 +6,8 @@
       <V4Select style="height:2em;" :selections="items"
                 v-model="selectedItem" v-bind:attached="false" />
 
-      <p class="error" v-if="errors.barcode">{{errors.barcode}}</p>
     </div>
+    <p class="error" v-if="errors.barcode">{{errors.barcode}}</p>
 
     <label class="special-instructions-input">
       <p>Add additional instructions if necessary:</p>
@@ -16,7 +16,7 @@
 
     <p>Click "Request" to proceed to the Special Collections request system, where you will be asked to select a visit date.</p>
 
-    <V4Button mode="primary" class="request-button" @click="submitAeon">Request</V4Button>
+    <V4Button mode="primary" class="request-button" @click="submitAeon" :disabled="buttonDisabled">Request</V4Button>
 
     <p class="notice"><b>PLEASE NOTE:</b> These items must be used within the Special Collections reading room.</p>
 
@@ -45,7 +45,8 @@ export default {
     ...mapFields({
       itemOptions: 'requests.activeOption.item_options',
       aeon: 'requests.aeon',
-      errors: 'requests.errors'
+      errors: 'requests.errors',
+      buttonDisabled: 'requests.buttonDisabled',
 
     }),
     items() {

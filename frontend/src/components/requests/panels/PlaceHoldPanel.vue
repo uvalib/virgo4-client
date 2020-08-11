@@ -15,7 +15,7 @@
       </div>
       <PickupLibrary />
 
-      <V4Button mode="primary" class="request-button" @click="placeHold">Place Hold</V4Button>
+      <V4Button mode="primary" class="request-button" @click="placeHold" :disabled="buttonDisabled">Place Hold</V4Button>
 
       <p class="error" v-if="errors.sirsi">{{errors.sirsi.join(', ')}}</p>
    </div>
@@ -43,6 +43,7 @@ export default {
          hold: "requests.hold",
          itemOptions: "requests.activeOption.item_options",
          errors: "requests.errors",
+         buttonDisabled: "requests.buttonDisabled",
       }),
       items() {
          let items = this.itemOptions;

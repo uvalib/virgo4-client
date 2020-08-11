@@ -15,13 +15,13 @@
          </div>
          <div role="radiogroup" class="entry pure-control-group" aria-labelledby="personal-label">
             <label id="personal-label">Will you be providing a copy of this material for the Library to scan?</label>
-            <V4Button id="personal-yes" class="radio" mode="icon" @click="request.personalCopy='true'" role="radio" 
+            <V4Button id="personal-yes" class="radio" mode="icon" @click="request.personalCopy='true'" role="radio"
                :aria-checked="(request.personalCopy=='true').toString()">
                <i v-if="request.personalCopy=='true'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
                Yes
             </V4Button>
-            <V4Button class="radio" mode="icon" @click="request.personalCopy='false'" role="radio" 
+            <V4Button class="radio" mode="icon" @click="request.personalCopy='false'" role="radio"
                :aria-checked="(request.personalCopy=='false').toString()">
                <i v-if="request.personalCopy=='false'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
@@ -89,20 +89,20 @@
                Will you accept the item in a language other than English?
                <span class="required">*</span>
             </label>
-            <V4Button id="any-language-yes" class="radio" mode="icon" @click="request.anyLanguage='true'" role="radio" 
+            <V4Button id="any-language-yes" class="radio" mode="icon" @click="request.anyLanguage='true'" role="radio"
                :aria-checked="(request.anyLanguage=='true').toString()">
                <i v-if="request.anyLanguage=='true'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
                Yes
             </V4Button>
-            <V4Button class="radio" mode="icon" @click="request.anyLanguage='false'" role="radio" 
+            <V4Button class="radio" mode="icon" @click="request.anyLanguage='false'" role="radio"
                :aria-checked="(request.anyLanguage=='false').toString()">
                <i v-if="request.anyLanguage=='false'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
                No
             </V4Button>
             <span v-if="hasError('anyLanguage')" class="error">Language choice is required</span>
-         </div>  
+         </div>
       </div>
       <div class="notice">
          <p class="head">
@@ -111,7 +111,7 @@
             </strong>
          </p>
          <p>
-            N.B. The Fair Use guidelines for Copyright Law are broad in scope and can be difficult to interpret. 
+            N.B. The Fair Use guidelines for Copyright Law are broad in scope and can be difficult to interpret.
             For this reason, the Library has come up with the following recommendations:
          </p>
          <p>
@@ -126,31 +126,31 @@
             </ul>
          </p>
          <p>
-            If you wish to go outside of these guidelines, or if you wish to use materials for more than one semester, 
+            If you wish to go outside of these guidelines, or if you wish to use materials for more than one semester,
             copyright permission may be sought from the publisher of the journal or book. The Copyright Clearance Center
-            offers a quick and convenient method of obtaining permission. More information on the University's copyright 
-            policy is available. The copyright law of the United States (Title 17, US Code) governs the making of photocopies 
-            or other reproduction of copyrighted material. Under certain conditions specified in the law, libraries and 
-            archives are authorized to furnish a photocopy or other reproduction. One of these specified conditions is that the 
-            photocopy or reproduction is not to be used for any other purpose other than private study, scholarship, or research. 
-            If a user makes a request for, or later uses, a photocopy or reproduction for purposes in excess of "fair use," that user 
-            may be liable for copyright infringement. This institution reserves the right to refuse to accept a copying order if, 
+            offers a quick and convenient method of obtaining permission. More information on the University's copyright
+            policy is available. The copyright law of the United States (Title 17, US Code) governs the making of photocopies
+            or other reproduction of copyrighted material. Under certain conditions specified in the law, libraries and
+            archives are authorized to furnish a photocopy or other reproduction. One of these specified conditions is that the
+            photocopy or reproduction is not to be used for any other purpose other than private study, scholarship, or research.
+            If a user makes a request for, or later uses, a photocopy or reproduction for purposes in excess of "fair use," that user
+            may be liable for copyright infringement. This institution reserves the right to refuse to accept a copying order if,
             in its judgment, fulfillment of the order would involve violation of copyright law.
          </p>
          <p>
-            SUBMISSION OF THIS REQUEST IS CONFIRMATION THAT you understand the University's Policy on Copying of Copyrighted Material, 
-            and that the material requested for reserve either complies with these guidelines or it may be copied because you have 
+            SUBMISSION OF THIS REQUEST IS CONFIRMATION THAT you understand the University's Policy on Copying of Copyrighted Material,
+            and that the material requested for reserve either complies with these guidelines or it may be copied because you have
             received written permission from the copyright holder.
          </p>
          <p>
-            Instructors are responsible for compliance with copyright law.    
+            Instructors are responsible for compliance with copyright law.
          </p>
       </div>
       <div class="controls">
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="buttonDisabled">
             Submit
          </V4Button>
       </div>
@@ -158,6 +158,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
 export default {
    data: function()  {
       return {
@@ -165,7 +166,7 @@ export default {
          errors: [],
          required: ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage'],
          request: {
-            scanType: "INSTRUCTIONAL", 
+            scanType: "INSTRUCTIONAL",
             course: "",
             date: "",
             personalCopy: "",
@@ -182,6 +183,11 @@ export default {
             anyLanguage: ""
          }
       }
+   },
+   computed: {
+      ...mapState({
+         buttonDisabled: state => state.requests.buttonDisabled,
+      })
    },
    methods: {
       async submitClicked() {
@@ -237,7 +243,7 @@ h2 {
       color: var(--uvalib-red-emergency);
    }
    .instruct {
-      margin: 0; 
+      margin: 0;
       p {
          margin: 5px 0;
       }

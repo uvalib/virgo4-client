@@ -1,13 +1,13 @@
 <template>
-   <button tabindex="0" :role="role" class="v4-button" 
-      @keydown.exact.tab="tabNext" 
+   <button tabindex="0" :role="role" class="v4-button"
+      @keydown.exact.tab="tabNext"
       @keydown.shift.tab="tabBack"
-      :class="{'text-button': mode=='text', 'icon-button': mode=='icon', 
-               'link-button': mode=='link', 
-               'pure-button': isButton, 
+      :class="{'text-button': mode=='text', 'icon-button': mode=='icon',
+               'link-button': mode=='link',
+               'pure-button': isButton,
                'pure-button-primary': mode == 'primary',
                'pure-button-secondary': mode == 'secondary',
-               'pure-button-tertiary': mode == 'tertiary'}" 
+               'pure-button-tertiary': mode == 'tertiary'}"
       @click.prevent.stop="clicked" @keyup.stop.prevent @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked" @keyup.stop.esc="escClicked">
       <slot></slot>
    </button>
@@ -35,7 +35,7 @@ export default {
       role: {
          type: String,
          default: "button"
-      }
+      },
    },
    computed: {
       isButton() {
@@ -49,7 +49,7 @@ export default {
       clicked() {
          if ( this.mode == 'link' && this.utl != "") {
             window.location.href = this.url
-         } 
+         }
          this.$emit('click')
       },
       tabBack() {
@@ -96,7 +96,7 @@ button.v4-button.icon-button {
    outline: none;
    &:focus {
       @include be-accessible();
-   } 
+   }
 }
 .link-button {
   border-radius: 5px;
@@ -147,7 +147,7 @@ button.v4-button.icon-button {
    font-weight: normal;
    &:focus {
       @include be-accessible();
-   } 
+   }
 }
 .pure-button.disabled {
    cursor: default;

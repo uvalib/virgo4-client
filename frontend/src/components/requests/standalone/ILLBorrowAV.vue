@@ -43,7 +43,7 @@
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="buttonDisabled">
             Submit
          </V4Button>
       </div>
@@ -59,7 +59,7 @@ export default {
          errors: [],
          required: ['date', 'title'],
          request: {
-            borrowType: "AV", 
+            borrowType: "AV",
             date: "",
             title: "",
             author: "",
@@ -72,6 +72,7 @@ export default {
    computed: {
       ...mapState({
          sysError: state => state.system.error,
+         buttonDisabled: state => state.requests.buttonDisabled,
       })
    },
    methods: {
@@ -130,7 +131,7 @@ h2 {
       color: var(--uvalib-red-emergency);
    }
    .instruct {
-      margin: 0; 
+      margin: 0;
       p {
          margin: 5px 0;
       }

@@ -65,20 +65,20 @@
                Will you accept the item in a language other than English?
                <span class="required">*</span>
             </label>
-            <V4Button id="any-language-yes" class="radio" mode="icon" @click="request.anyLanguage='true'" role="radio" 
+            <V4Button id="any-language-yes" class="radio" mode="icon" @click="request.anyLanguage='true'" role="radio"
                :aria-checked="(request.anyLanguage=='true').toString()">
                <i v-if="request.anyLanguage=='true'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
                Yes
             </V4Button>
-            <V4Button class="radio" mode="icon" @click="request.anyLanguage='false'" role="radio" 
+            <V4Button class="radio" mode="icon" @click="request.anyLanguage='false'" role="radio"
                :aria-checked="(request.anyLanguage=='false').toString()">
                <i v-if="request.anyLanguage=='false'" class="check fas fa-check-circle"></i>
                <i v-else class="check far fa-circle"></i>
                No
             </V4Button>
             <span v-if="hasError('anyLanguage')" class="error">Language choice is required</span>
-         </div>  
+         </div>
          <div class="entry pure-control-group">
             <label for="notes">Notes or Special Instructions</label>
             <textarea id="notes" v-model="request.notes"></textarea>
@@ -98,7 +98,7 @@
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="buttonDisabled">
             Submit
          </V4Button>
       </div>
@@ -114,7 +114,7 @@ export default {
          errors: [],
          required: ['doctype', 'date', 'title', 'year', 'anyLanguage'],
          request: {
-            borrowType: "ITEM", 
+            borrowType: "ITEM",
             doctype: "",
             date: "",
             title: "",
@@ -136,6 +136,7 @@ export default {
       ...mapState({
          pickupLibraries: state => state.system.pickupLibraries,
          sysError: state => state.system.error,
+         buttonDisabled: state => state.requests.buttonDisabled,
       })
    },
    methods: {
@@ -194,7 +195,7 @@ h2 {
       color: var(--uvalib-red-emergency);
    }
    .instruct {
-      margin: 0; 
+      margin: 0;
       p {
          margin: 5px 0;
       }

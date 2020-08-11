@@ -74,26 +74,26 @@
             </strong>
          </p>
          <p>
-            The copyright law of the United States (Title 17, United States Code) governs the making of 
-            photocopies or other reproductions of copyrighted materials. 
+            The copyright law of the United States (Title 17, United States Code) governs the making of
+            photocopies or other reproductions of copyrighted materials.
          </p>
          <p>
-            Under certain conditions specified in the law, libraries and archives are authorized to 
+            Under certain conditions specified in the law, libraries and archives are authorized to
             furnish a photocopy or other reproduction. One of these specified conditions is that the
-            photocopy or reproduction is not to be "used for any purpose other than private study, scholarship, or research". 
-            If a user makes a request for, or later uses, a photocopy or reproduction for purposes in excess of "fair use", 
-            that user may be liable for copyright infringement. 
+            photocopy or reproduction is not to be "used for any purpose other than private study, scholarship, or research".
+            If a user makes a request for, or later uses, a photocopy or reproduction for purposes in excess of "fair use",
+            that user may be liable for copyright infringement.
          </p>
          <p>
-            This institution reserves the right to refuse to accept a copying order if, in its judgment, 
-            fulfillment of the order would involve violation of copyright law. 
+            This institution reserves the right to refuse to accept a copying order if, in its judgment,
+            fulfillment of the order would involve violation of copyright law.
          </p>
       </div>
       <div class="controls">
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="buttonDisabled">
             Submit
          </V4Button>
       </div>
@@ -109,8 +109,8 @@ export default {
          errors: [],
          required: ['doctype', 'title', "article", "year", "pages", "date"],
          request: {
-            scanType: "ARTICLE", 
-            doctype: "", 
+            scanType: "ARTICLE",
+            doctype: "",
             title: "",
             article: "",
             author: "",
@@ -129,6 +129,7 @@ export default {
    computed: {
       ...mapState({
          sysError: state => state.system.error,
+         buttonDisabled: state => state.requests.buttonDisabled,
       })
    },
    methods: {
@@ -187,7 +188,7 @@ h2 {
       color: var(--uvalib-red-emergency);
    }
    .instruct {
-      margin: 0; 
+      margin: 0;
       p {
          margin: 5px 0;
       }
