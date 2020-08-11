@@ -160,7 +160,7 @@ export default {
          this.$store.commit("filters/setGlobalAvailability", avail)
          this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchAllPools", true)
+         await this.$store.dispatch("searchAllPools")
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
@@ -170,7 +170,7 @@ export default {
          let origPoolID = this.selectedResults.pool.id
          this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchAllPools", true)
+         await this.$store.dispatch("searchAllPools")
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)

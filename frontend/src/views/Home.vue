@@ -227,7 +227,7 @@ export default {
 
             // Need this to prevent re-running the search when toggle between basic and advanced
             if (this.rawQueryString != oldQ || force === true) {
-               await this.$store.dispatch("searchAllPools")
+               await this.$store.dispatch("searchAllPools", true)
                let tgtResultsIdx = this.results.findIndex( r => r.pool.id == targetPool)
                if ( tgtResultsIdx > -1) {
                   await this.$store.dispatch("selectPoolResults", tgtResultsIdx)

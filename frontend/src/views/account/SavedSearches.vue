@@ -56,8 +56,10 @@
             <div v-if="history.length > 0" class="history">
                <h3>Recent Searches <span class="info">(Newest to oldest)</span></h3>
                <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
-                  <span class="num">{{idx+1}}.</span>
-                  <router-link class="history" :to="h">{{urlToText(h)}}</router-link>
+                  <template v-if="urlToText(h).length > 0"> 
+                     <span class="num">{{idx+1}}.</span>
+                     <router-link class="history" :to="h">{{urlToText(h)}}</router-link>
+                  </template>
                </div>
                 <div class="controls">
                   <Confirm title="Confirm Delete" v-on:confirmed="clearHistory" id="del-history" buttonLabel="Clear search history">
@@ -89,6 +91,9 @@ export default {
    },
    methods: {
       urlToText(url) {
+         if (url.split("?").length === 1) {
+            return ""
+         }
          let out = url.split("?")[1].replace(/%3a/gi, ":")
          out = out.replace("&filter=", ", filter: ")
          out = out.replace("&pool=", ", target: ")

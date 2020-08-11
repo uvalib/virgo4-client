@@ -148,10 +148,12 @@ const filters = {
       },
 
       resetPoolFilters(state, pool) {
-         let pfObj = state.setPoolFacets.find( pf => pf.pool == pool) 
+         let pfObj = state.poolFacets.find( pf => pf.pool == pool) 
          if (pfObj ) {
             pfObj.facets.splice(0, pfObj.facets.length)   
-         }    
+         }  
+         state.globalAvailability = {id: "any", name: "All"}
+         state.globalCirculating = false
       },
 
       reset(state) {
@@ -217,7 +219,7 @@ const filters = {
 
    actions: {
       // Get all facets for the selected result set / query / pool
-      getSelectedResultFacets(ctx) {
+      async getSelectedResultFacets(ctx) {
          // Recreate the query for the target pool, but include a 
          // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
