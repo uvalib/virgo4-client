@@ -114,8 +114,8 @@ const router = new Router({
          component: Preferences
       },
       {
-         // NOTES: the signedin route doesn't actually have a 
-         // visual representation. It just handes the auth session 
+         // NOTES: the signedin route doesn't actually have a
+         // visual representation. It just handes the auth session
          // setup and redirects to account page
          path: '/signedin',
          beforeEnter: (_to, _from, next) => {
@@ -123,12 +123,8 @@ const router = new Router({
             let jwtStr = Vue.$cookies.get("v4_jwt")
             store.commit("user/setUserJWT", jwtStr)
             store.dispatch("user/getAccountInfo")  // needed for search preferences
-            store.dispatch("user/getCheckouts") // needed so the alert icon can show in menubar
+            store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
             store.commit('restore/load')
-            let to = store.state.user.authExpiresSec - 15 
-            setTimeout( () => {
-               store.dispatch("user/refreshAuth")
-            }, to*1000)
             next( store.state.restore.url )
          }
       },
@@ -189,7 +185,7 @@ const router = new Router({
       // dont alter scroll position on search page
       if (noScrollPages.includes(to.name) && to.fullPath != "/search" ) {
          return false
-      } 
+      }
 
       return new Promise(resolve => {
          setTimeout( () => {
@@ -205,7 +201,8 @@ router.beforeEach( async (to, _from, next) => {
    let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       console.log(`Page ${to.name} requires auth token only`)
-      await ensureAuthTokenPresent(next)
+      await ensureAuthTokenPresent()
+      next()
    } else {
       // Some pages require a signed in user...
       let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
@@ -227,12 +224,26 @@ router.beforeEach( async (to, _from, next) => {
    }
 })
 
-function ensureSignedIn() {
+async function ensureSignedIn() {
    if ( store.getters["user/isSignedIn"]) {
       console.log("session found in memory")
+      await sessionExpireCheck()
       return true
    }
-   return restoreSessionFromLocalStorage()  
+   let resp = await restoreSessionFromLocalStorage()
+   return resp
+}
+
+async function sessionExpireCheck() {
+   // Check the session expire time. If expired, try to refresh now.
+   // Since this is checked every page access, there is no need to use
+   // setTimeout to renew on a schedule.
+   let to = store.state.user.authExpiresSec - 15
+   if (to <= 0) {
+      console.log("refreshing expired session now...")
+      await store.dispatch("user/refreshAuth")
+      console.log("...refresh completed")
+   }
 }
 
 async function restoreSessionFromLocalStorage() {
@@ -241,48 +252,44 @@ async function restoreSessionFromLocalStorage() {
    if (jwtStr) {
       console.log("Found JWT in local storage...")
       store.commit("user/setUserJWT", jwtStr)
-      
-      let to = store.state.user.authExpiresSec - 15 
-      if (to > 0) {
-         setTimeout( () => {
-            store.dispatch("user/refreshAuth")
-         }, to*1000)
-      } else {
-         console.log("refreshing expired session now...")
-         await store.dispatch("user/refreshAuth")   
-         console.log("...refresh completed")
-      }
+
+      await sessionExpireCheck()
 
       console.log("load user data into session")
       await store.dispatch("user/getAccountInfo")  // needed for search preferences
       store.dispatch("user/getCheckouts")          // needed so the alert icon can show in menubar
       return true
-   } 
+   }
 
    console.log("Nothing found in local storage")
    return false
 }
 
-async function ensureAuthTokenPresent(next) {
-   console.log("Check memory for session...")
-   if (store.getters["user/hasAuthToken"] || store.getters["user/isSignedIn"]) {
-      console.log("Auth token found in memory")
-      next()
+async function ensureAuthTokenPresent() {
+   console.log("Check memory for auth token or session...")
+   // Check for sign-in first, and if found check for expire / renew
+   // Reason: signed in users have an auth token too. If that is detected first
+   // the session may expire without being refreshed
+   if (store.getters["user/isSignedIn"]) {
+      console.log("Sign-in session found in memory")
+      await sessionExpireCheck()
       return
-   } 
+   }
+   if (store.getters["user/hasAuthToken"]) {
+      console.log("Auth token found in memory")
+      return
+   }
 
    console.log("Check Local store for session...")
    let restored = await restoreSessionFromLocalStorage()
    if ( restored === true ) {
       console.log("Session restored from local store")
-      next()
       return
-   } 
+   }
 
    console.log("Get new auth token...")
    await store.dispatch("user/getAuthToken")
    console.log("...DONE; new auth token received")
-   next()
 }
 
 export default router

@@ -199,7 +199,7 @@ const user = {
 
          // set a timeout to refresh the token 30secs before it expires (or right now if it is expired)
          let nowSecs = Math.round((new Date()).getTime() / 1000)
-         state.authExpiresSec = parsed.exp - nowSecs 
+         state.authExpiresSec = parsed.exp - nowSecs
 
       },
       setAccountInfo(state, data) {
@@ -248,10 +248,6 @@ const user = {
          return axios.post("/api/reauth", null).then((response) => {
             console.log("Session refreshed")
             ctx.commit("setUserJWT", response.data )
-            let interval = ctx.state.authExpiresSec - 15 
-            setTimeout( () => {
-               ctx.dispatch("refreshAuth")
-            }, interval*1000)
          }).catch((_error) => {
             ctx.commit('system/setSessionExpired', null, { root: true })
             ctx.commit('clear')
@@ -302,7 +298,7 @@ const user = {
             let prefs = migratePreferences( ctx.rootState.pools.list, response.data.preferences)
             ctx.commit('preferences/setPreferences', prefs, { root: true })
             if (prefs.migrated && prefs.migrated == true) {
-               ctx.dispatch('preferences/savePreferences', null, { root: true })    
+               ctx.dispatch('preferences/savePreferences', null, { root: true })
             }
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
@@ -405,10 +401,6 @@ const user = {
             ctx.commit('restore/load', null, { root: true })
             ctx.dispatch("getAccountInfo")   // needed for search preferences
             ctx.dispatch("getCheckouts")     // needed so the alert icon can show in menubar
-            let to = ctx.state.authExpiresSec - 15 
-            setTimeout( () => {
-               ctx.dispatch("refreshAuth")
-            }, to*1000)
             router.push( ctx.rootState.restore.url )
          }).catch((error) => {
             ctx.commit('setAuthorizing', false)
@@ -440,13 +432,13 @@ function migratePreferences( pools, prefsStr ) {
          jsonPrefs.migrated = true
          jsonPrefs.excludePools = []
          jsonPrefs.excludePoolURLs.forEach( url => {
-            jsonPrefs.excludePools.push( getPoolID(pools, url))     
+            jsonPrefs.excludePools.push( getPoolID(pools, url))
          })
          delete jsonPrefs.excludePoolURLs
       }
       return jsonPrefs
    } catch (e) {
-      // just return blank obj 
+      // just return blank obj
       return {}
    }
 }
