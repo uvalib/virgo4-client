@@ -118,20 +118,17 @@ export default {
       }
    },
    watch: {
-      otherSrcSelection (newVal, _oldVal) {
+      async otherSrcSelection (newVal, _oldVal) {
          if (newVal == "") return
-         let found = false
-         this.results.some( (r,idx) => {
-            if ( r.pool.id == newVal.id) {
-               this.$store.dispatch("selectPoolResults", idx)
-               if ( this.$route.query.pool != r.pool.id ) {
-                  this.updateURL(r.pool.id)
-                  this.$store.dispatch("searches/updateHistory")
-               }
-               found = true
+         let tgtIdx = this.results.findIndex( r => r.pool.id == newVal.id )
+         if (tgtIdx > -1) {
+            await this.$store.dispatch("selectPoolResults", tgtIdx)
+            let newPoolID = this.results[tgtIdx].pool.id
+            if ( this.$route.query.pool != newPoolID ) {
+               this.$store.dispatch("searches/updateHistory")
+               this.updateURL(newPoolID)
             }
-            return found
-         })
+         }
       }
    },
    methods: {
@@ -165,11 +162,11 @@ export default {
       formatFilterValues(values) {
          return values.join(", ")
       },
-      resultsButtonClicked(resultIdx) {
+      async resultsButtonClicked(resultIdx) {
          let r = this.results[resultIdx]
          if ( this.poolFailed(r)) return
          this.otherSrcSelection = {id:"", name:""}
-         this.$store.dispatch("selectPoolResults", resultIdx)
+         await this.$store.dispatch("selectPoolResults", resultIdx)
          this.updateURL( r.pool.id)
          this.$store.dispatch("searches/updateHistory")
          this.poolSelected(r.pool.id)

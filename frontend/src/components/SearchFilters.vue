@@ -46,7 +46,7 @@ export default {
          return this.naFilters.join(", ")
       },
       hasFilter() {
-         return (this.allFilters(this.selectedResults.pool.id).length > 0 || 
+         return (this.allFilters(this.selectedResults.pool.id).length > 0 ||
                  this.naFilters.length > 0)
       },
       hasFacets() {
@@ -81,13 +81,13 @@ export default {
          }
          return out
       },
-      clearClicked() {
+      async clearClicked() {
          this.$store.commit("filters/resetPoolFilters", this.selectedResults.pool.id)
          let query = Object.assign({}, this.$route.query)
          delete query.filter
-         this.$router.push({ query })
          this.$store.commit("clearSelectedPoolResults")
-         this.$store.dispatch("searchSelectedPool")
+         await this.$store.dispatch("searchSelectedPool")
+         this.$router.push({ query })
       },
    }
 }

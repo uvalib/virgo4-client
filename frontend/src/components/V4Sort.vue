@@ -21,10 +21,10 @@ export default {
       },
    },
    methods: {
-      sortChanged() {
+      async sortChanged() {
          let query = Object.assign({}, this.$route.query)
          query.sort = this.activeSort
-         this.$store.dispatch("sort/applPoolSort", {poolID: this.pool.id, sort: this.activeSort})
+         await this.$store.dispatch("sort/applyPoolSort", {poolID: this.pool.id, sort: this.activeSort})
          this.$store.dispatch("searches/updateHistory")
          this.$router.push({query})
       }
@@ -40,7 +40,7 @@ export default {
       canSort() {
          return this.sortingSupport(this.pool.id)
       },
-      
+
       sortOptions() {
          let out = []
          this.pool.sort_options.forEach( so => {

@@ -10,9 +10,9 @@ const sort = {
 
       // activeSort is used to drive the sort dropdown on the search
       // results page. To use the sort on the selected pool dispatch
-      // applyPoolSort. This will move the activeSort setting into 
+      // applyPoolSort. This will move the activeSort setting into
       // the pools list above, and issue a search for the selected pool.
-      // The search logic polls sort settings from the pools list 
+      // The search logic polls sort settings from the pools list
       activeSort: DefaultSort
    },
 
@@ -33,11 +33,11 @@ const sort = {
    mutations: {
       updateField,
       setActivePool(state, poolID) {
-         state.activeSort = DefaultSort 
+         state.activeSort = DefaultSort
          let ps = state.pools.find( p => p.poolID == poolID)
          if ( ps) {
             state.activeSort = `${ps.sort.sort_id}_${ps.sort.order}`
-         } 
+         }
       },
       setPoolSort(state, data) {
          let sortString = data.sort
@@ -51,7 +51,7 @@ const sort = {
          let poolSortIdx = state.pools.findIndex( p => p.poolID == data.poolID )
          if (poolSortIdx > -1) {
             let ps = state.pools[poolSortIdx]
-            ps.sort = sort 
+            ps.sort = sort
             state.pools.splice(poolSortIdx,1)
             state.pools.push(ps)
          } else {
@@ -65,7 +65,7 @@ const sort = {
       }
    },
    actions: {
-      async applPoolSort(ctx, data) {
+      async applyPoolSort(ctx, data) {
          ctx.commit('setPoolSort', data)
          ctx.commit("clearSelectedPoolResults", null, {root: true})
          return ctx.dispatch("searchSelectedPool", null, {root: true})
