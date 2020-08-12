@@ -201,19 +201,19 @@ export default {
 
          if (query.exclude) {
             this.$store.commit("query/setExcludePreferences", query.exclude.split(","))
-         } 
-         
+         }
+
          if (query.tgt) {
             this.$store.commit("query/setPreferredPreference", query.tgt)
          } else {
             this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
          }
-         let targetPool = this.$store.state.query.preferredPool 
+         let targetPool = this.$store.state.query.preferredPool
          if (query.pool) {
-            targetPool = query.pool    
+            targetPool = query.pool
          }
 
-         if (query.filter) {        
+         if (query.filter) {
             this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
          }
 
@@ -239,7 +239,7 @@ export default {
                   await this.$store.dispatch("searchSelectedPool", page)
                }
                this.$store.commit('setSearching', false)
-            } 
+            }
          }
       },
       async searchCreated() {
@@ -308,16 +308,16 @@ export default {
          this.$analytics.trigger('Search', 'BASIC_SEARCH_RESOURCE_SET', tgt)
       },
 
-      searchClicked() {
+      async searchClicked() {
          if ( this.basicSearchScope.id == "all") {
             this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)   
+            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
          } else {
             this.$store.commit("query/setPreferredPreference", "")
-            this.$store.commit("query/setExcludePreferences", [])   
+            this.$store.commit("query/setExcludePreferences", [])
          }
 
-         // Refine search updates: 
+         // Refine search updates:
          // if pool, filter or sort were specified previously, preserve them in the URL.
          // a new search will always reset paging, so don't preserve that
          let priorQ = Object.assign({}, this.$route.query)
@@ -331,12 +331,12 @@ export default {
          if (priorQ.sort) {
             qp += `&sort=${priorQ.sort}`
          }
-         
+
          this.$store.commit("resetSearchResults")
-         this.$store.dispatch("searchAllPools")
+         await this.$store.dispatch("searchAllPools")
          this.$store.dispatch("searches/updateHistory")
-         this.$router.push(`/search?${qp}`)       
-   
+         this.$router.push(`/search?${qp}`)
+
          let s = "SIGNED_OUT"
          if ( this.isSignedIn ) {
             s = "SIGNED_IN"

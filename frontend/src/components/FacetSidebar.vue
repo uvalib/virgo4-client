@@ -45,7 +45,7 @@
                      <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
                      <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
                         <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                           <V4Checkbox :checked="fv.selected" 
+                           <V4Checkbox :checked="fv.selected"
                               @click="filterClicked(facetInfo.id, fv.value)">
                               {{fv.value}}
                            </V4Checkbox>
@@ -58,7 +58,7 @@
                                  <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
                               </template>
                               <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                                 <V4Checkbox :checked="fv.selected" 
+                                 <V4Checkbox :checked="fv.selected"
                                     @click="filterClicked(facetInfo.id, fv.value)">
                                     {{fv.value}}
                                  </V4Checkbox>
@@ -97,7 +97,7 @@ export default {
          displayWidth: state => state.system.displayWidth,
       }),
       ...mapFields("filters", [
-         "globalCirculating", 
+         "globalCirculating",
       ]),
       ...mapGetters({
           allFacets: 'filters/poolFacets',
@@ -159,23 +159,23 @@ export default {
       async availSelected(avail) {
          let origPoolID = this.selectedResults.pool.id
          this.$store.commit("filters/setGlobalAvailability", avail)
-         this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
          await this.$store.dispatch("searchAllPools")
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
          this.$store.dispatch("searches/updateHistory")
+         this.addFilterToURL()
       },
       async circFacetClicked() {
          let origPoolID = this.selectedResults.pool.id
-         this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
          await this.$store.dispatch("searchAllPools")
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
          this.$store.dispatch("searches/updateHistory")
+         this.addFilterToURL()
       },
       addFilterToURL() {
          // changing the filter resetes paging
@@ -186,7 +186,7 @@ export default {
             delete query.filter
          } else if ( this.$route.query.filter != fqp ) {
             query.filter = fqp
-         } 
+         }
          this.$router.push({ query })
       },
       isAvailSelected(avail) {
@@ -196,12 +196,12 @@ export default {
          let data = {pool: this.selectedResults.pool.id, facetID: facetID, value: value}
          this.toggleFacet(data)
       },
-      toggleFacet(data) {
+      async toggleFacet(data) {
          this.$store.commit("filters/toggleFilter", data)
-         this.addFilterToURL()
          this.$store.commit("clearSelectedPoolResults")
-         this.$store.dispatch("searchSelectedPool")
+         await this.$store.dispatch("searchSelectedPool")
          this.$store.dispatch("searches/updateHistory")
+         this.addFilterToURL()
       },
    }
 }

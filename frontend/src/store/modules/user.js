@@ -31,7 +31,7 @@ const user = {
       authMessage: "",
       lockedOut: false,
       parsedJWT: {},
-      authExpiresSec: 0
+      authExpiresAt: 0
    },
 
    getters: {
@@ -196,10 +196,7 @@ const user = {
          state.role =  parsed.role
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
          localStorage.setItem("v4_jwt", jwtStr)
-
-         // set a timeout to refresh the token 30secs before it expires (or right now if it is expired)
-         let nowSecs = Math.round((new Date()).getTime() / 1000)
-         state.authExpiresSec = parsed.exp - nowSecs
+         state.authExpiresAt = parsed.exp
 
       },
       setAccountInfo(state, data) {
@@ -211,7 +208,7 @@ const user = {
          state.sessionType = ""
          state.accountInfo = {}
          state.authTriesLeft = 5
-         state.authExpiresSec = 0
+         state.authExpiresAt = 0
          state.authMessage = ""
          state.role = ""
          state.lockedOut = false
@@ -245,13 +242,21 @@ const user = {
             return
          }
 
-         return axios.post("/api/reauth", null).then((response) => {
-            console.log("Session refreshed")
-            ctx.commit("setUserJWT", response.data )
-         }).catch((_error) => {
-            ctx.commit('system/setSessionExpired', null, { root: true })
-            ctx.commit('clear')
-          })
+         let nowSecs = Math.round((new Date()).getTime() / 1000)
+         let expireSecs = ctx.state.authExpiresAt - 15
+         let expiresIn = expireSecs - nowSecs
+         if (expiresIn <= 0) {
+            try {
+               console.log("Session expired. Refreshing...")
+               let response = await axios.post("/api/reauth", null)
+               console.log("Session refreshed")
+               ctx.commit("setUserJWT", response.data )
+            } catch(error)  {
+               console.error("Session refresh failed: "+error)
+               ctx.commit('system/setSessionExpired', null, { root: true })
+               ctx.commit('clear')
+            }
+         }
       },
 
       overrideClaims(ctx) {

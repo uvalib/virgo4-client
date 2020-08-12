@@ -81,10 +81,10 @@ export default new Vuex.Store({
       name += `<span class='total'>${res.total} hits</span>`
       state.otherSrcSelection.name = name
     },
-    
+
     selectPoolResults(state, resultIdx) {
       state.selectedResultsIdx = resultIdx
-   
+
       if (resultIdx > 1 && state.otherSrcSelection.id == "") {
         // this happens when a search is restored. otherSrcSelection is used
         // to drive the selected option in the other sources tab. Make sure it is
@@ -154,7 +154,7 @@ export default new Vuex.Store({
         // if a preffered pool was set in prefs (or url) track its index in results
         // so it can be selected after all results are updated
         if ( pr.pool_id == data.tgtPool ) {
-         tgtPoolIdx = idx    
+         tgtPoolIdx = idx
         }
 
         // Find the pool the results are associated with and populate some top level response info
@@ -193,7 +193,7 @@ export default new Vuex.Store({
       if ( tgtPoolIdx > -1) {
          state.selectedResultsIdx = tgtPoolIdx
          if ( tgtPoolIdx > 1) {
-            state.otherSrcSelection = {id: data.tgtPool, name: ""}    
+            state.otherSrcSelection = {id: data.tgtPool, name: ""}
          }
       } else {
          if ( firstPoolWithHits == -1) {
@@ -263,12 +263,16 @@ export default new Vuex.Store({
             if (src.id != tgtID) {
                req.preferences.exclude_pool.push(src.id)
             } else {
-               req.preferences.target_pool = src.id  
+               req.preferences.target_pool = src.id
             }
          })
       }
 
       commit('setSearching', true)
+      if ( rootGetters["user/isSignedIn"]) {
+         await dispatch("user/refreshAuth")
+      }
+
       let url = state.system.searchAPI + "/api/search"
       try {
         let response = await axios.post(url, req)
@@ -291,7 +295,7 @@ export default new Vuex.Store({
         // make sure the currently selected pool is always in URL
         let query = Object.assign({}, router.currentRoute.query)
         if (query.pool != rootGetters.selectedResults.pool.id ) {
-           query.pool = rootGetters.selectedResults.pool.id 
+           query.pool = rootGetters.selectedResults.pool.id
            router.push({query})
         }
 
@@ -322,7 +326,7 @@ export default new Vuex.Store({
       let filters = rootGetters['filters/poolFilter'](tgtResults.pool.id)
       let sort = rootGetters['sort/poolSort'](tgtResults.pool.id)
       let filterObj = {pool_id: tgtResults.pool.id, facets: filters}
-      let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize } 
+      let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize }
       if (pageOverride) {
          let pageDiff = pageOverride - tgtResults.page
          pagination.rows = state.pageSize * pageDiff
@@ -334,6 +338,11 @@ export default new Vuex.Store({
         sort: sort,
         filters: [filterObj]
       }
+
+      if ( rootGetters["user/isSignedIn"]) {
+         await dispatch("user/refreshAuth")
+      }
+
       let url = tgtResults.pool.url + "/api/search"
       try {
         let response = await axios.post(url, req)
@@ -343,7 +352,7 @@ export default new Vuex.Store({
          commit('updateOtherPoolLabel')
         }
         return dispatch("filters/getSelectedResultFacets")
-      } catch(error) { 
+      } catch(error) {
          console.error("SINGLE POOL SEARCH FAILED: "+error)
          commit('setSearching', false)
          commit('filters/setUpdatingFacets', false)

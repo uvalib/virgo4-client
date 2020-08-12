@@ -196,27 +196,19 @@ const router = new Router({
 })
 
 // This is called before every URL in the SPA is hit
-router.beforeEach( async (to, _from, next) => {
+router.beforeEach( (to, _from, next) => {
    // Some pages just require an auth token...
    let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       console.log(`Page ${to.name} requires auth token only`)
-      await ensureAuthTokenPresent()
-      next()
+      ensureAuthTokenPresent( next )
    } else {
       // Some pages require a signed in user...
       let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
          "course-reserves-request", "requests", "searches"]
       if (userPages.includes(to.name)) {
          console.log(`Page ${to.name} requires signed in user`)
-         let resp = await ensureSignedIn()
-         if ( resp === true) {
-            next()
-         } else {
-            console.log("Unable to find session for page access. Flag as expired")
-            store.commit('system/setSessionExpired')
-            store.dispatch("user/signout", "/")
-         }
+         ensureSignedIn( next )
       } else {
          // All others just proceed...
          next()
@@ -224,25 +216,20 @@ router.beforeEach( async (to, _from, next) => {
    }
 })
 
-async function ensureSignedIn() {
+async function ensureSignedIn( next ) {
    if ( store.getters["user/isSignedIn"]) {
-      console.log("session found in memory")
-      await sessionExpireCheck()
-      return true
-   }
-   let resp = await restoreSessionFromLocalStorage()
-   return resp
-}
-
-async function sessionExpireCheck() {
-   // Check the session expire time. If expired, try to refresh now.
-   // Since this is checked every page access, there is no need to use
-   // setTimeout to renew on a schedule.
-   let to = store.state.user.authExpiresSec - 15
-   if (to <= 0) {
-      console.log("refreshing expired session now...")
+      console.log("Sign-in session found in memory")
       await store.dispatch("user/refreshAuth")
-      console.log("...refresh completed")
+      next()
+   } else {
+      let resp = await restoreSessionFromLocalStorage()
+      if ( resp === true) {
+         next()
+      } else {
+         console.log("Unable to find session for page access. Flag as expired")
+         store.commit('system/setSessionExpired')
+         store.dispatch("user/signout", "/")
+      }
    }
 }
 
@@ -253,7 +240,7 @@ async function restoreSessionFromLocalStorage() {
       console.log("Found JWT in local storage...")
       store.commit("user/setUserJWT", jwtStr)
 
-      await sessionExpireCheck()
+      await store.dispatch("user/refreshAuth")
 
       console.log("load user data into session")
       await store.dispatch("user/getAccountInfo")  // needed for search preferences
@@ -265,18 +252,20 @@ async function restoreSessionFromLocalStorage() {
    return false
 }
 
-async function ensureAuthTokenPresent() {
+async function ensureAuthTokenPresent( next ) {
    console.log("Check memory for auth token or session...")
    // Check for sign-in first, and if found check for expire / renew
    // Reason: signed in users have an auth token too. If that is detected first
    // the session may expire without being refreshed
    if (store.getters["user/isSignedIn"]) {
       console.log("Sign-in session found in memory")
-      await sessionExpireCheck()
+      await store.dispatch("user/refreshAuth")
+      next()
       return
    }
    if (store.getters["user/hasAuthToken"]) {
       console.log("Auth token found in memory")
+      next()
       return
    }
 
@@ -284,12 +273,14 @@ async function ensureAuthTokenPresent() {
    let restored = await restoreSessionFromLocalStorage()
    if ( restored === true ) {
       console.log("Session restored from local store")
+      next()
       return
    }
 
    console.log("Get new auth token...")
    await store.dispatch("user/getAuthToken")
    console.log("...DONE; new auth token received")
+   next()
 }
 
 export default router
