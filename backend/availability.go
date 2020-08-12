@@ -84,7 +84,7 @@ type SolrDocument struct {
 	ISSN              []string `json:"issn_a,omitempty"`
 	Library           []string `json:"library_a,omitempty"`
 	Location          []string `json:"location2_a,omitempty"`
-	LocalNotes        []string `json:"local_note_a,omitempty"`
+	LocalNotes        []string `json:"local_notes_a,omitempty"`
 	Medium            []string `json:"medium_a,omitempty"`
 	PublicationDate   string   `json:"published_date,omitempty"`
 	PublishedLocation []string `json:"published_location_a,omitempty"`
@@ -133,7 +133,7 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 }
 func (svc *ServiceContext) getSolrDoc(id string) SolrDocument {
 	fields := solrFieldList()
-	solrPath := fmt.Sprintf(`select?fl=%s,&q=id%%3A"%s"`, fields, id)
+	solrPath := fmt.Sprintf(`select?fl=%s,&q=id%%3A%s`, fields, id)
 
 	respBytes, solrErr := svc.SolrGet(solrPath)
 	if solrErr != nil {
@@ -144,6 +144,7 @@ func (svc *ServiceContext) getSolrDoc(id string) SolrDocument {
 		log.Printf("ERROR: Unable to parse solr response: %s.", err.Error())
 	}
 	if SolrResp.Response.NumFound != 1 {
+		log.Printf("ERROR: Availability - More than one record found for the cat key: %s", id)
 	}
 	SolrDoc := SolrResp.Response.Docs[0]
 	return SolrDoc
@@ -258,6 +259,7 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 				Barcode:  item.Barcode,
 				Label:    item.CallNumber,
 				Location: item.CurrentLocation,
+				Library:  item.Library,
 				SCNotes:  notes,
 			}
 			Options = append(Options, scItem)
@@ -340,8 +342,6 @@ func createAeonURL(doc SolrDocument) string {
 	}
 
 	// Notes, Bacode, CallNumber, UserNotes need to be added by client for the specific item!
-
-	// arrays joined with newlines?
 
 	query, _ := query.Values(req)
 
