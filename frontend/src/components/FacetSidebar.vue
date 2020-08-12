@@ -164,7 +164,6 @@ export default {
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
-         this.$store.dispatch("searches/updateHistory")
          this.addFilterToURL()
       },
       async circFacetClicked() {
@@ -174,7 +173,6 @@ export default {
          let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
          await this.$store.dispatch("selectPoolResults", resIdx)
          this.$store.commit("setSearching", false)
-         this.$store.dispatch("searches/updateHistory")
          this.addFilterToURL()
       },
       addFilterToURL() {
@@ -200,7 +198,6 @@ export default {
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("clearSelectedPoolResults")
          await this.$store.dispatch("searchSelectedPool")
-         this.$store.dispatch("searches/updateHistory")
          this.addFilterToURL()
       },
    }

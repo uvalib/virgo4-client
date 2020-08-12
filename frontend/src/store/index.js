@@ -298,7 +298,7 @@ export default new Vuex.Store({
            query.pool = rootGetters.selectedResults.pool.id
            router.push({query})
         }
-
+        dispatch("searches/updateHistory")
         return dispatch("filters/getSelectedResultFacets")
       } catch (error) {
          console.error("SEARCH FAILED: "+error)
@@ -351,6 +351,8 @@ export default new Vuex.Store({
         if ( state.otherSrcSelection.id != "") {
          commit('updateOtherPoolLabel')
         }
+
+        dispatch("searches/updateHistory")
         return dispatch("filters/getSelectedResultFacets")
       } catch(error) {
          console.error("SINGLE POOL SEARCH FAILED: "+error)

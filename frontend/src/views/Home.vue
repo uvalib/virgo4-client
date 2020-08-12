@@ -333,8 +333,7 @@ export default {
          }
 
          this.$store.commit("resetSearchResults")
-         await this.$store.dispatch("searchAllPools")
-         this.$store.dispatch("searches/updateHistory")
+         this.$store.dispatch("searchAllPools")
          this.$router.push(`/search?${qp}`)
 
          let s = "SIGNED_OUT"

@@ -31,7 +31,7 @@
                      <option value="BETWEEN">BETWEEN</option>
                   </select>
                </template>
-               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)" 
+               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)"
                   :aria-label="`delete search criteria number ${idx+1}`">
                   <i class="fas fa-times-circle"></i>
                </V4Button>
@@ -62,7 +62,7 @@
                   </div>
                </template>
                <template v-else>
-                   <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term" 
+                   <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term"
                      :aria-label="`query string for search criteria number ${idx+1}`"/>
                </template>
             </div>
@@ -87,7 +87,7 @@
             <V4Checkbox v-for="src in filteredSources" :key="src.id" class="pool"
                :disabled="isTargetPool(src)"
                :aria-label="`toggle inclusion of ${src.name} in search results`"
-               :checked="!isPoolExcluded(src)"  
+               :checked="!isPoolExcluded(src)"
                @click="poolClicked(src)">
                {{src.name}}
                <span class="preferred" v-if="isTargetPool(src)">(preferred)</span>
@@ -103,7 +103,7 @@
          </div>
       </div>
       <div class="templates" v-if="isSignedIn">
-         <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm" 
+         <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm"
             id="savesearch" buttonLabel="Save Form" buttonMode="tertiary">
             <div>
                Save the current advanced search form to your account?<br/>
@@ -203,7 +203,7 @@ export default {
          }
          if (this.queryEntered) {
 
-            // Refine search updates: 
+            // Refine search updates:
             // if pool, filter or sort were specified previously, preserve them in the URL.
             // a new search will always reset paging, so don't preserve that
             let priorQ = Object.assign({}, this.$route.query)
@@ -217,9 +217,8 @@ export default {
             if (priorQ.sort) {
                qp += `&sort=${priorQ.sort}`
             }
-            
+
             this.$store.dispatch("searchAllPools")
-            this.$store.dispatch("searches/updateHistory")
             this.$router.push(`/search?${qp}`)
 
             let s = "SIGNED_OUT"
@@ -227,7 +226,7 @@ export default {
                s = "SIGNED_IN"
             }
             if ( decodeURI(qp).includes("UVA Library Digital Repository") ) {
-               this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')   
+               this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')
             }
             this.$analytics.trigger('Search', 'ADVANCED_SEARCH', s)
          } else {
@@ -289,7 +288,7 @@ export default {
       }
    },
    created() {
-      this.focusFirstTerm(false)    
+      this.focusFirstTerm(false)
    }
 };
 </script>
@@ -302,7 +301,7 @@ h2 {
    margin: 5px 0;
    display: flex;
    flex-flow: row nowrap;
-   justify-content: space-between; 
+   justify-content: space-between;
    align-items: center;
 }
 .sep {
@@ -370,13 +369,13 @@ div.options {
    flex-basis: content;
    &:focus {
       @include be-accessible();
-   } 
+   }
 }
 div.search-term select {
    height: auto !important;
    &:focus {
       @include be-accessible();
-   } 
+   }
 }
 
 div.query {

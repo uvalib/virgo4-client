@@ -125,7 +125,6 @@ export default {
             await this.$store.dispatch("selectPoolResults", tgtIdx)
             let newPoolID = this.results[tgtIdx].pool.id
             if ( this.$route.query.pool != newPoolID ) {
-               this.$store.dispatch("searches/updateHistory")
                this.updateURL(newPoolID)
             }
          }
@@ -168,7 +167,6 @@ export default {
          this.otherSrcSelection = {id:"", name:""}
          await this.$store.dispatch("selectPoolResults", resultIdx)
          this.updateURL( r.pool.id)
-         this.$store.dispatch("searches/updateHistory")
          this.poolSelected(r.pool.id)
       },
 
