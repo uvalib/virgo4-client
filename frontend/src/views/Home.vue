@@ -203,14 +203,10 @@ export default {
             this.$store.commit("query/setExcludePreferences", query.exclude.split(","))
          }
 
-         if (query.tgt) {
-            this.$store.commit("query/setPreferredPreference", query.tgt)
-         } else {
-            this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
-         }
-         let targetPool = this.$store.state.query.preferredPool
+         let targetPool = this.$store.state.query.targetPool
          if (query.pool) {
             targetPool = query.pool
+            this.$store.commit("query/setTargetPool", targetPool)
          }
 
          if (query.filter) {
@@ -310,10 +306,10 @@ export default {
 
       async searchClicked() {
          if ( this.basicSearchScope.id == "all") {
-            this.$store.commit("query/setPreferredPreference", this.tgtPoolPref)
+            this.$store.commit("query/setTargetPool", this.tgtPoolPref)
             this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
          } else {
-            this.$store.commit("query/setPreferredPreference", "")
+            this.$store.commit("query/setTargetPool", this.basicSearchScope.id)
             this.$store.commit("query/setExcludePreferences", [])
          }
 
@@ -324,6 +320,8 @@ export default {
          let qp =  this.queryURLParams
          if (priorQ.pool) {
             qp += `&pool=${priorQ.pool}`
+            console.log("overide pool preference with "+priorQ.pool)
+            this.$store.commit("query/setTargetPool", priorQ.pool)
          }
          if (priorQ.filter) {
             qp += `&filter=${priorQ.filter}`

@@ -141,7 +141,7 @@ export default new Vuex.Store({
     },
 
     setSearchResults(state, data) {
-      // // this is called from top level search; resets results from all pools
+      // this is called from top level search; resets results from all pools
       state.total = -1
       state.results.splice(0, state.results.length)
       let firstPoolWithHits = -1
@@ -247,7 +247,7 @@ export default new Vuex.Store({
         query: rootGetters['query/string'],
         pagination: { start: 0, rows: state.pageSize },
         preferences: {
-          target_pool: rootState.query.preferredPool,
+          target_pool: rootState.query.targetPool,
           exclude_pool: rootState.query.excludedPools
         },
         filters: rootGetters['filters/allPoolFilters'],
@@ -271,18 +271,17 @@ export default new Vuex.Store({
       commit('setSearching', true)
       if ( rootGetters["user/isSignedIn"]) {
          await dispatch("user/refreshAuth")
+         //make sure bookmarks are up to date when
+         // searching so the UI can show the correct status per item
+         dispatch("bookmarks/getBookmarks")
       }
 
       let url = state.system.searchAPI + "/api/search"
       try {
+        // POST the search query and wait for the response
         let response = await axios.post(url, req)
-         // If a user is signed in, make sure bookmarks are up to date when
-         // searching so the UI can show the correct status per item
-         if ( rootGetters["user/isSignedIn"]) {
-            dispatch("bookmarks/getBookmarks")
-         }
         commit('pools/setPools', response.data.pools)
-        commit('setSearchResults', {results: response.data, tgtPool: rootState.query.preferredPool})
+        commit('setSearchResults', {results: response.data, tgtPool: rootState.query.targetPool})
         commit('sort/setActivePool', state.results[state.selectedResultsIdx].pool.id )
         commit('setSuggestions', response.data.suggestions)
         if ( state.otherSrcSelection.id != "") {
@@ -298,6 +297,7 @@ export default new Vuex.Store({
            query.pool = rootGetters.selectedResults.pool.id
            router.push({query})
         }
+
         dispatch("searches/updateHistory")
         return dispatch("filters/getSelectedResultFacets")
       } catch (error) {

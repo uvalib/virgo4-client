@@ -15,7 +15,7 @@ const query = {
          { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" },
       ],
-      browse: 
+      browse:
          { op: "AND", value: "", field: "", comparison: "EQUAL", endVal: "" },
       advancedFields: [
          { value: "keyword", label: "Keyword", type: "text", choices: [] },
@@ -27,7 +27,7 @@ const query = {
          { value: "published", label: "Publisher/Place of Publication", type: "text", choices: []}
       ],
       excludedPools: [],
-      preferredPool: ""
+      targetPool: ""
    },
    getters: {
       getField,
@@ -51,9 +51,6 @@ const query = {
             qs += `&scope=${state.basicSearchScope.id}`
          }
          qs += `&q=${encodeURIComponent(getters.string)}`
-         if (state.preferredPool != "" ) {
-            qs += `&tgt=${state.preferredPool}`
-         }
          if ( state.excludedPools.length > 0) {
             qs += `&exclude=${state.excludedPools.join(",")}`
          }
@@ -114,7 +111,7 @@ const query = {
                   } else {
                      qs += `date: {${term.comparison} ${term.value}}`
                   }
-               } else if (term.field.includes("filter.")) { 
+               } else if (term.field.includes("filter.")) {
                   let tgtField = term.field.split(".")[1].trim()
                   qs += `filter: {${tgtField}:"${term.value}"}`
                } else {
@@ -214,7 +211,7 @@ const query = {
             let keyOp = queryParams.substring(0, braceIdx).trim()   // get all up to colon
             keyOp = keyOp.substring(0, keyOp.length - 1)            // remove colon
 
-            // the query term is the data between the { and }. Grab it 
+            // the query term is the data between the { and }. Grab it
             // and remove this whole term from the query string
             let value = queryParams.substring(braceIdx+1, braceIdx2)
             queryParams = queryParams.substring(braceIdx2+1).trim()
@@ -228,7 +225,7 @@ const query = {
                let filterField = value.split(":")[0].trim()
                let filterValue = value.split(":")[1].trim()
                filterValue = filterValue.substring(1, filterValue.length-1) // drop quotes
-               term.field = `filter.${filterField}`  
+               term.field = `filter.${filterField}`
                term.value = filterValue
             } else if (keyOpParts.length == 2 ) {
                term.op = keyOpParts[0].trim()
@@ -238,7 +235,7 @@ const query = {
                   let filterField = value.split(":")[0].trim()
                   let filterValue = value.split(":")[1].trim()
                   filterValue = filterValue.substring(1, filterValue.length-1) // drop quotes
-                  term.field = `filter.${filterField}`  
+                  term.field = `filter.${filterField}`
                   term.value = filterValue
                } else {
                   term.field = field
@@ -249,11 +246,11 @@ const query = {
 
             if (state.advancedFields.findIndex( af => af.value == term.field) == -1) {
                console.error(term.field+" from URL not found in advanced fields. Skipping")
-               continue  
+               continue
             }
-            
+
             if ( term.field == "date" ) {
-               // date values have 4 formats: {1988} {AFTER 1988} {BEFORE 1988} {1970 TO 2000} 
+               // date values have 4 formats: {1988} {AFTER 1988} {BEFORE 1988} {1970 TO 2000}
                if ( value.includes("AFTER") || value.includes("after")  ) {
                   term.comparison = "AFTER"
                   term.value = value.replace(/AFTER/gi, "").trim()
@@ -265,7 +262,7 @@ const query = {
                   term.value = value.split("TO")[0].trim()
                   term.endVal = value.split("TO")[1].trim()
                }
-            } 
+            }
             state.advanced.push(term)
          }
       },
@@ -290,8 +287,8 @@ const query = {
             state.excludedPools.push(pid)
          })
       },
-      setPreferredPreference(state, preferredPref) {
-         state.preferredPool = preferredPref
+      setTargetPool(state, pool) {
+         state.targetPool = pool
       },
       toggleAdvancedPoolExclusion(state, pool) {
          let idx = state.excludedPools.indexOf(pool.id)
@@ -307,7 +304,7 @@ const query = {
       excludeAll( state, pools ) {
          state.excludedPools.splice(0, state.excludedPools.length)
          pools.forEach( p => {
-            if (state.preferredPool != p.id) {
+            if (state.targetPool != p.id) {
                state.excludedPools.push(p.id)
             }
          })
@@ -354,7 +351,7 @@ const query = {
          state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
          state.excludedPools.splice(0, state.excludedPools.length)
-         state.preferredPool = ""
+         state.targetPool = ""
          state.browse = [
             { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" }]
       },
@@ -373,7 +370,7 @@ const query = {
             // load the saved search info from backend
             let response = await axios.get(`/api/searches/${token}`)
             if (response.data.url != "") {
-               router.replace(response.data.url)    
+               router.replace(response.data.url)
             } else {
                let old = JSON.parse(response.data.search)
                ctx.commit('restoreSearch', old )
@@ -394,8 +391,8 @@ const query = {
                   url += encodeURI(filters.join("|"))
                }
                url = `/search?${url}`
-               router.replace( url )   
-               let req = {token: token, name: response.data.name, url: url, isPublic: response.data.public, 
+               router.replace( url )
+               let req = {token: token, name: response.data.name, url: url, isPublic: response.data.public,
                   userID: ctx.rootState.user.signedInUser}
                ctx.dispatch("searches/save", req, {root:true})
             }
