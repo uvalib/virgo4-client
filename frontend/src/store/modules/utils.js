@@ -14,7 +14,7 @@ export function preProcessHitFields(hits) {
          }
 
          // Special fields are cover image and identifer. Move them to top level
-         if (field.name == "cover_image") {
+         if (field.type == "cover-image-url") {
             hit.cover_image = field.value
             return
          }
