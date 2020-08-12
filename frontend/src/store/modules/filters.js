@@ -31,16 +31,17 @@ const filters = {
          if (filter.length == 0) {
             return ""
          }
-         let out = []
+         let outObj = {}
          filter.forEach(f => {
+            if (Object.prototype.hasOwnProperty.call(outObj, f.facet_id) == false) {
+               outObj[f.facet_id] = []
+            }
             if ( f.value.length > 0) {
-               out.push(`${f.facet_id}.${f.value}`)
-            } else {
-               out.push(f.facet_id)
+               outObj[f.facet_id].push(f.value)
             }
          })
-         // string of id.val|id.val|...
-         return out.join("|")
+         let outStr = JSON.stringify(outObj)
+         return encodeURIComponent(outStr)
       },
 
       poolFacets: (state) => (poolID) => {
@@ -204,7 +205,7 @@ const filters = {
 
       restoreFromURL(state, data ) {
          // The filter URL param is just facetID.value,facetID,value,...
-         let filter = data.filter
+         let filterStr = data.filter
          let pfIdx = state.poolFacets.findIndex( pf => pf.pool == data.pool)
          let pfObj = null
          if (pfIdx == -1) {
@@ -213,35 +214,31 @@ const filters = {
             pfObj = state.poolFacets[pfIdx]
          }
 
-         filter.split("|").forEach( fp => {
-            let facetID = fp.split(".")[0]
-            let filterVal = fp.split(".")[1]
-
-            if (facetID == state.availabilityFacet.id) {
+         let filter = JSON.parse(decodeURIComponent(filterStr))
+         Object.keys( filter ).forEach( facetID => {
+            if (facetID == state.circulatingFacet.id) {
+               state.globalCirculating = true
+            } else if (facetID == state.availabilityFacet.id) {
+               let filterVal = filter[facetID][0]
                Object.entries(state.availabilityValues).forEach( ([key,value])=>{
                   if (value  == filterVal) {
                      state.globalAvailability = {id: key, name: filterVal}
                   }
                })
-               return
-            }
-
-            if (facetID == state.circulatingFacet.id) {
-               state.globalCirculating = true
-               return
-            }
-
-            let facet = pfObj.facets.find(f => f.id == facetID)
-            if ( facet  ) {
-               let bucket = facet.buckets.find( b => b.value == filterVal)
-               if (bucket) {
-                  bucket.selected = true
-               } else {
-                  facet.buckets.push({value: filterVal, selected: true})
-               }
             } else {
-               let newFacet = {id: facetID, buckets: [ {selected: true, value: filterVal} ]}
-               pfObj.facets.push( newFacet )
+               let facet = pfObj.facets.find(f => f.id == facetID)
+               if ( !facet ) {
+                  facet = {id: facetID, buckets: []}
+                  pfObj.facets.push( facet )
+               }
+               filter[facetID].forEach( filterVal => {
+                  let bucket = facet.buckets.find( b => b.value == filterVal)
+                  if (bucket) {
+                     bucket.selected = true
+                  } else {
+                     facet.buckets.push({value: filterVal, selected: true})
+                  }
+               })
             }
          })
          if ( pfIdx > -1) {

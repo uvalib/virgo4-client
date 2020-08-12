@@ -99,7 +99,7 @@ const router = new Router({
          beforeEnter: (to, _from, next) => {
             let field = to.query.search_field
             if ( field == "journal") {
-               console.log("Detected a journal query. Converting to V4 search...")
+               // console.log("Detected a journal query. Converting to V4 search...")
                let q = to.query.q
                next(`/search?mode=basic&scope=journals&q=title%3A%20%7B${q}%7D`)
             } else {
@@ -200,14 +200,14 @@ router.beforeEach( (to, _from, next) => {
    // Some pages just require an auth token...
    let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
-      console.log(`Page ${to.name} requires auth token only`)
+      // console.log(`Page ${to.name} requires auth token only`)
       ensureAuthTokenPresent( next )
    } else {
       // Some pages require a signed in user...
       let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
          "course-reserves-request", "requests", "searches"]
       if (userPages.includes(to.name)) {
-         console.log(`Page ${to.name} requires signed in user`)
+         // console.log(`Page ${to.name} requires signed in user`)
          ensureSignedIn( next )
       } else {
          // All others just proceed...
@@ -218,7 +218,7 @@ router.beforeEach( (to, _from, next) => {
 
 async function ensureSignedIn( next ) {
    if ( store.getters["user/isSignedIn"]) {
-      console.log("Sign-in session found in memory")
+      // console.log("Sign-in session found in memory")
       await store.dispatch("user/refreshAuth")
       next()
    } else {
@@ -226,7 +226,7 @@ async function ensureSignedIn( next ) {
       if ( resp === true) {
          next()
       } else {
-         console.log("Unable to find session for page access. Flag as expired")
+         // console.log("Unable to find session for page access. Flag as expired")
          store.commit('system/setSessionExpired')
          store.dispatch("user/signout", "/")
       }
@@ -234,52 +234,52 @@ async function ensureSignedIn( next ) {
 }
 
 async function restoreSessionFromLocalStorage() {
-   console.log("Restore session from local storage...")
+   // console.log("Restore session from local storage...")
    let jwtStr = localStorage.getItem('v4_jwt')
    if (jwtStr) {
-      console.log("Found JWT in local storage...")
+      // console.log("Found JWT in local storage...")
       store.commit("user/setUserJWT", jwtStr)
 
       await store.dispatch("user/refreshAuth")
 
-      console.log("load user data into session")
+      // console.log("load user data into session")
       await store.dispatch("user/getAccountInfo")  // needed for search preferences
       store.dispatch("user/getCheckouts")          // needed so the alert icon can show in menubar
       return true
    }
 
-   console.log("Nothing found in local storage")
+   // console.log("Nothing found in local storage")
    return false
 }
 
 async function ensureAuthTokenPresent( next ) {
-   console.log("Check memory for auth token or session...")
+   // console.log("Check memory for auth token or session...")
    // Check for sign-in first, and if found check for expire / renew
    // Reason: signed in users have an auth token too. If that is detected first
    // the session may expire without being refreshed
    if (store.getters["user/isSignedIn"]) {
-      console.log("Sign-in session found in memory")
+      // console.log("Sign-in session found in memory")
       await store.dispatch("user/refreshAuth")
       next()
       return
    }
    if (store.getters["user/hasAuthToken"]) {
-      console.log("Auth token found in memory")
+      // console.log("Auth token found in memory")
       next()
       return
    }
 
-   console.log("Check Local store for session...")
+   // console.log("Check Local store for session...")
    let restored = await restoreSessionFromLocalStorage()
    if ( restored === true ) {
-      console.log("Session restored from local store")
+      // console.log("Session restored from local store")
       next()
       return
    }
 
-   console.log("Get new auth token...")
+   // console.log("Get new auth token...")
    await store.dispatch("user/getAuthToken")
-   console.log("...DONE; new auth token received")
+   // console.log("...DONE; new auth token received")
    next()
 }
 
