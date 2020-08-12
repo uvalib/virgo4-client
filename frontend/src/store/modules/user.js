@@ -185,9 +185,14 @@ const user = {
             state.parsedJWT = JSON.stringify(parsed,undefined, 2);
          }
 
-         state.claims = {canPurchase: parsed.canPurchase, canLEO: parsed.canLEO,
-            canLEOPlus: parsed.canLEOPlus, canPlaceReserve: parsed.canPlaceReserve,
-            canBrowseReserve: parsed.canBrowseReserve, useSIS: parsed.useSIS }
+         state.claims = {canPurchase: parsed.canPurchase,
+            homeLibrary: parsed.homeLibrary,
+            canLEO: parsed.canLEO,
+            canLEOPlus: parsed.canLEOPlus,
+            canPlaceReserve: parsed.canPlaceReserve,
+            canBrowseReserve: parsed.canBrowseReserve,
+            useSIS: parsed.useSIS,
+         }
          state.authMessage = ""
          state.lockedOut = false
          state.signedInUser = parsed.userId

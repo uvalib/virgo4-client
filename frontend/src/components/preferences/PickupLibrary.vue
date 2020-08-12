@@ -14,7 +14,7 @@
     </p>
 
     <label for="pickup-sel">Preferred pickup location:
-      <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="pickupLibraries"
+      <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="librariesForUser()"
         pad="5px 10px" :attached="false"
         @changed="update"
       />
@@ -32,9 +32,18 @@ export default {
     }),
     ...mapState({
         pickupLibraries: state => state.system.pickupLibraries,
-    })
+        homeLibrary: state => state.user.claims.homeLibrary,
+    }),
   },
   methods: {
+    librariesForUser(){
+      if (this.homeLibrary == "HEALTHSCI") {
+        let healthSciLib = [{id: "HEALTHSCI", name: "Health Sciences Library"}]
+        return healthSciLib.concat(this.pickupLibraries)
+      } else {
+        return this.pickupLibraries
+      }
+    },
     update() {
       this.$store.dispatch("preferences/savePreferences")
     },
