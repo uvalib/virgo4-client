@@ -1,8 +1,6 @@
 <template>
   <div >
-    <div class="active-panel">
-
-
+    <div id="active-panel" ref="activePanel">
       <component v-bind:is="requests.activePanel" />
       <V4Button mode="tertiary" v-if="showReset(requests.activePanel)" class="reset" @click="reset">Reset</V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
@@ -38,13 +36,15 @@ export default {
     }),
 
   },
-  created() {
+  mounted() {
     this.$store.commit('requests/reset')
     let restoredPanel = this.$store.state.restore.activeRequest
     if (restoredPanel) {
         this.requests.activePanel = restoredPanel
         let optionSettings = this.findOption(restoredPanel)
         this.requests.activeOption = optionSettings
+        let requestPanel = this.$refs.activePanel
+        requestPanel.scrollIntoView({behavior: 'smooth', block: 'center'})
         this.$store.commit("restore/clear")
     }
     if (!this.requests.activePanel){
@@ -69,7 +69,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.active-panel {
+#active-panel {
    padding: 15px;
    position: relative;
    ::v-deep .v4-button {
