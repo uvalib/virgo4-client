@@ -20,11 +20,19 @@
                         Public
                      </V4Checkbox>
                      <span>
-                        <router-link :aria-label="`perform search named ${saved.name}`" :to="searchURL(saved.token)">{{saved.name}}</router-link>
+                        <router-link :aria-label="`perform search named ${saved.name}`"
+                           @mousedown.native="savedSearchClicked"
+                           :to="searchURL(saved.token)"
+                        >
+                           {{saved.name}}
+                        </router-link>
                      </span>
                      <span class="search-actions">
                         <span class="icon">
-                           <router-link :to="searchURL(saved.token)" :aria-label="`perform search named ${saved.name}`">
+                           <router-link @mousedown.native="savedSearchClicked"
+                              :to="searchURL(saved.token)"
+                              :aria-label="`perform search named ${saved.name}`"
+                           >
                               <i class="fas fa-search"></i>
                            </router-link>
                         </span>
@@ -56,9 +64,9 @@
             <div v-if="history.length > 0" class="history">
                <h3>Recent Searches <span class="info">(Newest to oldest)</span></h3>
                <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
-                  <template v-if="urlToText(h).length > 0"> 
+                  <template v-if="urlToText(h).length > 0">
                      <span class="num">{{idx+1}}.</span>
-                     <router-link class="history" :to="h">{{urlToText(h)}}</router-link>
+                     <router-link @mousedown.native="savedSearchClicked" class="history" :to="h">{{urlToText(h)}}</router-link>
                   </template>
                </div>
                 <div class="controls">
@@ -90,6 +98,9 @@ export default {
       })
    },
    methods: {
+      async savedSearchClicked() {
+         await this.$store.dispatch('resetSearch')
+      },
       urlToText(url) {
          if (url.split("?").length === 1) {
             return ""
@@ -138,8 +149,8 @@ export default {
          return date.split("T")[0];
       },
       publicURL(key) {
-         let base = window.location.href 
-         return `${base}/${key}` 
+         let base = window.location.href
+         return `${base}/${key}`
       },
       searchURL(key) {
          return `/search/${key}`
@@ -205,7 +216,7 @@ div.searches-content {
    div.searches-content {
       width: 95%;
    }
-} 
+}
 div.saved-search {
    display: flex;
    flex-flow: row nowrap;

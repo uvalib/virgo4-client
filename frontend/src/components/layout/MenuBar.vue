@@ -22,23 +22,23 @@
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
                <div v-if="svcMenuOpen" class="user-menu" @keydown.space.prevent.stop>
-                  <a href="https://www.library.virginia.edu/research/" target="_blank" role="menuitem" 
+                  <a href="https://www.library.virginia.edu/research/" target="_blank" role="menuitem"
                      tabindex="-1" id="guides">
                      <div class="submenu">Subject&nbsp;Guides</div>
                   </a>
-                  <a href="https://guides.lib.virginia.edu/journalfinder" target="_blank" role="menuitem" 
+                  <a href="https://guides.lib.virginia.edu/journalfinder" target="_blank" role="menuitem"
                      tabindex="-1" id="journalsub">
                      <div class="submenu">Journal&nbsp;Finder</div>
                   </a>
-                  <a href="https://guides.lib.virginia.edu/az.php" target="_blank" role="menuitem" 
+                  <a href="https://guides.lib.virginia.edu/az.php" target="_blank" role="menuitem"
                      tabindex="-1" id="databasesub">
                      <div class="submenu">Databases A-Z</div>
                   </a>
-                  <a href="https://cal.lib.virginia.edu/" target="_blank" role="menuitem" 
+                  <a href="https://cal.lib.virginia.edu/" target="_blank" role="menuitem"
                      tabindex="-1" id="spacesub">
                      <div class="submenu">Spaces & Equipment</div>
                   </a>
-                  <a href="https://www.library.virginia.edu/services" target="_blank" role="menuitem" 
+                  <a href="https://www.library.virginia.edu/services" target="_blank" role="menuitem"
                      tabindex="-1" id="moresub">
                      <div class="submenu">More Library Services</div>
                   </a>
@@ -90,13 +90,13 @@
             </router-link>
          </template>
          <template v-else>
-            <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin" 
+            <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin"
                 @click.native="closeSubMenus">
                <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
             </router-link>
          </template>
-         <div class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu" 
-            v-bind:class="{dim: alertCount==0}" 
+         <div class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu"
+            v-bind:class="{dim: alertCount==0}"
             @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
             @keydown.space.prevent.stop="alertClicked"
          >
@@ -139,11 +139,11 @@ export default {
       }),
    },
    created() {
-      document.addEventListener('seen-count-changed', (e)=>{ this.alertCount = e.detail.seenCount }) 
+      document.addEventListener('seen-count-changed', (e)=>{ this.alertCount = e.detail.seenCount })
    },
    methods: {
       // escAlert() {
-      //    document.querySelector('#alerts').seeAll()   
+      //    document.querySelector('#alerts').seeAll()
       // },
       alertClicked() {
          if ( this.alertCount > 0) {
@@ -197,7 +197,7 @@ export default {
          })
       },
       nextSvcMenu() {
-         if ( this.svcMenuOpen) { 
+         if ( this.svcMenuOpen) {
             this.svcMenuIdx++
             if (this.svcMenuIdx == this.svcMenu.length) {
                this.svcMenuIdx = 0
@@ -226,7 +226,7 @@ export default {
          })
       },
       prevSvcMenu() {
-         if ( this.svcMenuOpen) { 
+         if ( this.svcMenuOpen) {
             this.svcMenuIdx--
             if (this.svcMenuIdx < 0) {
                this.svcMenuIdx = this.svcMenu.length-1
@@ -242,10 +242,7 @@ export default {
       },
       searchClicked() {
          this.closeSubMenus()
-         this.$store.commit('resetSearchResults')
-         this.$store.commit('filters/reset')
-         this.$store.commit('sort/reset')
-         this.$store.commit('query/clear')
+         this.$store.dispatch('resetSearch')
       },
       signinClicked() {
          this.closeSubMenus()
@@ -365,7 +362,7 @@ export default {
 
       &:focus {
          @include be-accessible();
-      } 
+      }
    }
 
    .menu-item:hover {
@@ -436,7 +433,7 @@ export default {
       margin-left:20px;
       &:focus {
          @include be-accessible();
-      } 
+      }
    }
    .alert-wrap:hover {
       border-bottom:1px solid white;
@@ -467,7 +464,7 @@ export default {
 
       a:focus div.submenu, div.submenu:focus {
          background-color: var(--uvalib-brand-blue-lightest);
-         color: var(--uvalib-text-dark); 
+         color: var(--uvalib-text-dark);
       }
    }
 }

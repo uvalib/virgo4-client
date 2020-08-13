@@ -43,8 +43,9 @@ export default {
    methods: {
       async browseCreated() {
          await this.$store.dispatch('pools/getPools')
+         this.$store.dispatch('resetSearch')
 
-         let prior = this.rawQueryString
+         // let prior = this.rawQueryString
          let targetQ = this.$route.query.q
          let browseType = this.$route.params.type
 
@@ -55,14 +56,11 @@ export default {
             this.$store.commit("query/browseSubjects", targetQ)
          } else if (browseType == "author") {
             this.$store.commit("query/browseAuthors", targetQ)
+         } else {
+            this.$router.push("/notfound")
+            return
          }
-         let newQ = this.rawQueryString
-         if ( newQ != prior ) {
-            this.$store.commit('resetSearchResults')
-            this.$store.commit('filters/reset')
-            this.$store.commit('sort/reset')
-            this.$store.dispatch("searchAllPools")
-         }
+         this.$store.dispatch("searchAllPools")
       },
    }
 };

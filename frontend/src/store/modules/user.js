@@ -386,12 +386,10 @@ const user = {
          try {
             await axios.post("/signout", null)
             ctx.commit('clear')
-            ctx.commit('resetSearchResults', null, { root: true })
             ctx.commit('bookmarks/clear', null, { root: true })
             ctx.commit('preferences/clear', null, { root: true })
             ctx.commit('searches/clear', null, { root: true })
-            ctx.commit('query/clear', null, { root: true })
-            ctx.commit('filters/reset', null, { root: true })
+            ctx.dispatch('resetSearch', null, { root: true })
             await ctx.dispatch('getAuthToken')
          } catch (e) {
             console.error("Signout failed: "+e)

@@ -15,9 +15,8 @@ const filters = {
 
       // Global availability and hard-coded filter values
       globalAvailability: {id: "any", name: "All"},
-      availabilityFacet: {id: "FacetAvailability", name: "Availability"},
-      availabilityValues: {"online": "Online",
-         "shelf": "On shelf"},
+      availabilityFacet: {id: "FacetAvailability", name: "Availability",
+         values: [{id: "any", name: "All"}, {id: "online", name: "Online"}, {id: "shelf", name: "On shelf"}]},
 
       // global circulating flag; set to TRUE to hide non-circulating items
       circulatingFacet: {id: "FacetCirculating", name: "Hide items limited to in-Library use"},
@@ -41,7 +40,7 @@ const filters = {
             }
          })
          let outStr = JSON.stringify(outObj)
-         return encodeURIComponent(outStr)
+         return outStr
       },
 
       poolFacets: (state) => (poolID) => {
@@ -66,11 +65,11 @@ const filters = {
       },
 
       poolFilter: (state) => (poolID) => {
-         let globalVal = state.availabilityValues[state.globalAvailability.id]
          let pfObj = state.poolFacets.find( pf => pf.pool == poolID)
+         if (!pfObj) {
+            pfObj = {pool: poolID, facets: []}
+         }
          let filter = []
-         if (!pfObj) return filter
-         if ( !pfObj.facets) return filter
 
          if (state.globalCirculating == true ) {
             filter.push({facet_id: state.circulatingFacet.id,
@@ -78,12 +77,10 @@ const filters = {
                facet_name: state.circulatingFacet.name, value: ""})
          }
 
-         if (state.globalAvailability.id == "shelf") {
+         if (state.globalAvailability.id != "any") {
+            let ga = state.availabilityFacet.values.find( af => af.id == state.globalAvailability.id)
             filter.push({facet_id: state.availabilityFacet.id,
-               facet_name: state.availabilityFacet.name, value: "On shelf"})
-         } else if (state.globalAvailability.id != "any") {
-            filter.push({facet_id: state.availabilityFacet.id,
-               facet_name: state.availabilityFacet.name, value: globalVal})
+               facet_name: state.availabilityFacet.name, value: ga.name})
          }
 
          pfObj.facets.forEach( f => {
@@ -214,15 +211,21 @@ const filters = {
             pfObj = state.poolFacets[pfIdx]
          }
 
-         let filter = JSON.parse(decodeURIComponent(filterStr))
+         let decoded = decodeURIComponent(filterStr).trim()
+         let filter = {}
+         if ( decoded[0] != "{") {
+            filter = convertOldFilter( decoded, state.availabilityFacet, state.circulatingFacet )
+         } else {
+            filter = JSON.parse( decoded )
+         }
          Object.keys( filter ).forEach( facetID => {
             if (facetID == state.circulatingFacet.id) {
                state.globalCirculating = true
             } else if (facetID == state.availabilityFacet.id) {
                let filterVal = filter[facetID][0]
-               Object.entries(state.availabilityValues).forEach( ([key,value])=>{
-                  if (value  == filterVal) {
-                     state.globalAvailability = {id: key, name: filterVal}
+               state.availabilityFacet.values.forEach( af => {
+                  if (af.name  == filterVal) {
+                     state.globalAvailability = {id: af.id, name: filterVal}
                   }
                })
             } else {
@@ -285,6 +288,25 @@ const filters = {
           })
       }
    }
+}
+
+function convertOldFilter( filterStr, availFacet, circFacet ) {
+   let out = {}
+   filterStr.split("|").forEach( fp => {
+      let facetID = fp.split(".")[0]
+      let filterVal = fp.split(".")[1]
+      if (facetID == availFacet.id) {
+         out[facetID] = [filterVal]
+      } else if (facetID == circFacet.id) {
+         out[facetID] = []
+      } else {
+         if (Object.prototype.hasOwnProperty.call(out, facetID) == false) {
+            out[facetID] = []
+         }
+         out[facetID].push(filterVal)
+      }
+   })
+   return out
 }
 
 export default filters

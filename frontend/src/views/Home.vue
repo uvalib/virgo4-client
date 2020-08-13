@@ -173,10 +173,7 @@ export default {
       async restoreSearchFromQueryParams( query, force ) {
          if  (!query.q) {
             // No query - reset everything
-            this.$store.commit('resetSearchResults')
-            this.$store.commit('filters/reset')
-            this.$store.commit('sort/reset')
-            this.$store.commit('query/clear')
+            this.$store.dispatch('resetSearch')
             setTimeout( ()=> {
                let  s = document.getElementById("search")
                if (s) s.focus()
@@ -223,7 +220,7 @@ export default {
 
             // Need this to prevent re-running the search when toggle between basic and advanced
             if (this.rawQueryString != oldQ || force === true) {
-               await this.$store.dispatch("searchAllPools", true)
+               await this.$store.dispatch("searchAllPools")
                let tgtResultsIdx = this.results.findIndex( r => r.pool.id == targetPool)
                if ( tgtResultsIdx > -1) {
                   await this.$store.dispatch("selectPoolResults", tgtResultsIdx)

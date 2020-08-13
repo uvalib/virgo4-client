@@ -218,6 +218,7 @@ export default {
                qp += `&sort=${priorQ.sort}`
             }
 
+            this.$store.commit("resetSearchResults")
             this.$store.dispatch("searchAllPools")
             this.$router.push(`/search?${qp}`)
 
@@ -238,10 +239,7 @@ export default {
       },
       clearSearchClicked() {
          if (this.$router.currentRoute.fullPath != "/search?mode=advanced") {
-            this.$store.commit('query/clear')
-            this.$store.commit('resetSearchResults')
-            this.$store.commit('filters/reset')
-            this.$store.commit('sort/reset')
+            this.$store.dispatch('resetSearch')
             this.$router.push('/search?mode=advanced')
          } else {
             this.$store.commit('query/resetAdvanced')
@@ -265,9 +263,7 @@ export default {
          this.$store.commit("query/removeCriteria", idx);
       },
       barcodeScanned(barcode) {
-         this.$store.commit('resetSearchResults')
-         this.$store.commit('filters/reset')
-         this.$store.commit('sort/reset')
+         this.$store.dispatch('resetSearch')
          this.$store.commit("query/advancedBarcodeSearch", barcode)
          this.$store.dispatch("searchAllPools")
       },

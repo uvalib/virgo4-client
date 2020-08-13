@@ -1,9 +1,9 @@
 <template>
    <div class="header">
       <div class="library-link">
-         <UvaLibraryLogo v-if="isKiosk" /> 
+         <UvaLibraryLogo v-if="isKiosk" />
          <a v-else target="_blank" href="https://library.virginia.edu">
-            <UvaLibraryLogo />   
+            <UvaLibraryLogo />
          </a>
       </div>
       <div class="site-link">
@@ -30,10 +30,7 @@ export default {
    },
    methods: {
       homeClicked() {
-         this.$store.commit('resetSearchResults')
-         this.$store.commit('filters/reset')
-         this.$store.commit('sort/reset')
-         this.$store.commit('query/clear')
+         this.$store.dispatch('resetSearch')
       }
    }
 }
