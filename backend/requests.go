@@ -147,7 +147,7 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 	v4Claims, error := getJWTClaims(c)
 	if error != nil {
 		log.Printf("ERROR: %s", error.Error())
-		c.String(http.StatusUnauthorized, err.Error())
+		c.String(http.StatusUnauthorized, error.Error())
 		return
 	}
 
@@ -230,7 +230,7 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	v4Claims, error := getJWTClaims(c)
 	if error != nil {
 		log.Printf("ERROR: %s", error.Error())
-		c.String(http.StatusUnauthorized, err.Error())
+		c.String(http.StatusUnauthorized, error.Error())
 		return
 	}
 
@@ -316,7 +316,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	v4Claims, error := getJWTClaims(c)
 	if error != nil {
 		log.Printf("ERROR: %s", error.Error())
-		c.String(http.StatusUnauthorized, err.Error())
+		c.String(http.StatusUnauthorized, error.Error())
 		return
 	}
 

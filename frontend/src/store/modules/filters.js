@@ -212,12 +212,7 @@ const filters = {
          }
 
          let decoded = decodeURIComponent(filterStr).trim()
-         let filter = {}
-         if ( decoded[0] != "{") {
-            filter = convertOldFilter( decoded, state.availabilityFacet, state.circulatingFacet )
-         } else {
-            filter = JSON.parse( decoded )
-         }
+         let filter =  JSON.parse( decoded )
          Object.keys( filter ).forEach( facetID => {
             if (facetID == state.circulatingFacet.id) {
                state.globalCirculating = true
@@ -288,25 +283,6 @@ const filters = {
           })
       }
    }
-}
-
-function convertOldFilter( filterStr, availFacet, circFacet ) {
-   let out = {}
-   filterStr.split("|").forEach( fp => {
-      let facetID = fp.split(".")[0]
-      let filterVal = fp.split(".")[1]
-      if (facetID == availFacet.id) {
-         out[facetID] = [filterVal]
-      } else if (facetID == circFacet.id) {
-         out[facetID] = []
-      } else {
-         if (Object.prototype.hasOwnProperty.call(out, facetID) == false) {
-            out[facetID] = []
-         }
-         out[facetID].push(filterVal)
-      }
-   })
-   return out
 }
 
 export default filters

@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/rs/xid"
-	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
 // SearchTemplate contains details about a user saved advanced search template
@@ -122,6 +121,50 @@ func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
 
+// UpdateSavedSearch will update URL of a previpously saved search. This is temporary until
+// all searches have been converted
+func (svc *ServiceContext) UpdateSavedSearch(c *gin.Context) {
+	uid := c.Param("uid")
+	userID := c.MustGet("v4id").(int)
+	token := c.Param("token")
+	log.Printf("User %s[%d] update saved search request", uid, userID)
+
+	claims, error := getJWTClaims(c)
+	if error != nil {
+		log.Printf("ERROR: %s", error.Error())
+		c.String(http.StatusUnauthorized, error.Error())
+		return
+	}
+
+	if claims.UserID != uid {
+		log.Printf("ERROR: user %s in URL does not match JWT", uid)
+		c.String(http.StatusUnauthorized, error.Error())
+		return
+	}
+
+	var req struct {
+		URL string `json:"url"`
+	}
+	qpErr := c.ShouldBindJSON(&req)
+	if qpErr != nil {
+		log.Printf("ERROR: invalid saved search payload: %v", qpErr)
+		c.String(http.StatusBadRequest, qpErr.Error())
+		return
+	}
+
+	sq := svc.DB.NewQuery("update saved_searches set search_url={:url} where user_id={:uid} and token={:tok}")
+	sq.Bind(dbx.Params{"url": req.URL})
+	sq.Bind(dbx.Params{"uid": userID})
+	sq.Bind(dbx.Params{"tok": token})
+	_, err := sq.Execute()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Update failed %s", err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
+}
+
 // SaveSearch will save a named search in that saved_searches table along with an access token
 func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	uid := c.Param("uid")
@@ -210,16 +253,10 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 	}
 
 	log.Printf("Search %s is private to userID %d", token, search.UserID)
-	claimsIface, signedIn := c.Get("claims")
-	if signedIn == false {
-		log.Printf("Private search cannot be accessed by non-signed-in user (no claims present)")
-		c.String(http.StatusNotFound, "%s not found", token)
-		return
-	}
-	claims, ok := claimsIface.(*v4jwt.V4Claims)
-	if ok == false {
-		log.Printf("ERROR: invalid claims found")
-		c.String(http.StatusNotFound, "%s not found", token)
+	claims, error := getJWTClaims(c)
+	if error != nil {
+		log.Printf("ERROR: %s", error.Error())
+		c.String(http.StatusUnauthorized, error.Error())
 		return
 	}
 

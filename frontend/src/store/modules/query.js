@@ -370,7 +370,23 @@ const query = {
             // load the saved search info from backend
             let response = await axios.get(`/api/searches/${token}`)
             if (response.data.url != "") {
-               router.replace(response.data.url)
+               // This is in the newer format (a URL not an object)
+               // See if the filter part is old...
+               let searchURL = response.data.url
+               let params = new URLSearchParams(response.data.url.split("?")[1])
+               let rawFilter = params.get("filter")
+               if (rawFilter != "") {
+                  // old format. Needs conversion
+                  if ( rawFilter[0] != "{") {
+                     let filter = convertOldFilter(rawFilter,
+                        ctx.rootState.filters.availabilityFacet, ctx.rootState.filters.circulatingFacet)
+                     params.set("filter", filter)
+                     searchURL = "/search?"+params.toString()
+                     let req = {token: token, url: searchURL, userID: ctx.rootState.user.signedInUser}
+                     ctx.dispatch("searches/migrate", req, {root:true})
+                  }
+               }
+               router.replace(searchURL)
             } else {
                let old = JSON.parse(response.data.search)
                ctx.commit('restoreSearch', old )
@@ -392,9 +408,8 @@ const query = {
                }
                url = `/search?${url}`
                router.replace( url )
-               let req = {token: token, name: response.data.name, url: url, isPublic: response.data.public,
-                  userID: ctx.rootState.user.signedInUser}
-               ctx.dispatch("searches/save", req, {root:true})
+               let req = {token: token, url: url, userID: ctx.rootState.user.signedInUser}
+               ctx.dispatch("searches/migrate", req, {root:true})
             }
          } catch (error)  {
             ctx.commit('setSearching', false, { root: true })
@@ -402,6 +417,25 @@ const query = {
          }
       },
    }
+}
+
+function convertOldFilter( filterStr, availFacet, circFacet ) {
+   let out = {}
+   filterStr.split("|").forEach( fp => {
+      let facetID = fp.split(".")[0]
+      let filterVal = fp.split(".")[1]
+      if (facetID == availFacet.id) {
+         out[facetID] = [filterVal]
+      } else if (facetID == circFacet.id) {
+         out[facetID] = []
+      } else {
+         if (Object.prototype.hasOwnProperty.call(out, facetID) == false) {
+            out[facetID] = []
+         }
+         out[facetID].push(filterVal)
+      }
+   })
+   return JSON.stringify(out)
 }
 
 export default query
