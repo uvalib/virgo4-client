@@ -66,6 +66,9 @@ const user = {
       isBarred: state => {
          return state.accountInfo.standing == "BARRED" ||  state.accountInfo.standing == "BARR-SUPERVISOR"
       },
+      isHSLUser: state => {
+         return state.claims.homeLibrary == "HEALTHSCI"
+      },
       sortedCheckouts: state => {
          return state.checkouts.sort( (a,b) => {
             let d1 = a.due.split("T")[0]

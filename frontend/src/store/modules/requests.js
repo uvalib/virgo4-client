@@ -35,7 +35,8 @@ const requests = {
          year: '',
          pages: '',
          notes: '',
-         library: ''
+         library: '',
+
       },
 
       activePanel: '',

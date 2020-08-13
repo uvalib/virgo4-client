@@ -10,7 +10,7 @@
             <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
          </template>
          <div v-else class="details">
-            <template v-if="enableByDate('2020-08-10')">
+            <template v-if="!isHSLUser">
                <h2>Make a New Request</h2>
                <div class="subcontent buttons">
                   <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
@@ -185,10 +185,11 @@ export default {
       ...mapState({
          requests: state => state.user.requests,
          lookingUp: state => state.user.lookingUp,
-         devServer: state => state.system.devServer
+         devServer: state => state.system.devServer,
       }),
       ...mapGetters({
-         isDevServer: "system/isDevServer"
+         isDevServer: "system/isDevServer",
+         isHSLUser: "user/isHSLUser"
       }),
       illiadRequests() {
          return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&
@@ -220,12 +221,6 @@ export default {
       }
    },
    methods: {
-      enableByDate( dateStr) {
-         if ( this.devServer) return true
-         let today = new Date()
-         let tgtDate = new Date(dateStr)
-         return today >= tgtDate
-      },
       instructionalScanClick() {
          this.request = "InstructionalScan"
       },
