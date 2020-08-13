@@ -11,7 +11,7 @@
          </template>
          <div v-else class="details">
             <template v-if="enableByDate('2020-08-10')">
-               <h2>Issue Request</h2>
+               <h2>Make a New Request</h2>
                <div class="subcontent buttons">
                   <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
                   <!--<V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>-->
