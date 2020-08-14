@@ -1,6 +1,6 @@
 <template>
    <div class="home">
-      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false" />
+      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true"/>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
          <h1>Search</h1>
@@ -136,6 +136,7 @@ export default {
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
          tgtPoolPref: state=>state.preferences.targetPool,
          searchTemplate: state=>state.preferences.searchTemplate,
+         optInPoolPrefs: state=>state.preferences.optInPools,
          signedInUser: state => state.user.signedInUser,
       }),
       ...mapGetters({
@@ -149,6 +150,7 @@ export default {
         isSignedIn: 'user/isSignedIn',
         excludedPoolPrefs: 'preferences/excludedPools',
         hasSearchTemplate: 'preferences/hasSearchTemplate',
+        externalPoolIDs: 'pools/externalPoolIDs'
       }),
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
@@ -196,9 +198,20 @@ export default {
             }
          }
 
+         let excluded = []
          if (query.exclude) {
-            this.$store.commit("query/setExcludePreferences", query.exclude.split(","))
+            excluded = query.exclude.split(",")
          }
+         this.externalPoolIDs.forEach( pool => {
+            if ( this.isSignedIn == false ) {
+               excluded.push(pool)
+            } else {
+               if ( this.optInPoolPrefs.includes(pool) == false) {
+                  excluded.push(pool)
+               }
+            }
+         })
+         this.$store.commit("query/setExcludePreferences", excluded)
 
          let targetPool = this.$store.state.query.targetPool
          if (query.pool) {

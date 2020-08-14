@@ -13,10 +13,20 @@ const pools = {
       },
       sortedList: state => {
          return state.list.sort( (a,b) => {
-            if (a.name < b.name) return -1 
-            if (a.name > b.name) return 1 
+            if (a.name < b.name) return -1
+            if (a.name > b.name) return 1
             return 0
          })
+      },
+      externalPoolIDs: state => {
+         let out = []
+         state.list.forEach( p => {
+            let attr = p.attributes.find( a=> a.name=='external_hold')
+            if (attr && attr.supported ) {
+               out.push(p.id)
+            }
+         })
+         return out
       },
       hasCoverImages: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
@@ -48,9 +58,9 @@ const pools = {
          if (!pool.attributes) return ""
          let attr = pool.attributes.find( a=> a.name=='logo_url')
          if (!attr) return ""
-         if (attr.supported == false) return "" 
+         if (attr.supported == false) return ""
 
-         // NOTE: this assumes all logo assets are seved by the pool and advertised with a 
+         // NOTE: this assumes all logo assets are seved by the pool and advertised with a
          // relative URL
          let logo = attr.value
          logo = logo.replace("./", "/")
@@ -62,7 +72,7 @@ const pools = {
          if (!pool.attributes) return ""
          let attr = pool.attributes.find( a=> a.name=='external_url')
          if (!attr) return ""
-         if (attr.supported == false) return "" 
+         if (attr.supported == false) return ""
          return attr.value
       },
       hasExternalHoldings: (state) => (id) => {
@@ -103,7 +113,7 @@ const pools = {
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
-      
+
       setPools(state, data) {
          if (data.length == 0) {
             state.system.fatal = "No search pools configured"
@@ -121,12 +131,12 @@ const pools = {
             if (prior) {
                p.providers = prior.providers.slice()
             } else {
-               p.providers = []   
+               p.providers = []
             }
             if (!p.sort_options) {
                p.sort_options=[]
             }
-            state.list.push(p) 
+            state.list.push(p)
          })
       },
 
@@ -156,7 +166,7 @@ const pools = {
             let response = await axios.get(url)
             ctx.commit('setPools', response.data)
             ctx.commit("setLookingUp", false)
-            
+
             ctx.state.list.forEach( async p => {
                try {
                   let response = await axios.get(p.url+"/api/providers")
