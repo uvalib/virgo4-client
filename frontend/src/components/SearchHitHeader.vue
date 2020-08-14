@@ -5,12 +5,12 @@
             <span class="count">{{count}}</span><span v-if="subcount" class="count sub">.{{subcount}}</span>
          </span>
          <template v-if="link == false">
-            <span class="hit-title">{{hit.header.title}}</span>
-            <span v-if="hit.header.subtitle" class="hit-subtitle">{{hit.header.subtitle}}</span>
+            <span class="hit-title" v-html="hit.header.title"></span>
+            <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
          </template>
          <router-link @click.native="detailClicked" v-else :to="detailsURL">
-            <span class="hit-title">{{hit.header.title}}</span>
-            <span v-if="hit.header.subtitle" class="hit-subtitle">{{hit.header.subtitle}}</span>
+            <span class="hit-title" v-html="hit.header.title"></span>
+            <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
          </router-link>
       </div>
       <div class="bm-control">
@@ -102,7 +102,7 @@ div.bm-control {
 }
 
 .count-wrap {
-   display: flex; 
+   display: flex;
    flex-flow: row nowrap;
    margin-top: 2px;
    margin-right: 5px;
@@ -114,7 +114,7 @@ div.bm-control {
       color: var( --uvalib-grey );
    }
    .count.sub {
-      font-size: 0.65em;  
+      font-size: 0.65em;
    }
 }
 </style>
