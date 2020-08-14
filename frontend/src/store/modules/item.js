@@ -6,7 +6,7 @@ const item = {
    namespaced: true,
    state: {
       details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[],
-         related:[], digitalContent: [] },
+         related:[], digitalContent: [], embeddedMedia: [] },
       availability: {searching: true, titleId: "", columns: [], items: [], error: ""},
       googleBooksURL: ""
    },
@@ -28,6 +28,7 @@ const item = {
       setDetails(state, {source, details}) {
          utils.preProcessHitFields( [details] )
          details.digitalContent = []
+         details.embeddedMedia = []
          details.source = source
          state.details = details
          state.details.searching = false
@@ -60,9 +61,12 @@ const item = {
       setGoogleBooksURL(state, data) {
          state.googleBooksURL = data.items[0].volumeInfo.previewLink
       },
+      addEmbeddedMedia( state, html ) {
+         state.details.embeddedMedia.push(html)
+      },
       clearDetails(state) {
          state.details = {searching: true, source: "", identifier:"", basicFields:[],
-            detailFields:[], related:[], digitalContent: []}
+            detailFields:[], related:[], digitalContent: [], embeddedMedia: []}
          state.googleBooksURL = ""
       },
       setAvailability(state, {titleId, response}) {
@@ -137,6 +141,23 @@ const item = {
          })
       },
 
+      getOEmbedMedia(ctx) {
+         const noAuthAxios = axios.create({
+            timeout: 5000,
+         })
+         delete noAuthAxios.defaults.headers.common['Authorization']
+
+         let oembed = ctx.state.details.detailFields.filter( f => f.type == "oembed-url")
+         oembed.forEach( async oe => {
+            try {
+               let resp = await noAuthAxios.get(oe.value+"&maxheight=600")
+               ctx.commit("addEmbeddedMedia", resp.data.html)
+            } catch (err) {
+               console.error("Unable to get oEmbed media from "+oe.value+": "+err)
+            }
+         })
+      },
+
       async getGoogleBooksURL(ctx) {
          // The books API must be accessed without any auth headers or it will 401.
          // There may be other requests going on at the same time
@@ -205,6 +226,7 @@ const item = {
             ctx.commit("setDetails", {source:source, details: details})
             ctx.dispatch("getDigitalContentURLs")
             ctx.dispatch("getGoogleBooksURL")
+            ctx.dispatch("getOEmbedMedia")
          }).catch((error) => {
            ctx.commit('clearSearching')
            ctx.commit('system/setError', error, { root: true })
@@ -252,6 +274,7 @@ const item = {
                ctx.commit('setCatalogKeyDetails', response.data)
                ctx.dispatch("getDigitalContentURLs")
                ctx.dispatch("getGoogleBooksURL")
+               ctx.dispatch("getOEmbedMedia")
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
                router.replace(redirect)
             } else {

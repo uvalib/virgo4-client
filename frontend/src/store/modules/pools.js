@@ -101,10 +101,10 @@ const pools = {
       },
       findProvider: (state) => (poolID, providerID) => {
          let pool = state.list.find( p => p.id == poolID)
-         if (!pool) return {}
-         if (!pool.providers) return {}
+         if (!pool) return null
+         if (!pool.providers) return null
          let detail = pool.providers.find( p=> p.provider==providerID)
-         if (!detail) return {}
+         if (!detail) return null
          return detail
       },
    },

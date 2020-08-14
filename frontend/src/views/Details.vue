@@ -15,8 +15,8 @@
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
             <div class="info">
                <div v-if="hasExternalHoldings(details.source)" class="ext-warn">
-                  This resource is not held by UVA Libraries, 
-                  <a :href="owningInstitution" target="_blank">contact the owning institution<i style="margin:0 5px;" class="fas fa-external-link-alt"></i></a> 
+                  This resource is not held by UVA Libraries,
+                  <a :href="owningInstitution" target="_blank">contact the owning institution<i style="margin:0 5px;" class="fas fa-external-link-alt"></i></a>
                   to determine how to gain access to them, or disable searching of these materials in your preferences.
                </div>
                <dl class="fields">
@@ -100,6 +100,9 @@
                      </dd>
                   </template>
                </dl>
+               <template v-if="hasEmbeddedMedia">
+                  <span v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
+               </template>
                <template v-if="marcXML">
                   <AccordionContent class="marc" id="maxc-xml">
                      <template v-slot:title>MARC XML</template>
@@ -142,6 +145,8 @@ export default {
    },
    watch: {
       $route() {
+         // this is needed to load details when a grouped image thumb has been clicked; new content
+         // needs to be loaded, but the page remains the same (create not called)
          this.getDetails()
       }
    },
@@ -171,6 +176,9 @@ export default {
          hasExternalHoldings: 'pools/hasExternalHoldings',
          poolDetails: 'pools/poolDetails',
       }),
+      hasEmbeddedMedia() {
+         return this.details.embeddedMedia.length > 0
+      },
       hasPDFContent() {
          return this.details.digitalContent.filter( dc => dc.type == "PDF").length > 0
       },
