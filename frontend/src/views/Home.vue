@@ -1,6 +1,6 @@
 <template>
    <div class="home">
-      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true"/>
+      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel pure-form">
         <template v-if="basicSearch">
          <h1>Search</h1>
