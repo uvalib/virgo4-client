@@ -152,10 +152,11 @@ func (svc *ServiceContext) UpdateSavedSearch(c *gin.Context) {
 		return
 	}
 
-	sq := svc.DB.NewQuery("update saved_searches set search_url={:url} where user_id={:uid} and token={:tok}")
+	sq := svc.DB.NewQuery("update saved_searches set search_url={:url}, search={:empty} where user_id={:uid} and token={:tok}")
 	sq.Bind(dbx.Params{"url": req.URL})
 	sq.Bind(dbx.Params{"uid": userID})
 	sq.Bind(dbx.Params{"tok": token})
+	sq.Bind(dbx.Params{"empty": "{}"})
 	_, err := sq.Execute()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Update failed %s", err.Error())
