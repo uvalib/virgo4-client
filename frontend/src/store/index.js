@@ -303,7 +303,7 @@ export default new Vuex.Store({
             let query = Object.assign({}, router.currentRoute.query)
             if (query.pool != rootGetters.selectedResults.pool.id) {
                query.pool = rootGetters.selectedResults.pool.id
-               router.push({ query })
+               router.replace({ query })
             }
 
             dispatch("searches/updateHistory")
