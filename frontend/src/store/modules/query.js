@@ -266,15 +266,6 @@ const query = {
             state.advanced.push(term)
          }
       },
-      restoreSearch(state, data) {
-         state.mode = data.mode
-         if (data.mode == "basic") {
-            state.basicSearchScope = data.scope
-            state.basic = data.query
-         } else {
-            state.advanced = data.query
-         }
-      },
       setBasicSearchScope(state, scope) {
          state.basicSearchScope = scope
       },
@@ -388,26 +379,38 @@ const query = {
                }
                router.replace(searchURL)
             } else {
+               // This is a REALLY old search stored as an object...
                let old = JSON.parse(response.data.search)
-               ctx.commit('restoreSearch', old )
+               ctx.state.mode = old.mode
+               if (old.mode == "basic") {
+                  ctx.state.basicSearchScope = old.scope
+                  ctx.state.basic = old.query
+               } else {
+                  ctx.state.advanced = old.query
+               }
+
                let url = ctx.getters.queryURLParams
                if (old.pool != "") {
                   url += `&pool=${old.pool}`
                }
                if (old.filters && old.filters.length > 0) {
-                  url += "&filter="
-                  let filters = []
-                  old.filters.forEach(f => {
-                     if (f.value != "") {
-                        filters.push(`${f.facet_id}.${f.value}`)
-                     } else {
-                        filters.push(`${f.facet_id}`)
+                  let filterObj = {}
+                  old.filters.forEach( f=> {
+                     if (Object.prototype.hasOwnProperty.call(filterObj, f.facet_id) == false) {
+                        filterObj[f.facet_id] = []
+                     }
+                     if ( f.value.length > 0) {
+                        filterObj[f.facet_id].push(f.value)
                      }
                   })
-                  url += encodeURI(filters.join("|"))
+                  url += `&filter=${encodeURIComponent( JSON.stringify(filterObj))}`
                }
                url = `/search?${url}`
                router.replace( url )
+               ctx.commit("system/setMessage",
+                  "Legacy saved search detected.<br/>The results may not be as expected because the save format is no longer supported.",
+                   { root: true }
+               )
                let req = {token: token, url: url, userID: ctx.rootState.user.signedInUser}
                ctx.dispatch("searches/migrate", req, {root:true})
             }
