@@ -138,11 +138,13 @@ export default {
          searchTemplate: state=>state.preferences.searchTemplate,
          optInPoolPrefs: state=>state.preferences.optInPools,
          signedInUser: state => state.user.signedInUser,
+         activeSort: state=>state.sort.activeSort,
       }),
       ...mapGetters({
         queryEntered: 'query/queryEntered',
         queryURLParams: 'query/queryURLParams',
         rawQueryString: 'query/string',
+        filterQueryString: 'filters/asQueryParam',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
         sources: 'pools/sortedList',
@@ -213,26 +215,40 @@ export default {
          })
          this.$store.commit("query/setExcludePreferences", excluded)
 
-         let targetPool = this.$store.state.query.targetPool
+         let targetPool = ""
          if (query.pool) {
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)
+         } else {
+            targetPool = this.tgtPoolPref
          }
 
+         let oldFilterParam = this.filterQueryString(targetPool)
          if (query.filter) {
             this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
+         } else {
+            this.$store.commit("filters/resetPoolFilters", targetPool)
          }
 
-         if (query.sort ) {
-            this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: query.sort})
-            this.$store.commit("sort/setActivePool", targetPool)
+         // cant have sorting if a target pool is not defined...
+         let oldSort = ""
+         if ( targetPool != "") {
+            oldSort = this.activeSort
+            if (query.sort  ) {
+               this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: query.sort})
+               this.$store.commit("sort/setActivePool", targetPool)
+            } else {
+               this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: "SortRelevance_desc"})
+               this.$store.commit("sort/setActivePool", targetPool)
+            }
          }
 
          if (query.q) {
             this.$store.commit("query/restoreFromURL",query.q)
 
-            // Need this to prevent re-running the search when toggle between basic and advanced
-            if (this.rawQueryString != oldQ || force === true) {
+            // only re-run search when query, sort or filtering has changed (or when forced)
+            if (this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
+                this.activeSort != oldSort || force === true) {
                await this.$store.dispatch("searchAllPools")
                let tgtResultsIdx = this.results.findIndex( r => r.pool.id == targetPool)
                if ( tgtResultsIdx > -1) {
@@ -260,7 +276,7 @@ export default {
             this.restoreSearchFromQueryParams(this.$route.query, true)
             return
          } else {
-            await this.restoreSearchFromQueryParams(this.$route.query, true)
+            await this.restoreSearchFromQueryParams(this.$route.query)
          }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
