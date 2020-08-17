@@ -69,6 +69,9 @@ const user = {
       isHSLUser: state => {
          return state.claims.homeLibrary == "HEALTHSCI"
       },
+      isLawUser: state => {
+         return state.claims.homeLibrary == "LAW"
+      },
       sortedCheckouts: state => {
          return state.checkouts.sort( (a,b) => {
             let d1 = a.due.split("T")[0]
