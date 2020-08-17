@@ -1,21 +1,29 @@
 <template>
    <div class="header-wrapper">
-      <div class="full-title">
-         <span class="count-wrap" v-if="count">
-            <span class="count">{{count}}</span><span v-if="subcount" class="count sub">.{{subcount}}</span>
-         </span>
-         <template v-if="link == false">
-            <span class="hit-title" v-html="hit.header.title"></span>
-            <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
-         </template>
-         <router-link @click.native="detailClicked" v-else :to="detailsURL">
-            <span class="hit-title" v-html="hit.header.title"></span>
-            <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
-         </router-link>
+      <div class="title-wrapper">
+         <div class="full-title">
+            <span class="count-wrap" v-if="count">
+               <span class="count">{{count}}</span><span v-if="subcount" class="count sub">.{{subcount}}</span>
+            </span>
+            <template v-if="link == false">
+               <span class="hit-title" v-html="hit.header.title"></span>
+               <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
+            </template>
+            <router-link @click.native="detailClicked" v-else :to="detailsURL">
+               <span class="hit-title" v-html="hit.header.title"></span>
+               <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
+            </router-link>
+         </div>
+         <div class="bm-control">
+            <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
+            <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
+         </div>
       </div>
-      <div class="bm-control">
-         <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
-         <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
+      <div v-if="hit.header.author_display" class="author-wrapper">
+         <div v-if="hit.header.author" class="author">
+            <TruncatedText :id="`${hit.identifier}-author`"
+               :text="hit.header.author_display" :limit="authorTruncateLength" />
+         </div>
       </div>
    </div>
 </template>
@@ -23,6 +31,7 @@
 <script>
 import AddBookmark from '@/components/modals/AddBookmark'
 import SignInRequired from '@/components/modals/SignInRequired'
+import TruncatedText from '@/components/TruncatedText'
 import { mapGetters } from "vuex"
 export default {
    props: {
@@ -48,7 +57,7 @@ export default {
       }
    },
    components: {
-      AddBookmark,SignInRequired
+      AddBookmark,SignInRequired,TruncatedText
    },
    computed: {
       ...mapGetters({
@@ -56,6 +65,9 @@ export default {
       }),
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
+      },
+      authorTruncateLength() {
+         return 150
       },
    },
    methods: {
@@ -68,10 +80,20 @@ export default {
 
 <style lang="scss" scoped>
 .header-wrapper {
+}
+
+.title-wrapper {
    text-align: left;
    display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
+}
+
+.author-wrapper {
+   text-align: left;
+   padding-left: 40px;
+   padding-top: 5px;
+   padding-bottom: 10px;
 }
 
 #app .basic a:hover {
