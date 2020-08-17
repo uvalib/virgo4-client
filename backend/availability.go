@@ -365,7 +365,14 @@ func (svc *ServiceContext) removeETASRequestOptions(id string, solrDoc SolrDocum
 			ETASOption.CreateURL = solrDoc.URL[0]
 			ETASOption.Label = "Read via HathiTrust"
 		}
-		Result.Availability.RequestOptions = []RequestOption{ETASOption}
+		// get Scan request
+		ScanRequest := RequestOption{}
+		for _, v := range Result.Availability.RequestOptions {
+			if v.Type == "scan" {
+				ScanRequest = v
+			}
+		}
+		Result.Availability.RequestOptions = []RequestOption{ETASOption, ScanRequest}
 	}
 }
 
