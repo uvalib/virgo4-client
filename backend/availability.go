@@ -12,7 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-querystring/query"
-	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
 // AvailabilityData coming from ILS Connector
@@ -110,25 +109,25 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 	}
 
 	// Convert from json
-	var AvailabilityResponse AvailabilityData
-	if err := json.Unmarshal(bodyBytes, &AvailabilityResponse); err != nil {
+	var availResp AvailabilityData
+	if err := json.Unmarshal(bodyBytes, &availResp); err != nil {
 		// Non-Sirsi Item may be found in other places and have availability
-		AvailabilityResponse = AvailabilityData{}
+		availResp = AvailabilityData{}
 	}
-	//log.Printf("Availability Response: %+v", AvailabilityResponse)
+	//log.Printf("Availability Response: %+v", availResp)
 	solrDoc := svc.getSolrDoc(titleID)
 
-	svc.appendAeonRequestOptions(titleID, solrDoc, &AvailabilityResponse)
-
-	svc.removeETASRequestOptions(titleID, solrDoc, &AvailabilityResponse)
-
-	claims, _ := c.Get("claims")
-	v4Claims, ok := claims.(*v4jwt.V4Claims)
-	if ok && v4Claims.CanPlaceReserve {
-		svc.addCourseReserveVideoRequest(titleID, solrDoc, &AvailabilityResponse)
+	v4Claims, _ := getJWTClaims(c)
+	if v4Claims.HomeLibrary == "HEALTHSCI" {
+		svc.updateHSLScanOptions(titleID, &solrDoc, &availResp)
+	}
+	svc.appendAeonRequestOptions(titleID, solrDoc, &availResp)
+	svc.removeETASRequestOptions(titleID, solrDoc, &availResp)
+	if v4Claims.CanPlaceReserve {
+		svc.addCourseReserveVideoRequest(titleID, solrDoc, &availResp)
 	}
 
-	c.JSON(http.StatusOK, AvailabilityResponse)
+	c.JSON(http.StatusOK, availResp)
 
 }
 func (svc *ServiceContext) getSolrDoc(id string) SolrDocument {
@@ -170,6 +169,58 @@ func (svc *ServiceContext) addCourseReserveVideoRequest(id string, SolrDoc SolrD
 			return
 		}
 	}
+}
+
+func (svc *ServiceContext) updateHSLScanOptions(id string, solrDoc *SolrDocument, result *AvailabilityData) {
+	log.Printf("Updating scan options for HSL user")
+	// remove existing scan
+	for i, opt := range result.Availability.RequestOptions {
+		if opt.Type == "scan" {
+			result.Availability.RequestOptions = append(
+				result.Availability.RequestOptions[:i],
+				result.Availability.RequestOptions[i+1:]...)
+			break
+		}
+	}
+
+	hsScan := RequestOption{
+		Type:           "directLink",
+		Label:          "Request a scan",
+		SignInRequired: false,
+		Description:    "Select a portion of this item to be scanned.",
+		CreateURL:      openURLQuery(svc.Illiad.HealthSciURL, solrDoc),
+		ItemOptions:    make([]ItemOption, 0),
+	}
+	result.Availability.RequestOptions = append(result.Availability.RequestOptions, hsScan)
+}
+
+func openURLQuery(baseURL string, doc *SolrDocument) string {
+	var req struct {
+		Action  string `url:"Action"`
+		Form    string `url:"Form"`
+		ISSN    string `url:"issn,omitempty"`
+		Title   string `url:"loantitle"`
+		Author  string `url:"loanauthor,omitempty"`
+		Edition string `url:"loanedition,omitempty"`
+		Volume  string `url:"photojournalvolume,omitempty"`
+		Issue   string `url:"photojournalissue,omitempty"`
+		Date    string `url:"loandate,omitempty"`
+	}
+	req.Action = "10"
+	req.Form = "21"
+	req.ISSN = strings.Join(doc.ISSN, ", ")
+	req.Title = strings.Join(doc.Title, "; ")
+	req.Author = strings.Join(doc.Author, "; ")
+	req.Edition = doc.Edition
+	req.Volume = doc.Volume
+	req.Issue = doc.Issue
+	req.Date = doc.PublicationDate
+	query, err := query.Values(req)
+	if err != nil {
+		log.Printf("ERROR: couldn't generate OpenURL: %s", err.Error())
+	}
+
+	return fmt.Sprintf("%s/illiad.dll?%s", baseURL, query.Encode())
 }
 
 // Appends Aeon request to availability response

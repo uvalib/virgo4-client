@@ -258,13 +258,15 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
 		SearchAPI        string `json:"searchAPI"`
 		CitationsURL     string `json:"citationsURL"`
+		HealthSciURL     string `json:"hsILLiadURL"`
 		TranslateMessage string `json:"translateMessage"`
 		KioskMode        bool   `json:"kiosk"`
 		DevServer        bool   `json:"devServer"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
-	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL, KioskMode: false}
+	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL,
+		HealthSciURL: svc.Illiad.HealthSciURL, KioskMode: false}
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg

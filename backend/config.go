@@ -31,8 +31,9 @@ type SolrConfig struct {
 
 // IlliadConfig contains the configuration necessary to communicate with the Illiad API
 type IlliadConfig struct {
-	URL    string
-	APIKey string
+	URL          string
+	APIKey       string
+	HealthSciURL string
 }
 
 // ServiceConfig defines all of the v4client service configuration parameters
@@ -87,6 +88,7 @@ func LoadConfig() *ServiceConfig {
 	// Illiad communications
 	flag.StringVar(&cfg.Illiad.URL, "illiad", "", "Illiad API URL")
 	flag.StringVar(&cfg.Illiad.APIKey, "illiadkey", "", "Illiad API Key")
+	flag.StringVar(&cfg.Illiad.HealthSciURL, "hsilliad", "", "HS Illiad API URL")
 
 	// DB connection params
 	flag.StringVar(&cfg.DB.Host, "dbhost", "localhost", "Database host")

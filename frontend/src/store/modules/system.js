@@ -11,6 +11,7 @@ const system = {
       error: "",
       message: "",
       version: "unknown",
+      hsIlliadURL: "",
       citationsURL: "",
       searchAPI: "",
       seenTranslateMsg: false,
@@ -40,8 +41,8 @@ const system = {
    mutations: {
       setCodes( state,  codes) {
          let locs =  codes.locations.sort( (a,b) => {
-            if (a.id < b.id) return -1 
-            if (a.id > b.id) return 1 
+            if (a.id < b.id) return -1
+            if (a.id > b.id) return 1
             return 0
          })
          state.locationCodes.splice(0, state.locationCodes.length)
@@ -50,8 +51,8 @@ const system = {
          })
 
          let libs =  codes.libraries.sort( (a,b) => {
-            if (a.id < b.id) return -1 
-            if (a.id > b.id) return 1 
+            if (a.id < b.id) return -1
+            if (a.id > b.id) return 1
             return 0
          })
          state.libraryCodes.splice(0, state.libraryCodes.length)
@@ -95,14 +96,14 @@ const system = {
          }
          if (error.response) {
             // Server responded with a status code out of the range of 2xx
-            // If this is a 401, a session has expired when making a request. 
+            // If this is a 401, a session has expired when making a request.
             if (error.response.status == 401) {
                state.error = ""
                if (state.sessionExpired == false) {
                   state.sessionExpired = true
                   // NOTE: cant dispatch a signout here, so there is a plugin (expired.js) installed.
                   // It looks for setError with a 401 and does the signout
-                  setTimeout(() => {  state.sessionExpired=false }, 15000) 
+                  setTimeout(() => {  state.sessionExpired=false }, 15000)
                   router.push("/")
                }
             } else {
@@ -126,6 +127,7 @@ const system = {
          state.kiosk = cfg.kiosk
          state.devServer = cfg.devServer
          state.citationsURL = cfg.citationsURL
+         state.hsILLiadURL = cfg.hsILLiadURL
       },
    },
 

@@ -10,16 +10,17 @@
             <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
          </template>
          <div v-else class="details">
-            <template v-if="!isHSLUser">
-               <h2>Make a New Request</h2>
-               <div class="subcontent buttons">
-                  <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
-                  <!--<V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>-->
-                  <!--<V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>-->
-                  <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
-               </div>
-               <h2>Outstanding Requests</h2>
-            </template>
+            <h2>Make a New Request</h2>
+            <div v-if="!isHSLUser" class="subcontent buttons">
+               <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
+               <!--<V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>-->
+               <!--<V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>-->
+               <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
+            </div>
+            <div v-else class="subcontent">
+               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+            </div>
+            <h2>Outstanding Requests</h2>
             <div class="subcontent">
                <template v-if="lookingUp == false && requests.holds.length > 0">
                   <AccordionContent
@@ -186,6 +187,7 @@ export default {
          requests: state => state.user.requests,
          lookingUp: state => state.user.lookingUp,
          devServer: state => state.system.devServer,
+         hsILLiadURL: state => state.system.hsILLiadURL
       }),
       ...mapGetters({
          isDevServer: "system/isDevServer",
