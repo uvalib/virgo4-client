@@ -17,10 +17,11 @@
                <option value="Collab">Instruction</option>
             </select>
             <div class="scan-use-note" v-if="type == 'Article'">
-               Use this form to request a scan of materials for your coursework or personal academic research.
+               Use this form to request a scan for your coursework or personal academic research.
             </div>
             <div v-else class="scan-use-note" >
-               Use this form to request a scan of materials for use on your course management system and distribution to your students.
+               <b>For instructors only: </b>
+               <span>Use this form to request a scan for distribution to your students through a course management system (Collab, Canvas, etc).</span>
             </div>
          </div>
          <div class="entry pure-control-group">
