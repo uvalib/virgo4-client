@@ -226,8 +226,6 @@ export default {
          let oldFilterParam = this.filterQueryString(targetPool)
          if (query.filter) {
             this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
-         } else {
-            this.$store.commit("filters/resetPoolFilters", targetPool)
          }
 
          // cant have sorting if a target pool is not defined...
