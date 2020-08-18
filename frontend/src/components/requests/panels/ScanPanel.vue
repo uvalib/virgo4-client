@@ -16,6 +16,12 @@
                <option value="Article">Research</option>
                <option value="Collab">Instruction</option>
             </select>
+            <div class="scan-use-note" v-if="type == 'Article'">
+               Use this form to request a scan of materials for your coursework or personal academic research.
+            </div>
+            <div v-else class="scan-use-note" >
+               Use this form to request a scan of materials for use on your course management system and distribution to your students.
+            </div>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-title">Book or Journal Title</label>
@@ -179,6 +185,11 @@ export default {
    width: 50%;
    color: var(--uvalib-text);
    margin: 0 auto;
+   .scan-use-note {
+      padding:5px 0 10px 0;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--uvalib-grey-light);
+   }
    .controls {
       text-align: right;
    }

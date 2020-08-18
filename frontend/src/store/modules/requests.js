@@ -26,7 +26,7 @@ const requests = {
       scan: {
          barcode: '',
          issn: '',
-         type: 'Collab',
+         type: 'Article',
          title: '',
          chapter: '',
          author: '',
@@ -102,7 +102,7 @@ const requests = {
          store.scan = {
             barcode: '',
             issn: '',
-            type: 'Collab',
+            type: 'Article',
             title: '',
             chapter: '',
             author: '',
