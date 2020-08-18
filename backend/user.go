@@ -110,7 +110,7 @@ func (u *ILSUserInfo) IsStaff() bool {
 
 // CanPlaceReserve returns true if this user can place an item on course reserve
 func (u *ILSUserInfo) CanPlaceReserve() bool {
-	if u.IsGraduate() || u.IsUndergraduate() || u.IsAlumni() {
+	if u.IsUndergraduate() || u.IsAlumni() {
 		return false
 	}
 	match, _ := regexp.MatchString("(?i)(Virginia Borrower)|(Other VA Faculty)", u.Profile)

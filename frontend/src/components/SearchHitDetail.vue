@@ -2,10 +2,6 @@
    <div class="details-wrap">
       <div class="details">
          <div class="basic">
-            <div v-if="hit.header.author" class="author">
-               <TruncatedText  v-if="hit.header.author" :id="`${hit.identifier}-author`"
-                  :text="hit.header.author.value.join(hit.header.author.separator)" :limit="truncateLength" />
-            </div>
             <dl class="fields">
                <template v-for="(field,idx) in hit.basicFields">
                   <template v-if="shouldDisplay(field)">
@@ -148,10 +144,6 @@ export default {
          -webkit-hyphens: auto;
          -moz-hyphens: auto;
          hyphens: auto;
-      }
-
-      .author {
-         margin-bottom: 10px;
       }
    }
 

@@ -35,6 +35,7 @@ export default {
     }),
     ...mapGetters({
       isHSLUser: "user/isHSLUser",
+      isLawUser: "user/isLawUser",
     }),
   },
   methods: {
@@ -42,6 +43,11 @@ export default {
       if (this.isHSLUser) {
         let healthSciLib = [{id: "HEALTHSCI", name: "Health Sciences Library"}]
         return healthSciLib.concat(this.pickupLibraries)
+
+      } else if (this.isLawUser) {
+        let lawLib = [{id: "LAW", name: "Law Library"}]
+        return lawLib.concat(this.pickupLibraries)
+
       } else {
         return this.pickupLibraries
       }

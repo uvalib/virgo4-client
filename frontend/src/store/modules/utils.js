@@ -44,6 +44,10 @@ export function preProcessHitFields(hits) {
             hit.header.author.value.push(field.value)
             return
          }
+         if (field.type == "author-display") {
+            hit.header.author_display = field.value
+            return
+         }
 
          // Access_url is a special case. Instead of just repeated value, it also
          // has provider and item. preserve the data, grouped by provider. Ex:
@@ -119,6 +123,10 @@ export function preProcessHitFields(hits) {
             tgtMerged.push(field)
          }
       })
+
+      if (!hit.header.author_display && hit.header.author) {
+         hit.header.author_display = hit.header.author.value.join(hit.header.author.separator)
+      }
 
       delete hit.fields
    })
