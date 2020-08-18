@@ -18,6 +18,7 @@
 
     <V4Button mode="primary" class="request-button" @click="submitAeon" :disabled="buttonDisabled">Request</V4Button>
 
+    <p class="notice" v-html="selectedItem.notice" v-if="selectedItem.notice"></p>
     <p class="notice"><b>PLEASE NOTE:</b> These items must be used within the Special Collections reading room.</p>
 
     <p>Questions? Please contact the Special Collections Library <br>

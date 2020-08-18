@@ -57,6 +57,7 @@ type ItemOption struct {
 	SCNotes  string `json:"notes"`
 	Library  string `json:"library"`
 	Location string `json:"location"`
+	Notice   string `json:"notice"`
 }
 
 // SolrResponse container
@@ -313,6 +314,7 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 				Location: item.HomeLocationID,
 				Library:  item.Library,
 				SCNotes:  notes,
+				Notice:   item.Notice,
 			}
 			Options = append(Options, scItem)
 		}
