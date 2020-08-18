@@ -3,10 +3,10 @@
       <h2>Scan Request</h2>
 
       <div v-if="items.length > 1" class="item-selector">
-         <label for="scan-use">Select the item you want</label>
+         <label for="scan-use">Select the item you want<span class="required">*</span></label>
          <V4Select id="item-select" style="height:2.5em;margin-top:5px;" :selections="items"
             v-model="selectedItem" :attached="false"/>
-         <span v-if="hasError('item')" class="error">* item selection is required</span>
+         <span v-if="hasError('item')" class="error">Item selection is required</span>
       </div>
 
       <div class="scan pure-form">
@@ -24,19 +24,19 @@
             </div>
          </div>
          <div class="entry pure-control-group">
-            <label for="scan-title">Book or Journal Title</label>
+            <label for="scan-title">Book or Journal Title<span class="required">*</span></label>
             <input readonly type="text" v-model="title" id="scan-title" aria-required="true" required="required">
-            <span v-if="hasError('title')" class="error">* title is required</span>
+            <span v-if="hasError('title')" class="error">Title is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="scan-chapter">Chapter or Article Title</label>
+            <label for="scan-chapter">Chapter or Article Title<span class="required">*</span></label>
             <input type="text" v-model="chapter" id="scan-chapter" aria-required="true" required="required">
-            <span v-if="hasError('chapter')" class="error">* chapter or article is required</span>
+            <span v-if="hasError('chapter')" class="error">Chapter or article is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="scan-author">Chapter or Article Author</label>
+            <label for="scan-author">Chapter or Article Author<span class="required">*</span></label>
             <input type="text" v-model="author" id="scan-author" aria-required="true" required="required">
-            <span v-if="hasError('author')" class="error">* author is required</span>
+            <span v-if="hasError('author')" class="error">Author is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-year">Year</label>
@@ -51,18 +51,20 @@
             <input type="text" v-model="issue" id="scan-issue">
          </div>
          <div class="entry pure-control-group">
-            <label for="scan-pages">Pages</label>
+            <label for="scan-pages">Pages<span class="required">*</span></label>
             <input type="text" v-model="pages" id="scan-pages" aria-required="true" required="required">
-            <span v-if="hasError('pages')" class="error">* pages are required</span>
+            <span class="note">(ex: 1-15)</span>
+            <span v-if="pageLengthError" class="error">Please limt page information to 25 characters</span>
+            <span v-if="hasError('pages')" class="error">Pages are required</span>
          </div>
          <div v-if="type=='Article'" class="entry pure-control-group">
             <label for="scan-notes">Notes</label>
             <textarea id="scan-notes" v-model="notes"></textarea>
          </div>
          <div v-else class="entry pure-control-group">
-            <label for="scan-course">Course Information</label>
+            <label for="scan-course">Course Information<span class="required">*</span></label>
             <textarea id="scan-course" v-model="notes"  aria-required="true" required="required"></textarea>
-            <span v-if="hasError('course')" class="error">* course information is required</span>
+            <span v-if="hasError('course')" class="error">Course information is required</span>
          </div>
          <span v-if="sysError" class="error">{{sysError}}</span>
       </div>
@@ -79,6 +81,7 @@ export default {
       return {
          selectedItem: {},
          errors: [],
+         pageLengthError: false,
          required: ['title', 'chapter', 'author', 'pages']
       }
    },
@@ -166,6 +169,7 @@ export default {
          if ( JSON.stringify(this.selectedItem) === JSON.stringify({})) {
             this.errors.push("item")
          }
+
          if (this.errors.length > 0) {
             let tgtID = `scan-${this.errors[0]}`
             let first = document.getElementById(tgtID)
@@ -173,8 +177,18 @@ export default {
                first.focus()
             }
          } else {
-            this.$store.dispatch("requests/submitScan");
+            this.pageLengthError =  (this.scan.pages.length > 25)
+            if ( this.pageLengthError) {
+               let tgtID = `scan-pages`
+               let first = document.getElementById(tgtID)
+               if ( first ) {
+                  first.focus()
+               }
+            } else {
+               this.$store.dispatch("requests/submitScan")
+            }
          }
+
       },
    }
 };
@@ -185,6 +199,11 @@ export default {
    width: 50%;
    color: var(--uvalib-text);
    margin: 0 auto;
+   .required {
+      margin-left: 5px;
+      font-weight: bold;
+      color: var(--uvalib-red-emergency);
+   }
    .scan-use-note {
       padding:5px 0 10px 0;
       margin-bottom: 15px;
@@ -207,11 +226,15 @@ export default {
    .entry {
       margin-bottom: 5px;
    }
+   .note {
+      font-style: italic;
+   }
    span.error {
-      margin-left: 10px;
+      margin-left: 0px;
       font-weight: bold;
       font-style: italic;
       color: var(--color-error);
+      display: block;
    }
 }
 @media only screen and (max-width: 768px) {

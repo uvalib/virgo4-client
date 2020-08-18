@@ -74,6 +74,8 @@
          <div class="entry pure-control-group">
             <label for="pages">Pages<span class="required">*</span></label>
             <input type="text" v-model="request.pages" id="pages" aria-required="true" required="required">
+            <span class="note">(ex: 1-15)</span>
+            <span v-if="pageLengthError" class="error">Please limt page information to 25 characters</span>
             <span v-if="hasError('pages')" class="error">Pages are required</span>
          </div>
          <div class="entry pure-control-group">
@@ -163,6 +165,7 @@ export default {
    data: function()  {
       return {
          error: "",
+         pageLengthError: false,
          errors: [],
          required: ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage'],
          request: {
@@ -207,8 +210,16 @@ export default {
                first.focus()
             }
          } else {
-            await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
-            this.$emit('submitted')
+            this.pageLengthError =  (this.request.pages.length > 25)
+            if ( this.pageLengthError) {
+               let first = document.getElementById("pages")
+               if ( first ) {
+                  first.focus()
+               }
+            } else {
+               // await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
+               // this.$emit('submitted')
+            }
          }
       },
       hasError( val) {
