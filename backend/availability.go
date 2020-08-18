@@ -34,6 +34,7 @@ type Item struct {
 	Library         string                   `json:"library"`
 	LibraryID       string                   `json:"library_id"`
 	CurrentLocation string                   `json:"current_location"`
+	HomeLocationID  string                   `json:"home_location_id"`
 	CallNumber      string                   `json:"call_number"`
 	Volume          string                   `json:"volume"`
 	SCNotes         string                   `json:"special_collections_location"`
@@ -309,7 +310,7 @@ func createAeonItemOptions(Result *AvailabilityData, doc SolrDocument) []ItemOpt
 			scItem := ItemOption{
 				Barcode:  item.Barcode,
 				Label:    item.CallNumber,
-				Location: item.CurrentLocation,
+				Location: item.HomeLocationID,
 				Library:  item.Library,
 				SCNotes:  notes,
 			}
