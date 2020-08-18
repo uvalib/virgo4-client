@@ -114,6 +114,19 @@ const user = {
          if (state.accountInfo.id != state.signedInUser) return false
          return true
       },
+      libraries: (_state, getters, rootState) => {
+         if (getters.isHSLUser) {
+            let healthSciLib = [{id: "HEALTHSCI", name: "Health Sciences Library"}]
+            return healthSciLib.concat(rootState.system.pickupLibraries)
+         }
+
+         if (getters.isLawUser) {
+            let lawLib = [{id: "LAW", name: "Law Library"}]
+            return lawLib.concat(rootState.system.pickupLibraries)
+         }
+
+         return rootState.system.pickupLibraries
+       },
    },
 
    mutations: {

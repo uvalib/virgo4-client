@@ -13,8 +13,8 @@
             <h2>Make a New Request</h2>
             <div v-if="!isHSLUser" class="subcontent buttons">
                <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
-               <!--<V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>-->
-               <!--<V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>-->
+               <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
+               <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
                <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
             </div>
             <div v-else class="subcontent">

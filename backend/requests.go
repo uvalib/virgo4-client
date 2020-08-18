@@ -51,7 +51,7 @@ type illiadBorrowRequest struct {
 	ESPNumber          string
 	CitedIn            string
 	AcceptNonEnglish   bool
-	DeliveryMethod     string
+	ItemInfo4          string
 }
 
 type illiadNote struct {
@@ -152,8 +152,10 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 	}
 
 	log.Printf("Process borrow from %s for %s '%s'", v4Claims.UserID, req.BorrowType, req.Title)
-	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Loan", ProcessType: "Borrowing", NotWantedAfter: req.DateNeeded}
-	borrowReq := illiadBorrowRequest{LoanTitle: req.Title, LoanAuthor: req.Author, LoanDate: req.Year}
+	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Loan", ProcessType: "Borrowing",
+		NotWantedAfter: req.DateNeeded}
+	borrowReq := illiadBorrowRequest{LoanTitle: req.Title, LoanAuthor: req.Author, LoanDate: req.Year,
+		ItemInfo4: illaidLibraryMapping(req.PickupLibrary)}
 	if req.BorrowType == "AV" {
 		log.Printf("This is an A/V request")
 		illiadReq.DocumentType = "Audio/Video"
@@ -171,7 +173,6 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 		borrowReq.ISSN = req.ISSN
 		borrowReq.CitedIn = req.CitedIn
 		borrowReq.AcceptNonEnglish = (req.AnyLanguage == "true")
-		borrowReq.DeliveryMethod = illaidLibraryMapping(req.PickupLibrary)
 		borrowReq.illiadRequest = &illiadReq
 	}
 

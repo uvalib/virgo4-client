@@ -38,6 +38,16 @@
             <textarea id="notes" v-model="request.notes"></textarea>
             <span class="note">(ex: will accept other formats, library-use only okay)</span>
          </div>
+         <div class="entry pure-control-group">
+            <label for="doctype">Preferred pickup location<span class="required">*</span></label>
+            <select v-model="request.pickup" id="pickup">
+               <option value="">Select a location</option>
+               <template v-for="l in pickupLibraries">
+                  <option :value="l.id" :key="l.id">{{l.name}}</option>
+               </template>
+            </select>
+            <span v-if="hasError('pickup')" class="error">Pickup location is required</span>
+         </div>
       </div>
       <div class="controls">
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
@@ -52,12 +62,13 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    data: function()  {
       return {
          error: "",
          errors: [],
-         required: ['date', 'title'],
+         required: ['date', 'title', 'pickup'],
          request: {
             borrowType: "AV",
             date: "",
@@ -66,6 +77,7 @@ export default {
             year: "",
             format: "Any",
             notes: "",
+            pickup: "",
          }
       }
    },
@@ -73,6 +85,10 @@ export default {
       ...mapState({
          sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
+         preferredPickupLibrary: state => state.preferences.pickupLibrary,
+      }),
+      ...mapGetters({
+         pickupLibraries: "user/libraries",
       })
    },
    methods: {
@@ -102,6 +118,9 @@ export default {
       hasError( val) {
          return this.errors.includes(val)
       },
+   },
+   created() {
+      this.request.pickup = this.preferredPickupLibrary.id
    }
 }
 </script>

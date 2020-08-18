@@ -85,13 +85,14 @@
             <span class="note">(ex: missing from shelf, specific edition needed)</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="doctype">Pickup Location</label>
+            <label for="doctype">Preferred pickup location<span class="required">*</span></label>
             <select v-model="request.pickup" id="pickup">
                <option value="">Select a location</option>
                <template v-for="l in pickupLibraries">
                   <option :value="l.id" :key="l.id">{{l.name}}</option>
                </template>
             </select>
+            <span v-if="hasError('pickup')" class="error">Pickup location is required</span>
          </div>
       </div>
       <div class="controls">
@@ -107,12 +108,13 @@
 
 <script>
 import { mapState } from "vuex"
+import { mapGetters } from "vuex"
 export default {
    data: function()  {
       return {
          error: "",
          errors: [],
-         required: ['doctype', 'date', 'title', 'year', 'anyLanguage'],
+         required: ['doctype', 'date', 'title', 'year', 'anyLanguage', 'pickup'],
          request: {
             borrowType: "ITEM",
             doctype: "",
@@ -134,9 +136,12 @@ export default {
    },
    computed: {
       ...mapState({
-         pickupLibraries: state => state.system.pickupLibraries,
          sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
+         preferredPickupLibrary: state => state.preferences.pickupLibrary
+      }),
+      ...mapGetters({
+         pickupLibraries: "user/libraries",
       })
    },
    methods: {
@@ -166,6 +171,9 @@ export default {
       hasError( val) {
          return this.errors.includes(val)
       },
+   },
+   created() {
+      this.request.pickup = this.preferredPickupLibrary.id
    }
 }
 </script>
