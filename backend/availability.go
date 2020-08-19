@@ -125,9 +125,6 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 	}
 	svc.appendAeonRequestOptions(titleID, solrDoc, &availResp)
 	svc.removeETASRequestOptions(titleID, solrDoc, &availResp)
-	if v4Claims.CanPlaceReserve {
-		svc.addCourseReserveVideoRequest(titleID, solrDoc, &availResp)
-	}
 
 	c.JSON(http.StatusOK, availResp)
 
@@ -149,28 +146,6 @@ func (svc *ServiceContext) getSolrDoc(id string) SolrDocument {
 	}
 	SolrDoc := SolrResp.Response.Docs[0]
 	return SolrDoc
-}
-
-// Replaces scan request with video course reserve request
-func (svc *ServiceContext) addCourseReserveVideoRequest(id string, SolrDoc SolrDocument, Result *AvailabilityData) {
-
-	if !contains(SolrDoc.Format, "Video") {
-		return
-	}
-	VideoOption := RequestOption{
-		Type:           "videoReserve",
-		Label:          "Video reserve request",
-		SignInRequired: true,
-		Description:    "Request a video reserve for streaming",
-	}
-
-	for i, v := range Result.Availability.RequestOptions {
-		if v.Type == "scan" {
-			VideoOption.ItemOptions = v.ItemOptions
-			Result.Availability.RequestOptions[i] = VideoOption
-			return
-		}
-	}
 }
 
 func (svc *ServiceContext) updateHSLScanOptions(id string, solrDoc *SolrDocument, result *AvailabilityData) {
