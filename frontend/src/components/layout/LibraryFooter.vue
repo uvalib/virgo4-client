@@ -30,7 +30,7 @@
          <li><a href="https://www.library.virginia.edu/staff/">Staff Directory</a></li>
          <li><a href="https://www.library.virginia.edu/jobs/">Jobs</a></li>
          <li><a href="https://www.library.virginia.edu/press/">Press</a></li>
-         <li><a href="https://www.library.virginia.edu/renovation/">Alderman Renovation</a></li>
+         <li><a href="https://www.library.virginia.edu/renovation/">Renovation</a></li>
          <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
          <li class="give-library"><V4Button mode="link" url="https://www.library.virginia.edu/support-library/">Give to the Library</V4Button></li>
        </ul>
