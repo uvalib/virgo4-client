@@ -36,7 +36,34 @@ const requests = {
          pages: '',
          notes: '',
          library: '',
-
+      },
+      openurl: {
+         requestType: "Loan",
+         documentType: "Book",
+         processType: "Borrowing",
+         title: "",
+         author: "",
+         publisher: "",
+         pubplace: "",
+         pubdate: "",
+         edition: "",
+         volume: "",
+         issue: "",
+         month: "",
+         year: "",
+         pages: "",
+         issn: "",
+         oclc: "",
+         jtitle: "",
+         atitle: "",
+         aauthor: "",
+         bydate: "",
+         anylanguage: "",
+         altedition: "",
+         citedin: "",
+         notes: "",
+         pickup: "",
+         status: ""
       },
 
       activePanel: '',
@@ -67,6 +94,30 @@ const requests = {
    },
    mutations: {
       updateField,
+      setOpenURLRequestGenre(state, genre) {
+         // genre determines what type of form, and also a bunch of request values
+         if (genre == "article" || genre == "preprint") {
+            state.openurl.requestType = "Article"
+            state.openurl.documentType = "Article"
+            state.openurl.processType = "Borrowing"
+            state.openurl.status = "Awaiting Request Processing"
+         } else if ( genre == "bookitem"  ) {
+            state.openurl.requestType = "Article"
+            state.openurl.documentType = "BookChapter"
+            state.openurl.processType = "Borrowing"
+            state.openurl.status = "Awaiting Request Processing"
+         } else if ( genre == "conference" || genre == "proceeding"  ) {
+            state.openurl.requestType = "Article"
+            state.openurl.documentType = "Conference"
+            state.openurl.processType = "Borrowing"
+            state.openurl.status = "Awaiting Request Processing"
+         } else  {
+            state.openurl.requestType = "Loan"
+            state.openurl.documentType = "Book"
+            state.openurl.processType = "Borrowing"
+            state.openurl.status = "Awaiting Request Processing"
+         }
+      },
       activePanel(store, name) {
          store.activePanel = name
       },
@@ -112,6 +163,33 @@ const requests = {
             pages: '',
             notes: '',
             library: ''
+         },
+         store.openurl = {
+            requestType: "Loan",
+            documentType: "Book",
+            processType: "Borrowing",
+            title: "",
+            author: "",
+            publisher: "",
+            pubplace: "",
+            pubdate: "",
+            edition: "",
+            volume: "",
+            issue: "",
+            month: "",
+            year: "",
+            pages: "",
+            issn: "",
+            oclc: "",
+            jtitle: "",
+            atitle: "",
+            aauthor: "",
+            bydate: "",
+            anylanguage: "",
+            altedition: "",
+            citedin: "",
+            notes: "",
+            pickup: "",
          }
       }
    },
