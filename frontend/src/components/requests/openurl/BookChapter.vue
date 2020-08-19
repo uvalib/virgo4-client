@@ -2,18 +2,18 @@
    <div class="request-wrap">
       <div class="request-content pure-form">
          <div class="entry pure-control-group">
-            <label for="jtitle">Book Title<span class="required">*</span></label>
-            <input type="text" v-model="jtitle" id="jtitle" aria-required="true" required="required">
-            <span v-if="hasError('jtitle')" class="error">Book Title is required</span>
+            <label for="title">Book Title<span class="required">*</span></label>
+            <input type="text" v-model="title" id="title" aria-required="true" required="required">
+            <span v-if="hasError('title')" class="error">Book Title is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="atitle">Chapter Title<span class="required">*</span></label>
-            <input type="text" v-model="atitle" id="atitle" aria-required="true" required="required">
-            <span v-if="hasError('atitle')" class="error">Chapter Title is required</span>
+            <label for="article">Chapter Title<span class="required">*</span></label>
+            <input type="text" v-model="article" id="article" aria-required="true" required="required">
+            <span v-if="hasError('article')" class="error">Chapter Title is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="aauthor">Book or Chapter Author</label>
-            <input type="text" v-model="aauthor" id="aauthor">
+            <label for="author">Book or Chapter Author</label>
+            <input type="text" v-model="author" id="author">
          </div>
          <div class="entry pure-control-group">
             <label for="year">Year<span class="required">*</span></label>
@@ -65,7 +65,7 @@ export default {
       return {
          errors: [],
          pageLengthError: false,
-         required: ['jtitle', 'atitle', 'year', 'pages', 'bydate']
+         required: ['title', 'article', 'year', 'pages', 'bydate']
       }
    },
    computed: {
@@ -79,9 +79,9 @@ export default {
       }),
       ...mapFields('requests',[
          'buttonDisabled',
-         'openurl.jtitle',
-         'openurl.atitle',
-         'openurl.aauthor',
+         'openurl.title',
+         'openurl.article',
+         'openurl.author',
          'openurl.year',
          'openurl.pages',
          'openurl.issn',
@@ -92,7 +92,7 @@ export default {
    },
    created() {
       setTimeout(() => {
-         document.getElementById("jtitle").focus()
+         document.getElementById("title").focus()
       }, 150);
    },
    methods: {

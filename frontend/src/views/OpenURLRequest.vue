@@ -8,6 +8,7 @@
 <script>
 
 import { mapState } from "vuex"
+import { mapFields } from "vuex-map-fields"
 import Article from "@/components/requests/openurl/Article"
 import BookChapter from "@/components/requests/openurl/BookChapter"
 export default {
@@ -22,6 +23,24 @@ export default {
          preferredPickupLibrary: state => state.preferences.pickupLibrary,
          request: state=> state.requests.openurl.documentType
       }),
+      ...mapFields('requests',[
+         'openurl.title',
+         'openurl.article',
+         'openurl.author',
+         'openurl.publisher',
+         'openurl.pubplace',
+         'openurl.pubdate',
+         'openurl.edition',
+         'openurl.anylanguage',
+         'openurl.altedition',
+         'openurl.citedin',
+         'openurl.volume',
+         'openurl.issue',
+         'openurl.month',
+         'openurl.year',
+         'openurl.issn',
+         'openurl.oclc',
+      ]),
    },
    watch: {
       $route() {
@@ -42,7 +61,32 @@ export default {
             genre = genre[0]
          }
          this.$store.commit("requests/setOpenURLRequestGenre", genre)
+
+         this.oclc = this.getParam(queryParams, "rfe_dat").join(", ")
+         let cite = this.getParam(queryParams, "sid")
+         cite = cite.concat( this.getParam(queryParams, "rft_id") )
+         this.citedin = [...new Set(cite)].join(", ")
+
+         let issnKeys = ["rft.isbn", "rft.issn", "rft.eissn", 'issn', 'isbn']
+         let val = []
+         issnKeys.forEach( k => {
+            let v = this.getParam(queryParams, k)
+            val = val.concat(v)
+         })
+         this.issn = [...new Set(val)].join(", ")
       },
+
+      getParam( params, name) {
+         let val = params[name]
+         if ( val ) {
+            if (Array.isArray(val) ) {
+               return val
+            }
+            return [val.replace( /(<([^>]+)>)/ig, '')]
+         }
+         return []
+      },
+
       cancelRequest() {
          this.$router.push("/")
       },
