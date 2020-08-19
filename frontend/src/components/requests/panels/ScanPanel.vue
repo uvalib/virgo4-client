@@ -12,11 +12,11 @@
       <div class="scan pure-form">
          <div class="entry pure-control-group">
             <label for="scan-use">Scan Purpose</label>
-            <select v-model="type" id="scan-use">
+            <select v-model="scan.type" id="scan-use">
                <option value="Article">Research</option>
                <option value="Collab">Instruction</option>
             </select>
-            <div class="scan-use-note" v-if="type == 'Article'">
+            <div class="scan-use-note" v-if="scan.type == 'Article'">
                Use this form to request a scan for your coursework or personal academic research.
             </div>
             <div v-else class="scan-use-note" >
@@ -26,45 +26,45 @@
          </div>
          <div class="entry pure-control-group">
             <label for="scan-title">Book or Journal Title<span class="required">*</span></label>
-            <input readonly type="text" v-model="title" id="scan-title" aria-required="true" required="required">
+            <input readonly type="text" v-model="scan.title" id="scan-title" aria-required="true" required="required">
             <span v-if="hasError('title')" class="error">Title is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-chapter">Chapter or Article Title<span class="required">*</span></label>
-            <input type="text" v-model="chapter" id="scan-chapter" aria-required="true" required="required">
+            <input type="text" v-model="scan.chapter" id="scan-chapter" aria-required="true" required="required">
             <span v-if="hasError('chapter')" class="error">Chapter or article is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-author">Chapter or Article Author<span class="required">*</span></label>
-            <input type="text" v-model="author" id="scan-author" aria-required="true" required="required">
+            <input type="text" v-model="scan.author" id="scan-author" aria-required="true" required="required">
             <span v-if="hasError('author')" class="error">Author is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-year">Year</label>
-            <input type="text" v-model="year" id="scan-year">
+            <input type="text" v-model="scan.year" id="scan-year">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-volume">Volume</label>
-            <input type="text" v-model="volume" id="scan-volume">
+            <input type="text" v-model="scan.volume" id="scan-volume">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-issue">Issue</label>
-            <input type="text" v-model="issue" id="scan-issue">
+            <input type="text" v-model="scan.issue" id="scan-issue">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-pages">Pages<span class="required">*</span></label>
-            <input type="text" v-model="pages" id="scan-pages" aria-required="true" required="required">
+            <input type="text" v-model="scan.pages" id="scan-pages" aria-required="true" required="required">
             <span class="note">(ex: 1-15)</span>
-            <span v-if="pageLengthError" class="error">Please limt page information to 25 characters</span>
+            <span v-if="pageLengthError" class="error">Please limit page information to 25 characters</span>
             <span v-if="hasError('pages')" class="error">Pages are required</span>
          </div>
-         <div v-if="type=='Article'" class="entry pure-control-group">
+         <div v-if="scan.type=='Article'" class="entry pure-control-group">
             <label for="scan-notes">Notes</label>
-            <textarea id="scan-notes" v-model="notes"></textarea>
+            <textarea id="scan-notes" v-model="scan.notes"></textarea>
          </div>
          <div v-else class="entry pure-control-group">
             <label for="scan-course">Course Information<span class="required">*</span></label>
-            <textarea id="scan-course" v-model="notes"  aria-required="true" required="required"></textarea>
+            <textarea id="scan-course" v-model="scan.notes"  aria-required="true" required="required"></textarea>
             <span v-if="hasError('course')" class="error">Course information is required</span>
          </div>
          <span v-if="sysError" class="error">{{sysError}}</span>
@@ -88,8 +88,10 @@ export default {
    },
    watch: {
       selectedItem(newVal, _oldVal) {
-         this.barcode = newVal.barcode
-         this.library = newVal.library
+         this.scan.barcode = newVal.barcode
+         this.scan.library = newVal.library
+         this.scan.location = newVal.location
+         this.scan.callNumber = newVal.label
       }
    },
    computed: {
@@ -100,18 +102,7 @@ export default {
       }),
       ...mapFields('requests',[
          'buttonDisabled',
-         'scan.barcode',
-         'scan.issn',
-         'scan.type',
-         'scan.title',
-         'scan.chapter',
-         'scan.author',
-         'scan.volume',
-         'scan.issue',
-         'scan.year',
-         'scan.pages',
-         'scan.notes',
-         'scan.library',
+         'scan',
          'activeOption.item_options'
       ]),
       items() {
@@ -133,23 +124,23 @@ export default {
          } else {
             document.getElementById("item-select").focus()
          }
-         this.title = this.details.header.title
+         this.scan.title = this.details.header.title
          if (this.details.header.author) {
-            this.author = this.details.header.author.value.join(this.details.header.author.separator)
+            this.scan.author = this.details.header.author.value.join(this.details.header.author.separator)
          } else {
-            this.author = "Unknown"
+            this.scan.author = "Unknown"
          }
          let isbn = this.details.detailFields.find( f=>f.name=="isbn")
          if (isbn) {
-            this.issn = isbn.value.find( i => i.length == 13)
-            if (this.issn == "") {
-               this.issn = isbn.value[0]
+            this.scan.issn = isbn.value.find( i => i.length == 13)
+            if (this.scan.issn == "") {
+               this.scan.issn = isbn.value[0]
             }
          }
 
          let pubDate = this.details.basicFields.find( f=>f.name=="published_date")
          if (pubDate) {
-            this.year = pubDate.value
+            this.scan.year = pubDate.value
          }
       }, 150)
    },

@@ -36,6 +36,8 @@ const requests = {
          pages: '',
          notes: '',
          library: '',
+         location: '',
+         callNumber: ''
       },
       openurl: {
          requestType: "Loan",
@@ -160,7 +162,9 @@ const requests = {
             year: '',
             pages: '',
             notes: '',
-            library: ''
+            library: '',
+            location: '',
+            callNumber: ''
          },
          store.openurl = {
             requestType: "Loan",
@@ -210,12 +214,8 @@ const requests = {
       },
       submitScan(ctx) {
          ctx.commit('disableButton', true)
-         axios.post('/api/requests/scan', ctx.state.scan).then(response => {
-            if (response.data.scan.errors) {
-               ctx.commit('system/setError', response.data.scan.errors, { root: true })
-            } else {
-               ctx.commit('activePanel', "ConfirmationPanel")
-            }
+         axios.post('/api/requests/scan', ctx.state.scan).then(_response => {
+            ctx.commit('activePanel', "ConfirmationPanel")
          }).catch(e =>
             ctx.commit('system/setError', e, { root: true })
          ).finally(()=>
