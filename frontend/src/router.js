@@ -16,6 +16,7 @@ import DigitalDeliveries from './views/account/DigitalDeliveries.vue'
 import Preferences from './views/account/Preferences.vue'
 import Requests from './views/account/Requests.vue'
 import SavedSearches from './views/account/SavedSearches.vue'
+import OpenURLRequest from './views/OpenURLRequest.vue'
 
 import SignedOut from './views/SignedOut.vue'
 import Feedback from './views/Feedback.vue'
@@ -169,6 +170,11 @@ const router = new Router({
          component: SavedSearches
       },
       {
+         path: '/requests/openurl',
+         name: 'openurl',
+         component: OpenURLRequest
+      },
+      {
          path: '/signedout',
          name: 'signedout',
          component: SignedOut
@@ -205,7 +211,7 @@ router.beforeEach( (to, _from, next) => {
    } else {
       // Some pages require a signed in user...
       let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
-         "course-reserves-request", "requests", "searches"]
+         "course-reserves-request", "requests", "searches", "openurl"]
       if (userPages.includes(to.name)) {
          // console.log(`Page ${to.name} requires signed in user`)
          ensureSignedIn( next )
@@ -228,7 +234,8 @@ async function ensureSignedIn( next ) {
       } else {
          // console.log("Unable to find session for page access. Flag as expired")
          store.commit('system/setSessionExpired')
-         store.dispatch("user/signout", "/")
+         await store.dispatch("user/signout", "/")
+         next("/")
       }
    }
 }
