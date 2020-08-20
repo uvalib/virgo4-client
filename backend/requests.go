@@ -35,6 +35,7 @@ type illiadScanRequest struct {
 	ISSN                       string
 	ESPNumber                  string
 	Location                   string
+	CallNumber                 string
 	AcceptNonEnglish           bool
 }
 
@@ -293,18 +294,20 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	// ScanRequest contains data for a new Hold
 	type scanRequest struct {
-		PickupLibrary string `json:"library"`
-		ItemBarcode   string `json:"barcode"`
-		Issn          string `json:"issn"`
-		IlliadType    string `json:"type"`
-		Title         string `json:"title"`
-		Chapter       string `json:"chapter"`
-		Author        string `json:"author"`
-		Volume        string `json:"volume"`
-		Issue         string `json:"issue"`
-		Year          string `json:"year"`
-		Pages         string `json:"pages"`
-		Notes         string `json:"notes"`
+		Library     string `json:"library"`
+		ItemBarcode string `json:"barcode"`
+		CallNumber  string `json:"callNumber"`
+		Location    string `json:"location"`
+		Issn        string `json:"issn"`
+		IlliadType  string `json:"type"`
+		Title       string `json:"title"`
+		Chapter     string `json:"chapter"`
+		Author      string `json:"author"`
+		Volume      string `json:"volume"`
+		Issue       string `json:"issue"`
+		Year        string `json:"year"`
+		Pages       string `json:"pages"`
+		Notes       string `json:"notes"`
 	}
 	var scanReq scanRequest
 	err := c.ShouldBindJSON(&scanReq)
@@ -325,18 +328,27 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	log.Printf("Process scan request from %s for barcode %s", v4Claims.UserID, scanReq.ItemBarcode)
 	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
 		DocumentType: scanReq.IlliadType}
-	illadScanReq := illiadScanRequest{illiadRequest: &illiadReq,
-		PhotoJournalTitle: scanReq.Title, PhotoArticleTitle: scanReq.Chapter,
-		PhotoArticleAuthor: scanReq.Author, PhotoJournalVolume: scanReq.Volume, PhotoJournalIssue: scanReq.Issue,
-		PhotoJournalYear: scanReq.Year, PhotoJournalInclusivePages: scanReq.Pages,
-		ItemNumber: scanReq.ItemBarcode, ISSN: scanReq.Issn}
+	illiadScanReq := illiadScanRequest{illiadRequest: &illiadReq,
+		PhotoJournalTitle:          scanReq.Title,
+		PhotoArticleTitle:          scanReq.Chapter,
+		PhotoArticleAuthor:         scanReq.Author,
+		PhotoJournalVolume:         scanReq.Volume,
+		PhotoJournalIssue:          scanReq.Issue,
+		PhotoJournalYear:           scanReq.Year,
+		PhotoJournalInclusivePages: scanReq.Pages,
+		ISSN:                       scanReq.Issn,
+		ItemNumber:                 scanReq.ItemBarcode,
+		CallNumber:                 scanReq.CallNumber,
+		// Library needs to go in the illiad location field
+		Location: scanReq.Library,
+	}
 	if scanReq.IlliadType == "Article" {
-		illadScanReq.TransactionStatus = "Awaiting Document Delivery Processing"
+		illiadScanReq.TransactionStatus = "Awaiting Document Delivery Processing"
 	} else {
-		illadScanReq.TransactionStatus = "Awaiting Collab Processing"
+		illiadScanReq.TransactionStatus = "Awaiting Collab Processing"
 	}
 
-	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illadScanReq)
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illiadScanReq)
 	if illErr != nil {
 		// if the first ILLiad request fails, notify user and exit
 		c.JSON(illErr.StatusCode, illErr.Message)
@@ -346,17 +358,31 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	}
 
 	// parse transaction number from response
-	var illadResp struct {
+	var illiadResp struct {
 		TransactionNumber int
 	}
-	json.Unmarshal([]byte(rawResp), &illadResp)
+	json.Unmarshal([]byte(rawResp), &illiadResp)
 
 	if scanReq.Notes != "" {
 		noteReq := illiadNote{Note: scanReq.Notes, NoteType: "Staff"}
-		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
+		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illiadResp.TransactionNumber), noteReq)
 		if illErr != nil {
-			log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, illErr.Message)
+			log.Printf("WARN: unable to add note to scan %d: %s", illiadResp.TransactionNumber, illErr.Message)
 		}
+	}
+
+	// Only make a hold for certain libraries
+	makeHold := false
+	for _, holdLoc := range []string{"BY-REQUEST", "STACKS"} {
+		if scanReq.Location == holdLoc {
+			log.Printf("Making hold for %s", scanReq.ItemBarcode)
+			makeHold = true
+		}
+	}
+	if !makeHold {
+		log.Printf("No Hold for %s", scanReq.ItemBarcode)
+		c.JSON(http.StatusOK, nil)
+		return
 	}
 
 	type ilsScanRequest struct {
@@ -365,31 +391,38 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		IlliadTN      string `json:"illiadTN"`
 	}
 
+	// Scans have special pickup libraries
+	PickupLibrary := ""
+	if scanReq.Library == "BY-REQUEST" {
+		PickupLibrary = "LEO"
+	} else {
+		PickupLibrary = scanReq.Library
+	}
+
 	ilsScan := ilsScanRequest{
 		ItemBarcode:   scanReq.ItemBarcode,
-		PickupLibrary: scanReq.PickupLibrary,
-		IlliadTN:      fmt.Sprintf("%d", illadResp.TransactionNumber),
+		PickupLibrary: PickupLibrary,
+		IlliadTN:      fmt.Sprintf("%d", illiadResp.TransactionNumber),
 	}
 
 	createHoldURL := fmt.Sprintf("%s/v4/requests/scan", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
+	_, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
 	if ilsErr != nil {
 		// The ILLiad request was successful so the item needs to be moved to a special queue
 		// then fail the response
 		type illiadMove struct{ Status string }
 		moveReq := illiadMove{Status: "Virgo Hold Error"}
-		_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", illadResp.TransactionNumber), moveReq)
+		_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", illiadResp.TransactionNumber), moveReq)
 		if qErr != nil {
-			log.Printf("WARN: unable to add note to scan %d: %s", illadResp.TransactionNumber, qErr.Message)
+			log.Printf("WARN: unable to add note to scan %d: %s", illiadResp.TransactionNumber, qErr.Message)
 		}
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
 
-	// Pass through without modification
-	var result map[string]interface{}
-	json.Unmarshal([]byte(bodyBytes), &result)
-	c.JSON(http.StatusOK, result)
+	//TODO: update illiad with the actual hold barcode if necessary
+
+	c.JSON(http.StatusOK, nil)
 }
 
 // DeleteHold uses ILS Connector V4 API to delete a Hold
@@ -412,14 +445,11 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 	}
 
 	deleteHoldURL := fmt.Sprintf("%s/v4/requests/hold/%s", svc.ILSAPI, holdID)
-	bodyBytes, ilsErr := svc.ILSConnectorDelete(deleteHoldURL, c.GetString("jwt"))
+	_, ilsErr := svc.ILSConnectorDelete(deleteHoldURL, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
 
-	// Pass through without modification
-	var result map[string]interface{}
-	json.Unmarshal([]byte(bodyBytes), &result)
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, nil)
 }
