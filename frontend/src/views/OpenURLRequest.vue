@@ -1,7 +1,7 @@
 <template>
    <div class="request">
       <h1>Request an Item</h1>
-      <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+      <component v-bind:is="documentType" @canceled="cancelRequest" @submitted="requestSubmitted"/>
    </div>
 </template>
 
@@ -14,14 +14,14 @@ import BookChapter from "@/components/requests/openurl/BookChapter"
 export default {
    name: "openurl",
    components: {
-      Article,BookChapter
+      Article, BookChapter
    },
    computed: {
       ...mapState({
          sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
          preferredPickupLibrary: state => state.preferences.pickupLibrary,
-         request: state=> state.requests.openurl.documentType
+         documentType: state=> state.requests.openurl.documentType
       }),
       ...mapFields('requests',[
          'openurl.title',
@@ -62,25 +62,87 @@ export default {
          }
          this.$store.commit("requests/setOpenURLRequestGenre", genre)
 
+         // OCLC
          this.oclc = this.getParam(queryParams, "rfe_dat").join(", ")
-         let cite = this.getParam(queryParams, "sid")
-         cite = cite.concat( this.getParam(queryParams, "rft_id") )
-         this.citedin = [...new Set(cite)].join(", ")
 
-         let issnKeys = ["rft.isbn", "rft.issn", "rft.eissn", 'issn', 'isbn']
+         // ISSN/ISBN
+         let vals = this.getMultParam( queryParams, ["rft.isbn", "rft.issn", "rft.eissn", 'issn', 'isbn'])
+         this.issn = vals.join(", ")
+
+         if (this.documentType == "Article" || this.documentType == "BookChapter") {
+            // Journal/book title
+            vals = this.getMultParam( queryParams, ['rft.jtitle', 'rft.title', 'title', 'rft.stitle'])
+            this.title = vals.join("; ")
+
+            // Article/chapter title
+            vals = this.getMultParam( queryParams, ['rft.atitle', 'atitle'])
+            this.article = vals.join("; ")
+
+            // volume
+            vals = this.getMultParam(queryParams, ['rft.volume', 'volume'])
+            this.volume = vals.join(", ")
+
+            // issue
+            vals = this.getMultParam(queryParams, ['rft.issue', 'issue'])
+            this.issue = vals.join(", ")
+
+            // month
+            // MAPPING MISSING
+
+            // year
+            vals = this.getMultParam(queryParams, ['rft.date', 'date'])
+            this.year = vals.join(", ")
+         } else {
+            // book title
+            vals = this.getMultParam( queryParams, ['rft.btitle', 'rft.title', 'title'])
+            this.title = vals.join("; ")
+
+            // publication date
+            vals = this.getMultParam(queryParams, ['rft.date', 'date'])
+            this.pubdate = vals.join(", ")
+         }
+
+         // author; first see if its just au
+         vals = this.getParam(queryParams, "rft.au")
+         if (vals.length > 0) {
+            this.author = vals.join("; ")
+         } else {
+            let last = this.getMultParam(queryParams, ["rft.aulast", "aulast"])
+            let first = this.getMultParam(queryParams, ["rft.aufirst", "aufirst"])
+            let mi = this.getMultParam(queryParams, ["rft.auinitm", "auinitm"])
+            let authors = []
+            last.forEach( (ln, idx) => {
+               let name = ln
+               if (idx < first.length) {
+                  name += `, ${first[idx]}`
+                  if (idx < mi.length) {
+                     name += ` ${mi[idx]}`
+                  }
+               }
+               authors.push(name)
+            })
+            this.author = authors.join("; ")
+         }
+
+         // cited-in
+         vals = this.getMultParam( queryParams, ['sid', 'rft_id'])
+         this.citedin = vals.join(", ")
+      },
+
+      getMultParam( params, keys ) {
          let val = []
-         issnKeys.forEach( k => {
-            let v = this.getParam(queryParams, k)
+         keys.forEach( k => {
+            let v = this.getParam(params, k)
             val = val.concat(v)
          })
-         this.issn = [...new Set(val)].join(", ")
+         return [...new Set(val)]
       },
 
       getParam( params, name) {
          let val = params[name]
          if ( val ) {
             if (Array.isArray(val) ) {
-               return val
+               return [...new Set(val)]
             }
             return [val.replace( /(<([^>]+)>)/ig, '')]
          }
