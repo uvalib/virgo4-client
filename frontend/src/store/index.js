@@ -301,6 +301,8 @@ export default new Vuex.Store({
                router.replace({ query })
             }
 
+            commit('setSearching', false)
+
             dispatch("searches/updateHistory")
             return dispatch("filters/getSelectedResultFacets")
          } catch (error) {
