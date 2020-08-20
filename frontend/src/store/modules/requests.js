@@ -47,8 +47,6 @@ const requests = {
          article: "",
          author: "",
          publisher: "",
-         pubplace: "",
-         pubdate: "",
          edition: "",
          volume: "",
          issue: "",
@@ -101,17 +99,12 @@ const requests = {
             state.openurl.documentType = "Article"
             state.openurl.processType = "Borrowing"
             state.openurl.status = "Awaiting Request Processing"
-         } else if ( genre == "bookitem"  ) {
+         } else if ( genre == "bookitem" || genre == "conference" || genre == "proceeding") {
             state.openurl.requestType = "Article"
             state.openurl.documentType = "BookChapter"
             state.openurl.processType = "Borrowing"
             state.openurl.status = "Awaiting Request Processing"
-         } else if ( genre == "conference" || genre == "proceeding"  ) {
-            state.openurl.requestType = "Article"
-            state.openurl.documentType = "Conference"
-            state.openurl.processType = "Borrowing"
-            state.openurl.status = "Awaiting Request Processing"
-         } else  {
+         }  else  {
             state.openurl.requestType = "Loan"
             state.openurl.documentType = "Book"
             state.openurl.processType = "Borrowing"
@@ -174,8 +167,6 @@ const requests = {
             article: "",
             author: "",
             publisher: "",
-            pubplace: "",
-            pubdate: "",
             edition: "",
             volume: "",
             issue: "",

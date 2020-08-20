@@ -11,10 +11,11 @@ import { mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
 import Article from "@/components/requests/openurl/Article"
 import BookChapter from "@/components/requests/openurl/BookChapter"
+import Book from "@/components/requests/openurl/Book"
 export default {
    name: "openurl",
    components: {
-      Article, BookChapter
+      Article, BookChapter, Book
    },
    computed: {
       ...mapState({
@@ -28,8 +29,6 @@ export default {
          'openurl.article',
          'openurl.author',
          'openurl.publisher',
-         'openurl.pubplace',
-         'openurl.pubdate',
          'openurl.edition',
          'openurl.anylanguage',
          'openurl.altedition',
@@ -40,6 +39,7 @@ export default {
          'openurl.year',
          'openurl.issn',
          'openurl.oclc',
+         'openurl.pages',
       ]),
    },
    watch: {
@@ -86,20 +86,25 @@ export default {
             vals = this.getMultParam(queryParams, ['rft.issue', 'issue'])
             this.issue = vals.join(", ")
 
-            // month
-            // MAPPING MISSING
-
             // year
             vals = this.getMultParam(queryParams, ['rft.date', 'date'])
             this.year = vals.join(", ")
+
+            // pages
+             vals = this.getMultParam(queryParams, ['rft.pages', 'rft.spage', 'rft.epage', 'pages', 'spage', 'epage'])
+             this.pages = vals.join(", ")
          } else {
             // book title
             vals = this.getMultParam( queryParams, ['rft.btitle', 'rft.title', 'title'])
             this.title = vals.join("; ")
 
+            // publisher
+            vals = this.getParam(queryParams, "rft.pub")
+            this.publisher = vals.join(", ")
+
             // publication date
             vals = this.getMultParam(queryParams, ['rft.date', 'date'])
-            this.pubdate = vals.join(", ")
+            this.year = vals.join(", ")
          }
 
          // author; first see if its just au
