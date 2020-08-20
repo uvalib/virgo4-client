@@ -32,7 +32,8 @@ const query = {
    getters: {
       getField,
       advancedSearchTemplate( state ) {
-         let out = { excluded: state.excludedPools, fields: []}
+         let ep = [...new Set(state.excludedPools)]
+         let out = { excluded: ep, fields: []}
          state.advanced.forEach(  af => {
             let tpl =  {op: af.op, field: af.field, comparison: af.comparison}
             if (tpl.field.includes("filter.")) {
@@ -52,7 +53,8 @@ const query = {
          }
          qs += `&q=${encodeURIComponent(getters.string)}`
          if ( state.excludedPools.length > 0) {
-            qs += `&exclude=${state.excludedPools.join(",")}`
+            let ep = [...new Set(state.excludedPools)]
+            qs += `&exclude=${ep.join(",")}`
          }
          return qs
       },
