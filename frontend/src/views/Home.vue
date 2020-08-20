@@ -156,6 +156,7 @@ export default {
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
         basic: 'query.basic',
+        userSearched: 'query.userSearched',
       }),
       searchScopes() {
         let out = [{name: 'All Resource Types', id: 'all'}]
@@ -251,12 +252,12 @@ export default {
 
             // only re-run search when query, sort or filtering has changed (or when forced)
             if (this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
-                  this.activeSort != oldSort || force === true) {
+                  this.activeSort != oldSort || force === true || this.userSearched == true) {
                console.log("Issue new search")
+               this.userSearched = false
                this.$store.commit("resetSearchResults")
                await this.$store.dispatch("searchAllPools")
 
-               // FIXME this is a problem
                if (query.page) {
                   this.$store.commit("clearSelectedPoolResults")
                   let page = parseInt(query.page, 10)
@@ -356,6 +357,7 @@ export default {
          if (priorQ.sort) {
             qp += `&sort=${priorQ.sort}`
          }
+         this.userSearched = true
          this.$router.push(`/search?${qp}`)
 
          let s = "SIGNED_OUT"

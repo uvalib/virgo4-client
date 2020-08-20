@@ -130,7 +130,7 @@
 </template>
 
 <script>
-import { mapMultiRowFields } from "vuex-map-fields"
+import { mapMultiRowFields, mapFields } from "vuex-map-fields"
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
@@ -162,6 +162,9 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          hasSearchTemplate: 'preferences/hasSearchTemplate'
+      }),
+      ...mapFields({
+        userSearched: 'query.userSearched',
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -218,6 +221,7 @@ export default {
                qp += `&sort=${priorQ.sort}`
             }
 
+            this.userSearched = true
             this.$router.push(`/search?${qp}`)
 
             let s = "SIGNED_OUT"

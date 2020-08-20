@@ -5,6 +5,7 @@ import router from '../../router'
 const query = {
    namespaced: true,
    state: {
+      userSearched: false,
       mode: "basic",
       basic: "",
       basicSearchScope: { name: 'All Resource Types', id: 'all' },
