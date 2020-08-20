@@ -24,7 +24,6 @@ export default {
       async sortChanged() {
          let query = Object.assign({}, this.$route.query)
          query.sort = this.activeSort
-         await this.$store.dispatch("sort/applyPoolSort", {poolID: this.pool.id, sort: this.activeSort})
          this.$router.push({query})
       }
    },

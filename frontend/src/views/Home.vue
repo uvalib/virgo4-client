@@ -66,17 +66,7 @@ export default {
      SearchTips, AdvancedSearch,
      Welcome
    },
-   beforeRouteUpdate (to, _from, next) {
-      // This happens any time the route or query params change.
-      // The create handler only happens on initial page load, and in that case,
-      // beforeRouteUpdate is NOT called
-      this.isHomePage = false
-      if (to.path == "/") {
-         this.isHomePage = true
-      }
-      this.restoreSearchFromQueryParams(to.query)
-      next()
-   },
+
    created: function() {
       this.isHomePage = false
       if (this.$route.path == "/") {
@@ -93,6 +83,14 @@ export default {
       }
    },
    watch: {
+      $route() {
+         console.log("NEW HOME ROUTE "+ this.$route.fullPath)
+         this.isHomePage = false
+         if (this.$route.path == "/") {
+            this.isHomePage = true
+         }
+         this.restoreSearchFromQueryParams(this.$route.query)
+      },
       searching (newVal, _oldVal) {
          // If restore url is set, don't do special focus handling as it will mess up
          // the restore focus code
@@ -152,7 +150,8 @@ export default {
         isSignedIn: 'user/isSignedIn',
         excludedPoolPrefs: 'preferences/excludedPools',
         hasSearchTemplate: 'preferences/hasSearchTemplate',
-        externalPoolIDs: 'pools/externalPoolIDs'
+        externalPoolIDs: 'pools/externalPoolIDs',
+        poolSort: 'sort/poolSort'
       }),
       ...mapFields({
         basicSearchScope: 'query.basicSearchScope',
@@ -202,14 +201,19 @@ export default {
 
          let excluded = []
          if (query.exclude) {
-            excluded = query.exclude.split(",")
+            excluded = [...new Set(query.exclude.split(","))]
          }
-         this.externalPoolIDs.forEach( pool => {
-            if ( this.isSignedIn == false ) {
-               excluded.push(pool)
-            } else {
-               if ( this.optInPoolPrefs.includes(pool) == false) {
-                  excluded.push(pool)
+
+         // Check for pools that should be excluded unless opted-in
+         this.externalPoolIDs.forEach( extPool => {
+            // dont exclude the same pool multiple times
+            if (excluded.includes(extPool) == false) {
+               if ( this.isSignedIn == false ) {
+                  excluded.push(extPool)
+               } else {
+                  if ( this.optInPoolPrefs.includes(extPool) == false) {
+                     excluded.push(extPool)
+                  }
                }
             }
          })
@@ -231,7 +235,8 @@ export default {
          // cant have sorting if a target pool is not defined...
          let oldSort = ""
          if ( targetPool != "") {
-            oldSort = this.activeSort
+            let oldSortObj = this.poolSort(targetPool)
+            oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
             if (query.sort  ) {
                this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: query.sort})
                this.$store.commit("sort/setActivePool", targetPool)
@@ -241,18 +246,17 @@ export default {
             }
          }
 
-         if (query.q) {
-            this.$store.commit("query/restoreFromURL",query.q)
+         if ( query.q) {
+            this.$store.commit("query/restoreFromURL", query.q)
 
             // only re-run search when query, sort or filtering has changed (or when forced)
             if (this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
-                this.activeSort != oldSort || force === true) {
+                  this.activeSort != oldSort || force === true) {
+               console.log("Issue new search")
+               this.$store.commit("resetSearchResults")
                await this.$store.dispatch("searchAllPools")
-               let tgtResultsIdx = this.results.findIndex( r => r.pool.id == targetPool)
-               if ( tgtResultsIdx > -1) {
-                  await this.$store.dispatch("selectPoolResults", tgtResultsIdx)
-               }
 
+               // FIXME this is a problem
                if (query.page) {
                   this.$store.commit("clearSelectedPoolResults")
                   let page = parseInt(query.page, 10)
@@ -344,7 +348,6 @@ export default {
          let qp =  this.queryURLParams
          if (priorQ.pool) {
             qp += `&pool=${priorQ.pool}`
-            console.log("overide pool preference with "+priorQ.pool)
             this.$store.commit("query/setTargetPool", priorQ.pool)
          }
          if (priorQ.filter) {
@@ -353,9 +356,6 @@ export default {
          if (priorQ.sort) {
             qp += `&sort=${priorQ.sort}`
          }
-
-         this.$store.commit("resetSearchResults")
-         this.$store.dispatch("searchAllPools")
          this.$router.push(`/search?${qp}`)
 
          let s = "SIGNED_OUT"

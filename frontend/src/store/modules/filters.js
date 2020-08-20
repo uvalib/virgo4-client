@@ -201,7 +201,6 @@ const filters = {
       },
 
       restoreFromURL(state, data ) {
-         // The filter URL param is just facetID.value,facetID,value,...
          let filterStr = data.filter
          let pfIdx = state.poolFacets.findIndex( pf => pf.pool == data.pool)
          let pfObj = null

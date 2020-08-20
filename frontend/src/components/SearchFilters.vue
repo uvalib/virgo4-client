@@ -85,8 +85,8 @@ export default {
          this.$store.commit("filters/resetPoolFilters", this.selectedResults.pool.id)
          let query = Object.assign({}, this.$route.query)
          delete query.filter
-         this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchSelectedPool")
+         this.$store.commit("resetSearchResults")
+         await this.$store.dispatch("searchAllPools")
          this.$router.push({ query })
       },
    }

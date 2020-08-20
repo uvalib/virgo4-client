@@ -218,8 +218,6 @@ export default {
                qp += `&sort=${priorQ.sort}`
             }
 
-            this.$store.commit("resetSearchResults")
-            this.$store.dispatch("searchAllPools")
             this.$router.push(`/search?${qp}`)
 
             let s = "SIGNED_OUT"
