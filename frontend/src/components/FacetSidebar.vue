@@ -93,7 +93,6 @@ export default {
          updatingFacets: state => state.filters.updatingFacets,
          globalAvailability: state => state.filters.globalAvailability,
          circulatingFacet: state => state.filters.circulatingFacet,
-         globalCirculating: state => state.filters.globalCirculating,
          displayWidth: state => state.system.displayWidth,
       }),
       ...mapFields("filters", [
@@ -157,22 +156,14 @@ export default {
          return facetID+"_val_"+idx
       },
       async availSelected(avail) {
-         let origPoolID = this.selectedResults.pool.id
          this.$store.commit("filters/setGlobalAvailability", avail)
-         this.$store.commit("clearSelectedPoolResults")
+         this.$store.commit("resetSearchResults")
          await this.$store.dispatch("searchAllPools")
-         let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
-         await this.$store.dispatch("selectPoolResults", resIdx)
-         this.$store.commit("setSearching", false)
          this.addFilterToURL()
       },
       async circFacetClicked() {
-         let origPoolID = this.selectedResults.pool.id
-         this.$store.commit("clearSelectedPoolResults")
+         this.$store.commit("resetSearchResults")
          await this.$store.dispatch("searchAllPools")
-         let resIdx = this.results.findIndex( r => r.pool.id == origPoolID)
-         await this.$store.dispatch("selectPoolResults", resIdx)
-         this.$store.commit("setSearching", false)
          this.addFilterToURL()
       },
       addFilterToURL() {
