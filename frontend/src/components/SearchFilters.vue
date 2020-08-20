@@ -27,6 +27,7 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import { mapFields } from "vuex-map-fields"
 export default {
    computed: {
       ...mapState({
@@ -38,6 +39,9 @@ export default {
          notApplicableFilters: 'filters/notApplicableFilters',
          selectedResults: 'selectedResults',
          facetSupport: 'pools/facetSupport'
+      }),
+      ...mapFields({
+        userSearched: 'query.userSearched',
       }),
       naFilters() {
          return this.notApplicableFilters(this.selectedResults.pool.id)
@@ -85,8 +89,7 @@ export default {
          this.$store.commit("filters/resetPoolFilters", this.selectedResults.pool.id)
          let query = Object.assign({}, this.$route.query)
          delete query.filter
-         this.$store.commit("resetSearchResults")
-         await this.$store.dispatch("searchAllPools")
+         this.userSearched = true
          this.$router.push({ query })
       },
    }

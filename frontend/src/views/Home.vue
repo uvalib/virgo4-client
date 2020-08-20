@@ -257,12 +257,6 @@ export default {
                this.userSearched = false
                this.$store.commit("resetSearchResults")
                await this.$store.dispatch("searchAllPools")
-
-               if (query.page) {
-                  this.$store.commit("clearSelectedPoolResults")
-                  let page = parseInt(query.page, 10)
-                  await this.$store.dispatch("searchSelectedPool", page)
-               }
                this.$store.commit('setSearching', false)
             }
          }

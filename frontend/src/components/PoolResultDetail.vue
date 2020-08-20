@@ -93,7 +93,6 @@ export default {
                 this.loadingMore = false
                  let query = Object.assign({}, this.$route.query)
                  query.page = this.selectedResults.page+1 // page is 0 based internally
-                 this.$router.push({query})
                  let newY = window.scrollY
                  let nav = document.getElementById("v4-navbar")
                  let headerOffset = nav.offsetHeight

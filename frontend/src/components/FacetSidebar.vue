@@ -95,9 +95,10 @@ export default {
          circulatingFacet: state => state.filters.circulatingFacet,
          displayWidth: state => state.system.displayWidth,
       }),
-      ...mapFields("filters", [
-         "globalCirculating",
-      ]),
+      ...mapFields({
+         userSearched: 'query.userSearched',
+         globalCirculating: "filters.globalCirculating",
+      }),
       ...mapGetters({
           allFacets: 'filters/poolFacets',
           selectedResults: 'selectedResults',
@@ -157,13 +158,12 @@ export default {
       },
       async availSelected(avail) {
          this.$store.commit("filters/setGlobalAvailability", avail)
-         this.$store.commit("resetSearchResults")
-         await this.$store.dispatch("searchAllPools")
+         this.userSearched = true
          this.addFilterToURL()
       },
       async circFacetClicked() {
          this.$store.commit("resetSearchResults")
-         await this.$store.dispatch("searchAllPools")
+         this.userSearched = true
          this.addFilterToURL()
       },
       addFilterToURL() {

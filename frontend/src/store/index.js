@@ -249,7 +249,7 @@ export default new Vuex.Store({
       // advanced search parameters and will always start at page 1.
       // If isRestore is true, the spinner will not be cleared after the search
       // CTX: commit: ƒ boundCommit(type, payload, options)
-      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, isRestore) {
+      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
          commit('system/setError', "")
          let req = {
             query: rootGetters['query/string'],
@@ -261,8 +261,6 @@ export default new Vuex.Store({
             filters: rootGetters['filters/allPoolFilters'],
             pool_sorting: rootState.sort.pools
          }
-
-         let manageSpinner = !(isRestore === true)
 
          if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
             let tgtID = rootState.query.basicSearchScope.id
@@ -279,7 +277,7 @@ export default new Vuex.Store({
          commit('setSearching', true)
          if (rootGetters["user/isSignedIn"]) {
             await dispatch("user/refreshAuth")
-            //make sure bookmarks are up to date when
+            // make sure bookmarks are up to date when
             // searching so the UI can show the correct status per item
             dispatch("bookmarks/getBookmarks")
          }
@@ -294,9 +292,6 @@ export default new Vuex.Store({
             commit('setSuggestions', response.data.suggestions)
             if (state.otherSrcSelection.id != "") {
                commit('updateOtherPoolLabel')
-            }
-            if (manageSpinner) {
-               commit('setSearching', false)
             }
 
             // make sure the currently selected pool is always in URL
@@ -326,8 +321,7 @@ export default new Vuex.Store({
       // SearchSelectedPool is called only when one specific set of pool results is selected for
       // exploration. It is used to query for next page during load more, filter change and sort change.
       // Pool results are APPENDED to existing after load more, and reset for other searches.
-      // The default pagination can be overridden with the pageOverride; search will ask for all hits up to that page
-      async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }, pageOverride) {
+      async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
          commit('setSearching', true)
          commit('filters/setUpdatingFacets', true)
          let tgtResults = rootGetters.selectedResults
@@ -335,11 +329,7 @@ export default new Vuex.Store({
          let sort = rootGetters['sort/poolSort'](tgtResults.pool.id)
          let filterObj = { pool_id: tgtResults.pool.id, facets: filters }
          let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize }
-         if (pageOverride) {
-            let pageDiff = pageOverride - tgtResults.page
-            pagination.rows = state.pageSize * pageDiff
-            commit('setPage', pageOverride - 1) // tracked pages are 0-based
-         }
+
          let req = {
             query: rootGetters['query/string'],
             pagination: pagination,
