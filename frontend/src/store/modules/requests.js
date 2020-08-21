@@ -99,7 +99,7 @@ const requests = {
             state.openurl.processType = "Borrowing"
          } else if ( genre == "bookitem" || genre == "conference" || genre == "proceeding") {
             state.openurl.requestType = "Article"
-            state.openurl.documentType = "BookChapter"
+            state.openurl.documentType = "Book Chapter"
             state.openurl.processType = "Borrowing"
          }  else  {
             state.openurl.requestType = "Loan"

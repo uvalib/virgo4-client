@@ -75,7 +75,11 @@ export default {
    },
    watch: {
       $route() {
-         this.initForm(this.$route.query)
+         if (this.$route.query.submitted) {
+            this.request=""
+         } else {
+            this.initForm(this.$route.query)
+         }
       }
    },
    methods: {
@@ -92,7 +96,7 @@ export default {
             genre = genre[0]
          }
          this.$store.commit("requests/setOpenURLRequestGenre", genre)
-         this.request = this.documentType
+         this.request = this.documentType.replace(" ", "")
 
          // OCLC
          this.oclc = this.getParam(queryParams, "rfe_dat").join(", ")
@@ -193,6 +197,9 @@ export default {
          await this.$store.dispatch("requests/submitOpenURLRequest")
          if ( this.sysError == "" || this.sysError == null) {
             this.request = ""
+            let p = this.$route.fullPath
+            p = p.split("?")[0] + "?submitted=true"
+            this.$router.replace(p)
          }
       }
    },
