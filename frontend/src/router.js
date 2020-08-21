@@ -202,27 +202,36 @@ const router = new Router({
 })
 
 // This is called before every URL in the SPA is hit
-router.beforeEach( (to, _from, next) => {
+router.beforeEach( (to, from, next) => {
    // Some pages just require an auth token...
    let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       // console.log(`Page ${to.name} requires auth token only`)
       ensureAuthTokenPresent( next )
-   } else {
-      // Some pages require a signed in user...
-      let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
-         "course-reserves-request", "requests", "searches", "openurl"]
-      if (userPages.includes(to.name)) {
-         // console.log(`Page ${to.name} requires signed in user`)
-         ensureSignedIn( next )
-      } else {
-         // All others just proceed...
-         next()
-      }
+      return
    }
+
+   // Some pages require a signed in user...
+   let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
+      "course-reserves-request", "requests", "searches"]
+   if (userPages.includes(to.name)) {
+      // console.log(`Page ${to.name} requires signed in user`)
+      ensureSignedIn( from.fullPath, next, false )
+      return
+   }
+
+   // These pages require signed in user and will automatically netbadge in if not signed in
+   let autoAuth = ["openurl"]
+   if (autoAuth.includes(to.name)) {
+      ensureSignedIn( from.fullPath, next, true )
+      return
+   }
+
+   // All others just proceed...
+   next()
 })
 
-async function ensureSignedIn( next ) {
+async function ensureSignedIn( fromPath, next, autoNetbadge ) {
    if ( store.getters["user/isSignedIn"]) {
       // console.log("Sign-in session found in memory")
       await store.dispatch("user/refreshAuth")
@@ -232,10 +241,15 @@ async function ensureSignedIn( next ) {
       if ( resp === true) {
          next()
       } else {
-         // console.log("Unable to find session for page access. Flag as expired")
-         store.commit('system/setSessionExpired')
-         await store.dispatch("user/signout", "/")
-         next("/")
+         if (autoNetbadge) {
+            store.commit('restore/setURL', fromPath)
+            store.dispaych('user/netbadge')
+         } else {
+            // console.log("Unable to find session for page access. Flag as expired")
+            store.commit('system/setSessionExpired')
+            await store.dispatch("user/signout", "/")
+            next("/")
+         }
       }
    }
 }
