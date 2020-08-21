@@ -1,7 +1,32 @@
 <template>
    <div class="request">
-      <h1>Request an Item</h1>
-      <component v-bind:is="documentType" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+      <template v-if="request">
+         <h1>Request an Item</h1>
+         <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+      </template>
+      <div v-else class="submitted">
+         <h1>Request Submitted</h1>
+         <h2>We have received your request.</h2>
+         <table>
+            <tr>
+               <td class="label">User ID:</td>
+               <td>{{userId}}</td>
+            </tr>
+            <tr>
+               <td class="label">Title:</td>
+               <td>{{title}}</td>
+            </tr>
+            <tr>
+               <td class="label">Needed By:</td>
+               <td>{{bydate}}</td>
+            </tr>
+         </table>
+         <p>
+            You can check the status of this request on your
+            <router-link to="/requests">account requests</router-link>
+            page.
+         </p>
+      </div>
    </div>
 </template>
 
@@ -17,12 +42,18 @@ export default {
    components: {
       Article, BookChapter, Book
    },
+   data: function()  {
+      return {
+         request: "pending"
+      }
+   },
    computed: {
       ...mapState({
          sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
          preferredPickupLibrary: state => state.preferences.pickupLibrary,
-         documentType: state=> state.requests.openurl.documentType
+         documentType: state=> state.requests.openurl.documentType,
+         userId: state => state.user.signedInUser
       }),
       ...mapFields('requests',[
          'openurl.title',
@@ -31,7 +62,6 @@ export default {
          'openurl.publisher',
          'openurl.edition',
          'openurl.anylanguage',
-         'openurl.altedition',
          'openurl.citedin',
          'openurl.volume',
          'openurl.issue',
@@ -40,6 +70,7 @@ export default {
          'openurl.issn',
          'openurl.oclc',
          'openurl.pages',
+         'openurl.bydate'
       ]),
    },
    watch: {
@@ -61,6 +92,7 @@ export default {
             genre = genre[0]
          }
          this.$store.commit("requests/setOpenURLRequestGenre", genre)
+         this.request = this.documentType
 
          // OCLC
          this.oclc = this.getParam(queryParams, "rfe_dat").join(", ")
@@ -157,8 +189,11 @@ export default {
       cancelRequest() {
          this.$router.push("/")
       },
-      requestSubmitted() {
-         alert("submit")
+      async requestSubmitted() {
+         await this.$store.dispatch("requests/submitOpenURLRequest")
+         if ( this.sysError == "" || this.sysError == null) {
+            this.request = ""
+         }
       }
    },
    created() {
@@ -173,6 +208,18 @@ export default {
    margin: 0 auto;
    margin-top: 2vw;
    color: var(--color-primary-text);
+}
+table {
+   margin: 15px auto;
+  text-align: left;
+  td {
+     padding: 10px;
+  }
+  td.label {
+     text-align: right;
+     font-weight: 500;
+     padding-right: 0;
+  }
 }
 @media only screen and (min-width: 768px) {
    div.request  {

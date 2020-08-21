@@ -25,7 +25,7 @@
             <span v-if="hasError('year')" class="error">Year is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="edition">edition</label>
+            <label for="edition">Edition</label>
             <input type="text" v-model="edition" id="edition">
          </div>
          <div class="entry pure-control-group">
@@ -96,13 +96,11 @@ export default {
    data: () => {
       return {
          errors: [],
-         pageLengthError: false,
-         required: ['title', 'article', 'year', 'pages', 'bydate']
+         required: ['title', 'year', 'bydate']
       }
    },
    computed: {
       ...mapState({
-         sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
          request: state => state.requests.openurl,
          preferredPickupLibrary: state => state.preferences.pickupLibrary
@@ -147,22 +145,14 @@ export default {
          }
 
          if (this.errors.length > 0) {
+            console.error(this.errors)
             let tgtID = this.errors[0]
             let first = document.getElementById(tgtID)
             if ( first ) {
                first.focus()
             }
          } else {
-            this.pageLengthError =  (this.scan.pages.length > 25)
-            if ( this.pageLengthError) {
-               let tgtID = `pages`
-               let first = document.getElementById(tgtID)
-               if ( first ) {
-                  first.focus()
-               }
-            } else {
-               this.$emit("submitted")
-            }
+            this.$emit("submitted")
          }
 
       },

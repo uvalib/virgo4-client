@@ -82,7 +82,6 @@ export default {
    },
    computed: {
       ...mapState({
-         sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
          request: state => state.requests.openurl,
       }),
@@ -129,7 +128,7 @@ export default {
                first.focus()
             }
          } else {
-            this.pageLengthError =  (this.scan.pages.length > 25)
+            this.pageLengthError =  (this.pages.length > 25)
             if ( this.pageLengthError) {
                let tgtID = `pages`
                let first = document.getElementById(tgtID)

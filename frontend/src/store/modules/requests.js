@@ -56,8 +56,7 @@ const requests = {
          issn: "",
          oclc: "",
          bydate: "",
-         anylanguage: "",
-         altedition: "",
+         anylanguage: "false",
          citedin: "",
          notes: "",
          pickup: "",
@@ -98,17 +97,14 @@ const requests = {
             state.openurl.requestType = "Article"
             state.openurl.documentType = "Article"
             state.openurl.processType = "Borrowing"
-            state.openurl.status = "Awaiting Request Processing"
          } else if ( genre == "bookitem" || genre == "conference" || genre == "proceeding") {
             state.openurl.requestType = "Article"
             state.openurl.documentType = "BookChapter"
             state.openurl.processType = "Borrowing"
-            state.openurl.status = "Awaiting Request Processing"
          }  else  {
             state.openurl.requestType = "Loan"
             state.openurl.documentType = "Book"
             state.openurl.processType = "Borrowing"
-            state.openurl.status = "Awaiting Request Processing"
          }
       },
       activePanel(store, name) {
@@ -176,8 +172,7 @@ const requests = {
             issn: "",
             oclc: "",
             bydate: "",
-            anylanguage: "",
-            altedition: "",
+            anylanguage: "false",
             citedin: "",
             notes: "",
             pickup: "",
@@ -185,6 +180,15 @@ const requests = {
       }
    },
    actions: {
+      async submitOpenURLRequest(ctx) {
+         ctx.commit('disableButton', true)
+         await axios.post('/api/requests/openurl', ctx.state.openurl
+         ).catch(e =>
+            ctx.commit('system/setError', e, { root: true })
+         ).finally(()=>
+            ctx.commit('disableButton', false)
+         )
+      },
       async submitILLiadBorrowRequest(ctx, req) {
          ctx.commit('disableButton', true)
          await axios.post('/api/requests/standalone/borrow', req

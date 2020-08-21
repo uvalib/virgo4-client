@@ -444,27 +444,27 @@ func (svc *ServiceContext) ILLiadRequest(verb string, url string, data interface
 // ILSConnectorGet sends a GET request to the ILS connector and returns the response
 func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, httpClient *http.Client) ([]byte, *RequestError) {
 
-	logUrl := sanitizeUrl( url )
-	log.Printf("ILS Connector GET request: %s, timeout  %.0f sec", logUrl, httpClient.Timeout.Seconds())
+	logURL := sanitizeURL(url)
+	log.Printf("ILS Connector GET request: %s, timeout  %.0f sec", logURL, httpClient.Timeout.Seconds())
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
 
 	startTime := time.Now()
 	rawResp, rawErr := httpClient.Do(req)
-	resp, err := handleAPIResponse(logUrl, rawResp, rawErr)
+	resp, err := handleAPIResponse(logURL, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
 
 	if err != nil {
 		if shouldLogAsError(err.StatusCode) {
 			log.Printf("ERROR: Failed response from ILS GET %s - %d:%s. Elapsed Time: %d (ms)",
-				logUrl, err.StatusCode, err.Message, elapsedMS)
+				logURL, err.StatusCode, err.Message, elapsedMS)
 		} else {
 			log.Printf("INFO: Response from ILS GET %s - %d:%s. Elapsed Time: %d (ms)",
-				logUrl, err.StatusCode, err.Message, elapsedMS)
+				logURL, err.StatusCode, err.Message, elapsedMS)
 		}
 	} else {
-		log.Printf("Successful response from ILS GET %s. Elapsed Time: %d (ms)", logUrl, elapsedMS)
+		log.Printf("Successful response from ILS GET %s. Elapsed Time: %d (ms)", logURL, elapsedMS)
 	}
 	return resp, err
 }
@@ -565,16 +565,16 @@ func (svc *ServiceContext) SolrPost(query string, jsonReq interface{}) ([]byte, 
 	return resp, err
 }
 
-func handleAPIResponse(logUrl string, resp *http.Response, err error) ([]byte, *RequestError) {
+func handleAPIResponse(logURL string, resp *http.Response, err error) ([]byte, *RequestError) {
 	if err != nil {
 		status := http.StatusBadRequest
 		errMsg := err.Error()
 		if strings.Contains(err.Error(), "Timeout") {
 			status = http.StatusRequestTimeout
-			errMsg = fmt.Sprintf("%s timed out", logUrl)
+			errMsg = fmt.Sprintf("%s timed out", logURL)
 		} else if strings.Contains(err.Error(), "connection refused") {
 			status = http.StatusServiceUnavailable
-			errMsg = fmt.Sprintf("%s refused connection", logUrl)
+			errMsg = fmt.Sprintf("%s refused connection", logURL)
 		}
 		return nil, &RequestError{StatusCode: status, Message: errMsg}
 	} else if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
@@ -596,10 +596,10 @@ func shouldLogAsError(httpStatus int) bool {
 }
 
 // sanitize a url for logging by removing the customer PIN
-func sanitizeUrl( url string ) string {
+func sanitizeURL(url string) string {
 
 	// URL contains the user PIN
-	ix := strings.Index( url, "pin=" )
+	ix := strings.Index(url, "pin=")
 
 	// replace everything after
 	if ix >= 0 {

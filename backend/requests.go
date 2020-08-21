@@ -199,6 +199,91 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, illadResp)
 }
 
+// CreateOpenURLRequest will send an openURL request to ILLiad
+func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
+	var req struct {
+		RequestType string `json:"requestType"`
+		DocType     string `json:"documentType"`
+		ProcessType string `json:"processType"`
+		Title       string `json:"title"`
+		Article     string `json:"article"`
+		Author      string `json:"author"`
+		Publisher   string `json:"publisher"`
+		Edition     string `json:"edition"`
+		Volume      string `json:"volume"`
+		Issue       string `json:"issue"`
+		Month       string `json:"month"`
+		Year        string `json:"year"`
+		Pages       string `json:"pages"`
+		ISSN        string `json:"issn"`
+		OCLC        string `json:"oclc"`
+		ByDate      string `json:"bydate"`
+		AnyLanguage string `json:"anylanguage"`
+		CitedIn     string `json:"citedin"`
+		Notes       string `json:"notes"`
+		Pickup      string `json:"pickup"`
+	}
+
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: Unable to parse request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	v4Claims, error := getJWTClaims(c)
+	if error != nil {
+		log.Printf("ERROR: %s", error.Error())
+		c.String(http.StatusUnauthorized, error.Error())
+		return
+	}
+
+	log.Printf("Process OpenURL %s request from %s for '%s'", req.DocType, v4Claims.UserID, req.Title)
+	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: req.RequestType,
+		ProcessType: req.ProcessType, DocumentType: req.DocType,
+		TransactionStatus: "Awaiting Request Processing", NotWantedAfter: req.ByDate}
+	var openURLReq interface{}
+	if req.DocType == "Book" {
+		borrowReq := illiadBorrowRequest{illiadRequest: &illiadReq, LoanTitle: req.Title,
+			LoanAuthor: req.Author, LoanPublisher: req.Publisher, PhotoJournalVolume: req.Volume,
+			LoanDate: req.Year, LoanEdition: req.Edition, ISSN: req.ISSN, ESPNumber: req.OCLC,
+			CitedIn: req.CitedIn, ItemInfo4: illaidLibraryMapping(req.Pickup)}
+		if req.AnyLanguage == "true" {
+			borrowReq.AcceptNonEnglish = true
+		}
+		openURLReq = borrowReq
+	} else {
+		scanReq := illiadScanRequest{illiadRequest: &illiadReq, PhotoJournalTitle: req.Title,
+			PhotoArticleTitle: req.Article, PhotoArticleAuthor: req.Author,
+			PhotoJournalVolume: req.Volume, PhotoJournalIssue: req.Issue, PhotoJournalMonth: req.Month,
+			PhotoJournalYear: req.Year, PhotoJournalInclusivePages: req.Pages, ISSN: req.ISSN, ESPNumber: req.OCLC}
+		openURLReq = scanReq
+	}
+
+	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", openURLReq)
+	if illErr != nil {
+		log.Printf("WARN: Illiad Error: %s", illErr.Message)
+		c.JSON(illErr.StatusCode, "There was an error during your request. You may need to <a href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		return
+	}
+
+	// parse transaction number from response
+	var illadResp struct {
+		TransactionNumber int
+	}
+	json.Unmarshal([]byte(rawResp), &illadResp)
+
+	if req.Notes != "" {
+		noteReq := illiadNote{Note: req.Notes, NoteType: "Staff"}
+		_, illErr = svc.ILLiadRequest("POST", fmt.Sprintf("/transaction/%d/notes", illadResp.TransactionNumber), noteReq)
+		if illErr != nil {
+			log.Printf("WARN: unable to add note to OpenURL request %d: %s", illadResp.TransactionNumber, illErr.Message)
+		}
+	}
+
+	c.JSON(http.StatusOK, illadResp)
+}
+
 // CreateStandaloneScan send a request for a standalone scan to ILLiad
 func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	var req struct {

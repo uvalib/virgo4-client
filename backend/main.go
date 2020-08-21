@@ -113,6 +113,7 @@ func main() {
 		api.POST("/requests/scan", svc.AuthMiddleware, svc.CreateScan)
 		api.POST("/requests/standalone/scan", svc.AuthMiddleware, svc.CreateStandaloneScan)
 		api.POST("/requests/standalone/borrow", svc.AuthMiddleware, svc.CreateBorrowRequest)
+		api.POST("/requests/openurl", svc.AuthMiddleware, svc.CreateOpenURLRequest)
 
 		api.POST("/reserves", svc.AuthMiddleware, svc.CreateCourseReserves)
 		api.POST("/reserves/validate", svc.AuthMiddleware, svc.ValidateCourseReserves)
