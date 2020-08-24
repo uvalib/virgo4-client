@@ -328,25 +328,38 @@ export default {
       },
 
       async searchClicked() {
+         // grab the current url as an object
+         let priorQ = Object.assign({}, this.$route.query)
+         let targetPool = this.tgtPoolPref
+
+
+         let setPoolParam = true
          if ( this.basicSearchScope.id == "all") {
-            this.$store.commit("query/setTargetPool", this.tgtPoolPref)
+            this.$store.commit("query/setTargetPool", targetPool)
             this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
          } else {
-            this.$store.commit("query/setTargetPool", this.basicSearchScope.id)
+            targetPool = this.basicSearchScope.id
+            setPoolParam = false
+            this.$store.commit("query/setTargetPool", targetPool)
             this.$store.commit("query/setExcludePreferences", [])
          }
+
+         // get the query as a URL encoded string (including mode and excluded pools
+         // which were set above). This is the basis for the new search URL
+         let qp =  this.queryURLParams
 
          // Refine search updates:
          // if pool, filter or sort were specified previously, preserve them in the URL.
          // a new search will always reset paging, so don't preserve that
-         let priorQ = Object.assign({}, this.$route.query)
-         let qp =  this.queryURLParams
-         if (priorQ.pool) {
+         if (priorQ.pool && setPoolParam ) {
             qp += `&pool=${priorQ.pool}`
             this.$store.commit("query/setTargetPool", priorQ.pool)
          }
-         if (priorQ.filter) {
-            qp += `&filter=${priorQ.filter}`
+         if (targetPool != "") {
+            // grab current query string for the selected pool straight from the model.
+            // cant rely on preserving prior filter string as the target pool may have changed
+            // by the user selecting one from the dropdown
+            qp += this.filterQueryString(targetPool)
          }
          if (priorQ.sort) {
             qp += `&sort=${priorQ.sort}`
