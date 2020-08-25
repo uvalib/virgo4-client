@@ -83,7 +83,18 @@ export default new Vuex.Store({
    mutations: {
       updateField,
       hitSelected(state, identifier) {
-         state.selectedHitIdx = state.results[state.selectedResultsIdx].hits.findIndex( h => h.identifier == identifier)
+         state.selectedHitIdx = -1
+         state.results[state.selectedResultsIdx].hits.some( (h,idx) => {
+            if (h.identifier == identifier) {
+               state.selectedHitIdx = idx
+            } else if ( h.grouped == true) {
+               let gIdx = h.group.findIndex( g => g.identifier == identifier)
+               if ( gIdx > -1 ) {
+                  state.selectedHitIdx = idx
+               }
+            }
+            return state.selectedHitIdx != -1
+          })
       },
       setAutoExpandGroupID(state, id) {
          state.autoExpandGroupID = id
