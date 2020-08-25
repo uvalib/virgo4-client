@@ -1,13 +1,12 @@
 <template>
    <div class="details">
       <h1>
-         <V4Button mode="tertiary" class="paging" :class="{disabled: !prevHitAvailable}" @click="priorHitClicked">
-            <span class="btn-label">Prior</span>
-         </V4Button>
-         <span>Item Details</span>
-         <V4Button mode="tertiary" class="paging" :class="{disabled: !nextHitAvailable}" @click="nextHitClicked">
-            <span class="btn-label">Next</span>
-         </V4Button>
+         <span v-if="selectedHitIdx > -1" class="hidden-spacer"></span>
+         <span class="title">Item Details</span>
+         <V4Pager v-if="selectedHitIdx > -1" :total="selectedResults.total" :page="selectedHitIdx+1"
+            :prevAvailable="prevHitAvailable" :nextAvailable="nextHitAvailable"
+            @next="nextHitClicked" @prior="priorHitClicked"
+         />
       </h1>
       <div class="details-content">
          <div class="working" v-if="details.searching" >
@@ -137,6 +136,7 @@ import DownloadProgress from '@/components/modals/DownloadProgress'
 import V4DownloadButton from '@/components/V4DownloadButton'
 import TruncatedText from '@/components/TruncatedText'
 import V4LinksList from '@/components/V4LinksList'
+import V4Pager from '@/components/V4Pager'
 
 export default {
    name: "sources",
@@ -159,7 +159,7 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable, DownloadProgress, TruncatedText,
+      SearchHitHeader, AvailabilityTable, DownloadProgress, TruncatedText,V4Pager,
       ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList
    },
    computed: {
@@ -186,7 +186,8 @@ export default {
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
          prevHitAvailable: 'prevHitAvailable',
-         selectedHitIdentifier: 'selectedHitIdentifier'
+         selectedHitIdentifier: 'selectedHitIdentifier',
+         selectedResults: 'selectedResults'
       }),
       hasEmbeddedMedia() {
          return this.details.embeddedMedia.length > 0
@@ -326,11 +327,14 @@ export default {
    h1 {
       display: flex;
       flex-flow: row wrap;
-      justify-content: space-between;
+      justify-content: center;
       padding: 0px 10px 5px 10px;
-      .paging {
-         font-size: 0.5em;
-         margin: 0;
+      .hidden-spacer, .v4-pager {
+         flex:1;
+      }
+      span.title {
+         display: inline-block;
+         margin: 0 10px;
       }
    }
 
