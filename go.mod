@@ -11,10 +11,10 @@ require (
 	github.com/google/go-querystring v1.0.0
 	github.com/lib/pq v1.8.0
 	github.com/mitchellh/mapstructure v1.3.3
-	github.com/prometheus/common v0.11.1 // indirect
+	github.com/prometheus/common v0.13.0 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/uvalib/virgo4-jwt v0.0.0-20200812155832-7443daa580fd
 	github.com/zsais/go-gin-prometheus v0.1.0
-	golang.org/x/sys v0.0.0-20200812155832-6a926be9bd1d // indirect
+	golang.org/x/sys v0.0.0-20200824131525-c12d262b63d8 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 )

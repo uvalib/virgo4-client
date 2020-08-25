@@ -34,11 +34,31 @@ export default new Vuex.Store({
       total: -1,
       autoExpandGroupID: "",
       selectedResultsIdx: -1,
+      selectedHitIdx: -1,
       otherSrcSelection: { id: "", name: "" }
    },
 
    getters: {
       getField,
+      selectedHitIdentifier: state => {
+         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
+            return ""
+         }
+         return state.results[state.selectedResultsIdx].hits[state.selectedHitIdx].identifier
+      },
+      nextHitAvailable: state => {
+         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
+            return false
+         }
+         let tgtResults = state.results[state.selectedResultsIdx]
+         return state.selectedHitIdx < tgtResults.total-1
+      },
+      prevHitAvailable: state => {
+         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
+            return false
+         }
+         return state.selectedHitIdx > 0
+      },
       hasResults: state => {
          return state.total >= 0
       },
@@ -62,6 +82,9 @@ export default new Vuex.Store({
 
    mutations: {
       updateField,
+      hitSelected(state, identifier) {
+         state.selectedHitIdx = state.results[state.selectedResultsIdx].hits.findIndex( h => h.identifier == identifier)
+      },
       setAutoExpandGroupID(state, id) {
          state.autoExpandGroupID = id
       },
@@ -243,6 +266,26 @@ export default new Vuex.Store({
       moreResults(ctx) {
          ctx.commit('incrementPage')
          return ctx.dispatch("searchSelectedPool")
+      },
+      async nextHit(ctx) {
+         if ( ctx.state.selectedHitIdx == -1 || ctx.state.selectedResultsIdx == -1 ) return
+
+         let tgtResults = ctx.state.results[ctx.state.selectedResultsIdx]
+         if (ctx.state.selectedHitIdx == tgtResults.total-1) return
+
+         if ( ctx.state.selectedHitIdx == tgtResults.hits.length-1) {
+            ctx.commit( "item/clearDetails", null, {root:true})
+            await ctx.dispatch( "moreResults")
+         }
+
+         // NOTE this skips groups
+         ctx.state.selectedHitIdx++
+
+      },
+      async priorHit(ctx) {
+         if ( ctx.state.selectedHitIdx <= 0) return
+         // Note: this skips groups
+         ctx.state.selectedHitIdx--
       },
 
       // Search ALL configured pools. This is the initial search call using only the basic or

@@ -72,6 +72,7 @@ export default {
    },
    methods: {
       detailClicked() {
+         this.$store.commit("hitSelected", this.hit.identifier)
          this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
       },
    }
@@ -79,8 +80,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.header-wrapper {
-}
 
 .title-wrapper {
    text-align: left;

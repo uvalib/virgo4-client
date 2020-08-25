@@ -1,6 +1,14 @@
 <template>
    <div class="details">
-      <h1>Item Details</h1>
+      <h1>
+         <V4Button mode="tertiary" class="paging" :class="{disabled: !prevHitAvailable}" @click="priorHitClicked">
+            <span class="btn-label">Prior</span>
+         </V4Button>
+         <span>Item Details</span>
+         <V4Button mode="tertiary" class="paging" :class="{disabled: !nextHitAvailable}" @click="nextHitClicked">
+            <span class="btn-label">Next</span>
+         </V4Button>
+      </h1>
       <div class="details-content">
          <div class="working" v-if="details.searching" >
             <V4Spinner message="Looking up details..."/>
@@ -166,7 +174,8 @@ export default {
          googleBooksURL : state => state.item.googleBooksURL,
          activeRequest: state => state.restore.activeRequest,
          citationsURL: state => state.system.citationsURL,
-         pools: state => state.pools.list
+         pools: state => state.pools.list,
+         selectedHitIdx: state=> state.selectedHitIdx,
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
@@ -175,6 +184,9 @@ export default {
          isUVA: 'pools/isUVA',
          hasExternalHoldings: 'pools/hasExternalHoldings',
          poolDetails: 'pools/poolDetails',
+         nextHitAvailable: 'nextHitAvailable',
+         prevHitAvailable: 'prevHitAvailable',
+         selectedHitIdentifier: 'selectedHitIdentifier'
       }),
       hasEmbeddedMedia() {
          return this.details.embeddedMedia.length > 0
@@ -232,6 +244,20 @@ export default {
       }
    },
    methods: {
+      async nextHitClicked() {
+         await this.$store.dispatch("nextHit")
+         let url = this.$route.fullPath
+         let lastSlash = url.lastIndexOf("/")
+         url = url.substring(0,lastSlash )+"/"+this.selectedHitIdentifier
+         this.$router.push(url)
+      },
+      async priorHitClicked() {
+         await this.$store.dispatch("priorHit")
+         let url = this.$route.fullPath
+         let lastSlash = url.lastIndexOf("/")
+         url = url.substring(0,lastSlash )+"/"+this.selectedHitIdentifier
+         this.$router.push(url)
+      },
       copyrightIconSrc( info ) {
          let details = this.poolDetails(this.details.source)
          return details.url+info.icon
@@ -296,6 +322,17 @@ export default {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
+
+   h1 {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-between;
+      padding: 0px 10px 5px 10px;
+      .paging {
+         font-size: 0.5em;
+         margin: 0;
+      }
+   }
 
    .ext-warn {
       margin: 20px 10px 0 10px;
