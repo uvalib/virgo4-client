@@ -20,6 +20,7 @@
          </template>
          <template v-else>
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
+            <abbr class="unapi-id" :title="itemURL"></abbr>
             <div class="info">
                <div v-if="hasExternalHoldings(details.source)" class="ext-warn">
                   This resource is not held by UVA Libraries,
@@ -163,12 +164,6 @@ export default {
       ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList
    },
    computed: {
-      risURL() {
-         if (this.citationsURL == "") return ""
-         let poolObj = this.pools.find( p => p.id == this.details.source)
-         let itemURL = `${poolObj.url}/api/resource/${this.details.identifier}`
-         return `${this.citationsURL}/format/ris?item=${encodeURI(itemURL)}`
-      },
       ...mapState({
          details : state => state.item.details,
          googleBooksURL : state => state.item.googleBooksURL,
@@ -189,6 +184,14 @@ export default {
          selectedHitIdentifier: 'selectedHitIdentifier',
          selectedResults: 'selectedResults'
       }),
+      itemURL() {
+         let poolObj = this.pools.find( p => p.id == this.details.source)
+         return `${poolObj.url}/api/resource/${this.details.identifier}`
+      },
+      risURL() {
+         if (this.citationsURL == "") return ""
+         return `${this.citationsURL}/format/ris?item=${encodeURI(this.itemURL)}`
+      },
       hasEmbeddedMedia() {
          return this.details.embeddedMedia.length > 0
       },
@@ -312,10 +315,35 @@ export default {
          }
          return 300
       },
+      zoteroItemUpdated() {
+         // add unapi URL to document header for Zotero, if not already present
+         let unapiID = 'unapi'
+         if (!document.getElementById(unapiID)) {
+            let unapiURL = this.citationsURL + '/unapi'
+            var link = document.createElement('link')
+            link.id = unapiID
+            link.rel = 'unapi-server'
+            link.type = 'application/xml'
+            link.title = 'unAPI'
+            link.href = unapiURL
+            document.head.appendChild(link)
+            //console.log(`[zotero] created link tag with url: [${unapiURL}]`)
+         }
+
+         // notify zotero connector of an item change
+         document.dispatchEvent(new Event('ZoteroItemUpdated', {
+            bubbles: true,
+            cancelable: true
+         }))
+         //console.log(`[zotero] dispatched item updated event`)
+      },
    },
    created() {
       this.getDetails()
    },
+   updated() {
+      this.zoteroItemUpdated()
+   }
 }
 </script>
 <style lang="scss" scoped>
