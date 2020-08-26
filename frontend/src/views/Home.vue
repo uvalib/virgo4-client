@@ -337,38 +337,39 @@ export default {
       },
 
       async searchClicked() {
-         // grab the current url as an object
-         let priorQ = Object.assign({}, this.$route.query)
-         let targetPool = this.tgtPoolPref
-
-
-         let setPoolParam = true
+         let skipPoolParam = false
+         let tgtPool = this.tgtPoolPref
          if ( this.basicSearchScope.id == "all") {
-            this.$store.commit("query/setTargetPool", targetPool)
+            this.$store.commit("query/setTargetPool", tgtPool)
             this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
          } else {
-            targetPool = this.basicSearchScope.id
-            setPoolParam = false
-            this.$store.commit("query/setTargetPool", targetPool)
+            tgtPool = this.basicSearchScope.id
+            this.$store.commit("query/setTargetPool",  tgtPool)
             this.$store.commit("query/setExcludePreferences", [])
+            skipPoolParam = true
          }
-
-         // get the query as a URL encoded string (including mode and excluded pools
-         // which were set above). This is the basis for the new search URL
-         let qp =  this.queryURLParams
 
          // Refine search updates:
          // if pool, filter or sort were specified previously, preserve them in the URL.
          // a new search will always reset paging, so don't preserve that
-         if (priorQ.pool && setPoolParam ) {
+         let priorQ = Object.assign({}, this.$route.query)
+         let qp = this.queryURLParams
+         if (priorQ.pool && skipPoolParam==false) {
             qp += `&pool=${priorQ.pool}`
             this.$store.commit("query/setTargetPool", priorQ.pool)
+         } else {
+            qp += `&pool=${tgtPool}`
+            this.$store.commit("query/setTargetPool", tgtPool)
          }
-         if (targetPool != "") {
+         if (tgtPool != "") {
             // grab current query string for the selected pool straight from the model.
             // cant rely on preserving prior filter string as the target pool may have changed
             // by the user selecting one from the dropdown
-            qp += this.filterQueryString(targetPool)
+            qp += this.filterQueryString(tgtPool)
+         } else {
+            if (priorQ.filter) {
+               qp += `&filter=${priorQ.filter}`
+            }
          }
          if (priorQ.sort) {
             qp += `&sort=${priorQ.sort}`
