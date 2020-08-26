@@ -200,6 +200,7 @@ export default {
                this.errors.push(key)
             }
          }
+         console.log(this.errors)
          if (this.errors.length > 0) {
             let tgtID = this.errors[0]
             if (tgtID == "anyLanguage") {
@@ -217,8 +218,8 @@ export default {
                   first.focus()
                }
             } else {
-               // await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
-               // this.$emit('submitted')
+               await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
+               this.$emit('submitted')
             }
          }
       },
