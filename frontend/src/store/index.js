@@ -85,6 +85,8 @@ export default new Vuex.Store({
       updateField,
       hitSelected(state, identifier) {
          state.selectedHitIdx = -1
+         if ( state.selectedResultsIdx == -1) return
+
          state.results[state.selectedResultsIdx].hits.some( (h,idx) => {
             if (h.identifier == identifier) {
                state.selectedHitIdx = idx
