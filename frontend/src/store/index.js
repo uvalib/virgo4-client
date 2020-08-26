@@ -364,7 +364,7 @@ export default new Vuex.Store({
             commit('setSearching', false)
 
             dispatch("searches/updateHistory")
-            return dispatch("filters/getSelectedResultFacets")
+            return dispatch("filters/getSelectedResultFacets", true)
          } catch (error) {
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
@@ -413,7 +413,7 @@ export default new Vuex.Store({
             }
 
             dispatch("searches/updateHistory")
-            return dispatch("filters/getSelectedResultFacets")
+            return dispatch("filters/getSelectedResultFacets", true)
          } catch (error) {
             console.error("SINGLE POOL SEARCH FAILED: " + error)
             commit('setSearching', false)
@@ -437,7 +437,7 @@ export default new Vuex.Store({
             }
             ctx.commit('selectPoolResults', resultIdx)
             ctx.commit('sort/setActivePool', ctx.state.results[ctx.state.selectedResultsIdx].pool.id)
-            await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
+            await ctx.dispatch("filters/getSelectedResultFacets", false, { root: true })
          }
       },
    },
