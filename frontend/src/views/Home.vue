@@ -157,6 +157,7 @@ export default {
         basicSearchScope: 'query.basicSearchScope',
         basic: 'query.basic',
         userSearched: 'query.userSearched',
+        lastSearchScrollPosition: 'lastSearchScrollPosition'
       }),
       searchScopes() {
         let out = [{name: 'All Resource Types', id: 'all'}]
@@ -258,6 +259,14 @@ export default {
                this.$store.commit("resetSearchResults")
                await this.$store.dispatch("searchAllPools")
                this.$store.commit('setSearching', false)
+            }
+
+            if ( this.lastSearchScrollPosition > 0) {
+               window.scrollBy({
+                  top: this.lastSearchScrollPosition,
+                  behavior: "auto"
+               })
+               this.lastSearchScrollPosition = 0
             }
          }
       },

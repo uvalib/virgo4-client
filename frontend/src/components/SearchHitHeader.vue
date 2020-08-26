@@ -9,7 +9,7 @@
                <span class="hit-title" v-html="hit.header.title"></span>
                <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
             </template>
-            <router-link @click.native="detailClicked" v-else :to="detailsURL">
+            <router-link @mousedown.native="detailClicked" v-else :to="detailsURL">
                <span class="hit-title" v-html="hit.header.title"></span>
                <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
             </router-link>
