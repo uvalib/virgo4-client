@@ -52,12 +52,13 @@ type RequestOption struct {
 
 // ItemOption is a selectable item in a RequestOption
 type ItemOption struct {
-	Label    string `json:"label"`
-	Barcode  string `json:"barcode"`
-	SCNotes  string `json:"notes"`
-	Library  string `json:"library"`
-	Location string `json:"location"`
-	Notice   string `json:"notice"`
+	Label      string `json:"label"`
+	Barcode    string `json:"barcode"`
+	SCNotes    string `json:"notes"`
+	Library    string `json:"library"`
+	Location   string `json:"location"`
+	LocationID string `json:"location_id"`
+	Notice     string `json:"notice"`
 }
 
 // SolrResponse container
