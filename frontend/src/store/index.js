@@ -36,6 +36,7 @@ export default new Vuex.Store({
       selectedResultsIdx: -1,
       selectedHitIdx: -1,
       lastSearchScrollPosition: 0,
+      lastSearchURL: "",
       otherSrcSelection: { id: "", name: "" }
    },
 
@@ -100,6 +101,7 @@ export default new Vuex.Store({
           })
           if ( state.selectedHitIdx != -1 ) {
              state.lastSearchScrollPosition = window.scrollY
+             state.lastSearchURL = router.currentRoute.fullPath
           }
       },
       setAutoExpandGroupID(state, id) {
@@ -269,10 +271,15 @@ export default new Vuex.Store({
          state.results.splice(0, state.results.length)
          state.total = -1
          state.lastSearchScrollPosition = 0
+         state.lastSearchURL = ""
          state.selectedHitIdx = -1
          state.selectedResultsIdx = -1
          state.otherSrcSelection = { id: "", name: "" }
       },
+      clearLastSearch(state) {
+         state.lastSearchScrollPosition = 0
+         state.lastSearchURL = ""
+      }
    },
 
    actions: {

@@ -1,13 +1,18 @@
 <template>
    <div class="details">
-      <h1>
-         <span v-if="selectedHitIdx > -1" class="hidden-spacer"></span>
-         <span class="title">Item Details</span>
-         <V4Pager v-if="selectedHitIdx > -1" :total="selectedResults.total" :page="selectedHitIdx+1"
-            :prevAvailable="prevHitAvailable" :nextAvailable="nextHitAvailable"
-            @next="nextHitClicked" @prior="priorHitClicked"
-         />
-      </h1>
+      <div class="detail-header">
+         <span v-if="selectedHitIdx > -1 && selectedResults.total > 1" class="hidden-spacer"></span>
+         <h1>Item Details</h1>
+         <span class="paging" v-if="selectedHitIdx > -1">
+            <V4Pager :total="selectedResults.total" :page="selectedHitIdx+1"
+               :prevAvailable="prevHitAvailable" :nextAvailable="nextHitAvailable"
+               @next="nextHitClicked" @prior="priorHitClicked"
+            />
+            <div class="back">
+               <V4Button mode="text" @click="returnToSearch">Return to search results</V4Button>
+            </div>
+         </span>
+      </div>
       <div class="details-content">
          <div class="working" v-if="details.searching" >
             <V4Spinner message="Looking up details..."/>
@@ -171,6 +176,7 @@ export default {
          citationsURL: state => state.system.citationsURL,
          pools: state => state.pools.list,
          selectedHitIdx: state=> state.selectedHitIdx,
+         lastSearchURL: state => state.lastSearchURL,
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
@@ -248,6 +254,10 @@ export default {
       }
    },
    methods: {
+      returnToSearch() {
+         this.$router.push( this.lastSearchURL )
+      },
+
       async nextHitClicked() {
          await this.$store.dispatch("nextHit")
          let url = this.$route.fullPath
@@ -282,7 +292,6 @@ export default {
 
          if (src) {
             this.$store.dispatch("item/getDetails", {source:src, identifier:id})
-            this.$store.commit("hitSelected", id)
          } else {
             this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }
@@ -353,17 +362,32 @@ export default {
    margin-top: 2vw;
    color: var(--color-primary-text);
 
-   h1 {
+   dl.fields {
+      grid-template-columns: 1fr 2fr;
+      dt.label {
+         white-space: normal;
+      }
+   }
+
+   .detail-header {
       display: flex;
       flex-flow: row wrap;
       justify-content: center;
-      padding: 0px 10px 5px 10px;
-      .hidden-spacer, .v4-pager {
+      align-content: center;
+      padding-bottom: 15px;
+      .hidden-spacer, .paging {
          flex:1;
       }
-      span.title {
-         display: inline-block;
-         margin: 0 10px;
+      .paging {
+         flex: 1;
+         display: flex;
+         flex-flow: column;
+         justify-content: flex-end;
+         margin: 0 15px;
+      }
+      .back {
+         text-align: right;
+         margin: 5px 0;
       }
    }
 

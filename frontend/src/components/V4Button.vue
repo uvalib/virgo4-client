@@ -6,7 +6,7 @@
                'link-button': mode=='link',
                'pure-button': isButton,
                'pure-button-primary': mode == 'primary',
-               'pure-button-secondary': mode == 'secondary',
+               'pure-button-small': mode == 'small',
                'pure-button-tertiary': mode == 'tertiary'}"
       @click.prevent.stop="clicked" @keyup.stop.prevent @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked" @keyup.stop.esc="escClicked">
       <slot></slot>
@@ -114,7 +114,7 @@ button.v4-button.icon-button {
       @include be-accessible();
    }
 }
-.pure-button.pure-button-primary {
+.pure-button.pure-button-primary, .pure-button.pure-button-small {
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
    &:hover {
@@ -124,13 +124,6 @@ button.v4-button.icon-button {
    }
 }
 
-.pure-button.pure-button-secondary {
-   background-color: var(--uvalib-brand-blue-lighter);
-   color: black;
-}
-.pure-button.pure-button-secondary:hover {
-   background-color: var(--uvalib-brand-blue-lightest);
-}
 .pure-button.pure-button-tertiary {
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey);
@@ -140,7 +133,7 @@ button.v4-button.icon-button {
    background-color: var(--uvalib-grey-light);
 }
 .pure-button.pure-button-primary,
-.pure-button.pure-button-secondary,
+.pure-button.pure-button-small,
 .pure-button.pure-button-tertiary {
    margin: 0 0 5px 10px;
    border-radius: 5px;

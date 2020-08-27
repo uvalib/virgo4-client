@@ -1,14 +1,14 @@
 <template>
    <span class=v4-pager>
-      <button :disabled="!prevAvailable"  :class="{disabled: !prevAvailable}"  @click="$emit('prior')" aria-label="previous result">
+      <V4Button mode="small" :disabled="!prevAvailable"  @click="$emit('prior')" aria-label="previous result">
          <i class="fas fa-arrow-left"></i>
-      </button>
+      </V4Button>
       <span class="page-info">
          {{formatNum(page)}} of {{formatNum(total)}}
       </span>
-      <button :disabled="!nextAvailable"  :class="{disabled: !nextAvailable}" @click="$emit('next')" aria-label="next result">
+      <V4Button mode="small"  :disabled="!nextAvailable" @click="$emit('next')" aria-label="next result">
          <i class="fas fa-arrow-right"></i>
-      </button>
+      </V4Button>
    </span>
 </template>
 
@@ -54,15 +54,14 @@ export default {
    color: var( --uvalib-text);
    margin: 0, 5px;
    .page-info {
-      margin: 0 5px;
-      font-size: 14px;
+      margin: 0 10px;
+      font-size: 12px;
    }
-   button {
-      padding: 2px 10px;
-   }
-   button.disabled {
-      opacity: 0.6;
-      cursor: default;
+   .v4-button {
+      padding: 4px 12px;
+      color: white;
+      border-radius: 5px;
+      font-weight: normal;
    }
 }
 </style>
