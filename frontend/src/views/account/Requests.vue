@@ -20,6 +20,9 @@
             <div v-else class="subcontent">
                <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
             </div>
+            <div class="subcontent links">
+               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+            </div>
             <h2>Outstanding Requests</h2>
             <div class="subcontent">
                <template v-if="lookingUp == false && requests.holds.length > 0">
@@ -283,19 +286,22 @@ export default {
    text-align: left;
 
    h2 {
-      margin: 0 0 5px 0;
+      margin: 10px 0 5px 0;
       font-size: 1.25em;
       border-bottom: 1px solid;
    }
    .subcontent {
-      margin-bottom: 20px;
+      margin-bottom: 0px;
       padding: 10px;
+   }
+   .subcontent.links {
+      padding-top: 0;
    }
 
    .subcontent.buttons {
       display: flex;
       flex-flow: row wrap;
-      justify-content: center;
+      justify-content: flex-start;
       align-content: center;
       button.v4-button.pure-button-primary {
          margin:0 10px 10px 0;
