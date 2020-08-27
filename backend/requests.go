@@ -322,16 +322,27 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	}
 
 	log.Printf("Process standalone %s scan request from %s for  '%s'", req.ScanType, v4Claims.UserID, req.Title)
-	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", NotWantedAfter: req.DateNeeded}
-	scanReq := illiadScanRequest{illiadRequest: &illiadReq, PhotoArticleAuthor: req.Author, PhotoJournalVolume: req.Volume,
-		PhotoJournalIssue: req.Issue, PhotoJournalMonth: req.Month, PhotoJournalYear: req.Year,
-		PhotoJournalInclusivePages: req.Pages, ISSN: req.ISSN, ESPNumber: req.OCLC,
+	illiadReq := illiadRequest{
+		Username:          v4Claims.UserID,
+		RequestType:       "Article",
+		NotWantedAfter:    req.DateNeeded,
+		TransactionStatus: "Standalone Form Scan Request",
+	}
+	scanReq := illiadScanRequest{
+		illiadRequest:              &illiadReq,
+		PhotoArticleAuthor:         req.Author,
+		PhotoJournalVolume:         req.Volume,
+		PhotoJournalIssue:          req.Issue,
+		PhotoJournalMonth:          req.Month,
+		PhotoJournalYear:           req.Year,
+		PhotoJournalInclusivePages: req.Pages,
+		ISSN:                       req.ISSN,
+		ESPNumber:                  req.OCLC,
 	}
 	note := ""
 	if req.ScanType == "INSTRUCTIONAL" {
 		illiadReq.ProcessType = "DocDel"
 		illiadReq.DocumentType = "Collab"
-		illiadReq.TransactionStatus = "Awaiting DD Scanning Processing"
 		scanReq.PhotoJournalTitle = req.Work
 		scanReq.PhotoArticleTitle = req.Title
 		note = req.Course
@@ -342,7 +353,6 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 			scanReq.Location = "Personal Copy"
 		}
 	} else {
-		illiadReq.TransactionStatus = "Awaiting Request Processing"
 		illiadReq.ProcessType = "Borrowing"
 		illiadReq.DocumentType = req.DocType
 		scanReq.PhotoJournalTitle = req.Title
@@ -411,9 +421,15 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 
 	// First, attempt the ILLiad POST... convert into required structure
 	log.Printf("Process scan request from %s for barcode %s", v4Claims.UserID, scanReq.ItemBarcode)
-	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Article", ProcessType: "DocDel",
-		DocumentType: scanReq.IlliadType}
-	illiadScanReq := illiadScanRequest{illiadRequest: &illiadReq,
+	illiadReq := illiadRequest{
+		Username:          v4Claims.UserID,
+		RequestType:       "Article",
+		ProcessType:       "DocDel",
+		TransactionStatus: "No Hold Scan Request",
+		DocumentType:      scanReq.IlliadType,
+	}
+	illiadScanReq := illiadScanRequest{
+		illiadRequest:              &illiadReq,
 		PhotoJournalTitle:          scanReq.Title,
 		PhotoArticleTitle:          scanReq.Chapter,
 		PhotoArticleAuthor:         scanReq.Author,
@@ -426,11 +442,6 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		CallNumber:                 scanReq.CallNumber,
 		// Library needs to go in the illiad location field
 		Location: scanReq.Library,
-	}
-	if scanReq.IlliadType == "Article" {
-		illiadScanReq.TransactionStatus = "Awaiting Document Delivery Processing"
-	} else {
-		illiadScanReq.TransactionStatus = "Awaiting Collab Processing"
 	}
 
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illiadScanReq)
@@ -458,7 +469,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 
 	// Only make a hold for certain libraries
 	makeHold := false
-	for _, holdLoc := range []string{"BY-REQUEST", "STACKS"} {
+	for _, holdLoc := range []string{"BY-REQUEST", "STACKS", "OVERSIZE"} {
 		if scanReq.Location == holdLoc {
 			log.Printf("Making hold for %s", scanReq.ItemBarcode)
 			makeHold = true
@@ -499,10 +510,18 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		moveReq := illiadMove{Status: "Virgo Hold Error"}
 		_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", illiadResp.TransactionNumber), moveReq)
 		if qErr != nil {
-			log.Printf("WARN: unable to add note to scan %d: %s", illiadResp.TransactionNumber, qErr.Message)
+			log.Printf("WARN: unable to update scan status %d: %s", illiadResp.TransactionNumber, qErr.Message)
 		}
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
+	}
+
+	// Update Illiad status after successful hold
+	type illiadMove struct{ Status string }
+	moveReq := illiadMove{Status: "Scan Request - Hold Placed"}
+	_, qErr := svc.ILLiadRequest("PUT", fmt.Sprintf("/transaction/%d/route", illiadResp.TransactionNumber), moveReq)
+	if qErr != nil {
+		log.Printf("WARN: unable to update scan status %d: %s", illiadResp.TransactionNumber, qErr.Message)
 	}
 
 	//TODO: update illiad with the actual hold barcode if necessary

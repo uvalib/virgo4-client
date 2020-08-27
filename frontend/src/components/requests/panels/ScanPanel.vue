@@ -90,7 +90,7 @@ export default {
       selectedItem(newVal, _oldVal) {
          this.scan.barcode = newVal.barcode
          this.scan.library = newVal.library
-         this.scan.location = newVal.location
+         this.scan.location = newVal.location_id
          this.scan.callNumber = newVal.label
       }
    },
