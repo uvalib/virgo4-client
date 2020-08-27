@@ -27,7 +27,7 @@
                      <div class="controls">
                         <span class="sort">
                            <label>Sort by</label>
-                           <select :value="checkoutsOrder" @change="sortChanged" ref="uvasort"> 
+                           <select :value="checkoutsOrder" @change="sortChanged" ref="uvasort">
                               <option value="AUTHOR_ASC">Author (Ascending)</option>
                               <option value="AUTHOR_DESC">Author (Decending)</option>
                               <option value="TITLE_ASC">Title (Ascending)</option>
@@ -39,7 +39,12 @@
                      <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
                         <h3 class="item-title">
                            <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
-                           {{co.title}}
+                           <template v-if="co.id">
+                              <router-link :to="`/catalog/u${co.id}`">{{co.title}}</router-link>
+                           </template>
+                           <template v-else>
+                              {{co.title}}
+                           </template>
                         </h3>
                         <dl>
                         <dt>Author:</dt>
@@ -55,7 +60,7 @@
                            {{co.message}}
                         </div>
                         <div class="renewbar">
-                           <V4Button v-if="!isBarred" mode="primary" 
+                           <V4Button v-if="!isBarred" mode="primary"
                               @click="renewItem(co.barcode)" class="renew"
                               :aria-label="`renew ${co.title}`"
                            >
@@ -167,12 +172,12 @@ export default {
       this.lookingUpILL = true
       this.lookingUpUVA = true
       await this.$store.dispatch("user/getRequests")
-      this.lookingUpILL = false 
+      this.lookingUpILL = false
 
       await this.$store.dispatch("user/getCheckouts")
       this.lookingUpUVA = false
 
-      setTimeout(()=> { 
+      setTimeout(()=> {
          document.getElementById("checkouts-submenu").focus()
       }, 250)
    }
@@ -221,7 +226,7 @@ export default {
       text-align: left;
    }
 }
-   
+
 .checkout-list {
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey-light);
@@ -259,7 +264,7 @@ export default {
       box-shadow: $v4-box-shadow-light;
 
       h3 {
-         margin: 0 0 15px 0; 
+         margin: 0 0 15px 0;
          padding: 10px;
          border-bottom: 2px solid var(--uvalib-grey-light);
       }
