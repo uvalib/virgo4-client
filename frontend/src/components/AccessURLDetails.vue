@@ -3,7 +3,7 @@
       <template v-for="(p,idx) in urls">
          <div class='provider' :key="idx">
             <template v-if="p.links.length==1">
-               <a :href="p.links[0].url" target='_blank'
+               <a class="link-button" :href="p.links[0].url" target='_blank'
                   :aria-label="`access ${title} online with ${providerLabel(p.provider)}`"
                >
                   {{ providerLabel(p.provider) }}
@@ -100,12 +100,30 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .header.full {
    text-align: left;
    border-bottom: 1px solid var(--color-brand-blue);
    border-top: 1px solid var(--color-brand-blue);
    margin-bottom: 10px;
+}
+.provider {
+   a.link-button {
+      background-color: var(--uvalib-brand-blue-light);
+      border: 1px solid var(--uvalib-brand-blue-light);
+      color: white !important;
+      padding: .5em 1em;
+      border-radius: 5px;
+      display: inline-block;
+  margin: 0px 5px 5px 0 ;
+
+      &:hover {
+         background-color: var(--uvalib-brand-blue-lighter);
+         border: 1px solid var(--uvalib-brand-blue-lighter);
+         transition: all 0.3s ease;
+         text-decoration: none !important;
+      }
+   }
 }
 span.sep {
    margin: 0 5px;
