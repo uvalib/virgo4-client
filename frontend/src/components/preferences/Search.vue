@@ -1,18 +1,6 @@
 <template>
    <div class="pool-options">
       <h2>Search Preferences</h2>
-      <div class="grouping">
-         <p>
-            Related search results are grouped under a single search result. By default, these grouped results are 
-            all visible. Check the box below to collapse them by default.
-         </p>
-         <div class="check">
-            <label>
-               <input id="collapse-pref" @change="collapseGroupsClicked" class="choice" :checked="collapseGroups" type="checkbox"
-                  aria-label="toggle barcode group collapse functionality"/>Collpase Grouped Results
-            </label>
-         </div>
-      </div>
       <p>
          Select which Resource Types you want to include in your search results,
          and which Resource Type you prefer to see results from most.
@@ -64,6 +52,18 @@
             </div>
          </div>
       </div>
+      <div class="grouping">
+         <p>
+            Related search results are grouped under a single search result. By default, these grouped results are
+            all visible. Check the box below to collapse them by default.
+         </p>
+         <div class="check">
+            <label>
+               <input id="collapse-pref" @change="collapseGroupsClicked" class="choice" :checked="collapseGroups" type="checkbox"
+                  aria-label="toggle barcode group collapse functionality"/>Collapse Grouped Results
+            </label>
+         </div>
+      </div>
    </div>
 </template>
 <script>
@@ -102,9 +102,9 @@ export default {
 
 <style lang="scss" scoped>
 .grouping {
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   padding-bottom: 15px;
-   margin-bottom: 15px;
+   border-top: 1px solid var(--uvalib-grey-light);
+   padding: 5px 10px;
+   margin-top: 15px;
    .choice {
       margin: 5px 10px;
       width: 15px;
