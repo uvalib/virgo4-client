@@ -7,8 +7,8 @@
                   <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
                      <dd :key="getKey(field,`v${idx}`)" >
-                        <TruncatedText :id="`${hit.identifier}-${field.name}`"  
-                           :text="$utils.fieldValueString(field)" :limit="truncateLength" 
+                        <TruncatedText :id="`${hit.identifier}-${field.name}`"
+                           :text="$utils.fieldValueString(field)" :limit="truncateLength"
                         />
                      </dd>
                   </template>
@@ -21,22 +21,22 @@
                </template>
             </dl>
          </div>
-         <router-link v-if="hasCoverImages(pool)" @click.native="detailClicked" 
-            class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`" 
+         <router-link v-if="hasCoverImages(pool)" @click.native="detailClicked"
+            class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`"
          >
             <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
          </router-link>
       </div>
       <div class="digital-content">
-         <V4DownloadButton v-if="pdfDownloadURL" 
+         <V4DownloadButton v-if="pdfDownloadURL"
             icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"
             :aria-label="`download pdf for ${hit.header.title}`"
          />
-         <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt" 
+         <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt"
             label="Download OCR" :url="ocrDownloadURL"
             :aria-label="`download ocr for ${hit.header.title}`"
          />
-         <V4DownloadButton icon="fas fa-file-export" label="Export Citation" 
+         <V4DownloadButton icon="fas fa-file-export" label="Download RIS Citation"
             :url="risURL" @click="downloadRISClicked"
             :aria-label="`export citation for ${hit.header.title}`"
          />
@@ -66,17 +66,17 @@ export default {
          return `${this.citationsURL}/format/ris?item=${encodeURI(itemURL)}`
       },
       pdfDownloadURL() {
-         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")  
+         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")
          if (dc)  {
             return dc.value
-         } 
+         }
          return ""
       },
       ocrDownloadURL() {
-         let dc = this.hit.basicFields.find(f => f.name=="ocr_download_url")  
+         let dc = this.hit.basicFields.find(f => f.name=="ocr_download_url")
          if (dc)  {
             return dc.value
-         } 
+         }
          return ""
       },
       accessURLField() {
@@ -109,7 +109,7 @@ export default {
          return this.hit.identifier+field.value+idx
       },
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.type == "url" ||  
+         if (field.display == 'optional' || field.type == "url" ||
             field.type == "access-url" || field.name.includes("_download_url") ) return false
          return true
       },
