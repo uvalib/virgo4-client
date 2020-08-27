@@ -292,6 +292,7 @@ export default {
 
          if (src) {
             this.$store.dispatch("item/getDetails", {source:src, identifier:id})
+             this.$store.commit("hitSelected", id)
          } else {
             this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }

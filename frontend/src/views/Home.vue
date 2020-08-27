@@ -266,7 +266,6 @@ export default {
                   top: this.lastSearchScrollPosition,
                   behavior: "auto"
                })
-               this.$store.commit("clearLastSearch")
             }
          }
       },

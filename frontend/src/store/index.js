@@ -100,8 +100,11 @@ export default new Vuex.Store({
             return state.selectedHitIdx != -1
           })
           if ( state.selectedHitIdx != -1 ) {
-             state.lastSearchScrollPosition = window.scrollY
-             state.lastSearchURL = router.currentRoute.fullPath
+             // this also gets called on from details page. If it is from there, dont update last info
+            if (router.currentRoute.fullPath.includes("/sources") == false) {
+               state.lastSearchURL = router.currentRoute.fullPath
+               state.lastSearchScrollPosition = window.scrollY
+            }
           }
       },
       setAutoExpandGroupID(state, id) {
@@ -344,6 +347,7 @@ export default new Vuex.Store({
          }
 
          commit('setSearching', true)
+         commit("clearLastSearch")
          if (rootGetters["user/isSignedIn"]) {
             await dispatch("user/refreshAuth")
             // make sure bookmarks are up to date when
@@ -394,6 +398,7 @@ export default new Vuex.Store({
       // Pool results are APPENDED to existing after load more, and reset for other searches.
       async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
          commit('setSearching', true)
+         commit("clearLastSearch")
          commit('filters/setUpdatingFacets', true)
          let tgtResults = rootGetters.selectedResults
          let filters = rootGetters['filters/poolFilter'](tgtResults.pool.id)
