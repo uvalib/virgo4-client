@@ -14,4 +14,7 @@ How did it go?:
 URL:
 {{.URL}}
 
+Browser:
+{{.UserAgent}}
+
 ---------------------------------------

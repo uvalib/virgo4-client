@@ -41,7 +41,8 @@ const feedback = {
             email: ctx.state.email,
             wantedTo: ctx.state.wantedTo,
             explanation: ctx.state.explanation,
-            url: ctx.state.url
+            url: ctx.state.url,
+            userAgent: navigator.userAgent
          }
          return axios.post('/api/feedback', data).then((_response) => {
             ctx.commit("setSubmitSuccess")

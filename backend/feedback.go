@@ -21,6 +21,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		WantedTo    string `json:"wantedTo"  binding:"required"`
 		Explanation string `json:"explanation"  binding:"required"`
 		URL         string `json:"url" binding:"required"`
+		UserAgent   string `json:"userAgent"`
 	}
 
 	var request FeedbackRequest
