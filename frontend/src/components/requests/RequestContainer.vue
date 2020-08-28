@@ -63,7 +63,7 @@ export default {
     },
     showReset(panel){
       // Don't show reset on first and last panel
-      return !['ConfirmationPanel', 'OptionsPanel'].includes(panel)
+      return !['ConfirmationPanel', 'OptionsPanel', 'PDAPanel'].includes(panel)
     }
   },
 }

@@ -19,7 +19,6 @@
          </template>
       </dl>
 
-      <V4Button mode="primary" id="request-done" class="reset" @click="reset">Done</V4Button>
    </div>
 </template>
 <script>
