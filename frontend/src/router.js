@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Browse from './views/Browse.vue'
 import Codes from './views/Codes.vue'
 import Home from './views/Home.vue'
 import Journals from './views/Journals.vue'
@@ -50,12 +49,6 @@ const router = new Router({
          path: '/journals',
          name: 'journals',
          component: Journals
-      },
-      {
-         path: '/browse/:type',
-         name: 'browse',
-         component: Browse,
-         props: true,
       },
       {
          path: '/codes',
@@ -205,7 +198,7 @@ const router = new Router({
 router.beforeEach( (to, from, next) => {
    // Some pages just require an auth token...
    store.commit("system/setILSError", "")
-   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
+   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       // console.log(`Page ${to.name} requires auth token only`)
       ensureAuthTokenPresent( next )

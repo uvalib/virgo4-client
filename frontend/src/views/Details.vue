@@ -43,7 +43,7 @@
                      <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
                      <dd class="value" :key="`v${idx}`">
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                           :links="getBrowseLinks('subjects', field.value)" />
+                           :links="getBrowseLinks('subject', field.value)" />
                         <span class="related" v-else-if="field.type=='related-url'">
                            <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
                               <label class="link-label" :for="`rl-${idx}`">{{v.label}}</label>
@@ -303,7 +303,8 @@ export default {
       getBrowseLinks( name, values ) {
          let out = []
          values.forEach( v => {
-            let link = {label: v, url: `/browse/${name}?q=${encodeURI(v)}`}
+            let qp = `${name}: {"${encodeURIComponent(v)}"}`
+            let link = {label: v, url: `/search?mode=advanced&q=${qp}`}
             out.push(link)
          })
          return out

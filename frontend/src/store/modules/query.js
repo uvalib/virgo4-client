@@ -16,8 +16,6 @@ const query = {
          { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" },
       ],
-      browse:
-         { op: "AND", value: "", field: "", comparison: "EQUAL", endVal: "" },
       advancedFields: [
          { value: "keyword", label: "Keyword", type: "text", choices: [] },
          { value: "identifier", label: "Identifier", type: "text", choices: [] },
@@ -94,10 +92,6 @@ const query = {
          }
 
          let terms = state.advanced
-         if (state.mode == "browse") {
-            terms = state.browse
-         }
-
          let qs = ""
          terms.forEach(function (term) {
             if (term.value.length > 0) {
@@ -310,16 +304,6 @@ const query = {
       setBasicSearch(state) {
          state.mode = "basic"
       },
-      browseAuthors(state, author) {
-         state.mode = "browse"
-         state.browse = [
-            { op: "AND", value: `${author}`, field: "author", comparison: "EQUAL", endVal: "" }]
-      },
-      browseSubjects(state, subject) {
-         state.mode = "browse"
-         state.browse = [
-            { op: "AND", value: `"${subject}"`, field: "subject", comparison: "EQUAL", endVal: "" }]
-      },
       addCriteria(state) {
          state.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
       },
@@ -346,8 +330,6 @@ const query = {
          state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
          state.excludedPools.splice(0, state.excludedPools.length)
          state.targetPool = ""
-         state.browse = [
-            { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" }]
       },
    },
    actions: {
