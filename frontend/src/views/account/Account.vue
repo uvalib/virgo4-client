@@ -40,6 +40,8 @@
                   <ChangePin />
                </div>
 
+               <div v-if="ilsError" class="standing-info">{{ilsError}}</div>
+
                <div v-if="isBillOwed || totalFines>0" class="outstanding-bill">
                   <h2 class="fines-head">Billing</h2>
                   <div class="fines-content">
@@ -56,13 +58,13 @@
                            <div class="bills">
                               <div class="info">
                                  <p>
-                                 You have been billed for replacement of the items below. If you have the items, please return them 
-                                 and we will remove the replacement bills. If you pay for an item and find it within 90 days, 
+                                 You have been billed for replacement of the items below. If you have the items, please return them
+                                 and we will remove the replacement bills. If you pay for an item and find it within 90 days,
                                  you may be refunded the replacement amount.
                                  </p>
-                                  <h3>Replacement option:</h3> 
+                                  <h3>Replacement option:</h3>
                                  <p>
-                                    If you would like to supply a replacement copy rather than paying the bill, please contact the Library. 
+                                    If you would like to supply a replacement copy rather than paying the bill, please contact the Library.
                                     The Library reserves the right to refuse a replacement copy.
                                  </p>
                               </div>
@@ -129,13 +131,13 @@
                      <div class="payment">
                         <h3>Payment Information</h3>
                         <div v-if="useSIS">
-                           All bills must be paid using SIS. 
+                           All bills must be paid using SIS.
                            <a target="_blank" href="https://sisuva.admin.virginia.edu/ihprd/signon.html">
                            Access the SIS system to pay now.</a>
                         </div>
                         <div v-else>
                            <div>
-                              All fines must be paid at Clemons Library using cash for the exact amount or personal check. 
+                              All fines must be paid at Clemons Library using cash for the exact amount or personal check.
                               We do not take credit cards or any online payments at this time.
                            </div>
                            <div class="addr">
@@ -175,6 +177,7 @@ export default {
          info: state => state.user.accountInfo,
          lookingUp: state => state.user.lookingUp,
          bills: state => state.user.bills,
+         ilsError: state => state.system.ilsError,
       }),
       ...mapGetters({
         hasAccountInfo: 'user/hasAccountInfo',
@@ -302,6 +305,7 @@ div.notes p {
     padding: 10px;
     margin: 15px 0;
     border-radius: 5px;
+    color: var(--uvalib-text);
     background-color: var(--uvalib-red-lightest);
 }
 .pin {

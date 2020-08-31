@@ -71,8 +71,11 @@
                   </div>
                </AccordionContent>
             </template>
-            <div v-if="lookingUpUVA == false && checkouts.length == 0" class="none">
+            <div v-if="lookingUpUVA == false && checkouts.length == 0 && !ilsError" class="none">
                You have no UVA checkouts.
+            </div>
+            <div v-if="lookingUpUVA == false && ilsError" class="error">
+               {{ilsError}}
             </div>
             <template v-if="lookingUpILL == false && illiadCheckouts.length > 0">
                <AccordionContent
@@ -129,6 +132,7 @@ export default {
          checkouts: state => state.user.checkouts,
          checkoutsOrder: state => state.user.checkoutsOrder,
          requests: state => state.user.requests,
+         ilsError: state => state.system.ilsError,
       }),
       ...mapGetters({
         sortedCheckouts: 'user/sortedCheckouts',
@@ -336,13 +340,14 @@ v4-button.renew {
    font-weight: 500;
    margin-top: 10px;
 }
-.barred {
+.barred, .error {
    font-size: 1em;
    font-weight: bold;
    text-align: center;
    padding: 10px;
    margin: 15px 0;
    border-radius: 5px;
+   color: var(--uvalib-text);
    background-color: var(--uvalib-red-lightest);
 }
 </style>

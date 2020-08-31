@@ -170,7 +170,11 @@ func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userURL := fmt.Sprintf("%s/v4/users/%s/bills", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
+		if ilsErr.StatusCode == 503 {
+			c.String(503, "UVA billing information is currently unavailble. Please try again later")
+		} else {
+			c.String(ilsErr.StatusCode, ilsErr.Message)
+		}
 		return
 	}
 	var bills interface{}
@@ -244,7 +248,11 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
+		if ilsErr.StatusCode == 503 {
+			c.String(503, "UVA checkout information is currently unavailble. Please try again later")
+		} else {
+			c.String(ilsErr.StatusCode, ilsErr.Message)
+		}
 		return
 	}
 	var checkouts []CheckoutInfo
@@ -264,7 +272,11 @@ func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	userURL := fmt.Sprintf("%s/v4/users/%s/holds", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
+		if ilsErr.StatusCode == 503 {
+			c.String(503, "Request information is currently unavailble. Please try again later")
+		} else {
+			c.String(ilsErr.StatusCode, ilsErr.Message)
+		}
 		return
 	}
 
@@ -277,7 +289,6 @@ func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, holds)
-
 }
 
 // GetUser uses ILS Connector V2 API /users to get details for a user

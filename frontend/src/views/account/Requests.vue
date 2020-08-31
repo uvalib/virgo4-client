@@ -25,7 +25,10 @@
             </div>
             <h2>Outstanding Requests</h2>
             <div class="subcontent">
-               <template v-if="lookingUp == false && requests.holds.length > 0">
+               <template v-if="lookingUp == false && ilsError">
+                  <div class="ils-error">{{ilsError}}</div>
+               </template>
+               <template v-if="lookingUp == false && !ilsError && requests.holds.length > 0">
                   <AccordionContent
                         class="requests-accordion"
                         background="var(--uvalib-blue-alt-lightest)"
@@ -190,7 +193,8 @@ export default {
          requests: state => state.user.requests,
          lookingUp: state => state.user.lookingUp,
          devServer: state => state.system.devServer,
-         hsILLiadURL: state => state.system.hsILLiadURL
+         hsILLiadURL: state => state.system.hsILLiadURL,
+         ilsError: state => state.system.ilsError
       }),
       ...mapGetters({
          isDevServer: "system/isDevServer",
@@ -251,7 +255,7 @@ export default {
          return date.split("T")[0];
       },
       hasNoRequests() {
-         return this.illLoans.length == 0 && this.requests.holds.length == 0 && this.digitalRequests == 0
+         return this.illLoans.length == 0 && this.requests.holds.length == 0 && this.digitalRequests == 0 && this.ilsError == ""
       },
       deleteHold(id) {
          this.$store.dispatch("requests/deleteHold", id);
@@ -308,6 +312,17 @@ export default {
          min-width: 275px;
          width: 40%;
       }
+   }
+
+   .ils-error {
+      font-size: 1em;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 5px;
+      color: var(--uvalib-text);
+      background-color: var(--uvalib-red-lightest);
    }
 
    .working {

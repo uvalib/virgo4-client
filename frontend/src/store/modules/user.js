@@ -313,7 +313,11 @@ const user = {
                illiad: illiadResponse.data
             })
          })).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
+            if (error.response && error.response.status == 503) {
+               ctx.commit('system/setILSError', error.response.data, { root: true })
+            } else {
+               ctx.commit('system/setError', error, { root: true })
+            }
          }).finally(() => { ctx.commit('setLookingUp', false) })
       },
 
@@ -381,9 +385,13 @@ const user = {
          return axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
             ctx.commit('sortCheckouts', "AUTHOR_ASC")
-          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-          })
+         }).catch((error) => {
+            if (error.response && error.response.status == 503) {
+               ctx.commit('system/setILSError', error.response.data, { root: true })
+            } else {
+               ctx.commit('system/setError', error, { root: true })
+            }
+         })
       },
 
       getBillDetails(ctx) {
@@ -394,7 +402,11 @@ const user = {
             ctx.commit('setBills', response.data)
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
+            if (error.response && error.response.status == 503) {
+               ctx.commit('system/setILSError', error.response.data, { root: true })
+            } else {
+               ctx.commit('system/setError', error, { root: true })
+            }
             ctx.commit('setLookingUp', false)
           })
       },
@@ -430,8 +442,12 @@ const user = {
             ctx.dispatch("getCheckouts")     // needed so the alert icon can show in menubar
             router.push( ctx.rootState.restore.url )
          }).catch((error) => {
+            if (error.response && error.response.status == 503) {
+               ctx.commit('system/setILSError', error.response.data, { root: true })
+            } else {
+               ctx.commit('setAuthFailure', error)
+            }
             ctx.commit('setAuthorizing', false)
-            ctx.commit('setAuthFailure', error)
           })
       },
 

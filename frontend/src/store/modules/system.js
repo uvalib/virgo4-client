@@ -9,6 +9,7 @@ const system = {
       devServer: false,
       fatal: "",
       error: "",
+      ilsError: "",
       message: "",
       version: "unknown",
       hsIlliadURL: "",
@@ -89,7 +90,9 @@ const system = {
       setMessage(state, msg) {
          state.message = msg
       },
-
+      setILSError(state, error) {
+         state.ilsError = error
+      },
       setError(state, error) {
          if (error == null) {
             error = ""

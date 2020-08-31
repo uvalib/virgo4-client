@@ -111,6 +111,12 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 		return
 	}
 
+	if ilsErr != nil && ilsErr.StatusCode == 503 {
+		log.Printf("ERROR: Sirsi is offline")
+		c.String(ilsErr.StatusCode, "Availability information is currently unavailable. Please try again later.")
+		return
+	}
+
 	// Convert from json
 	var availResp AvailabilityData
 	if err := json.Unmarshal(bodyBytes, &availResp); err != nil {

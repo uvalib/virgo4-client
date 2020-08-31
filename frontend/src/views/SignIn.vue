@@ -46,17 +46,18 @@
                       </transition>
                     </td>
                   </tr>
-                  <tr>
+                  <tr v-if="!ilsError">
                     <td></td>
                     <td>
                       <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
                     </td>
                   </tr>
                </table>
+               <div class="ils-error" v-if="ilsError">{{ilsError}}</div>
             </div>
          </div>
          <div class="community">
-            Members of our community are welcome to use many UVA Library resources. 
+            Members of our community are welcome to use many UVA Library resources.
             <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank">Learn about creating an account and accessing materials.</a>
          </div>
       </div>
@@ -73,6 +74,7 @@ export default {
          authTriesLeft: state => state.user.authTriesLeft,
          authMessage: state => state.user.authMessage,
          lockedOut: state => state.user.lockedOut,
+         ilsError: state => state.system.ilsError,
       }),
       ...mapGetters({
         hasAuthToken: 'user/hasAuthToken'
@@ -113,6 +115,16 @@ export default {
    position: relative;
    margin: 2vw auto 6vw;
    color: var(--uvalib-text);
+}
+.ils-error {
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+    color: var(--uvalib-text);
+    background-color: var(--uvalib-red-lightest);
 }
 .sign-in-content {
    width: 60%;
@@ -155,7 +167,7 @@ div.netbadge {
 .community {
    padding-top: 25px;
    border-top: 1px solid var(--uvalib-grey-light);
-   margin: 25px 0;   
+   margin: 25px 0;
 }
 div.indent {
    margin-left: 35px;

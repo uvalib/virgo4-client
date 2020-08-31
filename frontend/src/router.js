@@ -204,6 +204,7 @@ const router = new Router({
 // This is called before every URL in the SPA is hit
 router.beforeEach( (to, from, next) => {
    // Some pages just require an auth token...
+   store.commit("system/setILSError", "")
    let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "browse", "feedback", "item"]
    if (tokenPages.includes(to.name)) {
       // console.log(`Page ${to.name} requires auth token only`)
