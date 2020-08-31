@@ -261,7 +261,7 @@ export default {
                this.$store.commit('setSearching', false)
             }
 
-            if ( this.lastSearchScrollPosition > 0) {
+            if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {
                window.scrollBy({
                   top: this.lastSearchScrollPosition,
                   behavior: "auto"
