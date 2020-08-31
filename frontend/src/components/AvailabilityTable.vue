@@ -5,12 +5,12 @@
       </div>
       <p class="error" v-if="availability.error" v-html="availability.error"> </p>
       <template v-else>
-         <template v-if="availability.items && availability.items.length > 0">
+         <template v-if="availability.items || availability.request_options">
             <h2>Availability</h2>
             <div class="availability-content">
                <RequestContainer :titleId="titleId" />
 
-               <table class="fields" >
+               <table class="fields" v-if="availability.items && availability.items.length > 0">
                   <thead>
                      <tr>
                         <th v-for="(column, idx) in availability.columns" :key="idx">

@@ -71,22 +71,25 @@
 
           <p class="error" v-if="errors.barcode">{{errors.barcode}}</p>
         </template>
-        <dt class="label">Preferred audio language</dt>
-        <dd>
-            <input id="audio_language" :aria-label="`preferred audio language`" v-model="audioLanguage" type="text">
-        </dd>
-        <dt class="label">Include subtitles?</dt>
-        <dd>
-            <select :aria-label="`include stubtitles?`" v-model="subtitles">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-        </dd>
-        <dt class="label">Subtitles language</dt>
-        <dd>
-            <input :aria-label="`subtitle language desired`" id="subtitle_language" v-model="subtitleLanguage" type="text">
-            <p v-if="hasError('subtitleLanguage')" class="error">* language is required</p>
-        </dd>
+
+        <template v-if="!streamingReserve">
+         <dt class="label">Preferred audio language</dt>
+         <dd>
+               <input id="audio_language" :aria-label="`preferred audio language`" v-model="audioLanguage" type="text">
+         </dd>
+         <dt class="label">Include subtitles?</dt>
+         <dd>
+               <select :aria-label="`include stubtitles?`" v-model="subtitles">
+               <option value="yes">Yes</option>
+               <option value="no">No</option>
+               </select>
+         </dd>
+         <dt class="label">Subtitles language</dt>
+         <dd>
+               <input :aria-label="`subtitle language desired`" id="subtitle_language" v-model="subtitleLanguage" type="text">
+               <p v-if="hasError('subtitleLanguage')" class="error">* language is required</p>
+         </dd>
+        </template>
         <dt>Notes</dt>
         <dd><textarea :aria-label="`notes for this request`" v-model="notes" name="item-notes"></textarea></dd>
       </dl>
@@ -124,6 +127,7 @@ export default {
    computed: {
       ...mapState({
         itemOptions: state => state.requests.activeOption.item_options,
+        streamingReserve: state => state.requests.activeOption.streaming_reserve,
         reserveRequest: state => state.reserves.request,
         userInfo: state => state.user.accountInfo,
         itemDetails: state => state.item.details,
