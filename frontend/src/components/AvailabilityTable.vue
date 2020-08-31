@@ -5,12 +5,12 @@
       </div>
       <p class="error" v-if="availability.error" v-html="availability.error"> </p>
       <template v-else>
-         <template v-if="availability.items || availability.request_options">
+         <template v-if="hasItems() || hasRequestOptions">
             <h2>Availability</h2>
             <div class="availability-content">
                <RequestContainer :titleId="titleId" />
 
-               <table class="fields" v-if="availability.items && availability.items.length > 0">
+               <table class="fields" v-if="hasItems()">
                   <thead>
                      <tr>
                         <th v-for="(column, idx) in availability.columns" :key="idx">
@@ -51,6 +51,7 @@ export default {
       ...mapGetters({
          availability: 'item/availability',
          isDevServer: 'system/isDevServer',
+         hasRequestOptions: 'requests/hasRequestOptions'
       }),
    },
    methods: {
@@ -65,7 +66,11 @@ export default {
             return []
          }
          return item.fields.filter(h => h.visible)
-      }
+      },
+      hasItems(){
+         return Array.isArray(this.availability.items) && this.availability.items.length > 0
+
+      },
    },
    created() {
       this.$store.dispatch("item/getAvailability", this.titleId )

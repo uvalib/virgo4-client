@@ -135,7 +135,7 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 	}
 	if v4Claims.CanPlaceReserve {
 		svc.addSirsiStreamingVideoReserve(titleID, solrDoc, &availResp)
-		//svc.addAvalonVideoReserve(titleID, solrDoc, &availResp)
+		svc.addAvalonVideoReserve(titleID, solrDoc, &availResp)
 	}
 
 	svc.appendAeonRequestOptions(titleID, solrDoc, &availResp)
@@ -244,24 +244,19 @@ func (svc *ServiceContext) addSirsiStreamingVideoReserve(id string, SolrDoc Solr
 // Adds option for course reserves video request for Avalon items
 func (svc *ServiceContext) addAvalonVideoReserve(id string, SolrDoc SolrDocument, Result *AvailabilityData) {
 
-	//	if !contains(SolrDoc.Source, "Avalon") {
-	//		return
-	//	}
-	//	log.Printf("Adding Avalon streaming video reserve option")
-	//	AvalonStreamingOption := ItemOption{
-	//		Label:    SolrDoc.CallNumber[0],
-	//		Barcode:  SolrDoc.Barcode[0],
-	//		Library:  SolrDoc.Library[0],
-	//		Location: SolrDoc.Location[0],
-	//	}
-	//	VideoOption := RequestOption{
-	//		Type:           "videoReserve",
-	//		Label:          "Video reserve request",
-	//		SignInRequired: true,
-	//		Description:    "Request a video reserve for streaming",
-	//		ItemOptions:    []ItemOption{AvalonStreamingOption},
-	//	}
-	//	Result.Availability.RequestOptions = append(Result.Availability.RequestOptions, VideoOption)
+	if !contains(SolrDoc.Source, "Avalon") {
+		return
+	}
+	log.Printf("Adding Avalon streaming video reserve option")
+	VideoOption := RequestOption{
+		Type:             "videoReserve",
+		Label:            "Video reserve request",
+		SignInRequired:   true,
+		StreamingReserve: true,
+		Description:      "Request a video reserve for streaming",
+		ItemOptions:      []ItemOption{},
+	}
+	Result.Availability.RequestOptions = append(Result.Availability.RequestOptions, VideoOption)
 
 	return
 }
