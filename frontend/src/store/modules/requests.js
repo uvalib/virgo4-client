@@ -78,6 +78,9 @@ const requests = {
    },
    getters: {
       getField,
+      hasRequestOptions(store){
+         return Array.isArray(store.requestOptions) && store.requestOptions.length > 0
+      },
       alertText(store) {
          return store.alertText
       },

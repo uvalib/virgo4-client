@@ -42,12 +42,13 @@ type Item struct {
 
 // RequestOption is a category of request that a user can make
 type RequestOption struct {
-	Type           string       `json:"type"`
-	Label          string       `json:"button_label"`
-	Description    string       `json:"description"`
-	CreateURL      string       `json:"create_url"`
-	SignInRequired bool         `json:"sign_in_required"`
-	ItemOptions    []ItemOption `json:"item_options"`
+	Type             string       `json:"type"`
+	Label            string       `json:"button_label"`
+	Description      string       `json:"description"`
+	CreateURL        string       `json:"create_url"`
+	SignInRequired   bool         `json:"sign_in_required"`
+	StreamingReserve bool         `json:"streaming_reserve"`
+	ItemOptions      []ItemOption `json:"item_options"`
 }
 
 // ItemOption is a selectable item in a RequestOption
@@ -73,7 +74,7 @@ type SolrResponse struct {
 type SolrDocument struct {
 	AnonAvailability  []string `json:"anon_availability_a,omitempty"`
 	Author            []string `json:"author_a,omitempty"`
-	Barcode           string   `json:"-"`
+	Barcode           []string `json:"barcode_a,omitempty"`
 	CallNumber        []string `json:"call_number_a,omitempty"`
 	Copy              string   `json:"-"`
 	Description       []string `json:"description_a,omitempty"`
@@ -88,10 +89,12 @@ type SolrDocument struct {
 	Location          []string `json:"location2_a,omitempty"`
 	LocalNotes        []string `json:"local_notes_a,omitempty"`
 	Medium            []string `json:"medium_a,omitempty"`
+	Pool              []string `json:"pool_f,omitempty"`
 	PublicationDate   string   `json:"published_date,omitempty"`
 	PublishedLocation []string `json:"published_location_a,omitempty"`
 	PublisherName     []string `json:"publisher_name_a,omitempty"`
 	SCAvailability    string   `json:"sc_availability_large_single,omitempty"`
+	Source            []string `json:"source_a,omitempty"`
 	Title             []string `json:"title_a,omitempty"`
 	URL               []string `json:"url_a,omitempty"`
 	Volume            string   `json:"-"`
@@ -130,6 +133,11 @@ func (svc *ServiceContext) GetAvailability(c *gin.Context) {
 	if v4Claims.HomeLibrary == "HEALTHSCI" {
 		svc.updateHSLScanOptions(titleID, &solrDoc, &availResp)
 	}
+	if v4Claims.CanPlaceReserve {
+		svc.addSirsiStreamingVideoReserve(titleID, solrDoc, &availResp)
+		svc.addAvalonVideoReserve(titleID, solrDoc, &availResp)
+	}
+
 	svc.appendAeonRequestOptions(titleID, solrDoc, &availResp)
 	svc.removeETASRequestOptions(titleID, solrDoc, &availResp)
 
@@ -205,6 +213,52 @@ func openURLQuery(baseURL string, doc *SolrDocument) string {
 	}
 
 	return fmt.Sprintf("%s/illiad.dll?%s", baseURL, query.Encode())
+}
+
+// Adds option for course reserves video request for Sirsi "Internet" items
+func (svc *ServiceContext) addSirsiStreamingVideoReserve(id string, SolrDoc SolrDocument, Result *AvailabilityData) {
+
+	if !(SolrDoc.Pool[0] == "video" && contains(SolrDoc.Location, "Internet materials")) {
+		return
+	}
+	log.Printf("Adding Sirsi streaming video reserve option")
+	SirsiStreamingOption := ItemOption{
+		Label:    SolrDoc.CallNumber[0],
+		Barcode:  SolrDoc.Barcode[0],
+		Library:  SolrDoc.Library[0],
+		Location: SolrDoc.Location[0],
+	}
+	VideoOption := RequestOption{
+		Type:             "videoReserve",
+		Label:            "Video reserve request",
+		SignInRequired:   true,
+		Description:      "Request a video reserve for streaming",
+		StreamingReserve: true,
+		ItemOptions:      []ItemOption{SirsiStreamingOption},
+	}
+	Result.Availability.RequestOptions = append(Result.Availability.RequestOptions, VideoOption)
+
+	return
+}
+
+// Adds option for course reserves video request for Avalon items
+func (svc *ServiceContext) addAvalonVideoReserve(id string, SolrDoc SolrDocument, Result *AvailabilityData) {
+
+	if !contains(SolrDoc.Source, "Avalon") {
+		return
+	}
+	log.Printf("Adding Avalon streaming video reserve option")
+	VideoOption := RequestOption{
+		Type:             "videoReserve",
+		Label:            "Video reserve request",
+		SignInRequired:   true,
+		StreamingReserve: true,
+		Description:      "Request a video reserve for streaming",
+		ItemOptions:      []ItemOption{},
+	}
+	Result.Availability.RequestOptions = append(Result.Availability.RequestOptions, VideoOption)
+
+	return
 }
 
 // Appends Aeon request to availability response
@@ -413,6 +467,9 @@ func (svc *ServiceContext) removeETASRequestOptions(id string, solrDoc SolrDocum
 }
 
 func contains(arr []string, str string) bool {
+	if len(arr) == 0 {
+		return false
+	}
 
 	matcher := regexp.MustCompile("(?i)" + str)
 	for _, a := range arr {
