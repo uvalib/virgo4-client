@@ -151,6 +151,8 @@ export default new Vuex.Store({
          tgtPool.page = 0
          state.results[state.selectedResultsIdx].hits = []
          state.total -= oldPoolTotal
+         state.lastSearchScrollPosition = 0
+         state.lastSearchURL = ""
       },
 
       toggleGroupExpanded(state, hitIdx) {
@@ -398,7 +400,6 @@ export default new Vuex.Store({
       // Pool results are APPENDED to existing after load more, and reset for other searches.
       async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
          commit('setSearching', true)
-         commit("clearLastSearch")
          commit('filters/setUpdatingFacets', true)
          let tgtResults = rootGetters.selectedResults
          let filters = rootGetters['filters/poolFilter'](tgtResults.pool.id)
