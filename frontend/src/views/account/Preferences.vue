@@ -43,13 +43,8 @@ export default {
    created() {
       this.$store.dispatch('pools/getPools')
       this.$store.dispatch("user/getAccountInfo")
-      setTimeout(()=> { 
-         let ele = document.getElementById("collapse-pref")
-         if ( ele ) {
-            ele.focus()
-         } else {
-             document.getElementById("preferences-submenu").focus()
-         }
+      setTimeout(()=> {
+         document.getElementById("preferences-submenu").focus()
       }, 500)
    }
 }
