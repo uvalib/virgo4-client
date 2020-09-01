@@ -95,7 +95,7 @@
                         <AccordionContent layout="narrow" borderWidth="0" id="fines">
                            <template v-slot:title>
                              <label style='font-weight:bold;margin-right:5px'>Total Fines:</label>
-                             <span>${{this.totalFines}}</span>
+                             <span>${{totalFines}}</span>
                            </template>
                            <div class="fines">
                               <div class="info">
