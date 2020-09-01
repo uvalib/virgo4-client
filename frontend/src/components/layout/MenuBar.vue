@@ -354,10 +354,11 @@ export default {
       display: inline-block;
       margin-left:20px;
       border-bottom:1px solid var(--color-secondary-blue);
+      font-weight: normal;
 
       .notice {
-         color: var(--uvalib-brand-orange);
-         margin-right: 5px;
+         color: var(--uvalib-yellow);
+         margin-right: 2px;
       }
 
       &:focus {

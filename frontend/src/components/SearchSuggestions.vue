@@ -52,7 +52,9 @@ export default {
          return `${sug.value}, suggested author related to your search`
       },
       getRelatedLink( sug ) {
-         return `/browse/${sug.type}?q=${encodeURI(sug.value)}`
+         let qp = `${sug.type}: {"${encodeURIComponent(sug.value)}"}`
+         let url = `/search?mode=advanced&q=${qp}`
+         return url
       },
       moreClicked() {
          this.moreVisible = true
