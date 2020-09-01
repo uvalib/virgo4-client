@@ -354,7 +354,6 @@ export default {
       display: inline-block;
       margin-left:20px;
       border-bottom:1px solid var(--color-secondary-blue);
-      font-weight: normal;
 
       .notice {
          color: var(--uvalib-yellow);
@@ -364,6 +363,9 @@ export default {
       &:focus {
          @include be-accessible();
       }
+   }
+   .menu-item.notice {
+      font-weight: normal;
    }
 
    .menu-item:hover {
