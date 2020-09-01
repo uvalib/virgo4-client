@@ -241,11 +241,6 @@ const query = {
                continue
             }
 
-            if (state.advancedFields.findIndex( af => af.value == term.field) == -1) {
-               console.error(term.field+" from URL not found in advanced fields. Skipping")
-               continue
-            }
-
             if ( term.field == "date" ) {
                // date values have 4 formats: {1988} {AFTER 1988} {BEFORE 1988} {1970 TO 2000}
                if ( value.includes("AFTER") || value.includes("after")  ) {
