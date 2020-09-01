@@ -41,6 +41,7 @@ type ServiceContext struct {
 	FastHTTPClient     *http.Client
 	HTTPClient         *http.Client
 	SlowHTTPClient     *http.Client
+	RenewHTTPClient    *http.Client
 }
 
 // RequestError contains http status code and message for a
@@ -117,6 +118,10 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx.SlowHTTPClient = &http.Client{
 		Transport: defaultTransport,
 		Timeout:   30 * time.Second,
+	}
+	ctx.RenewHTTPClient = &http.Client{
+		Transport: defaultTransport,
+		Timeout:   5 * time.Minute,
 	}
 
 	return &ctx, nil
@@ -477,7 +482,12 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt 
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	req.Header.Add("Content-type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
-	rawResp, rawErr := svc.HTTPClient.Do(req)
+	httpClient := svc.HTTPClient
+	if strings.Index(url, "/renewAll") > -1 {
+		log.Printf("User renewAll request detected. Increase timeout to 30 seconds")
+		httpClient = svc.RenewHTTPClient
+	}
+	rawResp, rawErr := httpClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)
 	elapsedMS := int64(elapsedNanoSec / time.Millisecond)

@@ -27,6 +27,7 @@ const user = {
       bills: [],
       requests: {illiad: [], holds: []},
       lookingUp: false,
+      renewing: false,
       authTriesLeft: 5,
       authMessage: "",
       lockedOut: false,
@@ -132,6 +133,9 @@ const user = {
    mutations: {
       setLookingUp(state, flag) {
          state.lookingUp = flag
+      },
+      setRenewing(state, flag) {
+         state.renewing = flag
       },
       setCheckouts(state, co) {
          state.checkouts = co
@@ -343,30 +347,30 @@ const user = {
       renewItem(ctx, barcode) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
 
-         ctx.commit('setLookingUp', true)
+         ctx.commit('setRenewing', true)
          let data = {item_barcode: barcode}
          axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
             ctx.commit('setCheckouts', response.data.checkouts)
             ctx.commit('setRenewResults', response.data.renewResults)
-            ctx.commit('setLookingUp', false)
+            ctx.commit('setRenewing', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', false)
+            ctx.commit('setRenewing', false)
           })
       },
 
       renewAll(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
 
-         ctx.commit('setLookingUp', true)
+         ctx.commit('setRenewing', true)
          let data = {item_barcode: "all"}
          axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
             ctx.commit('setCheckouts', response.data.checkouts)
             ctx.commit('setRenewResults', response.data.renewResults)
-            ctx.commit('setLookingUp', false)
+            ctx.commit('setRenewing', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', false)
+            ctx.commit('setRenewing', false)
           })
       },
 

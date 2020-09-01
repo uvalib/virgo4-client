@@ -3,6 +3,7 @@
       <h1>My Account</h1>
       <div class="checkout-content">
          <AccountActivities/>
+         <V4Spinner v-if="renewing" message="Renew in progress..." v-bind:overlay="true" />
          <div v-if="lookingUpUVA" class="working">
             <V4Spinner message="Looking up UVA Checkouts..." />
          </div>
@@ -133,6 +134,7 @@ export default {
          checkoutsOrder: state => state.user.checkoutsOrder,
          requests: state => state.user.requests,
          ilsError: state => state.system.ilsError,
+         renewing: state => state.user.renewing
       }),
       ...mapGetters({
         sortedCheckouts: 'user/sortedCheckouts',
