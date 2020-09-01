@@ -21,7 +21,7 @@
                </template>
             </dl>
          </div>
-         <router-link v-if="hasCoverImages(pool)" @click.native="detailClicked"
+         <router-link v-if="hasCoverImages(pool)" @mousedown.native="detailClicked"
             class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`"
          >
             <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
@@ -100,6 +100,7 @@ export default {
    },
    methods: {
       detailClicked() {
+         this.$store.commit("hitSelected", this.hit.identifier)
          this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
       },
       downloadRISClicked() {

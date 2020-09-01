@@ -2,13 +2,13 @@
    <div class="image-container">
       <div class="toolbar">
          <span class="short-title">
-            <TruncatedText mode="icon" :id="`title-${hit.identifier}`" :text="hit.header.title" :limit="19" 
+            <TruncatedText mode="icon" :id="`title-${hit.identifier}`" :text="hit.header.title" :limit="19"
                style="font-weight:bold;" />
          </span>
          <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
          <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
       </div>
-      <router-link @click.native="detailClicked" class="img-link" :to="detailsURL">
+      <router-link @mousedown.native="detailClicked" class="img-link" :to="detailsURL">
           <img aria-label=" " class="trigger" :src="iiifURL(hit)">
           <div class="metadata-popover" slot="popover">
              <div class="metadata-content">
@@ -48,6 +48,7 @@ export default {
    },
    methods: {
       detailClicked() {
+         this.$store.commit("hitSelected", this.hit.identifier)
          this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
       },
       iiifURL(item) {
