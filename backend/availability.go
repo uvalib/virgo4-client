@@ -21,6 +21,7 @@ type AvailabilityData struct {
 		Columns        []string        `json:"columns"`
 		Items          []Item          `json:"items"`
 		RequestOptions []RequestOption `json:"request_options"`
+		BoundWith      []BoundWithItem `json:"bound_with"`
 	} `json:"availability"`
 }
 
@@ -38,6 +39,15 @@ type Item struct {
 	CallNumber      string                   `json:"call_number"`
 	Volume          string                   `json:"volume"`
 	SCNotes         string                   `json:"special_collections_location"`
+}
+
+// BoundWithItem are related items bound with this work
+type BoundWithItem struct {
+	IsParent   bool   `json:"is_parent"`
+	TitleID    string `json:"title_id"`
+	CallNumber string `json:"call_number"`
+	Title      string `json:"title"`
+	Author     string `json:"author"`
 }
 
 // RequestOption is a category of request that a user can make
@@ -214,7 +224,8 @@ func openURLQuery(baseURL string, doc *SolrDocument) string {
 	return fmt.Sprintf("%s/illiad.dll?%s", baseURL, query.Encode())
 }
 
-// Adds option for course reserves video request for Sirsi "Internet" items
+// Adds option for course reserves video request for streaming video items
+// This could be Sirsi "Internet materials", Avalon, Swank, etc.
 func (svc *ServiceContext) addStreamingVideoReserve(id string, SolrDoc SolrDocument, Result *AvailabilityData) {
 
 	if (SolrDoc.Pool[0] == "video" && contains(SolrDoc.Location, "Internet materials")) ||

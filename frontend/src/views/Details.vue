@@ -134,7 +134,7 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import ImageDetails from '@/components/ImageDetails'
-import AvailabilityTable from "@/components/AvailabilityTable"
+import AvailabilityTable from "@/components/details/AvailabilityTable"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from '@/components/AccessURLDetails'
