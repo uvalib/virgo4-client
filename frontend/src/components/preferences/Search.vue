@@ -90,7 +90,7 @@ export default {
          this.$analytics.trigger('Preferences', 'SET_PREFERRED_POOL', pool.name)
       },
       async toggleExcludePool(pool) {
-         if ( this.excludedPools.length == this.pools.length-1) {
+         if ( this.excludedPools.length == this.pools.length-1 && this.isPoolExcluded(pool) == false) {
             this.$store.commit(
                "system/setError",
                "At least one resource must be included"
