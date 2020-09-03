@@ -12,6 +12,9 @@ const item = {
    },
 
    getters: {
+      identifier: state => {
+         return state.details.identifier
+      },
       hasDetails: state => (identifier) => {
          return state.identifier == identifier
       },
