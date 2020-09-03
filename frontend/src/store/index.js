@@ -260,11 +260,14 @@ export default new Vuex.Store({
          state.results.splice(0, state.results.length)
          let firstPoolWithHits = -1
          let tgtPoolIdx = -1
-         let hitNum = 1
+
          data.results.pool_results.forEach((pr, idx) => {
             if (!pr.group_list) {
                pr.group_list = []
             }
+
+            // reset hit counter for each pool
+            let hitNum = 1
 
             // if a preffered pool was set in prefs (or url) track its index in results
             // so it can be selected after all results are updated
