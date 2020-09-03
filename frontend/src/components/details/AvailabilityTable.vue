@@ -5,6 +5,8 @@
       </div>
       <p class="error" v-if="availability.error" v-html="availability.error"> </p>
       <template v-else>
+         <BoundWithItems v-if="hasBoundWithItems"/>
+
          <template v-if="hasItems() || hasRequestOptions">
             <h2>Availability</h2>
             <div class="availability-content">
@@ -40,9 +42,10 @@
 import { mapGetters } from "vuex"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice"
 import RequestContainer from "@/components/requests/RequestContainer"
+import BoundWithItems from "@/components/details/BoundWithItems"
 export default {
   components: {
-    AvailabilityNotice, RequestContainer
+    AvailabilityNotice, RequestContainer, BoundWithItems
   },
    props: {
       titleId: String
@@ -51,7 +54,8 @@ export default {
       ...mapGetters({
          availability: 'item/availability',
          isDevServer: 'system/isDevServer',
-         hasRequestOptions: 'requests/hasRequestOptions'
+         hasRequestOptions: 'requests/hasRequestOptions',
+         hasBoundWithItems: 'item/hasBoundWithItems'
       }),
    },
    methods: {
@@ -82,7 +86,7 @@ h2 {
    color: var(--color-primary-orange)
 }
 .availability-content {
-   border: 1px solid var(--uvalib-grey);
+   border: 1px solid var(--uvalib-grey-light);
    margin: 0 0 10vh 0;
    table {
       width: 100%;

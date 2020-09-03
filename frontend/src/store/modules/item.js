@@ -7,7 +7,7 @@ const item = {
    state: {
       details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[],
          related:[], digitalContent: [], embeddedMedia: [] },
-      availability: {searching: true, titleId: "", columns: [], items: [], error: ""},
+      availability: {searching: true, titleId: "", columns: [], items: [], bound_with: [], error: ""},
       googleBooksURL: ""
    },
 
@@ -22,6 +22,16 @@ const item = {
       getPDF: state => (name) => {
          return state.details.digitalContent.find( dc=>dc.name==name && dc.type=="PDF")
       },
+      hasBoundWithItems: state => {
+         return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
+      },
+      boundIn: state => {
+         return state.availability.bound_with.filter(item => item.is_parent == true)
+
+      },
+      boundWith: state => {
+         return state.availability.bound_with.filter(item => item.is_parent == false)
+      }
    },
 
    mutations: {
@@ -73,13 +83,14 @@ const item = {
         state.availability.titleId = titleId
         state.availability.columns = response.columns
         state.availability.items = response.items
+        state.availability.bound_with = response.bound_with
         state.availability.searching = false
       },
       setAvailabilityError(state, error) {
          state.availability.error = error
       },
       clearAvailability(state) {
-        state.availability = {searching: true, titleId: '', columns: [], items: [], error: ""}
+        state.availability = {searching: true, titleId: '', columns: [], items: [], bound_with: [], error: ""}
       },
       clearSearching(state){
         state.details.searching = false
