@@ -206,6 +206,15 @@ export default {
          }
          if (this.queryEntered) {
 
+            let fields = this.advanced.filter( f=>f.value != "")
+            if ( fields.length == 1 && fields[0].op == "NOT") {
+               this.$store.commit(
+                  "system/setError",
+                  "The NOT operator requires more than one search critera"
+               )
+               return
+            }
+
             // Refine search updates:
             // if pool, filter or sort were specified previously, preserve them in the URL.
             // a new search will always reset paging, so don't preserve that
