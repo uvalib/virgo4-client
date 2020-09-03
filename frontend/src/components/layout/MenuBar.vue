@@ -4,9 +4,9 @@
         <router-link role="menuitem" id="searchmenu" @click.native="searchClicked" to="/" v-on:focus.native="onMenuFocus">
            <span class="menu-item"><i class="icon fas fa-search"></i>Search</span>
         </router-link>
-        <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
+        <!-- <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
            <span class="menu-item"><i class="icon fas fa-university"></i>Course Reserves</span>
-        </router-link>
+        </router-link> -->
         <div v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback" @mousedown="closeSubMenus">
             <a tabindex="-1" href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
                <span><i class="icon fas fa-comments"></i></span>
