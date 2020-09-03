@@ -197,11 +197,11 @@ export default {
         this.$store.commit("query/toggleAdvancedPoolExclusion", pool)
       },
       doAdvancedSearch() {
-         if ( this.excludedPoolPrefs.length == this.pools.length) {
+         if ( this.excludedPools.length == this.pools.length) {
             this.$store.commit(
                "system/setError",
                "Please select at least one resource type before searching"
-            );
+            )
             return
          }
          if (this.queryEntered) {
