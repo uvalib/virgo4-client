@@ -30,7 +30,6 @@ export default {
    props: {
       hit: { type: Object, required: true},
       pool: {type: String, required: true},
-      count: {type: Number, required: true}
    },
    components: {
       AddBookmark, TruncatedText, SignInRequired

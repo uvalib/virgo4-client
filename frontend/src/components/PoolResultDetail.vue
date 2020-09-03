@@ -25,13 +25,13 @@
          </div>
          <div v-else class="hits">
             <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
-               <li v-for="(hit,idx) in selectedResults.hits" class="image hit-wrapper" :key="idx">
-                  <ImageSearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
+               <li v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
+                  <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
                </li>
             </ul>
             <div v-else class="hits-content">
-               <div v-for="(hit,idx) in selectedResults.hits" class="hit-wrapper" :key="idx">
-                  <SearchHit :pool="selectedResults.pool.id" :count="idx+1" :hit="hit" :key="idx"/>
+               <div v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.identifier}`">
+                  <SearchHit :pool="selectedResults.pool.id" :count="hit.number" :hit="hit"/>
                </div>
             </div>
          </div>

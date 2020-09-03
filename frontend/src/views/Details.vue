@@ -4,7 +4,7 @@
          <span v-if="selectedHitIdx > -1 && selectedResults.total > 1" class="hidden-spacer"></span>
          <h1>Item Details</h1>
          <span class="paging" v-if="selectedHitIdx > -1">
-            <V4Pager :total="selectedResults.total" :page="selectedHitIdx+1"
+            <V4Pager :total="selectedResults.total" :page="selectedHit.number"
                :prevAvailable="prevHitAvailable" :nextAvailable="nextHitAvailable"
                @next="nextHitClicked" @prior="priorHitClicked"
             />
@@ -187,7 +187,7 @@ export default {
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
          prevHitAvailable: 'prevHitAvailable',
-         selectedHitIdentifier: 'selectedHitIdentifier',
+         selectedHit: 'selectedHit',
          selectedResults: 'selectedResults'
       }),
       itemURL() {
@@ -262,14 +262,14 @@ export default {
          await this.$store.dispatch("nextHit")
          let url = this.$route.fullPath
          let lastSlash = url.lastIndexOf("/")
-         url = url.substring(0,lastSlash )+"/"+this.selectedHitIdentifier
+         url = url.substring(0,lastSlash )+"/"+this.selectedHit.identifier
          this.$router.push(url)
       },
       async priorHitClicked() {
          await this.$store.dispatch("priorHit")
          let url = this.$route.fullPath
          let lastSlash = url.lastIndexOf("/")
-         url = url.substring(0,lastSlash )+"/"+this.selectedHitIdentifier
+         url = url.substring(0,lastSlash )+"/"+this.selectedHit.identifier
          this.$router.push(url)
       },
       copyrightIconSrc( info ) {
