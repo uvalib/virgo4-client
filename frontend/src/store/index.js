@@ -220,9 +220,14 @@ export default new Vuex.Store({
       addPoolSearchResults(state, poolResults) {
          let tgtPool = state.results[state.selectedResultsIdx]
          let lastHit = tgtPool.hits[tgtPool.hits.length-1]
-         let hitNumber  = lastHit.number+1
-         if (lastHit.grouped) {
-            hitNumber = lastHit.group[lastHit.group.length-1].number+1
+
+         // When a facet is applied, the results are cleared and there is no last hit
+         let hitNumber = 1
+         if (lastHit) {
+            lastHit.number+1
+            if (lastHit.grouped) {
+               hitNumber = lastHit.group[lastHit.group.length-1].number+1
+            }
          }
 
          tgtPool.timeMS = poolResults.elapsed_ms
@@ -396,8 +401,12 @@ export default new Vuex.Store({
       // advanced search parameters and will always start at page 1.
       // If isRestore is true, the spinner will not be cleared after the search
       // CTX: commit: ƒ boundCommit(type, payload, options)
-      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
+      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, awaitFacets) {
          commit('system/setError', "")
+         let hideSpinner = true
+         if (awaitFacets === true) {
+            hideSpinner = false
+         }
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
@@ -430,10 +439,9 @@ export default new Vuex.Store({
             dispatch("bookmarks/getBookmarks")
          }
 
+         // POST the search query and wait for the response
          let url = state.system.searchAPI + "/api/search"
-         try {
-            // POST the search query and wait for the response
-            let response = await axios.post(url, req)
+         await axios.post(url, req).then((response) => {
             commit('pools/setPools', response.data.pools)
             commit('setSearchResults', { results: response.data, tgtPool: rootState.query.targetPool })
             commit('sort/setActivePool', state.results[state.selectedResultsIdx].pool.id)
@@ -449,23 +457,26 @@ export default new Vuex.Store({
                router.replace({ query })
             }
 
-            commit('setSearching', false)
+            if ( hideSpinner) {
+               commit('setSearching', false)
+            }
 
             dispatch("searches/updateHistory")
             return dispatch("filters/getSelectedResultFacets", true)
-         } catch (error) {
+         }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
             commit('filters/setUpdatingFacets', false)
             if (error.response && error.response.status == 401) {
                commit('system/setSessionExpired', null, { root: true })
                dispatch("user/signout", "/", { root: true })
+               // TODO check error.response.data.message too!
             } else {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)
             }
-         }
+         })
       },
 
       // SearchSelectedPool is called only when one specific set of pool results is selected for
@@ -492,18 +503,8 @@ export default new Vuex.Store({
          }
 
          let url = tgtResults.pool.url + "/api/search"
-         try {
-            let response = await axios.post(url, req)
-            commit('addPoolSearchResults', response.data)
-            commit('setSearching', false)
-            if (state.otherSrcSelection.id != "") {
-               commit('updateOtherPoolLabel')
-            }
-
-            dispatch("searches/updateHistory")
-            return dispatch("filters/getSelectedResultFacets", true)
-         } catch (error) {
-            console.error("SINGLE POOL SEARCH FAILED: " + error)
+         let response = await axios.post(url, req).catch((error) => {
+            console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)
             commit('filters/setUpdatingFacets', false)
             if (error.response && error.response.status == 401) {
@@ -514,7 +515,15 @@ export default new Vuex.Store({
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)
             }
+         })
+         commit('addPoolSearchResults', response.data)
+         commit('setSearching', false)
+         if (state.otherSrcSelection.id != "") {
+            commit('updateOtherPoolLabel')
          }
+
+         dispatch("searches/updateHistory")
+         return dispatch("filters/getSelectedResultFacets", true)
       },
 
       // Select pool results and get all facet info for the result
