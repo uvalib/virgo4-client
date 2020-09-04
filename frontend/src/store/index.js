@@ -467,11 +467,25 @@ export default new Vuex.Store({
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
             commit('filters/setUpdatingFacets', false)
-            if (error.response && error.response.status == 401) {
-               commit('system/setSessionExpired', null, { root: true })
-               dispatch("user/signout", "/", { root: true })
-               // TODO check error.response.data.message too!
-            } else {
+            let genericError = true
+            if (error.response) {
+               if (error.response.status == 401) {
+                  commit('system/setSessionExpired', null, { root: true })
+                  dispatch("user/signout", "/", { root: true })
+               } else if (error.response.data && error.response.data.message) {
+                  genericError = false
+                  let msg =  error.response.data.message
+                  msg += "<p>We regret the inconvenience. If this problem persists, "
+                  msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>"
+                  let err = {
+                     message: msg,
+                     details: error.response.data.details
+                  }
+                  commit('system/setError', err)
+               }
+            }
+
+            if (genericError) {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)

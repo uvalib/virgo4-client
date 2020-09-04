@@ -9,6 +9,7 @@ const system = {
       devServer: false,
       fatal: "",
       error: "",
+      errorDetail: "",
       ilsError: "",
       message: "",
       version: "unknown",
@@ -97,6 +98,7 @@ const system = {
          if (error == null) {
             error = ""
          }
+         state.errorDetail = ""
          if (error.response) {
             // Server responded with a status code out of the range of 2xx
             // If this is a 401, a session has expired when making a request.
@@ -116,8 +118,10 @@ const system = {
             // The request was made but no response was received
             state.error = "Search is non-responsive"
          } else if (error.message) {
-            // Something happened in setting up the request that triggered an Error
             state.error = error.message
+            if ( error.details ) {
+               state.errorDetail = error.details
+            }
          } else {
             // likely just a string error; just set it
             state.error = error
@@ -136,7 +140,7 @@ const system = {
 
    actions: {
       // Call getConfig at startup to get client configuration parameters
-      getConfig(ctx) {
+      async getConfig(ctx) {
          if (ctx.state.searchAPI != "") {
             return
          }
