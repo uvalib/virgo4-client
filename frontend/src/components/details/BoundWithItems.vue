@@ -38,6 +38,7 @@ export default {
 <style lang="scss" scoped>
 .bound-with {
   border: 1px solid var(--uvalib-grey-light);
+  margin-bottom: 2rem;
 
   p.group-header {
     text-align: left;
