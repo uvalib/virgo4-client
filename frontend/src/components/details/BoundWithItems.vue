@@ -53,6 +53,7 @@ export default {
     padding: 10px 15px;
 
     .card {
+      flex: 0 50%;
       text-align: left;
       padding: 10px;
       font-size: 0.8em;
