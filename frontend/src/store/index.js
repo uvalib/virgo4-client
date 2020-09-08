@@ -12,7 +12,6 @@ import filters from './modules/filters'
 import item from './modules/item'
 import reserves from './modules/reserves'
 import preferences from './modules/preferences'
-import journals from './modules/journals'
 import feedback from './modules/feedback'
 import restore from './modules/restore'
 import requests from './modules/requests'
@@ -557,7 +556,6 @@ export default new Vuex.Store({
       bookmarks: bookmarks,
       filters: filters,
       item: item,
-      journals: journals,
       pools: pools,
       preferences: preferences,
       query: query,
