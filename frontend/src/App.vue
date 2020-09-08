@@ -301,21 +301,36 @@ body {
       max-width: 95%;
    }
 }
-
-.alertbox {
+/* Regional Alert Boxes */
+.ra-box {
    position: relative;
    padding: .75rem 1.25rem;
    margin-bottom: 1rem;
    border: 1px solid transparent;
    border-radius: .25rem;
-   h2:first-of-type {
-      margin-top: .5rem;
+   h2{
+      &:first-of-type {
+         margin-top: .5rem;
+      }
    }
-} 
-.alertbox-primary {
-   background-color: var(--uvalib-teal-lightest);
-   border-color: var(--uvalib-teal-light);
-   color: var(--uvalib-text-dark);
+   h3{
+      &:first-of-type {
+         margin-top: .5em;
+      }
+      &:last-of-type {
+         margin-top: 2em;
+      }
+   }
+   &.ra-fiy {
+      background-color: var(--uvalib-teal-lightest);
+      border-color: var(--uvalib-teal-light);
+      color: var(--uvalib-text-dark);
+   }
+   &.ra-notice {
+      background-color: var(--uvalib-yellow);
+      border-color: var(--uvalib-yellow-dark);
+      color: #000;
+   }
 }
 
 .no-wrap {
