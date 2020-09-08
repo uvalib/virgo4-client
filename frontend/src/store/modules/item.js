@@ -57,7 +57,8 @@ const item = {
          let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status != "FAILED" && dc.pdf.status != "PROCESSING" && dc.pdf.status != "100%")
          pdfs.forEach( item => {
             if ( item.pdf.status == "READY") {
-               state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download, name: item.label})
+               state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download,
+                  name: item.label, thumbnail: item.thumbnail_url})
             } else if ( item.pdf.status.includes("%")) {
                state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download,
                   statusURL: item.pdf.urls.status, name: item.label})
