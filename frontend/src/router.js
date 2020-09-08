@@ -186,7 +186,7 @@ const router = new Router({
 router.beforeEach( (to, from, next) => {
    // Some pages just require an auth token...
    store.commit("system/setILSError", "")
-   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "public-bookmarks", "feedback", "item"]
+   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "public-bookmarks", "feedback", "item", "checkouts" ]
    if (tokenPages.includes(to.name)) {
       // console.log(`Page ${to.name} requires auth token only`)
       ensureAuthTokenPresent( next )
@@ -194,7 +194,7 @@ router.beforeEach( (to, from, next) => {
    }
 
    // Some pages require a signed in user...
-   let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
+   let userPages = ["preferences", "account", "bookmarks", "digital-deliveries",
       "course-reserves-request", "requests", "searches"]
    if (userPages.includes(to.name)) {
       // console.log(`Page ${to.name} requires signed in user`)

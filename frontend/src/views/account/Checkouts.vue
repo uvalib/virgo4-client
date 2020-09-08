@@ -1,7 +1,17 @@
 <template>
    <div class="checkout">
       <h1>My Account</h1>
-      <div class="checkout-content">
+      <div class="checkout-content" v-if="isSignedIn == false">
+         <h3>You must be signed in to access checkout information.</h3>
+         <p>
+            Click
+            <V4Button mode="text" id="link" @click="signInClicked" aria-label="Sign in to view checkout information">
+               here
+            </V4Button>
+            to sign in.
+         </p>
+      </div>
+      <div v-else class="checkout-content">
          <AccountActivities/>
          <V4Spinner v-if="renewing" message="Renew in progress..." v-bind:overlay="true" />
          <div v-if="lookingUpUVA" class="working">
@@ -139,12 +149,16 @@ export default {
       ...mapGetters({
         sortedCheckouts: 'user/sortedCheckouts',
         isBarred: 'user/isBarred',
+        isSignedIn: 'user/isSignedIn'
       }),
       illiadCheckouts() {
          return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
       }
    },
    methods: {
+      signInClicked() {
+         this.$router.push("/signin")
+      },
       sortChanged() {
          this.$store.commit("user/sortCheckouts", this.$refs.uvasort.value)
       },
@@ -175,17 +189,19 @@ export default {
       }
    },
    async created() {
-      this.lookingUpILL = true
-      this.lookingUpUVA = true
-      await this.$store.dispatch("user/getRequests")
-      this.lookingUpILL = false
+      if ( this.isSignedIn ) {
+         this.lookingUpILL = true
+         this.lookingUpUVA = true
+         await this.$store.dispatch("user/getRequests")
+         this.lookingUpILL = false
 
-      await this.$store.dispatch("user/getCheckouts")
-      this.lookingUpUVA = false
+         await this.$store.dispatch("user/getCheckouts")
+         this.lookingUpUVA = false
 
-      setTimeout(()=> {
-         document.getElementById("checkouts-submenu").focus()
-      }, 250)
+         setTimeout(()=> {
+            document.getElementById("checkouts-submenu").focus()
+         }, 250)
+      }
    }
 }
 </script>
