@@ -6,7 +6,11 @@
          <div class="searches">
             <template v-for="(s,idx) in suggestions.slice(0,2)">
                <span class="sep" v-if="idx > 0" :key="`sep${idx}`">|</span>
-               <router-link class="suggestion" :key="`s${idx}`" :aria-label="linkLabel(s)" :to="getRelatedLink(s)">
+               <router-link @mousedown.native="suggestionClick"
+                  class="suggestion" :key="`s${idx}`"
+                  :aria-label="linkLabel(s)"
+                  :to="getRelatedLink(s)"
+               >
                   {{s.value}}
                </router-link>
             </template>
@@ -32,6 +36,7 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import { mapFields } from 'vuex-map-fields'
 export default {
    name: "SearchSuggestions",
    data: function() {
@@ -45,9 +50,15 @@ export default {
       }),
       ...mapGetters({
         rawQueryString: 'query/string',
-      })
+      }),
+      ...mapFields({
+        userSearched: 'query.userSearched',
+      }),
    },
    methods: {
+      suggestionClick() {
+         this.userSearched = true
+      },
       linkLabel(sug) {
          return `${sug.value}, suggested author related to your search`
       },

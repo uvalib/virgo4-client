@@ -68,8 +68,9 @@
             <input type="text" v-model="request.month" id="month">
          </div>
          <div class="entry pure-control-group">
-            <label for="year">Year</label>
+            <label for="year">Year<span class="required">*</span></label>
             <input type="text" v-model="request.year" id="year">
+            <span v-if="hasError('year')" class="error">Year is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="pages">Pages<span class="required">*</span></label>
@@ -167,7 +168,7 @@ export default {
          error: "",
          pageLengthError: false,
          errors: [],
-         required: ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage'],
+         required: ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage', 'year'],
          request: {
             scanType: "INSTRUCTIONAL",
             course: "",

@@ -39,11 +39,12 @@ type IlliadConfig struct {
 // ServiceConfig defines all of the v4client service configuration parameters
 type ServiceConfig struct {
 	Port               int
+	AvailabilityURL    string
 	VirgoURL           string
 	CitationsURL       string
 	SearchAPI          string
 	CourseReserveEmail string
-	LawReserveEmaiil   string
+	LawReserveEmail    string
 	FeedbackEmail      string
 	ILSAPI             string
 	JWTKey             string
@@ -67,11 +68,12 @@ func LoadConfig() *ServiceConfig {
 	var cfg ServiceConfig
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
+	flag.StringVar(&cfg.AvailabilityURL, "availability", "https://availability-ws-dev.internal.lib.virginia.edu", "Availability service URL")
 	flag.StringVar(&cfg.CitationsURL, "citations", "https://citations-ws-dev.internal.lib.virginia.edu", "Citations service URL")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.JWTKey, "jwtkey", "", "JWT signature key")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
-	flag.StringVar(&cfg.LawReserveEmaiil, "lawemail", "", "Law Email recipient for course reserves requests")
+	flag.StringVar(&cfg.LawReserveEmail, "lawemail", "", "Law Email recipient for course reserves requests")
 	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 
@@ -120,10 +122,10 @@ func LoadConfig() *ServiceConfig {
 	} else {
 		log.Printf("Course Reserves email recipient: %s", cfg.CourseReserveEmail)
 	}
-	if cfg.LawReserveEmaiil == "" {
+	if cfg.LawReserveEmail == "" {
 		log.Fatal("lawemail param is required")
 	} else {
-		log.Printf("Law Course Reserves email recipient: %s", cfg.LawReserveEmaiil)
+		log.Printf("Law Course Reserves email recipient: %s", cfg.LawReserveEmail)
 	}
 	if cfg.FeedbackEmail == "" {
 		log.Fatal("feedbackemail param is required")
@@ -143,6 +145,7 @@ func LoadConfig() *ServiceConfig {
 	if cfg.JWTKey == "" {
 		log.Fatal("jwtkey param is required")
 	}
+	log.Printf("Availability URL: %s", cfg.AvailabilityURL)
 
 	return &cfg
 }

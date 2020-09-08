@@ -1,12 +1,14 @@
 <template>
    <div :id="id" class="disclosure">
-      <V4Button mode="text" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`" 
+      <V4Button mode="text" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`"
          @click="toggle" @esc="hide" @blur.native="blurred">
          <i class="arrow fas fa-caret-right" :style="{ transform: rotation }"></i>
          <slot name="summary"></slot>
       </V4Button>
       <transition name="fade">
-         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text" @keyup.stop.esc="hide">
+         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text"
+            :style="{background: backgroundColor, 'border-color': borderColor}"
+            @keyup.stop.esc="hide">
             <slot name="content"></slot>
          </div>
       </transition>
@@ -23,6 +25,14 @@ export default {
       closeOnBlur: {
          type: Boolean,
          default: true
+      },
+      backgroundColor: {
+         type: String,
+         default: "var(--uvalib-blue-alt-light)"
+      },
+      borderColor: {
+         type: String,
+         default: "var(--uvalib-blue-alt)"
       }
    },
    data: function() {
@@ -41,7 +51,7 @@ export default {
    methods: {
       blurred() {
          if (this.closeOnBlur) {
-            this.hide()       
+            this.hide()
          }
       },
       hide() {
@@ -60,8 +70,6 @@ export default {
    display: inline-block;
    text-align: left;
    .full-text {
-      background: var(  --uvalib-blue-alt-light);
-      border: 1px solid var(--uvalib-blue-alt);
       margin: 0px 10px 5px 15px;
       padding: 0;
       position: absolute;
@@ -70,6 +78,8 @@ export default {
       color: var(--uvalib-text-dark);
       font-weight: normal;
       z-index: 9999;
+      min-width: 20%;
+      max-width: 50%;
    }
    .arrow {
       padding-left: 2px;

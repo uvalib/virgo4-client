@@ -10,14 +10,17 @@
                <span v-else tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">Virgo Message</span>
             </div>
             <div class="message-body" id="msgbody" v-html="messageContent"></div>
+            <div class="details" v-if="details">
+               <ErrorDetails :details="details"/>
+            </div>
             <div class="controls">
                <V4Button v-if="type=='error'" id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
-                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack" 
+                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack"
                   :focusNextOverride="true" @tabnext="btnTabNext">
                   OK
                </V4Button>
-               <V4Button v-else id="okbtn" mode="primary" @esc="dismiss" :tabOverride="true" 
-                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack" 
+               <V4Button v-else id="okbtn" mode="primary" @esc="dismiss" :tabOverride="true"
+                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack"
                   :focusNextOverride="true" @tabnext="btnTabNext">
                   OK
                </V4Button>
@@ -29,6 +32,7 @@
 
 <script>
 import { mapState } from "vuex"
+import ErrorDetails from "@/components/disclosures/ErrorDetails"
 export default {
    props: {
       type: {
@@ -36,10 +40,14 @@ export default {
          default: "error"
       }
    },
+   components: {
+      ErrorDetails
+   },
    computed: {
       ...mapState({
          error: state => state.system.error,
          message: state => state.system.message,
+         details: state => state.system.errorDetail,
       }),
       msgRole() {
          if ( this.type == "error") {
@@ -48,7 +56,7 @@ export default {
          return "dialog"
       },
       hasMessage() {
-         return (this.error != "" && this.type == "error" || 
+         return (this.error != "" && this.type == "error" ||
                  this.message != "" && this.type == "info")
       },
       messageContent() {
@@ -100,9 +108,14 @@ div.messsage-box {
    z-index: 9999;
    top: $quarter;
 
+   .details {
+      text-align: left;
+      padding: 0 30px 20px 30px;
+   }
+
    .message {
       display: inline-block;
-      text-align: center;
+      text-align: left;
       background: white;
       padding: 0px;
       box-shadow: $v4-box-shadow;
@@ -133,11 +146,11 @@ div.messsage-box {
 
       .message-body {
          text-align: left;
-         padding: 20px 30px;
+         padding: 20px 30px 0 30px;
          font-weight: normal;
          opacity: 1;
          visibility: visible;
-         text-align: center;
+         text-align: left;
          word-break: break-word;
          -webkit-hyphens: auto;
          -moz-hyphens: auto;
@@ -146,7 +159,7 @@ div.messsage-box {
       }
 
       .controls {
-         padding: 0 10px 10px 0;
+         padding: 15px 10px 10px 0;
          font-size: 0.9em;
          text-align: right;
       }

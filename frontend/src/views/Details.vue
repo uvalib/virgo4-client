@@ -4,7 +4,7 @@
          <span v-if="selectedHitIdx > -1 && selectedResults.total > 1" class="hidden-spacer"></span>
          <h1>Item Details</h1>
          <span class="paging" v-if="selectedHitIdx > -1">
-            <V4Pager :total="selectedResults.total" :page="selectedHitIdx+1"
+            <V4Pager :total="selectedResults.total" :page="selectedHit.number"
                :prevAvailable="prevHitAvailable" :nextAvailable="nextHitAvailable"
                @next="nextHitClicked" @prior="priorHitClicked"
             />
@@ -73,10 +73,9 @@
                      <dt class="label">Download PDF:</dt>
                      <dd class="value">
                         <template v-for="(dc,idx) in pdfs">
-                           <a v-if="dc.status=='READY'" :href="dc.url" :key="`pdf${idx}`"
-                              :aria-label="`download pdf for ${dc.name}`"
-                           >
-                              {{dc.name}}
+                           <a v-if="dc.status=='READY'" :key="`pdf${idx}`" :href="dc.url" :aria-label="`download pdf for ${dc.name}`" class="pdf-download">
+                              <img v-if="dc.thumbnail" :src="dc.thumbnail"/>
+                              <span class="label">{{dc.name}}</span>
                            </a>
                            <DownloadProgress v-else :name="dc.name" :id="`${details.identifier}-pdf${idx}`" :key="`pdf${idx}`"
                               :ariaLabel="`download pdf for ${dc.name}`"
@@ -187,7 +186,7 @@ export default {
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
          prevHitAvailable: 'prevHitAvailable',
-         selectedHitIdentifier: 'selectedHitIdentifier',
+         selectedHit: 'selectedHit',
          selectedResults: 'selectedResults'
       }),
       itemURL() {
@@ -262,14 +261,14 @@ export default {
          await this.$store.dispatch("nextHit")
          let url = this.$route.fullPath
          let lastSlash = url.lastIndexOf("/")
-         url = url.substring(0,lastSlash )+"/"+this.selectedHitIdentifier
+         url = url.substring(0,lastSlash )+"/"+this.selectedHit.identifier
          this.$router.push(url)
       },
       async priorHitClicked() {
          await this.$store.dispatch("priorHit")
          let url = this.$route.fullPath
          let lastSlash = url.lastIndexOf("/")
-         url = url.substring(0,lastSlash )+"/"+this.selectedHitIdentifier
+         url = url.substring(0,lastSlash )+"/"+this.selectedHit.identifier
          this.$router.push(url)
       },
       copyrightIconSrc( info ) {
@@ -368,6 +367,22 @@ export default {
       grid-template-columns: 1fr 2fr;
       dt.label {
          white-space: normal;
+      }
+   }
+
+   .pdf-download {
+      display: inline-block;
+      text-align: center;
+      margin: 5px;
+      border: 1px solid var(--uvalib-grey-light);
+      padding: 5px 10px;
+      border-radius: 5px;
+      img {
+         display: inline-block;
+         border-radius: 5px;
+      }
+      span {
+         display: block
       }
    }
 

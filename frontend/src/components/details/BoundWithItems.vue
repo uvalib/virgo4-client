@@ -3,11 +3,12 @@
 
   <p class="group-header">Bound in:</p>
   <div class="items">
-    <a class="card" v-for="item in boundIn" :key="item.itemID" :href="'/items/u'+item.title_id">
+    <router-link class="card" v-for="item in boundIn" :key="item.itemID" :to="'/items/u'+item.title_id">
       <p class="title">{{item.title}}</p>
       <p>{{item.author}}</p>
       <p>{{item.call_number}}</p>
-    </a>
+      <p v-if="'u'+item.title_id != identifier">(Click for availability)</p>
+    </router-link>
   </div>
 
   <p class="group-header">Bound with these items:</p>
@@ -28,14 +29,16 @@ export default {
       ...mapGetters({
         boundIn: 'item/boundIn',
         boundWith: 'item/boundWith',
-      })
-  }
+        identifier: 'item/identifier'
+      }),
+  },
 
 }
 </script>
 <style lang="scss" scoped>
 .bound-with {
   border: 1px solid var(--uvalib-grey-light);
+  margin-bottom: 2rem;
 
   p.group-header {
     text-align: left;
@@ -50,6 +53,7 @@ export default {
     padding: 10px 15px;
 
     .card {
+      flex: 0 50%;
       text-align: left;
       padding: 10px;
       font-size: 0.8em;

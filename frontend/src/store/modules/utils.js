@@ -1,6 +1,6 @@
-// Each search ppol hit contains an array of field objects. These may be repeated, but for display 
-// purposes they need to be merged into a single field object with an array value. Additionally, the fields 
-// are classified as header (special rendering), basic (show by default), 
+// Each search ppol hit contains an array of field objects. These may be repeated, but for display
+// purposes they need to be merged into a single field object with an array value. Additionally, the fields
+// are classified as header (special rendering), basic (show by default),
 // detailed (hidden by default). Split them into separate sections of the hit. Identifer and
 // cover image are also special and get pulled to top level of hit data
 export function preProcessHitFields(hits) {
@@ -38,7 +38,7 @@ export function preProcessHitFields(hits) {
                if (!sep) {
                   sep = "; "
                }
-               hit.header.author = {label: field.label, separator: sep, value: []}   
+               hit.header.author = {label: field.label, separator: sep, value: []}
             }
             hit.header.author.label = field.label
             hit.header.author.value.push(field.value)
@@ -52,22 +52,22 @@ export function preProcessHitFields(hits) {
          // Access_url is a special case. Instead of just repeated value, it also
          // has provider and item. preserve the data, grouped by provider. Ex:
          // { name: access_url, label: "Online Access", value: [
-         //    {provider: "hathitrust", links: [ {url: url, label: "v4. 1988"} ] }  
+         //    {provider: "hathitrust", links: [ {url: url, label: "v4. 1988"} ] }
          // ]}
          if (field.name=="access_url") {
             let existing = hit.basicFields.find(f => f.name === field.name)
             if (existing) {
-               let provider = field.provider 
+               let provider = field.provider
                let newLink = {url: field.value}
                if ( field.item ) {
-                  newLink.label = field.item   
+                  newLink.label = field.item
                }
                let provData = existing.value.find( f => f.provider == provider)
                if (!provData) {
                   // a provider group does not exist; create one and set it to currProvider
                   provData = {provider: provider, links: []}
                   existing.value.push(provData)
-               } 
+               }
                provData.links.push(newLink)
             } else {
                let newF = {name: field.name, type: field.type, label: field.label,
@@ -75,7 +75,7 @@ export function preProcessHitFields(hits) {
                let newVal = {provider: field.provider, links: []}
                let newLink = {url: field.value}
                if ( field.item ) {
-                  newLink.label = field.item   
+                  newLink.label = field.item
                }
                newVal.links.push( newLink )
                newF.value.push( newVal )
@@ -92,7 +92,7 @@ export function preProcessHitFields(hits) {
             if (existing) {
                existing.value.push( val )
             } else {
-               let f = Object.assign({}, field) 
+               let f = Object.assign({}, field)
                delete f.item
                delete f.value
                f.value = [val]
@@ -134,19 +134,19 @@ export function preProcessHitFields(hits) {
 
 export function fieldValueString(field) {
    if ( Array.isArray(field.value)) {
-      let sep = field.separator 
+      let sep = field.separator
       if (sep == "paragraph") {
          let out = "<p>"
          field.value.forEach( (v,idx) => {
             out += v
-            if (idx === field.value.length - 1) { 
+            if (idx === field.value.length - 1) {
                out += "</p>"
             } else {
                out += "</p><p>"
             }
          })
          return out
-      } 
+      }
 
       if (!sep) {
          sep = ", "
@@ -167,8 +167,9 @@ export function getGroupHitMetadata(group, hit) {
       hit.identifier = group.record_list[0].identifier
       group.record_list.shift()
       hit.group = group.record_list
-      hit.group.forEach(h => {
+      hit.group.forEach( (h,idx) => {
          h.groupParent = hit.identifier
+         h.number = hit.number+idx+1
       })
    } else {
       hit.header.title = "ERROR: Mising group data"

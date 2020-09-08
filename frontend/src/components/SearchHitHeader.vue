@@ -3,7 +3,7 @@
       <div class="title-wrapper">
          <div class="full-title">
             <span class="count-wrap" v-if="count">
-               <span class="count">{{count}}</span><span v-if="subcount" class="count sub">.{{subcount}}</span>
+               <span class="count">{{count}}</span>
             </span>
             <template v-if="link == false">
                <span class="hit-title" v-html="hit.header.title"></span>
@@ -51,10 +51,6 @@ export default {
          type: Number,
          default: 0
       },
-      subcount: {
-         type: Number,
-         default: 0
-      }
    },
    components: {
       AddBookmark,SignInRequired,TruncatedText
@@ -86,6 +82,40 @@ export default {
    display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
+   .hit-title {
+      font-weight: bold;
+      display: inline-block;
+      margin-right: 5px;
+   }
+   .hit-subtitle {
+      display: inline-block;
+      font-weight: normal;
+   }
+   .full-title {
+      font-size: 1.25em;
+      display:flex;
+      flex-flow: row nowrap;
+      align-items: flex-start;
+      justify-content: flex-start;
+   }
+
+   .count-wrap {
+      display: flex;
+      flex-flow: row nowrap;
+      margin-top: 2px;
+      margin-right: 5px;
+      align-items: baseline;
+
+      .count {
+         display: inline-block;
+         font-size: 0.7em;
+         color: var( --uvalib-grey );
+      }
+   }
+   div.bm-control {
+      margin-left: auto;
+      padding: 5px;
+   }
 }
 
 .author-wrapper {
@@ -93,49 +123,5 @@ export default {
    padding-left: 40px;
    padding-top: 5px;
    padding-bottom: 10px;
-}
-
-#app .basic a:hover {
-   text-decoration: none;
-   color: var(--color-link)
-}
-
-div.bm-control {
-   margin-left: auto;
-   padding: 5px;
-}
-
-.hit-title {
-   font-weight: bold;
-   display: inline-block;
-   margin-right: 5px;
-}
-.hit-subtitle {
-   display: inline-block;
-   font-weight: normal;
-}
-.full-title {
-   font-size: 1.25em;
-   display:flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-   justify-content: flex-start;
-}
-
-.count-wrap {
-   display: flex;
-   flex-flow: row nowrap;
-   margin-top: 2px;
-   margin-right: 5px;
-   align-items: baseline;;
-
-   .count {
-      display: inline-block;
-      font-size: 0.7em;
-      color: var( --uvalib-grey );
-   }
-   .count.sub {
-      font-size: 0.65em;
-   }
 }
 </style>

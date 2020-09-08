@@ -12,7 +12,6 @@ import filters from './modules/filters'
 import item from './modules/item'
 import reserves from './modules/reserves'
 import preferences from './modules/preferences'
-import journals from './modules/journals'
 import feedback from './modules/feedback'
 import restore from './modules/restore'
 import requests from './modules/requests'
@@ -35,6 +34,7 @@ export default new Vuex.Store({
       autoExpandGroupID: "",
       selectedResultsIdx: -1,
       selectedHitIdx: -1,
+      selectedHitGroupIdx: -1,
       lastSearchScrollPosition: 0,
       lastSearchURL: "",
       otherSrcSelection: { id: "", name: "" }
@@ -42,21 +42,39 @@ export default new Vuex.Store({
 
    getters: {
       getField,
-      selectedHitIdentifier: state => {
+      selectedHit: state => {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
-            return ""
+            return {}
          }
-         return state.results[state.selectedResultsIdx].hits[state.selectedHitIdx].identifier
+         let hit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
+         if (hit.grouped && state.selectedHitGroupIdx > -1 ) {
+            return hit.group[state.selectedHitGroupIdx]
+         }
+         return hit
       },
-      nextHitAvailable: state => {
-         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
+      nextHitAvailable: (state, getters) => {
+         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
+
+         // if there are more to be loaded, next is definitily active
+         if (getters.hasMoreHits) {
+            return true
+         }
+
+         // no more results to be loaded, get the currently seleceted hit
          let tgtResults = state.results[state.selectedResultsIdx]
-         return state.selectedHitIdx < tgtResults.total-1
+         let selHit = tgtResults.hits[state.selectedHitIdx]
+         if (selHit.grouped == false ) {
+            // not grouped; disable if this is the last hit
+            return state.selectedHitIdx < tgtResults.hits.length-1
+         }
+
+         // grouped; check if the selected group is last
+         return state.selectedHitGroupIdx <= selHit.group.length-1
       },
       prevHitAvailable: state => {
-         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
+         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
          return state.selectedHitIdx > 0
@@ -78,7 +96,15 @@ export default new Vuex.Store({
             return false
          }
          let tgtResults = state.results[state.selectedResultsIdx]
-         return tgtResults.total > tgtResults.hits.length
+         let resultsCnt = 0
+         tgtResults.hits.forEach( r => {
+            if (r.grouped) {
+               resultsCnt += r.count
+            } else {
+               resultsCnt++
+            }
+         })
+         return tgtResults.total > resultsCnt
       },
    },
 
@@ -86,6 +112,7 @@ export default new Vuex.Store({
       updateField,
       hitSelected(state, identifier) {
          state.selectedHitIdx = -1
+         state.selectedHitGroupIdx = -1
          if ( state.selectedResultsIdx == -1) return
 
          state.results[state.selectedResultsIdx].hits.some( (h,idx) => {
@@ -95,17 +122,51 @@ export default new Vuex.Store({
                let gIdx = h.group.findIndex( g => g.identifier == identifier)
                if ( gIdx > -1 ) {
                   state.selectedHitIdx = idx
+                  state.selectedHitGroupIdx = gIdx
                }
             }
             return state.selectedHitIdx != -1
           })
           if ( state.selectedHitIdx != -1 ) {
-             // this also gets called on from details page. If it is from there, dont update last info
-            if (router.currentRoute.fullPath.includes("/sources") == false) {
+             // this also gets called on from details page. Only update last if route is home or search
+            if (router.currentRoute.path == "/search" ||  router.currentRoute.path == "/") {
                state.lastSearchURL = router.currentRoute.fullPath
                state.lastSearchScrollPosition = window.scrollY
             }
           }
+      },
+      nextHit(state) {
+         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) return
+         let currHit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
+         if ( currHit.grouped) {
+            if ( state.selectedHitGroupIdx == currHit.group.length-1) {
+               state.selectedHitIdx++
+               state.selectedHitGroupIdx = -1
+            } else {
+               state.selectedHitGroupIdx++
+            }
+         } else {
+            state.selectedHitIdx++
+         }
+      },
+      priorHit(state) {
+         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) return
+         let currHit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
+
+         // are we currently on a grouped result and not on the head?
+         if ( currHit.grouped && state.selectedHitGroupIdx >= 0) {
+            // just go to prior item in the group
+            state.selectedHitGroupIdx--
+         } else {
+            // paging back to a new hit; must check if it is grouped and select
+            // the last member of the group if so
+            state.selectedHitGroupIdx = -1
+            state.selectedHitIdx--
+            currHit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
+            if ( currHit.grouped ) {
+               state.selectedHitGroupIdx = currHit.group.length-1
+            }
+         }
       },
       setAutoExpandGroupID(state, id) {
          state.autoExpandGroupID = id
@@ -155,13 +216,19 @@ export default new Vuex.Store({
          state.lastSearchURL = ""
       },
 
-      toggleGroupExpanded(state, hitIdx) {
-         let group = state.results[state.selectedResultsIdx].hits[hitIdx]
-         group.expanded = !group.expanded
-      },
-
       addPoolSearchResults(state, poolResults) {
          let tgtPool = state.results[state.selectedResultsIdx]
+         let lastHit = tgtPool.hits[tgtPool.hits.length-1]
+
+         // When a facet is applied, the results are cleared and there is no last hit
+         let hitNumber = 1
+         if (lastHit) {
+            lastHit.number+1
+            if (lastHit.grouped) {
+               hitNumber = lastHit.group[lastHit.group.length-1].number+1
+            }
+         }
+
          tgtPool.timeMS = poolResults.elapsed_ms
          tgtPool.statusCode = 200
          tgtPool.statusMessage = ""
@@ -177,11 +244,15 @@ export default new Vuex.Store({
                if (group.count == 1) {
                   let hit = group.record_list[0]
                   hit.grouped = false
+                  hit.count = 1
+                  hit.number = hitNumber
                   tgtPool.hits.push(hit)
+                  hitNumber++
                } else {
-                  let hit = { grouped: true, count: group.count, group: group.record_list }
+                  let hit = { grouped: true, count: group.count, number: hitNumber, group: group.record_list }
                   utils.getGroupHitMetadata(group, hit)
                   tgtPool.hits.push(hit)
+                  hitNumber+=group.count
                }
             })
          }
@@ -193,10 +264,14 @@ export default new Vuex.Store({
          state.results.splice(0, state.results.length)
          let firstPoolWithHits = -1
          let tgtPoolIdx = -1
+
          data.results.pool_results.forEach((pr, idx) => {
             if (!pr.group_list) {
                pr.group_list = []
             }
+
+            // reset hit counter for each pool
+            let hitNum = 1
 
             // if a preffered pool was set in prefs (or url) track its index in results
             // so it can be selected after all results are updated
@@ -228,11 +303,15 @@ export default new Vuex.Store({
                if (group.count == 1) {
                   let hit = group.record_list[0]
                   hit.grouped = false
+                  hit.count = 1
+                  hit.number = hitNum
                   result.hits.push(hit)
+                  hitNum++
                } else {
-                  let hit = { grouped: true, expanded: false, count: group.count }
+                  let hit = { grouped: true, count: group.count, number: hitNum }
                   utils.getGroupHitMetadata(group, hit)
                   result.hits.push(hit)
+                  hitNum += group.count
                }
             })
 
@@ -278,6 +357,7 @@ export default new Vuex.Store({
          state.lastSearchScrollPosition = 0
          state.lastSearchURL = ""
          state.selectedHitIdx = -1
+         state.selectedHitGroupIdx = -1
          state.selectedResultsIdx = -1
          state.otherSrcSelection = { id: "", name: "" }
       },
@@ -309,22 +389,23 @@ export default new Vuex.Store({
             await ctx.dispatch( "moreResults")
          }
 
-         // NOTE this skips groups
-         ctx.state.selectedHitIdx++
+         ctx.commit("nextHit")
 
       },
       async priorHit(ctx) {
-         if ( ctx.state.selectedHitIdx <= 0) return
-         // Note: this skips groups
-         ctx.state.selectedHitIdx--
+         ctx.commit("priorHit")
       },
 
       // Search ALL configured pools. This is the initial search call using only the basic or
       // advanced search parameters and will always start at page 1.
       // If isRestore is true, the spinner will not be cleared after the search
       // CTX: commit: ƒ boundCommit(type, payload, options)
-      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
+      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, awaitFacets) {
          commit('system/setError', "")
+         let hideSpinner = true
+         if (awaitFacets === true) {
+            hideSpinner = false
+         }
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
@@ -357,10 +438,9 @@ export default new Vuex.Store({
             dispatch("bookmarks/getBookmarks")
          }
 
+         // POST the search query and wait for the response
          let url = state.system.searchAPI + "/api/search"
-         try {
-            // POST the search query and wait for the response
-            let response = await axios.post(url, req)
+         await axios.post(url, req).then((response) => {
             commit('pools/setPools', response.data.pools)
             commit('setSearchResults', { results: response.data, tgtPool: rootState.query.targetPool })
             commit('sort/setActivePool', state.results[state.selectedResultsIdx].pool.id)
@@ -376,23 +456,40 @@ export default new Vuex.Store({
                router.replace({ query })
             }
 
-            commit('setSearching', false)
+            if ( hideSpinner) {
+               commit('setSearching', false)
+            }
 
             dispatch("searches/updateHistory")
             return dispatch("filters/getSelectedResultFacets", true)
-         } catch (error) {
+         }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
             commit('filters/setUpdatingFacets', false)
-            if (error.response && error.response.status == 401) {
-               commit('system/setSessionExpired', null, { root: true })
-               dispatch("user/signout", "/", { root: true })
-            } else {
+            let genericError = true
+            if (error.response) {
+               if (error.response.status == 401) {
+                  commit('system/setSessionExpired', null, { root: true })
+                  dispatch("user/signout", "/", { root: true })
+               } else if (error.response.data && error.response.data.message) {
+                  genericError = false
+                  let msg =  error.response.data.message
+                  msg += "<p>We regret the inconvenience. If this problem persists, "
+                  msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>"
+                  let err = {
+                     message: msg,
+                     details: error.response.data.details
+                  }
+                  commit('system/setError', err)
+               }
+            }
+
+            if (genericError) {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)
             }
-         }
+         })
       },
 
       // SearchSelectedPool is called only when one specific set of pool results is selected for
@@ -419,18 +516,8 @@ export default new Vuex.Store({
          }
 
          let url = tgtResults.pool.url + "/api/search"
-         try {
-            let response = await axios.post(url, req)
-            commit('addPoolSearchResults', response.data)
-            commit('setSearching', false)
-            if (state.otherSrcSelection.id != "") {
-               commit('updateOtherPoolLabel')
-            }
-
-            dispatch("searches/updateHistory")
-            return dispatch("filters/getSelectedResultFacets", true)
-         } catch (error) {
-            console.error("SINGLE POOL SEARCH FAILED: " + error)
+         let response = await axios.post(url, req).catch((error) => {
+            console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)
             commit('filters/setUpdatingFacets', false)
             if (error.response && error.response.status == 401) {
@@ -441,7 +528,15 @@ export default new Vuex.Store({
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)
             }
+         })
+         commit('addPoolSearchResults', response.data)
+         commit('setSearching', false)
+         if (state.otherSrcSelection.id != "") {
+            commit('updateOtherPoolLabel')
          }
+
+         dispatch("searches/updateHistory")
+         return dispatch("filters/getSelectedResultFacets", true)
       },
 
       // Select pool results and get all facet info for the result
@@ -461,7 +556,6 @@ export default new Vuex.Store({
       bookmarks: bookmarks,
       filters: filters,
       item: item,
-      journals: journals,
       pools: pools,
       preferences: preferences,
       query: query,

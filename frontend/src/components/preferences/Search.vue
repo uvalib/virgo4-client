@@ -74,7 +74,8 @@ export default {
       ...mapGetters({
          isPoolExcluded: "preferences/isPoolExcluded",
          isTargetPool: "preferences/isTargetPool",
-         pools: "pools/sortedList"
+         pools: "pools/sortedList",
+         excludedPools: "preferences/excludedPools",
       }),
       ...mapState({
          collapseGroups: state => state.preferences.collapseGroups,
@@ -89,6 +90,13 @@ export default {
          this.$analytics.trigger('Preferences', 'SET_PREFERRED_POOL', pool.name)
       },
       async toggleExcludePool(pool) {
+         if ( this.excludedPools.length == this.pools.length-1 && this.isPoolExcluded(pool) == false) {
+            this.$store.commit(
+               "system/setError",
+               "At least one resource must be included"
+            )
+            return
+         }
          await this.$store.dispatch("preferences/toggleExcludePool", pool)
          if (this.isPoolExcluded(pool)) {
             this.$analytics.trigger('Preferences', 'IGNORE_POOL', pool.name)

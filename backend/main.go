@@ -78,8 +78,6 @@ func main() {
 		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
 		api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
 		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
-		api.POST("/journals", svc.GetJournalDetails)
-		api.GET("/journals/browse", svc.BrowseJournals)
 		api.GET("/search_filters", svc.AuthMiddleware, svc.GetSearchFilters)
 		api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Codes from './views/Codes.vue'
 import Home from './views/Home.vue'
-import Journals from './views/Journals.vue'
+
 import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
@@ -46,11 +46,6 @@ const router = new Router({
          component: PublicBookmarks
       },
       {
-         path: '/journals',
-         name: 'journals',
-         component: Journals
-      },
-      {
          path: '/codes',
          name: 'codes',
          component: Codes
@@ -90,16 +85,9 @@ const router = new Router({
       {
          // this is a catchall route for catalog queries from external search boxes
          path: '/catalog*',
-         beforeEnter: (to, _from, next) => {
-            let field = to.query.search_field
-            if ( field == "journal") {
-               // console.log("Detected a journal query. Converting to V4 search...")
-               let q = to.query.q
-               next(`/search?mode=basic&scope=journals&q=title%3A%20%7B${q}%7D`)
-            } else {
-               console.error("Unrecognized URL: "+to.fullPath+". Redirect to Virgo3")
-               window.location.href="https://v3.lib.virginia.edu"+to.fullPath
-            }
+         beforeEnter: (to, _from, _next) => {
+            console.error("Unrecognized URL: "+to.fullPath+". Redirect to Virgo3")
+            window.location.href="https://v3.lib.virginia.edu"+to.fullPath
          }
       },
       {
@@ -198,7 +186,7 @@ const router = new Router({
 router.beforeEach( (to, from, next) => {
    // Some pages just require an auth token...
    store.commit("system/setILSError", "")
-   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "journals", "public-bookmarks", "feedback", "item"]
+   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "public-bookmarks", "feedback", "item", "checkouts" ]
    if (tokenPages.includes(to.name)) {
       // console.log(`Page ${to.name} requires auth token only`)
       ensureAuthTokenPresent( next )
@@ -206,7 +194,7 @@ router.beforeEach( (to, from, next) => {
    }
 
    // Some pages require a signed in user...
-   let userPages = ["preferences", "account", "bookmarks", "checkouts", "digital-deliveries",
+   let userPages = ["preferences", "account", "bookmarks", "digital-deliveries",
       "course-reserves-request", "requests", "searches"]
    if (userPages.includes(to.name)) {
       // console.log(`Page ${to.name} requires signed in user`)

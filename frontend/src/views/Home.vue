@@ -175,7 +175,7 @@ export default {
       },
    },
    methods: {
-      async restoreSearchFromQueryParams( query, force ) {
+      async restoreSearchFromQueryParams( query ) {
          if  (!query.q) {
             // No query - reset everything
             this.$store.dispatch('resetSearch')
@@ -251,13 +251,12 @@ export default {
          if ( query.q) {
             this.$store.commit("query/restoreFromURL", query.q)
 
-            // only re-run search when query, sort or filtering has changed (or when forced)
+            // only re-run search when query, sort or filtering has changed
             if (this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
-                  this.activeSort != oldSort || force === true || this.userSearched == true) {
-               console.log("Issue new search")
-               this.userSearched = false
+                  this.activeSort != oldSort || this.userSearched == true) {
                this.$store.commit("resetSearchResults")
-               await this.$store.dispatch("searchAllPools")
+               await this.$store.dispatch("searchAllPools", !this.userSearched)
+               this.userSearched = false
                this.$store.commit('setSearching', false)
             }
 
@@ -278,7 +277,7 @@ export default {
             // Load the search from the :token and restore it
             let token = this.$route.params.id
             await this.$store.dispatch("query/loadSearch", token)
-            this.restoreSearchFromQueryParams(this.$route.query, true)
+            this.restoreSearchFromQueryParams(this.$route.query)
             return
          } else {
             await this.restoreSearchFromQueryParams(this.$route.query)

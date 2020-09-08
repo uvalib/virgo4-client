@@ -12,6 +12,9 @@ const item = {
    },
 
    getters: {
+      identifier: state => {
+         return state.details.identifier
+      },
       hasDetails: state => (identifier) => {
          return state.identifier == identifier
       },
@@ -54,7 +57,8 @@ const item = {
          let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status != "FAILED" && dc.pdf.status != "PROCESSING" && dc.pdf.status != "100%")
          pdfs.forEach( item => {
             if ( item.pdf.status == "READY") {
-               state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download, name: item.label})
+               state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download,
+                  name: item.label, thumbnail: item.thumbnail_url})
             } else if ( item.pdf.status.includes("%")) {
                state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download,
                   statusURL: item.pdf.urls.status, name: item.label})
@@ -246,7 +250,12 @@ const item = {
 
       async getAvailability(ctx, titleId ) {
         ctx.commit('clearAvailability')
-        axios.get("/api/availability/" + titleId).then((response) => {
+        let url = "/api/availability/" + titleId
+        if ( ctx.rootState.system.availabilityURL ) {
+          url = `${ctx.rootState.system.availabilityURL}/item/${titleId}`
+          console.log("Get avilability from standalone service: "+url)
+        }
+        axios.get(url).then((response) => {
           ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
           ctx.commit("requests/setRequestOptions", response.data.availability.request_options, {root: true})
         }).catch((error) => {
