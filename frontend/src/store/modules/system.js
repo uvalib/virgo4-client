@@ -13,6 +13,7 @@ const system = {
       ilsError: "",
       message: "",
       version: "unknown",
+      availabilityURL: "",
       hsIlliadURL: "",
       citationsURL: "",
       searchAPI: "",
@@ -133,6 +134,7 @@ const system = {
          state.translateMessage = cfg.translateMessage
          state.kiosk = cfg.kiosk
          state.devServer = cfg.devServer
+         state.availabilityURL = cfg.availabilityURL
          state.citationsURL = cfg.citationsURL
          state.hsILLiadURL = cfg.hsILLiadURL
       },

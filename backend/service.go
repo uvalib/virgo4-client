@@ -24,11 +24,12 @@ import (
 // ServiceContext contains common data used by all handlers
 type ServiceContext struct {
 	Version            string
+	AvailabilityURL    string
 	VirgoURL           string
 	CitationsURL       string
 	SearchAPI          string
 	CourseReserveEmail string
-	LawReserveEmaiil   string
+	LawReserveEmail    string
 	FeedbackEmail      string
 	ILSAPI             string
 	JWTKey             string
@@ -54,13 +55,14 @@ type RequestError struct {
 // InitService will initialize the service context based on the config parameters
 func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
+		AvailabilityURL:    cfg.AvailabilityURL,
 		VirgoURL:           cfg.VirgoURL,
 		SearchAPI:          cfg.SearchAPI,
 		CitationsURL:       cfg.CitationsURL,
 		Solr:               cfg.Solr,
 		JWTKey:             cfg.JWTKey,
 		CourseReserveEmail: cfg.CourseReserveEmail,
-		LawReserveEmaiil:   cfg.LawReserveEmaiil,
+		LawReserveEmail:    cfg.LawReserveEmail,
 		FeedbackEmail:      cfg.FeedbackEmail,
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
@@ -180,6 +182,20 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		}
 	}
 
+	if svc.AvailabilityURL != "" {
+		apiURL := fmt.Sprintf("%s/version", svc.AvailabilityURL)
+		resp, err := svc.FastHTTPClient.Get(apiURL)
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+		if err != nil {
+			log.Printf("ERROR: Failed response from Availability Service PING: %s - %s", err.Error(), svc.AvailabilityURL)
+			hcMap["availabilty"] = hcResp{Healthy: false, Message: err.Error()}
+		} else {
+			hcMap["availabilty"] = hcResp{Healthy: true}
+		}
+	}
+
 	tq := svc.DB.NewQuery("select * from schema_migrations order by version desc limit 1")
 	var schema struct {
 		Version int  `db:"version"`
@@ -262,6 +278,7 @@ func getLatestMigrationNumber() int {
 func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	type config struct {
 		SearchAPI        string `json:"searchAPI"`
+		AvailabilityURL  string `json:"availabilityURL"`
 		CitationsURL     string `json:"citationsURL"`
 		HealthSciURL     string `json:"hsILLiadURL"`
 		TranslateMessage string `json:"translateMessage"`
@@ -271,7 +288,8 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
 	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL,
-		HealthSciURL: svc.Illiad.HealthSciURL, KioskMode: false}
+		AvailabilityURL: svc.AvailabilityURL,
+		HealthSciURL:    svc.Illiad.HealthSciURL, KioskMode: false}
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg

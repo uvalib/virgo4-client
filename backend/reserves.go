@@ -184,8 +184,8 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		from := svc.SMTP.Sender
 		if reserveReq.Request.Library == "law" {
 			log.Printf("The reserve library is law. Send request to law %s and requestor %s from sender %s",
-				svc.LawReserveEmaiil, reserveReq.Request.Email, svc.SMTP.Sender)
-			to = append(to, svc.LawReserveEmaiil)
+				svc.LawReserveEmail, reserveReq.Request.Email, svc.SMTP.Sender)
+			to = append(to, svc.LawReserveEmail)
 			to = append(to, reserveReq.Request.Email)
 			if reserveReq.Request.InstructorEmail != "" {
 				to = append(to, reserveReq.Request.InstructorEmail)
