@@ -4,7 +4,7 @@
       <p>Virgo delivers high-quality search results through an easy-to-use interface that works on any device.</p>
       <p>You can use Virgo to conduct research, make requests, find and create Course Reserves, organize and share bookmarks, and set personal preferences for your own use of the system.</p>
       <template v-if="isKiosk == false">
-         <div class="alertbox alertbox-primary">
+         <div class="ra-box ra-fiy">
             <h3>Services during COVID-19</h3>
             <p>Please note that services are altered because of the University response to COVID-19. For example, course reserves are only available in electronic formats to allow for distance learning, and LEO Delivery is not currently available. <a href="https://www.library.virginia.edu/news/covid-19/">Read more about current Library resources.</a></p>
             <h3>Access to the older version of Virgo</h3>
@@ -49,9 +49,5 @@ h3.borders {
    text-align: left;
    color: var(  --uvalib-text);
 }
-.alertbox h3:first-of-type {
-   margin-top: .5em;
-}.alertbox h3:last-of-type {
-   margin-top: 2em;
-}
+
 </style>
