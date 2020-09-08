@@ -71,7 +71,7 @@ export default new Vuex.Store({
          }
 
          // grouped; check if the selected group is last
-         return state.selectedHitGroupIdx < selHit.group.length-1
+         return state.selectedHitGroupIdx <= selHit.group.length-1
       },
       prevHitAvailable: state => {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
