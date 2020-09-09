@@ -75,7 +75,6 @@ func main() {
 	api := router.Group("/api")
 	{
 		api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
-		api.GET("/availability/:id", svc.AuthMiddleware, svc.GetAvailability)
 		api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
 		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
 		api.GET("/search_filters", svc.AuthMiddleware, svc.GetSearchFilters)

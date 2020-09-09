@@ -250,11 +250,8 @@ const item = {
 
       async getAvailability(ctx, titleId ) {
         ctx.commit('clearAvailability')
-        let url = "/api/availability/" + titleId
-        if ( ctx.rootState.system.availabilityURL ) {
-          url = `${ctx.rootState.system.availabilityURL}/item/${titleId}`
-          console.log("Get avilability from standalone service: "+url)
-        }
+        let url = `${ctx.rootState.system.availabilityURL}/item/${titleId}`
+        console.log("Get avilability from: "+url)
         axios.get(url).then((response) => {
           ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
           ctx.commit("requests/setRequestOptions", response.data.availability.request_options, {root: true})

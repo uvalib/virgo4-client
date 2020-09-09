@@ -540,25 +540,6 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 	return resp, err
 }
 
-// SolrGet sends a GET request to solr and returns the response
-func (svc *ServiceContext) SolrGet(query string) ([]byte, *RequestError) {
-	url := fmt.Sprintf("%s/%s/%s", svc.Solr.URL, svc.Solr.Core, query)
-	log.Printf("Solr GET request: %s", url)
-	startTime := time.Now()
-	rawResp, rawErr := svc.FastHTTPClient.Get(url)
-	resp, err := handleAPIResponse(url, rawResp, rawErr)
-	elapsedNanoSec := time.Since(startTime)
-	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
-
-	if err != nil {
-		log.Printf("ERROR: Failed response from Solr GET %s - %d:%s. Elapsed Time: %d (ms)",
-			url, err.StatusCode, err.Message, elapsedMS)
-	} else {
-		log.Printf("Successful response from Solr GET %s. Elapsed Time: %d (ms)", url, elapsedMS)
-	}
-	return resp, err
-}
-
 // SolrPost sends a json POST request to solr and returns the response
 func (svc *ServiceContext) SolrPost(query string, jsonReq interface{}) ([]byte, *RequestError) {
 	url := fmt.Sprintf("%s/%s/%s", svc.Solr.URL, svc.Solr.Core, query)
