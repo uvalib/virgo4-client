@@ -337,68 +337,30 @@ const query = {
       },
       async loadSearch(ctx, token) {
          ctx.commit('setSearching', true, { root: true })
-         try {
-            // load the saved search info from backend
-            let response = await axios.get(`/api/searches/${token}`)
-            if (response.data.url != "") {
-               // This is in the newer format (a URL not an object)
-               // See if the filter part is old...
-               let searchURL = response.data.url
-               let params = new URLSearchParams(response.data.url.split("?")[1])
-               let rawFilter = params.get("filter")
-               if (rawFilter != "") {
-                  // old format. Needs conversion
-                  if ( rawFilter[0] != "{") {
-                     let filter = convertOldFilter(rawFilter,
-                        ctx.rootState.filters.availabilityFacet, ctx.rootState.filters.circulatingFacet)
-                     params.set("filter", filter)
-                     searchURL = "/search?"+params.toString()
-                     let req = {token: token, url: searchURL, userID: ctx.rootState.user.signedInUser}
-                     ctx.dispatch("searches/migrate", req, {root:true})
-                  }
+         await axios.get(`/api/searches/${token}`).then((response) => {
+            // See if the filter part is old...
+            let searchURL = response.data.url
+            let params = new URLSearchParams(response.data.url.split("?")[1])
+            let rawFilter = params.get("filter")
+            if ( rawFilter && rawFilter != "") {
+               // old format. Needs conversion
+               if ( rawFilter[0] != "{") {
+                  let filter = convertOldFilter(rawFilter,
+                     ctx.rootState.filters.availabilityFacet, ctx.rootState.filters.circulatingFacet)
+                  params.set("filter", filter)
+                  searchURL = "/search?"+params.toString()
+                  let req = {token: token, url: searchURL, userID: ctx.rootState.user.signedInUser}
+                  ctx.dispatch("searches/migrate", req, {root:true})
                }
-               router.replace(searchURL)
-            } else {
-               // This is a REALLY old search stored as an object...
-               let old = JSON.parse(response.data.search)
-               ctx.state.mode = old.mode
-               if (old.mode == "basic") {
-                  ctx.state.basicSearchScope = old.scope
-                  ctx.state.basic = old.query
-               } else {
-                  ctx.state.advanced = old.query
-               }
-
-               let url = ctx.getters.queryURLParams
-               if (old.pool != "") {
-                  url += `&pool=${old.pool}`
-               }
-               if (old.filters && old.filters.length > 0) {
-                  let filterObj = {}
-                  old.filters.forEach( f=> {
-                     if (Object.prototype.hasOwnProperty.call(filterObj, f.facet_id) == false) {
-                        filterObj[f.facet_id] = []
-                     }
-                     if ( f.value.length > 0) {
-                        filterObj[f.facet_id].push(f.value)
-                     }
-                  })
-                  url += `&filter=${encodeURIComponent( JSON.stringify(filterObj))}`
-               }
-               url = `/search?${url}`
-               router.replace( url )
-               ctx.commit("system/setMessage",
-                  "Legacy saved search detected.<br/>The results may not be as expected because the save format is no longer supported.",
-                   { root: true }
-               )
-               let req = {token: token, url: url, userID: ctx.rootState.user.signedInUser}
-               ctx.dispatch("searches/migrate", req, {root:true})
             }
-         } catch (error)  {
+            console.log("URL "+searchURL)
+            router.replace(searchURL)
+         }).catch((error) => {
+            console.error(error)
             ctx.commit('setSearching', false, { root: true })
             router.push("/not_found")
-         }
-      },
+         })
+      }
    }
 }
 

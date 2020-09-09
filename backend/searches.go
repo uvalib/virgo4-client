@@ -32,7 +32,6 @@ type SavedSearch struct {
 	Name      string    `db:"name" json:"name"`
 	Public    bool      `db:"is_public" json:"public"`
 	CreatedAt time.Time `db:"created_at" json:"created"`
-	Search    string    `db:"search" json:"search"`
 	URL       string    `db:"search_url" json:"url"`
 }
 
@@ -152,7 +151,7 @@ func (svc *ServiceContext) UpdateSavedSearch(c *gin.Context) {
 		return
 	}
 
-	sq := svc.DB.NewQuery("update saved_searches set search_url={:url}, search={:empty} where user_id={:uid} and token={:tok}")
+	sq := svc.DB.NewQuery("update saved_searches set search_url={:url} where user_id={:uid} and token={:tok}")
 	sq.Bind(dbx.Params{"url": req.URL})
 	sq.Bind(dbx.Params{"uid": userID})
 	sq.Bind(dbx.Params{"tok": token})
@@ -206,7 +205,7 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	if reqObj.Token == "" {
 		// Generate an access token and save it to the saved searches table
 		search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
-			CreatedAt: time.Now(), URL: reqObj.URL, Public: reqObj.IsPublic, Search: "{}"}
+			CreatedAt: time.Now(), URL: reqObj.URL, Public: reqObj.IsPublic}
 		err := svc.DB.Model(&search).Insert()
 		if err != nil {
 			log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
@@ -218,7 +217,7 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 		resp.Token = search.Token
 	} else {
 		log.Printf("Convert old-style search %s to URL", reqObj.Token)
-		q := svc.DB.NewQuery("update saved_searches set search_url={:u}, search={:empty} where token={:tok}")
+		q := svc.DB.NewQuery("update saved_searches set search_url={:u} where token={:tok}")
 		q.Bind(dbx.Params{"tok": reqObj.Token})
 		q.Bind(dbx.Params{"u": reqObj.URL})
 		q.Bind(dbx.Params{"empty": "{}"})
