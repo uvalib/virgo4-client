@@ -95,7 +95,7 @@
                <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
             </router-link>
          </template>
-         <div class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu"
+         <div v-if="!isKiosk && alertsReady" class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu"
             v-bind:class="{dim: alertCount==0}"
             @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
             @keydown.space.prevent.stop="alertClicked"
@@ -105,14 +105,13 @@
             </div>
          </div>
       </span>
-       <uvalib-alerts id="alerts"></uvalib-alerts>
+      <uvalib-alerts v-if="!isKiosk && alertsReady" id="alerts"></uvalib-alerts>
    </nav>
 </template>
 
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import '@uvalib/uvalib-alerts'
 
 export default {
    data: function() {
@@ -126,6 +125,7 @@ export default {
          svcMenuIdx: 0,
          svcMenu: ["guides", "journalsub", "databasesub", "spacesub", "moresub"],
          alertCount: 0,
+         alertsReady: false,
       }
    },
    computed: {
@@ -139,12 +139,15 @@ export default {
       }),
    },
    created() {
-      document.addEventListener('seen-count-changed', (e)=>{ this.alertCount = e.detail.seenCount })
+      (async () => {
+         if (this.isKiosk == false) {
+            await import ('@uvalib/uvalib-alerts')
+            document.addEventListener('seen-count-changed', (e)=>{ this.alertCount = e.detail.seenCount })
+            this.alertsReady = true
+         }
+      })()
    },
    methods: {
-      // escAlert() {
-      //    document.querySelector('#alerts').seeAll()
-      // },
       alertClicked() {
          if ( this.alertCount > 0) {
             document.querySelector('#alerts').unseeAll()
