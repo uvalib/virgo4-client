@@ -1,0 +1,1 @@
+DELETE from saved_searches where search_url='';
