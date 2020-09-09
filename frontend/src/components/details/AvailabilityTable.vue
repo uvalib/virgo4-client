@@ -9,6 +9,12 @@
 
          <template v-if="hasItems() || hasRequestOptions">
             <h2>Availability</h2>
+            <div class="ra-box ra-fiy">
+               <strong>Please note that stacks browsing is not available because of building restrictions due to COVID-19.</strong>
+               Physical materials must be requested. To make a request, sign in and click the "Request Item" button in an
+               item record.
+               <a href="https://www.library.virginia.edu/news/covid-19/" target="_blank">Learn more about Library resources during COVID-19</a>.
+            </div>
             <div class="availability-content">
                <RequestContainer :titleId="titleId" />
 
@@ -82,8 +88,13 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-h2 {
-   color: var(--color-primary-orange)
+.availability {
+   h2 {
+      color: var(--color-primary-orange)
+   }
+   .ra-box.ra-fiy {
+      margin-bottom: 30px;
+   }
 }
 .availability-content {
    border: 1px solid var(--uvalib-grey-light);
@@ -110,11 +121,11 @@ h2 {
      word-break: break-word;
   }
   .availability-content {
-   width: 100vw;
-   position: relative;
-   left: calc(-50vw + 50% );
-   border-left: none;
-   border-right: none;
+      width: 100vw;
+      position: relative;
+      left: calc(-50vw + 50% );
+      border-left: none;
+      border-right: none;
   }
 }
 </style>
