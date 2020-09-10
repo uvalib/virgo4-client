@@ -34,7 +34,6 @@ export default {
       ...mapState({
          lookingUpPools : state => state.pools.lookingUp,
          lookingUpAccount : state => state.user.lookingUp,
-         searchAPI: state => state.system.searchAPI,
       }),
    },
    methods: {

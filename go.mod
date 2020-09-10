@@ -9,7 +9,6 @@ require (
 	github.com/go-ozzo/ozzo-dbx v1.5.0
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/lib/pq v1.8.0
-	github.com/mitchellh/mapstructure v1.3.3
 	github.com/prometheus/common v0.13.0 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/uvalib/virgo4-jwt v0.0.0-20200812155832-7443daa580fd

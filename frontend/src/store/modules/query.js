@@ -328,11 +328,12 @@ const query = {
       },
    },
    actions: {
-      getAdvancedSeatchFilters(ctx) {
-         return axios.get(`/api/search_filters`).then((response) => {
+      async getAdvancedSeatchFilters(ctx) {
+         let url = `${ctx.rootState.system.searchAPI}/api/filters`
+         return axios.get(url).then((response) => {
             ctx.commit('setAdvancedFilterFields', response.data)
-         }).catch((_error) => {
-            // NO-OP If the fields can't be found, they just won't be available
+         }).catch((error) => {
+            console.warn("Unable to get advanced search filters: "+JSON.stringify(error))
          })
       },
       async loadSearch(ctx, token) {
