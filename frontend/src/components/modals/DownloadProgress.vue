@@ -14,7 +14,7 @@
       </template>
       <template v-slot:content>
          <p>
-            Digitial currently content is being generated.
+            Digitial content is being generated.
          </p><p>
             When progress reaches 100%, this message will disappear and the download link will be active.
          </p>
