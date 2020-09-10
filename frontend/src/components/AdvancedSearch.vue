@@ -177,7 +177,10 @@ export default {
       },
       getTermType( term ) {
          let tgtField = this.advancedFields.find( af=> af.value == term.field)
-         return tgtField.type
+         if (tgtField) {
+            return tgtField.type
+         }
+         return "text"
       },
       getTermLabel( term ) {
          let tgtField = this.advancedFields.find( af=> af.value == term.field)
