@@ -21,19 +21,22 @@
                <table class="fields" v-if="hasItems()">
                   <thead>
                      <tr>
-                        <th v-for="(column, idx) in availability.columns" :key="idx">
+                        <th v-for="(column, idx) in Object.values(availability.display)" :key="`hdr-${idx}`">
                            {{column}}
                         </th>
                      </tr>
                   </thead>
 
-                  <tr v-for="(item,idx) in availability.items" :key="idx">
-                     <td class="value" v-for="(field, id) in visibleFields(item)" :key="id">
-                        <template v-if="id == visibleFields(item).length-1 && item.notice">
-                           <AvailabilityNotice :label="formatValue(field.value)" :message="item.notice" />
+                  <tr v-for="(item,idx) in availability.items" :key="`val-${idx}`">
+                     <td class="value">{{formatValue(item.library)}}</td>
+                     <td class="value">{{formatValue(item.current_location)}}</td>
+                     <td class="value">{{formatValue(item.call_number)}}</td>
+                     <td class="value">
+                        <template v-if="item.notice">
+                           <AvailabilityNotice :label="formatValue(field.barcode)" :message="item.notice" />
                         </template>
                         <template v-else>
-                           {{formatValue(field.value)}}
+                           {{formatValue(item.barcode)}}
                         </template>
                      </td>
                   </tr>

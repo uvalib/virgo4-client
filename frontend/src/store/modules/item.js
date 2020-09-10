@@ -7,7 +7,7 @@ const item = {
    state: {
       details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[],
          related:[], digitalContent: [], embeddedMedia: [] },
-      availability: {searching: true, titleId: "", columns: [], items: [], bound_with: [], error: ""},
+      availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
       googleBooksURL: ""
    },
 
@@ -85,7 +85,7 @@ const item = {
       },
       setAvailability(state, {titleId, response}) {
         state.availability.titleId = titleId
-        state.availability.columns = response.columns
+        state.availability.display = response.display
         state.availability.items = response.items
         state.availability.bound_with = response.bound_with
         state.availability.searching = false
@@ -94,7 +94,7 @@ const item = {
          state.availability.error = error
       },
       clearAvailability(state) {
-        state.availability = {searching: true, titleId: '', columns: [], items: [], bound_with: [], error: ""}
+        state.availability = {searching: true, titleId: '', display: [], items: [], bound_with: [], error: ""}
       },
       clearSearching(state){
         state.details.searching = false
