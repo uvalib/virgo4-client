@@ -73,13 +73,16 @@
                      <dt class="label">Download PDF:</dt>
                      <dd class="value">
                         <template v-for="(dc,idx) in pdfs">
-                           <a v-if="dc.status=='READY'" :key="`pdf${idx}`" :href="dc.url" :aria-label="`download pdf for ${dc.name}`" class="pdf-download">
-                              <img v-if="dc.thumbnail" :src="dc.thumbnail"/>
-                              <span class="label">{{dc.name}}</span>
-                           </a>
-                           <DownloadProgress v-else :name="dc.name" :id="`${details.identifier}-pdf${idx}`" :key="`pdf${idx}`"
-                              :ariaLabel="`download pdf for ${dc.name}`"
-                           />
+                           <div class="download-card" :key="`pdf${idx}`" >
+                              <a v-if="dc.status=='READY'" :href="dc.url" :aria-label="`download pdf for ${dc.name}`" class="pdf-download">
+                                 <img v-if="dc.thumbnail" :src="dc.thumbnail"/>
+                                 <span class="label">{{dc.name}}</span>
+                              </a>
+                              <DownloadProgress v-else :name="dc.name" :id="`${details.identifier}-pdf${idx}`" :key="`pdf${idx}`"
+                                 :thumb="dc.thumbnail"
+                                 :ariaLabel="`download pdf for ${dc.name}`"
+                              />
+                           </div>
                         </template>
                      </dd>
                   </template>
@@ -370,13 +373,14 @@ export default {
       }
    }
 
-   .pdf-download {
+   .download-card {
       display: inline-block;
       text-align: center;
       margin: 5px;
       border: 1px solid var(--uvalib-grey-light);
-      padding: 5px 10px;
-      border-radius: 5px;
+      padding: 10px;
+      border-radius: 3px;
+      box-shadow: $v4-box-shadow-light;
       img {
          display: inline-block;
          border-radius: 5px;

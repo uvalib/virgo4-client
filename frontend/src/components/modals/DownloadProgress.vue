@@ -1,11 +1,13 @@
 <template>
-   <V4Modal :id="id" title="Download Progress" ref="progressmodal" 
+   <V4Modal :id="id" title="Download Progress" ref="progressmodal"
       @opened="opened"
       :buttonID="`${id}-open`">
       <template v-slot:button>
-         <V4Button mode="text" @click="$refs.progressmodal.show()" 
+         <img v-if="thumb" :src="thumb"/>
+         <V4Button mode="text" @click="$refs.progressmodal.show()"
             :id="`${id}-open`"
-             :aria-label="ariaLabel"
+            :class="{block: thumb}"
+            :aria-label="ariaLabel"
          >
             {{name}}
          </V4Button>
@@ -17,7 +19,7 @@
             When progress reaches 100%, this message will disappear and the download link will be active.
          </p>
          <div class="progress">
-            <label>Progress:</label> 
+            <label>Progress:</label>
             <div class="progress-bar-container">
                <div id="progress" class="progress-bar"></div>
             </div>
@@ -36,11 +38,15 @@ export default {
       },
       name: {
          type: String,
-         default: "" 
+         default: ""
       },
       ariaLabel: {
          type: String,
-         default: ""    
+         default: ""
+      },
+      thumb: {
+         type: String,
+         default: ""
       }
    },
    data: function()  {
@@ -58,11 +64,11 @@ export default {
       opened() {
          let pdf = this.getPDF(this.name)
          if ( pdf.status == "NOT_AVAIL") {
-            this.$store.dispatch("item/generateDigitalContent", {name: this.name, type: "PDF"} )   
-         } 
+            this.$store.dispatch("item/generateDigitalContent", {name: this.name, type: "PDF"} )
+         }
 
          this.timerID = setInterval( async () => {
-            await this.$store.dispatch("item/getDigitalContentStatus", {name: this.name, type: "PDF"} )   
+            await this.$store.dispatch("item/getDigitalContentStatus", {name: this.name, type: "PDF"} )
             let pdfStatus = this.getPDF(this.name).status
             if (pdfStatus == "READY") {
                pdfStatus = "100%"
@@ -85,6 +91,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.v4-button.block {
+   display: block;
+}
 .progress-bar-container {
    box-sizing: border-box;
    display: block;
@@ -105,5 +114,5 @@ export default {
       box-sizing: border-box;
       display: block;
    }
-}  
+}
 </style>

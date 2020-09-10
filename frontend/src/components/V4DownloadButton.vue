@@ -1,5 +1,5 @@
 <template>
-   <button tabindex="0" role="button" class="v4-download-button" 
+   <button tabindex="0" role="button" class="v4-download-button"
       @click.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <template v-if="icon">
          <i class="icon" :class="icon"></i>
@@ -22,7 +22,7 @@ export default {
       },
       label: {
          type: String,
-         required: true   
+         required: true
       }
    },
    methods: {
@@ -45,7 +45,7 @@ export default {
 
    &:focus {
       @include be-accessible();
-   } 
+   }
 
    .icon {
       font-size: 1.75em;

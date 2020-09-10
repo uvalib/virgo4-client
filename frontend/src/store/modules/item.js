@@ -61,10 +61,10 @@ const item = {
                   name: item.label, thumbnail: item.thumbnail_url})
             } else if ( item.pdf.status.includes("%")) {
                state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download,
-                  statusURL: item.pdf.urls.status, name: item.label})
+                  statusURL: item.pdf.urls.status, name: item.label, thumbnail: item.thumbnail_url})
             } else {
                state.details.digitalContent.push({type: "PDF", status: "NOT_AVAIL", url: item.pdf.urls.download,
-                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label})
+                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label, thumbnail: item.thumbnail_url})
             }
          })
          let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
