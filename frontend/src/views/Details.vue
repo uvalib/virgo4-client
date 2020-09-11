@@ -367,7 +367,7 @@ export default {
    color: var(--color-primary-text);
 
    dl.fields {
-      grid-template-columns: 1fr 2fr;
+      grid-template-columns: 0.5fr 2fr;
       dt.label {
          white-space: normal;
       }

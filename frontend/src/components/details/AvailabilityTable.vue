@@ -21,9 +21,10 @@
                <table class="fields" v-if="hasItems()">
                   <thead>
                      <tr>
-                        <th v-for="(column, idx) in Object.values(availability.display)" :key="`hdr-${idx}`">
-                           {{column}}
-                        </th>
+                        <th>Library</th>
+                        <th>Current Location</th>
+                        <th>Call Number</th>
+                        <th>Barcode</th>
                      </tr>
                   </thead>
 
