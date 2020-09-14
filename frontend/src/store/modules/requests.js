@@ -290,11 +290,11 @@ const requests = {
          aeonLink.query["Location"] = selected.location
          aeonLink.query["SpecialRequest"] = selected.specialRequest
 
-         // needs to be null to regenerate query below
+         // search needs to be null to regenerate query below
          aeonLink.search = null
          let aeonUrl = url.format(aeonLink)
          if (aeonUrl.length > 700){
-            aeonLink.query["Notes"] = selected.notes.substring(0,800)
+            aeonLink.query["Notes"] = selected.notes.substring(0,700) + '...'
             aeonLink.search = null
          }
          window.open(url.format(aeonLink), "_blank")
