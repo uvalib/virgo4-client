@@ -69,37 +69,12 @@
                         <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
-                  <template v-if="hasPDFContent">
-                     <dt class="label">Download PDF:</dt>
-                     <dd class="value">
-                        <template v-for="(dc,idx) in pdfs">
-                           <div class="download-card" :key="`pdf${idx}`" >
-                              <a v-if="dc.status=='READY'" :href="dc.url" :aria-label="`download pdf for ${dc.name}`" class="pdf-download">
-                                 <img v-if="dc.thumbnail" :src="dc.thumbnail"/>
-                                 <span class="label">{{dc.name}}</span>
-                              </a>
-                              <DownloadProgress v-else :name="dc.name" :id="`${details.identifier}-pdf${idx}`" :key="`pdf${idx}`"
-                                 :thumb="dc.thumbnail"
-                                 :ariaLabel="`download pdf for ${dc.name}`"
-                              />
-                           </div>
-                        </template>
-                     </dd>
-                  </template>
                   <dt class="label">Download Citation:</dt>
                   <dd class="value">
                      <V4DownloadButton style="padding-left:0" label="RIS" :url="risURL" @click="downloadRISCliecked"
                         :aria-label="`export citation for ${details.header.title}`"
                      />
                   </dd>
-                  <template v-if="googleBooksURL">
-                     <dt class="label">Google Preview:</dt>
-                     <dd class="value">
-                        <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
-                           <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
-                        </a>
-                     </dd>
-                  </template>
                   <template v-if="hasExtLink">
                      <dd></dd>
                      <dt class="value more">
@@ -125,7 +100,7 @@
                   </AccordionContent>
                </template>
             </div>
-            <AvailabilityTable v-if="hasAvailability" :titleId="details.identifier" />
+            <Availability v-if="hasAvailability" :titleId="details.identifier" />
          </template>
       </div>
    </div>
@@ -136,18 +111,17 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import ImageDetails from '@/components/ImageDetails'
-import AvailabilityTable from "@/components/details/AvailabilityTable"
+import Availability from "@/components/details/Availability"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from '@/components/AccessURLDetails'
-import DownloadProgress from '@/components/modals/DownloadProgress'
 import V4DownloadButton from '@/components/V4DownloadButton'
 import TruncatedText from '@/components/TruncatedText'
 import V4LinksList from '@/components/V4LinksList'
 import V4Pager from '@/components/V4Pager'
 
 export default {
-   name: "sources",
+   name: "detail",
    data: function() {
       return {
          viewerOpts: {
@@ -167,7 +141,7 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, AvailabilityTable, DownloadProgress, TruncatedText,V4Pager,
+      SearchHitHeader, Availability, TruncatedText, V4Pager,
       ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList
    },
    computed: {
@@ -202,12 +176,6 @@ export default {
       },
       hasEmbeddedMedia() {
          return this.details.embeddedMedia.length > 0
-      },
-      hasPDFContent() {
-         return this.details.digitalContent.filter( dc => dc.type == "PDF").length > 0
-      },
-      pdfs() {
-         return this.details.digitalContent.filter( dc => dc.type == "PDF")
       },
       poolMode() {
          let details = this.poolDetails(this.details.source)
@@ -312,6 +280,7 @@ export default {
          return out
       },
       shouldDisplay(field) {
+         // if ( field.display == 'availability') return false
          if (field.display == 'optional' || field.type == "iiif-manifest-url" ||
              field.type == "iiif-image-url" || field.type == "url" ||
              field.type == "access-url" || field.type == "sirsi-url" ||
@@ -372,24 +341,6 @@ export default {
          white-space: normal;
       }
    }
-
-   .download-card {
-      display: inline-block;
-      text-align: center;
-      margin: 5px;
-      border: 1px solid var(--uvalib-grey-light);
-      padding: 10px;
-      border-radius: 3px;
-      box-shadow: $v4-box-shadow-light;
-      img {
-         display: inline-block;
-         border-radius: 5px;
-      }
-      span {
-         display: block
-      }
-   }
-
    .detail-header {
       display: flex;
       flex-flow: row wrap;

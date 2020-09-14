@@ -51,7 +51,7 @@ export default {
 
    .option {
       text-align: left;
-      margin: 20px 0;
+      margin: 25px 0 0 0;
 
       .desc {
          max-width: 300px;
