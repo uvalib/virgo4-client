@@ -9,7 +9,7 @@
          </div>
       </transition>
       <VirgoHeader :id="headerID" />
-      <MenuBar :id="menuID" v-bind:style="{transform: `translateY(${menuPos}px)`}"/>
+      <MenuBar :id="menuID"/>
       <main class="v4-content">
          <SessionExpired />
          <router-view />
@@ -40,7 +40,6 @@ export default {
          menuID: "v4-navbar",
          headerHeight: 0,
          headerID: "v4-header",
-         menuPos: 0,
       };
    },
    components: {
@@ -76,15 +75,14 @@ export default {
       },
       scrollHandler( ) {
          if ( window.scrollY <= this.headerHeight ) {
-            this.menuPos = 0
+            document.getElementById(this.menuID).classList.remove("sticky")
          } else {
-            this.menuPos = (window.scrollY - this.headerHeight)
+            document.getElementById(this.menuID).classList.add("sticky")
          }
       },
    },
    mounted() {
       setTimeout( ()=>{
-         this.menuHeight = document.getElementById(this.menuID).offsetHeight
          this.headerHeight = document.getElementById(this.headerID).offsetHeight
       }, 1)
       window.addEventListener("scroll", this.scrollHandler)
@@ -185,7 +183,11 @@ body {
    padding: 0;
    background-color: var(--uvalib-blue-alt-darkest);
 }
-
+.sticky {
+   position: fixed !important;
+   top: 0;
+   width: 100%
+}
 #app .screen-reader-text {
    clip: rect(1px, 1px, 1px, 1px);
    position: absolute !important;
