@@ -1,9 +1,6 @@
 <template>
    <div class="availability">
-      <div class="working" v-if="availability.searching" >
-         <V4Spinner message="Loading Availability..."/>
-      </div>
-      <div class="availability-content" v-if="showAvailability">
+      <div class="availability-content" v-if="hasExternalHoldings(details.source)==false">
          <h2>Availability</h2>
          <div class="ra-box ra-fiy" v-if="hasItems || hasRequestOptions">
             <strong>Please note that stacks browsing is not available because of building restrictions due to COVID-19.</strong>
@@ -45,6 +42,10 @@
                   <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
                </a>
             </div>
+         </div>
+
+         <div class="working" v-if="availability.searching" >
+            <V4Spinner message="Loading Availability..."/>
          </div>
 
          <BoundWithItems v-if="hasBoundWithItems"/>
@@ -127,7 +128,8 @@ export default {
          availability: 'item/availability',
          isDevServer: 'system/isDevServer',
          hasRequestOptions: 'requests/hasRequestOptions',
-         hasBoundWithItems: 'item/hasBoundWithItems'
+         hasBoundWithItems: 'item/hasBoundWithItems',
+         hasExternalHoldings: 'pools/hasExternalHoldings',
       }),
       hasPDFContent() {
          return this.details.digitalContent.filter( dc => dc.type == "PDF").length > 0
@@ -166,7 +168,9 @@ export default {
       },
    },
    created() {
-      this.$store.dispatch("item/getAvailability", this.titleId )
+      if ( this.hasExternalHoldings(this.details.source) == false) {
+         this.$store.dispatch("item/getAvailability", this.titleId )
+      }
    }
 }
 </script>
@@ -252,6 +256,7 @@ export default {
       font-weight: normal;
       text-align: left;
       border-collapse: collapse;
+      box-shadow: $v4-box-shadow-light;
    }
    table td {
       padding: 4px 5px;

@@ -27,7 +27,7 @@
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
             <abbr class="unapi-id" :title="itemURL"></abbr>
             <div class="info">
-               <div v-if="hasExternalHoldings(details.source)" class="ext-warn">
+               <div v-if="hasExternalHoldings(details.source)" class="ra-box ra-fiy pad-top">
                   This resource is not held by UVA Libraries,
                   <a :href="owningInstitution" target="_blank">contact the owning institution<i style="margin:0 5px;" class="fas fa-external-link-alt"></i></a>
                   to determine how to gain access to them, or disable searching of these materials in your preferences.
@@ -335,6 +335,10 @@ export default {
    margin-top: 2vw;
    color: var(--color-primary-text);
 
+   .ra-box.ra-fiy.pad-top {
+      margin-top: 20px;
+   }
+
    dl.fields {
       grid-template-columns: 0.5fr 2fr;
       dt.label {
@@ -361,16 +365,6 @@ export default {
          text-align: right;
          margin: 5px 0;
       }
-   }
-
-   .ext-warn {
-      margin: 20px 10px 0 10px;
-      text-align: left;
-      padding: 10px 15px;
-      background: var(--uvalib-yellow);
-      border-radius: 5px;
-      font-weight: bold;
-      box-shadow: $v4-box-shadow-light;
    }
 
    .details-content {
