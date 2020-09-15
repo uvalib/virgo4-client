@@ -166,6 +166,12 @@ export default {
    margin: 0 0 10vh 0;
    text-align: left;
 
+   div.items {
+      border: 1px solid var(--uvalib-grey-light);
+      border-radius: 5px;
+      margin-top: 25px;
+   }
+
    div.value {
       margin: 10px 0 0 20px;
    }
@@ -202,7 +208,6 @@ export default {
       width: 100%;
       font-weight: normal;
       text-align: left;
-      margin-top: 10px;
    }
    table td {
       padding: 4px 5px;

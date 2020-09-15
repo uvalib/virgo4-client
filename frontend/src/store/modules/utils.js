@@ -7,7 +7,7 @@ export function preProcessHitFields(hits) {
    hits.forEach(function (hit) {
       hit.basicFields = []
       hit.detailFields = []
-      hit.summaryHoldings = []
+      hit.holdings = {}
       hit.header = {}
       hit.fields.forEach(function (field) {
          if (field.value === "" && field.name != "summary_holdings") {
@@ -103,16 +103,7 @@ export function preProcessHitFields(hits) {
          }
 
          if ( field.name == "summary_holdings") {
-
-            let holding = {
-               library: field.summary_library,
-               location: field.summary_location,
-               call_number: field.summary_call_number,
-               text: field.summary_text,
-               label: field.summary_label
-            }
-            console.log(holding)
-            hit.summaryHoldings.push(holding)
+            hit.holdings = field.structured_value.holdings
             return
          }
 

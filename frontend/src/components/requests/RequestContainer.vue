@@ -1,13 +1,11 @@
 <template>
-  <div >
-    <div id="active-panel" ref="activePanel">
+   <div id="active-panel" ref="activePanel">
       <component v-bind:is="requests.activePanel" />
       <V4Button mode="tertiary" v-if="showReset(requests.activePanel)" class="reset" @click="reset">Reset</V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
-    </div>
-  </div>
-
+   </div>
 </template>
+
 <script>
 import { mapFields } from 'vuex-map-fields';
 import { mapGetters } from "vuex";
