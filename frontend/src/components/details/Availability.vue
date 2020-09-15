@@ -17,6 +17,9 @@
          <p class="error" v-if="availability.error" v-html="availability.error"></p>
 
          <div class="digital-content">
+            <div class="working" v-if="loadingDigitalContent">
+               <V4Spinner message="Searching for digital content..." />
+            </div>
             <div class="pdfs" v-if="hasPDFContent">
                <label>Download PDF:</label>
                <div class="value">
@@ -48,7 +51,7 @@
 
          <div class="items" v-if="hasItems || hasRequestOptions">
             <RequestContainer :titleId="titleId" />
-            <ul class="holdings" v-if="details.holdings">
+            <ul class="holdings" v-if="details.holdings.libraries">
                <li v-for="(lib, idx) in details.holdings.libraries" :key="`lib${idx}`">
                   {{lib.library}}
                   <ul class="location">
@@ -118,6 +121,7 @@ export default {
       ...mapState({
          details : state => state.item.details,
          googleBooksURL : state => state.item.googleBooksURL,
+         loadingDigitalContent : state => state.item.loadingDigitalContent,
       }),
       ...mapGetters({
          availability: 'item/availability',
@@ -177,6 +181,7 @@ export default {
    }
    .working {
       margin-bottom: 25px;
+      text-align: center;
    }
 }
 ::v-deep .pdf {

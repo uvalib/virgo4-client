@@ -7,6 +7,7 @@ const item = {
    state: {
       details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[],
          related:[], digitalContent: [], embeddedMedia: [] },
+      loadingDigitalContent: false,
       availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
       googleBooksURL: ""
    },
@@ -51,6 +52,9 @@ const item = {
          if ( dc ) {
             dc.status = data.status
          }
+      },
+      setDigitalContentLoading(state, flag) {
+         state.loadingDigitalContent = flag
       },
       setDigitalContentData(state, data) {
          state.details.digitalContent.splice(0, state.details.digitalContent.length)
@@ -144,15 +148,17 @@ const item = {
          }
       },
 
-      getDigitalContentURLs(ctx) {
+      getDigitalContent(ctx) {
          let allFields = ctx.state.details.basicFields.concat(ctx.state.details.detailFields)
          let dcField = allFields.find( f=>f.name=="digital_content_url")
          if (!dcField) return
 
+         ctx.commit("setDigitalContentLoading", true)
          axios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
+            ctx.commit("setDigitalContentLoading", false)
          }).catch((_error) => {
-           // NO-OP; there just wont be any DC links
+            ctx.commit("setDigitalContentLoading", false)
          })
       },
 
@@ -239,7 +245,7 @@ const item = {
          axios.get(url).then((response) => {
             let details = response.data
             ctx.commit("setDetails", {source:source, details: details})
-            ctx.dispatch("getDigitalContentURLs")
+            ctx.dispatch("getDigitalContent")
             ctx.dispatch("getGoogleBooksURL")
             ctx.dispatch("getOEmbedMedia")
          }).catch((error) => {
@@ -289,7 +295,7 @@ const item = {
                window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
-               ctx.dispatch("getDigitalContentURLs")
+               ctx.dispatch("getDigitalContent")
                ctx.dispatch("getGoogleBooksURL")
                ctx.dispatch("getOEmbedMedia")
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
