@@ -13,7 +13,9 @@
          </div>
          <div class="ra-box ra-fiy" v-if="availabilityStatement" v-html="availabilityStatement"></div>
          <div class="ra-box ra-fiy" v-if="accessRestriction" v-html="accessRestriction"></div>
-         <p class="error" v-if="availability.error" v-html="availability.error"> </p>
+
+         <p class="error" v-if="availability.error" v-html="availability.error"></p>
+
          <div class="digital-content">
             <div class="pdfs" v-if="hasPDFContent">
                <label>Download PDF:</label>
@@ -46,6 +48,24 @@
 
          <div class="items" v-if="hasItems || hasRequestOptions">
             <RequestContainer :titleId="titleId" />
+            <ul class="holdings" v-if="details.holdings">
+               <li v-for="(lib, idx) in details.holdings.libraries" :key="`lib${idx}`">
+                  {{lib.library}}
+                  <ul class="location">
+                     <li v-for="(loc, lidx) in lib.locations" :key="`loc${lidx}`">
+                        {{loc.location}}
+                        <ul class="call">
+                           <li v-for="(cn, cidx) in loc.call_numbers" :key="`cn${cidx}`">
+                              {{cn.call_number}}
+                              <ul class="copy">
+                                 <li>{{cn.text.join(" ")}}</li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </li>
+                  </ul>
+               </li>
+            </ul>
             <table class="fields" v-if="hasItems">
                <thead>
                   <tr>
@@ -202,6 +222,24 @@ export default {
             display: block
          }
       }
+   }
+
+   ul {
+      list-style: none;
+   }
+
+   ul.holdings {
+      padding: 15px;
+      border-top: 1px solid var(--uvalib-grey-light);
+      font-weight: bold;
+      margin: 0;
+   }
+
+   ul.location, ul.call, ul.copy  {
+      font-weight: normal;
+   }
+   ul.copy  {
+      padding-bottom: 10px;
    }
 
    table {
