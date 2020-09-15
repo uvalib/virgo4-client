@@ -246,6 +246,7 @@ export default {
       width: 100%;
       font-weight: normal;
       text-align: left;
+      border-collapse: collapse;
    }
    table td {
       padding: 4px 5px;

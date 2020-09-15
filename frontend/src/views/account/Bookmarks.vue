@@ -11,8 +11,8 @@
             <template v-else>
                <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
                 <div v-if="canMakeReserves" class="notice">
-                   Reserve materials are currently only offered in electronic formats in order to provide access to course material 
-                   to both local and distance students. 
+                   Reserve materials are currently only offered in electronic formats in order to provide access to course material
+                   to both local and distance students.
                    <a href="https://www.library.virginia.edu/services/course-reserves/" targte="_blank">Click here for more information</a>.
                 </div>
                <div class="folder" v-for="(folderInfo,idx) in bookmarks" :key="folderInfo.id">
@@ -66,7 +66,7 @@
                                  </V4Checkbox>
                                  <span v-if="folderInfo.public" class="public-url">
                                     <a :href="getPublicURL(folderInfo)" target="_blank">
-                                       <span>View</span><i class="link fas fa-external-link-alt"></i></a>                                    
+                                       <span>View</span><i class="link fas fa-external-link-alt"></i></a>
                                     <span class="sep">|</span>
                                     <V4Button mode="text" @click="copyURL(folderInfo)">Copy URL to clipboard</V4Button>
                                  </span>
@@ -98,7 +98,7 @@
                   </AccordionContent>
                   <div class="folder-buttons">
                      <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo"/>
-                     <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)" 
+                     <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
                         :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
                         :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" >
                         <div>
@@ -198,7 +198,7 @@ export default {
          })
       },
       getTitle(folderInfo) {
-         let out = folderInfo.folder 
+         let out = folderInfo.folder
          if (folderInfo.public ){
             out += ` <span style="font-weight:normal; font-size:0.9em;">(public)</span>`
          }
@@ -208,7 +208,7 @@ export default {
          await this.$store.dispatch("bookmarks/toggleFolderVisibility", {id: folder.id, public: !folder.public})
       },
       getPublicURL(folder) {
-         let base = window.location.href 
+         let base = window.location.href
          return `${base}/${folder.token}`
       },
       folderOpened(folderID) {
@@ -230,7 +230,7 @@ export default {
       },
       async reserve() {
          // if ( this.selectedItems.length == 0) {
-         //     this.$store.commit("system/setError", 
+         //     this.$store.commit("system/setError",
          //       "No items have been selected to put on reserve.<br/>Please select one or more and try again.")
          //     return
          // }
@@ -277,7 +277,7 @@ export default {
          let ele = document.getElementById(focusID)
          if (ele ) {
             ele.focus()
-         } 
+         }
       },
       openCreate() {
          this.createOpen = true;
@@ -316,7 +316,7 @@ export default {
    },
    created() {
       this.$store.dispatch("bookmarks/getBookmarks")
-      setTimeout(()=> { 
+      setTimeout(()=> {
          let eles = document.getElementsByClassName("bookmark-folder")
          if ( eles.length > 0) {
             eles[0].focus()
@@ -385,14 +385,14 @@ div.folder {
    .folder-buttons {
       display: flex;
       flex-flow: row nowrap;
-      justify-content: space-between;   
+      justify-content: space-between;
       align-items: center;
       background: var(--uvalib-teal-lightest);
       color: var(--uvalib-grey-darkest);
       border-width: 0px 0px 3px;
       border-style: solid;
       border-color: var(--uvalib-teal-light);
-      padding: 6px 0;
+      padding: 6px 0 5px 0;
    }
 }
 div.folder .remove-folder {
