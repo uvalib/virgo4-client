@@ -21,7 +21,7 @@
                <label>Download PDF:</label>
                <div class="value">
                   <vue-horizontal-list :items="pdfs"
-                     :options="{item: {class: 'pdf', padding: 0}}">
+                     :options="{item: {class: 'pdf', padding: 0}, navigation: {start: 576}, list: {padding:0}}">
                      <template v-slot:default="{item}">
                         <div class="download-card">
                            <a v-if="item.status=='READY'" :href="item.url" :aria-label="`download pdf for ${item.name}`" class="pdf-download">

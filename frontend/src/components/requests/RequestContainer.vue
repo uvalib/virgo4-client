@@ -68,7 +68,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 #active-panel {
-   padding: 0;
+   padding: 10px;
    position: relative;
    ::v-deep .v4-button {
       margin:0 !important;
