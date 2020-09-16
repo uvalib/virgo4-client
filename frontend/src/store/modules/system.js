@@ -170,6 +170,21 @@ const system = {
             ctx.commit('setSearching', false, {root: true})
          })
       },
+
+      reportError(ctx, data) {
+         let err = {
+            url: router.currentRoute.fullPath,
+            userAgent: navigator.userAgent,
+            error: JSON.stringify(data)
+         }
+         if (ctx.rootGetters["user/isSignedIn"]) {
+            err.signedIn = true
+            err.user = ctx.rootState.user.signedInUser
+         } else {
+            err.signedIn = false
+         }
+         axios.post("/api/error", err)
+      }
    }
 }
 

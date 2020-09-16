@@ -306,6 +306,12 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, cfg)
 }
 
+// LogClientError accepts an error message from the client and logs it
+func (svc *ServiceContext) LogClientError(c *gin.Context) {
+	body, _ := ioutil.ReadAll(c.Request.Body)
+	log.Printf("CLIENT ERROR: %s", body)
+}
+
 // GetCodes will return the raw library and location codes from the ILS connector
 func (svc *ServiceContext) GetCodes(c *gin.Context) {
 	log.Printf("Get ILS connector codes")
