@@ -21,7 +21,7 @@
                </template>
             </dl>
          </div>
-         <router-link v-if="hasCoverImages(pool)" @mousedown.native="detailClicked"
+         <router-link v-if="hasCoverImages(pool) && hit.cover_image" @mousedown.native="detailClicked"
             class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`"
          >
             <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
