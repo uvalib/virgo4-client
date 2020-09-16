@@ -223,7 +223,7 @@ export default new Vuex.Store({
          // When a facet is applied, the results are cleared and there is no last hit
          let hitNumber = 1
          if (lastHit) {
-            lastHit.number+1
+            hitNumber = lastHit.number+1
             if (lastHit.grouped) {
                hitNumber = lastHit.group[lastHit.group.length-1].number+1
             }
