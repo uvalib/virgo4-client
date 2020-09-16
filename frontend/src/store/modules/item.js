@@ -39,8 +39,8 @@ const item = {
    },
 
    mutations: {
-      setDetails(state, {source, details}) {
-         utils.preProcessHitFields( [details] )
+      setDetails(state, {source, poolURL, details}) {
+         utils.preProcessHitFields( poolURL, [details] )
          details.digitalContent = []
          details.embeddedMedia = []
          details.source = source
@@ -117,7 +117,8 @@ const item = {
                let obj = pr.group_list[0].record_list[0]
                if (obj) {
                   let source = pr.pool_id
-                  utils.preProcessHitFields( [obj] )
+                  let poolObj = state.pools.list.find( p => p.id == source)
+                  utils.preProcessHitFields( poolObj.url, [obj] )
                   obj.source = source
                   state.details = obj
                   found = true
@@ -244,7 +245,7 @@ const item = {
          let url = baseURL + "/api/resource/" + identifier
          axios.get(url).then((response) => {
             let details = response.data
-            ctx.commit("setDetails", {source:source, details: details})
+            ctx.commit("setDetails", {source: source, poolURL: pool.url, details: details})
             ctx.dispatch("getDigitalContent")
             ctx.dispatch("getGoogleBooksURL")
             ctx.dispatch("getOEmbedMedia")
@@ -263,7 +264,7 @@ const item = {
           ctx.commit("requests/setRequestOptions", response.data.availability.request_options, {root: true})
         }).catch((error) => {
           ctx.commit('clearSearching')
-          if (error.response.status != 404){
+          if (error.response && error.response.status != 404){
             ctx.commit("setAvailabilityError", error.response.data)
           }
         })
@@ -307,7 +308,14 @@ const item = {
             ctx.commit('clearSearching')
             router.push("/not_found")
          })
-      }
+      },
+
+      async getCitations(ctx, {format, itemURL}) {
+        let url = `${ctx.rootState.system.citationsURL}/format/${format}?item=${encodeURI(itemURL)}`
+        console.log("Get citations from: "+url)
+        return axios.get(url)
+      },
+
    }
 }
 

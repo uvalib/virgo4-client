@@ -61,9 +61,7 @@ export default {
    computed: {
       risURL() {
          if (this.citationsURL == "") return ""
-         let poolObj = this.pools.find( p => p.id == this.pool)
-         let itemURL = `${poolObj.url}/api/resource/${this.hit.identifier}`
-         return `${this.citationsURL}/format/ris?item=${encodeURI(itemURL)}`
+         return `${this.citationsURL}/format/ris?item=${encodeURI(this.hit.itemURL)}`
       },
       pdfDownloadURL() {
          let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")

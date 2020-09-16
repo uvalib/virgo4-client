@@ -240,7 +240,7 @@ export default new Vuex.Store({
 
          if (poolResults.group_list) {
             poolResults.group_list.forEach(group => {
-               utils.preProcessHitFields(group.record_list)
+               utils.preProcessHitFields(tgtPool.pool.url, group.record_list)
                if (group.count == 1) {
                   let hit = group.record_list[0]
                   hit.grouped = false
@@ -293,10 +293,12 @@ export default new Vuex.Store({
             // record list is a list of fields in the hit. field is {name,label,type,value,visibility,display}
             pr.group_list.forEach(group => {
 
+               let poolObj = state.pools.list.find( p => p.id == pr.pool_id)
+
                // for each hit in the list, merge repeated fields into arrays, pull out
                // key fields like identifer to top-level named field and split others into basic and detail
                if (group.record_list) {
-                  utils.preProcessHitFields(group.record_list)
+                  utils.preProcessHitFields(poolObj.url, group.record_list)
                }
 
                // Different handling for grouped and single items

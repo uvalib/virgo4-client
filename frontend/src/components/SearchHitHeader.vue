@@ -14,9 +14,16 @@
                <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
             </router-link>
          </div>
-         <div class="bm-control">
-            <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
-            <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
+         <div class="icon-wrap">
+            <div class="citation-control">
+               <Citations title="Citations" :id="`citation-${hit.identifier}`" style="margin-right: 10px"
+                  :itemURL="hit.itemURL" format="all" :ariaLabel="`citations for ${hit.identifier}`" >
+               </Citations>
+            </div>
+            <div class="bm-control">
+               <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
+               <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
+            </div>
          </div>
       </div>
       <div v-if="hit.header.author_display" class="author-wrapper">
@@ -32,6 +39,7 @@
 import AddBookmark from '@/components/modals/AddBookmark'
 import SignInRequired from '@/components/modals/SignInRequired'
 import TruncatedText from '@/components/TruncatedText'
+import Citations from '@/components/modals/Citations'
 import { mapGetters } from "vuex"
 export default {
    props: {
@@ -53,7 +61,7 @@ export default {
       },
    },
    components: {
-      AddBookmark,SignInRequired,TruncatedText
+      AddBookmark,SignInRequired,TruncatedText,Citations
    },
    computed: {
       ...mapGetters({
@@ -112,8 +120,15 @@ export default {
          color: var( --uvalib-grey );
       }
    }
-   div.bm-control {
+   .icon-wrap {
+      display: flex;
+      flex-flow: row nowrap;
       margin-left: auto;
+   }
+   .citation-control {
+      padding: 5px;
+   }
+   .bm-control {
       padding: 5px;
    }
 }

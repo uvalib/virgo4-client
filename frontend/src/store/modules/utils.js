@@ -3,7 +3,7 @@
 // are classified as header (special rendering), basic (show by default),
 // detailed (hidden by default). Split them into separate sections of the hit. Identifer and
 // cover image are also special and get pulled to top level of hit data
-export function preProcessHitFields(hits) {
+export function preProcessHitFields(poolURL, hits) {
    hits.forEach(function (hit) {
       hit.basicFields = []
       hit.detailFields = []
@@ -21,6 +21,7 @@ export function preProcessHitFields(hits) {
          }
          if (field.type == "identifier" || field.name == "id") {
             hit.identifier = field.value
+            hit.itemURL = poolURL + "/api/resource/" + hit.identifier
             return
          }
 
@@ -171,6 +172,7 @@ export function getGroupHitMetadata(group, hit) {
       hit.detailFields = group.record_list[0].detailFields
       hit.cover_image = group.record_list[0].cover_image
       hit.identifier = group.record_list[0].identifier
+      hit.itemURL = group.record_list[0].itemURL
       group.record_list.shift()
       hit.group = group.record_list
       hit.group.forEach( (h,idx) => {
@@ -178,7 +180,7 @@ export function getGroupHitMetadata(group, hit) {
          h.number = hit.number+idx+1
       })
    } else {
-      hit.header.title = "ERROR: Mising group data"
+      hit.header.title = "ERROR: Missing group data"
    }
    delete group.fields
 }

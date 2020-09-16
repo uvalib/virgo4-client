@@ -25,7 +25,7 @@
          </template>
          <template v-else>
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
-            <abbr class="unapi-id" :title="itemURL"></abbr>
+            <abbr class="unapi-id" :title="details.itemURL"></abbr>
             <div class="info">
                <div v-if="hasExternalHoldings(details.source)" class="ra-box ra-fiy pad-top">
                   This resource is not held by UVA Libraries,
@@ -69,11 +69,20 @@
                         <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
                      </dd>
                   </template>
-                  <dt class="label">Download Citation:</dt>
+                  <dt class="label">Citations:</dt>
                   <dd class="value">
                      <V4DownloadButton style="padding-left:0" label="RIS" :url="risURL" @click="downloadRISCliecked"
                         :aria-label="`export citation for ${details.header.title}`"
                      />
+                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="mla" buttonLabel="MLA" :ariaLabel="`MLA citation for ${details.identifier}`" >
+                     </Citations>
+                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="apa" buttonLabel="APA" :ariaLabel="`APA citation for ${details.identifier}`" >
+                     </Citations>
+                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="cms" buttonLabel="Chicago" :ariaLabel="`Chicago citation for ${details.identifier}`" >
+                     </Citations>
                   </dd>
                   <template v-if="hasExtLink">
                      <dd></dd>
@@ -119,6 +128,7 @@ import V4DownloadButton from '@/components/V4DownloadButton'
 import TruncatedText from '@/components/TruncatedText'
 import V4LinksList from '@/components/V4LinksList'
 import V4Pager from '@/components/V4Pager'
+import Citations from '@/components/modals/Citations'
 
 export default {
    name: "detail",
@@ -142,7 +152,7 @@ export default {
    },
    components: {
       SearchHitHeader, Availability, TruncatedText, V4Pager,
-      ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList
+      ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList, Citations
    },
    computed: {
       ...mapState({
@@ -166,13 +176,9 @@ export default {
          selectedHit: 'selectedHit',
          selectedResults: 'selectedResults'
       }),
-      itemURL() {
-         let poolObj = this.pools.find( p => p.id == this.details.source)
-         return `${poolObj.url}/api/resource/${this.details.identifier}`
-      },
       risURL() {
          if (this.citationsURL == "") return ""
-         return `${this.citationsURL}/format/ris?item=${encodeURI(this.itemURL)}`
+         return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
       },
       hasEmbeddedMedia() {
          return this.details.embeddedMedia.length > 0
@@ -309,7 +315,6 @@ export default {
             link.title = 'unAPI'
             link.href = unapiURL
             document.head.appendChild(link)
-            //console.log(`[zotero] created link tag with url: [${unapiURL}]`)
          }
 
          // notify zotero connector of an item change
@@ -317,7 +322,6 @@ export default {
             bubbles: true,
             cancelable: true
          }))
-         //console.log(`[zotero] dispatched item updated event`)
       },
    },
    created() {
