@@ -137,7 +137,7 @@ export default {
          return [
             {id: "any", name: "All"},
             {id: "online", name: "Online"},
-            {id: "shelf", name: "On Shelf Now"},
+            // {id: "shelf", name: "On Shelf Now"},
          ]
       },
    },
