@@ -16,12 +16,22 @@
       </div>
       <template v-if="!searching">
          <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
-            <span>
-               No results found
-            </span>
-            <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
-               {{selectedResults.statusMessage}}
-            </p>
+            <div class="timeout" v-if="selectedResults.statusCode == 408">
+               <span>Search timed out</span>
+               <p class="note">
+                  Sorry! The system took too long to respond to your query. You can retry by clicking the button below.
+               </p>
+               <p class="note">
+                  If this problem persists, <a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>
+               </p>
+               <V4Button mode="primary" @click="retrySearch">Retry Search</V4Button>
+            </div>
+            <template v-else>
+               <span>No results found</span>
+               <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
+                  {{selectedResults.statusMessage}}
+               </p>
+            </template>
          </div>
          <div v-else class="hits">
             <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
@@ -83,6 +93,10 @@ export default {
       },
    },
    methods: {
+      retrySearch() {
+         this.$store.commit("clearSelectedPoolResults")
+         this.$store.dispatch("searchSelectedPool")
+      },
       loadMoreResults() {
          if ( this.searching) return
 
@@ -166,11 +180,22 @@ div.results-header {
 .hit-wrapper.none {
    background: white;
    padding:35px;
-   font-size: 1.5em;
-   font-weight: 500;
    color: var(--uvalib-text);
    box-shadow:  $v4-box-shadow-light;
    margin-bottom: 1rem;
+
+   span {
+      font-size: 1.5em;
+      font-weight: 500;
+   }
+
+   p.note {
+      margin: 5px 0;
+      font-weight: normal;
+   }
+   .v4-button {
+      margin-top:25px;
+   }
 }
 .hit-wrapper.none .error {
    padding: 0;
