@@ -116,7 +116,8 @@ import { mapGetters } from "vuex"
 export default {
    data: function() {
       return {
-         menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "servicemenu", "accountmenu", "alertmenu"],
+         //menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "servicemenu", "accountmenu", "alertmenu"],
+         menuBar: ["searchmenu", "feedbackmenu", "servicemenu", "accountmenu", "alertmenu"],
          menuBarIdx: 0,
          userMenu: ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub","outsub"],
          userMenuOpen: false,
@@ -364,7 +365,7 @@ export default {
       }
 
       &:focus {
-         @include be-accessible();
+         @include be-accessible-light();
       }
    }
    .menu-item.notice {
@@ -438,7 +439,7 @@ export default {
       display: inline-block;
       margin-left:20px;
       &:focus {
-         @include be-accessible();
+         @include be-accessible-light();
       }
    }
    .alert-wrap:hover {

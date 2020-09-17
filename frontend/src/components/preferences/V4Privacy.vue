@@ -3,8 +3,8 @@
       <h2>Privacy</h2>
       <div><b>The Library values your privacy.</b></div>
       <div>
-         We collect analytics information that is not personally identifiable 
-         for the purpose of evaluating trends in usage or otherwise improving 
+         We collect analytics information that is not personally identifiable
+         for the purpose of evaluating trends in usage or otherwise improving
          the product.<br/>We retain this aggregate information for a limited time.
       </div>
       <div class="opt-out">

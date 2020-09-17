@@ -79,9 +79,6 @@ div.v4-sort {
    }
    select {
       margin-left: 10px;
-      &:focus {
-         @include be-accessible();
-      }
    }
    .sort-type {
       margin-left: 5px;

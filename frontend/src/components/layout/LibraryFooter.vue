@@ -32,7 +32,9 @@
          <li><a href="https://www.library.virginia.edu/press/">Press</a></li>
          <li><a href="https://www.library.virginia.edu/renovation/">Renovation</a></li>
          <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
-         <li class="give-library"><V4Button mode="link" url="https://www.library.virginia.edu/support-library/">Give to the Library</V4Button></li>
+         <li class="give-library">
+            <V4Button id="give" mode="link" url="https://www.library.virginia.edu/support-library/">Give to the Library</V4Button>
+         </li>
        </ul>
      </div>
      <div class="footer-bucket">
@@ -107,6 +109,11 @@ footer {
    background-color: var(--uvalib-brand-blue);
    color: white;
    padding:20px 20px 0 20px;
+   #give {
+      &:focus {
+          @include be-accessible-light();
+      }
+   }
 }
 footer p.copy, footer p.gov {
    vertical-align: middle;

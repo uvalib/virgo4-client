@@ -343,7 +343,15 @@ body {
    a:focus {
       @include be-accessible();
    }
-   input:focus {
+   footer, div.header, nav {
+      a:focus {
+         @include be-accessible-light();
+      }
+   }
+   input:focus, select:focus {
+      @include be-accessible();
+   }
+   textarea:focus {
       @include be-accessible();
    }
 }

@@ -140,9 +140,6 @@ export default {
       }
    }
 }
-div.pool.excluded {
-   opacity: 0.7;
-}
 div.pool.excluded div.name {
    background: #aaa;
 }
@@ -172,6 +169,9 @@ div.source-controls {
 }
 div.toggle {
    cursor: pointer;
+   &:focus {
+      @include be-accessible();
+   }
 }
 i.fas.selected {
    color: var(--color-pale-blue);

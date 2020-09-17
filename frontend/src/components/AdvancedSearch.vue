@@ -377,14 +377,14 @@ div.options {
 .options select {
    margin: 0 5px 0 0;
    flex-basis: content;
-   &:focus {
-      @include be-accessible();
-   }
 }
-div.search-term select {
-   height: auto !important;
-   &:focus {
-      @include be-accessible();
+div.search-term {
+   select {
+      height: auto !important;
+   }
+   input {
+      margin-top: 5px;
+      margin-bottom: 0 !important;
    }
 }
 

@@ -458,15 +458,12 @@ h2 {
 #app .pure-form div.basic-search  input[type=text].basic {
   font-size: 1.15em;
   padding: 0.5vw 0.75vw;
-  border: 1px solid #ccc;
+  border: 1px solid var(--uvalib-grey);
   margin: 0;
   border-left: 0;
   border-radius: 0 5px 5px 0;
   flex: 1 1 auto;
   min-width: 100px;
-  &:focus {
-      @include be-accessible();
-   }
 }
 div.advanced {
   margin-top: 10px;

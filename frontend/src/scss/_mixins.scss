@@ -11,13 +11,17 @@
 // }
 
 @mixin be-accessible(){
-   outline: 3px dotted var( --uvalib-accessibility-highlight );//var(--uvalib-accessibility-highlight);
+   outline: 3px dotted var( --uvalib-accessibility-highlight );
+   outline-offset: 3px;
+}
+@mixin be-accessible-light(){
+   outline: 3px dotted var(--uvalib-grey-lightest);
    outline-offset: 3px;
 }
 
 @mixin be-accessible-field(){
    outline: 0;
-   box-shadow: 0 0 0 0.2rem var(--uvalib-accessibility-highlight);
+   box-shadow: inset 0 0 5px 1px var(--uvalib-accessibility-highlight);
 }
 
 @mixin apply-hover() {
