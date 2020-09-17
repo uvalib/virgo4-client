@@ -2,7 +2,7 @@
    <footer>
      <div class="pre-footer" v-if="$route.name != 'feedback'">
         This is the newest version of the Library catalog.
-        <router-link to="/feedback">Please give us your feedback.</router-link>
+        <router-link id="feedback" to="/feedback">Please give us your feedback.</router-link>
      </div>
      <div class="footer-container">
       <div class="footer-bucket">
@@ -123,6 +123,9 @@ footer p.copy, footer p.gov {
   color: var(--uvalib-text-dark);
   padding: 5px 20px;
   margin: -20px -20px 0 -20px;
+  #feedback:focus {
+     @include be-accessible();
+  }
 }
 .footer-container {
   display: grid;
