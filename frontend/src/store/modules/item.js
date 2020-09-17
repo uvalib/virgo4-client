@@ -130,22 +130,21 @@ const item = {
    },
 
    actions: {
-      async generateDigitalContent(ctx, data ) {
-         let dc = ctx.state.details.digitalContent.find( f=>f.name==data.name && f.type==data.type)
+      async generateDigitalContent(ctx, item ) {
          try {
-            await axios.get(dc.generateURL)
-            ctx.dispatch("getDigitalContentStatus", data.name)
+            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "0%"})
+            await axios.get(item.generateURL)
+            ctx.dispatch("getDigitalContentStatus", item.name)
          } catch (_err) {
-            ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
+            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "ERROR"})
          }
       },
-      async getDigitalContentStatus(ctx, data) {
+      async getDigitalContentStatus(ctx, item) {
          try {
-            let dc = ctx.state.details.digitalContent.find(  f=>f.name==data.name && f.type==data.type)
-            let response = await axios.get(dc.statusURL)
-            ctx.commit("setDigitalContentStatus", {name: data.name, type: data.type, status: response.data})
+            let response = await axios.get(item.statusURL)
+            ctx.commit("setDigitalContentStatus", {name: item.name, type: item.type, status: response.data})
          } catch(error) {
-            ctx.commit("setDigitalContentStatus", {name: data.name,  type: data.type, status: "ERROR"})
+            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "ERROR"})
          }
       },
 

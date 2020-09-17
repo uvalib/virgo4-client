@@ -28,10 +28,13 @@
                               <img v-if="item.thumbnail" :src="item.thumbnail"/>
                               <span class="label">{{item.name}}</span>
                            </a>
-                           <DownloadProgress v-else :name="item.name" :id="`${details.identifier}-pdf${item.name}`"
-                              :thumb="item.thumbnail"
+                           <span v-else class="pdf-download"
                               :ariaLabel="`download pdf for ${item.name}`"
-                           />
+                           >
+                              <V4ProgressBar v-if="generateInProgress(item)" :id="item.name" :percent="item.status" label="Generating PDF"/>
+                              <img tabindex="0" v-if="item.thumbnail" :src="item.thumbnail" @click="generatePDF(item)"/>
+                              <span class="label not-ready">{{item.name}}</span>
+                           </span>
                         </div>
                      </template>
                   </vue-horizontal-list>
@@ -102,14 +105,14 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import V4ProgressBar from "@/components/V4ProgressBar"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice"
 import RequestContainer from "@/components/requests/RequestContainer"
 import BoundWithItems from "@/components/details/BoundWithItems"
-import DownloadProgress from '@/components/modals/DownloadProgress'
 import VueHorizontalList from 'vue-horizontal-list'
 export default {
   components: {
-    AvailabilityNotice, RequestContainer, BoundWithItems, DownloadProgress, VueHorizontalList
+    AvailabilityNotice, RequestContainer, BoundWithItems, VueHorizontalList, V4ProgressBar
   },
    props: {
       titleId: String
@@ -160,6 +163,21 @@ export default {
       }
    },
    methods: {
+      generateInProgress(item) {
+         return !( item.status == "READY" || item.status == "ERROR" || item.status == "NOT_AVAIL")
+      },
+      async generatePDF( item ) {
+         await this.$store.dispatch("item/generateDigitalContent", item)
+         var timerID = setInterval( async () => {
+            // console.log("check status...")
+            await this.$store.dispatch("item/getDigitalContentStatus", item )
+            // console.log("GOT status "+item.status)
+            if (item.status == "READY" || item.status == "ERROR" || item.status == "100%") {
+               // console.log("CLEAR INTERVAL")
+               clearInterval(timerID)
+            }
+         }, 1000)
+      },
       formatValue(val) {
          if ( val == "On Shelf" ) {
             return "On Shelf Now"
@@ -212,6 +230,11 @@ export default {
       display: block;
    }
 
+   label.not-ready {
+      color: var(--uvalib-grey);
+      font-weight: bolder;
+   }
+
    div.pdfs {
       margin: 25px 0 0 0;
 
@@ -223,12 +246,25 @@ export default {
          padding: 10px;
          border-radius: 3px;
          box-shadow: $v4-box-shadow-light;
+
+
+         .pdf-download {
+             position: relative;
+             cursor: pointer;
+            .v4-progress-bar {
+               position: absolute;
+               width:100%;
+            }
+         }
          img {
             display: inline-block;
             border-radius: 5px;
+            &:focus {
+               @include be-accessible();
+            }
          }
          span {
-            display: block
+            display: block;
          }
       }
    }
