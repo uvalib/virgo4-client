@@ -1,7 +1,7 @@
 <template>
    <div class="inner-hit-wrapper" :class="{group: hit.grouped}">
       <div class="hit" v-bind:data-identifier="hit.identifier">
-         <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool"/>
+         <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool" from="SEARCH"/>
          <SearchHitDetail :hit="hit" :pool="pool"/>
       </div>
       <AccordionContent v-if="hit.grouped" :id="hit.identifier"

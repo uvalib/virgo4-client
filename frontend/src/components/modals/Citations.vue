@@ -31,6 +31,11 @@
                      </template>
                   </template>
                </dl>
+               <template v-if="risShow">
+                  <V4DownloadButton icon="fas fa-file-export" label="Download RIS Citation" :url="risURL"
+                     @click="downloadRISClicked" :aria-label="`export RIS citation for ${itemID}`"
+                  />
+               </template>
             </template>
          </div>
       </template>
@@ -44,6 +49,10 @@
 </template>
 
 <script>
+
+import { mapState } from "vuex"
+import V4DownloadButton from '@/components/V4DownloadButton'
+
 export default {
    props: {
       title: {
@@ -62,6 +71,9 @@ export default {
          type: String,
          required: true
       },
+      from: {
+         type: String
+      },
       buttonLabel: {
          type: String,
          default: ""
@@ -77,15 +89,43 @@ export default {
    },
    data: function() {
       return {
+         risShow: false,
+         risFrom: "",
          loading: true,
          failed: false,
          data: null
       };
    },
+   components: {
+      V4DownloadButton
+   },
    computed: {
+      ...mapState({
+         citationsURL: state => state.system.citationsURL,
+      }),
+      itemID() {
+         let parts = this.itemURL.split("/")
+         return parts[parts.length - 1]
+      },
+      risURL() {
+         if (this.citationsURL == "") return ""
+         return `${this.citationsURL}/format/ris?item=${encodeURI(this.itemURL)}`
+      },
    },
    methods: {
       opened() {
+         // only show RIS link when not showing an explicit format
+         this.risShow = false
+         if (this.format == "all") {
+            this.risShow = true
+
+            let from = this.from.toUpperCase()
+            if (from == "") {
+               from = 'MODAL'
+            }
+            this.risFrom = 'RIS_FROM_' + from
+         }
+
          this.loading = true
          this.failed = false
          this.data = null
@@ -107,6 +147,9 @@ export default {
                this.$refs.citationsdlg.hide()
             }
          }, 300)
+      },
+      downloadRISClicked() {
+         this.$analytics.trigger('Export', this.risFrom, this.itemID)
       },
    }
 }
@@ -143,5 +186,10 @@ dd {
    -moz-hyphens: auto;
    hyphens: auto;
    padding: 4px 0px;
+}
+
+.working {
+   text-align: center;
+   font-size: 1.25em;
 }
 </style>

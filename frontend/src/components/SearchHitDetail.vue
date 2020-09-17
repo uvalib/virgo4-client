@@ -36,10 +36,6 @@
             label="Download OCR" :url="ocrDownloadURL"
             :aria-label="`download ocr for ${hit.header.title}`"
          />
-         <V4DownloadButton icon="fas fa-file-export" label="Download RIS Citation"
-            :url="risURL" @click="downloadRISClicked"
-            :aria-label="`export citation for ${hit.header.title}`"
-         />
       </div>
    </div>
 </template>
@@ -59,10 +55,6 @@ export default {
       TruncatedText, AccessURLDetails, V4DownloadButton
    },
    computed: {
-      risURL() {
-         if (this.citationsURL == "") return ""
-         return `${this.citationsURL}/format/ris?item=${encodeURI(this.hit.itemURL)}`
-      },
       pdfDownloadURL() {
          let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")
          if (dc)  {
@@ -100,9 +92,6 @@ export default {
       detailClicked() {
          this.$store.commit("hitSelected", this.hit.identifier)
          this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
-      },
-      downloadRISClicked() {
-         this.$analytics.trigger('Export', 'RIS_FROM_SEARCH', this.hit.identifier)
       },
       getKey(field,idx) {
          return this.hit.identifier+field.value+idx

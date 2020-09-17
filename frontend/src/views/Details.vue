@@ -24,7 +24,7 @@
             </div>
          </template>
          <template v-else>
-            <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"/>
+            <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source" from="DETAIL"/>
             <abbr class="unapi-id" :title="details.itemURL"></abbr>
             <div class="info">
                <div v-if="hasExternalHoldings(details.source)" class="ra-box ra-fiy pad-top">
@@ -71,18 +71,18 @@
                   </template>
                   <dt class="label">Citations:</dt>
                   <dd class="value">
-                     <V4DownloadButton style="padding-left:0" label="RIS" :url="risURL" @click="downloadRISCliecked"
-                        :aria-label="`export citation for ${details.header.title}`"
+                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="mla" buttonLabel="MLA" from="DETAIL" :ariaLabel="`MLA citation for ${details.identifier}`" >
+                     </Citations>
+                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="apa" buttonLabel="APA" from="DETAIL" :ariaLabel="`APA citation for ${details.identifier}`" >
+                     </Citations>
+                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="cms" buttonLabel="Chicago" from="DETAIL" :ariaLabel="`Chicago citation for ${details.identifier}`" >
+                     </Citations>
+                     <V4DownloadButton style="padding-left:0" label="RIS" :url="risURL" @click="downloadRISClicked"
+                        :aria-label="`export RIS citation for ${details.header.title}`"
                      />
-                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
-                        :itemURL="details.itemURL" format="mla" buttonLabel="MLA" :ariaLabel="`MLA citation for ${details.identifier}`" >
-                     </Citations>
-                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
-                        :itemURL="details.itemURL" format="apa" buttonLabel="APA" :ariaLabel="`APA citation for ${details.identifier}`" >
-                     </Citations>
-                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
-                        :itemURL="details.itemURL" format="cms" buttonLabel="Chicago" :ariaLabel="`Chicago citation for ${details.identifier}`" >
-                     </Citations>
                   </dd>
                   <template v-if="hasExtLink">
                      <dd></dd>
@@ -255,7 +255,7 @@ export default {
       extDetailClicked() {
          this.$analytics.trigger('Results', 'MORE_DETAILS_CLICKED', this.details.identifier)
       },
-      downloadRISCliecked() {
+      downloadRISClicked() {
          this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
       },
       getDetails() {
