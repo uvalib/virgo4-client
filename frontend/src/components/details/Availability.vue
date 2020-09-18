@@ -21,20 +21,19 @@
                <label>Download PDF:</label>
                <div class="value">
                   <vue-horizontal-list :items="pdfs"
-                     :options="{item: {class: 'pdf', padding: 0}, navigation: {start: 576}, list: {padding:0}}">
+                     :options="{item: {class: 'pdf', padding: 0}, navigation: {start: 576}, list: {padding:0}}"
+                  >
                      <template v-slot:default="{item}">
-                        <div class="download-card">
-                           <a v-if="item.status=='READY'" :href="item.url" :aria-label="`download pdf for ${item.name}`" class="pdf-download">
-                              <img v-if="item.thumbnail" :src="item.thumbnail"/>
-                              <span class="label">{{item.name}}</span>
-                           </a>
-                           <span v-else class="pdf-download"
-                              :ariaLabel="`download pdf for ${item.name}`"
-                           >
-                              <V4ProgressBar v-if="generateInProgress(item)" :id="item.name" :percent="item.status" label="Generating PDF"/>
-                              <img tabindex="0" v-if="item.thumbnail" :src="item.thumbnail" @click="generatePDF(item)"/>
-                              <span class="label not-ready">{{item.name}}</span>
-                           </span>
+                        <div class="download-card" tabindex="0" role="button"
+                           @click.stop="pdfClicked(item)" @keyup.stop.enter="pdfClicked(item)"
+                           @keydown.space.prevent.stop="pdfClicked(item)"
+                           :aria-label="`download pdf for ${item.name}`"
+                        >
+                           <V4ProgressBar v-if="generateInProgress(item)" :id="item.name"
+                              :percent="item.status" label="Generating PDF"
+                           />
+                           <img v-if="item.thumbnail" :src="item.thumbnail"/>
+                           <span class="label">{{item.name}}</span>
                         </div>
                      </template>
                   </vue-horizontal-list>
@@ -166,7 +165,11 @@ export default {
       generateInProgress(item) {
          return !( item.status == "READY" || item.status == "ERROR" || item.status == "NOT_AVAIL")
       },
-      async generatePDF( item ) {
+      async pdfClicked( item ) {
+         if (item.status == "READY") {
+             window.location.href=item.url
+            return
+         }
          await this.$store.dispatch("item/generateDigitalContent", item)
          var timerID = setInterval( async () => {
             // console.log("check status...")
@@ -231,44 +234,42 @@ export default {
       display: block;
    }
 
-   span.label.not-ready {
-      color: var(--color-link);
-      font-weight: 500;
-      &:hover {
-         text-decoration: underline;
-      }
-   }
-
    div.pdfs {
       margin: 25px 0 0 0;
 
       .download-card {
+         position: relative;
          display: inline-block;
          text-align: center;
          margin: 5px;
          border: 1px solid var(--uvalib-grey-light);
-         padding: 10px;
+         padding: 15px 10px 10px 10px;
          border-radius: 3px;
          box-shadow: $v4-box-shadow-light;
+         cursor: pointer;
 
+         &:focus {
+            @include be-accessible();
+         }
 
-         .pdf-download {
-             position: relative;
-             cursor: pointer;
-            .v4-progress-bar {
-               position: absolute;
-               width:100%;
+         &:hover {
+            span.label {
+               text-decoration: underline;
             }
          }
-         img {
-            display: inline-block;
-            border-radius: 5px;
-            &:focus {
-               @include be-accessible();
-            }
-         }
-         span {
+
+         span.label {
+            color: var(--color-link);
+            font-weight: 500;
             display: block;
+         }
+
+         .v4-progress-bar {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            top: 40%;
+            transform: translateY(-50%);
          }
       }
    }
