@@ -12,7 +12,7 @@
          <template v-for="(groupHit,idx) in hit.group">
             <div class="group-hit" v-bind:data-identifier="groupHit.identifier"
                :class="{last: idx==hit.group.length-1, first: idx==0}" :key="`g${idx}`">
-               <SearchHitHeader :maxLen="60" :count="groupHit.number" :hit="groupHit" :pool="pool"/>
+               <SearchHitHeader :maxLen="60" :count="groupHit.number" :hit="groupHit" :pool="pool" from="SEARCH"/>
                <SearchHitDetail :hit="groupHit" :pool="pool"/>
             </div>
          </template>

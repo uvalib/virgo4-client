@@ -4,14 +4,13 @@
    >
       <template v-slot:button>
          <V4Button v-if="buttonLabel" :mode="buttonMode" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
-             :aria-label="ariaLabel"
+             :icon="citationIcon" :aria-label="ariaLabel"
          >
-            {{buttonLabel}}
+            {{buttonLabel}}<i class="icon-inline" :class="citationIcon" v-if="iconInline"></i>
          </V4Button>
          <V4Button v-else mode="icon" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
-             :aria-label="ariaLabel"
+             :icon="citationIcon" :aria-label="ariaLabel"
          >
-            <i class="quote fas fa-quote-right"></i>
          </V4Button>
       </template>
       <template v-slot:content>
@@ -22,6 +21,9 @@
             <template v-else-if="failed">
                <p class="error">{{data}}</p>
             </template>
+            <template v-else-if="singleFormat">
+               <div class="citation"><span v-html="data[0].value"></span></div>
+            </template>
             <template v-else>
                <dl class="citations">
                   <template v-for="(citation,idx) in data">
@@ -31,11 +33,9 @@
                      </template>
                   </template>
                </dl>
-               <template v-if="risShow">
-                  <V4DownloadButton icon="fas fa-file-export" label="Download RIS Citation" :url="risURL"
-                     @click="downloadRISClicked" :aria-label="`export RIS citation for ${itemID}`"
-                  />
-               </template>
+               <V4DownloadButton icon="fas fa-file-export" label="Download RIS Citation" :url="risURL"
+                  @click="downloadRISClicked" :aria-label="`export RIS citation for ${itemID}`"
+               />
             </template>
          </div>
       </template>
@@ -72,7 +72,16 @@ export default {
          required: true
       },
       from: {
-         type: String
+         type: String,
+         default: ""
+      },
+      icon: {
+         type: String,
+         default: ""
+      },
+      iconInline: {
+         type: Boolean,
+         default: false
       },
       buttonLabel: {
          type: String,
@@ -89,8 +98,6 @@ export default {
    },
    data: function() {
       return {
-         risShow: false,
-         risFrom: "",
          loading: true,
          failed: false,
          data: null
@@ -111,21 +118,34 @@ export default {
          if (this.citationsURL == "") return ""
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.itemURL)}`
       },
+      citationIcon() {
+         let icon = this.icon
+         if (icon == "") {
+            icon = "fas fa-quote-right"
+         }
+         return icon
+      },
+      singleFormat() {
+         if (this.format == "all") {
+            return false
+         }
+         return true
+      },
+      risFrom() {
+         if (this.singleFormat) {
+            return ""
+         }
+
+         let from = this.from.toUpperCase()
+         if (from == "") {
+            from = 'MODAL'
+         }
+
+         return 'RIS_FROM_' + from
+      },
    },
    methods: {
       opened() {
-         // only show RIS link when not showing an explicit format
-         this.risShow = false
-         if (this.format == "all") {
-            this.risShow = true
-
-            let from = this.from.toUpperCase()
-            if (from == "") {
-               from = 'MODAL'
-            }
-            this.risFrom = 'RIS_FROM_' + from
-         }
-
          this.loading = true
          this.failed = false
          this.data = null
@@ -156,7 +176,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-i.quote {
+i.icon-inline {
+   margin-left: 5px;
+   font-size: 0.8em;
+}
+
+i.icon {
    color: var(--uvalib-grey-dark);
    cursor: pointer;
    font-size: 1.2em;
@@ -191,5 +216,9 @@ dd {
 .working {
    text-align: center;
    font-size: 1.25em;
+}
+
+.citation {
+   margin: 15px;
 }
 </style>

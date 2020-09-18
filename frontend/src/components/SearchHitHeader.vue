@@ -15,11 +15,14 @@
             </router-link>
          </div>
          <div class="icon-wrap">
-            <div class="citation-control">
-               <Citations title="Citations" :id="`citation-${hit.identifier}`" style="margin-right: 10px"
-                  :itemURL="hit.itemURL" format="all" :from="from" :ariaLabel="`citations for ${hit.identifier}`" >
-               </Citations>
-            </div>
+            <template v-if="showCitations">
+               <div class="citation-control">
+                  <Citations title="Citations" :id="`citation-${hit.identifier}`" style="margin-right: 10px"
+                     :itemURL="hit.itemURL" format="all" buttonLabel="Cite" :from="from" :iconInline="true"
+                     :ariaLabel="`citations for ${hit.identifier}`" >
+                  </Citations>
+               </div>
+            </template>
             <div class="bm-control">
                <AddBookmark v-if="isSignedIn" :hit="hit" :pool="pool" :id="`bm-modal-${hit.identifier}`"/>
                <SignInRequired v-else  :hit="hit" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
@@ -76,6 +79,12 @@ export default {
       },
       authorTruncateLength() {
          return 150
+      },
+      showCitations() {
+         if (this.from.toUpperCase() == 'SEARCH') {
+            return true
+         }
+         return false
       },
    },
    methods: {

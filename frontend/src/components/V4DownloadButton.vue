@@ -1,7 +1,12 @@
 <template>
    <button tabindex="0" role="button" class="v4-download-button"
       @click.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
-      <template v-if="icon">
+      <template v-if="icon && iconInline">
+         <span class="download-text">
+            {{label}}<i class="icon-inline" :class="icon"></i>
+         </span>
+      </template>
+      <template v-else-if="icon">
          <i class="icon" :class="icon"></i>
          <label>{{label}}</label>
       </template>
@@ -15,6 +20,10 @@ export default {
       icon: {
          type: String,
          default: ""
+      },
+      iconInline: {
+         type: Boolean,
+         default: false
       },
       url: {
          type: String,
@@ -52,6 +61,11 @@ export default {
       display: block;
       color: var(--uvalib-text);
    }
+   .icon-inline {
+      margin-left: 5px;
+      font-size: 0.8em;
+   }
+
    label {
       font-size: 0.8em;
       color: var(--uvalib-text);
