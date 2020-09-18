@@ -277,7 +277,7 @@ export default {
          let collField = this.allFields.find( f => f.name == "collection")
          if (collField) {
             console.log("Trigger collection viewed "+collField.value+":"+id+"")
-            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id, collField.value)
+            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
          } else {
             this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
          }
