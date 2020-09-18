@@ -175,6 +175,7 @@ export default {
             if (item.status == "READY" || item.status == "ERROR" || item.status == "100%") {
                // console.log("CLEAR INTERVAL")
                clearInterval(timerID)
+               window.location.href=item.url
             }
          }, 1000)
       },
@@ -230,9 +231,12 @@ export default {
       display: block;
    }
 
-   label.not-ready {
-      color: var(--uvalib-grey);
-      font-weight: bolder;
+   span.label.not-ready {
+      color: var(--color-link);
+      font-weight: 500;
+      &:hover {
+         text-decoration: underline;
+      }
    }
 
    div.pdfs {
