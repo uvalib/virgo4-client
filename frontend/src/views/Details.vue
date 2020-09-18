@@ -274,12 +274,11 @@ export default {
             await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }
 
+         this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
          let collField = this.allFields.find( f => f.name == "collection")
          if (collField) {
             console.log("Trigger collection viewed "+collField.value+":"+id+"")
-            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
-         } else {
-            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
+            this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
          }
 
          if ( this.isSignedIn) {
