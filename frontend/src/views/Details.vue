@@ -258,7 +258,7 @@ export default {
       downloadRISClicked() {
          this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
       },
-      getDetails() {
+      async getDetails() {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
          let id= this.$route.params.id
@@ -267,11 +267,21 @@ export default {
          }
 
          if (src) {
-            this.$store.dispatch("item/getDetails", {source:src, identifier:id})
-             this.$store.commit("hitSelected", id)
+            this.$store.commit("hitSelected", id)
+            await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
+
          } else {
-            this.$store.dispatch("item/lookupCatalogKeyDetail", id )
+            await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }
+
+         let collField = this.allFields.find( f => f.name == "collection")
+         if (collField) {
+            console.log("Trigger collection viewed "+collField.value+":"+id+"")
+            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id, collField.value)
+         } else {
+            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
+         }
+
          if ( this.isSignedIn) {
             this.$store.dispatch("bookmarks/getBookmarks")
          }

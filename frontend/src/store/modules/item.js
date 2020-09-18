@@ -242,7 +242,7 @@ const item = {
          baseURL = pool.url
 
          let url = baseURL + "/api/resource/" + identifier
-         axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             let details = response.data
             ctx.commit("setDetails", {source: source, poolURL: pool.url, details: details})
             ctx.dispatch("getDigitalContent")

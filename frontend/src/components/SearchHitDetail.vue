@@ -91,7 +91,7 @@ export default {
    methods: {
       detailClicked() {
          this.$store.commit("hitSelected", this.hit.identifier)
-         this.$analytics.trigger('Export', 'DETAILS_CLICKED', this.hit.identifier)
+         this.$analytics.trigger('Results', 'DETAILS_CLICKED', this.hit.identifier)
       },
       getKey(field,idx) {
          return this.hit.identifier+field.value+idx
