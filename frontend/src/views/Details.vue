@@ -1,7 +1,7 @@
 <template>
    <div class="details">
       <div class="detail-header">
-         <span v-if="selectedHitIdx > -1 && selectedResults.total > 1" class="hidden-spacer"></span>
+         <span v-if="selectedHitIdx > -1" class="hidden-spacer"></span>
          <h1>Item Details</h1>
          <span class="paging" v-if="selectedHitIdx > -1">
             <V4Pager :total="selectedResults.total" :page="selectedHit.number"
