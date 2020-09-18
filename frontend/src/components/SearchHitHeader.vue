@@ -17,7 +17,7 @@
          <div class="icon-wrap">
             <div class="citation-control">
                <Citations title="Citations" :id="`citation-${hit.identifier}`" style="margin-right: 10px"
-                  :itemURL="hit.itemURL" format="all" :ariaLabel="`citations for ${hit.identifier}`" >
+                  :itemURL="hit.itemURL" format="all" :from="from" :ariaLabel="`citations for ${hit.identifier}`" >
                </Citations>
             </div>
             <div class="bm-control">
@@ -58,6 +58,10 @@ export default {
       count: {
          type: Number,
          default: 0
+      },
+      from: {
+         type: String,
+         default: ""
       },
    },
    components: {
