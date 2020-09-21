@@ -1,7 +1,12 @@
 <template>
    <div class="privacy">
       <h2>Privacy</h2>
-      <div><b>The Library values your privacy.</b></div>
+      <div>
+         <b>
+            The Library
+            <a href="https://www.library.virginia.edu/policies/privacy-policy/" target="_blank">values your privacy</a>.
+         </b>
+      </div>
       <div>
          We collect analytics information that is not personally identifiable
          for the purpose of evaluating trends in usage or otherwise improving
