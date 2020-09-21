@@ -168,10 +168,11 @@ const item = {
          })
          delete noAuthAxios.defaults.headers.common['Authorization']
 
+         let screenW = ctx.rootState.system.displayWidth-30;
          let oembed = ctx.state.details.detailFields.filter( f => f.type == "oembed-url")
          oembed.forEach( async oe => {
             try {
-               let resp = await noAuthAxios.get(oe.value+"&maxheight=600")
+               let resp = await noAuthAxios.get(oe.value+"&maxwidth="+screenW+"&maxheight=600")
                ctx.commit("addEmbeddedMedia", resp.data.html)
             } catch (err) {
                console.error("Unable to get oEmbed media from "+oe.value+": "+err)

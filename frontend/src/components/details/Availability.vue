@@ -316,9 +316,7 @@ export default {
      word-break: break-word;
   }
   .availability-content {
-      width: 100vw;
       position: relative;
-      left: calc(-50vw + 50% );
       border-left: none;
       border-right: none;
   }

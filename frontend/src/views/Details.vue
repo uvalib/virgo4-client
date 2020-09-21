@@ -96,16 +96,13 @@
                         </a>
                      </dt>
                   </template>
-                  <template v-if="poolMode=='image'">
+                  <template v-if="poolMode=='image' && !hasEmbeddedMedia">
                      <dt class="label">Image:</dt>
                      <dd class="image">
                         <ImageDetails :mode="mode"/>
                      </dd>
                   </template>
                </dl>
-               <template v-if="hasEmbeddedMedia">
-                  <span v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
-               </template>
                <template v-if="marcXML">
                   <AccordionContent class="marc" id="maxc-xml">
                      <template v-slot:title>MARC XML</template>
@@ -113,8 +110,15 @@
                   </AccordionContent>
                </template>
             </div>
-            <Availability v-if="hasAvailability" :titleId="details.identifier" />
          </template>
+      </div>
+      <div class="full-width-content">
+         <template v-if="hasEmbeddedMedia">
+            <span v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
+         </template>
+      </div>
+      <div class="availability-info">
+         <Availability v-if="hasAvailability" :titleId="details.identifier" />
       </div>
    </div>
 </template>
@@ -123,7 +127,7 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
-import ImageDetails from '@/components/ImageDetails'
+import ImageDetails from '@/components/details/ImageDetails'
 import Availability from "@/components/details/Availability"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
@@ -386,6 +390,11 @@ export default {
 
    .details-content {
       width: 80%;
+      margin: 0 auto;
+   }
+
+   .availability-info {
+      width: 95%;
       margin: 0 auto;
    }
 

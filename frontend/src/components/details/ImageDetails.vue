@@ -32,12 +32,12 @@
             <span class="hint">Click image to zoom</span>
             <span  v-if="manifestURL" class="iiif">
                <a :href="manifestURL" aria-label="open IIIF manifest data for this image in a new tab" target="_blank">
-                  <img aria-label=" " src="../assets/iiif_icon.png"/>
+                  <img aria-label=" " src="../../assets/iiif_icon.png"/>
                </a>
             </span>
          </div>
       </template>
-      <div  v-if="manifestURL" class="iiif-help">          
+      <div  v-if="manifestURL" class="iiif-help">
          <IIIFInfo />
       </div>
    </div>
