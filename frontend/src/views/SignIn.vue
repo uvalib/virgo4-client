@@ -5,7 +5,7 @@
          <div class="netbadge">
             <span class="netbadge">
                <h2>UVA Users</h2>
-               <p class="subhead">(Current UVA students, faculty, and staff)</p>
+               <p class="subhead">(UVA students, faculty, and staff)</p>
                <div class="indent littleextra">
                   <V4Button id="netbadge" mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
                </div>

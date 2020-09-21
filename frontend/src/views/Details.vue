@@ -71,16 +71,20 @@
                   </template>
                   <dt class="label">Citations:</dt>
                   <dd class="value">
-                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
-                        :itemURL="details.itemURL" format="mla" buttonLabel="MLA" from="DETAIL" :ariaLabel="`MLA citation for ${details.identifier}`" >
+                     <Citations title="MLA Citation" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="mla" buttonLabel="MLA" from="DETAIL" :iconInline="true"
+                        :ariaLabel="`show MLA citation for ${details.header.title}`" >
                      </Citations>
-                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
-                        :itemURL="details.itemURL" format="apa" buttonLabel="APA" from="DETAIL" :ariaLabel="`APA citation for ${details.identifier}`" >
+                     <Citations title="APA Citation" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="apa" buttonLabel="APA" from="DETAIL" :iconInline="true"
+                        :ariaLabel="`show APA citation for ${details.header.title}`" >
                      </Citations>
-                     <Citations title="Citations" :id="`citation-${details.identifier}`" style="margin-right: 10px"
-                        :itemURL="details.itemURL" format="cms" buttonLabel="Chicago" from="DETAIL" :ariaLabel="`Chicago citation for ${details.identifier}`" >
+                     <Citations title="Chicago Citation" :id="`citation-${details.identifier}`" style="margin-right: 10px"
+                        :itemURL="details.itemURL" format="cms" buttonLabel="Chicago" from="DETAIL" :iconInline="true"
+                        :ariaLabel="`show Chicago citation for ${details.header.title}`" >
                      </Citations>
-                     <V4DownloadButton style="padding-left:0" label="RIS" :url="risURL" @click="downloadRISClicked"
+                     <V4DownloadButton style="padding-left:0" label="Download RIS" :url="risURL" @click="downloadRISClicked"
+                        icon="fas fa-file-export" :iconInline="true"
                         :aria-label="`export RIS citation for ${details.header.title}`"
                      />
                   </dd>
