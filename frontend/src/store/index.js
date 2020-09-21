@@ -77,7 +77,7 @@ export default new Vuex.Store({
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
-         return state.selectedHitIdx > 0
+         return state.selectedHitIdx > 0 || state.selectedHitGroupIdx >=0
       },
       hasResults: state => {
          return state.total >= 0
