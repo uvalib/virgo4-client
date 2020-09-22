@@ -8,7 +8,7 @@ const versionChecker = (store) => {
       setInterval(() => {
          axios.get("/version").then((ckResp) => {
             if (currBuild!= ckResp.data.build) {
-               store.commit('system/newVersionDetected')   
+               store.commit('system/newVersionDetected')
             } else {
                if (store.state.system.fatal != "") {
                   store.commit('system/setFatal', "")
@@ -17,7 +17,7 @@ const versionChecker = (store) => {
          }).catch((_error) => {
             store.commit('system/setFatal', "Lost connection to Virgo backend services")
          })
-      }, 1000*60)
+      }, 1000*60*5)
     })
  }
 
