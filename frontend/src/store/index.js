@@ -490,6 +490,7 @@ export default new Vuex.Store({
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)
+               dispatch("system/reportError", error)
             }
          })
       },
@@ -529,6 +530,7 @@ export default new Vuex.Store({
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)
+               dispatch("system/reportError", error)
             }
          })
          commit('addPoolSearchResults', response.data)
