@@ -41,6 +41,10 @@ const item = {
    mutations: {
       setDetails(state, {source, poolURL, details}) {
          utils.preProcessHitFields( poolURL, [details] )
+         if ( details.related ) {
+            // strip out this item info from related
+            details.related = details.related.filter(  r => r.id != details.identifier)
+         }
          details.digitalContent = []
          details.embeddedMedia = []
          details.source = source

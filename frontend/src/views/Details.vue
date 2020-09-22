@@ -112,10 +112,14 @@
             </div>
          </template>
       </div>
-      <div class="full-width-content">
-         <template v-if="hasEmbeddedMedia">
-            <span v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
-         </template>
+      <div class="full-width-content" v-if="hasEmbeddedMedia">
+         <span v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
+         <div class="related" v-if="details.related">
+            <label>Related Images</label>
+             <a :href="relatedImageURL(r)"  v-for="r in details.related" :key="`r${r.id}`">
+               <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
+             </a>
+         </div>
       </div>
       <div class="availability-info">
          <Availability v-if="hasAvailability" :titleId="details.identifier" />
@@ -238,6 +242,9 @@ export default {
       }
    },
    methods: {
+      relatedImageURL( r ) {
+         return `/sources/${this.details.source}/items/${r.id}`
+      },
       returnToSearch() {
          this.$router.push( this.lastSearchURL )
       },
@@ -391,6 +398,26 @@ export default {
    .details-content {
       width: 80%;
       margin: 0 auto;
+   }
+
+   .related {
+      width: 90%;
+      margin: 15px auto 25px auto;
+      text-align: left;
+      label {
+         padding:0 0 5px 0;
+         border-bottom: 2px solid var(--color-brand-blue);
+         margin-bottom: 10px;
+      }
+      a {
+         margin: 10px;
+      }
+      img {
+         box-shadow: $v4-box-shadow;
+         &:hover {
+            box-shadow: 0px 2px 8px 0 #444;
+         }
+      }
    }
 
    .availability-info {
