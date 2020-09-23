@@ -1,7 +1,7 @@
 <template>
    <div id="active-panel" ref="activePanel">
       <component v-bind:is="requests.activePanel" />
-      <V4Button mode="tertiary" v-if="showReset(requests.activePanel)" class="reset" @click="reset">Reset</V4Button>
+      <V4Button mode="tertiary" v-if="showReset()" class="reset" @click="reset" v-html="resetLabel()"></V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
    </div>
 </template>
@@ -59,10 +59,17 @@ export default {
          }
       },150)
     },
-    showReset(panel){
+    showReset(){
       // Don't show reset on first and last panel
-      return !['ConfirmationPanel', 'OptionsPanel', 'PDAPanel'].includes(panel)
-    }
+      return !['OptionsPanel', 'PDAPanel'].includes(this.requests.activePanel)
+    },
+    resetLabel(){
+        if (this.requests.activePanel == 'ConfirmationPanel'){
+           return "Back"
+        }else{
+           return "Reset"
+        }
+     }
   },
 }
 </script>
