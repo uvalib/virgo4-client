@@ -85,7 +85,7 @@
                <tr v-for="(item,idx) in availability.items" :key="`val-${idx}`">
                   <td class="value">{{formatValue(item.library)}}</td>
                   <td class="value">{{formatValue(item.current_location)}}</td>
-                  <td class="value">{{formatValue(item.call_number)}} <template v-if="showCopyNumbers">{{formatCopyNumber(item)}}</template></td>
+                  <td class="value">{{formatValue(item.call_number)}}</td>
                   <td class="value">
                      <template v-if="item.notice">
                         <AvailabilityNotice :label="formatValue(item.barcode)" :message="item.notice" />
@@ -141,9 +141,7 @@ export default {
       },
       hasItems(){
          return Array.isArray(this.availability.items) && this.availability.items.length > 0
-      },
-      showCopyNumbers(){
-         return this.availability.items.some( i=> i.copy_number >= 2)
+
       },
       availabilityStatement() {
          let f = this.details.detailFields.find( f=>f.name == "availability_statement")
@@ -190,9 +188,6 @@ export default {
          }
          return val
       },
-      formatCopyNumber(item) {
-         return "(copy " + item.copy_number + ")"
-      }
    },
    created() {
       if ( this.hasExternalHoldings(this.details.source) == false) {
