@@ -257,7 +257,7 @@ export default {
          if ( size == 'full') {
             return [`${iiifField.value}/full/1200,/0/default.jpg`]
          } else if (size == 'max') {
-            return [`${iiifField.value}/full/max/0/default.jpg`]
+            return [`${iiifField.value}/full/full/0/default.jpg`]
          }
          return [`${iiifField.value}/full/600,/0/default.jpg`]
       },
