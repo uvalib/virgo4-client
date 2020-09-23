@@ -96,12 +96,6 @@
                         </a>
                      </dt>
                   </template>
-                  <template v-if="poolMode=='image' && !hasEmbeddedMedia">
-                     <dt class="label">Image:</dt>
-                     <dd class="image">
-                        <ImageDetails :mode="mode"/>
-                     </dd>
-                  </template>
                </dl>
                <template v-if="marcXML">
                   <AccordionContent class="marc" id="maxc-xml">
@@ -112,14 +106,26 @@
             </div>
          </template>
       </div>
-      <div class="full-width-content" v-if="hasEmbeddedMedia">
-         <span v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
-         <div class="related" v-if="details.related">
-            <label>Related Images</label>
-             <a :href="relatedImageURL(r)"  v-for="r in details.related" :key="`r${r.id}`">
-               <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
-             </a>
-         </div>
+      <div class="full-width-content" v-if="details.searching === false">
+         <template v-if="hasEmbeddedMedia">
+            <span class="oembed" v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
+         </template>
+         <template v-if="poolMode=='image'">
+            <div class="img-view large" ref="viewer">
+               <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
+               <div class="img-toolbar">
+                  <a target="_blank" :href="imageURL('max')">
+                     View full size<i class="fas fa-external-link-alt"></i>
+                  </a>
+               </div>
+            </div>
+            <div v-if="details.related.length > 0" class="related">
+               <label>Related Images</label>
+               <a :href="relatedImageURL(r)"  v-for="r in details.related" :key="`r${r.id}`">
+                  <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
+               </a>
+            </div>
+         </template>
       </div>
       <div class="availability-info">
          <Availability v-if="hasAvailability" :titleId="details.identifier" />
@@ -131,7 +137,6 @@
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
-import ImageDetails from '@/components/details/ImageDetails'
 import Availability from "@/components/details/Availability"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
@@ -149,10 +154,8 @@ export default {
          viewerOpts: {
             title: false, url: 'data-src', inline: false,
             backdrop:true, navbar:false, button:true,
-            toolbar:false, loop: false, fullScreen: true,
-            zIndex: 9999
+            toolbar:true, loop: false, fullScreen: true,
          },
-         mode: 'grouped'
       };
    },
    watch: {
@@ -164,7 +167,7 @@ export default {
    },
    components: {
       SearchHitHeader, Availability, TruncatedText, V4Pager,
-      ImageDetails, AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList, Citations
+      AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList, Citations
    },
    computed: {
       ...mapState({
@@ -248,7 +251,16 @@ export default {
       returnToSearch() {
          this.$router.push( this.lastSearchURL )
       },
-
+      imageURL(size) {
+         let iiifField = this.allFields.find( f => f.name=="iiif_image_url")
+         if (!iiifField) return ""
+         if ( size == 'full') {
+            return [`${iiifField.value}/full/1200,/0/default.jpg`]
+         } else if (size == 'max') {
+            return [`${iiifField.value}/full/max/0/default.jpg`]
+         }
+         return [`${iiifField.value}/full/600,/0/default.jpg`]
+      },
       async nextHitClicked() {
          await this.$store.dispatch("nextHit")
          let url = this.$route.fullPath
@@ -311,8 +323,7 @@ export default {
       },
       shouldDisplay(field) {
          // if ( field.display == 'availability') return false
-         if (field.display == 'optional' || field.type == "iiif-manifest-url" ||
-             field.type == "iiif-image-url" || field.type == "url" ||
+         if (field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
              field.type == "access-url" || field.type == "sirsi-url" ||
              field.name.includes("_download_url")  ) {
             return false
@@ -395,27 +406,59 @@ export default {
       }
    }
 
-   .details-content {
-      width: 80%;
-      margin: 0 auto;
-   }
-
-   .related {
-      width: 90%;
-      margin: 15px auto 25px auto;
-      text-align: left;
-      label {
-         padding:0 0 5px 0;
-         border-bottom: 2px solid var(--color-brand-blue);
-         margin-bottom: 10px;
+   .full-width-content {
+      .panzoom-wrap {
+         width: 60%;
+         display:inline-block;
+         margin: 0 auto;
+         overflow: hidden;
+         background: black;
+         img {
+            width: 100%;
+            height: 100%;
+         }
       }
-      a {
-         margin: 10px;
+      margin-bottom: 25px;
+      .img-view {
+         display: inline-block;
+         margin: 0 auto;
+         .img-toolbar {
+            padding: 10px 0;
+            text-align: right;
+            a {
+               font-weight: 100 !important;
+               i {
+                  margin-left: 8px;
+               }
+            }
+         }
       }
-      img {
-         box-shadow: $v4-box-shadow;
-         &:hover {
-            box-shadow: 0px 2px 8px 0 #444;
+      .related {
+         width: 90%;
+         margin: 15px auto 0 auto;
+         text-align: left;
+         label {
+            padding:0 0 5px 0;
+            border-bottom: 2px solid var(--color-brand-blue);
+            margin-bottom: 10px;
+            display: block;
+         font-weight: 500;
+         }
+         a {
+            display: inline-block;
+            margin: 10px;
+         }
+         img {
+            background-image: url('~@/assets/dots.gif');
+            background-repeat:no-repeat;
+            background-position: center center;
+            min-width: 175px;
+            min-height: 175px;
+            background-color: rgb(252, 252, 252);
+            box-shadow: $v4-box-shadow;
+            &:hover {
+               box-shadow: 0px 2px 8px 0 #444;
+            }
          }
       }
    }
@@ -429,8 +472,8 @@ export default {
       margin-left: 5px;
    }
    ::v-deep p {
-         margin: 8px 0;
-      }
+      margin: 8px 0;
+   }
 }
 .copyright {
    display: flex;
@@ -448,21 +491,19 @@ export default {
 @media only screen and (min-width: 768px) {
    div.details-content  {
       width: 80%;
+      margin: 0 auto;
    }
 }
 @media only screen and (max-width: 768px) {
    div.details-content  {
       width: 95%;
+      margin: 0 auto;
    }
 }
+
 .info {
    margin: 15px 0;
    border-top: 4px solid var(--color-brand-blue);
-}
-.cover-img {
-   max-width: 300px;
-   margin: 10px;
-   border-radius: 5px;
 }
 .working {
    text-align: center;
@@ -470,12 +511,6 @@ export default {
 }
 .working img {
    margin: 30px 0;
-}
-.bookmark-container {
-   float:left;
-}
-::v-deep .sep {
-   margin: 0 5px;
 }
 dl {
    margin-top: 15px;
@@ -516,15 +551,5 @@ dd {
    padding: 10px;
    margin: 0;
    border-top: 0;
-}
-.related {
-   label {
-      display: block;
-      font-weight: 500;
-   }
-   a {
-      display: inline-block;
-      margin-bottom: 10px;
-   }
 }
 </style>

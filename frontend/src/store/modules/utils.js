@@ -13,6 +13,10 @@ export function preProcessHitFields(poolURL, hits) {
          if (field.value === "" && field.name != "summary_holdings") {
             return
          }
+         if ( field.name == "iiif_manifest_url") {
+            // not supporting this field for now
+            return
+         }
 
          // Special fields are cover image and identifer. Move them to top level
          if (field.type == "cover-image-url") {

@@ -29,14 +29,10 @@ Vue.prototype.$utils = utils
 import VueMoment from 'vue-moment';
 Vue.use(VueMoment)
 
-import 'viewerjs/dist/viewer.css'
-import Viewer from 'v-viewer'
-
 import Purecss from 'purecss'
 
 Vue.use(VueCookies)
 Vue.use(Purecss)
-Vue.use(Viewer)
 Vue.use(VueClipboard)
 
 Vue.config.productionTip = false
