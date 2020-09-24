@@ -116,17 +116,18 @@ const user = {
          return true
       },
       libraries: (_state, getters, rootState) => {
+         let pickupLibraries = rootState.system.pickupLibraries
          if (getters.isHSLUser) {
-            let healthSciLib = [{id: "HEALTHSCI", name: "Health Sciences Library"}]
-            return healthSciLib.concat(rootState.system.pickupLibraries)
+            pickupLibraries.push({id: "HEALTHSCI", name: "Health Sciences Library"})
          }
-
          if (getters.isLawUser) {
-            let lawLib = [{id: "LAW", name: "Law Library"}]
-            return lawLib.concat(rootState.system.pickupLibraries)
+            pickupLibraries.push({id: "LAW", name: "Law Library"})
+         }
+         if (rootState.system.devServer) {
+            pickupLibraries.push({id: "LEO", name: 'Central Grounds Parking Garage ("LEO Mobile")' })
          }
 
-         return rootState.system.pickupLibraries
+         return pickupLibraries
        },
    },
 

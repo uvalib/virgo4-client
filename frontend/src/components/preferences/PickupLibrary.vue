@@ -14,7 +14,7 @@
     </p>
 
     <label for="pickup-sel">Preferred pickup location:
-      <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="librariesForUser()"
+      <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="librariesForUser"
         pad="5px 10px" :attached="false"
         @changed="update"
       />
@@ -24,34 +24,17 @@
 </template>
 <script>
 import { mapFields } from 'vuex-map-fields'
-import { mapState, mapGetters } from "vuex"
+import { mapGetters } from "vuex"
 export default {
   computed: {
     ...mapFields({
         pickupLibrary: 'preferences.pickupLibrary',
     }),
-    ...mapState({
-        pickupLibraries: state => state.system.pickupLibraries,
-    }),
     ...mapGetters({
-      isHSLUser: "user/isHSLUser",
-      isLawUser: "user/isLawUser",
+      librariesForUser: "user/libraries",
     }),
   },
   methods: {
-    librariesForUser(){
-      if (this.isHSLUser) {
-        let healthSciLib = [{id: "HEALTHSCI", name: "Health Sciences Library"}]
-        return healthSciLib.concat(this.pickupLibraries)
-
-      } else if (this.isLawUser) {
-        let lawLib = [{id: "LAW", name: "Law Library"}]
-        return lawLib.concat(this.pickupLibraries)
-
-      } else {
-        return this.pickupLibraries
-      }
-    },
     update() {
       this.$store.dispatch("preferences/savePreferences")
     },
