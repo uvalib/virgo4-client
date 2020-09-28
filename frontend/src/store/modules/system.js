@@ -26,10 +26,55 @@ const system = {
       pickupLibraries: [
          {id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'},
          {id: 'CLEMONS', name: 'Clemons'},
-      ]
+      ],
+      tourNone: [],
+      tourHomeSteps: [
+         {
+            target: '#source-select',
+            header: {
+               title: 'Search Dropdown'
+            },
+            content: `Search everything or choose a Resource Type for focused results.`,
+            params: {
+               enableScrolling: false
+            }
+         },
+         {
+            target: '#accountmenu',
+            header: {
+               title: 'Account'
+            },
+            content: `Sign in to customize Virgo, see checkouts, place requests, and more.`,
+            params: {
+               enableScrolling: false
+            }
+         },
+      ],
+      tourResultsSteps: [
+         {
+            target: '.pool-tabs',
+            header: {
+               title: 'Results Tabs'
+            },
+            content: `Check tabs for more results.`,
+            params: {
+               enableScrolling: false
+            }
+         },
+      ],
+      currTourName: "home",
    },
 
    getters: {
+      currTour: state => {
+         console.log("STEPS NAME "+state.currTourName)
+         if ( state.currTourName == "results") {
+            console.log("RESULTS STEPS ")
+            return state.tourResultsSteps
+         }
+         console.log("home steps")
+         return state.tourHomeSteps
+      },
       isKiosk: state => {
          return state.kiosk
       },
@@ -42,6 +87,10 @@ const system = {
    },
 
    mutations: {
+      setTourResults(state) {
+         console.log("SET RESULTS TOUR")
+         state.currTourName = "results"
+      },
       setCodes( state,  codes) {
          let locs =  codes.locations.sort( (a,b) => {
             if (a.id < b.id) return -1

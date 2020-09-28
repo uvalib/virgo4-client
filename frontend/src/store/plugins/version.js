@@ -17,7 +17,7 @@ const versionChecker = (store) => {
          }).catch((_error) => {
             store.commit('system/setFatal', "Lost connection to Virgo backend services")
          })
-      }, 1000*60*5)
+      }, 1000*5)
     })
  }
 

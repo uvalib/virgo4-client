@@ -26,13 +26,20 @@ Vue.prototype.$analytics = analytics
 import * as utils from './store/modules/utils'
 Vue.prototype.$utils = utils
 
-import VueMoment from 'vue-moment';
+// for guided tour popups
+import VueTour from 'vue-tour'
+require('vue-tour/dist/vue-tour.css')
+Vue.use(VueTour)
+
+// Used to format timestamp for saved searcged
+import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 
+// Styling helper library
 import Purecss from 'purecss'
+Vue.use(Purecss)
 
 Vue.use(VueCookies)
-Vue.use(Purecss)
 Vue.use(VueClipboard)
 
 Vue.config.productionTip = false

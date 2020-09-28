@@ -20,6 +20,8 @@
          <ScrollToTop />
       </main>
       <LibraryFooter v-if="isKiosk == false"/>
+
+      <v-tour name="v4tour" :steps="currTour" :options=tourOpts></v-tour>
    </div>
 </template>
 
@@ -40,6 +42,10 @@ export default {
          menuID: "v4-navbar",
          headerHeight: 0,
          headerID: "v4-header",
+         tourOpts: {
+            enableScrolling: false,
+            highlight: true
+         }
       };
    },
    components: {
@@ -64,6 +70,7 @@ export default {
          addingBookmark: "bookmarks/addingBookmark",
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
+         currTour: "system/currTour"
       }),
       showDimmer() {
          return this.error != "" || this.message != "" || this.sessionExpired
@@ -338,6 +345,56 @@ body {
 .no-wrap {
    white-space: nowrap;
 }
+
+// vue-tour settings
+#app {
+   .v-tour__target--highlighted {
+      outline: 2px solid var(--color-brand-orange);
+      box-shadow: none;
+      outline-offset: 3px;
+   }
+   .v-step {
+      background-color: var(--uvalib-grey-lightest);
+      color: var(--uvalib-text);
+      filter: none;
+      border: 1px solid var(--uvalib-grey);
+      box-shadow: $v4-box-shadow;
+      padding: 0;
+
+      .v-step__header {
+         background-color: var(--color-brand-blue) !important;
+         font-weight: bold;
+         color: white;
+         margin: 0;
+      }
+      .v-step__content {
+         padding: 20px;
+         margin:0;
+      }
+      .v-step__buttons {
+         padding: 10px;
+         color: var(--uvalib-text);
+         .v-step__button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bolder;
+            background: var(--uvalib-brand-blue-light);
+            border: 1px solid var(--uvalib-brand-blue-light);
+            &:hover {
+               background-color: var(--uvalib-brand-blue-lighter);
+               border: 1px solid var(--uvalib-brand-blue-lighter);
+               transition: all 0.3s ease;
+               color: white;
+               text-decoration: none !important;
+            }
+            :focus {
+               @include be-accessible();
+            }
+         }
+      }
+   }
+}
+
 //adding accessibility for keyboard focus
 #app {
    a:focus {

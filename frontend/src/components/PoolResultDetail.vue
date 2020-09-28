@@ -117,7 +117,14 @@ export default {
                  })
             })
          }
-      }
+      },
+   },
+   mounted() {
+      this.$store.commit("system/setTourResults")
+      setTimeout( ()=>{
+         console.log("START TOUR")
+         this.$tours['v4tour'].start()
+      }, 1500)
    }
 }
 </script>

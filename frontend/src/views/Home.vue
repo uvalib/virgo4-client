@@ -75,6 +75,13 @@ export default {
       this.searchCreated()
 
    },
+   mounted: function() {
+      setTimeout( ()=>{
+         console.log("START TOUR")
+         let t = this.$tours['v4tour']
+         t.start()
+      }, 1500)
+   },
 
    data: function() {
       return {
@@ -251,6 +258,9 @@ export default {
          if ( query.q) {
             this.$store.commit("query/restoreFromURL", query.q)
 
+            // skip ahead in help to results
+            this.$store.commit("system/setTourResults")
+
             // only re-run search when query, sort or filtering has changed
             if (this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
                   this.activeSort != oldSort || this.userSearched == true) {
@@ -261,7 +271,7 @@ export default {
             }
 
             if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {
-               window.scrollBy({
+               window.scrollTo({
                   top: this.lastSearchScrollPosition,
                   behavior: "auto"
                })
