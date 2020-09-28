@@ -4,6 +4,7 @@ import router from '../../router'
 const system = {
    namespaced: true,
    state: {
+      versionIntervalID: -1,
       newVersion: false,
       kiosk: false,
       devServer: false,
@@ -42,6 +43,9 @@ const system = {
    },
 
    mutations: {
+      setVersionIntervalID(state, tid) {
+         state.versionIntervalID = tid
+      },
       setCodes( state,  codes) {
          let locs =  codes.locations.sort( (a,b) => {
             if (a.id < b.id) return -1
