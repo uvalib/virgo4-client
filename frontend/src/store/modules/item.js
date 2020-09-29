@@ -48,8 +48,8 @@ const item = {
          details.digitalContent = []
          details.embeddedMedia = []
          details.source = source
+         details.searching = true
          state.details = details
-         state.details.searching = false
       },
       setDigitalContentStatus(state, data) {
          let dc = state.details.digitalContent.find( f=>f.name==data.name && f.type==data.type)
@@ -108,10 +108,6 @@ const item = {
         state.details.searching = false
         state.availability.searching = false
       },
-      setSearching(state) {
-         state.details.searching = true
-      },
-
       setCatalogKeyDetails(state, data) {
          if (data.total_hits == 0 || data.total_hits > 1) {
             state.details.searching = false
@@ -127,6 +123,7 @@ const item = {
                   let poolURL = pr.service_url
                   utils.preProcessHitFields( poolURL, [obj] )
                   obj.source = source
+                  obj.searching = true
                   state.details = obj
                   found = true
                }
@@ -224,11 +221,7 @@ const item = {
       },
 
       async getDetails(ctx, { source, identifier }) {
-         if (ctx.getters.hasDetails(identifier)) {
-            return
-         } else {
-            ctx.commit('clearDetails')
-         }
+         ctx.commit('clearDetails')
 
          // get source from poolID
          let baseURL = ""
@@ -247,7 +240,6 @@ const item = {
          }
 
          baseURL = pool.url
-
          let url = baseURL + "/api/resource/" + identifier
          return axios.get(url).then((response) => {
             let details = response.data
@@ -255,6 +247,7 @@ const item = {
             ctx.dispatch("getDigitalContent")
             ctx.dispatch("getGoogleBooksURL")
             ctx.dispatch("getOEmbedMedia")
+            ctx.commit('clearSearching')
          }).catch((error) => {
             if ( error.response && error.response.status == 404) {
                console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
@@ -284,12 +277,8 @@ const item = {
       async lookupCatalogKeyDetail(ctx, data) {
          let catalogKey = data.identifier
          let v3Redirect = data.v3Redirect
-         if (ctx.getters.hasDetails(catalogKey)) {
-            return
-         } else {
-            ctx.commit('clearDetails')
-         }
-         ctx.commit("setSearching")
+         ctx.commit('clearDetails')
+
          let pools = ctx.rootState.pools.list
          if (pools.length == 0) {
             await ctx.dispatch("pools/getPools", null, {root:true})
@@ -314,11 +303,10 @@ const item = {
                }
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
-               ctx.dispatch("getDigitalContent")
-               ctx.dispatch("getGoogleBooksURL")
-               ctx.dispatch("getOEmbedMedia")
+               // NOTE:  the result above only contains basic fields. the redirect below
+               // will trigger a full record get
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
-               router.replace(redirect)
+               router.push(redirect)
             } else {
                router.push(`/search?mode=advanced&q=identifier:{${catalogKey}}`)
             }
@@ -329,14 +317,13 @@ const item = {
             } else {
                ctx.commit('system/setError', error, { root: true })
             }
-         }).finally(() => {
             ctx.commit('clearSearching')
          })
       },
 
       async getCitations(ctx, {format, itemURL}) {
         let url = `${ctx.rootState.system.citationsURL}/format/${format}?item=${encodeURI(itemURL)}`
-        console.log("Get citations from: "+url)
+      //   console.log("Get citations from: "+url)
         return axios.get(url)
       },
 
