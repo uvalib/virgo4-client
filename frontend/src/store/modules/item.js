@@ -287,6 +287,9 @@ const item = {
          }
          await ctx.dispatch("pools/getPools", null, {root:true})
 
+         // strip punctuation that may be lingeraing at end of key from a bad cut/paste
+         catalogKey = cleanIdentifier(catalogKey)
+
          let req = {
             query: `identifier: {${catalogKey}}`,
             pagination: { start: 0, rows: 1 },
@@ -299,13 +302,11 @@ const item = {
          return axios.post(url, req).then((response) => {
             console.log(response.data)
             if (response.data.total_hits == 0 ) {
-               //ctx.commit('clearSearching')
-               //router.push("/not_found")
                ctx.commit('clearSearching')
                ctx.commit("clearDetails")
 
-               // Redirect to V3 for now
-               // window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
+               // Redirect to V3
+               window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                ctx.dispatch("getDigitalContent")
@@ -334,6 +335,13 @@ const item = {
       },
 
    }
+}
+
+function cleanIdentifier(identifier) {
+   // strip spaces and punctuation that may be attached to an identifier that was cut and pasted
+   let clean = identifier.trim()
+   clean = clean.replace(/(:|;|,|"|!|'|\?|\.|\]|\))+$/, '')
+   return clean
 }
 
 export default item
