@@ -196,6 +196,7 @@ export default {
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
       },
       hasEmbeddedMedia() {
+         if ( !this.details.embeddedMedia) return false
          return this.details.embeddedMedia.length > 0
       },
       poolMode() {

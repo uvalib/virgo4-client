@@ -134,6 +134,7 @@ export default {
          hasExternalHoldings: 'pools/hasExternalHoldings',
       }),
       hasPDFContent() {
+         if ( !this.details.digitalContent) return false
          return this.details.digitalContent.filter( dc => dc.type == "PDF").length > 0
       },
       pdfs() {
