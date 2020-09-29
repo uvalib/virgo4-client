@@ -73,6 +73,9 @@ const user = {
       isLawUser: state => {
          return state.claims.homeLibrary == "LAW"
       },
+      isFaculty: state => {
+         return state.accountInfo.profile == "Faculty"
+      },
       sortedCheckouts: state => {
          return state.checkouts.sort( (a,b) => {
             let d1 = a.due.split("T")[0]
@@ -123,11 +126,20 @@ const user = {
          if (getters.isLawUser) {
             pickupLibraries.push({id: "LAW", name: "Law Library"})
          }
-         if (rootState.system.devServer) {
+         if (getters.canLeoMobile) {
             pickupLibraries.push({id: "LEO", name: 'Central Grounds Parking Garage ("LEO Mobile")' })
          }
 
          return pickupLibraries
+       },
+       canLeoMobile: (_state, getters, rootState) => {
+          let turnOn = new Date('2020-10-05').getTime()
+          let now = new Date().getTime()
+          if ((rootState.system.devServer || (now > turnOn)) &&
+               getters.isFaculty) {
+                  return true
+          }
+          return false
        },
    },
 
