@@ -111,7 +111,7 @@
             <span class="oembed" v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
          </template>
          <template v-if="poolMode=='image'">
-            <div class="img-view large" ref="viewer" && v-if="hasEmbeddedMedia==false">
+            <div class="img-view large" ref="viewer" v-if="hasEmbeddedMedia==false">
                <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
                <div class="img-toolbar">
                   <a target="_blank" :href="imageURL('max')">
