@@ -296,9 +296,8 @@ export default {
          if (src) {
             this.$store.commit("hitSelected", id)
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
-
          } else {
-            await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
+            await this.$store.dispatch("item/lookupCatalogKeyDetail", {identifier: id, v3Redirect: true} )
          }
 
          this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)

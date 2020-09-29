@@ -87,7 +87,7 @@ const item = {
          state.details.embeddedMedia.push(html)
       },
       clearDetails(state) {
-         state.details = {searching: false, source: "", identifier:"", basicFields:[],
+         state.details = {searching: true, source: "", identifier:"", basicFields:[],
             detailFields:[], related:[], digitalContent: [], embeddedMedia: []}
          state.googleBooksURL = ""
       },
@@ -107,6 +107,9 @@ const item = {
       clearSearching(state){
         state.details.searching = false
         state.availability.searching = false
+      },
+      setSearching(state) {
+         state.details.searching = true
       },
 
       setCatalogKeyDetails(state, data) {
@@ -240,7 +243,6 @@ const item = {
 
          if (!pool) {
            ctx.commit('clearSearching')
-           ctx.commit('system/setError', `Invalid source '${source}'`, { root: true })
            return
          }
 
@@ -254,11 +256,11 @@ const item = {
             ctx.dispatch("getGoogleBooksURL")
             ctx.dispatch("getOEmbedMedia")
          }).catch((error) => {
-            ctx.commit('clearSearching')
             if ( error.response && error.response.status == 404) {
-               console.warn(`Item ID ${identifier} not found in ${source}`)
-               ctx.commit("clearDetails")
+               console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
+               ctx.dispatch("lookupCatalogKeyDetail", {identifier: identifier, v3Redirect: false})
             } else {
+               ctx.commit('clearSearching')
                ctx.commit('system/setError', error, { root: true })
             }
          })
@@ -279,13 +281,19 @@ const item = {
       },
 
       // This is used to lookup a catalog key without a source. end result of this action is a redirect
-      async lookupCatalogKeyDetail(ctx, catalogKey) {
+      async lookupCatalogKeyDetail(ctx, data) {
+         let catalogKey = data.identifier
+         let v3Redirect = data.v3Redirect
          if (ctx.getters.hasDetails(catalogKey)) {
             return
          } else {
             ctx.commit('clearDetails')
          }
-         await ctx.dispatch("pools/getPools", null, {root:true})
+         ctx.commit("setSearching")
+         let pools = ctx.rootState.pools.list
+         if (pools.length == 0) {
+            await ctx.dispatch("pools/getPools", null, {root:true})
+         }
 
          // strip punctuation that may be lingeraing at end of key from a bad cut/paste
          catalogKey = cleanIdentifier(catalogKey)
@@ -300,13 +308,10 @@ const item = {
          }
          let url = ctx.rootState.system.searchAPI + "/api/search"
          return axios.post(url, req).then((response) => {
-            console.log(response.data)
             if (response.data.total_hits == 0 ) {
-               ctx.commit('clearSearching')
-               ctx.commit("clearDetails")
-
-               // Redirect to V3
-               window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
+               if ( v3Redirect ) {
+                  window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
+               }
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                ctx.dispatch("getDigitalContent")
@@ -318,13 +323,14 @@ const item = {
                router.push(`/search?mode=advanced&q=identifier:{${catalogKey}}`)
             }
          }).catch((error) => {
-            ctx.commit('clearSearching')
             if ( error.response && error.response.status == 404) {
                console.warn(`Catalog Key ${catalogKey} not found`)
                ctx.commit("clearDetails")
             } else {
                ctx.commit('system/setError', error, { root: true })
             }
+         }).finally(() => {
+            ctx.commit('clearSearching')
          })
       },
 
@@ -340,7 +346,7 @@ const item = {
 function cleanIdentifier(identifier) {
    // strip spaces and punctuation that may be attached to an identifier that was cut and pasted
    let clean = identifier.trim()
-   clean = clean.replace(/(:|;|,|"|!|'|\?|\.|\]|\))+$/, '')
+   clean = clean.replace(/(:|;|,|-|"|!|'|\?|\.|\]|\))+$/, '')
    return clean
 }
 
