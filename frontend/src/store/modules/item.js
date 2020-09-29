@@ -87,7 +87,7 @@ const item = {
          state.details.embeddedMedia.push(html)
       },
       clearDetails(state) {
-         state.details = {searching: true, source: "", identifier:"", basicFields:[],
+         state.details = {searching: false, source: "", identifier:"", basicFields:[],
             detailFields:[], related:[], digitalContent: [], embeddedMedia: []}
          state.googleBooksURL = ""
       },
@@ -121,8 +121,8 @@ const item = {
                let obj = pr.group_list[0].record_list[0]
                if (obj) {
                   let source = pr.pool_id
-                  let poolObj = state.pools.list.find( p => p.id == source)
-                  utils.preProcessHitFields( poolObj.url, [obj] )
+                  let poolURL = pr.service_url
+                  utils.preProcessHitFields( poolURL, [obj] )
                   obj.source = source
                   state.details = obj
                   found = true
@@ -254,24 +254,28 @@ const item = {
             ctx.dispatch("getGoogleBooksURL")
             ctx.dispatch("getOEmbedMedia")
          }).catch((error) => {
-           ctx.commit('clearSearching')
-           ctx.commit('system/setError', error, { root: true })
+            ctx.commit('clearSearching')
+            if ( error.response && error.response.status == 404) {
+               console.warn(`Item ID ${identifier} not found in ${source}`)
+               ctx.commit("clearDetails")
+            } else {
+               ctx.commit('system/setError', error, { root: true })
+            }
          })
       },
 
-      async getAvailability(ctx, titleId ) {
-        ctx.commit('clearAvailability')
-        let url = `${ctx.rootState.system.availabilityURL}/item/${titleId}`
-        console.log("Get avilability from: "+url)
-        axios.get(url).then((response) => {
-          ctx.commit("setAvailability", {titleId: titleId, response: response.data.availability})
-          ctx.commit("requests/setRequestOptions", response.data.availability.request_options, {root: true})
-        }).catch((error) => {
-          ctx.commit('clearSearching')
-          if (error.response && error.response.status != 404){
-            ctx.commit("setAvailabilityError", error.response.data)
-          }
-        })
+      async getAvailability(ctx, titleId) {
+         ctx.commit('clearAvailability')
+         let url = `${ctx.rootState.system.availabilityURL}/item/${titleId}`
+         axios.get(url).then((response) => {
+            ctx.commit("setAvailability", { titleId: titleId, response: response.data.availability })
+            ctx.commit("requests/setRequestOptions", response.data.availability.request_options, { root: true })
+         }).catch((error) => {
+            ctx.commit('clearSearching')
+            if (error.response && error.response.status != 404) {
+               ctx.commit("setAvailabilityError", error.response.data)
+            }
+         })
       },
 
       // This is used to lookup a catalog key without a source. end result of this action is a redirect
@@ -293,11 +297,15 @@ const item = {
          }
          let url = ctx.rootState.system.searchAPI + "/api/search"
          return axios.post(url, req).then((response) => {
+            console.log(response.data)
             if (response.data.total_hits == 0 ) {
                //ctx.commit('clearSearching')
                //router.push("/not_found")
+               ctx.commit('clearSearching')
+               ctx.commit("clearDetails")
+
                // Redirect to V3 for now
-               window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
+               // window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                ctx.dispatch("getDigitalContent")
@@ -308,9 +316,14 @@ const item = {
             } else {
                router.push(`/search?mode=advanced&q=identifier:{${catalogKey}}`)
             }
-         }).catch((_error) => {
+         }).catch((error) => {
             ctx.commit('clearSearching')
-            router.push("/not_found")
+            if ( error.response && error.response.status == 404) {
+               console.warn(`Catalog Key ${catalogKey} not found`)
+               ctx.commit("clearDetails")
+            } else {
+               ctx.commit('system/setError', error, { root: true })
+            }
          })
       },
 
