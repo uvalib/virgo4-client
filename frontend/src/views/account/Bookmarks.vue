@@ -97,10 +97,10 @@
                      </div>
                   </AccordionContent>
                   <div class="folder-buttons">
-                     <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo"/>
+                     <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'"/>
                      <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
                         :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
-                        :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" >
+                        :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
                         <div>
                            Delete bookmark folder
                            <b>{{folderInfo.folder}}</b>? All bookmarks
