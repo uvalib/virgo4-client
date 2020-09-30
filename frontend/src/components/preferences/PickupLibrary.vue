@@ -13,6 +13,8 @@
       <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a> to request your item.
     </p>
 
+    <p v-if="canLeoMobile">You are eligible for LEO Mobile.</p>
+
     <label for="pickup-sel">Preferred pickup location:
       <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="librariesForUser"
         pad="5px 10px" :attached="false"
@@ -32,6 +34,7 @@ export default {
     }),
     ...mapGetters({
       librariesForUser: "user/libraries",
+      canLeoMobile: "user/canLeoMobile"
     }),
   },
   methods: {
