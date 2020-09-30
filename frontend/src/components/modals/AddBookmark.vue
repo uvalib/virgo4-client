@@ -21,7 +21,7 @@
                   </select>
                </template>
                <template v-else>
-                     <label for="new-folder">Create a new folder for the bookmark</label>  
+                     <label for="new-folder">Create a new folder for the bookmark</label>
                      <input id="new-folder" type="text" v-model="newFolder" @keyup.enter="okBookmark"
                      @keydown.shift.tab.prevent.stop="shiftTabSelect">
                </template>
@@ -83,18 +83,10 @@ export default {
    },
    methods: {
       opened() {
-         this.selectedFolder = ""
+         this.selectedFolder = this.folders[0].name
          this.bookmarkError = ""
          this.showAdd = false
          this.newFolder = ""
-         let found = false
-         this.folders.some( fobj=> {
-            if (fobj.name == "General") {
-               found = true
-               this.selectedFolder = fobj.name
-            }
-            return found == true
-         })
          document.getElementById("folder").focus()
       },
       newFolderTab() {
@@ -134,7 +126,7 @@ export default {
                this.bookmarkError = "A bookmark folder selection is required"
                return
             }
-            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.hit.identifier)   
+            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.hit.identifier)
             this.$store.dispatch("bookmarks/addBookmark", this.selectedFolder).then( () => {
                this.$store.commit("bookmarks/clearNewBookmark")
                this.$refs.addbmmodal.hide()

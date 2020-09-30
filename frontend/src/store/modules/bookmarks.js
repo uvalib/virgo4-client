@@ -16,29 +16,43 @@ const bookmarks = {
          if ( state.bookmarks.length === 0) return false
          return true
       },
+
       bookmarks: state => {
          if ( state.bookmarks == null ) return []
          return state.bookmarks
       },
+
       folders: state => {
-         if ( state.bookmarks == null ) return []
+         if ( state.bookmarks == null ) return [{id: 0, name: "General", lastUsed: ""} ]
+
          let out = []
          let foundGeneral = false
          state.bookmarks.forEach( (folderObj) => {
             if ( folderObj.folder == "General") {
                foundGeneral = true
             }
-            out.push( {id: folderObj.id, name: folderObj.folder} )
+
+            // Add date used info to folder. Default to date folder was created.
+            // All bookmarks in a folder come back from server sorted by ascending date added.
+            // Pick the latest bookmark from each folder and set that as folder used date.
+            let lastUsed = folderObj.addedAt
+            if (folderObj.bookmarks.length > 0) {
+               lastUsed = folderObj.bookmarks[folderObj.bookmarks.length-1].addedAt
+            }
+            out.push( {id: folderObj.id, name: folderObj.folder, lastUsed: lastUsed} )
          })
+
          if (foundGeneral == false ) {
-            out.push( {id: 0, name: "General"} )
+            out.push( {id: 0, name: "General", lastUsed: ""} )
          }
+
          return out.sort( (a,b) => {
-            if (a.name < b.name) return -1
-            if (a.name > b.name) return 1
+            if (a.lastUsed > b.lastUsed) return -1
+            if (a.lastUsed < b.lastUsed) return 1
             return 0
          })
       },
+
       addingBookmark: state => {
          return state.newBookmarkInfo != null
       },
