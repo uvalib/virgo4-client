@@ -50,7 +50,6 @@
                               {{fv.value}}
                            </V4Checkbox>
                            <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
-                           <span class="cnt" v-else>(0)</span>
                         </dd>
                         <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
                            <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
