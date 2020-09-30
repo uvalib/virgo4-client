@@ -17,6 +17,7 @@ const system = {
       availabilityURL: "",
       hsIlliadURL: "",
       citationsURL: "",
+      shelfBrowseURL: "",
       searchAPI: "",
       seenTranslateMsg: false,
       translateMessage: "",
@@ -141,6 +142,7 @@ const system = {
          state.availabilityURL = cfg.availabilityURL
          state.citationsURL = cfg.citationsURL
          state.hsILLiadURL = cfg.hsILLiadURL
+         state.shelfBrowseURL = cfg.shelfBrowseURL
       },
    },
 

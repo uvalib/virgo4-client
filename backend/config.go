@@ -36,6 +36,7 @@ type ServiceConfig struct {
 	AvailabilityURL    string
 	VirgoURL           string
 	CitationsURL       string
+	ShelfBrowseURL     string
 	SearchAPI          string
 	CourseReserveEmail string
 	LawReserveEmail    string
@@ -63,6 +64,7 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
 	flag.StringVar(&cfg.AvailabilityURL, "availability", "https://availability-ws-dev.internal.lib.virginia.edu", "Availability service URL")
 	flag.StringVar(&cfg.CitationsURL, "citations", "https://citations-ws-dev.internal.lib.virginia.edu", "Citations service URL")
+	flag.StringVar(&cfg.ShelfBrowseURL, "shelf", "https://shelf-browse-ws-dev.internal.lib.virginia.edu", "Shelf Browse service URL")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.JWTKey, "jwtkey", "", "JWT signature key")
 	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
@@ -125,6 +127,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("citations url param is required")
 	} else {
 		log.Printf("Citations URL: %s", cfg.CitationsURL)
+	}
+	if cfg.ShelfBrowseURL == "" {
+		log.Fatal("shelf browse url param is required")
+	} else {
+		log.Printf("Shelf Browse URL: %s", cfg.ShelfBrowseURL)
 	}
 	if cfg.JWTKey == "" {
 		log.Fatal("jwtkey param is required")
