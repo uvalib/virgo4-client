@@ -5,15 +5,11 @@
       This pickup location is where you will go to retrieve items you’ve requested from Ivy Stacks or are receiving as a result of a hold or a recall.
     </p>
 
-    <p>
-      IMPORTANT: Because of safety measures during COVID-19, pickup locations may be limited. Options may change over the course of the semester — for the most up-to-date information,
-      <a target="_blank" href="https://www.library.virginia.edu/news/covid-19">read our FAQ about Library services during COVID-19</a>.
-    </p>
     <p>If you cannot pick your item up at the location(s) shown below, please
       <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a> to request your item.
     </p>
 
-    <p v-if="canLeoMobile">You are eligible for LEO Mobile.</p>
+    <p v-if="canLeoMobile"><a target="_blank" href="http://library.virginia.edu/services/pickup">Learn more about options for Paging and Pickup.</a></p>
 
     <label for="pickup-sel">Preferred pickup location:
       <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="librariesForUser"
