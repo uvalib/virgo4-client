@@ -10,8 +10,8 @@
                </div>
                <div class="v4-modal-controls">
                   <slot v-if="hasControlSlot()" name="controls"></slot>
-                  <V4Button v-else mode="tertiary" :id="`${id}-close`" class="close" @click="hide" 
-                     :focusNextOverride="true" @tabnext="lastFocusTabbed" 
+                  <V4Button v-else mode="tertiary" :id="`${id}-close`" class="close" @click="hide"
+                     :focusNextOverride="true" @tabnext="lastFocusTabbed"
                      :focusBackOverride="true" @tabback="lastFocusTabbed" >
                         Close
                   </V4Button>
@@ -36,7 +36,7 @@ export default {
       firstFocusID: {
          type: String,
          default: ""
-      }, 
+      },
       lastFocusID: {
          type: String,
          default: ""
@@ -89,7 +89,7 @@ export default {
          let ele = document.getElementById(id)
          if (ele ) {
             ele.focus()
-         } 
+         }
       },
    },
 }
@@ -124,13 +124,13 @@ div.v4-modal {
       font-weight: normal;
    }
    div.v4-modal-title {
-      background: var(--uvalib-teal-lightest);
+      background:  var(--uvalib-blue-alt-light);
       font-size: 1.1em;
       color: var(--uvalib-text-dark);
       font-weight: 500;
       padding: 10px;
       border-radius: 5px 5px 0 0;
-      border-bottom: 2px solid var(--uvalib-teal-light);
+      border-bottom: 2px solid  var(--uvalib-blue-alt);
       text-align: left;
    }
    div.v4-modal-controls {

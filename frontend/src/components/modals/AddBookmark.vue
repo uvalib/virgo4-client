@@ -152,7 +152,7 @@ div.add-content {
 
    div.select {
       margin-top: 10px;
-      border-top: 5px solid var(--uvalib-teal-light);
+      border-top: 2px solid  var(--uvalib-blue-alt);
       padding-top: 25px;
       min-width:350px;
       width: 100%;

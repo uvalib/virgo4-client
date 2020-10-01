@@ -19,9 +19,9 @@
                   <AccordionContent
                      class="boxed bookmark-folder"
                      color="var(--uvalib-grey-darkest)"
-                     background="var(--uvalib-teal-lightest)"
+                     background="var(--uvalib-blue-alt-light)"
                      borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-teal-light)"
+                     borderColor="var(--uvalib-blue-alt)"
                      :id="folderInfo.id.toString()"
                      v-bind:closeOthers="expandedFolder"
                      @accordion-clicked="folderOpened(folderInfo.id)"
@@ -333,7 +333,6 @@ div.notice {
    padding: 10px 10px;
    background: var(--uvalib-yellow-light);
    margin: 0 0 15px 0;
-   font-weight: bold;
    border: 1px solid var(--uvalib-yellow);
    text-align: center;
 }
@@ -387,11 +386,11 @@ div.folder {
       flex-flow: row nowrap;
       justify-content: space-between;
       align-items: center;
-      background: var(--uvalib-teal-lightest);
+      background: var(--uvalib-blue-alt-light);
       color: var(--uvalib-grey-darkest);
       border-width: 0px 0px 3px;
       border-style: solid;
-      border-color: var(--uvalib-teal-light);
+      border-color: var(--uvalib-blue-alt);
       padding: 6px 0 5px 0;
    }
 }

@@ -271,8 +271,8 @@ span.num {
    text-align: right;
 }
 h3 {
-   background: var(--uvalib-teal-lightest);
-   padding: 4px 8px;
-   border-bottom: 3px solid var(--uvalib-teal-light);
+   background:  var(--uvalib-blue-alt-light);
+   padding: 5px 10px;
+   border-bottom: 3px solid  var(--uvalib-blue-alt);
 }
 </style>
