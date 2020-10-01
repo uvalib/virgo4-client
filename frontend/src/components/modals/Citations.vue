@@ -21,19 +21,19 @@
             <template v-else-if="failed">
                <p class="error">{{data}}</p>
             </template>
-            <template v-else-if="singleFormat">
-               <div class="citation"><span v-html="data[0].value"></span></div>
-            </template>
             <template v-else>
-               <dl class="citations">
-                  <template v-for="(citation,idx) in data">
+               <table class="citations">
+                  <tr v-for="(citation,idx) in data" :key="`cval-${idx}`">
                      <template v-if="citation.label">
-                        <dt class="label" :key="`cl${idx}`">{{citation.label}}:</dt>
-                        <dd class="value" :key="`cv${idx}`"><span v-html="citation.value"></span></dd>
+                        <td v-if="!singleFormat" class="label">{{citation.label}}:</td>
+                        <td class="value"><span v-html="citation.value"></span></td>
+                        <td class="copy-button">
+                           <V4Button mode="text-button" @click="copyCitation(citation)">Copy</V4Button>
+                        </td>
                      </template>
-                  </template>
-               </dl>
-               <V4DownloadButton icon="fas fa-file-export" label="Download RIS Citation" :url="risURL"
+                  </tr>
+               </table>
+               <V4DownloadButton v-if="!singleFormat" icon="fas fa-file-export" label="Download RIS Citation" :url="risURL"
                   @click="downloadRISClicked" :aria-label="`export RIS citation for ${itemID}`"
                />
             </template>
@@ -171,6 +171,19 @@ export default {
       downloadRISClicked() {
          this.$analytics.trigger('Export', this.risFrom, this.itemID)
       },
+      copyCitation( citation ) {
+         // strip html from citation.  this is safe since the source of the citation is trusted
+         var div = document.createElement("div")
+         div.innerHTML = citation.value
+         let text = div.textContent
+
+         // message/errors pop up behind the citation modal on details page, so only show one if we have to
+         this.$copyText(text).then( ()=> {
+            //this.$store.commit("system/setMessage", citation.label+" citation copied to clipboard.")
+         }, e => {
+            this.$store.commit("system/setError", "Unable to copy "+citation.label+" citation: "+e)
+         })
+      },
    }
 }
 </script>
@@ -188,21 +201,15 @@ i.icon {
    padding: 2px;
 }
 
-dl {
-   margin-top: 15px;
-   display: inline-grid;
-   grid-template-columns: max-content 2fr;
-   grid-column-gap: 10px;
-   width: 100%;
-}
-dt {
+td.label {
    font-weight: bold;
    text-align: right;
    padding: 4px 8px;
    white-space: nowrap;
    vertical-align: top;
 }
-dd {
+
+td.value {
    margin: 0;
    width: 100%;
    text-align: left;
@@ -218,7 +225,7 @@ dd {
    font-size: 1.25em;
 }
 
-.citation {
-   margin: 15px;
+.copy-button {
+   text-align: right;
 }
 </style>
