@@ -420,6 +420,11 @@ export default new Vuex.Store({
             pool_sorting: rootState.sort.pools
          }
 
+         if (req.query == "") {
+            let err = {message: 'EMPTY QUERY', caller: 'searchAllPools', query: rootGetters['query/getState']}
+            dispatch("system/reportError", err)
+         }
+
          if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
             let tgtID = rootState.query.basicSearchScope.id
             req.preferences.exclude_pool = []
@@ -513,6 +518,11 @@ export default new Vuex.Store({
             pagination: pagination,
             sort: sort,
             filters: [filterObj]
+         }
+
+         if (req.query == "") {
+            let err = {message: 'EMPTY QUERY', caller: 'searchSelectedPool', query: rootGetters['query/getState']}
+            dispatch("system/reportError", err)
          }
 
          if (rootGetters["user/isSignedIn"]) {

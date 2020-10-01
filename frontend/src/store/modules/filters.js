@@ -273,6 +273,12 @@ const filters = {
             pagination: { start: 0, rows: 0 },
             filters: [filterObj]
           }
+
+         if (req.query == "") {
+            let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: ctx.rootGetters['query/getState']}
+            this.dispatch("system/reportError", err)
+         }
+
          let tgtURL = pool.url+"/api/search/facets"
          ctx.commit('setUpdatingFacets', true)
          return axios.post(tgtURL, req).then((response) => {

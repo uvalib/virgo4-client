@@ -30,6 +30,9 @@ const query = {
    },
    getters: {
       getField,
+      getState: state => {
+         return state
+      },
       advancedSearchTemplate( state ) {
          let ep = [...new Set(state.excludedPools)]
          let out = { excluded: ep, fields: []}
