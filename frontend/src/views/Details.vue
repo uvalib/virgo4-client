@@ -130,6 +130,7 @@
       <div class="availability-info">
          <Availability v-if="hasAvailability" :titleId="details.identifier" />
       </div>
+      <ShelfBrowse v-if="shelfBrowseEnabled && !details.searching" :titleId="details.identifier" />
    </div>
 </template>
 
@@ -146,6 +147,7 @@ import TruncatedText from '@/components/TruncatedText'
 import V4LinksList from '@/components/V4LinksList'
 import V4Pager from '@/components/V4Pager'
 import Citations from '@/components/modals/Citations'
+import ShelfBrowse from "@/components/details/ShelfBrowse"
 
 export default {
    name: "detail",
@@ -166,7 +168,7 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, Availability, TruncatedText, V4Pager,
+      SearchHitHeader, Availability, TruncatedText, V4Pager, ShelfBrowse,
       AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList, Citations
    },
    computed: {
@@ -184,6 +186,7 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
+         isDevServer: 'system/isDevServer',
          hasExternalHoldings: 'pools/hasExternalHoldings',
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
@@ -191,6 +194,9 @@ export default {
          selectedHit: 'selectedHit',
          selectedResults: 'selectedResults'
       }),
+      shelfBrowseEnabled() {
+         return this.isDevServer
+      },
       risURL() {
          if (this.citationsURL == "") return ""
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
@@ -372,7 +378,13 @@ export default {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
+   margin-bottom: 10vh;
    color: var(--color-primary-text);
+
+   div.details-content  {
+      width: 95%;
+      margin: 0 auto;
+   }
 
    .ra-box.ra-fiy.pad-top {
       margin-top: 20px;
@@ -442,7 +454,7 @@ export default {
             border-bottom: 2px solid var(--color-brand-blue);
             margin-bottom: 10px;
             display: block;
-         font-weight: 500;
+            font-weight: 500;
          }
          a {
             display: inline-block;
@@ -486,18 +498,6 @@ export default {
    }
    .cr-note {
       margin-left: 25px;
-   }
-}
-@media only screen and (min-width: 768px) {
-   div.details-content  {
-      width: 80%;
-      margin: 0 auto;
-   }
-}
-@media only screen and (max-width: 768px) {
-   div.details-content  {
-      width: 95%;
-      margin: 0 auto;
    }
 }
 

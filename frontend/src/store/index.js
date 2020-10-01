@@ -16,6 +16,7 @@ import feedback from './modules/feedback'
 import restore from './modules/restore'
 import requests from './modules/requests'
 import searches from './modules/searches'
+import shelf from './modules/shelf'
 import sort from './modules/sort'
 import * as utils from './modules/utils'
 import { getField, updateField } from 'vuex-map-fields'
@@ -570,6 +571,7 @@ export default new Vuex.Store({
       restore: restore,
       requests: requests,
       searches: searches,
+      shelf: shelf,
       sort: sort,
    },
 
