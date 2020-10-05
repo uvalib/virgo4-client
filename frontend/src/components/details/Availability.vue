@@ -200,12 +200,14 @@ export default {
 <style lang="scss" scoped>
 .availability {
    h2 {
-      background:  var(--uvalib-blue-alt-light);
-      padding: 5px 10px;
-      border-top: 2px solid  var(--uvalib-blue-alt);
-      border-bottom: 2px solid  var(--uvalib-blue-alt);
-      font-size: 1.25em;
-      margin: 50px 0 30px 0;
+      // background:  var(--uvalib-blue-alt-light);
+      // padding: 5px 10px;
+      // border-top: 2px solid  var(--uvalib-blue-alt);
+      // border-bottom: 2px solid  var(--uvalib-blue-alt);
+      // font-size: 1.25em;
+      // margin: 50px 0 30px 0;
+      color: var(--color-primary-orange);
+      text-align: center;
    }
    .ra-box.ra-fiy {
       margin-bottom: 10px;
