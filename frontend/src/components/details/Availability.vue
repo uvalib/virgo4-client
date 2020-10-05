@@ -208,9 +208,10 @@ export default {
       // margin: 50px 0 30px 0;
       color: var(--color-primary-orange);
       text-align: center;
+      margin: 50px 0 30px 0;
    }
    .ra-box.ra-fiy {
-      margin-bottom: 10px;
+      margin: 40px 30px 40px 30px;
    }
    .working {
       margin-bottom: 25px;
@@ -226,8 +227,9 @@ export default {
 
    div.items {
       border: 1px solid var(--uvalib-grey-light);
-      border-radius: 5px;
+      // border-radius: 5px;
       margin-top: 25px;
+      box-shadow: $v4-box-shadow-light;
    }
 
    div.value {

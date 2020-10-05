@@ -2,12 +2,12 @@
 <V4Modal :id="id" title="Add Bookmark" ref="addbmmodal"
       firstFocusID="folder" :buttonID="`${id}-btn`" @opened="opened" >
       <template v-slot:button>
-         <BookmarkButton :hit="hit" :pool="pool" @clicked="$refs.addbmmodal.show()" :id="`${id}-btn`" />
+         <BookmarkButton :data="data" @clicked="$refs.addbmmodal.show()" :id="`${id}-btn`" />
       </template>
       <template v-slot:content>
          <div class="add-content">
-            <div>{{newBookmark.data.identifier}} : <b>{{newBookmark.data.header.title}}</b></div>
-            <TruncatedText id="bookmark-author" :text="authorText" :limit="120" ></TruncatedText>
+            <div>{{data.identifier}} : <b>{{data.title}}</b></div>
+            <TruncatedText id="bookmark-author" :text="data.author" :limit="120" ></TruncatedText>
             <div class="select pure-form" >
                <template v-if="showAdd==false">
                   <label for="folder">Select a folder for the bookmark</label>
@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import TruncatedText from '@/components/TruncatedText'
 import BookmarkButton from '@/components/BookmarkButton'
@@ -53,8 +52,8 @@ export default {
       TruncatedText, BookmarkButton
    },
    props: {
-      hit: { type: Object, required: true},
-      pool: {type: String, required: true},
+      // Fields: Pool, ID, Title. Author optional
+      data: { type: Object, required: true},
       id: {type: String, required: true}
    },
    data: function() {
@@ -66,20 +65,9 @@ export default {
       };
    },
    computed: {
-      ...mapState({
-         newBookmark: state => state.bookmarks.newBookmarkInfo,
-         lookingUp: state => state.bookmarks.searching,
-      }),
        ...mapGetters({
          folders: 'bookmarks/folders',
       }),
-      authorText() {
-         let author = ""
-         if ( this.newBookmark.data.header.author ) {
-            author = this.newBookmark.data.header.author.value.join(this.newBookmark.data.header.author.separator)
-         }
-         return author
-      }
    },
    methods: {
       opened() {
@@ -115,8 +103,8 @@ export default {
                this.bookmarkError = "A bookmark folder name is required"
                return
             }
-            this.$store.dispatch("bookmarks/addBookmark", this.newFolder).then( () => {
-               this.$store.commit("bookmarks/clearNewBookmark")
+            this.data.folder = this.newFolder
+            this.$store.dispatch("bookmarks/addBookmark", this.data).then( () => {
                this.$refs.addbmmodal.hide()
             }).catch((error) => {
                this.bookmarkError = error
@@ -126,9 +114,9 @@ export default {
                this.bookmarkError = "A bookmark folder selection is required"
                return
             }
-            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.hit.identifier)
-            this.$store.dispatch("bookmarks/addBookmark", this.selectedFolder).then( () => {
-               this.$store.commit("bookmarks/clearNewBookmark")
+            this.data.folder = this.selectedFolder
+            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.data.identifier)
+            this.$store.dispatch("bookmarks/addBookmark", this.data).then( () => {
                this.$refs.addbmmodal.hide()
             }).catch((error) => {
                this.bookmarkError = error

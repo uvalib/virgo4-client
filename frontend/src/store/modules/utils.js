@@ -199,3 +199,11 @@ export function scrollToItem( tgtEle ) {
      behavior: "smooth"
    })
  }
+
+ export function toBookmarkData( pool, hit ) {
+    let bmData = {identifier: hit.identifier, title: hit.header.title, pool: pool}
+    if (hit.header.author) {
+      bmData.author = hit.header.author.value.join(hit.header.author.separator)
+    }
+    return bmData
+ }

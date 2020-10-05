@@ -7,7 +7,6 @@ const bookmarks = {
       searching: false,
       public: [],
       bookmarks: [],
-      newBookmarkInfo: null,
    },
 
    getters: {
@@ -52,10 +51,6 @@ const bookmarks = {
             return 0
          })
       },
-
-      addingBookmark: state => {
-         return state.newBookmarkInfo != null
-      },
    },
 
    mutations: {
@@ -97,12 +92,6 @@ const bookmarks = {
             }
          })
       },
-      setNewBookmark(state, bookmarkData) {
-         state.newBookmarkInfo = bookmarkData
-      },
-      clearNewBookmark(state) {
-         state.newBookmarkInfo = null
-      },
    },
 
    actions: {
@@ -133,23 +122,19 @@ const bookmarks = {
             ctx.commit('setSearching', false)
           })
       },
-      addBookmark(ctx, folder ) {
+
+      // bmData Fields: Folder, Pool, ID, Title. Author optional
+      async addBookmark(ctx, bmData ) {
          let v4UID = ctx.rootState.user.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/items`
-         let bm = ctx.state.newBookmarkInfo
-         let data = {folder: folder, pool: bm.pool, identifier: bm.data.identifier}
-
-         // required details: title, author, call number, location, library, availability
-         let author = ""
-         if  (bm.data.header.author) {
-            author = bm.data.header.author.value.join(bm.data.header.author.separator)
-         }
-         let detail = {title :bm.data.header.title, author: author}
+         let data = {folder: bmData.folder, pool: bmData.pool, identifier: bmData.identifier}
+         let detail = {title : bmData.title, author: bmData.author}
          data['details'] = JSON.stringify(detail)
          return axios.post(url, data).then((response) => {
             ctx.commit('setBookmarks', response.data)
          })
       },
+
       addFolder(ctx, folder) {
          let v4UID = ctx.rootState.user.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders`

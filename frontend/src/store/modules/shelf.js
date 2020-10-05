@@ -5,7 +5,8 @@ const shelf = {
    state: {
       lookingUp: false,
       browse: [],
-      browseRange: 3
+      browseRange: 3,
+      showSpinner: true
    },
 
    getters: {
@@ -17,6 +18,9 @@ const shelf = {
    mutations: {
       setLookingUp(state, flag) {
          state.lookingUp = flag
+         if ( flag == false ) {
+            state.showSpinner = true
+         }
       },
 
       setBrowseDetails(state, data) {
@@ -27,17 +31,27 @@ const shelf = {
          })
       },
    },
-
    actions: {
+      browseNext(ctx) {
+         let nextIdx = ctx.state.browseRange+1
+         ctx.state.showSpinner = false
+         ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
+      },
+      browsePrior(ctx) {
+         let nextIdx = ctx.state.browseRange-1
+         ctx.state.showSpinner = false
+         ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
+      },
       async getBrowseData(ctx, centerId) {
-         ctx.commit("setLookingUp", true)
+         if ( ctx.state.showSpinner) {
+            ctx.commit("setLookingUp", true)
+         }
          if ( ctx.rootState.system.searchAPI.length == 0) {
             await ctx.dispatch('system/getConfig', null, { root: true })
          }
 
          let url = `${ctx.rootState.system.shelfBrowseURL}/api/browse/${centerId}?range=${ctx.state.browseRange}`
          await axios.get(url).then((response) => {
-            console.log("GOT DATA "+JSON.stringify(response.data.items))
             ctx.commit("setBrowseDetails", response.data.items)
             ctx.commit("setLookingUp", false)
          }).catch((error) => {

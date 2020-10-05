@@ -130,7 +130,7 @@
       <div class="availability-info">
          <Availability v-if="hasAvailability" :titleId="details.identifier" />
       </div>
-      <ShelfBrowse v-if="shelfBrowseEnabled && !details.searching" :titleId="details.identifier" />
+      <ShelfBrowse v-if="shelfBrowseEnabled && !details.searching" :hit="details" :pool="details.source" />
    </div>
 </template>
 
@@ -529,6 +529,7 @@ dt {
 dd {
    margin: 0;
    width: 100%;
+   max-width: 750px;
    text-align: left;
    word-break: break-word;
    -webkit-hyphens: auto;

@@ -61,7 +61,6 @@ export default {
          sessionExpired: state => state.system.sessionExpired,
       }),
       ...mapGetters({
-         addingBookmark: "bookmarks/addingBookmark",
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
       }),

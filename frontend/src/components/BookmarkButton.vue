@@ -1,16 +1,16 @@
 <template>
    <span v-if="isKiosk==false" class="bookmark-container">
-      <V4Button v-if="isBookmarked" mode="icon" @click="removeBookmarkClicked" 
+      <V4Button v-if="isBookmarked" mode="icon" @click="removeBookmarkClicked"
          :id="id"
          role="switch" aria-checked="true"
-         :aria-label="`bookmark ${hit.header.title}`"
+         :aria-label="`remove bookmark on ${data.title}`"
       >
          <i class="bookmark fas fa-bookmark"></i>
       </V4Button>
       <V4Button v-else mode="icon" @click="addBookmarkClicked"
          :id="id"
          role="switch" aria-checked="false"
-         :aria-label="`bookmark ${hit.header.title}`"
+         :aria-label="`bookmark ${data.title}`"
       >
          <i class="bookmark far fa-bookmark"></i>
       </V4Button>
@@ -21,8 +21,8 @@
 import { mapGetters } from "vuex"
 export default {
    props: {
-      hit: { type: Object, required: true},
-      pool: {type: String, required: true},
+      // Fields: Pool, ID, Title. Author optional
+      data: { type: Object, required: true},
       id:  {type: String, required: true},
    },
    computed: {
@@ -34,7 +34,7 @@ export default {
          let found = false
          this.bookmarks.some( folder => {
             folder.bookmarks.some( item => {
-               if (item.pool == this.pool && item.identifier == this.hit.identifier) {
+               if (item.pool == this.data.pool && item.identifier == this.data.identifier) {
                   found = true
                }
                return found == true
@@ -49,9 +49,9 @@ export default {
          let bookmarkID = -1
          this.bookmarks.some( folder => {
             folder.bookmarks.some( item => {
-               if (item.pool == this.pool && item.identifier == this.hit.identifier) {
+               if (item.pool == this.data.pool && item.identifier == this.data.identifier) {
                   bookmarkID = item.id
-                  this.$analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)   
+                  this.$analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)
                   this.$store.dispatch("bookmarks/removeBookmarks", [bookmarkID])
                }
                return bookmarkID != -1
@@ -60,8 +60,6 @@ export default {
          })
       },
       addBookmarkClicked() {
-         let data = {pool: this.pool, data: this.hit}
-         this.$store.commit("bookmarks/setNewBookmark", data)
          this.$emit('clicked')
       },
    }

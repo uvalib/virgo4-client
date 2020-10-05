@@ -5,8 +5,8 @@
       >
          <template v-slot:button>
             <V4Button v-if="act == 'bookmark'" mode="icon" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
-               role="switch" aria-checked="false" 
-               :aria-label="`bookmark ${hit.header.title}`"
+               role="switch" aria-checked="false"
+               :aria-label="`bookmark ${data.title}`"
             >
                <i class="disabled bookmark far fa-bookmark trigger"></i>
             </V4Button>
@@ -33,7 +33,7 @@
 import { mapGetters } from "vuex"
 export default {
    props: {
-      hit: { type: Object},
+      data: { type: Object},
       id:  {type: String, required: true},
       act: {type: String, required: true}
    },
@@ -49,13 +49,13 @@ export default {
       signInMessage() {
          if (this.act == "bookmark") {
             return "You must be signed in to use bookmarks."
-         } 
+         }
          return "You must be signed in to save searches."
       },
       signInAria() {
          if (this.act == "bookmark") {
             return "Sign in to bookmark item"
-         } 
+         }
          return "sign in to sae search"
       }
    },
@@ -65,9 +65,9 @@ export default {
       },
       signInClicked() {
          if ( this.act == "bookmark") {
-            this.$store.commit("restore/setBookmarkRecord", this.hit)
+            this.$store.commit("restore/setBookmarkRecord", this.data)
          } else {
-            this.$store.commit("restore/setRestoreSaveSearch")      
+            this.$store.commit("restore/setRestoreSaveSearch")
          }
          this.$router.push("/signin")
       },
