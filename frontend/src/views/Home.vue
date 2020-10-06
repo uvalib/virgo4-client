@@ -247,6 +247,9 @@ export default {
                this.$store.commit("sort/setActivePool", targetPool)
             }
          }
+         if (oldSort == "") {
+            oldSort = "SortRelevance_desc"
+         }
 
          if ( query.q) {
             this.$store.commit("query/restoreFromURL", query.q)
@@ -255,13 +258,22 @@ export default {
             if (this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
                   this.activeSort != oldSort || this.userSearched == true) {
                this.$store.commit("resetSearchResults")
-               await this.$store.dispatch("searchAllPools", !this.userSearched)
+               // console.log(`Q: ${this.rawQueryString} vs ${oldQ}`)
+               // console.log(`F: ${this.filterQueryString(targetPool)} vs ${oldFilterParam}`)
+               // console.log(`S: ${this.activeSort} vs ${oldSort}`)
+               // console.log(`U: ${this.userSearched}`)
+               // console.log("SEARCH "+this.$router.currentRoute.fullPath)
+               // dont keep the spinner up while getting facets if this is a search started by a user clicking search
+               // NOTE: immediately reset the user searched flag because searchAllPools may append &pool=something to
+               // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
+               // has changed. If userSearched is not reset, the search will run twice.
                this.userSearched = false
+               await this.$store.dispatch("searchAllPools")
                this.$store.commit('setSearching', false)
             }
 
             if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {
-               window.scrollBy({
+               window.scrollTo({
                   top: this.lastSearchScrollPosition,
                   behavior: "auto"
                })
@@ -337,7 +349,9 @@ export default {
          let skipPoolParam = false
          let tgtPool = this.tgtPoolPref
          if ( this.basicSearchScope.id == "all") {
-            this.$store.commit("query/setTargetPool", tgtPool)
+            if (tgtPool != "") {
+               this.$store.commit("query/setTargetPool", tgtPool)
+            }
             this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
          } else {
             tgtPool = this.basicSearchScope.id
@@ -355,8 +369,10 @@ export default {
             qp += `&pool=${priorQ.pool}`
             this.$store.commit("query/setTargetPool", priorQ.pool)
          } else {
-            qp += `&pool=${tgtPool}`
-            this.$store.commit("query/setTargetPool", tgtPool)
+            if ( tgtPool != "") {
+               qp += `&pool=${tgtPool}`
+               this.$store.commit("query/setTargetPool", tgtPool)
+            }
          }
          if (tgtPool != "") {
             // grab current query string for the selected pool straight from the model.

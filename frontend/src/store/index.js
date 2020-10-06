@@ -401,14 +401,9 @@ export default new Vuex.Store({
 
       // Search ALL configured pools. This is the initial search call using only the basic or
       // advanced search parameters and will always start at page 1.
-      // If isRestore is true, the spinner will not be cleared after the search
       // CTX: commit: ƒ boundCommit(type, payload, options)
-      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }, awaitFacets) {
+      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
          commit('system/setError', "")
-         let hideSpinner = true
-         if (awaitFacets === true) {
-            hideSpinner = false
-         }
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
@@ -464,10 +459,7 @@ export default new Vuex.Store({
                router.replace({ query })
             }
 
-            if ( hideSpinner) {
-               commit('setSearching', false)
-            }
-
+            commit('setSearching', false)
             dispatch("searches/updateHistory")
             return dispatch("filters/getSelectedResultFacets", true)
          }).catch((error) => {
