@@ -26,7 +26,6 @@ const shelf = {
       setBrowseDetails(state, data) {
          state.browse.splice(0, state.browse.length)
          data.forEach( b => {
-            console.log(b)
             state.browse.push(b)
          })
       },
