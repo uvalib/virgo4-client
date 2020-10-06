@@ -1,6 +1,6 @@
 <template>
    <div class="availability">
-      <div class="availability-content" v-if="hasExternalHoldings(details.source)==false && (hasItems || hasRequestOptions)">
+      <div class="availability-content" v-if="showAvailability">
          <h2>Availability</h2>
          <div class="ra-box ra-fiy" v-if="hasItems || hasRequestOptions">
             <strong>Please note that stacks browsing is not available because of building restrictions due to COVID-19.</strong>
