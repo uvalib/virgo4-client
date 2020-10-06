@@ -54,9 +54,13 @@ const shelf = {
             ctx.commit("setBrowseDetails", response.data.items)
             ctx.commit("setLookingUp", false)
          }).catch((error) => {
-            // no negative impact on client; just don't show shelf browse and log error
-            ctx.dispatch("system/reportError", error, {root: true})
             ctx.commit("setLookingUp", false)
+            if ( error.response && error.response.status == 404) {
+               console.warn("No browse data available for "+centerId)
+            } else {
+               // no negative impact on client; just don't show shelf browse and log error
+               ctx.dispatch("system/reportError", error, {root: true})
+            }
          })
       },
    }
