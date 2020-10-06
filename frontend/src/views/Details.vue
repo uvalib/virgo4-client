@@ -328,7 +328,7 @@ export default {
          return out
       },
       shouldDisplay(field) {
-         // if ( field.display == 'availability') return false
+         if ( field.display == 'availability') return false
          if (field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
              field.type == "access-url" || field.type == "sirsi-url" ||
              field.name.includes("_download_url")  ) {
