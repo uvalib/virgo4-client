@@ -59,12 +59,12 @@
                   {{lib.library}}
                   <ul class="location">
                      <li v-for="(loc, lidx) in lib.locations" :key="`loc${lidx}`">
-                        {{loc.location}}
+                        <span class="location">{{loc.location}}</span>
                         <ul class="call">
                            <li v-for="(cn, cidx) in loc.call_numbers" :key="`cn${cidx}`">
                               {{cn.call_number}}
                               <ul class="copy">
-                                 <li>{{cn.text.join(" ")}}</li>
+                                 <li v-for="(txt, tidx) in cn.text" :key="`loc${tidx}`">{{txt}}</li>
                               </ul>
                            </li>
                         </ul>
@@ -294,8 +294,19 @@ export default {
       margin: 0;
    }
 
-   ul.location, ul.call, ul.copy  {
+   ul.location  {
       font-weight: normal;
+      padding-left: 40px;
+      padding-bottom: 10px;
+      span.location {
+         text-decoration: underline;
+      }
+      li {
+         margin-top: 5px;
+      }
+   }
+   ul.call, ul.copy  {
+      padding-left: 10px;
    }
    ul.copy  {
       padding-bottom: 10px;
