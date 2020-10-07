@@ -10,6 +10,7 @@
          </div>
          <div class="ra-box ra-fiy" v-if="availabilityStatement" v-html="availabilityStatement"></div>
          <div class="ra-box ra-fiy" v-if="accessRestriction" v-html="accessRestriction"></div>
+         <div class="ra-box ra-fiy" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
 
          <p class="error" v-if="availability.error" v-html="availability.error"></p>
 
@@ -155,6 +156,13 @@ export default {
          let f = this.details.detailFields.find( f=>f.name == "access_note")
          if (f) {
             return f.value
+         }
+         return ""
+      },
+      extentOfDigitization() {
+         let f = this.details.detailFields.find( f=>f.name == "extent_of_digitization")
+         if (f) {
+            return f.label + ": " + f.value
          }
          return ""
       },
