@@ -9,7 +9,9 @@
             <div class="browse-card" v-for="(b,idx) in shelfBrowse" :class="{current: isCurrent(idx)}" :key="`b${b.id}`">
                <i class="current fas fa-caret-down" v-if="isCurrent(idx)"></i>
                <div class="thumb-wrap">
-                  <img class="thumb" v-if="b.cover_image_url" :src="b.cover_image_url" />
+                  <a :href="`/items/${b.id}`">
+                     <img class="thumb" v-if="b.cover_image_url" :src="b.cover_image_url" />
+                  </a>
                </div>
                <div class="details">
                   <span class="call">{{b.call_number}}</span>
@@ -24,9 +26,12 @@
             </div>
          </div>
          <div class="browse-control">
-               <V4Button mode="primary" @click="browsePrior()"><i class="prior fas fa-chevron-left"></i>Prior</V4Button>
-               <V4Button mode="primary" @click="browseNext()">Next<i class="next fas fa-chevron-right"></i></V4Button>
-            </div>
+            <V4Button mode="primary" @click="browsePrior()"><i class="prior fas fa-chevron-left"></i>Previous</V4Button>
+            <V4Button mode="primary" @click="browseNext()">Next<i class="next fas fa-chevron-right"></i></V4Button>
+         </div>
+         <div class="centered" v-if="showRestore">
+            <V4Button mode="primary" @click="browseRestore()">Return to {{currentCallNumber}}</V4Button>
+         </div>
       </template>
    </div>
 </template>
@@ -61,6 +66,14 @@ export default {
          hasBrowseData: 'shelf/hasBrowseData',
          isSignedIn: 'user/isSignedIn',
       }),
+      currentCallNumber() {
+         let f =  this.hit.detailFields.find( f => f.name == "call_number")
+         return f.value
+      },
+      showRestore() {
+         let center = this.shelfBrowse[this.browseRange]
+         return center.id != this.hit.identifier
+      }
    },
    methods: {
       bookmarkData( item ) {
@@ -71,6 +84,10 @@ export default {
          return item.id == this.hit.identifier
 
       },
+      browseRestore() {
+         this.$store.commit("shelf/setShowSpinner", false)
+         this.$store.dispatch("shelf/getBrowseData", this.hit.identifier )
+      },
       browseNext() {
          this.$store.dispatch("shelf/browseNext")
       },
@@ -78,9 +95,6 @@ export default {
          this.$store.dispatch("shelf/browsePrior")
       },
    },
-   mounted() {
-      this.$store.dispatch("shelf/getBrowseData", this.hit.identifier )
-   }
 }
 </script>
 
@@ -107,6 +121,9 @@ export default {
          margin: 0 8px 0 0;
       }
    }
+   .center {
+      text-align: centter;
+   };
 
    .browse-wrapper {
       padding: 5px 0;
@@ -150,6 +167,11 @@ export default {
                background-image: url('~@/assets/dots.gif');
                background-repeat:no-repeat;
                background-position: center center;
+               position: relative;
+               &:hover {
+                  top: -2px;
+                  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
+               }
             }
          }
          i.current {

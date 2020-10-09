@@ -22,6 +22,13 @@ const shelf = {
             state.showSpinner = true
          }
       },
+      setShowSpinner(state, flag) {
+         state.showSpinner = flag
+      },
+
+      clearBrowseDetails(state) {
+         state.browse.splice(0, state.browse.length)
+      },
 
       setBrowseDetails(state, data) {
          state.browse.splice(0, state.browse.length)
@@ -55,6 +62,7 @@ const shelf = {
             ctx.commit("setLookingUp", false)
          }).catch((error) => {
             ctx.commit("setLookingUp", false)
+            ctx.commit("clearBrowseDetails")
             if ( error.response && error.response.status == 404) {
                console.warn("No browse data available for "+centerId)
             } else {
