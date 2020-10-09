@@ -168,6 +168,8 @@ export default {
                background-repeat:no-repeat;
                background-position: center center;
                position: relative;
+               max-width: 100%;
+
                &:hover {
                   top: -2px;
                   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
