@@ -49,6 +49,9 @@
                                        </V4Button>
                                     </div>
                                     <div class="button-group">
+                                       <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                                          :id="`print-bookmarks-${folderInfo.id}`"
+                                       />
                                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                                           :id="`move-bookmarks-${folderInfo.id}`"
                                           v-on:move-approved="moveBookmarks"/>
@@ -137,6 +140,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import PrintBookmarks from "@/components/modals/PrintBookmarks"
 import MoveBookmark from "@/components/modals/MoveBookmark"
 import RenameBookmark from "@/components/modals/RenameBookmark"
 import AccordionContent from "@/components/AccordionContent"
@@ -148,6 +152,7 @@ export default {
       AccountActivities,
       MoveBookmark,
       RenameBookmark,
+      PrintBookmarks
    },
    data: function() {
       return {

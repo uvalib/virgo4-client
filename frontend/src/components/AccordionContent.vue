@@ -1,21 +1,21 @@
 <template>
-   <div class="accordion" :id="id" 
+   <div class="accordion" :id="id"
       @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
       <div v-if="showHeader" :id="`${id}-header`"
          tabindex="0"
          :class="layout" class="title" role="button"
          :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
          :aria-expanded="expandedStr" :aria-controls="contentID">
-         <slot name="title"></slot> 
+         <slot name="title"></slot>
          <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
       </div>
       <transition name="accordion"
             v-on:before-enter="beforeEnter" v-on:enter="enter"
             v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div :id="contentID" class="accordion-content" v-show="isExpanded" 
+         <div :id="contentID" class="accordion-content" v-show="isExpanded"
             :aria-labelledby="`${id}-header`" role="region" aria-live="polite"
-            :style="{ background: backgroundContent, color: color }" 
-            @click.stop @keyup.stop.enter @keydown.space.prevent.stop>
+            :style="{ background: backgroundContent, color: color }"
+            @click.stop @keyup.stop.enter @keydown.space.stop>
             <slot></slot>
             <div v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
                :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }" >
@@ -106,7 +106,7 @@ export default {
       autoExpandID(newVal, _oldVal) {
          if (this.isExpanded === false && this.id && newVal != "") {
             if (this.id == newVal) {
-               this.isExpanded = true    
+               this.isExpanded = true
             }
          }
       }
@@ -196,7 +196,7 @@ export default {
       display: flex;
       flex-flow: row nowrap;
       align-content: center;
-      justify-content: space-between;   
+      justify-content: space-between;
       align-items: stretch;
       height: 100%;
    }
@@ -212,7 +212,7 @@ export default {
       position: relative;
       flex-grow: 1;
       text-align: left;
-      
+
       .accordion-icon {
          margin-left: auto;
          font-size: 1.25em;
@@ -242,6 +242,6 @@ export default {
 .title {
    &:focus {
       @include be-accessible();
-   } 
+   }
 }
 </style>

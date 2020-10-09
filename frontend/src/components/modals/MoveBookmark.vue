@@ -1,5 +1,5 @@
 <template>
-   <V4Modal :id="id" title="Move Bookmarks" ref="movemodal" 
+   <V4Modal :id="id" title="Move Bookmarks" ref="movemodal"
       firstFocusID="foldersel" lastFocusID="move-ok" :buttonID="`${id}-open`" @opened="opened">
       <template v-slot:button>
          <V4Button mode="primary" @click="$refs.movemodal.show()" :id="`${id}-open`"
@@ -70,7 +70,7 @@ export default {
       opened() {
          this.selectedFolder = ""
          if (this.bookmarks.length == 0 ){
-            let btn = document.getElementById(this.id+"-close")   
+            let btn = document.getElementById(this.id+"-close")
             btn.focus()
          }
       },

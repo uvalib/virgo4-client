@@ -197,6 +197,35 @@ const bookmarks = {
          } catch (error)  {
             ctx.commit('system/setError', error, { root: true })
          }
+      },
+      async printBookmarks(ctx, data) {
+         let items = []
+         let bookmarkIDs = data.bookmarkIDs
+         let folderID = data.folderID
+         let folder = ctx.state.bookmarks.find( folder => folder.id == folderID)
+         bookmarkIDs.forEach( bid => {
+            let bm = folder.bookmarks.find( bm => bm.id == bid)
+            items.push( {pool: bm.pool, identifier: bm.identifier} )
+         })
+         let req = {title: data.title, notes: data.notes, items: items}
+
+         if ( ctx.rootState.system.searchAPI.length == 0) {
+            await ctx.dispatch('system/getConfig', null, { root: true })
+         }
+
+         let url = ctx.rootState.system.searchAPI + "/api/pdf"
+         await axios.post(url, req, {responseType: "blob"}).then((response) => {
+            let blob = new Blob([response.data], { type: response.headers['content-type'] })
+            let href = window.URL.createObjectURL(blob)
+            window.open(href)
+
+            // if using dowload.js
+            // const content = response.headers['content-type'];
+            // download(response.data, "results.pdf", content)
+         }).catch((error) => {
+             // no negative impact on client; just don't show shelf browse and log error
+             ctx.dispatch("system/reportError", error, {root: true})
+         })
       }
    }
 }
