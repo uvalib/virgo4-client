@@ -157,6 +157,12 @@ export default {
             text-align: center;
             background: white;
 
+            a {
+               display: inline-block;
+               &:focus {
+                  @include be-accessible();
+               }
+            }
             img {
                height: auto;
                align-self: center;
