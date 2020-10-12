@@ -23,6 +23,7 @@ const user = {
       accountInfo: {},
       claims: {},
       checkouts: [],
+      renewSummary: {renewed: -1, failed: -1, failures: []},
       checkoutsOrder: "AUTHOR_ASC",
       bills: [],
       requests: {illiad: [], holds: []},
@@ -36,6 +37,9 @@ const user = {
    },
 
    getters: {
+      hasRenewSummary: (state) => {
+         return state.renewSummary.renewed >= 0
+      },
       canChangePIN: (state, getters) => {
          if (getters.hasAccountInfo == false ) return false
          if ( state.sessionType == "netbadge") return false
@@ -144,6 +148,9 @@ const user = {
    },
 
    mutations: {
+      clearRenewSummary(state) {
+         state.renewSummary = {renewed: -1, failed: -1, failures: []}
+      },
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
@@ -152,6 +159,7 @@ const user = {
       },
       setCheckouts(state, co) {
          state.checkouts = co
+         state.renewSummary = {renewed: -1, failed: -1, failures: []}
       },
       sortCheckouts(state, order) {
          state.checkoutsOrder = order
@@ -185,10 +193,16 @@ const user = {
          state.requests = reqs
       },
       setRenewResults(state, renewResults) {
+         state.renewSummary.renewed = 0
+         state.renewSummary.failed = 0
          renewResults.results.forEach( renew => {
             if (renew.success == false) {
+               state.renewSummary.failed++
+               state.renewSummary.failures.push({barcode: co.barcode, message: renew.message})
                let co = state.checkouts.find( co => co.barcode == renew.barcode)
                co.message = renew.message
+            } else {
+               state.renewSummary.renewed++
             }
          })
       },
@@ -254,6 +268,7 @@ const user = {
          state.role = ""
          state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
+         state.renewSummary = {renewed: 0, failed: 0, failures: []}
          state.bills.splice(0, state.bills.length)
          Vue.$cookies.remove("v4_optout")
          localStorage.removeItem("v4_jwt")

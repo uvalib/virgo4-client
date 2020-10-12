@@ -1,6 +1,7 @@
 <template>
    <div class="checkout">
-      <h1>My Account</h1>
+      <h1>My Account {{hasRenewSummary}}</h1>
+      <RenewSummary v-if="hasRenewSummary"/>
       <div class="checkout-content" v-if="isSignedIn == false">
          <h3>You must be signed in to access checkout information.</h3>
          <p>
@@ -127,10 +128,11 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from "@/components/AccordionContent"
+import RenewSummary from "@/components/modals/RenewSummary"
 export default {
    name: "checkouts",
    components: {
-      AccountActivities,AccordionContent
+      AccountActivities,AccordionContent,RenewSummary
    },
    data: function() {
       return {
@@ -149,7 +151,8 @@ export default {
       ...mapGetters({
         sortedCheckouts: 'user/sortedCheckouts',
         isBarred: 'user/isBarred',
-        isSignedIn: 'user/isSignedIn'
+        isSignedIn: 'user/isSignedIn',
+        hasRenewSummary: 'user/hasRenewSummary'
       }),
       illiadCheckouts() {
          return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
