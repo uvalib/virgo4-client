@@ -2,7 +2,7 @@
 <V4Modal :id="id" title="Add Bookmark" ref="addbmmodal"
       firstFocusID="folder" :buttonID="`${id}-btn`" @opened="opened" >
       <template v-slot:button>
-         <BookmarkButton :data="data" @clicked="$refs.addbmmodal.show()" :id="`${id}-btn`" />
+         <BookmarkButton :data="data" @clicked="bookmarkButtonClicked()" :id="`${id}-btn`" />
       </template>
       <template v-slot:content>
          <div class="add-content">
@@ -70,6 +70,10 @@ export default {
       }),
    },
    methods: {
+      bookmarkButtonClicked() {
+         this.$emit("clicked")
+         this.$refs.addbmmodal.show()
+      },
       opened() {
          this.selectedFolder = this.folders[0].name
          this.bookmarkError = ""

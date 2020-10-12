@@ -9,19 +9,21 @@
             <div class="browse-card" v-for="(b,idx) in shelfBrowse" :class="{current: isCurrent(idx)}" :key="`b${b.id}`">
                <i class="current fas fa-caret-down" v-if="isCurrent(idx)"></i>
                <div class="thumb-wrap">
-                  <a :href="`/items/${b.id}`">
+                  <a @click="browseDetailClicked(b.id)" :href="`/items/${b.id}`">
                      <img class="thumb" v-if="b.cover_image_url" :src="b.cover_image_url" />
                   </a>
                </div>
                <div class="details">
                   <span class="call">{{b.call_number}}</span>
                   <span class="loc">{{b.location}}</span>
-                  <a :href="`/items/${b.id}`" class="title">{{b.title}}</a>
+                  <a @click="browseDetailClicked(b.id)" :href="`/items/${b.id}`" class="title">{{b.title}}</a>
                   <span class="title">{{b.published_date}}</span>
                </div>
                <div class="bm-control">
-                  <AddBookmark v-if="isSignedIn" :data="bookmarkData(b)" :id="`bm-modal-${b.identifier}`"/>
-                  <SignInRequired v-else :data="bookmarkData(b)" :id="`bm-modal-${b.identifier}`" act="bookmark" />
+                  <AddBookmark v-if="isSignedIn" :data="bookmarkData(b)" :id="`bm-modal-${b.id}`"
+                     @clicked="bookmarkClicked(b.id)"
+                  />
+                  <SignInRequired v-else :data="bookmarkData(b)" :id="`bm-modal-${b.id}`" act="bookmark" />
                </div>
             </div>
          </div>
@@ -87,14 +89,26 @@ export default {
       browseRestore() {
          this.$store.commit("shelf/setShowSpinner", false)
          this.$store.dispatch("shelf/getBrowseData", this.hit.identifier )
+         this.$analytics.trigger('ShelfBrowse', 'BROWSE_RESTORE_CLICKED', this.hit.identifier)
       },
       browseNext() {
          this.$store.dispatch("shelf/browseNext")
+         this.$analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED', this.hit.identifier)
       },
       browsePrior() {
          this.$store.dispatch("shelf/browsePrior")
+         this.$analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED', this.hit.identifier)
       },
+      browseDetailClicked(id) {
+         this.$analytics.trigger('ShelfBrowse', 'BROWSE_DETAIL_CLICKED', id)
+      },
+      bookmarkClicked(id) {
+         this.$analytics.trigger('ShelfBrowse', 'BROWSE_BOOKMARK_CLICKED', id)
+      }
    },
+   mounted() {
+      this.$analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', this.hit.identifier)
+   }
 }
 </script>
 
