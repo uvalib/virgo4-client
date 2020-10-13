@@ -19,16 +19,16 @@
                <V4Spinner message="Gathering citations..."/>
             </div>
             <template v-else-if="failed">
-               <p class="error">{{data}}</p>
+               <p class="error">{{citations}}</p>
             </template>
             <template v-else>
                <table class="citations">
-                  <tr v-for="(citation,idx) in data" :key="`cval-${idx}`">
+                  <tr v-for="(citation,idx) in citations" :key="`cval-${idx}`">
                      <template v-if="citation.label">
                         <td v-if="!singleFormat" class="label">{{citation.label}}:</td>
                         <td class="value"><span v-html="citation.value"></span></td>
                         <td class="copy-button">
-                           <V4Button mode="text-button" @click="copyCitation(citation)">Copy</V4Button>
+                           <V4Button mode="text-button" @click="copyCitation(citation,idx)">{{citation.copyButtonText}}</V4Button>
                         </td>
                      </template>
                   </tr>
@@ -100,7 +100,7 @@ export default {
       return {
          loading: true,
          failed: false,
-         data: null
+         citations: null
       };
    },
    components: {
@@ -148,16 +148,22 @@ export default {
       opened() {
          this.loading = true
          this.failed = false
-         this.data = null
+         this.citations = null
 
          this.$store.dispatch("item/getCitations", {format: this.format, itemURL: this.itemURL}).then( (response) => {
+            var citations = response.data
+
+            citations.forEach(c => {
+               c.copyButtonText = "Copy"
+            })
+
             this.loading = false
             this.failed = false
-            this.data = response.data
+            this.citations = citations
          }).catch((error) => {
             this.loading = false
             this.failed = true
-            this.data = error
+            this.citations = error
          })
       },
       dismissClicked() {
@@ -171,7 +177,7 @@ export default {
       downloadRISClicked() {
          this.$analytics.trigger('Export', this.risFrom, this.itemID)
       },
-      copyCitation( citation ) {
+      copyCitation(citation, idx) {
          // strip html from citation.  this is safe since the source of the citation is trusted
          var div = document.createElement("div")
          div.innerHTML = citation.value
@@ -180,6 +186,9 @@ export default {
          // message/errors pop up behind the citation modal on details page, so only show one if we have to
          this.$copyText(text).then( ()=> {
             //this.$store.commit("system/setMessage", citation.label+" citation copied to clipboard.")
+            this.citations.forEach((c, i) => {
+              c.copyButtonText = (i == idx) ? "Copied" : "Copy"
+            })
          }, e => {
             this.$store.commit("system/setError", "Unable to copy "+citation.label+" citation: "+e)
          })
