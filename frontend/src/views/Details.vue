@@ -85,7 +85,7 @@
                      </Citations>
                      <V4DownloadButton style="padding-left:0" label="Download RIS" :url="risURL" @click="downloadRISClicked"
                         icon="fas fa-file-export" :iconInline="true"
-                        :aria-label="`export RIS citation for ${details.header.title}`"
+                        :aria-label="`download RIS citation for ${details.header.title}`"
                      />
                   </dd>
                   <template v-if="hasExtLink">
