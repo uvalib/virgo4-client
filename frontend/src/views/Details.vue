@@ -314,8 +314,6 @@ export default {
             this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
          }
 
-         this.$store.dispatch("shelf/getBrowseData", this.details.identifier )
-
          if ( this.isSignedIn) {
             this.$store.dispatch("bookmarks/getBookmarks")
          }

@@ -104,10 +104,16 @@ export default {
       },
       bookmarkClicked(id) {
          this.$analytics.trigger('ShelfBrowse', 'BROWSE_BOOKMARK_CLICKED', id)
+      },
+      async getBrowseData() {
+         await this.$store.dispatch("shelf/getBrowseData", this.hit.identifier )
+         if ( this.hasBrowseData) {
+            this.$analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', this.hit.identifier)
+         }
       }
    },
    mounted() {
-      this.$analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', this.hit.identifier)
+      this.getBrowseData()
    }
 }
 </script>
