@@ -162,6 +162,10 @@ export default {
          font-size: .937em;
          text-align: center;
          width: 175px;
+         &:hover {
+            top: -2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
+         }
 
          .bm-control {
             position: absolute;
@@ -195,11 +199,6 @@ export default {
                background-position: center center;
                position: relative;
                max-width: 100%;
-
-               &:hover {
-                  top: -2px;
-                  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
-               }
             }
          }
          i.current {

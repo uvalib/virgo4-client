@@ -39,12 +39,20 @@ const shelf = {
    },
    actions: {
       browseNext(ctx) {
-         let nextIdx = ctx.state.browseRange+1
+         let inc = 3
+         if (ctx.rootState.system.displayWidth < 768 ) {
+            inc = 1
+         }
+         let nextIdx = ctx.state.browseRange+inc
          ctx.state.showSpinner = false
          ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
       },
       browsePrior(ctx) {
-         let nextIdx = ctx.state.browseRange-1
+         let inc = 3
+         if (ctx.rootState.system.displayWidth < 768 ) {
+            inc = 1
+         }
+         let nextIdx = ctx.state.browseRange-inc
          ctx.state.showSpinner = false
          ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
       },
