@@ -56,7 +56,7 @@ export default {
          if (this.act == "bookmark") {
             return "Sign in to bookmark item"
          }
-         return "sign in to sae search"
+         return "sign in to save search"
       }
    },
    methods: {
