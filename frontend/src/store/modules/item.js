@@ -241,17 +241,17 @@ const item = {
 
          baseURL = pool.url
          let url = baseURL + "/api/resource/" + identifier
-         return axios.get(url).then((response) => {
+         await axios.get(url).then((response) => {
             let details = response.data
             ctx.commit("setDetails", {source: source, poolURL: pool.url, details: details})
             ctx.dispatch("getDigitalContent")
             ctx.dispatch("getGoogleBooksURL")
             ctx.dispatch("getOEmbedMedia")
             ctx.commit('clearSearching')
-         }).catch((error) => {
+         }).catch( async (error) => {
             if ( error.response && error.response.status == 404) {
                console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
-               ctx.dispatch("lookupCatalogKeyDetail", {identifier: identifier, v3Redirect: false})
+               await ctx.dispatch("lookupCatalogKeyDetail", {identifier: identifier, v3Redirect: false})
             } else {
                ctx.commit('clearSearching')
                ctx.commit('system/setError', error, { root: true })
@@ -300,6 +300,8 @@ const item = {
             if (response.data.total_hits == 0 ) {
                if ( v3Redirect ) {
                   window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
+               } else {
+                  ctx.commit('clearSearching')
                }
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)

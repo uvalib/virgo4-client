@@ -128,9 +128,9 @@
          </template>
       </div>
       <div class="availability-info">
-         <Availability v-if="hasAvailability" :titleId="details.identifier" />
+         <Availability v-if="hasAvailability && notFound == false" :titleId="details.identifier" />
       </div>
-      <ShelfBrowse v-if="shelfBrowseEnabled && !details.searching" :hit="details" :pool="details.source" />
+      <ShelfBrowse v-if="shelfBrowseEnabled && !details.searching && notFound == false" :hit="details" :pool="details.source" />
    </div>
 </template>
 
@@ -307,15 +307,17 @@ export default {
             await this.$store.dispatch("item/lookupCatalogKeyDetail", {identifier: id, v3Redirect: true} )
          }
 
-         this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
-         let collField = this.allFields.find( f => f.name == "collection")
-         if (collField) {
-            console.log("Trigger collection viewed "+collField.value+":"+id+"")
-            this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
-         }
+         if ( this.notFound == false ) {
+            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
+            let collField = this.allFields.find( f => f.name == "collection")
+            if (collField) {
+               console.log("Trigger collection viewed "+collField.value+":"+id+"")
+               this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
+            }
 
-         if ( this.isSignedIn) {
-            this.$store.dispatch("bookmarks/getBookmarks")
+            if ( this.isSignedIn) {
+               this.$store.dispatch("bookmarks/getBookmarks")
+            }
          }
       },
       getBrowseLinks( name, values ) {
