@@ -182,6 +182,32 @@ const router = new Router({
    },
 })
 
+router.afterEach((to, _from) => {
+   let titles = {home: "Virgo", search: "Virgo", signin: "Virgo: Sign In", account: "Virgo: My Information",
+      checkouts: "Virgo: Checkouts", 'digital-deliveries': "Virgo: Digital Deliveries",
+      bookmarks: "Virgo: Bookmarks", requests: "Virgo: Requests", searches: "Virgo: Saved Searches",
+      preferences: "Virgo: Preferences"
+   }
+   Vue.nextTick(() => {
+      let title = titles[to.name]
+      if ( title == "Virgo") {
+         if (to.query.q) {
+            document.title = "Virgo: Search Results"
+         } else if (to.query.mode=="advanced" ){
+            document.title = "Virgo: Advanced Search"
+         } else {
+            document.title = title
+         }
+      } else {
+         if (title) {
+            document.title = title
+         } else {
+            document.title = "Virgo"
+         }
+      }
+   })
+})
+
 // This is called before every URL in the SPA is hit
 router.beforeEach( (to, from, next) => {
    // Some pages just require an auth token...

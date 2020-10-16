@@ -318,6 +318,9 @@ export default {
             if ( this.isSignedIn) {
                this.$store.dispatch("bookmarks/getBookmarks")
             }
+            document.title = this.details.header.title
+         } else {
+            document.title = "Virgo: Item Not Found"
          }
       },
       getBrowseLinks( name, values ) {
