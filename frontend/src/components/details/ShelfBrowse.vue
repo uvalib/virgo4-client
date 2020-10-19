@@ -9,7 +9,7 @@
             <div class="browse-card" v-for="(b,idx) in shelfBrowse" :class="{current: isCurrent(idx)}" :key="`b${b.id}`">
                <i class="current fas fa-caret-down" v-if="isCurrent(idx)"></i>
                <div class="thumb-wrap">
-                  <a @click="browseDetailClicked(b.id)" :href="`/items/${b.id}`" aria-hidden="true">
+                  <a @click="browseDetailClicked(b.id)" :href="`/items/${b.id}`" aria-hidden="true" tabindex="-1">
                      <img  alt="" class="thumb" v-if="b.cover_image_url" :src="b.cover_image_url" />
                   </a>
                </div>
