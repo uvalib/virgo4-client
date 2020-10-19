@@ -198,43 +198,48 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-i.icon-inline {
-   margin-left: 5px;
-   font-size: 0.8em;
-}
+.citations-content {
+   max-height: 400px;
+   overflow: scroll;
 
-i.icon {
-   color: var(--uvalib-grey-dark);
-   cursor: pointer;
-   font-size: 1.2em;
-   padding: 2px;
-}
+   i.icon-inline {
+      margin-left: 5px;
+      font-size: 0.8em;
+   }
 
-td.label {
-   font-weight: bold;
-   text-align: right;
-   padding: 4px 8px;
-   white-space: nowrap;
-   vertical-align: top;
-}
+   i.icon {
+      color: var(--uvalib-grey-dark);
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: 2px;
+   }
 
-td.value {
-   margin: 0;
-   width: 100%;
-   text-align: left;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-   padding: 4px 0px;
-}
+   td.label {
+      font-weight: bold;
+      text-align: right;
+      padding: 4px 8px;
+      white-space: nowrap;
+      vertical-align: top;
+   }
 
-.working {
-   text-align: center;
-   font-size: 1.25em;
-}
+   td.value {
+      margin: 0;
+      width: 100%;
+      text-align: left;
+      word-break: break-word;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+      hyphens: auto;
+      padding: 4px 0px;
+   }
 
-.copy-button {
-   text-align: right;
+   .working {
+      text-align: center;
+      font-size: 1.25em;
+   }
+
+   .copy-button {
+      text-align: right;
+   }
 }
 </style>
