@@ -130,7 +130,7 @@
       <div class="availability-info">
          <Availability v-if="hasAvailability && notFound == false" :titleId="details.identifier" />
       </div>
-      <ShelfBrowse v-if="shelfBrowseEnabled && !details.searching && notFound == false" :hit="details" :pool="details.source" />
+      <ShelfBrowse v-if="!details.searching && notFound == false" :hit="details" :pool="details.source" />
    </div>
 </template>
 
@@ -194,9 +194,6 @@ export default {
          selectedHit: 'selectedHit',
          selectedResults: 'selectedResults'
       }),
-      shelfBrowseEnabled() {
-         return this.isDevServer
-      },
       risURL() {
          if (this.citationsURL == "") return ""
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
