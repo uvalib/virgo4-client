@@ -263,7 +263,7 @@ func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", openURLReq)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.JSON(illErr.StatusCode, "There was an error during your request. You may need to <a href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
 		return
 	}
 
@@ -363,7 +363,7 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", scanReq)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.JSON(illErr.StatusCode, "There was an error during your request. You may need to <a href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
 		return
 	}
 
@@ -447,9 +447,8 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", illiadScanReq)
 	if illErr != nil {
 		// if the first ILLiad request fails, notify user and exit
-		c.JSON(illErr.StatusCode, illErr.Message)
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.JSON(illErr.StatusCode, "There was an error during your request. You may need to <a href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
 		return
 	}
 
