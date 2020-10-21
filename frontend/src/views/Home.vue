@@ -12,7 +12,7 @@
           <div class="basic-search">
             <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
               border="1px solid var(--uvalib-brand-blue)"
-              v-model="basicSearchScope"
+              v-model="searchScope"
               @changed="scopeChanged"
             />
             <input class="basic"
@@ -80,6 +80,7 @@ export default {
       return {
          showVideo: false,
          isHomePage: true,
+         searchScope: null,
       }
    },
    watch: {
@@ -135,6 +136,7 @@ export default {
          tgtPoolPref: state=>state.preferences.targetPool,
          searchTemplate: state=>state.preferences.searchTemplate,
          optInPoolPrefs: state=>state.preferences.optInPools,
+         sourceLabel: state => state.preferences.sourceLabel,
          signedInUser: state => state.user.signedInUser,
          activeSort: state=>state.sort.activeSort,
       }),
@@ -160,7 +162,7 @@ export default {
         lastSearchScrollPosition: 'lastSearchScrollPosition'
       }),
       searchScopes() {
-        let out = [{name: 'All Resource Types', id: 'all'}]
+        let out = [{name: `All ${this.sourceLabel}s`, id: 'all'}]
         let filtered = this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
         return out.concat(filtered)
       },
@@ -281,6 +283,10 @@ export default {
          }
       },
       async searchCreated() {
+         this.searchScope = this.basicSearchScope
+         if ( this.searchScope.name.includes("All")) {
+            this.searchScope.name = `All ${this.sourceLabel}s`
+         }
          await this.$store.dispatch('pools/getPools')
          this.$store.dispatch("query/getAdvancedSeatchFilters")
 
@@ -348,6 +354,7 @@ export default {
       async searchClicked() {
          let skipPoolParam = false
          let tgtPool = this.tgtPoolPref
+         this.basicSearchScope = this.searchScope
          if ( this.basicSearchScope.id == "all") {
             if (tgtPool != "") {
                this.$store.commit("query/setTargetPool", tgtPool)

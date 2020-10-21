@@ -76,7 +76,7 @@
       </div>
       <div class="pools-wrapper">
          <h2>
-            <span>Resource Types</span>
+            <span>{{sourceLabel}}s</span>
             <span>
                <V4Button mode="text" class="clear" @click="clearPoolsClicked">clear all</V4Button>
                <span class="sep">|</span>
@@ -148,6 +148,7 @@ export default {
          excludedPools: state => state.query.excludedPools,
          pools: state => state.pools.list,
          searchTemplate: state=>state.preferences.searchTemplate,
+         sourceLabel: state => state.preferences.sourceLabel,
          signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
@@ -203,7 +204,7 @@ export default {
          if ( this.excludedPools.length == this.pools.length) {
             this.$store.commit(
                "system/setError",
-               "Please select at least one resource type before searching"
+               `Please select at least one ${this.sourceLabel} before searching`
             )
             return
          }

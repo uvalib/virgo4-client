@@ -8,7 +8,7 @@ const query = {
       userSearched: false,
       mode: "basic",
       basic: "",
-      basicSearchScope: { name: 'All Resource Types', id: 'all' },
+      basicSearchScope: { name: 'All', id: 'all' },
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
@@ -319,7 +319,7 @@ const query = {
       clear(state) {
          state.mode = "basic"
          state.basic = ""
-         state.basicSearchScope = { name: 'All Resource Types', id: 'all' },
+         state.basicSearchScope = { name: 'All', id: 'all' },
          state.advanced.splice(0, state.advanced.length)
          state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" } )

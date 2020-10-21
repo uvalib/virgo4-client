@@ -27,7 +27,7 @@
                         </span>
                      </V4Button>
                   </template>
-                  <V4Select v-if="results.length > 3" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
+                  <V4Select v-if="results.length > maxTabs" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                      :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
                      placeholder="Other"
                      @changed="poolSelected"
@@ -73,6 +73,7 @@ export default {
          total: state=>state.total,
          results: state=>state.results,
          searchMode: state=>state.query.mode,
+         maxTabs: state=>state.preferences.maxTabs,
       }),
       ...mapFields([
         'otherSrcSelection'
@@ -89,14 +90,14 @@ export default {
          return "white"
       },
       sourceTabs() {
-         if (this.results.length == 3) {
+         if (this.results.length <= this.maxTabs) {
             return this.results
          }
-         return this.results.slice(0,2)
+         return this.results.slice(0, this.maxTabs-1 )
       },
       otherSources() {
          let opts = []
-         let others = this.results.slice(2).sort( (a,b) => {
+         let others = this.results.slice(this.maxTabs-1).sort( (a,b) => {
             if (a.pool.name < b.pool.name) return -1
             if (a.pool.name > b.pool.name) return 1
             return 0
@@ -147,7 +148,9 @@ export default {
          if (this.selectedResults.page > 0) {
             query.page = this.selectedResults.page +1
          }
-         this.$router.push({query})
+         if ( this.$route.query != query ) {
+            this.$router.push({query})
+         }
       },
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -220,7 +223,7 @@ p.relevant {
 }
 .pool-tabs .pool.v4-button {
    margin: 0;
-   padding: 8px 10px;
+   padding: 8px 8px 10px 8px;
    border-radius: 5px 5px 0 0;
    color: var(--uvalib-text-dark);
    border: 1px solid var(--uvalib-grey-light);

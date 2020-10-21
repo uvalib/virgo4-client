@@ -13,6 +13,8 @@ const preferences = {
    namespaced: true,
    state: {
       sourceSet: "default",
+      maxTabs: 3,
+      sourceLabel: "Resource Type",
       targetPool: "",
       excludePools: [],
       optInPools: [],
@@ -130,10 +132,19 @@ const preferences = {
          }
          if (prefsObj.sourceSet ) {
             state.sourceSet = prefsObj.sourceSet
+            if ( state.sourceSet == 'default') {
+               state.maxTabs = 3
+               state.sourceLabel = "Resource Type"
+            } else {
+               state.maxTabs = 4
+               state.sourceLabel = "Source"
+            }
          }
       },
       clear(state) {
          state.sourceSet = "default"
+         state.maxTabs = 3
+         state.sourceLabel = "Resource Type"
          state.trackingOptOut = false
          state.targetPool = ""
          state.collapseGroups = false
@@ -170,8 +181,12 @@ const preferences = {
       toggleAltSources(state) {
          if ( state.sourceSet == 'default') {
             state.sourceSet = 'alt'
+            state.maxTabs = 4
+            state.sourceLabel = "Source"
          } else {
             state.sourceSet = 'default'
+            state.maxTabs = 3
+            state.sourceLabel = "Resource Type"
          }
       },
       setSearchTemplate(state, tpl) {

@@ -189,10 +189,13 @@ export default new Vuex.Store({
          state.otherSrcSelection.name = name
       },
 
-      selectPoolResults(state, resultIdx) {
+      selectPoolResults(state, data) {
+         let resultIdx = data.resultIdx
+         let maxTabs = data.maxTabs
+         let otherIdx = maxTabs - 2 // -1 xero index and -1 for 'other'
          state.selectedResultsIdx = resultIdx
 
-         if (resultIdx > 1 && state.otherSrcSelection.id == "") {
+         if (resultIdx > otherIdx && state.otherSrcSelection.id == "") {
             // this happens when a search is restored. otherSrcSelection is used
             // to drive the selected option in the other sources tab. Make sure it is
             /// set correctly
@@ -553,7 +556,9 @@ export default new Vuex.Store({
             if (ctx.rootGetters["user/isSignedIn"]) {
                await ctx.dispatch("user/refreshAuth")
             }
-            ctx.commit('selectPoolResults', resultIdx)
+
+            let data = {resultIdx: resultIdx, maxTabs: ctx.rootState.preferences.maxTabs }
+            ctx.commit('selectPoolResults', data)
             ctx.commit('sort/setActivePool', ctx.state.results[ctx.state.selectedResultsIdx].pool.id)
             await ctx.dispatch("filters/getSelectedResultFacets", false, { root: true })
          }

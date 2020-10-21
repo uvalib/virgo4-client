@@ -7,16 +7,16 @@
             <label>
                <input id="alt-sources" @change="toggleAltSources" class="choice"
                   :checked="!isDefaultSources" type="checkbox"
-                  aria-label="toggle alternate search sources"/>Alternate Sources
+                  aria-label="toggle alternate search sources"/>Use Alternate Sources
             </label>
          </div>
       </div>
       <p v-if="isDefaultSources">
-         Select which Resource Types you want to include in your search results,
-         and which Resource Type you prefer to see results from most.
+         Select which {{sourceLabel}}s you want to include in your search results,
+         and which {{sourceLabel}} you prefer to see results from most.
       </p>
       <p v-else>
-         Select which sources you want to include in your search results.
+         Select which {{sourceLabel}}s you want to include in your search results.
       </p>
       <div class="pools">
          <div
@@ -93,6 +93,7 @@ export default {
       }),
       ...mapState({
          sourceSet: state => state.preferences.sourceSet,
+         sourceLabel: state => state.preferences.sourceLabel,
          collapseGroups: state => state.preferences.collapseGroups,
       }),
       isDefaultSources() {
