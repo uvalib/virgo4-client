@@ -12,6 +12,7 @@ function isPoolExternal(pool) {
 const preferences = {
    namespaced: true,
    state: {
+      sourceSet: "default",
       targetPool: "",
       excludePools: [],
       optInPools: [],
@@ -38,7 +39,7 @@ const preferences = {
          let out = new Set()
          rootState.pools.list.forEach( p => {
             // all external pools that are not opted in go in the exclude list
-            if ( isPoolExternal(p) && !state.optInPools.includes(p.id)) {   
+            if ( isPoolExternal(p) && !state.optInPools.includes(p.id)) {
                out.add(p.id)
             }
          })
@@ -46,7 +47,7 @@ const preferences = {
          state.excludePools.forEach( pool => {
             out.add(pool)
          })
-         return [...out] 
+         return [...out]
       },
 
       isPoolExcluded: state => pool => {
@@ -127,8 +128,12 @@ const preferences = {
          if (prefsObj.searchTemplate ) {
             state.searchTemplate = prefsObj.searchTemplate
          }
+         if (prefsObj.sourceSet ) {
+            state.sourceSet = prefsObj.sourceSet
+         }
       },
       clear(state) {
+         state.sourceSet = "default"
          state.trackingOptOut = false
          state.targetPool = ""
          state.collapseGroups = false
@@ -162,14 +167,21 @@ const preferences = {
             state.targetPool = pool.id
          }
       },
+      toggleAltSources(state) {
+         if ( state.sourceSet == 'default') {
+            state.sourceSet = 'alt'
+         } else {
+            state.sourceSet = 'default'
+         }
+      },
       setSearchTemplate(state, tpl) {
          state.searchTemplate.fields.splice(0, state.searchTemplate.fields.length)
          tpl.fields.forEach( f => {
-            state.searchTemplate.fields.push(f)    
+            state.searchTemplate.fields.push(f)
          })
          state.searchTemplate.excluded.splice(0, state.searchTemplate.excluded.length)
          tpl.excluded.forEach( e => {
-            state.searchTemplate.excluded.push(e)    
+            state.searchTemplate.excluded.push(e)
          })
       }
    },
@@ -178,6 +190,11 @@ const preferences = {
       async saveAdvancedSearchTemplate( ctx, template) {
          ctx.commit("setSearchTemplate", template)
          ctx.dispatch("savePreferences")
+      },
+      async toggleAltSources(ctx) {
+         ctx.commit("toggleAltSources")
+         await ctx.dispatch("savePreferences")
+         await ctx.dispatch("pools/getPools", null, {root:true})
       },
       toggleTargetPool(ctx, pool) {
          ctx.commit("toggleTargetPool", pool)
@@ -208,9 +225,10 @@ const preferences = {
             enableBarcodeScan: ctx.state.enableBarcodeScan,
             collapseGroups: ctx.state.collapseGroups,
             optInPools: ctx.state.optInPools,
-            searchTemplate: ctx.state.searchTemplate
+            searchTemplate: ctx.state.searchTemplate,
+            sourceSet: ctx.state.sourceSet
          }
-         axios.post(url, data)
+         return axios.post(url, data)
       }
    }
 }

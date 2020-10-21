@@ -295,7 +295,9 @@ const item = {
               exclude_pool: [],
             }
          }
-         let url = ctx.rootState.system.searchAPI + "/api/search"
+
+         let srcSet = ctx.rootState.preferences.sourceSet
+         let url = `${ctx.rootState.system.searchAPI}/api/search?sources=${srcSet}`
          return axios.post(url, req).then((response) => {
             if (response.data.total_hits == 0 ) {
                if ( v3Redirect ) {

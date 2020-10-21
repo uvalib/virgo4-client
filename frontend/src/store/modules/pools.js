@@ -161,7 +161,8 @@ const pools = {
             await ctx.dispatch('system/getConfig', null, { root: true })
          }
 
-         let url = ctx.rootState.system.searchAPI + "/api/pools"
+         let srcSet = ctx.rootState.preferences.sourceSet
+         let url = `${ctx.rootState.system.searchAPI}/api/pools?sources=${srcSet}`
          try {
             let response = await axios.get(url)
             ctx.commit('setPools', response.data)

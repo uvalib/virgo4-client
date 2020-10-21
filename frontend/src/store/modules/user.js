@@ -365,6 +365,9 @@ const user = {
             if (prefs.migrated && prefs.migrated == true) {
                ctx.dispatch('preferences/savePreferences', null, { root: true })
             }
+            if (prefs.sourceSet != "default") {
+               ctx.dispatch("pools/getPools", null, {root:true})
+            }
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })

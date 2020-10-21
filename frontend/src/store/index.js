@@ -442,7 +442,8 @@ export default new Vuex.Store({
          }
 
          // POST the search query and wait for the response
-         let url = state.system.searchAPI + "/api/search"
+         let srcSet = rootState.preferences.sourceSet
+         let url = `${rootState.system.searchAPI}/api/search?sources=${srcSet}`
          await axios.post(url, req).then((response) => {
             commit('pools/setPools', response.data.pools)
             commit('setSearchResults', { results: response.data, tgtPool: rootState.query.targetPool })

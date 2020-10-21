@@ -1,9 +1,22 @@
 <template>
    <div class="pool-options">
       <h2>Search Preferences</h2>
-      <p>
+      <div class="sets" v-if="isDevServer">
+         <p>Use the alternate set of sources for searching?</p>
+         <div class="check">
+            <label>
+               <input id="alt-sources" @change="toggleAltSources" class="choice"
+                  :checked="!isDefaultSources" type="checkbox"
+                  aria-label="toggle alternate search sources"/>Alternate Sources
+            </label>
+         </div>
+      </div>
+      <p v-if="isDefaultSources">
          Select which Resource Types you want to include in your search results,
          and which Resource Type you prefer to see results from most.
+      </p>
+      <p v-else>
+         Select which sources you want to include in your search results.
       </p>
       <div class="pools">
          <div
@@ -21,7 +34,7 @@
                <span v-html="p.description"></span>
             </div>
             <div class="source-controls">
-               <div
+               <div v-if="isDefaultSources"
                   tabindex="0"
                   role="switch"
                   class="toggle"
@@ -76,10 +89,15 @@ export default {
          isTargetPool: "preferences/isTargetPool",
          pools: "pools/sortedList",
          excludedPools: "preferences/excludedPools",
+         isDevServer: 'system/isDevServer',
       }),
       ...mapState({
+         sourceSet: state => state.preferences.sourceSet,
          collapseGroups: state => state.preferences.collapseGroups,
-      })
+      }),
+      isDefaultSources() {
+         return this.sourceSet == 'default'
+      }
    },
    methods: {
       collapseGroupsClicked() {
@@ -88,6 +106,9 @@ export default {
       toggleTargetPool(pool) {
          this.$store.dispatch("preferences/toggleTargetPool", pool)
          this.$analytics.trigger('Preferences', 'SET_PREFERRED_POOL', pool.name)
+      },
+      toggleAltSources() {
+         this.$store.dispatch("preferences/toggleAltSources")
       },
       async toggleExcludePool(pool) {
          if ( this.excludedPools.length == this.pools.length-1 && this.isPoolExcluded(pool) == false) {
@@ -122,6 +143,18 @@ export default {
 .pool-options {
    h2 {
       margin: 5px 0 10px 0;
+   }
+   .sets {
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      padding-bottom: 25px;
+      margin-bottom: 10px;
+      .check {
+         .choice {
+            margin: 5px 10px 5px 15px;
+            width: 15px;
+            height: 15px;
+         }
+      }
    }
    .pools {
       display: flex;
