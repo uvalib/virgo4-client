@@ -147,8 +147,16 @@ export default {
             this.alertsReady = true
          }
       })()
+      window.addEventListener("click", this.globalClick)
+   },
+   destroyed() {
+      window.removeEventListener("click", this.globalClick)
    },
    methods: {
+      globalClick() {
+         this.userMenuOpen = false
+         this.svcMenuOpen = false
+      },
       alertClicked() {
          if ( this.alertCount > 0) {
             document.querySelector('#alerts').unseeAll()
