@@ -1,8 +1,8 @@
 <template>
-   <div tabindex="0" role="checkbox" class="v4-checkbox" 
-      :class="{inline: !hasLabelSlot(), disabled: disabled}" 
+   <div tabindex="0" role="checkbox" class="v4-checkbox"
+      :class="{inline: !hasLabelSlot(), disabled: disabled}"
       :aria-checked="isChecked"
-      :aria-disabled="disabled" 
+      :aria-disabled="disabled"
       @click.stop="clicked" @keyup.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <i class="box" :class="checkClass"></i>
       <label v-if="hasLabelSlot()">
@@ -14,7 +14,7 @@
 <script>
 export default {
    props: {
-      // If the component is passed a v-model, value non-null 
+      // If the component is passed a v-model, value non-null
       // otherwise use the checked property
       value: {
          type: Boolean,
@@ -25,7 +25,7 @@ export default {
          default: false
       },
       disabled: {
-         type: Boolean, 
+         type: Boolean,
          default: false
       }
    },
@@ -56,7 +56,7 @@ export default {
          if ( this.value != null ) {
             let state = !this.value
             this.$emit('input', state)
-         } 
+         }
          this.$emit('click')
       },
    },
@@ -69,7 +69,7 @@ div.v4-checkbox.inline {
    i.box {
       margin-right:0 !important;
    }
-} 
+}
 div.v4-checkbox {
    display: flex;
    flex-flow: row nowrap;
@@ -91,6 +91,9 @@ div.v4-checkbox {
    }
    &:focus {
       @include be-accessible();
+   }
+   &:hover {
+      text-decoration: underline;
    }
 }
 div.v4-checkbox.disabled {

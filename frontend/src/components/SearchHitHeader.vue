@@ -107,6 +107,9 @@ export default {
       font-weight: bold;
       display: inline-block;
       margin-right: 5px;
+      &:hover {
+         text-decoration: underline;
+      }
    }
    .hit-subtitle {
       display: inline-block;

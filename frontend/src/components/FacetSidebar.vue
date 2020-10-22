@@ -8,7 +8,7 @@
             <div v-if="hasFacets" class="body">
                <dl role="radiogroup" aria-labelledby="availability_label">
                   <dt id="availability_label">Availability</dt>
-                  <dd v-for="avail in availabilityOpts" :key="avail.id">
+                  <dd v-for="avail in availabilityOpts" :key="avail.id" class="radio-opt">
                      <V4Button mode="icon" @click="availSelected(avail)" role="radio" :aria-checked="isAvailSelected(avail)">
                         <i v-if="isAvailSelected(avail)" class="check fas fa-check-circle"></i>
                         <i v-else class="check far fa-circle"></i>
@@ -252,6 +252,15 @@ dd {
    padding: 3px 2px;
    margin-left: 15px;
    font-weight: normal;
+}
+dd.radio-opt {
+   cursor: pointer;
+   .v4-button {
+      cursor:pointer !important;
+   }
+   &:hover {
+      text-decoration: underline;
+   }
 }
 i.check {
    margin-right: 10px;
