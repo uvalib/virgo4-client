@@ -203,8 +203,8 @@ export default {
       doAdvancedSearch() {
          if ( this.excludedPools.length == this.pools.length) {
             this.$store.commit(
-               "system/setError",
-               `Please select at least one ${this.sourceLabel} before searching`
+               "system/setSearchError",
+               {message:`Please select at least one ${this.sourceLabel} before searching`}
             )
             return
          }
@@ -213,8 +213,8 @@ export default {
             let fields = this.advanced.filter( f=>f.value != "")
             if ( fields.length == 1 && fields[0].op == "NOT") {
                this.$store.commit(
-                  "system/setError",
-                  "The NOT operator requires more than one search critera"
+                  "system/setSearchError",
+                  {message:"The NOT operator requires more than one search critera"}
                )
                return
             }
@@ -247,8 +247,8 @@ export default {
             this.$analytics.trigger('Search', 'ADVANCED_SEARCH', s)
          } else {
             this.$store.commit(
-               "system/setError",
-               "Please enter a search query"
+               "system/setSearchError",
+               {message:"Please enter a search query"}
             )
          }
       },

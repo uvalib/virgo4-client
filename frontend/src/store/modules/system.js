@@ -9,10 +9,13 @@ const system = {
       kiosk: false,
       devServer: false,
       fatal: "",
-      error: "",
-      errorDetail: "",
       ilsError: "",
-      message: "",
+      message: {
+         type: "none",
+         title: "",
+         content: "",
+         detail: ""
+      },
       version: "unknown",
       availabilityURL: "",
       hsIlliadURL: "",
@@ -40,6 +43,9 @@ const system = {
       },
       hasTranslateMessage: state => {
          return state.translateMessage.length > 0 && state.seenTranslateMsg == false
+      },
+      hasMessage: state => {
+         return state.message.type != "none"
       }
    },
 
@@ -94,8 +100,23 @@ const system = {
       setFatal(state, err) {
          state.fatal = err
       },
+      clearMessage( state ) {
+         state.message.type = "none"
+         state.message.title = "",
+         state.message.content = "",
+         state.message.detail = ""
+      },
       setMessage(state, msg) {
-         state.message = msg
+         state.message.type = "info"
+         state.message.title = "Virgo Message",
+         state.message.content = msg,
+         state.message.detail = ""
+      },
+      setSearchError(state, errorInfo) {
+         state.message.type = "error"
+         state.message.title = "Virgo Search Error",
+         state.message.content = errorInfo.message,
+         state.message.detail = errorInfo.detail
       },
       setILSError(state, error) {
          state.ilsError = error
@@ -104,12 +125,17 @@ const system = {
          if (error == null) {
             error = ""
          }
-         state.errorDetail = ""
+
+         // reset everything
+         state.message.type = "none"
+         state.message.title = ""
+         state.message.content = ""
+         state.message.detail = ""
+
          if (error.response) {
             // Server responded with a status code out of the range of 2xx
             // If this is a 401, a session has expired when making a request.
             if (error.response.status == 401) {
-               state.error = ""
                if (state.sessionExpired == false) {
                   state.sessionExpired = true
                   // NOTE: cant dispatch a signout here, so there is a plugin (expired.js) installed.
@@ -118,19 +144,30 @@ const system = {
                   router.push("/")
                }
             } else {
-               state.error = error.response.data
+               state.message.type = "error"
+               state.message.title = "Virgo Error"
+               state.message.content = error.response.data
             }
          } else if (error.request) {
             // The request was made but no response was received
-            state.error = "Search is non-responsive"
+            state.message.type = "error"
+            state.message.title = "Virgo Error"
+            state.message.content =  "Search is non-responsive"
          } else if (error.message) {
-            state.error = error.message
+            state.message.type = "error"
+            state.message.title = "Virgo Error"
+            state.message.content = error.message
             if ( error.details ) {
-               state.errorDetail = error.details
+               state.message.detail = error.details
+            }
+            if ( error.title ) {
+               state.message.title = error.title
             }
          } else {
             // likely just a string error; just set it
-            state.error = error
+            state.message.type = "error"
+            state.message.title = "Virgo Error"
+            state.message.content = error
          }
       },
 

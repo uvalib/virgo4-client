@@ -6,7 +6,7 @@
          <slot name="summary"></slot>
       </V4Button>
       <transition name="fade">
-         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text"
+         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text" :class="{inline: mode!='overlay'}"
             :style="{background: backgroundColor, 'border-color': borderColor}"
             @keyup.stop.esc="hide">
             <slot name="content"></slot>
@@ -33,6 +33,10 @@ export default {
       borderColor: {
          type: String,
          default: "var(--uvalib-blue-alt)"
+      },
+      mode: {
+         type: String,
+         default: "overlay"
       }
    },
    data: function() {
@@ -75,11 +79,23 @@ export default {
       position: absolute;
       box-shadow: $v4-box-shadow;
       font-size:0.95em;
-      color: var(--uvalib-text-dark);
+      color: var(--uvalib-text);
       font-weight: normal;
       z-index: 9999;
       min-width: 20%;
       max-width: 50%;
+   }
+   .full-text.inline {
+      position: relative;
+      box-shadow: none;
+      margin: 6px 0 0 15px;
+      width:100%;
+      min-width: auto;
+      max-width: inherit;
+      // background-color: var(--uvalib-grey-lightest) !important;
+      padding: 10px 20px;
+      border: 1px solid var(--uvalib-grey-light) !important;
+      box-sizing: border-box;
    }
    .arrow {
       padding-left: 2px;
@@ -87,23 +103,6 @@ export default {
       width: 8px;
       transform: rotate(0deg);
       transition-duration: 100ms;
-   }
-   button {
-      display: inline-block;
-      word-break: break-word;
-      -webkit-hyphens: auto;
-      -moz-hyphens: auto;
-      hyphens: auto;
-      cursor: default;
-      background: transparent;
-      border: none;
-      margin: 0;
-      padding: 0;
-      text-align: left;
-      box-sizing: border-box;
-      &:focus {
-         @include be-accessible();
-      }
    }
 }
 

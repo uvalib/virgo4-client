@@ -1,7 +1,8 @@
 <template>
    <V4Disclosure id="error-detail" :closeOnBlur="false" ref="disclosure"
-      backgroundColor="var(--uvalib-red-lightest)"
+      backgroundColor="white"
       borderColor="var(--uvalib-red)"
+      mode="inline"
    >
       <template v-slot:summary>
          <span>Details</span>

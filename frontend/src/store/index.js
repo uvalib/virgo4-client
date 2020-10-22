@@ -482,9 +482,9 @@ export default new Vuex.Store({
                   msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>"
                   let err = {
                      message: msg,
-                     details: error.response.data.details
+                     detail: error.response.data.details
                   }
-                  commit('system/setError', err)
+                  commit('system/setSearchError', err)
                }
             }
 

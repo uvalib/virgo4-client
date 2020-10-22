@@ -3,23 +3,19 @@
       enter-active-class="animated faster fadeIn"
       leave-active-class="animated faster fadeOut">
       <div v-if="hasMessage" class="messsage-box">
-         <div class="message" :role="msgRole" aria-modal="true" aria-labelledby="msgtitle" aria-describedby="msgbody"
-            :class="{error: type=='error', info: type=='info'}" @keyup.esc="dismiss">
+         <div class="message" :role="msgRole" aria-modal="true"
+            aria-labelledby="msgtitle" aria-describedby="msgbody"
+            @keyup.esc="dismiss"
+         >
             <div class="bar">
-               <span v-if="type=='error'" tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">Virgo Error</span>
-               <span v-else tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">Virgo Message</span>
+               <span tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">{{message.title}}</span>
             </div>
-            <div class="message-body" id="msgbody" v-html="messageContent"></div>
-            <div class="details" v-if="details">
-               <ErrorDetails :details="details"/>
+            <div class="message-body" id="msgbody" v-html="message.content"></div>
+            <div class="details" v-if="message.detail">
+               <ErrorDetails :details="message.detail"/>
             </div>
             <div class="controls">
-               <V4Button v-if="type=='error'" id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
-                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack"
-                  :focusNextOverride="true" @tabnext="btnTabNext">
-                  OK
-               </V4Button>
-               <V4Button v-else id="okbtn" mode="primary" @esc="dismiss" :tabOverride="true"
+               <V4Button id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
                   @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack"
                   :focusNextOverride="true" @tabnext="btnTabNext">
                   OK
@@ -31,40 +27,25 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import ErrorDetails from "@/components/disclosures/ErrorDetails"
 export default {
-   props: {
-      type: {
-         type: String,
-         default: "error"
-      }
-   },
    components: {
       ErrorDetails
    },
    computed: {
       ...mapState({
-         error: state => state.system.error,
          message: state => state.system.message,
-         details: state => state.system.errorDetail,
+      }),
+      ...mapGetters({
+         hasMessage: "system/hasMessage",
       }),
       msgRole() {
-         if ( this.type == "error") {
+         if ( this.message.type == "error") {
             return "alertdialog"
          }
          return "dialog"
       },
-      hasMessage() {
-         return (this.error != "" && this.type == "error" ||
-                 this.message != "" && this.type == "info")
-      },
-      messageContent() {
-         if (this.type == "error") {
-            return this.error
-         }
-         return this.message
-      }
    },
    methods: {
       btnTabNext() {
@@ -88,8 +69,7 @@ export default {
          }, timeout)
       },
       dismiss() {
-         this.$store.commit("system/setError", "")
-         this.$store.commit("system/setMessage", "")
+         this.$store.commit("system/clearMessage")
       },
    },
    created() {
@@ -121,27 +101,24 @@ div.messsage-box {
       box-shadow: $v4-box-shadow;
       min-width: 20%;
       max-width: 80%;
-      border-radius: 4px;
-
+      border-radius: 5px;
       .bar {
          padding: 5px;
-         color: white;
+         color: var(--uvalib-text-dark);
+         font-weight: 500;
          display: flex;
          flex-flow: row nowrap;
          align-items: center;
          justify-content: space-between;
+         background-color: var(--uvalib-blue-alt-light);
+         border-bottom: 2px solid var(--uvalib-blue-alt);
+         border-radius: 5px 5px 0 0;
+         font-size: 1.1em;
+         padding: 10px;
+      }
 
-         .title {
-            font-size: 1.25em;
-            font-weight: normal;
-         }
-
-         i.close {
-            float:right;
-            font-size: 1.4em;
-            cursor: pointer;
-            margin-left: 10px;
-         }
+      .title:focus {
+          @include be-accessible();
       }
 
       .message-body {
@@ -162,25 +139,6 @@ div.messsage-box {
          padding: 15px 10px 10px 0;
          font-size: 0.9em;
          text-align: right;
-      }
-   }
-
-   .message.error {
-      border: 3px solid var(--uvalib-red-emergency);
-      .bar {
-         padding: 5px;
-         background-color: var(--uvalib-red-emergency);
-      }
-
-      .message-body {
-         color: var(--uvalib-red-emergency);
-      }
-   }
-   .message.info {
-      border: 3px solid var(--uvalib-blue-alt);
-      .bar {
-         padding: 5px;
-         background-color: var(--uvalib-blue-alt);
       }
    }
 }

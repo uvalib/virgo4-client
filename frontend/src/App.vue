@@ -4,8 +4,7 @@
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer">
-             <MessageBox v-if="error" type="error" />
-             <MessageBox v-if="message" type="info" />
+             <MessageBox />
          </div>
       </transition>
       <VirgoHeader :id="headerID" />
@@ -54,8 +53,6 @@ export default {
    computed: {
       ...mapState({
          fatal: state => state.system.fatal,
-         error: state => state.system.error,
-         message: state => state.system.message,
          newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
          sessionExpired: state => state.system.sessionExpired,
@@ -63,9 +60,10 @@ export default {
       ...mapGetters({
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
+         hasMessage: "system/hasMessage",
       }),
       showDimmer() {
-         return this.error != "" || this.message != "" || this.sessionExpired
+         return this.hasMessage|| this.sessionExpired
       }
    },
    methods: {
