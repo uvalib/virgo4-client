@@ -406,7 +406,7 @@ export default new Vuex.Store({
       // advanced search parameters and will always start at page 1.
       // CTX: commit: ƒ boundCommit(type, payload, options)
       async searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
-         commit('system/clearMessage")
+         commit('system/clearMessage')
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
