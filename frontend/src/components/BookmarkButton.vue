@@ -81,6 +81,9 @@ export default {
       &:focus {
          @include be-accessible();
       }
+      &:hover {
+         color:var(--uvalib-brand-blue-light);
+      }
    }
 
    i.bookmark.disabled {

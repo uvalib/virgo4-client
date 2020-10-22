@@ -79,6 +79,11 @@ div.v4-sort {
    }
    select {
       margin-left: 10px;
+      cursor: pointer;
+      &:hover {
+         border-color: var(--uvalib-brand-blue-light);
+         color: var(--uvalib-brand-blue-light);
+      }
    }
    .sort-type {
       margin-left: 5px;
