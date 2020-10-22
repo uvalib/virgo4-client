@@ -293,12 +293,12 @@ export default {
       cancelCreate() {
          if (this.submitting) return;
          this.createOpen = false;
-         this.$store.commit("system/setError", "")
+         this.$store.commit("system/clearMessage")
       },
       async createFolder() {
          if (this.submitting) return
          this.submitting = true
-         this.$store.commit("system/setError", "")
+         this.$store.commit("system/clearMessage")
          if (this.newFolder == "") {
             this.$store.commit(
                "system/setError",

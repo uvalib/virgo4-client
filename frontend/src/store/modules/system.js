@@ -45,7 +45,7 @@ const system = {
          return state.translateMessage.length > 0 && state.seenTranslateMsg == false
       },
       hasMessage: state => {
-         return state.message.type != "none"
+         return state.message.type != "none" && state.message.content != ""
       }
    },
 
@@ -113,6 +113,7 @@ const system = {
          state.message.detail = ""
       },
       setSearchError(state, errorInfo) {
+         console.log("SET SEARCH ERROR")
          state.message.type = "error"
          state.message.title = "Virgo Search Error",
          state.message.content = errorInfo.message,
