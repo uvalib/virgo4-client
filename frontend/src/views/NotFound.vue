@@ -5,16 +5,35 @@
          <p>You may want to try&hellip;
          <ul>
             <li>Broadening your search by tweaking keywords or other filters*.</li>
-            <li>Searching <a href="https://guides.lib.virginia.edu/az.php">databases</a> or <a href="https://guides.lib.virginia.edu/?b=s">guides</a>, which cover a broad range of topics.</li>
-            <li>Contacting <a href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a> for web chat, or a <a href="https://guides.lib.virginia.edu/subjectlibrarians">Subject Liaison</a> for research assistance.</li>
+            <li>
+               Searching <a href="https://guides.lib.virginia.edu/az.php">databases</a> or
+               <a href="https://guides.lib.virginia.edu/?b=s">guides</a>, which cover a broad range of topics.
+            </li>
+            <li>
+               Contacting <a href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a> for web chat, or a
+               <a href="https://guides.lib.virginia.edu/subjectlibrarians">Subject Liaison</a> for research assistance.
+            </li>
          </ul>
-         <p class="sub-note">*Very small segments of the collection have not yet been migrated into the updated Virgo interface, as the migration is still in progress. It is possible that <a href="http://v3.lib.virginia.edu/">searching the old interface</a> will yield the item(s) you’re looking for.</p>
+         <p class="sub-note">
+            *Very small segments of the collection have not yet been migrated into the updated Virgo interface,
+            as the migration is still in progress. It is possible that
+            <a @click="v3LinkClicked" href="http://v3.lib.virginia.edu/">searching the old interface</a>
+            will yield the item(s) you’re looking for.
+         </p>
       </div>
    </div>
 </template>
 
 <script>
 export default {
+   methods: {
+      v3LinkClicked() {
+         this.$analytics.trigger('Navigation', 'VIRGO3_REDIRECT', "NOT_FOUND_PAGE")
+      }
+   },
+   mounted() {
+      this.$analytics.trigger('Navigation', 'NOT_FOUND')
+   }
 }
 </script>
 

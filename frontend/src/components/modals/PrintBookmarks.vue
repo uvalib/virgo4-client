@@ -75,6 +75,7 @@ export default {
          }
       },
       async printClicked() {
+         this.$analytics.trigger('Bookmarks', 'PRINT_CLICKED')
          let data = { title: this.title, notes: this.notes, folderID: this.srcFolder, bookmarkIDs: this.bookmarks}
          await this.$store.dispatch("bookmarks/printBookmarks", data )
          this.$refs.printmodal.hide()

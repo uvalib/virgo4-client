@@ -199,6 +199,7 @@ export default {
       setTimeout(()=> {
          document.getElementById("info-submenu").focus()
       },250)
+      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "My Information")
    }
 }
 </script>

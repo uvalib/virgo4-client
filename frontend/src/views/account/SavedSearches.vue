@@ -21,7 +21,7 @@
                      </V4Checkbox>
                      <span>
                         <router-link :aria-label="`perform search named ${saved.name}`"
-                           @mousedown.native="savedSearchClicked"
+                           @mousedown.native="savedSearchClicked('saved')"
                            :to="searchURL(saved.token)"
                         >
                            {{saved.name}}
@@ -29,7 +29,7 @@
                      </span>
                      <span class="search-actions">
                         <span class="icon">
-                           <router-link @mousedown.native="savedSearchClicked"
+                           <router-link @mousedown.native="savedSearchClicked('saved')"
                               :to="searchURL(saved.token)"
                               :aria-label="`perform search named ${saved.name}`"
                            >
@@ -66,7 +66,7 @@
                <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
                   <template v-if="urlToText(h).length > 0">
                      <span class="num">{{idx+1}}.</span>
-                     <router-link @mousedown.native="savedSearchClicked" class="history" :to="h">{{urlToText(h)}}</router-link>
+                     <router-link @mousedown.native="savedSearchClicked('history')" class="history" :to="h">{{urlToText(h)}}</router-link>
                   </template>
                </div>
                 <div class="controls">
@@ -98,7 +98,12 @@ export default {
       })
    },
    methods: {
-      async savedSearchClicked() {
+      async savedSearchClicked(searchType) {
+         if (searchType == "history") {
+            this.$analytics.trigger('Navigation', 'SEARCH_HISTORY_CLICKED')
+         } else {
+            this.$analytics.trigger('Navigation', 'SAVED_SEARCH_CLICKED')
+         }
          await this.$store.dispatch('resetSearch')
       },
       urlToText(url) {
@@ -171,6 +176,7 @@ export default {
             }
          }
       },250)
+      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Saved Searches")
    }
 };
 </script>

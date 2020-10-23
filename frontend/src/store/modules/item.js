@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as utils from './utils'
 import router from '../../router'
+import analytics from '../../analytics'
 
 const item = {
    namespaced: true,
@@ -301,6 +302,7 @@ const item = {
          return axios.post(url, req).then((response) => {
             if (response.data.total_hits == 0 ) {
                if ( v3Redirect ) {
+                  analytics.trigger('Navigation', 'VIRGO3_REDIRECT', `/items/${catalogKey}`)
                   window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
                } else {
                   ctx.commit('clearSearching')

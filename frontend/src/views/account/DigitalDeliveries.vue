@@ -86,7 +86,7 @@ export default {
                if (links.length > 0) {
                   links[0].focus()
                }
-            },250)   
+            },250)
          }
       }
    },
@@ -107,6 +107,7 @@ export default {
       setTimeout(()=> {
          document.getElementById("digital-submenu").focus()
       },250)
+      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Digital Deliveries")
    }
 }
 </script>

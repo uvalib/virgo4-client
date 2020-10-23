@@ -23,6 +23,8 @@ import NotFound from './views/NotFound.vue'
 import PublicBookmarks from './views/PublicBookmarks.vue'
 import store from './store'
 
+import analytics from './analytics'
+
 Vue.use(Router)
 
 const router = new Router({
@@ -87,6 +89,7 @@ const router = new Router({
          path: '/catalog*',
          beforeEnter: (to, _from, _next) => {
             console.error("Unrecognized URL: "+to.fullPath+". Redirect to Virgo3")
+            analytics.trigger('Navigation', 'VIRGO3_REDIRECT', to.fullPath)
             window.location.href="https://v3.lib.virginia.edu"+to.fullPath
          }
       },

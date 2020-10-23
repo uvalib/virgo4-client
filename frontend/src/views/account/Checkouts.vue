@@ -192,6 +192,7 @@ export default {
       }
    },
    async created() {
+      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
       if ( this.isSignedIn ) {
          this.lookingUpILL = true
          this.lookingUpUVA = true

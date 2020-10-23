@@ -268,7 +268,8 @@ export default {
       this.$store.commit('user/setLookingUp', false)
       setTimeout(() => {
          document.getElementById("requests-submenu").focus()
-      }, 250);
+      }, 250)
+      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
    }
 };
 </script>

@@ -45,6 +45,7 @@ export default {
       setTimeout(()=> {
          document.getElementById("preferences-submenu").focus()
       }, 500)
+      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
    }
 }
 </script>

@@ -22,23 +22,28 @@
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
                <div v-if="svcMenuOpen" class="user-menu" @keydown.space.prevent.stop>
-                  <a href="https://www.library.virginia.edu/research/" target="_blank" role="menuitem"
+                  <a @click="libServiceClicked('Subject Guides')"
+                     href="https://www.library.virginia.edu/research/" target="_blank" role="menuitem"
                      tabindex="-1" id="guides">
                      <div class="submenu">Subject&nbsp;Guides</div>
                   </a>
-                  <a href="https://guides.lib.virginia.edu/journalfinder" target="_blank" role="menuitem"
+                  <a @click="libServiceClicked('Journal Finder')"
+                     href="https://guides.lib.virginia.edu/journalfinder" target="_blank" role="menuitem"
                      tabindex="-1" id="journalsub">
                      <div class="submenu">Journal&nbsp;Finder</div>
                   </a>
-                  <a href="https://guides.lib.virginia.edu/az.php" target="_blank" role="menuitem"
+                  <a @click="libServiceClicked('Databases A-Z')"
+                     href="https://guides.lib.virginia.edu/az.php" target="_blank" role="menuitem"
                      tabindex="-1" id="databasesub">
                      <div class="submenu">Databases A-Z</div>
                   </a>
-                  <a href="https://cal.lib.virginia.edu/" target="_blank" role="menuitem"
+                  <a @click="libServiceClicked('Spaces & Equipment')"
+                     href="https://cal.lib.virginia.edu/" target="_blank" role="menuitem"
                      tabindex="-1" id="spacesub">
                      <div class="submenu">Spaces & Equipment</div>
                   </a>
-                  <a href="https://www.library.virginia.edu/services" target="_blank" role="menuitem"
+                  <a @click="libServiceClicked('More Library Services')"
+                     href="https://www.library.virginia.edu/services" target="_blank" role="menuitem"
                      tabindex="-1" id="moresub">
                      <div class="submenu">More Library Services</div>
                   </a>
@@ -153,6 +158,9 @@ export default {
       window.removeEventListener("click", this.globalClick)
    },
    methods: {
+      libServiceClicked(serviceName) {
+         this.$analytics.trigger('Navigation', 'LIBRARY_SERVICE_CLICKED', serviceName)
+      },
       globalClick() {
          this.userMenuOpen = false
          this.svcMenuOpen = false

@@ -329,6 +329,7 @@ export default {
             document.getElementById("bookmarks-submenu").focus()
          }
       }, 250)
+      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
    }
 };
 </script>

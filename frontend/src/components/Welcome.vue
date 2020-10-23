@@ -8,7 +8,10 @@
             <h3>Services during COVID-19</h3>
             <p>Please note that services are altered because of the University response to COVID-19. For example, course reserves are only available in electronic formats to allow for distance learning, and LEO Delivery is not currently available. <a href="https://www.library.virginia.edu/news/covid-19/">Read more about current Library resources.</a></p>
             <h3>Access to the older version of Virgo</h3>
-            <p><a href="https://v3.lib.virginia.edu/">Virgo 3</a> will remain available through fall 2020, but requests (LEO delivery, scan requests, recalls, etc.) are no longer available through the old interface.</p>
+            <p>
+               <a @click="v3LinkClicked" href="https://v3.lib.virginia.edu/">Virgo 3</a> will remain available through fall 2020,
+               but requests (LEO delivery, scan requests, recalls, etc.) are no longer available through the old interface.
+            </p>
          </div>
          <p><b>Need assistance?</b> <a href="https://www.library.virginia.edu/askalibrarian/">Ask a Librarian</a> web chat is happy to help with questions large and small.</p>
       </template>
@@ -22,6 +25,11 @@ export default {
       ...mapGetters({
          isKiosk: 'system/isKiosk',
       }),
+   },
+   methods: {
+      v3LinkClicked() {
+         this.$analytics.trigger('Navigation', 'VIRGO3_REDIRECT', "WELCOME_PAGE")
+      }
    }
 }
 </script>
