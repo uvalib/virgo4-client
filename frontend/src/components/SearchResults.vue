@@ -29,7 +29,7 @@
                   </template>
                   <V4Select v-if="results.length > maxTabs" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                      :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
-                     placeholder="Other"
+                     placeholder="More"
                      @changed="poolSelected"
                      v-model="otherSrcSelection"/>
                </div>
