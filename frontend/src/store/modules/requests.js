@@ -1,5 +1,7 @@
 import { getField, updateField } from 'vuex-map-fields'
 import axios from 'axios'
+import analytics from '../../analytics'
+
 const requests = {
    namespaced: true,
    state: {
@@ -184,6 +186,7 @@ const requests = {
    },
    actions: {
       async submitOpenURLRequest(ctx) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "openURL")
          ctx.commit('disableButton', true)
          await axios.post('/api/requests/openurl', ctx.state.openurl
          ).catch(e =>
@@ -193,6 +196,7 @@ const requests = {
          )
       },
       async submitILLiadBorrowRequest(ctx, req) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "illiadBorrow")
          ctx.commit('disableButton', true)
          await axios.post('/api/requests/standalone/borrow', req
          ).catch(e =>
@@ -202,6 +206,7 @@ const requests = {
          )
       },
       async submitILLiadScanRequest(ctx, req) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "illiadScan")
          ctx.commit('disableButton', true)
          await axios.post('/api/requests/standalone/scan', req
          ).catch(e =>
@@ -211,6 +216,7 @@ const requests = {
          )
       },
       submitScan(ctx) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "scan")
          ctx.commit('disableButton', true)
          axios.post('/api/requests/scan', ctx.state.scan).then(_response => {
             ctx.commit('activePanel', "ConfirmationPanel")
@@ -221,6 +227,7 @@ const requests = {
          )
       },
       createHold(ctx) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "createHold")
          ctx.commit('disableButton', true)
          let hold = ctx.getters.getField('hold')
          hold.pickupLibrary = ctx.rootGetters.getField('preferences.pickupLibrary').id
@@ -256,6 +263,7 @@ const requests = {
             )
       },
       sendDirectLink(ctx) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
          ctx.commit('disableButton', false)
          let optionSettings = ctx.getters.getField("activeOption")
          axios.post(optionSettings.create_url)
@@ -272,6 +280,7 @@ const requests = {
             })
       },
       submitAeon(ctx) {
+         analytics.trigger('Requests', 'REQUEST_SUBMITTED', "aeon")
          ctx.commit('disableButton', true)
          let optionSettings = ctx.getters.getField("activeOption")
          let selected = ctx.getters.getField("aeon")

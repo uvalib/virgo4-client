@@ -64,6 +64,7 @@ export default {
     if (this.items.length == 1){
       this.selectedItem = this.items[0]
     }
+    this.$analytics.trigger('Requests', 'REQUEST_STARTED', "aeon")
   },
   methods: {
     submitAeon() {

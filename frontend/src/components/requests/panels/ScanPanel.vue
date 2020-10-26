@@ -115,6 +115,7 @@ export default {
       }
    },
    created() {
+      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
       if (this.items.length == 1) {
          this.selectedItem = this.items[0]
       }

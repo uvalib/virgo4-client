@@ -103,13 +103,20 @@ const router = new Router({
          // visual representation. It just handes the auth session
          // setup and redirects to account page
          path: '/signedin',
-         beforeEnter: (_to, _from, next) => {
+         beforeEnter: async (_to, _from, next) => {
             // Grab the cookie and stuff in local storage. Cookie is short lived
             let jwtStr = Vue.$cookies.get("v4_jwt")
             store.commit("user/setUserJWT", jwtStr)
-            store.dispatch("user/getAccountInfo")  // needed for search preferences
+            await store.dispatch("user/getAccountInfo")  // needed for search preferences
             store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
             store.commit('restore/load')
+            if ( store.getters["user/isUndergraduate"]) {
+               analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
+            } else if ( store.getters["user/isGraduate"]) {
+               analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
+            } else {
+               analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
+            }
             next( store.state.restore.url )
          }
       },

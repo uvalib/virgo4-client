@@ -205,6 +205,7 @@ export default {
    },
    created() {
       this.initForm(this.$route.query)
+      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "openURL")
    }
 }
 </script>

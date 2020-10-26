@@ -121,6 +121,7 @@ export default {
    },
    created() {
       this.request.pickup = this.preferredPickupLibrary.id
+      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
    }
 }
 </script>

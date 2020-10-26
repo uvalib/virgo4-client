@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
+import analytics from '../../analytics'
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -47,6 +48,19 @@ const user = {
       },
       isAdmin: (state) => {
         return (state.role == 'admin')
+      },
+      isGraduate: (state) => {
+         if (state.accountInfo.description.toLowerCase().includes("graduate student")) return true
+         if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
+             state.accountInfo.profile.toLowerCase().includes("undergrad")) return false
+         if (state.accountInfo.profile.toLowerCase().includes("grad")) return true
+         return false
+      },
+      isUndergraduate: (state) => {
+         if (state.accountInfo.description.toLowerCase().includes("undergraduate")) return true
+         if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
+             state.accountInfo.profile.toLowerCase().includes("undergrad")) return true
+         return false
       },
       canPurchase: (state) => {
          if ( state.claims.canPurchase ) return state.claims.canPurchase
@@ -468,13 +482,20 @@ const user = {
 
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
-         axios.post("/authenticate/public", data).then((_response) => {
+         axios.post("/authenticate/public", data).then( async (_response) => {
             let jwtStr = Vue.$cookies.get("v4_jwt")
             ctx.commit("setUserJWT", jwtStr )
             ctx.commit('setAuthorizing', false)
             ctx.commit('restore/load', null, { root: true })
-            ctx.dispatch("getAccountInfo")   // needed for search preferences
+            await ctx.dispatch("getAccountInfo")   // needed for search preferences
             ctx.dispatch("getCheckouts")     // needed so the alert icon can show in menubar
+            if ( ctx.getters.isUndergraduate) {
+               analytics.trigger('User', 'PIN_SIGNIN', "undergraduate")
+            } else if ( ctx.getters.isGraduate) {
+               analytics.trigger('User', 'PIN_SIGNIN', "graduate")
+            } else {
+               analytics.trigger('User', 'PIN_SIGNIN', "other")
+            }
             router.push( ctx.rootState.restore.url )
          }).catch((error) => {
             if (error.response && error.response.status == 503) {

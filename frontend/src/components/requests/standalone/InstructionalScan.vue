@@ -227,6 +227,9 @@ export default {
       hasError( val) {
          return this.errors.includes(val)
       },
+   },
+   created() {
+      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
    }
 }
 </script>
