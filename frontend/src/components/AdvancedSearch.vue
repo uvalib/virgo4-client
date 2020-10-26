@@ -219,6 +219,15 @@ export default {
                return
             }
 
+            let bad = this.advanced.filter( f=>f.comparison == "BETWEEN" && (f.value == "" || f.endVal == ""))
+            if (bad.length > 0) {
+               this.$store.commit(
+                  "system/setSearchError",
+                  {message:"The BETWEEN operator requires both a start and end date."}
+               )
+               return
+            }
+
             // Refine search updates:
             // if pool, filter or sort were specified previously, preserve them in the URL.
             // a new search will always reset paging, so don't preserve that
