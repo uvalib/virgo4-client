@@ -8,8 +8,10 @@
          <dl class="filter-display">
             <template v-for="(values,filter, idx) in displayFilter">
                <template v-if="filter != 'undefined'">
-                  <dt :key="filter" class="label">{{filter}}:</dt>
-                  <dd :key="idx" class="filter">{{formatValues(values)}}</dd>
+                  <template v-if="values.length > 1 || values.length == 1 && values[0]!='No'">
+                     <dt :key="filter" class="label">{{filter}}:</dt>
+                     <dd :key="idx" class="filter">{{formatValues(values)}}</dd>
+                  </template>
                </template>
             </template>
          </dl>

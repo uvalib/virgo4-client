@@ -42,33 +42,40 @@
                </div>
                <dl v-else>
                   <template v-for="facetInfo in facets">
-                     <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
-                     <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
-                        <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                           <V4Checkbox :checked="fv.selected"
-                              @click="filterClicked(facetInfo.id, fv.value)">
-                              {{fv.value}}
-                           </V4Checkbox>
-                           <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
-                        </dd>
-                        <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
-                           <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
-                              <template v-slot:title>
-                                 <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
-                              </template>
-                              <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                                 <V4Checkbox :checked="fv.selected"
-                                    @click="filterClicked(facetInfo.id, fv.value)">
-                                    {{fv.value}}
-                                 </V4Checkbox>
-                                 <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
-                              </div>
-                              <template v-slot:footer>
-                                 <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
-                              </template>
-                           </AccordionContent>
-                        </dd>
-                     </div>
+                     <V4Checkbox v-if="facetInfo.id == 'PeerReviewedOnly'" class="peer-cb" ref="peercb"
+                        :checked="peerReviewOnly(facetInfo.buckets)" @click="peerReviewClicked" :key="`f${facetInfo.id}`"
+                     >
+                        Peer Reviewed Only
+                     </V4Checkbox>
+                     <template v-else>
+                        <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
+                        <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
+                           <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+                              <V4Checkbox :checked="fv.selected"
+                                 @click="filterClicked(facetInfo.id, fv.value)">
+                                 {{fv.value}}
+                              </V4Checkbox>
+                              <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
+                           </dd>
+                           <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
+                              <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
+                                 <template v-slot:title>
+                                    <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
+                                 </template>
+                                 <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
+                                    <V4Checkbox :checked="fv.selected"
+                                       @click="filterClicked(facetInfo.id, fv.value)">
+                                       {{fv.value}}
+                                    </V4Checkbox>
+                                    <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
+                                 </div>
+                                 <template v-slot:footer>
+                                    <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
+                                 </template>
+                              </AccordionContent>
+                           </dd>
+                        </div>
+                     </template>
                   </template>
                </dl>
             </div>
@@ -141,6 +148,18 @@ export default {
       },
    },
    methods: {
+      peerReviewOnly( values ) {
+         let sel = values.find( v => v.selected == true)
+         if (sel) return sel.value == "Yes"
+         return false
+      },
+      async peerReviewClicked() {
+         let data = {pool: this.selectedResults.pool.id, facetID: "PeerReviewedOnly"}
+         this.$store.commit("filters/toggleFilter", data)
+         this.$store.commit("clearSelectedPoolResults")
+         await this.$store.dispatch("searchSelectedPool")
+         this.addFilterToURL()
+      },
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
@@ -200,6 +219,10 @@ export default {
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;
+}
+.peer-cb {
+   padding: 3px 2px;
+   margin-left: 15px;
 }
 .facet-sidebar .global, .facet-sidebar .pool {
   box-shadow: $v4-box-shadow-light;

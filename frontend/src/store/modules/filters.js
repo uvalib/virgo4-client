@@ -163,10 +163,14 @@ const filters = {
          if ( facetInfo.type == "radio") {
             // only one value can be selected in radio buckets
             facetInfo.buckets.forEach( b=>{
-               if (b.value == data.value) {
-                  b.selected = true
+               if ( data.value) {
+                  if (b.value == data.value) {
+                     b.selected = true
+                  } else {
+                     b.selected = false
+                  }
                } else {
-                  b.selected = false
+                  b.selected = !b.selected
                }
             })
          } else {
