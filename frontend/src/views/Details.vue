@@ -130,7 +130,7 @@
       <div class="availability-info">
          <Availability v-if="hasAvailability && notFound == false" :titleId="details.identifier" />
       </div>
-      <ShelfBrowse v-if="!details.searching && notFound == false" :hit="details" :pool="details.source" />
+      <ShelfBrowse v-if="!details.searching && notFound == false" :hit="details" :pool="details.source" :target="browseTarget"/>
    </div>
 </template>
 
@@ -153,11 +153,7 @@ export default {
    name: "detail",
    data: function() {
       return {
-         viewerOpts: {
-            title: false, url: 'data-src', inline: false,
-            backdrop:true, navbar:false, button:true,
-            toolbar:true, loop: false, fullScreen: true,
-         },
+         browseTarget: ""
       };
    },
    watch: {
@@ -297,11 +293,24 @@ export default {
             this.$analytics.trigger('Bookmarks', 'FOLLOW_V3_BOOKMARK', id)
          }
 
+         let bmTarget = this.$store.getters['restore/bookmarkTarget']
+         if (bmTarget.origin == "SHELF_BROWSE"  ) {
+            this.browseTarget = bmTarget.id
+         }
+
          if (src) {
             this.$store.commit("hitSelected", id)
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {
             await this.$store.dispatch("item/lookupCatalogKeyDetail", {identifier: id, v3Redirect: true} )
+         }
+
+         if ( bmTarget.origin == "DETAIL" ) {
+            let bmEle = document.getElementById(`bm-modal-${bmTarget.id}-btn`)
+            if (bmEle) {
+               bmEle.focus()
+               bmEle.click()
+            }
          }
 
          if ( this.notFound == false ) {

@@ -337,8 +337,10 @@ export default {
          } else {
                let sel = `.hit[data-identifier="${identifier}"]`
                let tgtEle = document.body.querySelector(sel)
-               this.$utils.scrollToItem(tgtEle)
-               bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
+               if ( tgtEle) {
+                  this.$utils.scrollToItem(tgtEle)
+                  bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
+               }
          }
          let bmEle = document.getElementById(`bm-modal-${identifier}-btn`)
          if (bmEle) {

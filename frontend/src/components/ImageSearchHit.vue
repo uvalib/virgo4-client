@@ -5,8 +5,8 @@
             <TruncatedText mode="icon" :id="`title-${hit.identifier}`" :text="hit.header.title" :limit="19"
                style="font-weight:bold;" />
          </span>
-         <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit)" :id="`bm-modal-${hit.identifier}`"/>
-         <SignInRequired v-else :data="$utils.toBookmarkData(pool,hit)" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
+         <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`"/>
+         <SignInRequired v-else :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
       </div>
       <router-link @mousedown.native="detailClicked" class="img-link" :to="detailsURL">
           <img aria-label=" " class="trigger" :src="iiifURL(hit)">

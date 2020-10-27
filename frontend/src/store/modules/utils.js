@@ -200,10 +200,14 @@ export function scrollToItem( tgtEle ) {
    })
  }
 
- export function toBookmarkData( pool, hit ) {
-    let bmData = {identifier: hit.identifier, title: hit.header.title, pool: pool}
-    if (hit.header.author) {
-      bmData.author = hit.header.author.value.join(hit.header.author.separator)
+ // Convert a click on bookmark while not signed in into a data structure that can be used
+ // to restore the add bookmark after sign in has completed.
+ // Pool is the pool where hit is located, origin is the place where the bookmark started.
+ // Options: SEARCH, DETAIL, SHELF_BROWSE
+ export function toBookmarkData( pool, hit, origin ) {
+    let bmData = {identifier: hit.identifier, title: hit.header.title, pool: pool, origin: origin}
+    if (hit.groupParent) {
+       bmData.groupParent = hit.groupParent
     }
     return bmData
  }

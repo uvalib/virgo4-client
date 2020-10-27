@@ -24,8 +24,8 @@
                </div>
             </template>
             <div class="bm-control">
-               <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit)" :id="`bm-modal-${hit.identifier}`"/>
-               <SignInRequired v-else  :data="$utils.toBookmarkData(pool,hit)" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
+               <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,from)" :id="`bm-modal-${hit.identifier}`"/>
+               <SignInRequired v-else  :data="$utils.toBookmarkData(pool,hit,from)" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
             </div>
          </div>
       </div>

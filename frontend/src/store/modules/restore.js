@@ -4,12 +4,13 @@ const restore = {
       url: "/",
       activeRequest: "",
       bookmarkID: "",
+      bookmarkFrom: "",
       bookmarkGroupParent: "",
       restoreSaveSearch: false
    },
    getters: {
       bookmarkTarget: state => {
-         return { id: state.bookmarkID, parent: state.bookmarkGroupParent}
+         return { id: state.bookmarkID, parent: state.bookmarkGroupParent, origin: state.bookmarkFrom}
       },
    },
    mutations: {
@@ -27,10 +28,11 @@ const restore = {
       setRestoreSaveSearch(state) {
          state.restoreSaveSearch = true
       },
-      setBookmarkRecord(state, hit) {
-         state.bookmarkID = hit.identifier
-         if ( hit.groupParent ) {
-            state.bookmarkGroupParent = hit.groupParent
+      setBookmarkRecord(state, data) {
+         state.bookmarkID = data.identifier
+         state.bookmarkFrom = data.origin
+         if ( data.groupParent ) {
+            state.bookmarkGroupParent = data.groupParent
          }
       },
       clear(state) {
@@ -38,6 +40,7 @@ const restore = {
          state.activeRequest = ""
          state.bookmarkID = ""
          state.bookmarkGroupParent = ""
+         state.bookmarkFrom = ""
          state.restoreSaveSearch = false
       },
       save( state ) {
@@ -53,6 +56,7 @@ const restore = {
                state.activeRequest = data.activeRequest
                state.bookmarkID = data.bookmarkID
                state.bookmarkGroupParent = data.bookmarkGroupParent
+               state.bookmarkFrom = data.bookmarkFrom
                state.restoreSaveSearch = data.restoreSaveSearch
             } catch (e) {
                // NO-OP; just nothing to be restored

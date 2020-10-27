@@ -50,6 +50,10 @@ export default {
          type: Object,
          required: true
       },
+      target: {
+         type: String,
+         default: ""
+      },
       pool: {
          type: String,
          required: true
@@ -79,7 +83,7 @@ export default {
    },
    methods: {
       bookmarkData( item ) {
-         return {pool: this.pool, identifier: item.id, title: item.title }
+         return {pool: this.pool, identifier: item.id, title: item.title, origin: "SHELF_BROWSE" }
       },
       isCurrent(idx) {
          let item = this.shelfBrowse[idx]
@@ -106,9 +110,20 @@ export default {
          this.$analytics.trigger('ShelfBrowse', 'BROWSE_BOOKMARK_CLICKED', id)
       },
       async getBrowseData() {
-         await this.$store.dispatch("shelf/getBrowseData", this.hit.identifier )
+         let tgt = this.hit.identifier
+         if ( this.target && this.target != "")  {
+            tgt = this.target
+         }
+         await this.$store.dispatch("shelf/getBrowseData", tgt )
          if ( this.hasBrowseData) {
             this.$analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', this.hit.identifier)
+         }
+         if ( this.target && this.target != "")  {
+            let bmEle = document.getElementById(`bm-modal-${this.target}-btn`)
+            if (bmEle) {
+               bmEle.focus()
+               bmEle.click()
+            }
          }
       }
    },
