@@ -44,10 +44,9 @@
                      <dd class="value" :key="`v${idx}`">
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
                            :links="getBrowseLinks('subject', field.value)" />
-                        <span class="related" v-else-if="field.type=='related-url'">
+                        <span class="related" v-else-if="field.type=='related-url' && field.name != 'online_related'">
                            <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
-                              <label class="link-label" :for="`rl-${idx}`">{{v.label}}</label>
-                              <a :id="`rl-${idx}`" :href="v.url" target="_blank">{{v.url}}</a>
+                              <a :id="`rl-${idx}`" class="link-button" :href="v.url" target="_blank">{{v.label}}</a>
                            </div>
                         </span>
                         <span class="copyright" v-else-if="field.type=='copyright'">
@@ -398,6 +397,22 @@ export default {
    div.details-content  {
       width: 95%;
       margin: 0 auto;
+      a.link-button {
+         background-color: var(--uvalib-brand-blue-light);
+         border: 1px solid var(--uvalib-brand-blue-light);
+         color: white !important;
+         padding: .5em 1em;
+         border-radius: 5px;
+         display: inline-block;
+         margin: 0px 5px 5px 0 ;
+
+         &:hover {
+            background-color: var(--uvalib-brand-blue-lighter);
+            border: 1px solid var(--uvalib-brand-blue-lighter);
+            transition: all 0.3s ease;
+            text-decoration: none !important;
+         }
+      }
    }
 
    .ra-box.ra-fiy.pad-top {
@@ -433,17 +448,6 @@ export default {
    }
 
    .full-width-content {
-      .panzoom-wrap {
-         width: 60%;
-         display:inline-block;
-         margin: 0 auto;
-         overflow: hidden;
-         background: black;
-         img {
-            width: 100%;
-            height: 100%;
-         }
-      }
       margin-bottom: 25px;
       .img-view {
          display: inline-block;
