@@ -108,7 +108,7 @@ const router = new Router({
             let jwtStr = Vue.$cookies.get("v4_jwt")
             store.commit("user/setUserJWT", jwtStr)
             await store.dispatch("user/getAccountInfo")  // needed for search preferences
-            store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
+            store.dispatch("user/getCheckouts")          // needed so the alert icon can show in menubar
             store.commit('restore/load')
             if ( store.getters["user/isUndergraduate"]) {
                analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
@@ -117,7 +117,13 @@ const router = new Router({
             } else {
                analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
             }
-            next( store.state.restore.url )
+
+            let tgtURL = store.state.restore.url
+            if (!tgtURL || tgtURL == "") {
+               tgtURL = "/"
+            }
+            console.log("signed in, continue to "+tgtURL)
+            next( tgtURL )
          }
       },
       {
@@ -222,18 +228,17 @@ router.afterEach((to, _from) => {
 router.beforeEach( (to, from, next) => {
    // Some pages just require an auth token...
    store.commit("system/setILSError", "")
-   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "public-bookmarks", "feedback", "item", "checkouts" ]
+   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "public-bookmarks", "feedback", "item" ]
    if (tokenPages.includes(to.name)) {
-      // console.log(`Page ${to.name} requires auth token only`)
       ensureAuthTokenPresent( next )
       return
    }
 
-   // Some pages require a signed in user...
+   // Some pages require a signed in user; grab one from session or cookie.
+   // otherwise sign out the current user (if any)
    let userPages = ["preferences", "account", "bookmarks", "digital-deliveries",
-      "course-reserves-request", "requests", "searches"]
+      "course-reserves-request", "requests", "searches", "checkouts"]
    if (userPages.includes(to.name)) {
-      // console.log(`Page ${to.name} requires signed in user`)
       ensureSignedIn( from.fullPath, next, false )
       return
    }
@@ -263,10 +268,11 @@ async function ensureSignedIn( fromPath, next, autoNetbadge ) {
             store.commit('restore/setURL', fromPath)
             store.dispaych('user/netbadge')
          } else {
-            // console.log("Unable to find session for page access. Flag as expired")
-            store.commit('system/setSessionExpired')
-            await store.dispatch("user/signout", "/")
-            next("/")
+            // make sure all user session is cleared out, and
+            // continue on to target page where the sianged out user
+            // wll be handled
+            await store.dispatch("user/signout")
+            next()
          }
       }
    }
@@ -282,8 +288,8 @@ async function restoreSessionFromLocalStorage() {
       await store.dispatch("user/refreshAuth")
 
       // console.log("load user data into session")
-      await store.dispatch("user/getAccountInfo")  // needed for search preferences
-      store.dispatch("user/getCheckouts")          // needed so the alert icon can show in menubar
+      store.dispatch("user/getAccountInfo")  // needed for search preferences
+      store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
       return true
    }
 

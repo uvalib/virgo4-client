@@ -142,7 +142,6 @@ const system = {
                   // NOTE: cant dispatch a signout here, so there is a plugin (expired.js) installed.
                   // It looks for setError with a 401 and does the signout
                   setTimeout(() => {  state.sessionExpired=false }, 15000)
-                  router.push("/")
                }
             } else {
                state.message.type = "error"

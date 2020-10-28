@@ -1,17 +1,8 @@
 <template>
    <div class="checkout">
-      <h1>My Account {{hasRenewSummary}}</h1>
+      <h1>My Account</h1>
       <RenewSummary v-if="hasRenewSummary"/>
-      <div class="checkout-content" v-if="isSignedIn == false">
-         <h3>You must be signed in to access checkout information.</h3>
-         <p>
-            Click
-            <V4Button mode="text" id="link" @click="signInClicked" aria-label="Sign in to view checkout information">
-               here
-            </V4Button>
-            to sign in.
-         </p>
-      </div>
+      <SignInRequired v-if="isSignedIn == false" targetPage="checkout information"/>
       <div v-else class="checkout-content">
          <AccountActivities/>
          <V4Spinner v-if="renewing" message="Renew in progress..." v-bind:overlay="true" />
@@ -192,8 +183,8 @@ export default {
       }
    },
    async created() {
-      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
       if ( this.isSignedIn ) {
+         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
          this.lookingUpILL = true
          this.lookingUpUVA = true
          await this.$store.dispatch("user/getRequests")

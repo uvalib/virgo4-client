@@ -21,8 +21,9 @@
 <script>
 export default {
    methods: {
-      signOut() {
-         this.$store.dispatch("user/signout", "/signedout")
+      async signOut() {
+         await this.$store.dispatch("user/signout")
+         this.$router.push("/signedout")
       },
    },
 }

@@ -1,7 +1,8 @@
 <template>
    <div class="digital-deliveries">
       <h1>My Account</h1>
-      <div class="digital-delivery-content">
+      <SignInRequired v-if="isSignedIn == false" targetPage="digital deliveries"/>
+      <div v-else class="digital-delivery-content">
          <AccountActivities/>
          <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
          <div class="details">
@@ -62,7 +63,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "digital-deliveries",
@@ -73,6 +74,9 @@ export default {
       ...mapState({
          lookingUp: state => state.user.lookingUp,
          requests: state => state.user.requests,
+      }),
+      ...mapGetters({
+        isSignedIn: 'user/isSignedIn',
       }),
       webDeliveries() {
          return this.requests.illiad.filter( h=> h.transactionStatus == "Delivered to Web")
@@ -102,12 +106,14 @@ export default {
       },
    },
    created() {
-      this.$store.commit('user/setLookingUp', true)
-      this.$store.dispatch("user/getRequests")
-      setTimeout(()=> {
-         document.getElementById("digital-submenu").focus()
-      },250)
-      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Digital Deliveries")
+      if ( this.isSignedIn) {
+         this.$store.commit('user/setLookingUp', true)
+         this.$store.dispatch("user/getRequests")
+         setTimeout(()=> {
+            document.getElementById("digital-submenu").focus()
+         },250)
+         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Digital Deliveries")
+      }
    }
 }
 </script>

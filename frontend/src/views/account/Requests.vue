@@ -1,7 +1,8 @@
 <template>
    <div class="requests">
       <h1>My Account</h1>
-      <div class="requests-content">
+      <SignInRequired v-if="isSignedIn == false" targetPage="request information"/>
+      <div v-else class="requests-content">
          <AccountActivities />
          <div class="working" v-if="lookingUp">
             <V4Spinner message="Looking up requests..." />
@@ -198,7 +199,8 @@ export default {
       }),
       ...mapGetters({
          isDevServer: "system/isDevServer",
-         isHSLUser: "user/isHSLUser"
+         isHSLUser: "user/isHSLUser",
+         isSignedIn: 'user/isSignedIn',
       }),
       illiadRequests() {
          return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&
@@ -262,16 +264,18 @@ export default {
       }
    },
    async created() {
-      this.$store.commit('user/setLookingUp', true)
-      await this.$store.dispatch("system/getConfig")
-      await this.$store.dispatch("user/getRequests")
-      this.$store.commit('user/setLookingUp', false)
-      setTimeout(() => {
-         document.getElementById("requests-submenu").focus()
-      }, 250)
-      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
+      if ( this.isSignedIn) {
+         this.$store.commit('user/setLookingUp', true)
+         await this.$store.dispatch("system/getConfig")
+         await this.$store.dispatch("user/getRequests")
+         this.$store.commit('user/setLookingUp', false)
+         setTimeout(() => {
+            document.getElementById("requests-submenu").focus()
+         }, 250)
+         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
+      }
    }
-};
+}
 </script>
 
 <style lang="scss" scoped>

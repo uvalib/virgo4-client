@@ -474,7 +474,7 @@ export default new Vuex.Store({
             if (error.response) {
                if (error.response.status == 401) {
                   commit('system/setSessionExpired', null, { root: true })
-                  dispatch("user/signout", "/", { root: true })
+                  dispatch("user/signout", null, { root: true })
                } else if (error.response.data && error.response.data.message) {
                   genericError = false
                   let msg =  error.response.data.message
@@ -532,7 +532,7 @@ export default new Vuex.Store({
             commit('filters/setUpdatingFacets', false)
             if (error.response && error.response.status == 401) {
                commit('system/setSessionExpired', null, { root: true })
-               dispatch("user/signout", "/", { root: true })
+               dispatch("user/signout", null, { root: true })
             } else {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"

@@ -309,8 +309,9 @@ export default {
             menu.focus()
          },100)
       },
-      signOut() {
-         this.$store.dispatch("user/signout", "/signedout")
+      async signOut() {
+         await this.$store.dispatch("user/signout")
+         this.$router.push("/signedout")
       },
       beforeEnter: function(el) {
          el.style.height = '0'

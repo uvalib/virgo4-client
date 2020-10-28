@@ -1,7 +1,8 @@
 <template>
    <div class="bookmarks">
       <h1>My Account</h1>
-      <div class="bookmarks-content">
+      <SignInRequired v-if="isSignedIn == false" targetPage="bookmarks"/>
+      <div v-else class="bookmarks-content">
          <AccountActivities />
          <div class="working" v-if="lookingUpBookmarks">
             <V4Spinner message="Looking up bookmark information..."/>
@@ -172,7 +173,8 @@ export default {
          hasBookmarks: "bookmarks/hasBookmarks",
          bookmarks: "bookmarks/bookmarks",
          canMakeReserves: "user/canMakeReserves",
-         invalidReserves: "reserves/getInvalidReserveItems"
+         invalidReserves: "reserves/getInvalidReserveItems",
+         isSignedIn: 'user/isSignedIn',
       })
    },
    methods: {
@@ -320,16 +322,18 @@ export default {
       }
    },
    created() {
-      this.$store.dispatch("bookmarks/getBookmarks")
-      setTimeout(()=> {
-         let eles = document.getElementsByClassName("bookmark-folder")
-         if ( eles.length > 0) {
-            eles[0].focus()
-         } else {
-            document.getElementById("bookmarks-submenu").focus()
-         }
-      }, 250)
-      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
+      if (this.isSignedIn) {
+         this.$store.dispatch("bookmarks/getBookmarks")
+         setTimeout(()=> {
+            let eles = document.getElementsByClassName("bookmark-folder")
+            if ( eles.length > 0) {
+               eles[0].focus()
+            } else {
+               document.getElementById("bookmarks-submenu").focus()
+            }
+         }, 250)
+         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
+      }
    }
 };
 </script>

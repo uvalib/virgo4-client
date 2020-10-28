@@ -1,7 +1,8 @@
 <template>
    <div class="searches">
       <h1>My Account</h1>
-      <div class="searches-content">
+      <SignInRequired v-if="isSignedIn == false" targetPage="searches"/>
+      <div v-else class="searches-content">
          <AccountActivities/>
          <div class="working" v-if="lookingUp" >
             <V4Spinner message="Loading up requests..."/>
@@ -82,7 +83,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState,mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 export default {
    name: "requests",
@@ -95,7 +96,10 @@ export default {
          history: state => state.searches.history,
          lookingUp: state => state.searches.lookingUp,
          signedInUser: state => state.user.signedInUser
-      })
+      }),
+      ...mapGetters({
+        isSignedIn: 'user/isSignedIn',
+      }),
    },
    methods: {
       async savedSearchClicked(searchType) {
@@ -162,21 +166,23 @@ export default {
       }
    },
    created() {
-      this.$store.dispatch("searches/getAll", this.signedInUser)
-      setTimeout(()=> {
-         let eles = document.querySelectorAll(".v4-checkbox,.public")
-         if ( eles.length > 0) {
-            eles[0].focus()
-         } else {
-            eles = document.getElementsByClassName("history")
-            if (eles.length > 0) {
+      if ( this.isSignedIn) {
+         this.$store.dispatch("searches/getAll", this.signedInUser)
+         setTimeout(()=> {
+            let eles = document.querySelectorAll(".v4-checkbox,.public")
+            if ( eles.length > 0) {
                eles[0].focus()
             } else {
-               document.getElementById("searches-submenu").focus()
+               eles = document.getElementsByClassName("history")
+               if (eles.length > 0) {
+                  eles[0].focus()
+               } else {
+                  document.getElementById("searches-submenu").focus()
+               }
             }
-         }
-      },250)
-      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Saved Searches")
+         },250)
+         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Saved Searches")
+      }
    }
 };
 </script>

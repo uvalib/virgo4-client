@@ -1,7 +1,8 @@
 <template>
    <div class="account">
       <h1>My Account</h1>
-      <div class="account-content">
+      <SignInRequired v-if="isSignedIn == false" targetPage="account information"/>
+      <div v-else class="account-content">
          <AccountActivities/>
          <div class="working" v-if="!expandBilling && lookingUp" >
             <V4Spinner message="Looking up account details..."/>
@@ -185,6 +186,7 @@ export default {
         itemsWithFines: 'user/itemsWithFines',
         canChangePIN: 'user/canChangePIN',
         useSIS:  'user/useSIS',
+        isSignedIn: 'user/isSignedIn',
       }),
       isBillOwed() {
          let amtStr = this.info['amountOwed']
@@ -194,12 +196,14 @@ export default {
    methods: {
    },
    created() {
-      this.$store.dispatch("user/getAccountInfo")
-      this.$store.dispatch("user/getBillDetails")
-      setTimeout(()=> {
-         document.getElementById("info-submenu").focus()
-      },250)
-      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "My Information")
+      if ( this.isSignedIn ) {
+         this.$store.dispatch("user/getAccountInfo")
+         this.$store.dispatch("user/getBillDetails")
+         setTimeout(()=> {
+            document.getElementById("info-submenu").focus()
+         },250)
+         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "My Information")
+      }
    }
 }
 </script>

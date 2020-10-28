@@ -1,7 +1,8 @@
 <template>
   <div class="preferences">
     <h1>My Account</h1>
-    <div class="preferences-content">
+    <SignInRequired v-if="isSignedIn == false" targetPage="preferences"/>
+    <div v-else class="preferences-content">
       <AccountActivities/>
       <div class="working" v-if="lookingUpPools || lookingUpAccount" >
         <V4Spinner message="Loading preferences..."/>
@@ -18,7 +19,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import Search from "@/components/preferences/Search"
 import PickupLibrary from "@/components/preferences/PickupLibrary"
@@ -35,17 +36,19 @@ export default {
          lookingUpPools : state => state.pools.lookingUp,
          lookingUpAccount : state => state.user.lookingUp,
       }),
-   },
-   methods: {
-
+      ...mapGetters({
+        isSignedIn: 'user/isSignedIn',
+      }),
    },
    created() {
-      this.$store.dispatch('pools/getPools')
-      this.$store.dispatch("user/getAccountInfo")
-      setTimeout(()=> {
-         document.getElementById("preferences-submenu").focus()
-      }, 500)
-      this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
+      if ( this.isSignedIn) {
+         this.$store.dispatch('pools/getPools')
+         this.$store.dispatch("user/getAccountInfo")
+         setTimeout(()=> {
+            document.getElementById("preferences-submenu").focus()
+         }, 500)
+         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
+      }
    }
 }
 </script>

@@ -460,7 +460,7 @@ const user = {
           })
       },
 
-      async signout(ctx, redirectPath) {
+      async signout(ctx) {
          if ( ctx.state.signedInUser == "") return
 
          try {
@@ -473,10 +473,6 @@ const user = {
             await ctx.dispatch('getAuthToken')
          } catch (e) {
             console.error("Signout failed: "+e)
-         }
-
-         if (router.currentRoute.path != redirectPath) {
-            router.push(redirectPath)
          }
       },
 
