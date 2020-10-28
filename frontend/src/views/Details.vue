@@ -293,6 +293,11 @@ export default {
             this.$analytics.trigger('Bookmarks', 'FOLLOW_V3_BOOKMARK', id)
          }
 
+         if ( this.isSignedIn) {
+            await this.$store.dispatch("user/getAccountInfo")
+            this.$store.dispatch("bookmarks/getBookmarks")
+         }
+
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
          if (bmTarget.origin == "SHELF_BROWSE"  ) {
             this.browseTarget = bmTarget.id
@@ -300,6 +305,7 @@ export default {
 
          if (src) {
             this.$store.commit("hitSelected", id)
+            console.log("GET DETAILS "+src+":"+id)
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {
             await this.$store.dispatch("item/lookupCatalogKeyDetail", {identifier: id, v3Redirect: true} )
@@ -321,9 +327,6 @@ export default {
                this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
             }
 
-            if ( this.isSignedIn) {
-               this.$store.dispatch("bookmarks/getBookmarks")
-            }
             document.title = this.details.header.title
          } else {
             document.title = "Virgo: Item Not Found"

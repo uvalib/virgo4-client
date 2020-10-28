@@ -85,12 +85,10 @@
          </h2>
          <div class="pools">
             <V4Checkbox v-for="src in filteredSources" :key="src.id" class="pool"
-               :disabled="isTargetPool(src)"
                :aria-label="`toggle inclusion of ${src.name} in search results`"
                :checked="!isPoolExcluded(src)"
                @click="poolClicked(src)">
                {{src.name}}
-               <span class="preferred" v-if="isTargetPool(src)">(preferred)</span>
             </V4Checkbox>
          </div>
          <div class="what" v-if="!isKiosk">
@@ -156,7 +154,6 @@ export default {
          queryURLParams: 'query/queryURLParams',
          queryEntered: "query/queryEntered",
          sources: "pools/sortedList",
-         isTargetPool: "preferences/isTargetPool",
          excludedPoolPrefs: "preferences/excludedPools",
          isPoolExcluded: "query/isPoolExcluded",
          rawQueryString: 'query/string',

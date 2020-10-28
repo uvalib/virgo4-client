@@ -326,9 +326,6 @@ export default new Vuex.Store({
 
          if (tgtPoolIdx > -1) {
             state.selectedResultsIdx = tgtPoolIdx
-            if (tgtPoolIdx > 1) {
-               state.otherSrcSelection = { id: data.tgtPool, name: "" }
-            }
          } else {
             if (firstPoolWithHits == -1) {
                firstPoolWithHits = 0
@@ -411,7 +408,6 @@ export default new Vuex.Store({
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
             preferences: {
-               target_pool: rootState.query.targetPool,
                exclude_pool: rootState.query.excludedPools
             },
             filters: rootGetters['filters/allPoolFilters'],

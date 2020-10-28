@@ -34,20 +34,6 @@
                <span v-html="p.description"></span>
             </div>
             <div class="source-controls">
-               <div v-if="isDefaultSources"
-                  tabindex="0"
-                  role="switch"
-                  class="toggle"
-                  :aria-label="`set ${p.name} as preferred`"
-                  :aria-checked="isTargetPool(p).toString()"
-                  @click.stop="toggleTargetPool(p)"
-                  @keyup.stop.enter="toggleTargetPool(p)"
-                  @keydown.space.prevent.stop="toggleTargetPool(p)"
-               >
-                  <i v-if="isTargetPool(p)" class="fas fa-star"></i>
-                  <i v-else class="far fa-star"></i>
-                  <span class="label">Preferred</span>
-               </div>
                <div
                   class="toggle"
                   tabindex="0"
@@ -86,7 +72,6 @@ export default {
    computed: {
       ...mapGetters({
          isPoolExcluded: "preferences/isPoolExcluded",
-         isTargetPool: "preferences/isTargetPool",
          pools: "pools/sortedList",
          excludedPools: "preferences/excludedPools",
          isDevServer: 'system/isDevServer',
@@ -103,10 +88,6 @@ export default {
    methods: {
       collapseGroupsClicked() {
          this.$store.dispatch("preferences/toggleCollapseGroups")
-      },
-      toggleTargetPool(pool) {
-         this.$store.dispatch("preferences/toggleTargetPool", pool)
-         this.$analytics.trigger('Preferences', 'SET_PREFERRED_POOL', pool.name)
       },
       toggleAltSources() {
          this.$store.dispatch("preferences/toggleAltSources")

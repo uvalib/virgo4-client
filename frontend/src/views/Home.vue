@@ -133,7 +133,6 @@ export default {
          total: state=>state.total,
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
-         tgtPoolPref: state=>state.preferences.targetPool,
          searchTemplate: state=>state.preferences.searchTemplate,
          optInPoolPrefs: state=>state.preferences.optInPools,
          sourceLabel: state => state.preferences.sourceLabel,
@@ -224,21 +223,19 @@ export default {
          this.$store.commit("query/setExcludePreferences", excluded)
 
          let targetPool = ""
+         let oldFilterParam = ""
+         let oldSort = ""
          if (query.pool) {
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)
-         } else {
-            targetPool = this.tgtPoolPref
-         }
 
-         let oldFilterParam = this.filterQueryString(targetPool)
-         if (query.filter) {
-            this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
-         }
+            // get pool filters from URL (but preserve current)...
+            oldFilterParam = this.filterQueryString(targetPool)
+            if (query.filter) {
+               this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
+            }
 
-         // cant have sorting if a target pool is not defined...
-         let oldSort = ""
-         if ( targetPool != "") {
+            // get sort from URL (but preserve current sort)...
             let oldSortObj = this.poolSort(targetPool)
             oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
             if (query.sort  ) {
@@ -249,6 +246,8 @@ export default {
                this.$store.commit("sort/setActivePool", targetPool)
             }
          }
+
+         // If no sort detecetd, set it to the default relevance sort
          if (oldSort == "") {
             oldSort = "SortRelevance_desc"
          }
@@ -257,8 +256,8 @@ export default {
             this.$store.commit("query/restoreFromURL", query.q)
 
             // only re-run search when query, sort or filtering has changed
-            if (this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
-                  this.activeSort != oldSort || this.userSearched == true) {
+            if ( this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
+                 this.activeSort != oldSort || this.userSearched == true ) {
                this.$store.commit("resetSearchResults")
                // console.log(`Q: ${this.rawQueryString} vs ${oldQ}`)
                // console.log(`F: ${this.filterQueryString(targetPool)} vs ${oldFilterParam}`)
@@ -355,12 +354,9 @@ export default {
 
       async searchClicked() {
          let skipPoolParam = false
-         let tgtPool = this.tgtPoolPref
+         let tgtPool = ""
          this.basicSearchScope = this.searchScope
          if ( this.basicSearchScope.id == "all") {
-            if (tgtPool != "") {
-               this.$store.commit("query/setTargetPool", tgtPool)
-            }
             this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
          } else {
             tgtPool = this.basicSearchScope.id

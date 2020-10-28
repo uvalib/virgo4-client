@@ -15,7 +15,6 @@ const preferences = {
       sourceSet: "default",
       maxTabs: 3,
       sourceLabel: "Resource Type",
-      targetPool: "",
       excludePools: [],
       optInPools: [],
       trackingOptOut: false,
@@ -32,9 +31,6 @@ const preferences = {
       getField,
       hasSearchTemplate: state => {
          return state.searchTemplate && state.searchTemplate.fields.length > 0
-      },
-      isTargetPool: state => pool => {
-         return state.targetPool == pool.id
       },
 
       excludedPools: (state, _getters, rootState) => {
@@ -96,12 +92,7 @@ const preferences = {
          router.go()
       },
       setPreferences(state, prefsObj) {
-         state.targetPool = ""
          state.excludePools.splice(0, state.excludePools.length)
-
-         if (prefsObj.targetPool ) {
-            state.targetPool = prefsObj.targetPool
-         }
          if (prefsObj.excludePools ) {
             state.excludePools = prefsObj.excludePools
          }
@@ -146,7 +137,6 @@ const preferences = {
          state.maxTabs = 3
          state.sourceLabel = "Resource Type"
          state.trackingOptOut = false
-         state.targetPool = ""
          state.collapseGroups = false
          state.enableBarcodeScan = false
          state.excludePools.splice(0, state.excludePools.length)
@@ -165,17 +155,7 @@ const preferences = {
                state.excludePools.splice(idx, 1)
             } else {
                state.excludePools.push(pool.id)
-               if (state.targetPool == pool.id ) {
-                  state.targetPool = ""
-               }
             }
-         }
-      },
-      toggleTargetPool(state, pool) {
-         if (state.targetPool == pool.id) {
-            state.targetPool = ""
-         } else {
-            state.targetPool = pool.id
          }
       },
       toggleAltSources(state) {
@@ -211,10 +191,6 @@ const preferences = {
          await ctx.dispatch("savePreferences")
          await ctx.dispatch("pools/getPools", null, {root:true})
       },
-      toggleTargetPool(ctx, pool) {
-         ctx.commit("toggleTargetPool", pool)
-         ctx.dispatch("savePreferences")
-      },
       toggleExcludePool(ctx, pool) {
          ctx.commit("toggleExcludePool", pool)
          ctx.dispatch("savePreferences")
@@ -233,7 +209,7 @@ const preferences = {
       },
       savePreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
-         let data = {targetPool: ctx.state.targetPool,
+         let data = {
             excludePools: ctx.state.excludePools,
             trackingOptOut: ctx.state.trackingOptOut,
             pickupLibrary: ctx.state.pickupLibrary,

@@ -367,9 +367,13 @@ const user = {
          }).finally(() => { ctx.commit('setLookingUp', false) })
       },
 
-      getAccountInfo(ctx) {
-         if (ctx.rootGetters["user/hasAccountInfo"] ) return
-         if (ctx.rootGetters["user/isSignedIn"] == false) return
+      async getAccountInfo(ctx) {
+         if (ctx.getters.isSignedIn == false) {
+            return
+         }
+         if (ctx.getters.hasAccountInfo ){
+            return
+         }
 
          ctx.commit('setLookingUp', true)
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
@@ -518,11 +522,6 @@ const user = {
 function migratePreferences( pools, prefsStr ) {
    try {
       let jsonPrefs = JSON.parse(prefsStr)
-      if ( jsonPrefs.targetPoolURL ) {
-         jsonPrefs.migrated = true
-         jsonPrefs.targetPool = getPoolID(pools, jsonPrefs.targetPoolURL)
-         delete jsonPrefs.targetPoolURL
-      }
       if ( jsonPrefs.excludePoolURLs ) {
          jsonPrefs.migrated = true
          jsonPrefs.excludePools = []
