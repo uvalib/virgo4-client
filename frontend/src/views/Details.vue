@@ -320,7 +320,7 @@ export default {
 
          if ( this.notFound == false ) {
             this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
-            let collField = this.allFields.find( f => f.name == "collection")
+            let collField = this.allFields.find( f => f.name == "digital_collection")
             if (collField) {
                console.log("Trigger collection viewed "+collField.value+":"+id+"")
                this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
