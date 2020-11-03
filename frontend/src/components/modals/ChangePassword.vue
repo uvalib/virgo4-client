@@ -118,7 +118,7 @@ export default {
                if(e.response.data.message){
                   this.error = e.response.data.message
                } else {
-                  this.error = "Password change failed"
+                  this.error = "Password change failed. Please check your current password."
                }
             })
          }
