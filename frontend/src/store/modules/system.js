@@ -29,7 +29,7 @@ const system = {
       locationCodes: [],
       libraryCodes: [],
       pickupLibraries: [
-         {id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'},
+         //{id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'},
          {id: 'CLEMONS', name: 'Clemons'},
       ]
    },
