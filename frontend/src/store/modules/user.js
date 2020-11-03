@@ -137,7 +137,7 @@ const user = {
          return true
       },
       libraries: (_state, getters, rootState) => {
-         let pickupLibraries = rootState.system.pickupLibraries
+         let pickupLibraries = rootState.system.pickupLibraries.slice()
          if (getters.isHSLUser) {
             pickupLibraries.push({id: "HEALTHSCI", name: "Health Sciences Library"})
          }
@@ -145,17 +145,14 @@ const user = {
             pickupLibraries.push({id: "LAW", name: "Law Library"})
          }
          if (getters.canLeoMobile) {
-            pickupLibraries.push({id: "LEO", name: 'Central Grounds Parking Garage ("LEO Mobile")' })
+           pickupLibraries.push({id: "LEO", name: 'Central Grounds Parking Garage ("LEO Mobile")' })
          }
 
          return pickupLibraries
        },
-       canLeoMobile: (_state, getters, rootState) => {
-          let turnOn = new Date('2020-10-05').getTime()
-          let now = new Date().getTime()
-          if ((rootState.system.devServer || (now > turnOn)) &&
-               getters.isFaculty) {
-                  return true
+       canLeoMobile: (_state, getters, _rootState) => {
+          if (getters.isFaculty) {
+             return true
           }
           return false
        },

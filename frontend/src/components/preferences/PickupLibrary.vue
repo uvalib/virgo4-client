@@ -38,6 +38,12 @@ export default {
       this.$store.dispatch("preferences/savePreferences")
     },
   },
+  mounted: function(){
+    if(this.pickupLibrary != {} && !this.librariesForUser.some(lib => lib.id == this.pickupLibrary.id)){
+      // Clear the pickup Library if not in the currently available list
+      this.pickupLibrary = {}
+    }
+  }
 
 }
 </script>
