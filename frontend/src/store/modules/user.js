@@ -41,7 +41,7 @@ const user = {
       hasRenewSummary: (state) => {
          return state.renewSummary.renewed >= 0
       },
-      canChangePIN: (state, getters) => {
+      canChangePassword: (state, getters) => {
          if (getters.hasAccountInfo == false ) return false
          if ( state.sessionType == "netbadge") return false
          return true
@@ -512,7 +512,7 @@ const user = {
          window.location.href = "/authenticate/netbadge"
       },
 
-      changePIN(ctx, data) {
+      changePassword(ctx, data) {
          data['barcode'] = ctx.state.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },

@@ -37,8 +37,8 @@
                   <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
                </div>
 
-               <div v-if="canChangePIN" class="pin">
-                  <ChangePin />
+               <div v-if="canChangePassword" class="password">
+                  <ChangePassword />
                </div>
 
                <div v-if="ilsError" class="standing-info">{{ilsError}}</div>
@@ -162,7 +162,7 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
-import ChangePin from '@/components/modals/ChangePin'
+import ChangePassword from '@/components/modals/ChangePassword'
 export default {
    name: "account",
    data: function() {
@@ -171,7 +171,7 @@ export default {
       };
    },
    components: {
-      AccountActivities, AccordionContent, ChangePin
+      AccountActivities, AccordionContent, ChangePassword
    },
    computed: {
       ...mapState({
@@ -184,7 +184,7 @@ export default {
         hasAccountInfo: 'user/hasAccountInfo',
         totalFines:  'user/totalFines',
         itemsWithFines: 'user/itemsWithFines',
-        canChangePIN: 'user/canChangePIN',
+        canChangePassword: 'user/canChangePassword',
         useSIS:  'user/useSIS',
         isSignedIn: 'user/isSignedIn',
       }),
@@ -313,7 +313,7 @@ div.notes p {
     color: var(--uvalib-text);
     background-color: var(--uvalib-red-lightest);
 }
-.pin {
+.password {
    margin-top: 15px;
 }
 @media only screen and (min-width: 768px) {
