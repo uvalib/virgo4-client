@@ -53,7 +53,7 @@
                      aria-required="true" required="required"/>
                </div>
 
-               <p v-if="error" class="error">{{error}}</p>
+               <p v-if="error" class="error" v-html="error"></p>
             </div>
          </template>
       </template>
@@ -157,10 +157,11 @@ export default {
                }).catch((e) => {
                   console.log(e)
                   this.$refs.currPassword.focus()
+                  this.error = "Password change failed.</br>"
                   if(e.response.data.message){
-                     this.error = e.response.data.message
-                  } else {
-                     this.error = "Password change failed. Please check your current password."
+                     this.error += e.response.data.message
+                  }else{
+                     this.error += "Please check your current password."
                   }
                }).finally(()=>{
                   this.toggleOk()

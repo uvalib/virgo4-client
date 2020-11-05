@@ -23,7 +23,7 @@
                 <p>Driver's License Number, eg: A12345678</p>
               </div>
 
-              <p v-if="error" class="error">{{error}}</p>
+              <p v-if="error" class="error" v-html="error"></p>
             </div>
           </template>
       </template>
@@ -79,10 +79,9 @@ export default {
                this.emailSent = true
             }).catch((e) => {
                this.$refs.userId.focus()
+               this.error = "There was a problem sending the password reset email. Please <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for more help.<br/>"
                if(e.response.data.message){
-                  this.error = e.response.data.message
-               } else {
-                  this.error = "There was a problem sending the password reset email. Please Ask a Librarian for more help."
+                  this.error += e.response.data.message
                }
             }).finally(()=>{
                this.toggleOK()
