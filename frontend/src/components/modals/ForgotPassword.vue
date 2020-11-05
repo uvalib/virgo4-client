@@ -32,7 +32,7 @@
             Cancel
          </V4Button>
          <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
-            :focusNextOverride="true" @tabnext="nextTabOK">
+            :focusNextOverride="true" @tabnext="nextTabOK" :disabled="okDisabled">
             OK
          </V4Button>
       </template>
@@ -47,27 +47,33 @@ export default {
          userId: "",
          emailSent: false,
          error: "",
+         okDisabled: false
       }
    },
    props: ['user'],
    methods: {
-     opened(){
-       this.userId = this.user
-       this.emailSent = false
-       this.error = ""
-     },
+      opened(){
+         this.userId = this.user
+         this.emailSent = false
+         this.error = ""
+         this.okDisabled = false
+      },
       backTabCP() {
          this.$refs.forgotPassword.firstFocusBackTabbed()
       },
       nextTabOK() {
          this.$refs.forgotPassword.lastFocusTabbed()
       },
+      toggleOK(){
+         this.okDisabled = !this.okDisabled
+      },
       okClicked() {
-        if (this.emailSent == true){
-          this.$refs.forgotPassword.hide()
-          return
-        }
+         if (this.emailSent == true){
+           this.$refs.forgotPassword.hide()
+           return
+         }
 
+        this.toggleOK()
         // Send email
         this.$store.dispatch("user/forgotPassword", this.userId).then(() => {
                this.emailSent = true
@@ -78,6 +84,8 @@ export default {
                } else {
                   this.error = "There was a problem sending the password reset email. Please Ask a Librarian for more help."
                }
+            }).finally(()=>{
+               this.toggleOK()
             })
       },
    }
