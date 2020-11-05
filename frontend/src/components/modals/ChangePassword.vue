@@ -61,8 +61,8 @@
          <V4Button v-if="passwordChanged == false" mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.changePassword.hide()">
             Cancel
          </V4Button>
-         <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
-            :focusNextOverride="true" @tabnext="nextTabOK">
+         <V4Button :disabled="okDisabled" mode="primary" :id="`${id}-okbtn`" @click="okClicked"
+             :focusNextOverride="true" @tabnext="nextTabOK">
             OK
          </V4Button>
       </template>
@@ -79,13 +79,14 @@ export default {
          newPasswordConfirm: "",
          passwordToken: "",
          error: "",
-         passwordChanged: false
+         passwordChanged: false,
+         okDisabled: false
       }
    },
    computed: {
       hasPasswordToken: function(){
          return this.$route.query.token && this.$route.query.token.length > 0
-      }
+      },
    },
    mounted() {
       if(this.hasPasswordToken){
@@ -100,12 +101,16 @@ export default {
          this.newPasswordConfirm = ""
          this.error = ""
          this.passwordChanged = false
+         this.okDisabled = false
       },
       backTabCP() {
          this.$refs.changePassword.firstFocusBackTabbed()
       },
       nextTabOK() {
          this.$refs.changePassword.lastFocusTabbed()
+      },
+      toggleOk() {
+         this.okDisabled = !this.okDisabled
       },
       okClicked() {
          if ( this.passwordChanged) {
@@ -128,6 +133,8 @@ export default {
                this.error = "New password must be between 12 and 25 characters"
                return
             }
+
+            this.toggleOk()
             if(this.hasPasswordToken){
                let data = {reset_password_token: this.passwordToken, new_password: this.newPassword}
                this.$store.dispatch("user/changePasswordWithToken", data).then(() => {
@@ -140,9 +147,9 @@ export default {
                   } else {
                      this.error = "Password change failed."
                   }
+               }).finally(()=>{
+                  this.toggleOk()
                })
-
-
             }else{
                let data  = {current_pin: this.currPassword, new_pin: this.newPassword}
                this.$store.dispatch("user/changePassword", data).then(() => {
@@ -155,8 +162,11 @@ export default {
                   } else {
                      this.error = "Password change failed. Please check your current password."
                   }
+               }).finally(()=>{
+                  this.toggleOk()
                })
             }
+            return
          }
       },
    }
