@@ -163,6 +163,55 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 	c.String(http.StatusOK, "pin changed")
 }
 
+// ChangePasswordWithToken takes a resetPinToken and newPin as params in the json POST payload.
+// It changes the pin to new_pin.
+func (svc *ServiceContext) ChangePasswordWithToken(c *gin.Context) {
+	var qp struct {
+		Token   string `json:"reset_password_token"`
+		NewPass string `json:"new_password"`
+	}
+
+	qpErr := c.ShouldBindJSON(&qp)
+	if qpErr != nil {
+		log.Printf("ERROR: invalid change_pin payload: %v", qpErr)
+		c.String(http.StatusBadRequest, "Invalid request")
+		return
+	}
+	log.Printf("Attempting to change pin with token")
+	pinURL := fmt.Sprintf("%s/v4/users/change_password_with_token", svc.ILSAPI)
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
+	if ilsErr != nil {
+		log.Printf("User pin change with token failed")
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	c.String(http.StatusOK, "pin changed")
+}
+
+// ForgotPassword sends a password reset email via ILS Connector and Sirsi
+func (svc *ServiceContext) ForgotPassword(c *gin.Context) {
+	var qp struct {
+		UserBarcode string `json:"userBarcode"`
+	}
+
+	qpErr := c.ShouldBindJSON(&qp)
+	if qpErr != nil {
+		log.Printf("ERROR: invalid forgot password payload: %v", qpErr)
+		c.String(http.StatusBadRequest, "Invalid request")
+		return
+	}
+	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
+	pinURL := fmt.Sprintf("%s/v4/users/forgot_password", svc.ILSAPI)
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
+	if ilsErr != nil {
+		log.Printf("User %s password reset failed", qp.UserBarcode)
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+
+	c.String(http.StatusOK, "Password reset")
+}
+
 // GetUserBills uses ILS Connector user billing details
 func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userID := c.Param("uid")

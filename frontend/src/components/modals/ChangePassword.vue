@@ -3,14 +3,15 @@
       firstFocusID="currPassword" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`">
       <template v-slot:button>
-         <V4Button mode="primary" @click="$refs.changePassword.show()" :id="`${id}-open`">
+         <V4Button mode="primary" @click="$refs.changePassword.show()"
+            v-if="!hasPasswordToken" :id="`${id}-open`" >
             Change Password
          </V4Button>
       </template>
       <template v-slot:content>
          <template v-if="passwordChanged">
             <p>
-               Your password has been changed
+               Your password has been changed.
             </p>
          </template>
          <template v-else>
@@ -36,7 +37,7 @@
                </li>
             </ul>
             <div class="message pure-form">
-               <div>
+               <div v-if="!hasPasswordToken">
                   <label for="currpassword">Current PIN/Password</label>
                   <input ref="currPassword" id="currPassword" type="password" v-model="currPassword" @keydown.shift.tab.stop.prevent="backTabCP"
                      aria-required="true" required="required"/>
@@ -76,8 +77,20 @@ export default {
          currPassword: "",
          newPassword: "",
          newPasswordConfirm: "",
+         passwordToken: "",
          error: "",
          passwordChanged: false
+      }
+   },
+   computed: {
+      hasPasswordToken: function(){
+         return this.$route.query.token.length > 0
+      }
+   },
+   mounted() {
+      if(this.hasPasswordToken){
+         this.passwordToken = this.$route.query.token
+         this.$refs.changePassword.show()
       }
    },
    methods: {
@@ -99,7 +112,8 @@ export default {
             this.$refs.changePassword.hide()
          } else {
             this.error = ""
-            if ( this.currPassword == "" || this.newPassword == "" || this.newPasswordConfirm == "")  {
+            if ( !this.hasPasswordToken && (this.currPassword == "" ||
+                  this.newPassword == "" || this.newPasswordConfirm == ""))  {
                this.$refs.currPassword.focus()
                this.error = "All three fields are required"
                return
@@ -109,18 +123,40 @@ export default {
                this.error = "New password confirmation did not match"
                return
             }
-            let data  = {current_pin: this.currPassword, new_pin: this.newPassword}
-            this.$store.dispatch("user/changePassword", data).then(() => {
-               this.passwordChanged = true
-            }).catch((e) => {
-               console.log(e)
-               this.$refs.currPassword.focus()
-               if(e.response.data.message){
-                  this.error = e.response.data.message
-               } else {
-                  this.error = "Password change failed. Please check your current password."
-               }
-            })
+            if (this.newPassword.length < 12 || this.newPassword.length > 25){
+               this.$refs.newPassword.focus()
+               this.error = "New password must be between 12 and 25 characters"
+               return
+            }
+            if(this.hasPasswordToken){
+               let data = {reset_password_token: this.passwordToken, new_password: this.newPassword}
+               this.$store.dispatch("user/changePasswordWithToken", data).then(() => {
+                  this.passwordChanged = true
+               }).catch((e) => {
+                  console.log(e)
+                  this.$refs.newPassword.focus()
+                  if(e.response.data.message){
+                     this.error = e.response.data.message
+                  } else {
+                     this.error = "Password change failed."
+                  }
+               })
+
+
+            }else{
+               let data  = {current_pin: this.currPassword, new_pin: this.newPassword}
+               this.$store.dispatch("user/changePassword", data).then(() => {
+                  this.passwordChanged = true
+               }).catch((e) => {
+                  console.log(e)
+                  this.$refs.currPassword.focus()
+                  if(e.response.data.message){
+                     this.error = e.response.data.message
+                  } else {
+                     this.error = "Password change failed. Please check your current password."
+                  }
+               })
+            }
          }
       },
    }

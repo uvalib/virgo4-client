@@ -79,6 +79,8 @@ func main() {
 		api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
 		api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
 		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
+		api.POST("/change_password_token", svc.ChangePasswordWithToken)
+		api.POST("/forgot_password", svc.ForgotPassword)
 		api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 		api.GET("/users/:uid", svc.AuthMiddleware, svc.GetUser)
 		api.GET("/users/:uid/illiad", svc.AuthMiddleware, svc.GetILLiadRequests)

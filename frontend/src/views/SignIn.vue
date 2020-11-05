@@ -52,6 +52,12 @@
                       <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
                     </td>
                   </tr>
+                  <tr v-if="isDevServer">
+                     <td colspan="2">
+                        <ForgotPassword v-bind:user="user" />
+                        <ChangePassword v-if="hasPasswordToken" />
+                     </td>
+                  </tr>
                </table>
                <div class="ils-error" v-if="ilsError">{{ilsError}}</div>
             </div>
@@ -67,8 +73,13 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
+import ForgotPassword from '@/components/modals/ForgotPassword'
+import ChangePassword from '@/components/modals/ChangePassword'
 export default {
    name: "signin",
+   components: {
+      ForgotPassword, ChangePassword
+   },
    computed: {
       ...mapState({
          authTriesLeft: state => state.user.authTriesLeft,
@@ -77,8 +88,12 @@ export default {
          ilsError: state => state.system.ilsError,
       }),
       ...mapGetters({
-        hasAuthToken: 'user/hasAuthToken'
+        hasAuthToken: 'user/hasAuthToken',
+        isDevServer: 'system/isDevServer'
       }),
+      hasPasswordToken: function(){
+         return this.$route.query.token && this.$route.query.token.length > 0
+      }
    },
    data: function()  {
       return {
@@ -95,7 +110,7 @@ export default {
    },
    methods: {
       signinClicked() {
-         this.$store.dispatch("user/signin", {barcode: this.user, password: this.pin})
+         this.$store.dispatch("user/signin", {barcode: this.user.trim(), password: this.pin})
       },
       netbadgeLogin() {
          this.$store.dispatch("user/netbadge")

@@ -513,6 +513,12 @@ const user = {
          data['barcode'] = ctx.state.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },
+      changePasswordWithToken(_ctx, data) {
+         return axios.post("/api/change_password_token", data)
+      },
+      forgotPassword(_ctx, barcode) {
+         return axios.post("/api/forgot_password", {userBarcode: barcode} )
+      },
    }
 }
 
