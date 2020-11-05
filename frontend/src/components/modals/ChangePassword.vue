@@ -84,7 +84,7 @@ export default {
    },
    computed: {
       hasPasswordToken: function(){
-         return this.$route.query.token.length > 0
+         return this.$route.query.token && this.$route.query.token.length > 0
       }
    },
    mounted() {
