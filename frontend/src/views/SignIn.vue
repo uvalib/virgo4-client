@@ -117,6 +117,8 @@ export default {
       },
    },
    created() {
+      this.$store.dispatch("system/getConfig") // Can be removed after isDevServer is not needed
+
       setTimeout( ()=> {
          document.getElementById("netbadge").focus()
       },250)
