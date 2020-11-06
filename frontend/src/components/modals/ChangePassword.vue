@@ -127,9 +127,24 @@ export default {
             }
             if (this.newPassword.length < 8 || this.newPassword.length > 25){
                this.$refs.newPassword.focus()
-               this.error = "New password must be between 12 and 25 characters"
+               this.error = "New password must be between 8 and 25 characters"
                return
             }
+            // Check caps & numerals
+            const regex = RegExp('^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[a-z]).*$')
+            if(!regex.test(this.newPassword)){
+               this.$refs.newPassword.focus()
+               this.error = "New password must meet the complexity requirements."
+               return
+            }
+            const restrictedChars = RegExp(/[^a-zA-Z0-9!,@#$%&*+()_\-? ]/)
+            if(restrictedChars.test(this.newPassword)){
+               this.$refs.newPassword.focus()
+               this.error = "Please only use the allowed special characters."
+               return
+            }
+
+
 
             this.toggleOk()
             if(this.hasPasswordToken){
