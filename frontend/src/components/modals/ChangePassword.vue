@@ -18,10 +18,7 @@
             <p>New passwords must:</p>
             <ul>
                <li>
-                  Not be a previously used password
-               </li>
-               <li>
-                     Contain between 12 and 25 characters
+                     Contain between 8 and 25 characters
                </li>
                <li>
                   Include at least one lower-case letter
@@ -128,7 +125,7 @@ export default {
                this.error = "New password confirmation did not match"
                return
             }
-            if (this.newPassword.length < 12 || this.newPassword.length > 25){
+            if (this.newPassword.length < 8 || this.newPassword.length > 25){
                this.$refs.newPassword.focus()
                this.error = "New password must be between 12 and 25 characters"
                return
