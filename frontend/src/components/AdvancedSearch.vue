@@ -216,7 +216,7 @@ export default {
                return
             }
 
-            let bad = this.advanced.filter( f=>f.comparison == "BETWEEN" && (f.value == "" || f.endVal == ""))
+            let bad = this.advanced.filter( f=>f.comparison == "BETWEEN" && ((f.value == "" || f.endVal == "") && !(f.value == "" && f.endVal == "")))
             if (bad.length > 0) {
                this.$store.commit(
                   "system/setSearchError",
