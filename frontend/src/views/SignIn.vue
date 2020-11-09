@@ -52,7 +52,7 @@
                       <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
                     </td>
                   </tr>
-                  <tr v-if="isDevServer">
+                  <tr>
                      <td colspan="2">
                         <ForgotPassword v-bind:user="user" />
                         <ChangePassword v-if="hasPasswordToken" />
@@ -89,7 +89,6 @@ export default {
       }),
       ...mapGetters({
         hasAuthToken: 'user/hasAuthToken',
-        isDevServer: 'system/isDevServer'
       }),
       hasPasswordToken: function(){
          return this.$route.query.token && this.$route.query.token.length > 0
@@ -117,8 +116,6 @@ export default {
       },
    },
    created() {
-      this.$store.dispatch("system/getConfig") // Can be removed after isDevServer is not needed
-
       setTimeout( ()=> {
          document.getElementById("netbadge").focus()
       },250)
