@@ -178,7 +178,7 @@ const router = new Router({
       },
       {
          path: "*",
-         name: "notfound",
+         name: "not_found",
          component: NotFound
       }
    ],

@@ -1,36 +1,32 @@
 <template>
    <div class="not-found">
-      <h1>Sorry, no results found.</h1>
+      <h1>Page Not Found</h1>
       <div class="info">
-         <p>You may want to try&hellip;
-         <ul>
-            <li>Broadening your search by tweaking keywords or other filters*.</li>
-            <li>
-               Searching <a href="https://guides.lib.virginia.edu/az.php">databases</a> or
-               <a href="https://guides.lib.virginia.edu/?b=s">guides</a>, which cover a broad range of topics.
-            </li>
-            <li>
-               Contacting <a href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a> for web chat, or a
-               <a href="https://guides.lib.virginia.edu/subjectlibrarians">Subject Liaison</a> for research assistance.
-            </li>
-         </ul>
-         <p class="sub-note">
-            *Very small segments of the collection have not yet been migrated into the updated Virgo interface,
-            as the migration is still in progress. It is possible that
-            <a @click="v3LinkClicked" href="http://v3.lib.virginia.edu/">searching the old interface</a>
-            will yield the item(s) you’re looking for.
-         </p>
+         <p>We're sorry, but we can't find that page.</p>
+         <p>You may wish to search Virgo or consult our other resources for finding research materials listed below.</p>
+      </div>
+      <div class="info">
+         <div class="subhead">Where Else Can I Find Research Materials?</div>
+         <div class="details">
+            <div class=note>
+               You can also explore the resources listed below to find research materials.
+               The Library's departmental guides, comprehensive database list, and journal finder tools can help you find
+               on-topic articles, datasets, and more.
+            </div>
+            <div class="break">Resources</div>
+            <ul class="links">
+               <li><a href="https://library.virginia.edu/research" target="_blank">Subject Guides</a></li>
+               <li><a href="https://guides.lib.virginia.edu/journalfinder" target="_blank">Journal Finders</a></li>
+               <li><a href="https://guides.lib.virginia.edu/az.php" target="_blank">Databases A–Z</a></li>
+            </ul>
+         </div>
       </div>
    </div>
 </template>
 
 <script>
 export default {
-   methods: {
-      v3LinkClicked() {
-         this.$analytics.trigger('Navigation', 'VIRGO3_REDIRECT', "NOT_FOUND_PAGE")
-      }
-   },
+   name: "not_found",
    mounted() {
       this.$analytics.trigger('Navigation', 'NOT_FOUND')
    }
@@ -42,12 +38,27 @@ export default {
    min-height: 400px;
    position: relative;
    margin: 25px 0;
-}
-.info {
-   width:50%;
-   margin: 5px auto 30px auto;
-   text-align: left;
-   font-size: 1.1em;
+   .info {
+      width:50%;
+      margin: 5px auto 30px auto;
+      text-align: left;
+      font-size: 1.1em;
+   }
+   .break {
+      margin: 15px 0;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      border-top: 1px solid #ccc;
+      padding: 3px;
+   }
+   .subhead {
+      margin: 0 0 10px 0;
+      font-weight: bold;
+   }
+   ul {
+      list-style: none;
+      padding-left: 0;
+   }
 }
 @media only screen and (min-width: $breakpoint-mobile) {
    .info  {
@@ -58,12 +69,6 @@ export default {
    .info  {
        width: 80%;
    }
-}
-.sub-note {
-   font-size: 0.85em;
-}
-p {
-   margin: 5px;
 }
 </style>
 
