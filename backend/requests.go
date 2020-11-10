@@ -533,7 +533,7 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 
 	// v4-dev only
 	v4HostHeader := c.Request.Header.Get("V4Host")
-	if strings.Index(v4HostHeader, "-dev") == 0 && svc.Dev.AuthUser == "" {
+	if !strings.Contains(v4HostHeader, "-dev") && svc.Dev.AuthUser == "" {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

@@ -238,7 +238,8 @@ func (svc *ServiceContext) SignOut(c *gin.Context) {
 func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
 	//Dev server only
 	v4HostHeader := c.Request.Header.Get("V4Host")
-	if strings.Index(v4HostHeader, "-dev") == 0 && svc.Dev.AuthUser == "" {
+	if !strings.Contains(v4HostHeader, "-dev") && svc.Dev.AuthUser == "" {
+		log.Printf("ERROR: Setting admin claim is dev only.")
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
@@ -246,6 +247,7 @@ func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
 	claimsIface, _ := c.Get("claims")
 	originalClaims, ok := claimsIface.(*v4jwt.V4Claims)
 	if !ok || (originalClaims.Role != v4jwt.Admin) {
+		log.Printf("ERROR: User not an admin: %s", originalClaims.UserID)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

@@ -11,8 +11,9 @@ import (
 	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
-// UserMiddleware will extract the userID from params and lookup a DB ID for that user. If
-/// one cannot be found, the request will be aborted
+// UserMiddleware will extract the userID from params and lookup a DB ID for that user.
+// It also verifies the JWT user matches the provided ID
+// If one cannot be found, the request will be aborted
 func (svc *ServiceContext) UserMiddleware(c *gin.Context) {
 	uid := c.Param("uid")
 	var userID int
@@ -22,6 +23,19 @@ func (svc *ServiceContext) UserMiddleware(c *gin.Context) {
 	if uErr != nil {
 		log.Printf("ERROR: coubdn't find user %s: %v", uid, uErr)
 		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	claims, error := getJWTClaims(c)
+	if error != nil {
+		log.Printf("ERROR: %s", error.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	if claims.UserID != uid {
+		log.Printf("ERROR: user %s in URL does not match JWT", uid)
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
