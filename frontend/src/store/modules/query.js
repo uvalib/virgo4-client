@@ -20,6 +20,7 @@ const query = {
          { value: "keyword", label: "Keyword", type: "text", choices: [] },
          { value: "identifier", label: "Identifier", type: "text", choices: [] },
          { value: "title", label: "Title", type: "text", choices: [] },
+         { value: "journal_title", label: "Journal Title", type: "text", choices: [] },
          { value: "author", label: "Author", type: "text", choices: [] },
          { value: "subject", label: "Subject", type: "text", choices: [] },
          { value: "date", label: "Date", type: "date", choices: [] },
