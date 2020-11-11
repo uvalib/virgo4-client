@@ -44,7 +44,7 @@
                      <dd class="value" :key="`v${idx}`">
                         <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
                            :links="getBrowseLinks('subject', field.value)" />
-                        <span class="related" v-else-if="field.type=='related-url' && field.name != 'online_related'">
+                        <span class="related" v-else-if="field.type=='related-url'">
                            <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
                               <a :id="`rl-${idx}`" class="link-button" :href="v.url" target="_blank">{{v.label}}</a>
                            </div>
