@@ -78,7 +78,11 @@ func (svc *ServiceContext) NetbadgeAuthentication(c *gin.Context) {
 	// Set auth info in a cookie the client can read and pass along in future requests
 	c.SetCookie("v4_jwt", signedStr, 10, "/", "", false, false)
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.Redirect(http.StatusFound, "/signedin")
+	if c.Request.Header.Get("Content-Type") == "application/json" {
+		c.String(http.StatusOK, signedStr)
+	} else {
+		c.Redirect(http.StatusFound, "/signedin")
+	}
 }
 
 // PublicAuthentication aill authenticate public users of Virgo4
