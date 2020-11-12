@@ -158,8 +158,14 @@ const item = {
          let dcField = allFields.find( f=>f.name=="digital_content_url")
          if (!dcField) return
 
+         const noAuthAxios = axios.create({
+            timeout: 5000,
+         })
+         delete noAuthAxios.defaults.headers.common['Authorization']
+
          ctx.commit("setDigitalContentLoading", true)
-         axios.get(dcField.value).then((response) => {
+         console.log("GET DIGIAL CONTENT: "+dcField.value)
+         noAuthAxios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
             ctx.commit("setDigitalContentLoading", false)
          }).catch((_error) => {
