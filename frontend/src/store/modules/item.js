@@ -63,18 +63,10 @@ const item = {
       },
       setDigitalContentData(state, data) {
          state.details.digitalContent.splice(0, state.details.digitalContent.length)
-         let pdfs = data.parts.filter( dc => dc.pdf && dc.pdf.status != "FAILED" && dc.pdf.status != "PROCESSING" && dc.pdf.status != "100%")
-         pdfs.forEach( item => {
-            if ( item.pdf.status == "READY") {
-               state.details.digitalContent.push({type: "PDF", status: "READY", url: item.pdf.urls.download,
-                  name: item.label, thumbnail: item.thumbnail_url})
-            } else if ( item.pdf.status.includes("%")) {
-               state.details.digitalContent.push({type: "PDF", status: "PENDING", url: item.pdf.urls.download,
-                  statusURL: item.pdf.urls.status, name: item.label, thumbnail: item.thumbnail_url})
-            } else {
-               state.details.digitalContent.push({type: "PDF", status: "NOT_AVAIL", url: item.pdf.urls.download,
-                  generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status, name: item.label, thumbnail: item.thumbnail_url})
-            }
+         data.parts.filter( dc => dc.pdf).forEach( item => {
+            state.details.digitalContent.push({type: "PDF", status: "UNKNOWN", url: item.pdf.urls.download,
+               generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status,
+               name: item.label, thumbnail: item.thumbnail_url})
          })
          let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
          ocrs.forEach( item => {
@@ -137,10 +129,10 @@ const item = {
    actions: {
       async generateDigitalContent(ctx, item ) {
          try {
-            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "0%"})
             await axios.get(item.generateURL)
             ctx.dispatch("getDigitalContentStatus", item.name)
-         } catch (_err) {
+         } catch (err) {
+            console.error("Unable to generate "+item.ur+": "+err)
             ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "ERROR"})
          }
       },
@@ -149,7 +141,7 @@ const item = {
             let response = await axios.get(item.statusURL)
             ctx.commit("setDigitalContentStatus", {name: item.name, type: item.type, status: response.data})
          } catch(error) {
-            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "ERROR"})
+            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "NOT_AVAIL"})
          }
       },
 

@@ -172,22 +172,30 @@ export default {
    },
    methods: {
       generateInProgress(item) {
-         return !( item.status == "READY" || item.status == "ERROR" || item.status == "NOT_AVAIL")
+         return !( item.status == "READY" || item.status == "ERROR" || item.status == "NOT_AVAIL" ||  item.status == "UNKNOWN")
       },
       async pdfClicked( item ) {
-         if (item.status == "READY") {
-             window.location.href=item.url
+         await this.$store.dispatch("item/getDigitalContentStatus", item )
+         if (item.status == "READY" || item.status == "100%") {
+            window.location.href=item.url
+            return
+         } else if (item.status == "ERROR" ) {
+            this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable.")
             return
          }
-         await this.$store.dispatch("item/generateDigitalContent", item)
+
+         if ( item.status == "NOT_AVAIL" ) {
+            await this.$store.dispatch("item/generateDigitalContent", item)
+         }
+
          var timerID = setInterval( async () => {
-            // console.log("check status...")
-            await this.$store.dispatch("item/getDigitalContentStatus", item )
-            // console.log("GOT status "+item.status)
-            if (item.status == "READY" || item.status == "ERROR" || item.status == "100%") {
-               // console.log("CLEAR INTERVAL")
+             await this.$store.dispatch("item/getDigitalContentStatus", item )
+             if (item.status == "READY" || item.status == "100%") {
                clearInterval(timerID)
                window.location.href=item.url
+            } else if (item.status == "ERROR" ) {
+               clearInterval(timerID)
+               this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable.")
             }
          }, 1000)
       },
