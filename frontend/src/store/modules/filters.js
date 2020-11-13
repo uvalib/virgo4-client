@@ -162,6 +162,7 @@ const filters = {
 
          if ( facetInfo.type == "radio") {
             // only one value can be selected in radio buckets
+            // Radio facets may not be needed anymore with the peer reviewed facet changes
             facetInfo.buckets.forEach( b=>{
                if ( data.value) {
                   if (b.value == data.value) {

@@ -43,7 +43,9 @@
                <dl v-else>
                   <template v-for="facetInfo in facets">
                      <V4Checkbox v-if="facetInfo.id == 'PeerReviewedOnly'" class="peer-cb" ref="peercb"
-                        :checked="peerReviewOnly(facetInfo.buckets)" @click="peerReviewClicked" :key="`f${facetInfo.id}`"
+                        :checked="peerReviewOnly(facetInfo.buckets)"
+                        @click="filterClicked(facetInfo.id, 'Yes')"
+                        :key="`f${facetInfo.id}`"
                      >
                         Peer Reviewed Only
                      </V4Checkbox>
@@ -152,13 +154,6 @@ export default {
          let sel = values.find( v => v.selected == true)
          if (sel) return sel.value == "Yes"
          return false
-      },
-      async peerReviewClicked() {
-         let data = {pool: this.selectedResults.pool.id, facetID: "PeerReviewedOnly"}
-         this.$store.commit("filters/toggleFilter", data)
-         this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchSelectedPool")
-         this.addFilterToURL()
       },
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
