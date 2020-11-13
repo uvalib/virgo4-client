@@ -37,21 +37,6 @@ export default {
       SearchHitHeader, SearchHitDetail, AccordionContent
    },
    computed: {
-      hasDigitalContent() {
-         if (this.isKiosk) return false
-         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")
-         return dc
-      },
-      digitalContentLinks() {
-         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")
-         return `<a href="${dc.value}"><i class="icon far fa-file-pdf"></i><label>Download PDF</label></a>`
-      },
-      accessURLField() {
-         return this.hit.basicFields.find(f => f.name=="access_url")
-      },
-      detailsURL() {
-         return `/sources/${this.pool}/items/${this.hit.identifier}`
-      },
       groupTitle() {
          return `Show this group (${this.hit.group.length})`
       },
@@ -67,26 +52,6 @@ export default {
          isKiosk: "system/isKiosk",
          hasCoverImages: 'pools/hasCoverImages',
       }),
-      truncateLength() {
-         if ( this.hasCoverImages(this.pool)) return 60
-         return 80
-      }
-   },
-   methods: {
-      getKey(field,idx) {
-         return this.hit.identifier+field.value+idx
-      },
-      shouldDisplay(field) {
-         if (field.display == 'optional' || field.type == "url" || field.name.includes("_download_url") ) return false
-         if ( this.isKiosk && field.type == "url") return false
-         return true
-      },
-      fieldValueString(field) {
-         if ( Array.isArray(field.value)) {
-            return field.value.join(", ")
-         }
-         return field.value
-      },
    }
 };
 </script>
