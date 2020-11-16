@@ -106,11 +106,8 @@
          </template>
       </div>
       <div class="full-width-content" v-if="details.searching === false && notFound == false">
-         <template v-if="hasEmbeddedMedia">
-            <span class="oembed" v-for="(iframe,idx) in details.embeddedMedia" :key="`embed${idx}`" v-html="iframe"></span>
-         </template>
          <template v-if="poolMode=='image'">
-            <div class="img-view large" ref="viewer" v-if="hasEmbeddedMedia==false">
+            <div class="img-view large" ref="viewer">
                <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
                <div class="img-toolbar">
                   <a target="_blank" :href="imageURL('max')">
@@ -129,6 +126,7 @@
       <div class="availability-info">
          <Availability v-if="hasAvailability && notFound == false" :titleId="details.identifier" />
       </div>
+      <DigitalContent />
       <ShelfBrowse v-if="!details.searching && notFound == false" :hit="details" :pool="details.source" :target="browseTarget"/>
    </div>
 </template>
@@ -147,6 +145,7 @@ import V4LinksList from '@/components/V4LinksList'
 import V4Pager from '@/components/V4Pager'
 import Citations from '@/components/modals/Citations'
 import ShelfBrowse from "@/components/details/ShelfBrowse"
+import DigitalContent from "@/components/details/DigitalContent"
 
 export default {
    name: "detail",
@@ -163,7 +162,7 @@ export default {
       }
    },
    components: {
-      SearchHitHeader, Availability, TruncatedText, V4Pager, ShelfBrowse,
+      SearchHitHeader, Availability, TruncatedText, V4Pager, ShelfBrowse, DigitalContent,
       AccordionContent, AccessURLDetails, V4DownloadButton, V4LinksList, Citations
    },
    computed: {
@@ -192,10 +191,6 @@ export default {
       risURL() {
          if (this.citationsURL == "") return ""
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
-      },
-      hasEmbeddedMedia() {
-         if ( !this.details.embeddedMedia) return false
-         return this.details.embeddedMedia.length > 0
       },
       poolMode() {
          let details = this.poolDetails(this.details.source)

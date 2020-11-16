@@ -6,11 +6,11 @@ import analytics from '../../analytics'
 const item = {
    namespaced: true,
    state: {
-      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[],
-         related:[], digitalContent: [], embeddedMedia: [] },
+      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[] },
+      digitalContent: [],
+      googleBooksURL: "",
       loadingDigitalContent: false,
       availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
-      googleBooksURL: ""
    },
 
    getters: {
@@ -20,12 +20,13 @@ const item = {
       hasDetails: state => (identifier) => {
          return state.identifier == identifier
       },
+      hasDigitalContent: state => {
+         if ( !state.digitalContent) return false
+         return state.digitalContent.length > 0
+      },
       availability: state => {
         if ( state.availability == null ) return []
         return state.availability
-      },
-      getPDF: state => (name) => {
-         return state.details.digitalContent.find( dc=>dc.name==name && dc.type=="PDF")
       },
       hasBoundWithItems: state => {
          return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
@@ -46,43 +47,51 @@ const item = {
             // strip out this item info from related
             details.related = details.related.filter(  r => r.id != details.identifier)
          }
-         details.digitalContent = []
-         details.embeddedMedia = []
          details.source = source
          details.searching = true
          state.details = details
+         state.digitalContent.splice(0, state.digitalContent.length)
       },
       setDigitalContentStatus(state, data) {
-         let dc = state.details.digitalContent.find( f=>f.name==data.name && f.type==data.type)
-         if ( dc ) {
-            dc.status = data.status
+         let dcIdx = state.digitalContent.findIndex( f=>f.pid==data.pid )
+         if ( dcIdx >= 0) {
+            let dc = state.digitalContent[dcIdx]
+            if (data.type == "PDF") {
+               dc.pdf.status = data.status
+            }
+            // splice is reactive, use it to replace the item in array
+            state.digitalContent.splice(dcIdx, 1, dc)
          }
       },
       setDigitalContentLoading(state, flag) {
          state.loadingDigitalContent = flag
       },
       setDigitalContentData(state, data) {
-         state.details.digitalContent.splice(0, state.details.digitalContent.length)
+         state.digitalContent.splice(0, state.digitalContent.length)
          data.parts.filter( dc => dc.pdf).forEach( item => {
-            state.details.digitalContent.push({type: "PDF", status: "UNKNOWN", url: item.pdf.urls.download,
-               generateURL: item.pdf.urls.generate, statusURL: item.pdf.urls.status,
-               name: item.label, thumbnail: item.thumbnail_url})
+            state.digitalContent.push({
+               pdf: {
+                  status: "UNKNOWN",
+                  url: item.pdf.urls.download,
+                  generateURL: item.pdf.urls.generate,
+                  statusURL: item.pdf.urls.status,
+               },
+               oEmbedURL: item.oembed_url,
+               name: item.label,
+               pid: item.pid,
+               thumbnail: item.thumbnail_url
+            })
          })
-         let ocrs = data.parts.filter( dc => dc.ocr && dc.ocr.status == "READY" )
-         ocrs.forEach( item => {
-            state.details.digitalContent.push({type: "OCR", url: item.pdf.urls.download})
-         })
+         // TODO support OC... just merge the OCR links info into the digital content above
       },
       setGoogleBooksURL(state, data) {
          state.googleBooksURL = data.items[0].volumeInfo.previewLink
       },
-      addEmbeddedMedia( state, html ) {
-         state.details.embeddedMedia.push(html)
-      },
       clearDetails(state) {
          state.details = {searching: true, source: "", identifier:"", basicFields:[],
-            detailFields:[], related:[], digitalContent: [], embeddedMedia: []}
+            detailFields:[], related:[]}
          state.googleBooksURL = ""
+         state.digitalContent.splice(0, state.digitalContent.length)
       },
       setAvailability(state, {titleId, response}) {
         state.availability.titleId = titleId
@@ -127,21 +136,21 @@ const item = {
    },
 
    actions: {
-      async generateDigitalContent(ctx, item ) {
+      async generatePDF(ctx, item ) {
          try {
-            await axios.get(item.generateURL)
+            await axios.get(item.pdf.generateURL)
             ctx.dispatch("getDigitalContentStatus", item.name)
          } catch (err) {
-            console.error("Unable to generate "+item.ur+": "+err)
-            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "ERROR"})
+            console.error("Unable to generate PDF "+item.pdf.url+": "+err)
+            ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "PDF", status: "ERROR"})
          }
       },
-      async getDigitalContentStatus(ctx, item) {
+      async getPDFStatus(ctx, item) {
          try {
-            let response = await axios.get(item.statusURL)
-            ctx.commit("setDigitalContentStatus", {name: item.name, type: item.type, status: response.data})
+            let response = await axios.get(item.pdf.statusURL)
+            ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "PDF", status: response.data})
          } catch(error) {
-            ctx.commit("setDigitalContentStatus", {name: item.name,  type: item.type, status: "NOT_AVAIL"})
+            ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "PDF", status: "NOT_AVAIL"})
          }
       },
 
@@ -150,36 +159,18 @@ const item = {
          let dcField = allFields.find( f=>f.name=="digital_content_url")
          if (!dcField) return
 
+         // the URL is for a manifest stored in S3. Auth headers must be removed or request will fail
          const noAuthAxios = axios.create({
             timeout: 5000,
          })
          delete noAuthAxios.defaults.headers.common['Authorization']
 
          ctx.commit("setDigitalContentLoading", true)
-         console.log("GET DIGIAL CONTENT: "+dcField.value)
          noAuthAxios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
             ctx.commit("setDigitalContentLoading", false)
          }).catch((_error) => {
             ctx.commit("setDigitalContentLoading", false)
-         })
-      },
-
-      getOEmbedMedia(ctx) {
-         const noAuthAxios = axios.create({
-            timeout: 5000,
-         })
-         delete noAuthAxios.defaults.headers.common['Authorization']
-
-         let screenW = ctx.rootState.system.displayWidth-30;
-         let oembed = ctx.state.details.detailFields.filter( f => f.type == "oembed-url")
-         oembed.forEach( async oe => {
-            try {
-               let resp = await noAuthAxios.get(oe.value+"&maxwidth="+screenW+"&maxheight=600")
-               ctx.commit("addEmbeddedMedia", resp.data.html)
-            } catch (err) {
-               console.error("Unable to get oEmbed media from "+oe.value+": "+err)
-            }
          })
       },
 
@@ -245,7 +236,6 @@ const item = {
             ctx.commit("setDetails", {source: source, poolURL: pool.url, details: details})
             ctx.dispatch("getDigitalContent")
             ctx.dispatch("getGoogleBooksURL")
-            ctx.dispatch("getOEmbedMedia")
             ctx.commit('clearSearching')
          }).catch( async (error) => {
             if ( error.response && error.response.status == 404) {
@@ -327,7 +317,6 @@ const item = {
 
       async getCitations(ctx, {format, itemURL}) {
         let url = `${ctx.rootState.system.citationsURL}/format/${format}?item=${encodeURI(itemURL)}`
-      //   console.log("Get citations from: "+url)
         return axios.get(url)
       },
 

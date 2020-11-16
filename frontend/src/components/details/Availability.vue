@@ -14,39 +14,6 @@
 
          <p class="error" v-if="availability.error" v-html="availability.error"></p>
 
-         <div class="digital-content">
-            <div class="working" v-if="loadingDigitalContent">
-               <V4Spinner message="Searching for digital content..." />
-            </div>
-            <div class="pdfs" v-if="hasPDFContent">
-               <label>Download PDF:</label>
-               <div class="value">
-                  <vue-horizontal-list :items="pdfs"
-                     :options="{item: {class: 'pdf', padding: 0}, navigation: {start: 576}, list: {padding:0}}"
-                  >
-                     <template v-slot:default="{item}">
-                        <div class="download-card" tabindex="0" role="button"
-                           @click.stop="pdfClicked(item)" @keyup.stop.enter="pdfClicked(item)"
-                           @keydown.space.prevent.stop="pdfClicked(item)"
-                           :aria-label="`download pdf for ${item.name}`"
-                        >
-                           <V4ProgressBar v-if="generateInProgress(item)" :id="item.name"
-                              :percent="item.status" label="Generating PDF"
-                           />
-                           <img v-if="item.thumbnail" :src="item.thumbnail"/>
-                           <span class="label">{{item.name}}</span>
-                        </div>
-                     </template>
-                  </vue-horizontal-list>
-               </div>
-            </div>
-            <div class="google" v-if="googleBooksURL">
-               <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
-                  <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
-               </a>
-            </div>
-         </div>
-
          <div class="working" v-if="availability.searching" >
             <V4Spinner message="Loading Availability..."/>
          </div>
@@ -105,14 +72,12 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import V4ProgressBar from "@/components/V4ProgressBar"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice"
 import RequestContainer from "@/components/requests/RequestContainer"
 import BoundWithItems from "@/components/details/BoundWithItems"
-import VueHorizontalList from 'vue-horizontal-list'
 export default {
   components: {
-    AvailabilityNotice, RequestContainer, BoundWithItems, VueHorizontalList, V4ProgressBar
+    AvailabilityNotice, RequestContainer, BoundWithItems
   },
    props: {
       titleId: String
@@ -120,7 +85,7 @@ export default {
    computed: {
       showAvailability() {
          return this.availability.searching == false && (this.hasItems || this.hasRequestOptions ||
-            this.hasPDFContent || this.googleBooksURL != "" || this.availabilityFields.length > 0 )
+            this.hasDigitalContent || this.googleBooksURL != "" || this.availabilityFields.length > 0 )
       },
       ...mapState({
          details : state => state.item.details,
@@ -133,14 +98,8 @@ export default {
          hasRequestOptions: 'requests/hasRequestOptions',
          hasBoundWithItems: 'item/hasBoundWithItems',
          hasExternalHoldings: 'pools/hasExternalHoldings',
+         hasDigitalContent: 'item/hasDigitalContent'
       }),
-      hasPDFContent() {
-         if ( !this.details.digitalContent) return false
-         return this.details.digitalContent.filter( dc => dc.type == "PDF").length > 0
-      },
-      pdfs() {
-         return this.details.digitalContent.filter( dc => dc.type == "PDF")
-      },
       hasItems(){
          return Array.isArray(this.availability.items) && this.availability.items.length > 0
 
@@ -171,34 +130,6 @@ export default {
       }
    },
    methods: {
-      generateInProgress(item) {
-         return !( item.status == "READY" || item.status == "ERROR" || item.status == "NOT_AVAIL" ||  item.status == "UNKNOWN")
-      },
-      async pdfClicked( item ) {
-         await this.$store.dispatch("item/getDigitalContentStatus", item )
-         if (item.status == "READY" || item.status == "100%") {
-            window.location.href=item.url
-            return
-         } else if (item.status == "ERROR" ) {
-            this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable.")
-            return
-         }
-
-         if ( item.status == "NOT_AVAIL" ) {
-            await this.$store.dispatch("item/generateDigitalContent", item)
-         }
-
-         var timerID = setInterval( async () => {
-             await this.$store.dispatch("item/getDigitalContentStatus", item )
-             if (item.status == "READY" || item.status == "100%") {
-               clearInterval(timerID)
-               window.location.href=item.url
-            } else if (item.status == "ERROR" ) {
-               clearInterval(timerID)
-               this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable.")
-            }
-         }, 1000)
-      },
       formatValue(val) {
          if ( val == "On Shelf" ) {
             return "On Shelf Now"
@@ -234,9 +165,6 @@ export default {
       text-align: center;
    }
 }
-::v-deep .pdf {
-   padding-top: 0 !important;
-}
 .availability-content {
    margin: 0 0 20px 0;
    text-align: left;
@@ -257,46 +185,6 @@ export default {
    label {
       font-weight: bold;
       display: block;
-   }
-
-   div.pdfs {
-      margin: 25px 0 0 0;
-
-      .download-card {
-         position: relative;
-         display: inline-block;
-         text-align: center;
-         margin: 5px;
-         border: 1px solid var(--uvalib-grey-light);
-         padding: 15px 10px 10px 10px;
-         border-radius: 3px;
-         box-shadow: $v4-box-shadow-light;
-         cursor: pointer;
-
-         &:focus {
-            @include be-accessible();
-         }
-
-         &:hover {
-            span.label {
-               text-decoration: underline;
-            }
-         }
-
-         span.label {
-            color: var(--color-link);
-            font-weight: 500;
-            display: block;
-         }
-
-         .v4-progress-bar {
-            position: absolute;
-            left: 10px;
-            right: 10px;
-            top: 40%;
-            transform: translateY(-50%);
-         }
-      }
    }
 
    ul {
