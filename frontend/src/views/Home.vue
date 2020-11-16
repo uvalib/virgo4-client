@@ -25,6 +25,11 @@
             >
           </div>
           <div class="controls">
+             <template v-if="hasResults">
+               <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
+               <span class="sep">|</span>
+             </template>
+
             <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
           </div>
           <div class="advanced">
@@ -176,6 +181,10 @@ export default {
       },
    },
    methods: {
+      async resetSearch(){
+         this.$store.dispatch('resetSearch')
+         this.$router.push(`/search`)
+      },
       async restoreSearchFromQueryParams( query ) {
          if  (!query.q) {
             // No query - reset everything
@@ -445,11 +454,8 @@ span.sep {
   padding: 10px 0;
   display: flex;
   flex-flow: row wrap;
-  align-items: flex-start;
-  justify-content: flex-start;
-}
-.controls .search.v4-button {
-   margin-left: auto;
+  align-items: center;
+  justify-content: flex-end;
 }
 .controls  > * {
   flex: 0 1 auto;
