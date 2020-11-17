@@ -3,9 +3,9 @@
       <div class="working" v-if="loadingDigitalContent">
          <V4Spinner message="Searching for digital content..." />
       </div>
-      <div class="items" v-if="hasDigitalContent">
+      <div class="items" v-if="hasDigitalContent || googleBooksURL">
          <h2>View Online</h2>
-         <div class="viewer">
+         <div class="viewer" v-if="hasDigitalContent">
             <iframe :src="curioURL" style="background:black;" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
          </div>
          <div class="value">
@@ -40,11 +40,11 @@
                </template>
             </vue-horizontal-list>
          </div>
-      </div>
-      <div class="google" v-if="googleBooksURL">
-         <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
-            <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
-         </a>
+         <div class="google" v-if="googleBooksURL">
+            <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
+               <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
+            </a>
+         </div>
       </div>
    </div>
 </template>
@@ -60,6 +60,17 @@ export default {
    data: function() {
       return {
          selectedDigitalObjectIdx: 0,
+      }
+   },
+   watch: {
+      loadingDigitalContent() {
+         if (this.loadingDigitalContent == false && this.hasDigitalContent == true) {
+            this.digitalContent.forEach( dc => {
+               if (dc.pdf ) {
+                  this.$analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
+               }
+            })
+         }
       }
    },
    computed: {
@@ -106,6 +117,7 @@ export default {
       async pdfClicked( item ) {
          await this.$store.dispatch("item/getPDFStatus", item )
          if (item.pdf.status == "READY" || item.pdf.status == "100%") {
+            this.$analytics.trigger('PDF', 'PDF_DOWNLOAD_CLICKED', item.pid)
             window.location.href=item.pdf.url
             return
          } else if (item.pdf.status == "ERROR" ) {
@@ -114,6 +126,7 @@ export default {
          }
 
          if ( item.pdf.status == "NOT_AVAIL" ) {
+            this.$analytics.trigger('PDF', 'PDF_GENERATE_CLICKED', item.pid)
             await this.$store.dispatch("item/generatePDF", item)
          }
 
@@ -150,6 +163,10 @@ export default {
 
    div.viewer {
       margin-bottom: 25px;
+   }
+
+   .google {
+      margin-top: 25px;
    }
 
    div.items {
