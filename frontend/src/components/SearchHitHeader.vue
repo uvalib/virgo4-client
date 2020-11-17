@@ -15,6 +15,11 @@
             </router-link>
          </div>
          <div class="icon-wrap">
+            <V4Button v-if="from=='DETAIL'"  mode="icon" @click="shareClicked" :id="`share-${hit.identifier}`"
+               :aria-label="`copy link to ${hit.header.title}`"
+            >
+               <i class="share fas fa-share-alt"></i>
+            </V4Button>
             <template v-if="showCitations">
                <div class="citation-control">
                   <Citations title="Citations" :id="`citation-${hit.identifier}`" style="margin-right: 10px"
@@ -92,6 +97,14 @@ export default {
          this.$store.commit("hitSelected", this.hit.identifier)
          this.$analytics.trigger('Results', 'DETAILS_CLICKED', this.hit.identifier)
       },
+      shareClicked() {
+         let URL = window.location.href
+         this.$copyText(URL).then( ()=> {
+            this.$store.commit("system/setMessage", "Item URL copied to clipboard.")
+         }, e => {
+            this.$store.commit("system/setError", "Unable to URL to clipboard: "+e)
+         })
+      }
    }
 }
 </script>
@@ -140,6 +153,19 @@ export default {
       display: flex;
       flex-flow: row nowrap;
       margin-left: auto;
+      align-content: center;
+      i.share {
+         color: #444;
+         cursor: pointer;
+         font-size: 1.4em;
+         display: inline-block;
+         box-sizing: border-box;
+         margin-right: 5px;
+         padding:0;
+         &:hover {
+            color:var(--uvalib-brand-blue-light);
+         }
+      }
    }
    .citation-control {
       padding: 5px;
