@@ -432,3 +432,25 @@ func (svc *ServiceContext) SavePreferences(c *gin.Context) {
 
 	c.String(http.StatusOK, "OK")
 }
+
+// GetPreferences will save a block of JSON preference data to the user table
+func (svc *ServiceContext) GetPreferences(c *gin.Context) {
+	userID := c.Param("uid")
+	v4User := &V4User{}
+	q := svc.DB.NewQuery(`select id,preferences from users where virgo4_id={:id}`)
+	q.Bind(dbx.Params{"id": userID})
+	err := q.One(v4User)
+	if err != nil {
+		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err)
+		v4User.Preferences = "{}"
+	}
+	// Format preferences as JSON
+	prefStr := []byte(v4User.Preferences)
+	var prefJSON map[string]interface{}
+	if err := json.Unmarshal(prefStr, &prefJSON); err != nil {
+		log.Printf("ERROR: invalid preferences JSON")
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, prefJSON)
+}
