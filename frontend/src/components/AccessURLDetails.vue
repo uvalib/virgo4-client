@@ -7,15 +7,20 @@
                   :aria-label="`access ${title} online with ${providerLabel(p.provider)}`"
                >
                   {{ providerLabel(p.provider) }}
-                  <template v-if="p.links[0].label"> ({{ p.links[0].label }})</template>
+                  <template v-if="p.links[0].label && hasProviderInfo(p.provider)">
+                     ({{ p.links[0].label }})
+                  </template>
+                  <template v-else-if="p.links[0].label">
+                     {{ p.links[0].label }}
+                  </template>
                </a>
             </template>
             <template v-else>
-               <div v-if="hasProviderInfo" class="header" :class="{full: mode=='full'}">
+               <div v-if="hasProviderInfo(p.provider)" class="header" :class="{full: mode=='full'}">
                   <template v-if="providerHomepage(p.provider)">
-                     <a :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
-                        <img class="logo" v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
-                        <span v-else class="provider link">{{ providerLabel(p.provider) }}</span>
+                     <a class="provider-link" :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
+                        <img v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
+                        {{ providerLabel(p.provider) }}
                      </a>
                   </template>
                   <template v-else>
@@ -67,11 +72,11 @@ export default {
       ...mapGetters({
          findProvider: 'pools/findProvider'
       }),
+   },
+   methods: {
       hasProviderInfo(provider) {
          return this.findProvider(this.pool, provider) != null
       },
-   },
-   methods: {
       providerLabel(provider) {
          let p = this.findProvider(this.pool, provider)
          if ( p ) return p.label
@@ -135,10 +140,7 @@ span.provider {
 .header.full span.provider {
    font-size: 1.15em;
 }
-span.provider.link {
-   color: var(--color-link);
-   font-weight:  500 !important;
-}
+
 .links.indent {
    margin: 0 0 0 20px;
 }
@@ -152,11 +154,15 @@ span.provider.link {
 .links.full {
    font-size: 1em;
 }
-img.logo {
-   display: inline-block;
-   height: 55px;
-   width: auto !important;
-   margin:0;
-   padding: 10px 0 5px 0px;
+.provider-link {
+   display: inline-flex;
+   align-items: center;
+   color: var(--color-link);
+   font-weight: 500 !important;
+   img {
+      height: 55px;
+      width: auto !important;
+      margin: 3px 5px 3px 0;
+   }
 }
 </style>
