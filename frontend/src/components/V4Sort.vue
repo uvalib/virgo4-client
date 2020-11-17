@@ -81,8 +81,7 @@ div.v4-sort {
       margin-left: 10px;
       cursor: pointer;
       &:hover {
-         border-color: var(--uvalib-brand-blue-light);
-         color: var(--uvalib-brand-blue-light);
+         text-decoration: underline;
       }
    }
    .sort-type {
