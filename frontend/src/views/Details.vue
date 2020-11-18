@@ -105,24 +105,6 @@
             </div>
          </template>
       </div>
-      <div class="full-width-content" v-if="details.searching === false && notFound == false">
-         <template v-if="poolMode=='image'">
-            <div class="img-view large" ref="viewer">
-               <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
-               <div class="img-toolbar">
-                  <a target="_blank" :href="imageURL('max')">
-                     View full size<i class="fas fa-external-link-alt"></i>
-                  </a>
-               </div>
-            </div>
-            <div v-if="details.related.length > 0" class="related">
-               <label>Related Images</label>
-               <a :href="relatedImageURL(r)"  v-for="r in details.related" :key="`r${r.id}`">
-                  <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
-               </a>
-            </div>
-         </template>
-      </div>
       <div class="availability-info">
          <Availability v-if="hasAvailability && notFound == false" :titleId="details.identifier" />
       </div>
@@ -192,10 +174,6 @@ export default {
          if (this.citationsURL == "") return ""
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
       },
-      poolMode() {
-         let details = this.poolDetails(this.details.source)
-         return details.mode
-      },
       owningInstitution() {
          let details = this.poolDetails(this.details.source)
          let attr = details.attributes.find( a=> a.name=='external_hold')
@@ -239,21 +217,8 @@ export default {
       }
    },
    methods: {
-      relatedImageURL( r ) {
-         return `/sources/${this.details.source}/items/${r.id}`
-      },
       returnToSearch() {
          this.$router.push( this.lastSearchURL )
-      },
-      imageURL(size) {
-         let iiifField = this.allFields.find( f => f.name=="iiif_image_url")
-         if (!iiifField) return ""
-         if ( size == 'full') {
-            return [`${iiifField.value}/full/1200,/0/default.jpg`]
-         } else if (size == 'max') {
-            return [`${iiifField.value}/full/full/0/default.jpg`]
-         }
-         return [`${iiifField.value}/full/600,/0/default.jpg`]
       },
       async nextHitClicked() {
          await this.$store.dispatch("nextHit")
@@ -439,52 +404,6 @@ export default {
       .back {
          text-align: right;
          margin: 5px 0;
-      }
-   }
-
-   .full-width-content {
-      margin-bottom: 25px;
-      .img-view {
-         display: inline-block;
-         margin: 0 auto;
-         .img-toolbar {
-            padding: 10px 0;
-            text-align: right;
-            a {
-               font-weight: 100 !important;
-               i {
-                  margin-left: 8px;
-               }
-            }
-         }
-      }
-      .related {
-         width: 90%;
-         margin: 15px auto 0 auto;
-         text-align: left;
-         label {
-            padding:0 0 5px 0;
-            border-bottom: 2px solid var(--color-brand-blue);
-            margin-bottom: 10px;
-            display: block;
-            font-weight: 500;
-         }
-         a {
-            display: inline-block;
-            margin: 10px;
-         }
-         img {
-            background-image: url('~@/assets/dots.gif');
-            background-repeat:no-repeat;
-            background-position: center center;
-            min-width: 175px;
-            min-height: 175px;
-            background-color: rgb(252, 252, 252);
-            box-shadow: $v4-box-shadow;
-            &:hover {
-               box-shadow: 0px 2px 8px 0 #444;
-            }
-         }
       }
    }
 

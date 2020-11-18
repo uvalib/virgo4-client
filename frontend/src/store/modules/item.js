@@ -66,6 +66,14 @@ const item = {
       setDigitalContentLoading(state, flag) {
          state.loadingDigitalContent = flag
       },
+      setDigitalContentFromDetails(state) {
+         state.details.detailFields.filter( f => f.type == "oembed-url").forEach( o => {
+            state.digitalContent.push({
+               oEmbedURL: o.value,
+               pid: state.details.identifier,
+            })
+         })
+      },
       setDigitalContentData(state, data) {
          state.digitalContent.splice(0, state.digitalContent.length)
          data.parts.filter( dc => dc.pdf).forEach( item => {
@@ -157,7 +165,10 @@ const item = {
       getDigitalContent(ctx) {
          let allFields = ctx.state.details.basicFields.concat(ctx.state.details.detailFields)
          let dcField = allFields.find( f=>f.name=="digital_content_url")
-         if (!dcField) return
+         if (!dcField) {
+            ctx.commit("setDigitalContentFromDetails")
+            return
+         }
 
          // the URL is for a manifest stored in S3. Auth headers must be removed or request will fail
          const noAuthAxios = axios.create({

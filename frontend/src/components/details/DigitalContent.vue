@@ -3,13 +3,31 @@
       <div class="working" v-if="loadingDigitalContent">
          <V4Spinner message="Searching for digital content..." />
       </div>
-      <div class="items" v-if="hasDigitalContent || googleBooksURL">
+      <div class="items" v-if="hasDigitalContent || googleBooksURL || hasExternalImages">
          <h2>View Online</h2>
          <div class="viewer" v-if="hasDigitalContent">
             <iframe :src="curioURL" style="background:black;" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
          </div>
-         <div class="value">
-            <vue-horizontal-list :items="digitalContent"
+         <div v-else class="img-view large" ref="viewer">
+            <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
+            <div class="img-toolbar">
+               <a target="_blank" :href="imageURL('max')">
+                  View full size<i class="fas fa-external-link-alt"></i>
+               </a>
+            </div>
+         </div>
+
+         <template v-if="poolMode=='image'">
+            <div v-if="details.related.length > 0" class="related">
+               <label>Related Images</label>
+               <a :href="relatedImageURL(r)"  v-for="r in details.related" :key="`r${r.id}`">
+                  <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
+               </a>
+            </div>
+         </template>
+
+         <div v-else class="value">
+            <vue-horizontal-list :items="pdfContent"
                :options="{item: {class: 'pdf', padding: 0}, navigation: {start: 576}, list: {padding:0}}"
             >
                <template v-slot:default="{item}">
@@ -40,6 +58,7 @@
                </template>
             </vue-horizontal-list>
          </div>
+
          <div class="google" v-if="googleBooksURL">
             <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
                <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
@@ -75,14 +94,28 @@ export default {
    },
    computed: {
       ...mapState({
+         details : state => state.item.details,
          digitalContent : state => state.item.digitalContent,
          googleBooksURL : state => state.item.googleBooksURL,
          loadingDigitalContent : state => state.item.loadingDigitalContent,
          displayWidth: state => state.system.displayWidth
       }),
       ...mapGetters({
-         hasDigitalContent: 'item/hasDigitalContent'
+         hasDigitalContent: 'item/hasDigitalContent',
+         poolDetails: 'pools/poolDetails',
       }),
+      hasExternalImages() {
+         let iiifField = this.details.detailFields.find( f => f.name=="iiif_image_url")
+         if (iiifField) return true
+         return false
+      },
+      pdfContent() {
+         return this.digitalContent.filter( dc => dc.pdf)
+      },
+      poolMode() {
+         let details = this.poolDetails(this.details.source)
+         return details.mode
+      },
       curioURL() {
          let selDO = this.digitalContent[this.selectedDigitalObjectIdx]
          console.log(selDO)
@@ -104,6 +137,19 @@ export default {
       }
    },
    methods: {
+      imageURL(size) {
+         let iiifField = this.details.detailFields.find( f => f.name=="iiif_image_url")
+         if (!iiifField) return ""
+         if ( size == 'full') {
+            return [`${iiifField.value}/full/1200,/0/default.jpg`]
+         } else if (size == 'max') {
+            return [`${iiifField.value}/full/full/0/default.jpg`]
+         }
+         return [`${iiifField.value}/full/600,/0/default.jpg`]
+      },
+      relatedImageURL( r ) {
+         return `/sources/${this.details.source}/items/${r.id}`
+      },
       viewerClicked(item) {
          this.selectedDigitalObjectIdx = this.digitalContent.findIndex( i => i.pid == item.pid)
       },
@@ -112,6 +158,7 @@ export default {
          return (curr.pid == item.pid)
       },
       generatePDFInProgress(item) {
+         if ( !item.pdf) return false
          return !( item.pdf.status == "READY" || item.pdf.status == "ERROR" || item.pdf.status == "NOT_AVAIL" ||  item.pdf.status == "UNKNOWN")
       },
       async pdfClicked( item ) {
@@ -227,6 +274,49 @@ export default {
             right: 10px;
             top: 40%;
             transform: translateY(-50%);
+         }
+      }
+   }
+   .img-view {
+      display: inline-block;
+      margin: 0 auto;
+      .img-toolbar {
+         padding: 10px 0;
+         text-align: right;
+         a {
+            font-weight: 100 !important;
+            i {
+               margin-left: 8px;
+            }
+         }
+      }
+   }
+
+   div.related {
+      width: 90%;
+      margin: 15px auto 0 auto;
+      text-align: left;
+      label {
+         padding:0 0 5px 0;
+         border-bottom: 2px solid var(--color-brand-blue);
+         margin-bottom: 10px;
+         display: block;
+         font-weight: 500;
+      }
+      a {
+         display: inline-block;
+         margin: 10px;
+      }
+      img {
+         background-image: url('~@/assets/dots.gif');
+         background-repeat:no-repeat;
+         background-position: center center;
+         min-width: 175px;
+         min-height: 175px;
+         background-color: rgb(252, 252, 252);
+         box-shadow: $v4-box-shadow;
+         &:hover {
+            box-shadow: 0px 2px 8px 0 #444;
          }
       }
    }
