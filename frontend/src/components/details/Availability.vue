@@ -84,8 +84,7 @@ export default {
    },
    computed: {
       showAvailability() {
-         return this.availability.searching == false && (this.hasItems || this.hasRequestOptions ||
-            this.hasDigitalContent || this.googleBooksURL != "" || this.availabilityFields.length > 0 )
+         return this.availability.searching == false && (this.hasItems || this.hasRequestOptions || this.availabilityFields.length > 0 )
       },
       ...mapState({
          details : state => state.item.details,

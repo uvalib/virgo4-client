@@ -8,7 +8,7 @@
          <div class="viewer" v-if="hasDigitalContent">
             <iframe :src="curioURL" style="background:black;" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
          </div>
-         <div v-else class="img-view large" ref="viewer">
+         <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
             <div class="img-toolbar">
                <a target="_blank" :href="imageURL('max')">
@@ -134,6 +134,13 @@ export default {
       },
       curioHeight() {
          return this.curioWidth*0.75
+      },
+      hasImage() {
+         let iiifField = this.details.detailFields.find( f => f.name=="iiif_image_url")
+         if (iiifField) {
+            return true
+         }
+         return false
       }
    },
    methods: {

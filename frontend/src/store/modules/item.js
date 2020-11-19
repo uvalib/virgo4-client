@@ -93,7 +93,9 @@ const item = {
          // TODO support OC... just merge the OCR links info into the digital content above
       },
       setGoogleBooksURL(state, data) {
-         state.googleBooksURL = data.items[0].volumeInfo.previewLink
+         if (data.items[0].accessInfo.webReaderLink) {
+            state.googleBooksURL = data.items[0].accessInfo.webReaderLink
+         }
       },
       clearDetails(state) {
          state.details = {searching: true, source: "", identifier:"", basicFields:[],
