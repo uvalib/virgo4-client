@@ -296,7 +296,7 @@ export default {
             this.searchScope.name = `All ${this.sourceLabel}s`
          }
          await this.$store.dispatch('pools/getPools')
-         this.$store.dispatch("query/getAdvancedSeatchFilters")
+         this.$store.dispatch("query/getAdvancedSearchFilters")
 
          // When restoring a saved search, the call will be /search/:token
          if ( this.isRestore ) {

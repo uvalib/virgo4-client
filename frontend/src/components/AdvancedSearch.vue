@@ -57,7 +57,9 @@
                   <div class="select-criteria">
                      <select class="term" :aria-label="`select ${getTermLabel(term)} for criteria number ${idx+1}`" v-model="term.value">
                         <option value="" disabled selected>Select a {{getTermLabel(term)}}</option>
-                        <option v-for="opt in getTermChoices(term)" :key="`${opt}`" :value="opt">{{opt}}</option>
+                        <option v-for="opt in getTermChoices(term)" :key="opt.id" :value="opt.id">
+                           {{opt.name}}
+                        </option>
                      </select>
                   </div>
                </template>

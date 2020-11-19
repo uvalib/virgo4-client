@@ -157,7 +157,7 @@ const query = {
             // If the filter already exists in the fields list, remove it and replace with new
             // prepend the value with filter. so it can easily be identified as a filter when encountered in a
             // query term. Makes generating the v4 query much easier.
-            let val = `filter.${f.field}`
+            let val = `filter.${f.id}`
             let idx = state.advancedFields.findIndex( f=> f.value == val)
             if ( idx != -1 ) {
                state.advancedFields.splice(idx, 1)
@@ -165,7 +165,10 @@ const query = {
             if ( f.values.length == 0 ) {
                return
             }
-            let field = {value: `filter.${f.field}`, label: f.label, type: "select", choices: f.values}
+            let field = {value: `filter.${f.id}`, label: f.label, type: "select", choices: []}
+            f.values.forEach( v => {
+               field.choices.push({id: v.value, name: `${v.value} (${v.count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`})
+            })
             state.advancedFields.push(field)
          })
       },
@@ -208,7 +211,7 @@ const query = {
             // Content before the { is the keword and possibly boolean op
             // Regardless, this part ends in : plus 1 or more spaces which are not needed. Remove.
             // Example:
-            //   title: {pirate} AND filter: {source_f:"Hathi Trust Digital Library"}
+            //   title: {pirate} AND filter:{FilterCollection:"Avalon"}
             let keyOp = queryParams.substring(0, braceIdx).trim()   // get all up to colon
             keyOp = keyOp.substring(0, keyOp.length - 1)            // remove colon
 
@@ -222,7 +225,7 @@ const query = {
                // 'filter' is special. The field is filter.[fieldName] and fieldName is
                // the string before the colon in value. The actual value is the quoted string
                // after the colon, with the quotes stripped. So for the example above,
-               // field = filter.source_f and value=Hathi Trust Digital Library
+               // field = filter.FilterCollection and value=Avalon
                let filterField = value.split(":")[0].trim()
                let filterValue = value.split(":")[1].trim()
                filterValue = filterValue.substring(1, filterValue.length-1) // drop quotes
@@ -332,7 +335,7 @@ const query = {
       },
    },
    actions: {
-      async getAdvancedSeatchFilters(ctx) {
+      async getAdvancedSearchFilters(ctx) {
          let url = `${ctx.rootState.system.searchAPI}/api/filters`
          return axios.get(url).then((response) => {
             ctx.commit('setAdvancedFilterFields', response.data)
