@@ -98,6 +98,7 @@ export default {
          this.$analytics.trigger('Results', 'DETAILS_CLICKED', this.hit.identifier)
       },
       shareClicked() {
+         this.$analytics.trigger('Results', 'SHARE_ITEM_CLICKED', this.hit.identifier)
          let URL = window.location.href
          this.$copyText(URL).then( ()=> {
             this.$store.commit("system/setMessage", "Item URL copied to clipboard.")
