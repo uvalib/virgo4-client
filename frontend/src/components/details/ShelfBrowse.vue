@@ -74,7 +74,10 @@ export default {
       }),
       currentCallNumber() {
          let f =  this.hit.detailFields.find( f => f.name == "call_number")
-         return f.value
+         if ( f) {
+            return f.value
+         }
+         return this.hit.identifier
       },
       showRestore() {
          let center = this.shelfBrowse[this.browseRange]
