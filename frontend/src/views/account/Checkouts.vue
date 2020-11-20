@@ -32,9 +32,9 @@
                            <label>Sort by</label>
                            <select :value="checkoutsOrder" @change="sortChanged" ref="uvasort">
                               <option value="AUTHOR_ASC">Author (Ascending)</option>
-                              <option value="AUTHOR_DESC">Author (Decending)</option>
+                              <option value="AUTHOR_DESC">Author (Descending)</option>
                               <option value="TITLE_ASC">Title (Ascending)</option>
-                              <option value="TITLE_DESC">Title (Decending)</option>
+                              <option value="TITLE_DESC">Title (Descending)</option>
                            </select>
                         </span>
                         <V4Button v-if="!isBarred" id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
