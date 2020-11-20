@@ -226,8 +226,12 @@ const query = {
                // the string before the colon in value. The actual value is the quoted string
                // after the colon, with the quotes stripped. So for the example above,
                // field = filter.FilterCollection and value=Avalon
-               let filterField = value.split(":")[0].trim()
-               let filterValue = value.split(":")[1].trim()
+               let colonIdx = value.indexOf(":")
+               if (colonIdx == -1) {
+                  break
+               }
+               let filterField = value.substring(0, colonIdx).trim()
+               let filterValue = value.substring(colonIdx+1, value.length).trim()
                filterValue = filterValue.substring(1, filterValue.length-1) // drop quotes
                term.field = `filter.${filterField}`
                term.value = filterValue
@@ -236,8 +240,12 @@ const query = {
                let field = keyOpParts[1].trim().toLowerCase()
                if ( field == "filter") {
                   // see notes above for special filter handling details
-                  let filterField = value.split(":")[0].trim()
-                  let filterValue = value.split(":")[1].trim()
+                  let colonIdx = value.indexOf(":")
+                  if (colonIdx == -1) {
+                     break
+                  }
+                  let filterField = value.substring(0, colonIdx).trim()
+                  let filterValue = value.substring(colonIdx+1, value.length).trim()
                   filterValue = filterValue.substring(1, filterValue.length-1) // drop quotes
                   term.field = `filter.${filterField}`
                   term.value = filterValue
