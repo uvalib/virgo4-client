@@ -264,7 +264,6 @@ export default {
 
          if (src) {
             this.$store.commit("hitSelected", id)
-            console.log("GET DETAILS "+src+":"+id)
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {
             await this.$store.dispatch("item/lookupCatalogKeyDetail", {identifier: id, v3Redirect: true} )
@@ -282,7 +281,6 @@ export default {
             this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
             let collField = this.allFields.find( f => f.name == "digital_collection")
             if (collField) {
-               console.log("Trigger collection viewed "+collField.value+":"+id+"")
                this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
             }
 

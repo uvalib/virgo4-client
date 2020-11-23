@@ -1,130 +1,124 @@
 <template>
-   <div class="advanced-panel">
+   <div class="advanced-panel" :class="{narrow: hasResults}">
       <h1>
          <span>Advanced Search</span>
       </h1>
-      <div class="criteria">
-         <h2>
-            <span>Search Criteria</span>
-         </h2>
-         <div v-for="(term,idx) in advanced" :key="idx" class="search-term">
-            <div class="options">
-               <template v-if="idx > 0">
-                  <select class="search-term-op" v-model="term.op" :aria-label="`boolean operator for search criteria number ${idx+1}`">
-                     <option value="AND">AND</option>
-                     <option value="OR">OR</option>
-                     <option value="NOT">NOT</option>
-                  </select>
-               </template>
-               <select class="field" v-model="term.field" :aria-label="` field name for search criteria number ${idx+1}`">
-                  <option
-                     v-for="fieldObj in advancedFields"
-                     :key="fieldObj.value"
-                     :value="fieldObj.value"
-                  >{{fieldObj.label}}</option>
-               </select>
-               <template v-if="getTermType(term) == 'date'">
-                  <select class="date-range-type" v-model="term.comparison" :aria-label="`date comparision mode for search criteria ${idx+1}`">
-                     <option value="EQUAL">EQUALS</option>
-                     <option value="AFTER">AFTER</option>
-                     <option value="BEFORE">BEFORE</option>
-                     <option value="BETWEEN">BETWEEN</option>
-                  </select>
-               </template>
-               <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)"
-                  :aria-label="`delete search criteria number ${idx+1}`">
-                  <i class="fas fa-times-circle"></i>
-               </V4Button>
-            </div>
-
-            <div class="query">
-               <template v-if="getTermType(term) == 'date'">
-                   <div class="date-criteria">
-                     <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value"
-                         :aria-label="`date for search criteria number ${idx+1}`"/>
-                     <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
-                     <input
-                        v-if="term.comparison == 'BETWEEN'"
-                        type="text"
-                        @keyup.enter="doAdvancedSearch"
-                        v-model="term.endVal"
-                        :aria-label="`end date for search criteria ${idx+1}`"
-                     />
-                     <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
-                  </div>
-               </template>
-               <template v-else-if="getTermType(term) == 'select'">
-                  <div class="select-criteria">
-                     <select class="term" :aria-label="`select ${getTermLabel(term)} for criteria number ${idx+1}`" v-model="term.value">
-                        <option value="" disabled selected>Select a {{getTermLabel(term)}}</option>
-                        <option v-for="opt in getTermChoices(term)" :key="opt.id" :value="opt.id">
-                           {{opt.name}}
-                        </option>
+      <div class="advanced-controls">
+         <AdvancedFacets />
+         <div class="advanced-wrap">
+            <div class="criteria">
+               <div v-for="(term,idx) in advancedTerms" :key="idx" class="search-term">
+                  <div class="options">
+                     <template v-if="idx > 0">
+                        <select class="search-term-op" v-model="term.op" :aria-label="`boolean operator for search criteria number ${idx+1}`">
+                           <option value="AND">AND</option>
+                           <option value="OR">OR</option>
+                           <option value="NOT">NOT</option>
+                        </select>
+                     </template>
+                     <select class="field" v-model="term.field" :aria-label="` field name for search criteria number ${idx+1}`">
+                        <option
+                           v-for="fieldObj in advancedFields"
+                           :key="fieldObj.value"
+                           :value="fieldObj.value"
+                        >{{fieldObj.label}}</option>
                      </select>
+                     <template v-if="getTermType(term) == 'date'">
+                        <select class="date-range-type" v-model="term.comparison" :aria-label="`date comparision mode for search criteria ${idx+1}`">
+                           <option value="EQUAL">EQUALS</option>
+                           <option value="AFTER">AFTER</option>
+                           <option value="BEFORE">BEFORE</option>
+                           <option value="BETWEEN">BETWEEN</option>
+                        </select>
+                     </template>
+                     <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)"
+                        :aria-label="`delete search criteria number ${idx+1}`">
+                        <i class="fas fa-times-circle"></i>
+                     </V4Button>
                   </div>
-               </template>
-               <template v-else>
-                   <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term"
-                     :aria-label="`query string for search criteria number ${idx+1}`"/>
-               </template>
+
+                  <div class="query">
+                     <template v-if="getTermType(term) == 'date'">
+                        <div class="date-criteria">
+                           <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value"
+                              :aria-label="`date for search criteria number ${idx+1}`"/>
+                           <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
+                           <input
+                              v-if="term.comparison == 'BETWEEN'"
+                              type="text"
+                              @keyup.enter="doAdvancedSearch"
+                              v-model="term.endVal"
+                              :aria-label="`end date for search criteria ${idx+1}`"
+                           />
+                           <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
+                        </div>
+                     </template>
+                     <template v-else>
+                        <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term"
+                           :aria-label="`query string for search criteria number ${idx+1}`"/>
+                     </template>
+                  </div>
+               </div>
+               <div class="criteria-control">
+                  <V4Button mode="icon" id="add-criteria" @click="addClicked">
+                     <i class="fas fa-plus-circle"></i>
+                     <span class="btn-label">Add criteria</span>
+                  </V4Button>
+               </div>
+            </div>
+            <div class="controls-wrapper">
+               <div class="pools-wrapper">
+                  <h2>
+                     <span>{{sourceLabel}}s</span>
+                     <span>
+                        <V4Button mode="text" class="clear" @click="clearPoolsClicked">clear all</V4Button>
+                        <span class="sep">|</span>
+                        <V4Button mode="text" class="clear" @click="allPoolsClicked">select all</V4Button>
+                     </span>
+                  </h2>
+                  <div class="pools">
+                     <V4Checkbox v-for="src in filteredSources" :key="src.id" class="pool"
+                        :aria-label="`toggle inclusion of ${src.name} in search results`"
+                        :checked="!isPoolExcluded(src)"
+                        @click="poolClicked(src)">
+                        {{src.name}}
+                     </V4Checkbox>
+                  </div>
+                  <div class="what" v-if="!isKiosk">
+                     <a href="http://library.virginia.edu/virgo4/resource-types" target="_blank">
+                        What am I searching?
+                     </a>
+                     <span v-if="isSignedIn" style="text-align: left; padding-left: 10px;">
+                        You can manage this list in <router-link to="/preferences">your preferences</router-link>.
+                     </span>
+                  </div>
+               </div>
+               <div class="templates" v-if="isSignedIn">
+                  <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm"
+                     id="savesearch" buttonLabel="Save Form" buttonMode="tertiary">
+                     <div>
+                        Save the current advanced search form to your account?<br/>
+                        Once saved, it will be used as the default setup for future advanced searches.<br/>
+                        This can be changed at any time.
+                     </div>
+                  </Confirm>
+               </div>
+               <div class="controls">
+                  <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
+                  <span class="sep">|</span>
+                  <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
+               </div>
+               <div class="basic">
+                  <router-link to="/search?mode=basic">
+                     Basic Search&nbsp;
+                     <i class="fas fa-undo-alt"></i>
+                  </router-link>
+               </div>
+               <div class="basic">
+                  <V4BarcodeScanner @scanned="barcodeScanned"/>
+               </div>
             </div>
          </div>
-         <div class="criteria-control">
-            <V4Button mode="icon" id="add-criteria" @click="addClicked">
-                <i class="fas fa-plus-circle"></i>
-                <span class="btn-label">Add criteria</span>
-            </V4Button>
-         </div>
-      </div>
-      <div class="pools-wrapper">
-         <h2>
-            <span>{{sourceLabel}}s</span>
-            <span>
-               <V4Button mode="text" class="clear" @click="clearPoolsClicked">clear all</V4Button>
-               <span class="sep">|</span>
-               <V4Button mode="text" class="clear" @click="allPoolsClicked">select all</V4Button>
-            </span>
-         </h2>
-         <div class="pools">
-            <V4Checkbox v-for="src in filteredSources" :key="src.id" class="pool"
-               :aria-label="`toggle inclusion of ${src.name} in search results`"
-               :checked="!isPoolExcluded(src)"
-               @click="poolClicked(src)">
-               {{src.name}}
-            </V4Checkbox>
-         </div>
-         <div class="what" v-if="!isKiosk">
-            <a href="http://library.virginia.edu/virgo4/resource-types" target="_blank">
-               What am I searching?
-            </a>
-            <span v-if="isSignedIn" style="text-align: left; padding-left: 10px;">
-               You can manage this list in <router-link to="/preferences">your preferences</router-link>.
-            </span>
-         </div>
-      </div>
-      <div class="templates" v-if="isSignedIn">
-         <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm"
-            id="savesearch" buttonLabel="Save Form" buttonMode="tertiary">
-            <div>
-               Save the current advanced search form to your account?<br/>
-               Once saved, it will be used as the default setup for future advanced searches.<br/>
-               This can be changed at any time.
-            </div>
-         </Confirm>
-      </div>
-      <div class="controls">
-         <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
-         <span class="sep">|</span>
-         <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
-      </div>
-      <div class="basic">
-         <router-link to="/search?mode=basic">
-            Basic Search&nbsp;
-            <i class="fas fa-undo-alt"></i>
-         </router-link>
-      </div>
-      <div class="basic">
-         <V4BarcodeScanner @scanned="barcodeScanned"/>
       </div>
    </div>
 </template>
@@ -134,10 +128,11 @@ import { mapMultiRowFields, mapFields } from "vuex-map-fields"
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+import AdvancedFacets from "@/components/advanced/AdvancedFacets"
 
 export default {
    components: {
-      V4BarcodeScanner
+      V4BarcodeScanner,AdvancedFacets
    },
    computed: {
       filteredSources() {
@@ -161,7 +156,8 @@ export default {
          rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
-         hasSearchTemplate: 'preferences/hasSearchTemplate'
+         hasSearchTemplate: 'preferences/hasSearchTemplate',
+         hasResults: 'hasResults',
       }),
       ...mapFields({
         userSearched: 'query.userSearched',
@@ -169,6 +165,9 @@ export default {
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
          return this.advanced.length > 1
+      },
+      advancedTerms() {
+         return this.advanced.filter( t => t.field != "filter")
       }
    },
    methods: {
@@ -323,6 +322,24 @@ h2 {
    justify-content: space-between;
    align-items: center;
 }
+.advanced-panel {
+   margin: 0 auto 0 auto;
+   text-align: center;
+   padding: 10px 5px;
+   font-size: .95em;
+}
+.advanced-panel.narrow {
+   max-width: 800px;
+}
+.advanced-controls {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: space-between;
+   .advanced-wrap {
+      flex: 1 1 70%;
+      margin: 0;
+   }
+}
 .sep {
    margin: 0 5px;
 }
@@ -378,7 +395,7 @@ div.criteria {
 
 div.options {
    display: flex;
-   flex-flow: row nowrap;
+   flex-flow: row wrap;
    align-items: center;
    justify-content: space-between;
 }
@@ -432,6 +449,8 @@ div.query {
       font-style: italic;
       width: 100%;
       box-sizing: border-box;
+      margin-top: 10px;
+      display: block;
    }
    .date-sep {
       font-weight: 500;
@@ -446,9 +465,11 @@ div.query {
 }
 div.search-term {
    padding: 10px;
-   margin: 10px 0;
+   margin: 0 0 20px 0;
    background: var(--uvalib-grey-lightest);
    outline: 1px solid var(--uvalib-grey-light);
+   width: 100%;
+   box-sizing: border-box;
    .v4-button.remove {
       font-size: 1.6em;
       color: var(--uvalib-red-emergency);
@@ -457,7 +478,7 @@ div.search-term {
 }
 
 div.search-term .date-criteria > * {
-   margin: 0 5px 0 0;
+   margin: 5px 5px 0 0;
 }
 div.search-term .date-criteria input:last-child {
    margin-right: 0;

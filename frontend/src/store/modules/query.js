@@ -17,15 +17,17 @@ const query = {
          { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" },
       ],
       advancedFields: [
-         { value: "keyword", label: "Keyword", type: "text", choices: [] },
-         { value: "identifier", label: "Identifier", type: "text", choices: [] },
-         { value: "title", label: "Title", type: "text", choices: [] },
-         { value: "journal_title", label: "Journal Title", type: "text", choices: [] },
-         { value: "author", label: "Author", type: "text", choices: [] },
-         { value: "subject", label: "Subject", type: "text", choices: [] },
-         { value: "date", label: "Date", type: "date", choices: [] },
-         { value: "published", label: "Publisher/Place of Publication", type: "text", choices: []}
+         { value: "keyword", label: "Keyword", type: "text" },
+         { value: "identifier", label: "Identifier", type: "text" },
+         { value: "title", label: "Title", type: "text" },
+         { value: "journal_title", label: "Journal Title", type: "text" },
+         { value: "author", label: "Author", type: "text" },
+         { value: "subject", label: "Subject", type: "text" },
+         { value: "date", label: "Date", type: "date" },
+         { value: "published", label: "Publisher/Place of Publication", type: "text"}
       ],
+      preSearchFilters: [],
+      loadingFilters: false,
       excludedPools: [],
       targetPool: ""
    },
@@ -39,11 +41,9 @@ const query = {
          let out = { excluded: ep, fields: []}
          state.advanced.forEach(  af => {
             let tpl =  {op: af.op, field: af.field, comparison: af.comparison}
-            if (tpl.field.includes("filter.")) {
-               tpl.value = af.value
-            }
             out.fields.push( tpl )
          })
+         // TODO handler presearch filters
          return out
       },
       idQuery: () => id => {
@@ -70,6 +70,16 @@ const query = {
             found = term.value.length > 0
             return found == true
          })
+         if ( found ) {
+            return true
+         }
+         state.preSearchFilters.some(pf => {
+            pf.choices.some( c => {
+               found = c.selected
+               return found == true
+            })
+            return found == true
+         })
          return found
       },
       string: state => {
@@ -77,8 +87,6 @@ const query = {
          //     ( calico OR "tortoise shell" ) AND cats =>
          //     keyword: {(calico OR "tortoise shell") AND cats
          // Fields are joined together with AND or OR based on the fieldOp setting
-         // Special case are the select-type filter terms where field=filter.name. It is:
-         //     filter:{source_f:"Hathi Trust Digital Library"}
          if (state.mode == "basic") {
             let qp = state.basic
             let hasFields = false
@@ -112,14 +120,33 @@ const query = {
                   } else {
                      qs += `date: {${term.comparison} ${term.value}}`
                   }
-               } else if (term.field.includes("filter.")) {
-                  let tgtField = term.field.split(".")[1].trim()
-                  qs += `filter: {${tgtField}:"${term.value}"}`
                } else {
                   qs += `${term.field}: {${term.value}}`
                }
             }
          })
+
+         let categories = []
+         state.preSearchFilters.forEach( pf => {
+            let vals = []
+            let sel = pf.choices.filter( c => c.selected)
+            sel.forEach( fv=>{
+               vals.push(`${pf.value}:"${fv.value}"`)
+            })
+            if ( vals.length > 0) {
+               categories.push( `(${vals.join(" OR ")})`)
+            }
+         })
+         if ( categories.length > 0) {
+            let fStr = `filter: {${categories.join(" AND ")}}`
+            if ( qs.length > 0) {
+               qs += ` AND ${fStr}`
+            } else {
+               qs = fStr
+            }
+         }
+         // console.log("QS: "+qs)
+
          return qs
       },
       isPoolExcluded: state => pool => {
@@ -152,24 +179,29 @@ const query = {
             state.advanced.push(newField)
          })
       },
+      toggleFilter( state, data ) {
+         let fIdx = state.preSearchFilters.findIndex( pf => pf.value == data.filterID)
+         let f = state.preSearchFilters[fIdx]
+         let v = f.choices.find( c=> c.value == data.value)
+         v.selected = !v.selected
+         state.preSearchFilters.splice(fIdx, 1, f)
+      },
       setAdvancedFilterFields( state, filters) {
+         state.preSearchFilters.splice(0, state.preSearchFilters.length)
          filters.forEach( f=> {
             // If the filter already exists in the fields list, remove it and replace with new
-            // prepend the value with filter. so it can easily be identified as a filter when encountered in a
-            // query term. Makes generating the v4 query much easier.
-            let val = `filter.${f.id}`
-            let idx = state.advancedFields.findIndex( f=> f.value == val)
+            let idx = state.preSearchFilters.findIndex( f=> f.value == f.id)
             if ( idx != -1 ) {
-               state.advancedFields.splice(idx, 1)
+               state.preSearchFilters.splice(idx, 1)
             }
             if ( f.values.length == 0 ) {
                return
             }
-            let field = {value: `filter.${f.id}`, label: f.label, type: "select", choices: []}
+            let field = {value: f.id, label: f.label, choices: []}
             f.values.forEach( v => {
-               field.choices.push({id: v.value, name: `${v.value} (${v.count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`})
+               field.choices.push({value: v.value, count: v.count, selected: false})
             })
-            state.advancedFields.push(field)
+            state.preSearchFilters.push(field)
          })
       },
       restoreFromURL(state, queryParams) {
@@ -222,33 +254,12 @@ const query = {
             let keyOpParts = keyOp.split(" ")
             let term = { op: "AND", value: value, field: keyOp.toLowerCase(), comparison: "EQUAL", endVal: "" }
             if (keyOpParts.length == 1 && keyOp == "filter") {
-               // 'filter' is special. The field is filter.[fieldName] and fieldName is
-               // the string before the colon in value. The actual value is the quoted string
-               // after the colon, with the quotes stripped. So for the example above,
-               // field = filter.FilterCollection and value=Avalon
-               let colonIdx = value.indexOf(":")
-               if (colonIdx == -1) {
-                  break
-               }
-               let filterField = value.substring(0, colonIdx).trim()
-               let filterValue = value.substring(colonIdx+1, value.length).trim()
-               filterValue = filterValue.substring(1, filterValue.length-1) // drop quotes
-               term.field = `filter.${filterField}`
-               term.value = filterValue
+               // FIXME set the preSearchFilter?
             } else if (keyOpParts.length == 2 ) {
                term.op = keyOpParts[0].trim()
                let field = keyOpParts[1].trim().toLowerCase()
                if ( field == "filter") {
-                  // see notes above for special filter handling details
-                  let colonIdx = value.indexOf(":")
-                  if (colonIdx == -1) {
-                     break
-                  }
-                  let filterField = value.substring(0, colonIdx).trim()
-                  let filterValue = value.substring(colonIdx+1, value.length).trim()
-                  filterValue = filterValue.substring(1, filterValue.length-1) // drop quotes
-                  term.field = `filter.${filterField}`
-                  term.value = filterValue
+                  // FIXME  set the preSearchFilter?
                } else {
                   term.field = field
                }
@@ -327,6 +338,12 @@ const query = {
          state.advanced.push( {op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
+         state.preSearchFilters.forEach( pf => {
+            let sel = pf.choices.filter( c => c.selected)
+            sel.forEach( fv=>{
+               fv.selected = false
+            })
+         })
       },
       clear(state) {
          state.mode = "basic"
@@ -340,15 +357,27 @@ const query = {
          state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
          state.excludedPools.splice(0, state.excludedPools.length)
          state.targetPool = ""
+         state.preSearchFilters.forEach( pf => {
+            let sel = pf.choices.filter( c => c.selected)
+            sel.forEach( fv=>{
+               fv.selected = false
+            })
+         })
+      },
+      setLoadingFilters(state, flag) {
+         state.loadingFilters = flag
       },
    },
    actions: {
       async getAdvancedSearchFilters(ctx) {
+         ctx.commit("setLoadingFilters",true)
          let url = `${ctx.rootState.system.searchAPI}/api/filters`
          return axios.get(url).then((response) => {
             ctx.commit('setAdvancedFilterFields', response.data)
+            ctx.commit("setLoadingFilters",false)
          }).catch((error) => {
             console.warn("Unable to get advanced search filters: "+JSON.stringify(error))
+            ctx.commit("setLoadingFilters",false)
          })
       },
       async loadSearch(ctx, token) {
@@ -369,7 +398,7 @@ const query = {
                   ctx.dispatch("searches/migrate", req, {root:true})
                }
             }
-            console.log("URL "+searchURL)
+            // console.log("URL "+searchURL)
             router.replace(searchURL)
          }).catch((error) => {
             console.error(error)

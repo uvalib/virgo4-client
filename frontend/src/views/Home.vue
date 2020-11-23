@@ -2,52 +2,48 @@
    <div class="home">
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel pure-form">
-        <template v-if="basicSearch">
-         <h1>Search</h1>
-         <div v-if="hasTranslateMessage" class="translate-message">
-            {{translateMessage}}
-         </div>
-         <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
-         <label class="screen-reader-text" for="source-select">Search in</label>
-          <div class="basic-search">
-            <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
-              border="1px solid var(--uvalib-brand-blue)"
-              v-model="searchScope"
-              @changed="scopeChanged"
-            />
-            <input class="basic"
-                @keyup.enter="searchClicked"
-                v-model="basic"
-                autocomplete="off"
-                type="text"
-                id="search"
-                placeholder="Search Virgo for books, articles, and more"
-            >
-          </div>
-          <div class="controls">
-             <template v-if="hasResults">
-               <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
-               <span class="sep">|</span>
-             </template>
-
-            <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
-          </div>
-          <div class="advanced">
-            <SearchTips/><span class="sep">|</span>
-            <router-link tabindex="0" to="/search?mode=advanced">
-              <span>Advanced Search&nbsp;<i class="fas fa-search-plus"></i></span>
-            </router-link>
-          </div>
-          <div class="advanced">
-            <V4BarcodeScanner @scanned="barcodeScanned"/>
-          </div>
-          <!-- <div v-if="isHomePage" class="advanced">
-            <router-link to="/journals">
-              Browse Journals&nbsp;<i class="far fa-newspaper"></i>
-            </router-link>
-          </div> -->
-        </template>
-        <AdvancedSearch v-else/>
+         <template v-if="basicSearch">
+            <h1>Search</h1>
+            <div v-if="hasTranslateMessage" class="translate-message">
+               {{translateMessage}}
+            </div>
+            <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
+            <label class="screen-reader-text" for="source-select">Search in</label>
+            <div class="basic-search">
+               <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
+               border="1px solid var(--uvalib-brand-blue)"
+               v-model="searchScope"
+               @changed="scopeChanged"
+               />
+               <input class="basic"
+                  @keyup.enter="searchClicked"
+                  v-model="basic"
+                  autocomplete="off"
+                  type="text"
+                  id="search"
+                  placeholder="Search Virgo for books, articles, and more"
+               >
+            </div>
+            <div class="controls-wrapper">
+               <div class="controls">
+                  <template v-if="hasResults">
+                     <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
+                     <span class="sep">|</span>
+                  </template>
+                  <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
+               </div>
+               <div class="advanced">
+                  <SearchTips/><span class="sep">|</span>
+                  <router-link tabindex="0" to="/search?mode=advanced">
+                  <span>Advanced Search&nbsp;<i class="fas fa-search-plus"></i></span>
+                  </router-link>
+               </div>
+               <div class="advanced">
+                  <V4BarcodeScanner @scanned="barcodeScanned"/>
+               </div>
+            </div>
+         </template>
+         <AdvancedSearch v-else/>
       </div>
       <Welcome  v-if="isHomePage && hasResults==false" />
       <SearchResults/>
@@ -60,7 +56,7 @@ import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import SearchTips from "@/components/disclosures/SearchTips"
-import AdvancedSearch from "@/components/AdvancedSearch"
+import AdvancedSearch from "@/components/advanced/AdvancedSearch"
 import Welcome from "@/components/Welcome"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
 
@@ -450,15 +446,19 @@ export default {
 span.sep {
    margin: 0 5px;
 }
-.controls {
-  padding: 10px 0;
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: flex-end;
-}
-.controls  > * {
-  flex: 0 1 auto;
+.controls-wrapper  {
+   max-width: 800px;
+   margin: 0 auto 0 auto;
+   .controls {
+      padding: 10px 0;
+      display: flex;
+      flex-flow: row wrap;
+      align-items: center;
+      justify-content: flex-end;
+   }
+   .controls  > * {
+   flex: 0 1 auto;
+   }
 }
 
 .home {
@@ -472,14 +472,15 @@ h2 {
 .search-panel {
   margin: 0 auto 0 auto;
   text-align: center;
-  max-width: 800px;
   padding: 10px 2vw 10px 2vw;
   font-size: 0.95em;
 }
 .basic-search {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: flex-start;
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: flex-start;
+   max-width: 800px;
+   margin: 0 auto 0 auto;
 }
 #app .pure-form div.basic-search  input[type=text].basic {
   font-size: 1.15em;

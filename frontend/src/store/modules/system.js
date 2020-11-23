@@ -113,7 +113,6 @@ const system = {
          state.message.detail = ""
       },
       setSearchError(state, errorInfo) {
-         console.log("SET SEARCH ERROR")
          state.message.type = "error"
          state.message.title = "Virgo Search Error",
          state.message.content = errorInfo.message,
