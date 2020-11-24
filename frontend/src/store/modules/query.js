@@ -262,20 +262,25 @@ const query = {
             let keyOpParts = keyOp.split(" ")
 
             // Pre-search Filters are special. DO NOT add them to the advanced terms. Instead,
-            // parse them out and add them to the preSearchFilters data
+            // parse them out and add them to the preSearchFilters data. IMPORTANT: Value can look like this:
+            //     (FilterLibrary:"Brown Science and Engineering") AND (FilterFormat:"Atlas" OR FilterFormat:"Book")
             if (keyOpParts.pop() == "filter")  {
-               let filter = value.split(":")[0].replace(/\(/g, "").trim()
-               let filterVal = value.split(":").pop().replace(/\)|"/g, "").trim()
-               let f = state.preSearchFilters.find( pf => pf.value == filter)
-               if (f) {
-                  let fv = f.choices.find( fv => fv.value == filterVal)
-                  if ( fv) {
-                     fv.selected = true
+               // toss all of the operators and parens to get a list of FILTER:VALUE separated by |
+               let values = value.replace(/\sAND\s|\sOR\s/g, "|").replace(/\(|\)/g, "").split("|")
+               values.forEach( v => {
+                  let filter = v.split(":")[0].replace(/\(/g, "").trim()
+                  let filterVal = v.split(":").pop().replace(/\)|"/g, "").trim()
+                  let f = state.preSearchFilters.find( pf => pf.value == filter)
+                  if (f) {
+                     let fv = f.choices.find( fv => fv.value == filterVal)
+                     if ( fv) {
+                        fv.selected = true
+                     }
+                  } else {
+                     let field = {value: filter, label: filter, choices: [{value: filterVal, count: 0, selected: true}]}
+                     state.preSearchFilters.push(field)
                   }
-               } else {
-                  let field = {value: filter, label: filter, choices: [{value: filterVal, count: 0, selected: true}]}
-                  state.preSearchFilters.push(field)
-               }
+               })
                continue
             }
             let term = { op: "AND", value: value, field: keyOp.toLowerCase(), comparison: "EQUAL", endVal: "" }
