@@ -11,37 +11,27 @@
                <div v-if="loadingFilters" class="working">
                   <V4Spinner message="Loading filters..."/>
                </div>
-               <dl v-else>
-                  <template v-for="filterInfo in filters">
-                     <dt :key="filterInfo.value">{{filterInfo.label}}</dt>
-                     <div role="group" :aria-labelledby="filterInfo.value" :key="`f-${filterInfo.value}`">
-                        <dd v-for="fv in filterValues(filterInfo,0,5)"  :key="fv.value">
-                           <V4Checkbox :checked="fv.selected"
-                              @click="filterClicked(filterInfo.value, fv.value)">
-                              {{fv.value}}
-                           </V4Checkbox>
-                           <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
-                        </dd>
-                        <dd v-if="filterInfo.choices && filterInfo.choices.length > 5" :key="`more-${filterInfo.value}`">
-                           <AccordionContent class="more" :id="`${filterInfo.value}-more`" borderWidth="0">
-                              <template v-slot:title>
-                                 <span :aria-label="`see more ${filterInfo.label} filters`">See More</span>
-                              </template>
-                              <div class="expanded-item" v-for="fv in filterValues(filterInfo,5)" :key="fv.value">
-                                 <V4Checkbox :checked="fv.selected"
-                                    @click="filterClicked(filterInfo.value, fv.value)">
-                                    {{fv.value}}
-                                 </V4Checkbox>
-                                 <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
-                              </div>
-                              <template v-slot:footer>
-                                 <span :aria-label="`see less ${filterInfo.label} filters`"><b>See Less</b></span>
-                              </template>
-                           </AccordionContent>
-                        </dd>
+
+               <template v-else v-for="filterInfo in filters">
+                  <AccordionContent  :key="filterInfo.value"
+                     id="`${filterInfo.value}-acc`"
+                     class="filter-list"
+                     background="var(--uvalib-grey-lightest)"
+                     borderWidth="1px"
+                  >
+                     <template v-slot:title>
+                        <span :aria-label="`see more ${filterInfo.label} filters`">{{filterInfo.label}}</span>
+                     </template>
+                     <div class="expanded-item" v-for="fv in filterInfo.choices" :key="fv.value">
+                        <V4Checkbox :checked="fv.selected"
+                           @click="filterClicked(filterInfo.value, fv.value)">
+                           {{fv.value}}
+                        </V4Checkbox>
+                        <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
                      </div>
-                  </template>
-               </dl>
+                  </AccordionContent>
+               </template>
+
             </div>
           </AccordionContent>
       </div>
@@ -159,7 +149,7 @@ export default {
    display: inline-block;
 
    .filters {
-      outline: 1px solid var(--uvalib-brand-blue);
+      outline: 1px solid var(--uvalib-grey-light);
       .body {
          border-top: 0;
          text-align: left;
@@ -183,35 +173,11 @@ export default {
    justify-content: space-between;
    cursor: pointer;
 }
-dl  {
-   margin: 0;
-   color: var(--uvalib-text-dark);
-}
-dt {
-   font-weight: bold;
-   margin-top: 10px;
-}
-dt:first-child {
-   margin-top:0;
-}
-dd {
-   cursor: pointer;
-   font-size: 1em;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: flex-start;
-   padding: 3px 2px;
-   margin-left: 15px;
-   font-weight: normal;
-}
-i.check {
-   margin-right: 10px;
-   color: var(--uvalib-text);
-   font-size: 1.2em;
+.filter-list {
+   margin-bottom: 10px;
 }
 .expanded-item {
-   padding: 3px 0;
+   padding: 3px 0 3px 10px;
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
@@ -223,22 +189,10 @@ span.cnt {
    margin-left: auto;
    font-size: 0.8em;
 }
-div.none {
-   text-align: center;
-   margin:25px 5px;
-   font-size: 1.25em;
-   color: var(--uvalib-text);
-}
 </style>
 <style>
 #app .accordion.filter .title {
    padding: 5px 10px;
-}
-#app .accordion.more .title {
-   padding: 5px 0;
    font-weight: bold;
-}
-#app .accordion.more {
-   width: 100%;
 }
 </style>
