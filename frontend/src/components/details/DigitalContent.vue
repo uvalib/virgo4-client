@@ -118,11 +118,9 @@ export default {
       },
       curioURL() {
          let selDO = this.digitalContent[this.selectedDigitalObjectIdx]
-         console.log(selDO)
          let idx = selDO.oEmbedURL.indexOf("/oembed")
          let url = selDO.oEmbedURL.substring(0, idx)
          url += "/view/" + selDO.pid
-         console.log(url)
          return url
       },
       curioWidth() {

@@ -145,7 +145,6 @@ const query = {
                qs = fStr
             }
          }
-         // console.log("QS: "+qs)
 
          return qs
       },
@@ -204,6 +203,7 @@ const query = {
             state.preSearchFilters.push(field)
          })
       },
+
       restoreFromURL(state, queryParams) {
          if ( state.mode == "basic") {
             // a basic search generally looks like this: q=keyword: {pirate}
@@ -228,7 +228,15 @@ const query = {
             return
          }
 
+         // Clear out all existing data
          state.advanced.splice(0, state.advanced.length)
+         state.preSearchFilters.forEach( pf => {
+            let sel = pf.choices.filter( c => c.selected)
+            sel.forEach( fv=>{
+               fv.selected = false
+            })
+         })
+
          while (queryParams.length > 0) {
             // A valid query has a field and term surrounded by { }. Find the braces...
             let braceIdx = queryParams.indexOf("{")
@@ -252,17 +260,28 @@ const query = {
             let value = queryParams.substring(braceIdx+1, braceIdx2)
             queryParams = queryParams.substring(braceIdx2+1).trim()
             let keyOpParts = keyOp.split(" ")
-            let term = { op: "AND", value: value, field: keyOp.toLowerCase(), comparison: "EQUAL", endVal: "" }
-            if (keyOpParts.length == 1 && keyOp == "filter") {
-               // FIXME set the preSearchFilter?
-            } else if (keyOpParts.length == 2 ) {
-               term.op = keyOpParts[0].trim()
-               let field = keyOpParts[1].trim().toLowerCase()
-               if ( field == "filter") {
-                  // FIXME  set the preSearchFilter?
+
+            // Pre-search Filters are special. DO NOT add them to the advanced terms. Instead,
+            // parse them out and add them to the preSearchFilters data
+            if (keyOpParts.pop() == "filter")  {
+               let filter = value.split(":")[0].replace(/\(/g, "").trim()
+               let filterVal = value.split(":").pop().replace(/\)|"/g, "").trim()
+               let f = state.preSearchFilters.find( pf => pf.value == filter)
+               if (f) {
+                  let fv = f.choices.find( fv => fv.value == filterVal)
+                  if ( fv) {
+                     fv.selected = true
+                  }
                } else {
-                  term.field = field
+                  let field = {value: filter, label: filter, choices: [{value: filterVal, count: 0, selected: true}]}
+                  state.preSearchFilters.push(field)
                }
+               continue
+            }
+            let term = { op: "AND", value: value, field: keyOp.toLowerCase(), comparison: "EQUAL", endVal: "" }
+            if (keyOpParts.length == 2 ) {
+               term.op = keyOpParts[0].trim()
+               term.field = keyOpParts[1].trim().toLowerCase()
             } else if (keyOpParts.length > 2) {
                continue
             }
@@ -398,7 +417,6 @@ const query = {
                   ctx.dispatch("searches/migrate", req, {root:true})
                }
             }
-            // console.log("URL "+searchURL)
             router.replace(searchURL)
          }).catch((error) => {
             console.error(error)
