@@ -151,7 +151,7 @@ const user = {
          return pickupLibraries
        },
        canLeoMobile: (_state, getters, _rootState) => {
-          if (getters.isFaculty) {
+          if (getters.isFaculty || getters.isGraduate) {
              return true
           }
           return false
