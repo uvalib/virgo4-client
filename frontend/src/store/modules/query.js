@@ -186,6 +186,15 @@ const query = {
          state.preSearchFilters.splice(fIdx, 1, f)
       },
       setAdvancedFilterFields( state, filters) {
+         // preserve any previously selected filters before clear....
+         let oldFilterSelects = []
+         state.preSearchFilters.forEach( pf => {
+            pf.choices.forEach( pfc => {
+               if (pfc.selected) {
+                  oldFilterSelects.push(pfc)
+               }
+            })
+         })
          state.preSearchFilters.splice(0, state.preSearchFilters.length)
          filters.forEach( f=> {
             // If the filter already exists in the fields list, remove it and replace with new
@@ -198,7 +207,11 @@ const query = {
             }
             let field = {value: f.id, label: f.label, choices: []}
             f.values.forEach( v => {
-               field.choices.push({value: v.value, count: v.count, selected: false})
+               let selected = false
+               if (oldFilterSelects.some( s => s.value === v.value)) {
+                  selected = true
+               }
+               field.choices.push({value: v.value, count: v.count, selected: selected})
             })
             state.preSearchFilters.push(field)
          })
