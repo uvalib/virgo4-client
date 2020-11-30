@@ -14,17 +14,16 @@
             </p>
          </template>
          <template v-else>
-             <p>An email will be sent to the address on file with a link to reset your password. If you do not receive an email please ask a librarian.</p>
-           <div class="message pure-form">
-            <div>
-                <label for="userId">Library ID</label>
-                <input id="userId" ref="userId" v-model="userId"
-                    aria-required="true" required="required"/>
-                <p>Driver's License Number, eg: A12345678</p>
+             <p>An email will be sent to the address on file with a link to reset your password. If you need assistance, please <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.</p>
+           <div class="password-reset-form pure-form">
+              <div>
+               <label for="userId">Library ID</label>
+               <input id="userId" ref="userId" v-model="userId" />
               </div>
+                <p class="hint">Driver's License Number,<br>eg: A12345678</p>
 
-              <p v-if="error" class="error" v-html="error"></p>
             </div>
+            <p v-if="error" class="error" v-html="error"></p>
           </template>
       </template>
       <template v-slot:controls>
@@ -79,7 +78,7 @@ export default {
                this.emailSent = true
             }).catch((e) => {
                this.$refs.userId.focus()
-               this.error = "There was a problem sending the password reset email. Please <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for more help.<br/>"
+               this.error = "Library ID not found, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
                if(e.response.data.message){
                   this.error += e.response.data.message
                }
@@ -95,8 +94,9 @@ export default {
 .v4-button {
   margin-top: 2em;
 }
-.message {
+.password-reset-form{
    margin-bottom:15px;
+   display: flex;
 }
 input[type=password] {
    width: 100%;
@@ -104,12 +104,13 @@ input[type=password] {
 label {
    display: block;
    margin: 10px 0 2px 0;
+   padding-bottom: .25em;
    font-weight: bold;
 }
+.hint {
+   margin: 2em auto auto .5em;
+}
 p.error {
-   padding: 0;
-   font-size: 0.8em;
-   color: var(  --uvalib-red-emergency);
-   text-align: center;
+   color: var(--uvalib-red-darker);
 }
 </style>

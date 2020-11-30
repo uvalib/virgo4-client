@@ -123,6 +123,7 @@ export default {
    --uvalib-red-lightest: #fbcfda;
    --uvalib-red: #ef3f6b;
    --uvalib-red-emergency: #df1e43;
+   --uvalib-red-darker: #B30000;
 
    --uvalib-yellow-light: #fef6c8;
    --uvalib-yellow: #ecc602;
