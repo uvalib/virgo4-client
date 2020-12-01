@@ -32,7 +32,10 @@
                            <li v-for="(cn, cidx) in loc.call_numbers" :key="`cn${cidx}`">
                               {{cn.call_number}}
                               <ul class="copy">
-                                 <li v-for="(txt, tidx) in cn.text" :key="`loc${tidx}`">{{txt}}</li>
+                                 <div v-for="(txt, tnidx) in cn.text_notes" :key="`t${tnidx}`">
+                                   <li>{{txt.text}}</li>
+                                   <li class="note" v-if="txt.note">{{txt.note}}</li>
+                                 </div>
                               </ul>
                            </li>
                         </ul>
@@ -213,6 +216,9 @@ export default {
    }
    ul.copy  {
       padding-bottom: 10px;
+   }
+   li.note {
+      font-style: italic;
    }
 
    table {
