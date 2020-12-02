@@ -20,11 +20,11 @@ const searches = {
       setSearches(state, data) {
          state.saved.splice(0, state.saved.length)
          data.saved.forEach( s => {
-            state.saved.push( s )
+            state.saved.push( stripExclude(s) )
          })
          state.history.splice(0, state.history.length)
          data.history.forEach( s => {
-            state.history.push( s )
+            state.history.push( stripExclude(s) )
          })
       },
       clearSavedSearches(state) {
@@ -125,6 +125,19 @@ const searches = {
           })
       }
    }
+}
+
+function stripExclude( url) {
+   let idx1 = url.indexOf("&exclude")
+   if (idx1 > -1) {
+      let idx2 = url.indexOf("&", idx1+1)
+      if ( idx2 > -1) {
+         url = url.substring(0,idx1)+url.substring(idx2)
+      } else {
+         url = url.substring(0,idx1)
+      }
+   }
+   return url
 }
 
 export default searches
