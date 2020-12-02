@@ -254,7 +254,7 @@ const query = {
             // Pre-search Filters are special. DO NOT add them to the advanced terms. Instead,
             // parse them out and add them to the preSearchFilters data. IMPORTANT: Value can look like this:
             //     (FilterLibrary:"Brown Science and Engineering") AND (FilterFormat:"Atlas" OR FilterFormat:"Book")
-            if (keyOpParts.pop() == "filter")  {
+            if (keyOp.split(" ").pop() == "filter")  {
                // toss all of the operators and parens to get a list of FILTER:VALUE separated by |
                let values = value.replace(/\sAND\s|\sOR\s/g, "|").replace(/\(|\)/g, "").split("|")
                values.forEach( v => {
