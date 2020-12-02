@@ -108,7 +108,7 @@ label {
    font-weight: bold;
 }
 .hint {
-   margin: 2em auto auto .5em;
+   margin: 2em auto auto 1em;
 }
 p.error {
    color: var(--uvalib-red-darker);
