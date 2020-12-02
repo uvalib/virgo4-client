@@ -67,32 +67,6 @@
                </div>
             </div>
             <div class="controls-wrapper">
-               <div class="pools-wrapper">
-                  <h2>
-                     <span>{{sourceLabel}}s</span>
-                     <span>
-                        <V4Button mode="text" class="clear" @click="clearPoolsClicked">clear all</V4Button>
-                        <span class="sep">|</span>
-                        <V4Button mode="text" class="clear" @click="allPoolsClicked">select all</V4Button>
-                     </span>
-                  </h2>
-                  <div class="pools">
-                     <V4Checkbox v-for="src in filteredSources" :key="src.id" class="pool"
-                        :aria-label="`toggle inclusion of ${src.name} in search results`"
-                        :checked="!isPoolExcluded(src)"
-                        @click="poolClicked(src)">
-                        {{src.name}}
-                     </V4Checkbox>
-                  </div>
-                  <div class="what" v-if="!isKiosk">
-                     <a href="http://library.virginia.edu/virgo4/resource-types" target="_blank">
-                        What am I searching?
-                     </a>
-                     <span v-if="isSignedIn" style="text-align: left; padding-left: 10px;">
-                        You can manage this list in <router-link to="/preferences">your preferences</router-link>.
-                     </span>
-                  </div>
-               </div>
                <div class="templates" v-if="isSignedIn">
                   <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm"
                      id="savesearch" buttonLabel="Save Form" buttonMode="tertiary">
@@ -135,12 +109,8 @@ export default {
       V4BarcodeScanner,AdvancedFacets
    },
    computed: {
-      filteredSources() {
-         return this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
-      },
       ...mapState({
          advancedFields: state => state.query.advancedFields,
-         excludedPools: state => state.query.excludedPools,
          pools: state => state.pools.list,
          searchTemplate: state=>state.preferences.searchTemplate,
          sourceLabel: state => state.preferences.sourceLabel,
@@ -151,8 +121,6 @@ export default {
          queryURLParams: 'query/queryURLParams',
          queryEntered: "query/queryEntered",
          sources: "pools/sortedList",
-         excludedPoolPrefs: "preferences/excludedPools",
-         isPoolExcluded: "query/isPoolExcluded",
          rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
@@ -189,23 +157,7 @@ export default {
          let tgtField = this.advancedFields.find( af=> af.value == term.field)
          return tgtField.choices
       },
-      clearPoolsClicked() {
-         this.$store.commit("query/excludeAll", this.sources)
-      },
-      allPoolsClicked() {
-         this.$store.commit("query/clearExcluded")
-      },
-      poolClicked(pool) {
-        this.$store.commit("query/toggleAdvancedPoolExclusion", pool)
-      },
       doAdvancedSearch() {
-         if ( this.excludedPools.length == this.pools.length) {
-            this.$store.commit(
-               "system/setSearchError",
-               {message:`Please select at least one ${this.sourceLabel} before searching`}
-            )
-            return
-         }
          if (this.queryEntered) {
 
             let fields = this.advanced.filter( f=>f.value != "")
@@ -265,7 +217,6 @@ export default {
             this.$router.push('/search?mode=advanced')
          } else {
             this.$store.commit('query/resetAdvanced')
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
             if ( this.hasSearchTemplate ) {
                this.$store.commit("query/restoreTemplate", this.searchTemplate)
             }
@@ -342,30 +293,6 @@ h2 {
 }
 .sep {
    margin: 0 5px;
-}
-div.pools-wrapper {
-   margin: 15px 0 10px 0;
-   padding: 10px 0;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-}
-div.pools {
-   text-align: left;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
-   justify-content: flex-start;
-   margin: 0;
-}
-.what {
-   margin-top: 10px;
-   text-align: left;
-}
-.v4-checkbox.pool {
-   margin: 5px 10px;
-   cursor: pointer;
-}
-.v4-checkbox.pool >>> label {
-   margin:0;
 }
 
 div.criteria-control {

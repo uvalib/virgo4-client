@@ -150,7 +150,6 @@ export default {
         sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
         isSignedIn: 'user/isSignedIn',
-        excludedPoolPrefs: 'preferences/excludedPools',
         hasSearchTemplate: 'preferences/hasSearchTemplate',
         externalPoolIDs: 'pools/externalPoolIDs',
         poolSort: 'sort/poolSort'
@@ -163,7 +162,7 @@ export default {
       }),
       searchScopes() {
         let out = [{name: `All ${this.sourceLabel}s`, id: 'all'}]
-        let filtered = this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
+        let filtered = this.sources.filter( s => s.id != "jmrl" && s.id != "worldcat" )
         return out.concat(filtered)
       },
       basicSearch() {
@@ -195,7 +194,6 @@ export default {
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
             if ( this.hasSearchTemplate ) {
                this.$store.commit("query/restoreTemplate", this.searchTemplate)
             }
@@ -206,26 +204,6 @@ export default {
                this.$store.commit("query/setBasicSearchScope", tgtScope)
             }
          }
-
-         let excluded = []
-         if (query.exclude) {
-            excluded = [...new Set(query.exclude.split(","))]
-         }
-
-         // Check for pools that should be excluded unless opted-in
-         this.externalPoolIDs.forEach( extPool => {
-            // dont exclude the same pool multiple times
-            if (excluded.includes(extPool) == false) {
-               if ( this.isSignedIn == false ) {
-                  excluded.push(extPool)
-               } else {
-                  if ( this.optInPoolPrefs.includes(extPool) == false) {
-                     excluded.push(extPool)
-                  }
-               }
-            }
-         })
-         this.$store.commit("query/setExcludePreferences", excluded)
 
          let targetPool = ""
          let oldFilterParam = ""
@@ -361,12 +339,9 @@ export default {
          let skipPoolParam = false
          let tgtPool = ""
          this.basicSearchScope = this.searchScope
-         if ( this.basicSearchScope.id == "all") {
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
-         } else {
+         if ( this.basicSearchScope.id != "all") {
             tgtPool = this.basicSearchScope.id
             this.$store.commit("query/setTargetPool",  tgtPool)
-            this.$store.commit("query/setExcludePreferences", [])
             skipPoolParam = true
          }
 

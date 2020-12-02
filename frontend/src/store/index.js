@@ -407,9 +407,7 @@ export default new Vuex.Store({
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
-            preferences: {
-               exclude_pool: rootState.query.excludedPools
-            },
+            preferences: {},
             filters: rootGetters['filters/allPoolFilters'],
             pool_sorting: rootState.sort.pools
          }

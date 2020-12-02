@@ -375,14 +375,7 @@ const user = {
          ctx.commit('setLookingUp', true)
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
-            let prefs = migratePreferences( ctx.rootState.pools.list, response.data.preferences)
-            ctx.commit('preferences/setPreferences', prefs, { root: true })
-            if (prefs.migrated && prefs.migrated == true) {
-               ctx.dispatch('preferences/savePreferences', null, { root: true })
-            }
-            if (prefs.sourceSet != "default") {
-               ctx.dispatch("pools/getPools", null, {root:true})
-            }
+            ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
@@ -520,28 +513,6 @@ const user = {
          return axios.post("/api/forgot_password", {userBarcode: barcode} )
       },
    }
-}
-
-function migratePreferences( pools, prefsStr ) {
-   try {
-      let jsonPrefs = JSON.parse(prefsStr)
-      if ( jsonPrefs.excludePoolURLs ) {
-         jsonPrefs.migrated = true
-         jsonPrefs.excludePools = []
-         jsonPrefs.excludePoolURLs.forEach( url => {
-            jsonPrefs.excludePools.push( getPoolID(pools, url))
-         })
-         delete jsonPrefs.excludePoolURLs
-      }
-      return jsonPrefs
-   } catch (e) {
-      // just return blank obj
-      return {}
-   }
-}
-function getPoolID( pools, url ) {
-   let p = pools.find( p => p.url == url)
-   return p.id
 }
 
 export default user

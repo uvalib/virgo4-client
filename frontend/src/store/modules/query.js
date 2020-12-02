@@ -28,7 +28,6 @@ const query = {
       ],
       preSearchFilters: [],
       loadingFilters: false,
-      excludedPools: [],
       targetPool: ""
    },
    getters: {
@@ -37,8 +36,7 @@ const query = {
          return state
       },
       advancedSearchTemplate( state ) {
-         let ep = [...new Set(state.excludedPools)]
-         let out = { excluded: ep, fields: []}
+         let out = { fields: []}
          state.advanced.forEach(  af => {
             let tpl =  {op: af.op, field: af.field, comparison: af.comparison}
             out.fields.push( tpl )
@@ -55,10 +53,6 @@ const query = {
             qs += `&scope=${state.basicSearchScope.id}`
          }
          qs += `&q=${encodeURIComponent(getters.string)}`
-         if ( state.excludedPools.length > 0) {
-            let ep = [...new Set(state.excludedPools)]
-            qs += `&exclude=${ep.join(",")}`
-         }
          return qs
       },
       queryEntered: state => {
@@ -148,27 +142,10 @@ const query = {
 
          return qs
       },
-      isPoolExcluded: state => pool => {
-         let excluded = false
-         state.excludedPools.some( pid => {
-            if (pid == pool.id) {
-               excluded = true
-            }
-            return excluded == true
-         })
-
-         return excluded
-      },
    },
    mutations: {
       updateField,
       restoreTemplate(state, template) {
-         template.excluded.forEach( e => {
-            if ( !state.excludedPools.includes(e) ) {
-               state.excludedPools.push( e )
-            }
-         })
-
          state.advanced.splice(0, state.advanced.length)
          template.fields.forEach( f => {
             let newField = { op: f.op, value: "", field: f.field, comparison: f.cpmparison, endVal: "" }
@@ -327,33 +304,8 @@ const query = {
       setAdvancedSearch(state) {
          state.mode = "advanced"
       },
-      setExcludePreferences(state, excludePrefs) {
-         state.excludedPools.splice(0, state.excludedPools.length)
-         excludePrefs.forEach( pid => {
-            state.excludedPools.push(pid)
-         })
-      },
       setTargetPool(state, pool) {
          state.targetPool = pool
-      },
-      toggleAdvancedPoolExclusion(state, pool) {
-         let idx = state.excludedPools.indexOf(pool.id)
-         if (idx > -1) {
-            state.excludedPools.splice(idx, 1)
-         } else {
-            state.excludedPools.push(pool.id)
-         }
-      },
-      clearExcluded( state ) {
-         state.excludedPools.splice(0, state.excludedPools.length)
-      },
-      excludeAll( state, pools ) {
-         state.excludedPools.splice(0, state.excludedPools.length)
-         pools.forEach( p => {
-            if (state.targetPool != p.id) {
-               state.excludedPools.push(p.id)
-            }
-         })
       },
       advancedBarcodeSearch(state, barcode) {
          state.advanced.splice(0, state.advanced.length)
@@ -392,7 +344,6 @@ const query = {
          state.advanced.push( {op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
-         state.excludedPools.splice(0, state.excludedPools.length)
          state.targetPool = ""
          state.preSearchFilters.forEach( pf => {
             let sel = pf.choices.filter( c => c.selected)
