@@ -59,23 +59,23 @@
                      </template>
                   </div>
                </div>
-               <div class="criteria-control">
+            </div>
+            <div class="controls-wrapper">
+               <div class="form-acts">
                   <V4Button mode="icon" id="add-criteria" @click="addClicked">
                      <i class="fas fa-plus-circle"></i>
                      <span class="btn-label">Add criteria</span>
                   </V4Button>
-               </div>
-            </div>
-            <div class="controls-wrapper">
-               <div class="templates" v-if="isSignedIn">
-                  <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm"
-                     id="savesearch" buttonLabel="Save Form" buttonMode="tertiary">
+                  <Confirm  v-if="isSignedIn" title="Save Search Form" v-on:confirmed="saveSearchForm"
+                     id="savesearch" buttonLabel="Save Form" buttonMode="tertiary"
+                  >
                      <div>
                         Save the current advanced search form to your account?<br/>
                         Once saved, it will be used as the default setup for future advanced searches.<br/>
                         This can be changed at any time.
                      </div>
                   </Confirm>
+
                </div>
                <div class="controls">
                   <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
@@ -295,24 +295,30 @@ h2 {
    margin: 0 5px;
 }
 
-div.criteria-control {
+.form-acts {
    display: flex;
-   flex-flow: row;
-   justify-content: center;
+   flex-flow: row nowrap;
+   justify-content: space-between;
+   padding-bottom: 20px;
+   margin-bottom: 15px;
    border-bottom: 1px solid var(--uvalib-grey-light);
-   padding-bottom: 10px;
    #add-criteria {
       color: var(--uvalib-blue-alt);
       font-size: 1.6em;
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
+      align-self: center;
       .btn-label {
          margin-left: 5px;
          font-size: 0.7em;
          color: var(--uvalib-text);
       }
    }
+}
+
+::v-deep .form-acts button.v4-button.pure-button {
+   margin: 0 !important;
 }
 
 div.criteria {

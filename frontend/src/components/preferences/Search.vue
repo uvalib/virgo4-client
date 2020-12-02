@@ -33,9 +33,6 @@ export default {
 
 <style lang="scss" scoped>
 .grouping {
-   border-top: 1px solid var(--uvalib-grey-light);
-   padding: 5px 10px;
-   margin-top: 15px;
    .choice {
       margin: 5px 10px;
       width: 15px;

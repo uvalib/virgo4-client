@@ -9,7 +9,6 @@ const preferences = {
       sourceSet: "alt",
       maxTabs: 4,
       sourceLabel: "Source",
-      optInPools: [],
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       enableBarcodeScan: false,
@@ -51,9 +50,6 @@ const preferences = {
          if (prefsObj.collapseGroups ) {
             state.collapseGroups = prefsObj.collapseGroups
          }
-         if (prefsObj.optInPools ) {
-            state.optInPools = prefsObj.optInPools
-         }
          if ( prefsObj.trackingOptOut) {
             state.trackingOptOut  = prefsObj.trackingOptOut
             let optOutCookie = Vue.$cookies.get('v4_optout')
@@ -81,7 +77,6 @@ const preferences = {
          state.trackingOptOut = false
          state.collapseGroups = false
          state.enableBarcodeScan = false
-         state.optInPools.splice(0, state.optInPools.length)
          state.searchTemplate.fields.splice(0, state.searchTemplate.fields.length)
       },
       setSearchTemplate(state, tpl) {
@@ -116,7 +111,6 @@ const preferences = {
             pickupLibrary: ctx.state.pickupLibrary,
             enableBarcodeScan: ctx.state.enableBarcodeScan,
             collapseGroups: ctx.state.collapseGroups,
-            optInPools: ctx.state.optInPools,
             searchTemplate: ctx.state.searchTemplate,
          }
          return axios.post(url, data)

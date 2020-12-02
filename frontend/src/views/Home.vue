@@ -135,7 +135,6 @@ export default {
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
          searchTemplate: state=>state.preferences.searchTemplate,
-         optInPoolPrefs: state=>state.preferences.optInPools,
          sourceLabel: state => state.preferences.sourceLabel,
          signedInUser: state => state.user.signedInUser,
          activeSort: state=>state.sort.activeSort,
