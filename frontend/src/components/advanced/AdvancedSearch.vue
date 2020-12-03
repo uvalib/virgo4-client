@@ -113,7 +113,6 @@ export default {
          advancedFields: state => state.query.advancedFields,
          pools: state => state.pools.list,
          searchTemplate: state=>state.preferences.searchTemplate,
-         sourceLabel: state => state.preferences.sourceLabel,
          signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
