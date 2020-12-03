@@ -10,9 +10,9 @@
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <label class="screen-reader-text" for="source-select">Search in</label>
             <div class="basic-search">
-               <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
+               <V4Select id="source-select" :selections="resourceTypes" v-bind:attached="true"
                border="1px solid var(--uvalib-brand-blue)"
-               v-model="searchScope"
+               :value="basicSearchScope"
                @changed="scopeChanged"
                />
                <input class="basic"
@@ -81,7 +81,6 @@ export default {
       return {
          showVideo: false,
          isHomePage: true,
-         searchScope: null,
       }
    },
    watch: {
@@ -135,7 +134,6 @@ export default {
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
          searchTemplate: state=>state.preferences.searchTemplate,
-         sourceLabel: state => state.preferences.sourceLabel,
          signedInUser: state => state.user.signedInUser,
          activeSort: state=>state.sort.activeSort,
       }),
@@ -151,19 +149,15 @@ export default {
         isSignedIn: 'user/isSignedIn',
         hasSearchTemplate: 'preferences/hasSearchTemplate',
         externalPoolIDs: 'pools/externalPoolIDs',
-        poolSort: 'sort/poolSort'
+        poolSort: 'sort/poolSort',
+        resourceTypes: 'query/resourceTypes',
+        basicSearchScope:  'query/basicSearchScope'
       }),
       ...mapFields({
-        basicSearchScope: 'query.basicSearchScope',
         basic: 'query.basic',
         userSearched: 'query.userSearched',
         lastSearchScrollPosition: 'lastSearchScrollPosition'
       }),
-      searchScopes() {
-        let out = [{name: `All ${this.sourceLabel}s`, id: 'all'}]
-        let filtered = this.sources.filter( s => s.id != "jmrl" && s.id != "worldcat" )
-        return out.concat(filtered)
-      },
       basicSearch() {
         return this.searchMode != "advanced"
       },
@@ -181,12 +175,9 @@ export default {
       },
       async restoreSearchFromQueryParams( query ) {
          if  (!query.q) {
-            // No query - reset everything
+            // only reset the search when there is NO query present,
+            // otherwise the search is re-excuted each time a tab changes
             this.$store.dispatch('resetSearch')
-            setTimeout( ()=> {
-               let  s = document.getElementById("search")
-               if (s) s.focus()
-            }, 250)
          }
 
          // Interrogate query params and convert them to a search in the model (if present)
@@ -198,10 +189,6 @@ export default {
             }
          } else {
             this.$store.commit("query/setBasicSearch")
-            if (query.scope && query.scope != "") {
-               let tgtScope = this.searchScopes.find( s => s.id == query.scope)
-               this.$store.commit("query/setBasicSearchScope", tgtScope)
-            }
          }
 
          let targetPool = ""
@@ -264,10 +251,6 @@ export default {
          }
       },
       async searchCreated() {
-         this.searchScope = this.basicSearchScope
-         if ( this.searchScope.name.includes("All")) {
-            this.searchScope.name = `All ${this.sourceLabel}s`
-         }
          await this.$store.dispatch('pools/getPools')
          this.$store.dispatch("query/getAdvancedSearchFilters")
 
@@ -330,39 +313,26 @@ export default {
          }
       },
 
-      scopeChanged( tgt ) {
-         this.$analytics.trigger('Search', 'BASIC_SEARCH_RESOURCE_SET', tgt)
+      scopeChanged( val ) {
+         this.$analytics.trigger('Search', 'BASIC_SEARCH_RESOURCE_SET', val)
+         this.$store.commit("query/setBasicSearchFilter", val)
+         this.$store.commit("filters/reset")
       },
 
       async searchClicked() {
-         let skipPoolParam = false
-         let tgtPool = ""
-         this.basicSearchScope = this.searchScope
-         if ( this.basicSearchScope.id != "all") {
-            tgtPool = this.basicSearchScope.id
-            this.$store.commit("query/setTargetPool",  tgtPool)
-            skipPoolParam = true
-         }
-
          // Refine search updates:
          // if pool, filter or sort were specified previously, preserve them in the URL.
          // a new search will always reset paging, so don't preserve that
          let priorQ = Object.assign({}, this.$route.query)
          let qp = this.queryURLParams
-         if (priorQ.pool && skipPoolParam==false) {
+         if ( priorQ.pool ) {
             qp += `&pool=${priorQ.pool}`
             this.$store.commit("query/setTargetPool", priorQ.pool)
-         } else {
-            if ( tgtPool != "") {
-               qp += `&pool=${tgtPool}`
-               this.$store.commit("query/setTargetPool", tgtPool)
-            }
-         }
-         if (tgtPool != "") {
+
             // grab current query string for the selected pool straight from the model.
             // cant rely on preserving prior filter string as the target pool may have changed
             // by the user selecting one from the dropdown
-            qp += this.filterQueryString(tgtPool)
+            qp += this.filterQueryString( priorQ.pool )
          } else {
             if (priorQ.filter) {
                qp += `&filter=${priorQ.filter}`

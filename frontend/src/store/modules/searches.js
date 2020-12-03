@@ -75,10 +75,6 @@ const searches = {
          ctx.commit('setLastSavedSearchKey', resp.data.token)
       },
 
-      async migrate(_ctx, data) {
-         await axios.put(`/api/users/${data.userID}/searches/${data.token}`, {url: data.url})
-      },
-
       updateHistory(ctx) {
          if ( ctx.rootGetters['user/isSignedIn'] ) {
             let searchURL = router.currentRoute.fullPath

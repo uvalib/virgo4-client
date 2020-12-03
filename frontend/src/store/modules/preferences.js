@@ -8,7 +8,6 @@ const preferences = {
    state: {
       sourceSet: "alt",
       maxTabs: 4,
-      sourceLabel: "Source",
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       enableBarcodeScan: false,
@@ -73,7 +72,6 @@ const preferences = {
       clear(state) {
          state.sourceSet = "alt"
          state.maxTabs = 4
-         state.sourceLabel = "Source"
          state.trackingOptOut = false
          state.collapseGroups = false
          state.enableBarcodeScan = false
