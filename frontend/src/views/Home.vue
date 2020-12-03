@@ -25,6 +25,25 @@
                >
             </div>
             <div class="controls-wrapper">
+               <div class="src-targets">
+                  <label class="screen-reader-text">search mode:</label>
+                  <label for="search-all">
+                     <input id="search-all" type="radio" v-model="searchSources" value="all" name="sources">
+                     <span>Everything</span>
+                  </label>
+                  <label for="search-catalog">
+                     <input id="search-catalog" type="radio" v-model="searchSources" value="uva_library" name="sources">
+                     <span>Catalog Only</span>
+                  </label>
+                  <label for="search-articles">
+                     <input id="search-articles" type="radio" v-model="searchSources" value="articles" name="sources">
+                     <span>Articles Only</span>
+                  </label>
+                  <label for="search-images">
+                     <input id="search-images" type="radio" v-model="searchSources" value="images" name="sources">
+                     <span>Images Only</span>
+                  </label>
+               </div>
                <div class="controls">
                   <template v-if="hasResults">
                      <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
@@ -151,10 +170,12 @@ export default {
         externalPoolIDs: 'pools/externalPoolIDs',
         poolSort: 'sort/poolSort',
         resourceTypes: 'query/resourceTypes',
-        basicSearchScope:  'query/basicSearchScope'
+        basicSearchScope:  'query/basicSearchScope',
+        poolDetails: 'pools/poolDetails',
       }),
       ...mapFields({
         basic: 'query.basic',
+        searchSources: 'query.searchSources',
         userSearched: 'query.userSearched',
         lastSearchScrollPosition: 'lastSearchScrollPosition'
       }),
@@ -235,7 +256,12 @@ export default {
                // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
                // has changed. If userSearched is not reset, the search will run twice.
                this.userSearched = false
-               await this.$store.dispatch("searchAllPools")
+               if (this.searchSources == "all") {
+                  await this.$store.dispatch("searchAllPools")
+               } else {
+                  let p = this.poolDetails(this.searchSources)
+                  await this.$store.dispatch("searchPool", {pool: p})
+               }
                this.$store.commit('setSearching', false)
             }
 
@@ -398,7 +424,33 @@ span.sep {
       justify-content: flex-end;
    }
    .controls  > * {
-   flex: 0 1 auto;
+      flex: 0 1 auto;
+   }
+   .src-targets {
+      text-align: left;
+      margin: 15px 0;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      label {
+         display: flex;
+         flex-flow: row nowrap;
+         align-content: center;
+         margin: 0;
+         padding: 0;
+         margin-right: 25px;
+         cursor: pointer;
+         &:hover {
+            text-decoration: underline;
+         }
+      }
+      input {
+         cursor: pointer;
+         margin-right: 8px;
+         display: inline-block;
+         width: 15px;
+         height: 15px;
+      }
    }
 }
 

@@ -10,6 +10,7 @@ const query = {
       basic: "",
       srcTypeFilterName: "FilterFormat",
       allResourceTypes: {name: `All Resource Types`, id: 'all'},
+      searchSources: "all",
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
@@ -346,6 +347,7 @@ const query = {
       clear(state) {
          state.mode = "basic"
          state.basic = ""
+         state.searchSources = "all"
          state.advanced.splice(0, state.advanced.length)
          state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" } )

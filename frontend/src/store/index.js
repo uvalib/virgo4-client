@@ -224,7 +224,7 @@ export default new Vuex.Store({
          let tgtPool = state.results[state.selectedResultsIdx]
          if ( !tgtPool) {
             let result = {
-               pool: poolResults.identity, sort: poolResults.sort, total: poolResults.pagination.total,
+               pool: poolResults.pool, sort: poolResults.sort, total: poolResults.pagination.total,
                page: 0, timeMS: poolResults.elapsed_ms,
                hits: [], statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
             }
@@ -541,11 +541,10 @@ export default new Vuex.Store({
             }
          })
 
-         if ( response.data.identity ) {
-            // the identity info in the pool response is incomplete. Replace it with the full data
-            // retrieved from the master search. This is only needed when a single pool is searched directly.
-            let pool = rootState.pools.list.find( p => p.name = response.data.identity.name)
-            response.data.identity = pool
+         if ( startPage == 0 ) {
+            // when single pool seach is called to start a search, pool is required in response.
+            let pool = rootState.pools.list.find( p => p.id == params.pool.id)
+            response.data.pool = pool
          }
 
          // Note: for pagination, filtering, etc, the existing pool results will be appended.
