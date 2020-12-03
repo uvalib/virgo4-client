@@ -379,7 +379,12 @@ export default new Vuex.Store({
       },
       moreResults(ctx) {
          ctx.commit('incrementPage')
-         return ctx.dispatch("searchSelectedPool")
+         let sr = ctx.rootGetters.selectedResults
+         let params = {
+            pool: sr.pool,
+            page: sr.page
+         }
+         return ctx.dispatch("searchPool", params)
       },
       async nextHit(ctx) {
          if ( ctx.state.selectedHitIdx == -1 || ctx.state.selectedResultsIdx == -1 ) return
@@ -481,14 +486,13 @@ export default new Vuex.Store({
       // SearchSelectedPool is called only when one specific set of pool results is selected for
       // exploration. It is used to query for next page during load more, filter change and sort change.
       // Pool results are APPENDED to existing after load more, and reset for other searches.
-      async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
+      async searchPool({ state, commit, _rootState, rootGetters, dispatch }, params) {
          commit('setSearching', true)
          commit('filters/setUpdatingFacets', true)
-         let tgtResults = rootGetters.selectedResults
-         let filters = rootGetters['filters/poolFilter'](tgtResults.pool.id)
-         let sort = rootGetters['sort/poolSort'](tgtResults.pool.id)
-         let filterObj = { pool_id: tgtResults.pool.id, facets: filters }
-         let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize }
+         let filters = rootGetters['filters/poolFilter'](params.pool.id)
+         let sort = rootGetters['sort/poolSort'](params.pool.id)
+         let filterObj = { pool_id: params.pool.id, facets: filters }
+         let pagination = { start: params.page * state.pageSize, rows: state.pageSize }
 
          let req = {
             query: rootGetters['query/string'],
@@ -506,7 +510,7 @@ export default new Vuex.Store({
             await dispatch("user/refreshAuth")
          }
 
-         let url = tgtResults.pool.url + "/api/search"
+         let url = params.pool.url + "/api/search"
          let response = await axios.post(url, req).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)

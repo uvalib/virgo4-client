@@ -154,8 +154,12 @@ const query = {
       updateField,
       setTemplate(state, template) {
          state.advanced.splice(0, state.advanced.length)
-         template.fields.forEach( f  => {
-            state.advanced.push( f )
+         template.fields.forEach( f => {
+            let newField = { op: f.op, value: "", field: f.field, comparison: f.cpmparison, endVal: "" }
+            if (f.value ) {
+               newField.value = f.value
+            }
+            state.advanced.push(newField)
          })
       },
       setBasicSearchFilter(state, value) {

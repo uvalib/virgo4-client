@@ -201,7 +201,11 @@ export default {
       async toggleFacet(data) {
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("clearSelectedPoolResults")
-         await this.$store.dispatch("searchSelectedPool")
+         let params = {
+            pool: this.selectedResults.pool,
+            page: this.selectedResults.page
+         }
+         await this.$store.dispatch("searchPool", params)
          this.addFilterToURL()
       },
    }
