@@ -184,9 +184,6 @@ export default {
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
-            if ( this.hasSearchTemplate ) {
-               this.$store.commit("query/restoreTemplate", this.searchTemplate)
-            }
          } else {
             this.$store.commit("query/setBasicSearch")
          }

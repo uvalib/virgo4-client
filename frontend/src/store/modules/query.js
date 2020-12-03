@@ -152,14 +152,10 @@ const query = {
    },
    mutations: {
       updateField,
-      restoreTemplate(state, template) {
+      setTemplate(state, template) {
          state.advanced.splice(0, state.advanced.length)
-         template.fields.forEach( f => {
-            let newField = { op: f.op, value: "", field: f.field, comparison: f.cpmparison, endVal: "" }
-            if (f.value ) {
-               newField.value = f.value
-            }
-            state.advanced.push(newField)
+         template.fields.forEach( f  => {
+            state.advanced.push( f )
          })
       },
       setBasicSearchFilter(state, value) {
@@ -328,6 +324,7 @@ const query = {
       removeCriteria(state, idx) {
          state.advanced.splice(idx, 1)
       },
+
       resetAdvanced( state ) {
          state.advanced.splice(0, state.advanced.length)
          state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )

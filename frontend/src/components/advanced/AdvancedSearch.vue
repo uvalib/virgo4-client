@@ -217,7 +217,7 @@ export default {
          } else {
             this.$store.commit('query/resetAdvanced')
             if ( this.hasSearchTemplate ) {
-               this.$store.commit("query/restoreTemplate", this.searchTemplate)
+               this.$store.commit("query/setTemplate", this.searchTemplate)
             }
             this.focusFirstTerm(true)
          }

@@ -375,7 +375,11 @@ const user = {
          ctx.commit('setLookingUp', true)
          return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
             ctx.commit('setAccountInfo', response.data)
-            ctx.commit('preferences/setPreferences', response.data.preferences, { root: true })
+            let prefs = JSON.parse(response.data.preferences)
+            ctx.commit('preferences/setPreferences', prefs, { root: true })
+            if ( prefs.searchTemplate ) {
+               ctx.commit('query/setTemplate',  prefs.searchTemplate, { root: true })
+            }
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
