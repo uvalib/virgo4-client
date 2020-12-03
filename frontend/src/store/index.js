@@ -407,7 +407,6 @@ export default new Vuex.Store({
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
-            preferences: {},
             filters: rootGetters['filters/allPoolFilters'],
             pool_sorting: rootState.sort.pools
          }
@@ -415,18 +414,6 @@ export default new Vuex.Store({
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'searchAllPools', query: rootGetters['query/getState']}
             dispatch("system/reportError", err)
-         }
-
-         if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
-            let tgtID = rootState.query.basicSearchScope.id
-            req.preferences.exclude_pool = []
-            rootState.pools.list.forEach(src => {
-               if (src.id != tgtID) {
-                  req.preferences.exclude_pool.push(src.id)
-               } else {
-                  req.preferences.target_pool = src.id
-               }
-            })
          }
 
          commit('setSearching', true)
