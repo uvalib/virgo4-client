@@ -257,6 +257,10 @@ export default {
          }
       },
       async searchCreated() {
+         let cachedSrc = localStorage.getItem('v4SearchSources')
+         if (cachedSrc) {
+            this.searchSources = cachedSrc
+         }
          await this.$store.dispatch('pools/getPools')
          this.$store.dispatch("query/getAdvancedSearchFilters")
 

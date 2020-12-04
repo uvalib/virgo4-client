@@ -32,6 +32,7 @@ export default {
    },
    watch: {
       searchSources() {
+         localStorage.setItem("v4SearchSources", this.searchSources)
          let query = Object.assign({}, this.$route.query)
          if (query.pool) {
             delete query.page
