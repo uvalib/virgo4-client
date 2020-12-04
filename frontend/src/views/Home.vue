@@ -111,6 +111,18 @@ export default {
          }
          this.restoreSearchFromQueryParams(this.$route.query)
       },
+      searchSources() {
+         let query = Object.assign({}, this.$route.query)
+         if (query.pool) {
+            delete query.page
+            delete query.pool
+            if ( this.searchSources != "all") {
+               query.pool = this.searchSources
+            }
+            this.userSearched = true
+            this.$router.push({ query })
+         }
+      },
       searching (newVal, _oldVal) {
          // If restore url is set, don't do special focus handling as it will mess up
          // the restore focus code
