@@ -78,6 +78,7 @@
                   </Confirm>
 
                </div>
+               <PreSearchFilters />
                <div class="controls">
                   <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
                   <span class="sep">|</span>
@@ -105,10 +106,11 @@ import { mapState } from "vuex"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
 import AdvancedFacets from "@/components/advanced/AdvancedFacets"
 import SourceSelector from "@/components/SourceSelector"
+import PreSearchFilters from "@/components/advanced/PreSearchFilters"
 
 export default {
    components: {
-      V4BarcodeScanner, AdvancedFacets, SourceSelector
+      V4BarcodeScanner, AdvancedFacets, SourceSelector, PreSearchFilters
    },
    computed: {
       ...mapState({
