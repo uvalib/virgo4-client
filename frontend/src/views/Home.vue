@@ -25,25 +25,7 @@
                >
             </div>
             <div class="controls-wrapper">
-               <div class="src-targets">
-                  <label class="screen-reader-text">search mode:</label>
-                  <label for="search-all">
-                     <input id="search-all" type="radio" v-model="searchSources" value="all" name="sources">
-                     <span>Everything</span>
-                  </label>
-                  <label for="search-catalog">
-                     <input id="search-catalog" type="radio" v-model="searchSources" value="uva_library" name="sources">
-                     <span>Catalog Only</span>
-                  </label>
-                  <label for="search-articles">
-                     <input id="search-articles" type="radio" v-model="searchSources" value="articles" name="sources">
-                     <span>Articles Only</span>
-                  </label>
-                  <label for="search-images">
-                     <input id="search-images" type="radio" v-model="searchSources" value="images" name="sources">
-                     <span>Images Only</span>
-                  </label>
-               </div>
+               <SourceSelector />
                <div class="controls">
                   <template v-if="hasResults">
                      <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
@@ -78,13 +60,14 @@ import SearchTips from "@/components/disclosures/SearchTips"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch"
 import Welcome from "@/components/Welcome"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+import SourceSelector from "@/components/SourceSelector"
 
 export default {
    name: "home",
    components: {
      SearchResults, V4BarcodeScanner,
      SearchTips, AdvancedSearch,
-     Welcome
+     Welcome, SourceSelector
    },
 
    created: function() {
@@ -110,18 +93,6 @@ export default {
             this.isHomePage = true
          }
          this.restoreSearchFromQueryParams(this.$route.query)
-      },
-      searchSources() {
-         let query = Object.assign({}, this.$route.query)
-         if (query.pool) {
-            delete query.page
-            delete query.pool
-            if ( this.searchSources != "all") {
-               query.pool = this.searchSources
-            }
-            this.userSearched = true
-            this.$router.push({ query })
-         }
       },
       searching (newVal, _oldVal) {
          // If restore url is set, don't do special focus handling as it will mess up
@@ -395,19 +366,65 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.home {
+   min-height: 400px;
+   position: relative;
+   h2 {
+      margin-top:30px;
+      color: #444;
+   }
+   .search-panel {
+      margin: 0 auto 0 auto;
+      text-align: center;
+      padding: 10px 2vw 10px 2vw;
+      font-size: 0.95em;
+   }
+   .basic-search {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: flex-start;
+      max-width: 800px;
+      margin: 0 auto 0 auto;
+   }
+   div.advanced {
+      margin-top: 10px;
+      font-size: 1em;
+      text-align: right;
+   }
+   div.translate-message {
+      margin: 5px 0 15px 0;
+      font-size: 0.85em;
+   }
+   span.sep {
+      margin: 0 5px;
+   }
+   .controls-wrapper  {
+      max-width: 800px;
+      margin: 0 auto 0 auto;
+      .controls {
+         padding: 10px 0;
+         display: flex;
+         flex-flow: row wrap;
+         align-items: center;
+         justify-content: flex-end;
+      }
+      .controls  > * {
+         flex: 0 1 auto;
+      }
+   }
+}
+
 @media only screen and (min-width: 768px) {
   div.searching-box {
     padding: 20px 90px;
   }
 }
+
 @media only screen and (max-width: 768px) {
   div.searching-box {
       width: 95%;
       padding: 20px 0;
       margin-top:30%;
-  }
-  div.tips-container {
-    display: none;
   }
   ::-webkit-input-placeholder {
     color:transparent;
@@ -422,71 +439,7 @@ export default {
     color:transparent;
   }
 }
-span.sep {
-   margin: 0 5px;
-}
-.controls-wrapper  {
-   max-width: 800px;
-   margin: 0 auto 0 auto;
-   .controls {
-      padding: 10px 0;
-      display: flex;
-      flex-flow: row wrap;
-      align-items: center;
-      justify-content: flex-end;
-   }
-   .controls  > * {
-      flex: 0 1 auto;
-   }
-   .src-targets {
-      text-align: left;
-      margin: 15px 0;
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: center;
-      label {
-         display: flex;
-         flex-flow: row nowrap;
-         align-content: center;
-         margin: 0;
-         padding: 0;
-         margin-right: 25px;
-         cursor: pointer;
-         &:hover {
-            text-decoration: underline;
-         }
-      }
-      input {
-         cursor: pointer;
-         margin-right: 8px;
-         display: inline-block;
-         width: 15px;
-         height: 15px;
-      }
-   }
-}
 
-.home {
-   min-height: 400px;
-   position: relative;
-}
-h2 {
-  margin-top:30px;
-  color: #444;
-}
-.search-panel {
-  margin: 0 auto 0 auto;
-  text-align: center;
-  padding: 10px 2vw 10px 2vw;
-  font-size: 0.95em;
-}
-.basic-search {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-   max-width: 800px;
-   margin: 0 auto 0 auto;
-}
 #app .pure-form div.basic-search  input[type=text].basic {
   font-size: 1.15em;
   padding: 0.5vw 0.75vw;
@@ -496,20 +449,5 @@ h2 {
   border-radius: 0 5px 5px 0;
   flex: 1 1 auto;
   min-width: 100px;
-}
-div.advanced {
-  margin-top: 10px;
-  font-size: 1em;
-  text-align: right;
-}
-div.tips-container {
-  position: absolute;
-  font-size: 1em;
-  top: 15px;
-  right: 15px;
-}
-div.translate-message {
-  margin: 5px 0 15px 0;
-  font-size: 0.85em;
 }
 </style>

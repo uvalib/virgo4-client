@@ -61,6 +61,7 @@
                </div>
             </div>
             <div class="controls-wrapper">
+               <SourceSelector />
                <div class="form-acts">
                   <V4Button mode="icon" id="add-criteria" @click="addClicked">
                      <i class="fas fa-plus-circle"></i>
@@ -103,10 +104,11 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
 import AdvancedFacets from "@/components/advanced/AdvancedFacets"
+import SourceSelector from "@/components/SourceSelector"
 
 export default {
    components: {
-      V4BarcodeScanner,AdvancedFacets
+      V4BarcodeScanner, AdvancedFacets, SourceSelector
    },
    computed: {
       ...mapState({
