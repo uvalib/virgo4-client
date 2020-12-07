@@ -8,7 +8,7 @@ const query = {
       userSearched: false,
       mode: "basic",
       basic: "",
-      srcTypeFilterName: "FilterFormat",
+      srcTypeFilterName: "FilterResourceType",
       allResourceTypes: {name: `All Resource Types`, id: 'all'},
       searchSources: "all",
       advanced: [
