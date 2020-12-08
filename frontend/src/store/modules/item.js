@@ -289,34 +289,32 @@ const item = {
          let req = {
             query: `identifier: {${catalogKey}}`,
             pagination: { start: 0, rows: 1 },
-            preferences: {
-              target_pool: "",
-              exclude_pool: [],
-            }
          }
 
          let srcSet = ctx.rootState.preferences.sourceSet
          let url = `${ctx.rootState.system.searchAPI}/api/search?sources=${srcSet}`
          return axios.post(url, req).then((response) => {
-            if (response.data.total_hits == 0 ) {
-               ctx.commit('clearSearching')
-            } else if (response.data.total_hits == 1 ) {
+            ctx.commit('clearSearching')
+            if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                // NOTE:  the result above only contains basic fields. the redirect below
                // will trigger a full record get
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
                router.push(redirect)
             } else {
-               router.push(`/search?mode=advanced&q=identifier:{${catalogKey}}`)
+               ctx.commit("clearDetails")
+               router.push(`/not_found`)
             }
          }).catch((error) => {
+            ctx.commit('clearSearching')
+            ctx.commit("clearDetails")
             if ( error.response && error.response.status == 404) {
                console.warn(`Catalog Key ${catalogKey} not found`)
-               ctx.commit("clearDetails")
+               router.push(`/not_found`)
             } else {
                ctx.commit('system/setError', error, { root: true })
             }
-            ctx.commit('clearSearching')
+
          })
       },
 
