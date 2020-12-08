@@ -1,7 +1,6 @@
 import axios from 'axios'
 import * as utils from './utils'
 import router from '../../router'
-import analytics from '../../analytics'
 
 const item = {
    namespaced: true,
@@ -253,7 +252,7 @@ const item = {
          }).catch( async (error) => {
             if ( error.response && error.response.status == 404) {
                console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
-               await ctx.dispatch("lookupCatalogKeyDetail", {identifier: identifier, v3Redirect: false})
+               await ctx.dispatch("lookupCatalogKeyDetail", identifier)
             } else {
                ctx.commit('clearSearching')
                ctx.commit('system/setError', error, { root: true })
@@ -276,9 +275,7 @@ const item = {
       },
 
       // This is used to lookup a catalog key without a source. end result of this action is a redirect
-      async lookupCatalogKeyDetail(ctx, data) {
-         let catalogKey = data.identifier
-         let v3Redirect = data.v3Redirect
+      async lookupCatalogKeyDetail(ctx, catalogKey) {
          ctx.commit('clearDetails')
 
          let pools = ctx.rootState.pools.list
@@ -302,12 +299,7 @@ const item = {
          let url = `${ctx.rootState.system.searchAPI}/api/search?sources=${srcSet}`
          return axios.post(url, req).then((response) => {
             if (response.data.total_hits == 0 ) {
-               if ( v3Redirect ) {
-                  analytics.trigger('Navigation', 'VIRGO3_REDIRECT', `/items/${catalogKey}`)
-                  window.location.href = "https://v3.lib.virginia.edu/catalog/"+catalogKey
-               } else {
-                  ctx.commit('clearSearching')
-               }
+               ctx.commit('clearSearching')
             } else if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                // NOTE:  the result above only contains basic fields. the redirect below

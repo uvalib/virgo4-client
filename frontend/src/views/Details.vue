@@ -248,9 +248,6 @@ export default {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
          let id= this.$route.params.id
-         if (this.$route.path.includes("/catalog/")) {
-            this.$analytics.trigger('Bookmarks', 'FOLLOW_V3_BOOKMARK', id)
-         }
 
          if ( this.isSignedIn) {
             await this.$store.dispatch("user/getAccountInfo")
@@ -266,7 +263,7 @@ export default {
             this.$store.commit("hitSelected", id)
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {
-            await this.$store.dispatch("item/lookupCatalogKeyDetail", {identifier: id, v3Redirect: true} )
+            await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }
 
          if ( bmTarget.origin == "DETAIL" ) {

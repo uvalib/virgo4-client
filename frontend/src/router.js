@@ -80,18 +80,8 @@ const router = new Router({
       {
          // route to details page when pool is not known
          path: '/items/:id',
-         alias: '/catalog/:id',
          name: 'item',
          component: Details,
-      },
-      {
-         // this is a catchall route for catalog queries from external search boxes
-         path: '/catalog*',
-         beforeEnter: (to, _from, _next) => {
-            console.error("Unrecognized URL: "+to.fullPath+". Redirect to Virgo3")
-            analytics.trigger('Navigation', 'VIRGO3_REDIRECT', to.fullPath)
-            window.location.href="https://v3.lib.virginia.edu"+to.fullPath
-         }
       },
       {
          path: '/preferences',
