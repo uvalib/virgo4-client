@@ -80,7 +80,6 @@ const router = new Router({
       {
          // route to details page when pool is not known
          path: '/items/:id',
-         alias: '/catalog/:id',
          name: 'item',
          component: Details,
       },
