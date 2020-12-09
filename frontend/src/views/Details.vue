@@ -156,6 +156,7 @@ export default {
          pools: state => state.pools.list,
          selectedHitIdx: state=> state.selectedHitIdx,
          lastSearchURL: state => state.lastSearchURL,
+         poolMapping: state=>state.system.poolMapping,
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
@@ -247,7 +248,14 @@ export default {
       async getDetails() {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
-         let id= this.$route.params.id
+         let id = this.$route.params.id
+         let mapping = this.poolMapping[src]
+         if (mapping && mapping.pool != src) {
+            src = mapping.pool
+            let fixed = `/sources/${src}/items/${id}`
+            this.$router.replace( fixed )
+            return
+         }
 
          if ( this.isSignedIn) {
             await this.$store.dispatch("user/getAccountInfo")
