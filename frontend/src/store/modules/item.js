@@ -236,8 +236,10 @@ const item = {
 
          pool = pools.find( p => p.id == source)
 
+         // FIXME: old links will have oinvalid pool names causing this fail. Map here and handle better
          if (!pool) {
            ctx.commit('clearSearching')
+           router.push(`/not_found`)
            return
          }
 

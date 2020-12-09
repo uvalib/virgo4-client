@@ -37,7 +37,7 @@ export default {
    .info {
       width:50%;
       margin: 35px auto 30px auto;
-      text-align: center;
+      text-align: left;
       font-size: 1.25em;
    }
    ul {
