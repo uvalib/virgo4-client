@@ -1,6 +1,6 @@
 <template>
    <div class="not-found">
-      <h1>Page Not Found</h1>
+      <h1>404 error: Page not found</h1>
       <div class="info">
          <p>
             It looks like there’s a typo in this address or perhaps an outdated link led you to the wrong place.
