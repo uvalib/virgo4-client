@@ -124,22 +124,9 @@ func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
 // all searches have been converted
 func (svc *ServiceContext) UpdateSavedSearch(c *gin.Context) {
 	uid := c.Param("uid")
-	userID := c.MustGet("v4id").(int)
+	v4UserID := c.MustGet("v4id").(int)
 	token := c.Param("token")
-	log.Printf("User %s[%d] update saved search request", uid, userID)
-
-	claims, error := getJWTClaims(c)
-	if error != nil {
-		log.Printf("ERROR: %s", error.Error())
-		c.String(http.StatusUnauthorized, error.Error())
-		return
-	}
-
-	if claims.UserID != uid {
-		log.Printf("ERROR: user %s in URL does not match JWT", uid)
-		c.String(http.StatusUnauthorized, error.Error())
-		return
-	}
+	log.Printf("User %s update saved search request", uid)
 
 	var req struct {
 		URL string `json:"url"`
@@ -153,9 +140,8 @@ func (svc *ServiceContext) UpdateSavedSearch(c *gin.Context) {
 
 	sq := svc.DB.NewQuery("update saved_searches set search_url={:url} where user_id={:uid} and token={:tok}")
 	sq.Bind(dbx.Params{"url": req.URL})
-	sq.Bind(dbx.Params{"uid": userID})
+	sq.Bind(dbx.Params{"uid": v4UserID})
 	sq.Bind(dbx.Params{"tok": token})
-	sq.Bind(dbx.Params{"empty": "{}"})
 	_, err := sq.Execute()
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Update failed %s", err.Error())

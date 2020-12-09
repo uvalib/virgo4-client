@@ -20,12 +20,20 @@ const searches = {
       setSearches(state, data) {
          state.saved.splice(0, state.saved.length)
          data.saved.forEach( s => {
-            state.saved.push( stripExclude(s) )
+            state.saved.push( s )
          })
          state.history.splice(0, state.history.length)
          data.history.forEach( s => {
             state.history.push( stripExclude(s) )
          })
+      },
+      updateSearch(state, {token, url}) {
+         let sIdx = state.saved.findIndex( s => s.token==token)
+         if ( sIdx > -1 ) {
+            let s = state.saved[sIdx]
+            s.url = url
+            state.saved.splice(sIdx,1,s)
+         }
       },
       clearSavedSearches(state) {
          state.saved.splice(0, state.saved.length)
@@ -57,6 +65,10 @@ const searches = {
             await axios.delete(`/api/users/${data.userID}/searches/${data.token}/publish`)
          }
          ctx.commit('setLookingUp', false)
+      },
+      updateURL(ctx, {userID,token,searchURI}) {
+         axios.put(`/api/users/${userID}/searches/${token}`, {url: searchURI})
+         ctx.commit('updateSearch', {token, searchURI} )
       },
 
       getAll(ctx, userID) {

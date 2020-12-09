@@ -70,28 +70,9 @@ export default {
      Welcome, SourceSelector
    },
 
-   created: function() {
-      this.isHomePage = false
-      if (this.$route.path == "/") {
-         this.isHomePage = true
-      }
-      this.searchCreated()
-
-   },
-
-   data: function() {
-      return {
-         showVideo: false,
-         isHomePage: true,
-      }
-   },
    watch: {
       $route() {
          console.log("NEW HOME ROUTE "+ this.$route.fullPath)
-         this.isHomePage = false
-         if (this.$route.path == "/") {
-            this.isHomePage = true
-         }
          this.restoreSearchFromQueryParams(this.$route.query)
       },
       searching (newVal, _oldVal) {
@@ -126,31 +107,27 @@ export default {
          }
       },
    },
+
    computed: {
       ...mapState({
          searching: state => state.searching,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
-         results: state => state.results,
          total: state=>state.total,
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
-         searchTemplate: state=>state.preferences.searchTemplate,
-         signedInUser: state => state.user.signedInUser,
          activeSort: state=>state.sort.activeSort,
+         poolMapping: state=>state.system.poolMapping,
+         signedInUser: state=>state.user.signedInUser,
       }),
       ...mapGetters({
-        queryEntered: 'query/queryEntered',
         queryURLParams: 'query/queryURLParams',
         rawQueryString: 'query/string',
         filterQueryString: 'filters/asQueryParam',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
-        sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
         isSignedIn: 'user/isSignedIn',
-        hasSearchTemplate: 'preferences/hasSearchTemplate',
-        externalPoolIDs: 'pools/externalPoolIDs',
         poolSort: 'sort/poolSort',
         resourceTypes: 'query/resourceTypes',
         basicSearchScope:  'query/basicSearchScope',
@@ -171,12 +148,87 @@ export default {
               this.$route.params.id !== undefined &&
               this.$route.params.id != "")
       },
+      isHomePage() {
+         return (this.$route.path == "/")
+      },
    },
+
+   created: async function() {
+      let cachedSrc = localStorage.getItem('v4SearchSources')
+      if (cachedSrc) {
+         this.searchSources = cachedSrc
+      }
+      await this.$store.dispatch('pools/getPools')
+      this.$store.dispatch("query/getAdvancedSearchFilters")
+
+      // When restoring a saved search, the call will be /search/:token
+      let token = this.$route.params.id
+      if ( token ) {
+         // Load the search from the :token and restore it
+         await this.$store.dispatch("query/loadSearch", token)
+      }
+      this.mapLegacyQueries( token )
+      await this.restoreSearchFromQueryParams(this.$route.query)
+
+      let bmTarget = this.$store.getters['restore/bookmarkTarget']
+      if (bmTarget.id != "") {
+         this.showAddBookmark(bmTarget)
+         this.$store.commit("restore/clear")
+      } else if ( this.restoreSaveSearch ) {
+         let saveBtn = document.getElementById("save-modal-open")
+         if (saveBtn) {
+            saveBtn.focus()
+            saveBtn.click()
+         }
+      }
+   },
+
    methods: {
       async resetSearch(){
          this.$store.dispatch('resetSearch')
          this.$router.push(`/search`)
       },
+
+      mapLegacyQueries( token ) {
+         if (this.$route.query.scope || this.$route.query.pool || this.$route.query.exclude) {
+            let newQ = Object.assign({}, this.$route.query)
+            let oldSrc = newQ.scope
+            if (!oldSrc) {
+               oldSrc = newQ.pool
+            }
+            let mapping = this.poolMapping[oldSrc]
+
+            if (newQ.pool != mapping.pool || newQ.scope || newQ.exclude) {
+               delete newQ.scope
+               delete newQ.exclude
+               newQ.pool = mapping.pool
+               this.searchSources = mapping.pool
+               if (mapping.filter != "all") {
+                  let q = newQ.q
+                  delete newQ.q
+                  q += ` AND filter: {(FilterResourceType:"${mapping.filter}")}`
+                  newQ.q = q
+               }
+
+               if ( token ) {
+                  this.updateSavedSearch(token, newQ)
+               }
+
+               this.$router.replace({query: newQ})
+            }
+         }
+      },
+
+      updateSavedSearch(token, newQuery) {
+         let qs = []
+         for (const [k, v] of Object.entries(newQuery)) {
+            qs.push(`${k}=${encodeURIComponent(v)}`)
+         }
+         let searchURI = `/search?${qs.join("&")}`
+         let userID = this.signedInUser
+         this.$store.dispatch("searches/updateURL", {userID, token, searchURI})
+      },
+
       async restoreSearchFromQueryParams( query ) {
          if  (!query.q) {
             // only reset the search when there is NO query present,
@@ -195,7 +247,7 @@ export default {
          let targetPool = ""
          let oldFilterParam = ""
          let oldSort = ""
-         if (query.pool) {
+         if (query.pool && !query.scope) {
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)
 
@@ -253,37 +305,6 @@ export default {
                   top: this.lastSearchScrollPosition,
                   behavior: "auto"
                })
-            }
-         }
-      },
-      async searchCreated() {
-         let cachedSrc = localStorage.getItem('v4SearchSources')
-         if (cachedSrc) {
-            this.searchSources = cachedSrc
-         }
-         await this.$store.dispatch('pools/getPools')
-         this.$store.dispatch("query/getAdvancedSearchFilters")
-
-         // When restoring a saved search, the call will be /search/:token
-         if ( this.isRestore ) {
-            // Load the search from the :token and restore it
-            let token = this.$route.params.id
-            await this.$store.dispatch("query/loadSearch", token)
-            this.restoreSearchFromQueryParams(this.$route.query)
-            return
-         } else {
-            await this.restoreSearchFromQueryParams(this.$route.query)
-         }
-
-         let bmTarget = this.$store.getters['restore/bookmarkTarget']
-         if (bmTarget.id != "") {
-            this.showAddBookmark(bmTarget)
-            this.$store.commit("restore/clear")
-         } else if ( this.restoreSaveSearch ) {
-            let saveBtn = document.getElementById("save-modal-open")
-            if (saveBtn) {
-               saveBtn.focus()
-               saveBtn.click()
             }
          }
       },

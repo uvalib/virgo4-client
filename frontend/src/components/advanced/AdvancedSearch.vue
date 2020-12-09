@@ -401,7 +401,7 @@ div.query {
 }
 div.search-term {
    padding: 10px;
-   margin: 0 0 20px 0;
+   margin: 0 0 10px 0;
    background: var(--uvalib-grey-lightest);
    outline: 1px solid var(--uvalib-grey-light);
    width: 100%;

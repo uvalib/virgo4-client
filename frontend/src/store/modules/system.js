@@ -31,7 +31,8 @@ const system = {
       pickupLibraries: [
          //{id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'},
          {id: 'CLEMONS', name: 'Clemons'},
-      ]
+      ],
+      poolMapping: {}
    },
 
    getters: {
@@ -179,6 +180,7 @@ const system = {
          state.citationsURL = cfg.citationsURL
          state.hsILLiadURL = cfg.hsILLiadURL
          state.shelfBrowseURL = cfg.shelfBrowseURL
+         state.poolMapping = cfg.poolMapping
       },
    },
 

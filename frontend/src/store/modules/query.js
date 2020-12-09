@@ -167,7 +167,7 @@ const query = {
          let fIdx = state.preSearchFilters.findIndex( pf => pf.value == state.srcTypeFilterName)
          let typeFilter = state.preSearchFilters[fIdx]
          typeFilter.choices.forEach( c => {
-            if ( value == state.allResourceTypes.name) {
+            if ( value == state.allResourceTypes.name || value == "all") {
                c.selected = false
             } else {
                if (c.value == value) {
