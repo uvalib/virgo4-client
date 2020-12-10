@@ -18,24 +18,6 @@ const pools = {
             return 0
          })
       },
-      externalPoolIDs: state => {
-         let out = []
-         state.list.forEach( p => {
-            let attr = p.attributes.find( a=> a.name=='external_hold')
-            if (attr && attr.supported ) {
-               out.push(p.id)
-            }
-         })
-         return out
-      },
-      hasCoverImages: (state) => (id) => {
-         let pool = state.list.find( p => p.id == id)
-         if (!pool) return false
-         if (!pool.attributes) return true
-         let attr = pool.attributes.find( a=> a.name=='cover_images')
-         if (!attr) return true
-         return attr.supported
-      },
       facetSupport: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return false
@@ -74,14 +56,6 @@ const pools = {
          if (!attr) return ""
          if (attr.supported == false) return ""
          return attr.value
-      },
-      hasExternalHoldings: (state) => (id) => {
-         let pool = state.list.find( p => p.id == id)
-         if (!pool) return false
-         if (!pool.attributes) return false
-         let attr = pool.attributes.find( a=> a.name=='external_hold')
-         if (!attr) return false
-         return attr.supported
       },
       isUVA: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)

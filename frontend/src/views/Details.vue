@@ -27,7 +27,7 @@
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source" from="DETAIL"/>
             <abbr class="unapi-id" :title="details.itemURL"></abbr>
             <div class="info">
-               <div v-if="hasExternalHoldings(details.source)" class="ra-box ra-fiy pad-top">
+               <div v-if="isExternal(details.source)" class="ra-box ra-fiy pad-top">
                   This resource is not held by UVA Libraries,
                   <a :href="owningInstitution" target="_blank">contact the owning institution<i style="margin:0 5px;" class="fas fa-external-link-alt"></i></a>
                   to determine how to gain access to them, or disable searching of these materials in your preferences.
@@ -163,8 +163,6 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
-         isDevServer: 'system/isDevServer',
-         hasExternalHoldings: 'pools/hasExternalHoldings',
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
          prevHitAvailable: 'prevHitAvailable',
@@ -218,6 +216,9 @@ export default {
       }
    },
    methods: {
+      isExternal( source ) {
+         return (source == "jmrl" || source == "worldcat")
+      },
       returnToSearch() {
          this.$router.push( this.lastSearchURL )
       },

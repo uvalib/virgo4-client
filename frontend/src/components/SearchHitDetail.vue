@@ -21,7 +21,7 @@
                </template>
             </dl>
          </div>
-         <router-link v-if="hasCoverImages(pool) && hit.cover_image" @mousedown.native="detailClicked"
+         <router-link v-if="hit.cover_image" @mousedown.native="detailClicked"
             class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`"
          >
             <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
@@ -81,10 +81,9 @@ export default {
       }),
       ...mapGetters({
          isKiosk: "system/isKiosk",
-         hasCoverImages: 'pools/hasCoverImages',
       }),
       truncateLength() {
-         if ( this.hasCoverImages(this.pool)) return 60
+         if ( this.hit.cover_image ) return 60
          return 80
       }
    },
