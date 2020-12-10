@@ -323,6 +323,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	cfg.PoolMapping["musical-scores"] = mapTarget{Pool: "uva_library", Filter: "Musical Scores"}
 	cfg.PoolMapping["sound-recordings"] = mapTarget{Pool: "uva_library", Filter: "Sound Recordings"}
 	cfg.PoolMapping["thesis"] = mapTarget{Pool: "uva_library", Filter: "Theses"}
+	cfg.PoolMapping["uva_library"] = mapTarget{Pool: "uva_library", Filter: "all"}
 	cfg.PoolMapping["video"] = mapTarget{Pool: "uva_library", Filter: "Video"}
 	cfg.PoolMapping["worldcat"] = mapTarget{Pool: "worldcat", Filter: "all"}
 

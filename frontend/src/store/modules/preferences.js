@@ -6,7 +6,6 @@ import { getField, updateField } from 'vuex-map-fields'
 const preferences = {
    namespaced: true,
    state: {
-      sourceSet: "alt",
       maxTabs: 4,
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
@@ -70,7 +69,6 @@ const preferences = {
          }
       },
       clear(state) {
-         state.sourceSet = "alt"
          state.maxTabs = 4
          state.trackingOptOut = false
          state.collapseGroups = false

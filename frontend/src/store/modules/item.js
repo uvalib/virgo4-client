@@ -293,9 +293,7 @@ const item = {
             pagination: { start: 0, rows: 1 },
          }
 
-         let srcSet = ctx.rootState.preferences.sourceSet
-         let url = `${ctx.rootState.system.searchAPI}/api/search?sources=${srcSet}`
-         return axios.post(url, req).then((response) => {
+         return axios.post(`${ctx.rootState.system.searchAPI}/api/search`, req).then((response) => {
             ctx.commit('clearSearching')
             if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)

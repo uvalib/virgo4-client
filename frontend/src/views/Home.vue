@@ -196,9 +196,11 @@ export default {
             if (!oldSrc) {
                oldSrc = newQ.pool
             }
-            let mapping = this.poolMapping[oldSrc]
 
-            if (newQ.pool != mapping.pool || newQ.scope || newQ.exclude) {
+            // look up a mpaaing from legacy v4 pool name to current pool name.
+            // this mapping may be one to one for current pools, or pools that didn't change
+            let mapping = this.poolMapping[oldSrc]
+            if (mapping && (newQ.pool != mapping.pool || newQ.scope || newQ.exclude) ) {
                delete newQ.scope
                delete newQ.exclude
                newQ.pool = mapping.pool

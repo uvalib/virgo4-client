@@ -161,10 +161,8 @@ const pools = {
             await ctx.dispatch('system/getConfig', null, { root: true })
          }
 
-         let srcSet = ctx.rootState.preferences.sourceSet
-         let url = `${ctx.rootState.system.searchAPI}/api/pools?sources=${srcSet}`
          try {
-            let response = await axios.get(url)
+            let response = await axios.get( `${ctx.rootState.system.searchAPI}/api/pools` )
             ctx.commit('setPools', response.data)
             ctx.commit("setLookingUp", false)
 
