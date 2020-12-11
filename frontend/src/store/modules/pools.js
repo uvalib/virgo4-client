@@ -18,6 +18,14 @@ const pools = {
             return 0
          })
       },
+      itemMessage: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return ""
+         if (!pool.attributes) return ""
+         let attr = pool.attributes.find( a=> a.name=='item_message')
+         if (!attr || attr && attr.supported == false) return ""
+         return attr.value
+      },
       facetSupport: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return false
@@ -62,14 +70,6 @@ const pools = {
          if (!pool) return false
          if (!pool.attributes) return true
          let attr = pool.attributes.find( a=> a.name=='uva_ils')
-         if (!attr) return true
-         return attr.supported
-      },
-      courseReserveSupport: (state) => (id) => {
-         let pool = state.list.find( p => p.id == id)
-         if (!pool) return false
-         if (!pool.attributes) return true
-         let attr = pool.attributes.find( a=> a.name=='course_reserves')
          if (!attr) return true
          return attr.supported
       },

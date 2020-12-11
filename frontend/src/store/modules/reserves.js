@@ -131,12 +131,12 @@ const reserves = {
          // this information is readily availble without an extra API request
          // validate those first
          let itemIds = []
-         ctx.state.requestList.forEach( (item,idx) => {
-            let tgtPool = item.pool
+         ctx.state.requestList.forEach( item => {
+            // FIXME reserves are item based now
             itemIds.push(item.identifier)
-            if (ctx.rootGetters["pools/courseReserveSupport"](tgtPool)==false) {
-               ctx.commit("markInvalidReserveItem", idx)
-            }
+            // if (ctx.rootGetters["pools/courseReserveSupport"](tgtPool)==false) {
+            //    ctx.commit("markInvalidReserveItem", idx)
+            // }
          })
 
          ctx.commit('setSearching', true, { root: true })
@@ -191,7 +191,7 @@ const reserves = {
          let v4UserID = ctx.rootState.user.signedInUser
          let data = { userID: v4UserID, request: ctx.state.request,
             items: [video]}
-            
+
          axios.post(`/api/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')
             ctx.commit('setSearching', false, { root: true })
