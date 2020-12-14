@@ -224,6 +224,7 @@ const item = {
 
       async getDetails(ctx, { source, identifier }) {
          ctx.commit('clearDetails')
+         ctx.commit('clearAvailability')
 
          // get source from poolID
          let baseURL = ""
@@ -279,6 +280,7 @@ const item = {
       // This is used to lookup a catalog key without a source. end result of this action is a redirect
       async lookupCatalogKeyDetail(ctx, catalogKey) {
          ctx.commit('clearDetails')
+         ctx.commit('clearAvailability')
 
          let pools = ctx.rootState.pools.list
          if (pools.length == 0) {

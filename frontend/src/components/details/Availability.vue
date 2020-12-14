@@ -136,9 +136,7 @@ export default {
       },
    },
    created() {
-      if ( this.isUVA(this.details.source) == false) {
-         this.$store.dispatch("item/getAvailability", this.titleId )
-      }
+      this.$store.dispatch("item/getAvailability", this.titleId )
    }
 }
 </script>
