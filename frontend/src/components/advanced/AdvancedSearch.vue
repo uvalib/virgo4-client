@@ -261,6 +261,9 @@ export default {
    },
    created() {
       this.focusFirstTerm(false)
+      if ( this.hasSearchTemplate ) {
+         this.$store.commit("query/setTemplate", this.searchTemplate)
+      }
    }
 };
 </script>
