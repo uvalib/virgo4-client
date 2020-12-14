@@ -149,7 +149,7 @@ const pools = {
                }
             })
          } catch (error)  {
-            ctx.commit('system/setFatal', "Unable to get pools: " + error.response.data, { root: true })
+            ctx.commit('system/setFatal', "Unable to get sources: " + error, { root: true })
             ctx.commit("setLookingUp", false)
          }
       },

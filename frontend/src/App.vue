@@ -1,6 +1,5 @@
 <template>
    <div id="app">
-      <FatalError v-if="fatal.length > 0" />
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer">
@@ -29,7 +28,6 @@ import MessageBox from "@/components/layout/MessageBox"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
 import SessionExpired from "@/components/layout/SessionExpired"
-import FatalError from "@/components/layout/FatalError"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {
@@ -44,7 +42,6 @@ export default {
    components: {
       VirgoHeader,
       LibraryFooter,
-      FatalError,
       MenuBar,
       ScrollToTop,
       MessageBox,
@@ -52,7 +49,6 @@ export default {
    },
    computed: {
       ...mapState({
-         fatal: state => state.system.fatal,
          newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
          sessionExpired: state => state.system.sessionExpired,

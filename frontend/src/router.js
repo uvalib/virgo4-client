@@ -19,8 +19,11 @@ import OpenURLRequest from './views/OpenURLRequest.vue'
 
 import SignedOut from './views/SignedOut.vue'
 import Feedback from './views/Feedback.vue'
-import NotFound from './views/NotFound.vue'
 import PublicBookmarks from './views/PublicBookmarks.vue'
+
+import NotFound from './views/NotFound.vue'
+import FatalError from './views/FatalError.vue'
+
 import store from './store'
 
 import analytics from './analytics'
@@ -167,6 +170,11 @@ const router = new Router({
          component: SignedOut
       },
       {
+         path: "/error",
+         name: "fatal_error",
+         component: FatalError
+      },
+      {
          path: "*",
          name: "not_found",
          component: NotFound
@@ -192,7 +200,7 @@ router.afterEach((to, _from) => {
    let titles = {home: "Virgo", search: "Virgo", signin: "Virgo: Sign In", account: "Virgo: My Information",
       checkouts: "Virgo: Checkouts", 'digital-deliveries': "Virgo: Digital Deliveries",
       bookmarks: "Virgo: Bookmarks", requests: "Virgo: Requests", searches: "Virgo: Saved Searches",
-      preferences: "Virgo: Preferences"
+      preferences: "Virgo: Preferences", fatal_error: "Virgo System Error"
    }
    Vue.nextTick(() => {
       let title = titles[to.name]

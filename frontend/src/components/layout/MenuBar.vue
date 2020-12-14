@@ -50,55 +50,57 @@
                </div>
             </transition>
          </span>
-         <template v-if="isSignedIn">
-            <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen.toString()"
-               @click.stop="toggleUserMenu" @keyup.prevent.stop.enter="toggleUserMenu" @keydown.space.prevent.stop="toggleUserMenu"
-               @keyup.down="nextUserMenu" @keyup.up="prevUserMenu">
-               <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
-               <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('user') }"></i>
-               <transition name="grow"
-                  v-on:before-enter="beforeEnter" v-on:enter="enter"
-                  v-on:before-leave="beforeLeave" v-on:leave="leave">
-                  <div v-if="userMenuOpen" class="user-menu"  @keydown.space.prevent.stop>
-                     <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
-                        <div class="submenu">My Information</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Checkouts</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/digital-deliveries" id="digitalsub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Digital Deliveries</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Requests</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Bookmarks</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Searches</div>
-                     </router-link>
-                     <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub" @keyup.native.enter.prevent.stop>
-                        <div class="submenu">Preferences</div>
-                     </router-link>
-                     <div role="menuitem" tabindex="-1"  id="outsub" class="submenu"
-                        @click="signOut" @keyup.stop.enter="signOut" @keydown.space.prevent.stop="signOut" >
-                        <span>Sign out</span>
+         <template v-if="!fatal">
+            <template v-if="isSignedIn">
+               <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen.toString()"
+                  @click.stop="toggleUserMenu" @keyup.prevent.stop.enter="toggleUserMenu" @keydown.space.prevent.stop="toggleUserMenu"
+                  @keyup.down="nextUserMenu" @keyup.up="prevUserMenu">
+                  <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
+                  <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('user') }"></i>
+                  <transition name="grow"
+                     v-on:before-enter="beforeEnter" v-on:enter="enter"
+                     v-on:before-leave="beforeLeave" v-on:leave="leave">
+                     <div v-if="userMenuOpen" class="user-menu"  @keydown.space.prevent.stop>
+                        <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
+                           <div class="submenu">My Information</div>
+                        </router-link>
+                        <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub" @keyup.native.enter.prevent.stop>
+                           <div class="submenu">Checkouts</div>
+                        </router-link>
+                        <router-link role="menuitem" tabindex="-1" to="/digital-deliveries" id="digitalsub" @keyup.native.enter.prevent.stop>
+                           <div class="submenu">Digital Deliveries</div>
+                        </router-link>
+                        <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub" @keyup.native.enter.prevent.stop>
+                           <div class="submenu">Requests</div>
+                        </router-link>
+                        <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub" @keyup.native.enter.prevent.stop>
+                           <div class="submenu">Bookmarks</div>
+                        </router-link>
+                        <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
+                           <div class="submenu">Searches</div>
+                        </router-link>
+                        <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub" @keyup.native.enter.prevent.stop>
+                           <div class="submenu">Preferences</div>
+                        </router-link>
+                        <div role="menuitem" tabindex="-1"  id="outsub" class="submenu"
+                           @click="signOut" @keyup.stop.enter="signOut" @keydown.space.prevent.stop="signOut" >
+                           <span>Sign out</span>
+                        </div>
                      </div>
-                  </div>
-               </transition>
-            </span>
-            <router-link v-if="itemsOnNotice.length > 0" to="/checkouts">
-               <span  class="menu-item notice">
-                  <i class="notice fas fa-exclamation-triangle"></i>{{itemsOnNotice.length}}
+                  </transition>
                </span>
-            </router-link>
-         </template>
-         <template v-else>
-            <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin"
-                @click.native="closeSubMenus">
-               <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
-            </router-link>
+               <router-link v-if="itemsOnNotice.length > 0" to="/checkouts">
+                  <span  class="menu-item notice">
+                     <i class="notice fas fa-exclamation-triangle"></i>{{itemsOnNotice.length}}
+                  </span>
+               </router-link>
+            </template>
+            <template v-else>
+               <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin"
+                  @click.native="closeSubMenus">
+                  <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
+               </router-link>
+            </template>
          </template>
          <div v-if="!isKiosk && alertsReady" class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu"
             v-bind:class="{dim: alertCount==0}"
@@ -137,6 +139,7 @@ export default {
    computed: {
       ...mapState({
          signedInUser: state => state.user.signedInUser,
+         fatal: state => state.system.fatal,
       }),
       ...mapGetters({
         isKiosk: 'system/isKiosk',

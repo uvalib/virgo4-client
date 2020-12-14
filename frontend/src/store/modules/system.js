@@ -100,6 +100,7 @@ const system = {
 
       setFatal(state, err) {
          state.fatal = err
+         router.push( "/error" )
       },
       clearMessage( state ) {
          state.message.type = "none"
@@ -194,7 +195,7 @@ const system = {
          return axios.get("/config", {headers: {V4Host:host}}).then((response) => {
             ctx.commit('setConfig', response.data)
          }).catch((error) => {
-            ctx.commit('setFatal', "Unable to get configuration: " + error.response.data)
+            ctx.commit('setFatal', "Unable to get configuration: " + error)
          })
       },
 
@@ -210,7 +211,7 @@ const system = {
             ctx.commit('setCodes', response.data.availability_list)
             ctx.commit('setSearching', false, {root: true})
          }).catch((error) => {
-            ctx.commit('setFatal', "Unable to get codes: " + error.response.data)
+            ctx.commit('setError', "Unable to get codes: " + error.response.data)
             ctx.commit('setSearching', false, {root: true})
          })
       },
