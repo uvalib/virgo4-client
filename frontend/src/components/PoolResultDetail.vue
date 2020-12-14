@@ -93,7 +93,11 @@ export default {
    methods: {
       retrySearch() {
          this.$store.commit("clearSelectedPoolResults")
-         this.$store.dispatch("searchSelectedPool")
+         let params = {
+            pool: this.selectedResults.pool,
+            page: this.selectedResults.page
+         }
+         this.$store.dispatch("searchPool", params)
       },
       loadMoreResults() {
          if ( this.searching) return

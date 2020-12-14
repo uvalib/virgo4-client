@@ -224,6 +224,7 @@ const item = {
 
       async getDetails(ctx, { source, identifier }) {
          ctx.commit('clearDetails')
+         ctx.commit('clearAvailability')
 
          // get source from poolID
          let baseURL = ""
@@ -236,8 +237,10 @@ const item = {
 
          pool = pools.find( p => p.id == source)
 
+         // FIXME: old links will have oinvalid pool names causing this fail. Map here and handle better
          if (!pool) {
            ctx.commit('clearSearching')
+           router.push(`/not_found`)
            return
          }
 
@@ -277,6 +280,7 @@ const item = {
       // This is used to lookup a catalog key without a source. end result of this action is a redirect
       async lookupCatalogKeyDetail(ctx, catalogKey) {
          ctx.commit('clearDetails')
+         ctx.commit('clearAvailability')
 
          let pools = ctx.rootState.pools.list
          if (pools.length == 0) {
@@ -289,34 +293,30 @@ const item = {
          let req = {
             query: `identifier: {${catalogKey}}`,
             pagination: { start: 0, rows: 1 },
-            preferences: {
-              target_pool: "",
-              exclude_pool: [],
-            }
          }
 
-         let srcSet = ctx.rootState.preferences.sourceSet
-         let url = `${ctx.rootState.system.searchAPI}/api/search?sources=${srcSet}`
-         return axios.post(url, req).then((response) => {
-            if (response.data.total_hits == 0 ) {
-               ctx.commit('clearSearching')
-            } else if (response.data.total_hits == 1 ) {
+         return axios.post(`${ctx.rootState.system.searchAPI}/api/search`, req).then((response) => {
+            ctx.commit('clearSearching')
+            if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                // NOTE:  the result above only contains basic fields. the redirect below
                // will trigger a full record get
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
                router.push(redirect)
             } else {
-               router.push(`/search?mode=advanced&q=identifier:{${catalogKey}}`)
+               ctx.commit("clearDetails")
+               router.push(`/not_found`)
             }
          }).catch((error) => {
+            ctx.commit('clearSearching')
+            ctx.commit("clearDetails")
             if ( error.response && error.response.status == 404) {
                console.warn(`Catalog Key ${catalogKey} not found`)
-               ctx.commit("clearDetails")
+               router.push(`/not_found`)
             } else {
                ctx.commit('system/setError', error, { root: true })
             }
-            ctx.commit('clearSearching')
+
          })
       },
 

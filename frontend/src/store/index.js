@@ -222,6 +222,18 @@ export default new Vuex.Store({
 
       addPoolSearchResults(state, poolResults) {
          let tgtPool = state.results[state.selectedResultsIdx]
+         if ( !tgtPool) {
+            let result = {
+               pool: poolResults.pool, sort: poolResults.sort, total: poolResults.pagination.total,
+               page: 0, timeMS: poolResults.elapsed_ms,
+               hits: [], statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
+            }
+            state.results.push(result)
+            state.selectedResultsIdx = 0
+            state.otherSrcSelection = { id: "", name: "" }
+            state.total = poolResults.pagination.total
+            tgtPool = state.results[0]
+         }
          let lastHit = tgtPool.hits[tgtPool.hits.length-1]
 
          // When a facet is applied, the results are cleared and there is no last hit
@@ -379,7 +391,12 @@ export default new Vuex.Store({
       },
       moreResults(ctx) {
          ctx.commit('incrementPage')
-         return ctx.dispatch("searchSelectedPool")
+         let sr = ctx.rootGetters.selectedResults
+         let params = {
+            pool: sr.pool,
+            page: sr.page
+         }
+         return ctx.dispatch("searchPool", params)
       },
       async nextHit(ctx) {
          if ( ctx.state.selectedHitIdx == -1 || ctx.state.selectedResultsIdx == -1 ) return
@@ -407,9 +424,6 @@ export default new Vuex.Store({
          let req = {
             query: rootGetters['query/string'],
             pagination: { start: 0, rows: state.pageSize },
-            preferences: {
-               exclude_pool: rootState.query.excludedPools
-            },
             filters: rootGetters['filters/allPoolFilters'],
             pool_sorting: rootState.sort.pools
          }
@@ -417,18 +431,6 @@ export default new Vuex.Store({
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'searchAllPools', query: rootGetters['query/getState']}
             dispatch("system/reportError", err)
-         }
-
-         if (rootState.query.mode == "basic" && rootState.query.basicSearchScope.id != "all") {
-            let tgtID = rootState.query.basicSearchScope.id
-            req.preferences.exclude_pool = []
-            rootState.pools.list.forEach(src => {
-               if (src.id != tgtID) {
-                  req.preferences.exclude_pool.push(src.id)
-               } else {
-                  req.preferences.target_pool = src.id
-               }
-            })
          }
 
          commit('setSearching', true)
@@ -441,9 +443,7 @@ export default new Vuex.Store({
          }
 
          // POST the search query and wait for the response
-         let srcSet = rootState.preferences.sourceSet
-         let url = `${rootState.system.searchAPI}/api/search?sources=${srcSet}`
-         await axios.post(url, req).then((response) => {
+         await axios.post(`${rootState.system.searchAPI}/api/search`, req).then((response) => {
             commit('pools/setPools', response.data.pools)
             commit('setSearchResults', { results: response.data, tgtPool: rootState.query.targetPool })
             commit('sort/setActivePool', state.results[state.selectedResultsIdx].pool.id)
@@ -493,17 +493,19 @@ export default new Vuex.Store({
          })
       },
 
-      // SearchSelectedPool is called only when one specific set of pool results is selected for
-      // exploration. It is used to query for next page during load more, filter change and sort change.
-      // Pool results are APPENDED to existing after load more, and reset for other searches.
-      async searchSelectedPool({ state, commit, _rootState, rootGetters, dispatch }) {
+      // searchPool wil search only the pool specified. It can be used to filter, sort and page
+      // existing results or as a standalone query to a single pool
+      async searchPool({ state, commit, rootState, rootGetters, dispatch }, params) {
          commit('setSearching', true)
          commit('filters/setUpdatingFacets', true)
-         let tgtResults = rootGetters.selectedResults
-         let filters = rootGetters['filters/poolFilter'](tgtResults.pool.id)
-         let sort = rootGetters['sort/poolSort'](tgtResults.pool.id)
-         let filterObj = { pool_id: tgtResults.pool.id, facets: filters }
-         let pagination = { start: tgtResults.page * state.pageSize, rows: state.pageSize }
+         let filters = rootGetters['filters/poolFilter'](params.pool.id)
+         let sort = rootGetters['sort/poolSort'](params.pool.id)
+         let filterObj = { pool_id: params.pool.id, facets: filters }
+         let startPage = params.page
+         if (!startPage) {
+            startPage = 0
+         }
+         let pagination = { start: startPage * state.pageSize, rows: state.pageSize }
 
          let req = {
             query: rootGetters['query/string'],
@@ -521,7 +523,7 @@ export default new Vuex.Store({
             await dispatch("user/refreshAuth")
          }
 
-         let url = tgtResults.pool.url + "/api/search"
+         let url = params.pool.url + "/api/search"
          let response = await axios.post(url, req).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)
@@ -536,13 +538,31 @@ export default new Vuex.Store({
                dispatch("system/reportError", error)
             }
          })
+
+         if ( startPage == 0 ) {
+            // when single pool seach is called to start a search, pool is required in response.
+            let pool = rootState.pools.list.find( p => p.id == params.pool.id)
+            response.data.pool = pool
+         }
+
+         // Note: for pagination, filtering, etc, the existing pool results will be appended.
+         // if this is a direct single pool search, there will be no existing results. This call
+         // will create them.
          commit('addPoolSearchResults', response.data)
+
+
          commit('setSearching', false)
          if (state.otherSrcSelection.id != "") {
             commit('updateOtherPoolLabel')
          }
 
-         dispatch("searches/updateHistory")
+         // make sure the currently selected pool is always in URL
+         let query = Object.assign({}, router.currentRoute.query)
+         if (query.pool != rootGetters.selectedResults.pool.id) {
+            query.pool = rootGetters.selectedResults.pool.id
+            router.replace({ query })
+         }
+
          return dispatch("filters/getSelectedResultFacets", true)
       },
 

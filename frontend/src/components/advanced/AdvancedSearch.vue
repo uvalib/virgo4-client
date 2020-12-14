@@ -59,50 +59,26 @@
                      </template>
                   </div>
                </div>
-               <div class="criteria-control">
+            </div>
+            <div class="controls-wrapper">
+               <SourceSelector />
+               <div class="form-acts">
                   <V4Button mode="icon" id="add-criteria" @click="addClicked">
                      <i class="fas fa-plus-circle"></i>
                      <span class="btn-label">Add criteria</span>
                   </V4Button>
-               </div>
-            </div>
-            <div class="controls-wrapper">
-               <div class="pools-wrapper">
-                  <h2>
-                     <span>{{sourceLabel}}s</span>
-                     <span>
-                        <V4Button mode="text" class="clear" @click="clearPoolsClicked">clear all</V4Button>
-                        <span class="sep">|</span>
-                        <V4Button mode="text" class="clear" @click="allPoolsClicked">select all</V4Button>
-                     </span>
-                  </h2>
-                  <div class="pools">
-                     <V4Checkbox v-for="src in filteredSources" :key="src.id" class="pool"
-                        :aria-label="`toggle inclusion of ${src.name} in search results`"
-                        :checked="!isPoolExcluded(src)"
-                        @click="poolClicked(src)">
-                        {{src.name}}
-                     </V4Checkbox>
-                  </div>
-                  <div class="what" v-if="!isKiosk">
-                     <a href="http://library.virginia.edu/virgo4/resource-types" target="_blank">
-                        What am I searching?
-                     </a>
-                     <span v-if="isSignedIn" style="text-align: left; padding-left: 10px;">
-                        You can manage this list in <router-link to="/preferences">your preferences</router-link>.
-                     </span>
-                  </div>
-               </div>
-               <div class="templates" v-if="isSignedIn">
-                  <Confirm title="Save Search Form" v-on:confirmed="saveSearchForm"
-                     id="savesearch" buttonLabel="Save Form" buttonMode="tertiary">
+                  <Confirm  v-if="isSignedIn" title="Save Search Form" v-on:confirmed="saveSearchForm"
+                     id="savesearch" buttonLabel="Save Form" buttonMode="tertiary"
+                  >
                      <div>
                         Save the current advanced search form to your account?<br/>
                         Once saved, it will be used as the default setup for future advanced searches.<br/>
                         This can be changed at any time.
                      </div>
                   </Confirm>
+
                </div>
+               <PreSearchFilters />
                <div class="controls">
                   <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
                   <span class="sep">|</span>
@@ -129,21 +105,18 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
 import AdvancedFacets from "@/components/advanced/AdvancedFacets"
+import SourceSelector from "@/components/SourceSelector"
+import PreSearchFilters from "@/components/advanced/PreSearchFilters"
 
 export default {
    components: {
-      V4BarcodeScanner,AdvancedFacets
+      V4BarcodeScanner, AdvancedFacets, SourceSelector, PreSearchFilters
    },
    computed: {
-      filteredSources() {
-         return this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
-      },
       ...mapState({
          advancedFields: state => state.query.advancedFields,
-         excludedPools: state => state.query.excludedPools,
          pools: state => state.pools.list,
          searchTemplate: state=>state.preferences.searchTemplate,
-         sourceLabel: state => state.preferences.sourceLabel,
          signedInUser: state => state.user.signedInUser
       }),
       ...mapGetters({
@@ -151,8 +124,6 @@ export default {
          queryURLParams: 'query/queryURLParams',
          queryEntered: "query/queryEntered",
          sources: "pools/sortedList",
-         excludedPoolPrefs: "preferences/excludedPools",
-         isPoolExcluded: "query/isPoolExcluded",
          rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
@@ -189,23 +160,7 @@ export default {
          let tgtField = this.advancedFields.find( af=> af.value == term.field)
          return tgtField.choices
       },
-      clearPoolsClicked() {
-         this.$store.commit("query/excludeAll", this.sources)
-      },
-      allPoolsClicked() {
-         this.$store.commit("query/clearExcluded")
-      },
-      poolClicked(pool) {
-        this.$store.commit("query/toggleAdvancedPoolExclusion", pool)
-      },
       doAdvancedSearch() {
-         if ( this.excludedPools.length == this.pools.length) {
-            this.$store.commit(
-               "system/setSearchError",
-               {message:`Please select at least one ${this.sourceLabel} before searching`}
-            )
-            return
-         }
          if (this.queryEntered) {
 
             let fields = this.advanced.filter( f=>f.value != "")
@@ -265,9 +220,8 @@ export default {
             this.$router.push('/search?mode=advanced')
          } else {
             this.$store.commit('query/resetAdvanced')
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
             if ( this.hasSearchTemplate ) {
-               this.$store.commit("query/restoreTemplate", this.searchTemplate)
+               this.$store.commit("query/setTemplate", this.searchTemplate)
             }
             this.focusFirstTerm(true)
          }
@@ -307,6 +261,9 @@ export default {
    },
    created() {
       this.focusFirstTerm(false)
+      if ( this.hasSearchTemplate ) {
+         this.$store.commit("query/setTemplate", this.searchTemplate)
+      }
    }
 };
 </script>
@@ -343,49 +300,31 @@ h2 {
 .sep {
    margin: 0 5px;
 }
-div.pools-wrapper {
-   margin: 15px 0 10px 0;
-   padding: 10px 0;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-}
-div.pools {
-   text-align: left;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
-   justify-content: flex-start;
-   margin: 0;
-}
-.what {
-   margin-top: 10px;
-   text-align: left;
-}
-.v4-checkbox.pool {
-   margin: 5px 10px;
-   cursor: pointer;
-}
-.v4-checkbox.pool >>> label {
-   margin:0;
-}
 
-div.criteria-control {
+.form-acts {
    display: flex;
-   flex-flow: row;
-   justify-content: center;
+   flex-flow: row nowrap;
+   justify-content: space-between;
+   padding-bottom: 20px;
+   margin-bottom: 15px;
    border-bottom: 1px solid var(--uvalib-grey-light);
-   padding-bottom: 10px;
    #add-criteria {
       color: var(--uvalib-blue-alt);
       font-size: 1.6em;
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
+      align-self: center;
       .btn-label {
          margin-left: 5px;
          font-size: 0.7em;
          color: var(--uvalib-text);
       }
    }
+}
+
+::v-deep .form-acts button.v4-button.pure-button {
+   margin: 0 !important;
 }
 
 div.criteria {
@@ -465,7 +404,7 @@ div.query {
 }
 div.search-term {
    padding: 10px;
-   margin: 0 0 20px 0;
+   margin: 0 0 10px 0;
    background: var(--uvalib-grey-lightest);
    outline: 1px solid var(--uvalib-grey-light);
    width: 100%;

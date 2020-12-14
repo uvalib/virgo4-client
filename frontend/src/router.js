@@ -19,8 +19,11 @@ import OpenURLRequest from './views/OpenURLRequest.vue'
 
 import SignedOut from './views/SignedOut.vue'
 import Feedback from './views/Feedback.vue'
-import NotFound from './views/NotFound.vue'
 import PublicBookmarks from './views/PublicBookmarks.vue'
+
+import NotFound from './views/NotFound.vue'
+import FatalError from './views/FatalError.vue'
+
 import store from './store'
 
 import analytics from './analytics'
@@ -167,6 +170,11 @@ const router = new Router({
          component: SignedOut
       },
       {
+         path: "/error",
+         name: "fatal_error",
+         component: FatalError
+      },
+      {
          path: "*",
          name: "not_found",
          component: NotFound
@@ -192,7 +200,7 @@ router.afterEach((to, _from) => {
    let titles = {home: "Virgo", search: "Virgo", signin: "Virgo: Sign In", account: "Virgo: My Information",
       checkouts: "Virgo: Checkouts", 'digital-deliveries': "Virgo: Digital Deliveries",
       bookmarks: "Virgo: Bookmarks", requests: "Virgo: Requests", searches: "Virgo: Saved Searches",
-      preferences: "Virgo: Preferences"
+      preferences: "Virgo: Preferences", fatal_error: "Virgo System Error"
    }
    Vue.nextTick(() => {
       let title = titles[to.name]
@@ -215,60 +223,48 @@ router.afterEach((to, _from) => {
 })
 
 // This is called before every URL in the SPA is hit
-router.beforeEach( (to, from, next) => {
-   // Some pages just require an auth token...
+router.beforeEach( async (to, from, next) => {
    store.commit("system/setILSError", "")
-   let tokenPages = ["home", "codes", "course-reserves", "details", "search", "public-bookmarks", "feedback", "item" ]
-   if (tokenPages.includes(to.name)) {
-      ensureAuthTokenPresent( next )
-      return
-   }
+
+   // keep sign-in or access tokens current (issue new token if none present)
+   await refreshSession()
+
 
    // Some pages require a signed in user; grab one from session or cookie.
    // otherwise sign out the current user (if any)
    let userPages = ["preferences", "account", "bookmarks", "digital-deliveries",
       "course-reserves-request", "requests", "searches", "checkouts"]
    if (userPages.includes(to.name)) {
-      ensureSignedIn( from.fullPath, next, false )
-      return
+      if (store.getters["user/isSignedIn"] == false) {
+         // clear out any possible signin session. The consequences will be handled on the targte page
+         await store.dispatch("user/signout")
+      }
    }
 
    // These pages require signed in user and will automatically netbadge in if not signed in
    let autoAuth = ["openurl"]
    if (autoAuth.includes(to.name)) {
-      ensureSignedIn( from.fullPath, next, true )
-      return
+      if (store.getters["user/isSignedIn"] == false) {
+         store.commit('restore/setURL', from)
+         store.dispatch('user/netbadge')
+         return
+      }
    }
 
-   // All others just proceed...
+   // console.log("session OK... continue")
    next()
 })
 
-async function ensureSignedIn( fromPath, next, autoNetbadge ) {
-   if ( store.getters["user/isSignedIn"]) {
+async function refreshSession() {
+   // First, check for active (in-memory) sign-in and refresh it...
+   if (store.getters["user/isSignedIn"]) {
       // console.log("Sign-in session found in memory")
       await store.dispatch("user/refreshAuth")
-      next()
-   } else {
-      let resp = await restoreSessionFromLocalStorage()
-      if ( resp === true) {
-         next()
-      } else {
-         if (autoNetbadge) {
-            store.commit('restore/setURL', fromPath)
-            store.dispaych('user/netbadge')
-         } else {
-            // make sure all user session is cleared out, and
-            // continue on to target page where the sianged out user
-            // wll be handled
-            await store.dispatch("user/signout")
-            next()
-         }
-      }
+      // console.log("session refreshed")
+      return
    }
-}
 
-async function restoreSessionFromLocalStorage() {
+   // Next, see if a session is in local storage and refresh it...
    // console.log("Restore session from local storage...")
    let jwtStr = localStorage.getItem('v4_jwt')
    if (jwtStr) {
@@ -276,46 +272,23 @@ async function restoreSessionFromLocalStorage() {
       store.commit("user/setUserJWT", jwtStr)
 
       await store.dispatch("user/refreshAuth")
+      // console.log("session refreshed")
 
       // console.log("load user data into session")
       store.dispatch("user/getAccountInfo")  // needed for search preferences
       store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
-      return true
-   }
-
-   // console.log("Nothing found in local storage")
-   return false
-}
-
-async function ensureAuthTokenPresent( next ) {
-   // console.log("Check memory for auth token or session...")
-   // Check for sign-in first, and if found check for expire / renew
-   // Reason: signed in users have an auth token too. If that is detected first
-   // the session may expire without being refreshed
-   if (store.getters["user/isSignedIn"]) {
-      // console.log("Sign-in session found in memory")
-      await store.dispatch("user/refreshAuth")
-      next()
-      return
-   }
-   if (store.getters["user/hasAuthToken"]) {
-      // console.log("Auth token found in memory")
-      next()
       return
    }
 
-   // console.log("Check Local store for session...")
-   let restored = await restoreSessionFromLocalStorage()
-   if ( restored === true ) {
-      // console.log("Session restored from local store")
-      next()
-      return
-   }
+   // Last, if there is no auth token get one
+   if (store.getters["user/hasAuthToken"] == false) {
+      console.log("no sign-in nor auth token; get new auth token")
+      await store.dispatch("user/getAuthToken")
+      // console.log("session created")
+   } // else {
+      // console.log("has auth token")
+   // }
 
-   // console.log("Get new auth token...")
-   await store.dispatch("user/getAuthToken")
-   // console.log("...DONE; new auth token received")
-   next()
 }
 
 export default router

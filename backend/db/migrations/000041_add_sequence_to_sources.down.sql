@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE sources DROP COLUMN sequence;
+COMMIT;

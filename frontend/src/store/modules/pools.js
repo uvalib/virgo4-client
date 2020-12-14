@@ -18,23 +18,13 @@ const pools = {
             return 0
          })
       },
-      externalPoolIDs: state => {
-         let out = []
-         state.list.forEach( p => {
-            let attr = p.attributes.find( a=> a.name=='external_hold')
-            if (attr && attr.supported ) {
-               out.push(p.id)
-            }
-         })
-         return out
-      },
-      hasCoverImages: (state) => (id) => {
+      itemMessage: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
-         if (!pool) return false
-         if (!pool.attributes) return true
-         let attr = pool.attributes.find( a=> a.name=='cover_images')
-         if (!attr) return true
-         return attr.supported
+         if (!pool) return ""
+         if (!pool.attributes) return ""
+         let attr = pool.attributes.find( a=> a.name=='item_message')
+         if (!attr || attr && attr.supported == false) return ""
+         return attr.value
       },
       facetSupport: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
@@ -75,27 +65,11 @@ const pools = {
          if (attr.supported == false) return ""
          return attr.value
       },
-      hasExternalHoldings: (state) => (id) => {
-         let pool = state.list.find( p => p.id == id)
-         if (!pool) return false
-         if (!pool.attributes) return false
-         let attr = pool.attributes.find( a=> a.name=='external_hold')
-         if (!attr) return false
-         return attr.supported
-      },
       isUVA: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return false
          if (!pool.attributes) return true
          let attr = pool.attributes.find( a=> a.name=='uva_ils')
-         if (!attr) return true
-         return attr.supported
-      },
-      courseReserveSupport: (state) => (id) => {
-         let pool = state.list.find( p => p.id == id)
-         if (!pool) return false
-         if (!pool.attributes) return true
-         let attr = pool.attributes.find( a=> a.name=='course_reserves')
          if (!attr) return true
          return attr.supported
       },
@@ -161,10 +135,8 @@ const pools = {
             await ctx.dispatch('system/getConfig', null, { root: true })
          }
 
-         let srcSet = ctx.rootState.preferences.sourceSet
-         let url = `${ctx.rootState.system.searchAPI}/api/pools?sources=${srcSet}`
          try {
-            let response = await axios.get(url)
+            let response = await axios.get( `${ctx.rootState.system.searchAPI}/api/pools` )
             ctx.commit('setPools', response.data)
             ctx.commit("setLookingUp", false)
 
@@ -177,7 +149,7 @@ const pools = {
                }
             })
          } catch (error)  {
-            ctx.commit('system/setFatal', "Unable to get pools: " + error.response.data, { root: true })
+            ctx.commit('system/setFatal', "Unable to get sources: " + error, { root: true })
             ctx.commit("setLookingUp", false)
          }
       },

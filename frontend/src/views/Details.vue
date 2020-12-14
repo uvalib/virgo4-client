@@ -27,10 +27,7 @@
             <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source" from="DETAIL"/>
             <abbr class="unapi-id" :title="details.itemURL"></abbr>
             <div class="info">
-               <div v-if="hasExternalHoldings(details.source)" class="ra-box ra-fiy pad-top">
-                  This resource is not held by UVA Libraries,
-                  <a :href="owningInstitution" target="_blank">contact the owning institution<i style="margin:0 5px;" class="fas fa-external-link-alt"></i></a>
-                  to determine how to gain access to them, or disable searching of these materials in your preferences.
+               <div v-if="itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="itemMessage(details.source)">
                </div>
                <dl class="fields">
                   <template v-if="details.header.author">
@@ -156,28 +153,23 @@ export default {
          pools: state => state.pools.list,
          selectedHitIdx: state=> state.selectedHitIdx,
          lastSearchURL: state => state.lastSearchURL,
+         poolMapping: state=>state.system.poolMapping,
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          isUVA: 'pools/isUVA',
-         isDevServer: 'system/isDevServer',
-         hasExternalHoldings: 'pools/hasExternalHoldings',
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
          prevHitAvailable: 'prevHitAvailable',
          selectedHit: 'selectedHit',
-         selectedResults: 'selectedResults'
+         selectedResults: 'selectedResults',
+         itemMessage:  'pools/itemMessage'
       }),
       risURL() {
          if (this.citationsURL == "") return ""
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
-      },
-      owningInstitution() {
-         let details = this.poolDetails(this.details.source)
-         let attr = details.attributes.find( a=> a.name=='external_hold')
-         return attr.value
       },
       hasAvailability() {
          return this.isUVA(this.details.source)
@@ -247,7 +239,14 @@ export default {
       async getDetails() {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
-         let id= this.$route.params.id
+         let id = this.$route.params.id
+         let mapping = this.poolMapping[src]
+         if (mapping && mapping.pool != src) {
+            src = mapping.pool
+            let fixed = `/sources/${src}/items/${id}`
+            this.$router.replace( fixed )
+            return
+         }
 
          if ( this.isSignedIn) {
             await this.$store.dispatch("user/getAccountInfo")

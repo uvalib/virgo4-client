@@ -8,7 +8,9 @@ const query = {
       userSearched: false,
       mode: "basic",
       basic: "",
-      basicSearchScope: { name: 'All', id: 'all' },
+      srcTypeFilterName: "FilterResourceType",
+      allResourceTypes: {name: `All Resource Types`, id: 'all'},
+      searchSources: "all",
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
@@ -28,7 +30,6 @@ const query = {
       ],
       preSearchFilters: [],
       loadingFilters: false,
-      excludedPools: [],
       targetPool: ""
    },
    getters: {
@@ -36,9 +37,29 @@ const query = {
       getState: state => {
          return state
       },
+      resourceTypes( state ) {
+         let out = [state.allResourceTypes]
+         if ( state.loadingFilters == false && state.preSearchFilters.length > 0) {
+            let st = state.preSearchFilters.find( psf => psf.value == state.srcTypeFilterName)
+            st.choices.forEach( c => {
+               out.push({name: c.value, id: c.value})
+            })
+         }
+         return out
+
+      },
+      basicSearchScope(state) {
+         if ( state.loadingFilters == false && state.preSearchFilters.length > 0) {
+            let st = state.preSearchFilters.find( psf => psf.value == state.srcTypeFilterName)
+            let c = st.choices.find( c=> c.selected == true)
+            if ( c) {
+               return {name: c.value, id: c.value}
+            }
+         }
+         return state.allResourceTypes
+      },
       advancedSearchTemplate( state ) {
-         let ep = [...new Set(state.excludedPools)]
-         let out = { excluded: ep, fields: []}
+         let out = { fields: []}
          state.advanced.forEach(  af => {
             let tpl =  {op: af.op, field: af.field, comparison: af.comparison}
             out.fields.push( tpl )
@@ -51,14 +72,7 @@ const query = {
       },
       queryURLParams: (state, getters) => {
          let qs = `mode=${state.mode}`
-         if ( state.mode == 'basic') {
-            qs += `&scope=${state.basicSearchScope.id}`
-         }
          qs += `&q=${encodeURIComponent(getters.string)}`
-         if ( state.excludedPools.length > 0) {
-            let ep = [...new Set(state.excludedPools)]
-            qs += `&exclude=${ep.join(",")}`
-         }
          return qs
       },
       queryEntered: state => {
@@ -87,24 +101,12 @@ const query = {
          //     ( calico OR "tortoise shell" ) AND cats =>
          //     keyword: {(calico OR "tortoise shell") AND cats
          // Fields are joined together with AND or OR based on the fieldOp setting
+         let qs = ""
          if (state.mode == "basic") {
-            let qp = state.basic
-            let hasFields = false
-            state.advancedFields.some(f => {
-               let k = f.value+":"
-               if ( qp.includes(k) ) {
-                  hasFields = true
-               }
-               return hasFields == true
-            })
-            if (hasFields) {
-               return qp
-            }
-            return `keyword: {${qp}}`
+            qs = `keyword: {${state.basic}}`
          }
 
          let terms = state.advanced
-         let qs = ""
          terms.forEach(function (term) {
             if (term.value.length > 0) {
                if (qs.length > 0) {
@@ -148,27 +150,10 @@ const query = {
 
          return qs
       },
-      isPoolExcluded: state => pool => {
-         let excluded = false
-         state.excludedPools.some( pid => {
-            if (pid == pool.id) {
-               excluded = true
-            }
-            return excluded == true
-         })
-
-         return excluded
-      },
    },
    mutations: {
       updateField,
-      restoreTemplate(state, template) {
-         template.excluded.forEach( e => {
-            if ( !state.excludedPools.includes(e) ) {
-               state.excludedPools.push( e )
-            }
-         })
-
+      setTemplate(state, template) {
          state.advanced.splice(0, state.advanced.length)
          template.fields.forEach( f => {
             let newField = { op: f.op, value: "", field: f.field, comparison: f.cpmparison, endVal: "" }
@@ -177,6 +162,22 @@ const query = {
             }
             state.advanced.push(newField)
          })
+      },
+      setBasicSearchFilter(state, value) {
+         let fIdx = state.preSearchFilters.findIndex( pf => pf.value == state.srcTypeFilterName)
+         let typeFilter = state.preSearchFilters[fIdx]
+         typeFilter.choices.forEach( c => {
+            if ( value == state.allResourceTypes.name || value == "all") {
+               c.selected = false
+            } else {
+               if (c.value == value) {
+                  c.selected = true
+               } else {
+                  c.selected = false
+               }
+            }
+         })
+         state.preSearchFilters.splice(fIdx, 1, typeFilter)
       },
       toggleFilter( state, data ) {
          let fIdx = state.preSearchFilters.findIndex( pf => pf.value == data.filterID)
@@ -218,30 +219,8 @@ const query = {
       },
 
       restoreFromURL(state, queryParams) {
-         if ( state.mode == "basic") {
-            // a basic search generally looks like this: q=keyword: {pirate}
-            // but it can include fields like advanced. Ex: title: {test}. See if it does...
-            let adv = false
-            state.advancedFields.some(f => {
-               let k = f.value+":"
-               if ( queryParams.includes(k) && f.value != "keyword") {
-                  adv = true
-               }
-               return adv == true
-            })
-            var count = (queryParams.match(/keyword:/gi) || []).length
-            if (count == 1 && adv == false) {
-               // this is really just a basic keyword search, strip out URL params and set just query string
-               // NOTE: this is just so the basic search input box looks nice; not like keyword: {pirate}
-               state.basic = queryParams.replace(/^.*{/g, "").replace(/}/g, "")
-            } else {
-               // This has multiple keywords or advanced fields. Just put the full string in the box
-               state.basic = queryParams
-            }
-            return
-         }
-
          // Clear out all existing data
+         state.basic = ""
          state.advanced.splice(0, state.advanced.length)
          state.preSearchFilters.forEach( pf => {
             let sel = pf.choices.filter( c => c.selected)
@@ -296,11 +275,20 @@ const query = {
                })
                continue
             }
+
             let term = { op: "AND", value: value, field: keyOp.toLowerCase(), comparison: "EQUAL", endVal: "" }
             if (keyOpParts.length == 2 ) {
                term.op = keyOpParts[0].trim()
                term.field = keyOpParts[1].trim().toLowerCase()
             } else if (keyOpParts.length > 2) {
+               continue
+            }
+
+            if (state.mode == "basic") {
+               // basic only supports keyword
+               if ( term.field == "keyword" ) {
+                  state.basic = value
+               }
                continue
             }
 
@@ -321,39 +309,12 @@ const query = {
             state.advanced.push(term)
          }
       },
-      setBasicSearchScope(state, scope) {
-         state.basicSearchScope = scope
-      },
+
       setAdvancedSearch(state) {
          state.mode = "advanced"
       },
-      setExcludePreferences(state, excludePrefs) {
-         state.excludedPools.splice(0, state.excludedPools.length)
-         excludePrefs.forEach( pid => {
-            state.excludedPools.push(pid)
-         })
-      },
       setTargetPool(state, pool) {
          state.targetPool = pool
-      },
-      toggleAdvancedPoolExclusion(state, pool) {
-         let idx = state.excludedPools.indexOf(pool.id)
-         if (idx > -1) {
-            state.excludedPools.splice(idx, 1)
-         } else {
-            state.excludedPools.push(pool.id)
-         }
-      },
-      clearExcluded( state ) {
-         state.excludedPools.splice(0, state.excludedPools.length)
-      },
-      excludeAll( state, pools ) {
-         state.excludedPools.splice(0, state.excludedPools.length)
-         pools.forEach( p => {
-            if (state.targetPool != p.id) {
-               state.excludedPools.push(p.id)
-            }
-         })
       },
       advancedBarcodeSearch(state, barcode) {
          state.advanced.splice(0, state.advanced.length)
@@ -368,6 +329,7 @@ const query = {
       removeCriteria(state, idx) {
          state.advanced.splice(idx, 1)
       },
+
       resetAdvanced( state ) {
          state.advanced.splice(0, state.advanced.length)
          state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
@@ -385,14 +347,12 @@ const query = {
       clear(state) {
          state.mode = "basic"
          state.basic = ""
-         state.basicSearchScope = { name: 'All', id: 'all' },
          state.advanced.splice(0, state.advanced.length)
          state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
          state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
-         state.excludedPools.splice(0, state.excludedPools.length)
          state.targetPool = ""
          state.preSearchFilters.forEach( pf => {
             let sel = pf.choices.filter( c => c.selected)
@@ -425,14 +385,10 @@ const query = {
             let params = new URLSearchParams(response.data.url.split("?")[1])
             let rawFilter = params.get("filter")
             if ( rawFilter && rawFilter != "") {
-               // old format. Needs conversion
                if ( rawFilter[0] != "{") {
-                  let filter = convertOldFilter(rawFilter,
-                     ctx.rootState.filters.availabilityFacet, ctx.rootState.filters.circulatingFacet)
-                  params.set("filter", filter)
+                  // really old format; just drop the filter
+                  params.delete("filter")
                   searchURL = "/search?"+params.toString()
-                  let req = {token: token, url: searchURL, userID: ctx.rootState.user.signedInUser}
-                  ctx.dispatch("searches/migrate", req, {root:true})
                }
             }
             router.replace(searchURL)
@@ -443,25 +399,6 @@ const query = {
          })
       }
    }
-}
-
-function convertOldFilter( filterStr, availFacet, circFacet ) {
-   let out = {}
-   filterStr.split("|").forEach( fp => {
-      let facetID = fp.split(".")[0]
-      let filterVal = fp.split(".")[1]
-      if (facetID == availFacet.id) {
-         out[facetID] = [filterVal]
-      } else if (facetID == circFacet.id) {
-         out[facetID] = []
-      } else {
-         if (Object.prototype.hasOwnProperty.call(out, facetID) == false) {
-            out[facetID] = []
-         }
-         out[facetID].push(filterVal)
-      }
-   })
-   return JSON.stringify(out)
 }
 
 export default query

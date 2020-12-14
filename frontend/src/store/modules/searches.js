@@ -24,8 +24,16 @@ const searches = {
          })
          state.history.splice(0, state.history.length)
          data.history.forEach( s => {
-            state.history.push( s )
+            state.history.push( stripExclude(s) )
          })
+      },
+      updateSearch(state, {token, url}) {
+         let sIdx = state.saved.findIndex( s => s.token==token)
+         if ( sIdx > -1 ) {
+            let s = state.saved[sIdx]
+            s.url = url
+            state.saved.splice(sIdx,1,s)
+         }
       },
       clearSavedSearches(state) {
          state.saved.splice(0, state.saved.length)
@@ -58,6 +66,10 @@ const searches = {
          }
          ctx.commit('setLookingUp', false)
       },
+      updateURL(ctx, {userID,token,searchURI}) {
+         axios.put(`/api/users/${userID}/searches/${token}`, {url: searchURI})
+         ctx.commit('updateSearch', {token, searchURI} )
+      },
 
       getAll(ctx, userID) {
          ctx.commit('setLookingUp', true)
@@ -73,10 +85,6 @@ const searches = {
       async save(ctx, data) {
          let resp = await axios.post(`/api/users/${data.userID}/searches`, data)
          ctx.commit('setLastSavedSearchKey', resp.data.token)
-      },
-
-      async migrate(_ctx, data) {
-         await axios.put(`/api/users/${data.userID}/searches/${data.token}`, {url: data.url})
       },
 
       updateHistory(ctx) {
@@ -125,6 +133,19 @@ const searches = {
           })
       }
    }
+}
+
+function stripExclude( url) {
+   let idx1 = url.indexOf("&exclude")
+   if (idx1 > -1) {
+      let idx2 = url.indexOf("&", idx1+1)
+      if ( idx2 > -1) {
+         url = url.substring(0,idx1)+url.substring(idx2)
+      } else {
+         url = url.substring(0,idx1)
+      }
+   }
+   return url
 }
 
 export default searches

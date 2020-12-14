@@ -23,7 +23,6 @@
 
 <script>
 import { mapState } from "vuex"
-import { mapGetters } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import SearchHitDetail from '@/components/SearchHitDetail'
 import AccordionContent from '@/components/AccordionContent'
@@ -44,14 +43,9 @@ export default {
          return `Collapse this group (${this.hit.group.length})`
       },
       ...mapState({
-         searching: state => state.searching,
          autoExpandGroupID: state => state.autoExpandGroupID,
          collapseGroups: state => state.preferences.collapseGroups,
-      }),
-      ...mapGetters({
-         isKiosk: "system/isKiosk",
-         hasCoverImages: 'pools/hasCoverImages',
-      }),
+      })
    }
 };
 </script>

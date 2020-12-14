@@ -91,16 +91,12 @@ export default {
       },
       ...mapState({
          details : state => state.item.details,
-         googleBooksURL : state => state.item.googleBooksURL,
-         loadingDigitalContent : state => state.item.loadingDigitalContent,
       }),
       ...mapGetters({
          availability: 'item/availability',
-         isDevServer: 'system/isDevServer',
          hasRequestOptions: 'requests/hasRequestOptions',
          hasBoundWithItems: 'item/hasBoundWithItems',
-         hasExternalHoldings: 'pools/hasExternalHoldings',
-         hasDigitalContent: 'item/hasDigitalContent'
+         isUVA: 'pools/isUVA',
       }),
       hasItems(){
          return Array.isArray(this.availability.items) && this.availability.items.length > 0
@@ -140,21 +136,13 @@ export default {
       },
    },
    created() {
-      if ( this.hasExternalHoldings(this.details.source) == false) {
-         this.$store.dispatch("item/getAvailability", this.titleId )
-      }
+      this.$store.dispatch("item/getAvailability", this.titleId )
    }
 }
 </script>
 <style lang="scss" scoped>
 .availability {
    h2 {
-      // background:  var(--uvalib-blue-alt-light);
-      // padding: 5px 10px;
-      // border-top: 2px solid  var(--uvalib-blue-alt);
-      // border-bottom: 2px solid  var(--uvalib-blue-alt);
-      // font-size: 1.25em;
-      // margin: 50px 0 30px 0;
       color: var(--color-primary-orange);
       text-align: center;
       margin: 50px 0 30px 0;

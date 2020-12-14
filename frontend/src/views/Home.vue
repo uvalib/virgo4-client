@@ -10,9 +10,9 @@
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <label class="screen-reader-text" for="source-select">Search in</label>
             <div class="basic-search">
-               <V4Select id="source-select" :selections="searchScopes" v-bind:attached="true"
+               <V4Select id="source-select" :selections="resourceTypes" v-bind:attached="true"
                border="1px solid var(--uvalib-brand-blue)"
-               v-model="searchScope"
+               :value="basicSearchScope"
                @changed="scopeChanged"
                />
                <input class="basic"
@@ -25,6 +25,7 @@
                >
             </div>
             <div class="controls-wrapper">
+               <SourceSelector />
                <div class="controls">
                   <template v-if="hasResults">
                      <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
@@ -59,38 +60,19 @@ import SearchTips from "@/components/disclosures/SearchTips"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch"
 import Welcome from "@/components/Welcome"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
+import SourceSelector from "@/components/SourceSelector"
 
 export default {
    name: "home",
    components: {
      SearchResults, V4BarcodeScanner,
      SearchTips, AdvancedSearch,
-     Welcome
+     Welcome, SourceSelector
    },
 
-   created: function() {
-      this.isHomePage = false
-      if (this.$route.path == "/") {
-         this.isHomePage = true
-      }
-      this.searchCreated()
-
-   },
-
-   data: function() {
-      return {
-         showVideo: false,
-         isHomePage: true,
-         searchScope: null,
-      }
-   },
    watch: {
       $route() {
          console.log("NEW HOME ROUTE "+ this.$route.fullPath)
-         this.isHomePage = false
-         if (this.$route.path == "/") {
-            this.isHomePage = true
-         }
          this.restoreSearchFromQueryParams(this.$route.query)
       },
       searching (newVal, _oldVal) {
@@ -125,47 +107,38 @@ export default {
          }
       },
    },
+
    computed: {
       ...mapState({
          searching: state => state.searching,
          searchMode: state => state.query.mode,
          translateMessage: state => state.system.translateMessage,
-         results: state => state.results,
          total: state=>state.total,
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
-         searchTemplate: state=>state.preferences.searchTemplate,
-         optInPoolPrefs: state=>state.preferences.optInPools,
-         sourceLabel: state => state.preferences.sourceLabel,
-         signedInUser: state => state.user.signedInUser,
          activeSort: state=>state.sort.activeSort,
+         poolMapping: state=>state.system.poolMapping,
+         signedInUser: state=>state.user.signedInUser,
       }),
       ...mapGetters({
-        queryEntered: 'query/queryEntered',
         queryURLParams: 'query/queryURLParams',
         rawQueryString: 'query/string',
         filterQueryString: 'filters/asQueryParam',
         hasResults: 'hasResults',
         hasTranslateMessage: 'system/hasTranslateMessage',
-        sources: 'pools/sortedList',
         selectedResults: 'selectedResults',
         isSignedIn: 'user/isSignedIn',
-        excludedPoolPrefs: 'preferences/excludedPools',
-        hasSearchTemplate: 'preferences/hasSearchTemplate',
-        externalPoolIDs: 'pools/externalPoolIDs',
-        poolSort: 'sort/poolSort'
+        poolSort: 'sort/poolSort',
+        resourceTypes: 'query/resourceTypes',
+        basicSearchScope:  'query/basicSearchScope',
+        poolDetails: 'pools/poolDetails',
       }),
       ...mapFields({
-        basicSearchScope: 'query.basicSearchScope',
         basic: 'query.basic',
+        searchSources: 'query.searchSources',
         userSearched: 'query.userSearched',
         lastSearchScrollPosition: 'lastSearchScrollPosition'
       }),
-      searchScopes() {
-        let out = [{name: `All ${this.sourceLabel}s`, id: 'all'}]
-        let filtered = this.sources.filter( s => !this.excludedPoolPrefs.includes(s.id) )
-        return out.concat(filtered)
-      },
       basicSearch() {
         return this.searchMode != "advanced"
       },
@@ -175,62 +148,108 @@ export default {
               this.$route.params.id !== undefined &&
               this.$route.params.id != "")
       },
+      isHomePage() {
+         return (this.$route.path == "/")
+      },
    },
+
+   created: async function() {
+      let cachedSrc = localStorage.getItem('v4SearchSources')
+      if (cachedSrc) {
+         this.searchSources = cachedSrc
+      }
+      await this.$store.dispatch('pools/getPools')
+      this.$store.dispatch("query/getAdvancedSearchFilters")
+
+      // When restoring a saved search, the call will be /search/:token
+      let token = this.$route.params.id
+      if ( token ) {
+         // Load the search from the :token and restore it
+         await this.$store.dispatch("query/loadSearch", token)
+      }
+      this.mapLegacyQueries( token )
+      await this.restoreSearchFromQueryParams(this.$route.query)
+
+      let bmTarget = this.$store.getters['restore/bookmarkTarget']
+      if (bmTarget.id != "") {
+         this.showAddBookmark(bmTarget)
+         this.$store.commit("restore/clear")
+      } else if ( this.restoreSaveSearch ) {
+         let saveBtn = document.getElementById("save-modal-open")
+         if (saveBtn) {
+            saveBtn.focus()
+            saveBtn.click()
+         }
+      }
+   },
+
    methods: {
       async resetSearch(){
          this.$store.dispatch('resetSearch')
          this.$router.push(`/search`)
       },
+
+      mapLegacyQueries( token ) {
+         if (this.$route.query.scope || this.$route.query.pool || this.$route.query.exclude) {
+            let newQ = Object.assign({}, this.$route.query)
+            let oldSrc = newQ.scope
+            if (!oldSrc) {
+               oldSrc = newQ.pool
+            }
+
+            // look up a mpaaing from legacy v4 pool name to current pool name.
+            // this mapping may be one to one for current pools, or pools that didn't change
+            let mapping = this.poolMapping[oldSrc]
+            if (mapping && (newQ.pool != mapping.pool || newQ.scope || newQ.exclude) ) {
+               delete newQ.scope
+               delete newQ.exclude
+               newQ.pool = mapping.pool
+               this.searchSources = mapping.pool
+               if (mapping.filter != "all") {
+                  let q = newQ.q
+                  delete newQ.q
+                  q += ` AND filter: {(FilterResourceType:"${mapping.filter}")}`
+                  newQ.q = q
+               }
+
+               if ( token ) {
+                  this.updateSavedSearch(token, newQ)
+               }
+
+               this.$router.replace({query: newQ})
+            }
+         }
+      },
+
+      updateSavedSearch(token, newQuery) {
+         let qs = []
+         for (const [k, v] of Object.entries(newQuery)) {
+            qs.push(`${k}=${encodeURIComponent(v)}`)
+         }
+         let searchURI = `/search?${qs.join("&")}`
+         let userID = this.signedInUser
+         this.$store.dispatch("searches/updateURL", {userID, token, searchURI})
+      },
+
       async restoreSearchFromQueryParams( query ) {
          if  (!query.q) {
-            // No query - reset everything
+            // only reset the search when there is NO query present,
+            // otherwise the search is re-excuted each time a tab changes
             this.$store.dispatch('resetSearch')
-            setTimeout( ()=> {
-               let  s = document.getElementById("search")
-               if (s) s.focus()
-            }, 250)
          }
 
          // Interrogate query params and convert them to a search in the model (if present)
          let oldQ = this.rawQueryString
          if (query.mode == 'advanced') {
             this.$store.commit("query/setAdvancedSearch")
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
-            if ( this.hasSearchTemplate ) {
-               this.$store.commit("query/restoreTemplate", this.searchTemplate)
-            }
          } else {
             this.$store.commit("query/setBasicSearch")
-            if (query.scope && query.scope != "") {
-               let tgtScope = this.searchScopes.find( s => s.id == query.scope)
-               this.$store.commit("query/setBasicSearchScope", tgtScope)
-            }
          }
-
-         let excluded = []
-         if (query.exclude) {
-            excluded = [...new Set(query.exclude.split(","))]
-         }
-
-         // Check for pools that should be excluded unless opted-in
-         this.externalPoolIDs.forEach( extPool => {
-            // dont exclude the same pool multiple times
-            if (excluded.includes(extPool) == false) {
-               if ( this.isSignedIn == false ) {
-                  excluded.push(extPool)
-               } else {
-                  if ( this.optInPoolPrefs.includes(extPool) == false) {
-                     excluded.push(extPool)
-                  }
-               }
-            }
-         })
-         this.$store.commit("query/setExcludePreferences", excluded)
 
          let targetPool = ""
          let oldFilterParam = ""
          let oldSort = ""
-         if (query.pool) {
+         if (query.pool && !query.scope) {
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)
 
@@ -274,7 +293,12 @@ export default {
                // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
                // has changed. If userSearched is not reset, the search will run twice.
                this.userSearched = false
-               await this.$store.dispatch("searchAllPools")
+               if (this.searchSources == "all") {
+                  await this.$store.dispatch("searchAllPools")
+               } else {
+                  let p = this.poolDetails(this.searchSources)
+                  await this.$store.dispatch("searchPool", {pool: p})
+               }
                this.$store.commit('setSearching', false)
             }
 
@@ -283,37 +307,6 @@ export default {
                   top: this.lastSearchScrollPosition,
                   behavior: "auto"
                })
-            }
-         }
-      },
-      async searchCreated() {
-         this.searchScope = this.basicSearchScope
-         if ( this.searchScope.name.includes("All")) {
-            this.searchScope.name = `All ${this.sourceLabel}s`
-         }
-         await this.$store.dispatch('pools/getPools')
-         this.$store.dispatch("query/getAdvancedSearchFilters")
-
-         // When restoring a saved search, the call will be /search/:token
-         if ( this.isRestore ) {
-            // Load the search from the :token and restore it
-            let token = this.$route.params.id
-            await this.$store.dispatch("query/loadSearch", token)
-            this.restoreSearchFromQueryParams(this.$route.query)
-            return
-         } else {
-            await this.restoreSearchFromQueryParams(this.$route.query)
-         }
-
-         let bmTarget = this.$store.getters['restore/bookmarkTarget']
-         if (bmTarget.id != "") {
-            this.showAddBookmark(bmTarget)
-            this.$store.commit("restore/clear")
-         } else if ( this.restoreSaveSearch ) {
-            let saveBtn = document.getElementById("save-modal-open")
-            if (saveBtn) {
-               saveBtn.focus()
-               saveBtn.click()
             }
          }
       },
@@ -353,42 +346,26 @@ export default {
          }
       },
 
-      scopeChanged( tgt ) {
-         this.$analytics.trigger('Search', 'BASIC_SEARCH_RESOURCE_SET', tgt)
+      scopeChanged( val ) {
+         this.$analytics.trigger('Search', 'BASIC_SEARCH_RESOURCE_SET', val)
+         this.$store.commit("query/setBasicSearchFilter", val)
+         this.$store.commit("filters/reset")
       },
 
       async searchClicked() {
-         let skipPoolParam = false
-         let tgtPool = ""
-         this.basicSearchScope = this.searchScope
-         if ( this.basicSearchScope.id == "all") {
-            this.$store.commit("query/setExcludePreferences", this.excludedPoolPrefs)
-         } else {
-            tgtPool = this.basicSearchScope.id
-            this.$store.commit("query/setTargetPool",  tgtPool)
-            this.$store.commit("query/setExcludePreferences", [])
-            skipPoolParam = true
-         }
-
          // Refine search updates:
          // if pool, filter or sort were specified previously, preserve them in the URL.
          // a new search will always reset paging, so don't preserve that
          let priorQ = Object.assign({}, this.$route.query)
          let qp = this.queryURLParams
-         if (priorQ.pool && skipPoolParam==false) {
+         if ( priorQ.pool ) {
             qp += `&pool=${priorQ.pool}`
             this.$store.commit("query/setTargetPool", priorQ.pool)
-         } else {
-            if ( tgtPool != "") {
-               qp += `&pool=${tgtPool}`
-               this.$store.commit("query/setTargetPool", tgtPool)
-            }
-         }
-         if (tgtPool != "") {
+
             // grab current query string for the selected pool straight from the model.
             // cant rely on preserving prior filter string as the target pool may have changed
             // by the user selecting one from the dropdown
-            qp += this.filterQueryString(tgtPool)
+            qp += this.filterQueryString( priorQ.pool )
          } else {
             if (priorQ.filter) {
                qp += `&filter=${priorQ.filter}`
@@ -416,19 +393,65 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.home {
+   min-height: 400px;
+   position: relative;
+   h2 {
+      margin-top:30px;
+      color: #444;
+   }
+   .search-panel {
+      margin: 0 auto 0 auto;
+      text-align: center;
+      padding: 10px 2vw 10px 2vw;
+      font-size: 0.95em;
+   }
+   .basic-search {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: flex-start;
+      max-width: 800px;
+      margin: 0 auto 0 auto;
+   }
+   div.advanced {
+      margin-top: 10px;
+      font-size: 1em;
+      text-align: right;
+   }
+   div.translate-message {
+      margin: 5px 0 15px 0;
+      font-size: 0.85em;
+   }
+   span.sep {
+      margin: 0 5px;
+   }
+   .controls-wrapper  {
+      max-width: 800px;
+      margin: 0 auto 0 auto;
+      .controls {
+         padding: 10px 0;
+         display: flex;
+         flex-flow: row wrap;
+         align-items: center;
+         justify-content: flex-end;
+      }
+      .controls  > * {
+         flex: 0 1 auto;
+      }
+   }
+}
+
 @media only screen and (min-width: 768px) {
   div.searching-box {
     padding: 20px 90px;
   }
 }
+
 @media only screen and (max-width: 768px) {
   div.searching-box {
       width: 95%;
       padding: 20px 0;
       margin-top:30%;
-  }
-  div.tips-container {
-    display: none;
   }
   ::-webkit-input-placeholder {
     color:transparent;
@@ -443,45 +466,7 @@ export default {
     color:transparent;
   }
 }
-span.sep {
-   margin: 0 5px;
-}
-.controls-wrapper  {
-   max-width: 800px;
-   margin: 0 auto 0 auto;
-   .controls {
-      padding: 10px 0;
-      display: flex;
-      flex-flow: row wrap;
-      align-items: center;
-      justify-content: flex-end;
-   }
-   .controls  > * {
-   flex: 0 1 auto;
-   }
-}
 
-.home {
-   min-height: 400px;
-   position: relative;
-}
-h2 {
-  margin-top:30px;
-  color: #444;
-}
-.search-panel {
-  margin: 0 auto 0 auto;
-  text-align: center;
-  padding: 10px 2vw 10px 2vw;
-  font-size: 0.95em;
-}
-.basic-search {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-   max-width: 800px;
-   margin: 0 auto 0 auto;
-}
 #app .pure-form div.basic-search  input[type=text].basic {
   font-size: 1.15em;
   padding: 0.5vw 0.75vw;
@@ -491,20 +476,5 @@ h2 {
   border-radius: 0 5px 5px 0;
   flex: 1 1 auto;
   min-width: 100px;
-}
-div.advanced {
-  margin-top: 10px;
-  font-size: 1em;
-  text-align: right;
-}
-div.tips-container {
-  position: absolute;
-  font-size: 1em;
-  top: 15px;
-  right: 15px;
-}
-div.translate-message {
-  margin: 5px 0 15px 0;
-  font-size: 0.85em;
 }
 </style>

@@ -60,37 +60,10 @@ export default {
       startExpanded() {
          return this.displayWidth > 810
       },
-      facets() {
-         let out = this.allFacets(this.selectedResults.pool.id)
-         return out.filter(f=>f.id != "FacetAvailability" && f.type != "boolean")
-      },
    },
    methods: {
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      },
-      filterValues(filter, start, end) {
-         if (!filter.choices) return []
-         let out = filter.choices.slice(start,end)
-         return out
-      },
-      moreKey(id) {
-         return "more"+id
-      },
-      valueKey(idx, facetID) {
-         return facetID+"_val_"+idx
-      },
-      addFilterToURL() {
-         // changing the filter resetes paging
-         let query = Object.assign({}, this.$route.query)
-         delete query.page
-         let fqp = this.filterQueryParam( this.selectedResults.pool.id )
-         if (fqp.length == 0) {
-            delete query.filter
-         } else if ( this.$route.query.filter != fqp ) {
-            query.filter = fqp
-         }
-         this.$router.push({ query })
       },
       filterClicked(facetID,value) {
          this.$store.commit("filters/reset")
