@@ -96,7 +96,6 @@ export default {
          availability: 'item/availability',
          hasRequestOptions: 'requests/hasRequestOptions',
          hasBoundWithItems: 'item/hasBoundWithItems',
-         isUVA: 'pools/isUVA',
       }),
       hasItems(){
          return Array.isArray(this.availability.items) && this.availability.items.length > 0
@@ -142,6 +141,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .availability {
+   width: 95%;
+   margin: 0 auto;
+
    h2 {
       color: var(--color-primary-orange);
       text-align: center;

@@ -102,9 +102,7 @@
             </div>
          </template>
       </div>
-      <div class="availability-info">
-         <Availability v-if="hasAvailability && notFound == false" :titleId="details.identifier" />
-      </div>
+      <Availability v-if="notFound == false" :titleId="details.identifier" />
       <DigitalContent />
       <ShelfBrowse v-if="!details.searching && notFound == false" :hit="details" :pool="details.source" :target="browseTarget"/>
    </div>
@@ -159,7 +157,6 @@ export default {
          isAdmin: 'user/isAdmin',
          isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
-         isUVA: 'pools/isUVA',
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
          prevHitAvailable: 'prevHitAvailable',
@@ -170,9 +167,6 @@ export default {
       risURL() {
          if (this.citationsURL == "") return ""
          return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
-      },
-      hasAvailability() {
-         return this.isUVA(this.details.source)
       },
       notFound() {
          return this.details.identifier.length == 0
@@ -201,7 +195,6 @@ export default {
          return extLink.value
       },
       marcXML() {
-         if ( this.isUVA(this.details.source) === false ) return ""
          if ( !this.isAdmin ) return ""
          let xml = this.allFields.find( f => f.type == "marc-xml")
          if ( !xml) return ""
@@ -400,12 +393,6 @@ export default {
          margin: 5px 0;
       }
    }
-
-   .availability-info {
-      width: 95%;
-      margin: 0 auto;
-   }
-
    .icon {
       margin-left: 5px;
    }

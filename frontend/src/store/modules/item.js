@@ -237,7 +237,6 @@ const item = {
 
          pool = pools.find( p => p.id == source)
 
-         // FIXME: old links will have oinvalid pool names causing this fail. Map here and handle better
          if (!pool) {
            ctx.commit('clearSearching')
            router.push(`/not_found`)
@@ -267,9 +266,13 @@ const item = {
          ctx.commit('clearAvailability')
          let url = `${ctx.rootState.system.availabilityURL}/item/${titleId}`
          axios.get(url).then((response) => {
-            ctx.commit("setAvailability", { titleId: titleId, response: response.data.availability })
-            ctx.commit("requests/setRequestOptions", response.data.availability.request_options, { root: true })
+            ctx.commit('clearSearching')
+            if (response.data) {
+               ctx.commit("setAvailability", { titleId: titleId, response: response.data.availability })
+               ctx.commit("requests/setRequestOptions", response.data.availability.request_options, { root: true })
+            }
          }).catch((error) => {
+            console.log(error)
             ctx.commit('clearSearching')
             if (error.response && error.response.status != 404) {
                ctx.commit("setAvailabilityError", error.response.data)
