@@ -4,7 +4,6 @@
       <V4Spinner message="Submitting feedback..." v-if="status=='submit'" v-bind:overlay="true" />
       <div v-if="status!='success'" class="feedback-content">
          <div class="feedback-form pure-form">
-            <h2>Virgo 4 is being developed as the next version of the library catalog.</h2>
             <div class="pure-control-group">
                <label for="wantedTo">
                   First, explain what you wanted to do.
