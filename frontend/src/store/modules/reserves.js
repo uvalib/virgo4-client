@@ -123,20 +123,10 @@ const reserves = {
 
    actions: {
       async validateReservesRequest(ctx) {
-         // This could be called from a refresh or bookmark; make sure needed data is present
-         if (ctx.rootState.system.searchAPI == "") {
-            await ctx.dispatch("pools/getPools", null, {root:true})
-         }
-         // pools define the ability to make a course reserve.
-         // this information is readily availble without an extra API request
-         // validate those first
+         // Generate a list if item IDs to be validated for course reserve by ILS connector
          let itemIds = []
          ctx.state.requestList.forEach( item => {
-            // FIXME reserves are item based now
             itemIds.push(item.identifier)
-            // if (ctx.rootGetters["pools/courseReserveSupport"](tgtPool)==false) {
-            //    ctx.commit("markInvalidReserveItem", idx)
-            // }
          })
 
          ctx.commit('setSearching', true, { root: true })
