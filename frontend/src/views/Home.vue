@@ -10,11 +10,6 @@
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <label class="screen-reader-text" for="source-select">Search in</label>
             <div class="basic-search">
-               <V4Select id="source-select" :selections="resourceTypes" v-bind:attached="true"
-               border="1px solid var(--uvalib-brand-blue)"
-               :value="basicSearchScope"
-               @changed="scopeChanged"
-               />
                <input class="basic"
                   @keyup.enter="searchClicked"
                   v-model="basic"
@@ -23,25 +18,16 @@
                   id="search"
                   placeholder="Search Virgo for books, articles, and more"
                >
+               <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
             </div>
             <div class="controls-wrapper">
-               <SourceSelector />
-               <div class="controls">
-                  <template v-if="hasResults">
-                     <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
-                     <span class="sep">|</span>
-                  </template>
-                  <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
-               </div>
-               <div class="advanced">
-                  <SearchTips/><span class="sep">|</span>
-                  <router-link tabindex="0" to="/search?mode=advanced">
-                  <span>Advanced Search&nbsp;<i class="fas fa-search-plus"></i></span>
-                  </router-link>
-               </div>
-               <div class="advanced">
-                  <V4BarcodeScanner @scanned="barcodeScanned"/>
-               </div>
+               <SourceSelector mode="basic"/>
+            </div>
+            <div class="search-mode">
+               <router-link tabindex="0" to="/search?mode=advanced">Advanced Search</router-link>
+            </div>
+            <div class="search-mode">
+               <V4BarcodeScanner @scanned="barcodeScanned"/>
             </div>
          </template>
          <AdvancedSearch v-else/>
@@ -56,7 +42,6 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
-import SearchTips from "@/components/disclosures/SearchTips"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch"
 import Welcome from "@/components/Welcome"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner"
@@ -65,11 +50,8 @@ import SourceSelector from "@/components/SourceSelector"
 export default {
    name: "home",
    components: {
-     SearchResults, V4BarcodeScanner,
-     SearchTips, AdvancedSearch,
-     Welcome, SourceSelector
+     SearchResults, V4BarcodeScanner, AdvancedSearch, Welcome, SourceSelector
    },
-
    watch: {
       $route() {
          console.log("NEW HOME ROUTE "+ this.$route.fullPath)
@@ -129,8 +111,6 @@ export default {
         selectedResults: 'selectedResults',
         isSignedIn: 'user/isSignedIn',
         poolSort: 'sort/poolSort',
-        resourceTypes: 'query/resourceTypes',
-        basicSearchScope:  'query/basicSearchScope',
         poolDetails: 'pools/poolDetails',
       }),
       ...mapFields({
@@ -184,11 +164,6 @@ export default {
    },
 
    methods: {
-      async resetSearch(){
-         this.$store.dispatch('resetSearch')
-         this.$router.push(`/search`)
-      },
-
       mapLegacyQueries( token ) {
          if (this.$route.query.scope || this.$route.query.pool || this.$route.query.exclude) {
             let newQ = Object.assign({}, this.$route.query)
@@ -346,12 +321,6 @@ export default {
          }
       },
 
-      scopeChanged( val ) {
-         this.$analytics.trigger('Search', 'BASIC_SEARCH_RESOURCE_SET', val)
-         this.$store.commit("query/setBasicSearchFilter", val)
-         this.$store.commit("filters/reset")
-      },
-
       async searchClicked() {
          // Refine search updates:
          // if pool, filter or sort were specified previously, preserve them in the URL.
@@ -409,9 +378,26 @@ export default {
    .basic-search {
       display: flex;
       flex-flow: row nowrap;
-      align-items: flex-start;
+      align-items: stretch;
+      justify-content: flex-start;
       max-width: 800px;
       margin: 0 auto 0 auto;
+
+      input[type=text].basic {
+         font-size: 1.15em;
+         padding: 0.5vw 0.75vw;
+         border: 1px solid var(--uvalib-grey);
+         border-right: 0;
+         margin: 0 !important;
+         border-radius: 5px 0 0 5px;
+         flex: 1 1 auto;
+         min-width: 100px;
+      }
+      .search {
+         border-radius: 0 5px 5px 0;
+         margin: 0;
+         padding: 0 40px;
+      }
    }
    div.advanced {
       margin-top: 10px;
@@ -427,7 +413,7 @@ export default {
    }
    .controls-wrapper  {
       max-width: 800px;
-      margin: 0 auto 0 auto;
+      margin: 0 auto 20px auto;
       .controls {
          padding: 10px 0;
          display: flex;
@@ -438,6 +424,10 @@ export default {
       .controls  > * {
          flex: 0 1 auto;
       }
+   }
+   .search-mode {
+      text-align: center;
+      margin: 10px 0 5px 0;
    }
 }
 
@@ -465,16 +455,5 @@ export default {
   :-ms-input-placeholder {
     color:transparent;
   }
-}
-
-#app .pure-form div.basic-search  input[type=text].basic {
-  font-size: 1.15em;
-  padding: 0.5vw 0.75vw;
-  border: 1px solid var(--uvalib-grey);
-  margin: 0;
-  border-left: 0;
-  border-radius: 0 5px 5px 0;
-  flex: 1 1 auto;
-  min-width: 100px;
 }
 </style>

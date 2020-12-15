@@ -330,29 +330,12 @@ const query = {
          state.advanced.splice(idx, 1)
       },
 
-      resetAdvanced( state ) {
-         state.advanced.splice(0, state.advanced.length)
-         state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
-         state.preSearchFilters.forEach( pf => {
-            let sel = pf.choices.filter( c => c.selected)
-            sel.forEach( fv=>{
-               fv.selected = false
-            })
-         })
-      },
       clear(state) {
-         state.mode = "basic"
          state.basic = ""
-         state.advanced.splice(0, state.advanced.length)
-         state.advanced.push( {op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" } )
-         state.advanced.push( {op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" } )
+         state.advanced.forEach( a => {
+            a.op = "AND"
+            a.value = ""
+         })
          state.targetPool = ""
          state.preSearchFilters.forEach( pf => {
             let sel = pf.choices.filter( c => c.selected)

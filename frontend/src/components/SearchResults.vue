@@ -9,6 +9,7 @@
                   <div class="qs">{{queryString}}</div>
                </div>
                <span class="buttons">
+                  <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
                   <SaveSearch v-if="isSignedIn"/>
                   <SignInRequired v-else id="save-signin-modal" act="save-search"/>
                </span>
@@ -66,6 +67,7 @@ export default {
          rawQueryString: 'query/string',
          filterQueryParam: 'filters/asQueryParam',
          selectedResults: 'selectedResults',
+         hasSearchTemplate: 'preferences/hasSearchTemplate',
       }),
       ...mapState({
          selectedResultsIdx: state=>state.selectedResultsIdx,
@@ -74,6 +76,7 @@ export default {
          results: state=>state.results,
          searchMode: state=>state.query.mode,
          maxTabs: state=>state.preferences.maxTabs,
+         searchTemplate: state=>state.preferences.searchTemplate,
       }),
       ...mapFields([
         'otherSrcSelection'
@@ -132,6 +135,17 @@ export default {
       }
    },
    methods: {
+      async resetSearch(){
+         this.$store.dispatch('resetSearch')
+         if ( this.searchMode == "basic") {
+            this.$router.push(`/search`)
+         } else {
+            this.$router.push('/search?mode=advanced')
+            if ( this.hasSearchTemplate ) {
+               this.$store.commit("query/setTemplate", this.searchTemplate)
+            }
+         }
+      },
       updateURL( poolID) {
          let query = Object.assign({}, this.$route.query)
          query.pool = poolID
@@ -180,15 +194,11 @@ export default {
 }
 </script>
 
-<style>
-div.pool-tabs {
-  font-weight: bold;
-}
-div.pool-tabs span.total {
-   display: block;
-   font-size: 0.75em;
-   margin: 0;
-   font-weight: normal;
+
+<style scoped lang="scss">
+.results-main {
+   display: inline-block;
+   flex: 1 1 70%;
 }
 
 .shady {
@@ -197,30 +207,64 @@ div.pool-tabs span.total {
   background-color: var(--uvalib-grey-lightest);
 }
 
-</style>
-<style scoped lang="scss">
-.qs {
-   margin-left:15px;
-   font-style: italic;
-   font-weight: 100;
+.results-header {
+   display: flex;
+   flex-flow: row wrap;
+   align-content: center;
+   align-items: center;
+   justify-content: space-between;
+   padding-top: 10px;
+   margin-bottom: 10px;
+   .summary {
+      margin: 0 0 0.2vw 0;
+      font-weight: 500;
+      text-align: left;
+      .qs {
+         margin-left:15px;
+         font-style: italic;
+         font-weight: 100;
+      }
+      span {
+         font-size: 0.85em;
+      }
+      .subtotal {
+         display: block;
+         margin: 2px 0 2px 15px;
+      }
+      .query {
+         text-align: left;
+         margin: 0 0 0.2vw 0;
+         font-weight: bold;
+         font-size: 1.1em;
+      }
+   }
+   .buttons {
+      display: flex;
+      flex-flow: row nowrap;
+   }
 }
-p.relevant {
-   text-align: left;
-   padding: 0;
-   margin: 0 0 0 10px;
-}
-.v4-select {
-   margin: 0 -1px 2px 0;
-   border-radius: 5px 5px 0 0;
-   flex: 1 1 auto;
-}
-.pool-tabs {
+
+
+div.pool-tabs {
+   font-weight: bold;
    margin: 0;
    text-align: left;
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
+   span.total {
+      display: block;
+      font-size: 0.75em;
+      margin: 0;
+      font-weight: normal;
+   }
+   .v4-select {
+      margin: 0 -1px 2px 0;
+      border-radius: 5px 5px 0 0;
+      flex: 1 1 auto;
+   }
 }
+
 .pool-tabs .pool.v4-button {
    margin: 0;
    padding: 8px 8px 10px 8px;
@@ -231,13 +275,11 @@ p.relevant {
    flex: 1 1 auto;
    background: #FFF;
    outline: none;
-}
-.pool-tabs .pool.v4-button:focus {
-   //  border-bottom: none;
-   //  box-shadow: 0 0 0 3px rgba(21, 156, 228, 0.4);
-    z-index: 10;
-    &:focus {
-      @include be-accessible();
+   &:focus {
+      z-index: 10;
+      &:focus {
+         @include be-accessible();
+      }
    }
 }
 .pool-results {
@@ -258,53 +300,18 @@ p.relevant {
 .pool-tabs .pool.v4-button:last-child {
    margin-right: -1px;
 }
-.summary .query {
-   text-align: left;
-   margin: 0 0 0.2vw 0;
-   font-weight: bold;
-   font-size: 1.1em;
-}
-.results-header {
-   display: flex;
-   flex-flow: row wrap;
-   align-content: center;
-   align-items: center;
-   justify-content: space-between;
-   padding-top: 10px;
-   margin-bottom: 10px;
-}
-.results-main {
-   display: inline-block;
-   flex: 1 1 70%;
-}
-.summary {
-   margin: 0 0 0.2vw 0;
-   font-weight: 500;
-   text-align: left;
-}
-.summary span {
-   font-size: 0.85em;
-}
-.summary .subtotal {
-   display: block;
-   margin: 2px 0 2px 15px;
-}
+
+
 @media only screen and (min-width: $breakpoint-mobile) {
    div.search-results {
       margin: 0;
       padding: 0 5vw 20px 5vw;
-   }
-    .save-box{
-      width: 50%;
    }
 }
 @media only screen and (max-width: $breakpoint-mobile) {
    div.search-results {
       margin: 0;
       padding: 0 2vw 20px 2vw;
-   }
-   .save-box{
-      width: 90%;
    }
    .pool.v4-button:first-child {
       margin-left: -1px;

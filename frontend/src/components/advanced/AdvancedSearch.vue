@@ -61,7 +61,7 @@
                </div>
             </div>
             <div class="controls-wrapper">
-               <SourceSelector />
+               <SourceSelector mode="advanced"/>
                <div class="form-acts">
                   <V4Button mode="icon" id="add-criteria" @click="addClicked">
                      <i class="fas fa-plus-circle"></i>
@@ -80,18 +80,7 @@
                </div>
                <PreSearchFilters />
                <div class="controls">
-                  <V4Button mode="text" class="clear" @click="clearSearchClicked">reset search</V4Button>
-                  <span class="sep">|</span>
                   <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
-               </div>
-               <div class="basic">
-                  <router-link to="/search?mode=basic">
-                     Basic Search&nbsp;
-                     <i class="fas fa-undo-alt"></i>
-                  </router-link>
-               </div>
-               <div class="basic">
-                  <V4BarcodeScanner @scanned="barcodeScanned"/>
                </div>
             </div>
          </div>
@@ -103,14 +92,13 @@
 import { mapMultiRowFields, mapFields } from "vuex-map-fields"
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import V4BarcodeScanner from "@/components/V4BarcodeScanner"
 import AdvancedFacets from "@/components/advanced/AdvancedFacets"
 import SourceSelector from "@/components/SourceSelector"
 import PreSearchFilters from "@/components/advanced/PreSearchFilters"
 
 export default {
    components: {
-      V4BarcodeScanner, AdvancedFacets, SourceSelector, PreSearchFilters
+      AdvancedFacets, SourceSelector, PreSearchFilters
    },
    computed: {
       ...mapState({
@@ -123,10 +111,7 @@ export default {
          advancedSearchTemplate: 'query/advancedSearchTemplate',
          queryURLParams: 'query/queryURLParams',
          queryEntered: "query/queryEntered",
-         sources: "pools/sortedList",
-         rawQueryString: 'query/string',
          isSignedIn: 'user/isSignedIn',
-         isKiosk: 'system/isKiosk',
          hasSearchTemplate: 'preferences/hasSearchTemplate',
          hasResults: 'hasResults',
       }),
@@ -151,14 +136,6 @@ export default {
             return tgtField.type
          }
          return "text"
-      },
-      getTermLabel( term ) {
-         let tgtField = this.advancedFields.find( af=> af.value == term.field)
-         return tgtField.label
-      },
-      getTermChoices( term ) {
-         let tgtField = this.advancedFields.find( af=> af.value == term.field)
-         return tgtField.choices
       },
       doAdvancedSearch() {
          if (this.queryEntered) {
@@ -214,18 +191,6 @@ export default {
             )
          }
       },
-      clearSearchClicked() {
-         if (this.$router.currentRoute.fullPath != "/search?mode=advanced") {
-            this.$store.dispatch('resetSearch')
-            this.$router.push('/search?mode=advanced')
-         } else {
-            this.$store.commit('query/resetAdvanced')
-            if ( this.hasSearchTemplate ) {
-               this.$store.commit("query/setTemplate", this.searchTemplate)
-            }
-            this.focusFirstTerm(true)
-         }
-      },
       addClicked() {
          this.$store.commit("query/addCriteria")
          setTimeout( () => {
@@ -237,11 +202,6 @@ export default {
       },
       removeCriteria(idx) {
          this.$store.commit("query/removeCriteria", idx);
-      },
-      barcodeScanned(barcode) {
-         this.$store.dispatch('resetSearch')
-         this.$store.commit("query/advancedBarcodeSearch", barcode)
-         this.$store.dispatch("searchAllPools")
       },
       focusFirstTerm(scroll) {
          setTimeout( () => {

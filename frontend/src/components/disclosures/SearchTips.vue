@@ -1,10 +1,17 @@
 <template>
    <V4Disclosure id="search-tips" ref="tipsdisclose" @click="clicked">
       <template v-slot:summary>
-         <span>Search Tips</span>
+         <span>Help me search</span>
       </template>
       <template v-slot:content>
          <div class="tips">
+            <p class="section">How to search</p>
+            <ul class="dots">
+               <li>Selecting "Everything" will result in a sorted list of any record in Virgo.</li>
+               <li>Selecting "Catalog Only" results only in items UVA owns, minus articles and images.</li>
+               <li>After searching, you can use Filters to narrow your query.</li>
+            </ul>
+             <p class="section pad">Search tips</p>
             <ul>
                <li class="no-pad">
                   <p>Use quotation marks to find exact phrases:</p>
@@ -44,14 +51,24 @@ export default {
 div.tips {
    margin: 5px 10px;
    font-weight: normal;
+   p.section {
+      font-weight: bold;
+      margin: 15px 0 0 0;
+      font-size: 1.15em;
+   }
+   .section.pad {
+      margin-top: 30px;
+   }
 
    .note {
       margin: 25px 0 10px 0;
    }
-
+   ul.dots {
+      list-style-type: disc;
+   }
    ul {
       list-style-type: none;
-      padding:0;
+      padding: 0px 0 0 20px;
       margin: 0;
    }
    ul p {
@@ -60,9 +77,6 @@ div.tips {
    }
    ul li {
       padding-top: 10px;
-   }
-   ul li.no-pad {
-      padding-top: 5px;
    }
    p.example {
       margin: 5px 0 0 25px;

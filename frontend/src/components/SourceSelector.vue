@@ -17,13 +17,23 @@
             <input id="search-images" type="radio" v-model="searchSources" value="images" name="sources">
             <span>Images Only</span>
          </label>
+         <SearchTips v-if="mode=='basic'" />
       </div>
 </template>
 
 <script>
 import { mapFields } from 'vuex-map-fields'
-
+import SearchTips from "@/components/disclosures/SearchTips"
 export default {
+    components: {
+     SearchTips
+   },
+   props: {
+      mode: {
+         type: String,
+         default: "basic"
+      },
+   },
    computed: {
       ...mapFields({
         searchSources: 'query.searchSources',
