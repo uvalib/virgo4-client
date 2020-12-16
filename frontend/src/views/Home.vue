@@ -221,18 +221,12 @@ export default {
             this.$store.commit("query/setBasicSearch")
          }
 
-         let targetPool = ""
+         let targetPool = "presearch"
          let oldFilterParam = ""
          let oldSort = ""
-         if (query.pool && !query.scope) {
+         if ( query.pool ) {
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)
-
-            // get pool filters from URL (but preserve current)...
-            oldFilterParam = this.filterQueryString(targetPool)
-            if (query.filter) {
-               this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
-            }
 
             // get sort from URL (but preserve current sort)...
             let oldSortObj = this.poolSort(targetPool)
@@ -244,6 +238,12 @@ export default {
                this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: "SortRelevance_desc"})
                this.$store.commit("sort/setActivePool", targetPool)
             }
+         }
+
+         // get pool filters from URL (but preserve current)...
+         oldFilterParam = this.filterQueryString(targetPool)
+         if (query.filter) {
+            this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
          }
 
          // If no sort detecetd, set it to the default relevance sort

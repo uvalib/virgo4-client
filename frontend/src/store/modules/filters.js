@@ -93,6 +93,22 @@ const filters = {
             }
          })
 
+         // NOW get any presearch filters and merge them in with the current filter
+         let psf = state.poolFacets.find( pf => pf.pool == "presearch")
+         if (!psf) {
+            return filter
+         }
+         psf.facets.forEach( pf => {
+            pf.buckets.forEach( pb => {
+               if ( pb.selected) {
+                  let exist = filter.find( ef=> ef.facet_id == pf.id && ef.value == pb.value)
+                  if (!exist) {
+                     filter.push( {facet_id: pf.id, facet_name: pf.name, value: pb.value})
+                  }
+               }
+            })
+         })
+
          return filter
       },
 
@@ -149,7 +165,6 @@ const filters = {
          // NOTE: There was loginc in the old query.js that attempted to preserve prior settings. Unsure
          // if it is needed or not. Use git histor in query and look for setAdvancedFilterFields()
          state.poolFacets.splice(0, state.poolFacets.length)
-         console.log("set presearch filters")
 
          // Place all of this data into a transient 'presearch' pool that can be
          // used to apply filters to any pool before search
@@ -189,7 +204,6 @@ const filters = {
          })
 
          tgtFacets.splice(0, tgtFacets.length)
-         console.log(state.poolFacets)
          data.facets.forEach( function(facet) {
             // Availability/Circulation are global and handled differently; skip
             if ( facet.id ==  state.availabilityFacet.id || facet.id == state.circulatingFacet.id) return
@@ -234,6 +248,13 @@ const filters = {
          } else {
             let bucket = facetInfo.buckets.find( b=> b.value == data.value )
             bucket.selected = !bucket.selected
+            if (data.pool != "presearch") {
+               // when a pool changes a filter, keep presearch in sync
+               let prePfObj = state.poolFacets.find(pf => pf.pool == "presearch")
+               let preFacetInfo = prePfObj.facets.find(f => f.id === data.facetID)
+               let preBucket = preFacetInfo.buckets.find( b=> b.value == data.value )
+               preBucket.selected = bucket.selected
+            }
          }
       },
 
@@ -248,6 +269,17 @@ const filters = {
          }
          state.globalAvailability = {id: "any", name: "All"}
          state.globalCirculating = false
+
+         let pre = state.poolFacets.find( pf => pf.pool=="presearch")
+         if (pre) {
+            pre.facets.forEach( f => {
+               f.buckets.forEach(b => {
+                  b.selected = false
+               })
+            })
+            state.poolFacets.splice(0, state.poolFacets.length)
+            state.poolFacets.push(pre)
+         }
       },
 
       reset(state) {
