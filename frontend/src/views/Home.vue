@@ -181,10 +181,7 @@ export default {
                newQ.pool = mapping.pool
                this.searchSources = mapping.pool
                if (mapping.filter != "all") {
-                  let q = newQ.q
-                  delete newQ.q
-                  q += ` AND filter: {(FilterResourceType:"${mapping.filter}")}`
-                  newQ.q = q
+                 newQ.filter = `{"FacetResourceType":["${mapping.filter}"]}`
                }
 
                if ( token ) {
