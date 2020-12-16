@@ -8,8 +8,6 @@ const query = {
       userSearched: false,
       mode: "basic",
       basic: "",
-      srcTypeFilterName: "FilterResourceType",
-      allResourceTypes: {name: `All Resource Types`, id: 'all'},
       searchSources: "all",
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
@@ -28,35 +26,12 @@ const query = {
          { value: "date", label: "Date", type: "date" },
          { value: "published", label: "Publisher/Place of Publication", type: "text"}
       ],
-      preSearchFilters: [],
-      loadingFilters: false,
       targetPool: ""
    },
    getters: {
       getField,
       getState: state => {
          return state
-      },
-      resourceTypes( state ) {
-         let out = [state.allResourceTypes]
-         if ( state.loadingFilters == false && state.preSearchFilters.length > 0) {
-            let st = state.preSearchFilters.find( psf => psf.value == state.srcTypeFilterName)
-            st.choices.forEach( c => {
-               out.push({name: c.value, id: c.value})
-            })
-         }
-         return out
-
-      },
-      basicSearchScope(state) {
-         if ( state.loadingFilters == false && state.preSearchFilters.length > 0) {
-            let st = state.preSearchFilters.find( psf => psf.value == state.srcTypeFilterName)
-            let c = st.choices.find( c=> c.selected == true)
-            if ( c) {
-               return {name: c.value, id: c.value}
-            }
-         }
-         return state.allResourceTypes
       },
       advancedSearchTemplate( state ) {
          let out = { fields: []}
@@ -87,13 +62,6 @@ const query = {
          if ( found ) {
             return true
          }
-         state.preSearchFilters.some(pf => {
-            pf.choices.some( c => {
-               found = c.selected
-               return found == true
-            })
-            return found == true
-         })
          return found
       },
       string: state => {
@@ -128,26 +96,6 @@ const query = {
             }
          })
 
-         let categories = []
-         state.preSearchFilters.forEach( pf => {
-            let vals = []
-            let sel = pf.choices.filter( c => c.selected)
-            sel.forEach( fv=>{
-               vals.push(`${pf.value}:"${fv.value}"`)
-            })
-            if ( vals.length > 0) {
-               categories.push( `(${vals.join(" OR ")})`)
-            }
-         })
-         if ( categories.length > 0) {
-            let fStr = `filter: {${categories.join(" AND ")}}`
-            if ( qs.length > 0) {
-               qs += ` AND ${fStr}`
-            } else {
-               qs = fStr
-            }
-         }
-
          return qs
       },
    },
@@ -163,71 +111,11 @@ const query = {
             state.advanced.push(newField)
          })
       },
-      setBasicSearchFilter(state, value) {
-         let fIdx = state.preSearchFilters.findIndex( pf => pf.value == state.srcTypeFilterName)
-         let typeFilter = state.preSearchFilters[fIdx]
-         typeFilter.choices.forEach( c => {
-            if ( value == state.allResourceTypes.name || value == "all") {
-               c.selected = false
-            } else {
-               if (c.value == value) {
-                  c.selected = true
-               } else {
-                  c.selected = false
-               }
-            }
-         })
-         state.preSearchFilters.splice(fIdx, 1, typeFilter)
-      },
-      toggleFilter( state, data ) {
-         let fIdx = state.preSearchFilters.findIndex( pf => pf.value == data.filterID)
-         let f = state.preSearchFilters[fIdx]
-         let v = f.choices.find( c=> c.value == data.value)
-         v.selected = !v.selected
-         state.preSearchFilters.splice(fIdx, 1, f)
-      },
-      setAdvancedFilterFields( state, filters) {
-         // preserve any previously selected filters before clear....
-         let oldFilterSelects = []
-         state.preSearchFilters.forEach( pf => {
-            pf.choices.forEach( pfc => {
-               if (pfc.selected) {
-                  oldFilterSelects.push(pfc)
-               }
-            })
-         })
-         state.preSearchFilters.splice(0, state.preSearchFilters.length)
-         filters.forEach( f=> {
-            // If the filter already exists in the fields list, remove it and replace with new
-            let idx = state.preSearchFilters.findIndex( f=> f.value == f.id)
-            if ( idx != -1 ) {
-               state.preSearchFilters.splice(idx, 1)
-            }
-            if ( f.values.length == 0 ) {
-               return
-            }
-            let field = {value: f.id, label: f.label, choices: []}
-            f.values.forEach( v => {
-               let selected = false
-               if (oldFilterSelects.some( s => s.value === v.value)) {
-                  selected = true
-               }
-               field.choices.push({value: v.value, count: v.count, selected: selected})
-            })
-            state.preSearchFilters.push(field)
-         })
-      },
 
       restoreFromURL(state, queryParams) {
          // Clear out all existing data
          state.basic = ""
          state.advanced.splice(0, state.advanced.length)
-         state.preSearchFilters.forEach( pf => {
-            let sel = pf.choices.filter( c => c.selected)
-            sel.forEach( fv=>{
-               fv.selected = false
-            })
-         })
 
          while (queryParams.length > 0) {
             // A valid query has a field and term surrounded by { }. Find the braces...
@@ -252,30 +140,6 @@ const query = {
             let value = queryParams.substring(braceIdx+1, braceIdx2)
             queryParams = queryParams.substring(braceIdx2+1).trim()
             let keyOpParts = keyOp.split(" ")
-
-            // Pre-search Filters are special. DO NOT add them to the advanced terms. Instead,
-            // parse them out and add them to the preSearchFilters data. IMPORTANT: Value can look like this:
-            //     (FilterLibrary:"Brown Science and Engineering") AND (FilterFormat:"Atlas" OR FilterFormat:"Book")
-            if (keyOp.split(" ").pop() == "filter")  {
-               // toss all of the operators and parens to get a list of FILTER:VALUE separated by |
-               let values = value.replace(/\sAND\s|\sOR\s/g, "|").replace(/\(|\)/g, "").split("|")
-               values.forEach( v => {
-                  let filter = v.split(":")[0].replace(/\(/g, "").trim()
-                  let filterVal = v.split(":").pop().replace(/\)|"/g, "").trim()
-                  let f = state.preSearchFilters.find( pf => pf.value == filter)
-                  if (f) {
-                     let fv = f.choices.find( fv => fv.value == filterVal)
-                     if ( fv) {
-                        fv.selected = true
-                     }
-                  } else {
-                     let field = {value: filter, label: filter, choices: [{value: filterVal, count: 0, selected: true}]}
-                     state.preSearchFilters.push(field)
-                  }
-               })
-               continue
-            }
-
             let term = { op: "AND", value: value, field: keyOp.toLowerCase(), comparison: "EQUAL", endVal: "" }
             if (keyOpParts.length == 2 ) {
                term.op = keyOpParts[0].trim()
@@ -323,6 +187,14 @@ const query = {
       setBasicSearch(state) {
          state.mode = "basic"
       },
+      addWildcardCriteria(state) {
+         let kw = state.advanced.find( af => af.field == "keyword")
+         if (kw) {
+            kw.value = "*"
+         } else   {
+            state.advanced.push({ op: "AND", value: "*", field: "keyword", comparison: "EQUAL", endVal: "" })
+         }
+      },
       addCriteria(state) {
          state.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
       },
@@ -337,29 +209,9 @@ const query = {
             a.value = ""
          })
          state.targetPool = ""
-         state.preSearchFilters.forEach( pf => {
-            let sel = pf.choices.filter( c => c.selected)
-            sel.forEach( fv=>{
-               fv.selected = false
-            })
-         })
-      },
-      setLoadingFilters(state, flag) {
-         state.loadingFilters = flag
       },
    },
    actions: {
-      async getAdvancedSearchFilters(ctx) {
-         ctx.commit("setLoadingFilters",true)
-         let url = `${ctx.rootState.system.searchAPI}/api/filters`
-         return axios.get(url).then((response) => {
-            ctx.commit('setAdvancedFilterFields', response.data)
-            ctx.commit("setLoadingFilters",false)
-         }).catch((error) => {
-            console.warn("Unable to get advanced search filters: "+JSON.stringify(error))
-            ctx.commit("setLoadingFilters",false)
-         })
-      },
       async loadSearch(ctx, token) {
          ctx.commit('setSearching', true, { root: true })
          await axios.get(`/api/searches/${token}`).then((response) => {

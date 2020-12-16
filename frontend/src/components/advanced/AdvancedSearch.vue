@@ -114,6 +114,8 @@ export default {
          isSignedIn: 'user/isSignedIn',
          hasSearchTemplate: 'preferences/hasSearchTemplate',
          hasResults: 'hasResults',
+         preSearchFilterApplied: 'filters/preSearchFilterApplied',
+         filterQueryString: 'filters/asQueryParam',
       }),
       ...mapFields({
         userSearched: 'query.userSearched',
@@ -138,7 +140,11 @@ export default {
          return "text"
       },
       doAdvancedSearch() {
-         if (this.queryEntered) {
+         if (this.queryEntered == false && this.preSearchFilterApplied ) {
+            // For now, when a filter-only query is made, add a query for keyword: *
+            this.$store.commit("query/addWildcardCriteria")
+         }
+         if (this.queryEntered  ) {
 
             let fields = this.advanced.filter( f=>f.value != "")
             if ( fields.length == 1 && fields[0].op == "NOT") {
@@ -166,7 +172,11 @@ export default {
             if (priorQ.pool) {
                qp += `&pool=${priorQ.pool}`
             }
-            if (priorQ.filter) {
+            if ( this.preSearchFilterApplied ) {
+               // Turn presearch filter into query string. From here on out, post search filters will
+               // be used instead
+               qp += `&filter=${this.filterQueryString('presearch')}`
+            } else if (priorQ.filter) {
                qp += `&filter=${priorQ.filter}`
             }
             if (priorQ.sort) {
@@ -203,24 +213,8 @@ export default {
       removeCriteria(idx) {
          this.$store.commit("query/removeCriteria", idx);
       },
-      focusFirstTerm(scroll) {
-         setTimeout( () => {
-            let terms = document.getElementsByClassName("term")
-            if (terms.length > 0) {
-               terms[0].focus()
-               if (scroll) {
-                  this.$utils.scrollToItem(terms[0])
-                  terms = document.getElementsByClassName("search-term")
-                  if (terms.length > 0) {
-                     this.$utils.scrollToItem(terms[0])
-                  }
-               }
-            }
-         }, 250)
-      }
    },
    created() {
-      this.focusFirstTerm(false)
       if ( this.hasSearchTemplate ) {
          this.$store.commit("query/setTemplate", this.searchTemplate)
       }

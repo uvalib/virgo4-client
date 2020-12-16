@@ -266,6 +266,10 @@ export default {
       searchClicked() {
          this.closeSubMenus()
          this.$store.dispatch('resetSearch')
+         window.scrollTo({
+            top: 0,
+            behavior: "auto"
+         })
       },
       signinClicked() {
          this.closeSubMenus()

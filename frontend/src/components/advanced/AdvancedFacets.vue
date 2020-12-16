@@ -12,19 +12,19 @@
                   <V4Spinner message="Loading filters..."/>
                </div>
 
-               <template v-else v-for="(filterInfo,idx) in filters">
-                  <AccordionContent  :key="`${idx}-${filterInfo.value}`"
-                     id="`${filterInfo.value}-acc`"
+               <template v-else v-for="filterInfo in filters">
+                  <AccordionContent  :key="filterInfo.id"
+                     :id="`${filterInfo.id}-acc`"
                      class="filter-list"
                      background="var(--uvalib-grey-lightest)"
                      borderWidth="1px"
                   >
                      <template v-slot:title>
-                        <span :aria-label="`see more ${filterInfo.label} filters`">{{filterInfo.label}}</span>
+                        <span :aria-label="`see more ${filterInfo.name} filters`">{{filterInfo.name}}</span>
                      </template>
-                     <div class="expanded-item" v-for="fv in filterInfo.choices" :key="fv.value">
+                     <div class="expanded-item" v-for="fv in filterInfo.buckets" :key="fv.value">
                         <V4Checkbox :checked="fv.selected"
-                           @click="filterClicked(filterInfo.value, fv.value)">
+                           @click="filterClicked(filterInfo.id, fv.value)">
                            {{fv.value}}
                         </V4Checkbox>
                         <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
@@ -48,11 +48,11 @@ export default {
    computed: {
       ...mapState({
          displayWidth: state => state.system.displayWidth,
-         loadingFilters: state => state.query.loadingFilters,
-         filters: state => state.query.preSearchFilters,
+         loadingFilters: state => state.filters.updatingFacets,
       }),
       ...mapGetters({
          hasResults: 'hasResults',
+         filters: 'filters/preSearchFilters',
       }),
       filterColor() {
          return "var(--uvalib-brand-blue)"
@@ -65,10 +65,9 @@ export default {
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
-      filterClicked(facetID,value) {
-         this.$store.commit("filters/reset")
-         let data = {filterID: facetID, value: value}
-         this.$store.commit("query/toggleFilter", data)
+      filterClicked(facetID, value) {
+         let data = {pool: "presearch", facetID: facetID, value: value}
+         this.$store.commit("filters/toggleFilter", data)
       },
    }
 }

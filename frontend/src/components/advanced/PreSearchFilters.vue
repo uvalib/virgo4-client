@@ -4,12 +4,12 @@
          <span class="title">Selected Filters</span>
          <V4Button v-if="anyFiltersSet" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
       </div>
-      <template v-if="anyFiltersSet">
+      <template v-if="loadingFilters == false && anyFiltersSet">
          <dl class="filter-display">
             <template v-for="psf in preSearchFilters">
                <template v-if="hasSelections(psf)">
-                  <dt :key="psf.value" class="label">{{psf.label}}</dt>
-                  <dd :key="`filters-${psf.value}`" class="filter">
+                  <dt :key="psf.value" class="label">{{psf.name}}</dt>
+                  <dd :key="`filters-${psf.id}`" class="filter">
                      <template  v-for="sel in selections(psf)">
                         <span :key="sel.value" class="selected">
                            <V4Button mode="icon" class="remove" @click="sel.selected = false"
@@ -33,16 +33,17 @@
 import { mapState, mapGetters } from "vuex"
 export default {
    computed: {
-      ...mapState({
-         preSearchFilters: state => state.query.preSearchFilters,
-      }),
       ...mapGetters({
          hasResults: 'hasResults',
+         preSearchFilters: 'filters/preSearchFilters',
+      }),
+      ...mapState({
+         loadingFilters: state => state.filters.updatingFacets,
       }),
       anyFiltersSet() {
          let filters = false
          this.preSearchFilters.some( pf => {
-            pf.choices.some( c => {
+            pf.buckets.some( c => {
                filters = c.selected
                return filters == true
             })
@@ -54,20 +55,20 @@ export default {
    methods: {
       hasSelections( filter ) {
          let filtered = false
-         filter.choices.some( c => {
+         filter.buckets.some( c => {
             filtered = c.selected
             return filtered == true
          })
          return filtered
       },
       selections( filter ) {
-         let out = filter.choices.filter( c=> c.selected)
+         let out = filter.buckets.filter( c=> c.selected)
          console.log("SEL: "+JSON.stringify(out))
          return out
       },
       async clearClicked() {
          this.preSearchFilters.forEach( pf => {
-            let sel = pf.choices.filter( c => c.selected)
+            let sel = pf.buckets.filter( c => c.selected)
             sel.forEach( fv=>{
                fv.selected = false
             })

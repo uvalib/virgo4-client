@@ -139,7 +139,7 @@ export default {
          this.searchSources = cachedSrc
       }
       await this.$store.dispatch('pools/getPools')
-      this.$store.dispatch("query/getAdvancedSearchFilters")
+      this.$store.dispatch("filters/getPreSearchFilters")
 
       // When restoring a saved search, the call will be /search/:token
       let token = this.$route.params.id
@@ -251,9 +251,12 @@ export default {
             oldSort = "SortRelevance_desc"
          }
 
-         if ( query.q) {
+         if ( query.q ) {
             this.$store.commit("query/restoreFromURL", query.q)
+         }
 
+         // If there is a query or filter in params it may be necessary to run a search
+         if ( query.q || query.filter) {
             // only re-run search when query, sort or filtering has changed
             if ( this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
                  this.activeSort != oldSort || this.userSearched == true ) {
@@ -262,8 +265,6 @@ export default {
                // console.log(`F: ${this.filterQueryString(targetPool)} vs ${oldFilterParam}`)
                // console.log(`S: ${this.activeSort} vs ${oldSort}`)
                // console.log(`U: ${this.userSearched}`)
-               // console.log("SEARCH "+this.$router.currentRoute.fullPath)
-               // dont keep the spinner up while getting facets if this is a search started by a user clicking search
                // NOTE: immediately reset the user searched flag because searchAllPools may append &pool=something to
                // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
                // has changed. If userSearched is not reset, the search will run twice.

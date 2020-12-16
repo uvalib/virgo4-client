@@ -32,11 +32,15 @@ const filters = {
          }
          let outObj = {}
          filter.forEach(f => {
+            let tgtFacetID = f.facet_id
+            // HACK: Currently pre/post search filterIDs are named differently (ex: FilterResourceType vs FacetResourceType).
+            // Make pre match post.... once names are aligned this goes away
+            tgtFacetID = tgtFacetID.replace("Filter", "Facet")
             if (Object.prototype.hasOwnProperty.call(outObj, f.facet_id) == false) {
-               outObj[f.facet_id] = []
+               outObj[tgtFacetID] = []
             }
             if ( f.value.length > 0) {
-               outObj[f.facet_id].push(f.value)
+               outObj[tgtFacetID].push(f.value)
             }
          })
          let outStr = JSON.stringify(outObj)
@@ -96,6 +100,34 @@ const filters = {
          return filter
       },
 
+      preSearchFilterApplied: state => {
+         if ( state.updatingFacets) return false
+
+         let found = false
+         let psf = state.poolFacets.find( pf => pf.pool == "presearch")
+         if (psf) {
+            psf.facets.some( pf => {
+               pf.buckets.some( b => {
+                  if (b.selected) {
+                     found = true
+                  }
+                  return found == true
+               })
+               return found == true
+            })
+         }
+         return found
+      },
+
+      preSearchFilters: state => {
+         if ( state.updatingFacets) return []
+         let psf = state.poolFacets.find( pf => pf.pool == "presearch")
+         if (psf) {
+            return psf.facets
+         }
+         return []
+      },
+
       // This is only used to get the filter map for use in global search
       allPoolFilters: (_state, getters, rootState) =>  {
          let out = []
@@ -116,7 +148,31 @@ const filters = {
          state.globalAvailability = avail
       },
 
+      setPreSearchFilters(state, filters) {
+         // this happens pre-search, so throw out all existing facet info
+         // NOTE: There was loginc in the old query.js that attempted to preserve prior settings. Unsure
+         // if it is needed or not. Use git histor in query and look for setAdvancedFilterFields()
+         state.poolFacets.splice(0, state.poolFacets.length)
+         console.log("set presearch filters")
+
+         // Place all of this data into a transient 'presearch' pool that can be
+         // used to apply filters to any pool before search
+         let tgtPFObj = {pool: "presearch", facets: []}
+         filters.forEach( f => {
+            // pre-search filter data format: { id,label,values: [{value,count}] }
+            // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
+            let newF = {id:f.id, name: f.label, type: "", sort: "", buckets: []}
+            f.values.forEach( v => {
+               newF.buckets.push( {selected: false, value: v.value, count: v.count} )
+            })
+            tgtPFObj.facets.push(newF)
+         })
+         state.poolFacets.push(tgtPFObj)
+
+      },
+
       setPoolFacets(state, data) {
+         console.log(`set ${data.pool} facets`)
          // Get currently selected facets, then clear everything out
          // repopulate with data from API call, and restore prior selected state
          let tgtPFObj = state.poolFacets.find(pf => pf.pool == data.pool)
@@ -133,6 +189,7 @@ const filters = {
          })
 
          tgtFacets.splice(0, tgtFacets.length)
+         console.log(state.poolFacets)
          data.facets.forEach( function(facet) {
             // Availability/Circulation are global and handled differently; skip
             if ( facet.id ==  state.availabilityFacet.id || facet.id == state.circulatingFacet.id) return
@@ -194,15 +251,24 @@ const filters = {
       },
 
       reset(state) {
-         // NOTE: clearing array by setting it to [] breaks vuex
-         // responsiveness. Only array methods like push,pop and splice
-         // should be used as they preserve responsiveness...
-         // https://vuejs.org/v2/guide/list.html#Array-Change-Detection
          state.globalAvailability = {id: "any", name: "Any"}
          state.globalCirculating = false
-         state.poolFacets.forEach( pf => {
-            pf.facets.splice(0, pf.facets.length)
-         })
+
+         console.log("reset filters")
+         let pre = state.poolFacets.find( pf => pf.pool=="presearch")
+         if (pre) {
+            // if presearch filters exist, just flag them all as unselected instead of removing
+            // this is because they are only requested once at initial search page load
+            pre.facets.forEach( f => {
+               f.buckets.forEach(b => {
+                  b.selected = false
+               })
+            })
+            state.poolFacets.splice(0, state.poolFacets.length)
+            state.poolFacets.push(pre)
+         } else {
+            state.poolFacets.splice(0, state.poolFacets.length)
+         }
       },
 
       restoreFromURL(state, data ) {
@@ -251,6 +317,18 @@ const filters = {
    },
 
    actions: {
+      async getPreSearchFilters(ctx) {
+         console.log("GET PRESEARCH FILTERS")
+         ctx.commit('setUpdatingFacets', true)
+         let url = `${ctx.rootState.system.searchAPI}/api/filters`
+         return axios.get(url).then((response) => {
+            ctx.commit('setPreSearchFilters', response.data)
+            ctx.commit('setUpdatingFacets', false)
+         }).catch((error) => {
+            ctx.commit('setUpdatingFacets', false)
+            console.warn("Unable to get pre-search filters: "+JSON.stringify(error))
+         })
+      },
       // Get all facets for the selected result set / query / pool
       // This is called from 3 different places: when all pools are search, when a specifi pool
       // is search and when a new pool is selected. The first 2 should ALWAYS request new facets
