@@ -39,7 +39,6 @@ const query = {
             let tpl =  {op: af.op, field: af.field, comparison: af.comparison}
             out.fields.push( tpl )
          })
-         // TODO handler presearch filters
          return out
       },
       idQuery: () => id => {

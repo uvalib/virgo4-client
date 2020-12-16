@@ -32,15 +32,11 @@ const filters = {
          }
          let outObj = {}
          filter.forEach(f => {
-            let tgtFacetID = f.facet_id
-            // HACK: Currently pre/post search filterIDs are named differently (ex: FilterResourceType vs FacetResourceType).
-            // Make pre match post.... once names are aligned this goes away
-            tgtFacetID = tgtFacetID.replace("Filter", "Facet")
             if (Object.prototype.hasOwnProperty.call(outObj, f.facet_id) == false) {
-               outObj[tgtFacetID] = []
+               outObj[f.facet_id] = []
             }
             if ( f.value.length > 0) {
-               outObj[tgtFacetID].push(f.value)
+               outObj[f.facet_id].push(f.value)
             }
          })
          let outStr = JSON.stringify(outObj)
@@ -161,7 +157,11 @@ const filters = {
          filters.forEach( f => {
             // pre-search filter data format: { id,label,values: [{value,count}] }
             // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
-            let newF = {id:f.id, name: f.label, type: "", sort: "", buckets: []}
+            // HACK: Currently pre/post search filterIDs are named differently (ex: FilterResourceType vs FacetResourceType).
+            // Make pre match post.... once names are aligned this goes away
+            let facetID = f.id
+            facetID = facetID.replace("Filter", "Facet")
+            let newF = {id: facetID, name: f.label, type: "", sort: "", buckets: []}
             f.values.forEach( v => {
                newF.buckets.push( {selected: false, value: v.value, count: v.count} )
             })
@@ -342,6 +342,8 @@ const filters = {
             // this pool doesn't support facets; nothing more to do
             return
          }
+
+         console.log(`GET POOL ${pool.id} FILTERS`)
 
          let currFacets = ctx.getters.poolFacets(pool.id)
          if (currFacets.length > 0 && updateExisting == false) {
