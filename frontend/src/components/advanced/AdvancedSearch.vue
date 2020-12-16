@@ -184,6 +184,7 @@ export default {
             }
 
             this.userSearched = true
+            this.$store.dispatch("filters/promotePreSearchFilters")
             this.$router.push(`/search?${qp}`)
 
             let s = "SIGNED_OUT"

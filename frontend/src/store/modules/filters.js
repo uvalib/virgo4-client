@@ -93,22 +93,6 @@ const filters = {
             }
          })
 
-         // NOW get any presearch filters and merge them in with the current filter
-         let psf = state.poolFacets.find( pf => pf.pool == "presearch")
-         if (!psf) {
-            return filter
-         }
-         psf.facets.forEach( pf => {
-            pf.buckets.forEach( pb => {
-               if ( pb.selected) {
-                  let exist = filter.find( ef=> ef.facet_id == pf.id && ef.value == pb.value)
-                  if (!exist) {
-                     filter.push( {facet_id: pf.id, facet_name: pf.name, value: pb.value})
-                  }
-               }
-            })
-         })
-
          return filter
       },
 
@@ -248,13 +232,6 @@ const filters = {
          } else {
             let bucket = facetInfo.buckets.find( b=> b.value == data.value )
             bucket.selected = !bucket.selected
-            if (data.pool != "presearch") {
-               // when a pool changes a filter, keep presearch in sync
-               let prePfObj = state.poolFacets.find(pf => pf.pool == "presearch")
-               let preFacetInfo = prePfObj.facets.find(f => f.id === data.facetID)
-               let preBucket = preFacetInfo.buckets.find( b=> b.value == data.value )
-               preBucket.selected = bucket.selected
-            }
          }
       },
 
@@ -349,8 +326,30 @@ const filters = {
    },
 
    actions: {
+      promotePreSearchFilters(ctx) {
+         let psf = ctx.state.poolFacets.find( pf => pf.pool == "presearch")
+         ctx.rootState.pools.list.forEach( pool => {
+            let tgtPFObj = ctx.state.poolFacets.find( pf => pf.pool == pool.id)
+            if ( !tgtPFObj ) {
+               tgtPFObj = {pool: pool.id, facets: []}
+               ctx.state.poolFacets.push(tgtPFObj)
+            }
+            psf.facets.forEach( pf => {
+               pf.buckets.forEach( b => {
+                  if (b.selected) {
+                     let tgtFacet = tgtPFObj.facets.find( tf => tf.id == pf.id)
+                     if ( !tgtFacet ) {
+                        tgtFacet = {id: pf.id, name: pf.name, sort: pf.sort, type: pf.type, buckets: []}
+                        tgtPFObj.facets.push(tgtFacet)
+                     }
+                     tgtFacet.buckets.push({value: b.value, selected: true})
+                  }
+               })
+            })
+         })
+      },
+
       async getPreSearchFilters(ctx) {
-         console.log("GET PRESEARCH FILTERS")
          ctx.commit('setUpdatingFacets', true)
          let url = `${ctx.rootState.system.searchAPI}/api/filters`
          return axios.get(url).then((response) => {
@@ -374,8 +373,6 @@ const filters = {
             // this pool doesn't support facets; nothing more to do
             return
          }
-
-         console.log(`GET POOL ${pool.id} FILTERS`)
 
          let currFacets = ctx.getters.poolFacets(pool.id)
          if (currFacets.length > 0 && updateExisting == false) {
