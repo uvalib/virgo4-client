@@ -168,11 +168,13 @@ export default {
          let changed = false
          let newQ = Object.assign({}, this.$route.query)
          let queryStr = newQ.q
-         let idx0 = queryStr.indexOf(" AND filter:")
-         if ( idx0 > -1) {
-            delete newQ.q
-            newQ.q = queryStr.substring(0,idx0).trim()
-            changed = true
+         if ( queryStr) {
+            let idx0 = queryStr.indexOf(" AND filter:")
+            if ( idx0 > -1) {
+               delete newQ.q
+               newQ.q = queryStr.substring(0,idx0).trim()
+               changed = true
+            }
          }
 
          if (this.$route.query.scope || this.$route.query.pool || this.$route.query.exclude) {
