@@ -15,11 +15,11 @@ const filters = {
 
       // Global availability and hard-coded filter values
       globalAvailability: {id: "any", name: "All"},
-      availabilityFacet: {id: "FacetAvailability", name: "Availability",
+      availabilityFacet: {id: "FilterAvailability", name: "Availability",
          values: [{id: "any", name: "All"}, {id: "online", name: "Online"}, {id: "shelf", name: "On shelf"}]},
 
       // global circulating flag; set to TRUE to hide non-circulating items
-      circulatingFacet: {id: "FacetCirculating", name: "Hide items limited to in-Library use"},
+      circulatingFacet: {id: "FilterCirculating", name: "Hide items limited to in-Library use"},
       globalCirculating: false
    },
 
@@ -156,11 +156,7 @@ const filters = {
          filters.forEach( f => {
             // pre-search filter data format: { id,label,values: [{value,count}] }
             // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
-            // HACK: Currently pre/post search filterIDs are named differently (ex: FilterResourceType vs FacetResourceType).
-            // Make pre match post.... once names are aligned this goes away
-            let facetID = f.id
-            facetID = facetID.replace("Filter", "Facet")
-            let newF = {id: facetID, name: f.label, type: "", sort: "", buckets: []}
+            let newF = {id: f.id, name: f.label, type: "", sort: "", buckets: []}
             f.values.forEach( v => {
                newF.buckets.push( {selected: false, value: v.value, count: v.count} )
             })

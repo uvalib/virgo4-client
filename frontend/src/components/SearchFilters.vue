@@ -67,7 +67,7 @@ export default {
          let out = {}
          this.allFilters(this.selectedResults.pool.id).forEach(pf=>{
             let val = pf.value
-            if (pf.facet_id == "FacetCirculating") {
+            if (pf.facet_id == "FilterCirculating") {
                val = "Yes"
             }
             if ( Object.prototype.hasOwnProperty.call(out, pf.facet_name) == false ) {

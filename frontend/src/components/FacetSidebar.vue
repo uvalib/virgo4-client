@@ -139,7 +139,7 @@ export default {
       },
       facets() {
          let out = this.allFacets(this.selectedResults.pool.id)
-         return out.filter(f=>f.id != "FacetAvailability" && f.type != "boolean")
+         return out.filter(f=>f.id != "FilterAvailability" && f.type != "boolean")
       },
       availabilityOpts() {
          return [
