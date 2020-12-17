@@ -179,7 +179,7 @@ const filters = {
          let selected = []
          tgtFacets.forEach( f => {
             f.buckets.filter( b => b.selected == true).forEach( sb => {
-               selected.push(sb.value)
+               selected.push({id: f.id, value: sb.value})
             })
          })
 
@@ -190,7 +190,7 @@ const filters = {
 
             // if this is in the preserved selected items, select it and remove from saved list
             facet.buckets.forEach( fb => {
-               let idx = selected.findIndex( selVal => fb.value == selVal )
+               let idx = selected.findIndex( s => facet.id == s.id && fb.value == s.value )
                if ( idx > -1) {
                   fb.selected  = true
                   selected.splice(idx,1)
@@ -201,7 +201,7 @@ const filters = {
          if (selected.length > 0) {
             let notApplicable = {id: "NotApplicable", name: "Not Applicable", buckets: []}
             selected.forEach( s => {
-               notApplicable.buckets.push({value: s, selected: true, count: 0})
+               notApplicable.buckets.push({value: s.value, selected: true, count: 0})
             })
             tgtFacets.push(notApplicable)
          }
