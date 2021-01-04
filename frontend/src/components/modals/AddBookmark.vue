@@ -61,7 +61,8 @@ export default {
          selectedFolder: "",
          bookmarkError: "",
          showAdd: false,
-         newFolder: ""
+         newFolder: "",
+         bookmarkData: this.data,
       };
    },
    computed: {
@@ -107,8 +108,8 @@ export default {
                this.bookmarkError = "A bookmark folder name is required"
                return
             }
-            this.data.folder = this.newFolder
-            this.$store.dispatch("bookmarks/addBookmark", this.data).then( () => {
+            this.bookmarkData.folder = this.newFolder
+            this.$store.dispatch("bookmarks/addBookmark", this.bookmarkData).then( () => {
                this.$refs.addbmmodal.hide()
             }).catch((error) => {
                this.bookmarkError = error
@@ -118,9 +119,9 @@ export default {
                this.bookmarkError = "A bookmark folder selection is required"
                return
             }
-            this.data.folder = this.selectedFolder
-            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.data.identifier)
-            this.$store.dispatch("bookmarks/addBookmark", this.data).then( () => {
+            this.bookmarkData.folder = this.selectedFolder
+            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.bookmarkData.identifier)
+            this.$store.dispatch("bookmarks/addBookmark", this.bookmarkData).then( () => {
                this.$refs.addbmmodal.hide()
             }).catch((error) => {
                this.bookmarkError = error
