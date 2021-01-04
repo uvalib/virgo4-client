@@ -57,9 +57,9 @@
                                  @click="filterClicked(facetInfo.id, fv.value)">
                                  {{fv.value}}
                               </V4Checkbox>
-                              <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
+                              <span class="cnt">({{formatNum(fv.count)}})</span>
                            </dd>
-                           <dd v-if="facetInfo.buckets && facetInfo.buckets.length > 5" :key="moreKey(facetInfo.id)">
+                           <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
                               <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
                                  <template v-slot:title>
                                     <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
@@ -158,9 +158,13 @@ export default {
       formatNum(num) {
          return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
       },
+      facetValuesCount(facet) {
+         if (!facet.buckets) return 0
+         return facet.buckets.filter(b=>b.count > 0).length
+      },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.slice(start,end)
+         let out = facet.buckets.filter(b=>b.count > 0).slice(start,end)
          return out
       },
       moreKey(id) {

@@ -147,7 +147,6 @@ const filters = {
       setPreSearchFilters(state, filters) {
          // Clear out PRESEARCH filter only. Leave others alone because they
          // may have been restored from query params
-         console.log("IN setPreSearchFilters.. CLEAR ALL")
          let psfIdx = state.poolFacets.findIndex( pf => pf.pool == "presearch")
          if ( psfIdx > -1) {
             state.poolFacets.splice(psfIdx, 1)
