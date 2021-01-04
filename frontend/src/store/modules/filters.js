@@ -145,10 +145,13 @@ const filters = {
       },
 
       setPreSearchFilters(state, filters) {
-         // this happens pre-search, so throw out all existing facet info
-         // NOTE: There was loginc in the old query.js that attempted to preserve prior settings. Unsure
-         // if it is needed or not. Use git histor in query and look for setAdvancedFilterFields()
-         state.poolFacets.splice(0, state.poolFacets.length)
+         // Clear out PRESEARCH filter only. Leave others alone because they
+         // may have been restored from query params
+         console.log("IN setPreSearchFilters.. CLEAR ALL")
+         let psfIdx = state.poolFacets.findIndex( pf => pf.pool == "presearch")
+         if ( psfIdx > -1) {
+            state.poolFacets.splice(psfIdx, 1)
+         }
 
          // Place all of this data into a transient 'presearch' pool that can be
          // used to apply filters to any pool before search
