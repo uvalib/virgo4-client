@@ -12,15 +12,6 @@ const filters = {
    state: {
       poolFacets: [],
       updatingFacets: false,
-
-      // Global availability and hard-coded filter values
-      globalAvailability: {id: "any", name: "All"},
-      availabilityFacet: {id: "FilterAvailability", name: "Availability",
-         values: [{id: "any", name: "All"}, {id: "online", name: "Online"}, {id: "shelf", name: "On shelf"}]},
-
-      // global circulating flag; set to TRUE to hide non-circulating items
-      circulatingFacet: {id: "FilterCirculating", name: "Hide items limited to in-Library use"},
-      globalCirculating: false
    },
 
    getters: {
@@ -70,19 +61,6 @@ const filters = {
             pfObj = {pool: poolID, facets: []}
          }
          let filter = []
-
-         if (state.globalCirculating == true ) {
-            filter.push({facet_id: state.circulatingFacet.id,
-               // NOTE the value here is not used. Just the presense of this facet implies true
-               facet_name: state.circulatingFacet.name, value: ""})
-         }
-
-         if (state.globalAvailability.id != "any") {
-            let ga = state.availabilityFacet.values.find( af => af.id == state.globalAvailability.id)
-            filter.push({facet_id: state.availabilityFacet.id,
-               facet_name: state.availabilityFacet.name, value: ga.name})
-         }
-
          pfObj.facets.forEach( f => {
             if (f.id != "NotApplicable") {
                f.buckets.forEach( bucket => {
@@ -140,10 +118,6 @@ const filters = {
 
    mutations: {
       updateField,
-      setGlobalAvailability(state, avail) {
-         state.globalAvailability = avail
-      },
-
       setPreSearchFilters(state, filters) {
          // Clear out PRESEARCH filter only. Leave others alone because they
          // may have been restored from query params
@@ -187,9 +161,6 @@ const filters = {
 
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
-            // Availability/Circulation are global and handled differently; skip
-            if ( facet.id ==  state.availabilityFacet.id || facet.id == state.circulatingFacet.id) return
-
             // if this is in the preserved selected items, select it and remove from saved list
             facet.buckets.forEach( fb => {
                let idx = selected.findIndex( s => facet.id == s.id && fb.value == s.value )
@@ -242,8 +213,6 @@ const filters = {
          if (pfObj ) {
             pfObj.facets.splice(0, pfObj.facets.length)
          }
-         state.globalAvailability = {id: "any", name: "All"}
-         state.globalCirculating = false
 
          let pre = state.poolFacets.find( pf => pf.pool=="presearch")
          if (pre) {
@@ -258,9 +227,6 @@ const filters = {
       },
 
       reset(state) {
-         state.globalAvailability = {id: "any", name: "Any"}
-         state.globalCirculating = false
-
          console.log("reset filters")
          let pre = state.poolFacets.find( pf => pf.pool=="presearch")
          if (pre) {
@@ -291,30 +257,19 @@ const filters = {
          let decoded = decodeURIComponent(filterStr).trim()
          let filter =  JSON.parse( decoded )
          Object.keys( filter ).forEach( facetID => {
-            if (facetID == state.circulatingFacet.id) {
-               state.globalCirculating = true
-            } else if (facetID == state.availabilityFacet.id) {
-               let filterVal = filter[facetID][0]
-               state.availabilityFacet.values.forEach( af => {
-                  if (af.name  == filterVal) {
-                     state.globalAvailability = {id: af.id, name: filterVal}
-                  }
-               })
-            } else {
-               let facet = pfObj.facets.find(f => f.id == facetID)
-               if ( !facet ) {
-                  facet = {id: facetID, buckets: []}
-                  pfObj.facets.push( facet )
-               }
-               filter[facetID].forEach( filterVal => {
-                  let bucket = facet.buckets.find( b => b.value == filterVal)
-                  if (bucket) {
-                     bucket.selected = true
-                  } else {
-                     facet.buckets.push({value: filterVal, selected: true})
-                  }
-               })
+            let facet = pfObj.facets.find(f => f.id == facetID)
+            if ( !facet ) {
+               facet = {id: facetID, buckets: []}
+               pfObj.facets.push( facet )
             }
+            filter[facetID].forEach( filterVal => {
+               let bucket = facet.buckets.find( b => b.value == filterVal)
+               if (bucket) {
+                  bucket.selected = true
+               } else {
+                  facet.buckets.push({value: filterVal, selected: true})
+               }
+            })
          })
          if ( pfIdx > -1) {
             state.poolFacets.splice(pfIdx,1)
@@ -363,6 +318,7 @@ const filters = {
       // is search and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
       async getSelectedResultFacets(ctx, updateExisting) {
+         console.log("GET NEW FACETS")
          // Recreate the query for the target pool, but include a
          // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
@@ -392,6 +348,7 @@ const filters = {
          }
 
          let tgtURL = pool.url+"/api/search/facets"
+         console.log("GET NEW FACETS CALLING: "+tgtURL)
          ctx.commit('setUpdatingFacets', true)
          return axios.post(tgtURL, req).then((response) => {
             let facets = response.data.facet_list

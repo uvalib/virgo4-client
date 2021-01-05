@@ -1,39 +1,17 @@
 <template>
    <div class="facet-sidebar" :class="{overlay: !startExpanded}">
-      <div class="global" :class="{overlay: !startExpanded}">
-         <AccordionContent class="filter" :background="filterColor" id="global-filter"
-            borderColor="var(--uvalib-brand-blue)"
-            color="white" :expanded="startExpanded" :invert="!startExpanded">
-            <template v-slot:title>{{globalTitle}}</template>
-            <div v-if="hasFacets" class="body">
-               <dl role="radiogroup" aria-labelledby="availability_label">
-                  <dt id="availability_label">Availability</dt>
-                  <dd v-for="avail in availabilityOpts" :key="avail.id" class="radio-opt">
-                     <V4Button mode="icon" @click="availSelected(avail)" role="radio" :aria-checked="isAvailSelected(avail)">
-                        <i v-if="isAvailSelected(avail)" class="check fas fa-check-circle"></i>
-                        <i v-else class="check far fa-circle"></i>
-                        {{avail.name}}
-                     </V4Button>
-                  </dd>
-               </dl>
-               <div class="circulate">
-                  <V4Checkbox v-model="globalCirculating" @click="circFacetClicked">{{circulatingFacet.name}}</V4Checkbox>
-               </div>
-            </div>
-            <div v-else class="none">
-               This resource does not support filtering
-            </div>
-         </AccordionContent>
-      </div>
-
-      <div v-if="hasFacets" class="pool" :class="{overlay: !startExpanded}">
+      <div class="pool" :class="{overlay: !startExpanded}">
           <AccordionContent id="pool-filter" class="filter"
             :background="filterColor"
             color="white" :expanded="startExpanded"
             borderColor="var(--uvalib-brand-blue)"
             :layoutChange="updatingFacets"  :invert="!startExpanded">
             <template v-slot:title>{{poolFilterTitle}}</template>
-            <div class="body">
+
+            <div v-if="!hasFacets" class="none">
+               {{selectedResults.pool.name}} does not support filtering
+            </div>
+            <div v-else class="body">
                <div v-if="updatingFacets" class="working">
                   <V4Spinner message="Loading filters..."/>
                </div>
@@ -50,14 +28,14 @@
                         Peer Reviewed Only
                      </V4Checkbox>
                      <template v-else>
-                        <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
+                        <dt v-if="facetInfo.id != 'PeerReviewedOnly'" :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
                         <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
                            <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
                               <V4Checkbox :checked="fv.selected"
                                  @click="filterClicked(facetInfo.id, fv.value)">
                                  {{fv.value}}
                               </V4Checkbox>
-                              <span class="cnt">({{formatNum(fv.count)}})</span>
+                              <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
                            </dd>
                            <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
                               <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
@@ -89,7 +67,6 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import { mapFields } from "vuex-map-fields"
 import AccordionContent from "@/components/AccordionContent"
 export default {
    components: {
@@ -99,13 +76,7 @@ export default {
       ...mapState({
          results: state => state.results,
          updatingFacets: state => state.filters.updatingFacets,
-         globalAvailability: state => state.filters.globalAvailability,
-         circulatingFacet: state => state.filters.circulatingFacet,
          displayWidth: state => state.system.displayWidth,
-      }),
-      ...mapFields({
-         userSearched: 'query.userSearched',
-         globalCirculating: "filters.globalCirculating",
       }),
       ...mapGetters({
           allFacets: 'filters/poolFacets',
@@ -115,12 +86,6 @@ export default {
       }),
       hasFacets() {
          return this.facetSupport(this.selectedResults.pool.id)
-      },
-      globalTitle() {
-         if ( !this.startExpanded ) {
-            return "Filter Results"
-         }
-         return "Filter Results By"
       },
       filterColor() {
          if ( !this.startExpanded ) {
@@ -138,15 +103,7 @@ export default {
          return `Filter ${this.selectedResults.pool.name} By`
       },
       facets() {
-         let out = this.allFacets(this.selectedResults.pool.id)
-         return out.filter(f=>f.id != "FilterAvailability" && f.type != "boolean")
-      },
-      availabilityOpts() {
-         return [
-            {id: "any", name: "All"},
-            {id: "online", name: "Online"},
-            // {id: "shelf", name: "On Shelf Now"},
-         ]
+         return this.allFacets(this.selectedResults.pool.id)
       },
    },
    methods: {
@@ -156,15 +113,18 @@ export default {
          return false
       },
       formatNum(num) {
-         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+         if (num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+         }
+         return ""
       },
       facetValuesCount(facet) {
          if (!facet.buckets) return 0
-         return facet.buckets.filter(b=>b.count > 0).length
+         return facet.buckets.filter(b=>b.count > 0 || b.count == null).length
       },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.filter(b=>b.count > 0).slice(start,end)
+         let out = facet.buckets.filter(b=>b.count > 0 || b.count == null).slice(start,end)
          return out
       },
       moreKey(id) {
@@ -172,16 +132,6 @@ export default {
       },
       valueKey(idx, facetID) {
          return facetID+"_val_"+idx
-      },
-      async availSelected(avail) {
-         this.$store.commit("filters/setGlobalAvailability", avail)
-         this.userSearched = true
-         this.addFilterToURL()
-      },
-      async circFacetClicked() {
-         this.$store.commit("resetSearchResults")
-         this.userSearched = true
-         this.addFilterToURL()
       },
       addFilterToURL() {
          // changing the filter resetes paging
@@ -194,9 +144,6 @@ export default {
             query.filter = fqp
          }
          this.$router.push({ query })
-      },
-      isAvailSelected(avail) {
-         return this.globalAvailability.id == avail.id
       },
       filterClicked(facetID,value) {
          let data = {pool: this.selectedResults.pool.id, facetID: facetID, value: value}
@@ -222,14 +169,13 @@ export default {
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;
+   .pool {
+      box-shadow: $v4-box-shadow-light;
+   }
 }
 .peer-cb {
    padding: 3px 2px;
    margin-left: 15px;
-}
-.facet-sidebar .global, .facet-sidebar .pool {
-  box-shadow: $v4-box-shadow-light;
-  margin-bottom: 1rem;
 }
 .body {
    border-top: 0;
@@ -254,9 +200,6 @@ export default {
    justify-content: space-between;
    cursor: pointer;
 }
-i.global {
-   margin-right: 10px;
-}
 dl  {
    margin: 0;
    color: var(--uvalib-text-dark);
@@ -279,15 +222,6 @@ dd {
    margin-left: 15px;
    font-weight: normal;
 }
-dd.radio-opt {
-   cursor: pointer;
-   .v4-button {
-      cursor:pointer !important;
-   }
-   &:hover {
-      text-decoration: underline;
-   }
-}
 i.check {
    margin-right: 10px;
    color: var(--uvalib-text);
@@ -307,9 +241,6 @@ i.check {
    opacity: 0.9;
    font-size: 1.25em;
    font-weight: bold;
-}
-.global {
-   margin-bottom: 10px;
 }
 .expanded-item {
    padding: 3px 0;
@@ -342,12 +273,6 @@ i.check {
    align-items: flex-end;
    justify-content: space-between;
 }
-div.global.overlay {
-   margin: 0;
-   flex: 1 1 auto;
-   margin-right: 5px;
-   border: none;
-}
 div.pool.overlay {
    margin: 0;
    flex: 1 1 auto;
@@ -356,8 +281,6 @@ div.pool.overlay {
 div.pool.overlay .body {
    max-height: 450px;
    overflow: scroll;
-}
-div.pool.overlay .body,  div.global.overlay .body {
   box-shadow:  $v4-box-shadow-light;
 }
 span.cnt {
@@ -370,12 +293,6 @@ div.none {
    margin:25px 5px;
    font-size: 1.25em;
    color: var(--uvalib-text);
-}
-div.circulate {
-   border-top: 1px solid var(--uvalib-grey-light);
-   padding-top: 15px;
-   color: var(--uvalib-text);
-   margin: 15px 0 10px 15px;
 }
 </style>
 <style>

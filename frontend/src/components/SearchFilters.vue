@@ -27,15 +27,10 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from "vuex-map-fields"
 export default {
    computed: {
-      ...mapState({
-         updatingFacets: state => state.filters.updatingFacets,
-         availabilityFacet: state => state.filters.availabilityFacet,
-      }),
       ...mapGetters({
          allFilters: 'filters/poolFilter',
          notApplicableFilters: 'filters/notApplicableFilters',
@@ -67,9 +62,6 @@ export default {
          let out = {}
          this.allFilters(this.selectedResults.pool.id).forEach(pf=>{
             let val = pf.value
-            if (pf.facet_id == "FilterCirculating") {
-               val = "Yes"
-            }
             if ( Object.prototype.hasOwnProperty.call(out, pf.facet_name) == false ) {
                out[pf.facet_name] = [val]
             } else {
@@ -82,9 +74,6 @@ export default {
    methods: {
       formatValues(values) {
          let out = values.join(", ")
-         if (out == "On shelf") {
-            out = "On Shelf Now"
-         }
          return out
       },
       async clearClicked() {

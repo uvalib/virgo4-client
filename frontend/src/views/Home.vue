@@ -67,9 +67,6 @@ export default {
                   let t =  document.getElementsByClassName("suggestion")[0]
                   if ( t) {
                      t.focus()
-                  } else {
-                     t = document.getElementById("global-filter")
-                     t.focus()
                   }
                   this.$utils.scrollToItem(r)
                } else {
