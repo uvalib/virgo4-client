@@ -71,6 +71,7 @@ const query = {
          let qs = ""
          if (state.mode == "basic") {
             qs = `keyword: {${state.basic}}`
+            return qs
          }
 
          let terms = state.advanced

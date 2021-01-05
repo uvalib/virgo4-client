@@ -143,7 +143,6 @@ const filters = {
       },
 
       setPoolFacets(state, data) {
-         console.log(`set ${data.pool} facets`)
          // Get currently selected facets, then clear everything out
          // repopulate with data from API call, and restore prior selected state
          let tgtPFObj = state.poolFacets.find(pf => pf.pool == data.pool)
@@ -183,25 +182,8 @@ const filters = {
       toggleFilter(state, data) {
          let pfOj = state.poolFacets.find(pf => pf.pool == data.pool)
          let facetInfo = pfOj.facets.find(f => f.id === data.facetID)
-
-         if ( facetInfo.type == "radio") {
-            // only one value can be selected in radio buckets
-            // Radio facets may not be needed anymore with the peer reviewed facet changes
-            facetInfo.buckets.forEach( b=>{
-               if ( data.value) {
-                  if (b.value == data.value) {
-                     b.selected = true
-                  } else {
-                     b.selected = false
-                  }
-               } else {
-                  b.selected = !b.selected
-               }
-            })
-         } else {
-            let bucket = facetInfo.buckets.find( b=> b.value == data.value )
-            bucket.selected = !bucket.selected
-         }
+         let bucket = facetInfo.buckets.find( b=> b.value == data.value )
+         bucket.selected = !bucket.selected
       },
 
       setUpdatingFacets(state, flag) {
@@ -280,6 +262,7 @@ const filters = {
 
    actions: {
       promotePreSearchFilters(ctx) {
+         console.log("PROMOTE PRE-SEARCH FILTERS")
          let psf = ctx.state.poolFacets.find( pf => pf.pool == "presearch")
          ctx.rootState.pools.list.forEach( pool => {
             let tgtPFObj = ctx.state.poolFacets.find( pf => pf.pool == pool.id)
@@ -317,19 +300,14 @@ const filters = {
       // This is called from 3 different places: when all pools are search, when a specifi pool
       // is search and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
-      async getSelectedResultFacets(ctx, updateExisting) {
-         console.log("GET NEW FACETS")
+      async getSelectedResultFacets(ctx) {
          // Recreate the query for the target pool, but include a
          // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
          let pool = ctx.rootState.results[resultsIdx].pool
+         console.log("GET NEW FACETS FOR "+pool.id)
          if (!ctx.rootGetters['pools/facetSupport'](pool.id)) {
             // this pool doesn't support facets; nothing more to do
-            return
-         }
-
-         let currFacets = ctx.getters.poolFacets(pool.id)
-         if (currFacets.length > 0 && updateExisting == false) {
             return
          }
 
