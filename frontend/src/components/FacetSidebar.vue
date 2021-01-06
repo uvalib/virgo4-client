@@ -20,15 +20,7 @@
                </div>
                <dl v-else>
                   <template v-for="facetInfo in facets">
-                     <V4Checkbox v-if="facetInfo.id == 'PeerReviewedOnly'" class="peer-cb" ref="peercb"
-                        :checked="peerReviewOnly(facetInfo.buckets)"
-                        @click="filterClicked(facetInfo.id, 'Yes')"
-                        :key="`f${facetInfo.id}`"
-                     >
-                        Peer Reviewed Only
-                     </V4Checkbox>
-                     <template v-else>
-                        <dt v-if="facetInfo.id != 'PeerReviewedOnly'" :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
+                        <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
                         <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
                            <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
                               <V4Checkbox :checked="fv.selected"
@@ -55,7 +47,6 @@
                               </AccordionContent>
                            </dd>
                         </div>
-                     </template>
                   </template>
                </dl>
             </div>
@@ -107,11 +98,6 @@ export default {
       },
    },
    methods: {
-      peerReviewOnly( values ) {
-         let sel = values.find( v => v.selected == true)
-         if (sel) return sel.value == "Yes"
-         return false
-      },
       formatNum(num) {
          if (num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -172,10 +158,6 @@ export default {
    .pool {
       box-shadow: $v4-box-shadow-light;
    }
-}
-.peer-cb {
-   padding: 3px 2px;
-   margin-left: 15px;
 }
 .body {
    border-top: 0;
