@@ -5,6 +5,8 @@ import Vuex from 'vuex'
 
 import { getField, updateField } from 'vuex-map-fields'
 
+import analytics from '../../analytics'
+
 Vue.use(Vuex)
 
 const filters = {
@@ -184,6 +186,19 @@ const filters = {
          let facetInfo = pfOj.facets.find(f => f.id === data.facetID)
          let bucket = facetInfo.buckets.find( b=> b.value == data.value )
          bucket.selected = !bucket.selected
+         if ( bucket.selected ) {
+            if ( data.pool == "presearch") {
+               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_SET', `${data.facetID}:${data.value}`)
+            } else {
+               analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${data.facetID}:${data.value}`)
+            }
+         } else {
+            if ( data.pool == "presearch") {
+               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_REMOVED', `${data.facetID}:${data.value}`)
+            } else {
+               analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${data.facetID}:${data.value}`)
+            }
+         }
       },
 
       setUpdatingFacets(state, flag) {
