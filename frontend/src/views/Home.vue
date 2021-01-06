@@ -171,6 +171,12 @@ export default {
                delete newQ.q
                newQ.q = queryStr.substring(0,idx0).trim()
                changed = true
+               let f = queryStr.substring(idx0)
+               if ( f.indexOf("Special Collections") !== -1) {
+                  newQ.filter = '{"FilterCollection":["Special Collections"]}'
+               } else if ( f.indexOf("Libra Repository") !== -1) {
+                  newQ.filter = '{"FilterCollection":["Libra Repository"]}'
+               }
             }
          }
 
