@@ -102,7 +102,7 @@
             </div>
          </template>
       </div>
-      <Availability v-if="notFound == false" :titleId="details.identifier" />
+      <Availability v-if="hasAvailability(details.source) && notFound == false" :titleId="details.identifier" />
       <DigitalContent />
       <ShelfBrowse v-if="!details.searching && notFound == false" :hit="details" :pool="details.source" :target="browseTarget"/>
    </div>
@@ -162,7 +162,8 @@ export default {
          prevHitAvailable: 'prevHitAvailable',
          selectedHit: 'selectedHit',
          selectedResults: 'selectedResults',
-         itemMessage:  'pools/itemMessage'
+         itemMessage:  'pools/itemMessage',
+         hasAvailability:  'pools/hasAvailability'
       }),
       risURL() {
          if (this.citationsURL == "") return ""

@@ -18,13 +18,21 @@ const pools = {
             return 0
          })
       },
+      hasAvailability: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return false
+         let attr = pool.attributes.find( a=> a.name=='availability')
+         if (!attr) return false
+         return attr.supported
+      },
       itemMessage: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return ""
          if (!pool.attributes) return ""
          let attr = pool.attributes.find( a=> a.name=='item_message')
          if (!attr || attr && attr.supported == false) return ""
-         return attr.value
+         return attr.supported
       },
       facetSupport: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
