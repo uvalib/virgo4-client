@@ -38,7 +38,7 @@
                </li>
             </ul>
             <div v-else class="hits-content">
-               <div v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.identifier}`">
+               <div v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
                   <SearchHit :pool="selectedResults.pool.id" :count="hit.number" :hit="hit"/>
                </div>
             </div>

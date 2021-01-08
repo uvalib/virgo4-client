@@ -164,6 +164,15 @@ export default {
       mapLegacyQueries( token ) {
          let changed = false
          let newQ = Object.assign({}, this.$route.query)
+         if (newQ.filter) {
+            if (newQ.filter.indexOf("Facet") > -1) {
+               let f = newQ.filter
+               delete newQ.filter
+               let  fixed =  f.replace(/Facet/g, "Filter")
+               newQ.filter = fixed
+               changed = true
+            }
+         }
          let queryStr = newQ.q
          if ( queryStr) {
             let idx0 = queryStr.indexOf(" AND filter:")
@@ -176,6 +185,11 @@ export default {
                   newQ.filter = '{"FilterCollection":["Special Collections"]}'
                } else if ( f.indexOf("Libra Repository") !== -1) {
                   newQ.filter = '{"FilterCollection":["Libra Repository"]}'
+               }
+            } else {
+               let idx0 = queryStr.indexOf("filter:")
+               if ( idx0 == 0) {
+                  console.log("JUST A FILTER")
                }
             }
          }
@@ -197,9 +211,9 @@ export default {
                this.searchSources = mapping.pool
                if (mapping.filter != "all") {
                   if (newQ.filter) {
-                     newQ.filter = `${newQ.filter} AND {"FacetResourceType":["${mapping.filter}"]}`
+                     newQ.filter = `${newQ.filter} AND {"FilterResourceType":["${mapping.filter}"]}`
                   } else {
-                     newQ.filter = `{"FacetResourceType":["${mapping.filter}"]}`
+                     newQ.filter = `{"FilterResourceType":["${mapping.filter}"]}`
                   }
                }
                changed = true
@@ -210,6 +224,7 @@ export default {
             if ( token ) {
                this.updateSavedSearch(token, newQ)
             }
+            console.log("UPDATED: "+JSON.stringify(newQ))
             this.$router.replace({query: newQ})
          }
       },
