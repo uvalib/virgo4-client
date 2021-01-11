@@ -144,7 +144,8 @@ export default {
          // Load the search from the :token and restore it
          await this.$store.dispatch("query/loadSearch", token)
       }
-      this.mapLegacyQueries( token )
+
+      await this.mapLegacyQueries( token )
       await this.restoreSearchFromQueryParams(this.$route.query)
 
       let bmTarget = this.$store.getters['restore/bookmarkTarget']
@@ -161,57 +162,79 @@ export default {
    },
 
    methods: {
-      mapLegacyQueries( token ) {
+      async mapLegacyQueries( token ) {
          let changed = false
          let newQ = Object.assign({}, this.$route.query)
+
+         // always discard exclude param if it is present
+         if (newQ.exclude) {
+            delete newQ.exclude
+            changed = true
+         }
+
+         // Older filters were called Facet*... update name to Filter*
+         // and fix a completely new mapping: FacetCollection => FilterDigitalCollection
          if (newQ.filter) {
             if (newQ.filter.indexOf("Facet") > -1) {
                let f = newQ.filter
                delete newQ.filter
-               let  fixed =  f.replace(/Facet/g, "Filter")
+               let  fixed = f.replace("FacetCollection", "FilterDigitalCollection")
+               fixed =  fixed.replace(/Facet/g, "Filter")
                newQ.filter = fixed
                changed = true
             }
          }
+
          let queryStr = newQ.q
          if ( queryStr) {
             let idx0 = queryStr.indexOf(" AND filter:")
             if ( idx0 > -1) {
                delete newQ.q
-               newQ.q = queryStr.substring(0,idx0).trim()
                changed = true
+
+               newQ.q = queryStr.substring(0,idx0).trim()
                let f = queryStr.substring(idx0)
+               let newFilter =  ""
                if ( f.indexOf("Special Collections") !== -1) {
-                  newQ.filter = '{"FilterCollection":["Special Collections"]}'
+                  newFilter = '{"FilterCollection":["Special Collections"]}'
                } else if ( f.indexOf("Libra Repository") !== -1) {
-                  newQ.filter = '{"FilterCollection":["Libra Repository"]}'
+                  newFilter = '{"FilterCollection":["Libra Repository"]}'
+               }
+               if ( newQ.filter ) {
+                  newQ.filter = `{${newQ.filter.replace(/{|}/g, "")},${newFilter.replace(/{|}/g, "")}}`
+               } else {
+                  newQ.filter = newFilter
                }
             } else {
                let idx0 = queryStr.indexOf("filter:")
                if ( idx0 == 0) {
-                  console.log("JUST A FILTER")
+                  newQ.q = "keyword:{*}"
+                  let fStr = queryStr.replace(/filter:|{|}|\(|\)/g, "")
+                  fStr = `{"${fStr.split(":")[0]}":[${fStr.split(":")[1]}]}`
+                  newQ.filter = fStr
+                  changed = true
                }
             }
          }
 
-         if (this.$route.query.scope || this.$route.query.pool || this.$route.query.exclude) {
-
-            let oldSrc = newQ.scope
-            if (!oldSrc) {
-               oldSrc = newQ.pool
+         if (newQ.scope || newQ.pool ) {
+            let oldSrc = newQ.pool
+            if (!oldSrc ) {
+               oldSrc = newQ.scope
             }
+            delete newQ.scope
 
-            // look up a mpaaing from legacy v4 pool name to current pool name.
-            // this mapping may be one to one for current pools, or pools that didn't change
+            // look up a mapping from legacy v4 pool name to current pool name.
+            // this mapping may be one to one for current pools for pools that didn't change
             let mapping = this.poolMapping[oldSrc]
-            if (mapping && (newQ.pool != mapping.pool || newQ.scope || newQ.exclude) ) {
-               delete newQ.scope
-               delete newQ.exclude
+            console.log(`MAP ${oldSrc} TO ${JSON.stringify(mapping)}`)
+            if (mapping && (newQ.pool != mapping.pool) ) {
+
                newQ.pool = mapping.pool
-               this.searchSources = mapping.pool
                if (mapping.filter != "all") {
                   if (newQ.filter) {
-                     newQ.filter = `${newQ.filter} AND {"FilterResourceType":["${mapping.filter}"]}`
+                     let stripped = newQ.filter.replace(/{|}/g, "")
+                     newQ.filter = `{${stripped},"FilterResourceType":["${mapping.filter}"]}`
                   } else {
                      newQ.filter = `{"FilterResourceType":["${mapping.filter}"]}`
                   }
@@ -224,8 +247,16 @@ export default {
             if ( token ) {
                this.updateSavedSearch(token, newQ)
             }
-            console.log("UPDATED: "+JSON.stringify(newQ))
-            this.$router.replace({query: newQ})
+
+            // set set of sources searched to widest to ensure currect results shown
+            this.searchSources = "all"
+            if (newQ.pool == "images") {
+               this.searchSources = "images"
+            } else if (newQ.pool == "articles") {
+               this.searchSources = "articles"
+            }
+
+            await this.$router.replace({query: newQ})
          }
       },
 
