@@ -164,6 +164,35 @@ export default {
                return
             }
 
+            let badDate = false
+            this.advanced.filter( f=>f.field == "date").some( df => {
+               let dateStr = df.value
+               let parts = dateStr.split("-")
+               if (parts.length > 3) {
+                  badDate = true
+               } else {
+                  parts.forEach( (p,idx) => {
+                     if (idx == 0) {
+                        if ( p.match(/^\d{4}$/) == null ) {
+                           badDate = true
+                        }
+                     } else {
+                        if ( p.match(/^\d{2}$/) == null ) {
+                              badDate = true
+                        }
+                     }
+                  })
+               }
+               return badDate == true
+            })
+            if ( badDate ) {
+               this.$store.commit(
+                  "system/setSearchError",
+                  {message:"Dates must match one of the accepted formats: YYYY, YYYY-MM or YYYY-MM-DD"}
+               )
+               return
+            }
+
             // Refine search updates:
             // if pool, filter or sort were specified previously, preserve them in the URL.
             // a new search will always reset paging, so don't preserve that
