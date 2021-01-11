@@ -19,7 +19,7 @@
                   Filters are not available for this search
                </div>
                <dl v-else>
-                  <template v-for="facetInfo in facets">
+                  <template v-for="facetInfo in facets.filter( f=> f.hidden == false)">
                         <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
                         <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
                            <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">

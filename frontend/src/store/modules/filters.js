@@ -134,7 +134,7 @@ const filters = {
          filters.forEach( f => {
             // pre-search filter data format: { id,label,values: [{value,count}] }
             // POSTsearch filter format:      { id,name,type,sort, buckets: [{value,count,selected}] }
-            let newF = {id: f.id, name: f.label, type: "", sort: "", buckets: []}
+            let newF = {id: f.id, name: f.label, type: "", sort: "", hidden: f.hidden, buckets: []}
             f.values.forEach( v => {
                newF.buckets.push( {selected: false, value: v.value, count: v.count} )
             })
