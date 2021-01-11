@@ -125,7 +125,7 @@ export default {
       async otherSrcSelection (newVal, _oldVal) {
          if (newVal == "") return
          let tgtIdx = this.results.findIndex( r => r.pool.id == newVal.id )
-         if (tgtIdx > -1) {
+         if (tgtIdx > -1 && tgtIdx != this.selectedResultsIdx ) {
             await this.$store.dispatch("selectPoolResults", tgtIdx)
             let newPoolID = this.results[tgtIdx].pool.id
             if ( this.$route.query.pool != newPoolID ) {
@@ -179,12 +179,14 @@ export default {
          return values.join(", ")
       },
       async resultsButtonClicked(resultIdx) {
-         let r = this.results[resultIdx]
-         if ( this.poolFailed(r)) return
-         this.otherSrcSelection = {id:"", name:""}
-         await this.$store.dispatch("selectPoolResults", resultIdx)
-         this.updateURL( r.pool.id)
-         this.poolSelected(r.pool.id)
+         if ( this.selectedResultsIdx != resultIdx) {
+            let r = this.results[resultIdx]
+            if ( this.poolFailed(r)) return
+            this.otherSrcSelection = {id:"", name:""}
+            await this.$store.dispatch("selectPoolResults", resultIdx)
+            this.updateURL( r.pool.id)
+            this.poolSelected(r.pool.id)
+         }
       },
 
       poolSelected( id) {
