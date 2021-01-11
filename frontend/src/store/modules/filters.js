@@ -269,9 +269,10 @@ const filters = {
             })
          })
          if ( pfIdx > -1) {
-            state.poolFacets.splice(pfIdx,1)
+            state.poolFacets.splice(pfIdx,1, pfObj)
+         } else {
+            state.poolFacets.push(pfObj)
          }
-         state.poolFacets.push(pfObj)
       },
    },
 

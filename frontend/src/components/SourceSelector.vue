@@ -2,19 +2,27 @@
       <div class="src-targets">
          <label class="screen-reader-text">search mode:</label>
          <label for="search-all">
-            <input id="search-all" type="radio" v-model="searchSources" value="all" name="sources">
+            <input @click="sourcesClicked('all')" id="search-all" type="radio"
+               v-model="searchSources" value="all" name="sources"
+            >
             <span>Everything</span>
          </label>
          <label for="search-catalog">
-            <input id="search-catalog" type="radio" v-model="searchSources" value="uva_library" name="sources">
+            <input  @click="sourcesClicked('uva_library')" id="search-catalog" type="radio"
+               v-model="searchSources" value="uva_library" name="sources"
+            >
             <span>Catalog Only</span>
          </label>
          <label for="search-articles">
-            <input id="search-articles" type="radio" v-model="searchSources" value="articles" name="sources">
+            <input @click="sourcesClicked('articles')" id="search-articles" type="radio"
+               v-model="searchSources" value="articles" name="sources"
+            >
             <span>Articles Only</span>
          </label>
          <label for="search-images">
-            <input id="search-images" type="radio" v-model="searchSources" value="images" name="sources">
+            <input @click="sourcesClicked('images')" id="search-images" type="radio"
+               v-model="searchSources" value="images" name="sources"
+            >
             <span>Images Only</span>
          </label>
          <SearchTips v-if="mode=='basic'" />
@@ -40,9 +48,9 @@ export default {
         userSearched: 'query.userSearched',
       }),
    },
-   watch: {
-      searchSources() {
-         localStorage.setItem("v4SearchSources", this.searchSources)
+   methods: {
+      sourcesClicked( setting ) {
+         localStorage.setItem("v4SearchSources", setting)
          let query = Object.assign({}, this.$route.query)
          if (query.pool) {
             delete query.page
