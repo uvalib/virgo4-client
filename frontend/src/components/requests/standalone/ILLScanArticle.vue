@@ -60,8 +60,8 @@
          </div>
          <div class="entry pure-control-group">
             <label for="date">Need By Date<span class="required">*</span></label>
-            <input type="text" v-model="request.date" id="date" aria-required="true" required="required">
-            <span v-if="hasError('date')" class="error">Need by date is required</span>
+            <input type="date" v-model="request.date" id="date" aria-required="true" required="required" aria-placeholder="mm/dd/yyyy">
+            <span v-if="hasError('date')" class="error">Need by date is required and should use the format mm/dd/yyyy</span>
          </div>
          <div class="entry pure-control-group">
             <label for="notes">Notes or Special Instructions</label>
@@ -143,6 +143,11 @@ export default {
                this.errors.push(key)
             }
          }
+         let d = new Date(this.request.date).toLocaleDateString("en-US")
+         if ( d == "Invalid Date" ){
+            this.errors.push('date')
+         }
+
          if (this.errors.length > 0) {
             let tgtID = this.errors[0]
             if (tgtID == "anyLanguage") {

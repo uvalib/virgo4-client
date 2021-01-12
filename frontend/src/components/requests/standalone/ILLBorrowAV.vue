@@ -30,7 +30,7 @@
          </div>
          <div class="entry pure-control-group">
             <label for="date">Need By Date<span class="required">*</span></label>
-            <input type="text" v-model="request.date" id="date" aria-required="true" required="required">
+            <input type="date" v-model="request.date" id="date" aria-required="true" required="required" aria-placeholder="mm/dd/yyyy">
             <span v-if="hasError('date')" class="error">Need by date is required</span>
          </div>
          <div class="entry pure-control-group">
@@ -98,6 +98,10 @@ export default {
             if ( this.required.includes(key) && value == "") {
                this.errors.push(key)
             }
+         }
+         let d = new Date(this.request.date).toLocaleDateString("en-US")
+         if ( d == "Invalid Date" ){
+            this.errors.push('date')
          }
          if (this.errors.length > 0) {
             let tgtID = this.errors[0]

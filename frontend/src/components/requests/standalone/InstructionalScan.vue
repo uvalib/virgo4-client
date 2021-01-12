@@ -10,7 +10,7 @@
          </div>
          <div class="entry pure-control-group">
             <label for="date">Need By Date<span class="required">*</span></label>
-            <input type="text" v-model="request.date" id="date" aria-required="true" required="required">
+            <input type="date" v-model="request.date" id="date" aria-required="true" required="required" aria-placeholder="mm/dd/yyyy">
             <span v-if="hasError('date')" class="error">Date is required</span>
          </div>
          <div role="radiogroup" class="entry pure-control-group" aria-labelledby="personal-label">
@@ -200,6 +200,10 @@ export default {
             if ( this.required.includes(key) && value == "") {
                this.errors.push(key)
             }
+         }
+         let d = new Date(this.request.date).toLocaleDateString("en-US")
+         if ( d == "Invalid Date" ){
+            this.errors.push('date')
          }
          console.log(this.errors)
          if (this.errors.length > 0) {
