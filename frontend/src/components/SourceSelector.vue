@@ -53,15 +53,10 @@ export default {
          this.searchSources = setting
          localStorage.setItem("v4SearchSources", setting)
          let query = Object.assign({}, this.$route.query)
-         if (query.pool) {
-            delete query.page
-            delete query.pool
-            if ( this.searchSources != "all") {
-               query.pool = this.searchSources
-            }
-            this.userSearched = true
-            this.$router.push({ query })
-         }
+         delete query.page
+         delete query.pool
+         this.userSearched = true
+         this.$router.push({ query })
       },
    },
 }
