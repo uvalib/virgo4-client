@@ -415,7 +415,7 @@ export default {
             qp += `&sort=${priorQ.sort}`
          }
          this.userSearched = true
-         this.$router.push(`/search?${qp}`)
+         this.$router.push(`/search?${qp}`).catch(_err => {})
 
          let s = "SIGNED_OUT"
          if ( this.isSignedIn ) {
