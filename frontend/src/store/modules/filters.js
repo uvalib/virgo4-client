@@ -181,6 +181,7 @@ const filters = {
                tgtFacets.push(facet)
             }
          })
+
          if (selected.length > 0) {
             let notApplicable = {id: "NotApplicable", name: "Not Applicable", buckets: []}
             selected.forEach( s => {
@@ -217,23 +218,15 @@ const filters = {
       resetPoolFilters(state, pool) {
          let pfObj = state.poolFacets.find( pf => pf.pool == pool)
          if (pfObj ) {
-            pfObj.facets.splice(0, pfObj.facets.length)
-         }
-
-         let pre = state.poolFacets.find( pf => pf.pool=="presearch")
-         if (pre) {
-            pre.facets.forEach( f => {
+            pfObj.facets.forEach( f => {
                f.buckets.forEach(b => {
                   b.selected = false
                })
             })
-            state.poolFacets.splice(0, state.poolFacets.length)
-            state.poolFacets.push(pre)
          }
       },
 
       reset(state) {
-         console.log("reset filters")
          let pre = state.poolFacets.find( pf => pf.pool=="presearch")
          if (pre) {
             // if presearch filters exist, just flag them all as unselected instead of removing
