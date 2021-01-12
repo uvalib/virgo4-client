@@ -332,7 +332,10 @@ export default {
                // NOTE: immediately reset the user searched flag because searchAllPools may append &pool=something to
                // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
                // has changed. If userSearched is not reset, the search will run twice.
-               this.userSearched = false
+               if ( this.userSearched ) {
+                  this.$store.dispatch("searches/updateHistory")
+                  this.userSearched = false
+               }
                if (this.searchSources == "all") {
                   await this.$store.dispatch("searchAllPools")
                } else {

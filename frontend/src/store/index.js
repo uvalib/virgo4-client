@@ -460,7 +460,6 @@ export default new Vuex.Store({
             }
 
             commit('setSearching', false)
-            dispatch("searches/updateHistory")
             return dispatch("filters/getSelectedResultFacets")
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
