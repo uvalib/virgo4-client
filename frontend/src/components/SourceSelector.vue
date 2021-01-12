@@ -50,6 +50,7 @@ export default {
    },
    methods: {
       sourcesClicked( setting ) {
+         this.searchSources = setting
          localStorage.setItem("v4SearchSources", setting)
          let query = Object.assign({}, this.$route.query)
          if (query.pool) {
