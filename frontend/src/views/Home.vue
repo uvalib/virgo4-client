@@ -38,8 +38,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import SearchResults from "@/components/SearchResults"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch"
@@ -308,6 +307,8 @@ export default {
          oldFilterParam = this.filterQueryString(targetPool)
          if (query.filter) {
             this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
+         } else {
+            this.$store.commit("filters/resetPoolFilters", targetPool)
          }
 
          // If no sort detecetd, set it to the default relevance sort
@@ -321,14 +322,16 @@ export default {
 
          // If there is a query or filter in params it may be necessary to run a search
          if ( query.q || query.filter) {
+            // console.log(`Q: ${this.rawQueryString} vs ${oldQ}`)
+            // console.log(`F: ${this.filterQueryString(targetPool)} vs ${oldFilterParam}`)
+            // console.log(`S: ${this.activeSort} vs ${oldSort}`)
+            // console.log(`U: ${this.userSearched}`)
+
             // only re-run search when query, sort or filtering has changed
             if ( this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
                  this.activeSort != oldSort || this.userSearched == true ) {
                this.$store.commit("resetSearchResults")
-               // console.log(`Q: ${this.rawQueryString} vs ${oldQ}`)
-               // console.log(`F: ${this.filterQueryString(targetPool)} vs ${oldFilterParam}`)
-               // console.log(`S: ${this.activeSort} vs ${oldSort}`)
-               // console.log(`U: ${this.userSearched}`)
+
                // NOTE: immediately reset the user searched flag because searchAllPools may append &pool=something to
                // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
                // has changed. If userSearched is not reset, the search will run twice.
@@ -342,7 +345,7 @@ export default {
                   let p = this.poolDetails(this.searchSources)
                   await this.$store.dispatch("searchPool", {pool: p})
                }
-               this.$store.commit('setSearching', false)
+               this.$store.dispatch("filters/getSelectedResultFacets")
             }
 
             if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {

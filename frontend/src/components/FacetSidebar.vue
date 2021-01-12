@@ -56,8 +56,8 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
+import { mapState, mapGetters } from "vuex"
+import { mapFields } from 'vuex-map-fields'
 import AccordionContent from "@/components/AccordionContent"
 export default {
    components: {
@@ -74,6 +74,9 @@ export default {
           selectedResults: 'selectedResults',
           filterQueryParam: 'filters/asQueryParam',
           facetSupport: 'pools/facetSupport',
+      }),
+      ...mapFields({
+        userSearched: 'query.userSearched'
       }),
       hasFacets() {
          return this.facetSupport(this.selectedResults.pool.id)
@@ -138,11 +141,7 @@ export default {
       async toggleFacet(data) {
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("clearSelectedPoolResults")
-         let params = {
-            pool: this.selectedResults.pool,
-            page: this.selectedResults.page
-         }
-         await this.$store.dispatch("searchPool", params)
+         this.userSearched = true
          this.addFilterToURL()
       },
    }

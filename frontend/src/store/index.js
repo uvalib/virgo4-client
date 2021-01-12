@@ -460,7 +460,6 @@ export default new Vuex.Store({
             }
 
             commit('setSearching', false)
-            return dispatch("filters/getSelectedResultFacets")
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
@@ -523,7 +522,31 @@ export default new Vuex.Store({
          }
 
          let url = params.pool.url + "/api/search"
-         let response = await axios.post(url, req).catch((error) => {
+         await axios.post(url, req).then( response => {
+            if ( startPage == 0 ) {
+               // when single pool seach is called to start a search, pool is required in response.
+               let pool = rootState.pools.list.find( p => p.id == params.pool.id)
+               response.data.pool = pool
+            }
+
+            // Note: for pagination, filtering, etc, the existing pool results will be appended.
+            // if this is a direct single pool search, there will be no existing results. This call
+            // will create them.
+            commit('addPoolSearchResults', response.data)
+
+
+            commit('setSearching', false)
+            if (state.otherSrcSelection.id != "") {
+               commit('updateOtherPoolLabel')
+            }
+
+            // make sure the currently selected pool is always in URL
+            let query = Object.assign({}, router.currentRoute.query)
+            if (query.pool != rootGetters.selectedResults.pool.id) {
+               query.pool = rootGetters.selectedResults.pool.id
+               router.replace({ query })
+            }
+         }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)
             commit('filters/setUpdatingFacets', false)
@@ -537,32 +560,6 @@ export default new Vuex.Store({
                dispatch("system/reportError", error)
             }
          })
-
-         if ( startPage == 0 ) {
-            // when single pool seach is called to start a search, pool is required in response.
-            let pool = rootState.pools.list.find( p => p.id == params.pool.id)
-            response.data.pool = pool
-         }
-
-         // Note: for pagination, filtering, etc, the existing pool results will be appended.
-         // if this is a direct single pool search, there will be no existing results. This call
-         // will create them.
-         commit('addPoolSearchResults', response.data)
-
-
-         commit('setSearching', false)
-         if (state.otherSrcSelection.id != "") {
-            commit('updateOtherPoolLabel')
-         }
-
-         // make sure the currently selected pool is always in URL
-         let query = Object.assign({}, router.currentRoute.query)
-         if (query.pool != rootGetters.selectedResults.pool.id) {
-            query.pool = rootGetters.selectedResults.pool.id
-            router.replace({ query })
-         }
-
-         return dispatch("filters/getSelectedResultFacets")
       },
 
       // Select pool results and get all facet info for the result
