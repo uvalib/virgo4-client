@@ -15,7 +15,7 @@
                <div v-if="updatingFacets" class="working">
                   <V4Spinner message="Loading filters..."/>
                </div>
-               <div v-if="facets.length == 0" class="none">
+               <div v-if="facets.filter( f=> f.hidden !== true).length == 0" class="none">
                   Filters are not available for this search
                </div>
                <dl v-else>
