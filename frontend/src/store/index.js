@@ -572,7 +572,6 @@ export default new Vuex.Store({
             let data = {resultIdx: resultIdx, maxTabs: ctx.rootState.preferences.maxTabs }
             ctx.commit('selectPoolResults', data)
             ctx.commit('sort/setActivePool', ctx.state.results[ctx.state.selectedResultsIdx].pool.id)
-            await ctx.dispatch("filters/getSelectedResultFacets", null, { root: true })
          }
       },
    },

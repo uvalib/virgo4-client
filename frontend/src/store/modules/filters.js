@@ -152,6 +152,7 @@ const filters = {
             tgtPFObj = {pool: data.pool, facets: []}
             state.poolFacets.push(tgtPFObj)
          }
+         delete tgtPFObj.placeholder
          let tgtFacets = tgtPFObj.facets
          let selected = []
          tgtFacets.forEach( f => {
@@ -163,27 +164,21 @@ const filters = {
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
             // if this is in the preserved selected items, select it and remove from saved list
-            if ( facet.buckets) {
-               facet.buckets.forEach( fb => {
-                  let idx = selected.findIndex( s => facet.id == s.id && fb.value == s.value )
-                  if ( idx > -1) {
-                     fb.selected  = true
-                     selected.splice(idx,1)
-                  }
-               })
-            } else {
-               facet.buckets = []
-               selected.filter( s => s.id == facet.id).forEach( sb => {
-                  facet.buckets.push({value: sb.value, selected: true, count: 0})
-               })
-            }
+            facet.buckets.forEach( fb => {
+               let idx = selected.findIndex( s => facet.id == s.id && fb.value == s.value )
+               if ( idx > -1) {
+                  fb.selected  = true
+                  selected.splice(idx,1)
+               }
+            })
+
             if ( facet.buckets.length > 0) {
                tgtFacets.push(facet)
             }
          })
 
          if (selected.length > 0) {
-            let notApplicable = {id: "NotApplicable", name: "Not Applicable", buckets: []}
+            let notApplicable = {id: "NotApplicable", name: "Not Applicable", buckets: [], hidden: true}
             selected.forEach( s => {
                notApplicable.buckets.push({value: s.value, selected: true, count: 0})
             })
@@ -258,7 +253,7 @@ const filters = {
          Object.keys( filter ).forEach( facetID => {
             let facet = pfObj.facets.find(f => f.id == facetID)
             if ( !facet ) {
-               facet = {id: facetID, buckets: []}
+               facet = {id: facetID, buckets: [], placeholder: true}
                pfObj.facets.push( facet )
             }
             filter[facetID].forEach( filterVal => {
@@ -280,12 +275,11 @@ const filters = {
 
    actions: {
       promotePreSearchFilters(ctx) {
-         console.log("PROMOTE PRE-SEARCH FILTERS")
          let psf = ctx.state.poolFacets.find( pf => pf.pool == "presearch")
          ctx.rootState.pools.list.forEach( pool => {
             let tgtPFObj = ctx.state.poolFacets.find( pf => pf.pool == pool.id)
             if ( !tgtPFObj ) {
-               tgtPFObj = {pool: pool.id, facets: []}
+               tgtPFObj = {pool: pool.id, facets: [], placeholder: true}
                ctx.state.poolFacets.push(tgtPFObj)
             }
             psf.facets.forEach( pf => {
@@ -318,12 +312,11 @@ const filters = {
       // This is called from 3 different places: when all pools are search, when a specifi pool
       // is search and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
-      async getSelectedResultFacets(ctx) {
+      getSelectedResultFacets(ctx, paramsChanged) {
          // Recreate the query for the target pool, but include a
          // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
          let pool = ctx.rootState.results[resultsIdx].pool
-         console.log("GET NEW FACETS FOR "+pool.id)
          if (!ctx.rootGetters['pools/facetSupport'](pool.id)) {
             // this pool doesn't support facets; nothing more to do
             return
@@ -331,6 +324,16 @@ const filters = {
 
          let filters = ctx.getters.poolFilter(pool.id)
          let filterObj = {pool_id: pool.id, facets: filters}
+         if (paramsChanged == false) {
+            // check filter for either: no filters or placeholder filters (presearch promotions or restored from url)
+            let poolFacetObj = ctx.state.poolFacets.find( pf => pf.pool == pool.id)
+            if ( poolFacetObj ) {
+               if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
+                  console.log("Facets are current, do not refresh")
+                  return
+               }
+            }
+         }
 
          let req = {
             query: ctx.rootGetters['query/string'],
@@ -341,12 +344,12 @@ const filters = {
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: ctx.rootGetters['query/getState']}
             this.dispatch("system/reportError", err)
+            return
          }
 
          let tgtURL = pool.url+"/api/search/facets"
-         console.log("GET NEW FACETS CALLING: "+tgtURL)
          ctx.commit('setUpdatingFacets', true)
-         return axios.post(tgtURL, req).then((response) => {
+         axios.post(tgtURL, req).then((response) => {
             let facets = response.data.facet_list
             if (!facets) {
                facets = []

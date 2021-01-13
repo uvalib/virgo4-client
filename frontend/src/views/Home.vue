@@ -90,6 +90,7 @@ export default {
       ...mapState({
          searching: state => state.searching,
          searchMode: state => state.query.mode,
+         currentPool: state => state.query.targetPool,
          translateMessage: state => state.system.translateMessage,
          total: state=>state.total,
          restoreURL: state=>state.restore.url,
@@ -287,6 +288,7 @@ export default {
          let targetPool = "presearch"
          let oldFilterParam = ""
          let oldSort = ""
+         let poolChanged = (query.pool != this.currentPool)
          if ( query.pool ) {
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)
@@ -331,6 +333,7 @@ export default {
             if ( this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
                  this.activeSort != oldSort || this.userSearched == true ) {
                this.$store.commit("resetSearchResults")
+               let changed = this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam || this.userSearched == true
 
                // NOTE: immediately reset the user searched flag because searchAllPools may append &pool=something to
                // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
@@ -345,7 +348,11 @@ export default {
                   let p = this.poolDetails(this.searchSources)
                   await this.$store.dispatch("searchPool", {pool: p})
                }
-               this.$store.dispatch("filters/getSelectedResultFacets")
+               this.$store.dispatch("filters/getSelectedResultFacets", changed)
+            } else {
+               if (poolChanged) {
+                  this.$store.dispatch("filters/getSelectedResultFacets", false)
+               }
             }
 
             if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {
