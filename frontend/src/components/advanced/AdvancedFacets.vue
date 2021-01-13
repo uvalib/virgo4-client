@@ -22,7 +22,7 @@
                      <template v-slot:title>
                         <span :aria-label="`see more ${filterInfo.name} filters`">{{filterInfo.name}}</span>
                      </template>
-                     <div class="expanded-item" v-for="fv in filterInfo.buckets" :key="fv.value">
+                     <div class="expanded-item" v-for="fv in filterInfo.buckets.filter(f => f.value)" :key="fv.value">
                         <V4Checkbox :checked="fv.selected"
                            @click="filterClicked(filterInfo.id, fv.value)">
                            {{fv.value}}

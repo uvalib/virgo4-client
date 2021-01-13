@@ -109,11 +109,11 @@ export default {
       },
       facetValuesCount(facet) {
          if (!facet.buckets) return 0
-         return facet.buckets.filter(b=>b.count > 0 || b.count == null).length
+         return facet.buckets.filter(b=>(b.count > 0 || b.count == null)  && b.value ).length
       },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.filter(b=>b.count > 0 || b.count == null).slice(start,end)
+         let out = facet.buckets.filter(b=>(b.count > 0 || b.count == null) && b.value).slice(start,end)
          return out
       },
       moreKey(id) {
