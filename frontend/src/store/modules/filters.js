@@ -50,9 +50,11 @@ const filters = {
          if (!pfObj) return out
          if ( !pfObj.facets) return out
          pfObj.facets.filter( ff => ff.id == "NotApplicable").forEach( f => {
-            f.filters.forEach( naF => {
-               out.push({filter_id: naF.filter_id, value: naF.value})
-            })
+            if ( f.filters ) {
+               f.filters.forEach( naF => {
+                  out.push({filter_id: naF.filter_id, value: naF.value})
+               })
+            }
          })
          return out
       },
@@ -230,9 +232,12 @@ const filters = {
          let pfObj = state.poolFacets.find( pf => pf.pool == pool)
          if (pfObj ) {
             pfObj.facets.forEach( f => {
-               f.buckets.forEach(b => {
-                  b.selected = false
-               })
+               if ( f.buckets) {
+                  f.buckets.forEach(b => {
+                     b.selected = false
+                  })
+               }
+               delete f.filters
             })
          }
       },
