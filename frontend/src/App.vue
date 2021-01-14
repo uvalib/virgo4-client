@@ -6,6 +6,16 @@
              <MessageBox />
          </div>
       </transition>
+      <div class="covid-alert">
+         <span class="lead">COVID-19 Update: </span>
+         <span>
+            Check out the
+            <a href="https://www.library.virginia.edu/status" target="_blank">Status Dashboard</a>
+            for quick reference and
+            <a href="https://www.library.virginia.edu/news/covid-19/" target="_blank">Library Resources FAQ</a>
+            for details.
+         </span>
+      </div>
       <VirgoHeader :id="headerID" />
       <MenuBar :id="menuID"/>
       <main class="v4-content">
@@ -90,6 +100,28 @@ export default {
 </script>
 
 <style lang="scss">
+.covid-alert {
+   background-color: rgb(37, 202, 211);
+   text-align: center;
+   padding: 0.5em;
+   font-size: 1.06rem;
+   position: relative;
+   color: rgb(43, 43, 43);
+   font-family: franklin-gothic-urw, arial, sans-serif;
+   span {
+      font-size: 1em;
+      font-weight: 400;
+      a {
+         color: rgb(20, 30, 60);
+         text-decoration: underline !important;
+      }
+   }
+   .lead {
+      font-size: 1.15em;
+      font-weight: bold;
+        margin: 0px;
+   }
+}
 /* Color variable definitions */
 :root {
    /* OFFICIAL BRAND COLORS */
