@@ -237,7 +237,6 @@ const filters = {
                      b.selected = false
                   })
                }
-               delete f.filters
             })
          }
       },
