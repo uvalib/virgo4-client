@@ -20,9 +20,6 @@ const filters = {
       getField,
       asQueryParam:  (_state, getters) => (poolID) => {
          let filter = getters.poolFilter(poolID)
-         if (filter.length == 0) {
-            return ""
-         }
          let outObj = {}
          filter.forEach(f => {
             if (Object.prototype.hasOwnProperty.call(outObj, f.facet_id) == false) {
@@ -32,6 +29,15 @@ const filters = {
                outObj[f.facet_id].push(f.value)
             }
          })
+
+         let naFilter = getters.notApplicableFilters(poolID)
+         naFilter.forEach( naf => {
+            if (Object.prototype.hasOwnProperty.call(outObj, naf.facet_id) == false) {
+               outObj[naf.facet_id] = []
+            }
+            outObj[naf.facet_id].push(naf.value)
+         })
+
          let outStr = JSON.stringify(outObj)
          return outStr
       },
@@ -52,7 +58,7 @@ const filters = {
          pfObj.facets.filter( ff => ff.id == "NotApplicable").forEach( f => {
             if ( f.filters ) {
                f.filters.forEach( naF => {
-                  out.push({filter_id: naF.filter_id, value: naF.value})
+                  out.push({facet_id: naF.facet_id, value: naF.value})
                })
             }
          })
@@ -160,13 +166,20 @@ const filters = {
          tgtFacets.forEach( f => {
             if ( f.id != "NotApplicable") {
                f.buckets.filter( b => b.selected == true).forEach( sb => {
-                  selected.push({facet_id: f.id, value: sb.value})
+                  let existIdx = selected.findIndex( s => s.facet_id == f.id && s.value == sb.value)
+                  if (existIdx == -1) {
+                     selected.push({facet_id: f.id, value: sb.value})
+                  }
                })
             } else {
                // NA filters are stored a bit different... make sure they are included in the sel list too
                // as their status may changed based on the new query/filter
                f.filters.forEach( naF => {
-                  selected.push({facet_id: naF.facet_id, value: naF.value})
+                  // placeholder filters added from the URL may appear in selected and tgtFacets. dont add 2x.
+                  let existIdx = selected.findIndex( s => s.facet_id == naf.facet_id && s.value == naf.value)
+                  if (existIdx == -1) {
+                     selected.push({facet_id: naF.facet_id, value: naF.value})
+                  }
                })
             }
          })
