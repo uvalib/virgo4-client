@@ -69,6 +69,7 @@
          </div>
          <span v-if="sysError" class="error">{{sysError}}</span>
       </div>
+      <ILLCopyrightNotice></ILLCopyrightNotice>
       <div class="controls">
          <V4Button mode="primary" class="request-button" @click="submit" :disabled="buttonDisabled">Submit Request</V4Button>
       </div>
@@ -77,7 +78,9 @@
 <script>
 import { mapFields } from "vuex-map-fields"
 import { mapState } from "vuex"
+import ILLCopyrightNotice from '../ILLCopyrightNotice.vue';
 export default {
+   components: {ILLCopyrightNotice},
    data: () => {
       return {
          selectedItem: {},
@@ -203,6 +206,7 @@ export default {
       border-bottom: 1px solid var(--uvalib-grey-light);
    }
    .controls {
+      margin-top: 15px;
       text-align: right;
    }
    h2 {

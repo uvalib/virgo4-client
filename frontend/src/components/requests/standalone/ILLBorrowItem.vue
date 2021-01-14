@@ -196,6 +196,7 @@ h2 {
    font-size: 1.2em;
 }
 .scan {
+   padding: 0 5px;
    margin-bottom: 25px;
    border-bottom: 1px solid var(--uvalib-grey-light);
 
@@ -239,7 +240,7 @@ h2 {
    }
 }
 .controls {
-   margin: 10px 0;
+   margin: 10px 10px;
    text-align: right;
 }
 p.error {

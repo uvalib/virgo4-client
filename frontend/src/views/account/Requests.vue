@@ -7,10 +7,7 @@
          <div class="working" v-if="lookingUp">
             <V4Spinner message="Looking up requests..." />
          </div>
-         <template v-if="request" class="details">
-            <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
-         </template>
-         <div v-else class="details">
+         <div class="details">
             <h2>Make a New Request</h2>
             <div v-if="!isHSLUser" class="subcontent buttons">
                <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
@@ -24,6 +21,9 @@
             <div class="subcontent links">
                <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
             </div>
+
+            <component v-if="request" v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+
             <h2>Outstanding Requests</h2>
             <div class="subcontent">
                <template v-if="lookingUp == false && ilsError">
@@ -298,6 +298,9 @@ export default {
       margin: 10px 0 5px 0;
       font-size: 1.25em;
       border-bottom: 1px solid;
+   }
+   .form-panel {
+      border: 1px solid var(--uvalib-blue-alt);
    }
    .subcontent {
       margin-bottom: 0px;
