@@ -63,7 +63,6 @@ export default {
       },
       selections( filter ) {
          let out = filter.buckets.filter( c=> c.selected)
-         console.log("SEL: "+JSON.stringify(out))
          return out
       },
       async clearClicked() {
