@@ -11,7 +11,7 @@
          <template v-else>
             <dl class="filter-display" v-if="hasFilter">
                <template  v-for="(values, filter) in appliedFilters">
-                  <dt :key="filter" class="label">{{filter}}</dt>
+                  <dt :key="filter" class="label" v-show="filter != 'undefined'">{{filter}}</dt>
                   <dd :key="`${filter}-values`" class="label">
                      <span v-for="val in values" class="selected" :key="val">
                         <V4Button mode="icon" class="remove" @click="removeFilter(filter,val)"
