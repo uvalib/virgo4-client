@@ -69,7 +69,7 @@
             <span class="note">(ex: missing from shelf, color copies)</span>
          </div>
       </div>
-      <ILLCopyrightNotice></ILLCopyrightNotice>
+      <ILLCopyrightNotice type="research" />
       <div class="controls">
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel

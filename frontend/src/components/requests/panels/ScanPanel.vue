@@ -69,7 +69,7 @@
          </div>
          <span v-if="sysError" class="error">{{sysError}}</span>
       </div>
-      <ILLCopyrightNotice></ILLCopyrightNotice>
+      <ILLCopyrightNotice :type="scan.type === 'Article' ? 'research' : 'instruction' " />
       <div class="controls">
          <V4Button mode="primary" class="request-button" @click="submit" :disabled="buttonDisabled">Submit Request</V4Button>
       </div>
@@ -236,7 +236,7 @@ export default {
 }
 @media only screen and (max-width: 768px) {
    .request-scan {
-      max-width: 95%;
+      width: 95%;
    }
 }
 </style>
