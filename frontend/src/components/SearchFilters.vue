@@ -1,33 +1,53 @@
 <template>
    <div class="filters"  v-if="hasFacets">
-      <div class="filters-head clearfix">
-         <span class="title">Applied Filters</span>
-         <V4Button v-if="hasFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
-      </div>
-      <template v-if="hasFilter">
-         <dl class="filter-display">
-            <template v-for="(values,filter, idx) in displayFilter">
-               <template v-if="filter != 'undefined'">
-                  <template v-if="values.length > 1 || values.length == 1 && values[0]!='No'">
-                     <dt :key="filter" class="label">{{filter}}:</dt>
-                     <dd :key="idx" class="filter">{{formatValues(values)}}</dd>
-                  </template>
+      <div class="filters-section">
+         <div class="filters-head">
+            <span class="title">Applied Filters</span>
+            <V4Button v-if="hasFilter || hasNaFilters" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
+         </div>
+         <div class="no-filter working" v-if="updatingFacets">
+            Working...
+         </div>
+         <template v-else>
+            <dl class="filter-display" v-if="hasFilter">
+               <template  v-for="(values, filter) in appliedFilters">
+                  <dt :key="filter" class="label">{{filter}}</dt>
+                  <dd :key="`${filter}-values`" class="label">
+                     <span v-for="val in values" class="selected" :key="val">
+                        <V4Button mode="icon" class="remove" @click="removeFilter(filter,val)"
+                           :aria-label="`remove filter #{val}`">
+                           <i class="fas fa-times-circle"></i>{{val}}
+                        </V4Button>
+                     </span>
+                  </dd>
                </template>
-            </template>
-         </dl>
-         <dl class="filter-display" v-if="naFilters.length>0">
-            <dt class="label">Not Applicable:</dt>
-            <dd class="filter">{{formatNAFilters}}</dd>
-         </dl>
-      </template>
-      <div v-else class="no-filter">
-         <span>None</span>
+            </dl>
+            <div v-else class="no-filter">
+               <span>None</span>
+            </div>
+         </template>
       </div>
+
+      <div v-if="naFilters.length>0" class="filters-section">
+         <div class="filters-head">
+            <span class="title">Not Applicable Filters</span>
+         </div>
+         <div class="unsupported filter-display" >
+            <span v-for="naF in naFilters" class="selected" :key="`${naF.value}`">
+               <V4Button mode="icon" class="remove" @click="removeFilter('NotApplicable',naF.value)"
+                  :aria-label="`remove filter #{naf.value}`">
+                  <i class="fas fa-times-circle"></i>{{naF.value}}
+               </V4Button>
+            </span>
+         </div>
+      </div>
+
+
    </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
 export default {
    computed: {
@@ -35,7 +55,11 @@ export default {
          allFilters: 'filters/poolFilter',
          notApplicableFilters: 'filters/notApplicableFilters',
          selectedResults: 'selectedResults',
-         facetSupport: 'pools/facetSupport'
+         facetSupport: 'pools/facetSupport',
+         filterQueryParam: 'filters/asQueryParam',
+      }),
+      ...mapState({
+         updatingFacets: state => state.filters.updatingFacets,
       }),
       ...mapFields({
         userSearched: 'query.userSearched',
@@ -47,16 +71,9 @@ export default {
          return this.naFilters.join(", ")
       },
       hasFilter() {
-         return (this.allFilters(this.selectedResults.pool.id).length > 0 ||
-                 this.naFilters.length > 0)
+         return (this.allFilters(this.selectedResults.pool.id).length > 0)
       },
-      hasFacets() {
-         return this.facetSupport(this.selectedResults.pool.id)
-      },
-      total() {
-         return this.selectedResults.total
-      },
-      displayFilter() {
+      appliedFilters() {
          // display is grouped by facet, raw data is just a series of
          // facet_id/value pairs. Convert to display
          let out = {}
@@ -69,13 +86,41 @@ export default {
             }
          })
          return out
-      }
+      },
+      hasNaFilters() {
+         return this.naFilters.length > 0
+      },
+      hasFacets() {
+         return this.facetSupport(this.selectedResults.pool.id)
+      },
+      total() {
+         return this.selectedResults.total
+      },
    },
    methods: {
-      formatValues(values) {
-         let out = values.join(", ")
-         return out
+      removeFilter( facetName, value) {
+         this.userSearched = true
+         let query = Object.assign({}, this.$route.query)
+         delete query.page
+         delete query.filter
+         let data = {}
+
+         if ( facetName == "NotApplicable") {
+            data = {pool: this.selectedResults.pool.id, facetID: "NotApplicable", value: value}
+         } else {
+            let poolFilter = this.allFilters(this.selectedResults.pool.id)
+            let facet = poolFilter.find( pf => pf.facet_name == facetName)
+            data = {pool: this.selectedResults.pool.id, facetID: facet.facet_id, value: value}
+         }
+         this.$store.commit("filters/toggleFilter", data)
+         this.$store.commit("clearSelectedPoolResults")
+         let fqp = this.filterQueryParam( this.selectedResults.pool.id )
+         if (fqp) {
+            query.filter = fqp
+         }
+         this.$router.push({ query })
       },
+
       async clearClicked() {
          this.$store.commit("filters/resetPoolFilters", this.selectedResults.pool.id)
          let query = Object.assign({}, this.$route.query)
@@ -87,84 +132,62 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .filters {
    background: white;
    color: var(--uvalib-text);
    padding: 5px 5px 10px 5px;
    margin-top: 5px;
 }
-.filters-head {
-   font-weight: bold;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   margin-bottom: 5px;
-   padding-bottom: 10px;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
-}
-.filters-head button.v4-button {
-   margin-left: auto;
-}
-.no.filters-head  {
-   border-bottom: 0;
-   font-weight: normal;
-   margin: 0;
-   padding: 0;
-   font-size: 0.9em;
-   text-align: center;
-}
-@media only screen and (max-width: 768px) {
-  dl.filter-display {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 8px;
-  }
-}
-@media only screen and (min-width: 768px) {
-  dl.filter-display {
-    display: grid;
-    grid-template-columns: 0.3fr 1fr;
-    grid-gap: 2px;
-  }
-}
-.filter-display dt {
-   font-weight: bold;
-}
-.filter-display dd {
-  margin-inline-start: 0px;
-  align-self: center;
-}
-.filter-display {
-   margin-left: 10px;
-}
-.filters-head .title {
-   vertical-align: -webkit-baseline-middle;
-   padding-left: 10px;
-}
-.no-filter {
-   margin-left: 15px;
-}
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-.clear {
-   float: right;
-   margin-right: 6px;
-   cursor:pointer;
-}
-.remove-filter {
-   padding-right: 10px;
-   color: var(--uvalib-text);
-   cursor: pointer;
-}
-.remove-filter:hover {
-   opacity: 1;
-}
-i.warn {
-   margin-right: 5px;
-   color: var(--uvalib-yellow);
+.filters-section {
+   padding-bottom: 0px;
+   .filters-head {
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-flow: row wrap;
+      align-items: flex-start;
+      button.v4-button {
+         margin-left: auto;
+      }
+      .title {
+         vertical-align: -webkit-baseline-middle;
+         padding: 5px 10px;
+      }
+   }
+   .no-filter {
+      margin: 5px 0 5px 30px;
+      display: block;
+   }
+   .filter-display {
+      margin: 0 20px;
+      font-size: 0.9em;
+      dt {
+         font-weight: 500;
+      }
+      dd {
+         font-weight: normal;
+         margin: 5px 0 10px 20px;
+      }
+      .filter-sep {
+         margin: 0 8px 0 0;
+      }
+      .v4-button.remove {
+         border: 1px solid var(--uvalib-grey-light);
+         padding: 2px 15px 2px 3px;
+         border-radius: 10px;
+         margin-right: 10px;
+         cursor: pointer;
+         i {
+            margin-right: 10px;
+            color: var(--uvalib-red);
+         }
+         &:hover {
+            border: 1px solid var(--uvalib-grey);
+            text-decoration: underline;
+         }
+      }
+   }
 }
 </style>

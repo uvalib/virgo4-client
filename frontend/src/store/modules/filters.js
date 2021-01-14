@@ -50,8 +50,8 @@ const filters = {
          if (!pfObj) return out
          if ( !pfObj.facets) return out
          pfObj.facets.filter( ff => ff.id == "NotApplicable").forEach( f => {
-            f.buckets.forEach( nab => {
-               out.push(nab.value)
+            f.filters.forEach( naF => {
+               out.push({filter_id: naF.filter_id, value: naF.value})
             })
          })
          return out
@@ -145,7 +145,7 @@ const filters = {
       },
 
       setPoolFacets(state, data) {
-         // Get currently selected facets, then clear everything out
+         // Get currently selected facets (both valid and N/A), then clear everything out
          // repopulate with data from API call, and restore prior selected state
          let tgtPFObj = state.poolFacets.find(pf => pf.pool == data.pool)
          if (!tgtPFObj) {
@@ -156,16 +156,24 @@ const filters = {
          let tgtFacets = tgtPFObj.facets
          let selected = []
          tgtFacets.forEach( f => {
-            f.buckets.filter( b => b.selected == true).forEach( sb => {
-               selected.push({id: f.id, value: sb.value})
-            })
+            if ( f.id != "NotApplicable") {
+               f.buckets.filter( b => b.selected == true).forEach( sb => {
+                  selected.push({facet_id: f.id, value: sb.value})
+               })
+            } else {
+               // NA filters are stored a bit different... make sure they are included in the sel list too
+               // as their status may changed based on the new query/filter
+               f.filters.forEach( naF => {
+                  selected.push({facet_id: naF.facet_id, value: naF.value})
+               })
+            }
          })
 
          tgtFacets.splice(0, tgtFacets.length)
          data.facets.forEach( function(facet) {
             // if this is in the preserved selected items, select it and remove from saved list
             facet.buckets.forEach( fb => {
-               let idx = selected.findIndex( s => facet.id == s.id && fb.value == s.value )
+               let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
                if ( idx > -1) {
                   fb.selected  = true
                   selected.splice(idx,1)
@@ -178,9 +186,9 @@ const filters = {
          })
 
          if (selected.length > 0) {
-            let notApplicable = {id: "NotApplicable", name: "Not Applicable", buckets: [], hidden: true}
+            let notApplicable = {id: "NotApplicable", name: "Not Applicable", filters: [], hidden: true}
             selected.forEach( s => {
-               notApplicable.buckets.push({value: s.value, selected: true, count: 0})
+               notApplicable.filters.push({facet_id: s.facet_id, value: s.value})
             })
             tgtFacets.push(notApplicable)
          }
@@ -189,6 +197,14 @@ const filters = {
       toggleFilter(state, data) {
          let pfOj = state.poolFacets.find(pf => pf.pool == data.pool)
          let facetInfo = pfOj.facets.find(f => f.id === data.facetID)
+         if ( data.facetID == "NotApplicable") {
+            let idx = facetInfo.filters.findIndex( f=> f.value == data.value )
+            if (idx > -1)  {
+               facetInfo.filters.splice(idx,1)
+               analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${data.facetID}:${data.value}`)
+            }
+            return
+         }
          let bucket = facetInfo.buckets.find( b=> b.value == data.value )
          bucket.selected = !bucket.selected
          if ( bucket.selected ) {
