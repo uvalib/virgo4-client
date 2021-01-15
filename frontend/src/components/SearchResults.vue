@@ -24,7 +24,7 @@
                      <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
                         <span>
                            <span class="pool">{{r.pool.name}}</span>
-                           <span class="total">({{$utils.formatNum(r.total)}})</span>
+                           <span class="total">({{$utils.formatNum(r.total) || '0'}})</span>
                         </span>
                      </V4Button>
                   </template>
@@ -114,7 +114,7 @@ export default {
                name += "<span class='total'>Skipped</span>"
             } else {
                let t = this.$utils.formatNum(r.total)
-               name += `<span class='total'>(${t})</span>`
+               name += `<span class='total'>(${t || '0'})</span>`
             }
             name += "</span>"
             opts.push({id: r.pool.id, name: name})

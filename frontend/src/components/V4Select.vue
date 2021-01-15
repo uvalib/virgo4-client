@@ -267,21 +267,11 @@ button.v4-select:focus {
   margin:0;
 }
 
-@media only screen and (min-width: 768px) {
-   .v4-select .options.left  {
-      left: -1px;
-   }
-   .v4-select .options.right  {
-      left: -1px;
-   }
+.v4-select .options.left  {
+   left: -1px;
 }
-@media only screen and (max-width: 768px) {
-   .v4-select .options.left  {
-      left: -1px;
-   }
-   .v4-select .options.right  {
-      right: 0;
-   }
+.v4-select .options.right  {
+   right: 0;
 }
 .v4-select .option {
   align-items: stretch;
