@@ -27,7 +27,7 @@
                                  @click="filterClicked(facetInfo.id, fv.value)">
                                  {{fv.value}}
                               </V4Checkbox>
-                              <span class="cnt" v-if="fv.count">({{$utils.formatNum(fv.count)}})</span>
+                              <span class="cnt">({{$utils.formatNum(fv.count)}})</span>
                            </dd>
                            <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
                               <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
@@ -39,7 +39,7 @@
                                        @click="filterClicked(facetInfo.id, fv.value)">
                                        {{fv.value}}
                                     </V4Checkbox>
-                                    <span class="cnt" v-if="fv.count">({{$utils.formatNum(fv.count)}})</span>
+                                    <span class="cnt">({{$utils.formatNum(fv.count)}})</span>
                                  </div>
                                  <template v-slot:footer>
                                     <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
@@ -103,11 +103,11 @@ export default {
    methods: {
       facetValuesCount(facet) {
          if (!facet.buckets) return 0
-         return facet.buckets.filter(b=>(b.count > 0 || b.count == null)  && b.value ).length
+         return facet.buckets.filter(b=>b.value ).length
       },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.filter(b=>(b.count > 0 || b.count == null) && b.value).slice(start,end)
+         let out = facet.buckets.filter(b=> b.value).slice(start,end)
          return out
       },
       moreKey(id) {

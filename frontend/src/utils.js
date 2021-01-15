@@ -213,6 +213,9 @@ export function scrollToItem( tgtEle ) {
  }
 
 export function formatNum(num) {
+   if (num == 0) {
+      return "0"
+   }
    if (num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
    }
