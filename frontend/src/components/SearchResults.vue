@@ -5,7 +5,7 @@
          <div class="results-header">
             <template v-if="showSummary">
                <div id="search-summary" class="summary">
-                  <div class="query">Showing {{formatNum(total)}} results for:</div>
+                  <div class="query">Showing {{$utils.formatNum(total)}} results for:</div>
                   <div class="qs">{{queryString}}</div>
                </div>
                <span class="buttons">
@@ -24,7 +24,7 @@
                      <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
                         <span>
                            <span class="pool">{{r.pool.name}}</span>
-                           <span class="total">({{formatNum(r.total)}})</span>
+                           <span class="total">({{$utils.formatNum(r.total)}})</span>
                         </span>
                      </V4Button>
                   </template>
@@ -107,15 +107,16 @@ export default {
          })
 
          others.forEach( r=>{
-            let name = `<span class='pool'>${r.pool.name}</span>`
+            let name = `<span class='other-src'><span class='pool'>${r.pool.name}</span>`
             if (this.poolFailed(r)) {
                name += "<span class='total'>Failed</span>"
             } else if (this.wasPoolSkipped(r)) {
                name += "<span class='total'>Skipped</span>"
             } else {
-               let t = this.formatNum(r.total)
+               let t = this.$utils.formatNum(r.total)
                name += `<span class='total'>(${t})</span>`
             }
+            name += "</span>"
             opts.push({id: r.pool.id, name: name})
          })
          return opts
@@ -167,9 +168,6 @@ export default {
             this.$router.push({query})
          }
       },
-      formatNum(num) {
-         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      },
       poolFailed(p) {
          return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
       },
@@ -199,6 +197,20 @@ export default {
 
 
 <style scoped lang="scss">
+::v-deep .other-src {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
+   padding:0;
+   margin:0;
+   .total {
+      margin-left: auto;
+   }
+   .pool {
+      margin-right: 5px;
+   }
+}
 .results-main {
    display: inline-block;
    flex: 1 1 70%;

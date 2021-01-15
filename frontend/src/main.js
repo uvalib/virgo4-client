@@ -25,7 +25,7 @@ Vue.component('SignInRequired', SignInRequired)
 import analytics from './analytics'
 Vue.prototype.$analytics = analytics
 
-import * as utils from './store/modules/utils'
+import * as utils from './utils'
 Vue.prototype.$utils = utils
 
 import VueMoment from 'vue-moment';

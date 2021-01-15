@@ -9,9 +9,9 @@
             </div>
          </template>
       </div>
-      <div v-else tabindex="0" :aria-expanded="showFull.toString()" 
+      <div v-else tabindex="0" :aria-expanded="showFull.toString()"
             class="truncated-content" :id="`${id}-cut`"
-            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
+            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle"
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
       >
          <div :id="`${id}-list`" aria-live="polite">
@@ -70,7 +70,7 @@ export default {
          this.$nextTick( () => {
             let tgt = document.getElementById(this.id+"-cut")
             tgt.focus()
-            this.scrollToItem(tgt)
+            this.$utils.scrollToItem(tgt)
          })
       },
       toggle() {
@@ -79,21 +79,13 @@ export default {
              this.$nextTick( () => {
                let tgt = document.getElementById(this.id+"-cut")
                tgt.focus()
-               this.scrollToItem(tgt)
+               this.$utils.scrollToItem(tgt)
             })
          } else {
             let links = document.getElementsByClassName("link")
             links[0].focus()
          }
       },
-      scrollToItem( tgtEle ) {
-         let nav = document.getElementById("v4-navbar")
-         var headerOffset = nav.offsetHeight
-         var elementPosition = tgtEle.getBoundingClientRect().top
-         var offsetPosition = elementPosition - (headerOffset+15)
-         window.scrollBy({top: offsetPosition})
-      },
-
    }
 }
 </script>

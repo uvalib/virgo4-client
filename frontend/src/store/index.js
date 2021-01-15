@@ -18,7 +18,7 @@ import requests from './modules/requests'
 import searches from './modules/searches'
 import shelf from './modules/shelf'
 import sort from './modules/sort'
-import * as utils from './modules/utils'
+import * as utils from '../utils'
 import { getField, updateField } from 'vuex-map-fields'
 import router from '../router'
 

@@ -7,7 +7,7 @@
          <div tabindex="0" :aria-expanded="showFull.toString()"
             class="truncated-content"
             :class="{icon: mode=='icon'}"
-            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle" 
+            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle"
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
             <div  v-if="!showFull" :id="`${id}-cut`" class="truncated"  aria-live="polite" >
@@ -41,7 +41,7 @@ export default {
          default: 80
       },
       mode: {
-         type: String, 
+         type: String,
          default: "text"
       },
       id: {
@@ -80,7 +80,7 @@ export default {
          if (txt.length <= this.limit) return txt
          var trunc = txt.substr(0, this.limit-1)
          var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()
-         return out    
+         return out
       },
       stripTags(txt) {
          let regex = /(<([^>]+)>)/gi;
@@ -93,7 +93,7 @@ export default {
             let ele = document.getElementById( tgtID )
             if (ele) {
                ele.focus()
-               this.scrollToItem(ele)
+               this.$utils.scrollToItem(ele)
             }
          })
       },
@@ -108,17 +108,10 @@ export default {
             if (ele) {
                ele.focus()
                if (this.showFull == false) {
-                  this.scrollToItem(ele)
+                  this.$utils.scrollToItem(ele)
                }
             }
          })
-      },
-      scrollToItem( tgtEle ) {
-         let nav = document.getElementById("v4-navbar")
-         var headerOffset = nav.offsetHeight
-         var elementPosition = tgtEle.getBoundingClientRect().top
-         var offsetPosition = elementPosition - (headerOffset+15)
-         window.scrollBy({top: offsetPosition})
       },
    }
 }
@@ -141,7 +134,7 @@ export default {
    box-shadow: $v4-box-shadow;
    i {
       position: absolute;
-      right: 5px; 
+      right: 5px;
       top: 5px;
    }
 }
@@ -172,7 +165,7 @@ export default {
       }
       i {
          position: absolute;
-         right: 5px; 
+         right: 5px;
          top: 5px;
       }
    }
@@ -205,7 +198,7 @@ export default {
       font-size: 0.9em;
    }
    .more.icon  {
-       color: var( --uvalib-text);   
+       color: var( --uvalib-text);
        margin-left: 0px;
    }
    .more:hover, .less:hover {

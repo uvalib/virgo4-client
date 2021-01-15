@@ -27,7 +27,7 @@
                            @click="filterClicked(filterInfo.id, fv.value)">
                            {{fv.value}}
                         </V4Checkbox>
-                        <span class="cnt" v-if="fv.count">({{formatNum(fv.count)}})</span>
+                        <span class="cnt" v-if="fv.count">({{$utils.formatNum(fv.count)}})</span>
                      </div>
                   </AccordionContent>
                </template>
@@ -62,9 +62,6 @@ export default {
       },
    },
    methods: {
-      formatNum(num) {
-         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      },
       filterClicked(facetID, value) {
          let data = {pool: "presearch", facetID: facetID, value: value}
          this.$store.commit("filters/toggleFilter", data)

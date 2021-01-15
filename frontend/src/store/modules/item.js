@@ -1,5 +1,5 @@
 import axios from 'axios'
-import * as utils from './utils'
+import * as utils from '../../utils'
 import router from '../../router'
 
 const item = {

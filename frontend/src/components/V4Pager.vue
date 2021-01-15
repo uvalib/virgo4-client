@@ -4,7 +4,7 @@
          <i class="fas fa-arrow-left"></i>
       </V4Button>
       <span class="page-info">
-         {{formatNum(page)}} of {{formatNum(total)}}
+         {{$utils.formatNum(page)}} of {{$utils.formatNum(total)}}
       </span>
       <V4Button mode="small"  :disabled="!nextAvailable" @click="$emit('next')" aria-label="next result">
          <i class="fas fa-arrow-right"></i>
@@ -31,13 +31,6 @@ export default {
          type: Boolean,
          required: true
       }
-   },
-   computed: {
-   },
-   methods: {
-      formatNum(num) {
-         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      },
    },
 }
 </script>
