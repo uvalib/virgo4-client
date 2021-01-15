@@ -144,6 +144,13 @@ const query = {
          state.basic = ""
          state.advanced.splice(0, state.advanced.length)
 
+         // queries should be formatted like 'field: {...', but some older queries lack the field and braces
+         // look for these and turn them into a basic keyword seatch
+         if ( !queryParams.match(/^\w+:\s?{/) ) {
+            state.basic = queryParams
+            return
+         }
+
          while (queryParams.length > 0) {
             // A valid query has a field and term surrounded by { }. Find the braces...
             let braceIdx = queryParams.indexOf("{")
