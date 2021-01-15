@@ -176,7 +176,7 @@ const filters = {
                // as their status may changed based on the new query/filter
                f.filters.forEach( naF => {
                   // placeholder filters added from the URL may appear in selected and tgtFacets. dont add 2x.
-                  let existIdx = selected.findIndex( s => s.facet_id == naf.facet_id && s.value == naf.value)
+                  let existIdx = selected.findIndex( s => s.facet_id == naF.facet_id && s.value == naF.value)
                   if (existIdx == -1) {
                      selected.push({facet_id: naF.facet_id, value: naF.value})
                   }
