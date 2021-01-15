@@ -101,7 +101,26 @@ const query = {
    },
    mutations: {
       updateField,
+      fixDateSearches(state) {
+         state.advanced.filter( f => f.field == "date" && f.comparison == "BETWEEN").forEach( df => {
+            if ( df.value == "" && df.endVal != "") {
+               df.comparison = "BEFORE"
+            }
+            if ( df.value != "" && df.endVal == "") {
+               df.comparison = "AFTER"
+            }
+         })
+      },
+      resetAdvancedForm(state) {
+         state.advanced.splice(0, state.advanced.length)
+         state.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
+         state.advanced.push({ op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" })
+         state.advanced.push({ op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" })
+         state.advanced.push({ op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" })
+         state.advanced.push({ op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" })
+      },
       setTemplate(state, template) {
+         console.log("SET TEMPLATE")
          let hasQuery = false
          state.advanced.some( t => {
             if (t.value != "") {

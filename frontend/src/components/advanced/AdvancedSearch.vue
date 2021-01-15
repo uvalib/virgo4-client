@@ -145,7 +145,7 @@ export default {
             this.$store.commit("query/addWildcardCriteria")
          }
          if (this.queryEntered  ) {
-
+            this.$store.commit("query/fixDateSearches")
             let fields = this.advanced.filter( f=>f.value != "")
             if ( fields.length == 1 && fields[0].op == "NOT") {
                this.$store.commit(
@@ -155,17 +155,8 @@ export default {
                return
             }
 
-            let bad = this.advanced.filter( f=>f.comparison == "BETWEEN" && ((f.value == "" || f.endVal == "") && !(f.value == "" && f.endVal == "")))
-            if (bad.length > 0) {
-               this.$store.commit(
-                  "system/setSearchError",
-                  {message:"The BETWEEN operator requires both a start and end date."}
-               )
-               return
-            }
-
             let badDate = false
-            this.advanced.filter( f=>f.field == "date").some( df => {
+            this.advanced.filter( f=>f.field == "date" && f.value != "").some( df => {
                let dateStr = df.value
                let parts = dateStr.split("-")
                if (parts.length > 3) {
