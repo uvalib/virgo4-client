@@ -120,7 +120,6 @@ const query = {
          state.advanced.push({ op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" })
       },
       setTemplate(state, template) {
-         console.log("SET TEMPLATE")
          let hasQuery = false
          state.advanced.some( t => {
             if (t.value != "") {

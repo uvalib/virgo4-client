@@ -254,6 +254,8 @@ export default {
                this.searchSources = "images"
             } else if (newQ.pool == "articles") {
                this.searchSources = "articles"
+            } else if (newQ.pool == "uva_library") {
+               this.searchSources = "uva_library"
             }
 
             await this.$router.replace({query: newQ})
