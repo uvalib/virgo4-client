@@ -32,7 +32,7 @@ const pools = {
          if (!pool.attributes) return ""
          let attr = pool.attributes.find( a=> a.name=='item_message')
          if (!attr || attr && attr.supported == false) return ""
-         return attr.supported
+         return attr.value
       },
       facetSupport: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
