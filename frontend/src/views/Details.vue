@@ -102,8 +102,8 @@
             </div>
          </template>
       </div>
-      <Availability v-if="hasAvailability(details.source) && notFound == false" :titleId="details.identifier" />
       <DigitalContent />
+      <Availability v-if="hasAvailability(details.source) && notFound == false" :titleId="details.identifier" />
       <ShelfBrowse v-if="!details.searching && notFound == false" :hit="details" :pool="details.source" :target="browseTarget"/>
    </div>
 </template>
