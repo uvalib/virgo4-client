@@ -209,7 +209,7 @@ export default {
                let idx0 = queryStr.indexOf("filter:")
                if ( idx0 == 0) {
                   newQ.q = "keyword:{*}"
-                  let fStr = queryStr.replace(/filter:|{|}|\(|\)/g, "")
+                  let fStr = queryStr.replace(/filter:|{|}|\(|\)/g, "").trim()
                   fStr = `{"${fStr.split(":")[0]}":[${fStr.split(":")[1]}]}`
                   newQ.filter = fStr
                   changed = true
