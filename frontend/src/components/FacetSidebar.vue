@@ -27,7 +27,7 @@
                                  @click="filterClicked(facetInfo.id, fv.value)">
                                  {{fv.value}}
                               </V4Checkbox>
-                              <span class="cnt">({{$utils.formatNum(fv.count)}})</span>
+                              <span class="cnt" v-if="$utils.formatNum(fv.count)">({{$utils.formatNum(fv.count)}})</span>
                            </dd>
                            <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
                               <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
