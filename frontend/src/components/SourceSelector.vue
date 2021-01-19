@@ -7,9 +7,9 @@
             >
             <span>Everything</span>
          </label>
-         <label for="search-catalog">
+         <label for="search-catalog" name="sources" :class="{curr_scope: searchSources=='uva_library'}" >
             <input  @click="sourcesClicked('uva_library')" id="search-catalog" type="radio"
-               v-model="searchSources" value="uva_library" name="sources"
+               v-model="searchSources" value="uva_library"
             >
             <span>Catalog Only</span>
          </label>
@@ -50,14 +50,16 @@ export default {
    },
    methods: {
       sourcesClicked( setting ) {
-         this.searchSources = setting
-         localStorage.setItem("v4SearchSources", setting)
-         let query = Object.assign({}, this.$route.query)
-         if (query.q) {
-            delete query.page
-            delete query.pool
-            this.userSearched = true
-            this.$router.push({ query })
+         if ( this.searchSources  != setting ) {
+            this.searchSources = setting
+            localStorage.setItem("v4SearchSources", setting)
+            let query = Object.assign({}, this.$route.query)
+            if (query.q) {
+               delete query.page
+               delete query.pool
+               this.userSearched = true
+               this.$router.push({ query })
+            }
          }
       },
    },
@@ -90,6 +92,15 @@ export default {
       display: inline-block;
       width: 15px;
       height: 15px;
+   }
+   label.curr_scope {
+      cursor: default;
+      &:hover {
+         text-decoration: none;
+      }
+      input {
+         cursor: default;
+      }
    }
 }
 
