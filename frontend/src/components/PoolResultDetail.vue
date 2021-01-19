@@ -16,10 +16,20 @@
       </div>
       <template v-if="!searching">
          <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
-            <span>No results found</span>
-            <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
-               {{selectedResults.statusMessage}}
-            </p>
+            <div class="timeout" v-if="selectedResults.statusCode == 408">
+               <span>Search timed out</span>
+               <p class="note">
+                  Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
+                  If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> may be able to help.
+               </p>
+               <V4Button mode="primary" @click="retrySearch">Retry Search</V4Button>
+            </div>
+            <template v-else>
+               <span>No results found</span>
+               <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
+                  {{selectedResults.statusMessage}}
+               </p>
+            </template>
          </div>
          <div v-else class="hits">
             <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
@@ -81,6 +91,15 @@ export default {
       },
    },
    methods: {
+      async retrySearch() {
+         this.$store.commit("clearSelectedPoolResults")
+         let params = {
+            pool: this.selectedResults.pool,
+            page: this.selectedResults.page
+         }
+         await this.$store.dispatch("searchPool", params)
+         this.$store.dispatch("filters/getSelectedResultFacets", false)
+      },
       loadMoreResults() {
          if ( this.searching) return
 
