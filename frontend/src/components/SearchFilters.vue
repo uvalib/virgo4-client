@@ -13,10 +13,10 @@
                <template  v-for="(values, filter) in appliedFilters">
                   <dt :key="filter" class="label" v-show="filter != 'undefined'">{{filter}}</dt>
                   <dd :key="`${filter}-values`" class="label">
-                     <span v-for="val in values" class="selected" :key="val">
-                        <V4Button mode="icon" class="remove" @click="removeFilter(filter,val)"
+                     <span v-for="val in values" class="selected" :key="val.filter">
+                        <V4Button mode="icon" class="remove" @click="removeFilter(val)"
                            :aria-label="`remove filter #{val}`">
-                           <i class="fas fa-times-circle"></i>{{val}}
+                           <i class="fas fa-times-circle"></i>{{val.filter}}
                         </V4Button>
                      </span>
                   </dd>
@@ -28,13 +28,13 @@
          </template>
       </div>
 
-      <div v-if="naFilters.length>0" class="filters-section">
+      <div v-if="naFilters.length>0 && !updatingFacets" class="filters-section">
          <div class="filters-head">
             <span class="title">Not Applicable Filters</span>
          </div>
          <div class="unsupported filter-display" >
             <span v-for="naF in naFilters" class="selected" :key="`${naF.value}`">
-               <V4Button mode="icon" class="remove" @click="removeFilter('NotApplicable',naF.value)"
+               <V4Button mode="icon" class="remove" @click="removeFilter({facet:'NotApplicable', filter: naF.value})"
                   :aria-label="`remove filter #{naf.value}`">
                   <i class="fas fa-times-circle"></i>{{naF.value}}
                </V4Button>
@@ -79,11 +79,11 @@ export default {
          let out = {}
          this.allFilters(this.selectedResults.pool.id).forEach(pf=>{
             let val = pf.value
-            if ( Object.prototype.hasOwnProperty.call(out, pf.facet_name) == false ) {
-               out[pf.facet_name] = [val]
-            } else {
-               out[pf.facet_name].push(val)
+            let facetName = pf.facet_name
+            if ( Object.prototype.hasOwnProperty.call(out, facetName) == false ) {
+               out[facetName] = []
             }
+            out[facetName].push( {facet: pf.facet_id, filter: val} )
          })
          return out
       },
@@ -98,20 +98,14 @@ export default {
       },
    },
    methods: {
-      removeFilter( facetName, value) {
+      removeFilter( value) {
          this.userSearched = true
          let query = Object.assign({}, this.$route.query)
          delete query.page
          delete query.filter
          let data = {}
 
-         if ( facetName == "NotApplicable") {
-            data = {pool: this.selectedResults.pool.id, facetID: "NotApplicable", value: value}
-         } else {
-            let poolFilter = this.allFilters(this.selectedResults.pool.id)
-            let facet = poolFilter.find( pf => pf.facet_name == facetName)
-            data = {pool: this.selectedResults.pool.id, facetID: facet.facet_id, value: value}
-         }
+         data = {pool: this.selectedResults.pool.id, facetID: value.facet, value: value.filter}
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("clearSelectedPoolResults")
          let fqp = this.filterQueryParam( this.selectedResults.pool.id )
