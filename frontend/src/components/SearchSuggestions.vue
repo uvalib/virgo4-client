@@ -6,7 +6,7 @@
          <div class="searches">
             <template v-for="(s,idx) in suggestions.slice(0,2)">
                <span class="sep" v-if="idx > 0" :key="`sep${idx}`">|</span>
-               <router-link @mousedown.native="suggestionClick"
+               <router-link @mousedown.native="suggestionClick(s.value)"
                   class="suggestion" :key="`s${idx}`"
                   :aria-label="linkLabel(s)"
                   :to="getRelatedLink(s)"
@@ -21,7 +21,10 @@
             <template  v-if="suggestions.length > 2 && moreVisible == true">
                <template v-for="(s,idx) in suggestions.slice(2)">
                   <span class="sep" :key="`sep${idx+2}`">|</span>
-                  <router-link class="suggestion" :aria-label="linkLabel(s)" :key="`s${idx+2}`" :to="getRelatedLink(s)">
+                  <router-link  @mousedown.native="suggestionClick(s.value)"
+                     class="suggestion" :aria-label="linkLabel(s)" :key="`s${idx+2}`"
+                     :to="getRelatedLink(s)"
+                  >
                      {{s.value}}
                   </router-link>
                </template>
@@ -56,8 +59,9 @@ export default {
       }),
    },
    methods: {
-      suggestionClick() {
+      suggestionClick(val) {
          this.userSearched = true
+         this.$analytics.trigger('Results', 'AUTHOR_SUGGEST_CLICKED', val)
       },
       linkLabel(sug) {
          return `${sug.value}, suggested author related to your search`
