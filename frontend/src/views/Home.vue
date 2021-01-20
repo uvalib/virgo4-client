@@ -257,8 +257,18 @@ export default {
             } else if (newQ.pool == "uva_library") {
                this.searchSources = "uva_library"
             }
-
             await this.$router.replace({query: newQ})
+         } else {
+            if ( this.userSearched == false ) {
+               this.searchSources = "all"
+               if (newQ.pool == "images") {
+                  this.searchSources = "images"
+               } else if (newQ.pool == "articles") {
+                  this.searchSources = "articles"
+               } else if (newQ.pool == "uva_library") {
+                  this.searchSources = "uva_library"
+               }
+            }
          }
       },
 
