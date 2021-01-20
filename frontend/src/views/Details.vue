@@ -152,6 +152,7 @@ export default {
          selectedHitIdx: state=> state.selectedHitIdx,
          lastSearchURL: state => state.lastSearchURL,
          poolMapping: state=>state.system.poolMapping,
+         searchAPI: state=>state.system.searchAPI,
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
@@ -231,6 +232,9 @@ export default {
          this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
       },
       async getDetails() {
+         if (this.searchAPI == "") {
+            await this.$store.dispatch("system/getConfig", null, {root:true})
+         }
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
          let id = this.$route.params.id
