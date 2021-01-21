@@ -12,6 +12,9 @@
     <p v-if="canLeoMobile"><a target="_blank" href="http://library.virginia.edu/services/pickup">Learn more about options for Paging and Pickup.</a></p>
 
     <label for="pickup-sel">Preferred pickup location:
+     <transition name="fade" v-on:after-enter="showSaved = false">
+       <span v-if="showSaved" class="success">  Saved</span>
+     </transition>
       <V4Select id="pickup-sel" v-model="pickupLibrary" :selections="librariesForUser"
         pad="5px 10px" :attached="false"
         @changed="update"
@@ -24,6 +27,11 @@
 import { mapFields } from 'vuex-map-fields'
 import { mapGetters } from "vuex"
 export default {
+  data: ()=>{
+    return {
+      showSaved: false
+    }
+  },
   computed: {
     ...mapFields({
         pickupLibrary: 'preferences.pickupLibrary',
@@ -35,7 +43,7 @@ export default {
   },
   methods: {
     update() {
-      this.$store.dispatch("preferences/savePreferences")
+      this.$store.dispatch("preferences/savePreferences").then(()=>{this.showSaved = true})
     },
   },
   mounted: function(){
@@ -59,8 +67,18 @@ export default {
   }
   #pickup-sel{
     width: fit-content;
-    display: inline-flex;
     margin-bottom: 30px;
   }
+  .success {
+    color: var(--uvalib-green-dark);
+  }
+
+  .fade-leave-active {
+    transition: all 1s ease-in 1s;
+  }
+  .fade-enter {
+    opacity: 1;
+  }
+
 }
 </style>

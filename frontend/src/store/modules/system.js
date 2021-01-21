@@ -29,6 +29,7 @@ const system = {
       locationCodes: [],
       libraryCodes: [],
       pickupLibraries: [
+         // logic to add Brown after 2021-2-1 in user.js, enable permanently here after that date
          //{id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'},
          {id: 'CLEMONS', name: 'Clemons'},
       ],
