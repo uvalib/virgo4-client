@@ -346,9 +346,12 @@ const filters = {
       // is search and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
       getSelectedResultFacets(ctx, paramsChanged) {
-         // Recreate the query for the target pool, but include a
-         // request for ALL facet info
          let resultsIdx = ctx.rootState.selectedResultsIdx
+         if ( resultsIdx == -1) {
+            // no results/pool selected. do nothing!
+            return
+         }
+
          let pool = ctx.rootState.results[resultsIdx].pool
          if (!ctx.rootGetters['pools/facetSupport'](pool.id)) {
             // this pool doesn't support facets; nothing more to do
@@ -368,6 +371,7 @@ const filters = {
             }
          }
 
+         // Recreate the query for the target pool, but include a request for ALL facet info
          let req = {
             query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
