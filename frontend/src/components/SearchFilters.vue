@@ -1,5 +1,5 @@
 <template>
-   <div class="filters"  v-if="hasFacets">
+   <div class="filters">
       <div class="filters-section">
          <div class="filters-head">
             <span class="title">Applied Filters</span>
@@ -67,9 +67,6 @@ export default {
       naFilters() {
          return this.notApplicableFilters(this.selectedResults.pool.id)
       },
-      formatNAFilters() {
-         return this.naFilters.join(", ")
-      },
       hasFilter() {
          return (this.allFilters(this.selectedResults.pool.id).length > 0)
       },
@@ -89,12 +86,6 @@ export default {
       },
       hasNaFilters() {
          return this.naFilters.length > 0
-      },
-      hasFacets() {
-         return this.facetSupport(this.selectedResults.pool.id)
-      },
-      total() {
-         return this.selectedResults.total
       },
    },
    methods: {
@@ -163,9 +154,6 @@ export default {
       dd {
          font-weight: normal;
          margin: 5px 0 10px 20px;
-      }
-      .filter-sep {
-         margin: 0 8px 0 0;
       }
       .v4-button.remove {
          border: 1px solid var(--uvalib-grey-light);

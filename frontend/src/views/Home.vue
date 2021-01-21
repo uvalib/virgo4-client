@@ -260,7 +260,6 @@ export default {
             await this.$router.replace({query: newQ})
          } else {
             if ( this.userSearched == false ) {
-               this.searchSources = "all"
                if (newQ.pool == "images") {
                   this.searchSources = "images"
                } else if (newQ.pool == "articles") {
@@ -300,7 +299,7 @@ export default {
          let targetPool = "presearch"
          let oldFilterParam = ""
          let oldSort = ""
-         let poolChanged = (query.pool != this.currentPool)
+         let poolChanged = (query.pool && query.pool != this.currentPool)
          if ( query.pool ) {
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)

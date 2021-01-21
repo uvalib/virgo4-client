@@ -353,11 +353,6 @@ const filters = {
          }
 
          let pool = ctx.rootState.results[resultsIdx].pool
-         if (!ctx.rootGetters['pools/facetSupport'](pool.id)) {
-            // this pool doesn't support facets; nothing more to do
-            return
-         }
-
          let filters = ctx.getters.poolFilter(pool.id)
          let filterObj = {pool_id: pool.id, facets: filters}
          if (paramsChanged == false) {
