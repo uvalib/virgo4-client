@@ -35,7 +35,9 @@ const filters = {
             if (Object.prototype.hasOwnProperty.call(outObj, naf.facet_id) == false) {
                outObj[naf.facet_id] = []
             }
-            outObj[naf.facet_id].push(naf.value)
+            if ( outObj[naf.facet_id].indexOf(naf.value) == -1) {
+               outObj[naf.facet_id].push(naf.value)
+            }
          })
 
          let outStr = JSON.stringify(outObj)
@@ -185,7 +187,7 @@ const filters = {
          })
 
          tgtFacets.splice(0, tgtFacets.length)
-         data.facets.forEach( function(facet) {
+         data.facets.forEach( facet => {
             // if this is in the preserved selected items, select it and remove from saved list
             facet.buckets.forEach( fb => {
                let idx = selected.findIndex( s => facet.id == s.facet_id && fb.value == s.value )
@@ -294,7 +296,18 @@ const filters = {
                if (bucket) {
                   bucket.selected = true
                } else {
-                  facet.buckets.push({value: filterVal, selected: true})
+                  // not in normal facet list, see if it is N/A list
+                  let add = true
+                  let naF = pfObj.facets.find(f => f.id == "NotApplicable")
+                  if ( naF ) {
+                     if (naF.filters.find( b => b.value == filterVal)) {
+                        add = false
+                     }
+                  }
+
+                  if (add) {
+                     facet.buckets.push({value: filterVal, selected: true})
+                  }
                }
             })
          })
@@ -348,7 +361,9 @@ const filters = {
       getSelectedResultFacets(ctx, paramsChanged) {
          let resultsIdx = ctx.rootState.selectedResultsIdx
          if ( resultsIdx == -1) {
-            // no results/pool selected. do nothing!
+            return
+         }
+         if ( ctx.state.updatingFacets) {
             return
          }
 
@@ -371,8 +386,7 @@ const filters = {
             query: ctx.rootGetters['query/string'],
             pagination: { start: 0, rows: 0 },
             filters: [filterObj]
-          }
-
+         }
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: ctx.rootGetters['query/getState']}
             this.dispatch("system/reportError", err)
