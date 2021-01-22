@@ -109,7 +109,7 @@ export default {
          others.forEach( r=>{
             let name = `<span class='other-src'><span class='pool'>${r.pool.name}</span>`
             if (this.poolFailed(r)) {
-               name += "<span class='total'>Failed</span>"
+               name += "<span class='total error'>Failed</span>"
             } else if (this.wasPoolSkipped(r)) {
                name += "<span class='total'>Skipped</span>"
             } else {
@@ -206,6 +206,10 @@ export default {
    margin:0;
    .total {
       margin-left: auto;
+   }
+   .total.error {
+      color: var(--uvalib-red-emergency);
+      font-weight: bold;
    }
    .pool {
       margin-right: 5px;

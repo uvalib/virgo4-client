@@ -451,14 +451,6 @@ export default new Vuex.Store({
             if (state.otherSrcSelection.id != "") {
                commit('updateOtherPoolLabel')
             }
-
-            // make sure the currently selected pool is always in URL
-            let query = Object.assign({}, router.currentRoute.query)
-            if (query.pool != rootGetters.selectedResults.pool.id) {
-               query.pool = rootGetters.selectedResults.pool.id
-               router.replace({ query })
-            }
-
             commit('setSearching', false)
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
@@ -538,13 +530,6 @@ export default new Vuex.Store({
             commit('setSearching', false)
             if (state.otherSrcSelection.id != "") {
                commit('updateOtherPoolLabel')
-            }
-
-            // make sure the currently selected pool is always in URL
-            let query = Object.assign({}, router.currentRoute.query)
-            if (query.pool != rootGetters.selectedResults.pool.id) {
-               query.pool = rootGetters.selectedResults.pool.id
-               router.replace({ query })
             }
          }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))

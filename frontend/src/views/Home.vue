@@ -299,8 +299,10 @@ export default {
          let targetPool = "presearch"
          let oldFilterParam = ""
          let oldSort = ""
-         let poolChanged = (query.pool && query.pool != this.currentPool)
+         let poolChanged = false
+
          if ( query.pool ) {
+            poolChanged = (query.pool != this.currentPool)
             targetPool = query.pool
             this.$store.commit("query/setTargetPool", targetPool)
 
@@ -364,6 +366,13 @@ export default {
                if (poolChanged) {
                   this.$store.dispatch("filters/getSelectedResultFacets", false)
                }
+            }
+
+            // make sure the currently selected pool is always in URL
+            let testQ = Object.assign({}, this.$router.currentRoute.query)
+            if (testQ.pool != this.selectedResults.pool.id) {
+               testQ.pool = this.selectedResults.pool.id
+               await this.$router.replace({query: testQ})
             }
 
             if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {
