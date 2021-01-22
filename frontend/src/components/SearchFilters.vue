@@ -3,7 +3,7 @@
       <div class="filters-section">
          <div class="filters-head">
             <span class="title">Applied Filters</span>
-            <V4Button v-if="hasFilter || hasNaFilters" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
+            <V4Button v-if="hasFilter || hasNaFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
          </div>
          <div class="no-filter working" v-if="updatingFacets">
             Working...
@@ -13,10 +13,10 @@
                <template  v-for="(values, filter) in appliedFilters">
                   <dt :key="filter" class="label" v-show="filter != 'undefined'">{{filter}}</dt>
                   <dd :key="`${filter}-values`" class="label">
-                     <span v-for="val in values" class="selected" :key="val.filter">
-                        <V4Button mode="icon" class="remove" @click="removeFilter(val)"
+                     <span v-for="fv in values" class="selected" :key="fv.value">
+                        <V4Button mode="icon" class="remove" @click="removeFilter(fv)"
                            :aria-label="`remove filter #{val}`">
-                           <i class="fas fa-times-circle"></i>{{val.filter}}
+                           <i class="fas fa-times-circle"></i>{{fv.value}}
                         </V4Button>
                      </span>
                   </dd>
@@ -28,13 +28,13 @@
          </template>
       </div>
 
-      <div v-if="naFilters.length>0 && !updatingFacets" class="filters-section">
+      <div v-if="hasNaFilter && !updatingFacets" class="filters-section">
          <div class="filters-head">
             <span class="title">Not Applicable Filters</span>
          </div>
          <div class="unsupported filter-display" >
             <span v-for="naF in naFilters" class="selected" :key="`${naF.value}`">
-               <V4Button mode="icon" class="remove" @click="removeFilter({facet:'NotApplicable', filter: naF.value})"
+               <V4Button mode="icon" class="remove" @click="removeFilter(naF)"
                   :aria-label="`remove filter #{naf.value}`">
                   <i class="fas fa-times-circle"></i>{{naF.value}}
                </V4Button>
@@ -53,7 +53,6 @@ export default {
    computed: {
       ...mapGetters({
          allFilters: 'filters/poolFilter',
-         notApplicableFilters: 'filters/notApplicableFilters',
          selectedResults: 'selectedResults',
          facetSupport: 'pools/facetSupport',
          filterQueryParam: 'filters/asQueryParam',
@@ -65,38 +64,43 @@ export default {
         userSearched: 'query.userSearched',
       }),
       naFilters() {
-         return this.notApplicableFilters(this.selectedResults.pool.id)
+         let out = []
+         this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na === true).forEach(pf=>{
+            let val = pf.value
+            out.push( {facet_id: pf.facet_id, value: val} )
+         })
+         return out
       },
       hasFilter() {
-         return (this.allFilters(this.selectedResults.pool.id).length > 0)
+         return this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
+      },
+      hasNaFilter() {
+         return this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na === true).length > 0
       },
       appliedFilters() {
          // display is grouped by facet, raw data is just a series of
          // facet_id/value pairs. Convert to display
          let out = {}
-         this.allFilters(this.selectedResults.pool.id).forEach(pf=>{
+         this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na != true).forEach(pf=>{
             let val = pf.value
             let facetName = pf.facet_name
             if ( Object.prototype.hasOwnProperty.call(out, facetName) == false ) {
                out[facetName] = []
             }
-            out[facetName].push( {facet: pf.facet_id, filter: val} )
+            out[facetName].push( {facet_id: pf.facet_id, value: val} )
          })
          return out
       },
-      hasNaFilters() {
-         return this.naFilters.length > 0
-      },
    },
    methods: {
-      removeFilter( value) {
+      removeFilter( filter ) {
          this.userSearched = true
          let query = Object.assign({}, this.$route.query)
          delete query.page
          delete query.filter
          let data = {}
 
-         data = {pool: this.selectedResults.pool.id, facetID: value.facet, value: value.filter}
+         data = {pool: this.selectedResults.pool.id, facetID: filter.facet_id, value: filter.value}
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("clearSelectedPoolResults")
          let fqp = this.filterQueryParam( this.selectedResults.pool.id )

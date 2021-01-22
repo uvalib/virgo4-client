@@ -38,7 +38,7 @@ export default {
          preSearchFilters: 'filters/preSearchFilters',
       }),
       ...mapState({
-         loadingFilters: state => state.filters.updatingFacets,
+         loadingFilters: state => state.filters.getPresearchFacets,
       }),
       anyFiltersSet() {
          let filters = false

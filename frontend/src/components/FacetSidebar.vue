@@ -15,11 +15,11 @@
                <div v-if="updatingFacets" class="working">
                   <V4Spinner message="Loading filters..."/>
                </div>
-               <div v-if="facets.filter( f=> f.hidden !== true).length == 0" class="none">
+               <div v-if="facets.length == 0" class="none">
                   Filters are not available for this search
                </div>
                <dl v-else>
-                  <template v-for="facetInfo in facets.filter( f=> f.hidden !== true)">
+                  <template v-for="facetInfo in facets">
                         <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
                         <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
                            <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
@@ -97,17 +97,17 @@ export default {
          return `Filter ${this.selectedResults.pool.name} By`
       },
       facets() {
-         return this.allFacets(this.selectedResults.pool.id)
+         return this.allFacets(this.selectedResults.pool.id).filter( f=> f.hidden !== true && f.na !== true)
       },
    },
    methods: {
       facetValuesCount(facet) {
          if (!facet.buckets) return 0
-         return facet.buckets.filter(b=>b.value ).length
+         return facet.buckets.filter(b=>b.value && b.na != true).length
       },
       facetValues(facet, start, end) {
          if (!facet.buckets) return []
-         let out = facet.buckets.filter(b=> b.value).slice(start,end)
+         let out = facet.buckets.filter(b=> b.value && b.na != true).slice(start,end)
          return out
       },
       moreKey(id) {
