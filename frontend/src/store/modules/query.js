@@ -243,6 +243,11 @@ const query = {
             a.value = ""
          })
          state.targetPool = ""
+
+         let cachedSrc = localStorage.getItem('v4SearchSources')
+         if (cachedSrc) {
+            state.searchSources = cachedSrc
+         }
       },
    },
    actions: {
