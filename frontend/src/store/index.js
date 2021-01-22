@@ -487,7 +487,6 @@ export default new Vuex.Store({
       // existing results or as a standalone query to a single pool
       async searchPool({ state, commit, rootState, rootGetters, dispatch }, params) {
          commit('setSearching', true)
-         commit('filters/setUpdatingFacets', true)
          let filters = rootGetters['filters/poolFilter'](params.pool.id)
          let sort = rootGetters['sort/poolSort'](params.pool.id)
          let filterObj = { pool_id: params.pool.id, facets: filters }
