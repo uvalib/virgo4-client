@@ -455,7 +455,6 @@ export default new Vuex.Store({
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
-            commit('filters/setUpdatingFacets', false)
             let genericError = true
             if (error.response) {
                if (error.response.status == 401) {
@@ -533,7 +532,6 @@ export default new Vuex.Store({
          }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)
-            commit('filters/setUpdatingFacets', false)
             if (error.response && error.response.status == 401) {
                commit('system/setSessionExpired', null, { root: true })
                dispatch("user/signout", null, { root: true })
