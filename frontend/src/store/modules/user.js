@@ -187,6 +187,10 @@ const user = {
                keyA = a.title.toUpperCase()
                keyB = b.title.toUpperCase()
             }
+            if (order.includes("DUE")){
+               keyA = a.due.split("T")[0]
+               keyB = b.due.split("T")[0]
+            }
             if (order.includes("ASC")) {
                if (keyA < keyB) {
                   return -1

@@ -35,6 +35,8 @@
                               <option value="AUTHOR_DESC">Author (Descending)</option>
                               <option value="TITLE_ASC">Title (Ascending)</option>
                               <option value="TITLE_DESC">Title (Descending)</option>
+                              <option value="DUE_ASC">Due Date (Ascending)</option>
+                              <option value="DUE_DESC">Due Date (Descending)</option>
                            </select>
                         </span>
                         <V4Button v-if="!isBarred" id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
