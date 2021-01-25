@@ -50,8 +50,10 @@
                            </template>
                         </h3>
                         <dl>
-                        <dt>Author:</dt>
+                        <template v-if="co.author.length > 0">
+                           <dt>Author:</dt>
                            <dd>{{co.author}}</dd>
+                        </template>
                         <dt class="label">Call number:</dt>
                            <dd>{{co.callNumber}}</dd>
                         <dt class="label">Due Date:</dt>
