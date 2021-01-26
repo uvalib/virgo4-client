@@ -172,6 +172,9 @@ const query = {
             // the query term is the data between the { and }. Grab it
             // and remove this whole term from the query string
             let value = queryParams.substring(braceIdx+1, braceIdx2)
+            if ( value.length == 0) {
+               value = "*"
+            }
             queryParams = queryParams.substring(braceIdx2+1).trim()
             let keyOpParts = keyOp.split(" ")
             let term = { op: "AND", value: value, field: keyOp.toLowerCase(), comparison: "EQUAL", endVal: "" }
