@@ -4,33 +4,18 @@
          <V4Spinner message="Getting shelf browse data..." />
       </div>
       <template v-if="!working && hasBrowseData">
-         <h2>Shelf Browse </h2>
-         <div class="browse-wrapper">
-            <div class="browse-card" v-for="(b,idx) in shelfBrowse" :class="{current: isCurrent(idx)}" :key="`b${b.id}`">
-               <i class="current fas fa-caret-down" v-if="isCurrent(idx)"></i>
-               <div class="thumb-wrap">
-                  <a @click="browseDetailClicked(b.id)" :href="`/items/${b.id}`" aria-hidden="true" tabindex="-1">
-                     <img  alt="" class="thumb" v-if="b.cover_image_url" :src="b.cover_image_url" />
-                  </a>
-               </div>
-               <div class="details">
-                  <span class="call">{{b.call_number}}</span>
-                  <span class="loc">{{b.location}}</span>
-                  <a @click="browseDetailClicked(b.id)" :href="`/items/${b.id}`" class="title">{{b.title}}</a>
-                  <span class="title">{{b.published_date}}</span>
-               </div>
-               <div class="bm-control">
-                  <AddBookmark v-if="isSignedIn" :data="bookmarkData(b)" :id="`bm-modal-${b.id}`"
-                     @clicked="bookmarkClicked(b.id)"
-                  />
-                  <SignInRequired v-else :data="bookmarkData(b)" :id="`bm-modal-${b.id}`" act="bookmark" />
-               </div>
+         <h2>
+            <span>Shelf Browse</span>
+             <router-link :to="browseURL" class="to-browse">
+                View full page
+             </router-link>
+         </h2>
+         <div class="browse-cards">
+            <div v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
+               <BrowseCard :current="isCurrent(idx)" :pool="pool" :data="b" style="height:100%"/>
             </div>
          </div>
-         <div class="browse-control">
-            <V4Button mode="primary" @click="browsePrior()"><i class="prior fas fa-chevron-left"></i>Previous</V4Button>
-            <V4Button mode="primary" @click="browseNext()">Next<i class="next fas fa-chevron-right"></i></V4Button>
-         </div>
+         <BrowsePager />
          <div class="centered" v-if="showRestore">
             <V4Button mode="primary" @click="browseRestore()">Return to {{currentCallNumber}}</V4Button>
          </div>
@@ -43,7 +28,8 @@ import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import AddBookmark from '@/components/modals/AddBookmark'
 import SignInRequired from '@/components/modals/SignInRequired'
-
+import BrowseCard from '@/components/details/BrowseCard'
+import BrowsePager from '@/components/details/BrowsePager'
 export default {
    props: {
       hit: {
@@ -60,7 +46,7 @@ export default {
       }
    },
    components: {
-      AddBookmark, SignInRequired
+      AddBookmark, SignInRequired, BrowseCard, BrowsePager
    },
    computed: {
       ...mapState({
@@ -82,37 +68,24 @@ export default {
       showRestore() {
          let center = this.shelfBrowse[this.browseRange]
          return center.id != this.hit.identifier
+      },
+      browseURL() {
+         return `/sources/${this.pool}/items/${this.hit.identifier}/browse`
       }
    },
    methods: {
-      bookmarkData( item ) {
-         return {pool: this.pool, identifier: item.id, title: item.title, origin: "SHELF_BROWSE" }
-      },
       isCurrent(idx) {
+         if ( this.working) return false
          let item = this.shelfBrowse[idx]
          return item.id == this.hit.identifier
-
       },
       browseRestore() {
          this.$store.commit("shelf/setShowSpinner", false)
          this.$store.dispatch("shelf/getBrowseData", this.hit.identifier )
          this.$analytics.trigger('ShelfBrowse', 'BROWSE_RESTORE_CLICKED', this.hit.identifier)
       },
-      browseNext() {
-         this.$store.dispatch("shelf/browseNext")
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED', this.hit.identifier)
-      },
-      browsePrior() {
-         this.$store.dispatch("shelf/browsePrior")
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED', this.hit.identifier)
-      },
-      browseDetailClicked(id) {
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_DETAIL_CLICKED', id)
-      },
-      bookmarkClicked(id) {
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_BOOKMARK_CLICKED', id)
-      },
       async getBrowseData() {
+         this.$store.commit("shelf/setBrowseRange", 3)
          let tgt = this.hit.identifier
          if ( this.target && this.target != "")  {
             tgt = this.target
@@ -147,125 +120,32 @@ export default {
       font-size: 0.85em;
    }
 
-   .browse-control {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: space-between;
-      margin: 10px 25px;
-      i.next {
-         margin: 0 0 0 8px;
-      }
-      i.prior {
-         margin: 0 8px 0 0;
-      }
-   }
    .center {
       text-align: centter;
    };
 
-   .browse-wrapper {
+   .browse-cards {
       padding: 5px 0;
       display: flex;
       flex-flow: row nowrap;
       overflow: hidden;
       justify-content: center;
-      .browse-card {
-         border: 1px solid var(--uvalib-grey);
-         box-shadow: $v4-box-shadow;
-         padding: 0 0 25px 0;
-         margin: 5px;
-         position: relative;
-         display: flex;
-         flex-direction: column;
-         font-size: .937em;
-         text-align: center;
-         width: 175px;
-         &:hover {
-            top: -2px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
-         }
-
-         .bm-control {
-            position: absolute;
-            bottom: 0;
-            bottom: 4px;
-            right: 5px;
-            height: 25px;
-            text-align: right;
-         }
-
-         .thumb-wrap {
-            height: 215px;
-            text-align: center;
-            background: white;
-
-            a {
-               display: inline-block;
-               &:focus {
-                  @include be-accessible();
-               }
-            }
-            img {
-               height: auto;
-               align-self: center;
-               display: block;
-               min-width:135px;
-               max-height: 200px;
-               margin: 7px auto 5px auto;
-               background-image: url('~@/assets/dots.gif');
-               background-repeat:no-repeat;
-               background-position: center center;
-               position: relative;
-               max-width: 100%;
-            }
-         }
-         i.current {
-            position: absolute;
-            top: -15px;
-            width: 100%;
-            text-align: center;
-         }
-         .details {
-            background: white;
-            border-top: 3px solid var(--uvalib-grey-light);
-            border-radius: 0 0 5px 5px;
-            padding: 5px 0;
-         }
-         .call, .loc, .title {
-            background: white;
-            word-break: break-word;
-            -webkit-hyphens: auto;
-            -moz-hyphens: auto;
-            hyphens: auto;
-            max-width: 95%;
-            display: block;
-            margin: 0 auto;
-            font-weight: 500;
-         }
-         .loc {
-            font-weight: normal;
-         }
-         .title  {
-            margin-top:5px;
-         }
-      }
-
-      .browse-card.current {
-         border: 3px solid var(--uvalib-brand-blue-light);
+      align-content: stretch;
+      .card-wrap {
+         width: 190px;
       }
    }
 
    h2 {
-      // background:  var(--uvalib-blue-alt-light);
-      // padding: 5px 10px;
-      // border-top: 2px solid  var(--uvalib-blue-alt);
-      // border-bottom: 2px solid  var(--uvalib-blue-alt);
-      // text-align: left;
-      // font-size: 1.25em;
-      // margin: 50px 0 30px 0;
-      margin: 50px 0 30px 0;
+      margin: 50px 0 10px 0;
       color: var(--color-primary-orange);
       text-align: center;
+      .to-browse {
+         font-size: 0.65em;
+         display: block;
+         margin-left: auto;
+         margin: 10px 0 15px 0;
+      }
    }
 }
 </style>

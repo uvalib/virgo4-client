@@ -29,6 +29,9 @@ const shelf = {
       clearBrowseDetails(state) {
          state.browse.splice(0, state.browse.length)
       },
+      setBrowseRange( state, range) {
+         state.browseRange = range
+      },
 
       setBrowseDetails(state, data) {
          state.browse.splice(0, state.browse.length)
@@ -40,13 +43,21 @@ const shelf = {
    actions: {
       browseNext(ctx) {
          let nextIdx = ctx.state.browseRange
-         nextIdx++
+         if ( ctx.state.browseRange == 3) {
+            nextIdx++
+         } else {
+            nextIdx +=  ctx.state.browseRange
+         }
          ctx.state.showSpinner = false
          ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
       },
       browsePrior(ctx) {
          let nextIdx = ctx.state.browseRange
-         nextIdx--
+         if ( ctx.state.browseRange == 3) {
+            nextIdx--
+         } else {
+            nextIdx -=  ctx.state.browseRange
+         }
          ctx.state.showSpinner = false
          ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
       },

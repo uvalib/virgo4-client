@@ -7,6 +7,7 @@ import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
 import Details from './views/Details.vue'
+import ShelfBrowse from './views/ShelfBrowse.vue'
 import SignIn from './views/SignIn.vue'
 import Account from './views/account/Account.vue'
 import Bookmarks from './views/account/Bookmarks.vue'
@@ -85,6 +86,11 @@ const router = new Router({
          path: '/items/:id',
          name: 'item',
          component: Details,
+      },
+      {
+         path: '/sources/:src/items/:id/browse',
+         name: 'shelf-browse',
+         component: ShelfBrowse,
       },
       {
          path: '/preferences',
@@ -200,7 +206,7 @@ router.afterEach((to, _from) => {
    let titles = {home: "Virgo", search: "Virgo", signin: "Virgo: Sign In", account: "Virgo: My Information",
       checkouts: "Virgo: Checkouts", 'digital-deliveries': "Virgo: Digital Deliveries",
       bookmarks: "Virgo: Bookmarks", requests: "Virgo: Requests", searches: "Virgo: Saved Searches",
-      preferences: "Virgo: Preferences", fatal_error: "Virgo System Error"
+      preferences: "Virgo: Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Virgo: Shelf Browse"
    }
    Vue.nextTick(() => {
       let title = titles[to.name]
