@@ -87,6 +87,7 @@ func main() {
 		users.GET("/:uid", svc.GetUser)
 		users.GET("/:uid/illiad", svc.GetILLiadRequests)
 		users.GET("/:uid/bills", svc.GetUserBills)
+		users.GET("/:uid/checkouts.csv", svc.DownloadUserCheckouts)
 		users.GET("/:uid/checkouts", svc.GetUserCheckouts)
 		users.GET("/:uid/holds", svc.GetUserHolds)
 		users.POST("/:uid/checkouts/renew", svc.RenewCheckouts)

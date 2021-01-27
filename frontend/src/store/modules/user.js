@@ -450,6 +450,33 @@ const user = {
             }
          })
       },
+      downloadCheckoutsCSV(ctx) {
+         if ( ctx.state.checkouts.length == 0) {
+            return
+         }
+
+         const axInst = axios.create({
+            timeout: 30*1000,
+         })
+         return axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts.csv`).then((response) => {
+            const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+            const fileLink = document.createElement('a');
+
+            fileLink.href = fileURL;
+            fileLink.setAttribute('download', response.headers["content-disposition"].split("filename=")[1])
+            document.body.appendChild(fileLink);
+
+            fileLink.click();
+            window.URL.revokeObjectURL(fileURL);
+
+         }).catch((error) => {
+            if (error.response && error.response.status == 503) {
+               ctx.commit('system/setILSError', error.response.data, { root: true })
+            } else {
+               ctx.commit('system/setError', error, { root: true })
+            }
+         })
+      },
 
       getBillDetails(ctx) {
          if ( ctx.state.bills.length > 0) return

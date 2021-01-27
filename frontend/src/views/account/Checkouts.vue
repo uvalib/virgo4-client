@@ -40,6 +40,12 @@
                            </select>
                         </span>
                         <V4Button v-if="!isBarred" id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
+                        <V4Button v-if="checkouts.length" id="download-csv-btn"
+                           mode="secondary"
+                           @click="downloadCSV()"
+                           title="Download your checkouts as a CSV file" >
+                           <i class="fas fa-download"></i>
+                        </V4Button>
                      </div>
                      <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
                         <h3 class="item-title">
@@ -137,6 +143,7 @@ export default {
    },
    computed: {
       ...mapState({
+         userID: state => state.user.userID,
          checkouts: state => state.user.checkouts,
          checkoutsOrder: state => state.user.checkoutsOrder,
          requests: state => state.user.requests,
@@ -165,6 +172,9 @@ export default {
       },
       renewAll() {
          this.$store.dispatch("user/renewAll")
+      },
+      downloadCSV(){
+         this.$store.dispatch("user/downloadCheckoutsCSV")
       },
       formatILLDate(dateStr) {
          if (!dateStr) {
@@ -272,7 +282,7 @@ export default {
          margin-left: auto !important;
       }
       .v4-button {
-         margin: 0!important;
+         margin: 0 10px !important;
       }
    }
 

@@ -314,6 +314,29 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	c.JSON(http.StatusOK, checkouts)
 }
 
+// DownloadUserCheckouts uses ILS Connector V4 API /users to get checked out items
+func (svc *ServiceContext) DownloadUserCheckouts(c *gin.Context) {
+	userID := c.Param("uid")
+	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
+	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts.csv", svc.ILSAPI, userID)
+	bodyBytes, ilsStatus := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
+
+	if ilsStatus != nil {
+		if ilsStatus.StatusCode == 503 {
+			c.String(503, "UVA checkout information is currently unavailable. Please try again later.")
+		} else {
+			c.String(ilsStatus.StatusCode, ilsStatus.Message)
+		}
+		return
+	}
+
+	c.Header("Content-Description", "File Transfer")
+	fileName := fmt.Sprintf("checkouts-%s-%s.csv", c.Param("uid"), time.Now().Format("2006-01-02"))
+	c.Header("Content-Disposition", "attachment; filename="+fileName)
+	c.Data(http.StatusOK, "text/csv", bodyBytes)
+
+}
+
 // GetUserHolds uses ILS Connector V4 API /users to get checked out items
 func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	userID := c.Param("uid")
