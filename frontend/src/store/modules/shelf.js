@@ -46,7 +46,7 @@ const shelf = {
          if ( ctx.state.browseRange == 3) {
             nextIdx++
          } else {
-            nextIdx +=  ctx.state.browseRange
+            nextIdx =  ctx.state.browse.length -1
          }
          ctx.state.showSpinner = false
          ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
@@ -56,7 +56,7 @@ const shelf = {
          if ( ctx.state.browseRange == 3) {
             nextIdx--
          } else {
-            nextIdx -=  ctx.state.browseRange
+            nextIdx =  0
          }
          ctx.state.showSpinner = false
          ctx.dispatch("getBrowseData", ctx.state.browse[nextIdx].id)
