@@ -28,9 +28,8 @@
             <div class="pure-control-group">
                <label for="url">
                   Relevant URL
-                  <span v-if="hasError('url')" class="error">Please include the URL for the relevant page</span>
                </label>
-               <input v-model="url" name="url" />
+               <input tabindex="-1" readonly="readonly" v-model="url" name="url" />
             </div>
          </div>
 
@@ -74,11 +73,6 @@ export default {
             await this.$store.dispatch("feedback/submitFeedback")
             if ( this.status=="success" ) {
                this.scrollTop()
-               setTimeout( ()=>{
-                  if ( this.$route.name == "feedback" ) {
-                     this.$router.push("/")
-                  }
-               }, 10000)
             }
          }
       },
@@ -120,32 +114,68 @@ export default {
          return true
       }
    },
-   beforeRouteEnter(_to, from, next) {
-        next((vm) => {
-            vm.url = document.location.origin + from.fullPath;
-        });
-    },
    mounted() {
       this.$store.commit("feedback/clearFeedback")
       var userId = this.$store.state.user.signedInUser
       if (userId && this.$store.state.user.sessionType == "netbadge") {
          this.email = userId + "@virginia.edu"
       }
+      let query = Object.assign({}, this.$route.query)
+      let url = query.url
+      delete query.url
+      let params = []
+      Object.entries(query).forEach(([key, value]) => {
+         params.push(`${key}=${encodeURIComponent(value)}`)
+      })
+      let qp = params.join("&")
+      if (qp.length > 0) {
+         url += `?${qp}`
+      }
+      this.$store.commit("feedback/setRelatedURL", document.location.origin+url)
    }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .feedback {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
+
+   .feedback-content {
+      width: 60%;
+      margin: 0 auto;
+      text-align: left;
+
+      .feedback-form.pure-form label {
+         font-weight: 500;
+         display: block;
+         margin: 20px 0 5px 0;
+      }
+      .action-group {
+         text-align: right;
+         margin: 15px 0 30px 0;
+      }
+      textarea, input {
+         box-sizing: border-box;
+         width: 100%;
+      }
+      span.error {
+         color: var(--uvalib-red-emergency);
+         font-weight: 500;
+         margin-left: 5px;
+      }
+   }
+   h3 {
+      text-align: center;
+      font-size: 1.3em;
+      color: var(--color-primary-text);
+      margin: 35px;
+      font-weight: 500;
+   }
 }
-.feedback-content {
-   width: 60%;
-   margin: 0 auto;
-}
+
 @media only screen and (min-width: 768px) {
    div.feedback-content {
       width: 60%;
@@ -155,39 +185,5 @@ export default {
    div.feedback-content {
       width: 95%;
    }
-}
-span.alt-color-dark {
-   color: var(--color-link-darker);
-   font-weight: 500;
-}
-h2 {
-   font-size: 1.1em;
-   font-weight: 500;
-   color: var(uvalib-text);
-}
-.feedback-form.pure-form label {
-   font-weight: 500;
-   display: block;
-   margin: 20px 0 5px 0;
-}
-.action-group {
-   text-align: right;
-   margin: 15px 0 30px 0;
-}
-textarea, input {
-   box-sizing: content-box;
-   width: 100%;
-}
-h3 {
-   text-align: center;
-   font-size: 1.3em;
-   color: var(--color-primary-text);
-   margin: 35px;
-   font-weight: 500;
-}
-span.error {
-   color: var(--uvalib-red-emergency);
-   font-weight: 500;
-   margin-left: 5px;
 }
 </style>

@@ -23,6 +23,9 @@ const feedback = {
          state.url = ""
          state.status="pending"
       },
+      setRelatedURL(state, url) {
+         state.url = url
+      },
       setSubmitting(state) {
          state.status="submit"
       },
