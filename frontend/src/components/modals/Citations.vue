@@ -198,21 +198,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep  .icon-inline {
+   margin-left: 6px;
+   font-size: 0.95em;
+   display: inline-block;
+}
+::v-deep  i.icon {
+   color: var(--uvalib-grey-dark);
+   cursor: pointer;
+   font-size: 1.2em;
+   padding: 2px;
+}
 .citations-content {
    max-height: 400px;
    overflow: scroll;
-
-   i.icon-inline {
-      margin-left: 5px;
-      font-size: 0.8em;
-   }
-
-   i.icon {
-      color: var(--uvalib-grey-dark);
-      cursor: pointer;
-      font-size: 1.2em;
-      padding: 2px;
-   }
 
    td.label {
       font-weight: bold;

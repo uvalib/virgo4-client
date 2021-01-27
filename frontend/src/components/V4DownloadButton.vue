@@ -44,6 +44,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .icon {
+   font-size: 1.75em;
+   display: block;
+   color: var(--uvalib-text);
+}
+::v-deep  .icon-inline {
+   margin-left: 6px;
+   font-size: 0.9em;
+}
 .v4-download-button {
    border: none;
    outline: none;
@@ -54,16 +63,6 @@ export default {
 
    &:focus {
       @include be-accessible();
-   }
-
-   .icon {
-      font-size: 1.75em;
-      display: block;
-      color: var(--uvalib-text);
-   }
-   .icon-inline {
-      margin-left: 5px;
-      font-size: 0.8em;
    }
 
    label {

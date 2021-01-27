@@ -140,87 +140,76 @@ export default {
          return "text"
       },
       doAdvancedSearch() {
-         if (this.queryEntered == false && this.preSearchFilterApplied ) {
-            // For now, when a filter-only query is made, add a query for keyword: *
-            this.$store.commit("query/addWildcardCriteria")
-         }
-         if (this.queryEntered  ) {
-            this.$store.commit("query/fixDateSearches")
-            let fields = this.advanced.filter( f=>f.value != "")
-            if ( fields.length == 1 && fields[0].op == "NOT") {
-               this.$store.commit(
-                  "system/setSearchError",
-                  {message:"The NOT operator requires more than one search critera"}
-               )
-               return
-            }
-
-            let badDate = false
-            this.advanced.filter( f=>f.field == "date" && f.value != "").some( df => {
-               let dateStr = df.value
-               let parts = dateStr.split("-")
-               if (parts.length > 3) {
-                  badDate = true
-               } else {
-                  parts.forEach( (p,idx) => {
-                     if (idx == 0) {
-                        if ( p.match(/^\d{4}$/) == null ) {
-                           badDate = true
-                        }
-                     } else {
-                        if ( p.match(/^\d{2}$/) == null ) {
-                              badDate = true
-                        }
-                     }
-                  })
-               }
-               return badDate == true
-            })
-            if ( badDate ) {
-               this.$store.commit(
-                  "system/setSearchError",
-                  {message:"Dates must match one of the accepted formats: YYYY, YYYY-MM or YYYY-MM-DD"}
-               )
-               return
-            }
-
-            // Refine search updates:
-            // if pool, filter or sort were specified previously, preserve them in the URL.
-            // a new search will always reset paging, so don't preserve that
-            let priorQ = Object.assign({}, this.$route.query)
-            let qp =  this.queryURLParams
-            if (priorQ.pool) {
-               qp += `&pool=${priorQ.pool}`
-            }
-            if ( this.preSearchFilterApplied ) {
-               // Turn presearch filter into query string. From here on out, post search filters will
-               // be used instead
-               qp += `&filter=${this.filterQueryString('presearch')}`
-            } else if (priorQ.filter) {
-               qp += `&filter=${priorQ.filter}`
-            }
-            if (priorQ.sort) {
-               qp += `&sort=${priorQ.sort}`
-            }
-
-            this.userSearched = true
-            this.$store.dispatch("filters/promotePreSearchFilters")
-            this.$router.push(`/search?${qp}`).catch(_err => {})
-
-            let s = "SIGNED_OUT"
-            if ( this.isSignedIn ) {
-               s = "SIGNED_IN"
-            }
-            if ( decodeURI(qp).includes("UVA Library Digital Repository") ) {
-               this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')
-            }
-            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', s)
-         } else {
+         this.$store.commit("query/fixDateSearches")
+         let fields = this.advanced.filter( f=>f.value != "")
+         if ( fields.length == 1 && fields[0].op == "NOT") {
             this.$store.commit(
                "system/setSearchError",
-               {message:"Please enter a search query"}
+               {message:"The NOT operator requires more than one search critera"}
             )
+            return
          }
+
+         let badDate = false
+         this.advanced.filter( f=>f.field == "date" && f.value != "").some( df => {
+            let dateStr = df.value
+            let parts = dateStr.split("-")
+            if (parts.length > 3) {
+               badDate = true
+            } else {
+               parts.forEach( (p,idx) => {
+                  if (idx == 0) {
+                     if ( p.match(/^\d{4}$/) == null ) {
+                        badDate = true
+                     }
+                  } else {
+                     if ( p.match(/^\d{2}$/) == null ) {
+                           badDate = true
+                     }
+                  }
+               })
+            }
+            return badDate == true
+         })
+         if ( badDate ) {
+            this.$store.commit(
+               "system/setSearchError",
+               {message:"Dates must match one of the accepted formats: YYYY, YYYY-MM or YYYY-MM-DD"}
+            )
+            return
+         }
+
+         // Refine search updates:
+         // if pool, filter or sort were specified previously, preserve them in the URL.
+         // a new search will always reset paging, so don't preserve that
+         let priorQ = Object.assign({}, this.$route.query)
+         let qp =  this.queryURLParams
+         if (priorQ.pool) {
+            qp += `&pool=${priorQ.pool}`
+         }
+         if ( this.preSearchFilterApplied ) {
+            // Turn presearch filter into query string. From here on out, post search filters will
+            // be used instead
+            qp += `&filter=${this.filterQueryString('presearch')}`
+         } else if (priorQ.filter) {
+            qp += `&filter=${priorQ.filter}`
+         }
+         if (priorQ.sort) {
+            qp += `&sort=${priorQ.sort}`
+         }
+
+         this.userSearched = true
+         this.$store.dispatch("filters/promotePreSearchFilters")
+         this.$router.push(`/search?${qp}`).catch(_err => {})
+
+         let s = "SIGNED_OUT"
+         if ( this.isSignedIn ) {
+            s = "SIGNED_IN"
+         }
+         if ( decodeURI(qp).includes("UVA Library Digital Repository") ) {
+            this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')
+         }
+         this.$analytics.trigger('Search', 'ADVANCED_SEARCH', s)
       },
       addClicked() {
          this.$store.commit("query/addCriteria")
