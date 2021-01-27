@@ -6,7 +6,7 @@
       <template v-if="!working && hasBrowseData">
          <h2>
             <span>Shelf Browse</span>
-             <router-link :to="browseURL" class="to-browse">
+             <router-link @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
                 View full page
              </router-link>
          </h2>
@@ -74,6 +74,9 @@ export default {
       }
    },
    methods: {
+      fullScreenBrowseClicked() {
+         this.$analytics.trigger('ShelfBrowse', 'FULL_SCREEN_BROWSE_CLICKED', this.hit.identifier)
+      },
       isCurrent(idx) {
          if ( this.working) return false
          let item = this.shelfBrowse[idx]
