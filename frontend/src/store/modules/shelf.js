@@ -36,9 +36,27 @@ const shelf = {
       setBrowseDetails(state, data) {
          state.browse.splice(0, state.browse.length)
          data.forEach( b => {
+            b.cover_image_url = ""
+            b.status = "loading"
+            b.placeholder_class= placeholderClass(b.id)
             state.browse.push(b)
          })
       },
+      setCoverImage(state, data) {
+         let idx = state.browse.findIndex( b=>b.id == data.id)
+         if ( idx > -1) {
+            let b = state.browse[idx]
+            if (data.status == "not_found" || data.status=="unprocessed") {
+               b.status = "not_found"
+               b.placeholder_class= placeholderClass(b.id)
+            } else {
+               b.status = "ready"
+               b.image_base64 = data.image_base64
+               b.cover_image_url = data.image_url
+            }
+            state.browse.splice(idx, 1, b)
+         }
+      }
    },
    actions: {
       browseNext(ctx) {
@@ -71,8 +89,22 @@ const shelf = {
 
          let url = `${ctx.rootState.system.shelfBrowseURL}/api/browse/${centerId}?range=${ctx.state.browseRange}`
          await axios.get(url).then((response) => {
+            response.data.items.forEach( b => {
+               if ( b.cover_image_url) {
+                  let testURL = b.cover_image_url.replace("?", ".json?")
+                  axios.get(testURL).then((ciR) => {
+                     let ciD = ciR.data
+                     ctx.commit("setCoverImage", {
+                        id: b.id, image_url: ciD.image_url, image_base64:ciD.image_base64, status: ciD.status})
+                  }).catch(() => {
+                     ctx.commit("setCoverImage", {
+                        id: b.id, image_url: "", image_base64: "", status: "not_found"})
+                  })
+               }
+            })
             ctx.commit("setBrowseDetails", response.data.items)
             ctx.commit("setLookingUp", false)
+
          }).catch((error) => {
             ctx.commit("setLookingUp", false)
             ctx.commit("clearBrowseDetails")
@@ -86,5 +118,15 @@ const shelf = {
       },
    }
 }
+
+function placeholderClass (src) {
+   let hash = 0
+   for(let i = 0; i < src.length; i++) {
+      hash = Math.imul(31, hash) + src.charCodeAt(i) | 0
+   }
+   let hashStr = ""+hash
+   let cn = `cover${hashStr.substring(hashStr.length-1)}`
+   return cn
+ };
 
 export default shelf

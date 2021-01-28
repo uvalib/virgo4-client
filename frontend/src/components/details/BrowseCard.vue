@@ -3,7 +3,10 @@
       <i class="current fas fa-caret-down" v-if="current"></i>
       <div class="thumb-wrap">
          <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" aria-hidden="true" tabindex="-1">
-            <img  alt="" class="thumb" v-if="data.cover_image_url" :src="data.cover_image_url" />
+            <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
+            <span class="no-thumb" :class="data.placeholder_class" v-else>
+               <span class="title">{{data.title}}</span>
+            </span>
          </a>
       </div>
       <div class="details">
@@ -94,6 +97,71 @@ export default {
       text-align: center;
       background: white;
       padding: 10px 5px;
+
+      .loading {
+         height: 100%;
+         height: 100%;
+         display: block;
+         margin: 0 auto;
+         background: #f2f2f2;
+         border: 1px solid var(--uvalib-grey-light);
+         background-image: url('~@/assets/dots.gif');
+         background-repeat:no-repeat;
+         background-position: center center;
+      }
+
+      .no-thumb {
+         height: 100%;
+         height: 100%;
+         display: block;
+         margin: 0 auto;
+         background: var(--uvalib-teal-dark);
+         .title {
+            background: var( --uvalib-grey-lightest);
+            opacity: 0.9;
+            color: var(--uvalib-text);
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            margin: 10px auto;
+            display: inline-block;
+            padding: 10px;
+            width: 90%;
+            font-weight: 500;
+         }
+      }
+
+      .no-thumb.cover0 {
+         background: var(--uvalib-brand-orange-dark);
+      }
+      .no-thumb.cover1 {
+         background: var(--uvalib-blue-alt-dark);
+      }
+      .no-thumb.cover2 {
+         background: var(--uvalib-blue-alt-darkest);
+      }
+      .no-thumb.cover3 {
+         background: var(--uvalib-green-dark);
+      }
+      .no-thumb.cover4 {
+         background: var(--uvalib-red-darker);
+      }
+      .no-thumb.cover5 {
+         background: var(--uvalib-grey-dark);
+      }
+      .no-thumb.cover6 {
+         background: var(--uvalib-yellow-dark);
+      }
+      .no-thumb.cover7 {
+         background: var(--uvalib-brand-blue-light);
+      }
+      .no-thumb.cover8 {
+         background: var(--uvalib-blue-alt);
+      }
+      .no-thumb.cover9 {
+         background: var(--uvalib-teal-dark);
+      }
 
       img {
          height: auto;
