@@ -1,6 +1,7 @@
 <template>
    <div class="checkout">
       <h1>My Account</h1>
+      <V4Spinner v-if="downloading" message="Downloading..." v-bind:overlay="true" />
       <RenewSummary v-if="hasRenewSummary"/>
       <SignInRequired v-if="isSignedIn == false" targetPage="checkout information"/>
       <div v-else class="checkout-content">
@@ -139,6 +140,7 @@ export default {
       return {
          lookingUpILL: true,
          lookingUpUVA: true,
+         downloading: false,
       }
    },
    computed: {
@@ -173,8 +175,10 @@ export default {
       renewAll() {
          this.$store.dispatch("user/renewAll")
       },
-      downloadCSV(){
-         this.$store.dispatch("user/downloadCheckoutsCSV")
+      async downloadCSV(){
+         this.downloading = true
+         await this.$store.dispatch("user/downloadCheckoutsCSV")
+         this.downloading = false
       },
       formatILLDate(dateStr) {
          if (!dateStr) {

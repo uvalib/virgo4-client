@@ -450,7 +450,7 @@ const user = {
             }
          })
       },
-      downloadCheckoutsCSV(ctx) {
+      async downloadCheckoutsCSV(ctx) {
          if ( ctx.state.checkouts.length == 0) {
             return
          }
