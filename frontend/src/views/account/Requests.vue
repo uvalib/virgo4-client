@@ -8,23 +8,25 @@
             <V4Spinner message="Looking up requests..." />
          </div>
          <div class="details">
-            <h2>Make a New Request</h2>
-            <div v-if="!isHSLUser" class="subcontent buttons">
-               <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
-               <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
-               <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
-               <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
-            </div>
-            <div v-else class="subcontent">
-               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
-            </div>
-            <div class="subcontent links">
-               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
-            </div>
+            <template v-if="!isGuest">
+               <h2>Make a New Request</h2>
+               <div v-if="!isHSLUser" class="subcontent buttons">
+                  <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
+                  <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
+                  <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
+                  <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
+               </div>
+               <div v-else class="subcontent">
+                  <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+               </div>
+               <div class="subcontent links">
+                  <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+               </div>
 
-            <component v-if="request" v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+               <component v-if="request" v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
 
-            <h2>Outstanding Requests</h2>
+               <h2>Outstanding Requests</h2>
+            </template>
             <div class="subcontent">
                <template v-if="lookingUp == false && ilsError">
                   <div class="ils-error">{{ilsError}}</div>
@@ -171,8 +173,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import { mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from "@/components/AccordionContent"
 import InstructionalScan from "@/components/requests/standalone/InstructionalScan"
@@ -201,6 +202,7 @@ export default {
          isDevServer: "system/isDevServer",
          isHSLUser: "user/isHSLUser",
          isSignedIn: 'user/isSignedIn',
+         isGuest: 'user/isGuest',
       }),
       illiadRequests() {
          return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&

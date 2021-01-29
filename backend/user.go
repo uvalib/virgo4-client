@@ -38,6 +38,7 @@ func (u V4User) TableName() string {
 // ILSUserInfo contains ILS connector details for a user
 type ILSUserInfo struct {
 	ID            string `json:"id"`
+	NoAccount     bool   `json:"noAccount"`
 	CommunityUser bool   `json:"communityUser"`
 	Barcode       string `json:"barcode"`
 	DisplayName   string `json:"displayName"`

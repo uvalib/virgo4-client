@@ -21,7 +21,7 @@
          <BoundWithItems v-if="hasBoundWithItems"/>
 
          <div class="items" v-if="hasItems || hasRequestOptions">
-            <RequestContainer :titleId="titleId" />
+            <RequestContainer :titleId="titleId" v-if="!isGuest" />
             <ul class="holdings" v-if="details.holdings.libraries">
                <li v-for="(lib, idx) in details.holdings.libraries" :key="`lib${idx}`">
                   {{lib.library}}
@@ -96,6 +96,7 @@ export default {
          availability: 'item/availability',
          hasRequestOptions: 'requests/hasRequestOptions',
          hasBoundWithItems: 'item/hasBoundWithItems',
+         isGuest: 'user/isGuest',
       }),
       hasItems(){
          return Array.isArray(this.availability.items) && this.availability.items.length > 0

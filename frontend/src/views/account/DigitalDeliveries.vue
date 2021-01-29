@@ -107,7 +107,6 @@ export default {
    },
    created() {
       if ( this.isSignedIn) {
-         this.$store.commit('user/setLookingUp', true)
          this.$store.dispatch("user/getRequests")
          setTimeout(()=> {
             document.getElementById("digital-submenu").focus()

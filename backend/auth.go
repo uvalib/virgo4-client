@@ -333,12 +333,26 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMetho
 	log.Printf("Adding %s claims based on ILS response", v4User.Virgo4ID)
 	// Normally this is HomeLibrary == "LEO"
 
-	v4Claims.HomeLibrary = ilsUser.HomeLibrary
-	v4Claims.CanLEO = (ilsUser.HomeLibrary != "UVA-LIB")
-	v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
-	v4Claims.CanPurchase = ilsUser.CanPurchase()
-	v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
-	v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
+	if ilsUser.NoAccount {
+		log.Printf("WARN: User %s has no Sirsi account", v4User.Virgo4ID)
+		if ilsUser.CommunityUser {
+			v4Claims.IsUVA = false
+		}
+		v4Claims.CanLEO = false
+		v4Claims.CanLEOPlus = false
+		v4Claims.CanPurchase = false
+		v4Claims.CanPlaceReserve = false
+		v4Claims.UseSIS = false
+		v4Claims.Role = v4jwt.Guest
+	} else {
+		v4Claims.HomeLibrary = ilsUser.HomeLibrary
+		v4Claims.CanLEO = (ilsUser.HomeLibrary != "UVA-LIB")
+		v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
+		v4Claims.CanPurchase = ilsUser.CanPurchase()
+		v4Claims.CanPlaceReserve = ilsUser.CanPlaceReserve()
+		v4Claims.UseSIS = (ilsUser.IsUndergraduate() || ilsUser.IsGraduate() || ilsUser.IsAlumni())
+	}
+
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
 	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)

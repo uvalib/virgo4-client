@@ -46,10 +46,14 @@ const user = {
          if ( state.sessionType == "netbadge") return false
          return true
       },
+      isGuest: (state) => {
+         return (state.role == 'guest')
+       },
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
       isGraduate: (state) => {
+         if ( state.role == 'guest' ) return false
          if (state.accountInfo.description.toLowerCase().includes("graduate student")) return true
          if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
              state.accountInfo.profile.toLowerCase().includes("undergrad")) return false
@@ -57,6 +61,7 @@ const user = {
          return false
       },
       isUndergraduate: (state) => {
+         if ( state.role == 'guest' ) return false
          if (state.accountInfo.description.toLowerCase().includes("undergraduate")) return true
          if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
              state.accountInfo.profile.toLowerCase().includes("undergrad")) return true
@@ -75,7 +80,7 @@ const user = {
          return false
       },
       useSIS: (state) => {
-         if ( state.claims.canBrowseReserve ) return state.claims.canBrowseReserve
+         if ( state.claims.useSIS ) return state.claims.useSIS
          return false
       },
       canMakeReserves: (state) => {
@@ -127,8 +132,7 @@ const user = {
       },
       isSignedIn: state => {
          return state.signedInUser != ""  && state.authToken != "" &&
-            state.sessionType != "" && state.sessionType != "none" &&
-            state.role != "" && state.role != "guest"
+            state.sessionType != "" && state.sessionType != "none"
       },
       hasAccountInfo: state => {
          if (state.signedInUser.length == 0)  return false
@@ -256,20 +260,21 @@ const user = {
             state.parsedJWT = JSON.stringify(parsed,undefined, 2);
          }
 
-         state.claims = {canPurchase: parsed.canPurchase,
+         state.claims = {
+            canPurchase: parsed.canPurchase,
             homeLibrary: parsed.homeLibrary,
             canLEO: parsed.canLEO,
             canLEOPlus: parsed.canLEOPlus,
             canPlaceReserve: parsed.canPlaceReserve,
-            canBrowseReserve: parsed.canBrowseReserve,
             useSIS: parsed.useSIS,
+            isUVA: parsed.isUVA,
          }
          state.authMessage = ""
          state.lockedOut = false
          state.signedInUser = parsed.userId
          state.authToken = jwtStr
          state.sessionType =  parsed.authMethod
-         state.role =  parsed.role
+         state.role = parsed.role
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
          localStorage.setItem("v4_jwt", jwtStr)
          state.authExpiresAt = parsed.exp
@@ -356,6 +361,7 @@ const user = {
 
       getRequests(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
+         if (ctx.rootGetters["user/isGuest"]) return
          ctx.commit('setLookingUp', true)
 
          return axios.all([axios.get(`/api/users/${ctx.state.signedInUser}/holds`),
@@ -399,6 +405,7 @@ const user = {
 
       renewItem(ctx, barcode) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
+         if (ctx.rootGetters["user/isGuest"]) return
 
          ctx.commit('setRenewing', true)
          let data = {item_barcode: barcode}
@@ -414,6 +421,7 @@ const user = {
 
       renewAll(ctx) {
          if (ctx.rootGetters["user/isSignedIn"] == false) return
+         if (ctx.rootGetters["user/isGuest"]) return
 
          ctx.commit('setRenewing', true)
          let data = {item_barcode: "all"}
@@ -435,6 +443,7 @@ const user = {
          if ( ctx.getters.hasAccountInfo == false) {
             await this.dispatch("user/getAccountInfo")
          }
+         if (ctx.rootGetters["user/isGuest"]) return
 
          const axInst = axios.create({
             timeout: 30*1000,
@@ -480,6 +489,7 @@ const user = {
 
       getBillDetails(ctx) {
          if ( ctx.state.bills.length > 0) return
+         if (ctx.rootGetters["user/isGuest"]) return
 
          ctx.commit('setLookingUp', true)
          axios.get(`/api/users/${ctx.state.signedInUser}/bills`).then((response) => {
