@@ -168,19 +168,6 @@ export default {
    created() {
       if ( this.isSignedIn) {
          this.$store.dispatch("searches/getAll", this.signedInUser)
-         setTimeout(()=> {
-            let eles = document.querySelectorAll(".v4-checkbox,.public")
-            if ( eles.length > 0) {
-               eles[0].focus()
-            } else {
-               eles = document.getElementsByClassName("history")
-               if (eles.length > 0) {
-                  eles[0].focus()
-               } else {
-                  document.getElementById("searches-submenu").focus()
-               }
-            }
-         },250)
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Saved Searches")
       }
    }

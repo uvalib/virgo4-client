@@ -57,8 +57,6 @@ export default {
          this.restoreSearchFromQueryParams(this.$route.query)
       },
       searching (newVal, _oldVal) {
-         // If restore url is set, don't do special focus handling as it will mess up
-         // the restore focus code
          if (newVal == false && this.restoreURL == "/") {
             setTimeout( () => {
                if ( this.total > 0) {
@@ -68,18 +66,6 @@ export default {
                      t.focus()
                   }
                   this.$utils.scrollToItem(r)
-               } else {
-                  let s= document.getElementById("search")
-                  if ( s) {
-                     s.focus()
-                     s.select()
-                  } else {
-                     s = document.getElementsByClassName("term")[0]
-                     if ( s ) {
-                        s.focus()
-                     }
-
-                  }
                }
             }, 250)
          }

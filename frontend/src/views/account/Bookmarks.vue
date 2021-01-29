@@ -324,14 +324,6 @@ export default {
    created() {
       if (this.isSignedIn) {
          this.$store.dispatch("bookmarks/getBookmarks")
-         setTimeout(()=> {
-            let eles = document.getElementsByClassName("bookmark-folder")
-            if ( eles.length > 0) {
-               eles[0].focus()
-            } else {
-               document.getElementById("bookmarks-submenu").focus()
-            }
-         }, 250)
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
       }
    }

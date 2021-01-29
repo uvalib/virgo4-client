@@ -108,9 +108,6 @@ export default {
    created() {
       if ( this.isSignedIn) {
          this.$store.dispatch("user/getRequests")
-         setTimeout(()=> {
-            document.getElementById("digital-submenu").focus()
-         },250)
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Digital Deliveries")
       }
    }

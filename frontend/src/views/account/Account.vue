@@ -199,9 +199,6 @@ export default {
       if ( this.isSignedIn ) {
          this.$store.dispatch("user/getAccountInfo")
          this.$store.dispatch("user/getBillDetails")
-         setTimeout(()=> {
-            document.getElementById("info-submenu").focus()
-         },250)
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "My Information")
       }
    }

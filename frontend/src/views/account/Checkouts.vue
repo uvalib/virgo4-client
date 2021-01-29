@@ -210,10 +210,6 @@ export default {
 
          await this.$store.dispatch("user/getCheckouts")
          this.lookingUpUVA = false
-
-         setTimeout(()=> {
-            document.getElementById("checkouts-submenu").focus()
-         }, 250)
       }
    }
 }

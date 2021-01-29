@@ -271,9 +271,6 @@ export default {
          await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch("user/getRequests")
          this.$store.commit('user/setLookingUp', false)
-         setTimeout(() => {
-            document.getElementById("requests-submenu").focus()
-         }, 250)
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
       }
    }

@@ -54,7 +54,7 @@ import InstructorSearchResults from "@/components/reserves/InstructorSearchResul
 export default {
    name: "course-reserves",
    components: {
-      CourseSearchResults, InstructorSearchResults 
+      CourseSearchResults, InstructorSearchResults
    },
    data: function() {
       return {
@@ -84,9 +84,9 @@ export default {
                this.loadingMore = true
                this.$store.dispatch("reserves/nextPage").finally( ()=> {
                   this.loadingMore = false
-               })   
-            } 
-         } 
+               })
+            }
+         }
       }
    },
    methods: {
@@ -101,9 +101,6 @@ export default {
    },
    created() {
       this.$store.dispatch("user/getAccountInfo")
-      setTimeout( ()=> {
-         document.getElementById("crsearch").focus()
-      },250)
    },
 }
 </script>

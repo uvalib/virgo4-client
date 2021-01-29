@@ -44,9 +44,6 @@ export default {
       if ( this.isSignedIn) {
          this.$store.dispatch('pools/getPools')
          this.$store.dispatch("user/getAccountInfo")
-         setTimeout(()=> {
-            document.getElementById("preferences-submenu").focus()
-         }, 500)
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
       }
    }

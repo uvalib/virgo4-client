@@ -1,5 +1,6 @@
 <template>
    <div id="app">
+      <SkipToNavigation />
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer">
@@ -18,7 +19,7 @@
       </div>
       <VirgoHeader :id="headerID" />
       <MenuBar :id="menuID"/>
-      <main class="v4-content">
+      <main tabindex="-1" class="v4-content" id="v4-main">
          <SessionExpired />
          <router-view />
          <div v-if="newVersion" class="update-pop">
@@ -37,6 +38,7 @@ import LibraryFooter from "@/components/layout/LibraryFooter"
 import MessageBox from "@/components/layout/MessageBox"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
+import SkipToNavigation from "@/components/layout/SkipToNavigation"
 import SessionExpired from "@/components/layout/SessionExpired"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -50,12 +52,7 @@ export default {
       };
    },
    components: {
-      VirgoHeader,
-      LibraryFooter,
-      MenuBar,
-      ScrollToTop,
-      MessageBox,
-      SessionExpired
+      VirgoHeader, LibraryFooter, MenuBar, ScrollToTop, MessageBox, SessionExpired, SkipToNavigation
    },
    computed: {
       ...mapState({
@@ -366,6 +363,12 @@ body {
 }
 //adding accessibility for keyboard focus
 #app {
+   #v4-main {
+      outline: 0;
+      &:focus {
+         outline: 0;
+      }
+   }
    a:focus {
       @include be-accessible();
    }
