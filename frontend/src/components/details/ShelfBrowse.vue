@@ -6,9 +6,9 @@
       <template v-if="!working && hasBrowseData">
          <h2>
             <span>Shelf Browse</span>
-             <router-link @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
+             <!-- <router-link @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
                 View full page
-             </router-link>
+             </router-link> -->
          </h2>
          <div class="browse-cards">
             <div v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
