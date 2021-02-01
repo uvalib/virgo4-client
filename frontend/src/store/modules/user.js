@@ -143,11 +143,6 @@ const user = {
       libraries: (_state, getters, rootState) => {
          let pickupLibraries = rootState.system.pickupLibraries.slice()
 
-         // After 2021-2-1 move this to system.js
-         if (Date.now() >= Date.parse('2021-2-1')){
-            pickupLibraries.push({id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'})
-         }
-
          if (getters.isHSLUser) {
             pickupLibraries.push({id: "HEALTHSCI", name: "Health Sciences Library"})
          }
