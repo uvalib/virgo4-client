@@ -406,35 +406,15 @@ export default {
       },
 
       async searchClicked() {
-         // Refine search updates:
-         // if pool, filter or sort were specified previously, preserve them in the URL.
-         // a new search will always reset paging, so don't preserve that
-         let priorQ = Object.assign({}, this.$route.query)
-         let qp = this.queryURLParams
-         if ( priorQ.pool ) {
-            qp += `&pool=${priorQ.pool}`
-            this.$store.commit("query/setTargetPool", priorQ.pool)
-
-            // grab current query string for the selected pool straight from the model.
-            // cant rely on preserving prior filter string as the target pool may have changed
-            // by the user selecting one from the dropdown
-            qp += this.filterQueryString( priorQ.pool )
-         } else {
-            if (priorQ.filter) {
-               qp += `&filter=${priorQ.filter}`
-            }
-         }
-         if (priorQ.sort) {
-            qp += `&sort=${priorQ.sort}`
-         }
-         this.userSearched = true
-         this.$router.push(`/search?${qp}`).catch(_err => {})
-
-         let s = "SIGNED_OUT"
          if ( this.isSignedIn ) {
-            s = "SIGNED_IN"
+            this.$analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_IN")
+         } else {
+            this.$analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_OUT")
          }
-         this.$analytics.trigger('Search', 'BASIC_SEARCH', s)
+         let newQ = Object.assign({}, this.$route.query)
+         newQ.q = this.rawQueryString
+         this.userSearched = true
+         await this.$router.replace({query: newQ})
       },
 
       barcodeScanned( barcode ) {

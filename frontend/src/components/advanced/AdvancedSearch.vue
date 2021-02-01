@@ -78,7 +78,7 @@
                   </Confirm>
 
                </div>
-               <PreSearchFilters />
+               <PreSearchFilters v-if="hasResults==false"/>
                <div class="controls">
                   <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
                </div>
@@ -116,6 +116,8 @@ export default {
          hasResults: 'hasResults',
          preSearchFilterApplied: 'filters/preSearchFilterApplied',
          filterQueryString: 'filters/asQueryParam',
+         preSearchFilters: 'filters/preSearchFilters',
+         rawQueryString: 'query/string'
       }),
       ...mapFields({
         userSearched: 'query.userSearched',
@@ -139,7 +141,8 @@ export default {
          }
          return "text"
       },
-      doAdvancedSearch() {
+
+      async doAdvancedSearch() {
          this.$store.commit("query/fixDateSearches")
          let fields = this.advanced.filter( f=>f.value != "")
          if ( fields.length == 1 && fields[0].op == "NOT") {
@@ -179,37 +182,28 @@ export default {
             return
          }
 
-         // Refine search updates:
-         // if pool, filter or sort were specified previously, preserve them in the URL.
-         // a new search will always reset paging, so don't preserve that
-         let priorQ = Object.assign({}, this.$route.query)
-         let qp =  this.queryURLParams
-         if (priorQ.pool) {
-            qp += `&pool=${priorQ.pool}`
-         }
-         if ( this.preSearchFilterApplied ) {
-            // Turn presearch filter into query string. From here on out, post search filters will
-            // be used instead
-            qp += `&filter=${this.filterQueryString('presearch')}`
-         } else if (priorQ.filter) {
-            qp += `&filter=${priorQ.filter}`
-         }
-         if (priorQ.sort) {
-            qp += `&sort=${priorQ.sort}`
-         }
-
-         this.userSearched = true
-         this.$store.dispatch("filters/promotePreSearchFilters")
-         this.$router.push(`/search?${qp}`).catch(_err => {})
-
-         let s = "SIGNED_OUT"
          if ( this.isSignedIn ) {
-            s = "SIGNED_IN"
+            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', "SIGNED_IN")
+         } else {
+            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', "SIGNED_OUT")
          }
-         if ( decodeURI(qp).includes("UVA Library Digital Repository") ) {
-            this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')
+
+         let coll = this.preSearchFilters.find( psf => psf.id == "FilterCollection")
+         if (coll) {
+            let uvad = coll.buckets.find(b => b.value == "UVA Library Digital Repository")
+            if (uvad && uvad.selected) {
+               this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')
+            }
          }
-         this.$analytics.trigger('Search', 'ADVANCED_SEARCH', s)
+
+         let newQ = Object.assign({}, this.$route.query)
+         newQ.q = this.rawQueryString
+         if ( this.hasResults == false && this.preSearchFilterApplied ) {
+            this.$store.dispatch("filters/promotePreSearchFilters")
+            newQ.filter = this.filterQueryString('presearch')
+         }
+         this.userSearched = true
+         await this.$router.replace({query: newQ})
       },
       addClicked() {
          this.$store.commit("query/addCriteria")

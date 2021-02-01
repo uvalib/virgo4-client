@@ -13,7 +13,7 @@
                <template  v-for="(values, filter) in appliedFilters">
                   <dt :key="filter" class="label" v-show="filter != 'undefined'">{{filter}}</dt>
                   <dd :key="`${filter}-values`" class="label">
-                     <span v-for="fv in values" class="selected" :key="fv.value">
+                     <span v-for="fv in values" class="selected" :key="`${filter}-${fv.value}`">
                         <V4Button mode="icon" class="remove" @click="removeFilter(fv)"
                            :aria-label="`remove filter #{val}`">
                            <i class="fas fa-times-circle"></i>{{fv.value}}
@@ -33,7 +33,7 @@
             <span class="title">Not Applicable Filters</span>
          </div>
          <div class="unsupported filter-display" >
-            <span v-for="naF in naFilters" class="selected" :key="`${naF.value}`">
+            <span v-for="naF in naFilters" class="selected" :key="`na-${naF.value}`">
                <V4Button mode="icon" class="remove" @click="removeFilter(naF)"
                   :aria-label="`remove filter #{naf.value}`">
                   <i class="fas fa-times-circle"></i>{{naF.value}}

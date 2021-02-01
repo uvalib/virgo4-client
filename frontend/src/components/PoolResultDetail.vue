@@ -1,6 +1,6 @@
 <template>
    <div class="pool-results">
-      <div class="results-header">
+      <div class="pool-header">
          <div class="desc" v-html="selectedResults.pool.description">
          </div>
          <div v-if="hasLogo" class="source-logo">
@@ -147,7 +147,7 @@ export default {
    position: relative;
    top: -5px;
 }
-div.results-header {
+div.pool-header {
    font-size: 1em;
    color: white;
    background: var(--uvalib-brand-blue);
@@ -219,7 +219,7 @@ div.results-header {
       margin: 0 0 20px 0;
       grid-gap: .5rem;
    }
-   div.results-header {
+   div.pool-header {
       margin: 0 0 1rem 0;
    }
 }
