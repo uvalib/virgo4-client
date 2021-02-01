@@ -532,10 +532,25 @@ export default new Vuex.Store({
          }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)
-            if (error.response && error.response.status == 401) {
-               commit('system/setSessionExpired', null, { root: true })
-               dispatch("user/signout", null, { root: true })
-            } else {
+            let genericError = true
+            if (error.response ) {
+               if (error.response.status == 401) {
+                  commit('system/setSessionExpired', null, { root: true })
+                  dispatch("user/signout", null, { root: true })
+                  genericError = false
+               } else if (error.response.status == 400) {
+                  let msg = "This query is malformed or unsupported. Please ensure that all quotes and parenthesis are matched."
+                  msg += "<p>We regret the inconvenience. If this problem persists, "
+                  msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>"
+                  let err = {
+                     message: msg,
+                  }
+                  commit('system/setSearchError', err)
+                  genericError = false
+               }
+            }
+
+            if ( genericError ) {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)

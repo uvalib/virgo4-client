@@ -356,7 +356,7 @@ export default {
 
             // make sure the currently selected pool is always in URL
             let testQ = Object.assign({}, this.$router.currentRoute.query)
-            if (testQ.pool != this.selectedResults.pool.id) {
+            if (this.selectedResults.pool.id != "none" && testQ.pool != this.selectedResults.pool.id) {
                testQ.pool = this.selectedResults.pool.id
                await this.$router.replace({query: testQ})
             }
