@@ -550,12 +550,8 @@ export default new Vuex.Store({
       },
 
       // Select pool results and get all facet info for the result
-      async selectPoolResults(ctx, resultIdx) {
+      selectPoolResults(ctx, resultIdx) {
          if (ctx.state.selectedResultsIdx != resultIdx) {
-            if (ctx.rootGetters["user/isSignedIn"]) {
-               await ctx.dispatch("user/refreshAuth")
-            }
-
             let data = {resultIdx: resultIdx, maxTabs: ctx.rootState.preferences.maxTabs }
             ctx.commit('selectPoolResults', data)
             ctx.commit('sort/setActivePool', ctx.state.results[ctx.state.selectedResultsIdx].pool.id)
