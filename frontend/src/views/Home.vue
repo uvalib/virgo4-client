@@ -334,13 +334,16 @@ export default {
                this.$store.commit("resetSearchResults")
                let changed = this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam || this.userSearched == true
 
-               // NOTE: immediately reset the user searched flag because searchAllPools may append &pool=something to
-               // the URL. When this happens, a route change is detected and the search should NOT be re-run as nothing
-               // has changed. If userSearched is not reset, the search will run twice.
                if ( this.userSearched ) {
                   this.$store.dispatch("searches/updateHistory")
                   this.userSearched = false
                }
+
+               if ( this.isSignedIn ) {
+                  await this.$store.dispatch("user/refreshAuth")
+                  this.$store.dispatch("bookmarks/getBookmarks")
+               }
+
                if (this.searchSources == "all") {
                   await this.$store.dispatch("searchAllPools")
                } else {

@@ -238,16 +238,17 @@ export default {
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
          let id = this.$route.params.id
-         let mapping = this.poolMapping[src]
-         if (mapping && mapping.pool != src) {
-            src = mapping.pool
-            let fixed = `/sources/${src}/items/${id}`
-            this.$router.replace( fixed )
-            return
+         if ( src ) {
+            let mapping = this.poolMapping[src]
+            if (mapping && mapping.pool != src) {
+               src = mapping.pool
+               let fixed = `/sources/${src}/items/${id}`
+               this.$router.replace( fixed )
+               return
+            }
          }
 
          if ( this.isSignedIn) {
-            await this.$store.dispatch("user/getAccountInfo")
             this.$store.dispatch("bookmarks/getBookmarks")
          }
 

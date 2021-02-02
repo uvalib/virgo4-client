@@ -435,12 +435,6 @@ export default new Vuex.Store({
 
          commit('setSearching', true)
          commit("clearLastSearch")
-         if (rootGetters["user/isSignedIn"]) {
-            await dispatch("user/refreshAuth")
-            // make sure bookmarks are up to date when
-            // searching so the UI can show the correct status per item
-            dispatch("bookmarks/getBookmarks")
-         }
 
          // POST the search query and wait for the response
          await axios.post(`${rootState.system.searchAPI}/api/search`, req).then((response) => {
@@ -505,10 +499,6 @@ export default new Vuex.Store({
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'searchSelectedPool', query: rootGetters['query/getState']}
             dispatch("system/reportError", err)
-         }
-
-         if (rootGetters["user/isSignedIn"]) {
-            await dispatch("user/refreshAuth")
          }
 
          let url = params.pool.url + "/api/search"

@@ -434,11 +434,9 @@ const user = {
          if ( ctx.state.checkouts.length > 0) {
             return
          }
-
-         if ( ctx.getters.hasAccountInfo == false) {
-            await this.dispatch("user/getAccountInfo")
+         if (ctx.state.signedInUser.length == 0) {
+            return
          }
-         if (ctx.rootGetters["user/isGuest"]) return
 
          const axInst = axios.create({
             timeout: 30*1000,

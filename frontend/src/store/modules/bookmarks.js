@@ -11,19 +11,15 @@ const bookmarks = {
 
    getters: {
       hasBookmarks: state => {
-         if ( state.bookmarks == null ) return false
          if ( state.bookmarks.length === 0) return false
          return true
       },
 
       bookmarks: state => {
-         if ( state.bookmarks == null ) return []
          return state.bookmarks
       },
 
       folders: state => {
-         if ( state.bookmarks == null ) return [{id: 0, name: "General", lastUsed: ""} ]
-
          let out = []
          let foundGeneral = false
          state.bookmarks.forEach( (folderObj) => {
@@ -109,18 +105,20 @@ const bookmarks = {
           })
       },
       async getBookmarks(ctx) {
-         ctx.commit('setSearching', true)
-         if (ctx.rootGetters["user/hasAccountInfo"] == false) {
-            await ctx.dispatch("user/getAccountInfo", null, { root: true })
+         if (ctx.getters.hasBookmarks) {
+            return
          }
          let v4UID = ctx.rootState.user.signedInUser
-         return axios.get(`/api/users/${v4UID}/bookmarks`).then((response) => {
-            ctx.commit('setBookmarks', response.data)
-            ctx.commit('setSearching', false)
-          }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setSearching', false)
-          })
+         if ( v4UID) {
+            ctx.commit('setSearching', true)
+            return axios.get(`/api/users/${v4UID}/bookmarks`).then((response) => {
+               ctx.commit('setBookmarks', response.data)
+               ctx.commit('setSearching', false)
+            }).catch((error) => {
+               ctx.commit('system/setError', error, { root: true })
+               ctx.commit('setSearching', false)
+            })
+         }
       },
 
       // bmData Fields: Folder, Pool, ID, Title. Author optional
