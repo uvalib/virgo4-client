@@ -1,7 +1,7 @@
 <template>
-   <span tabindex="0" class="skip-to" :class="{show: hasFocus}" role="menu" :aria-expanded="menuOpen.toString()"
+   <span tabindex="0" class="skip-to"
+      role="menu" :aria-expanded="menuOpen.toString()"
       aria-label="Skip to menu"
-      @focus="menuFocused"
       @click.stop="toggleNavMenu" @keyup.prevent.stop.enter="toggleNavMenu"
       @keydown.space.prevent.stop="toggleNavMenu"
       @keyup.down="nextMenu" @keyup.up="prevMenu"
@@ -44,7 +44,6 @@
 export default {
    data: function() {
       return {
-         hasFocus: false,
          menuOpen: false,
          menuIdx: 0,
          menuItem: ["skipnav", "skipmain", "skipsearch"],
@@ -62,9 +61,6 @@ export default {
       },
    },
    methods: {
-      menuFocused() {
-         this.hasFocus = true
-      },
       skipToMain() {
          let m = document.getElementById("v4-main")
          m.focus()
@@ -118,19 +114,12 @@ export default {
       },
       globalClick() {
          this.menuOpen = false
-         setTimeout( () => {
-            this.hasFocus = false
-         }, 200)
       },
       toggleNavMenu() {
          this.menuOpen = !this.menuOpen
          this.menuIdx = 0
          if (this.menuOpen) {
             this.focusCurrentSubmenu()
-         } else {
-            setTimeout( () => {
-            this.hasFocus = false
-         }, 200)
          }
       },
       beforeEnter: function(el) {
@@ -158,23 +147,24 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.skip-to.show {
-   top: 5px;
-}
 .skip-to {
    background: white;
    color: var(--uvalib-text);
    padding: 0;
    text-align: left;
-   border-radius: 5px;
    box-shadow: $v4-box-shadow;
    position: absolute;
-   top: -40px;
-   left: 5px;
+   transform: translateY(-150%);
+   left: 0;
    z-index: 9000;
    width: 125px;
+   text-align: left;
+   transition: transform 200ms;
    &:focus {
       @include be-accessible-light();
+   }
+   &:active, &:focus, &:hover, &:focus-within {
+      transform: translateY(0%);
    }
 
    .menu-header {
