@@ -87,7 +87,7 @@ export default {
    },
    computed: {
       showAvailability() {
-         return this.availability.searching == false && (this.hasItems || this.hasRequestOptions || this.availabilityFields.length > 0 )
+         return this.availability.searching == false && (this.hasItems || this.hasRequestOptions || this.availabilityFields.length > 0 || this.hasBoundWithItems)
       },
       ...mapState({
          details : state => state.item.details,
