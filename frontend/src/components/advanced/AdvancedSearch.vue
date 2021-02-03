@@ -222,6 +222,7 @@ export default {
       if ( this.hasSearchTemplate ) {
          this.$store.commit("query/setTemplate", this.searchTemplate)
       }
+      document.getElementById("app").focus()
    }
 };
 </script>

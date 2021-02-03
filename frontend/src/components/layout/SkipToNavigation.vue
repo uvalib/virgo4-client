@@ -4,7 +4,8 @@
       aria-label="Skip to menu"
       @click.stop="toggleNavMenu" @keyup.prevent.stop.enter="toggleNavMenu"
       @keydown.space.prevent.stop="toggleNavMenu"
-      @keyup.down="nextMenu" @keyup.up="prevMenu"
+      @keydown.down.prevent.stop="nextMenu" @keydown.up.prevent.stop="prevMenu"
+      @keyup.down.prevent.stop @keyup.up.prevent.stop
    >
       <span class="menu-header">
          <span>Skip To</span>
@@ -76,7 +77,7 @@ export default {
          if ( s) {
             s.focus()
          } else {
-            s = document.getElementsByClassName("term")[0]
+            s = document.getElementsByClassName("field")[0]
             if ( s ) {
                s.focus()
             }
@@ -190,12 +191,15 @@ export default {
       .submenu {
          cursor: pointer;
          padding: 5px 10px;
+         border-radius: 0;
+         outline: 0;
          &:hover {
             background-color: var(--uvalib-brand-blue-lightest);
             color: var(--uvalib-text-dark);
          }
          &:focus {
-            @include be-accessible();
+            background-color: var(--uvalib-brand-blue-lightest);
+            color: var(--uvalib-text-dark);
          }
       }
    }

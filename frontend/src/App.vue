@@ -1,5 +1,5 @@
 <template>
-   <div id="app">
+   <div tabindex="0" id="app">
       <SkipToNavigation />
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">

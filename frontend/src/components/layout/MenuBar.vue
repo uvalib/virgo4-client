@@ -15,7 +15,9 @@
          </div>
          <span v-if="isKiosk==false" role="menu" id="servicemenu" class="menu-item service" tabindex="-1" :aria-expanded="svcMenuOpen.toString()"
             @click.stop="toggleSvcMenu" @keyup.prevent.stop.enter="toggleSvcMenu" @keydown.space.prevent.stop="toggleSvcMenu"
-            @keyup.down="nextSvcMenu" @keyup.up="prevSvcMenu">
+            @keydown.down.prevent.stop="nextSvcMenu" @keydown.up.prevent.stop="prevSvcMenu"
+            @keyup.down.prevent.stop @keyup.up.prevent.stop
+         >
             <span>Library Services&nbsp;</span>
             <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('svc') }"></i>
             <transition name="grow"
@@ -54,7 +56,9 @@
             <template v-if="isSignedIn">
                <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen.toString()"
                   @click.stop="toggleUserMenu" @keyup.prevent.stop.enter="toggleUserMenu" @keydown.space.prevent.stop="toggleUserMenu"
-                  @keyup.down="nextUserMenu" @keyup.up="prevUserMenu">
+                  @keydown.down.prevent.stop="nextUserMenu" @keydown.up.prevent.stop="prevUserMenu"
+                  @keyup.down.prevent.stop @keyup.up.prevent.stop
+               >
                   <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
                   <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('user') }"></i>
                   <transition name="grow"
@@ -194,7 +198,7 @@ export default {
             this.menuBarIdx = 0
          }
          let menu = document.getElementById(this.menuBar[this.menuBarIdx])
-         menu.focus()
+         menu.focus({preventScroll:true})
       },
       prevMenu() {
          this.closeSubMenus()
@@ -203,7 +207,7 @@ export default {
             this.menuBarIdx = this.menuBar.length - 1
          }
          let menu = document.getElementById(this.menuBar[this.menuBarIdx])
-         menu.focus()
+         menu.focus({preventScroll:true})
       },
       nextUserMenu( ) {
          if ( this.userMenuOpen) {
@@ -216,7 +220,7 @@ export default {
          }
          this.$nextTick( () => {
             let menu = document.getElementById(this.userMenu[this.userMenuIdx])
-            menu.focus()
+            menu.focus({preventScroll:true})
          })
       },
       nextSvcMenu() {
@@ -230,7 +234,7 @@ export default {
          }
          this.$nextTick( () => {
             let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
-            menu.focus()
+            menu.focus({preventScroll:true})
          })
       },
       prevUserMenu() {
@@ -245,7 +249,7 @@ export default {
          }
          this.$nextTick( () => {
             let menu = document.getElementById(this.userMenu[this.userMenuIdx])
-            menu.focus()
+            menu.focus({preventScroll:true})
          })
       },
       prevSvcMenu() {
@@ -260,7 +264,7 @@ export default {
          }
          this.$nextTick( () => {
             let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
-            menu.focus()
+            menu.focus({preventScroll:true})
          })
       },
       searchClicked() {
@@ -409,18 +413,19 @@ export default {
       padding: 10px 15px;
       outline: none;
 
+      &::hover {
+         background-color: var(--uvalib-brand-blue-lightest);
+         color: var(--uvalib-text-dark);
+      }
+
       a {
          color:white;
+         &:hover {
+            text-decoration: none;
+            border: none;
+            color: white;
+         }
       }
-      a:hover {
-         text-decoration: none;
-         border: none;
-         color: white;
-      }
-   }
-   .submenu:hover {
-      background-color: var(--uvalib-brand-blue-lightest);
-      color: var(--uvalib-text-dark);
    }
 
    .submenu-arrow {
