@@ -1,21 +1,25 @@
 <template>
    <nav class="menu" role="menubar" aria-label="Virgo Menu"
-      @keyup.right="nextMenu" @keyup.left="prevMenu" @keyup.esc="closeSubMenus"
+      @keyup.right="nextMenu" @keyup.left="prevMenu"
+      @keyup.esc="closeSubMenus"
    >
       <span class="menu-right">
-        <router-link role="menuitem" id="searchmenu" @click.native="searchClicked" to="/" v-on:focus.native="onMenuFocus">
-           <span class="menu-item"><i class="icon fas fa-search"></i>Search</span>
-        </router-link>
-        <!-- <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
-           <span class="menu-item"><i class="icon fas fa-university"></i>Course Reserves</span>
-        </router-link> -->
-        <div v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback" @mousedown="closeSubMenus">
+         <router-link role="menuitem" id="searchmenu" @mousedown.native="searchClicked" to="/">
+            <span class="menu-item"><i class="icon fas fa-search"></i>Search</span>
+         </router-link>
+         <!-- <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
+            <span class="menu-item"><i class="icon fas fa-university"></i>Course Reserves</span>
+         </router-link> -->
+         <div v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback"
+            @mousedown="closeSubMenus"
+         >
             <a tabindex="-1" href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
                <span><i class="icon fas fa-comments"></i></span>
                <span>Questions? Ask a Librarian</span>
             </a>
          </div>
-         <span v-if="isKiosk==false" role="menu" id="servicemenu" class="menu-item service" tabindex="-1" :aria-expanded="svcMenuOpen.toString()"
+         <span v-if="isKiosk==false" role="menu" id="servicemenu" class="menu-item service" tabindex="-1"
+            :aria-expanded="svcMenuOpen.toString()"
             @click.stop="toggleSvcMenu" @keyup.prevent.stop.enter="toggleSvcMenu" @keydown.space.prevent.stop="toggleSvcMenu"
             @keydown.down.prevent.stop="nextSvcMenu" @keydown.up.prevent.stop="prevSvcMenu"
             @keyup.down.prevent.stop @keyup.up.prevent.stop
@@ -102,8 +106,7 @@
                </router-link>
             </template>
             <template v-else>
-               <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin"
-                  @click.native="closeSubMenus">
+               <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin">
                   <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
                </router-link>
             </template>
@@ -178,10 +181,6 @@ export default {
          if ( this.alertCount > 0) {
             document.querySelector('#alerts').unseeAll()
          }
-      },
-      onMenuFocus() {
-         this.menuBarIdx = 0
-         this.closeSubMenus()
       },
       rotation( menu) {
          let flag = this.userMenuOpen
@@ -270,7 +269,6 @@ export default {
          })
       },
       searchClicked() {
-         this.closeSubMenus()
          this.$store.dispatch('resetSearch')
          window.scrollTo({
             top: 0,
@@ -306,7 +304,6 @@ export default {
       closeSubMenus() {
          this.closeSvcMenu()
          this.closeUserMenu()
-         this.restoreMenuBarFocus()
       },
       closeSvcMenu() {
          this.svcMenuOpen = false
@@ -315,12 +312,6 @@ export default {
       closeUserMenu() {
          this.userMenuOpen = false
          this.userMenuIdx = 0
-      },
-      restoreMenuBarFocus() {
-         setTimeout( () => {
-            let menu = document.getElementById(this.menuBar[this.menuBarIdx])
-            menu.focus()
-         },100)
       },
       async signOut() {
          await this.$store.dispatch("user/signout")

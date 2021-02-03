@@ -115,11 +115,6 @@ export default {
          this.$store.dispatch("user/netbadge")
       },
    },
-   created() {
-      setTimeout( ()=> {
-         document.getElementById("netbadge").focus()
-      },250)
-   }
 }
 </script>
 

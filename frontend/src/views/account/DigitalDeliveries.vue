@@ -82,18 +82,6 @@ export default {
          return this.requests.illiad.filter( h=> h.transactionStatus == "Delivered to Web")
       }
    },
-   watch: {
-      lookingUp(newVal, _oldVal) {
-         if (newVal == false ) {
-            setTimeout(()=> {
-               let links = document.getElementsByClassName("pdf-link")
-               if (links.length > 0) {
-                  links[0].focus()
-               }
-            },250)
-         }
-      }
-   },
    methods: {
       formatDate(date) {
          return date.split("T")[0];

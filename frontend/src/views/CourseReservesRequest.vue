@@ -101,7 +101,7 @@
                      <dl>
                         <dt>Loan Period</dt>
                         <dd>
-                           <select :aria-label="`loan period for ${bm.details.title}`" 
+                           <select :aria-label="`loan period for ${bm.details.title}`"
                               v-model="bm.period" id="item-period" name="item-period"
                               aria-required="true" required="required"
                            >
@@ -122,10 +122,10 @@
             <h3>Video-format items to be placed on reserve</h3>
             <div class="wrapper-content pure-form pure-form-aligned">
                <div class="video-note">
-                  <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System. 
+                  <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System.
                      If you have questions about video reserves, please email
                      <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.</b>
-               </div>  
+               </div>
                <div class="items">
                   <div class="card" v-for="bm in videoRequests" :key="bm.identifier">
                      <div class="title">{{bm.details.title}}</div>
@@ -135,14 +135,14 @@
                         <dd>
                            <input :aria-label="`preferred audio language for ${bm.details.title}`" v-model="bm.audioLanguage" type="text">
                         </dd>
-                        <dt class="label">Subtitles</dt> 
+                        <dt class="label">Subtitles</dt>
                         <dd>
                            <select :aria-label="`include stubtitles for ${bm.details.title}`" v-model="bm.subtitles">
                               <option value="yes">Yes</option>
                               <option value="no">No</option>
                            </select>
                         </dd>
-                        <dt class="label">Subtitles Language</dt> 
+                        <dt class="label">Subtitles Language</dt>
                         <dd>
                            <input :aria-label="`stubtitle language for ${bm.details.title}`" v-model="bm.subtitleLanguage" type="text">
                            <span v-if="hasSubtitleError(bm)" class="error">* language is required</span>
@@ -193,17 +193,14 @@ export default {
       ]),
       ...mapMultiRowFields('reserves', ['requestList']),
       videoRequests() {
-        return this.requestList.filter( r=> r.pool == "video") 
-      }, 
+        return this.requestList.filter( r=> r.pool == "video")
+      },
       nonVideoRequests() {
-         return this.requestList.filter( r=> r.pool != "video") 
+         return this.requestList.filter( r=> r.pool != "video")
       }
    },
    created() {
       this.$store.commit("reserves/setRequestingUser", this.userInfo)
-      setTimeout( ()=> {
-         document.getElementById("behalf_of").focus()
-      }, 100)
    },
    methods: {
       hasSubtitleError( item) {
@@ -220,7 +217,7 @@ export default {
          this.errors.splice(0, this.errors.length)
          let proxyRequest = this.reserveRequest.onBehalfOf == "yes"
          for (let [key, value] of Object.entries(this.reserveRequest)) {
-            if ( key == "period" && this.nonVideoRequests == 0) continue 
+            if ( key == "period" && this.nonVideoRequests == 0) continue
             if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail") ) continue
             if (value == "") {
                this.errors.push(key)
@@ -233,12 +230,12 @@ export default {
             }
          })
          if (subtitleError) {
-            this.errors.push("subtitleLanguage")    
+            this.errors.push("subtitleLanguage")
          }
          if ( this.errors.length == 0) {
             this.$store.dispatch("reserves/createReserves")
          } else {
-            this.$store.commit("system/setError", "Some required fields are missing")  
+            this.$store.commit("system/setError", "Some required fields are missing")
             var scrollStep = -window.scrollY / (500 / 10),
             scrollInterval = setInterval(()=> {
                if ( window.scrollY != 0 ) {
@@ -246,7 +243,7 @@ export default {
                } else {
                   clearInterval(scrollInterval)
                }
-            },10)  
+            },10)
          }
       },
       itemsPeriodChosen() {
@@ -326,7 +323,7 @@ h3 {
    margin: 0;
 }
 .video-note {
-   text-align: left; 
+   text-align: left;
    padding: 10px 10px 0 10px;
 }
 div.items {
@@ -364,7 +361,7 @@ div.wrapper {
    margin-bottom: 20px;
 }
 div.wrapper-content {
- border: 1px solid var(--uvalib-grey-light); 
+ border: 1px solid var(--uvalib-grey-light);
 }
 dl {
    margin: 0;

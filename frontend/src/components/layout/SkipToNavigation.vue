@@ -1,8 +1,9 @@
 <template>
-   <span tabindex="0" class="skip-to"
+   <span tabindex="0" class="skip-to" id="skip-to"
       role="menu" :aria-expanded="menuOpen.toString()"
       aria-label="Skip to menu"
       @click.stop="toggleNavMenu" @keyup.prevent.stop.enter="toggleNavMenu"
+      @keyup.esc="globalClick"
       @keydown.space.prevent.stop="toggleNavMenu"
       @keydown.down.prevent.stop="nextMenu" @keydown.up.prevent.stop="prevMenu"
       @keyup.down.prevent.stop @keyup.up.prevent.stop
@@ -63,23 +64,23 @@ export default {
    },
    methods: {
       skipToMain() {
-         let m = document.getElementById("v4-main")
-         m.focus()
          this.toggleNavMenu()
+         let m = document.getElementById("v4-main")
+         m.focus( {preventScroll:true} )
       },
       skipToNav() {
          let m = document.getElementById("searchmenu")
-         m.focus()
+         m.focus( {preventScroll:true} )
          this.toggleNavMenu()
       },
       skipToSearch() {
          let s = document.getElementById("search")
          if ( s) {
-            s.focus()
+            s.focus( {preventScroll:true} )
          } else {
             s = document.getElementsByClassName("field")[0]
             if ( s ) {
-               s.focus()
+               s.focus( {preventScroll:true} )
             }
          }
          this.toggleNavMenu()
@@ -115,6 +116,7 @@ export default {
       },
       globalClick() {
          this.menuOpen = false
+         document.getElementById("skip-to").blur()
       },
       toggleNavMenu() {
          this.menuOpen = !this.menuOpen
