@@ -305,7 +305,7 @@ const item = {
                // NOTE:  the result above only contains basic fields. the redirect below
                // will trigger a full record get
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
-               router.push(redirect)
+               router.replace(redirect)
             } else {
                ctx.commit("clearDetails")
                router.push(`/not_found`)
