@@ -61,10 +61,7 @@ export default {
             setTimeout( () => {
                if ( this.total > 0) {
                   let r = document.getElementById("results-container")
-                  let t =  document.getElementsByClassName("suggestion")[0]
-                  if ( t) {
-                     t.focus()
-                  }
+                  r.focus({preventScroll:true})
                   this.$utils.scrollToItem(r)
                }
             }, 250)

@@ -1,43 +1,43 @@
 <template>
-   <div class="results-wrap" aria-live="polite">
-      <div v-if="hasResults" id="results-container" class="search-results shady" aria-describedby="search-summary">
-         <SearchSuggestions />
-         <div class="results-header">
-            <template v-if="showSummary">
-               <div id="search-summary" class="summary">
-                  <div class="query">Showing {{$utils.formatNum(total)}} results for:</div>
-                  <div class="qs">{{queryString}}</div>
-               </div>
-               <span class="buttons">
-                  <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
-                  <SaveSearch v-if="isSignedIn"/>
-                  <SignInRequired v-else id="save-signin-modal" act="save-search"/>
-               </span>
-            </template>
-         </div>
+   <div v-if="hasResults" tabindex="-1" id="results-container"
+      class="search-results" aria-describedby="search-summary"
+   >
+      <SearchSuggestions />
+      <div class="results-header">
+         <template v-if="showSummary">
+            <div id="search-summary" class="summary">
+               <div class="query">Showing {{$utils.formatNum(total)}} results for:</div>
+               <div class="qs">{{queryString}}</div>
+            </div>
+            <span class="buttons">
+               <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
+               <SaveSearch v-if="isSignedIn"/>
+               <SignInRequired v-else id="save-signin-modal" act="save-search"/>
+            </span>
+         </template>
+      </div>
 
-         <div class="results-wrapper" >
-            <FacetSidebar />
-            <div class="results-main">
-               <div class="pool-tabs">
-                  <template  v-for="(r,idx) in sourceTabs">
-                     <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
-                        <span>
-                           <span class="pool">{{r.pool.name}}</span>
-                           <span class="total">({{$utils.formatNum(r.total) || '0'}})</span>
-                        </span>
-                     </V4Button>
-                  </template>
-                  <V4Select v-if="results.length > maxTabs" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
-                     :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
-                     placeholder="More"
-                     @changed="poolSelected"
-                     v-model="otherSrcSelection"/>
-               </div>
-               <PoolResultDetail v-if="selectedResultsIdx > -1" />
-               <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
-                  No results found
-               </div>
+      <div class="results-wrapper" >
+         <FacetSidebar />
+         <div class="results-main">
+            <div class="pool-tabs">
+               <template  v-for="(r,idx) in sourceTabs">
+                  <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
+                     <span>
+                        <span class="pool">{{r.pool.name}}</span>
+                        <span class="total">({{$utils.formatNum(r.total) || '0'}})</span>
+                     </span>
+                  </V4Button>
+               </template>
+               <V4Select v-if="results.length > maxTabs" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
+                  :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
+                  placeholder="More"
+                  @changed="poolSelected"
+                  v-model="otherSrcSelection"/>
+            </div>
+            <PoolResultDetail v-if="selectedResultsIdx > -1" />
+            <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
+               No results found
             </div>
          </div>
       </div>
@@ -215,15 +215,16 @@ export default {
       margin-right: 5px;
    }
 }
+
 .results-main {
    display: inline-block;
    flex: 1 1 70%;
 }
 
-.shady {
-  margin: 16px -1000px 16px -1000px;
-  padding: calc(16px*2) 1000px calc(16px*2) 1000px;
-  background-color: var(--uvalib-grey-lightest);
+.search-results  {
+   box-sizing: border-box;
+   outline: 0;
+   background-color: var(--uvalib-grey-lightest);
 }
 
 .results-header {
