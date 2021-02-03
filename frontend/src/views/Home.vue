@@ -210,7 +210,6 @@ export default {
             // look up a mapping from legacy v4 pool name to current pool name.
             // this mapping may be one to one for current pools for pools that didn't change
             let mapping = this.poolMapping[oldSrc]
-            console.log(`MAP ${oldSrc} TO ${JSON.stringify(mapping)}`)
             if (mapping && (newQ.pool != mapping.pool) ) {
 
                newQ.pool = mapping.pool

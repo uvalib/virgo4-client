@@ -28,7 +28,7 @@ Vue.prototype.$analytics = analytics
 import * as utils from './utils'
 Vue.prototype.$utils = utils
 
-import VueMoment from 'vue-moment';
+import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 
 import Purecss from 'purecss'
@@ -36,6 +36,9 @@ import Purecss from 'purecss'
 Vue.use(VueCookies)
 Vue.use(Purecss)
 Vue.use(VueClipboard)
+
+import VueAnnouncer from '@vue-a11y/announcer'
+Vue.use(VueAnnouncer, {}, router)
 
 Vue.config.productionTip = false
 

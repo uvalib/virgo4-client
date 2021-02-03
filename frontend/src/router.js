@@ -203,18 +203,18 @@ const router = new Router({
 })
 
 router.afterEach((to, _from) => {
-   let titles = {home: "Virgo", search: "Virgo", signin: "Virgo: Sign In", account: "Virgo: My Information",
-      checkouts: "Virgo: Checkouts", 'digital-deliveries': "Virgo: Digital Deliveries",
-      bookmarks: "Virgo: Bookmarks", requests: "Virgo: Requests", searches: "Virgo: Saved Searches",
-      preferences: "Virgo: Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Virgo: Shelf Browse"
+   let titles = {home: "Virgo", search: "Virgo", signin: "Sign In", account: "My Information",
+      checkouts: "Checkouts", 'digital-deliveries': "Digital Deliveries",
+      bookmarks: "Bookmarks", requests: "Requests", searches: "Saved Searches",
+      preferences: "Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse"
    }
    Vue.nextTick(() => {
       let title = titles[to.name]
       if ( title == "Virgo") {
          if (to.query.q) {
-            document.title = "Virgo: Search Results"
+            document.title = "Search Results"
          } else if (to.query.mode=="advanced" ){
-            document.title = "Virgo: Advanced Search"
+            document.title = "Advanced Search"
          } else {
             document.title = title
          }

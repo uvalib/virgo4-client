@@ -21,6 +21,7 @@
       <MenuBar :id="menuID"/>
       <main tabindex="-1" class="v4-content" id="v4-main">
          <SessionExpired />
+         <VueAnnouncer />
          <router-view />
          <div v-if="newVersion" class="update-pop">
             <div class="msg">A new version of Virgo is available.</div>
