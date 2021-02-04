@@ -1,58 +1,56 @@
 <template>
-   <div class="facet-sidebar" :class="{overlay: !startExpanded}">
-      <div class="pool" :class="{overlay: !startExpanded}">
-          <AccordionContent id="pool-filter" class="filter"
-            :background="filterColor"
-            color="white" :expanded="startExpanded"
-            borderColor="var(--uvalib-brand-blue)"
-            :layoutChange="updatingFacets"  :invert="!startExpanded">
-            <template v-slot:title>{{poolFilterTitle}}</template>
+   <section class="facet-sidebar" :class="{overlay: !startExpanded}" role="group">
+      <AccordionContent id="pool-filter" class="filter"
+         :background="filterColor"
+         color="white" :expanded="startExpanded"
+         borderColor="var(--uvalib-brand-blue)"
+         :layoutChange="updatingFacets"  :invert="!startExpanded">
+         <template v-slot:title>{{poolFilterTitle}}</template>
 
-            <div v-if="!hasFacets" class="none">
-               {{selectedResults.pool.name}} does not support filtering
+         <div v-if="!hasFacets" class="none">
+            {{selectedResults.pool.name}} does not support filtering
+         </div>
+         <div v-else class="body">
+            <div v-if="updatingFacets" class="working">
+               <V4Spinner message="Loading filters..."/>
             </div>
-            <div v-else class="body">
-               <div v-if="updatingFacets" class="working">
-                  <V4Spinner message="Loading filters..."/>
-               </div>
-               <div v-if="facets.length == 0" class="none">
-                  Filters are not available for this search
-               </div>
-               <dl v-else>
-                  <template v-for="facetInfo in facets">
-                        <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
-                        <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
-                           <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+            <div v-if="facets.length == 0" class="none">
+               Filters are not available for this search
+            </div>
+            <dl v-else>
+               <template v-for="facetInfo in facets">
+                  <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
+                  <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
+                     <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
+                        <V4Checkbox :checked="fv.selected"
+                           @click="filterClicked(facetInfo.id, fv.value)">
+                           {{fv.value}}
+                        </V4Checkbox>
+                        <span class="cnt" v-if="$utils.formatNum(fv.count)">({{$utils.formatNum(fv.count)}})</span>
+                     </dd>
+                     <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
+                        <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
+                           <template v-slot:title>
+                              <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
+                           </template>
+                           <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
                               <V4Checkbox :checked="fv.selected"
                                  @click="filterClicked(facetInfo.id, fv.value)">
                                  {{fv.value}}
                               </V4Checkbox>
-                              <span class="cnt" v-if="$utils.formatNum(fv.count)">({{$utils.formatNum(fv.count)}})</span>
-                           </dd>
-                           <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
-                              <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
-                                 <template v-slot:title>
-                                    <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
-                                 </template>
-                                 <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                                    <V4Checkbox :checked="fv.selected"
-                                       @click="filterClicked(facetInfo.id, fv.value)">
-                                       {{fv.value}}
-                                    </V4Checkbox>
-                                    <span class="cnt">({{$utils.formatNum(fv.count)}})</span>
-                                 </div>
-                                 <template v-slot:footer>
-                                    <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
-                                 </template>
-                              </AccordionContent>
-                           </dd>
-                        </div>
-                  </template>
-               </dl>
-            </div>
-          </AccordionContent>
-      </div>
-   </div>
+                              <span class="cnt">({{$utils.formatNum(fv.count)}})</span>
+                           </div>
+                           <template v-slot:footer>
+                              <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
+                           </template>
+                        </AccordionContent>
+                     </dd>
+                  </div>
+               </template>
+            </dl>
+         </div>
+      </AccordionContent>
+   </section>
 </template>
 
 <script>
@@ -148,32 +146,31 @@ export default {
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;
-   .pool {
-      box-shadow: $v4-box-shadow-light;
+
+   .pool-filter-header, .filter {
+      width: 100%;
    }
-}
-.body {
-   border-top: 0;
-   text-align: left;
-   padding: 10px;
-   margin: 0;
-   background: white;
-   position: relative;
-   min-height: 80px;
-}
-.pool .body {
-   min-height: 150px;
-}
-.heading {
-   background-color: var(--uvalib-brand-blue);
-   text-align: left;
-   padding: 5px 10px;
-   color: white;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: space-between;
-   cursor: pointer;
+   .body {
+      box-shadow: $v4-box-shadow-light;
+      border-top: 0;
+      text-align: left;
+      padding: 10px;
+      margin: 0;
+      background: white;
+      position: relative;
+      min-height: 150px;
+      span.cnt {
+         margin-left: 5px;
+         margin-left: auto;
+         font-size: 0.8em;
+      }
+      div.none {
+         text-align: center;
+         margin:25px 5px;
+         font-size: 1.25em;
+         color: var(--uvalib-text);
+      }
+   }
 }
 dl  {
    margin: 0;
@@ -225,20 +222,10 @@ i.check {
    justify-content: flex-start;
    font-weight: normal;
 }
-@media only screen and (min-width: $breakpoint-tablet) {
-   .filter-icons {
-      display: inline-block;
-   }
-}
-@media only screen and (max-width: $breakpoint-tablet) {
-   .filter-icons {
-      display: none;
-   }
-}
 .facet-sidebar.overlay {
    position: fixed;
-   left: 0px;
-   right: 0px;
+   left: 5px;
+   right: 5px;
    z-index: 5000;
    bottom: 0px;
    padding: 0;
@@ -247,27 +234,14 @@ i.check {
    flex-flow: row nowrap;
    align-items: flex-end;
    justify-content: space-between;
-}
-div.pool.overlay {
    margin: 0;
    flex: 1 1 auto;
-   border: none;
-}
-div.pool.overlay .body {
-   max-height: 450px;
-   overflow: scroll;
-  box-shadow:  $v4-box-shadow-light;
-}
-span.cnt {
-   margin-left: 5px;
-   margin-left: auto;
-   font-size: 0.8em;
-}
-div.none {
-   text-align: center;
-   margin:25px 5px;
-   font-size: 1.25em;
-   color: var(--uvalib-text);
+   box-shadow: $v4-box-shadow;
+
+   .body {
+      max-height: 450px;
+      overflow: scroll;
+   }
 }
 </style>
 <style>
