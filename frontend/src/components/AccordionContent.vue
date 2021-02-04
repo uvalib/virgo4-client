@@ -13,7 +13,7 @@
             v-on:before-enter="beforeEnter" v-on:enter="enter"
             v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div :id="contentID" class="accordion-content" v-show="isExpanded"
-            :aria-labelledby="`${id}-header`" role="region" aria-live="polite"
+            :aria-labelledby="`${id}-header`" role="region"
             :style="{ background: backgroundContent, color: color }"
             @click.stop @keyup.stop.enter @keydown.space.stop>
             <slot></slot>

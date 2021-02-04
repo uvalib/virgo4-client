@@ -1,25 +1,27 @@
 <template>
    <div tabindex="-1" id="app">
-      <SkipToNavigation />
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer">
              <MessageBox />
          </div>
       </transition>
-      <div class="covid-alert">
-         <span class="lead">COVID-19 Update: </span>
-         <span>
-            Check out the
-            <a href="https://www.library.virginia.edu/status" target="_blank">Status Dashboard</a>
-            for quick reference and
-            <a href="https://www.library.virginia.edu/news/covid-19/" target="_blank">Library Resources FAQ</a>
-            for details.
-         </span>
+      <div role="banner" class="site-header">
+         <SkipToNavigation />
+         <div class="covid-alert">
+            <span class="lead">COVID-19 Update: </span>
+            <span>
+               Check out the
+               <a href="https://www.library.virginia.edu/status" target="_blank">Status Dashboard</a>
+               for quick reference and
+               <a href="https://www.library.virginia.edu/news/covid-19/" target="_blank">Library Resources FAQ</a>
+               for details.
+            </span>
+         </div>
+         <VirgoHeader :id="headerID" />
+         <MenuBar :id="menuID"/>
       </div>
-      <VirgoHeader :id="headerID" />
-      <MenuBar :id="menuID"/>
-      <main tabindex="-1" class="v4-content" id="v4-main">
+      <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
          <VueAnnouncer />
          <router-view />

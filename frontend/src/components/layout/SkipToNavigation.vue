@@ -15,29 +15,29 @@
       <transition name="grow"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <div v-if="menuOpen" class="skip-menu"  @keydown.space.prevent.stop>
-            <div class="submenu" role="menuitem" tabindex="-1" id="skipnav"
+         <ul v-if="menuOpen" class="skip-menu"  @keydown.space.prevent.stop role="group">
+            <li class="submenu" role="menuitem" tabindex="-1" id="skipnav"
                @click.prevent.stop="skipToNav"
                @keydown.space.prevent.stop="skipToNav"
                @keyup.prevent.stop.enter="skipToNav"
             >
                Navigation
-            </div>
-            <div class="submenu" role="menuitem" tabindex="-1" id="skipmain"
+            </li>
+            <li class="submenu" role="menuitem" tabindex="-1" id="skipmain"
                @click.prevent.stop="skipToMain"
                @keydown.space.prevent.stop="skipToMain"
                @keyup.prevent.stop.enter="skipToMain"
             >
                Main Content
-            </div>
-             <div v-if="isSearchPage" class="submenu" role="menuitem" tabindex="-1" id="skipsearch"
+            </li>
+             <li v-if="isSearchPage" class="submenu" role="menuitem" tabindex="-1" id="skipsearch"
                @click.prevent.stop="skipToSearch"
                @keydown.space.prevent.stop="skipToSearch"
                @keyup.prevent.stop.enter="skipToSearch"
             >
                Search
-            </div>
-         </div>
+            </li>
+         </ul>
       </transition>
    </span>
 </template>
@@ -190,11 +190,15 @@ export default {
    .skip-menu {
       margin-top: 5px;
       transition: 200ms ease-out;
+      list-style: none;
+      padding: 0;
+      margin: 0;
       .submenu {
          cursor: pointer;
          padding: 5px 10px;
          border-radius: 0;
          outline: 0;
+
          &:hover {
             background-color: var(--uvalib-brand-blue-lightest);
             color: var(--uvalib-text-dark);

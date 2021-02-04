@@ -1,5 +1,5 @@
 <template>
-   <footer>
+   <footer role="contentinfo">
      <div class="pre-footer" v-if="$route.name != 'feedback'">
         This is the newest version of the Library catalog.
         <router-link id="feedback"

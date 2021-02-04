@@ -222,6 +222,9 @@ export default {
       if ( this.hasSearchTemplate ) {
          this.$store.commit("query/setTemplate", this.searchTemplate)
       }
+   },
+   mounted() {
+      this.$announcer.set(`virgo advanced search has loaded`, 'assertive')
    }
 };
 </script>

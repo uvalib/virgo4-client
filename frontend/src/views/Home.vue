@@ -143,6 +143,11 @@ export default {
          }
       }
    },
+   mounted() {
+      if ( this.searchMode == "basic") {
+         this.$announcer.set(`virgo search has loaded`)
+      }
+   },
 
    methods: {
       async mapLegacyQueries( token ) {

@@ -40,11 +40,21 @@ const router = new Router({
          alias: '/search',
          name: 'home',
          component: Home,
+         meta: {
+            announcer: {
+              skip: true
+            }
+         }
       },
       {
          path: '/search/:id',
          name: 'search',
-         component: Home
+         component: Home,
+         meta: {
+            announcer: {
+              skip: true
+            }
+         }
       },
       {
          path: '/bookmarks/:key',
