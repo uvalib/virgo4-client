@@ -1,5 +1,5 @@
 <template>
-   <div tabindex="-1" id="app">
+   <div tabindex="-1" id="app" role="application">
       <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer">

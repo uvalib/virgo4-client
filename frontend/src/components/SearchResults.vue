@@ -3,13 +3,13 @@
       class="search-results" aria-describedby="search-summary"
    >
       <SearchSuggestions />
-      <div class="results-header">
+      <div class="results-header" role="heading" aria-level="2">
          <template v-if="showSummary">
             <div id="search-summary" class="summary">
                <div class="query">Showing {{$utils.formatNum(total)}} results for:</div>
                <div class="qs">{{queryString}}</div>
             </div>
-            <span class="buttons">
+            <span class="buttons" role="toolbar">
                <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
                <SaveSearch v-if="isSignedIn"/>
                <SignInRequired v-else id="save-signin-modal" act="save-search"/>

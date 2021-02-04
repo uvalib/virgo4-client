@@ -347,6 +347,7 @@ export default {
                   this.userSearched = false
                }
 
+               this.$announcer.set(`search in progress`, 'assertive')
                if (this.searchSources == "all") {
                   await this.$store.dispatch("searchAllPools")
                } else {

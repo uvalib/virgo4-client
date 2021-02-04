@@ -31,24 +31,26 @@
                </p>
             </template>
          </div>
-         <div v-else class="hits">
-            <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content">
-               <li v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
+         <div v-else class="hits" role="region" aria-label="search results">
+            <ul v-if="selectedResults.pool.mode=='image'" class="image hits-content" role="list">
+               <li role="listitem" v-for="hit in selectedResults.hits" class="image hit-wrapper" :key="`img-${hit.identifier}`">
                   <ImageSearchHit :pool="selectedResults.pool.id" :hit="hit"/>
                </li>
             </ul>
-            <div v-else class="hits-content">
-               <div v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
+            <div v-else class="hits-content" role="list">
+               <div role="listitem" v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
                   <SearchHit :pool="selectedResults.pool.id" :count="hit.number" :hit="hit"/>
                </div>
             </div>
          </div>
-         <V4Button v-if="hasMoreHits" mode="primary" @click="loadMoreResults">
-            <span v-if="loadingMore">
-               <V4Spinner v-if="loadingMore" color="white"/>
-            </span>
-            <span v-else>Load More Results</span>
-         </V4Button>
+         <span role="toolbar">
+            <V4Button v-if="hasMoreHits" mode="primary" @click="loadMoreResults">
+               <span v-if="loadingMore">
+                  <V4Spinner v-if="loadingMore" color="white"/>
+               </span>
+               <span v-else>Load More Results</span>
+            </V4Button>
+         </span>
       </template>
    </div>
 </template>
