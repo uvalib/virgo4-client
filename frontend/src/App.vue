@@ -6,9 +6,9 @@
              <MessageBox />
          </div>
       </transition>
-      <div role="banner" class="site-header">
+      <div role="banner" class="site-header" id="v4-header">
          <SkipToNavigation />
-         <div class="covid-alert">
+         <div class="covid-alert" id="covid-alert">
             <span class="lead">COVID-19 Update: </span>
             <span>
                Check out the
@@ -18,8 +18,8 @@
                for details.
             </span>
          </div>
-         <VirgoHeader :id="headerID" />
-         <MenuBar :id="menuID"/>
+         <VirgoHeader />
+         <MenuBar id="v4-menu"/>
       </div>
       <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
@@ -48,10 +48,8 @@ import { mapGetters } from "vuex"
 export default {
    data: function() {
       return {
-         menuHeight: 0,
-         menuID: "v4-navbar",
          headerHeight: 0,
-         headerID: "v4-header",
+         menuHeight: 0
       };
    },
    components: {
@@ -74,20 +72,24 @@ export default {
    },
    methods: {
       updateClicked() {
-          window.location.reload(true)
+          window.location.reload()
       },
       scrollHandler( ) {
          if ( window.scrollY <= this.headerHeight ) {
-            document.getElementById(this.menuID).classList.remove("sticky")
+            document.getElementById("v4-menu").classList.remove("sticky")
+            document.getElementById("v4-main").style.paddingTop = '0px'
          } else {
-            document.getElementById(this.menuID).classList.add("sticky")
+            document.getElementById("v4-menu").classList.add("sticky")
+            document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
          }
       },
    },
    mounted() {
-      setTimeout( ()=>{
-         this.headerHeight = document.getElementById(this.headerID).offsetHeight
-      }, 1)
+      this.$nextTick( ()=>{
+         this.menuHeight = document.getElementById("v4-menu").offsetHeight
+         this.headerHeight = document.getElementById("v4-header").offsetHeight
+         this.headerHeight -= this.menuHeight
+      })
       window.addEventListener("scroll", this.scrollHandler)
       window.onresize = () => {
          this.$store.commit("system/setDisplayWidth",window.innerWidth)
@@ -212,7 +214,8 @@ body {
 .sticky {
    position: fixed !important;
    top: 0;
-   width: 100%
+   width: 100%;
+   z-index: 10000;
 }
 #app .screen-reader-text {
    clip: rect(1px, 1px, 1px, 1px);
