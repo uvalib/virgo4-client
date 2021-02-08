@@ -34,7 +34,7 @@
             <div class="unsupported filter-display" >
                <span v-for="naF in naFilters" class="selected" :key="`na-${naF.value}`">
                   <V4Button mode="icon" class="remove" @click="removeFilter(naF)"
-                     :aria-label="`remove filter ${naf.value}`">
+                     :aria-label="`remove filter ${naF.value}`">
                      <i class="fas fa-times-circle"></i>
                      <span aria-hidden="true">{{naF.value}}</span>
                   </V4Button>
