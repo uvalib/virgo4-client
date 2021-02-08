@@ -13,7 +13,7 @@
                      <template  v-for="sel in selections(psf)">
                         <span :key="sel.value" class="selected">
                            <V4Button mode="icon" class="remove" @click="sel.selected = false"
-                              :aria-label="`remove filter #{sel.value}`">
+                              :aria-label="`remove filter ${sel.value}`">
                               <i class="fas fa-times-circle"></i>{{sel.value}}
                            </V4Button>
                         </span>

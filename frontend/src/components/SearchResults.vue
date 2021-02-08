@@ -25,7 +25,7 @@
                   <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
                      <span>
                         <span class="pool">{{r.pool.name}}</span>
-                        <span class="total">({{$utils.formatNum(r.total) || '0'}})</span>
+                        <span :aria-label="`has ${r.total} results`" class="total">({{$utils.formatNum(r.total) || '0'}})</span>
                      </span>
                   </V4Button>
                </template>

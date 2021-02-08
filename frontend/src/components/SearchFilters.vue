@@ -1,22 +1,22 @@
 <template>
-   <div class="filters">
-      <div class="filters-section">
-         <div class="filters-head">
-            <span class="title">Applied Filters</span>
-            <V4Button v-if="hasFilter || hasNaFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
-         </div>
-         <div class="no-filter working" v-if="updatingFacets">
-            Working...
-         </div>
-         <template v-else>
+   <div class="filters" aria-live="polite">
+      <div class="working" v-if="updatingFacets" aria-hidden="true">
+         Loading filters...
+      </div>
+      <template v-else>
+         <div class="filters-section">
+            <div class="filters-head">
+               <span class="title">Applied Filters</span>
+               <V4Button v-if="hasFilter || hasNaFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
+            </div>
             <dl class="filter-display" v-if="hasFilter">
                <template  v-for="(values, filter) in appliedFilters">
                   <dt :key="filter" class="label" v-show="filter != 'undefined'">{{filter}}</dt>
                   <dd :key="`${filter}-values`" class="label">
                      <span v-for="fv in values" class="selected" :key="`${filter}-${fv.value}`">
-                        <V4Button mode="icon" class="remove" @click="removeFilter(fv)"
-                           :aria-label="`remove filter #{val}`">
-                           <i class="fas fa-times-circle"></i>{{fv.value}}
+                        <V4Button mode="icon" class="remove" @click="removeFilter(fv)" :aria-label="`remove filter ${fv.value}`">
+                           <i class="fas fa-times-circle"></i>
+                           <span aria-hidden="true">{{fv.value}}</span>
                         </V4Button>
                      </span>
                   </dd>
@@ -25,24 +25,23 @@
             <div v-else class="no-filter">
                <span>None</span>
             </div>
-         </template>
-      </div>
-
-      <div v-if="hasNaFilter && !updatingFacets" class="filters-section">
-         <div class="filters-head">
-            <span class="title">Not Applicable Filters</span>
          </div>
-         <div class="unsupported filter-display" >
-            <span v-for="naF in naFilters" class="selected" :key="`na-${naF.value}`">
-               <V4Button mode="icon" class="remove" @click="removeFilter(naF)"
-                  :aria-label="`remove filter #{naf.value}`">
-                  <i class="fas fa-times-circle"></i>{{naF.value}}
-               </V4Button>
-            </span>
+
+         <div v-if="hasNaFilter" class="filters-section">
+            <div class="filters-head">
+               <span class="title">Not Applicable Filters</span>
+            </div>
+            <div class="unsupported filter-display" >
+               <span v-for="naF in naFilters" class="selected" :key="`na-${naF.value}`">
+                  <V4Button mode="icon" class="remove" @click="removeFilter(naF)"
+                     :aria-label="`remove filter ${naf.value}`">
+                     <i class="fas fa-times-circle"></i>
+                     <span aria-hidden="true">{{naF.value}}</span>
+                  </V4Button>
+               </span>
+            </div>
          </div>
-      </div>
-
-
+      </template>
    </div>
 </template>
 
@@ -127,6 +126,9 @@ export default {
    color: var(--uvalib-text);
    padding: 5px 5px 10px 5px;
    margin-top: 5px;
+   .working {
+      padding: 10px 20px;
+   }
 }
 .filters-section {
    padding-bottom: 0px;

@@ -3,7 +3,7 @@
       <h2 class="query-summary">
          Course reserves for course '{{query}}'
       </h2>
-      <div class="course" v-for="(course,cidx) in results" :key="`C${cidx}#{course.id}`">
+      <div class="course" v-for="(course,cidx) in results" :key="`C${cidx}${course.id}`">
          <div class="course-name">
             <h3 class="value">{{course.name}}</h3>
             <p class="value-id">{{course.id}}</p>
