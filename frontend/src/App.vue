@@ -19,7 +19,7 @@
             </span>
          </div>
          <VirgoHeader />
-         <MenuBar id="v4-menu"/>
+         <MenuBar id="v4-navbar"/>
       </div>
       <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
@@ -76,17 +76,17 @@ export default {
       },
       scrollHandler( ) {
          if ( window.scrollY <= this.headerHeight ) {
-            document.getElementById("v4-menu").classList.remove("sticky")
+            document.getElementById("v4-navbar").classList.remove("sticky")
             document.getElementById("v4-main").style.paddingTop = '0px'
          } else {
-            document.getElementById("v4-menu").classList.add("sticky")
+            document.getElementById("v4-navbar").classList.add("sticky")
             document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
          }
       },
    },
    mounted() {
       this.$nextTick( ()=>{
-         this.menuHeight = document.getElementById("v4-menu").offsetHeight
+         this.menuHeight = document.getElementById("v4-navbar").offsetHeight
          this.headerHeight = document.getElementById("v4-header").offsetHeight
          this.headerHeight -= this.menuHeight
       })

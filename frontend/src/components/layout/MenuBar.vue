@@ -1,126 +1,158 @@
 <template>
-   <nav class="menu" role="menubar" aria-label="Virgo Menu"
-      @keyup.right="nextMenu" @keyup.left="prevMenu"
-      @keyup.esc="closeSubMenus"
-   >
-      <span class="menu-right">
-         <router-link role="menuitem" id="searchmenu" @mousedown.native="searchClicked" to="/">
-            <span class="menu-item"><i class="icon fas fa-search"></i>Search</span>
-         </router-link>
-         <!-- <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
-            <span class="menu-item"><i class="icon fas fa-university"></i>Course Reserves</span>
-         </router-link> -->
-         <div v-if="isKiosk==false" tabindex="-1" id="feedbackmenu" role="menuitem" class="menu-item feedback"
-            @mousedown="closeSubMenus"
-         >
-            <a tabindex="-1" href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
-               <span><i class="icon fas fa-comments"></i></span>
-               <span>Questions? Ask a Librarian</span>
-            </a>
-         </div>
-         <span v-if="isKiosk==false" role="menu" id="servicemenu" class="menu-item service" tabindex="-1"
-            :aria-expanded="svcMenuOpen.toString()"
-            @click.stop="toggleSvcMenu" @keyup.prevent.stop.enter="toggleSvcMenu" @keydown.space.prevent.stop="toggleSvcMenu"
-            @keydown.down.prevent.stop="nextSvcMenu" @keydown.up.prevent.stop="prevSvcMenu"
-            @keyup.down.prevent.stop @keyup.up.prevent.stop
-         >
-            <span>Library Services&nbsp;</span>
-            <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('svc') }"></i>
-            <transition name="grow"
+   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu">
+      <ul class="menu-right"
+         @keydown.right.prevent.stop="nextMenu" @keyup.left.prevent.stop="prevMenu"
+         @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
+         @keydown.down.prevent.stop @keydown.up.prevent.stop>
+         <li role="none">
+            <router-link role="menuitem" id="searchmenu" @focus.native="resetMenus" @mousedown.native="searchClicked" to="/">
+               <span class="menu-item no-pad"><i class="icon fas fa-search"></i>Search</span>
+            </router-link>
+         </li>
+         <template v-if="isKiosk==false">
+            <!-- <li>
+               <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
+                  <span class="menu-item"><i class="icon fas fa-university"></i>Course Reserves</span>
+               </router-link>
+            </li> -->
+            <li role="none">
+               <a tabindex="-1" id="feedbackmenu" role="menuitem"
+                  href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
+                  <span class="menu-item"><i class="icon fas fa-comments"></i>Questions? Ask a Librarian</span>
+               </a>
+            </li>
+            <li role="none"
+               @click.stop="toggleSubMenu('servicemenu')" @keyup.enter="toggleSubMenu()"
+               @keydown.space="toggleSubMenu()" @keydown.up.prevent.stop="prevSubMenu"
+               @keydown.down.prevent.stop="nextSubMenu">
+               <span role="menu" id="servicemenu" class="menu-item service" tabindex="-1"
+                  :aria-expanded="isOpen('servicemenu').toString()">
+                  Library Services
+                  <i class="fas fa-caret-down submenu-arrow" :class="{ rotated: isOpen('servicemenu') }"></i>
+               </span>
+               <transition name="grow"
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
-               <div v-if="svcMenuOpen" class="user-menu" @keydown.space.prevent.stop>
-                  <a @click="libServiceClicked('Subject Guides')"
-                     href="https://www.library.virginia.edu/research/" target="_blank" role="menuitem"
-                     tabindex="-1" id="guides">
-                     <div class="submenu">Subject&nbsp;Guides</div>
-                  </a>
-                  <a @click="libServiceClicked('Journal Finder')"
-                     href="https://guides.lib.virginia.edu/journalfinder" target="_blank" role="menuitem"
-                     tabindex="-1" id="journalsub">
-                     <div class="submenu">Journal&nbsp;Finder</div>
-                  </a>
-                  <a @click="libServiceClicked('Databases A-Z')"
-                     href="https://guides.lib.virginia.edu/az.php" target="_blank" role="menuitem"
-                     tabindex="-1" id="databasesub">
-                     <div class="submenu">Databases A-Z</div>
-                  </a>
-                  <a @click="libServiceClicked('Spaces & Equipment')"
-                     href="https://cal.lib.virginia.edu/" target="_blank" role="menuitem"
-                     tabindex="-1" id="spacesub">
-                     <div class="submenu">Spaces & Equipment</div>
-                  </a>
-                  <a @click="libServiceClicked('More Library Services')"
-                     href="https://www.library.virginia.edu/services" target="_blank" role="menuitem"
-                     tabindex="-1" id="moresub">
-                     <div class="submenu">More Library Services</div>
-                  </a>
-               </div>
-            </transition>
-         </span>
-         <template v-if="!fatal">
-            <template v-if="isSignedIn">
-               <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1" :aria-expanded="userMenuOpen.toString()"
-                  @click.stop="toggleUserMenu" @keyup.prevent.stop.enter="toggleUserMenu" @keydown.space.prevent.stop="toggleUserMenu"
-                  @keydown.down.prevent.stop="nextUserMenu" @keydown.up.prevent.stop="prevUserMenu"
-                  @keyup.down.prevent.stop @keyup.up.prevent.stop
-               >
-                  <span><i class="fas fa-user"></i>&nbsp;Signed in as {{signedInUser}}&nbsp;</span>
-                  <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation('user') }"></i>
-                  <transition name="grow"
-                     v-on:before-enter="beforeEnter" v-on:enter="enter"
-                     v-on:before-leave="beforeLeave" v-on:leave="leave">
-                     <div v-if="userMenuOpen" class="user-menu"  @keydown.space.prevent.stop>
-                        <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
-                           <div class="submenu">My Information</div>
-                        </router-link>
-                        <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub" @keyup.native.enter.prevent.stop>
-                           <div class="submenu">Checkouts</div>
-                        </router-link>
-                        <router-link role="menuitem" tabindex="-1" to="/digital-deliveries" id="digitalsub" @keyup.native.enter.prevent.stop>
-                           <div class="submenu">Digital Deliveries</div>
-                        </router-link>
-                        <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub" @keyup.native.enter.prevent.stop>
-                           <div class="submenu">Requests</div>
-                        </router-link>
-                        <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub" @keyup.native.enter.prevent.stop>
-                           <div class="submenu">Bookmarks</div>
-                        </router-link>
-                        <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub" @keyup.native.enter.prevent.stop>
-                           <div class="submenu">Searches</div>
-                        </router-link>
-                        <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub" @keyup.native.enter.prevent.stop>
-                           <div class="submenu">Preferences</div>
-                        </router-link>
-                        <div role="menuitem" tabindex="-1"  id="outsub" class="submenu"
-                           @click="signOut" @keyup.stop.enter="signOut" @keydown.space.prevent.stop="signOut" >
-                           <span>Sign out</span>
-                        </div>
-                     </div>
-                  </transition>
+                  <ul v-if="isOpen('servicemenu')" class="dropdown-menu" @keydown.space.stop.prevent @click.stop>
+                     <li class="submenu">
+                        <a @click="libServiceClicked('Subject Guides')"
+                           href="https://www.library.virginia.edu/research/" role="menuitem"
+                           tabindex="-1" id="guides">
+                           Subject Guides
+                        </a>
+                     </li>
+                     <li class="submenu">
+                        <a @click="libServiceClicked('Journal Finder')" target="_blank"
+                           href="https://guides.lib.virginia.edu/journalfinder" role="menuitem"
+                           tabindex="-1" id="journalsub">
+                           Journal Finder
+                        </a>
+                     </li>
+                     <li class="submenu">
+                        <a @click="libServiceClicked('Databases A-Z')" target="_blank"
+                           href="https://guides.lib.virginia.edu/az.php" role="menuitem"
+                           tabindex="-1" id="databasesub">
+                           Databases A-Z
+                        </a>
+                     </li>
+                     <li class="submenu">
+                        <a @click="libServiceClicked('Spaces & Equipment')" target="_blank"
+                           href="https://cal.lib.virginia.edu/" role="menuitem"
+                           tabindex="-1" id="spacesub">
+                           Spaces & Equipment
+                        </a>
+                     </li>
+                     <li class="submenu">
+                        <a @click="libServiceClicked('More Library Services')" target="_blank"
+                           href="https://www.library.virginia.edu/services" role="menuitem"
+                           tabindex="-1" id="moresub">
+                           More Library Services
+                        </a>
+                     </li>
+                  </ul>
+               </transition>
+            </li>
+            <li v-if="isSignedIn" role="none"
+               @click.stop="toggleSubMenu('accountmenu')" @keydown.enter="toggleSubMenu()"
+               @keydown.space="toggleSubMenu()" @keydown.up.prevent.stop="prevSubMenu"
+               @keydown.down.prevent.stop="nextSubMenu">
+               <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1"
+                  :aria-expanded="isOpen('accountmenu').toString()">
+                  <i class="fas fa-user"></i>
+                  &nbsp;Signed in as {{signedInUser}}&nbsp;
+                  <i class="fas fa-caret-down submenu-arrow" :class="{ rotated: isOpen('accountmenu') }"></i>
                </span>
-               <router-link v-if="itemsOnNotice.length > 0" to="/checkouts">
+               <transition name="grow"
+                  v-on:before-enter="beforeEnter" v-on:enter="enter"
+                  v-on:before-leave="beforeLeave" v-on:leave="leave">
+                  <ul v-if="isOpen('accountmenu')" class="dropdown-menu"
+                     @keydown.space.prevent.stop @keydown.enter.stop="linkClicked">
+                     <li class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
+                           My Information
+                        </router-link>
+                     </li>
+                     <li class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub">
+                           Checkouts
+                        </router-link>
+                     </li>
+                     <li class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/digital-deliveries" id="digitalsub">
+                           Digital Deliveries
+                        </router-link>
+                     </li>
+                     <li class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub">
+                           Requests
+                        </router-link>
+                     </li>
+                     <li class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub">
+                           Bookmarks
+                        </router-link>
+                     </li>
+                     <li class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub">
+                           Searches
+                        </router-link>
+                     </li>
+                     <li class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub">
+                           Preferences
+                        </router-link>
+                     </li>
+                     <li class="submenu">
+                        <div role="menuitem" tabindex="-1"  id="outsub" @click="signOut" @keydown.stop.enter="signOut">
+                           Sign out
+                        </div>
+                     </li>
+                  </ul>
+               </transition>
+            </li>
+            <li v-if="isSignedIn && itemsOnNotice.length > 0" role="none">
+               <router-link to="/checkouts" role="menuitem" >
                   <span  class="menu-item notice">
-                     <i class="notice fas fa-exclamation-triangle"></i>{{itemsOnNotice.length}}
+                     <i class="fas fa-exclamation-triangle"></i><span class="cnt">{{itemsOnNotice.length}}</span>
                   </span>
                </router-link>
-            </template>
-            <template v-else>
-               <router-link tabindex="-1" v-if="isKiosk==false" role="menuitem" id="accountmenu" to="/signin">
+            </li>
+            <li v-if="isSignedIn == false" role="none">
+               <router-link tabindex="-1" role="menuitem" id="accountmenu" to="/signin">
                   <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
                </router-link>
-            </template>
+            </li>
+            <li v-if="alertsReady" class="menu-item alert-wrap"
+               :class="{dim: alertCount==0}" tabindex="-1" role="menuitem" id="alertmenu"
+               @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
+               @keydown.space.prevent.stop="alertClicked"
+            >
+               <div class="alert-bell icon fas fa-bell">
+                  <span v-if="alertCount" class="alert-count">{{alertCount}}</span>
+               </div>
+            </li>
          </template>
-         <div v-if="!isKiosk && alertsReady" class="alert-wrap" tabindex="-1" role="menuitem" id="alertmenu"
-            v-bind:class="{dim: alertCount==0}"
-            @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
-            @keydown.space.prevent.stop="alertClicked"
-         >
-            <div class="alert-bell icon fas fa-bell">
-               <span v-if="alertCount" class="alert-count">{{alertCount}}</span>
-            </div>
-         </div>
-      </span>
+      </ul>
       <uvalib-alerts v-if="!isKiosk && alertsReady" id="alerts"></uvalib-alerts>
    </nav>
 </template>
@@ -132,15 +164,19 @@ import { mapGetters } from "vuex"
 export default {
    data: function() {
       return {
-         //menuBar: ["searchmenu", "reservemenu", "feedbackmenu", "servicemenu", "accountmenu", "alertmenu"],
-         menuBar: ["searchmenu", "feedbackmenu", "servicemenu", "accountmenu", "alertmenu"],
+         noFocus: false,
+         menuBar: [
+            {id: "searchmenu", submenu:[], expanded: false},
+            {id: "feedbackmenu", submenu:[], expanded: false},
+            {id: "servicemenu",
+               submenu:["guides", "journalsub", "databasesub", "spacesub", "moresub"],
+               expanded: false, subMenuIdx: 0},
+            {id: "accountmenu", submenu:
+               ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub", "outsub"],
+               expanded: false, subMenuIdx: 0},
+            {id: "alertmenu", submenu:[], expanded: false},
+         ],
          menuBarIdx: 0,
-         userMenu: ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub","outsub"],
-         userMenuOpen: false,
-         userMenuIdx: 0,
-         svcMenuOpen: false,
-         svcMenuIdx: 0,
-         svcMenu: ["guides", "journalsub", "databasesub", "spacesub", "moresub"],
          alertCount: 0,
          alertsReady: false,
       }
@@ -164,33 +200,40 @@ export default {
             this.alertsReady = true
          }
       })()
-      window.addEventListener("click", this.globalClick)
+      window.addEventListener("click", this.resetMenus)
    },
    destroyed() {
-      window.removeEventListener("click", this.globalClick)
+      window.removeEventListener("click", this.resetMenus)
    },
    methods: {
-      libServiceClicked(serviceName) {
-         this.$analytics.trigger('Navigation', 'LIBRARY_SERVICE_CLICKED', serviceName)
+      linkClicked() {
+         this.noFocus = true
       },
-      globalClick() {
-         this.userMenuOpen = false
-         this.svcMenuOpen = false
+      isOpen( menuID ) {
+         let m = this.menuBar.find( mb => mb.id == menuID)
+         return m.expanded
+      },
+      resetMenus() {
+         this.menuBarIdx = 0
+         this.closeSubMenus()
+      },
+      closeSubMenus() {
+         this.menuBar.forEach( mb => {
+            if (mb.submenu.length > 0) {
+               mb.expanded = false
+               mb.idx = 0
+            }
+         })
+      },
+      libServiceClicked(serviceName) {
+         this.resetMenus()
+         this.$analytics.trigger('Navigation', 'LIBRARY_SERVICE_CLICKED', serviceName)
+
       },
       alertClicked() {
          if ( this.alertCount > 0) {
             document.querySelector('#alerts').unseeAll()
          }
-      },
-      rotation( menu) {
-         let flag = this.userMenuOpen
-         if (menu == 'svc') {
-            flag = this.sveMenuOpen
-         }
-         if (flag) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
       },
       nextMenu() {
          this.closeSubMenus()
@@ -198,8 +241,7 @@ export default {
          if (this.menuBarIdx == this.menuBar.length) {
             this.menuBarIdx = 0
          }
-         let menu = document.getElementById(this.menuBar[this.menuBarIdx])
-         menu.focus({preventScroll:true})
+         this.setMenuFocus()
       },
       prevMenu() {
          this.closeSubMenus()
@@ -207,66 +249,64 @@ export default {
          if (this.menuBarIdx < 0) {
             this.menuBarIdx = this.menuBar.length - 1
          }
-         let menu = document.getElementById(this.menuBar[this.menuBarIdx])
-         menu.focus({preventScroll:true})
+         this.setMenuFocus()
       },
-      nextUserMenu( ) {
-         if ( this.userMenuOpen) {
-            this.userMenuIdx++
-            if (this.userMenuIdx == this.userMenu.length) {
-               this.userMenuIdx = 0
-            }
-         } else {
-            this.toggleUserMenu()
+      toggleSubMenu( targetMenu ) {
+         if ( targetMenu ) {
+            this.menuBarIdx = this.menuBar.findIndex( mb => mb.id == targetMenu)
          }
-         this.$nextTick( () => {
-            let menu = document.getElementById(this.userMenu[this.userMenuIdx])
-            menu.focus({preventScroll:true})
-         })
+         let menu = this.menuBar[this.menuBarIdx]
+         if ( menu.submenu.length == 0) {
+            return
+         }
+         menu.expanded = !menu.expanded
+         menu.subMenuIdx = 0
+         this.setMenuFocus()
       },
-      nextSvcMenu() {
-         if ( this.svcMenuOpen) {
-            this.svcMenuIdx++
-            if (this.svcMenuIdx == this.svcMenu.length) {
-               this.svcMenuIdx = 0
-            }
-         } else {
-            this.toggleSvcMenu()
+      nextSubMenu() {
+         let currMenu = this.menuBar[this.menuBarIdx]
+         if ( currMenu.submenu.length == 0) {
+            return
          }
-         this.$nextTick( () => {
-            let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
-            menu.focus({preventScroll:true})
-         })
+         if ( currMenu.expanded ) {
+            currMenu.subMenuIdx++
+         } else {
+            currMenu.expanded = true
+         }
+         if ( currMenu.subMenuIdx == currMenu.submenu.length) {
+            currMenu.subMenuIdx = 0
+         }
+         this.setMenuFocus()
       },
-      prevUserMenu() {
-         if ( this.userMenuOpen) {
-            this.userMenuIdx--
-            if (this.userMenuIdx < 0) {
-               this.userMenuIdx = this.userMenu.length-1
-            }
-         } else {
-            this.toggleUserMenu()
-            this.userMenuIdx = this.userMenu.length-1
+      prevSubMenu() {
+         let currMenu = this.menuBar[this.menuBarIdx]
+         if ( currMenu.submenu.length == 0) {
+            return
          }
-         this.$nextTick( () => {
-            let menu = document.getElementById(this.userMenu[this.userMenuIdx])
-            menu.focus({preventScroll:true})
-         })
+         if ( currMenu.expanded ) {
+            currMenu.subMenuIdx--
+         } else {
+            currMenu.expanded = true
+         }
+         if ( currMenu.subMenuIdx < 0) {
+            currMenu.subMenuIdx = currMenu.submenu.length-1
+         }
+         this.setMenuFocus()
       },
-      prevSvcMenu() {
-         if ( this.svcMenuOpen) {
-            this.svcMenuIdx--
-            if (this.svcMenuIdx < 0) {
-               this.svcMenuIdx = this.svcMenu.length-1
-            }
-         } else {
-            this.toggleSvcMenu()
-            this.svcMenuIdx = this.svcMenu.length-1
+      setMenuFocus() {
+         if ( this.noFocus === true) {
+            this.noFocus = false
+            return
          }
-         this.$nextTick( () => {
-            let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
-            menu.focus({preventScroll:true})
-         })
+         let menu = this.menuBar[this.menuBarIdx]
+         if (menu.submenu.length == 0 || menu.expanded == false) {
+            document.getElementById(menu.id).focus({preventScroll:true})
+         } else {
+            this.$nextTick( () => {
+               let subMenuEle = document.getElementById(menu.submenu[menu.subMenuIdx])
+               subMenuEle.focus({preventScroll:true})
+            })
+         }
       },
       searchClicked() {
          this.$store.dispatch('resetSearch')
@@ -279,40 +319,7 @@ export default {
          this.closeSubMenus()
          this.$router.push("/signin")
       },
-      toggleUserMenu() {
-         this.svcMenuOpen = false
-         this.userMenuOpen = !this.userMenuOpen
-         this.userMenuIdx = 0
-         if (this.userMenuOpen) {
-            setTimeout( () => {
-               let menu = document.getElementById(this.userMenu[this.userMenuIdx])
-               menu.focus()
-            },100)
-         }
-      },
-      toggleSvcMenu() {
-         this.closeUserMenu()
-         this.svcMenuOpen = !this.svcMenuOpen
-         this.svcMenuIdx = 0
-         if (this.svcMenuOpen) {
-            setTimeout( () => {
-               let menu = document.getElementById(this.svcMenu[this.svcMenuIdx])
-               menu.focus()
-            },100)
-         }
-      },
-      closeSubMenus() {
-         this.closeSvcMenu()
-         this.closeUserMenu()
-      },
-      closeSvcMenu() {
-         this.svcMenuOpen = false
-         this.svcMenuIdx = 0
-      },
-      closeUserMenu() {
-         this.userMenuOpen = false
-         this.userMenuIdx = 0
-      },
+
       async signOut() {
          await this.$store.dispatch("user/signout")
          this.$router.push("/signedout")
@@ -336,9 +343,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app .menu {
+#app nav.menu {
    text-align: right;
    padding: 0px;
+   margin: 0;
    background-color: var(--uvalib-blue-alt-darkest);
    color: white;
    display: flex;
@@ -347,29 +355,76 @@ export default {
    justify-content: space-between;
    position: relative;
 
-   .menu-right {
-      margin-left: auto;
-      padding: 10px;
-   }
-
    .icon {
       font-size: 1.3em;
       margin-right: 5px;
    }
+
+   ul {
+      display: block;
+      position: relative;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      li {
+         display: inline-block;
+         padding: 0;
+         margin: 0;
+         font-weight: 500;
+         position: relative;
+      }
+   }
+
+   ul.menu-right {
+      margin: 0 0 0 auto;
+      padding: 10px;
+      li {
+         margin: 0 0 0 20px;
+      }
+   }
+
+   ul.dropdown-menu {
+      position: absolute;
+      z-index: 1000;
+      background: white;
+      padding: 0;
+      border-radius: 0 0 5px 5px;
+      border: 1px solid var(--uvalib-grey-light);
+      border-top: none;
+      top: 29px;
+      right: 0;
+      overflow: hidden;
+      transition: 200ms ease-out;
+      display: grid;
+      grid-auto-rows: auto;
+      width: max-content;
+
+      li.submenu {
+         padding: 0;
+         margin: 0;
+         a, div {
+            margin:0;
+            padding: 10px 15px;
+            font-weight: normal;
+            color: var(--uvalib-text-dark);
+            text-align: right;
+            box-sizing: border-box;
+            display: block;
+            cursor: pointer;
+            outline: none;
+            &:hover {
+               text-decoration: underline;
+            }
+            &:focus {
+               background-color: var(--uvalib-brand-blue-lightest);
+               color: var(--uvalib-text-dark);
+            }
+         }
+      }
+   }
+
    #alerts {
       width: 100%;
-   }
-
-   a {
-      color: white;
-   }
-
-   a:hover {
-      text-decoration: none;
-   }
-
-   a:first-child .menu-item {
-      margin-left:0
    }
 
    .menu-item {
@@ -377,12 +432,10 @@ export default {
       color: white;
       flex: 0 1 auto;
       display: inline-block;
-      margin-left:20px;
       border-bottom:1px solid var(--color-secondary-blue);
 
-      .notice {
-         color: var(--uvalib-yellow);
-         margin-right: 2px;
+      &:hover {
+         border-bottom:1px solid white;
       }
 
       &:focus {
@@ -390,34 +443,17 @@ export default {
       }
    }
    .menu-item.notice {
+      color: var(--uvalib-yellow);
+      margin-right: 2px;
       font-weight: normal;
-   }
-
-   .menu-item:hover {
-      border-bottom:1px solid white;
-   }
-
-   .submenu {
-      margin:0;
-      font-weight: normal;
-      color: var(--uvalib-text-dark);
-      align-items: stretch;
-      justify-items: stretch;
-      padding: 10px 15px;
-      outline: none;
-
-      &::hover {
-         background-color: var(--uvalib-brand-blue-lightest);
-         color: var(--uvalib-text-dark);
-      }
-
-      a {
-         color:white;
-         &:hover {
-            text-decoration: none;
-            border: none;
-            color: white;
-         }
+      .cnt {
+         font-size: 0.8em;
+         font-weight: bold;
+         font-family: sans-serif;
+         display: inline-block;
+         position: relative;
+         top: -6px;
+         left: -2px;
       }
    }
 
@@ -425,11 +461,8 @@ export default {
       transform: rotate(0deg);
       transition-duration: 200ms;
    }
-
-   .menu-item.account, .menu-item.service {
-      position: relative;
-      display: inline-block;
-      font-weight: 500;
+     .submenu-arrow.rotated {
+      transform: rotate(180deg);
    }
 
    .alert-bell {
@@ -454,6 +487,9 @@ export default {
    .alert-wrap.dim  {
       opacity: 0.6;
       cursor: default;
+      &:hover {
+         border-bottom: none;
+      }
    }
    .alert-wrap {
       cursor: pointer;
@@ -463,37 +499,8 @@ export default {
       &:focus {
          @include be-accessible-light();
       }
-   }
-   .alert-wrap:hover {
-      border-bottom:1px solid white;
-   }
-   .alert-wrap.dim:hover {
-      border-bottom: none;
-   }
-
-   .user-menu {
-      position: absolute;
-      z-index: 1000;
-      background: white;
-      padding: 0 0 5px 0;
-      border-radius: 0 0 5px 5px;
-      border: 1px solid var(--uvalib-grey-light);
-      border-top: none;
-      top: 30px;
-      right: 0;
-      overflow: hidden;
-      transition: 200ms ease-out;
-      display: grid;
-      grid-auto-rows: auto;
-      width: max-content;
-
-      a {
-         outline: none;
-      }
-
-      a:focus div.submenu, div.submenu:focus {
-         background-color: var(--uvalib-brand-blue-lightest);
-         color: var(--uvalib-text-dark);
+      &::hover {
+         border-bottom:1px solid white;
       }
    }
 }

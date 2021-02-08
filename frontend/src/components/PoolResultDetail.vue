@@ -102,24 +102,16 @@ export default {
          await this.$store.dispatch("searchPool", params)
          this.$store.dispatch("filters/getSelectedResultFacets", false)
       },
-      loadMoreResults() {
+      async loadMoreResults() {
          if ( this.searching) return
 
          if (this.hasMoreHits) {
-            let origY = window.scrollY
             this.loadingMore = true
+            await this.$store.dispatch("user/refreshAuth")
             this.$store.dispatch("moreResults").finally( ()=> {
                 this.loadingMore = false
                  let query = Object.assign({}, this.$route.query)
                  query.page = this.selectedResults.page+1 // page is 0 based internally
-                 let newY = window.scrollY
-                 let nav = document.getElementById("v4-navbar")
-                 let headerOffset = nav.offsetHeight
-                 let delta = origY - newY - headerOffset
-                 window.scrollBy({
-                    top: delta,
-                    behavior: "smooth"
-                 })
             })
          }
       }
