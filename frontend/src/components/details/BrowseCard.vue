@@ -1,5 +1,5 @@
 <template>
-   <div class="browse-card" :class="{current: current}">
+   <div class="browse-card" :class="{current: current}" :aria-current="current.toString()">
       <i class="current fas fa-caret-down" v-if="current"></i>
       <div class="thumb-wrap">
          <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" aria-hidden="true" tabindex="-1">

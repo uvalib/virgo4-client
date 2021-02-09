@@ -1,25 +1,25 @@
 <template>
-   <div class="shelf-browse">
+   <div class="shelf-browse" aria-live="polite">
       <div class="working" v-if="working">
          <V4Spinner message="Getting shelf browse data..." />
       </div>
-      <template v-if="!working && hasBrowseData">
-         <h2>
+      <nav aria-labelledby="shelf-title" v-if="!working && hasBrowseData">
+         <h2 id="shelf-title">
             <span>Shelf Browse</span>
-             <!-- <router-link @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
+             <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
                 View full page
-             </router-link> -->
+             </router-link>
          </h2>
-         <div class="browse-cards">
-            <div v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
+         <ul class="browse-cards">
+            <li v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
                <BrowseCard :current="isCurrent(idx)" :pool="pool" :data="b" style="height:100%"/>
-            </div>
-         </div>
+            </li>
+         </ul>
          <BrowsePager />
          <div class="centered" v-if="showRestore">
             <V4Button mode="primary" @click="browseRestore()">Return to {{currentCallNumber}}</V4Button>
          </div>
-      </template>
+      </nav>
    </div>
 </template>
 
@@ -53,6 +53,7 @@ export default {
          shelfBrowse : state => state.shelf.browse,
          working: state => state.shelf.lookingUp,
          browseRange: state => state.shelf.browseRange,
+         devServer: state => state.system.devServer
       }),
       ...mapGetters({
          hasBrowseData: 'shelf/hasBrowseData',
