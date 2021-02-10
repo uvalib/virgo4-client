@@ -181,7 +181,9 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		// svc.CourseReserveEmail with the from address of the patron submitting the request.
 		// For Law it should send the email to svc.LawReserveEmail AND the patron
 		to := []string{}
+		cc := []string{}
 		from := svc.SMTP.Sender
+		subjectName := reserveReq.Request.Name
 		if reserveReq.Request.Library == "law" {
 			log.Printf("The reserve library is law. Send request to law %s and requestor %s from sender %s",
 				svc.LawReserveEmail, reserveReq.Request.Email, svc.SMTP.Sender)
@@ -191,20 +193,30 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 				to = append(to, reserveReq.Request.InstructorEmail)
 			}
 		} else {
-			log.Printf("The reserve library is not law. Send request to %s from %s",
-				svc.CourseReserveEmail, reserveReq.Request.Email)
+			log.Printf("The reserve library is not law.")
 			to = append(to, svc.CourseReserveEmail)
-			from = reserveReq.Request.Email
+			if reserveReq.Request.InstructorEmail != "" {
+				from = reserveReq.Request.InstructorEmail
+				cc = append(cc, reserveReq.Request.Email)
+				subjectName = reserveReq.Request.InstructorName
+			} else {
+				from = reserveReq.Request.Email
+			}
 		}
 
 		mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-		subject := fmt.Sprintf("Subject: %s: %s\n", reserveReq.Request.Name, reserveReq.Request.Course)
+		subject := fmt.Sprintf("Subject: %s: %s\n", subjectName, reserveReq.Request.Course)
 		toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
-		msg := []byte(subject + toHdr + mime + renderedEmail.String())
+		ccHdr := ""
+		if len(cc) > 0 {
+			ccHdr = fmt.Sprintf("CC: %s\n", strings.Join(cc, ","))
+		}
+		msg := []byte(subject + toHdr + ccHdr + mime + renderedEmail.String())
 
 		if svc.Dev.FakeSMTP {
 			log.Printf("Email is in dev mode. Logging message instead of sending")
 			log.Printf("==================================================")
+			log.Printf("From: %s", from)
 			log.Printf("%s", msg)
 			log.Printf("==================================================")
 		} else {
