@@ -1,5 +1,5 @@
 <template>
-   <div class="shelf-browse" aria-live="polite">
+   <div class="shelf-browse">
       <div class="working" v-if="working">
          <V4Spinner message="Getting shelf browse data..." />
       </div>

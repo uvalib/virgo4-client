@@ -2,6 +2,7 @@
    <div class="browse-card" :class="{current: current}" :aria-current="current.toString()">
       <i class="current fas fa-caret-down" v-if="current"></i>
       <div class="thumb-wrap">
+         <span v-if="data.status=='ready'" class="vertical-spacer"></span>
          <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" aria-hidden="true" tabindex="-1">
             <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
             <span class="no-thumb" :class="data.placeholder_class" v-else>
@@ -97,6 +98,24 @@ export default {
       text-align: center;
       background: white;
       padding: 10px 5px;
+      white-space: nowrap;
+
+      .vertical-spacer {
+         display: inline-block;
+         height: 100%;
+         vertical-align: middle;
+      }
+
+      img {
+         height: auto;
+         align-self: center;
+         display: inline-block;
+         min-width: 135px;
+         max-width: 100%;
+         margin: 0 auto;
+         max-height: 100%;
+         vertical-align: middle;
+      }
 
       .loading {
          height: 100%;
@@ -111,7 +130,6 @@ export default {
       }
 
       .no-thumb {
-         height: 100%;
          height: 100%;
          display: block;
          margin: 0 auto;
@@ -129,6 +147,7 @@ export default {
             padding: 10px;
             width: 90%;
             font-weight: 500;
+            white-space: normal;
          }
       }
 
@@ -161,15 +180,6 @@ export default {
       }
       .no-thumb.cover9 {
          background: var(--uvalib-teal-dark);
-      }
-
-      img {
-         height: auto;
-         align-self: center;
-         display: block;
-         min-width: 135px;
-         margin: 0 auto;
-         max-height: 210px;
       }
    }
    i.current {
