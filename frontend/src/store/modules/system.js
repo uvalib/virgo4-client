@@ -1,6 +1,9 @@
 import axios from 'axios'
 import router from '../../router'
 
+import firebase from 'firebase/app'
+import 'firebase/database'
+
 const system = {
    namespaced: true,
    state: {
@@ -16,6 +19,7 @@ const system = {
          content: "",
          detail: ""
       },
+      alertsDB: null,
       version: "unknown",
       availabilityURL: "",
       hsIlliadURL: "",
@@ -182,6 +186,17 @@ const system = {
          state.hsILLiadURL = cfg.hsILLiadURL
          state.shelfBrowseURL = cfg.shelfBrowseURL
          state.poolMapping = cfg.poolMapping
+
+         if (cfg.firebase) {
+            let db = firebase.initializeApp({
+               apiKey: cfg.firebase.apiKey,
+               authDomain: cfg.firebase.authDomain,
+               databaseURL: cfg.firebase.databaseURL,
+               projectId: cfg.firebase.projectId,
+               appId: cfg.firebase.appId
+            }).database()
+            state.alertsDB = db.ref('library-alerts')
+         }
       },
    },
 
@@ -194,6 +209,9 @@ const system = {
          let host = window.location.hostname
          return axios.get("/config", {headers: {V4Host:host}}).then((response) => {
             ctx.commit('setConfig', response.data)
+            if ( ctx.state.alertsDB) {
+               ctx.dispatch("bindAlerts", null, {root:true})
+            }
          }).catch((error) => {
             ctx.commit('setFatal', "Unable to get configuration: " + error)
          })

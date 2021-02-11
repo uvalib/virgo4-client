@@ -22,6 +22,8 @@ import * as utils from '../utils'
 import { getField, updateField } from 'vuex-map-fields'
 import router from '../router'
 
+import { vuexfireMutations, firebaseAction } from 'vuexfire'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -38,11 +40,15 @@ export default new Vuex.Store({
       selectedHitGroupIdx: -1,
       lastSearchScrollPosition: 0,
       lastSearchURL: "",
-      otherSrcSelection: { id: "", name: "" }
+      otherSrcSelection: { id: "", name: "" },
+      alerts: [],
    },
 
    getters: {
       getField,
+      headerAlerts: state => {
+         return state.alerts.filter( a => a.severity == "alert4")
+      },
       selectedHit: state => {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
             return {}
@@ -379,10 +385,14 @@ export default new Vuex.Store({
       clearLastSearch(state) {
          state.lastSearchScrollPosition = 0
          state.lastSearchURL = ""
-      }
+      },
+      ...vuexfireMutations,
    },
 
    actions: {
+      bindAlerts: firebaseAction(async context => {
+         await context.bindFirebaseRef('alerts', context.rootState.system.alertsDB)
+      }),
       resetSearch( ctx ) {
          ctx.commit("resetSearchResults")
          ctx.commit('query/clear')

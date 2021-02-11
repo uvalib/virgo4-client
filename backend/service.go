@@ -34,6 +34,7 @@ type ServiceContext struct {
 	ILSAPI             string
 	JWTKey             string
 	Dev                DevConfig
+	Firebase           FirebaseConfig
 	PendingTranslates  map[string]string
 	DB                 *dbx.DB
 	SMTP               SMTPConfig
@@ -66,7 +67,8 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		ILSAPI:             cfg.ILSAPI,
 		SMTP:               cfg.SMTP,
 		Illiad:             cfg.Illiad,
-		Dev:                cfg.Dev}
+		Dev:                cfg.Dev,
+		Firebase:           cfg.Firebase}
 
 	log.Printf("Connect to Postgres")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
@@ -289,6 +291,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		KioskMode        bool                 `json:"kiosk"`
 		DevServer        bool                 `json:"devServer"`
 		PoolMapping      map[string]mapTarget `json:"poolMapping"`
+		Firebase         *FirebaseConfig      `json:"firebase,omitempty"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
@@ -298,6 +301,9 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg
+	}
+	if svc.Firebase.APIKey != "" {
+		cfg.Firebase = &svc.Firebase
 	}
 
 	v4HostHeader := c.Request.Header.Get("V4Host")

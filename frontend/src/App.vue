@@ -8,15 +8,11 @@
       </transition>
       <div role="banner" class="site-header" id="v4-header">
          <SkipToNavigation />
-         <div class="covid-alert" id="covid-alert">
-            <span class="lead">COVID-19 Update: </span>
-            <span>
-               Check out the
-               <a href="https://www.library.virginia.edu/status" target="_blank">Status Dashboard</a>
-               for quick reference and
-               <a href="https://www.library.virginia.edu/news/covid-19/" target="_blank">Library Resources FAQ</a>
-               for details.
-            </span>
+         <div class="header-alert" v-if="headerAlerts.length > 0">
+            <div v-for="ha in headerAlerts" :key="ha.uuid" class="alert-body">
+               <span class="lead">{{ha.title}}:&nbsp;</span>
+               <span class="alert-text" v-html="ha.body"></span>
+            </div>
          </div>
          <VirgoHeader />
          <MenuBar id="v4-navbar"/>
@@ -65,6 +61,7 @@ export default {
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
          hasMessage: "system/hasMessage",
+         headerAlerts: "headerAlerts"
       }),
       showDimmer() {
          return this.hasMessage|| this.sessionExpired
@@ -102,26 +99,41 @@ export default {
 </script>
 
 <style lang="scss">
-.covid-alert {
+.header-alert {
    background-color: rgb(37, 202, 211);
    text-align: center;
    padding: 0.5em;
    font-size: 1.06rem;
    position: relative;
    color: rgb(43, 43, 43);
+   line-height: 1.1;
    font-family: franklin-gothic-urw, arial, sans-serif;
-   span {
+   .alert-body {
+      display: inline-block;
+      padding-left: 1.25rem;
+   }
+   .alert-text {
       font-size: 1em;
       font-weight: 400;
+      display: inline-block;
+      color: rgb(0, 0, 0);
+      line-height: 1.5;
+      margin-left: 5px;
+      font-style: normal;
+      p {
+         margin-bottom: 0px;
+         margin-top: 0px;
+      }
       a {
-         color: rgb(20, 30, 60);
+         color: rgb(20, 30, 60) !important;
          text-decoration: underline !important;
+         font-weight: 400 !important;
       }
    }
    .lead {
       font-size: 1.15em;
       font-weight: bold;
-        margin: 0px;
+      margin: 0px;
    }
 }
 /* Color variable definitions */
