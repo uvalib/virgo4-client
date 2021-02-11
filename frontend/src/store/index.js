@@ -129,6 +129,14 @@ export default new Vuex.Store({
 
    mutations: {
       updateField,
+      autoHideAlert3(state) {
+         let alerts = state.alerts.filter( a => a.severity == "alert3" && !state.seenAlerts.includes(a.uuid))
+         alerts.forEach( a=> {
+            state.seenAlerts.push(a.uuid)
+         })
+         let str = JSON.stringify(state.seenAlerts)
+         localStorage.setItem(AlertsStorage, str)
+      },
       loadSeenAlerts(state) {
          let seen = localStorage.getItem(AlertsStorage)
          if ( seen ) {
@@ -427,6 +435,7 @@ export default new Vuex.Store({
       bindAlerts: firebaseAction(async context => {
          await context.bindFirebaseRef('alerts', context.rootState.system.alertsDB)
          context.commit("loadSeenAlerts")
+         context.commit("autoHideAlert3")
       }),
       resetSearch( ctx ) {
          ctx.commit("resetSearchResults")

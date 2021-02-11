@@ -18,7 +18,7 @@
          <MenuBar id="v4-navbar"/>
       </div>
       <div class="alerts-list" v-if="!isKiosk && alertCount > 0" id="alerts">
-         <div v-for="a in menuAlerts" :key="a.uuid" class="alert" :class="a.severity">
+         <div v-for="a in menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
             <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
             <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
             <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
@@ -95,7 +95,11 @@ export default {
    },
    methods: {
       dismissAlert( uuid ) {
-         this.$store.commit("dismissAlert", uuid)
+         let a = document.getElementById(uuid)
+         a.classList.add("dismissed")
+         setTimeout( () => {
+            this.$store.commit("dismissAlert", uuid)
+         }, 200);
       },
       updateClicked() {
           window.location.reload()
@@ -187,6 +191,7 @@ export default {
       display: flex;
       flex-flow: row nowrap;
       justify-content: flex-start;
+      transition-duration: 200ms;
       .alert-icon {
          font-weight: 900;
          font-size: 1.5em;
@@ -215,6 +220,9 @@ export default {
             margin: 0;
          }
       }
+   }
+   .alert.dismissed {
+      opacity: 0;
    }
    .alert.alert1 {
       background-color: var(--uvalib-red-lightest);

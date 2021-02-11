@@ -344,7 +344,7 @@ export default {
    align-items: center;
    justify-content: space-between;
    position: relative;
-
+   box-shadow: $v4-box-shadow-mid;
    .icon {
       font-size: 1.3em;
       margin-right: 5px;
