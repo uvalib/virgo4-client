@@ -17,6 +17,21 @@
          <VirgoHeader />
          <MenuBar id="v4-navbar"/>
       </div>
+      <div class="alerts-list" v-if="!isKiosk && alertCount > 0" id="alerts">
+         <div v-for="a in menuAlerts" :key="a.uuid" class="alert" :class="a.severity">
+            <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
+            <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
+            <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
+            <div class="alert-body">
+               <h3 class="lead">{{a.title}}:&nbsp;</h3>
+               <span class="alert-text" v-html="a.body"></span>
+            </div>
+            <V4Button mode="icon" v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
+               @click="dismissAlert(a.uuid)" aria-label="dismiss alert">
+               <i class="dismiss-icon far fa-window-close"></i>
+            </V4Button>
+         </div>
+      </div>
       <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
          <VueAnnouncer />
@@ -61,23 +76,45 @@ export default {
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
          hasMessage: "system/hasMessage",
-         headerAlerts: "headerAlerts"
+         headerAlerts: "headerAlerts",
+         alertCount: 'alertCount',
+         menuAlerts: 'menuAlerts',
       }),
       showDimmer() {
          return this.hasMessage|| this.sessionExpired
       }
    },
+   watch: {
+      headerAlerts() {
+         // when header alerts change, need to recalc height of header so menu bar sticks properly
+         this.$nextTick( ()=>{
+            this.headerHeight = document.getElementById("v4-header").offsetHeight
+            this.headerHeight -= this.menuHeight
+         })
+      }
+   },
    methods: {
+      dismissAlert( uuid ) {
+         this.$store.commit("dismissAlert", uuid)
+      },
       updateClicked() {
           window.location.reload()
       },
       scrollHandler( ) {
          if ( window.scrollY <= this.headerHeight ) {
             document.getElementById("v4-navbar").classList.remove("sticky")
-            document.getElementById("v4-main").style.paddingTop = '0px'
+            if ( this.isKiosk || this.headerAlerts.length == 0) {
+               document.getElementById("v4-main").style.paddingTop = '0px'
+            } else {
+               document.getElementById("alerts").style.paddingTop = '0px'
+            }
          } else {
             document.getElementById("v4-navbar").classList.add("sticky")
-            document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
+            if ( this.isKiosk || this.headerAlerts.length == 0) {
+               document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
+            } else {
+               document.getElementById("alerts").style.paddingTop = `${this.menuHeight}px`
+            }
          }
       },
    },
@@ -136,6 +173,62 @@ export default {
       margin: 0px;
    }
 }
+.alerts-list {
+   text-align: left;
+   color: rgb(35, 45, 75);
+   font-family: franklin-gothic-urw, arial, sans-serif;
+
+   .alert {
+      padding: .5em;
+      font-size: 1.06rem;
+      line-height: 1.5;
+      position: relative;
+      color: var(--uvalib-text-dark);
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      .alert-icon {
+         font-weight: 900;
+         font-size: 1.5em;
+         padding-top: .25em;
+      }
+      button.v4-button.dismiss-alert.icon-button {
+         height: fit-content;
+         cursor: pointer;
+      }
+      .dismiss-icon {
+         font-size: 1.5em;
+         cursor: pointer;
+      }
+      .alert-body {
+         padding-left: 1.25rem;
+      }
+      .lead {
+         font-size: 1.33rem;
+         line-height: 1.1;
+         margin-top: 0;
+         margin-bottom: .5rem;
+      }
+      .alert-text {
+         display: inline-block;
+         p {
+            margin: 0;
+         }
+      }
+   }
+   .alert.alert1 {
+      background-color: var(--uvalib-red-lightest);
+      border-left: 8px solid var(--uvalib-red-dark);
+   }
+   .alert.alert2 {
+      background-color: var(--uvalib-yellow-light);
+      border-left: 8px solid var(--uvalib-yellow);
+   }
+   .alert.alert3 {
+      background-color: var(--uvalib-blue-alt-light);
+      border-left: 8px solid var(--uvalib-blue-alt);
+   }
+}
 /* Color variable definitions */
 :root {
    /* OFFICIAL BRAND COLORS */
@@ -162,10 +255,11 @@ export default {
    --uvalib-green: #62bb46;
    --uvalib-green-dark: #4e9737;
 
-   --uvalib-red-lightest: #fbcfda;
+   --uvalib-red-lightest: #FBCFDA;
    --uvalib-red: #ef3f6b;
    --uvalib-red-emergency: #df1e43;
    --uvalib-red-darker: #B30000;
+   --uvalib-red-dark: #DF1E43;
 
    --uvalib-yellow-light: #fef6c8;
    --uvalib-yellow: #ecc602;

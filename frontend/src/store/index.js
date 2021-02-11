@@ -26,6 +26,8 @@ import { vuexfireMutations, firebaseAction } from 'vuexfire'
 
 Vue.use(Vuex)
 
+const  AlertsStorage = "v4SeenAlerts"
+
 export default new Vuex.Store({
    state: {
       noSpinner: false,
@@ -42,12 +44,22 @@ export default new Vuex.Store({
       lastSearchURL: "",
       otherSrcSelection: { id: "", name: "" },
       alerts: [],
+      seenAlerts: []
    },
 
    getters: {
       getField,
       headerAlerts: state => {
          return state.alerts.filter( a => a.severity == "alert4")
+      },
+      menuAlerts: state => {
+         return state.alerts.filter( a => a.severity != "alert4" && !state.seenAlerts.includes(a.uuid))
+      },
+      alertCount: state => {
+         return state.alerts.filter( a => a.severity != "alert4" && !state.seenAlerts.includes(a.uuid)).length
+      },
+      seenAlertsCount: state => {
+         return state.seenAlerts.length
       },
       selectedHit: state => {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
@@ -117,6 +129,28 @@ export default new Vuex.Store({
 
    mutations: {
       updateField,
+      loadSeenAlerts(state) {
+         let seen = localStorage.getItem(AlertsStorage)
+         if ( seen ) {
+            try {
+               state.seenAlerts.splice(0, state.seenAlerts.length)
+               JSON.parse(seen).forEach( a =>  {
+                  state.seenAlerts.push(a)
+               })
+            } catch (e) {
+               state.seenAlerts.splice(0, state.seenAlerts.length)
+            }
+         }
+      },
+      dismissAlert(state, uuid) {
+         state.seenAlerts.push(uuid)
+         let str = JSON.stringify(state.seenAlerts)
+         localStorage.setItem(AlertsStorage, str)
+      },
+      unseeAllAlerts(state) {
+         state.seenAlerts.splice(0, state.seenAlerts.length)
+         localStorage.removeItem(AlertsStorage)
+      },
       hitSelected(state, identifier) {
          state.selectedHitIdx = -1
          state.selectedHitGroupIdx = -1
@@ -392,6 +426,7 @@ export default new Vuex.Store({
    actions: {
       bindAlerts: firebaseAction(async context => {
          await context.bindFirebaseRef('alerts', context.rootState.system.alertsDB)
+         context.commit("loadSeenAlerts")
       }),
       resetSearch( ctx ) {
          ctx.commit("resetSearchResults")

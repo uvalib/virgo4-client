@@ -142,18 +142,17 @@
                   <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
                </router-link>
             </li>
-            <li v-if="alertsReady" class="menu-item alert-wrap"
+            <li v-if="!isKiosk" class="menu-item alert-wrap"
                :class="{dim: alertCount==0}" tabindex="-1" role="menuitem" id="alertmenu"
                @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
                @keydown.space.prevent.stop="alertClicked"
             >
                <div class="alert-bell icon fas fa-bell">
-                  <span v-if="alertCount" class="alert-count">{{alertCount}}</span>
+                  <span v-if="seenAlertsCount" class="alert-count">{{seenAlertsCount}}</span>
                </div>
             </li>
          </template>
       </ul>
-      <uvalib-alerts v-if="!isKiosk && alertsReady" id="alerts"></uvalib-alerts>
    </nav>
 </template>
 
@@ -177,8 +176,6 @@ export default {
             {id: "alertmenu", submenu:[], expanded: false},
          ],
          menuBarIdx: 0,
-         alertCount: 0,
-         alertsReady: false,
       }
    },
    computed: {
@@ -189,17 +186,12 @@ export default {
       ...mapGetters({
         isKiosk: 'system/isKiosk',
         isSignedIn: 'user/isSignedIn',
-        itemsOnNotice: 'user/itemsOnNotice'
+        itemsOnNotice: 'user/itemsOnNotice',
+        alertCount: 'alertCount',
+        seenAlertsCount: 'seenAlertsCount'
       }),
    },
    created() {
-      (async () => {
-         if (this.isKiosk == false) {
-            await import ('@uvalib/uvalib-alerts')
-            document.addEventListener('seen-count-changed', (e)=>{ this.alertCount = e.detail.seenCount })
-            this.alertsReady = true
-         }
-      })()
       window.addEventListener("click", this.resetMenus)
    },
    destroyed() {
@@ -231,9 +223,7 @@ export default {
 
       },
       alertClicked() {
-         if ( this.alertCount > 0) {
-            document.querySelector('#alerts').unseeAll()
-         }
+         this.$store.commit("unseeAllAlerts")
       },
       nextMenu() {
          this.closeSubMenus()
@@ -422,11 +412,6 @@ export default {
          }
       }
    }
-
-   #alerts {
-      width: 100%;
-   }
-
    .menu-item {
       cursor: pointer;
       color: white;

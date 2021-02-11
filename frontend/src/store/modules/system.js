@@ -195,7 +195,11 @@ const system = {
                projectId: cfg.firebase.projectId,
                appId: cfg.firebase.appId
             }).database()
-            state.alertsDB = db.ref('library-alerts')
+            if ( state.devServer) {
+               state.alertsDB = db.ref('library-alerts-dev')
+            } else {
+               state.alertsDB = db.ref('library-alerts-dev')
+            }
          }
       },
    },
