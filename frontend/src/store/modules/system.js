@@ -198,7 +198,7 @@ const system = {
             if ( state.devServer) {
                state.alertsDB = db.ref('library-alerts-dev')
             } else {
-               state.alertsDB = db.ref('library-alerts-dev')
+               state.alertsDB = db.ref('library-alerts')
             }
          }
       },

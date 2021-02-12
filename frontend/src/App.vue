@@ -200,6 +200,7 @@ export default {
       button.v4-button.dismiss-alert.icon-button {
          height: fit-content;
          cursor: pointer;
+         margin-left: auto;
       }
       .dismiss-icon {
          font-size: 1.5em;
