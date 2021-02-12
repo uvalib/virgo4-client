@@ -58,11 +58,11 @@ export default {
       },
       searching (newVal, _oldVal) {
          if (newVal == false && this.restoreURL == "/") {
-            setTimeout( () => {
+            this.$nextTick( () => {
                let r = document.getElementById("results-container")
                r.focus({preventScroll:true})
                this.$utils.scrollToItem(r)
-            }, 250)
+            })
          }
       },
    },
