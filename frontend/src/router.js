@@ -235,7 +235,7 @@ router.afterEach((to, _from) => {
             document.title = "Virgo"
          }
       }
-      document.getElementById("app").focus()
+      // document.getElementById("app").focus()
    })
 })
 

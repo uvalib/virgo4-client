@@ -7,7 +7,7 @@
          </div>
       </transition>
       <div role="banner" class="site-header" id="v4-header">
-         <SkipToNavigation />
+         <!-- <SkipToNavigation /> -->
          <div class="header-alert" v-if="headerAlerts.length > 0">
             <div v-for="ha in headerAlerts" :key="ha.uuid" class="alert-body">
                <span class="lead">{{ha.title}}:&nbsp;</span>
@@ -52,7 +52,7 @@ import LibraryFooter from "@/components/layout/LibraryFooter"
 import MessageBox from "@/components/layout/MessageBox"
 import VirgoHeader from "@/components/layout/VirgoHeader"
 import MenuBar from "@/components/layout/MenuBar"
-import SkipToNavigation from "@/components/layout/SkipToNavigation"
+// import SkipToNavigation from "@/components/layout/SkipToNavigation"
 import SessionExpired from "@/components/layout/SessionExpired"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
@@ -64,7 +64,8 @@ export default {
       };
    },
    components: {
-      VirgoHeader, LibraryFooter, MenuBar, ScrollToTop, MessageBox, SessionExpired, SkipToNavigation
+      VirgoHeader, LibraryFooter, MenuBar, ScrollToTop, MessageBox, SessionExpired
+      // , SkipToNavigation
    },
    computed: {
       ...mapState({
