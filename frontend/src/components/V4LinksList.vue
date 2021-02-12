@@ -11,7 +11,7 @@
       </div>
       <div v-else tabindex="0" :aria-expanded="showFull.toString()"
             class="truncated-content" :id="`${id}-cut`"
-            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle"
+            @keydown.prevent.stop.enter="toggle"
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
       >
          <div :id="`${id}-list`" aria-live="polite">

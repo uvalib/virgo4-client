@@ -8,7 +8,7 @@
                'pure-button-primary': mode == 'primary',
                'pure-button-small': mode == 'small',
                'pure-button-tertiary': mode == 'tertiary'}"
-      @click.prevent.stop="clicked" @keyup.stop.prevent @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked" @keyup.stop.esc="escClicked">
+      @click.prevent.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked" @keyup.stop.esc="escClicked">
       <slot></slot>
    </button>
 </template>

@@ -7,7 +7,7 @@
          <div tabindex="0" :aria-expanded="showFull.toString()"
             class="truncated-content"
             :class="{icon: mode=='icon'}"
-            @keyup.stop.prevent @keydown.prevent.stop.enter="toggle"
+            @keydown.prevent.stop.enter="toggle"
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
             <div  v-if="!showFull" :id="`${id}-cut`" class="truncated"  aria-live="polite" >
