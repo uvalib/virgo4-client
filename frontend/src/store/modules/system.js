@@ -244,6 +244,9 @@ const system = {
             userAgent: navigator.userAgent,
             error: JSON.stringify(data)
          }
+         if (err.error == "{}" ) {
+            err.error = data.toString()
+         }
          if (ctx.rootGetters["user/isSignedIn"]) {
             err.signedIn = true
             err.user = ctx.rootState.user.signedInUser

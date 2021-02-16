@@ -218,9 +218,11 @@ const user = {
          renewResults.results.forEach( renew => {
             if (renew.success == false) {
                state.renewSummary.failed++
-               state.renewSummary.failures.push({barcode: co.barcode, message: renew.message})
+               state.renewSummary.failures.push({barcode: renew.barcode, message: renew.message})
                let co = state.checkouts.find( co => co.barcode == renew.barcode)
-               co.message = renew.message
+               if ( co ) {
+                  co.message = renew.message
+               }
             } else {
                state.renewSummary.renewed++
             }
