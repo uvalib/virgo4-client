@@ -17,10 +17,10 @@
          <span class="title">{{data.published_date}}</span>
       </div>
       <div class="bm-control">
-         <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`bm-modal-${data.id}`"
+         <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
             @clicked="bookmarkClicked(data.id)"
          />
-         <SignInRequired v-else :data="bookmarkData(data)" :id="`bm-modal-${data.id}`" act="bookmark" />
+         <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
       </div>
    </div>
 </template>

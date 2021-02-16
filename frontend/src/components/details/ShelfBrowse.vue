@@ -6,10 +6,10 @@
       <nav aria-labelledby="shelf-title" v-if="!working && hasBrowseData">
          <h2 id="shelf-title">
             <span>Shelf Browse</span>
-             <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
-                View full page
-             </router-link>
          </h2>
+         <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
+            View full page
+         </router-link>
          <ul class="browse-cards">
             <li v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
                <BrowseCard :current="isCurrent(idx)" :pool="pool" :data="b" style="height:100%"/>
@@ -135,6 +135,7 @@ export default {
       overflow: hidden;
       justify-content: center;
       align-content: stretch;
+      list-style-type: none;
       .card-wrap {
          width: 190px;
       }
