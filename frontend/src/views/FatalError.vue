@@ -1,6 +1,5 @@
 <template>
    <div class="fatal-error">
-      <h1>Virgo System Error</h1>
       <div class="message">
          <h3>Virgo is experiencing technical difficulties. Please check back later.</h3>
          <h4>{{fatal}}</h4>

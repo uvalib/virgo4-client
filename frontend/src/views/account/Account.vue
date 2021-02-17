@@ -1,6 +1,5 @@
 <template>
    <div class="account">
-      <h1>My Account</h1>
       <SignInRequired v-if="isSignedIn == false" targetPage="account information"/>
       <div v-else class="account-content">
          <AccountActivities/>

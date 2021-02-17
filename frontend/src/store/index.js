@@ -30,6 +30,7 @@ const  AlertsStorage = "v4SeenAlerts"
 
 export default new Vuex.Store({
    state: {
+      pageTitle: "Search",
       noSpinner: false,
       searching: false,
       pageSize: 20,
@@ -44,11 +45,32 @@ export default new Vuex.Store({
       lastSearchURL: "",
       otherSrcSelection: { id: "", name: "" },
       alerts: [],
-      seenAlerts: []
+      seenAlerts: [],
+      regionalAlerts: []
    },
 
    getters: {
       getField,
+      pageAlerts:  state => tgtPath => {
+         if ( tgtPath == "/") tgtPath = "ROOT"
+         let tgtRegex = new RegExp(tgtPath)
+         let out = []
+         state.regionalAlerts.forEach( ra => {
+            let urls = ra.url
+            if ( !Array.isArray(urls) ) urls = [{value:urls}]
+            let matched = false
+            urls.some( u => {
+               if ( (u.value.match(/^search.lib.virginia.edu$/) && tgtPath == "ROOT") ||
+                    (u.value.match(/search.lib.virginia.edu/) && u.value.match(tgtRegex)) ) {
+                  out.push(ra)
+                  matched = true
+               }
+               return matched == true
+            })
+
+         })
+         return out
+      },
       headerAlerts: state => {
          return state.alerts.filter( a => a.severity == "alert4")
       },
@@ -129,6 +151,9 @@ export default new Vuex.Store({
 
    mutations: {
       updateField,
+      setPageTitle(state, title) {
+         state.pageTitle = title
+      },
       autoHideAlert3(state) {
          let alerts = state.alerts.filter( a => a.severity == "alert3" && !state.seenAlerts.includes(a.uuid))
          alerts.forEach( a=> {
@@ -436,6 +461,9 @@ export default new Vuex.Store({
          await context.bindFirebaseRef('alerts', context.rootState.system.alertsDB)
          context.commit("loadSeenAlerts")
          context.commit("autoHideAlert3")
+      }),
+      bindRegionalAlerts: firebaseAction(async context => {
+         await context.bindFirebaseRef('regionalAlerts', context.rootState.system.regionalAlertsDB)
       }),
       resetSearch( ctx ) {
          ctx.commit("resetSearchResults")

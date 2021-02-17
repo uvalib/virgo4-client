@@ -1,12 +1,11 @@
 <template>
    <div class="request">
       <template v-if="request">
-         <h1>Request an Item</h1>
          <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
       </template>
       <div v-else class="submitted">
-         <h1>Request Submitted</h1>
-         <h2>We have received your request.</h2>
+         <h2>Request Submitted</h2>
+         <h3>We have received your request.</h3>
          <table>
             <tr>
                <td class="label">User ID:</td>

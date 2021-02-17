@@ -243,6 +243,23 @@ router.afterEach((to, _from) => {
 router.beforeEach( async (to, from, next) => {
    store.commit("system/setILSError", "")
 
+   // Page header is now in the main app template and driven by the pageTitle
+   // model variable. Ensure it is set correctly for each new page
+   let h1 = {home: "Search", search: "Search", signin: "User Sign In", account: "My Account",
+      checkouts: "My Account", 'digital-deliveries': "My Account",
+      bookmarks: "My Account", requests: "My Account", searches: "My Account",
+      preferences: "My Account", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
+      codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found",
+      'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item",
+      'course-reserves': "Course Reserves", 'course-reserves-request': "Course Reserves Request", reserved: "Course Reserves Request"
+   }
+   store.commit("setPageTitle", "Search")
+   let title =  h1[to.name]
+   console.log(to.name +": "+title)
+   if (title) {
+      store.commit("setPageTitle", title)
+   }
+
    // keep sign-in or access tokens current (issue new token if none present)
    await refreshSession()
 

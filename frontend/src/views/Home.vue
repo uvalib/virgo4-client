@@ -3,7 +3,6 @@
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel pure-form">
          <template v-if="basicSearch">
-            <h1>Search</h1>
             <div v-if="hasTranslateMessage" class="translate-message">
                {{translateMessage}}
             </div>
@@ -55,6 +54,10 @@ export default {
       $route() {
          console.log("NEW HOME ROUTE "+ this.$route.fullPath)
          this.restoreSearchFromQueryParams(this.$route.query)
+         this.pageTitle = "Search"
+         if (this.searchMode != "basic") {
+            this.pageTitle = "Advanced Search"
+         }
       },
       searching (newVal, _oldVal) {
          if (newVal == false && this.restoreURL == "/") {
@@ -95,7 +98,8 @@ export default {
         basic: 'query.basic',
         searchSources: 'query.searchSources',
         userSearched: 'query.userSearched',
-        lastSearchScrollPosition: 'lastSearchScrollPosition'
+        lastSearchScrollPosition: 'lastSearchScrollPosition',
+        pageTitle: 'pageTitle'
       }),
       basicSearch() {
         return this.searchMode != "advanced"
@@ -116,8 +120,6 @@ export default {
       if (cachedSrc) {
          this.searchSources = cachedSrc
       }
-      await this.$store.dispatch('pools/getPools')
-      this.$store.dispatch("filters/getPreSearchFilters")
 
       // When restoring a saved search, the call will be /search/:token
       let token = this.$route.params.id

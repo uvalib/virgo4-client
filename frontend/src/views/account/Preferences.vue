@@ -1,6 +1,5 @@
 <template>
   <div class="preferences">
-    <h1>My Account</h1>
     <SignInRequired v-if="isSignedIn == false" targetPage="preferences"/>
     <div v-else class="preferences-content">
       <AccountActivities/>
@@ -42,7 +41,6 @@ export default {
    },
    created() {
       if ( this.isSignedIn) {
-         this.$store.dispatch('pools/getPools')
          this.$store.dispatch("user/getAccountInfo")
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
       }

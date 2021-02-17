@@ -1,8 +1,5 @@
 <template>
    <div class="shelf-browse">
-      <div class="browse-header">
-         <h1>Shelf Browse</h1>
-      </div>
       <div class="browse-content">
          <div class="working" v-if="working" >
             <V4Spinner message="Looking up items..."/>
@@ -74,9 +71,6 @@ export default {
       async initializeBrowse() {
          this.$store.commit("shelf/setBrowseRange", 10)
          this.$store.commit("shelf/setShowSpinner", true)
-         if (this.searchAPI == "") {
-            await this.$store.dispatch("system/getConfig", null, {root:true})
-         }
          if ( this.isSignedIn) {
             this.$store.dispatch("bookmarks/getBookmarks")
          }

@@ -1,6 +1,5 @@
 <template>
    <div class="checkout">
-      <h1>My Account</h1>
       <V4Spinner v-if="downloading" message="Downloading..." v-bind:overlay="true" />
       <RenewSummary v-if="hasRenewSummary"/>
       <SignInRequired v-if="isSignedIn == false" targetPage="checkout information"/>

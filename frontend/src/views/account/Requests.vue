@@ -1,6 +1,5 @@
 <template>
    <div class="requests">
-      <h1>My Account</h1>
       <SignInRequired v-if="isSignedIn == false" targetPage="request information"/>
       <div v-else class="requests-content">
          <AccountActivities />
@@ -268,7 +267,6 @@ export default {
    async created() {
       if ( this.isSignedIn) {
          this.$store.commit('user/setLookingUp', true)
-         await this.$store.dispatch("system/getConfig")
          await this.$store.dispatch("user/getRequests")
          this.$store.commit('user/setLookingUp', false)
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")

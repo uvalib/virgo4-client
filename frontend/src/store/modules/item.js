@@ -230,11 +230,6 @@ const item = {
          let baseURL = ""
          let pool = null
          let pools = ctx.rootState.pools.list
-         if (pools.length == 0) {
-            await ctx.dispatch("pools/getPools", null, {root:true})
-            pools = ctx.rootState.pools.list
-         }
-
          pool = pools.find( p => p.id == source)
 
          if (!pool) {
@@ -284,11 +279,6 @@ const item = {
       async lookupCatalogKeyDetail(ctx, catalogKey) {
          ctx.commit('clearDetails')
          ctx.commit('clearAvailability')
-
-         let pools = ctx.rootState.pools.list
-         if (pools.length == 0) {
-            await ctx.dispatch("pools/getPools", null, {root:true})
-         }
 
          // strip punctuation that may be lingeraing at end of key from a bad cut/paste
          catalogKey = cleanIdentifier(catalogKey)

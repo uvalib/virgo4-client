@@ -92,9 +92,6 @@ const bookmarks = {
 
    actions: {
       async getPublicBookmarks(ctx, token) {
-         if (ctx.rootState.system.searchAPI == "") {
-            await ctx.dispatch("system/getConfig", null, {root:true})
-         }
          ctx.commit('setSearching', true)
          return axios.get(`/api/bookmarks/${token}`).then((response) => {
             ctx.commit('setPublicBookmarks', response.data)
@@ -206,11 +203,6 @@ const bookmarks = {
             items.push( {pool: bm.pool, identifier: bm.identifier} )
          })
          let req = {title: data.title, notes: data.notes, items: items}
-
-         if ( ctx.rootState.system.searchAPI.length == 0) {
-            await ctx.dispatch('system/getConfig', null, { root: true })
-         }
-
          let url = ctx.rootState.system.searchAPI + "/api/pdf"
          await axios.post(url, req, {responseType: "blob"}).then((response) => {
             let blob = new Blob([response.data], { type: response.headers['content-type'] })

@@ -1,8 +1,5 @@
 <template>
    <div class="advanced-panel" :class="{narrow: hasResults}">
-      <h1>
-         <span>Advanced Search</span>
-      </h1>
       <div class="advanced-controls">
          <AdvancedFacets />
          <div class="advanced-wrap">

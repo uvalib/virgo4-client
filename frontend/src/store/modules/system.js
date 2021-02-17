@@ -20,6 +20,7 @@ const system = {
          detail: ""
       },
       alertsDB: null,
+      regionalAlertsDB:  null,
       version: "unknown",
       availabilityURL: "",
       hsIlliadURL: "",
@@ -128,11 +129,6 @@ const system = {
          state.ilsError = error
       },
       setError(state, error) {
-         if (error == null) {
-            error = ""
-         }
-
-         // reset everything
          state.message.type = "none"
          state.message.title = ""
          state.message.content = ""
@@ -153,11 +149,6 @@ const system = {
                state.message.title = "Virgo Error"
                state.message.content = error.response.data
             }
-         } else if (error.request) {
-            // The request was made but no response was received
-            state.message.type = "error"
-            state.message.title = "Virgo Error"
-            state.message.content =  "Search is non-responsive"
          } else if (error.message) {
             state.message.type = "error"
             state.message.title = "Virgo Error"
@@ -169,7 +160,6 @@ const system = {
                state.message.title = error.title
             }
          } else {
-            // likely just a string error; just set it
             state.message.type = "error"
             state.message.title = "Virgo Error"
             state.message.content = error
@@ -197,8 +187,10 @@ const system = {
             }).database()
             if ( state.devServer) {
                state.alertsDB = db.ref('library-alerts-dev')
+               state.regionalAlertsDB = db.ref('regionalalerts-dev')
             } else {
                state.alertsDB = db.ref('library-alerts')
+               state.regionalAlertsDB = db.ref('regionalalerts')
             }
          }
       },
@@ -215,6 +207,7 @@ const system = {
             ctx.commit('setConfig', response.data)
             if ( ctx.state.alertsDB) {
                ctx.dispatch("bindAlerts", null, {root:true})
+               ctx.dispatch("bindRegionalAlerts", null, {root:true})
             }
          }).catch((error) => {
             ctx.commit('setFatal', "Unable to get configuration: " + error)

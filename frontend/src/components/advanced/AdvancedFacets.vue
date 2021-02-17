@@ -48,7 +48,7 @@ export default {
    computed: {
       ...mapState({
          displayWidth: state => state.system.displayWidth,
-         loadingFilters: state => state.filters.updatingFacets,
+         loadingFilters: state => state.filters.getPresearchFacets,
       }),
       ...mapGetters({
          hasResults: 'hasResults',

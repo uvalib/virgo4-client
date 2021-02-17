@@ -1,6 +1,5 @@
 <template>
    <div class="codes">
-      <h1>Codes</h1>
       <div class="codes-content">
          <div class="working" v-if="working" >
             <V4Spinner message="Looking up codes..."/>

@@ -1,6 +1,5 @@
 <template>
    <div class="bookmarks">
-      <h1>My Account</h1>
       <SignInRequired v-if="isSignedIn == false" targetPage="bookmarks"/>
       <div v-else class="bookmarks-content">
          <AccountActivities />

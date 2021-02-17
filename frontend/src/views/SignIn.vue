@@ -1,6 +1,5 @@
 <template>
    <div class="signin">
-      <h1>User Sign In</h1>
       <div class="sign-in-content">
          <div class="netbadge">
             <span class="netbadge">

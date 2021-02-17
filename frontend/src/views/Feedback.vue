@@ -1,6 +1,5 @@
 <template>
    <div class="feedback">
-      <h1>Virgo Feedback</h1>
       <V4Spinner message="Submitting feedback..." v-if="status=='submit'" v-bind:overlay="true" />
       <div v-if="status!='success'" class="feedback-content">
          <div class="feedback-form pure-form">

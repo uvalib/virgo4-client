@@ -83,9 +83,6 @@ const shelf = {
          if ( ctx.state.showSpinner) {
             ctx.commit("setLookingUp", true)
          }
-         if ( ctx.rootState.system.searchAPI.length == 0) {
-            await ctx.dispatch('system/getConfig', null, { root: true })
-         }
 
          let url = `${ctx.rootState.system.shelfBrowseURL}/api/browse/${centerId}?range=${ctx.state.browseRange}`
          await axios.get(url).then((response) => {

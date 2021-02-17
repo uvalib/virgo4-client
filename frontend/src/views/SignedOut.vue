@@ -1,6 +1,5 @@
 <template>
    <div class="signedout">
-      <h1>Signed Out</h1>
       <div class="messages">
          <p>You have successfully ended your Virgo session.</p>
       </div>

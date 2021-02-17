@@ -1,6 +1,5 @@
 <template>
    <div class="course-reserves">
-      <h1>Course Reserves</h1>
       <div class="reserves-content">
          <V4Spinner v-if="searching && totalReserves == -1" message="Looking up reserved items..." v-bind:overlay="true"/>
          <div class="instructions">

@@ -2,7 +2,6 @@
    <div class="details">
       <div class="detail-header">
          <span v-if="selectedHitIdx > -1" class="hidden-spacer"></span>
-         <h1>Item Details</h1>
          <span class="paging" v-if="selectedHitIdx > -1">
             <V4Pager :total="selectedResults.total" :page="selectedHit.number"
                :prevAvailable="prevHitAvailable" :nextAvailable="nextHitAvailable"
@@ -236,9 +235,6 @@ export default {
          this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
       },
       async getDetails() {
-         if (this.searchAPI == "") {
-            await this.$store.dispatch("system/getConfig", null, {root:true})
-         }
          this.mode = this.$route.query.mode
          let src = this.$route.params.src
          let id = this.$route.params.id

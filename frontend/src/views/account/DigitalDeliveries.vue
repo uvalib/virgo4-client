@@ -1,6 +1,5 @@
 <template>
    <div class="digital-deliveries">
-      <h1>My Account</h1>
       <SignInRequired v-if="isSignedIn == false" targetPage="digital deliveries"/>
       <div v-else class="digital-delivery-content">
          <AccountActivities/>

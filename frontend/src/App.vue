@@ -35,7 +35,16 @@
       <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
          <VueAnnouncer />
-         <router-view />
+         <!-- <div v-if="pageAlerts($route.path).length > 0">
+            <p v-for="a in pageAlerts($route.path)" :key="a.uuid">
+               TITLE: {{a.title}}
+            </p>
+         </div> -->
+         <h1>{{pageTitle}}</h1>
+         <router-view v-if="configuring==false"/>
+         <div v-else  class="configure">
+            <V4Spinner message="Configuring system..."/>
+         </div>
          <div v-if="newVersion" class="update-pop">
             <div class="msg">A new version of Virgo is available.</div>
             <V4Button mode="primary" @click="updateClicked">Update Now</V4Button>
@@ -60,7 +69,8 @@ export default {
    data: function() {
       return {
          headerHeight: 0,
-         menuHeight: 0
+         menuHeight: 0,
+         configuring: true
       };
    },
    components: {
@@ -71,7 +81,8 @@ export default {
          newVersion: state => state.system.newVersion,
          authorizing: state => state.user.authorizing,
          sessionExpired: state => state.system.sessionExpired,
-         devServer: state => state.system.devServer
+         devServer: state => state.system.devServer,
+         pageTitle: state => state.pageTitle
       }),
       ...mapGetters({
          hasTranslateMessage: "system/hasTranslateMessage",
@@ -80,6 +91,7 @@ export default {
          headerAlerts: "headerAlerts",
          alertCount: 'alertCount',
          menuAlerts: 'menuAlerts',
+         pageAlerts: 'pageAlerts',
       }),
       showDimmer() {
          return this.hasMessage|| this.sessionExpired
@@ -92,6 +104,9 @@ export default {
             this.headerHeight = document.getElementById("v4-header").offsetHeight
             this.headerHeight -= this.menuHeight
          })
+      },
+      $route() {
+         console.log(this.pageAlerts(this.$route.path))
       }
    },
    methods: {
@@ -126,6 +141,14 @@ export default {
          console.log(event)
       }
    },
+   async beforeCreate() {
+      // First time app is being created, request all common config
+      // the flag shows a config spinner until ready
+      await this.$store.dispatch('system/getConfig')
+      await this.$store.dispatch('pools/getPools')
+      this.$store.dispatch("filters/getPreSearchFilters")
+      this.configuring = false
+   },
    mounted() {
       this.$nextTick( ()=>{
          this.menuHeight = document.getElementById("v4-navbar").offsetHeight
@@ -150,6 +173,9 @@ export default {
 </script>
 
 <style lang="scss">
+.configure {
+   margin-bottom: 150px;
+}
 .header-alert {
    background-color: rgb(37, 202, 211);
    text-align: center;
@@ -409,7 +435,7 @@ body {
 
 #app h1 {
    color: var(--uvalib-brand-orange);
-   margin: 8px 0;
+   margin: 25px 0;
    padding-bottom: 5px;
    font-weight: bold;
    position: relative;

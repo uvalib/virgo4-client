@@ -1,6 +1,5 @@
 <template>
    <div class="public-bookmarks">
-      <h1>Public Bookmarks</h1>
       <div class="bookmarks-content">
          <div class="working" v-if="searching">
             <V4Spinner message="Looking up bookmark information..."/>
