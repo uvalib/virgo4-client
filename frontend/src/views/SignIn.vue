@@ -70,7 +70,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
 import { mapState } from "vuex"
 import ForgotPassword from '@/components/modals/ForgotPassword'
 import ChangePassword from '@/components/modals/ChangePassword'
@@ -85,9 +84,6 @@ export default {
          authMessage: state => state.user.authMessage,
          lockedOut: state => state.user.lockedOut,
          ilsError: state => state.system.ilsError,
-      }),
-      ...mapGetters({
-        hasAuthToken: 'user/hasAuthToken',
       }),
       hasPasswordToken: function(){
          return this.$route.query.token && this.$route.query.token.length > 0

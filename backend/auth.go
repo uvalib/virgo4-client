@@ -19,7 +19,7 @@ import (
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
-	signedStr, err := v4jwt.Mint(guestClaim, 24*time.Hour, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(guestClaim, 15*time.Minute, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		c.String(http.StatusInternalServerError, "unable to generate authorization")

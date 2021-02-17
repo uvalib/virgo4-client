@@ -126,10 +126,6 @@ const user = {
          })
          return total.toFixed(2)
       },
-      hasAuthToken: state => {
-        if (state.authToken == null) return false
-        return state.authToken.length > 0
-      },
       isSignedIn: state => {
          return state.signedInUser != ""  && state.authToken != "" &&
             state.sessionType != "" && state.sessionType != "none"
@@ -232,6 +228,8 @@ const user = {
       setAuthToken(state, token) {
          state.authToken = token
          axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
+         let parsed = parseJwt(token)
+         state.authExpiresAt = parsed.exp
       },
       setAuthorizing(state, auth) {
          state.authorizing = auth
@@ -289,6 +287,7 @@ const user = {
          state.authTriesLeft = 5
          state.authExpiresAt = 0
          state.authMessage = ""
+         state.authToken = ""
          state.role = ""
          state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
@@ -303,37 +302,53 @@ const user = {
    },
 
    actions: {
-      getAuthToken(ctx) {
-        ctx.commit('setAuthorizing', true)
-        return axios.post("/authorize").then((response) => {
-          console.log("Set new auth token for user")
-          ctx.commit('setAuthToken', response.data)
-          ctx.commit('setAuthorizing', false)
-        }).catch((error) => {
-          ctx.commit('setAuthToken', '')
-          ctx.commit('system/setFatal', "Authorization failure: " + error, { root: true })
-          ctx.commit('setAuthorizing', false)
-        })
-      },
-
-      async refreshAuth(ctx) {
-         // if the user has signed out already, don't refresh
-         if (ctx.state.signedInUser == "" ||  ctx.state.sessionType == "" || ctx.state.sessionType == "none" ) {
-            return
+      async authenticate(ctx) {
+         let expiresIn = 0
+         let signedIn = false
+         if ( ctx.state.authExpiresAt > 0) {
+            let nowSecs = Math.round((new Date()).getTime() / 1000)
+            let expireSecs = ctx.state.authExpiresAt - 15
+            expiresIn = expireSecs - nowSecs
          }
-
-         let nowSecs = Math.round((new Date()).getTime() / 1000)
-         let expireSecs = ctx.state.authExpiresAt - 15
-         let expiresIn = expireSecs - nowSecs
          if (expiresIn <= 0) {
             try {
-               console.log("Session expired. Refreshing...")
-               let response = await axios.post("/api/reauth", null)
-               console.log("Session refreshed")
-               ctx.commit("setUserJWT", response.data )
+               console.log("Authentication expired. Refreshing...")
+               let jwtStr = localStorage.getItem('v4_jwt')
+
+               // see if there is a session in memory or local store
+               if (ctx.getters.isSignedIn ) {
+                  console.log("Sign-in session")
+                  signedIn = true
+               } else if (jwtStr) {
+                  console.log("Found JWT in local storage...")
+                  signedIn = true
+                  ctx.commit("setUserJWT", jwtStr)
+               }
+
+               if ( signedIn) {
+                  console.log("Refreshing sign-in session")
+                  await axios.post("/api/reauth", null).then( response => {
+                     console.log("Session refreshed")
+                     ctx.commit("setUserJWT", response.data )
+                     ctx.dispatch("getAccountInfo")  // needed for search preferences
+                     ctx.dispatch("getCheckouts")    // needed so the alert icon can show in menubar
+                     ctx.dispatch("bookmarks/getBookmarks", null, { root: true })
+                  })
+               } else {
+                  console.log("Get new guest authorization token")
+                  await axios.post("/authorize", null).then( response => {
+                     ctx.commit('setAuthToken', response.data)
+                  })
+               }
             } catch(error)  {
-               console.error("Session refresh failed: "+error)
-               ctx.commit('system/setSessionExpired', null, { root: true })
+               console.error("Authenticate failed: "+error)
+               if ( signedIn ) {
+                  ctx.commit('system/setSessionExpired', null, { root: true })
+               } else {
+                  let err = {message: `Unable to get auth token: ${error.toString()}`,
+                     caller: 'authenticate', query: ctx.ootGetters['query/getState']}
+                  ctx.dispatch("system/reportError", err)
+               }
                ctx.commit('clear')
             }
          }
@@ -511,7 +526,6 @@ const user = {
             ctx.commit('preferences/clear', null, { root: true })
             ctx.commit('searches/clear', null, { root: true })
             ctx.dispatch('resetSearch', null, { root: true })
-            await ctx.dispatch('getAuthToken')
          } catch (e) {
             console.error("Signout failed: "+e)
          }

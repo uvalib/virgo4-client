@@ -329,13 +329,6 @@ export default {
             // console.log(`S: ${this.activeSort} vs ${oldSort}`)
             // console.log(`U: ${this.userSearched}`)
 
-            // any time it may be necessary to query the backend for search or facets,
-            // be sure the auth session is kept alive, and bookmarks are present
-            if ( this.isSignedIn ) {
-               await this.$store.dispatch("user/refreshAuth")
-               this.$store.dispatch("bookmarks/getBookmarks")
-            }
-
             // only re-run search when query, sort or filtering has changed
             if ( this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
                  this.activeSort != oldSort || this.userSearched == true ) {

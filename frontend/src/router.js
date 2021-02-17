@@ -242,6 +242,13 @@ router.afterEach((to, _from) => {
 // This is called before every URL in the SPA is hit
 router.beforeEach( async (to, from, next) => {
    store.commit("system/setILSError", "")
+   if ( to.path == "/signedin") {
+      // signedin page is a temporary redirect after netbadge. don't
+      // do any special handling for at as that page has specific handling
+      // baked into the router above
+      next()
+      return
+   }
 
    // Page header is now in the main app template and driven by the pageTitle
    // model variable. Ensure it is set correctly for each new page
@@ -253,16 +260,13 @@ router.beforeEach( async (to, from, next) => {
       'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item",
       'course-reserves': "Course Reserves", 'course-reserves-request': "Course Reserves Request", reserved: "Course Reserves Request"
    }
-   store.commit("setPageTitle", "Search")
    let title =  h1[to.name]
-   console.log(to.name +": "+title)
    if (title) {
       store.commit("setPageTitle", title)
    }
 
    // keep sign-in or access tokens current (issue new token if none present)
-   await refreshSession()
-
+   await store.dispatch("user/authenticate")
 
    // Some pages require a signed in user; grab one from session or cookie.
    // otherwise sign out the current user (if any)
@@ -288,41 +292,5 @@ router.beforeEach( async (to, from, next) => {
    // console.log("session OK... continue")
    next()
 })
-
-async function refreshSession() {
-   // First, check for active (in-memory) sign-in and refresh it...
-   if (store.getters["user/isSignedIn"]) {
-      // console.log("Sign-in session found in memory")
-      await store.dispatch("user/refreshAuth")
-      // console.log("session refreshed")
-      return
-   }
-
-   // Next, see if a session is in local storage and refresh it...
-   // console.log("Restore session from local storage...")
-   let jwtStr = localStorage.getItem('v4_jwt')
-   if (jwtStr) {
-      // console.log("Found JWT in local storage...")
-      store.commit("user/setUserJWT", jwtStr)
-
-      await store.dispatch("user/refreshAuth")
-      // console.log("session refreshed")
-
-      // console.log("load user data into session")
-      store.dispatch("user/getAccountInfo")  // needed for search preferences
-      store.dispatch("user/getCheckouts")    // needed so the alert icon can show in menubar
-      return
-   }
-
-   // Last, if there is no auth token get one
-   if (store.getters["user/hasAuthToken"] == false) {
-      console.log("no sign-in nor auth token; get new auth token")
-      await store.dispatch("user/getAuthToken")
-      // console.log("session created")
-   } // else {
-      // console.log("has auth token")
-   // }
-
-}
 
 export default router

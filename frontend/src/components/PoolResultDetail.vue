@@ -107,7 +107,7 @@ export default {
 
          if (this.hasMoreHits) {
             this.loadingMore = true
-            await this.$store.dispatch("user/refreshAuth")
+            await this.$store.dispatch("user/authenticate")
             this.$store.dispatch("moreResults").finally( ()=> {
                 this.loadingMore = false
                  let query = Object.assign({}, this.$route.query)

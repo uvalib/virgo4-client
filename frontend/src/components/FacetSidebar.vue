@@ -146,12 +146,13 @@ export default {
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;
+   box-shadow: $v4-box-shadow-light;
+   height: fit-content;
 
    .pool-filter-header, .filter {
       width: 100%;
    }
    .body {
-      box-shadow: $v4-box-shadow-light;
       border-top: 0;
       text-align: left;
       padding: 10px;
