@@ -25,8 +25,8 @@ const preferences = {
 
    mutations: {
       updateField,
-      setPickupLibrary(state, lib){
-         state.pickupLibrary = lib
+      clearPickupLibrary(state){
+         state.pickupLibrary = {id: "", name: ""}
       },
       toggleBarcodeScan(state) {
          state.enableBarcodeScan = !state.enableBarcodeScan
