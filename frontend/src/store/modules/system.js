@@ -178,19 +178,23 @@ const system = {
          state.poolMapping = cfg.poolMapping
 
          if (cfg.firebase) {
-            let db = firebase.initializeApp({
-               apiKey: cfg.firebase.apiKey,
-               authDomain: cfg.firebase.authDomain,
-               databaseURL: cfg.firebase.databaseURL,
-               projectId: cfg.firebase.projectId,
-               appId: cfg.firebase.appId
-            }).database()
-            if ( state.devServer) {
-               state.alertsDB = db.ref('library-alerts-dev')
-               state.regionalAlertsDB = db.ref('regionalalerts-dev')
-            } else {
-               state.alertsDB = db.ref('library-alerts')
-               state.regionalAlertsDB = db.ref('regionalalerts')
+            try {
+               let db = firebase.initializeApp({
+                  apiKey: cfg.firebase.apiKey,
+                  authDomain: cfg.firebase.authDomain,
+                  databaseURL: cfg.firebase.databaseURL,
+                  projectId: cfg.firebase.projectId,
+                  appId: cfg.firebase.appId
+               }).database()
+               if ( state.devServer) {
+                  state.alertsDB = db.ref('library-alerts-dev')
+                  state.regionalAlertsDB = db.ref('regionalalerts-dev')
+               } else {
+                  state.alertsDB = db.ref('library-alerts')
+                  state.regionalAlertsDB = db.ref('regionalalerts')
+               }
+            } catch(e){
+               this.dispatch('system/reportError', e)
             }
          }
       },
