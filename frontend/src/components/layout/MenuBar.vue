@@ -1,5 +1,5 @@
 <template>
-   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu">
+   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu" :class="{shadow: seenAlertsCount>0 || alertCount == 0}">
       <ul class="menu-right"
          @keydown.right.prevent.stop="nextMenu" @keyup.left.prevent.stop="prevMenu"
          @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
@@ -143,7 +143,7 @@
                </router-link>
             </li>
             <li v-if="!isKiosk" class="menu-item alert-wrap"
-               :class="{dim: alertCount==0}" tabindex="-1" role="menuitem" id="alertmenu"
+               :class="{dim: alertCount==0 && seenAlertsCount==0 || alertCount>0}" tabindex="-1" role="menuitem" id="alertmenu"
                @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
                @keydown.space.prevent.stop="alertClicked"
             >
@@ -333,6 +333,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#app nav.menu.shadow {
+   box-shadow: $v4-box-shadow;
+}
 #app nav.menu {
    text-align: right;
    padding: 0px;
@@ -344,7 +347,7 @@ export default {
    align-items: center;
    justify-content: space-between;
    position: relative;
-   box-shadow: $v4-box-shadow-mid;
+
    .icon {
       font-size: 1.3em;
       margin-right: 5px;
@@ -417,7 +420,7 @@ export default {
       color: white;
       flex: 0 1 auto;
       display: inline-block;
-      border-bottom:1px solid var(--color-secondary-blue);
+      border-bottom:1px solid transparent;
 
       &:hover {
          border-bottom:1px solid white;
