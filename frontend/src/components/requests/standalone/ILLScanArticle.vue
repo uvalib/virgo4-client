@@ -147,9 +147,7 @@ export default {
                }
             } else {
                await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
-               if ( this.sysError == "" || this.sysError == null) {
-                  this.$emit('submitted')
-               }
+               this.$emit('submitted')
             }
          }
       },

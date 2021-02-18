@@ -179,7 +179,8 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", borrowReq)
 	if illErr != nil {
-		c.String(illErr.StatusCode, illErr.Message)
+		log.Printf("WARN: Illiad Error: %s", illErr.Message)
+		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
 		return
 	}
 

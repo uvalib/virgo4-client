@@ -83,7 +83,6 @@ export default {
    },
    computed: {
       ...mapState({
-         sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
          preferredPickupLibrary: state => state.preferences.pickupLibrary,
       }),
@@ -114,9 +113,7 @@ export default {
             }
          } else {
             await this.$store.dispatch("requests/submitILLiadBorrowRequest", this.request)
-            if ( this.sysError == "" || this.sysError == null) {
-               this.$emit('submitted')
-            }
+            this.$emit('submitted')
          }
       },
       hasError( val) {

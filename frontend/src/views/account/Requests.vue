@@ -202,6 +202,7 @@ export default {
          isHSLUser: "user/isHSLUser",
          isSignedIn: 'user/isSignedIn',
          isGuest: 'user/isGuest',
+         hasSysError: "system/hasError"
       }),
       illiadRequests() {
          return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&
@@ -249,6 +250,10 @@ export default {
          this.request = ""
       },
       requestSubmitted() {
+         if (this.hasSysError){
+            return
+         }
+
          this.request = ""
          this.$store.dispatch("user/getRequests")
          this.$store.commit("system/setMessage", "Your request has been submitted.")

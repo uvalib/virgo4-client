@@ -52,7 +52,11 @@ const system = {
       },
       hasMessage: state => {
          return state.message.type != "none" && state.message.content != ""
-      }
+      },
+      hasError: state => {
+         return state.message.type == "error"
+      },
+
    },
 
    mutations: {

@@ -152,7 +152,7 @@ export default {
    computed: {
       ...mapState({
          buttonDisabled: state => state.requests.buttonDisabled,
-      })
+      }),
    },
    methods: {
       async submitClicked() {
