@@ -186,13 +186,8 @@ const system = {
                   projectId: cfg.firebase.projectId,
                   appId: cfg.firebase.appId
                }).database()
-               if ( state.devServer) {
-                  state.alertsDB = db.ref('library-alerts-dev')
-                  state.regionalAlertsDB = db.ref('regionalalerts-dev')
-               } else {
-                  state.alertsDB = db.ref('library-alerts')
-                  state.regionalAlertsDB = db.ref('regionalalerts')
-               }
+               state.alertsDB = db.ref('library-alerts')
+               state.regionalAlertsDB = db.ref('regionalalerts')
             } catch(e){
                this.dispatch('system/reportError', e)
             }

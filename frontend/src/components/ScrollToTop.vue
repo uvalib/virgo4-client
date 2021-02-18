@@ -2,8 +2,8 @@
    <transition name="message-transition"
          enter-active-class="animated faster fadeIn"
          leave-active-class="animated faster fadeOut">
-      <div v-if="showScrollTop" role="button" 
-         @click.stop="backToTop" 
+      <div v-if="showScrollTop" role="button"
+         @click.stop="backToTop"
          class="scroll-to-top" :class="{mobile: smallScreen}"
       >
          <i class="fas fa-angle-up"></i>
@@ -83,8 +83,8 @@ export default {
 .scroll-to-top.mobile {
    position: fixed;
    background-color: white;
-   color: var(--color-brand-orange);
-   border: 3px solid var(--color-brand-orange);
+   color: var(--uvalib-brand-orange);
+   border: 3px solid var(--uvalib-brand-orange);
    font-size: 2em;
    font-weight: 100;
    padding: 0px 12px;

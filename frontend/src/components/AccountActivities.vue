@@ -48,6 +48,6 @@ export default {
 
 #app .activities a.router-link-active {
    font-weight: bold;
-   color: var(--color-brand-orange);
+   color: var(--uvalib-brand-orange);
 }
 </style>

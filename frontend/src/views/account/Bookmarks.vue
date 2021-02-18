@@ -10,11 +10,6 @@
             <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
             <template v-else>
                <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
-                <div v-if="canMakeReserves" class="notice">
-                   Reserve materials are currently only offered in electronic formats in order to provide access to course material
-                   to both local and distance students.
-                   <a href="https://www.library.virginia.edu/services/course-reserves/" targte="_blank">Click here for more information</a>.
-                </div>
                <div class="folder" v-for="(folderInfo,idx) in bookmarks" :key="folderInfo.id">
                   <AccordionContent
                      class="boxed bookmark-folder"

@@ -23,7 +23,7 @@
             <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
             <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
             <div class="alert-body">
-               <h3 class="lead">{{a.title}}:&nbsp;</h3>
+               <h3 class="lead">{{a.title}}</h3>
                <span class="alert-text" v-html="a.body"></span>
             </div>
             <V4Button mode="icon" v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
@@ -35,13 +35,15 @@
       <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
          <VueAnnouncer />
-         <!-- <div v-if="pageAlerts($route.path).length > 0">
-            <p v-for="a in pageAlerts($route.path)" :key="a.uuid">
-               TITLE: {{a.title}}
-            </p>
-         </div> -->
          <h1>{{pageTitle}}</h1>
-         <router-view v-if="configuring==false"/>
+         <template v-if="configuring==false">
+            <div v-if="pageAlerts($route.path).length > 0" class="regional-alerts">
+               <div v-for="ra in pageAlerts($route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
+                  <span class="alert-text" v-html="ra.body"></span>
+               </div>
+            </div>
+            <router-view />
+         </template>
          <div v-else  class="configure">
             <V4Spinner message="Configuring system..."/>
          </div>
@@ -105,9 +107,6 @@ export default {
             this.headerHeight -= this.menuHeight
          })
       },
-      $route() {
-         console.log(this.pageAlerts(this.$route.path))
-      }
    },
    methods: {
       dismissAlert( uuid ) {
@@ -121,25 +120,23 @@ export default {
           window.location.reload()
       },
       scrollHandler( ) {
+         let alerts = document.getElementById("alerts")
          if ( window.scrollY <= this.headerHeight ) {
             document.getElementById("v4-navbar").classList.remove("sticky")
-            if ( this.isKiosk || this.headerAlerts.length == 0) {
+            if ( !alerts || this.isKiosk || this.headerAlerts.length == 0) {
                document.getElementById("v4-main").style.paddingTop = '0px'
             } else {
-               document.getElementById("alerts").style.paddingTop = '0px'
+               alerts.style.paddingTop = '0px'
             }
          } else {
             document.getElementById("v4-navbar").classList.add("sticky")
-            if ( this.isKiosk || this.headerAlerts.length == 0) {
+            if ( !alerts || this.isKiosk || this.headerAlerts.length == 0 ) {
                document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
             } else {
-               document.getElementById("alerts").style.paddingTop = `${this.menuHeight}px`
+              alerts.style.paddingTop = `${this.menuHeight}px`
             }
          }
       },
-      keylogger(event) {
-         console.log(event)
-      }
    },
    async beforeCreate() {
       // First time app is being created, request all common config
@@ -156,18 +153,12 @@ export default {
          this.headerHeight -= this.menuHeight
       })
       window.addEventListener("scroll", this.scrollHandler)
-      if ( this.devServer) {
-         window.addEventListener("keydown", this.keylogger)
-      }
       window.onresize = () => {
          this.$store.commit("system/setDisplayWidth",window.innerWidth)
       }
    },
    destroyed: function() {
       window.removeEventListener("scroll", this.scrollHandler)
-      if ( this.devServer) {
-         window.removeEventListener("keydown", this.keylogger)
-      }
    }
 };
 </script>
@@ -188,35 +179,36 @@ export default {
    .alert-body {
       display: inline-block;
       padding-left: 1.25rem;
-   }
-   .alert-text {
-      font-size: 1em;
-      font-weight: 400;
-      display: inline-block;
-      color: rgb(0, 0, 0);
-      line-height: 1.5;
-      margin-left: 5px;
-      font-style: normal;
-      p {
-         margin-bottom: 0px;
-         margin-top: 0px;
+      .alert-text {
+         font-size: 1em;
+         font-weight: 400;
+         display: inline-block;
+         color: rgb(0, 0, 0);
+         line-height: 1.5;
+         margin-left: 5px;
+         font-style: normal;
+         p {
+            margin-bottom: 0px;
+            margin-top: 0px;
+         }
+         a {
+            color: rgb(20, 30, 60) !important;
+            text-decoration: underline !important;
+            font-weight: 400 !important;
+         }
       }
-      a {
-         color: rgb(20, 30, 60) !important;
-         text-decoration: underline !important;
-         font-weight: 400 !important;
+      .lead {
+         font-size: 1.15em;
+         font-weight: bold;
+         margin: 0px;
       }
-   }
-   .lead {
-      font-size: 1.15em;
-      font-weight: bold;
-      margin: 0px;
    }
 }
 .alerts-list {
    text-align: left;
    color: rgb(35, 45, 75);
    font-family: franklin-gothic-urw, arial, sans-serif;
+   box-shadow: $v4-box-shadow;
 
    .alert {
       padding: .5em;
@@ -274,6 +266,26 @@ export default {
       border-left: 8px solid var(--uvalib-blue-alt);
    }
 }
+.regional-alerts {
+   width: 90%;
+   margin: 0 auto 30px auto;
+   .regional-alert {
+      color: var( --uvalib-grey-darkest);
+      background-color: var(  --uvalib-teal-lightest);
+      border: 0.2em solid var(--uvalib-teal);
+      border-radius: 0.5em;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      .alert-text {
+         padding-left: 1.25rem;
+         display: inline-block;
+         p {
+            margin: 0;
+         }
+      }
+   }
+}
+
 /* Color variable definitions */
 :root {
    /* OFFICIAL BRAND COLORS */
@@ -291,10 +303,11 @@ export default {
    --uvalib-blue-alt-dark: #005679;
    --uvalib-blue-alt-darkest: #141E3C;
 
-   --uvalib-teal-lightest: #c8f2f4;
-   --uvalib-teal-light: #5bd7de;
-   --uvalib-teal: #1da1a8;
-   --uvalib-teal-dark: #16777c;
+   --uvalib-teal-lightest: #C8F2F4;
+   --uvalib-teal-light: #5BD7DE;
+   --uvalib-teal: #25CAD3;
+   --uvalib-teal-dark: #1DA1A8;
+   --uvalib-teal-darker: #16777C;
 
    --uvalib-green-lightest: #89cc74;
    --uvalib-green: #62bb46;
@@ -323,30 +336,13 @@ export default {
    --uvalib-text: var(--uvalib-grey-dark);
    --uvalib-text-dark: var(--uvalib-grey-darkest);
 
-// testing out colors for focus states
    --uvalib-accessibility-highlight: var(--uvalib-brand-blue-light);
 
-   /* Color Remapping */
-   --color-brand-blue: var(--uvalib-brand-blue);
-   --color-light-blue: var(--uvalib-brand-blue-light);
-   --color-lighter-blue: var(--uvalib-brand-blue-lighter);
-   --color-lightest-blue: var(--uvalib-brand-blue-lightest);
-   --color-brand-orange: var(--uvalib-brand-orange);
-   --color-light-orange: var(--uvalib-brand-orange-lightest);
-   --color-lighter-orange: var(--uvalib-brand-orange-lightest);
    --color-primary-orange: var(--uvalib-brand-orange);
-   --color-dark-orange: var(--uvalib-brand-orange-dark);
    --color-link: var(--uvalib-blue-alt-dark);
    --color-link-darker: var(--uvalib-blue-alt-dark);
    --color-primary-text: var(--uvalib-grey-dark);
    --color-error: var(--uvalib-red-emergency);
-
-   /*to be phased out*/
-   --color-primary-blue: #0052cc;
-   --color-pale-blue: #5d7eff;
-   --color-secondary-blue: #002359;
-   --color-dark-blue: #002f6c;
-   /* --color-hover-highight: #f5f5f4; */
 }
 
 .fade-enter-active, .fade-leave-active {
@@ -436,7 +432,6 @@ body {
 #app h1 {
    color: var(--uvalib-brand-orange);
    margin: 25px 0;
-   padding-bottom: 5px;
    font-weight: bold;
    position: relative;
 }
