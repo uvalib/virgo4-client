@@ -6,7 +6,7 @@
          </div>
          <template v-else>
             <div class="info">
-               Browse items related to
+               Browsing items related to
                <router-link :to="backURL" class="to-item`">
                   <span class="item-call" v-html="browseTarget.call_number"></span>:&nbsp;
                   <span class="item-title" v-html="browseTarget.title"></span>
