@@ -60,6 +60,9 @@ type illiadNote struct {
 	NoteType string
 }
 
+// IlliadErrorMessage displayed in error modal
+const IlliadErrorMessage = "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account <i class=\"fas fa-external-link-alt\"></i></a> first."
+
 func illaidLibraryMapping(v4Lib string) string {
 	libs := map[string]string{
 		"ALDERMAN":  "ALDERMAN",
@@ -180,7 +183,7 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", borrowReq)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
 
@@ -264,7 +267,7 @@ func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", openURLReq)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
 
@@ -364,7 +367,7 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	rawResp, illErr := svc.ILLiadRequest("POST", "/transaction", scanReq)
 	if illErr != nil {
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
 
@@ -449,7 +452,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	if illErr != nil {
 		// if the first ILLiad request fails, notify user and exit
 		log.Printf("WARN: Illiad Error: %s", illErr.Message)
-		c.String(illErr.StatusCode, "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account</a> first.")
+		c.String(illErr.StatusCode, IlliadErrorMessage)
 		return
 	}
 
