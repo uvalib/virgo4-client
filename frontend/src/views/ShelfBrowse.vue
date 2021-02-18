@@ -1,25 +1,23 @@
 <template>
    <div class="shelf-browse">
-      <div class="browse-content">
-         <div class="working" v-if="working" >
-            <V4Spinner message="Looking up items..."/>
+      <div class="working" v-if="working" >
+         <V4Spinner message="Looking up items..."/>
+      </div>
+      <template v-else>
+         <div class="info">
+            Browsing items related to
+            <router-link :to="backURL" class="to-item`">
+               <span class="item-call" v-html="browseTarget.call_number"></span>:&nbsp;
+               <span class="item-title" v-html="browseTarget.title"></span>
+            </router-link>
          </div>
-         <template v-else>
-            <div class="info">
-               Browsing items related to
-               <router-link :to="backURL" class="to-item`">
-                  <span class="item-call" v-html="browseTarget.call_number"></span>:&nbsp;
-                  <span class="item-title" v-html="browseTarget.title"></span>
-               </router-link>
-            </div>
-         </template>
-         <div class="browse-detail" v-if="!working" >
-            <BrowsePager/>
-            <div class="browse-cards">
-               <BrowseCard  v-for="(b,idx) in shelfBrowse" :current="isCurrent(idx)" :pool="$route.params.src" :data="b"  :key="`b${b.id}`"/>
-            </div>
-            <BrowsePager/>
+      </template>
+      <div class="browse-detail" v-if="!working" >
+         <BrowsePager/>
+         <div class="browse-cards">
+            <BrowseCard  v-for="(b,idx) in shelfBrowse" :current="isCurrent(idx)" :pool="$route.params.src" :data="b"  :key="`b${b.id}`"/>
          </div>
+         <BrowsePager/>
       </div>
    </div>
 </template>
@@ -89,23 +87,12 @@ export default {
    margin-top: 2vw;
    margin-bottom: 10vh;
    color: var(--color-primary-text);
+   width: 95%;
+   margin: 0 auto;
 
-   .browse-header {
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: center;
-      align-content: center;
-      padding-bottom: 15px;
-   }
-
-   .browse-content  {
-      width: 95%;
-      margin: 0 auto;
-
-      .browse-detail {
-         margin: 20px 30px 0 30px;
-         padding-top: 5px;
-      }
+   .browse-detail {
+      margin: 20px 30px 0 30px;
+      padding-top: 5px;
    }
 
    .browse-cards {
