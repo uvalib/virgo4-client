@@ -1,5 +1,5 @@
 <template>
-   <div class="filter-sidebar" :class="{overlay: !startExpanded}" v-if="hasResults == false">
+   <div class="filter-sidebar" :class="{overlay: !startExpanded}" v-if="hasResults == false && !searching">
       <div class="filters">
           <AccordionContent class="filter" id="acc-filter-sidebar"
             :background="filterColor"
@@ -49,6 +49,7 @@ export default {
       ...mapState({
          displayWidth: state => state.system.displayWidth,
          loadingFilters: state => state.filters.getPresearchFacets,
+         searching: state => state.searching,
       }),
       ...mapGetters({
          hasResults: 'hasResults',

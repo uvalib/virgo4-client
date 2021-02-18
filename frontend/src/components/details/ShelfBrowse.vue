@@ -1,14 +1,12 @@
 <template>
-   <div class="shelf-browse">
-      <div class="working" v-if="working">
+   <section class="shelf-browse" aria-live="polite">
+      <div class="working" v-if="working" aria-hidden="true">
          <V4Spinner message="Getting shelf browse data..." />
       </div>
       <nav aria-labelledby="shelf-title" v-if="!working && hasBrowseData">
-         <h2 id="shelf-title">
-            <span>Shelf Browse</span>
-         </h2>
-         <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse">
-            View full page
+         <h2 id="shelf-title">Shelf Browse</h2>
+         <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
+            View full page shelf browse
          </router-link>
          <ul class="browse-cards">
             <li v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
@@ -20,7 +18,7 @@
             <V4Button mode="primary" @click="browseRestore()">Return to {{currentCallNumber}}</V4Button>
          </div>
       </nav>
-   </div>
+   </section>
 </template>
 
 <script>
