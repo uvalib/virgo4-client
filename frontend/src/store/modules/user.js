@@ -525,6 +525,7 @@ const user = {
             ctx.commit('bookmarks/clear', null, { root: true })
             ctx.commit('preferences/clear', null, { root: true })
             ctx.commit('searches/clear', null, { root: true })
+            ctx.commit('clearSeenAlerts', null, { root: true })
             ctx.dispatch('resetSearch', null, { root: true })
          } catch (e) {
             console.error("Signout failed: "+e)

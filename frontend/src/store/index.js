@@ -52,16 +52,14 @@ export default new Vuex.Store({
    getters: {
       getField,
       pageAlerts:  state => tgtPath => {
-         if ( tgtPath == "/") tgtPath = "ROOT"
-         let tgtRegex = new RegExp(tgtPath)
+         let tgtRegex = new RegExp(`${tgtPath}$`)
          let out = []
          state.regionalAlerts.forEach( ra => {
             let urls = ra.url
             if ( !Array.isArray(urls) ) urls = [{value:urls}]
             let matched = false
             urls.some( u => {
-               if ( (u.value.match(/(^|^http.*:\/\/)search.lib.virginia.edu$/) && tgtPath == "ROOT") ||
-                    (u.value.match(/search.lib.virginia.edu/) && u.value.match(tgtRegex)) ) {
+               if ( u.value.match(/search.lib.virginia.edu/) && u.value.match(tgtRegex) ) {
                   out.push(ra)
                   matched = true
                }
@@ -154,6 +152,10 @@ export default new Vuex.Store({
       setPageTitle(state, title) {
          state.pageTitle = title
       },
+      clearSeenAlerts(state) {
+         localStorage.removeItem(AlertsStorage)
+         state.seenAlerts.splice(0, state.seenAlerts.length)
+      },
       autoHideAlert3(state) {
          let alerts = state.alerts.filter( a => a.severity == "alert3" && !state.seenAlerts.includes(a.uuid))
          alerts.forEach( a=> {
@@ -166,10 +168,19 @@ export default new Vuex.Store({
          let seen = localStorage.getItem(AlertsStorage)
          if ( seen ) {
             try {
+               let needsUpdate = false
                state.seenAlerts.splice(0, state.seenAlerts.length)
-               JSON.parse(seen).forEach( a =>  {
-                  state.seenAlerts.push(a)
+               JSON.parse(seen).forEach( saUUID =>  {
+                  if ( state.alerts.find(a => a.uuid == saUUID) ) {
+                     state.seenAlerts.push(saUUID)
+                  } else {
+                     needsUpdate = true
+                  }
                })
+               if (needsUpdate) {
+                  let str = JSON.stringify(state.seenAlerts)
+                  localStorage.setItem(AlertsStorage, str)
+               }
             } catch (e) {
                state.seenAlerts.splice(0, state.seenAlerts.length)
             }

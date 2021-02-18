@@ -1,5 +1,5 @@
 <template>
-   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu" :class="{shadow: seenAlertsCount>0 || alertCount == 0}">
+   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu" :class="{shadow: seenAlertsCount>0 && alertCount==0 || alertCount == 0}">
       <ul class="menu-right"
          @keydown.right.prevent.stop="nextMenu" @keyup.left.prevent.stop="prevMenu"
          @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
