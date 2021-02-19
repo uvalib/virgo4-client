@@ -1,171 +1,169 @@
 <template>
    <div class="requests">
       <SignInRequired v-if="isSignedIn == false" targetPage="request information"/>
-      <div v-else class="requests-content">
-         <AccountActivities />
-         <div class="working" v-if="lookingUp">
-            <V4Spinner message="Looking up requests..." />
-         </div>
-         <div class="details">
-            <template v-if="!isGuest">
-               <h2>Make a New Request</h2>
-               <div v-if="!isHSLUser" class="subcontent buttons">
-                  <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
-                  <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
-                  <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
-                  <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
-               </div>
-               <div v-else class="subcontent">
-                  <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
-               </div>
-               <div class="subcontent links">
-                  <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
-               </div>
-
-               <component v-if="request" v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
-
-               <h2>Outstanding Requests</h2>
-            </template>
-            <div class="subcontent">
-               <template v-if="lookingUp == false && ilsError">
-                  <div class="ils-error">{{ilsError}}</div>
-               </template>
-               <template v-if="lookingUp == false && !ilsError && requests.holds.length > 0">
-                  <AccordionContent
-                        class="requests-accordion"
-                        background="var(--uvalib-blue-alt-lightest)"
-                        borderWidth="0 0 3px 0"
-                        borderColor="var(--uvalib-blue-alt)"
-                        id="ils-holds"
-                  >
-                     <template v-slot:title><span class="section-title">UVA Holds</span></template>
-                     <div class="request-list">
-                        <div class="request" v-for="(req,idx) in requests.holds" :key="`ils-${idx}`">
-                           <h3 class="title">{{req.title}}</h3>
-                           <dl>
-                              <template v-if="req.author">
-                                 <dt>Author:</dt>
-                                 <dd>{{req.author}}</dd>
-                              </template>
-                              <dt>Call Number:</dt>
-                              <dd>{{req.callNumber}}</dd>
-                              <dt>Hold Status:</dt>
-                              <dd>{{req.status}}</dd>
-                              <dt>Deliver To:</dt>
-                              <dd>{{req.pickupLocation}}</dd>
-                              <dt>Date Placed:</dt>
-                              <dd>{{formatDate(req.placedDate)}}</dd>
-                              <dt>Position:</dt>
-                              <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
-                              <dt>Item Status:</dt>
-                              <dd>{{req.itemStatus}}</dd>
-                           </dl>
-                           <p  v-if="isDevServer">
-                              <V4Button
-                                 mode="tertiary"
-                                 @click="deleteHold(req.id)"
-                                 :aria-label="`Delete hold on ${req.title}`"
-                                 class="delete"
-                              >
-                                 Delete Hold
-                              </V4Button>
-                           </p>
-                        </div>
-                     </div>
-                  </AccordionContent>
-               </template>
-
-               <template v-if="lookingUp == false && illLoans.length > 0">
-                  <AccordionContent
-                        class="requests-accordion"
-                        background="var(--uvalib-blue-alt-lightest)"
-                        borderWidth="0 0 3px 0"
-                        borderColor="var(--uvalib-blue-alt)"
-                        id="ill-holds"
-                  >
-                     <template v-slot:title><span class="section-title">ILL Loan</span></template>
-                     <div class="request-list">
-                        <div class="request" v-for="(req,idx) in illLoans" :key="`ill-loan-${idx}`">
-                           <h3 class="title">{{req.loanTitle}}</h3>
-                           <dl>
-                              <dt>Author:</dt>
-                              <dd>{{req.loanAuthor}}</dd>
-                              <dt>Call Number:</dt>
-                              <dd>{{req.callNumber}}</dd>
-                              <dt>Transaction Number:</dt>
-                              <dd>{{req.transactionNumber}}</dd>
-                              <dt>Date Requested:</dt>
-                              <dd>{{formatDate(req.creationDate)}}</dd>
-                              <dt>Status:</dt>
-                              <dd>{{req.transactionStatus}}</dd>
-                           </dl>
-                        </div>
-                     </div>
-                  </AccordionContent>
-               </template>
-
-               <template v-if="lookingUp == false && digitalRequests.length > 0">
-                  <AccordionContent
-                        class="requests-accordion"
-                        background="var(--uvalib-blue-alt-lightest)"
-                        borderWidth="0 0 3px 0"
-                        borderColor="var(--uvalib-blue-alt)"
-                        id="ill-holds"
-                  >
-                     <template v-slot:title><span class="section-title">Digital Delivery Requests</span></template>
-                     <div class="request-list">
-                        <div class="request" v-for="(req,idx) in digitalRequests" :key="`digital-${idx}`">
-                           <h3 class="title">{{req.photoJournalTitle}}</h3>
-                           <dl>
-                              <dt>Author:</dt>
-                              <dd>{{req.photoArticleAuthor}}</dd>
-                              <template v-if="req.photoArticleTitle">
-                                 <dt>Article Title:</dt>
-                                 <dd>{{req.photoArticleTitle}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalVolume">
-                                 <dt>Volume:</dt>
-                                 <dd>{{req.photoJournalVolume}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalVolume">
-                                 <dt>Issue:</dt>
-                                 <dd>{{req.photoJournalIssue}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalMonth">
-                                 <dt>Month:</dt>
-                                 <dd>{{req.photoJournalMonth}}</dd>
-                              </template>
-                              <template v-if="req.photoIssueYear">
-                                 <dt>Year:</dt>
-                                 <dd>{{req.photoIssueYear}}</dd>
-                              </template>
-                              <template v-if="req.photoJournalInclusivePages">
-                                 <dt>Pages:</dt>
-                                 <dd>{{req.photoJournalInclusivePages}}</dd>
-                              </template>
-                              <template v-if="req.callNumber">
-                                 <dt>Call Number:</dt>
-                                 <dd>{{req.callNumber}}</dd>
-                              </template>
-                              <dt>Transaction Number:</dt>
-                              <dd>{{req.transactionNumber}}</dd>
-                              <dt>Date Requested:</dt>
-                              <dd>{{formatDate(req.creationDate)}}</dd>
-                              <dt>Status:</dt>
-                              <dd>{{req.transactionStatus}}</dd>
-                              <template v-if="req.transactionStatus == 'Delivered to Web'">
-                                 <dt>PDF Download:</dt>
-                                 <dd v-html="getDownloadLink(req)"></dd>
-                              </template>
-                           </dl>
-                        </div>
-                     </div>
-                  </AccordionContent>
-               </template>
-               <template v-if="hasNoRequests()">
-                  <div v-if="!lookingUp" class="none">You currently have no outstanding requests</div>
-               </template>
+      <AccountActivities  v-if="isSignedIn"/>
+      <div class="working" v-if="lookingUp">
+         <V4Spinner message="Looking up requests..." />
+      </div>
+      <div class="details">
+         <template v-if="!isGuest">
+            <h2>Make a New Request</h2>
+            <div v-if="!isHSLUser" class="subcontent buttons">
+               <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
+               <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
+               <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
+               <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
             </div>
+            <div v-else class="subcontent">
+               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+            </div>
+            <div class="subcontent links">
+               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+            </div>
+
+            <component v-if="request" v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+
+            <h2>Outstanding Requests</h2>
+         </template>
+         <div class="subcontent">
+            <template v-if="lookingUp == false && ilsError">
+               <div class="ils-error">{{ilsError}}</div>
+            </template>
+            <template v-if="lookingUp == false && !ilsError && requests.holds.length > 0">
+               <AccordionContent
+                     class="requests-accordion"
+                     background="var(--uvalib-blue-alt-lightest)"
+                     borderWidth="0 0 3px 0"
+                     borderColor="var(--uvalib-blue-alt)"
+                     id="ils-holds"
+               >
+                  <template v-slot:title><span class="section-title">UVA Holds</span></template>
+                  <div class="request-list">
+                     <div class="request" v-for="(req,idx) in requests.holds" :key="`ils-${idx}`">
+                        <h3 class="title">{{req.title}}</h3>
+                        <dl>
+                           <template v-if="req.author">
+                              <dt>Author:</dt>
+                              <dd>{{req.author}}</dd>
+                           </template>
+                           <dt>Call Number:</dt>
+                           <dd>{{req.callNumber}}</dd>
+                           <dt>Hold Status:</dt>
+                           <dd>{{req.status}}</dd>
+                           <dt>Deliver To:</dt>
+                           <dd>{{req.pickupLocation}}</dd>
+                           <dt>Date Placed:</dt>
+                           <dd>{{formatDate(req.placedDate)}}</dd>
+                           <dt>Position:</dt>
+                           <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
+                           <dt>Item Status:</dt>
+                           <dd>{{req.itemStatus}}</dd>
+                        </dl>
+                        <p  v-if="isDevServer">
+                           <V4Button
+                              mode="tertiary"
+                              @click="deleteHold(req.id)"
+                              :aria-label="`Delete hold on ${req.title}`"
+                              class="delete"
+                           >
+                              Delete Hold
+                           </V4Button>
+                        </p>
+                     </div>
+                  </div>
+               </AccordionContent>
+            </template>
+
+            <template v-if="lookingUp == false && illLoans.length > 0">
+               <AccordionContent
+                     class="requests-accordion"
+                     background="var(--uvalib-blue-alt-lightest)"
+                     borderWidth="0 0 3px 0"
+                     borderColor="var(--uvalib-blue-alt)"
+                     id="ill-holds"
+               >
+                  <template v-slot:title><span class="section-title">ILL Loan</span></template>
+                  <div class="request-list">
+                     <div class="request" v-for="(req,idx) in illLoans" :key="`ill-loan-${idx}`">
+                        <h3 class="title">{{req.loanTitle}}</h3>
+                        <dl>
+                           <dt>Author:</dt>
+                           <dd>{{req.loanAuthor}}</dd>
+                           <dt>Call Number:</dt>
+                           <dd>{{req.callNumber}}</dd>
+                           <dt>Transaction Number:</dt>
+                           <dd>{{req.transactionNumber}}</dd>
+                           <dt>Date Requested:</dt>
+                           <dd>{{formatDate(req.creationDate)}}</dd>
+                           <dt>Status:</dt>
+                           <dd>{{req.transactionStatus}}</dd>
+                        </dl>
+                     </div>
+                  </div>
+               </AccordionContent>
+            </template>
+
+            <template v-if="lookingUp == false && digitalRequests.length > 0">
+               <AccordionContent
+                     class="requests-accordion"
+                     background="var(--uvalib-blue-alt-lightest)"
+                     borderWidth="0 0 3px 0"
+                     borderColor="var(--uvalib-blue-alt)"
+                     id="ill-holds"
+               >
+                  <template v-slot:title><span class="section-title">Digital Delivery Requests</span></template>
+                  <div class="request-list">
+                     <div class="request" v-for="(req,idx) in digitalRequests" :key="`digital-${idx}`">
+                        <h3 class="title">{{req.photoJournalTitle}}</h3>
+                        <dl>
+                           <dt>Author:</dt>
+                           <dd>{{req.photoArticleAuthor}}</dd>
+                           <template v-if="req.photoArticleTitle">
+                              <dt>Article Title:</dt>
+                              <dd>{{req.photoArticleTitle}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalVolume">
+                              <dt>Volume:</dt>
+                              <dd>{{req.photoJournalVolume}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalVolume">
+                              <dt>Issue:</dt>
+                              <dd>{{req.photoJournalIssue}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalMonth">
+                              <dt>Month:</dt>
+                              <dd>{{req.photoJournalMonth}}</dd>
+                           </template>
+                           <template v-if="req.photoIssueYear">
+                              <dt>Year:</dt>
+                              <dd>{{req.photoIssueYear}}</dd>
+                           </template>
+                           <template v-if="req.photoJournalInclusivePages">
+                              <dt>Pages:</dt>
+                              <dd>{{req.photoJournalInclusivePages}}</dd>
+                           </template>
+                           <template v-if="req.callNumber">
+                              <dt>Call Number:</dt>
+                              <dd>{{req.callNumber}}</dd>
+                           </template>
+                           <dt>Transaction Number:</dt>
+                           <dd>{{req.transactionNumber}}</dd>
+                           <dt>Date Requested:</dt>
+                           <dd>{{formatDate(req.creationDate)}}</dd>
+                           <dt>Status:</dt>
+                           <dd>{{req.transactionStatus}}</dd>
+                           <template v-if="req.transactionStatus == 'Delivered to Web'">
+                              <dt>PDF Download:</dt>
+                              <dd v-html="getDownloadLink(req)"></dd>
+                           </template>
+                        </dl>
+                     </div>
+                  </div>
+               </AccordionContent>
+            </template>
+            <template v-if="hasNoRequests()">
+               <div v-if="!lookingUp" class="none">You currently have no outstanding requests</div>
+            </template>
          </div>
       </div>
    </div>
@@ -285,14 +283,9 @@ export default {
 .requests {
    min-height: 400px;
    position: relative;
-   margin-top: 2vw;
    color: var(--color-primary-text);
-}
-
-
-.requests-content {
    width: 80%;
-   margin: 0 auto;
+   margin: 2vw auto 0 auto;
    position: relative;
    text-align: left;
 
@@ -383,12 +376,12 @@ export default {
 }
 
 @media only screen and (min-width: 768px) {
-   div.requests-content {
+   div.requests {
       width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.requests-content {
+   div.requests {
       width: 95%;
    }
 }

@@ -39,6 +39,7 @@ export default {
    width: 60%;
    margin: 0 auto;
    position: relative;
+   text-align: center;
 }
 @media only screen and (min-width: 768px) {
    div.signout-content  {

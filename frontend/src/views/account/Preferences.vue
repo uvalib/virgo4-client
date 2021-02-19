@@ -1,20 +1,18 @@
 <template>
-  <div class="preferences">
-    <SignInRequired v-if="isSignedIn == false" targetPage="preferences"/>
-    <div v-else class="preferences-content">
-      <AccountActivities/>
+   <div class="preferences">
+      <SignInRequired v-if="isSignedIn == false" targetPage="preferences"/>
+      <AccountActivities v-if="isSignedIn"/>
       <div class="working" v-if="lookingUpPools || lookingUpAccount" >
-        <V4Spinner message="Loading preferences..."/>
+         <V4Spinner message="Loading preferences..."/>
       </div>
       <div v-else>
-        <Search class="section"/>
-        <PickupLibrary class="section"/>
-        <BarcodeScan class="section"/>
-        <V4Privacy class="section"/>
-        <JWTAdmin class="section"/>
+         <Search class="section"/>
+         <PickupLibrary class="section"/>
+         <BarcodeScan class="section"/>
+         <V4Privacy class="section"/>
+         <JWTAdmin class="section"/>
       </div>
-    </div>
-  </div>
+   </div>
 </template>
 
 <script>
@@ -51,8 +49,9 @@ export default {
 .preferences {
    min-height: 400px;
    position: relative;
-   margin-top: 2vw;
    color: var(--color-primary-text);
+   width: 60%;
+   margin: 2vw auto 0 auto;
 }
 .working {
    text-align: center;
@@ -61,18 +60,14 @@ export default {
 .working img {
    margin: 30px 0;
 }
-.preferences-content {
-   width: 60%;
-   margin: 0 auto;
-}
 @media only screen and (min-width: 768px) {
-   div.preferences-content  {
-       width: 60%;
+   div.preferences  {
+      width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.preferences-content  {
-       width: 95%;
+   div.preferences  {
+      width: 95%;
    }
 }
 .section {

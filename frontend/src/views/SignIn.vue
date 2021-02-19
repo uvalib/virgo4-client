@@ -1,70 +1,67 @@
 <template>
    <div class="signin">
-      <div class="sign-in-content">
-         <div class="netbadge">
-            <span class="netbadge">
-               <h2>UVA Users</h2>
-               <p class="subhead">(UVA students, faculty, and staff)</p>
-               <div class="indent littleextra">
-                  <V4Button id="netbadge" mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
-               </div>
-            </span>
-         </div>
-         <div>
-            <h2>All Other Users</h2>
-            <p>(All other researchers, including UVA alumni or retirees)</p>
+      <div class="netbadge">
+         <span class="netbadge">
+            <h2>UVA Users</h2>
+            <p class="subhead">(UVA students, faculty, and staff)</p>
             <div class="indent">
-               <table class="pure-form form">
-                  <tr>
-                     <td class="label">Library ID</td>
-                     <td class="value">
-                        <input v-model="user" type="text">
-                        <p class="hint">Driver's License Number, eg: A12345678</p>
-                     </td>
-                  </tr>
-                  <tr>
-                     <td class="label">PIN</td>
-                     <td class="value">
-                        <input @keyup.enter="signinClicked" v-model="pin" type="password">
-                     </td>
-                  </tr>
-                  <tr>
-                    <td colspan="2">
-                      <transition name="message-transition"
-                         enter-active-class="animated faster fadeIn"
-                         leave-active-class="animated faster fadeOut">
-                         <div v-if="authMessage" class="authMessage">
-                            <div v-if="lockedOut" class="locked-out">
-                               {{ authMessage }}
-                            </div>
-                            <div v-else class="tries">
-                               <div class="auth-msg">{{ authMessage }}</div>
-                               You have <b>{{authTriesLeft}}</b> more tries before your account is locked.
-                            </div>
-                         </div>
-                      </transition>
-                    </td>
-                  </tr>
-                  <tr v-if="!ilsError">
-                    <td></td>
-                    <td>
-                      <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
-                    </td>
-                  </tr>
-                  <tr>
-                     <td colspan="2">
-                        <ForgotPassword v-bind:user="user" />
-                        <ChangePassword v-if="hasPasswordToken" />
-                     </td>
-                  </tr>
-               </table>
-               <div class="ils-error" v-if="ilsError">{{ilsError}}</div>
+               <V4Button id="netbadge" mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
             </div>
+         </span>
+      </div>
+      <div>
+         <h2>All Other Users</h2>
+         <p>(All other researchers, including UVA alumni or retirees)</p>
+         <div class="indent">
+            <table class="pure-form form">
+               <tr>
+                  <td class="label">Library ID</td>
+                  <td class="value">
+                     <input v-model="user" type="text">
+                     <p class="hint">Driver's License Number, eg: A12345678</p>
+                  </td>
+               </tr>
+               <tr>
+                  <td class="label">PIN</td>
+                  <td class="value">
+                     <input @keyup.enter="signinClicked" v-model="pin" type="password">
+                  </td>
+               </tr>
+               <tr>
+                  <td colspan="2">
+                     <transition name="message-transition"
+                        enter-active-class="animated faster fadeIn"
+                        leave-active-class="animated faster fadeOut">
+                        <div v-if="authMessage" class="authMessage">
+                           <div v-if="lockedOut" class="locked-out">
+                              {{ authMessage }}
+                           </div>
+                           <div v-else class="tries">
+                              <div class="auth-msg">{{ authMessage }}</div>
+                              You have <b>{{authTriesLeft}}</b> more tries before your account is locked.
+                           </div>
+                        </div>
+                     </transition>
+                  </td>
+               </tr>
+               <tr v-if="!ilsError">
+                  <td colspan="2">
+                     <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
+                  </td>
+               </tr>
+               <tr>
+                  <td colspan="2">
+                     <ForgotPassword v-bind:user="user" />
+                     <ChangePassword v-if="hasPasswordToken" />
+                  </td>
+               </tr>
+            </table>
+            <div class="ils-error" v-if="ilsError">{{ilsError}}</div>
          </div>
-         <div class="community">
-            Members of our community are welcome to use many UVA Library resources.
-            <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank">Learn about creating an account and accessing materials.</a>
-         </div>
+      </div>
+      <div class="community">
+         Members of our community are welcome to use many UVA Library resources.
+         <a href="https://www.library.virginia.edu/policies/circulation/" target="_blank">Learn about creating an account and accessing materials.</a>
       </div>
    </div>
 </template>
@@ -119,6 +116,7 @@ export default {
    position: relative;
    margin: 2vw auto 6vw;
    color: var(--uvalib-text);
+   text-align: left;
 }
 .ils-error {
     font-size: 1em;
@@ -174,31 +172,19 @@ div.netbadge {
    margin: 25px 0;
 }
 div.indent {
-   margin-left: 35px;
-}
-div.indent.littleextra {
-  margin-left: 112px;
+   text-align: center;
 }
 @media only screen and (min-width: 768px) {
    .signin {
-     max-width: 55vw;
-   }
-   .sign-in-content  {
-       width: 60%;
+      width: 35%;
    }
 }
 @media only screen and (max-width: 768px) {
    .signin {
-     max-width: 95vw;
-   }
-   .sign-in-content  {
-       width: 95%;
+      width: 95%;
    }
    div.indent {
      margin-left: 0;
-   }
-   div.indent.littleextra {
-     margin-left: 77px;
    }
 }
 .authMessage {

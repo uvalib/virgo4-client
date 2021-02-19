@@ -1,131 +1,129 @@
 <template>
    <div class="bookmarks">
       <SignInRequired v-if="isSignedIn == false" targetPage="bookmarks"/>
-      <div v-else class="bookmarks-content">
-         <AccountActivities />
-         <div class="working" v-if="lookingUpBookmarks">
-            <V4Spinner message="Looking up bookmark information..."/>
-         </div>
-         <div v-else>
-            <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
-            <template v-else>
-               <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
-               <div class="folder" v-for="(folderInfo,idx) in bookmarks" :key="folderInfo.id">
-                  <AccordionContent
-                     class="boxed bookmark-folder"
-                     color="var(--uvalib-grey-darkest)"
-                     background="var(--uvalib-blue-alt-light)"
-                     borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-blue-alt)"
-                     :id="folderInfo.id.toString()"
-                     v-bind:closeOthers="expandedFolder"
-                     @accordion-clicked="folderOpened(folderInfo.id)"
-                  >
-                     <template v-slot:title>
-                        <span class="folder-title" v-html="getTitle(folderInfo)"></span>
-                     </template>
-                     <div class="none" v-if="folderInfo.bookmarks.length == 0">
-                        There are no bookmarks in this folder.
-                     </div>
-                     <div v-else class="bookmark-folder-details">
-                        <table>
-                           <tr>
-                              <th colspan="3">
-                                 <div class="folder-menu">
-                                    <div style="margin-bottom:5px;">
-                                       <V4Button mode="text" @click="selectAll(folderInfo.bookmarks)"
-                                          :aria-label="`select all bookmarks in folder ${folderInfo.folder}`">
-                                          select all
-                                       </V4Button>
-                                       <span class="spacer">|</span>
-                                       <V4Button mode="text" @click="clearAll"
-                                          :aria-label="`deselect all bookmarks in folder ${folderInfo.folder}`">
-                                          clear all
-                                       </V4Button>
-                                    </div>
-                                    <div class="button-group">
-                                       <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                                          :id="`print-bookmarks-${folderInfo.id}`"
-                                       />
-                                       <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                                          :id="`move-bookmarks-${folderInfo.id}`"
-                                          v-on:move-approved="moveBookmarks"/>
-                                       <V4Button @click="removeBookmarks" mode="primary">Delete</V4Button>
-                                       <V4Button v-if="canMakeReserves" class="disabled" mode="primary" @click="reserve">Place on course reserve</V4Button>
-                                    </div>
-                                 </div>
-                              </th>
-                           </tr>
-                           <tr>
-                              <th colspan="3">
-                                 <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                                    :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder} `">
-                                    Public
-                                 </V4Checkbox>
-                                 <span v-if="folderInfo.public" class="public-url">
-                                    <a :href="getPublicURL(folderInfo)" target="_blank">
-                                       <span>View</span><i class="link fas fa-external-link-alt"></i></a>
-                                    <span class="sep">|</span>
-                                    <V4Button mode="text" @click="copyURL(folderInfo)">Copy URL to clipboard</V4Button>
-                                 </span>
-                              </th>
-                           </tr>
-                           <tr>
-                              <th></th>
-                              <th>Title</th>
-                              <th>Author</th>
-                           </tr>
-                           <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
-                              <td>
-                                 <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
-                                    :aria-label="ariaLabel(bookmark)" />
-                              </td>
-                              <td>
-                                 <router-link @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
-                                    {{bookmark.details.title}}
-                                 </router-link>
-                              </td>
-                              <td>
-                                 <router-link  @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
-                                    {{bookmark.details.author}}
-                                 </router-link>
-                              </td>
-                           </tr>
-                        </table>
-                     </div>
-                  </AccordionContent>
-                  <div class="folder-buttons">
-                     <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'"/>
-                     <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
-                        :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
-                        :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
-                        <div>
-                           Delete bookmark folder
-                           <b>{{folderInfo.folder}}</b>? All bookmarks
-                        </div>
-                        <div>contained within it will also be deleted.</div>
-                        <div>
-                           <br />This cannot be reversed.
-                        </div>
-                     </Confirm>
+      <AccountActivities v-if="isSignedIn"/>
+      <div class="working" v-if="lookingUpBookmarks">
+         <V4Spinner message="Looking up bookmark information..."/>
+      </div>
+      <div v-else>
+         <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
+         <template v-else>
+            <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
+            <div class="folder" v-for="(folderInfo,idx) in bookmarks" :key="folderInfo.id">
+               <AccordionContent
+                  class="boxed bookmark-folder"
+                  color="var(--uvalib-grey-darkest)"
+                  background="var(--uvalib-blue-alt-light)"
+                  borderWidth="0 0 3px 0"
+                  borderColor="var(--uvalib-blue-alt)"
+                  :id="folderInfo.id.toString()"
+                  v-bind:closeOthers="expandedFolder"
+                  @accordion-clicked="folderOpened(folderInfo.id)"
+               >
+                  <template v-slot:title>
+                     <span class="folder-title" v-html="getTitle(folderInfo)"></span>
+                  </template>
+                  <div class="none" v-if="folderInfo.bookmarks.length == 0">
+                     There are no bookmarks in this folder.
                   </div>
+                  <div v-else class="bookmark-folder-details">
+                     <table>
+                        <tr>
+                           <th colspan="3">
+                              <div class="folder-menu">
+                                 <div style="margin-bottom:5px;">
+                                    <V4Button mode="text" @click="selectAll(folderInfo.bookmarks)"
+                                       :aria-label="`select all bookmarks in folder ${folderInfo.folder}`">
+                                       select all
+                                    </V4Button>
+                                    <span class="spacer">|</span>
+                                    <V4Button mode="text" @click="clearAll"
+                                       :aria-label="`deselect all bookmarks in folder ${folderInfo.folder}`">
+                                       clear all
+                                    </V4Button>
+                                 </div>
+                                 <div class="button-group">
+                                    <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                                       :id="`print-bookmarks-${folderInfo.id}`"
+                                    />
+                                    <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                                       :id="`move-bookmarks-${folderInfo.id}`"
+                                       v-on:move-approved="moveBookmarks"/>
+                                    <V4Button @click="removeBookmarks" mode="primary">Delete</V4Button>
+                                    <V4Button v-if="canMakeReserves" class="disabled" mode="primary" @click="reserve">Place on course reserve</V4Button>
+                                 </div>
+                              </div>
+                           </th>
+                        </tr>
+                        <tr>
+                           <th colspan="3">
+                              <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
+                                 :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder} `">
+                                 Public
+                              </V4Checkbox>
+                              <span v-if="folderInfo.public" class="public-url">
+                                 <a :href="getPublicURL(folderInfo)" target="_blank">
+                                    <span>View</span><i class="link fas fa-external-link-alt"></i></a>
+                                 <span class="sep">|</span>
+                                 <V4Button mode="text" @click="copyURL(folderInfo)">Copy URL to clipboard</V4Button>
+                              </span>
+                           </th>
+                        </tr>
+                        <tr>
+                           <th></th>
+                           <th>Title</th>
+                           <th>Author</th>
+                        </tr>
+                        <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
+                           <td>
+                              <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
+                                 :aria-label="ariaLabel(bookmark)" />
+                           </td>
+                           <td>
+                              <router-link @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
+                                 {{bookmark.details.title}}
+                              </router-link>
+                           </td>
+                           <td>
+                              <router-link  @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
+                                 {{bookmark.details.author}}
+                              </router-link>
+                           </td>
+                        </tr>
+                     </table>
+                  </div>
+               </AccordionContent>
+               <div class="folder-buttons">
+                  <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'"/>
+                  <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
+                     :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
+                     :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
+                     <div>
+                        Delete bookmark folder
+                        <b>{{folderInfo.folder}}</b>? All bookmarks
+                     </div>
+                     <div>contained within it will also be deleted.</div>
+                     <div>
+                        <br />This cannot be reversed.
+                     </div>
+                  </Confirm>
                </div>
-            </template>
-            <div class="controls">
-               <V4Button v-if="createOpen==false" @click="openCreate" id="create-folder-btn" mode="primary">Create Folder</V4Button>
-               <div v-else class="create-folder pure-form">
-                  <label for="newname">New Folder:</label>
-                  <input
-                     id="newname"
-                     ref="folderInput"
-                     @keyup.enter="createFolder"
-                     v-model="newFolder"
-                     type="text"
-                     aria-required="true" required="required"
-                  />
-                  <V4Button @click="cancelCreate" :class="{disabled: submitting}" mode="tertiary">Cancel</V4Button>
-                  <V4Button @click="createFolder" class="{disabled: submitting}" mode="primary">Create</V4Button>
-               </div>
+            </div>
+         </template>
+         <div class="controls">
+            <V4Button v-if="createOpen==false" @click="openCreate" id="create-folder-btn" mode="primary">Create Folder</V4Button>
+            <div v-else class="create-folder pure-form">
+               <label for="newname">New Folder:</label>
+               <input
+                  id="newname"
+                  ref="folderInput"
+                  @keyup.enter="createFolder"
+                  v-model="newFolder"
+                  type="text"
+                  aria-required="true" required="required"
+               />
+               <V4Button @click="cancelCreate" :class="{disabled: submitting}" mode="tertiary">Cancel</V4Button>
+               <V4Button @click="createFolder" class="{disabled: submitting}" mode="primary">Create</V4Button>
             </div>
          </div>
       </div>
@@ -400,24 +398,22 @@ div.folder .remove-folder {
 .bookmarks {
    min-height: 400px;
    position: relative;
-   margin-top: 2vw;
+   margin: 2vw auto 0 auto;
    color: var(--color-primary-text);
+   width: 60%;
+   margin: 0 auto;
 }
 .working {
    text-align: center;
    font-size: 1.25em;
 }
-.bookmarks-content {
-   width: 60%;
-   margin: 0 auto;
-}
 @media only screen and (min-width: 768px) {
-   div.bookmarks-content {
+   div.bookmarks {
       width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.bookmarks-content {
+   div.bookmarks {
       width: 95%;
    }
 }

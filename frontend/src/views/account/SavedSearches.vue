@@ -1,80 +1,78 @@
 <template>
    <div class="searches">
       <SignInRequired v-if="isSignedIn == false" targetPage="searches"/>
-      <div v-else class="searches-content">
-         <AccountActivities/>
-         <div class="working" v-if="lookingUp" >
-            <V4Spinner message="Loading up requests..."/>
-         </div>
-         <div class="details">
-            <template v-if="searches.length == 0">
-               <div v-if="!lookingUp" class="none">You currently have no saved searches</div>
-            </template>
-            <div class="saved" v-else>
-               <h3>Saved Searches</h3>
-               <div class="row" v-for="(saved,idx) in searches"  :key="saved.token">
-                  <div class="saved-search">
-                     <span class="num">{{idx+1}}.</span>
-                     <V4Checkbox class="public" :checked="saved.public" @click="publicClicked(saved)"
-                        :aria-label="`Toggle public visibility of ${saved.name}`">
-                        Public
-                     </V4Checkbox>
-                     <span>
-                        <router-link :aria-label="`perform search named ${saved.name}`"
-                           @mousedown.native="savedSearchClicked('saved')"
+      <AccountActivities v-if="isSignedIn"/>
+      <div class="working" v-if="lookingUp" >
+         <V4Spinner message="Loading up requests..."/>
+      </div>
+      <div class="details">
+         <template v-if="searches.length == 0">
+            <div v-if="!lookingUp" class="none">You currently have no saved searches</div>
+         </template>
+         <div class="saved" v-else>
+            <h3>Saved Searches</h3>
+            <div class="row" v-for="(saved,idx) in searches"  :key="saved.token">
+               <div class="saved-search">
+                  <span class="num">{{idx+1}}.</span>
+                  <V4Checkbox class="public" :checked="saved.public" @click="publicClicked(saved)"
+                     :aria-label="`Toggle public visibility of ${saved.name}`">
+                     Public
+                  </V4Checkbox>
+                  <span>
+                     <router-link :aria-label="`perform search named ${saved.name}`"
+                        @mousedown.native="savedSearchClicked('saved')"
+                        :to="searchURL(saved.token)"
+                     >
+                        {{saved.name}}
+                     </router-link>
+                  </span>
+                  <span class="search-actions">
+                     <span class="icon">
+                        <router-link @mousedown.native="savedSearchClicked('saved')"
                            :to="searchURL(saved.token)"
+                           :aria-label="`perform search named ${saved.name}`"
                         >
-                           {{saved.name}}
+                           <i class="fas fa-search"></i>
                         </router-link>
                      </span>
-                     <span class="search-actions">
-                        <span class="icon">
-                           <router-link @mousedown.native="savedSearchClicked('saved')"
-                              :to="searchURL(saved.token)"
-                              :aria-label="`perform search named ${saved.name}`"
-                           >
-                              <i class="fas fa-search"></i>
-                           </router-link>
-                        </span>
-                        <Confirm title="Confirm Delete" v-on:confirmed="removeSavedSearch(saved.token)"
-                           :id="`del-saved-search-${idx+1}`"
-                           :ariaLabel="`Delete search named ${saved.name}`"
-                        >
-                           <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
-                           <div class="del-detail">This cannot be reversed.</div>
-                        </Confirm>
-                     </span>
-                  </div>
-                  <div v-if="saved.public" class="public-controls">
-                     <a  class="view" :href="searchURL(saved.token)" target="_blank">
-                        <span>View published search</span>
-                        <i class="link fas fa-external-link-alt"></i>
-                     </a>
-                     <span class="sep">|</span>
-                     <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
-                  </div>
+                     <Confirm title="Confirm Delete" v-on:confirmed="removeSavedSearch(saved.token)"
+                        :id="`del-saved-search-${idx+1}`"
+                        :ariaLabel="`Delete search named ${saved.name}`"
+                     >
+                        <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
+                        <div class="del-detail">This cannot be reversed.</div>
+                     </Confirm>
+                  </span>
                </div>
-                <div class="controls">
-                  <Confirm title="Confirm Delete" v-on:confirmed="removeAllSearches" id="del-all-searches" buttonLabel="Delete all saved searches">
-                     <div>Delete all saved searches?</div>
-                     <div class="del-detail">This cannot be reversed.</div>
-                  </Confirm>
+               <div v-if="saved.public" class="public-controls">
+                  <a  class="view" :href="searchURL(saved.token)" target="_blank">
+                     <span>View published search</span>
+                     <i class="link fas fa-external-link-alt"></i>
+                  </a>
+                  <span class="sep">|</span>
+                  <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
                </div>
             </div>
-            <div v-if="history.length > 0" class="history">
-               <h3>Recent Searches <span class="info">(Newest to oldest)</span></h3>
-               <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
-                  <template v-if="urlToText(h).length > 0">
-                     <span class="num">{{idx+1}}.</span>
-                     <router-link @mousedown.native="savedSearchClicked('history')" class="history" :to="h">{{urlToText(h)}}</router-link>
-                  </template>
-               </div>
-                <div class="controls">
-                  <Confirm title="Confirm Delete" v-on:confirmed="clearHistory" id="del-history" buttonLabel="Clear search history">
-                     <div>Delete search history?</div>
-                     <div class="del-detail">This cannot be reversed.</div>
-                  </Confirm>
-               </div>
+               <div class="controls">
+               <Confirm title="Confirm Delete" v-on:confirmed="removeAllSearches" id="del-all-searches" buttonLabel="Delete all saved searches">
+                  <div>Delete all saved searches?</div>
+                  <div class="del-detail">This cannot be reversed.</div>
+               </Confirm>
+            </div>
+         </div>
+         <div v-if="history.length > 0" class="history">
+            <h3>Recent Searches <span class="info">(Newest to oldest)</span></h3>
+            <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
+               <template v-if="urlToText(h).length > 0">
+                  <span class="num">{{idx+1}}.</span>
+                  <router-link @mousedown.native="savedSearchClicked('history')" class="history" :to="h">{{urlToText(h)}}</router-link>
+               </template>
+            </div>
+               <div class="controls">
+               <Confirm title="Confirm Delete" v-on:confirmed="clearHistory" id="del-history" buttonLabel="Clear search history">
+                  <div>Delete search history?</div>
+                  <div class="del-detail">This cannot be reversed.</div>
+               </Confirm>
             </div>
          </div>
       </div>
@@ -196,22 +194,21 @@ span.info {
 .searches {
    min-height: 400px;
    position: relative;
-   margin-top: 2vw;
    color: var(--color-primary-text);
 }
 
-div.searches-content {
+div.searches {
    width: 60%;
-   margin: 0 auto;
+   margin: 2vw auto 0 auto;
    text-align: center;
 }
 @media only screen and (min-width: 768px) {
-   div.searches-content {
+   div.searches {
       width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.searches-content {
+   div.searches {
       width: 95%;
    }
 }

@@ -1,62 +1,60 @@
 <template>
    <div class="digital-deliveries">
       <SignInRequired v-if="isSignedIn == false" targetPage="digital deliveries"/>
-      <div v-else class="digital-delivery-content">
-         <AccountActivities/>
-         <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
-         <div class="details">
-            <div class="notice">
-               PDF links are available for 30 days after delivery
-            </div>
-            <template v-if="webDeliveries.length > 0">
-               <div class="item" v-for="(co,idx) in webDeliveries" :key="idx">
-                  <h3 class="title">{{co.photoJournalTitle}}</h3>
-                  <dl>
-                     <dt>Author:</dt>
-                     <dd>{{co.photoArticleAuthor}}</dd>
-                     <template v-if="co.photoArticleTitle">
-                        <dt>Article Title:</dt>
-                        <dd>{{co.photoArticleTitle}}</dd>
-                     </template>
-                     <template v-if="co.photoJournalVolume">
-                        <dt>Volume:</dt>
-                        <dd>{{co.photoJournalVolume}}</dd>
-                     </template>
-                     <template v-if="co.photoJournalVolume">
-                        <dt>Issue:</dt>
-                        <dd>{{co.photoJournalIssue}}</dd>
-                     </template>
-                     <template v-if="co.photoJournalMonth">
-                        <dt>Month:</dt>
-                        <dd>{{co.photoJournalMonth}}</dd>
-                     </template>
-                     <template v-if="co.photoIssueYear">
-                        <dt>Year:</dt>
-                        <dd>{{co.photoIssueYear}}</dd>
-                     </template>
-                     <template v-if="co.photoJournalInclusivePages">
-                        <dt>Pages:</dt>
-                        <dd>{{co.photoJournalInclusivePages}}</dd>
-                     </template>
-                     <template v-if="co.callNumber">
-                        <dt>Call Number:</dt>
-                        <dd>{{co.callNumber}}</dd>
-                      </template>
-                     <dt>Transaction Number:</dt>
-                     <dd>{{co.transactionNumber}}</dd>
-                     <dt>Date Requested:</dt>
-                     <dd>{{formatDate(co.creationDate)}}</dd>
-                     <dt>PDF Download:</dt>
-                     <dd v-html="getDownloadLink(co)"></dd>
-                  </dl>
-               </div>
-            </template>
-            <template v-if="!lookingUp && webDeliveries.length == 0" >
-               <div class="none">
-                  You currently have no digital deliveries available
-               </div>
-            </template>
+      <AccountActivities v-if="isSignedIn"/>
+      <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
+      <div class="details">
+         <div class="notice">
+            PDF links are available for 30 days after delivery
          </div>
+         <template v-if="webDeliveries.length > 0">
+            <div class="item" v-for="(co,idx) in webDeliveries" :key="idx">
+               <h3 class="title">{{co.photoJournalTitle}}</h3>
+               <dl>
+                  <dt>Author:</dt>
+                  <dd>{{co.photoArticleAuthor}}</dd>
+                  <template v-if="co.photoArticleTitle">
+                     <dt>Article Title:</dt>
+                     <dd>{{co.photoArticleTitle}}</dd>
+                  </template>
+                  <template v-if="co.photoJournalVolume">
+                     <dt>Volume:</dt>
+                     <dd>{{co.photoJournalVolume}}</dd>
+                  </template>
+                  <template v-if="co.photoJournalVolume">
+                     <dt>Issue:</dt>
+                     <dd>{{co.photoJournalIssue}}</dd>
+                  </template>
+                  <template v-if="co.photoJournalMonth">
+                     <dt>Month:</dt>
+                     <dd>{{co.photoJournalMonth}}</dd>
+                  </template>
+                  <template v-if="co.photoIssueYear">
+                     <dt>Year:</dt>
+                     <dd>{{co.photoIssueYear}}</dd>
+                  </template>
+                  <template v-if="co.photoJournalInclusivePages">
+                     <dt>Pages:</dt>
+                     <dd>{{co.photoJournalInclusivePages}}</dd>
+                  </template>
+                  <template v-if="co.callNumber">
+                     <dt>Call Number:</dt>
+                     <dd>{{co.callNumber}}</dd>
+                     </template>
+                  <dt>Transaction Number:</dt>
+                  <dd>{{co.transactionNumber}}</dd>
+                  <dt>Date Requested:</dt>
+                  <dd>{{formatDate(co.creationDate)}}</dd>
+                  <dt>PDF Download:</dt>
+                  <dd v-html="getDownloadLink(co)"></dd>
+               </dl>
+            </div>
+         </template>
+         <template v-if="!lookingUp && webDeliveries.length == 0" >
+            <div class="none">
+               You currently have no digital deliveries available
+            </div>
+         </template>
       </div>
    </div>
 </template>
@@ -144,20 +142,17 @@ div.notice {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-}
-
-.digital-delivery-content {
    width: 60%;
-   margin: 0 auto;
+   margin: 2vw auto 0 auto;
    position: relative;
 }
 @media only screen and (min-width: 768px) {
-   div.digital-delivery-content  {
+   div.digital-deliveries {
        width: 60%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.digital-delivery-content  {
+   div.digital-deliveries  {
        width: 95%;
    }
 }
