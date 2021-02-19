@@ -5,14 +5,14 @@
       </div>
       <nav aria-labelledby="shelf-title" v-if="!working && hasBrowseData">
          <h2 id="shelf-title">Shelf Browse</h2>
-         <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
-            View full page shelf browse
-         </router-link>
-         <ul class="browse-cards">
+         <ul class="browse-cards" role="list">
             <li v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
                <BrowseCard :current="isCurrent(idx)" :pool="pool" :data="b" style="height:100%"/>
             </li>
          </ul>
+         <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
+            View full page
+         </router-link>
          <BrowsePager />
          <div class="centered" v-if="showRestore">
             <V4Button mode="primary" @click="browseRestore()">Return to {{currentCallNumber}}</V4Button>
