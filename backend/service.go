@@ -339,7 +339,12 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 // LogClientError accepts an error message from the client and logs it
 func (svc *ServiceContext) LogClientError(c *gin.Context) {
 	body, _ := ioutil.ReadAll(c.Request.Body)
-	log.Printf("CLIENT ERROR: %s", body)
+	build := "unknown"
+	files, _ := filepath.Glob("../buildtag.*")
+	if len(files) == 1 {
+		build = strings.Replace(files[0], "../buildtag.", "", 1)
+	}
+	log.Printf("CLIENT ERROR (Version %s.%s): %s", svc.Version, build, body)
 }
 
 // GetCodes will return the raw library and location codes from the ILS connector
