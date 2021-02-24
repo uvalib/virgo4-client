@@ -2,8 +2,8 @@
    <div class="digital-deliveries">
       <SignInRequired v-if="isSignedIn == false" targetPage="digital deliveries"/>
       <AccountActivities v-if="isSignedIn"/>
-      <V4Spinner v-if="lookingUp" message="Working..." v-bind:overlay="true"/>
-      <div class="details">
+      <V4Spinner v-if="lookingUp && isSignedIn" message="Working..." v-bind:overlay="true"/>
+      <div class="details" v-if="isSignedIn">
          <div class="notice">
             PDF links are available for 30 days after delivery
          </div>

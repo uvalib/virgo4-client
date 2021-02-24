@@ -2,10 +2,10 @@
    <div class="searches">
       <SignInRequired v-if="isSignedIn == false" targetPage="searches"/>
       <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="lookingUp" >
+      <div class="working" v-if="lookingUp && isSignedIn" >
          <V4Spinner message="Loading up requests..."/>
       </div>
-      <div class="details">
+      <div class="details" v-if="isSignedIn">
          <template v-if="searches.length == 0">
             <div v-if="!lookingUp" class="none">You currently have no saved searches</div>
          </template>
