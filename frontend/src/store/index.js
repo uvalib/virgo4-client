@@ -308,15 +308,26 @@ export default new Vuex.Store({
          let tgtPool = state.results[state.selectedResultsIdx]
          if ( !tgtPool) {
             let result = {
-               pool: poolResults.pool, sort: poolResults.sort, total: poolResults.pagination.total,
-               page: 0, timeMS: poolResults.elapsed_ms,
-               hits: [], statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
+               pool: poolResults.pool,
+               sort: poolResults.sort,
+               total: poolResults.pagination.total,
+               page: 0,
+               timeMS: poolResults.elapsed_ms,
+               hits: [],
+               statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
             }
             state.results.push(result)
             state.selectedResultsIdx = 0
             state.otherSrcSelection = { id: "", name: "" }
             state.total = poolResults.pagination.total
             tgtPool = state.results[0]
+         } else {
+            // Update total
+            tgtPool.total = poolResults.pagination.total
+            // Only update overall total when paging if searching 1 pool.
+            if(state.results.length == 1){
+               state.total = poolResults.pagination.total
+            }
          }
          let lastHit = tgtPool.hits[tgtPool.hits.length-1]
 
