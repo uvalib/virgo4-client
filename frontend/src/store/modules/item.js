@@ -170,15 +170,8 @@ const item = {
             ctx.commit("setDigitalContentFromDetails")
             return
          }
-
-         // the URL is for a manifest stored in S3. Auth headers must be removed or request will fail
-         const noAuthAxios = axios.create({
-            timeout: 5000,
-         })
-         delete noAuthAxios.defaults.headers.common['Authorization']
-
          ctx.commit("setDigitalContentLoading", true)
-         noAuthAxios.get(dcField.value).then((response) => {
+         axios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
             ctx.commit("setDigitalContentLoading", false)
          }).catch((_error) => {
@@ -187,14 +180,6 @@ const item = {
       },
 
       async getGoogleBooksURL(ctx) {
-         // The books API must be accessed without any auth headers or it will 401.
-         // There may be other requests going on at the same time
-         // this request is made that DO require auth, so a new axios instance must be created and have
-         // the auth header stripped
-         const axInst = axios.create({
-            timeout: 1000,
-         })
-         delete axInst.defaults.headers.common['Authorization']
          let detail = ctx.state.details
          let done = false
          let fields = ["isbn", "oclc", "lccn"]
@@ -207,13 +192,13 @@ const item = {
                idField.value.some( async v => {
                   let url = `https://www.googleapis.com/books/v1/volumes?q=${name}:${v}`
                   try {
-                     let response = await axInst.get(url)
+                     let response = await axios.get(url)
                      if (response.data.totalItems > 0 && response.data.items[0].accessInfo.viewability != "NO_PAGES") {
                         ctx.commit('setGoogleBooksURL', response.data)
                         done = true
                      }
                   } catch(_error) {
-                    // NO-OP
+                     // NO-OP
                   }
                   return done == true
                })

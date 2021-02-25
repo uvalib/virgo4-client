@@ -27,8 +27,6 @@ import FatalError from './views/FatalError.vue'
 
 import store from './store'
 
-import analytics from './analytics'
-
 Vue.use(Router)
 
 const router = new Router({
@@ -108,30 +106,16 @@ const router = new Router({
          component: Preferences
       },
       {
-         // NOTES: the signedin route doesn't actually have a
-         // visual representation. It just handes the auth session
-         // setup and redirects to account page
+         // NOTES: the signedin route doesn't have a visual representation. It just stores token and redirects
          path: '/signedin',
          beforeEnter: async (_to, _from, next) => {
-            // Grab the cookie and stuff in local storage. Cookie is short lived
             let jwtStr = Vue.$cookies.get("v4_jwt")
             store.commit("user/setUserJWT", jwtStr)
-            await store.dispatch("user/getAccountInfo")  // needed for search preferences
-            store.dispatch("user/getCheckouts")          // needed so the alert icon can show in menubar
             store.commit('restore/load')
-            if ( store.getters["user/isUndergraduate"]) {
-               analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
-            } else if ( store.getters["user/isGraduate"]) {
-               analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
-            } else {
-               analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
-            }
-
             let tgtURL = store.state.restore.url
             if (!tgtURL || tgtURL == "") {
                tgtURL = "/"
             }
-            console.log("signed in, continue to "+tgtURL)
             next( tgtURL )
          }
       },
@@ -265,20 +249,6 @@ router.beforeEach( async (to, from, next) => {
       store.commit("setPageTitle", title)
    }
 
-   // keep sign-in or access tokens current (issue new token if none present)
-   await store.dispatch("user/authenticate")
-
-   // Some pages require a signed in user; grab one from session or cookie.
-   // otherwise sign out the current user (if any)
-   let userPages = ["preferences", "account", "bookmarks", "digital-deliveries",
-      "course-reserves-request", "requests", "searches", "checkouts"]
-   if (userPages.includes(to.name)) {
-      if (store.getters["user/isSignedIn"] == false) {
-         // clear out any possible signin session. The consequences will be handled on the targte page
-         await store.dispatch("user/signout")
-      }
-   }
-
    // These pages require signed in user and will automatically netbadge in if not signed in
    let autoAuth = ["openurl"]
    if (autoAuth.includes(to.name)) {
@@ -289,7 +259,6 @@ router.beforeEach( async (to, from, next) => {
       }
    }
 
-   // console.log("session OK... continue")
    next()
 })
 
