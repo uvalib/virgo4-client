@@ -29,6 +29,7 @@
                <p class="error" v-if="selectedResults.statusCode != 200 && selectedResults.statusMessage">
                   {{selectedResults.statusMessage}}
                </p>
+               <ExpandSearch />
             </template>
          </div>
          <div v-else class="hits" role="region" aria-label="search results">
@@ -43,7 +44,9 @@
                </div>
             </div>
          </div>
-         <span role="toolbar">
+         <span role="toolbar"  v-if="selectedResults.hits.length > 0">
+            <ExpandSearch class="expand-panel" />
+
             <V4Button v-if="hasMoreHits" mode="primary" @click="loadMoreResults">
                <span v-if="loadingMore">
                   <V4Spinner v-if="loadingMore" color="white"/>
@@ -62,9 +65,10 @@ import SearchHit from "@/components/SearchHit"
 import ImageSearchHit from "@/components/ImageSearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import V4Sort from "@/components/V4Sort"
+import ExpandSearch from "@/components/ExpandSearch"
 export default {
    components: {
-      ImageSearchHit, SearchHit, SearchFilters, V4Sort
+      ImageSearchHit, SearchHit, SearchFilters, V4Sort, ExpandSearch
    },
    data: function() {
       return {
@@ -228,5 +232,10 @@ div.pool-header {
 .source-logo .logo {
    max-height:90px;
    display: inline-block;
+}
+.expand-panel {
+   margin: 0px 0 25px 5px;
+   box-shadow: $v4-box-shadow-light;
+   border: 1px solid var(--uvalib-grey-light);
 }
 </style>

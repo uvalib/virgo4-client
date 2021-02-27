@@ -2,10 +2,10 @@
    <div class="bookmarks">
       <SignInRequired v-if="isSignedIn == false" targetPage="bookmarks"/>
       <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="lookingUpBookmarks">
+      <div class="working" v-if="lookingUpBookmarks && isSignedIn">
          <V4Spinner message="Looking up bookmark information..."/>
       </div>
-      <div v-else>
+      <div v-else-if="isSignedIn">
          <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
             <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import versionChecker from './plugins/version'
-import expiredSessionWatcher from './plugins/expired'
+import errorReporter from './plugins/error_reporter'
 import bookmarks from './modules/bookmarks'
 import system from './modules/system'
 import pools from './modules/pools'
@@ -308,15 +308,26 @@ export default new Vuex.Store({
          let tgtPool = state.results[state.selectedResultsIdx]
          if ( !tgtPool) {
             let result = {
-               pool: poolResults.pool, sort: poolResults.sort, total: poolResults.pagination.total,
-               page: 0, timeMS: poolResults.elapsed_ms,
-               hits: [], statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
+               pool: poolResults.pool,
+               sort: poolResults.sort,
+               total: poolResults.pagination.total,
+               page: 0,
+               timeMS: poolResults.elapsed_ms,
+               hits: [],
+               statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
             }
             state.results.push(result)
             state.selectedResultsIdx = 0
             state.otherSrcSelection = { id: "", name: "" }
             state.total = poolResults.pagination.total
             tgtPool = state.results[0]
+         } else {
+            // Update total
+            tgtPool.total = poolResults.pagination.total
+            // Only update overall total when paging if searching 1 pool.
+            if(state.results.length == 1){
+               state.total = poolResults.pagination.total
+            }
          }
          let lastHit = tgtPool.hits[tgtPool.hits.length-1]
 
@@ -542,13 +553,8 @@ export default new Vuex.Store({
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
-            let genericError = true
-            if (error.response) {
-               if (error.response.status == 401) {
-                  commit('system/setSessionExpired', null, { root: true })
-                  dispatch("user/signout", null, { root: true })
-               } else if (error.response.data && error.response.data.message) {
-                  genericError = false
+            if (error.response && error.response.status != 401) {
+               if (error.response && error.response.data && error.response.data.message) {
                   let msg =  error.response.data.message
                   msg += "<p>We regret the inconvenience. If this problem persists, "
                   msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>"
@@ -557,14 +563,12 @@ export default new Vuex.Store({
                      detail: error.response.data.details
                   }
                   commit('system/setSearchError', err)
+               } else {
+                  let msg = "System error, we regret the inconvenience. If this problem persists, "
+                  msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+                  commit('system/setError', msg)
+                  dispatch("system/reportError", error)
                }
-            }
-
-            if (genericError) {
-               let msg = "System error, we regret the inconvenience. If this problem persists, "
-               msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-               commit('system/setError', msg)
-               dispatch("system/reportError", error)
             }
          })
       },
@@ -615,25 +619,15 @@ export default new Vuex.Store({
          }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             commit('setSearching', false)
-            let genericError = true
-            if (error.response ) {
-               if (error.response.status == 401) {
-                  commit('system/setSessionExpired', null, { root: true })
-                  dispatch("user/signout", null, { root: true })
-                  genericError = false
-               } else if (error.response.status == 400) {
-                  let msg = "This query is malformed or unsupported. Please ensure that all quotes and parenthesis are matched."
-                  msg += "<p>We regret the inconvenience. If this problem persists, "
-                  msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>"
-                  let err = {
-                     message: msg,
-                  }
-                  commit('system/setSearchError', err)
-                  genericError = false
+            if (error.response && error.response.status == 400) {
+               let msg = "This query is malformed or unsupported. Please ensure that all quotes and parenthesis are matched."
+               msg += "<p>We regret the inconvenience. If this problem persists, "
+               msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a></p>"
+               let err = {
+                  message: msg,
                }
-            }
-
-            if ( genericError ) {
+               commit('system/setSearchError', err)
+            } else if (error.response && error.response.status != 401) {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
                commit('system/setError', msg)
@@ -670,5 +664,5 @@ export default new Vuex.Store({
       sort: sort,
    },
 
-   plugins: [versionChecker, expiredSessionWatcher]
+   plugins: [versionChecker, errorReporter]
 })

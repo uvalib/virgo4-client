@@ -47,13 +47,13 @@ const user = {
          return true
       },
       isGuest: (state) => {
-         return (state.role == 'guest')
+         return (state.role == 'guest' || state.role == '')
        },
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
       isGraduate: (state) => {
-         if ( state.role == 'guest' ) return false
+         if ( state.role == 'guest' || state.role == '') return false
          if (state.accountInfo.description.toLowerCase().includes("graduate student")) return true
          if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
              state.accountInfo.profile.toLowerCase().includes("undergrad")) return false
@@ -61,7 +61,7 @@ const user = {
          return false
       },
       isUndergraduate: (state) => {
-         if ( state.role == 'guest' ) return false
+         if ( state.role == 'guest' || state.role == '' ) return false
          if (state.accountInfo.description.toLowerCase().includes("undergraduate")) return true
          if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
              state.accountInfo.profile.toLowerCase().includes("undergrad")) return true
@@ -131,8 +131,7 @@ const user = {
             state.sessionType != "" && state.sessionType != "none"
       },
       hasAccountInfo: state => {
-         if (state.signedInUser.length == 0)  return false
-         if (state.accountInfo == null) return false
+         if (state.signedInUser.length == 0 || state.role == '')  return false
          if (state.accountInfo.id != state.signedInUser) return false
          return true
       },
@@ -225,12 +224,6 @@ const user = {
             }
          })
       },
-      setAuthToken(state, token) {
-         state.authToken = token
-         axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
-         let parsed = parseJwt(token)
-         state.authExpiresAt = parsed.exp
-      },
       setAuthorizing(state, auth) {
          state.authorizing = auth
       },
@@ -271,7 +264,6 @@ const user = {
          state.authToken = jwtStr
          state.sessionType =  parsed.authMethod
          state.role = parsed.role
-         axios.defaults.headers.common['Authorization'] = "Bearer "+state.authToken
          localStorage.setItem("v4_jwt", jwtStr)
          state.authExpiresAt = parsed.exp
 
@@ -304,52 +296,32 @@ const user = {
    actions: {
       async authenticate(ctx) {
          let expiresIn = 0
-         let signedIn = false
-         if ( ctx.state.authExpiresAt > 0) {
-            let nowSecs = Math.round((new Date()).getTime() / 1000)
-            let expireSecs = ctx.state.authExpiresAt - 15
-            expiresIn = expireSecs - nowSecs
-         }
+         let nowSecs = Math.round((new Date()).getTime() / 1000)
+         let expireSecs = ctx.state.authExpiresAt - 15
+         expiresIn = expireSecs - nowSecs
          if (expiresIn <= 0) {
-            try {
-               console.log("Authentication expired. Refreshing...")
-               let jwtStr = localStorage.getItem('v4_jwt')
-
-               // see if there is a session in memory or local store
-               if (ctx.getters.isSignedIn ) {
-                  console.log("Sign-in session")
-                  signedIn = true
-               } else if (jwtStr) {
-                  console.log("Found JWT in local storage...")
-                  signedIn = true
-                  ctx.commit("setUserJWT", jwtStr)
-               }
-
-               if ( signedIn) {
-                  console.log("Refreshing sign-in session")
-                  await axios.post("/api/reauth", null).then( response => {
-                     console.log("Session refreshed")
-                     ctx.commit("setUserJWT", response.data )
-                     ctx.dispatch("getAccountInfo")  // needed for search preferences
-                     ctx.dispatch("getCheckouts")    // needed so the alert icon can show in menubar
-                     ctx.dispatch("bookmarks/getBookmarks", null, { root: true })
-                  })
-               } else {
-                  console.log("Get new guest authorization token")
-                  await axios.post("/authorize", null).then( response => {
-                     ctx.commit('setAuthToken', response.data)
-                  })
-               }
-            } catch(error)  {
-               console.error("Authenticate failed: "+error)
-               if ( signedIn ) {
+            console.log("Authentication expired. Refreshing...")
+            if ( ctx.state.role == "" || ctx.state.role == "guest") {
+               console.log("Get GUEST authorization token")
+               await axios.post("/authorize", null).then( response => {
+                  ctx.commit("setUserJWT", response.data)
+               }).catch( error => {
+                  let msg = error.toString()
+                  if (error.response) {
+                     msg = error.response.data
+                  }
+                  ctx.dispatch("system/reportError", `Unable to get auth token: ${msg}`, { root: true })
+               })
+            } else {
+               console.log("Refreshing sign-in session")
+               await axios.post("/api/reauth", null).then( response => {
+                  console.log(`Session refreshed`)
+                  ctx.commit("setUserJWT", response.data )
+               }).catch( error => {
+                  console.error("Refreshing failed: "+error.toString())
+                  ctx.dispatch("signout")
                   ctx.commit('system/setSessionExpired', null, { root: true })
-               } else {
-                  let err = {message: `Unable to get auth token: ${error.toString()}`,
-                     caller: 'authenticate', query: ctx.ootGetters['query/getState']}
-                  ctx.dispatch("system/reportError", err)
-               }
-               ctx.commit('clear')
+               })
             }
          }
       },
@@ -360,7 +332,6 @@ const user = {
             let claims = ctx.state.parsedJWT
             return axios.post("api/admin/claims", claims).then((_response) => {
                let jwtStr = Vue.$cookies.get("v4_jwt")
-               ctx.commit('setAuthToken', jwtStr)
                ctx.commit("setUserJWT", jwtStr )
                setTimeout(() => {
                   ctx.commit('setAuthorizing', false)
@@ -455,11 +426,7 @@ const user = {
          if (ctx.state.signedInUser.length == 0) {
             return
          }
-
-         const axInst = axios.create({
-            timeout: 30*1000,
-         })
-         return axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
+         return axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
             ctx.commit('sortCheckouts', "AUTHOR_ASC")
          }).catch((error) => {
@@ -474,11 +441,7 @@ const user = {
          if ( ctx.state.checkouts.length == 0) {
             return
          }
-
-         const axInst = axios.create({
-            timeout: 30*1000,
-         })
-         return axInst.get(`/api/users/${ctx.state.signedInUser}/checkouts.csv`).then((response) => {
+         return axios.get(`/api/users/${ctx.state.signedInUser}/checkouts.csv`).then((response) => {
             const fileURL = window.URL.createObjectURL(new Blob([response.data]));
             const fileLink = document.createElement('a');
 
