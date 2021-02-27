@@ -139,9 +139,20 @@ const system = {
          state.message.detail = ""
 
          if (error.response) {
-            state.message.type = "error"
-            state.message.title = "Virgo Error"
-            state.message.content = error.response.data
+            // Server responded with a status code out of the range of 2xx
+            // If this is a 401, a session has expired when making a request.
+            if (error.response.status == 401) {
+               if (state.sessionExpired == false) {
+                  state.sessionExpired = true
+                  // NOTE: cant dispatch a signout here, so there is a plugin (expired.js) installed.
+                  // It looks for setError with a 401 and does the signout
+                  setTimeout(() => {  state.sessionExpired=false }, 15000)
+               }
+            } else {
+               state.message.type = "error"
+               state.message.title = "Virgo Error"
+               state.message.content = error.response.data
+            }
          } else if (error.message) {
             state.message.type = "error"
             state.message.title = "Virgo Error"
@@ -201,33 +212,6 @@ const system = {
                ctx.dispatch("bindAlerts", null, {root:true})
                ctx.dispatch("bindRegionalAlerts", null, {root:true})
             }
-
-            // setup axios REQUEST interceptor to keep auth session alive
-            axios.interceptors.request.use( async config => {
-               let availRegex = new RegExp(`${ctx.state.availabilityURL}`)
-               let citationRegex = new RegExp(`${ctx.state.citationsURL}`)
-
-               let url = config.url
-               if ( url.match(/\/api\/reauth/) || url.match(/\/api\/error/)) {
-                  // these methods need an auth token to log/verify, but it is ok if expired
-                  config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-               } else if ( url.match(/\/api\//) || url.match(availRegex) || url.match(citationRegex) ) {
-                  // These calls all need active auth token
-                  config.timeout = 0
-                  if ( url.match(/\/checkouts/) ) {
-                     // Checkouts can be big, add extra time
-                     config.timeout = 30*1000
-                  }
-
-                  await ctx.dispatch("user/authenticate", null, {root:true})
-                  if ( ctx.rootState.user.authToken ) {
-                     config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-                  }
-               }
-               return config
-            }, error => {
-               Promise.reject(error)
-            })
          }).catch((error) => {
             ctx.commit('setFatal', "Unable to get configuration: " + error)
          })

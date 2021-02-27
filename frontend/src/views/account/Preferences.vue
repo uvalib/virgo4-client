@@ -2,17 +2,15 @@
    <div class="preferences">
       <SignInRequired v-if="isSignedIn == false" targetPage="preferences"/>
       <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="(lookingUpPools || lookingUpAccount) && isSignedIn" >
+      <div class="working" v-if="lookingUpPools || lookingUpAccount" >
          <V4Spinner message="Loading preferences..."/>
       </div>
       <div v-else>
-         <template v-if="isSignedIn">
-            <Search class="section"/>
-            <PickupLibrary class="section"/>
-            <BarcodeScan class="section"/>
-            <V4Privacy class="section"/>
-            <JWTAdmin class="section"/>
-         </template>
+         <Search class="section"/>
+         <PickupLibrary class="section"/>
+         <BarcodeScan class="section"/>
+         <V4Privacy class="section"/>
+         <JWTAdmin class="section"/>
       </div>
    </div>
 </template>

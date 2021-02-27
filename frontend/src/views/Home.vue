@@ -63,11 +63,8 @@ export default {
          if (newVal == false && this.restoreURL == "/") {
             this.$nextTick( () => {
                let r = document.getElementById("results-container")
-               if (r) {
-                  // sometimes results may not be availble - maybe auth session problems for one
-                  r.focus({preventScroll:true})
-                  this.$utils.scrollToItem(r)
-               }
+               r.focus({preventScroll:true})
+               this.$utils.scrollToItem(r)
             })
          }
       },

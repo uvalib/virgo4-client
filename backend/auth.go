@@ -21,7 +21,7 @@ func (svc *ServiceContext) Authorize(c *gin.Context) {
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
 	signedStr, err := v4jwt.Mint(guestClaim, 15*time.Minute, svc.JWTKey)
 	if err != nil {
-		log.Printf("ERROR: Unable to generate signed JWT token: %s", err.Error())
+		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		c.String(http.StatusInternalServerError, "unable to generate authorization")
 		return
 	}
@@ -205,22 +205,22 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
 	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("ERROR: Authentication failed, no JWT in header: [%s]", err.Error())
-		c.AbortWithError(http.StatusUnauthorized, errors.New("missing authorization"))
+		log.Printf("Authentication failed: [%s]", err.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	refreshToken, err := c.Cookie("v4_refresh")
 	if err != nil {
-		log.Printf("Authentication failed, refresh token for %s expired or not accessible %s", tokenStr, err.Error())
-		c.AbortWithError(http.StatusUnauthorized, errors.New("session expired"))
+		log.Printf("ERROR: v4_refresh cookie not found %s", err.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
 	if err != nil {
-		log.Printf("ERROR: Unable to refresh JWT %s: %s", tokenStr, err.Error())
-		c.AbortWithError(http.StatusUnauthorized, errors.New("authorization failed"))
+		log.Printf("Unable to refresh JWT: %s", err.Error())
+		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	v4Claims, _ := v4jwt.Validate(refreshed, svc.JWTKey)

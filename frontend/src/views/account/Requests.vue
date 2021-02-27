@@ -2,10 +2,10 @@
    <div class="requests">
       <SignInRequired v-if="isSignedIn == false" targetPage="request information"/>
       <AccountActivities  v-if="isSignedIn"/>
-      <div class="working" v-if="lookingUp && isSignedIn">
+      <div class="working" v-if="lookingUp">
          <V4Spinner message="Looking up requests..." />
       </div>
-      <div class="details" v-if="isSignedIn">
+      <div class="details">
          <template v-if="!isGuest">
             <h2>Make a New Request</h2>
             <div v-if="!isHSLUser" class="subcontent buttons">

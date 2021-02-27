@@ -139,32 +139,10 @@ export default {
       },
    },
    async beforeCreate() {
-      // anon and signed in users will always have a localstore with JWT in it. be sure
-      // to restore it first, as everything that follows depends upon it
-      let jwtStr = localStorage.getItem('v4_jwt')
-      if ( jwtStr  ) {
-         console.log("init auth from localstore")
-         this.$store.commit("user/setUserJWT", jwtStr)
-      }
-
       // First time app is being created, request all common config
       // the flag shows a config spinner until ready
       await this.$store.dispatch('system/getConfig')
       await this.$store.dispatch('pools/getPools')
-
-      if ( this.$route.path == "/signedin") {
-         await store.dispatch("user/getAccountInfo")
-         store.dispatch("user/getCheckouts")
-         store.dispatch("user/getBookmarks")
-         if ( store.getters["user/isUndergraduate"]) {
-            this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
-         } else if ( store.getters["user/isGraduate"]) {
-            this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
-         } else {
-            this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
-         }
-      }
-
       this.$store.dispatch("filters/getPreSearchFilters")
       this.configuring = false
    },
