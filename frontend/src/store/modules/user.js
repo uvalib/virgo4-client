@@ -54,6 +54,7 @@ const user = {
       },
       isGraduate: (state) => {
          if ( state.role == 'guest' || state.role == '') return false
+         if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.description.toLowerCase().includes("graduate student")) return true
          if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
              state.accountInfo.profile.toLowerCase().includes("undergrad")) return false
@@ -62,6 +63,7 @@ const user = {
       },
       isUndergraduate: (state) => {
          if ( state.role == 'guest' || state.role == '' ) return false
+         if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.description.toLowerCase().includes("undergraduate")) return true
          if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
              state.accountInfo.profile.toLowerCase().includes("undergrad")) return true

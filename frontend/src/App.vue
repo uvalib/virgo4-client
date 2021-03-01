@@ -94,6 +94,7 @@ export default {
          alertCount: 'alertCount',
          menuAlerts: 'menuAlerts',
          pageAlerts: 'pageAlerts',
+         isSignedIn: 'user/isSignedIn'
       }),
       showDimmer() {
          return this.hasMessage|| this.sessionExpired
@@ -143,7 +144,6 @@ export default {
       // to restore it first, as everything that follows depends upon it
       let jwtStr = localStorage.getItem('v4_jwt')
       if ( jwtStr  ) {
-         console.log("init auth from localstore")
          this.$store.commit("user/setUserJWT", jwtStr)
       }
 
@@ -152,13 +152,13 @@ export default {
       await this.$store.dispatch('system/getConfig')
       await this.$store.dispatch('pools/getPools')
 
-      if ( this.$route.path == "/signedin") {
-         await store.dispatch("user/getAccountInfo")
-         store.dispatch("user/getCheckouts")
-         store.dispatch("user/getBookmarks")
-         if ( store.getters["user/isUndergraduate"]) {
+      if ( this.isSignedIn ) {
+         await this.$store.dispatch("user/getAccountInfo")
+         this.$store.dispatch("user/getCheckouts")
+         this.$store.dispatch("bookmarks/getBookmarks")
+         if ( this.$store.getters["user/isUndergraduate"]) {
             this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
-         } else if ( store.getters["user/isGraduate"]) {
+         } else if ( this.$store.getters["user/isGraduate"]) {
             this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
          } else {
             this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
