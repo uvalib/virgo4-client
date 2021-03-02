@@ -157,10 +157,9 @@ const user = {
          if (getters.isLawUser) {
             pickupLibraries.push({id: "LAW", name: "Law Library"})
          }
-         // Temporarily disable LEO
-         //if (getters.canLeoMobile) {
-         //  pickupLibraries.push({id: "LEO", name: 'Central Grounds Parking Garage ("LEO Mobile")' })
-         //}
+         if (getters.canLeoMobile) {
+           pickupLibraries.push({id: "LEO", name: 'Central Grounds Parking Garage ("LEO Mobile")' })
+         }
 
          return pickupLibraries
        },
