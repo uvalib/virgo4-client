@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/smtp"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -480,6 +481,31 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 		log.Printf("Successful response from ILS DELETE %s. Elapsed Time: %d (ms)", url, elapsedMS)
 	}
 	return resp, err
+}
+
+// SendEmail will and send an email to the specified recipients
+func (svc *ServiceContext) SendEmail(subjectStr string, to []string, emailBody string) error {
+	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
+	subject := fmt.Sprintf("Subject: %s\n", subjectStr)
+	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
+	msg := []byte(subject + toHdr + mime + emailBody)
+
+	if svc.Dev.FakeSMTP {
+		log.Printf("Email is in dev mode. Logging message instead of sending")
+		log.Printf("==================================================")
+		log.Printf("%s", msg)
+		log.Printf("==================================================")
+		return nil
+	}
+
+	log.Printf("Sending %s email to %s", subjectStr, strings.Join(to, ","))
+	if svc.SMTP.Pass != "" {
+		auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
+		return smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, svc.SMTP.Sender, to, msg)
+	}
+
+	log.Printf("Using SendMail with no auth")
+	return smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, svc.SMTP.Sender, to, msg)
 }
 
 func handleAPIResponse(logURL string, resp *http.Response, err error) ([]byte, *RequestError) {

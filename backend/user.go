@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -51,6 +53,20 @@ type ILSUserInfo struct {
 	Standing      string `json:"standing"`
 	AmountOwed    string `json:"amountOwed"`
 	HomeLibrary   string `json:"homeLibrary"`
+}
+
+// AccountRequest contains data required to request a Sirsi Account
+type AccountRequest struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Phone      string `json:"phone"`
+	Department string `json:"department"`
+	Address1   string `json:"address1"`
+	Address2   string `json:"address2"`
+	City       string `json:"city"`
+	State      string `json:"state"`
+	Zip        string `json:"zip"`
 }
 
 // IsGraduate returns true if this user is a graduate student
@@ -455,6 +471,39 @@ func (svc *ServiceContext) SavePreferences(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, "OK")
+}
+
+// CreateAccountRequest accepts a user request for a new Sirsi account and sends it to lib-circ@virginia.edu
+func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
+	virgo4ID := c.Param("uid")
+	log.Printf("User %s is requesting a Sirsi account", virgo4ID)
+	req := AccountRequest{}
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: invalid account request payload: %v", err)
+		c.String(http.StatusBadRequest, "Invalid account request")
+		return
+	}
+
+	log.Printf("Rendering account request email body")
+	var renderedEmail bytes.Buffer
+	tpl := template.Must(template.New("new_account.txt").ParseFiles("templates/new_account.txt"))
+	err = tpl.Execute(&renderedEmail, req)
+	if err != nil {
+		log.Printf("ERROR: Unable to render account request email: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	to := []string{"lib-circ@virginia.edu"}
+	sendErr := svc.SendEmail("New Account Request", to, renderedEmail.String())
+	if sendErr != nil {
+		log.Printf("ERROR: Unable to new account request email: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "new account request sent")
 }
 
 // GetPreferences will save a block of JSON preference data to the user table

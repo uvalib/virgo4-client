@@ -6,7 +6,7 @@
          <V4Spinner message="Looking up requests..." />
       </div>
       <div class="details" v-if="isSignedIn">
-         <template v-if="!isGuest">
+         <template v-if="!isGuest &&  !noILSAccount">
             <h2>Make a New Request</h2>
             <div v-if="!isHSLUser" class="subcontent buttons">
                <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
@@ -200,7 +200,8 @@ export default {
          isHSLUser: "user/isHSLUser",
          isSignedIn: 'user/isSignedIn',
          isGuest: 'user/isGuest',
-         hasSysError: "system/hasError"
+         hasSysError: "system/hasError",
+         noILSAccount: 'user/noILSAccount',
       }),
       illiadRequests() {
          return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&

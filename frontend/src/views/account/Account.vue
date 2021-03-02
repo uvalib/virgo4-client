@@ -5,7 +5,8 @@
       <div class="working" v-if="!expandBilling && lookingUp" >
          <V4Spinner message="Looking up account details..."/>
       </div>
-      <template v-else-if="hasAccountInfo">
+      <AccountRequestForm />
+      <template v-if="hasAccountInfo">
          <h2 class="user-name">{{info.displayName}} ({{info.id}})</h2>
          <div>{{info.department}} - {{info.profile}}</div>
          <div>{{info.address}}</div>
@@ -155,8 +156,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex"
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
+import AccountRequestForm from '@/components/AccountRequestForm'
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
 import ChangePassword from '@/components/modals/ChangePassword'
@@ -168,7 +169,7 @@ export default {
       };
    },
    components: {
-      AccountActivities, AccordionContent, ChangePassword
+      AccountActivities, AccordionContent, ChangePassword, AccountRequestForm
    },
    computed: {
       ...mapState({
@@ -178,19 +179,17 @@ export default {
          ilsError: state => state.system.ilsError,
       }),
       ...mapGetters({
-        hasAccountInfo: 'user/hasAccountInfo',
-        totalFines:  'user/totalFines',
-        itemsWithFines: 'user/itemsWithFines',
-        canChangePassword: 'user/canChangePassword',
-        useSIS:  'user/useSIS',
-        isSignedIn: 'user/isSignedIn',
+         hasAccountInfo: 'user/hasAccountInfo',
+         totalFines:  'user/totalFines',
+         itemsWithFines: 'user/itemsWithFines',
+         canChangePassword: 'user/canChangePassword',
+         useSIS:  'user/useSIS',
+         isSignedIn: 'user/isSignedIn',
       }),
       isBillOwed() {
          let amtStr = this.info['amountOwed']
          return parseFloat(amtStr) > 0
       },
-   },
-   methods: {
    },
    created() {
       if ( this.isSignedIn ) {
@@ -201,7 +200,20 @@ export default {
    }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
+@media only screen and (min-width: 768px) {
+   div.account  {
+       width: 60%;
+   }
+}
+@media only screen and (max-width: 768px) {
+   div.account  {
+      width: 95%;
+   }
+   .standing-info {
+      width: 90%;
+   }
+}
 .account {
    min-height: 400px;
    position: relative;
@@ -310,19 +322,6 @@ div.notes p {
 }
 .password {
    margin-top: 15px;
-}
-@media only screen and (min-width: 768px) {
-   div.account  {
-       width: 60%;
-   }
-}
-@media only screen and (max-width: 768px) {
-   div.account  {
-       width: 95%;
-   }
-   .standing-info {
-      width: 90%;
-   }
 }
 .info h3 {
    font-size: 1em;

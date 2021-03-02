@@ -2,10 +2,8 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
-	"net/smtp"
 	"strings"
 	"text/template"
 
@@ -43,36 +41,16 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		return
 	}
 
-	log.Printf("Generate SMTP message")
 	to := []string{svc.FeedbackEmail}
 	if strings.HasSuffix(request.Email, "virginia.edu") {
 		to = append(to, request.Email)
 	}
-	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subject := "Subject: Virgo 4 Feedback\n"
-	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
-	msg := []byte(subject + toHdr + mime + renderedEmail.String())
 
-	if svc.Dev.FakeSMTP {
-		log.Printf("Email is in dev mode. Logging message instead of sending")
-		log.Printf("==================================================")
-		log.Printf("%s", msg)
-		log.Printf("==================================================")
-	} else {
-		log.Printf("Sending feedback email to %s", strings.Join(to, ","))
-		var err error
-		if svc.SMTP.Pass != "" {
-			auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
-			err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, svc.SMTP.Sender, to, msg)
-		} else {
-			log.Printf("Using SendMail with no auth")
-			err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, svc.SMTP.Sender, to, msg)
-		}
-		if err != nil {
-			log.Printf("ERROR: Unable to send feedback email: %s", err.Error())
-			c.String(http.StatusInternalServerError, err.Error())
-			return
-		}
+	sendErr := svc.SendEmail("Virgo 4 Feedback", to, renderedEmail.String())
+	if sendErr != nil {
+		log.Printf("ERROR: Unable to send feedback email: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	c.String(http.StatusOK, "Feedback email sent")

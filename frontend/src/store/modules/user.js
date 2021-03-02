@@ -2,6 +2,7 @@ import axios from 'axios'
 import Vue from 'vue'
 import router from '../../router'
 import analytics from '../../analytics'
+import { getField, updateField } from 'vuex-map-fields'
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -34,10 +35,19 @@ const user = {
       authMessage: "",
       lockedOut: false,
       parsedJWT: {},
-      authExpiresAt: 0
+      authExpiresAt: 0,
+      noAccount: false,
+      accountRequest: {name: "", id: "", email: "", phone: "", department: "",
+         address1: "", address2: "", city: "", state: "", zip: ""},
+      accountRequested: false
    },
 
    getters: {
+      getField,
+      noILSAccount: (state, getters) => {
+         if (getters.isSignedIn == false ) return false
+         return state.noAccount
+      },
       hasRenewSummary: (state) => {
          return state.renewSummary.renewed >= 0
       },
@@ -134,8 +144,9 @@ const user = {
       },
       hasAccountInfo: state => {
          if (state.signedInUser.length == 0 || state.role == '')  return false
+         if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.id != state.signedInUser) return false
-         return true
+         return (state.noAccount==false)
       },
       libraries: (_state, getters, rootState) => {
          let pickupLibraries = rootState.system.pickupLibraries.slice()
@@ -162,6 +173,7 @@ const user = {
    },
 
    mutations: {
+      updateField,
       clearRenewSummary(state) {
          state.renewSummary = {renewed: -1, failed: -1, failures: []}
       },
@@ -273,8 +285,27 @@ const user = {
       setAccountInfo(state, data) {
          state.accountInfo = data.user
          state.accountInfo.leoAddress = data.leoLocation
+         state.noAccount = data.user.noAccount
+         if (localStorage.getItem("v4_requested") ) {
+            state.accountRequested = true
+         }
+         if ( state.noAccount) {
+            state.accountRequest.name = data.user.displayName
+            state.accountRequest.id = data.user.id
+            state.accountRequest.email = data.user.email
+            state.accountRequest.phone = ""
+            state.accountRequest.department = data.user.department
+            state.accountRequest.address1 = ""
+            state.accountRequest.address2 = ""
+            state.accountRequest.city = ""
+            state.accountRequest.state = ""
+            state.accountRequest.zip = ""
+         }
+         delete  state.accountInfo.noAccount
       },
       clear(state) {
+         state.accountRequest =  {name: "", id: "", email: "", phone: "", department: "",
+            address1: "", address2: "", city: "", state: ""}
          state.signedInUser = ""
          state.sessionType = ""
          state.accountInfo = {}
@@ -289,10 +320,16 @@ const user = {
          state.bills.splice(0, state.bills.length)
          Vue.$cookies.remove("v4_optout")
          localStorage.removeItem("v4_jwt")
+         localStorage.removeItem("v4_requested")
+         state.accountRequested = false
       },
       setBills(state, bills) {
          state.bills = bills
       },
+      flagAccountRequested(state) {
+         state.accountRequested = true
+         localStorage.setItem("v4_requested", "yes")
+      }
    },
 
    actions: {
@@ -381,6 +418,9 @@ const user = {
             ctx.commit('preferences/setPreferences', prefs, { root: true })
             if ( prefs.searchTemplate ) {
                ctx.commit('query/setTemplate',  prefs.searchTemplate, { root: true })
+            }
+            if (response.data.user.noAccount && router.currentRoute.path != "/account") {
+               router.push( "/account" )
             }
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
@@ -538,6 +578,23 @@ const user = {
       },
       forgotPassword(_ctx, barcode) {
          return axios.post("/api/forgot_password", {userBarcode: barcode} )
+      },
+      async submitNewAccountRequest(ctx) {
+         ctx.commit('setLookingUp', true)
+         await axios.post("/api/requests/account", ctx.state.accountRequest ).then( _resp => {
+            ctx.commit('setLookingUp', false)
+            ctx.commit('flagAccountRequested')
+            window.scrollTo({
+               top: 0,
+               behavior: "auto"
+            })
+         }).catch ( error => {
+            console.log("Unable to request new account: "+error)
+            let msg = "System error, we regret the inconvenience. If this problem persists, "
+            msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+            ctx.commit("system/setError", msg, {root: true})
+            ctx.commit('setLookingUp', false)
+         })
       },
    }
 }
