@@ -152,6 +152,7 @@
             </div>
          </div>
       </template>
+      <iframe src="https://curio.lib.virginia.edu/view/uv/uv.html#?manifest=https%3a%2f%2fs3.us-east-1.amazonaws.com%2fiiif-manifest-cache-production%2fpid-uva-lib-2228211&c=0&m=0&s=0&cv=0&config=/public/uv.json&locales=en-GB:English (GB)" style="background:black;" width="800" height="600" allowfullscreen frameborder="0"></iframe>
    </div>
 </template>
 
