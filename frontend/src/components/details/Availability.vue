@@ -21,7 +21,7 @@
          <BoundWithItems v-if="hasBoundWithItems"/>
 
          <div class="items" v-if="hasItems || hasRequestOptions">
-            <RequestContainer :titleId="titleId" />
+            <RequestContainer :titleId="titleId" v-if="canMakeRequests" />
             <ul class="holdings" v-if="details.holdings.libraries">
                <li v-for="(lib, idx) in details.holdings.libraries" :key="`lib${idx}`">
                   {{lib.library}}
@@ -91,14 +91,24 @@ export default {
       },
       ...mapState({
          details : state => state.item.details,
+         requestOptions: state => state.requests.requestOptions,
+         noILSAccount: state => state.user.noILSAccount,
       }),
       ...mapGetters({
          availability: 'item/availability',
          hasRequestOptions: 'requests/hasRequestOptions',
          hasBoundWithItems: 'item/hasBoundWithItems',
          isGuest: 'user/isGuest',
-         noILSAccount: 'user/noILSAccount',
       }),
+      canMakeRequests() {
+         if ( this.noILSAccount) {
+            if (this.requestOptions.find( ro => ro.sign_in_required === false)) {
+               return true
+            }
+            return false
+         }
+         return this.hasRequestOptions
+      },
       hasItems(){
          return Array.isArray(this.availability.items) && this.availability.items.length > 0
 

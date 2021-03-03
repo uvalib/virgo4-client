@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex"
+import { mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
 export default {
    data: function()  {
@@ -79,9 +79,7 @@ export default {
          lookingUp: state => state.user.lookingUp,
          accountRequest: state => state.user.accountRequest,
          accountRequested: state => state.user.accountRequested,
-      }),
-      ...mapGetters({
-         noILSAccount: 'user/noILSAccount',
+         noILSAccount: state => state.user.noILSAccount,
       }),
       ...mapFields({
          id: "user.accountRequest.id",

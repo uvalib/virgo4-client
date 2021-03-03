@@ -6,7 +6,7 @@
          <V4Spinner message="Looking up requests..." />
       </div>
       <div class="details" v-if="isSignedIn">
-         <template v-if="!isGuest &&  !noILSAccount">
+         <template v-if="!noILSAccount">
             <h2>Make a New Request</h2>
             <div v-if="!isHSLUser" class="subcontent buttons">
                <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
@@ -193,7 +193,8 @@ export default {
          lookingUp: state => state.user.lookingUp,
          devServer: state => state.system.devServer,
          hsILLiadURL: state => state.system.hsILLiadURL,
-         ilsError: state => state.system.ilsError
+         ilsError: state => state.system.ilsError,
+         noILSAccount: state => state.user.noILSAccount,
       }),
       ...mapGetters({
          isDevServer: "system/isDevServer",
@@ -201,7 +202,6 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isGuest: 'user/isGuest',
          hasSysError: "system/hasError",
-         noILSAccount: 'user/noILSAccount',
       }),
       illiadRequests() {
          return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&

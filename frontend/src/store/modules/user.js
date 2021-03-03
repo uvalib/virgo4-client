@@ -20,7 +20,7 @@ const user = {
       authToken: "",
       authorizing: false,
       signedInUser: "",
-      role: "",
+      role: "guest",
       sessionType: "",
       accountInfo: {},
       claims: {},
@@ -36,7 +36,7 @@ const user = {
       lockedOut: false,
       parsedJWT: {},
       authExpiresAt: 0,
-      noAccount: false,
+      noILSAccount: false,
       accountRequest: {name: "", id: "", email: "", phone: "", department: "",
          address1: "", address2: "", city: "", state: "", zip: ""},
       accountRequested: false
@@ -44,10 +44,6 @@ const user = {
 
    getters: {
       getField,
-      noILSAccount: (state, getters) => {
-         if (getters.isSignedIn == false ) return false
-         return state.noAccount
-      },
       hasRenewSummary: (state) => {
          return state.renewSummary.renewed >= 0
       },
@@ -146,7 +142,7 @@ const user = {
          if (state.signedInUser.length == 0 || state.role == '')  return false
          if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.id != state.signedInUser) return false
-         return (state.noAccount==false)
+         return (state.noILSAccount==false)
       },
       libraries: (_state, getters, rootState) => {
          let pickupLibraries = rootState.system.pickupLibraries.slice()
@@ -284,11 +280,11 @@ const user = {
       setAccountInfo(state, data) {
          state.accountInfo = data.user
          state.accountInfo.leoAddress = data.leoLocation
-         state.noAccount = data.user.noAccount
+         state.noILSAccount = data.user.noILSAccount
          if (localStorage.getItem("v4_requested") ) {
             state.accountRequested = true
          }
-         if ( state.noAccount) {
+         if ( state.noILSAccount) {
             state.accountRequest.name = data.user.displayName
             state.accountRequest.id = data.user.id
             state.accountRequest.email = data.user.email
@@ -300,7 +296,7 @@ const user = {
             state.accountRequest.state = ""
             state.accountRequest.zip = ""
          }
-         delete  state.accountInfo.noAccount
+         delete  state.accountInfo.noILSAccount
       },
       clear(state) {
          state.accountRequest =  {name: "", id: "", email: "", phone: "", department: "",
@@ -312,7 +308,7 @@ const user = {
          state.authExpiresAt = 0
          state.authMessage = ""
          state.authToken = ""
-         state.role = ""
+         state.role = "guest"
          state.lockedOut = false
          state.checkouts.splice(0, state.checkouts.length)
          state.renewSummary = {renewed: 0, failed: 0, failures: []}
@@ -321,6 +317,7 @@ const user = {
          localStorage.removeItem("v4_jwt")
          localStorage.removeItem("v4_requested")
          state.accountRequested = false
+         state.noILSAccount = false
       },
       setBills(state, bills) {
          state.bills = bills
@@ -418,7 +415,7 @@ const user = {
             if ( prefs.searchTemplate ) {
                ctx.commit('query/setTemplate',  prefs.searchTemplate, { root: true })
             }
-            if (response.data.user.noAccount && router.currentRoute.path != "/account") {
+            if (response.data.user.noILSAccount && router.currentRoute.path != "/account") {
                router.push( "/account" )
             }
             ctx.commit('setLookingUp', false)
