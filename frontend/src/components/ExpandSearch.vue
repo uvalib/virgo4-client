@@ -23,7 +23,6 @@ export default {
    methods: {
       widenSearch() {
          this.searchSources = "all"
-         localStorage.setItem("v4SearchSources", this.searchSources)
          let query = Object.assign({}, this.$route.query)
          if (query.q) {
             delete query.page

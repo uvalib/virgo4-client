@@ -52,7 +52,6 @@ export default {
       sourcesClicked( setting ) {
          if ( this.searchSources  != setting ) {
             this.searchSources = setting
-            localStorage.setItem("v4SearchSources", setting)
             let query = Object.assign({}, this.$route.query)
             if (query.q) {
                delete query.page

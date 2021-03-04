@@ -119,11 +119,6 @@ export default {
    },
 
    created: async function() {
-      let cachedSrc = localStorage.getItem('v4SearchSources')
-      if (cachedSrc) {
-         this.searchSources = cachedSrc
-      }
-
       // When restoring a saved search, the call will be /search/:token
       let token = this.$route.params.id
       if ( token ) {
