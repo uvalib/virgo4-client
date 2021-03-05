@@ -1,5 +1,5 @@
 <template>
-   <button tabindex="0" role="button" class="v4-download-button"
+   <button tabindex="0" role="button" class="v4-download-button" :class="{text: mode != 'button'}"
       @click.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <template v-if="icon && iconInline">
          <span class="download-text">
@@ -32,6 +32,10 @@ export default {
       label: {
          type: String,
          required: true
+      },
+      mode: {
+         type: String,
+         default: "text"
       }
    },
    methods: {
@@ -53,12 +57,14 @@ export default {
    margin-left: 6px;
    font-size: 0.9em;
 }
+
 .v4-download-button {
-   border: none;
-   outline: none;
-   background: transparent;
-   margin: 0 15px 0 0;
-   padding:2px;
+   background-color: var(--uvalib-brand-blue-light);
+   border: 1px solid var(--uvalib-brand-blue-light);
+   margin: 0 0 5px 10px;
+   border-radius: 5px;
+   font-weight: normal;
+   padding: 0;
    cursor: pointer;
 
    &:focus {
@@ -73,11 +79,26 @@ export default {
       font-weight: normal;
    }
    .download-text {
-      color: var(--color-link);
+      color: white;
       font-weight: 500;
+      margin: .5em 1em;
+      display: inline-block;
    }
    .download-text:hover {
       text-decoration: underline;
+   }
+}
+.v4-download-button.text {
+   border: none;
+   outline: none;
+   background: transparent;
+   margin: 0 15px 0 0;
+   padding: 2px;
+   .download-text {
+      color: var(--color-link);
+      font-weight: 500;
+      margin: 0;
+      display: inline-block;
    }
 }
 </style>

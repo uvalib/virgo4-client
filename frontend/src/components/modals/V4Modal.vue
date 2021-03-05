@@ -136,8 +136,10 @@ div.v4-modal {
    div.v4-modal-controls {
       padding: 10px;
       font-size: 0.9em;
-      text-align: right;
       margin: 0;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-end;
    }
 }
 @media only screen and (min-width: 768px) {

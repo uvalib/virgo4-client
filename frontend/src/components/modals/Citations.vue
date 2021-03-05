@@ -1,7 +1,5 @@
 <template>
-   <V4Modal :id="id" :title="title" ref="citationsdlg"
-      :firstFocusID="`${id}-dismissbtn`" :buttonID="`${id}-open`" @opened="opened"
-   >
+   <V4Modal :id="id" :title="title" ref="citationsdlg" :buttonID="`${id}-open`" @opened="opened">
       <template v-slot:button>
          <V4Button v-if="buttonLabel" :mode="buttonMode" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
              :icon="citationIcon" :aria-label="ariaLabel"
@@ -22,27 +20,43 @@
                <p class="error">{{citations}}</p>
             </template>
             <template v-else>
-               <table class="citations">
-                  <tr v-for="(citation,idx) in citations" :key="`cval-${idx}`">
-                     <template v-if="citation.label">
-                        <td v-if="!singleFormat" class="label">{{citation.label}}:</td>
-                        <td class="value"><span v-html="citation.value"></span></td>
-                        <td class="copy-button">
-                           <V4Button mode="text-button" @click="copyCitation(citation,idx)">{{citation.copyButtonText}}</V4Button>
-                        </td>
-                     </template>
-                  </tr>
-               </table>
-               <V4DownloadButton v-if="!singleFormat" icon="fas fa-file-export" label="Download RIS Citation" :url="risURL"
-                  @click="downloadRISClicked" :aria-label="`export RIS citation for ${itemID}`"
-               />
+               <div class="citations" v-if="format=='all'">
+                  <div class="list">
+                     <V4Button v-for="(citation,idx) in citations" :key="citation.label"
+                        mode="text" class="citation" :class="{selected: idx == selectedIdx}"
+                        :focusBackOverride="true" @tabback="backTabCitation(idx)"
+                        @click="citationSelected(idx)" :id="`citation-tab${idx}`">
+                        {{citation.label}}
+                     </V4Button>
+                  </div>
+                  <div class="citation-text">
+                      <span v-html="citations[selectedIdx].value"></span>
+                  </div>
+               </div>
+               <div v-else class="citation">
+                  <span v-html="citations[0].value"></span>
+               </div>
             </template>
+            <div class="messagebox">
+               <span v-if="message" class="info">{{message}}</span>
+               <span v-if="error" class="error">{{error}}</span>
+            </div>
          </div>
       </template>
       <template v-slot:controls>
+         <V4DownloadButton v-if="format == 'all'" style="padding-left:0" label="Download RIS" :url="risURL"
+            @click="downloadRISClicked" id="download-citation"
+            icon="fas fa-file-export" :iconInline="true" mode="button"
+            :aria-label="`download RIS citation for ${itemID}`"
+         />
+         <V4Button mode="primary" id="copy-citation"
+            :focusBackOverride="true" @tabback="backTabCopy"
+            @click="copyCitation()">
+            Copy Citation
+         </V4Button>
          <V4Button mode="primary" :id="`${id}-dismissbtn`" @click="dismissClicked"
-            :focusNextOverride="true">
-            Dismiss
+            :focusNextOverride="true" @tabnext="nextTabClose">
+            Close
          </V4Button>
       </template>
    </V4Modal>
@@ -100,7 +114,10 @@ export default {
       return {
          loading: true,
          failed: false,
-         citations: null
+         citations: null,
+         selectedIdx: 0,
+         error: "",
+         message: ""
       };
    },
    components: {
@@ -145,18 +162,18 @@ export default {
       },
    },
    methods: {
+      citationSelected(idx) {
+         this.selectedIdx = idx
+      },
       opened() {
+         this.error = ""
+         this.message = ""
          this.loading = true
          this.failed = false
          this.citations = null
 
          this.$store.dispatch("item/getCitations", {format: this.format, itemURL: this.itemURL}).then( (response) => {
             var citations = response.data
-
-            citations.forEach(c => {
-               c.copyButtonText = "Copy"
-            })
-
             this.loading = false
             this.failed = false
             this.citations = citations
@@ -164,34 +181,66 @@ export default {
             this.loading = false
             this.failed = true
             this.citations = error
+         }).finally( ()=> {
+            this.setInitialFocus()
          })
       },
-      dismissClicked() {
-         this.$emit('dismissed')
-         setTimeout( () => {
-            if ( this.$refs.citationsdlg ) {
-               this.$refs.citationsdlg.hide()
+      setInitialFocus() {
+         let btn = document.getElementById("copy-citation")
+         if ( this.format == 'all') {
+            btn = document.getElementById("citation-tab0")
+         }
+         if ( !btn ) {
+            btn = document.getElementById(`${id}-dismissbtn`)
+         }
+         btn.focus()
+      },
+      nextTabClose() {
+         this.setInitialFocus()
+      },
+      backTabCitation( idx ) {
+         if ( idx == 0 ) {
+            document.getElementById(`${this.id}-dismissbtn`).focus()
+         } else {
+            idx--
+            let btn = document.getElementById(`citation-tab${idx}`)
+            btn.focus()
+         }
+      },
+      backTabCopy() {
+         let btn = document.getElementById(`${this.id}-dismissbtn`)
+         if ( this.format == 'all') {
+            btn = document.getElementById("download-citation")
+            if ( !btn ) {
+               document.getElementById(`${this.id}-dismissbtn`)
             }
-         }, 300)
+         }
+         btn.focus()
+      },
+      dismissClicked() {
+         this.$refs.citationsdlg.hide()
       },
       downloadRISClicked() {
          this.$analytics.trigger('Export', this.risFrom, this.itemID)
       },
-      copyCitation(citation, idx) {
+      copyCitation() {
          // strip html from citation.  this is safe since the source of the citation is trusted
+         let citation = this.citations[this.selectedIdx]
          var div = document.createElement("div")
          div.innerHTML = citation.value
          let text = div.textContent
 
          // message/errors pop up behind the citation modal on details page, so only show one if we have to
          this.$copyText(text).then( ()=> {
-            //this.$store.commit("system/setMessage", citation.label+" citation copied to clipboard.")
-            this.citations.forEach((c, i) => {
-              c.copyButtonText = (i == idx) ? "Copied" : "Copy"
-            })
+            this.message = citation.label+" citation copied to clipboard."
          }, e => {
-            this.$store.commit("system/setError", "Unable to copy "+citation.label+" citation: "+e)
+            this.error =  "Unable to copy "+citation.label+" citation: "+e.toString()
          })
+         this.$nextTick( () => {document.getElementById("copy-citation").focus()} )
+         setTimeout( () => {
+            this.error = ""
+            this.message = ""
+         }, 5000)
       },
    }
 }
@@ -210,35 +259,81 @@ export default {
    padding: 2px;
 }
 .citations-content {
-   max-height: 400px;
-   overflow: scroll;
+   max-height: 500px;
 
-   td.label {
-      font-weight: bold;
-      text-align: right;
-      padding: 4px 8px;
-      white-space: nowrap;
-      vertical-align: top;
+   .messagebox {
+      min-height: 30px;
+   }
+   .info {
+      padding: 10px 0 0 0;
+      text-align: center;
+      color: var( --uvalib-blue-alt-dark);
+      font-style: italic;
+      display: inline-block;
+      width:100%;
+   }
+   .error {
+      display: inline-block;
+      padding: 10px 0 0 0;
+      text-align: center;
+      color: var( --uvalib-red-emergency);
+       width:100%;
    }
 
-   td.value {
-      margin: 0;
-      width: 100%;
-      text-align: left;
-      word-break: break-word;
-      -webkit-hyphens: auto;
-      -moz-hyphens: auto;
-      hyphens: auto;
-      padding: 4px 0px;
+   .citations {
+      .list {
+         font-weight: bold;
+         margin: 0;
+         text-align: left;
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: flex-start;
+         .v4-button.citation {
+            margin: 0;
+            padding: 8px 15px;
+            border-radius: 5px 5px 0 0;
+            color: var(--uvalib-text-dark);
+            border: 1px solid var(--uvalib-grey);
+            text-align: left;
+            border-bottom: 0;
+            background: var(--uvalib-grey-lightest);
+         }
+         .v4-button.citation.selected {
+            background: var(--uvalib-brand-blue-light);
+            color: white;
+         }
+      }
+      .citation-text {
+         padding: 20px;
+         border-radius: 0 5px 5px 5px;
+         border: 1px solid var(--uvalib-grey);
+         outline: 0;
+         max-height: 420px;
+         overflow: scroll;
+      }
    }
 
    .working {
       text-align: center;
       font-size: 1.25em;
    }
-
-   .copy-button {
-      text-align: right;
+}
+@media only screen and (min-width: 768px) {
+   .citations-content {
+      max-height: 500px !important;
+      min-width: 450px;
+   }
+   .citation-text {
+      max-height: 420px !important;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .citations-content {
+      max-height: 365px !important;
+      min-width: 350px;
+   }
+   .citation-text {
+      max-height: 260px !important;
    }
 }
 </style>
