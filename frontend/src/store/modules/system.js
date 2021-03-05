@@ -206,12 +206,13 @@ const system = {
             axios.interceptors.request.use( async config => {
                let availRegex = new RegExp(`${ctx.state.availabilityURL}`)
                let citationRegex = new RegExp(`${ctx.state.citationsURL}`)
+               let pdaRegex = new RegExp(/pda-ws/)
 
                let url = config.url
                if ( url.match(/\/api\/reauth/) || url.match(/\/api\/error/)) {
                   // these methods need an auth token to log/verify, but it is ok if expired
                   config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-               } else if ( url.match(/\/api\//) || url.match(availRegex) || url.match(citationRegex) ) {
+               } else if ( url.match(/\/api\//) || url.match(availRegex) || url.match(citationRegex) || url.match(pdaRegex) ) {
                   // These calls all need active auth token
                   config.timeout = 0
                   if ( url.match(/\/checkouts/) ) {
