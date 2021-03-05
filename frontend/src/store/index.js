@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import analytics from '../analytics'
 import versionChecker from './plugins/version'
 import errorReporter from './plugins/error_reporter'
 import bookmarks from './modules/bookmarks'
@@ -550,6 +551,9 @@ export default new Vuex.Store({
                commit('updateOtherPoolLabel')
             }
             commit('setSearching', false)
+            if ( response.data.total_hits == 0) {
+               analytics.trigger('Results', 'NO_RESULTS', router.currentRoute.fullPath)
+            }
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
             commit('setSearching', false)
@@ -610,7 +614,9 @@ export default new Vuex.Store({
             // if this is a direct single pool search, there will be no existing results. This call
             // will create them.
             commit('addPoolSearchResults', response.data)
-
+            if ( response.data.pagination.total == 0 ) {
+               analytics.trigger('Results', 'NO_RESULTS', router.currentRoute.fullPath)
+            }
 
             commit('setSearching', false)
             if (state.otherSrcSelection.id != "") {
