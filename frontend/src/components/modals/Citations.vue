@@ -21,16 +21,24 @@
             </template>
             <template v-else>
                <div class="citations" v-if="format=='all'">
-                  <div class="list">
+                  <label>Choose a citation format</label>
+                  <ul class="list">
+                     <li>
                      <V4Button v-for="(citation,idx) in citations" :key="citation.label"
                         mode="text" class="citation" :class="{selected: idx == selectedIdx}"
                         :focusBackOverride="true" @tabback="backTabCitation(idx)"
-                        @click="citationSelected(idx)" :id="`citation-tab${idx}`">
+                        @click="citationSelected(idx)"
+                        :id="`citation-tab${idx}`"
+                     >
                         {{citation.label}}
                      </V4Button>
-                  </div>
-                  <div class="citation-text">
-                      <span v-html="citations[selectedIdx].value"></span>
+                     </li>
+                  </ul>
+                  <div aria-live="polite">
+                     <label>{{citations[selectedIdx].label}} Citation</label>
+                     <div class="citation-text">
+                        <span v-html="citations[selectedIdx].value"></span>
+                     </div>
                   </div>
                </div>
                <div v-else class="citation">
@@ -47,7 +55,7 @@
          <V4DownloadButton v-if="format == 'all'" style="padding-left:0" label="Download RIS" :url="risURL"
             @click="downloadRISClicked" id="download-citation"
             icon="fas fa-file-export" :iconInline="true" mode="button"
-            :aria-label="`download RIS citation for ${itemID}`"
+            aria-label="download RIS citation"
          />
          <V4Button mode="primary" id="copy-citation"
             :focusBackOverride="true" @tabback="backTabCopy"
@@ -280,22 +288,31 @@ export default {
        width:100%;
    }
 
+   label {
+      display: block;
+      margin: 10px 0 5px 0;
+      font-weight: bold;
+   }
+
    .citations {
       .list {
+         list-style: none;
+         padding: 0;
          font-weight: bold;
-         margin: 0;
+         margin: 0 0 20px 0;
          text-align: left;
          display: flex;
          flex-flow: row wrap;
          justify-content: flex-start;
+
          .v4-button.citation {
-            margin: 0;
+            margin: 0 5px 0 0;
             padding: 8px 15px;
-            border-radius: 5px 5px 0 0;
+            border-radius: 5px;
             color: var(--uvalib-text-dark);
             border: 1px solid var(--uvalib-grey);
             text-align: left;
-            border-bottom: 0;
+            // border-bottom: 0;
             background: var(--uvalib-grey-lightest);
          }
          .v4-button.citation.selected {
@@ -304,10 +321,8 @@ export default {
          }
       }
       .citation-text {
-         padding: 20px;
-         border-radius: 0 5px 5px 5px;
-         border: 1px solid var(--uvalib-grey);
          outline: 0;
+         min-height: 75px;
          max-height: 420px;
          overflow: scroll;
       }
@@ -321,7 +336,7 @@ export default {
 @media only screen and (min-width: 768px) {
    .citations-content {
       max-height: 500px !important;
-      min-width: 450px;
+      min-width: 550px;
    }
    .citation-text {
       max-height: 420px !important;
@@ -334,6 +349,7 @@ export default {
    }
    .citation-text {
       max-height: 260px !important;
+      width: 95%;
    }
 }
 </style>
