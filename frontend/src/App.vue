@@ -384,7 +384,6 @@ body {
    position: fixed !important;
    top: 0;
    width: 100%;
-   z-index: 10000;
 }
 #app .screen-reader-text {
    clip: rect(1px, 1px, 1px, 1px);
@@ -419,7 +418,7 @@ body {
    position: fixed;
    left: 0;
    right: 0;
-   z-index: 500;
+   z-index: 20;
    box-sizing: border-box;
 }
 
@@ -429,7 +428,7 @@ body {
    top: 0;
    width: 100%;
    height: 100%;
-   z-index: 1000;
+   z-index: 10;
    background: rgba(0, 0, 0, 0.2);
 }
 

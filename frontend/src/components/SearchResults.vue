@@ -296,14 +296,11 @@ div.pool-tabs {
    background: #FFF;
    outline: none;
    &:focus {
-      z-index: 10;
+      z-index: 1;
       &:focus {
          @include be-accessible();
       }
    }
-}
-.pool-results {
-   z-index: 11;
 }
 .pool.v4-button:first-child {
   margin-left: 4px;

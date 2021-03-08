@@ -1,5 +1,12 @@
 <template>
-   <div class="v4-modal-wrapper">
+   <div class="v4-modal-wrapper"
+      @keydown.stop.prevent.down
+      @keydown.stop.prevent.up
+      @keyup.stop.prevent.down
+      @keyup.stop.prevent.up
+      @keyup.stop.prevent.left
+      @keyup.stop.prevent.right
+   >
       <slot name="button"></slot>
       <transition name="fade">
          <div class="v4-modal-dimmer" v-if="isOpen">
