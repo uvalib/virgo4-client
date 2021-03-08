@@ -291,7 +291,6 @@ func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 	q.Bind(dbx.Params{"id": userID})
 	err := q.One(&user)
 	if err != nil {
-		log.Printf("ERROR: find user %s failed: %s", userID, err.Error())
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
 		user := V4User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 		addErr := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
