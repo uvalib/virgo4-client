@@ -280,7 +280,7 @@ const user = {
       setAccountInfo(state, data) {
          state.accountInfo = data.user
          state.accountInfo.leoAddress = data.leoLocation
-         state.noILSAccount = data.user.noILSAccount
+         state.noILSAccount = data.user.noAccount
          if (localStorage.getItem("v4_requested") ) {
             state.accountRequested = true
          }
@@ -296,7 +296,7 @@ const user = {
             state.accountRequest.state = ""
             state.accountRequest.zip = ""
          }
-         delete  state.accountInfo.noILSAccount
+         delete  state.accountInfo.noAccount
       },
       clear(state) {
          state.accountRequest =  {name: "", id: "", email: "", phone: "", department: "",
