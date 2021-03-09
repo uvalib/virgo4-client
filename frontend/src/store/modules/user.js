@@ -142,7 +142,7 @@ const user = {
          if (state.signedInUser.length == 0 || state.role == '')  return false
          if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.id != state.signedInUser) return false
-         return (state.noILSAccount==false)
+         return (state.noILSAccount != true)
       },
       libraries: (_state, getters, rootState) => {
          let pickupLibraries = rootState.system.pickupLibraries.slice()
