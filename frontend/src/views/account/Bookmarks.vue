@@ -43,6 +43,9 @@
                                     </V4Button>
                                  </div>
                                  <div class="button-group">
+                                    <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder, folderInfo.bookmarks)">
+                                       Export
+                                    </V4Button>
                                     <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                                        :id="`print-bookmarks-${folderInfo.id}`"
                                     />
@@ -170,6 +173,26 @@ export default {
       })
    },
    methods: {
+      exportBookmarks(folder, bookmarks) {
+         let out = ["identifier,title,author,url\n"]
+         bookmarks.forEach(bm=>{
+            let auth = bm.details.author
+            if ( auth == 'undefinied' ) {
+               auth = "N/A"
+            }
+            let url = window.location.href
+            let bmURL = this.detailsURL(bm)
+            url = url.replace("/bookmarks", bmURL)
+            out.push(`${bm.identifier},${bm.details.title},${bm.details.author},${url}\n`)
+         })
+         const fileURL = window.URL.createObjectURL(new Blob(out))
+         const fileLink = document.createElement('a')
+         fileLink.href = fileURL
+         fileLink.setAttribute('download', `bookmarks-${folder}.csv`)
+         document.body.appendChild(fileLink)
+         fileLink.click()
+         window.URL.revokeObjectURL(fileURL)
+      },
       bookmarkFollowed(identifier) {
          this.$analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
       },
