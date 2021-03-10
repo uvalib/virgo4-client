@@ -151,6 +151,9 @@ export default {
                let data = {reset_password_token: this.passwordToken, new_password: this.newPassword}
                this.$store.dispatch("user/changePasswordWithToken", data).then(() => {
                   this.passwordChanged = true
+                  let query = Object.assign({}, this.$route.query);
+                  delete query.token;
+                  this.$router.replace({ query });
                }).catch((e) => {
                   console.log(e)
                   this.$refs.newPassword.focus()
