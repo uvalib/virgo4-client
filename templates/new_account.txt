@@ -15,4 +15,6 @@ Mailing Address
 {{- end}}
 {{.City}}
 {{.State}}, {{.Zip}}
+
+https://scorpius.lib.virginia.edu/cgi-bin/whois.pl?string
 _______________________________________________________________________
