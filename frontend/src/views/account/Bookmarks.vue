@@ -177,17 +177,19 @@ export default {
          let out = ["identifier,title,author,url\n"]
          bookmarks.forEach(bm=>{
             let auth = bm.details.author
-            if ( auth == 'undefinied' ) {
+            if ( auth === undefined ) {
                auth = "N/A"
             }
             let url = window.location.href
             let bmURL = this.detailsURL(bm)
             url = url.replace("/bookmarks", bmURL)
-            out.push(`${bm.identifier},${bm.details.title},${bm.details.author},${url}\n`)
+            let title = bm.details.title.replace(/"/g, '""')
+            auth =  auth.replace(/"/g, '""')
+            out.push(`"${bm.identifier}","${title}","${auth}","${url}"\n`)
          })
-         const fileURL = window.URL.createObjectURL(new Blob(out))
+         const fileURL = window.URL.createObjectURL(new Blob(out, { type: 'text/csv' }))
          const fileLink = document.createElement('a')
-         fileLink.href = fileURL
+         fileLink.href =  fileURL
          fileLink.setAttribute('download', `bookmarks-${folder}.csv`)
          document.body.appendChild(fileLink)
          fileLink.click()
