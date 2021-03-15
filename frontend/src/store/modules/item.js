@@ -58,6 +58,12 @@ const item = {
             if (data.type == "PDF") {
                dc.pdf.status = data.status
             }
+            if ( data.type == "OCR") {
+               dc.ocr.status = "NOT_AVAIL"
+               if ( data.status.has_ocr ) {
+                  dc.ocr.status = "READY"
+               }
+            }
             // splice is reactive, use it to replace the item in array
             state.digitalContent.splice(dcIdx, 1, dc)
          }
@@ -75,21 +81,32 @@ const item = {
       },
       setDigitalContentData(state, data) {
          state.digitalContent.splice(0, state.digitalContent.length)
-         data.parts.filter( dc => dc.pdf).forEach( item => {
-            state.digitalContent.push({
-               pdf: {
-                  status: "UNKNOWN",
-                  url: item.pdf.urls.download,
-                  generateURL: item.pdf.urls.generate,
-                  statusURL: item.pdf.urls.status,
-               },
+         data.parts.forEach( item => {
+            let dc = {
                oEmbedURL: item.oembed_url,
                name: item.label,
                pid: item.pid,
                thumbnail: item.thumbnail_url
-            })
+            }
+            if (item.pdf) {
+               dc.pdf = {
+                  status: "UNKNOWN",
+                  url: item.pdf.urls.download,
+                  generateURL: item.pdf.urls.generate,
+                  statusURL: item.pdf.urls.status,
+               }
+            }
+            if (item.ocr) {
+               dc.ocr = {
+                  status: "UNKNOWN",
+                  url: item.ocr.urls.download,
+                  generateURL: item.ocr.urls.generate,
+                  statusURL: item.ocr.urls.status,
+               }
+
+            }
+            state.digitalContent.push(dc)
          })
-         // TODO support OC... just merge the OCR links info into the digital content above
       },
       setGoogleBooksURL(state, data) {
          if (data.items[0].accessInfo.webReaderLink) {
@@ -160,6 +177,14 @@ const item = {
             ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "PDF", status: response.data})
          } catch(error) {
             ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "PDF", status: "NOT_AVAIL"})
+         }
+      },
+      async getOCRStatus(ctx, item) {
+         try {
+            let response = await axios.get(item.ocr.statusURL)
+            ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "OCR", status: response.data})
+         } catch(error) {
+            ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "OCR", status: "NOT_AVAIL"})
          }
       },
 
@@ -283,7 +308,8 @@ const item = {
                router.replace(redirect)
             } else {
                ctx.commit("clearDetails")
-               router.push(`/not_found`)
+               let q = `identifier: {${catalogKey}}`
+               router.push(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
             }
          }).catch((error) => {
             ctx.commit('clearSearching')
