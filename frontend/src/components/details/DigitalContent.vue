@@ -27,13 +27,21 @@
          </template>
 
          <div v-else class="value">
-            <vue-horizontal-list :items="pdfContent"
-               :options="{item: {class: 'pdf', padding: 0}, navigation: {start: 576}, list: {padding:0}}"
-            >
-               <template v-slot:default="{item}">
-                  <div class="download-card" role="button" :class="{current: isCurrent(item)}" @click.stop="viewerClicked(item)">
+            <div class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></div>
+            <div class="hscroller">
+               <div class="hcontent">
+                  <div v-for="item in pdfContent" :key="item.pid"
+                     class="download-card" role="button"
+                     :class="{current: isCurrent(item)}"
+                     @click.stop="viewerClicked(item)"
+                  >
                      <V4ProgressBar v-if="generatePDFInProgress(item)" :id="item.name"
+                        :style="{top: pdfTop(item)}"
                         :percent="item.pdf.status" label="Generating PDF"
+                     />
+                     <V4ProgressBar v-if="generateOCRInProgress(item)" :id="item.name"
+                        :style="{top: ocrTop(item)}"
+                        :percent="item.ocr.status" label="Extracting Text"
                      />
                      <img v-if="item.thumbnail" :src="item.thumbnail"/>
                      <span class="label">{{item.name}}</span>
@@ -45,6 +53,11 @@
                      >
                         Download PDF
                      </span>
+                     <OCRRequest v-if="isSignedIn && item.ocr"
+                        :id="'ocr-${item.details.identifier}'"
+                        :dcIndex="digitalContentIndex(item)"
+                        @ocr-started="ocrStarted(item)"
+                     />
                      <span class="link" tabindex="0"
                         @click.stop="viewerClicked(item)"
                         @keyup.stop.enter="viewerClicked(item)"
@@ -55,8 +68,8 @@
                         Open in Viewer
                      </span>
                   </div>
-               </template>
-            </vue-horizontal-list>
+               </div>
+            </div>
          </div>
 
          <div class="google" v-if="googleBooksURL">
@@ -71,14 +84,16 @@
 <script>
 import { mapState, mapGetters } from "vuex"
 import V4ProgressBar from "@/components/V4ProgressBar"
-import VueHorizontalList from 'vue-horizontal-list'
+import OCRRequest from "@/components/modals/OCRRequest"
 export default {
    components: {
-      VueHorizontalList, V4ProgressBar
+      V4ProgressBar, OCRRequest
    },
    data: function() {
       return {
          selectedDigitalObjectIdx: 0,
+         pdfTimerID: -1,
+         ocrTimerID: -1
       }
    },
    watch: {
@@ -103,6 +118,7 @@ export default {
       ...mapGetters({
          hasDigitalContent: 'item/hasDigitalContent',
          poolDetails: 'pools/poolDetails',
+         isSignedIn: 'user/isSignedIn'
       }),
       hasExternalImages() {
          let iiifField = this.details.detailFields.find( f => f.name=="iiif_image_url")
@@ -162,9 +178,28 @@ export default {
          let curr = this.digitalContent[this.selectedDigitalObjectIdx]
          return (curr.pid == item.pid)
       },
+      digitalContentIndex( item) {
+         return this.digitalContent.findIndex( i => i.pid == item.pid)
+      },
+      ocrTop(item) {
+         if ( this.generatePDFInProgress(item) ) {
+            return "65%"
+         }
+         return "40%"
+      },
+      pdfTop(item) {
+         if ( this.generateOCRInProgress(item) ) {
+            return "30%"
+         }
+         return "40%"
+      },
       generatePDFInProgress(item) {
          if ( !item.pdf) return false
          return !( item.pdf.status == "READY" || item.pdf.status == "ERROR" || item.pdf.status == "NOT_AVAIL" ||  item.pdf.status == "UNKNOWN")
+      },
+      generateOCRInProgress(item) {
+         if ( !item.ocr) return false
+         return !( item.ocr.status == "READY" || item.ocr.status == "NOT_AVAIL" ||  item.ocr.status == "UNKNOWN")
       },
       async pdfClicked( item ) {
          await this.$store.dispatch("item/getPDFStatus", item )
@@ -182,18 +217,38 @@ export default {
             await this.$store.dispatch("item/generatePDF", item)
          }
 
-         var timerID = setInterval( async () => {
+         this.pdfTimerID = setInterval( async () => {
              await this.$store.dispatch("item/getPDFStatus", item )
              if (item.pdf.status == "READY" || item.pdf.status == "100%") {
-               clearInterval(timerID)
+               clearInterval(this.pdfTimerID)
                window.location.href=item.pdf.url
             } else if (item.pdf.status == "ERROR" ) {
-               clearInterval(timerID)
+               clearInterval(this.pdfTimerID)
                this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable.")
             }
          }, 1000)
       },
+      ocrStarted(item) {
+         this.ocrTimerID = setInterval( async () => {
+             await this.$store.dispatch("item/getOCRStatus", item )
+             if (item.ocr.status == "READY" || item.ocr.status == "100%") {
+               clearInterval(this.ocrTimerID)
+               await this.$store.dispatch("item/downloadOCRText", item)
+            } else if (item.ocr.status == "ERROR" ) {
+               clearInterval(this.ocrTimerID)
+               this.store.commit('system/setError', "Sorry, unable to extract text for "+item.name)
+            }
+         }, 5000)
+      },
    },
+   destroyed() {
+      if ( this.ocrTimerID > -1) {
+         clearInterval(this.ocrTimerID)
+      }
+      if ( this.pdfTimerID > -1) {
+         clearInterval(this.pdfTimerID)
+      }
+   }
 }
 </script>
 <style lang="scss" scoped>
@@ -235,6 +290,8 @@ export default {
          padding: 15px 10px 10px 10px;
          box-shadow: $v4-box-shadow-light;
          cursor: pointer;
+         min-width: 150px;
+         background: white;
          &:hover {
             top: -2px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
@@ -248,14 +305,14 @@ export default {
             display: block;
             font-weight: 500;
             font-size:0.9em;
-            margin: 5px 0;
+            margin: 10px 0;
          }
          span.link {
             color: var(--color-link);
             font-size:0.9em;
             display: block;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin: 5px 0 10px 0;
             display: flex;
             flex-flow: row nowrap;
             justify-content: center;
@@ -324,6 +381,27 @@ export default {
             box-shadow: 0px 2px 8px 0 #444;
          }
       }
+   }
+}
+.do-header {
+   background: #efefef;
+   border: 1px solid var(--uvalib-grey-light);
+   border-bottom: 0;
+   padding: 10px 0 5px 0;
+   text-align: center;
+}
+.hscroller {
+   overflow: scroll;
+   background: #efefef;
+   border: 1px solid var(--uvalib-grey-light);
+   border-top: 0;
+
+   .hcontent {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: stretch;
+      padding: 0 15px 15px 15px;
    }
 }
 ::v-deep .pdf {

@@ -60,8 +60,10 @@ const item = {
             }
             if ( data.type == "OCR") {
                dc.ocr.status = "NOT_AVAIL"
-               if ( data.status.has_ocr ) {
+               if ( data.status.has_ocr ||  data.status.has_transcription) {
                   dc.ocr.status = "READY"
+               } else if ( data.status.ocr_progress ) {
+                  dc.ocr.status = data.status.ocr_progress
                }
             }
             // splice is reactive, use it to replace the item in array
@@ -165,9 +167,8 @@ const item = {
       async generatePDF(ctx, item ) {
          try {
             await axios.get(item.pdf.generateURL)
-            ctx.dispatch("getDigitalContentStatus", item.name)
+            await ctx.dispatch("getPDFStatus", item)
          } catch (err) {
-            console.error("Unable to generate PDF "+item.pdf.url+": "+err)
             ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "PDF", status: "ERROR"})
          }
       },
@@ -179,6 +180,14 @@ const item = {
             ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "PDF", status: "NOT_AVAIL"})
          }
       },
+      async generateOCR(ctx, {item, email} ) {
+         let url = `${item.ocr.generateURL}?email=${email}`
+         await axios.get(url).catch( err => {
+            console.log("OCR FAILED: "+err)
+            ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "PDF", status: "ERROR"})
+         })
+         await ctx.dispatch("getOCRStatus", item)
+      },
       async getOCRStatus(ctx, item) {
          try {
             let response = await axios.get(item.ocr.statusURL)
@@ -187,7 +196,21 @@ const item = {
             ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "OCR", status: "NOT_AVAIL"})
          }
       },
-
+      async downloadOCRText( ctx, item) {
+         await axios.get(item.ocr.url).then( response => {
+            const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: 'text/plain' }))
+            const fileLink = document.createElement('a')
+            fileLink.href =  fileURL
+            fileLink.setAttribute('download', `${item.name}.txt`)
+            document.body.appendChild(fileLink)
+            fileLink.click()
+            window.URL.revokeObjectURL(fileURL)
+            ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "OCR", status: "READY"})
+         }).catch( e => {
+            console.error("Unable to download OCR text: "+e)
+            ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "OCR", status: "ERROR"})
+         })
+      },
       getDigitalContent(ctx) {
          let allFields = ctx.state.details.basicFields.concat(ctx.state.details.detailFields)
          let dcField = allFields.find( f=>f.name=="digital_content_url")

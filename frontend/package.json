@@ -20,7 +20,6 @@
     "vue-barcode-reader": "^0.0.3",
     "vue-clipboard2": "^0.3.1",
     "vue-cookies": "^1.7.4",
-    "vue-horizontal-list": "^1.0.12",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.4.3",
     "vuex": "^3.6.0",
