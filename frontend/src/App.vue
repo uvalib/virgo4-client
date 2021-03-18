@@ -84,7 +84,8 @@ export default {
          authorizing: state => state.user.authorizing,
          sessionExpired: state => state.system.sessionExpired,
          devServer: state => state.system.devServer,
-         pageTitle: state => state.pageTitle
+         pageTitle: state => state.pageTitle,
+         noILSAccount: state => state.user.noILSAccount
       }),
       ...mapGetters({
          hasTranslateMessage: "system/hasTranslateMessage",
@@ -154,7 +155,9 @@ export default {
 
       if ( this.isSignedIn ) {
          await this.$store.dispatch("user/getAccountInfo")
-         this.$store.dispatch("user/getCheckouts")
+         if ( this.noILSAccount == false ) {
+            this.$store.dispatch("user/getCheckouts")
+         }
          this.$store.dispatch("bookmarks/getBookmarks")
          if ( this.$store.getters["user/isUndergraduate"]) {
             this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
