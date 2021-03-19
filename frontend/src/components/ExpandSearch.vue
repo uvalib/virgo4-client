@@ -1,7 +1,7 @@
 <template>
    <div v-if="searchSources != 'all'" class="expand-search">
       <div>You are currently searching {{scopeLabel}}. There may be more results if you search everything.</div>
-      <div>Click <V4Button mode="text" aria-label="broaden search" @click="widenSearch">here</V4Button> to broaden your search.</div>
+      <div><V4Button mode="text" aria-label="broaden search" @click="widenSearch">Click to broaden your search to Everything.</V4Button></div>
    </div>
 </template>
 
