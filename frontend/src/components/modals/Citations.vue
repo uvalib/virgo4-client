@@ -23,15 +23,15 @@
                <div class="citations" v-if="format=='all'">
                   <label>Choose a citation format</label>
                   <ul class="list">
-                     <li>
-                     <V4Button v-for="(citation,idx) in citations" :key="citation.label"
-                        mode="text" class="citation" :class="{selected: idx == selectedIdx}"
-                        :focusBackOverride="true" @tabback="backTabCitation(idx)"
-                        @click="citationSelected(idx)"
-                        :id="`citation-tab${idx}`"
-                     >
-                        {{citation.label}}
-                     </V4Button>
+                     <li v-for="(citation,idx) in citations" :key="citation.label">
+                        <V4Button
+                           mode="text" class="citation" :class="{selected: idx == selectedIdx}"
+                           :focusBackOverride="true" @tabback="backTabCitation(idx)"
+                           @click="citationSelected(idx)"
+                           :id="`citation-tab${idx}`"
+                        >
+                           {{citation.label}}
+                        </V4Button>
                      </li>
                   </ul>
                   <div aria-live="polite">
@@ -45,7 +45,7 @@
                   <span v-html="citations[0].value"></span>
                </div>
             </template>
-            <div class="messagebox">
+            <div class="messagebox" aria-live="polite">
                <span v-if="message" class="info">{{message}}</span>
                <span v-if="error" class="error">{{error}}</span>
             </div>
