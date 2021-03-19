@@ -43,7 +43,7 @@
                                     </V4Button>
                                  </div>
                                  <div class="button-group">
-                                    <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder, folderInfo.bookmarks)">
+                                    <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder)">
                                        Export
                                     </V4Button>
                                     <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
@@ -173,27 +173,8 @@ export default {
       })
    },
    methods: {
-      exportBookmarks(folder, bookmarks) {
-         let out = ["identifier,title,author,url\n"]
-         bookmarks.forEach(bm=>{
-            let auth = bm.details.author
-            if ( auth === undefined ) {
-               auth = "N/A"
-            }
-            let url = window.location.href
-            let bmURL = this.detailsURL(bm)
-            url = url.replace("/bookmarks", bmURL)
-            let title = bm.details.title.replace(/"/g, '""')
-            auth =  auth.replace(/"/g, '""')
-            out.push(`"${bm.identifier}","${title}","${auth}","${url}"\n`)
-         })
-         const fileURL = window.URL.createObjectURL(new Blob(out, { type: 'text/csv' }))
-         const fileLink = document.createElement('a')
-         fileLink.href =  fileURL
-         fileLink.setAttribute('download', `bookmarks-${folder}.csv`)
-         document.body.appendChild(fileLink)
-         fileLink.click()
-         window.URL.revokeObjectURL(fileURL)
+      exportBookmarks(folder) {
+         this.$store.dispatch("bookmarks/exportBookmarks", folder )
       },
       bookmarkFollowed(identifier) {
          this.$analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)

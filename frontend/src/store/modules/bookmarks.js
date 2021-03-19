@@ -216,6 +216,26 @@ const bookmarks = {
              // no negative impact on client; just don't show shelf browse and log error
              ctx.dispatch("system/reportError", error, {root: true})
          })
+      },
+      async exportBookmarks(ctx, folderName) {
+         let items = []
+         let folder = ctx.state.bookmarks.find( bmf => bmf.folder == folderName )
+          folder.bookmarks.forEach( bm =>{
+            items.push( {pool: bm.pool, identifier: bm.identifier} )
+         })
+         let req = {title: folderName, notes: "", items: items}
+         let url = ctx.rootState.system.searchAPI + "/api/csv"
+         await axios.post(url, req, {responseType: "blob"}).then((response) => {
+            const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }))
+            const fileLink = document.createElement('a')
+            fileLink.href =  fileURL
+            fileLink.setAttribute('download', `bookmarks-${folderName}.csv`)
+            document.body.appendChild(fileLink)
+            fileLink.click()
+            window.URL.revokeObjectURL(fileURL)
+         }).catch((error) => {
+             ctx.dispatch("system/reportError", error, {root: true})
+         })
       }
    }
 }
