@@ -10,7 +10,7 @@
       <slot name="button"></slot>
       <transition name="fade">
          <div class="v4-modal-dimmer" v-if="isOpen">
-            <div role="dialog" :aria-labeledby="`${id}-title`" :id="id" class="v4-modal">
+            <div role="dialog" :aria-labelledby="`${id}-title`" :id="id" class="v4-modal">
                <div :id="`${id}-title`" class="v4-modal-title">{{title}}</div>
                <div class="v4-modal-content">
                   <slot name="content"></slot>

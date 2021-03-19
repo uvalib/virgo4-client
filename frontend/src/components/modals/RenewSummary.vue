@@ -1,7 +1,7 @@
 <template>
    <transition name="fade">
       <div class="summary-dimmer">
-         <div role="dialog" tabindex="0" aria-labeledby="renew-summary-title" id="renew-summary">
+         <div role="dialog" tabindex="0" aria-labelledby="renew-summary-title" id="renew-summary">
             <div tabindex="-1" id="renew-summary-title">Renew Summary</div>
              <div class="renew-content">
                 <div v-if="summary.renewed > 0"><strong>{{summary.renewed}}</strong> items successfully renewed.</div>
