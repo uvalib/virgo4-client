@@ -53,6 +53,7 @@ type ILSUserInfo struct {
 	Standing      string `json:"standing"`
 	AmountOwed    string `json:"amountOwed"`
 	HomeLibrary   string `json:"homeLibrary"`
+	PrivateLDAP   string `json:"private"`
 }
 
 // AccountRequest contains data required to request a Sirsi Account

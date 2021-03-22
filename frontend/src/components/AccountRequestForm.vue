@@ -1,5 +1,7 @@
 <template>
-   <div v-if="noILSAccount == true && accountRequested == false" class="signup-form pure-form  pure-form-stacked">
+   <div v-if="noILSAccount == true && accountRequested == false && publicLDAP"
+      class="signup-form pure-form  pure-form-stacked"
+   >
       <p>You do not currently have a UVA Library account. Please fill out the form below to request one.</p>
       <p>If you have already requested an account, click Ignore.</p>
       <div class="entry pure-control-group">
@@ -80,6 +82,7 @@ export default {
          accountRequest: state => state.user.accountRequest,
          accountRequested: state => state.user.accountRequested,
          noILSAccount: state => state.user.noILSAccount,
+         privateLDAP: state => state.user.accountInfo.private,
       }),
       ...mapFields({
          id: "user.accountRequest.id",
@@ -93,6 +96,9 @@ export default {
          state: "user.accountRequest.state",
          zip: "user.accountRequest.zip",
       }),
+      publicLDAP() {
+         return (this.privateLDAP == "false" || this.privateLDAP == false)
+      }
    },
    methods: {
       hasError( val) {
