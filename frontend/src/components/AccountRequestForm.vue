@@ -63,6 +63,15 @@
       <p class="light">You will be notified via email when the account has been created.</p>
       <p class="light">If you have any questions or problems, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.</p>
    </div>
+   <div v-else-if="noILSAccount == true && publicLDAP == false" class="signup-form pending">
+      <p class="light">
+         You have access to Virgo features such as bookmarks, search history, and preferences,
+         but don't have borrowing privileges.
+      </p>
+      <p class="light">
+         Contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> for more information.
+      </p>
+   </div>
 </template>
 
 <script>
