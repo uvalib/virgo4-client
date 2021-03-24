@@ -63,19 +63,25 @@
       <p class="light">You will be notified via email when the account has been created.</p>
       <p class="light">If you have any questions or problems, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.</p>
    </div>
-   <div v-else-if="noILSAccount == true && publicLDAP == false" class="signup-form pending">
-      <p class="light">
-         You have access to Virgo features such as bookmarks, search history, and preferences,
-         but don't have borrowing privileges.
+   <div v-else-if="canRequestAccount == false && accountRequested == false" class="signup-form no-signup">
+      <p class="left">Hello!</p>
+      <p class="left">It appears you do not have a UVA Library circulation account.</p>
+      <p class="light left">
+         The UVA Libraries are open to only current students, staff, and faculty.
+         If you are a current student, staff, or faculty and need an account, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
       </p>
-      <p class="light">
-         Contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> for more information.
+      <p class="light left">
+         If you are an alum, we apologize for the inconvenience. Once the libraries reopen to the public,
+         please visit one in person and we will be happy to register you. For information about library access,
+         please visit
+         <a target="_blank" href="https://www.library.virginia.edu/news/covid-19/#access">
+            https://www.library.virginia.edu/news/covid-19/#access</a>.
       </p>
    </div>
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import { mapFields } from "vuex-map-fields"
 export default {
    data: function()  {
@@ -91,7 +97,10 @@ export default {
          accountRequest: state => state.user.accountRequest,
          accountRequested: state => state.user.accountRequested,
          noILSAccount: state => state.user.noILSAccount,
-         privateLDAP: state => state.user.accountInfo.private,
+         accountInfo: state => state.user.accountInfo.private,
+      }),
+      ...mapGetters({
+         canRequestAccount: 'user/canRequestAccount',
       }),
       ...mapFields({
          id: "user.accountRequest.id",
@@ -105,9 +114,6 @@ export default {
          state: "user.accountRequest.state",
          zip: "user.accountRequest.zip",
       }),
-      publicLDAP() {
-         return (this.privateLDAP == "false" || this.privateLDAP == false)
-      }
    },
    methods: {
       hasError( val) {
@@ -158,6 +164,9 @@ export default {
    p.light {
       font-weight: normal;
    }
+   p.left {
+      text-align: left;
+   }
    input{
       width: 100%;
       margin-bottom: 15px !important;
@@ -183,5 +192,8 @@ export default {
 }
 .signup-form.pending {
    margin-top: 45px;
+}
+.signup-form.no-signup {
+   width: 80%;
 }
 </style>

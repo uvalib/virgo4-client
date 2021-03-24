@@ -52,6 +52,12 @@ const user = {
          if ( state.sessionType == "netbadge") return false
          return true
       },
+      canRequestAccount: (state, getters) => {
+         if (getters.hasAccountInfo == false ) return false
+         if (state.noILSAccount == false ) return false
+         if (state.accountInfo.description.toLowerCase().includes("alumni")) return false
+         return true
+      },
       isGuest: (state) => {
          return (state.role == 'guest' || state.role == '')
        },
