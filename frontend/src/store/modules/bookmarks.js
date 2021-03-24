@@ -223,7 +223,8 @@ const bookmarks = {
           folder.bookmarks.forEach( bm =>{
             items.push( {pool: bm.pool, identifier: bm.identifier} )
          })
-         let req = {title: folderName, notes: "", items: items}
+         let v4URL = window.location.href.replace("/bookmarks", "")
+         let req = {title: folderName, notes: v4URL, items: items}
          let url = ctx.rootState.system.searchAPI + "/api/csv"
          await axios.post(url, req, {responseType: "blob"}).then((response) => {
             const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }))
