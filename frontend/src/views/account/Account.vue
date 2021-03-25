@@ -5,7 +5,7 @@
       <div class="working" v-if="!expandBilling && lookingUp" >
          <V4Spinner message="Looking up account details..."/>
       </div>
-      <AccountRequestForm />
+      <AccountRequestForm v-if="noILSAccount == true" />
       <template v-if="hasAccountInfo">
          <h2 class="user-name">{{info.displayName}} ({{info.id}})</h2>
          <div>{{info.department}} - {{info.profile}}</div>
@@ -177,6 +177,7 @@ export default {
          lookingUp: state => state.user.lookingUp,
          bills: state => state.user.bills,
          ilsError: state => state.system.ilsError,
+         noILSAccount: state => state.user.noILSAccount,
       }),
       ...mapGetters({
          hasAccountInfo: 'user/hasAccountInfo',

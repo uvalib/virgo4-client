@@ -12,13 +12,13 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.10.0
 	github.com/prometheus/client_golang v1.10.0 // indirect
-	github.com/prometheus/common v0.19.0 // indirect
+	github.com/prometheus/common v0.20.0 // indirect
 	github.com/rs/xid v1.2.1
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/ugorji/go v1.2.4 // indirect
 	github.com/uvalib/virgo4-jwt v0.0.0-20210129165249-920a9cfd20bd
 	github.com/zsais/go-gin-prometheus v0.1.0
-	golang.org/x/crypto v0.0.0-20210317152858-513c2a44f670 // indirect
-	golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4 // indirect
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
+	golang.org/x/sys v0.0.0-20210324051608-47abb6519492 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

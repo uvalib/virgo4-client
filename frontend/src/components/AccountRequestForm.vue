@@ -1,7 +1,5 @@
 <template>
-   <div v-if="noILSAccount == true && accountRequested == false && publicLDAP"
-      class="signup-form pure-form  pure-form-stacked"
-   >
+   <div v-if="accountRequested == false && canRequestAccount" class="signup-form pure-form  pure-form-stacked">
       <p>You do not currently have a UVA Library account. Please fill out the form below to request one.</p>
       <p>If you have already requested an account, click Ignore.</p>
       <div class="entry pure-control-group">
@@ -58,11 +56,6 @@
          <V4Button mode="primary" @click="submitClicked">Submit</V4Button>
       </div>
    </div>
-   <div v-else-if="noILSAccount == true && accountRequested == true" class="signup-form pending">
-      <p>Your request for a UVA Library account has been submitted and will be created within 1-2 business days.</p>
-      <p class="light">You will be notified via email when the account has been created.</p>
-      <p class="light">If you have any questions or problems, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.</p>
-   </div>
    <div v-else-if="canRequestAccount == false && accountRequested == false" class="signup-form no-signup">
       <p class="left">Hello!</p>
       <p class="left">It appears you do not have a UVA Library circulation account.</p>
@@ -77,6 +70,11 @@
          <a target="_blank" href="https://www.library.virginia.edu/news/covid-19/#access">
             https://www.library.virginia.edu/news/covid-19/#access</a>.
       </p>
+   </div>
+   <div v-else-if="accountRequested == true" class="signup-form pending">
+      <p>Your request for a UVA Library account has been submitted and will be created within 1-2 business days.</p>
+      <p class="light">You will be notified via email when the account has been created.</p>
+      <p class="light">If you have any questions or problems, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.</p>
    </div>
 </template>
 
@@ -96,7 +94,6 @@ export default {
          lookingUp: state => state.user.lookingUp,
          accountRequest: state => state.user.accountRequest,
          accountRequested: state => state.user.accountRequested,
-         noILSAccount: state => state.user.noILSAccount,
          accountInfo: state => state.user.accountInfo.private,
       }),
       ...mapGetters({
