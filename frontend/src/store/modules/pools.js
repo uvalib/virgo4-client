@@ -89,12 +89,6 @@ const pools = {
       },
 
       setPools(state, data) {
-         if (data.length == 0) {
-            state.system.fatal = "No search pools configured"
-            state.list.splice(0, state.list.length)
-            return
-         }
-
          // Copy old items to preserve providers lists for each, then wipe out list
          let old = state.list.slice()
          state.list.splice(0, state.list.length)
@@ -135,23 +129,24 @@ const pools = {
             await ctx.dispatch('system/getConfig', null, { root: true })
          }
 
-         try {
-            let response = await axios.get( `${ctx.rootState.system.searchAPI}/api/pools` )
+         await axios.get( `${ctx.rootState.system.searchAPI}/api/pools` ).then( response => {
             ctx.commit('setPools', response.data)
             ctx.commit("setLookingUp", false)
-
-            ctx.state.list.forEach( async p => {
-               try {
-                  let response = await axios.get(p.url+"/api/providers")
-                  ctx.commit('setPoolProviders', {pool: p.id, providers: response.data.providers})
-               } catch (e) {
-                  console.error(`Unable to get providers for ${p.id}: ${e}`)
-               }
-            })
-         } catch (error)  {
-            ctx.commit('system/setFatal', "Unable to get sources: " + error, { root: true })
+            if (ctx.state.list.length == 0) {
+               ctx.commit('system/setFatal', "No search sources found", { root: true })
+            } else {
+               ctx.state.list.forEach( async p => {
+                  await axios.get(p.url+"/api/providers").then( response => {
+                     ctx.commit('setPoolProviders', {pool: p.id, providers: response.data.providers})
+                  }).catch(e => {
+                     console.error(`Unable to get providers for ${p.id}: ${e}`)
+                  })
+               })
+            }
+         }).catch ( error => {
+            ctx.commit('system/setFatal', error, { root: true })
             ctx.commit("setLookingUp", false)
-         }
+         })
       },
    }
 }

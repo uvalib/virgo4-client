@@ -476,8 +476,6 @@ func (svc *ServiceContext) SavePreferences(c *gin.Context) {
 
 // CreateAccountRequest accepts a user request for a new Sirsi account and sends it to lib-circ@virginia.edu
 func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
-	virgo4ID := c.Param("uid")
-	log.Printf("User %s is requesting a Sirsi account", virgo4ID)
 	req := AccountRequest{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
@@ -485,6 +483,7 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Invalid account request")
 		return
 	}
+	log.Printf("User %+v is requesting a Sirsi account", req)
 
 	log.Printf("Rendering account request email body")
 	var renderedEmail bytes.Buffer

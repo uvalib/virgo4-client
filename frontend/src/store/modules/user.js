@@ -52,11 +52,25 @@ const user = {
          if ( state.sessionType == "netbadge") return false
          return true
       },
-      canRequestAccount: (state, getters) => {
-         if (getters.hasAccountInfo == false ) return false
+      canRequestAccount: state => {
+         if (state.signedInUser.length == 0 ) return false
          if (state.noILSAccount == false ) return false
-         if (state.accountInfo.description.toLowerCase().includes("alumni")) return false
-         return true
+
+         let desc = state.accountInfo.description.toLowerCase()
+         let allowed = desc.includes("alumni") == false
+         if (allowed) return true
+
+         // Description includes alumni, so this user can't create a sirsi account.. unles they
+         // also have one of these in their description too
+         let roles = ["continuing and professional studies student", "contractor", "faculty",
+            "graduate student", "instructor", "sponsored account staff",
+            "student worker", "undergraduate student"] // "staff" ??
+         desc.split(",").forEach( r => {
+            if ( roles.includes( r.trim() ) ) {
+               allowed = true
+            }
+         })
+         return allowed
       },
       isGuest: (state) => {
          return (state.role == 'guest' || state.role == '')
