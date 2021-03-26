@@ -63,8 +63,8 @@ const user = {
          // Description includes alumni, so this user can't create a sirsi account.. unles they
          // also have one of these in their description too
          let roles = ["continuing and professional studies student", "contractor", "faculty",
-            "graduate student", "instructor", "sponsored account staff",
-            "student worker", "undergraduate student"] // "staff" ??
+            "staff", "graduate student", "instructor", "sponsored account staff",
+            "student worker", "undergraduate student"]
          desc.split(",").forEach( r => {
             if ( roles.includes( r.trim() ) ) {
                allowed = true
