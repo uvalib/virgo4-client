@@ -29,7 +29,7 @@
          </div>
          <div class="message"  v-else-if="mode=='submitted'">
             <p>
-               <b>Thank you</b>.<br/>Your request has been submitted and you will recive an email when it is ready.
+               <b>Thank you</b>.<br/>Your request has been submitted and you will receive an email when it is ready.
                <br/>You do not need to remain on this page.
             </p>
          </div>
