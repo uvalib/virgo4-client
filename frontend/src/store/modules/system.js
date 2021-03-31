@@ -209,13 +209,15 @@ const system = {
                let pdaRegex = new RegExp(/pda-ws/)
 
                let url = config.url
-               if ( url.match(/\/api\/reauth/) || url.match(/\/api\/error/)) {
-                  // these methods need an auth token to log/verify, but it is ok if expired
-                  config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-               } else if ( url.match(/\/api\//) || url.match(availRegex) || url.match(citationRegex) || url.match(pdaRegex) ) {
-                  // These calls all need active auth token
-                  await ctx.dispatch("user/authenticate", null, {root:true})
-                  config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
+               if ( !url.match(/\/api\/pools/) ) {
+                  if ( url.match(/\/api\/reauth/) || url.match(/\/api\/error/)) {
+                     // these methods need an auth token to log/verify, but it is ok if expired
+                     config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
+                  } else if ( url.match(/\/api\//) || url.match(availRegex) || url.match(citationRegex) || url.match(pdaRegex) ) {
+                     // These calls all need active auth token
+                     await ctx.dispatch("user/authenticate", null, {root:true})
+                     config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
+                  }
                }
                return config
             }, error => {
