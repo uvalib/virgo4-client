@@ -27,8 +27,9 @@
             <div class="pure-control-group">
                <label for="url">
                   Relevant URL
+                  <span v-if="hasError('url')" class="error">This information is required</span>
                </label>
-               <input tabindex="-1" readonly="readonly" v-model="url" name="url" />
+               <input v-model="url" name="url" />
             </div>
          </div>
 
@@ -96,6 +97,9 @@ export default {
          if (this.email == ""  ) {
             this.errors.push("email")
          }
+         if (this.url == "") {
+            this.errors.push("url")
+         }
 
          if ( this.errors.length > 0) {
             this.$store.commit("system/setError", "Required fields are missing or invalid. Please correct the errors and try again.")
@@ -120,17 +124,9 @@ export default {
          this.email = userId + "@virginia.edu"
       }
       let query = Object.assign({}, this.$route.query)
-      let url = query.url
-      delete query.url
-      let params = []
-      Object.entries(query).forEach(([key, value]) => {
-         params.push(`${key}=${encodeURIComponent(value)}`)
-      })
-      let qp = params.join("&")
-      if (qp.length > 0) {
-         url += `?${qp}`
-      }
-      this.$store.commit("feedback/setRelatedURL", document.location.origin+url)
+      // Assign the url in decending usefulness.
+      let url = query.url || document.referrer || window.location.origin
+      this.$store.commit("feedback/setRelatedURL", url)
    }
 }
 </script>

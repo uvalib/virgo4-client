@@ -3,7 +3,7 @@
      <div class="pre-footer" v-if="$route.name != 'feedback'">
         This is the newest version of the Library catalog.
         <router-link id="feedback"
-            :to="`/feedback?url=${$route.fullPath}`"
+            :to="`/feedback?url=${feedbackURL()}`"
             target="_blank">Please give us your feedback.<i class="fas fa-external-link-alt"></i></router-link>
      </div>
      <div class="footer-container">
@@ -94,8 +94,13 @@ export default {
    },
    data: function() {
       return {
-         showFeedbackLinks: false
+         showFeedbackLinks: false,
       }
+   },
+   methods: {
+     feedbackURL(){
+       return encodeURIComponent(window.location.href)
+     }
    },
    mounted() {
       this.$store.dispatch("system/getVersion")
