@@ -152,6 +152,7 @@ export default {
       // the flag shows a config spinner until ready
       await this.$store.dispatch('system/getConfig')
       await this.$store.dispatch('pools/getPools')
+      this.configuring = false
 
       if ( this.isSignedIn ) {
          await this.$store.dispatch("user/getAccountInfo")
@@ -169,7 +170,6 @@ export default {
       }
 
       this.$store.dispatch("filters/getPreSearchFilters")
-      this.configuring = false
    },
    mounted() {
       this.$nextTick( ()=>{
