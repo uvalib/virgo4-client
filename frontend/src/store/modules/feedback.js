@@ -40,8 +40,10 @@ const feedback = {
       submitFeedback(ctx) {
          ctx.commit("setSubmitting")
          let v4UserID = ctx.rootState.user.signedInUser
+         let name = ctx.rootState.user.accountInfo.displayName
          let data = { userID: v4UserID,
             email: ctx.state.email,
+            name: name,
             wantedTo: ctx.state.wantedTo,
             explanation: ctx.state.explanation,
             url: ctx.state.url,

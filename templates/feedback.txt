@@ -2,8 +2,12 @@
 Virgo 4 Feedback
 ---------------------------------------
 
-Requester Email: {{.Email}}
-Requester User ID: {{.UserID}}
+---- Requester ------------------------
+Email:   {{.Email}}
+User ID: {{.UserID}}
+{{if .Authenticated }}Name:    {{.Name}}{{else}}
+NOTE: To reply to this unauthenticated user, be sure to include their email in the response.{{end}}
+---------------------------------------
 
 First, explain what you wanted to do:
 {{.WantedTo}}
@@ -16,5 +20,6 @@ URL:
 
 Browser:
 {{.UserAgent}}
+
 
 ---------------------------------------

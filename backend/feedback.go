@@ -14,12 +14,14 @@ import (
 func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 	log.Printf("Received feedback request")
 	type FeedbackRequest struct {
-		UserID      string `json:"userID"`
-		Email       string `json:"email" binding:"required" `
-		WantedTo    string `json:"wantedTo"  binding:"required"`
-		Explanation string `json:"explanation"  binding:"required"`
-		URL         string `json:"url" binding:"required"`
-		UserAgent   string `json:"userAgent"`
+		UserID        string `json:"userID"`
+		Email         string `json:"email" binding:"required" `
+		Name          string `json:"name,omitempty"`
+		WantedTo      string `json:"wantedTo"  binding:"required"`
+		Explanation   string `json:"explanation"  binding:"required"`
+		URL           string `json:"url" binding:"required"`
+		UserAgent     string `json:"userAgent"`
+		Authenticated bool
 	}
 
 	var request FeedbackRequest
@@ -29,6 +31,15 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
+
+	to := []string{svc.FeedbackEmail}
+	if request.UserID != "anonymous" && strings.HasSuffix(request.Email, "virginia.edu") {
+		to = append(to, request.Email)
+		request.Authenticated = true
+	} else {
+		request.Authenticated = false
+	}
+
 	log.Printf("Feedback: %+v", request)
 
 	log.Printf("Rendering feedback email body")
@@ -39,11 +50,6 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		log.Printf("ERROR: Unable to render feedback email: %s", err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
 		return
-	}
-
-	to := []string{svc.FeedbackEmail}
-	if strings.HasSuffix(request.Email, "virginia.edu") {
-		to = append(to, request.Email)
 	}
 
 	sendErr := svc.SendEmail("Virgo 4 Feedback", to, renderedEmail.String())
