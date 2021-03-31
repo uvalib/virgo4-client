@@ -47,6 +47,7 @@ func (svc *ServiceContext) UserMiddleware(c *gin.Context) {
 // AuthMiddleware is middleware that checks for a user auth token in the
 // Authorization header. For now, it does nothing but ensure token presence.
 func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
+	log.Printf("Authorize access to %s", c.Request.URL)
 	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("Authentication failed: [%s]", err.Error())

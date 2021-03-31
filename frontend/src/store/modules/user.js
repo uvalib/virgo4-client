@@ -360,22 +360,12 @@ const user = {
                console.log("Get GUEST authorization token")
                await axios.post("/authorize", null).then( response => {
                   ctx.commit("setUserJWT", response.data)
-               }).catch( error => {
-                  let msg = error.toString()
-                  if (error.response) {
-                     msg = error.response.data
-                  }
-                  ctx.dispatch("system/reportError", `Unable to get auth token: ${msg}`, { root: true })
                })
             } else {
                console.log("Refreshing sign-in session")
                await axios.post("/api/reauth", null).then( response => {
-                  console.log(`Session refreshed`)
                   ctx.commit("setUserJWT", response.data )
-               }).catch( error => {
-                  console.error("Refreshing failed: "+error.toString())
-                  ctx.dispatch("signout")
-                  ctx.commit('system/setSessionExpired', null, { root: true })
+                  console.log(`Session refreshed`)
                })
             }
          }

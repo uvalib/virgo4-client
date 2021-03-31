@@ -214,21 +214,25 @@ const system = {
                   config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
                } else if ( url.match(/\/api\//) || url.match(availRegex) || url.match(citationRegex) || url.match(pdaRegex) ) {
                   // These calls all need active auth token
-                  config.timeout = 0
-                  if ( url.match(/\/checkouts/) ) {
-                     // Checkouts can be big, add extra time
-                     config.timeout = 30*1000
-                  }
-
                   await ctx.dispatch("user/authenticate", null, {root:true})
-                  if ( ctx.rootState.user.authToken ) {
-                     config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-                  }
+                  config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
                }
                return config
             }, error => {
-               Promise.reject(error)
+               return Promise.reject(error)
             })
+
+            axios.interceptors.response.use(
+               res => res,
+               async err => {
+                  if (err.response && err.response.status === 401) {
+                     if ( ctx.rootState.user.signedInUser != "") {
+                        await ctx.dispatch("user/signout", null, {root:true})
+                        ctx.commit('system/setSessionExpired', null, { root: true })
+                     }
+                  }
+                  return Promise.reject(err)
+               })
          }).catch((error) => {
             ctx.commit('setFatal', "Unable to get configuration: " + error)
          })
@@ -260,6 +264,14 @@ const system = {
          if (err.error == "{}" ) {
             err.error = data.toString()
          }
+
+         // dont report network errors!
+         if ( err.error.includes("System error, we regret the inconvenience") ||
+              err.error.includes("Network Error") ||
+              err.error.includes("ECONNREFUSED") ) {
+            return
+         }
+
          if (ctx.rootGetters["user/isSignedIn"]) {
             err.signedIn = true
             err.user = ctx.rootState.user.signedInUser
