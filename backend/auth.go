@@ -19,7 +19,7 @@ import (
 func (svc *ServiceContext) Authorize(c *gin.Context) {
 	log.Printf("Generate API access token")
 	guestClaim := v4jwt.V4Claims{Role: v4jwt.Guest}
-	signedStr, err := v4jwt.Mint(guestClaim, 15*time.Minute, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(guestClaim, 20*time.Second, svc.JWTKey)
 	if err != nil {
 		log.Printf("ERROR: Unable to generate signed JWT token: %s", err.Error())
 		c.String(http.StatusInternalServerError, "unable to generate authorization")
@@ -217,7 +217,7 @@ func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
 		return
 	}
 
-	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
+	refreshed, err := v4jwt.Refresh(tokenStr, 20*time.Second, svc.JWTKey)
 	if err != nil {
 		log.Printf("ERROR: Unable to refresh JWT %s: %s", tokenStr, err.Error())
 		c.AbortWithError(http.StatusUnauthorized, errors.New("authorization failed"))
@@ -354,7 +354,7 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMetho
 
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(v4Claims, 20*time.Second, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
