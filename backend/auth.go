@@ -203,34 +203,33 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 // RefreshAuthentication will use the long-lived refresh token for a user to generate a short-lived
 // auth token, then regenerate the lon-lived token
 func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
-	c.AbortWithError(http.StatusUnauthorized, errors.New("session expired"))
-	// tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
-	// if err != nil {
-	// 	log.Printf("ERROR: Authentication failed, no JWT in header: [%s]", err.Error())
-	// 	c.AbortWithError(http.StatusUnauthorized, errors.New("missing authorization"))
-	// 	return
-	// }
+	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
+	if err != nil {
+		log.Printf("ERROR: Authentication failed, no JWT in header: [%s]", err.Error())
+		c.AbortWithError(http.StatusUnauthorized, errors.New("missing authorization"))
+		return
+	}
 
-	// refreshToken, err := c.Cookie("v4_refresh")
-	// if err != nil {
-	// 	log.Printf("Authentication failed, refresh token for %s expired or not accessible %s", tokenStr, err.Error())
-	// 	c.AbortWithError(http.StatusUnauthorized, errors.New("session expired"))
-	// 	return
-	// }
+	refreshToken, err := c.Cookie("v4_refresh")
+	if err != nil {
+		log.Printf("Authentication failed, refresh token for %s expired or not accessible %s", tokenStr, err.Error())
+		c.AbortWithError(http.StatusUnauthorized, errors.New("session expired"))
+		return
+	}
 
-	// refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
-	// if err != nil {
-	// 	log.Printf("ERROR: Unable to refresh JWT %s: %s", tokenStr, err.Error())
-	// 	c.AbortWithError(http.StatusUnauthorized, errors.New("authorization failed"))
-	// 	return
-	// }
-	// v4Claims, _ := v4jwt.Validate(refreshed, svc.JWTKey)
+	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
+	if err != nil {
+		log.Printf("ERROR: Unable to refresh JWT %s: %s", tokenStr, err.Error())
+		c.AbortWithError(http.StatusUnauthorized, errors.New("authorization failed"))
+		return
+	}
+	v4Claims, _ := v4jwt.Validate(refreshed, svc.JWTKey)
 
-	// log.Printf("Regenerate long-lived refresh token for %s", v4Claims.UserID)
-	// refreshToken = xid.New().String()
-	// c.SetCookie("v4_refresh", refreshToken, 60*60*24*7, "/", "", false, true)
+	log.Printf("Regenerate long-lived refresh token for %s", v4Claims.UserID)
+	refreshToken = xid.New().String()
+	c.SetCookie("v4_refresh", refreshToken, 60*60*24*7, "/", "", false, true)
 
-	// c.String(http.StatusOK, refreshed)
+	c.String(http.StatusOK, refreshed)
 }
 
 // SignOut ends a user session and removes the refresh token
@@ -355,7 +354,7 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMetho
 
 	log.Printf("User %s claims %+v", v4User.Virgo4ID, v4Claims)
 
-	signedStr, err := v4jwt.Mint(v4Claims, 20*time.Second, svc.JWTKey)
+	signedStr, err := v4jwt.Mint(v4Claims, 30*time.Minute, svc.JWTKey)
 	if err != nil {
 		log.Printf("Unable to generate signed JWT token: %s", err.Error())
 		return "", err
