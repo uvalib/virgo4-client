@@ -340,10 +340,7 @@ const item = {
             if ( error.response && error.response.status == 404) {
                console.warn(`Catalog Key ${catalogKey} not found`)
                router.push(`/not_found`)
-            } else {
-               ctx.commit('system/setError', error, { root: true })
             }
-
          })
       },
 

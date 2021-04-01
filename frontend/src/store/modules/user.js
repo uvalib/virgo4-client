@@ -366,6 +366,11 @@ const user = {
                await axios.post("/api/reauth", null).then( response => {
                   ctx.commit("setUserJWT", response.data )
                   console.log(`Session refreshed`)
+               }).catch( async () => {
+                  // Signout, but preserve the search as it will be retried as guest
+                  console.log("reauth failed, signing out")
+                  await ctx.dispatch("signout", false)
+                  ctx.commit('system/setSessionExpired', null, { root: true })
                })
             }
          }
@@ -527,7 +532,7 @@ const user = {
           })
       },
 
-      async signout(ctx) {
+      async signout(ctx, resetSearch) {
          if ( ctx.state.signedInUser == "") return
 
          try {
@@ -537,7 +542,9 @@ const user = {
             ctx.commit('preferences/clear', null, { root: true })
             ctx.commit('searches/clear', null, { root: true })
             ctx.commit('clearSeenAlerts', null, { root: true })
-            ctx.dispatch('resetSearch', null, { root: true })
+            if ( resetSearch === true) {
+               ctx.dispatch('resetSearch', null, { root: true })
+            }
          } catch (e) {
             console.error("Signout failed: "+e)
          }

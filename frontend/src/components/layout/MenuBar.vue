@@ -311,7 +311,7 @@ export default {
       },
 
       async signOut() {
-         await this.$store.dispatch("user/signout")
+         await this.$store.dispatch("user/signout", true)
          this.$router.push("/signedout")
       },
       beforeEnter: function(el) {

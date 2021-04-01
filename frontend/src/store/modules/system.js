@@ -202,22 +202,14 @@ const system = {
                ctx.dispatch("bindRegionalAlerts", null, {root:true})
             }
 
-            // setup axios REQUEST interceptor to keep auth session alive
+            // append credentials to header if needed
             axios.interceptors.request.use( async config => {
-               let availRegex = new RegExp(`${ctx.state.availabilityURL}`)
-               let citationRegex = new RegExp(`${ctx.state.citationsURL}`)
-               let pdaRegex = new RegExp(/pda-ws/)
-
                let url = config.url
-               if ( !url.match(/\/api\/pools/) ) {
-                  if ( url.match(/\/api\/reauth/) || url.match(/\/api\/error/)) {
-                     // these methods need an auth token to log/verify, but it is ok if expired
-                     config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-                  } else if ( url.match(/\/api\//) || url.match(availRegex) || url.match(citationRegex) || url.match(pdaRegex) ) {
-                     // These calls all need active auth token
-                     await ctx.dispatch("user/authenticate", null, {root:true})
-                     config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-                  }
+               if ( (url.match(/\/api\//) && !url.match(/\/api\/pools/)) ||
+                     url.match(ctx.state.availabilityURL) ||
+                     url.match(ctx.state.citationsURL) ||
+                     url.match("pda-ws") ) {
+                  config.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
                }
                return config
             }, error => {
@@ -227,10 +219,16 @@ const system = {
             axios.interceptors.response.use(
                res => res,
                async err => {
-                  if (err.response && err.response.status === 401) {
-                     if ( ctx.rootState.user.signedInUser != "") {
-                        await ctx.dispatch("user/signout", null, {root:true})
-                        ctx.commit('system/setSessionExpired', null, { root: true })
+                  // If the original request was not an auth request, and it resulted in a 401,
+                  // reauth as guest and retry ONCE
+                  var origConfig = err.config
+                  if ( !origConfig.url.match(/\/api\/reauth/) && !origConfig.url.match(/\/authenticate/) ) {
+                     if (err.response && err.response.status == 401 && origConfig._retry !== true) {
+                        origConfig._retry = true
+                        await ctx.dispatch("user/authenticate", null, {root:true})
+                        origConfig.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
+                        console.log("RETRY "+origConfig.url+" AS GUEST")
+                        return axios(origConfig)
                      }
                   }
                   return Promise.reject(err)
