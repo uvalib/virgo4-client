@@ -225,9 +225,10 @@ const system = {
                   if ( !origConfig.url.match(/\/api\/reauth/) && !origConfig.url.match(/\/authenticate/) ) {
                      if (err.response && err.response.status == 401 && origConfig._retry !== true) {
                         origConfig._retry = true
-                        await ctx.dispatch("user/authenticate", null, {root:true})
+                        console.log("REFRESH AUTHENTICATION")
+                        await ctx.dispatch("user/refreshAuth", null, {root:true})
                         origConfig.headers['Authorization'] = 'Bearer ' + ctx.rootState.user.authToken
-                        console.log("RETRY "+origConfig.url+" AS GUEST")
+                        console.log("RETRY "+origConfig.url+" AS "+ctx.rootState.user.role)
                         return axios(origConfig)
                      }
                   }

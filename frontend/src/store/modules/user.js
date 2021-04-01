@@ -35,7 +35,6 @@ const user = {
       authMessage: "",
       lockedOut: false,
       parsedJWT: {},
-      authExpiresAt: 0,
       noILSAccount: false,
       accountRequest: {name: "", id: "", email: "", phone: "", department: "",
          address1: "", address2: "", city: "", state: "", zip: ""},
@@ -294,8 +293,6 @@ const user = {
          state.sessionType =  parsed.authMethod
          state.role = parsed.role
          localStorage.setItem("v4_jwt", jwtStr)
-         state.authExpiresAt = parsed.exp
-
       },
       setAccountInfo(state, data) {
          state.accountInfo = data.user
@@ -325,7 +322,6 @@ const user = {
          state.sessionType = ""
          state.accountInfo = {}
          state.authTriesLeft = 5
-         state.authExpiresAt = 0
          state.authMessage = ""
          state.authToken = ""
          state.role = "guest"
@@ -349,30 +345,24 @@ const user = {
    },
 
    actions: {
-      async authenticate(ctx) {
-         let expiresIn = 0
-         let nowSecs = Math.round((new Date()).getTime() / 1000)
-         let expireSecs = ctx.state.authExpiresAt - 15
-         expiresIn = expireSecs - nowSecs
-         if (expiresIn <= 0) {
-            console.log("Authentication expired. Refreshing...")
-            if ( ctx.state.role == "" || ctx.state.role == "guest") {
-               console.log("Get GUEST authorization token")
-               await axios.post("/authorize", null).then( response => {
-                  ctx.commit("setUserJWT", response.data)
-               })
-            } else {
-               console.log("Refreshing sign-in session")
-               await axios.post("/api/reauth", null).then( response => {
-                  ctx.commit("setUserJWT", response.data )
-                  console.log(`Session refreshed`)
-               }).catch( async () => {
-                  // Signout, but preserve the search as it will be retried as guest
-                  console.log("reauth failed, signing out")
-                  await ctx.dispatch("signout", false)
-                  ctx.commit('system/setSessionExpired', null, { root: true })
-               })
-            }
+      async refreshAuth(ctx) {
+         console.log("Refresh authentication...")
+         if ( ctx.state.role == "" || ctx.state.role == "guest") {
+            console.log("Get GUEST authorization token")
+            await axios.post("/authorize", null).then( response => {
+               ctx.commit("setUserJWT", response.data)
+            })
+         } else {
+            console.log("Refreshing sign-in session")
+            await axios.post("/api/reauth", null).then( response => {
+               ctx.commit("setUserJWT", response.data )
+               console.log(`Session refreshed`)
+            }).catch( async () => {
+               // Signout, but preserve the search as it will be retried as guest
+               console.log("reauth failed, signing out")
+               await ctx.dispatch("signout", false)
+               ctx.commit('system/setSessionExpired', null, { root: true })
+            })
          }
       },
 
