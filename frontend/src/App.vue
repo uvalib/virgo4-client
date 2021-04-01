@@ -148,14 +148,14 @@ export default {
          this.$store.commit("user/setUserJWT", jwtStr)
       }
 
-      // Make sure the session is authenticated first
-      await this.$store.dispatch('user/authenticate')
-
       // First time app is being created, request all common config
       // the flag shows a config spinner until ready
       await this.$store.dispatch('system/getConfig')
       await this.$store.dispatch('pools/getPools')
       this.configuring = false
+
+      // Make sure the session is is kept alive
+      await this.$store.dispatch('user/refreshAuth')
 
       if ( this.isSignedIn ) {
          await this.$store.dispatch("user/getAccountInfo")

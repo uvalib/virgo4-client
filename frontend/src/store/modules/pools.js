@@ -96,30 +96,30 @@ const pools = {
          // copy new pools into list and add pre-existing providers data
          data.forEach( p => {
             let prior = old.find(op => op.name == p.name  )
-            if (prior) {
-               p.providers = prior.providers.slice()
+
+            // no providers in new data?
+            if ( !(p.providers && p.providers.length > 0) ) {
+               if (prior) {
+                  p.providers = prior.providers.slice()
+               } else {
+                  p.providers = []
+               }
             } else {
-               p.providers = []
+               p.providers.forEach( pp => {
+                  if ( pp.logo_url ) {
+                     let logo = pp.logo_url
+                     logo = logo.replace("./", "/")
+                     pp.logo_url =  p.url+logo
+                  }
+               })
             }
+
             if (!p.sort_options) {
                p.sort_options=[]
             }
             state.list.push(p)
          })
       },
-
-      setPoolProviders(state, data) {
-         let pool = state.list.find(p=> p.id == data.pool)
-         pool.providers.splice(0, pool.providers.length)
-         data.providers.forEach( prov => {
-            if ( prov.logo_url ) {
-               let logo = prov.logo_url
-               logo = logo.replace("./", "/")
-               prov.logo_url= pool.url+logo
-            }
-            pool.providers.push(prov)
-         })
-      }
    },
 
    actions: {
@@ -134,14 +134,6 @@ const pools = {
             ctx.commit("setLookingUp", false)
             if (ctx.state.list.length == 0) {
                ctx.commit('system/setFatal', "No search sources found", { root: true })
-            } else {
-               ctx.state.list.forEach( async p => {
-                  await axios.get(p.url+"/api/providers").then( response => {
-                     ctx.commit('setPoolProviders', {pool: p.id, providers: response.data.providers})
-                  }).catch(e => {
-                     console.error(`Unable to get providers for ${p.id}: ${e}`)
-                  })
-               })
             }
          }).catch ( error => {
             ctx.commit('system/setFatal', error, { root: true })
