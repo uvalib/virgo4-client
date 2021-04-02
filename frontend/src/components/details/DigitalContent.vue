@@ -27,49 +27,51 @@
          </template>
 
          <div v-else class="value">
-            <div class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></div>
-            <div class="hscroller">
-               <div class="hcontent">
-                  <div v-for="item in pdfContent" :key="item.pid"
-                     class="download-card" role="button"
-                     :class="{current: isCurrent(item)}"
-                     @click.stop="viewerClicked(item)"
-                  >
-                     <V4ProgressBar v-if="generatePDFInProgress(item)" :id="item.name"
-                        :style="{top: pdfTop(item)}"
-                        :percent="item.pdf.status" label="Generating PDF"
-                     />
-                     <V4ProgressBar v-if="generateOCRInProgress(item)" :id="item.name"
-                        :style="{top: ocrTop(item)}"
-                        :percent="item.ocr.status" label="Extracting Text"
-                     />
-                     <img v-if="item.thumbnail" :src="item.thumbnail"/>
-                     <span class="label">{{item.name}}</span>
-                     <span class="link" tabindex="0"
-                        @click.stop="pdfClicked(item)"
-                        @keyup.stop.enter="pdfClicked(item)"
-                        @keydown.space.prevent.stop="pdfClicked(item)"
-                        :aria-label="`download pdf for ${item.name}`"
-                     >
-                        Download PDF
-                     </span>
-                     <OCRRequest v-if="isSignedIn && item.ocr"
-                        :id="'ocr-${item.details.identifier}'"
-                        :dcIndex="digitalContentIndex(item)"
-                        @ocr-started="ocrStarted(item)"
-                     />
-                     <span class="link" tabindex="0"
+            <template v-if="pdfContent.length > 0">
+               <div class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></div>
+               <div class="hscroller">
+                  <div class="hcontent">
+                     <div v-for="item in pdfContent" :key="item.pid"
+                        class="download-card" role="button"
+                        :class="{current: isCurrent(item)}"
                         @click.stop="viewerClicked(item)"
-                        @keyup.stop.enter="viewerClicked(item)"
-                        @keydown.space.prevent.stop="viewerClicked(item)"
-                        :aria-label="`open ${item.name} in viewer`"
                      >
-                        <i v-if="isCurrent(item)" class="fas fa-check-circle"></i>
-                        Open in Viewer
-                     </span>
+                        <V4ProgressBar v-if="generatePDFInProgress(item)" :id="item.name"
+                           :style="{top: pdfTop(item)}"
+                           :percent="item.pdf.status" label="Generating PDF"
+                        />
+                        <V4ProgressBar v-if="generateOCRInProgress(item)" :id="item.name"
+                           :style="{top: ocrTop(item)}"
+                           :percent="item.ocr.status" label="Extracting Text"
+                        />
+                        <img v-if="item.thumbnail" :src="item.thumbnail"/>
+                        <span class="label">{{item.name}}</span>
+                        <span class="link" tabindex="0"
+                           @click.stop="pdfClicked(item)"
+                           @keyup.stop.enter="pdfClicked(item)"
+                           @keydown.space.prevent.stop="pdfClicked(item)"
+                           :aria-label="`download pdf for ${item.name}`"
+                        >
+                           Download PDF
+                        </span>
+                        <OCRRequest v-if="isSignedIn && item.ocr"
+                           :id="'ocr-${item.details.identifier}'"
+                           :dcIndex="digitalContentIndex(item)"
+                           @ocr-started="ocrStarted(item)"
+                        />
+                        <span class="link" tabindex="0"
+                           @click.stop="viewerClicked(item)"
+                           @keyup.stop.enter="viewerClicked(item)"
+                           @keydown.space.prevent.stop="viewerClicked(item)"
+                           :aria-label="`open ${item.name} in viewer`"
+                        >
+                           <i v-if="isCurrent(item)" class="fas fa-check-circle"></i>
+                           Open in Viewer
+                        </span>
+                     </div>
                   </div>
                </div>
-            </div>
+            </template>
          </div>
 
          <div class="google" v-if="googleBooksURL">
