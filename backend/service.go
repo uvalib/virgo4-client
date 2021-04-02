@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -103,11 +102,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 
 	log.Printf("Create HTTP client for external service calls")
 	defaultTransport := &http.Transport{
-		Dial: (&net.Dialer{
-			Timeout:   5 * time.Second,
-			KeepAlive: 600 * time.Second,
-		}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second,
+		TLSHandshakeTimeout: 10 * time.Second,
 		MaxIdleConns:        100,
 		MaxIdleConnsPerHost: 100,
 	}
