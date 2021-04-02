@@ -38,7 +38,6 @@ const shelf = {
          data.forEach( b => {
             b.cover_image_url = ""
             b.status = "loading"
-            b.placeholder_class= placeholderClass(b.id)
             state.browse.push(b)
          })
       },
@@ -48,7 +47,6 @@ const shelf = {
             let b = state.browse[idx]
             if (data.status == "not_found" || data.status=="unprocessed") {
                b.status = "not_found"
-               b.placeholder_class= placeholderClass(b.id)
             } else {
                b.status = "ready"
                b.image_base64 = data.image_base64
@@ -115,15 +113,5 @@ const shelf = {
       },
    }
 }
-
-function placeholderClass (src) {
-   let hash = 0
-   for(let i = 0; i < src.length; i++) {
-      hash = Math.imul(31, hash) + src.charCodeAt(i) | 0
-   }
-   let hashStr = ""+hash
-   let cn = `cover${hashStr.substring(hashStr.length-1)}`
-   return cn
- };
 
 export default shelf

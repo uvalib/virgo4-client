@@ -221,3 +221,22 @@ export function formatNum(num) {
    }
    return ""
 }
+
+export function truncateTitle( title ) {
+   if ( title.length <= 90) {
+      return title
+   }
+   let spaceIdx = 90
+   let found = false
+   while ( !found && spaceIdx >0 ) {
+      if ( title[spaceIdx] == ' ') {
+         found = true
+      } else {
+         spaceIdx--
+      }
+   }
+   if ( found) {
+      return `${title.substring(0,spaceIdx).trim()}&nbsp;[&nbsp;&hellip;&nbsp;]`
+   }
+   return title
+}

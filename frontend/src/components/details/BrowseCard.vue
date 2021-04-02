@@ -5,8 +5,8 @@
          <span v-if="data.status=='ready'" class="vertical-spacer"></span>
          <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" aria-hidden="true" tabindex="-1">
             <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
-            <span class="no-thumb" :class="data.placeholder_class" v-else>
-               <span class="title">{{data.title}}</span>
+            <span class="no-thumb" v-else>
+               <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
             </span>
          </a>
       </div>
@@ -133,11 +133,11 @@ export default {
          height: 100%;
          display: block;
          margin: 0 auto;
-         background: var(--uvalib-teal-dark);
+         background: white;
          .title {
-            background: var( --uvalib-grey-lightest);
+            background: white;
             opacity: 0.9;
-            color: var(--uvalib-text);
+            color: var(--uvalib-text-dark);
             text-align: center;
             padding: 0;
             margin: 0;
@@ -149,37 +149,6 @@ export default {
             font-weight: 500;
             white-space: normal;
          }
-      }
-
-      .no-thumb.cover0 {
-         background: var(--uvalib-brand-orange-dark);
-      }
-      .no-thumb.cover1 {
-         background: var(--uvalib-blue-alt-dark);
-      }
-      .no-thumb.cover2 {
-         background: var(--uvalib-blue-alt-darkest);
-      }
-      .no-thumb.cover3 {
-         background: var(--uvalib-green-dark);
-      }
-      .no-thumb.cover4 {
-         background: var(--uvalib-red-darker);
-      }
-      .no-thumb.cover5 {
-         background: var(--uvalib-grey-dark);
-      }
-      .no-thumb.cover6 {
-         background: var(--uvalib-yellow-dark);
-      }
-      .no-thumb.cover7 {
-         background: var(--uvalib-brand-blue-light);
-      }
-      .no-thumb.cover8 {
-         background: var(--uvalib-blue-alt);
-      }
-      .no-thumb.cover9 {
-         background: var(--uvalib-teal-dark);
       }
    }
    i.current {
