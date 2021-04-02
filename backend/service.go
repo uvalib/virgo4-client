@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"net/smtp"
 	"os"
@@ -102,9 +103,17 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 
 	log.Printf("Create HTTP client for external service calls")
 	defaultTransport := &http.Transport{
-		TLSHandshakeTimeout: 10 * time.Second,
-		MaxIdleConns:        100,
-		MaxIdleConnsPerHost: 100,
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 600 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 	}
 	ctx.HTTPClient = &http.Client{
 		Transport: defaultTransport,
@@ -122,6 +131,8 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		Transport: defaultTransport,
 		Timeout:   5 * time.Minute,
 	}
+
+	log.Printf("DEFAULT CLIENT %+v", http.DefaultClient)
 
 	return &ctx, nil
 }
@@ -216,14 +227,14 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	}
 
 	// temporary removal if alliad check... its down and not really critical for v4 to be running
-	// respBytes, illErr := svc.ILLiadRequest("GET", "SystemInfo/SecurePlatformVersion", nil)
-	// if illErr != nil {
-	// 	log.Printf("ERROR: Failed response from ILLiad PING: %s", illErr.Message)
-	// 	hcMap["illiad"] = hcResp{Healthy: false, Message: illErr.Message}
-	// } else {
-	// 	hcMap["illiad"] = hcResp{Healthy: true}
-	// 	log.Printf("ILLiad version: %s", respBytes)
-	// }
+	respBytes, illErr := svc.ILLiadRequest("GET", "SystemInfo/SecurePlatformVersion", nil)
+	if illErr != nil {
+		log.Printf("ERROR: Failed response from ILLiad PING: %s", illErr.Message)
+		hcMap["illiad"] = hcResp{Healthy: false, Message: illErr.Message}
+	} else {
+		hcMap["illiad"] = hcResp{Healthy: true}
+		log.Printf("ILLiad version: %s", respBytes)
+	}
 
 	c.JSON(http.StatusOK, hcMap)
 }
