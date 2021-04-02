@@ -105,6 +105,9 @@ export default {
                if (dc.pdf ) {
                   this.$analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
                }
+               if (dc.ocr ) {
+                  this.$analytics.trigger('OCR', 'OCR_LINK_PRESENTED', dc.pid)
+               }
             })
          }
       }

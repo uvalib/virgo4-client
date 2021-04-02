@@ -82,17 +82,19 @@ export default {
       async ocrClicked() {
          this.$refs.ocrmodal.show()
          await this.$store.dispatch("item/getOCRStatus", this.item )
-         console.log("OCR "+this.item.ocr.status)
          if (this.item.ocr.status == "NOT_AVAIL") {
+            this.$analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', this.item.pid)
             this.mode = "request"
             this.$nextTick( () => {
                document.getElementById("email").focus()
             })
          } else if (this.item.ocr.status == "READY") {
+            this.$analytics.trigger('OCR', 'OCR_DOWNLOAD_CLICKED', this.item.pid)
             await this.$store.dispatch("item/downloadOCRText", this.item)
             this.$refs.ocrmodal.hide()
             this.mode = "init"
          } else {
+            this.$analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', this.item.pid)
             this.mode = "request"
             this.$nextTick( () => {
                document.getElementById("email").focus()
