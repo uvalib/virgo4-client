@@ -220,14 +220,15 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		hcMap["postgres"] = hcResp{Healthy: true, Version: schema.Version}
 	}
 
-	respBytes, illErr := svc.ILLiadRequest("GET", "SystemInfo/SecurePlatformVersion", nil)
-	if illErr != nil {
-		log.Printf("ERROR: Failed response from ILLiad PING: %s", illErr.Message)
-		hcMap["illiad"] = hcResp{Healthy: false, Message: illErr.Message}
-	} else {
-		hcMap["illiad"] = hcResp{Healthy: true}
-		log.Printf("ILLiad version: %s", respBytes)
-	}
+	// temporary removal if alliad check... its down and not really critical for v4 to be running
+	// respBytes, illErr := svc.ILLiadRequest("GET", "SystemInfo/SecurePlatformVersion", nil)
+	// if illErr != nil {
+	// 	log.Printf("ERROR: Failed response from ILLiad PING: %s", illErr.Message)
+	// 	hcMap["illiad"] = hcResp{Healthy: false, Message: illErr.Message}
+	// } else {
+	// 	hcMap["illiad"] = hcResp{Healthy: true}
+	// 	log.Printf("ILLiad version: %s", respBytes)
+	// }
 
 	c.JSON(http.StatusOK, hcMap)
 }
