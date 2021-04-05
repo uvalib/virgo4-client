@@ -7,14 +7,16 @@
             <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
             <span class="no-thumb" v-else>
                <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
+               <br/>
+               <span class="no">(No image available)</span>
             </span>
          </a>
       </div>
       <div class="details">
          <span class="call">{{data.call_number}}</span>
-         <span class="loc">{{data.location}}</span>
          <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" class="title">{{data.title}}</a>
-         <span class="title">{{data.published_date}}</span>
+         <span class="year">[{{data.published_date}}]</span>
+         <span class="loc">{{data.location}}</span>
       </div>
       <div class="bm-control">
          <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
@@ -71,7 +73,7 @@ export default {
 .browse-card {
    border: 1px solid var(--uvalib-grey);
    box-shadow: $v4-box-shadow-light;
-   padding: 0 0 30px 0;
+   padding: 0 0 40px 0;
    margin: 5px;
    position: relative;
    display: flex;
@@ -142,12 +144,18 @@ export default {
             padding: 0;
             margin: 0;
             box-sizing: border-box;
-            margin: 10px auto;
+            margin: 20px auto 10px auto;
             display: inline-block;
             padding: 10px;
             width: 90%;
             font-weight: 500;
             white-space: normal;
+         }
+         span.no {
+            color: var(--uvalib-text);
+            text-decoration: none;
+            margin:  0;
+            display: inline-block;
          }
       }
    }
@@ -159,26 +167,34 @@ export default {
    }
    .details {
       background: white;
-      border-top: 3px solid var(--uvalib-grey-light);
-      border-radius: 0 0 5px 5px;
       padding: 5px 0;
-   }
-   .call, .loc, .title {
-      background: white;
-      word-break: break-word;
-      -webkit-hyphens: auto;
-      -moz-hyphens: auto;
-      hyphens: auto;
-      max-width: 95%;
-      display: block;
-      margin: 0 auto;
-      font-weight: 500;
-   }
-   .loc {
-      font-weight: normal;
-   }
-   .title  {
-      margin-top:5px;
+      .call, .loc, .title {
+         background: white;
+         word-break: break-word;
+         -webkit-hyphens: auto;
+         -moz-hyphens: auto;
+         hyphens: auto;
+         max-width: 95%;
+         display: block;
+         margin: 0 auto;
+         font-weight: 500;
+      }
+      .call {
+         background: var(--uvalib-grey-lightest);
+         max-width: 100%;
+         padding: 10px 0;
+         margin-bottom: 20px;
+         color: var(--uvalib-text-dark);
+
+      }
+      .loc {
+         font-weight: normal;
+         margin-top: 15px;
+      }
+      a.title  {
+         font-weight: bold !important;
+         margin-bottom: 5px;
+      }
    }
 }
 
