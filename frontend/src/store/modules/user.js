@@ -126,19 +126,6 @@ const user = {
       isFaculty: state => {
          return state.accountInfo.profile == "Faculty"
       },
-      sortedCheckouts: state => {
-         return state.checkouts.sort( (a,b) => {
-            let d1 = a.due.split("T")[0]
-            let d2 = b.due.split("T")[0]
-            if (d1 < d2) return -1
-            if (d1 > d2) return 1
-            if (parseFloat(a.overdueFee) < parseFloat(b.overdueFee)) return 1
-            if (parseFloat(a.overdueFee) > parseFloat(b.overdueFee)) return -1
-            if (a.overdue == false && b.overdue == true) return 1
-            if (a.overdue == true && b.overdue == false) return -1
-            return 0
-         })
-      },
       itemsOnNotice: state => {
          return state.checkouts.filter( co=> co.overdue || co.recallDate != "")
       },
@@ -204,6 +191,17 @@ const user = {
       sortCheckouts(state, order) {
          state.checkoutsOrder = order
          state.checkouts.sort( (a,b) => {
+            if ( order == "OVERDUE") {
+               if (a.overdue == false && b.overdue == true) return 1
+               if (a.overdue == true && b.overdue == false) return -1
+
+               // recall date is like: 2021-03-21
+               if (a.recallDate < b.recallDate ) return 1
+               if (a.recallDate > b.recallDate ) return -1
+
+               return 0
+            }
+
             let keyA = a.author.toUpperCase()
             let keyB = b.author.toUpperCase()
             if (order.includes("TITLE")) {

@@ -131,7 +131,7 @@
                </transition>
             </li>
             <li v-if="isSignedIn && itemsOnNotice.length > 0" role="none">
-               <router-link to="/checkouts" role="menuitem" >
+               <router-link to="/checkouts?overdue=1" role="menuitem" >
                   <span  class="menu-item notice">
                      <i class="fas fa-exclamation-triangle"></i><span class="cnt">{{itemsOnNotice.length}}</span>
                   </span>
