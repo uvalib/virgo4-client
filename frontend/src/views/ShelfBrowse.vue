@@ -26,11 +26,31 @@
             <i class="next pager fas fa-arrow-right"></i>
          </V4Button>
       </div>
+      <div class="view-mode">
+         <span tabindex="0" class="view" id="view"
+             @click.stop="toggleViewMenu" @keyup.prevent.stop.enter="toggleViewMenu"
+         >
+            <span class="select-header">
+               <span v-html="viewMode"></span>
+               <i class="dd-caret fas fa-caret-down" v-bind:style="{ transform: rotation }"></i>
+            </span>
+            <transition name="grow"
+               v-on:before-enter="beforeEnter" v-on:enter="enter"
+               v-on:before-leave="beforeLeave" v-on:leave="leave"
+            >
+               <ul v-if="viewModeOpen" class="view-menu"  @keydown.space.prevent.stop role="group">
+                  <li v-for="vm in viewModes" :key="vm.id" v-html="vm.title"
+                     @click.stop.prevent="selectView(vm.id)"></li>
+               </ul>
+            </transition>
+         </span>
+      </div>
       <div class="browse-detail" v-if="!working" >
-         <div class="browse-cards">
-            <BrowseCard  v-for="(b,idx) in shelfBrowse" :current="isCurrent(idx)" :pool="$route.params.src" :data="b"  :key="`b${b.id}`"/>
+         <div class="browse-cards" :class="currViewMode">
+            <BrowseCard  v-for="(b,idx) in shelfBrowse" :current="isCurrent(idx)"
+               :pool="$route.params.src" :data="b"  :key="`b${b.id}`" :mode="currViewMode" :index="idx+1"
+            />
          </div>
-         <BrowsePager/>
       </div>
    </div>
 </template>
@@ -47,6 +67,10 @@ export default {
 
    data: function() {
       return {
+         viewModes: [{id: 'gallery', title: "<i class='fas fa-grip-horizontal'></i>&nbsp;View gallery"},
+                     {id: 'list', title: "<i class='fas fa-list'></i>&nbsp;View list"}],
+         currViewMode: 'gallery',
+         viewModeOpen: false,
          browseTarget: null
       };
    },
@@ -62,6 +86,10 @@ export default {
    },
 
    computed: {
+      viewMode() {
+         var m = this.viewModes.find( vm => vm.id == this.currViewMode)
+         return m.title
+      },
       ...mapState({
          shelfBrowse : state => state.shelf.browse,
          working: state => state.shelf.lookingUp,
@@ -69,6 +97,12 @@ export default {
       ...mapGetters({
          isSignedIn: 'user/isSignedIn',
       }),
+      rotation() {
+         if ( this.viewModeOpen ) {
+            return "rotate(180deg)"
+         }
+         return "rotate(0deg)"
+      },
       backURL() {
          return `/sources/${this.$route.params.src}/items/${this.$route.params.id}`
       },
@@ -80,6 +114,13 @@ export default {
       }
    },
    methods: {
+      selectView( mode) {
+         this.currViewMode = mode
+         this.viewModeOpen = false
+      },
+      toggleViewMenu() {
+         this.viewModeOpen = !this.viewModeOpen
+      },
       isCurrent(idx) {
          if ( this.working) return false
          let item = this.shelfBrowse[idx]
@@ -93,6 +134,28 @@ export default {
          }
          await this.$store.dispatch("shelf/getBrowseData", this.$route.params.id )
       },
+      browseNext() {
+         this.$store.dispatch("shelf/browseNext")
+         this.$analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
+      },
+      browsePrior() {
+         this.$store.dispatch("shelf/browsePrior")
+         this.$analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
+      },
+      beforeEnter: function(el) {
+         el.style.height = '0'
+      },
+      enter: function(el) {
+         el.style.height = el.scrollHeight + 'px'
+         this.expandedItem = el
+      },
+      beforeLeave: function(el) {
+         el.style.height = el.scrollHeight + 'px'
+         this.expandedItem = el
+      },
+      leave: function(el) {
+         el.style.height = '0'
+      }
    },
    created() {
       this.initializeBrowse()
@@ -145,6 +208,67 @@ export default {
 
    }
 
+   .view-mode {
+      text-align: right;
+      margin-right: 15px;
+      .view {
+         .select-header {
+            width: 120px;
+            display: flex;
+            flex-flow: row nowrap;
+            text-align: left;
+            justify-content: space-between;
+            span, i {
+               display: inline-block;
+            }
+
+
+         }
+         position: relative;
+         transition: transform 200ms;
+         display: inline-block;
+         cursor: pointer;
+         padding: 0 5px;
+         &:focus {
+            @include be-accessible();
+         }
+      }
+
+      i.dd-caret {
+         margin-left: 5px;
+         display: inline-block;
+         transition: transform 200ms;
+      }
+      .view-menu {
+         text-align: left;
+         transition: 100ms;
+         list-style: none;
+         padding:10px 0 0 0;
+         margin: 0;
+         border-radius: 0 0 5px 5px;
+         border: 1px solid var(--uvalib-grey-light);
+         position: absolute;
+         z-index: 100;
+         background: white;
+         left:0;
+         right:0;
+         box-shadow: $v4-box-shadow;
+         li {
+            line-height: 35px;
+            padding: 0 10px 0 10px;
+            &:hover {
+               background-color: var(--uvalib-brand-blue-lightest);
+               color: var(--uvalib-text-dark);
+            }
+            &:focus {
+               background-color: var(--uvalib-brand-blue-lightest);
+               color: var(--uvalib-text-dark);
+            }
+         }
+
+      }
+   }
+
    .browse-detail {
       margin: 20px 30px 0 30px;
       padding-top: 5px;
@@ -183,6 +307,17 @@ export default {
    .browse-cards {
       grid-template-columns: repeat(4, 200px);
    }
+   .browse-cards.list {
+      max-width:75%;
+      margin: 0 auto;
+      grid-template-columns: unset;
+      grid-gap: unset;
+      display: flex;
+      flex-direction:  column;
+      .browse-card {
+         width: 100%;
+      }
+   }
 }
 @media only screen and (max-width: 768px) {
    div.info  {
@@ -203,6 +338,17 @@ export default {
     }
    .browse-cards {
       grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+   }
+   .browse-cards.list {
+      max-width:90%;
+      grid-template-columns: unset;
+      grid-gap: unset;
+      display: flex;
+      flex-direction:  column;
+      margin: 0 auto;
+      .browse-card {
+         width: 100%;
+      }
    }
 }
 </style>

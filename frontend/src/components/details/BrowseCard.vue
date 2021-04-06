@@ -1,7 +1,7 @@
 <template>
-   <div class="browse-card" :class="{current: current}" :aria-current="current.toString()">
+   <div class="browse-card" :class="{current: current, list: mode!='gallery'}" :aria-current="current.toString()">
       <i class="current fas fa-caret-down" v-if="current"></i>
-      <div class="thumb-wrap">
+      <div class="thumb-wrap" v-if="mode=='gallery'">
          <span v-if="data.status=='ready'" class="vertical-spacer"></span>
          <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" aria-hidden="true" tabindex="-1">
             <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
@@ -12,18 +12,45 @@
             </span>
          </a>
       </div>
-      <div class="details">
-         <span class="call">{{data.call_number}}</span>
-         <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" class="title">{{data.title}}</a>
-         <span class="year">[{{data.published_date}}]</span>
-         <span class="loc">{{data.location}}</span>
-      </div>
-      <div class="bm-control">
-         <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
-            @clicked="bookmarkClicked(data.id)"
-         />
-         <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
-      </div>
+      <template v-if="mode=='gallery'">
+         <div class="details">
+            <span class="call">{{data.call_number}}</span>
+            <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" class="title">
+               {{$utils.truncateTitle(data.title)}}
+            </a>
+            <span class="year">[{{data.published_date}}]</span>
+            <span class="loc">{{data.location}}</span>
+         </div>
+         <div class="bm-control">
+            <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
+               @clicked="bookmarkClicked(data.id)"
+            />
+            <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
+         </div>
+      </template>
+      <template v-else>
+         <div class="list details">
+            <span class="index">{{index}}.</span>
+            <span class="stuff">
+               <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" class="title">
+                  {{$utils.truncateTitle(data.title)}}
+               </a>
+               <span class="year">[{{data.published_date}}]</span>
+               <span class="callinfo">
+                  {{data.call_number}}&nbsp;&nbsp;
+                  <template v-if="data.location">
+                     <span class="bar">|&nbsp;&nbsp;</span><span class="list-loc">{{data.location}}</span>
+                  </template>
+               </span>
+            </span>
+            <span class="listbm">
+               <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
+                  @clicked="bookmarkClicked(data.id)"
+               />
+               <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
+            </span>
+         </div>
+      </template>
    </div>
 </template>
 
@@ -48,6 +75,14 @@ export default {
       data: {
          type: Object,
          required: true
+      },
+      mode: {
+         type: String,
+         default: "gallery"
+      },
+      index: {
+         type: Number,
+         default: 0
       }
    },
    computed: {
@@ -70,6 +105,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.browse-card.list {
+   margin: 5px !important;
+}
 .browse-card {
    border: 1px solid var(--uvalib-grey);
    box-shadow: $v4-box-shadow-light;
@@ -165,6 +203,21 @@ export default {
       width: 100%;
       text-align: center;
    }
+   .details.list {
+      display: grid;
+      text-align: left;
+      a.title  {
+         margin: initial;
+      }
+      .callinfo {
+         display: block;
+         margin-top: 5px;;
+      }
+      .listbm {
+         display: inline-block;
+         text-align: right;
+      }
+   }
    .details {
       background: white;
       padding: 5px 0;
@@ -193,8 +246,38 @@ export default {
       }
       a.title  {
          font-weight: bold !important;
-         margin-bottom: 5px;
+         margin-bottom: 5px !important;
       }
+   }
+}
+
+@media only screen and (min-width: 768px) {
+   .browse-card.list {
+      padding: 20px;
+   }
+   .details.list {
+      grid-template-columns: 50px 1fr 125px;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .browse-card.list {
+      padding: 10px;
+   }
+   .details.list {
+      grid-template-columns: 25px 1fr;
+      grid-template-rows: max-content 10px;
+      grid-row-gap: 15px;
+   }
+   .listbm {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+   }
+   .bar {
+      display: none;
+   }
+   .list-loc {
+      display: block;
    }
 }
 
