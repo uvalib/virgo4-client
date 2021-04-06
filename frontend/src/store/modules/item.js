@@ -222,6 +222,19 @@ const item = {
          axios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
             ctx.commit("setDigitalContentLoading", false)
+
+            // Get the status of each OCR object. Those that are ready will be available
+            // for all to download
+            let ocrs = ctx.state.digitalContent.filter( item => item.ocr && item.ocr.status == "UNKNOWN")
+            let timerID = setInterval( () => {
+               if ( ocrs.length > 0) {
+                  let dcOCR = ocrs.pop()
+                  ctx.dispatch("getOCRStatus", dcOCR)
+               } else {
+                  clearInterval(timerID)
+               }
+            }, 250)
+
          }).catch((_error) => {
             ctx.commit("setDigitalContentLoading", false)
          })
