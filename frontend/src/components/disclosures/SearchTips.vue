@@ -26,9 +26,13 @@
                   <p>Use parentheses to group parts of your search:</p>
                   <p class="example">(calico OR "tortoise shell") AND cats</p>
                </li>
+               <li>
+                  <p>Use an asterisk ( * ) for wildcard searches:</p>
+                  <p class="example">octo*<br/>Returns both "octopus" and "octothorpe".</p>
+               </li>
             </ul>
             <div class="note">
-               <b>NOTE: </b>Nested parentheses within a query are not supported
+               <b>NOTE: </b>Nested parentheses within a query are not supported.
             </div>
          </div>
        </template>

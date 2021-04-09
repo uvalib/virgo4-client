@@ -25,7 +25,7 @@
             >
             <span>Images Only</span>
          </label>
-         <SearchTips v-if="mode=='basic'" />
+         <SearchTips />
       </div>
 </template>
 

@@ -77,13 +77,14 @@ export default {
       margin: 0px 10px 5px 15px;
       padding: 0;
       position: absolute;
+      right: 10%;
       box-shadow: $v4-box-shadow;
       font-size:0.95em;
       color: var(--uvalib-text);
       font-weight: normal;
       z-index: 9999;
       min-width: 20%;
-      max-width: 50%;
+      max-width: 75%;
    }
    .full-text.inline {
       position: relative;
