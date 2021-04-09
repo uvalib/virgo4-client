@@ -1,27 +1,56 @@
 <template>
-   <div class="browse-card" :class="{current: current}" :aria-current="current.toString()">
+   <div class="browse-card" :class="{current: current, list: mode!='gallery'}" :aria-current="current.toString()">
       <i class="current fas fa-caret-down" v-if="current"></i>
-      <div class="thumb-wrap">
+      <div class="thumb-wrap" v-if="mode=='gallery'">
          <span v-if="data.status=='ready'" class="vertical-spacer"></span>
          <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" aria-hidden="true" tabindex="-1">
             <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
             <span class="no-thumb" v-else>
                <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
+               <br/>
+               <span class="no">(No image available)</span>
             </span>
          </a>
       </div>
-      <div class="details">
-         <span class="call">{{data.call_number}}</span>
-         <span class="loc">{{data.location}}</span>
-         <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" class="title">{{data.title}}</a>
-         <span class="title">{{data.published_date}}</span>
-      </div>
-      <div class="bm-control">
-         <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
-            @clicked="bookmarkClicked(data.id)"
-         />
-         <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
-      </div>
+      <template v-if="mode=='gallery'">
+         <div class="details">
+            <span class="call">{{data.call_number}}</span>
+            <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" class="title">
+               {{$utils.truncateTitle(data.title)}}
+            </a>
+            <span class="year">[{{data.published_date}}]</span>
+            <span class="loc">{{data.location}}</span>
+         </div>
+         <div class="bm-control">
+            <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
+               @clicked="bookmarkClicked(data.id)"
+            />
+            <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
+         </div>
+      </template>
+      <template v-else>
+         <div class="list details">
+            <span class="index">{{index}}.</span>
+            <span class="stuff">
+               <a @click="browseDetailClicked(data.id)" :href="`/items/${data.id}`" class="title">
+                  {{$utils.truncateTitle(data.title)}}
+               </a>
+               <span class="year">[{{data.published_date}}]</span>
+               <span class="callinfo">
+                  {{data.call_number}}&nbsp;&nbsp;
+                  <template v-if="data.location">
+                     <span class="bar">|&nbsp;&nbsp;</span><span class="list-loc">{{data.location}}</span>
+                  </template>
+               </span>
+            </span>
+            <span class="listbm">
+               <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
+                  @clicked="bookmarkClicked(data.id)"
+               />
+               <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
+            </span>
+         </div>
+      </template>
    </div>
 </template>
 
@@ -46,6 +75,14 @@ export default {
       data: {
          type: Object,
          required: true
+      },
+      mode: {
+         type: String,
+         default: "gallery"
+      },
+      index: {
+         type: Number,
+         default: 0
       }
    },
    computed: {
@@ -68,10 +105,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.browse-card.list {
+   margin: 5px !important;
+}
 .browse-card {
    border: 1px solid var(--uvalib-grey);
    box-shadow: $v4-box-shadow-light;
-   padding: 0 0 30px 0;
+   padding: 0 0 40px 0;
    margin: 5px;
    position: relative;
    display: flex;
@@ -142,12 +182,18 @@ export default {
             padding: 0;
             margin: 0;
             box-sizing: border-box;
-            margin: 10px auto;
+            margin: 20px auto 10px auto;
             display: inline-block;
             padding: 10px;
             width: 90%;
             font-weight: 500;
             white-space: normal;
+         }
+         span.no {
+            color: var(--uvalib-text);
+            text-decoration: none;
+            margin:  0;
+            display: inline-block;
          }
       }
    }
@@ -157,28 +203,81 @@ export default {
       width: 100%;
       text-align: center;
    }
+   .details.list {
+      display: grid;
+      text-align: left;
+      a.title  {
+         margin: initial;
+      }
+      .callinfo {
+         display: block;
+         margin-top: 5px;;
+      }
+      .listbm {
+         display: inline-block;
+         text-align: right;
+      }
+   }
    .details {
       background: white;
-      border-top: 3px solid var(--uvalib-grey-light);
-      border-radius: 0 0 5px 5px;
       padding: 5px 0;
+      .call, .loc, .title {
+         background: white;
+         word-break: break-word;
+         -webkit-hyphens: auto;
+         -moz-hyphens: auto;
+         hyphens: auto;
+         max-width: 95%;
+         display: block;
+         margin: 0 auto;
+         font-weight: 500;
+      }
+      .call {
+         background: var(--uvalib-grey-lightest);
+         max-width: 100%;
+         padding: 10px 0;
+         margin-bottom: 20px;
+         color: var(--uvalib-text-dark);
+
+      }
+      .loc {
+         font-weight: normal;
+         margin-top: 15px;
+      }
+      a.title  {
+         font-weight: bold !important;
+         margin-bottom: 5px !important;
+      }
    }
-   .call, .loc, .title {
-      background: white;
-      word-break: break-word;
-      -webkit-hyphens: auto;
-      -moz-hyphens: auto;
-      hyphens: auto;
-      max-width: 95%;
+}
+
+@media only screen and (min-width: 768px) {
+   .browse-card.list {
+      padding: 20px;
+   }
+   .details.list {
+      grid-template-columns: 50px 1fr 125px;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .browse-card.list {
+      padding: 10px;
+   }
+   .details.list {
+      grid-template-columns: 25px 1fr;
+      grid-template-rows: max-content 10px;
+      grid-row-gap: 15px;
+   }
+   .listbm {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+   }
+   .bar {
+      display: none;
+   }
+   .list-loc {
       display: block;
-      margin: 0 auto;
-      font-weight: 500;
-   }
-   .loc {
-      font-weight: normal;
-   }
-   .title  {
-      margin-top:5px;
    }
 }
 

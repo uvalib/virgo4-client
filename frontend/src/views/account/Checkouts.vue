@@ -24,6 +24,7 @@
                   borderWidth="0 0 3px 0"
                   borderColor="var(--uvalib-blue-alt)"
                   id="uva-checkouts"
+                  :expanded="checkoutsOrder == 'OVERDUE'"
                >
                   <template v-slot:title><span class="section-title">UVA Checkouts ({{checkouts.length}})</span></template>
                   <div class="checkout-list">
@@ -37,6 +38,7 @@
                               <option value="TITLE_DESC">Title (Descending)</option>
                               <option value="DUE_ASC">Due Date (Ascending)</option>
                               <option value="DUE_DESC">Due Date (Descending)</option>
+                              <option value="OVERDUE">Overdue / Recalled</option>
                            </select>
                         </span>
                         <V4Button v-if="!isBarred" id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
@@ -47,7 +49,7 @@
                            <i class="fas fa-download"></i>
                         </V4Button>
                      </div>
-                     <div class="item" v-for="(co,idx) in sortedCheckouts" :key="idx">
+                     <div class="item" v-for="(co,idx) in checkouts" :key="idx">
                         <h3 class="item-title">
                            <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
                            <template v-if="co.id">
@@ -152,7 +154,6 @@ export default {
          renewing: state => state.user.renewing
       }),
       ...mapGetters({
-        sortedCheckouts: 'user/sortedCheckouts',
         isBarred: 'user/isBarred',
         isSignedIn: 'user/isSignedIn',
         hasRenewSummary: 'user/hasRenewSummary'
@@ -211,6 +212,10 @@ export default {
 
          await this.$store.dispatch("user/getCheckouts")
          this.lookingUpUVA = false
+         if (this.$route.query.overdue) {
+            this.checkoutsOrder = "OVERDUE"
+            this.$store.commit("user/sortCheckouts", "OVERDUE")
+         }
       }
    }
 }

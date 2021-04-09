@@ -51,19 +51,21 @@ const item = {
          state.details = details
          state.digitalContent.splice(0, state.digitalContent.length)
       },
-      setDigitalContentStatus(state, data) {
-         let dcIdx = state.digitalContent.findIndex( f=>f.pid==data.pid )
+      setDigitalContentStatus(state, {pid, type, status}) {
+         let dcIdx = state.digitalContent.findIndex( f=>f.pid==pid )
          if ( dcIdx >= 0) {
             let dc = state.digitalContent[dcIdx]
-            if (data.type == "PDF") {
-               dc.pdf.status = data.status
+            if (type == "PDF") {
+               dc.pdf.status = status
             }
-            if ( data.type == "OCR") {
-               dc.ocr.status = "NOT_AVAIL"
-               if ( data.status.has_ocr ||  data.status.has_transcription) {
+            if ( type == "OCR") {
+               if ( status.has_ocr ||  status.has_transcription) {
+                  console.log("SET OCR READY")
                   dc.ocr.status = "READY"
-               } else if ( data.status.ocr_progress ) {
-                  dc.ocr.status = data.status.ocr_progress
+               } else if ( status.ocr_progress ) {
+                  dc.ocr.status = status.ocr_progress
+               } else {
+                  dc.ocr.status = "NOT_AVAIL"
                }
             }
             // splice is reactive, use it to replace the item in array
@@ -182,8 +184,7 @@ const item = {
       },
       async generateOCR(ctx, {item, email} ) {
          let url = `${item.ocr.generateURL}?email=${email}`
-         await axios.get(url).catch( err => {
-            console.log("OCR FAILED: "+err)
+         await axios.get(url).catch( () => {
             ctx.commit("setDigitalContentStatus", {pid: item.pid,  type: "PDF", status: "ERROR"})
          })
          await ctx.dispatch("getOCRStatus", item)
@@ -205,7 +206,7 @@ const item = {
             document.body.appendChild(fileLink)
             fileLink.click()
             window.URL.revokeObjectURL(fileURL)
-            ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "OCR", status: "READY"})
+            ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "OCR", status: {has_ocr: true}})
          }).catch( e => {
             console.error("Unable to download OCR text: "+e)
             ctx.commit("setDigitalContentStatus", {pid: item.pid, type: "OCR", status: "ERROR"})
@@ -222,6 +223,19 @@ const item = {
          axios.get(dcField.value).then((response) => {
             ctx.commit("setDigitalContentData", response.data)
             ctx.commit("setDigitalContentLoading", false)
+
+            // Get the status of each OCR object. Those that are ready will be available
+            // for all to download
+            let ocrs = ctx.state.digitalContent.filter( item => item.ocr && item.ocr.status == "UNKNOWN")
+            let timerID = setInterval( () => {
+               if ( ocrs.length > 0) {
+                  let dcOCR = ocrs.pop()
+                  ctx.dispatch("getOCRStatus", dcOCR)
+               } else {
+                  clearInterval(timerID)
+               }
+            }, 250)
+
          }).catch((_error) => {
             ctx.commit("setDigitalContentLoading", false)
          })
