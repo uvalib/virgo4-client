@@ -268,9 +268,8 @@ export default {
          this.$store.dispatch("requests/deleteHold", id);
       }
    },
-   async created() {
+   created() {
       if ( this.isSignedIn) {
-         await this.$store.dispatch("user/getRequests")
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
       }
    }

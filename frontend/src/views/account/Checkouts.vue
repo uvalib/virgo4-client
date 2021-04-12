@@ -139,7 +139,6 @@ export default {
    },
    data: function() {
       return {
-         lookingUpILL: true,
          lookingUpUVA: true,
          downloading: false,
       }
@@ -151,7 +150,8 @@ export default {
          checkoutsOrder: state => state.user.checkoutsOrder,
          requests: state => state.user.requests,
          ilsError: state => state.system.ilsError,
-         renewing: state => state.user.renewing
+         renewing: state => state.user.renewing,
+         lookingUpILL: state => state.user.lookingUp,
       }),
       ...mapGetters({
         isBarred: 'user/isBarred',
@@ -201,15 +201,10 @@ export default {
       }
    },
    async created() {
-      this.lookingUpILL = false
       this.lookingUpUVA = false
       if ( this.isSignedIn ) {
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
-         this.lookingUpILL = true
          this.lookingUpUVA = true
-         await this.$store.dispatch("user/getRequests")
-         this.lookingUpILL = false
-
          await this.$store.dispatch("user/getCheckouts")
          this.lookingUpUVA = false
          if (this.$route.query.overdue) {

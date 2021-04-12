@@ -92,7 +92,6 @@ export default {
    },
    created() {
       if ( this.isSignedIn) {
-         this.$store.dispatch("user/getRequests")
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Digital Deliveries")
       }
    }

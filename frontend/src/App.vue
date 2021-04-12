@@ -162,6 +162,7 @@ export default {
          if ( this.noILSAccount == false ) {
             this.$store.dispatch("user/getBillDetails")
             this.$store.dispatch("user/getCheckouts")
+            this.$store.dispatch("user/getRequests")
          }
          this.$store.dispatch("bookmarks/getBookmarks")
          if ( this.$store.getters["user/isUndergraduate"]) {
