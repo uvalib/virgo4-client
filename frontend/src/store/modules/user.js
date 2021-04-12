@@ -386,8 +386,9 @@ const user = {
          if (ctx.rootGetters["user/isGuest"]) return
          ctx.commit('setLookingUp', true)
 
-         return axios.all([axios.get(`/api/users/${ctx.state.signedInUser}/holds`),
-                    axios.get(`/api/users/${ctx.state.signedInUser}/illiad`),
+         return axios.all([
+            axios.get(`/api/users/${ctx.state.signedInUser}/holds`),
+            axios.get(`/api/users/${ctx.state.signedInUser}/illiad`),
          ]).then(axios.spread((holdResponse, illiadResponse) => {
             ctx.commit('setRequests', {
                holds: holdResponse.data.holds,
