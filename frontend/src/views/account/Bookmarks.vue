@@ -321,7 +321,6 @@ export default {
    },
    created() {
       if (this.isSignedIn) {
-         this.$store.dispatch("bookmarks/getBookmarks")
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
       }
    }

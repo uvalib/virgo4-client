@@ -41,7 +41,6 @@ export default {
    },
    created() {
       if ( this.isSignedIn) {
-         this.$store.dispatch("user/getAccountInfo")
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
       }
    }

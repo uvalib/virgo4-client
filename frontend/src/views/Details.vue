@@ -161,7 +161,6 @@ export default {
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
-         isSignedIn: 'user/isSignedIn',
          isKiosk: 'system/isKiosk',
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
@@ -248,10 +247,6 @@ export default {
                this.$router.replace( fixed )
                return
             }
-         }
-
-         if ( this.isSignedIn) {
-            this.$store.dispatch("bookmarks/getBookmarks")
          }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']

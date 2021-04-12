@@ -206,21 +206,21 @@ func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
 	tokenStr, err := getBearerToken(c.Request.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("ERROR: Authentication failed, no JWT in header: [%s]", err.Error())
-		c.AbortWithError(http.StatusUnauthorized, errors.New("missing authorization"))
+		c.String(http.StatusUnauthorized, "unauthorized request")
 		return
 	}
 
 	refreshToken, err := c.Cookie("v4_refresh")
 	if err != nil {
 		log.Printf("Authentication failed, refresh token for %s expired or not accessible %s", tokenStr, err.Error())
-		c.AbortWithError(http.StatusUnauthorized, errors.New("session expired"))
+		c.String(http.StatusUnauthorized, "unauthorized request")
 		return
 	}
 
 	refreshed, err := v4jwt.Refresh(tokenStr, 30*time.Minute, svc.JWTKey)
 	if err != nil {
 		log.Printf("ERROR: Unable to refresh JWT %s: %s", tokenStr, err.Error())
-		c.AbortWithError(http.StatusUnauthorized, errors.New("authorization failed"))
+		c.String(http.StatusUnauthorized, "unauthorized request")
 		return
 	}
 	v4Claims, _ := v4jwt.Validate(refreshed, svc.JWTKey)

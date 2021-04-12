@@ -160,6 +160,7 @@ export default {
       if ( this.isSignedIn ) {
          await this.$store.dispatch("user/getAccountInfo")
          if ( this.noILSAccount == false ) {
+            this.$store.dispatch("user/getBillDetails")
             this.$store.dispatch("user/getCheckouts")
          }
          this.$store.dispatch("bookmarks/getBookmarks")

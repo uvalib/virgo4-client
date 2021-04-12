@@ -194,8 +194,6 @@ export default {
    },
    created() {
       if ( this.isSignedIn ) {
-         this.$store.dispatch("user/getAccountInfo")
-         this.$store.dispatch("user/getBillDetails")
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "My Information")
       }
    }

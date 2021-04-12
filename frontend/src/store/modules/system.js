@@ -269,6 +269,7 @@ const system = {
          // dont report network errors!
          if ( err.error.includes("System error, we regret the inconvenience") ||
               err.error.includes("Network Error") ||
+              err.error.includes("status code 401") ||
               err.error.includes("ECONNREFUSED") ) {
             return
          }
