@@ -42,8 +42,6 @@ Vue.use(VueAnnouncer, {}, router)
 
 Vue.config.productionTip = false
 
-import '@fortawesome/fontawesome-free/css/all.css'
-
 new Vue({
   router,
   store,
