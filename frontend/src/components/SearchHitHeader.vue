@@ -35,10 +35,8 @@
          </div>
       </div>
       <div v-if="hit.header.author_display" class="author-wrapper">
-         <div v-if="hit.header.author" class="author">
-            <TruncatedText :id="`${hit.identifier}-author`"
-               :text="hit.header.author_display" :limit="authorTruncateLength" />
-         </div>
+         <TruncatedText :id="`${hit.identifier}-author`"
+            :text="hit.header.author_display" :limit="authorTruncateLength" />
       </div>
    </div>
 </template>
