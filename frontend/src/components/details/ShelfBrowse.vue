@@ -10,7 +10,7 @@
                <BrowseCard :current="isCurrent(idx)" :pool="pool" :data="b" style="height:100%"/>
             </li>
          </ul>
-         <router-link v-if="devServer" @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
+         <router-link @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
             View full page
          </router-link>
          <BrowsePager />
