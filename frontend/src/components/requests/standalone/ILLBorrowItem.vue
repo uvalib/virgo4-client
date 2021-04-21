@@ -23,7 +23,7 @@
             <span v-if="hasError('title')" class="error">Article or chapter title is required</span>
          </div>
          <div class="entry pure-control-group">
-            <label for="author">Article/Editor</label>
+            <label for="author">Author/Editor</label>
             <input type="text" v-model="request.author" id="author">
          </div>
          <div class="entry pure-control-group">
