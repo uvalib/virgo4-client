@@ -7,7 +7,7 @@
          :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
          :aria-expanded="expandedStr" :aria-controls="contentID">
          <slot name="title"></slot>
-         <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
+         <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
       </div>
       <transition name="accordion"
             v-on:before-enter="beforeEnter" v-on:enter="enter"
@@ -20,7 +20,7 @@
             <div v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
                :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }" >
                <slot name="footer"></slot>
-               <i class="accordion-icon fas fa-angle-down" :style="{ transform: rotation }"></i>
+               <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
             </div>
          </div>
       </transition>

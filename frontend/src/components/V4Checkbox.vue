@@ -32,9 +32,9 @@ export default {
    computed: {
       checkClass() {
          if ( this.isChecked )  {
-            return "fas fa-check-square"
+            return "fal fa-check-square"
          } else {
-            return "far fa-square"
+            return "fal fa-square"
          }
       },
       isChecked() {

@@ -28,7 +28,7 @@
             </div>
             <V4Button mode="icon" v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
                @click="dismissAlert(a.uuid)" aria-label="dismiss alert">
-               <i class="dismiss-icon far fa-window-close"></i>
+               <i class="dismiss-icon fal fa-window-close"></i>
             </V4Button>
          </div>
       </div>

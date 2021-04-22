@@ -1,13 +1,13 @@
 <template>
    <span class=v4-pager>
       <V4Button mode="small" :disabled="!prevAvailable"  @click="$emit('prior')" aria-label="previous result">
-         <i class="fas fa-arrow-left"></i>
+         <i class="fal fa-arrow-left"></i>
       </V4Button>
       <span class="page-info">
          {{$utils.formatNum(page)}} of {{$utils.formatNum(total)}}
       </span>
       <V4Button mode="small"  :disabled="!nextAvailable" @click="$emit('next')" aria-label="next result">
-         <i class="fas fa-arrow-right"></i>
+         <i class="fal fa-arrow-right"></i>
       </V4Button>
    </span>
 </template>

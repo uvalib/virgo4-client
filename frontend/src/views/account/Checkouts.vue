@@ -41,13 +41,16 @@
                               <option value="OVERDUE">Overdue / Recalled</option>
                            </select>
                         </span>
-                        <V4Button v-if="!isBarred" id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
-                        <V4Button v-if="checkouts.length" id="download-csv-btn"
-                           mode="secondary"
-                           @click="downloadCSV()"
-                           title="Download your checkouts as a CSV file" >
-                           <i class="fas fa-download"></i>
-                        </V4Button>
+                        <span class="checkout-options">
+                           <V4Button v-if="checkouts.length" id="download-csv-btn"
+                              mode="icon"
+                              @click="downloadCSV()"
+                              title="Download your checkouts as a CSV file" >
+                              <i class="fal fa-download"></i>
+                           </V4Button>
+                           <V4Button  id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
+
+                        </span>
                      </div>
                      <div class="item" v-for="(co,idx) in checkouts" :key="idx">
                         <h3 class="item-title">
@@ -287,10 +290,16 @@ export default {
       }
 
       #renew-all-btn {
-         margin-left: auto !important;
+         margin: 0;
       }
-      .v4-button {
-         margin: 0 10px !important;
+      #download-csv-btn {
+         cursor: pointer;
+         font-size: 1.25em;
+         margin: 0 15px;
+      }
+
+      .checkout-options{
+         margin-left: auto !important;
       }
    }
 

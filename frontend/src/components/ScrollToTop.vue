@@ -6,7 +6,7 @@
          @click.stop="backToTop"
          class="scroll-to-top" :class="{mobile: smallScreen}"
       >
-         <i class="fas fa-angle-up"></i>
+         <i class="fal fa-angle-up"></i>
       </div>
    </transition>
 </template>
@@ -63,9 +63,9 @@ export default {
    position: fixed;
    background-color: white;
    color: var(--uvalib-brand-orange);
-   font-size: 2.5em;
+   font-size: 2.9em;
    font-weight: 100;
-   border: 3px solid var(--uvalib-brand-orange);
+   border: 2px solid var(--uvalib-brand-orange);
    border-radius: 50%;
    cursor: pointer;
    align-items: center;

@@ -12,7 +12,7 @@
          role="switch" aria-checked="false"
          :aria-label="`bookmark ${data.title}`"
       >
-         <i class="bookmark far fa-bookmark"></i>
+         <i class="bookmark fal fa-bookmark"></i>
       </V4Button>
    </span>
 </template>

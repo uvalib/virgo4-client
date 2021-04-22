@@ -32,7 +32,7 @@
                            :to="searchURL(saved.token)"
                            :aria-label="`perform search named ${saved.name}`"
                         >
-                           <i class="fas fa-search"></i>
+                           <i class="viewsave fal fa-search"></i>
                         </router-link>
                      </span>
                      <Confirm title="Confirm Delete" v-on:confirmed="removeSavedSearch(saved.token)"
@@ -47,7 +47,7 @@
                <div v-if="saved.public" class="public-controls">
                   <a  class="view" :href="searchURL(saved.token)" target="_blank">
                      <span>View published search</span>
-                     <i class="link fas fa-external-link-alt"></i>
+                     <i class="link fal fa-external-link-alt"></i>
                   </a>
                   <span class="sep">|</span>
                   <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
@@ -235,9 +235,11 @@ span.search-actions {
    flex-flow: row nowrap;
    align-items: flex-start;
 }
-span.icon i.fas {
+span.icon i.fal {
    color: var(--uvalib-text);
-   margin-right: 15px;
+   margin-right: 13px;
+   margin-top: 4px;
+   padding: 2px;
 }
 i.link {
    margin: 0 0 0 5px;

@@ -61,7 +61,7 @@ type illiadNote struct {
 }
 
 // IlliadErrorMessage displayed in error modal
-const IlliadErrorMessage = "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account <i class=\"fas fa-external-link-alt\"></i></a> first."
+const IlliadErrorMessage = "There was an error during your request. You may need to <a target='_blank' href=\"https://www.library.virginia.edu/services/ils/ill/\">set up an Illiad account <i class=\"fal fa-external-link-alt\"></i></a> first."
 
 func illaidLibraryMapping(v4Lib string) string {
 	libs := map[string]string{

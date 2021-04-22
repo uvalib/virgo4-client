@@ -8,7 +8,7 @@
                role="button" aria-checked="false"
                :aria-label="`bookmark ${data.title}`"
             >
-               <i class="disabled bookmark far fa-bookmark trigger"></i>
+               <i class="disabled bookmark fal fa-bookmark trigger"></i>
             </V4Button>
             <V4Button v-else mode="primary" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
                role="button" aria-checked="false" aria-label="save search"

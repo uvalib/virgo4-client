@@ -12,13 +12,13 @@
          <template v-if="isKiosk==false">
             <!-- <li>
                <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
-                  <span class="menu-item"><i class="icon fas fa-university"></i>Course Reserves</span>
+                  <span class="menu-item"><i class="icon fal fa-university"></i>Course Reserves</span>
                </router-link>
             </li> -->
             <li role="none">
                <a tabindex="-1" id="feedbackmenu" role="menuitem"
                   href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
-                  <span class="menu-item"><i class="icon fas fa-comments"></i>Questions? Ask a Librarian</span>
+                  <span class="menu-item"><i class="icon fal fa-comment-dots"></i>Questions? Ask a Librarian</span>
                </a>
             </li>
             <li role="none"
@@ -78,7 +78,7 @@
                @keydown.down.prevent.stop="nextSubMenu">
                <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1"
                   :aria-expanded="isOpen('accountmenu').toString()">
-                  <i class="fas fa-user"></i>
+                  <i class="icon fal fa-user-circle"></i>
                   &nbsp;Signed in as {{signedInUser}}&nbsp;
                   <i class="fas fa-caret-down submenu-arrow" :class="{ rotated: isOpen('accountmenu') }"></i>
                </span>
@@ -139,7 +139,7 @@
             </li>
             <li v-if="isSignedIn == false" role="none">
                <router-link tabindex="-1" role="menuitem" id="accountmenu" to="/signin">
-                  <span tabindex="-1" class="menu-item"><i class="icon fas fa-user"></i>Sign In</span>
+                  <span tabindex="-1" class="menu-item"><i class="icon fal fa-user-circle"></i>Sign In</span>
                </router-link>
             </li>
             <li v-if="!isKiosk" class="menu-item alert-wrap"
@@ -147,7 +147,7 @@
                @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
                @keydown.space.prevent.stop="alertClicked"
             >
-               <div class="alert-bell icon fas fa-bell">
+               <div class="alert-bell icon fal fa-bell">
                   <span v-if="seenAlertsCount" class="alert-count">{{seenAlertsCount}}</span>
                </div>
             </li>
@@ -473,7 +473,7 @@ export default {
       }
    }
    .alert-wrap.dim  {
-      opacity: 0.6;
+      opacity: 0.4;
       cursor: default;
       &:hover {
          border-bottom: none;

@@ -1,17 +1,17 @@
 <template>
-   <V4Modal :id="id" title="Rename Bookmark Folder" ref="renamemodal" 
+   <V4Modal :id="id" title="Rename Bookmark Folder" ref="renamemodal"
       firstFocusID="rename" :buttonID="`${id}-open`" @opened="opened" >
       <template v-slot:button>
          <V4Button mode="icon" @click="$refs.renamemodal.show()" :id="`${id}-open`"
              :aria-label="`rename bookmark folder ${folderInfo.folder}`"
              style="margin: 0 5px"
          >
-            <i class="rename fas fa-edit"></i>
+            <i class="rename fal fa-edit"></i>
          </V4Button>
       </template>
       <template v-slot:content>
          <div class="message pure-form">
-            <input @keyup.enter="okClicked"  id="rename" type="text" v-model="folderName" 
+            <input @keyup.enter="okClicked"  id="rename" type="text" v-model="folderName"
                @keydown.shift.tab.stop.prevent="backTabInput"
                aria-required="true" aria-label="new folder name" required="required"/>
          </div>
@@ -72,7 +72,7 @@ export default {
 
 <style lang="scss" scoped>
 i.rename {
-   color: var(--uvalib-grey-dark);
+   color: black;
    cursor: pointer;
    font-size: 1.2em;
    padding: 2px;

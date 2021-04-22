@@ -19,11 +19,11 @@
       </template>
       <div class="browse-controls full">
          <V4Button class="pager" mode="primary" @click="browsePrior()" aria-label="browse previous shelf item">
-            <i class="prior pager fas fa-arrow-left"></i>
+            <i class="prior pager fal fa-arrow-left"></i>
          </V4Button>
          <span class="range"><b>CATALOG RANGE:</b>{{firstCall}}&nbsp;-&nbsp;{{lastCall}}</span>
          <V4Button class="pager" mode="primary" @click="browseNext()"  aria-label="browse next shelf item">
-            <i class="next pager fas fa-arrow-right"></i>
+            <i class="next pager fal fa-arrow-right"></i>
          </V4Button>
       </div>
       <div class="view-mode">
@@ -68,7 +68,7 @@ export default {
    data: function() {
       return {
          viewModes: [{id: 'gallery', title: "<i class='fas fa-grip-horizontal'></i>&nbsp;View gallery"},
-                     {id: 'list', title: "<i class='fas fa-list'></i>&nbsp;View list"}],
+                     {id: 'list', title: "<i class='fal fa-list'></i>&nbsp;View list"}],
          currViewMode: 'gallery',
          viewModeOpen: false,
          browseTarget: null

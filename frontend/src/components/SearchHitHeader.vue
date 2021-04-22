@@ -18,7 +18,7 @@
             <V4Button v-if="from=='DETAIL'"  mode="icon" @click="shareClicked" :id="`share-${hit.identifier}`"
                :aria-label="`copy link to ${hit.header.title}`"
             >
-               <i class="share fas fa-share-alt"></i>
+               <i class="share fal fa-share-alt"></i>
             </V4Button>
             <template v-if="showCitations">
                <div class="citation-control">

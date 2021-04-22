@@ -12,7 +12,7 @@
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
             <div class="img-toolbar">
                <a target="_blank" :href="imageURL('max')">
-                  View full size<i class="fas fa-external-link-alt"></i>
+                  View full size<i class="fal fa-external-link-alt"></i>
                </a>
             </div>
          </div>

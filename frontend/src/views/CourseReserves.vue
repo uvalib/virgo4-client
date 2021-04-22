@@ -21,12 +21,12 @@
             </div>
             <div class="links">
                <a href="https://collab.its.virginia.edu/portal" target="_blank">
-                  UVA Collab<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+                  UVA Collab<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                </a>
             </div>
             <div class="links">
                <a href="http://www.library.virginia.edu/services/course-reserves/" target="_blank">
-                  Place a Reserve (Instructors only)<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+                  Place a Reserve (Instructors only)<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                </a>
             </div>
          </div>

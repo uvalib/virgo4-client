@@ -15,10 +15,10 @@
                <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
             </div>
             <div v-else class="subcontent">
-               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
             </div>
             <div class="subcontent links">
-               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fas fa-external-link-alt"></i></a>
+               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
             </div>
 
             <component v-if="request" v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>

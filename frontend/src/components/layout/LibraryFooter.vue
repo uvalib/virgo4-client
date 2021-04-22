@@ -4,7 +4,7 @@
         This is the newest version of the Library catalog.
         <router-link id="feedback"
             :to="`/feedback?url=${feedbackURL()}`"
-            target="_blank">Please give us your feedback.<i class="fas fa-external-link-alt"></i></router-link>
+            target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></router-link>
      </div>
      <div class="footer-container">
       <div class="footer-bucket">

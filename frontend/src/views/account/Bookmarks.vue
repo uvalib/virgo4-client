@@ -66,7 +66,7 @@
                               </V4Checkbox>
                               <span v-if="folderInfo.public" class="public-url">
                                  <a :href="getPublicURL(folderInfo)" target="_blank">
-                                    <span>View</span><i class="link fas fa-external-link-alt"></i></a>
+                                    <span>View</span><i class="link fal fa-external-link-alt"></i></a>
                                  <span class="sep">|</span>
                                  <V4Button mode="text" @click="copyURL(folderInfo)">Copy URL to clipboard</V4Button>
                               </span>
@@ -499,6 +499,9 @@ i.details {
    color: var(--uvalib-grey-dark);
    margin-left: 20px;
    margin-top: 10px;
+   i {
+      margin: 0 2px 0 7px;
+   }
 }
 .folder-menu .v4-button {
    margin-bottom: 5px;

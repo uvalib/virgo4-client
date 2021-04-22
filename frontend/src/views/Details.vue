@@ -51,7 +51,7 @@
                            <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
                               href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
                            >
-                              More about Rights and Permissions<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+                              More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                            </a>
                         </span>
                         <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
@@ -83,7 +83,7 @@
                         :ariaLabel="`show Bluebook citation for ${details.header.title}`" >
                      </Citations>
                      <V4DownloadButton style="padding-left:0" label="Download RIS" :url="risURL" @click="downloadRISClicked"
-                        icon="fas fa-file-export" :iconInline="true"
+                        icon="fal fa-download" :iconInline="true"
                         :aria-label="`download RIS citation for ${details.header.title}`"
                      />
                   </dd>
@@ -91,7 +91,7 @@
                      <dd></dd>
                      <dt class="value more">
                         <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
-                           More Details<i style="margin-left:5px;" class="fas fa-external-link-alt"></i>
+                           More Details<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                         </a>
                      </dt>
                   </template>

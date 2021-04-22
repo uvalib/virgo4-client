@@ -1,5 +1,5 @@
 <template>
-   <V4Modal :id="id" :title="title" ref="confirmdlg" 
+   <V4Modal :id="id" :title="title" ref="confirmdlg"
       :firstFocusID="`${id}-cancelbtn`" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`"
    >
@@ -12,7 +12,7 @@
          <V4Button v-else mode="icon" @click="$refs.confirmdlg.show()" :id="`${id}-open`"
              :aria-label="ariaLabel"
          >
-            <i class="trash fas fa-trash-alt"></i>
+            <i class="trash fal fa-trash-alt"></i>
          </V4Button>
       </template>
       <template v-slot:content>
@@ -45,7 +45,7 @@ export default {
       },
       buttonLabel: {
          type: String,
-         default: "" 
+         default: ""
       },
       buttonMode: {
          type: String,
@@ -53,7 +53,7 @@ export default {
       },
       ariaLabel: {
          type: String,
-         default: ""    
+         default: ""
       }
    },
    methods: {
@@ -77,7 +77,7 @@ export default {
 
 <style lang="scss" scoped>
 i.trash {
-   color: var(--uvalib-grey-dark);
+   color: black;
    cursor: pointer;
    font-size: 1.2em;
    padding: 2px;
