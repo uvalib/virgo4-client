@@ -6,7 +6,7 @@
          @keydown.down.prevent.stop @keydown.up.prevent.stop>
          <li role="none">
             <router-link role="menuitem" id="searchmenu" @focus.native="resetMenus" @mousedown.native="searchClicked" to="/">
-               <span class="menu-item no-pad"><i class="icon fas fa-search"></i>Search</span>
+               <span class="menu-item no-pad"><i class="icon fal fa-search"></i>Search</span>
             </router-link>
          </li>
          <template v-if="isKiosk==false">

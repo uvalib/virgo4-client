@@ -31,6 +31,8 @@ Vue.prototype.$utils = utils
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 
+import '@fortawesome/fontawesome-pro/css/all.css'
+
 import Purecss from 'purecss'
 
 Vue.use(VueCookies)
