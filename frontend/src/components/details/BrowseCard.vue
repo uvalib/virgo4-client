@@ -121,7 +121,7 @@ export default {
    box-sizing: border-box;
    width: auto;
 
-   &:hover {
+   &:hover, &:focus-within, &:focus {
       top: -2px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
    }

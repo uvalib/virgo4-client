@@ -5,13 +5,13 @@
       >
          <template v-slot:button>
             <V4Button v-if="act == 'bookmark'" mode="icon" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
-               role="button" aria-checked="false"
+               role="switch" aria-checked="false"
                :aria-label="`bookmark ${data.title}`"
             >
                <i class="disabled bookmark fal fa-bookmark trigger"></i>
             </V4Button>
             <V4Button v-else mode="primary" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
-               role="button" aria-checked="false" aria-label="save search"
+               role="button" aria-label="save search"
             >
                Save Search
             </V4Button>
