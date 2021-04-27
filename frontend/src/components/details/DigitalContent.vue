@@ -6,7 +6,8 @@
       <div class="items" v-if="hasDigitalContent || googleBooksURL || hasExternalImages">
          <h2>View Online</h2>
          <div class="viewer" v-if="hasDigitalContent">
-            <iframe :src="curioURL" style="background:black;" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
+            <iframe v-if="isDevServer" :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
+            <iframe v-else :src="curioURL" :width="curioWidth"  :height="curioHeight" style="background:black;" allowfullscreen frameborder="0"/>
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
