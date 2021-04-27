@@ -123,7 +123,8 @@ export default {
       ...mapGetters({
          hasDigitalContent: 'item/hasDigitalContent',
          poolDetails: 'pools/poolDetails',
-         isSignedIn: 'user/isSignedIn'
+         isSignedIn: 'user/isSignedIn',
+         isDevServer: 'system/isDevServer',
       }),
       hasExternalImages() {
          let iiifField = this.details.detailFields.find( f => f.name=="iiif_image_url")
@@ -142,6 +143,9 @@ export default {
          let idx = selDO.oEmbedURL.indexOf("/oembed")
          let url = selDO.oEmbedURL.substring(0, idx)
          url += "/view/" + selDO.pid
+         if ( this.isDevServer) {
+            url = url.replace("curio", "curio-dev.internal")
+         }
          return url
       },
       curioWidth() {
