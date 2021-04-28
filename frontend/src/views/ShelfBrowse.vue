@@ -16,42 +16,52 @@
                <span class="item-call" v-html="browseTarget.call_number"></span>
             </div>
          </div>
-      </template>
-      <div class="browse-controls full">
-         <V4Button class="pager" mode="primary" @click="browsePrior()" aria-label="browse previous shelf item">
-            <i class="prior pager fal fa-arrow-left"></i>
-         </V4Button>
-         <span class="range"><b>CATALOG RANGE:</b>{{firstCall}}&nbsp;-&nbsp;{{lastCall}}</span>
-         <V4Button class="pager" mode="primary" @click="browseNext()"  aria-label="browse next shelf item">
-            <i class="next pager fal fa-arrow-right"></i>
-         </V4Button>
-      </div>
-      <div class="view-mode">
-         <span tabindex="0" class="view" id="view"
-             @click.stop="toggleViewMenu" @keyup.prevent.stop.enter="toggleViewMenu"
-         >
-            <span class="select-header">
-               <span v-html="viewMode"></span>
-               <i class="dd-caret fas fa-caret-down" v-bind:style="{ transform: rotation }"></i>
-            </span>
-            <transition name="grow"
-               v-on:before-enter="beforeEnter" v-on:enter="enter"
-               v-on:before-leave="beforeLeave" v-on:leave="leave"
-            >
-               <ul v-if="viewModeOpen" class="view-menu"  @keydown.space.prevent.stop role="group">
-                  <li v-for="vm in viewModes" :key="vm.id" v-html="vm.title"
-                     @click.stop.prevent="selectView(vm.id)"></li>
-               </ul>
-            </transition>
-         </span>
-      </div>
-      <div class="browse-detail" v-if="!working" >
-         <div class="browse-cards" :class="currViewMode">
-            <BrowseCard  v-for="(b,idx) in shelfBrowse" :current="isCurrent(idx)"
-               :pool="$route.params.src" :data="b"  :key="`b${b.id}`" :mode="currViewMode" :index="idx+1"
-            />
+         <div class="browse-controls full">
+            <V4Button class="pager" mode="primary" @click="browsePrior()" aria-label="browse previous shelf item">
+               <i class="prior pager fal fa-arrow-left"></i>
+            </V4Button>
+            <span class="range"><b>CATALOG RANGE:</b>{{firstCall}}&nbsp;-&nbsp;{{lastCall}}</span>
+            <V4Button class="pager" mode="primary" @click="browseNext()"  aria-label="browse next shelf item">
+               <i class="next pager fal fa-arrow-right"></i>
+            </V4Button>
          </div>
-      </div>
+         <div class="view-mode">
+            <button tabindex="0" class="view" id="view"
+               @click.stop="toggleViewMenu"
+               @keyup.esc="closeViewMenu"
+               @key.down.prevent.stop.enter="toggleViewMenu"
+               @keydown.down.prevent.stop="nextMenu"
+               @keydown.up.prevent.stop="prevMenu"
+               @keyup.down.prevent.stop @keyup.up.prevent.stop
+            >
+               <span class="select-header" aria-haspopup="listbox">
+                  <span v-html="viewMode"></span>
+                  <i class="dd-caret fas fa-caret-down" v-bind:style="{ transform: rotation }"></i>
+               </span>
+               <transition name="grow"
+                  v-on:before-enter="beforeEnter" v-on:enter="enter"
+                  v-on:before-leave="beforeLeave" v-on:leave="leave"
+               >
+                  <ul v-show="viewModeOpen" class="view-menu"  @keydown.space.prevent.stop role="group">
+                     <li v-for="vm in viewModes" :key="vm.id" v-html="vm.title" :id="vm.id"
+                        class="mode-item" tabindex="-1"
+                        @keydown.down.prevent.stop="nextMenu"
+                        @keydown.up.prevent.stop="prevMenu"
+                        @keydown.enter.prevent.stop="selectView(vm.id)"
+                        @click.stop.prevent="selectView(vm.id)">
+                     </li>
+                  </ul>
+               </transition>
+            </button>
+         </div>
+         <div class="browse-detail" >
+            <div class="browse-cards" :class="currViewMode">
+               <BrowseCard  v-for="(b,idx) in shelfBrowse" :current="isCurrent(idx)"
+                  :pool="$route.params.src" :data="b"  :key="`b${b.id}`" :mode="currViewMode" :index="idx+1"
+               />
+            </div>
+         </div>
+      </template>
    </div>
 </template>
 
@@ -70,6 +80,7 @@ export default {
          viewModes: [{id: 'gallery', title: "<i class='fas fa-grip-horizontal'></i>&nbsp;View gallery"},
                      {id: 'list', title: "<i class='fal fa-list'></i>&nbsp;View list"}],
          currViewMode: 'gallery',
+         currFocus: 'gallery',
          viewModeOpen: false,
          browseTarget: null
       };
@@ -80,7 +91,6 @@ export default {
          // in browse data and set it
          if ( newVal == false && this.browseTarget == null) {
             this.browseTarget = this.shelfBrowse.find(b=> b.id == this.$route.params.id)
-            console.log("CENTER: "+JSON.stringify(this.browseTarget ))
          }
       }
    },
@@ -120,6 +130,43 @@ export default {
       },
       toggleViewMenu() {
          this.viewModeOpen = !this.viewModeOpen
+      },
+      nextMenu() {
+         if ( !this.viewModeOpen ) {
+            this.viewModeOpen = true
+            this.currFocus = 'gallery'
+         } else {
+            if ( this.currFocus =='gallery' ) {
+               this.currFocus = 'list'
+            } else {
+               this.currFocus = 'gallery'
+            }
+         }
+         this.focusMenuItem()
+      },
+      prevMenu() {
+         if ( !this.viewModeOpen ) {
+            this.viewModeOpen = true
+            this.currFocus = 'list'
+         } else {
+            if ( this.currFocus =='gallery' ) {
+               this.currFocus = 'list'
+            } else {
+               this.currFocus = 'gallery'
+            }
+         }
+         this.focusMenuItem()
+      },
+      focusMenuItem() {
+         this.$nextTick( () => {
+            let menu = document.getElementById(this.currFocus)
+            if (menu) {
+               menu.focus()
+            }
+         })
+      },
+      closeViewMenu() {
+         this.viewModeOpen = false
       },
       isCurrent(idx) {
          if ( this.working) return false
@@ -212,6 +259,16 @@ export default {
       text-align: right;
       margin-right: 15px;
       .view {
+         display: inline-block;
+         outline: none;
+         cursor: pointer;
+         border: none;
+         background: transparent;
+         text-align: left;
+         padding: 0 10px;
+         text-align: left;
+         color: var(--uvalib-text);
+
          .select-header {
             width: 120px;
             display: flex;
@@ -256,6 +313,7 @@ export default {
          li {
             line-height: 35px;
             padding: 0 10px 0 10px;
+            outline: 0;
             &:hover {
                background-color: var(--uvalib-brand-blue-lightest);
                color: var(--uvalib-text-dark);

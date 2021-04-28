@@ -101,7 +101,7 @@ export default {
       },
    },
    methods: {
-      handleKeypress() {
+      handleKeypress(event) {
          //console.log("KEY "+event.keyCode)
          if (event.keyCode == 38 && this.highlightedIdx > 0) {
             // up arrow
