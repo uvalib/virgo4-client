@@ -127,6 +127,10 @@ export default {
       selectView( mode) {
          this.currViewMode = mode
          this.viewModeOpen = false
+         this.$nextTick( () => {
+            let dd = document.getElementById("view")
+            dd.focus()
+         })
       },
       toggleViewMenu() {
          this.viewModeOpen = !this.viewModeOpen
