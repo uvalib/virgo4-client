@@ -205,11 +205,13 @@ export default {
       },
       generatePDFInProgress(item) {
          if ( !item.pdf) return false
-         return !( item.pdf.status == "READY" || item.pdf.status == "ERROR" || item.pdf.status == "NOT_AVAIL" ||  item.pdf.status == "UNKNOWN")
+         return !( item.pdf.status == "READY" || item.pdf.status == "ERROR" || item.pdf.status == "FAILED" ||
+            item.pdf.status == "NOT_AVAIL" ||  item.pdf.status == "UNKNOWN")
       },
       generateOCRInProgress(item) {
          if ( !item.ocr) return false
-         return !( item.ocr.status == "READY" || item.ocr.status == "NOT_AVAIL" ||  item.ocr.status == "UNKNOWN")
+         return !( item.ocr.status == "READY" ||  item.ocr.status == "ERROR" || item.ocr.status == "FAILED" ||
+            item.ocr.status == "NOT_AVAIL" ||  item.ocr.status == "UNKNOWN")
       },
       async pdfClicked( item ) {
          await this.$store.dispatch("item/getPDFStatus", item )
@@ -217,8 +219,8 @@ export default {
             this.$analytics.trigger('PDF', 'PDF_DOWNLOAD_CLICKED', item.pid)
             window.location.href=item.pdf.url
             return
-         } else if (item.pdf.status == "ERROR" ) {
-            this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable.")
+         } else if (item.pdf.status == "ERROR" || item.pdf.status == "FAILED") {
+            this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable. Please try again later.")
             return
          }
 
@@ -232,9 +234,9 @@ export default {
              if (item.pdf.status == "READY" || item.pdf.status == "100%") {
                clearInterval(this.pdfTimerID)
                window.location.href=item.pdf.url
-            } else if (item.pdf.status == "ERROR" ) {
+            } else if (item.pdf.status == "ERROR" || item.pdf.status == "FAILED") {
                clearInterval(this.pdfTimerID)
-               this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable.")
+               this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable. Please try again later.")
             }
          }, 1000)
       },
@@ -244,9 +246,9 @@ export default {
              if (item.ocr.status == "READY" || item.ocr.status == "100%") {
                clearInterval(this.ocrTimerID)
                await this.$store.dispatch("item/downloadOCRText", item)
-            } else if (item.ocr.status == "ERROR" ) {
+            } else if (item.ocr.status == "ERROR" || item.ocr.status == "FAILED") {
                clearInterval(this.ocrTimerID)
-               this.store.commit('system/setError', "Sorry, unable to extract text for "+item.name)
+               this.store.commit('system/setError', "Sorry, unable to extract text for "+item.name+". Please try again later.")
             }
          }, 5000)
       },
