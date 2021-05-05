@@ -3,7 +3,7 @@
          enter-active-class="animated faster fadeIn"
          leave-active-class="animated faster fadeOut">
       <div v-if="showScrollTop" role="button"
-         @click.stop="backToTop"
+         @click.stop="backToTop" arial-label="scroll to top of page"
          class="scroll-to-top" :class="{mobile: smallScreen}"
       >
          <i class="fal fa-angle-up"></i>
