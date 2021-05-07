@@ -45,7 +45,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .collection-header {
-   background-color: var(--uvalib-grey-lightest);
+   background-color: white;
    padding: 15px;
    .top-row {
       display: flex;

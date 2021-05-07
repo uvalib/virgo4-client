@@ -8,6 +8,9 @@ const collection = {
       id: "",
       description: "",
       itemLabel: "Issue",
+      startDate: "",
+      endDate: "",
+      selectedYear: "",
       filter: {
          name: "",
          value: ""
@@ -41,7 +44,10 @@ const collection = {
          state.features.splice(0, state.features.length)
          state.description  = ""
          state.itemLabel = "Issue"
+         state.startDate = ""
+         state.endDate = ""
          state.filter = {name: "", value: ""}
+         state.selectedYear = ""
       },
       setCollectionDetails(state, data) {
          state.id = data.id
@@ -49,6 +55,11 @@ const collection = {
          data.features.forEach( f=> state.features.push(f) )
          state.description  = data.description
          state.itemLabel = data.items_label
+         state.startDate = data.start_date
+         state.endDate = data.end_date
+         if (state.startDate && state.startDate != "") {
+            state.selectedYear = state.startDate.split("-")[0]
+         }
          state.filter = {name: data.filter, value: data.filter_value}
       }
    },
@@ -62,7 +73,7 @@ const collection = {
             ctx.commit("setLookingUp", false)
          }).catch( () => {
             ctx.commit("setLookingUp", false)
-            ctx.commit("clearBrowseDetails")
+            ctx.commit("setCollectionDetails")
          })
       },
    }

@@ -5,7 +5,10 @@
          <V4Spinner message="Loading digital content..." />
       </div>
       <div v-else class="details-content" v-bind:style="{width: curioWidth }">
-         <div class="image-title">{{details.header.title}}</div>
+         <div class="image-title-bar">
+            <span class="image-title">{{details.header.title}}</span>
+            <SearchHitActions :hit="details" :pool="details.source" from="COLLECTION" />
+         </div>
          <div class="viewer">
             <iframe :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
          </div>
@@ -15,12 +18,13 @@
 
 <script>
 import CollectionHeader from "@/components/details/CollectionHeader"
+import SearchHitActions from '@/components/SearchHitActions'
 import { mapState } from "vuex"
 
 export default {
    name: "fullscreen-collection-view",
    components: {
-      CollectionHeader
+      CollectionHeader, SearchHitActions
    },
    computed: {
       ...mapState({
@@ -54,9 +58,15 @@ export default {
    .details-content {
       margin: 25px auto;
    }
-   .image-title {
+   .image-title-bar {
       text-align: left;
-      font-weight: bold;
+      display:flex;
+      flex-flow: row wrap;
+      justify-content: space-between;
+      align-items: center;
+      .image-title {
+         font-weight: bold;
+      }
    }
    .viewer iframe {
       margin-top:10px;

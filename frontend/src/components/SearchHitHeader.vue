@@ -14,25 +14,7 @@
                <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
             </router-link>
          </div>
-         <div class="icon-wrap">
-            <V4Button v-if="from=='DETAIL'"  mode="icon" @click="shareClicked" :id="`share-${hit.identifier}`"
-               :aria-label="`copy link to ${hit.header.title}`"
-            >
-               <i class="share fal fa-share-alt"></i>
-            </V4Button>
-            <template v-if="showCitations">
-               <div class="citation-control">
-                  <Citations title="Citations" :id="`citation-${hit.identifier}`" style="margin-right: 10px"
-                     :itemURL="hit.itemURL" format="all" buttonLabel="Cite" :from="from" :iconInline="true"
-                     :ariaLabel="`citations for ${hit.identifier}`" >
-                  </Citations>
-               </div>
-            </template>
-            <div class="bm-control">
-               <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,from)" :id="`bm-modal-${hit.identifier}`"/>
-               <SignInRequired v-else  :data="$utils.toBookmarkData(pool,hit,from)" :id="`bm-modal-${hit.identifier}`" act="bookmark" />
-            </div>
-         </div>
+         <SearchHitActions :hit="hit" :pool="pool" :from="from" />
       </div>
       <div v-if="hit.header.author_display" class="author-wrapper">
          <TruncatedText :id="`${hit.identifier}-author`"
@@ -42,11 +24,8 @@
 </template>
 
 <script>
-import AddBookmark from '@/components/modals/AddBookmark'
-import SignInRequired from '@/components/modals/SignInRequired'
 import TruncatedText from '@/components/TruncatedText'
-import Citations from '@/components/modals/Citations'
-import { mapGetters } from "vuex"
+import SearchHitActions from '@/components/SearchHitActions'
 export default {
    props: {
       hit: {
@@ -71,23 +50,14 @@ export default {
       },
    },
    components: {
-      AddBookmark,SignInRequired,TruncatedText,Citations
+      TruncatedText,SearchHitActions
    },
    computed: {
-      ...mapGetters({
-        isSignedIn: 'user/isSignedIn',
-      }),
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
       authorTruncateLength() {
          return 150
-      },
-      showCitations() {
-         if (this.from.toUpperCase() == 'SEARCH') {
-            return true
-         }
-         return false
       },
    },
    methods: {
@@ -95,15 +65,6 @@ export default {
          this.$store.commit("hitSelected", this.hit.identifier)
          this.$analytics.trigger('Results', 'DETAILS_CLICKED', this.hit.identifier)
       },
-      shareClicked() {
-         this.$analytics.trigger('Results', 'SHARE_ITEM_CLICKED', this.hit.identifier)
-         let URL = window.location.href
-         this.$copyText(URL).then( ()=> {
-            this.$store.commit("system/setMessage", "Item URL copied to clipboard.")
-         }, e => {
-            this.$store.commit("system/setError", "Unable to URL to clipboard: "+e)
-         })
-      }
    }
 }
 </script>

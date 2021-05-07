@@ -1,6 +1,6 @@
 <template>
    <div class="details">
-      <div class="working" v-if="details.searching" >
+      <div class="working" v-if="details.searching || loadingDigitalContent" >
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
@@ -32,6 +32,7 @@ export default {
          details : state => state.item.details,
          citationsURL: state => state.system.citationsURL,
          poolMapping: state=>state.system.poolMapping,
+         loadingDigitalContent : state => state.item.loadingDigitalContent,
       }),
       ...mapGetters({
          isDevServer: 'system/isDevServer',
@@ -69,7 +70,7 @@ export default {
             await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }
 
-         if ( bmTarget.origin == "DETAIL" ) {
+         if ( bmTarget.origin == "DETAIL" || bmTarget.origin == "COLLECTION" ) {
             let bmEle = document.getElementById(`bm-modal-${bmTarget.id}-btn`)
             if (bmEle) {
                bmEle.focus()
