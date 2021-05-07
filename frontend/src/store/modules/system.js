@@ -25,6 +25,7 @@ const system = {
       availabilityURL: "",
       hsIlliadURL: "",
       citationsURL: "",
+      collectionsURL: "",
       shelfBrowseURL: "",
       searchAPI: "",
       seenTranslateMsg: false,
@@ -166,6 +167,7 @@ const system = {
          state.devServer = cfg.devServer
          state.availabilityURL = cfg.availabilityURL
          state.citationsURL = cfg.citationsURL
+         state.collectionsURL = cfg.collectionsURL
          state.hsILLiadURL = cfg.hsILLiadURL
          state.shelfBrowseURL = cfg.shelfBrowseURL
          state.poolMapping = cfg.poolMapping

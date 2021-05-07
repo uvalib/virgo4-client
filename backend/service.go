@@ -27,6 +27,7 @@ type ServiceContext struct {
 	AvailabilityURL    string
 	VirgoURL           string
 	CitationsURL       string
+	CollectionsURL     string
 	ShelfBrowseURL     string
 	SearchAPI          string
 	CourseReserveEmail string
@@ -60,6 +61,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		VirgoURL:           cfg.VirgoURL,
 		SearchAPI:          cfg.SearchAPI,
 		CitationsURL:       cfg.CitationsURL,
+		CollectionsURL:     cfg.CollectionsURL,
 		ShelfBrowseURL:     cfg.ShelfBrowseURL,
 		JWTKey:             cfg.JWTKey,
 		CourseReserveEmail: cfg.CourseReserveEmail,
@@ -131,8 +133,6 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		Transport: defaultTransport,
 		Timeout:   5 * time.Minute,
 	}
-
-	log.Printf("DEFAULT CLIENT %+v", http.DefaultClient)
 
 	return &ctx, nil
 }
@@ -293,6 +293,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		SearchAPI        string               `json:"searchAPI"`
 		AvailabilityURL  string               `json:"availabilityURL"`
 		CitationsURL     string               `json:"citationsURL"`
+		ColectionsURL    string               `json:"collectionsURL"`
 		ShelfBrowseURL   string               `json:"shelfBrowseURL"`
 		HealthSciURL     string               `json:"hsILLiadURL"`
 		TranslateMessage string               `json:"translateMessage"`
@@ -304,6 +305,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
 	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL,
+		ColectionsURL:   svc.CollectionsURL,
 		AvailabilityURL: svc.AvailabilityURL, ShelfBrowseURL: svc.ShelfBrowseURL,
 		HealthSciURL: svc.Illiad.HealthSciURL, KioskMode: false}
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {

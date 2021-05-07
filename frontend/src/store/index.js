@@ -5,6 +5,7 @@ import analytics from '../analytics'
 import versionChecker from './plugins/version'
 import errorReporter from './plugins/error_reporter'
 import bookmarks from './modules/bookmarks'
+import collection from './modules/collection'
 import system from './modules/system'
 import pools from './modules/pools'
 import user from './modules/user'
@@ -654,6 +655,7 @@ export default new Vuex.Store({
 
    modules: {
       bookmarks: bookmarks,
+      collection: collection,
       filters: filters,
       item: item,
       pools: pools,

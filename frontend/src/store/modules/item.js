@@ -19,6 +19,16 @@ const item = {
       hasDetails: state => (identifier) => {
          return state.identifier == identifier
       },
+      isDigitalCollection: state => {
+         return state.details.detailFields.findIndex( f=> f.name == 'digital_collection') > -1
+      },
+      collectionName: state => {
+         let field = state.details.detailFields.find( f=> f.name == 'digital_collection')
+         if (field) {
+            return field.value
+         }
+         return ""
+      },
       hasDigitalContent: state => {
          if ( !state.digitalContent) return false
          return state.digitalContent.length > 0

@@ -161,6 +161,7 @@ export default {
       }),
       ...mapGetters({
          isAdmin: 'user/isAdmin',
+         isDevServer: 'system/isDevServer',
          isKiosk: 'system/isKiosk',
          poolDetails: 'pools/poolDetails',
          nextHitAvailable: 'nextHitAvailable',
@@ -168,7 +169,9 @@ export default {
          selectedHit: 'selectedHit',
          selectedResults: 'selectedResults',
          itemMessage:  'pools/itemMessage',
-         hasAvailability:  'pools/hasAvailability'
+         hasAvailability:  'pools/hasAvailability',
+         isDigitalCollection: 'item/isDigitalCollection',
+         collectionName: 'item/collectionName'
       }),
       risURL() {
          if (this.citationsURL == "") return ""
@@ -270,13 +273,16 @@ export default {
          }
 
          if ( this.notFound == false ) {
-            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
-            let collField = this.allFields.find( f => f.name == "digital_collection")
-            if (collField) {
-               this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collField.value)
-            }
-
             document.title = this.details.header.title
+
+            this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
+
+            if (this.isDigitalCollection) {
+               this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', this.collectionName )
+               if ( this.isDevServer ) {
+                  this.$store.dispatch("collection/getCollectionContext", this.collectionName )
+               }
+            }
          } else {
             document.title = "Virgo: Item Not Found"
          }

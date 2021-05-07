@@ -53,6 +53,7 @@ type ServiceConfig struct {
 	AvailabilityURL    string
 	VirgoURL           string
 	CitationsURL       string
+	CollectionsURL     string
 	ShelfBrowseURL     string
 	SearchAPI          string
 	CourseReserveEmail string
@@ -73,7 +74,8 @@ func LoadConfig() *ServiceConfig {
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
 	flag.StringVar(&cfg.AvailabilityURL, "availability", "https://availability-ws-dev.internal.lib.virginia.edu", "Availability service URL")
-	flag.StringVar(&cfg.CitationsURL, "citations", "https://citations-ws-dev.internal.lib.virginia.edu", "Citations service URL")
+	flag.StringVar(&cfg.CitationsURL, "citations", "https://collections-ws-dev.internal.lib.virginia.edu", "Citations service URL")
+	flag.StringVar(&cfg.CollectionsURL, "collections", "https://collections-ws-dev.internal.lib.virginia.edu", "Collections service URL")
 	flag.StringVar(&cfg.ShelfBrowseURL, "shelf", "https://shelf-browse-ws-dev.internal.lib.virginia.edu", "Shelf Browse service URL")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.JWTKey, "jwtkey", "", "JWT signature key")
@@ -145,6 +147,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("citations url param is required")
 	} else {
 		log.Printf("Citations URL: %s", cfg.CitationsURL)
+	}
+	if cfg.CollectionsURL == "" {
+		log.Fatal("collections url param is required")
+	} else {
+		log.Printf("Collections URL: %s", cfg.CollectionsURL)
 	}
 	if cfg.ShelfBrowseURL == "" {
 		log.Fatal("shelf browse url param is required")
