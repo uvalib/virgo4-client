@@ -24,7 +24,7 @@ const collection = {
       hasCalendar: state => {
          return state.features.findIndex( f => f == "calendar_navigation") > -1
       },
-      canFullScreen: state => {
+      isFullPage: state => {
          return state.features.findIndex( f => f == "full_page_view") > -1
       },
       canNavigate: state => {
@@ -48,7 +48,7 @@ const collection = {
          state.features.splice(0, state.features.length)
          data.features.forEach( f=> state.features.push(f) )
          state.description  = data.description
-         state.itemLabel = data.item_label
+         state.itemLabel = data.items_label
          state.filter = {name: data.filter, value: data.filter_value}
       }
    },
