@@ -7,7 +7,7 @@
       </V4Button>
       <transition name="fade">
          <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text"
-            :class="{inline: mode!='overlay', left: align='left'}"
+            :class="{inline: mode!='overlay', left: align=='left'}"
             :style="{background: backgroundColor, 'border-color': borderColor}"
             @keyup.stop.esc="hide">
             <slot name="content"></slot>
