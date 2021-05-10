@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '../../router'
 
 const collection = {
    namespaced: true,
@@ -67,7 +68,7 @@ const collection = {
       async getCollectionContext(ctx, collection) {
          ctx.commit("setLookingUp", true)
 
-         let url = `${ctx.rootState.system.collectionsURL}/collection/${collection}`
+         let url = `${ctx.rootState.system.collectionsURL}/collections/${collection}`
          await axios.get(url).then((response) => {
             ctx.commit("setCollectionDetails", response.data)
             ctx.commit("setLookingUp", false)
@@ -76,6 +77,30 @@ const collection = {
             ctx.commit("setCollectionDetails")
          })
       },
+      async nextItem(ctx, currDate) {
+         ctx.commit("setLookingUp", true)
+         let cname = ctx.state.filter.value
+         let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/next`
+         await axios.get(url).then((response) => {
+            let newURL = `/sources/uva_library/items/${response.data}`
+            router.push(newURL)
+            ctx.commit("setLookingUp", false)
+         }).catch( () => {
+            ctx.commit("setLookingUp", false)
+         })
+      },
+      async priorItem(ctx, currDate) {
+         ctx.commit("setLookingUp", true)
+         let cname = ctx.state.filter.value
+         let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/previous`
+         await axios.get(url).then((response) => {
+            let newURL = `/sources/uva_library/items/${response.data}`
+            router.push(newURL)
+            ctx.commit("setLookingUp", false)
+         }).catch( () => {
+            ctx.commit("setLookingUp", false)
+         })
+      }
    }
 }
 

@@ -3,10 +3,10 @@
       <div class="top-row">
          <span class="collection-title">{{collectionName}}</span>
          <span class="seq-nav" v-if="canNavigate">
-            <V4Button class="pager" mode="primary" @click="browsePrior()" :aria-label="`previous ${itemLabel}`">
+            <V4Button class="pager" mode="primary" @click="prevItem()" :aria-label="`previous ${itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{itemLabel}}
             </V4Button>
-            <V4Button class="pager" mode="primary" @click="browseNext()"  :aria-label="`next ${itemLabel}`">
+            <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${itemLabel}`">
                Next {{itemLabel}}<i class="next fal fa-arrow-right"></i>
             </V4Button>
          </span>
@@ -24,6 +24,7 @@ export default {
       ...mapState({
          itemLabel: state=>state.collection.itemLabel,
          lastSearchURL: state => state.lastSearchURL,
+         details : state => state.item.details,
       }),
       ...mapGetters({
          canNavigate: 'collection/canNavigate',
@@ -35,10 +36,16 @@ export default {
          this.$router.push( this.lastSearchURL )
       },
       nextItem() {
-         // TODO
+         let field = this.details.detailFields.find( f => f.name == "published_date")
+         if (field) {
+            this.$store.dispatch("collection/nextItem", field.value)
+         }
       },
       prevItem() {
-         // TODO
+         let field = this.details.detailFields.find( f => f.name == "published_date")
+         if (field) {
+            this.$store.dispatch("collection/priorItem", field.value)
+         }
       },
    },
 }
