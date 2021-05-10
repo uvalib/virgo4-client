@@ -6,25 +6,40 @@
             <V4Button class="pager" mode="primary" @click="prevItem()" :aria-label="`previous ${itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{itemLabel}}
             </V4Button>
+            <V4Button class="calendar" mode="primary" :aria-label="`view collection calendar`">
+               <i class="fal fa-calendar-alt"></i>
+            </V4Button>
             <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${itemLabel}`">
                Next {{itemLabel}}<i class="next fal fa-arrow-right"></i>
             </V4Button>
          </span>
       </div>
-      <div class="back" v-if="lastSearchURL">
-         <V4Button mode="text" @click="returnToSearch">Return to search results</V4Button>
+      <div class="mid-row">
+         <AboutCollection :details="description" />
+         <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
+      </div>
+      <div class="collection-search">
+         <input autocomplete="off" type="text" id="search"
+            placeholder="Search this collection"
+         >
+         <V4Button class="search" mode="primary">Search</V4Button>
       </div>
    </section>
 </template>
 
 <script>
 import { mapGetters, mapState } from "vuex"
+import AboutCollection from "@/components/disclosures/AboutCollection"
 export default {
+   components: {
+      AboutCollection
+   },
    computed: {
       ...mapState({
          itemLabel: state=>state.collection.itemLabel,
          lastSearchURL: state => state.lastSearchURL,
          details : state => state.item.details,
+         description : state => state.collection.description,
       }),
       ...mapGetters({
          canNavigate: 'collection/canNavigate',
@@ -58,12 +73,41 @@ export default {
       display: flex;
       flex-flow: row wrap;
       justify-content: space-between;
-      margin: 10px 0px;
+      margin: 10px 0;
       align-items: center;
    }
-   .back {
-      margin-top: 15px;
-      text-align: right;
+   .mid-row {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: center;
+      .back {
+         margin-left: auto;
+      }
+   }
+   .collection-search {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: stretch;
+      justify-content: flex-start;
+      max-width: 800px;
+      margin: 20px auto 0 auto;
+
+      input[type=text] {
+         font-size: 1.15em;
+         padding: 0.5vw 0.75vw;
+         border: 1px solid var(--uvalib-grey);
+         border-right: 0;
+         margin: 0 !important;
+         border-radius: 5px 0 0 5px;
+         flex: 1 1 auto;
+         min-width: 100px;
+      }
+      .search {
+         border-radius: 0 5px 5px 0;
+         margin: 0;
+         padding: 0 40px;
+      }
    }
 
    .collection-title {
@@ -74,6 +118,9 @@ export default {
       justify-content: flex-start;
    }
 
+   .v4-button.calendar {
+       margin: 0 0 0 5px;
+   }
    .v4-button.pager {
       margin: 0 0 0 5px;
       i.next {

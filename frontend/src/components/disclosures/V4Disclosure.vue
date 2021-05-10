@@ -6,7 +6,8 @@
          <slot name="summary"></slot>
       </V4Button>
       <transition name="fade">
-         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text" :class="{inline: mode!='overlay'}"
+         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text"
+            :class="{inline: mode!='overlay', left: align='left'}"
             :style="{background: backgroundColor, 'border-color': borderColor}"
             @keyup.stop.esc="hide">
             <slot name="content"></slot>
@@ -21,6 +22,10 @@ export default {
       id: {
          type: String,
          required: true
+      },
+      align: {
+         type: String,
+         default: "default"
       },
       closeOnBlur: {
          type: Boolean,
@@ -85,6 +90,9 @@ export default {
       z-index: 9999;
       min-width: 20%;
       max-width: 75%;
+   }
+   .full-text.left {
+      left: 5px;
    }
    .full-text.inline {
       position: relative;
