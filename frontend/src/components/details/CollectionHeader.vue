@@ -20,19 +20,27 @@
       </div>
       <div class="collection-search">
          <input autocomplete="off" type="text" id="search"
+            @keyup.enter="searchClicked"
+            v-model="basic"
             placeholder="Search this collection"
          >
-         <V4Button class="search" mode="primary">Search</V4Button>
+         <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
       </div>
    </section>
 </template>
 
 <script>
 import { mapGetters, mapState } from "vuex"
+import { mapFields } from 'vuex-map-fields'
 import AboutCollection from "@/components/disclosures/AboutCollection"
 export default {
    components: {
       AboutCollection
+   },
+   data: function() {
+      return {
+         collectionQuery: ""
+      }
    },
    computed: {
       ...mapState({
@@ -40,13 +48,37 @@ export default {
          lastSearchURL: state => state.lastSearchURL,
          details : state => state.item.details,
          description : state => state.collection.description,
+         collectionFacet : state => state.collection.filter,
       }),
       ...mapGetters({
          canNavigate: 'collection/canNavigate',
          collectionName: 'item/collectionName',
-      })
+         rawQueryString: 'query/string',
+         filtersQueryParam: 'filters/asQueryParam',
+      }),
+       ...mapFields({
+         userSearched: 'query.userSearched',
+         basic: 'query.basic',
+       })
    },
    methods: {
+      searchClicked() {
+         // Set up the search in the store and flag it is user generated
+         this.$store.commit("filters/reset")
+         let data = {pool: "presearch", facetID: this.collectionFacet.name, value: this.collectionFacet.value}
+         this.$store.commit("filters/toggleFilter", data)
+         this.$store.commit("query/setTargetPool", this.details.source)
+         this.userSearched = true
+
+         // use the model to setup the URL
+         let query = Object.assign({}, this.$route.query)
+         delete query.page
+         delete query.filter
+         query.q = this.rawQueryString
+         query.filter = this.filtersQueryParam( "presearch" )
+         query.pool = this.details.source
+         this.$router.push({path: "/search", query: query })
+      },
       returnToSearch() {
          this.$router.push( this.lastSearchURL )
       },
