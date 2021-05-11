@@ -3,12 +3,10 @@
       <div class="top-row">
          <span class="collection-title">{{collectionName}}</span>
          <span class="seq-nav" v-if="canNavigate">
-            <V4Button class="pager" mode="primary" @click="prevItem()" :aria-label="`previous ${itemLabel}`">
+            <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{itemLabel}}
             </V4Button>
-            <V4Button class="calendar" mode="primary" :aria-label="`view collection calendar`">
-               <i class="fal fa-calendar-alt"></i>
-            </V4Button>
+            <CollectionDates id="coll-dates" :date="publishedDate" />
             <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${itemLabel}`">
                Next {{itemLabel}}<i class="next fal fa-arrow-right"></i>
             </V4Button>
@@ -33,9 +31,10 @@
 import { mapGetters, mapState } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import AboutCollection from "@/components/disclosures/AboutCollection"
+import CollectionDates from "@/components/modals/CollectionDates"
 export default {
    components: {
-      AboutCollection
+      AboutCollection, CollectionDates
    },
    data: function() {
       return {
@@ -56,10 +55,17 @@ export default {
          rawQueryString: 'query/string',
          filtersQueryParam: 'filters/asQueryParam',
       }),
-       ...mapFields({
+      ...mapFields({
          userSearched: 'query.userSearched',
          basic: 'query.basic',
-       })
+      }),
+      publishedDate() {
+         let field = this.details.detailFields.find( f => f.name == "published_date")
+         if (field) {
+            return field.value
+         }
+         return ""
+      }
    },
    methods: {
       searchClicked() {
@@ -83,15 +89,15 @@ export default {
          this.$router.push( this.lastSearchURL )
       },
       nextItem() {
-         let field = this.details.detailFields.find( f => f.name == "published_date")
-         if (field) {
-            this.$store.dispatch("collection/nextItem", field.value)
+         let date = this.publishedDate
+         if (date) {
+            this.$store.dispatch("collection/nextItem", date)
          }
       },
       prevItem() {
-         let field = this.details.detailFields.find( f => f.name == "published_date")
-         if (field) {
-            this.$store.dispatch("collection/priorItem", field.value)
+         let date = this.publishedDate
+         if (date) {
+            this.$store.dispatch("collection/priorItem", date)
          }
       },
    },
@@ -149,17 +155,20 @@ export default {
       align-items: flex-start;
       justify-content: flex-start;
    }
-
-   .v4-button.calendar {
-       margin: 0 0 0 5px;
-   }
-   .v4-button.pager {
-      margin: 0 0 0 5px;
-      i.next {
+   .seq-nav {
+      display: flex;
+      flex-flow: row nowrap;
+      .v4-button.pager {
          margin: 0 0 0 5px;
+         i.next {
+            margin: 0 0 0 5px;
+         }
+         i.prior {
+            margin: 0 5px 0 0;
+         }
       }
-      i.prior {
-         margin: 0 5px 0 0;
+      .v4-button.pager.prev {
+         margin: 0 5px;
       }
    }
 }
