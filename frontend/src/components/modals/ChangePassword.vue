@@ -14,6 +14,10 @@
                Your password has been changed.
             </p>
          </template>
+         <template v-else-if="expiredToken">
+            <p class="error" v-html="error"></p>
+            <p class="error">Please request a new password reset email.</p>
+         </template>
          <template v-else>
             <p>New passwords must:</p>
             <ul>
@@ -55,7 +59,7 @@
          </template>
       </template>
       <template v-slot:controls>
-         <V4Button v-if="passwordChanged == false" mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.changePassword.hide()">
+         <V4Button v-if="passwordChanged == false && !expiredToken" mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.changePassword.hide()">
             Cancel
          </V4Button>
          <V4Button :disabled="okDisabled" mode="primary" :id="`${id}-okbtn`" @click="okClicked"
@@ -68,6 +72,7 @@
 
 <script>
 export default {
+   emits: ['show-forgot-password'],
    data: function() {
       return {
          id: "change-password",
@@ -77,7 +82,8 @@ export default {
          passwordToken: "",
          error: "",
          passwordChanged: false,
-         okDisabled: false
+         okDisabled: false,
+         expiredToken: false
       }
    },
    computed: {
@@ -110,8 +116,20 @@ export default {
          this.okDisabled = !this.okDisabled
       },
       okClicked() {
-         if ( this.passwordChanged) {
+         if ( this.passwordChanged ) {
+            let query = Object.assign({}, this.$route.query);
+            delete query.token;
+            this.$router.replace({ query });
             this.$refs.changePassword.hide()
+            return
+         }else if(this.expiredToken){
+            let query = Object.assign({}, this.$route.query);
+            delete query.token;
+            this.$router.replace({ query });
+            this.$refs.changePassword.hide()
+            this.$parent.$children.forEach( (c)=> c.$emit("show-forgot-password") )
+            return
+
          } else {
             this.error = ""
             if ( !this.hasPasswordToken && (this.currPassword == "" ||
@@ -144,19 +162,14 @@ export default {
                return
             }
 
-
-
             this.toggleOk()
             if(this.hasPasswordToken){
                let data = {reset_password_token: this.passwordToken, new_password: this.newPassword}
                this.$store.dispatch("user/changePasswordWithToken", data).then(() => {
                   this.passwordChanged = true
-                  let query = Object.assign({}, this.$route.query);
-                  delete query.token;
-                  this.$router.replace({ query });
                }).catch((e) => {
-                  console.log(e)
-                  this.$refs.newPassword.focus()
+                  this.expiredToken = true
+
                   if(e.response.data.message){
                      this.error = e.response.data.message
                   } else {

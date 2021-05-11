@@ -50,6 +50,11 @@ export default {
       }
    },
    props: ['user'],
+   mounted() {
+      this.$on('show-forgot-password', () => {
+         this.$refs.forgotPassword.show()
+         })
+   },
    methods: {
       opened(){
          this.userId = this.user
