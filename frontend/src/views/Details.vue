@@ -85,7 +85,13 @@ export default {
          if (this.isDigitalCollection) {
             this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', this.collectionName )
             if ( this.isDevServer ) {
-               this.$store.dispatch("collection/getCollectionContext", this.collectionName )
+               let dateField = this.details.detailFields.find( f => f.name == "published_date")
+               if (dateField) {
+                  this.$store.dispatch("collection/getCollectionContext",
+                     {collection: this.collectionName, date: dateField.value} )
+               } else {
+                  log.error("Collection with no publication date. Skipping.")
+               }
             }
          }
       },
