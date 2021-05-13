@@ -78,6 +78,8 @@ export default {
       font-size: 1.4em;
       display: inline-block;
       box-sizing: border-box;
+      padding:0;
+      margin:0;
       &:focus {
          @include be-accessible();
       }

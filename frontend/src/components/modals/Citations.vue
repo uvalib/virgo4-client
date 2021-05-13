@@ -2,9 +2,10 @@
    <V4Modal :id="id" :title="title" ref="citationsdlg" :buttonID="`${id}-open`" @opened="opened">
       <template v-slot:button>
          <V4Button v-if="buttonLabel" :mode="buttonMode" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
+            class="citations-text-button" :class="{toolbar: toolbarButton}"
              :icon="citationIcon" :aria-label="ariaLabel"
          >
-            {{buttonLabel}}<i class="icon-inline" :class="citationIcon" v-if="iconInline"></i>
+            {{buttonLabel}}<i class="icon-inline" :class="citationIcon" v-if="iconInline || toolbarButton"></i>
          </V4Button>
          <V4Button v-else mode="icon" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
              :icon="citationIcon" :aria-label="ariaLabel"
@@ -102,6 +103,10 @@ export default {
          default: ""
       },
       iconInline: {
+         type: Boolean,
+         default: false
+      },
+      toolbarButton: {
          type: Boolean,
          default: false
       },
@@ -255,10 +260,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep  .icon-inline {
+button.v4-button.citations-text-button .icon-inline {
    margin-left: 6px;
    font-size: 0.95em;
    display: inline-block;
+}
+button.v4-button.citations-text-button.toolbar {
+   color: #444;
+   cursor: pointer;
+   .icon-inline {
+      margin-left: 5px;
+      font-size: 0.95em;
+      display: inline-block;
+      color: #444;
+      cursor: pointer;
+      box-sizing: border-box;
+      &:hover {
+         color:var(--uvalib-brand-blue-light);
+      }
+   }
+   &:hover {
+      color:var(--uvalib-brand-blue-light);
+      text-decoration: none !important;
+      .icon-inline {
+         color:var(--uvalib-brand-blue-light);
+      }
+   }
 }
 ::v-deep  i.icon {
    color: var(--uvalib-grey-dark);

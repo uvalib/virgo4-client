@@ -22,6 +22,9 @@ Vue.component('V4Disclosure', V4Disclosure)
 Vue.component('Confirm', Confirm)
 Vue.component('SignInRequired', SignInRequired)
 
+import VueEllipseProgress from 'vue-ellipse-progress'
+Vue.use(VueEllipseProgress)
+
 import analytics from './analytics'
 Vue.prototype.$analytics = analytics
 
