@@ -52,7 +52,7 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		return
 	}
 
-	sendErr := svc.SendEmail("Virgo 4 Feedback", to, renderedEmail.String())
+	sendErr := svc.SendEmail("Virgo 4 Feedback", to, "", renderedEmail.String())
 	if sendErr != nil {
 		log.Printf("ERROR: Unable to send feedback email: %s", err.Error())
 		c.String(http.StatusInternalServerError, err.Error())

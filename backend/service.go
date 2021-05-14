@@ -493,11 +493,15 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 }
 
 // SendEmail will and send an email to the specified recipients
-func (svc *ServiceContext) SendEmail(subjectStr string, to []string, emailBody string) error {
+func (svc *ServiceContext) SendEmail(subjectStr string, to []string, replyTo string, emailBody string) error {
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
 	subject := fmt.Sprintf("Subject: %s\n", subjectStr)
 	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
-	msg := []byte(subject + toHdr + mime + emailBody)
+	replyToHdr := ""
+	if replyTo != "" {
+		replyToHdr = fmt.Sprintf("Reply-To: %s\n", replyTo)
+	}
+	msg := []byte(subject + toHdr + replyToHdr + mime + emailBody)
 
 	if svc.Dev.FakeSMTP {
 		log.Printf("Email is in dev mode. Logging message instead of sending")
