@@ -97,12 +97,12 @@ export default {
             this.$analytics.trigger('PDF', 'PDF_DOWNLOAD_CLICKED', item.pid)
             window.location.href=item.pdf.url
             return
-         } else if (item.pdf.status == "ERROR" || item.pdf.status == "FAILED") {
+         } else if (item.pdf.status == "ERROR") {
             this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable. Please try again later.")
             return
          }
 
-         if ( item.pdf.status == "NOT_AVAIL" ) {
+         if ( item.pdf.status == "NOT_AVAIL" || item.pdf.status == "FAILED") {
             this.$analytics.trigger('PDF', 'PDF_GENERATE_CLICKED', item.pid)
             await this.$store.dispatch("item/generatePDF", item)
          }
