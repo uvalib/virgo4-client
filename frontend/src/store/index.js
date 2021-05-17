@@ -61,9 +61,14 @@ export default new Vuex.Store({
             if ( !Array.isArray(urls) ) urls = [{value:urls}]
             let matched = false
             urls.some( u => {
-               if ( u.value.match(/search.lib.virginia.edu/) && u.value.match(tgtRegex) ) {
+               if (tgtPath == "/" && u.value.match(/search.lib.virginia.edu$/) ) {
                   out.push(ra)
                   matched = true
+               } else {
+                  if ( u.value.match(/search.lib.virginia.edu/) && u.value.match(tgtRegex) ) {
+                     out.push(ra)
+                     matched = true
+                  }
                }
                return matched == true
             })
