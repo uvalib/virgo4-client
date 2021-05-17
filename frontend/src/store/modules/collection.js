@@ -124,9 +124,14 @@ const collection = {
          let url = `${ctx.rootState.system.collectionsURL}/collections/${collection}`
          await axios.get(url).then((response) => {
             ctx.commit("setCollectionDetails", response.data)
-            let year = date.split("-")[0]
+            let startDate = date
+            if ( !startDate) {
+               startDate = ctx.state.startDate
+               console.log("date not set, using start date: "+startDate)
+            }
+            let year = startDate.split("-")[0]
             ctx.dispatch("getPublishedDates", year)
-            ctx.commit("setSelectedDate", date)
+            ctx.commit("setSelectedDate", startDate)
          }).finally( ()=> {
             ctx.commit("setLookingUp", false)
          })

@@ -365,6 +365,10 @@ const filters = {
             }
             ctx.commit("setPoolFacets", {pool: pool.id, facets: facets})
             ctx.commit('setUpdatingFacets', false)
+            let f = filterObj.facets.filter( f=>f.facet_id == "FilterDigitalCollection")
+            if (f.length == 1) {
+               this.dispatch("collection/getCollectionContext", {collection: f[0].value})
+            }
          }).catch((error) => {
             if (error.response && error.response.status == 501) {
                ctx.commit("setPoolFacets", {pool: pool.id, facets: false})

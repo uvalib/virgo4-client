@@ -25,6 +25,10 @@
             <div v-else class="no-filter">
                <span>None</span>
             </div>
+            <div class="collection-context" v-if="hasCollectionCtx">
+               <span class="desc" v-html="collectionDesc"></span>
+               <CollectionDates id="coll-dates" :date="collectionDate" />
+            </div>
          </div>
 
          <div v-if="hasNaFilter" class="filters-section">
@@ -48,16 +52,23 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
+import CollectionDates from "@/components/modals/CollectionDates"
 export default {
+   components: {
+      CollectionDates
+   },
    computed: {
       ...mapGetters({
          allFilters: 'filters/poolFilter',
          selectedResults: 'selectedResults',
          facetSupport: 'pools/facetSupport',
          filterQueryParam: 'filters/asQueryParam',
+         hasCollectionCtx: 'collection/isAvailable'
       }),
       ...mapState({
          updatingFacets: state => state.filters.updatingFacets,
+         collectionDesc: state => state.collection.description,
+         collectionDate: state => state.collection.startDate,
       }),
       ...mapFields({
         userSearched: 'query.userSearched',
@@ -128,6 +139,14 @@ export default {
    margin-top: 5px;
    .working {
       padding: 10px 20px;
+   }
+}
+.collection-context {
+   padding: 20px 10px 10px 10px;
+   display: flex;
+   flex-flow: row nowrap;
+   .desc {
+      margin-right: 25px;
    }
 }
 .filters-section {
