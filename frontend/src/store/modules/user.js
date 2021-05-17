@@ -166,11 +166,16 @@ const user = {
          return pickupLibraries
        },
        canLeoMobile: (_state, getters, _rootState) => {
-          if (getters.isFaculty || getters.isGraduate) {
-             return true
-          }
-          return false
-       },
+
+         let undergradLeoEligible = getters.isUndergraduate &&
+                                    Date.now >= Date.parse("5/24/2021") &&
+                                    Date.now <= Date.parse("8/12/2021")
+
+         if (getters.isFaculty || getters.isGraduate || undergradLeoEligible ) {
+            return true
+         }
+         return false
+      },
    },
 
    mutations: {
