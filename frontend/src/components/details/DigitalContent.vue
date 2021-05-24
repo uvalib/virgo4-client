@@ -410,7 +410,7 @@ export default {
    .hcontent {
       display: flex;
       flex-flow: row nowrap;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: stretch;
       padding: 0 15px 15px 15px;
    }
