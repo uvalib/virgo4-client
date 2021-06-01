@@ -78,7 +78,9 @@ export default {
             }
          }
 
-         document.title = this.details.header.title
+         if (this.details && this.details.header) {
+            document.title = this.details.header.title
+         }
 
          this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
 

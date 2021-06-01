@@ -79,7 +79,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$quarter: math.percentage(1/4);
+$quarter: math.percentage(  math.div(1, 4) );
 
 div.messsage-box {
    position: fixed;
