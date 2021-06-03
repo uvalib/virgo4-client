@@ -25,7 +25,7 @@ export default {
    components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel},
 
    computed: {
-      ...mapFields(['requests', 'item/availability', 'requests/refreshKey' ]),
+      ...mapFields(['requests', 'item/availability' ]),
       ...mapGetters({
          isSignedIn: 'user/isSignedIn',
          isAdmin: 'user/isAdmin',
@@ -44,7 +44,12 @@ export default {
          if (restoredPanel) {
             this.requests.activePanel = restoredPanel
             let optionSettings = this.findOption(restoredPanel)
-            this.requests.activeOption = optionSettings
+            if (optionSettings){
+               this.requests.activeOption = optionSettings
+            } else {
+               // selected option not found
+               this.requests.activePanel = 'OptionsPanel'
+            }
             let requestPanel = this.$refs.activePanel
             requestPanel.scrollIntoView({behavior: 'smooth', block: 'center'})
             this.$store.commit("restore/clear")
@@ -74,11 +79,6 @@ export default {
             }
       }
    },
-   watch: {
-      'requests.refreshKey': function(){
-         this.restore()
-      }
-   }
 
 }
 </script>

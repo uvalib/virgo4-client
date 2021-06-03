@@ -9,7 +9,6 @@ const requests = {
       requestOptions: [],
       errors: {},
       buttonDisabled: false,
-      refreshKey: 0,
 
       // selected request option
       activeOption: {},
@@ -127,9 +126,6 @@ const requests = {
       },
       disableButton(store, isDisabled) {
          store.buttonDisabled = isDisabled
-      },
-      reload(store){
-         store.refreshKey += 1
       },
       reset(store) {
          store.activePanel = 'OptionsPanel'
@@ -314,6 +310,12 @@ const requests = {
 
          ctx.commit('disableButton', false)
          ctx.commit('activePanel', "ConfirmationPanel")
+      },
+      reload(ctx){
+         let ident = ctx.rootGetters['item/identifier']
+         if(ident){
+            ctx.dispatch('item/getAvailability', ident, {root: true})
+         }
       }
    }
 }

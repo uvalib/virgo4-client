@@ -565,7 +565,7 @@ const user = {
                   throw e;
               }
             })
-            ctx.commit('requests/reload', null, {root: true})
+            ctx.dispatch('requests/reload', null, {root: true})
          }).catch((error) => {
             if (error.response && error.response.status == 503) {
                ctx.commit('system/setILSError', error.response.data, { root: true })
