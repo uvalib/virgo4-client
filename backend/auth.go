@@ -345,6 +345,7 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMetho
 		v4Claims.Role = v4jwt.Guest
 	} else {
 		v4Claims.HomeLibrary = ilsUser.HomeLibrary
+		v4Claims.Profile = ilsUser.Profile
 		v4Claims.CanLEO = (ilsUser.HomeLibrary != "UVA-LIB")
 		v4Claims.CanLEOPlus = false // TODO update with rules once they have been decided
 		v4Claims.CanPurchase = ilsUser.CanPurchase()

@@ -18,7 +18,7 @@ require (
 	github.com/rs/xid v1.3.0
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/ugorji/go v1.2.6 // indirect
-	github.com/uvalib/virgo4-jwt v0.0.0-20210129165249-920a9cfd20bd
+	github.com/uvalib/virgo4-jwt v0.0.0-20210603185225-4637094c1342
 	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
 	golang.org/x/sys v0.0.0-20210601080250-7ecdf8ef093b // indirect

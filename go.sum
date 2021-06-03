@@ -319,6 +319,8 @@ github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijb
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/uvalib/virgo4-jwt v0.0.0-20210129165249-920a9cfd20bd h1:eFcRGz+SyPq/xh6pGpCzd60Lqoi899BaFlI9yvm6cGk=
 github.com/uvalib/virgo4-jwt v0.0.0-20210129165249-920a9cfd20bd/go.mod h1:pPSHBTeq1RftpQGB6H1GaihwPZtl5RpGCEeov0eH05Y=
+github.com/uvalib/virgo4-jwt v0.0.0-20210603185225-4637094c1342 h1:FZSah2SCIKjRqtmS5KAE4L9yrwkD99FwHjvlcOQtSsw=
+github.com/uvalib/virgo4-jwt v0.0.0-20210603185225-4637094c1342/go.mod h1:pPSHBTeq1RftpQGB6H1GaihwPZtl5RpGCEeov0eH05Y=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/zsais/go-gin-prometheus v0.1.0 h1:bkLv1XCdzqVgQ36ScgRi09MA2UC1t3tAB6nsfErsGO4=
 github.com/zsais/go-gin-prometheus v0.1.0/go.mod h1:Slirjzuz8uM8Cw0jmPNqbneoqcUtY2GGjn2bEd4NRLY=
