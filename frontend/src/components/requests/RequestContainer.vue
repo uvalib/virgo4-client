@@ -1,5 +1,5 @@
 <template>
-   <div id="active-panel" ref="activePanel">
+   <div id="active-panel" ref="activePanel" >
       <component v-bind:is="requests.activePanel" />
       <V4Button mode="tertiary" v-if="showReset()" class="reset" @click="reset" v-html="resetLabel()"></V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
@@ -19,58 +19,67 @@ import VideoReservePanel from './panels/VideoReservePanel';
 import ConfirmationPanel from './panels/ConfirmationPanel';
 
 export default {
-  props: {
+   props: {
       titleId: String,
    },
-  components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel},
+   components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel},
 
-  computed: {
-    ...mapFields(['requests', 'item/availability' ]),
-    ...mapGetters({
-        isSignedIn: 'user/isSignedIn',
-        isAdmin: 'user/isAdmin',
-        restoredPanel: 'restore/activeRequest',
-        findOption: "requests/findOption",
-    }),
+   computed: {
+      ...mapFields(['requests', 'item/availability', 'requests/refreshKey' ]),
+      ...mapGetters({
+         isSignedIn: 'user/isSignedIn',
+         isAdmin: 'user/isAdmin',
+         restoredPanel: 'restore/activeRequest',
+         findOption: "requests/findOption",
+      }),
 
-  },
-  mounted() {
-    this.$store.commit('requests/reset')
-    let restoredPanel = this.$store.state.restore.activeRequest
-    if (restoredPanel) {
-        this.requests.activePanel = restoredPanel
-        let optionSettings = this.findOption(restoredPanel)
-        this.requests.activeOption = optionSettings
-        let requestPanel = this.$refs.activePanel
-        requestPanel.scrollIntoView({behavior: 'smooth', block: 'center'})
-        this.$store.commit("restore/clear")
-    }
-    if (!this.requests.activePanel){
-      this.requests.activePanel = 'OptionsPanel'
-    }
-  },
-  methods: {
-    reset(){
+   },
+   mounted() {
       this.$store.commit('requests/reset')
-      setTimeout( () => {
-         let opts = document.getElementsByClassName("option-button")
-         if (opts.length > 0) {
-            opts[0].focus()
+      this.restore()
+   },
+   methods: {
+      restore(){
+         let restoredPanel = this.$store.state.restore.activeRequest
+         if (restoredPanel) {
+            this.requests.activePanel = restoredPanel
+            let optionSettings = this.findOption(restoredPanel)
+            this.requests.activeOption = optionSettings
+            let requestPanel = this.$refs.activePanel
+            requestPanel.scrollIntoView({behavior: 'smooth', block: 'center'})
+            this.$store.commit("restore/clear")
          }
-      },150)
-    },
-    showReset(){
-      // Don't show reset on first and last panel
-      return !['OptionsPanel', 'PDAPanel'].includes(this.requests.activePanel)
-    },
-    resetLabel(){
-        if (this.requests.activePanel == 'ConfirmationPanel'){
-           return "Back"
-        }else{
-           return "Reset"
-        }
-     }
-  },
+         if (!this.requests.activePanel){
+            this.requests.activePanel = 'OptionsPanel'
+         }
+      },
+      reset(){
+         this.$store.commit('requests/reset')
+         setTimeout( () => {
+            let opts = document.getElementsByClassName("option-button")
+            if (opts.length > 0) {
+               opts[0].focus()
+            }
+         },150)
+      },
+      showReset(){
+         // Don't show reset on first and last panel
+         return !['OptionsPanel', 'PDAPanel'].includes(this.requests.activePanel)
+      },
+      resetLabel(){
+            if (this.requests.activePanel == 'ConfirmationPanel'){
+               return "Back"
+            }else{
+               return "Reset"
+            }
+      }
+   },
+   watch: {
+      'requests.refreshKey': function(){
+         this.restore()
+      }
+   }
+
 }
 </script>
 <style lang="scss" scoped>

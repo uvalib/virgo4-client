@@ -9,6 +9,7 @@ const requests = {
       requestOptions: [],
       errors: {},
       buttonDisabled: false,
+      refreshKey: 0,
 
       // selected request option
       activeOption: {},
@@ -126,6 +127,9 @@ const requests = {
       },
       disableButton(store, isDisabled) {
          store.buttonDisabled = isDisabled
+      },
+      reload(store){
+         store.refreshKey += 1
       },
       reset(store) {
          store.activePanel = 'OptionsPanel'

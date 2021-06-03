@@ -560,7 +560,12 @@ const user = {
             } else {
                analytics.trigger('User', 'PIN_SIGNIN', "other")
             }
-            router.push( ctx.rootState.restore.url )
+            router.push( ctx.rootState.restore.url ).catch((e)=>{
+               if (e.name !== 'NavigationDuplicated') {
+                  throw e;
+              }
+            })
+            ctx.commit('requests/reload', null, {root: true})
          }).catch((error) => {
             if (error.response && error.response.status == 503) {
                ctx.commit('system/setILSError', error.response.data, { root: true })
