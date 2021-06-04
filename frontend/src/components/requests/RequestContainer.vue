@@ -70,7 +70,7 @@ export default {
       },
       showReset(){
          // Don't show reset on first and last panel
-         return !['OptionsPanel', 'PDAPanel'].includes(this.requests.activePanel)
+         return !['OptionsPanel'].includes(this.requests.activePanel)
       },
       resetLabel(){
             if (this.requests.activePanel == 'ConfirmationPanel'){
