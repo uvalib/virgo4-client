@@ -91,8 +91,8 @@ const user = {
          if ( state.role == 'guest' || state.role == '' ) return false
          if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.description.toLowerCase().includes("undergraduate")) return true
-         if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
-             state.accountInfo.profile.toLowerCase().includes("undergrad")) return true
+         let profile = state.accountInfo.profile.toLowerCase()
+         if (profile.includes("ugrad") || profile.includes("undergrad")) return true
          return false
       },
       canPurchase: (state) => {
@@ -169,8 +169,8 @@ const user = {
        canLeoMobile: (_state, getters, _rootState) => {
 
          let undergradLeoEligible = getters.isUndergraduate &&
-                                    Date.now >= Date.parse("5/24/2021") &&
-                                    Date.now <= Date.parse("8/12/2021")
+                                    Date.now() >= Date.parse("5/24/2021") &&
+                                    Date.now() <= Date.parse("8/12/2021")
 
          if (getters.isFaculty || getters.isGraduate || undergradLeoEligible ) {
             return true
