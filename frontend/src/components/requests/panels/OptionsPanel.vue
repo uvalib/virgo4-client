@@ -28,6 +28,7 @@ export default {
 
          let newActive = this.requests.optionMap[option.type];
          let optionSettings = this.findOption(newActive);
+         this.requests.alertText = ""
          if (option.type == "directLink"){
             let tab = window.open(option.create_url, '_blank');
             tab.focus();
