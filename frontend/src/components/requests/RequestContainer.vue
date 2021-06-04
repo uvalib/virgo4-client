@@ -48,6 +48,7 @@ export default {
                this.requests.activeOption = optionSettings
             } else {
                // selected option not found
+               this.requests.alertText = "Sorry, the selected request type ("+restoredPanel.replace('Panel','')+") is not available for your account."
                this.requests.activePanel = 'OptionsPanel'
             }
             let requestPanel = this.$refs.activePanel
