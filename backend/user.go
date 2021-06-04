@@ -360,7 +360,7 @@ func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get holds for user %s with ILS Connector...", userID)
 	userURL := fmt.Sprintf("%s/v4/users/%s/holds", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
+	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
 		if ilsErr.StatusCode == 503 {
 			c.String(503, "Request information is currently unavailable. Please try again later.")
