@@ -112,9 +112,16 @@ const router = new Router({
             let jwtStr = Vue.$cookies.get("v4_jwt")
             store.commit("user/setUserJWT", jwtStr)
             store.commit('restore/load')
-            let tgtURL = store.state.restore.url
-            if (!tgtURL || tgtURL == "") {
-               tgtURL = "/"
+            let tgtURL = "/"
+            if ( store.state.user.noILSAccount &&  store.state.user.signedInUser != "") {
+               console.log("NetBadge success, but NO ILS ACCOUNT")
+               tgtURL = "/account"
+            } else {
+               tgtURL = store.state.restore.url
+               console.log("redirect to "+tgtURL)
+               if (!tgtURL || tgtURL == "") {
+                  tgtURL = "/"
+               }
             }
             next( tgtURL )
          }

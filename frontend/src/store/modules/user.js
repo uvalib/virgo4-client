@@ -54,6 +54,7 @@ const user = {
       canRequestAccount: state => {
          if (state.signedInUser.length == 0 ) return false
          if (state.noILSAccount == false ) return false
+         if (!state.accountInfo.description ) return false
 
          let desc = state.accountInfo.description.toLowerCase()
          let allowed = desc.includes("alumni") == false
@@ -295,6 +296,23 @@ const user = {
          state.authToken = jwtStr
          state.sessionType =  parsed.authMethod
          state.role = parsed.role
+
+         if (state.role == "guest" && state.sessionType == "netbadge" && state.signedInUser != "anonymous") {
+            state.noILSAccount = true
+            state.accountRequest.name = ""
+            state.accountRequest.id = parsed.userId
+            state.accountRequest.email = parsed.userId+"@virginia.edu"
+            state.accountRequest.phone = ""
+            state.accountRequest.department = ""
+            state.accountRequest.address1 = ""
+            state.accountRequest.address2 = ""
+            state.accountRequest.city = ""
+            state.accountRequest.state = ""
+            state.accountRequest.zip = ""
+            if (localStorage.getItem("v4_requested") ) {
+               state.accountRequested = true
+            }
+         }
          localStorage.setItem("v4_jwt", jwtStr)
       },
       setAccountInfo(state, data) {
@@ -350,7 +368,7 @@ const user = {
    actions: {
       async refreshAuth(ctx) {
          console.log("Refresh authentication...")
-         if ( ctx.state.role == "" || ctx.state.role == "guest") {
+         if ( ctx.state.sessionType != "netbadge" && (ctx.state.role == "" || ctx.state.role == "guest") ) {
             console.log("Get GUEST authorization token")
             await axios.post("/authorize", null).then( response => {
                ctx.commit("setUserJWT", response.data)
@@ -470,7 +488,7 @@ const user = {
          if ( ctx.state.checkouts.length > 0) {
             return
          }
-         if (ctx.state.signedInUser.length == 0) {
+         if (ctx.state.signedInUser.length == 0 || ctx.state.noILSAccount) {
             return
          }
          return axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
