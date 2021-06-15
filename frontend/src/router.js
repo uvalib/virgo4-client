@@ -231,7 +231,7 @@ router.afterEach((to, _from) => {
 })
 
 // This is called before every URL in the SPA is hit
-router.beforeEach( async (to, from, next) => {
+router.beforeEach( async (to, _from, next) => {
    store.commit("system/setILSError", "")
    if ( to.path == "/signedin") {
       // signedin page is a temporary redirect after netbadge. don't
@@ -260,7 +260,8 @@ router.beforeEach( async (to, from, next) => {
    let autoAuth = ["openurl"]
    if (autoAuth.includes(to.name)) {
       if (store.getters["user/isSignedIn"] == false) {
-         store.commit('restore/setURL', from)
+         store.commit('restore/setURL', to.fullPath)
+         store.commit('restore/save')
          store.dispatch('user/netbadge')
          return
       }

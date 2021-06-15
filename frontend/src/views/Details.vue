@@ -92,7 +92,7 @@ export default {
                   this.$store.dispatch("collection/getCollectionContext",
                      {collection: this.collectionName, date: dateField.value} )
                } else {
-                  log.error("Collection with no publication date. Skipping.")
+                  console.error("Collection with no publication date. Skipping.")
                }
             }
          }
