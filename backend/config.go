@@ -60,6 +60,7 @@ type ServiceConfig struct {
 	LawReserveEmail    string
 	FeedbackEmail      string
 	ILSAPI             string
+	CatalogPoolURL     string
 	JWTKey             string
 	Dev                DevConfig
 	DB                 DBConfig
@@ -83,6 +84,7 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.LawReserveEmail, "lawemail", "", "Law Email recipient for course reserves requests")
 	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
+	flag.StringVar(&cfg.CatalogPoolURL, "catalogPoolURL", "https://pool-solr-ws-uva-library-dev.internal.lib.virginia.edu/api/search", "Catalog Pool API URL")
 
 	// Dev mode settings
 	flag.StringVar(&cfg.Dev.AuthUser, "devuser", "", "Authorized computing id for dev")
@@ -127,6 +129,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("ils param is required")
 	} else {
 		log.Printf("ILS Connector API endpoint: %s", cfg.ILSAPI)
+	}
+	if cfg.CatalogPoolURL == "" {
+		log.Fatal("catalog pool param is required")
+	} else {
+		log.Printf("Catalog Pool API endpoint: %s", cfg.CatalogPoolURL)
 	}
 	if cfg.CourseReserveEmail == "" {
 		log.Fatal("cremail param is required")

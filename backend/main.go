@@ -82,6 +82,7 @@ func main() {
 		api.POST("/change_password_token", svc.ChangePasswordWithToken)
 		api.POST("/forgot_password", svc.ForgotPassword)
 		api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
+		api.GET("/searches/:token/rss", svc.GetRSSFeed)
 
 		users := api.Group("/users").Use(svc.AuthMiddleware, svc.UserMiddleware)
 		users.GET("/:uid", svc.GetUser)

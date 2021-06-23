@@ -34,6 +34,7 @@ type ServiceContext struct {
 	LawReserveEmail    string
 	FeedbackEmail      string
 	ILSAPI             string
+	CatalogPoolURL     string
 	JWTKey             string
 	Dev                DevConfig
 	Firebase           FirebaseConfig
@@ -68,6 +69,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		LawReserveEmail:    cfg.LawReserveEmail,
 		FeedbackEmail:      cfg.FeedbackEmail,
 		ILSAPI:             cfg.ILSAPI,
+		CatalogPoolURL:     cfg.CatalogPoolURL,
 		SMTP:               cfg.SMTP,
 		Illiad:             cfg.Illiad,
 		Dev:                cfg.Dev,
@@ -467,6 +469,30 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt 
 			url, err.StatusCode, err.Message, elapsedMS)
 	} else {
 		log.Printf("Successful response from ILS POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
+}
+
+// SearchPost sends a POST to the search pool and returns results
+func (svc *ServiceContext) SearchPost(body interface{}, jwt string) ([]byte, *RequestError) {
+	url := svc.CatalogPoolURL
+	log.Printf("Seach Pool POST request: %s", url)
+	startTime := time.Now()
+	b, _ := json.Marshal(body)
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
+	req.Header.Add("Content-type", "application/json")
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+	httpClient := svc.HTTPClient
+	rawResp, rawErr := httpClient.Do(req)
+	resp, err := handleAPIResponse(url, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		log.Printf("ERROR: Failed response from Search POST %s - %d:%s. Elapsed Time: %d (ms)",
+			url, err.StatusCode, err.Message, elapsedMS)
+	} else {
+		log.Printf("Successful response from Search POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
 	}
 	return resp, err
 }

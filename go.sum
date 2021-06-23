@@ -147,6 +147,8 @@ github.com/google/pprof v0.0.0-20200708004538-1a94d8640e99/go.mod h1:ZgVRPoUq/hf
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
+github.com/gorilla/feeds v1.1.1 h1:HwKXxqzcRNg9to+BbvJog4+f3s/xzvtZXICcQGutYfY=
+github.com/gorilla/feeds v1.1.1/go.mod h1:Nk0jZrvPFZX1OBe5NPiddPw7CfwF6Q9eqzaBbaightA=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
@@ -236,6 +238,8 @@ github.com/ugorji/go v1.2.6/go.mod h1:anCg0y61KIhDlPZmnH+so+RQbysYVyDko0IMgJv0Nn
 github.com/ugorji/go/codec v1.1.7/go.mod h1:Ax+UKWsSmolVDwsd+7N3ZtXu+yMGCf907BLYF3GoBXY=
 github.com/ugorji/go/codec v1.2.6 h1:7kbGefxLoDBuYXOms4yD7223OpNMMPNPZxXk5TvFcyQ=
 github.com/ugorji/go/codec v1.2.6/go.mod h1:V6TCNZ4PHqoHGFZuSG1W8nrCzzdgA2DozYxWFFpvxTw=
+github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656 h1:iTL8x10EXEyBt057McnLH6NKKySaqbwMbYOplStFhvc=
+github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656/go.mod h1:p+LmQBQahBom6DErthL8iGZU6NgRJ9aN2wM7EE6VBSE=
 github.com/uvalib/virgo4-jwt v0.0.0-20210603185225-4637094c1342 h1:FZSah2SCIKjRqtmS5KAE4L9yrwkD99FwHjvlcOQtSsw=
 github.com/uvalib/virgo4-jwt v0.0.0-20210603185225-4637094c1342/go.mod h1:pPSHBTeq1RftpQGB6H1GaihwPZtl5RpGCEeov0eH05Y=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
