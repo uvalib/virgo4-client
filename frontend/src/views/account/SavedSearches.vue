@@ -51,6 +51,25 @@
                   </a>
                   <span class="sep">|</span>
                   <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
+                  <span class="sep">|</span>
+                  <V4Modal :id="saved.token" ref="rssmodal" :title='`RSS Feed for "${saved.name}"`' :buttonID="`${saved.token}-open`" @closed="closeRSSModal()">
+                     <template v-slot:button>
+                        <V4Button @click="$refs.rssmodal.find(m=> m.id == saved.token).show()" :id="`${saved.token}-open`" mode="text">
+                           RSS <i class='link fal fa-rss'></i>
+                        </V4Button>
+                     </template>
+                     <template v-slot:content>
+                        <h3 class="rss-url" v-text="rssURL(saved.token)"></h3>
+                        <p>
+                        <V4Button  mode="primary" @click="copyRSS(saved.token)">
+                           Copy to clipboard
+                        </V4Button>
+                        <span v-html="rssMessage" class="rss-message"></span>
+                        </p>
+                        <p>This RSS feed will provide updates on new UVA Catalog items as they are received.</p>
+                        <p>Note: RSS feeds are not able to show updates from third party sources including articles.</p>
+                     </template>
+                  </V4Modal>
                </div>
             </div>
                <div class="controls">
@@ -86,6 +105,12 @@ export default {
    name: "requests",
    components: {
       AccountActivities
+   },
+   data: ()=>{
+      return {
+         rssMessage: ""
+      }
+
    },
    computed: {
       ...mapState({
@@ -146,6 +171,22 @@ export default {
             this.$store.commit("system/setError", "Unable to copy public search URL: "+e)
          })
       },
+      copyRSS(token) {
+         let URL = this.rssURL(token)
+         this.$copyText(URL).then( ()=> {
+            this.rssMessage = `Copied!`
+         }, e => {
+            this.rssMessage = `Unable to automatically copy RSS URL: ${e}`
+         })
+      },
+      openRSSModal(token){
+         this.$emit("clicked")
+         this.$refs.addbmmodal[token].open()
+      },
+      closeRSSModal(){
+         this.rssMessage = ""
+
+      },
       publicClicked(saved) {
          saved.public = !saved.public
          saved.userID = this.signedInUser
@@ -160,6 +201,9 @@ export default {
       },
       searchURL(key) {
          return `/search/${key}`
+      },
+      rssURL(key){
+         return `${window.location.protocol}//${window.location.host}/api/searches/${key}/rss`
       }
    },
    created() {
@@ -271,5 +315,17 @@ h3 {
    background:  var(--uvalib-blue-alt-light);
    padding: 5px 10px;
    border-bottom: 3px solid  var(--uvalib-blue-alt);
+}
+.rss-url {
+   -webkit-user-select: all; /* for Safari */
+  user-select: all;
+}
+.rss-message {
+   margin-left: 1em;
+   color: var(--uvalib-grey);
+
+}
+.v4-modal-wrapper{
+   display: inline;
 }
 </style>

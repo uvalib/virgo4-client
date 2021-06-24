@@ -124,6 +124,7 @@ div.v4-modal {
    box-shadow: $v4-box-shadow;
    border-radius: 5px;
    min-width: 300px;
+   word-break: break-word;
 
    div.v4-modal-content {
       padding: 10px 10px 0 10px;
