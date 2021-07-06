@@ -252,7 +252,7 @@ export default {
          }, 5000)
       },
    },
-   destroyed() {
+   unmounted() {
       if ( this.ocrTimerID > -1) {
          clearInterval(this.ocrTimerID)
       }

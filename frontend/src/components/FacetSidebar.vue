@@ -18,9 +18,9 @@
                Filters are not available for this search
             </div>
             <dl v-else>
-               <template v-for="facetInfo in facets">
-                  <dt :key="facetInfo.id" :id="facetInfo.id">{{facetInfo.name}}</dt>
-                  <div role="group" :aria-labelledby="facetInfo.id" :key="`l${facetInfo.id}`">
+               <template v-for="facetInfo in facets" :key="facetInfo.id">
+                  <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
+                  <div role="group" :aria-labelledby="facetInfo.id">
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
                         <V4Checkbox :checked="fv.selected"
                            @click="filterClicked(facetInfo.id, fv.value)">

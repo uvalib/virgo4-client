@@ -143,7 +143,7 @@ export default {
    created() {
       window.addEventListener("click", this.globalClick)
    },
-   destroyed() {
+   unmounted() {
       window.removeEventListener("click", this.globalClick)
    },
 }

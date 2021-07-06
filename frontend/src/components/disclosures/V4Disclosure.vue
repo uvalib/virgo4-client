@@ -1,7 +1,7 @@
 <template>
    <div :id="id" class="disclosure">
       <V4Button mode="text" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`"
-         @click="toggle" @esc="hide" @blur.native="blurred">
+         @click="toggle" @esc="hide" @blur="blurred">
          <i class="arrow fas fa-caret-right" :style="{ transform: rotation }"></i>
          <slot name="summary"></slot>
       </V4Button>

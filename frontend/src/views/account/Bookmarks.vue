@@ -83,12 +83,12 @@
                                  :aria-label="ariaLabel(bookmark)" />
                            </td>
                            <td>
-                              <router-link @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
+                              <router-link @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
                                  {{bookmark.details.title}}
                               </router-link>
                            </td>
                            <td>
-                              <router-link  @click.native="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
+                              <router-link  @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
                                  {{bookmark.details.author}}
                               </router-link>
                            </td>

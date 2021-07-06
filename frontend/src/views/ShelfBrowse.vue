@@ -68,11 +68,10 @@
 <script>
 import { mapState, mapGetters } from "vuex"
 import BrowseCard from '@/components/details/BrowseCard'
-import BrowsePager from '@/components/details/BrowsePager'
 export default {
    name: "shelf-browse",
    components: {
-      BrowseCard, BrowsePager
+      BrowseCard
    },
 
    data: function() {

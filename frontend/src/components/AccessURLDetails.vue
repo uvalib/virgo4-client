@@ -1,7 +1,7 @@
 <template>
    <div class="access-urls">
-      <template v-for="(p,idx) in urls">
-         <div class='provider' :key="idx">
+      <template v-for="(p,idx) in urls" :key="idx">
+         <div class='provider'>
             <template v-if="p.links.length==1">
                <a class="link-button" :href="p.links[0].url" target='_blank'
                   :aria-label="`access ${title} online with ${providerLabel(p.provider)}`"
@@ -28,14 +28,12 @@
                   </template>
                </div>
                <div class="links" :class="{full: mode=='full', indent: hasProviderInfo}">
-                  <template v-for="(l,idx) in providerLinks(p)">
-                     <div :key="`${l.url}-${idx}`">
-                        <a class="link-button" :href="l.url" target="_blank" :aria-label="`access ${title} ${l.label} with ${providerLabel(p.provider)}`">
-                           <template v-if="l.label">{{l.label}}</template>
-                           <template v-else>{{l.url}}</template>
-                        </a>
-                     </div>
-                  </template>
+                  <div v-for="(l,idx) in providerLinks(p)" :key="`${l.url}-${idx}`">
+                     <a class="link-button" :href="l.url" target="_blank" :aria-label="`access ${title} ${l.label} with ${providerLabel(p.provider)}`">
+                        <template v-if="l.label">{{l.label}}</template>
+                        <template v-else>{{l.url}}</template>
+                     </a>
+                  </div>
                   <template v-if="mode=='brief' && remainingLinks(p)">
                      <div>see {{remainingLinks(p)}} more on details page</div>
                   </template>

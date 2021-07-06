@@ -6,16 +6,14 @@
          </div>
          <div v-else>
             <ul class="bookmarks">
-               <template v-for="(bookmark,idx) in bookmarks">
-                  <li class="bookmark-wrapper" :key="`BM${idx}`">
-                     <div class="title">
-                        <router-link @click.native="bookmarkFollowed(bookmark.identifier)"  :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
-                     </div>
-                     <div class="info">
-                        <div class="author">{{bookmark.details.author}}</div>
-                     </div>
-                  </li>
-               </template>
+               <li class="bookmark-wrapper" v-for="(bookmark,idx) in bookmarks" :key="`BM${idx}`">
+                  <div class="title">
+                     <router-link @click="bookmarkFollowed(bookmark.identifier)"  :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
+                  </div>
+                  <div class="info">
+                     <div class="author">{{bookmark.details.author}}</div>
+                  </div>
+               </li>
             </ul>
          </div>
       </div>

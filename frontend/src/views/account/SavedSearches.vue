@@ -20,7 +20,7 @@
                   </V4Checkbox>
                   <span>
                      <router-link :aria-label="`perform search named ${saved.name}`"
-                        @mousedown.native="savedSearchClicked('saved')"
+                        @mousedown="savedSearchClicked('saved')"
                         :to="searchURL(saved.token)"
                      >
                         {{saved.name}}
@@ -28,7 +28,7 @@
                   </span>
                   <span class="search-actions">
                      <span class="icon">
-                        <router-link @mousedown.native="savedSearchClicked('saved')"
+                        <router-link @mousedown="savedSearchClicked('saved')"
                            :to="searchURL(saved.token)"
                            :aria-label="`perform search named ${saved.name}`"
                         >
@@ -84,7 +84,7 @@
             <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
                <template v-if="urlToText(h).length > 0">
                   <span class="num">{{idx+1}}.</span>
-                  <router-link @mousedown.native="savedSearchClicked('history')" class="history" :to="h">{{urlToText(h)}}</router-link>
+                  <router-link @mousedown="savedSearchClicked('history')" class="history" :to="h">{{urlToText(h)}}</router-link>
                </template>
             </div>
                <div class="controls">

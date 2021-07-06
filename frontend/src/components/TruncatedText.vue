@@ -11,7 +11,7 @@
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
             <div  v-if="!showFull" :id="`${id}-cut`" class="truncated"  aria-live="polite" >
-               <span class="text" :inner-html.prop="text | truncate(limit)"></span>
+               <span class="text" :inner-html.prop="truncateText(text)"></span>
                <span class="trigger" @click.prevent.stop="toggle">
                   <span  v-if="mode=='text'" class="more">...&nbsp;More</span>
                   <span  v-else class="more icon">...</span>
@@ -47,17 +47,6 @@ export default {
       id: {
          type: String,
          required: true
-      }
-   },
-   filters: {
-      truncate: function (value, limit) {
-         if (!value) return "";
-         if (value.length > limit) {
-            var trunc = value.substr(0, limit-1)
-            var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()
-            return out
-         }
-         return value
       }
    },
    data: function() {

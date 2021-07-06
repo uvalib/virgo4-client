@@ -3,16 +3,21 @@ module.exports = {
   env: {
     node: true
   },
-  'extends': [
-     "plugin:vue/base"
+  "extends": [
+    "plugin:vue/vue3-essential",
+    "eslint:recommended"
   ],
   rules: {
     'no-unused-vars': [2, {"args": "all", "argsIgnorePattern": "^_.*"}],
-   //  'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'experimental-script-setup-vars': 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    "vue/no-v-for-template-key": "off",
+    "vue/no-v-for-template-key-on-child": 2,
+    "vue/html-self-closing": "off" // Fix v-for/template/key bug
   },
   parserOptions: {
     parser: 'babel-eslint'
   }
 }
+
+

@@ -10,7 +10,7 @@
                <BrowseCard :current="isCurrent(idx)" :pool="pool" :data="b" style="height:100%"/>
             </li>
          </ul>
-         <router-link @click.native="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
+         <router-link @click="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
             View full page
          </router-link>
          <BrowsePager />
@@ -24,8 +24,6 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import AddBookmark from '@/components/modals/AddBookmark'
-import SignInRequired from '@/components/modals/SignInRequired'
 import BrowseCard from '@/components/details/BrowseCard'
 import BrowsePager from '@/components/details/BrowsePager'
 export default {
@@ -44,7 +42,7 @@ export default {
       }
    },
    components: {
-      AddBookmark, SignInRequired, BrowseCard, BrowsePager
+      BrowseCard, BrowsePager
    },
    computed: {
       ...mapState({

@@ -13,7 +13,7 @@
             <div class="message-body">
                Your Virgo session has expired.
                <br />
-               <router-link id="resignlink" @click.native="dismiss" to="/signin">Sign in again.</router-link>
+               <router-link id="resignlink" @click="dismiss" to="/signin">Sign in again.</router-link>
             </div>
             <div class="controls">
                <V4Button mode="primary" id="dismiss" @esc="dismiss" @click="dismiss">OK</V4Button>

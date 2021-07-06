@@ -204,7 +204,7 @@ export default {
             btn = document.getElementById("citation-tab0")
          }
          if ( !btn ) {
-            btn = document.getElementById(`${id}-dismissbtn`)
+            btn = document.getElementById(`${this.id}-dismissbtn`)
          }
          btn.focus()
       },

@@ -10,14 +10,12 @@
                <template v-if="hasSelections(psf)">
                   <dt :key="psf.value" class="label">{{psf.name}}</dt>
                   <dd :key="`filters-${psf.id}`" class="filter">
-                     <template  v-for="sel in selections(psf)">
-                        <span :key="sel.value" class="selected">
-                           <V4Button mode="icon" class="remove" @click="sel.selected = false"
-                              :aria-label="`remove filter ${sel.value}`">
-                              <i class="fas fa-times-circle"></i>{{sel.value}}
-                           </V4Button>
-                        </span>
-                     </template>
+                     <span  v-for="sel in selections(psf)" :key="sel.value" class="selected">
+                        <V4Button mode="icon" class="remove" @click="sel.selected = false"
+                           :aria-label="`remove filter ${sel.value}`">
+                           <i class="fas fa-times-circle"></i>{{sel.value}}
+                        </V4Button>
+                     </span>
                   </dd>
                </template>
             </template>

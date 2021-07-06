@@ -1,5 +1,5 @@
 <template>
-   <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened"
+   <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened" @show-forgot-password="refs.forgotPassword.show()"
       firstFocusID="userId" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`">
       <template v-slot:button>
@@ -50,11 +50,6 @@ export default {
       }
    },
    props: ['user'],
-   mounted() {
-      this.$on('show-forgot-password', () => {
-         this.$refs.forgotPassword.show()
-         })
-   },
    methods: {
       opened(){
          this.userId = this.user

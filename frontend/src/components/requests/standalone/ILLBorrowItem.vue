@@ -88,9 +88,7 @@
             <label for="doctype">Preferred pickup location<span class="required">*</span></label>
             <select v-model="request.pickup" id="pickup">
                <option value="">Select a location</option>
-               <template v-for="l in pickupLibraries">
-                  <option :value="l.id" :key="l.id">{{l.name}}</option>
-               </template>
+               <option v-for="l in pickupLibraries" :key="l.id" :value="l.id">{{l.name}}</option>
             </select>
             <span v-if="hasError('pickup')" class="error">Pickup location is required</span>
          </div>

@@ -5,13 +5,13 @@
          @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
          @keydown.down.prevent.stop @keydown.up.prevent.stop>
          <li role="none">
-            <router-link role="menuitem" id="searchmenu" @focus.native="resetMenus" @mousedown.native="searchClicked" to="/">
+            <router-link role="menuitem" id="searchmenu" @focus="resetMenus" @mousedown="searchClicked" to="/">
                <span class="menu-item no-pad"><i class="icon fal fa-search"></i>Search</span>
             </router-link>
          </li>
          <template v-if="isKiosk==false">
             <!-- <li>
-               <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown.native="closeSubMenus">
+               <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown="closeSubMenus">
                   <span class="menu-item"><i class="icon fal fa-university"></i>Course Reserves</span>
                </router-link>
             </li> -->
@@ -194,7 +194,7 @@ export default {
    created() {
       window.addEventListener("click", this.resetMenus)
    },
-   destroyed() {
+   unmounted() {
       window.removeEventListener("click", this.resetMenus)
    },
    methods: {

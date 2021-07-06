@@ -25,9 +25,9 @@
                      <V4LinksList id="author-links" :inline="true" :links="getBrowseLinks('author', details.header.author.value)" />
                   </dd>
                </template>
-               <template v-for="(field,idx) in allDisplayFields">
-                  <dt class="label" :key="`l${idx}`">{{field.label}}:</dt>
-                  <dd class="value" :key="`v${idx}`">
+               <template v-for="(field,idx) in allDisplayFields"  :key="`lv${idx}`">
+                  <dt class="label">{{field.label}}:</dt>
+                  <dd class="value">
                      <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
                         :links="getBrowseLinks('subject', field.value)" />
                      <span class="related" v-else-if="field.type=='related-url'">
@@ -96,7 +96,6 @@ import V4Pager from '@/components/V4Pager'
 import CitationsList from '@/components/details/CitationsList'
 import ShelfBrowse from "@/components/details/ShelfBrowse"
 import DigitalContent from "@/components/details/DigitalContent"
-import CollectionHeader from "@/components/details/CollectionHeader"
 
 export default {
    name: "item-view",
@@ -107,7 +106,7 @@ export default {
    },
    components: {
       SearchHitHeader, Availability, TruncatedText, V4Pager, ShelfBrowse, DigitalContent,
-      AccordionContent, AccessURLDetails, V4LinksList, CitationsList, CollectionHeader
+      AccordionContent, AccessURLDetails, V4LinksList, CitationsList
    },
    computed: {
       ...mapState({

@@ -187,7 +187,7 @@ export default {
          this.$store.commit("system/setDisplayWidth",window.innerWidth)
       }
    },
-   destroyed: function() {
+   unmounted: function() {
       window.removeEventListener("scroll", this.scrollHandler)
    }
 };

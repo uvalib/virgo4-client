@@ -4,10 +4,10 @@
       <div class="wrapper">
          <span class="note">Authors related to your search</span>
          <div class="searches">
-            <template v-for="(s,idx) in suggestions.slice(0,2)">
-               <span class="sep" v-if="idx > 0" :key="`sep${idx}`">|</span>
-               <router-link @mousedown.native="suggestionClick(s.value)"
-                  class="suggestion" :key="`s${idx}`"
+            <template v-for="(s,idx) in suggestions.slice(0,2)"  :key="`sugest${idx}`">
+               <span class="sep" v-if="idx > 0">|</span>
+               <router-link @mousedown="suggestionClick(s.value)"
+                  class="suggestion"
                   :aria-label="linkLabel(s)"
                   :to="getRelatedLink(s)"
                >
@@ -19,10 +19,10 @@
                <V4Button mode="text" @click="moreClicked" class="more">Show More...</V4Button>
             </template>
             <template  v-if="suggestions.length > 2 && moreVisible == true">
-               <template v-for="(s,idx) in suggestions.slice(2)">
-                  <span class="sep" :key="`sep${idx+2}`">|</span>
-                  <router-link  @mousedown.native="suggestionClick(s.value)"
-                     class="suggestion" :aria-label="linkLabel(s)" :key="`s${idx+2}`"
+               <template v-for="(s,idx) in suggestions.slice(2)"  :key="`sugest${idx+2}`">
+                  <span class="sep">|</span>
+                  <router-link  @mousedown="suggestionClick(s.value)"
+                     class="suggestion" :aria-label="linkLabel(s)"
                      :to="getRelatedLink(s)"
                   >
                      {{s.value}}

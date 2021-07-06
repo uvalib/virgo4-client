@@ -21,14 +21,15 @@
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
-               <template  v-for="(r,idx) in sourceTabs">
-                  <V4Button mode="text" @click="resultsButtonClicked(idx)" :key="idx" class="pool" v-bind:class="{showing: idx == selectedResultsIdx}">
-                     <span>
-                        <span class="pool">{{r.pool.name}}</span>
-                        <span :aria-label="`has ${r.total} results`" class="total">({{$utils.formatNum(r.total) || '0'}})</span>
-                     </span>
-                  </V4Button>
-               </template>
+               <V4Button v-for="(r,idx) in sourceTabs" :key="idx"
+                  class="pool" v-bind:class="{showing: idx == selectedResultsIdx}"
+                  mode="text" @click="resultsButtonClicked(idx)"
+               >
+                  <span>
+                     <span class="pool">{{r.pool.name}}</span>
+                     <span :aria-label="`has ${r.total} results`" class="total">({{$utils.formatNum(r.total) || '0'}})</span>
+                  </span>
+               </V4Button>
                <V4Select v-if="results.length > maxTabs" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                   :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
                   placeholder="More"

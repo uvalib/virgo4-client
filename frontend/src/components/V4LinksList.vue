@@ -1,13 +1,11 @@
 <template>
    <div :id="id" class="links-list">
       <div v-if="links.length <= 5" class="link-list">
-         <template v-for="(val,idx) in truncatedLinks">
-            <div class="link-wrap" :class="{inline: inline}"  :key="`${id}-${idx}`">
-               <span v-if="!inline" class="number">{{idx+1}}.</span>
-               <router-link :to="val.url" class="link">{{val.label}}</router-link>
-               <span v-if="inline && idx < truncatedLinks.length-1" class="sep">{{separator}}</span>
-            </div>
-         </template>
+         <div  v-for="(val,idx) in truncatedLinks" class="link-wrap" :class="{inline: inline}"  :key="`${id}-${idx}`">
+            <span v-if="!inline" class="number">{{idx+1}}.</span>
+            <router-link :to="val.url" class="link">{{val.label}}</router-link>
+            <span v-if="inline && idx < truncatedLinks.length-1" class="sep">{{separator}}</span>
+         </div>
       </div>
       <div v-else tabindex="0" :aria-expanded="showFull.toString()"
             class="truncated-content" :id="`${id}-cut`"
@@ -15,13 +13,11 @@
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
       >
          <div :id="`${id}-list`" aria-live="polite">
-            <template v-for="(val,idx) in truncatedLinks">
-               <div class="link-wrap" :class="{inline: inline}" :key="`${id}-${idx}`">
-                  <span v-if="!inline" class="number">{{idx+1}}.</span>
-                  <router-link :to="val.url" class="link">{{val.label}}</router-link>
-                  <span v-if="inline && idx < truncatedLinks.length-1" class="sep">{{separator}}</span>
-               </div>
-            </template>
+            <div v-for="(val,idx) in truncatedLinks" class="link-wrap" :class="{inline: inline}" :key="`${id}-${idx}`">
+               <span v-if="!inline" class="number">{{idx+1}}.</span>
+               <router-link :to="val.url" class="link">{{val.label}}</router-link>
+               <span v-if="inline && idx < truncatedLinks.length-1" class="sep">{{separator}}</span>
+            </div>
             <div class="controls">
                <span tabindex="0" role="button" v-if="!showFull" class="more" @click.prevent.stop="toggle">...More ({{links.length}} items)</span>
                <span tabindex="0" role="button" v-else class="less" @click.prevent.stop="toggle">...Less</span>

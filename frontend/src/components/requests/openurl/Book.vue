@@ -72,9 +72,7 @@
             <label for="doctype">Preferred pickup location</label>
             <select v-model="pickup" id="pickup">
                <option value="">Select a location</option>
-               <template v-for="l in pickupLibraries">
-                  <option :value="l.id" :key="l.id">{{l.name}}</option>
-               </template>
+               <option v-for="l in pickupLibraries" :key="l.id" :value="l.id">{{l.name}}</option>
             </select>
          </div>
       </div>

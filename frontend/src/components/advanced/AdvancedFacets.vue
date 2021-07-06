@@ -12,8 +12,8 @@
                   <V4Spinner message="Loading filters..."/>
                </div>
 
-               <template v-else v-for="filterInfo in filters.filter( f=> f.hidden !== true)">
-                  <AccordionContent  :key="filterInfo.id"
+               <template v-else v-for="filterInfo in filters.filter( f=> f.hidden !== true)" :key="filterInfo.id">
+                  <AccordionContent
                      :id="`${filterInfo.id}-acc`"
                      class="filter-list"
                      background="var(--uvalib-grey-lightest)"

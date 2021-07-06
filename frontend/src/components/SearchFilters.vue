@@ -10,9 +10,9 @@
                <V4Button v-if="hasFilter || hasNaFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
             </div>
             <dl class="filter-display" v-if="hasFilter">
-               <template  v-for="(values, filter) in appliedFilters">
-                  <dt :key="filter" class="label" v-show="filter != 'undefined'">{{filter}}</dt>
-                  <dd :key="`${filter}-values`" class="label">
+               <template  v-for="(values, filter) in appliedFilters" :key="`${filter}-values`">
+                  <dt class="label" v-show="filter != 'undefined'">{{filter}}</dt>
+                  <dd class="label">
                      <span v-for="fv in values" class="selected" :key="`${filter}-${fv.value}`">
                         <V4Button mode="icon" class="remove" @click="removeFilter(fv)" :aria-label="`remove filter ${fv.value}`">
                            <i class="fas fa-times-circle"></i>

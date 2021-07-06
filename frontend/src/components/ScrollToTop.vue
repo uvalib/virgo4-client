@@ -49,7 +49,7 @@ export default {
    created: function() {
       window.addEventListener("scroll", this.scrollChecker)
    },
-   destroyed: function() {
+   unmounted: function() {
       window.removeEventListener("scroll", this.scrollChecker)
    }
 }

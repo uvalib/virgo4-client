@@ -8,9 +8,9 @@
          <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`"/>
          <SignInRequired v-else :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
       </div>
-      <router-link @mousedown.native="detailClicked" class="img-link" :to="detailsURL">
+      <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">
           <img aria-label=" " class="trigger" :src="iiifURL(hit)">
-          <div class="metadata-popover" slot="popover">
+          <div class="metadata-popover">
              <div class="metadata-content">
                 <div>{{hit.header.title}}</div>
              </div>

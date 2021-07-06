@@ -72,5 +72,22 @@ module.exports = {
       maxEntrypointSize: 1024000,
       maxAssetSize: 1024000
     }
+  },
+  chainWebpack: config => {
+    config.resolve.alias.set('vue', '@vue/compat')
+
+    config.module
+      .rule('vue')
+      .use('vue-loader')
+      .tap(options => {
+        return {
+          ...options,
+          compilerOptions: {
+            compatConfig: {
+              MODE: 2
+            }
+          }
+        }
+      })
   }
 }
