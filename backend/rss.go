@@ -121,12 +121,12 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 	feed.Items = svc.MapFeedItems(searchResult)
 
 	// Output the feed
-	atom, _ := feed.ToAtom()
+	rss, _ := feed.ToRss()
 	if err != nil {
 		log.Fatal(err)
 	}
 	c.Writer.Header().Set("Content-Type", "application/xml")
-	c.Writer.Write([]byte(atom))
+	c.Writer.Write([]byte(rss))
 
 }
 func (svc *ServiceContext) MapFeedItems(poolResults v4api.PoolResult) []*feeds.Item {
@@ -160,9 +160,11 @@ func (svc *ServiceContext) MapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 					feedItem.Author = &a
 
 				case "date_received":
-					feedItem.Updated, _ = time.ParseInLocation("20060102", field.Value, tz)
-				case "published_date":
-					feedItem.Created, _ = time.ParseInLocation("2006", field.Value, tz)
+					var parseErr error
+					feedItem.Created, parseErr = time.ParseInLocation("20060102", field.Value, tz)
+					if parseErr != nil {
+						log.Printf("RSS Date parse error: %+v", parseErr)
+					}
 				}
 				log.Printf("Field: %+v", field)
 				if field.Display != "optional" && field.Name != "id" {
