@@ -31,6 +31,7 @@
 
 <script>
 import { mapFields } from 'vuex-map-fields'
+import { mapGetters } from "vuex"
 import SearchTips from "@/components/disclosures/SearchTips"
 export default {
     components: {
@@ -43,6 +44,9 @@ export default {
       },
    },
    computed: {
+      ...mapGetters({
+         rawQueryString: 'query/string'
+      }),
       ...mapFields({
         searchSources: 'query.searchSources',
         userSearched: 'query.userSearched',
@@ -52,10 +56,11 @@ export default {
       sourcesClicked( setting ) {
          if ( this.searchSources  != setting ) {
             this.searchSources = setting
-            let query = Object.assign({}, this.$route.query)
-            if (query.q) {
+            if ( this.rawQueryString != "") {
+               let query = Object.assign({}, this.$route.query)
                delete query.page
-               delete query.pool
+               query.q = this.rawQueryString
+               query.pool = setting
                this.userSearched = true
                this.$router.push({ query })
             }
