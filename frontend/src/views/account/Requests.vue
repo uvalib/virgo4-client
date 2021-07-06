@@ -8,14 +8,17 @@
       <div class="details" v-if="isSignedIn">
          <template v-if="!noILSAccount">
             <h2>Make a New Request</h2>
-            <div v-if="!isHSLUser" class="subcontent buttons">
+            <div v-if="!isUVA">
+               {{/* No ILL requests for community borrowers */ }}
+            </div>
+            <div v-else-if="isHSLUser" class="subcontent">
+               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
+            </div>
+            <div v-else class="subcontent buttons">
                <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
                <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
                <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
                <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
-            </div>
-            <div v-else class="subcontent">
-               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
             </div>
             <div class="subcontent links">
                <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
@@ -201,6 +204,7 @@ export default {
          isHSLUser: "user/isHSLUser",
          isSignedIn: 'user/isSignedIn',
          isGuest: 'user/isGuest',
+         isUVA: 'user/isUVA',
          hasSysError: "system/hasError",
       }),
       illiadRequests() {
