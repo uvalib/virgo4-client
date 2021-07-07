@@ -415,7 +415,7 @@ export default {
       padding: 0 15px 15px 15px;
    }
 }
-::v-deep .pdf {
+:deep(.pdf) {
    padding-top: 0 !important;
 }
 

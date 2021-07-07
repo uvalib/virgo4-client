@@ -281,7 +281,7 @@ h2 {
    }
 }
 
-::v-deep .form-acts button.v4-button.pure-button {
+:deep(.form-acts button.v4-button.pure-button) {
    margin: 0 !important;
 }
 

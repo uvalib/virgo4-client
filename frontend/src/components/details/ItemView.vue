@@ -279,7 +279,7 @@ export default {
    .icon {
       margin-left: 5px;
    }
-   ::v-deep p {
+   :deep(p) {
       margin: 8px 0;
    }
    .info {

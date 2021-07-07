@@ -87,7 +87,7 @@ export default {
 #active-panel {
    padding: 10px;
    position: relative;
-   ::v-deep .v4-button {
+   :deep(.v4-button) {
       margin:0 !important;
    }
    .reset {

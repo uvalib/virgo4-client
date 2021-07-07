@@ -48,12 +48,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .icon {
+:deep(.icon) {
    font-size: 1.75em;
    display: block;
    color: var(--uvalib-text);
 }
-::v-deep  .icon-inline {
+:deep(.icon-inline) {
    margin-left: 6px;
    font-size: 0.9em;
 }

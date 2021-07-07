@@ -77,12 +77,12 @@ export default {
    color: var(--color-primary-text);
    text-align: left;
 }
-td >>> .fa-times-circle {
+:deep(.fa-times-circle) {
    color: var(--uvalib-red);
    font-size: 1.15em;
    opacity: 0.6;
 }
-td >>> .fa-check-circle {
+:deep(.fa-check-circle) {
    color: var(--uvalib-green-dark);
    font-size: 1.15em;
 }

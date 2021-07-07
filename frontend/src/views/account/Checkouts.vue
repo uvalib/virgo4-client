@@ -220,8 +220,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// v-deep allows these dynamically added classes to be styled
-::v-deep .details div.overdue, .details div.recall {
+:deep(.details div.overdue) {
    background: var(--uvalib-red-emergency);
    color: white;
    font-weight: bold;
@@ -229,11 +228,13 @@ export default {
    width:fit-content;
    margin: 2px 0;
 }
-::v-deep .details div.recall {
+:deep(.details div.recall) {
    background-color: var(--uvalib-yellow);
    color: var(--uvalib-grey-darkest);
+   font-weight: bold;
    padding: 5px 15px;
    width:fit-content;
+   margin: 2px 0;
 }
 
 .checkout {

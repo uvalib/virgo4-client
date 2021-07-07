@@ -287,7 +287,7 @@ button.v4-button.citations-text-button.toolbar {
       }
    }
 }
-::v-deep  i.icon {
+:deep(i.icon) {
    color: var(--uvalib-grey-dark);
    cursor: pointer;
    font-size: 1.2em;

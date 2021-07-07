@@ -131,13 +131,13 @@ export default {
    border-right: 1px solid var(--uvalib-brand-blue);
    font-size: 0.9em;
 }
-.desc >>> a {
+.desc :deep(a) {
    color: white !important;
    text-decoration: underline !important;
    font-weight: normal !important;
-}
-.desc >>> a:hover {
-  font-style: italic !important;
+   &:hover {
+      font-style: italic !important;
+   }
 }
 .pool-results {
    border: 0;

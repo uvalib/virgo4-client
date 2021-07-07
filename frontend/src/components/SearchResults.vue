@@ -198,7 +198,7 @@ export default {
 
 
 <style scoped lang="scss">
-::v-deep .other-src {
+:deep(.other-src) {
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
