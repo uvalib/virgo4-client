@@ -11,7 +11,7 @@
             @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
             <div  v-if="!showFull" :id="`${id}-cut`" class="truncated"  aria-live="polite" >
-               <span class="text" :inner-html.prop="truncateText(text)"></span>
+               <span class="text" :html="truncateText(text)"></span>
                <span class="trigger" @click.prevent.stop="toggle">
                   <span  v-if="mode=='text'" class="more">...&nbsp;More</span>
                   <span  v-else class="more icon">...</span>
