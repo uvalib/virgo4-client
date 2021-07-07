@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import axios from 'axios'
 import analytics from '../analytics'
 import versionChecker from './plugins/version'
@@ -26,11 +25,9 @@ import router from '../router'
 
 import { vuexfireMutations, firebaseAction } from 'vuexfire'
 
-Vue.use(Vuex)
-
 const  AlertsStorage = "v4SeenAlerts"
 
-export default new Vuex.Store({
+export default createStore({
    state: {
       pageTitle: "Search",
       noSpinner: false,

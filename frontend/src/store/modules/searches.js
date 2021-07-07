@@ -1,5 +1,4 @@
 import axios from 'axios'
-import router from '../../router'
 
 const searches = {
    namespaced: true,
@@ -89,7 +88,7 @@ const searches = {
 
       updateHistory(ctx) {
          if ( ctx.rootGetters['user/isSignedIn'] ) {
-            let searchURL = router.currentRoute.fullPath
+            let searchURL = this.router.currentRoute.fullPath
             let userID = ctx.rootState.user.signedInUser
             let req = {url: searchURL, history: true}
             axios.post(`/api/users/${userID}/searches`, req).catch((error) => {

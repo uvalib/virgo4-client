@@ -1,6 +1,5 @@
 import axios from 'axios'
-import Vue from 'vue'
-import router from '../../router'
+import VueCookies from 'vue-cookies'
 import { getField, updateField } from 'vuex-map-fields'
 
 const preferences = {
@@ -38,11 +37,11 @@ const preferences = {
          state.trackingOptOut = !state.trackingOptOut
          if ( state.trackingOptOut ) {
             let data = {v4_opt_out: true}
-            Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+            VueCookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
          } else {
-            Vue.$cookies.remove("v4_optout")
+            VueCookies.remove("v4_optout")
          }
-         router.go()
+         this.router.go()
       },
       setPreferences(state, prefsObj) {
          if (prefsObj.collapseGroups ) {
@@ -50,12 +49,12 @@ const preferences = {
          }
          if ( prefsObj.trackingOptOut) {
             state.trackingOptOut  = prefsObj.trackingOptOut
-            let optOutCookie = Vue.$cookies.get('v4_optout')
+            let optOutCookie = VueCookies.get('v4_optout')
             if ( state.trackingOptOut && !optOutCookie) {
                let data = {v4_opt_out: true}
-               Vue.$cookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
+               VueCookies.set("v4_optout", JSON.stringify(data), new Date(2099,12,31).toUTCString())
             } else {
-               Vue.$cookies.remove("v4_optout")
+               VueCookies.remove("v4_optout")
             }
          }
          if (prefsObj.pickupLibrary ) {

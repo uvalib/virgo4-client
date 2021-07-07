@@ -1,6 +1,5 @@
 import axios from 'axios'
 import * as utils from '../../utils'
-import router from '../../router'
 
 const item = {
    namespaced: true,
@@ -291,7 +290,7 @@ const item = {
 
          if (!pool) {
            ctx.commit('clearSearching')
-           router.push(`/not_found`)
+           this.router.push(`/not_found`)
            return
          }
 
@@ -352,18 +351,18 @@ const item = {
                // NOTE:  the result above only contains basic fields. the redirect below
                // will trigger a full record get
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
-               router.replace(redirect)
+               this.router.replace(redirect)
             } else {
                ctx.commit("clearDetails")
                let q = `identifier: {${catalogKey}}`
-               router.push(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
+               this.router.push(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
             }
          }).catch((error) => {
             ctx.commit('clearSearching')
             ctx.commit("clearDetails")
             if ( error.response && error.response.status == 404) {
                console.warn(`Catalog Key ${catalogKey} not found`)
-               router.push(`/not_found`)
+               this.router.push(`/not_found`)
             }
          })
       },

@@ -25,7 +25,7 @@ import PublicBookmarks from './views/PublicBookmarks.vue'
 import NotFound from './views/NotFound.vue'
 import FatalError from './views/FatalError.vue'
 
-import store from './store'
+import VueCookies from 'vue-cookies'
 
 Vue.use(Router)
 
@@ -109,15 +109,15 @@ const router = new Router({
          // NOTES: the signedin route doesn't have a visual representation. It just stores token and redirects
          path: '/signedin',
          beforeEnter: async (_to, _from, next) => {
-            let jwtStr = Vue.$cookies.get("v4_jwt")
-            store.commit("user/setUserJWT", jwtStr)
-            store.commit('restore/load')
+            let jwtStr = VueCookies.get("v4_jwt")
+            router.store.commit("user/setUserJWT", jwtStr)
+            router.store.commit('restore/load')
             let tgtURL = "/"
-            if ( store.state.user.noILSAccount &&  store.state.user.signedInUser != "") {
+            if ( router.store.state.user.noILSAccount &&  router.store.state.user.signedInUser != "") {
                console.log("NetBadge success, but NO ILS ACCOUNT")
                tgtURL = "/account"
             } else {
-               tgtURL = store.state.restore.url
+               tgtURL = router.store.state.restore.url
                console.log("redirect to "+tgtURL)
                if (!tgtURL || tgtURL == "") {
                   tgtURL = "/"
@@ -131,8 +131,8 @@ const router = new Router({
          name: 'signin',
          component: SignIn,
          beforeEnter(_to, from, next) {
-            store.commit('restore/setURL', from.fullPath)
-            store.commit('restore/save')
+            router.store.commit('restore/setURL', from.fullPath)
+            router.store.commit('restore/save')
             next()
          }
       },
@@ -232,7 +232,7 @@ router.afterEach((to, _from) => {
 
 // This is called before every URL in the SPA is hit
 router.beforeEach( async (to, _from, next) => {
-   store.commit("system/setILSError", "")
+   router.store.commit("system/setILSError", "")
    if ( to.path == "/signedin") {
       // signedin page is a temporary redirect after netbadge. don't
       // do any special handling for at as that page has specific handling
@@ -253,16 +253,16 @@ router.beforeEach( async (to, _from, next) => {
    }
    let title =  h1[to.name]
    if (title) {
-      store.commit("setPageTitle", title)
+      router.store.commit("setPageTitle", title)
    }
 
    // These pages require signed in user and will automatically netbadge in if not signed in
    let autoAuth = ["openurl"]
    if (autoAuth.includes(to.name)) {
-      if (store.getters["user/isSignedIn"] == false) {
-         store.commit('restore/setURL', to.fullPath)
-         store.commit('restore/save')
-         store.dispatch('user/netbadge')
+      if (router.store.getters["user/isSignedIn"] == false) {
+         router.store.commit('restore/setURL', to.fullPath)
+         router.store.commit('restore/save')
+         router.store.dispatch('user/netbadge')
          return
       }
    }

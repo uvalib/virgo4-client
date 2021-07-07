@@ -1,6 +1,5 @@
 import { getField, updateField } from 'vuex-map-fields'
 import axios from 'axios'
-import router from '../../router'
 
 const query = {
    namespaced: true,
@@ -260,11 +259,11 @@ const query = {
                   searchURL = "/search?"+params.toString()
                }
             }
-            router.replace(searchURL)
+            this.router.replace(searchURL)
          }).catch((error) => {
             console.error(error)
             ctx.commit('setSearching', false, { root: true })
-            router.push("/not_found")
+            this.router.push("/not_found")
          })
       }
    }

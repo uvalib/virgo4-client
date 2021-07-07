@@ -1,5 +1,4 @@
 import axios from 'axios'
-import router from '../../router'
 
 const bookmarks = {
    namespaced: true,
@@ -98,7 +97,7 @@ const bookmarks = {
             ctx.commit('setSearching', false)
           }).catch((_error) => {
             ctx.commit('setSearching', false)
-            router.push("/not_found")
+            this.router.push("/not_found")
           })
       },
       async getBookmarks(ctx) {

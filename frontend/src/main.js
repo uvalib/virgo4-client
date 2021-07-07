@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import VueCookies from 'vue-cookies'
 import VueClipboard from 'vue-clipboard2'
 import V4Button from "@/components/V4Button"
 import V4Checkbox from "@/components/V4Checkbox"
@@ -20,9 +19,10 @@ router.store = store
 
 const app = createApp({
   router,
-  store,
   ...App
 })
+
+app.use(store)
 
 app.component('V4Button', V4Button)
 app.component('V4Checkbox', V4Checkbox)
@@ -48,7 +48,6 @@ app.config.globalProperties.$utils = utils
 import '@fortawesome/fontawesome-pro/css/all.css'
 import Purecss from 'purecss'
 
-app.use(VueCookies)
 app.use(Purecss)
 app.use(VueClipboard)
 

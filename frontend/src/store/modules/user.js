@@ -1,8 +1,7 @@
 import axios from 'axios'
-import Vue from 'vue'
-import router from '../../router'
 import analytics from '../../analytics'
 import { getField, updateField } from 'vuex-map-fields'
+import VueCookies from 'vue-cookies'
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -350,7 +349,7 @@ const user = {
          state.checkouts.splice(0, state.checkouts.length)
          state.renewSummary = {renewed: 0, failed: 0, failures: []}
          state.bills.splice(0, state.bills.length)
-         Vue.$cookies.remove("v4_optout")
+         VueCookies.remove("v4_optout")
          localStorage.removeItem("v4_jwt")
          localStorage.removeItem("v4_requested")
          state.accountRequested = false
@@ -392,7 +391,7 @@ const user = {
             ctx.commit('setAuthorizing', true)
             let claims = ctx.state.parsedJWT
             return axios.post("api/admin/claims", claims).then((_response) => {
-               let jwtStr = Vue.$cookies.get("v4_jwt")
+               let jwtStr = VueCookies.get("v4_jwt")
                ctx.commit("setUserJWT", jwtStr )
                setTimeout(() => {
                   ctx.commit('setAuthorizing', false)
@@ -442,8 +441,8 @@ const user = {
             if ( prefs.searchTemplate ) {
                ctx.commit('query/setTemplate',  prefs.searchTemplate, { root: true })
             }
-            if (response.data.user.noILSAccount && router.currentRoute.path != "/account") {
-               router.push( "/account" )
+            if (response.data.user.noILSAccount && this.router.currentRoute.path != "/account") {
+               this.router.push( "/account" )
             }
             ctx.commit('setLookingUp', false)
           }).catch((error) => {
@@ -565,7 +564,7 @@ const user = {
       signin(ctx, data) {
          ctx.commit('setAuthorizing', true)
          axios.post("/authenticate/public", data).then( async (_response) => {
-            let jwtStr = Vue.$cookies.get("v4_jwt")
+            let jwtStr = VueCookies.get("v4_jwt")
             ctx.commit("setUserJWT", jwtStr )
             ctx.commit('setAuthorizing', false)
             ctx.commit('restore/load', null, { root: true })
@@ -578,7 +577,7 @@ const user = {
             } else {
                analytics.trigger('User', 'PIN_SIGNIN', "other")
             }
-            router.push( ctx.rootState.restore.url ).catch((e)=>{
+            this.router.push( ctx.rootState.restore.url ).catch((e)=>{
                if (e.name !== 'NavigationDuplicated') {
                   throw e;
               }

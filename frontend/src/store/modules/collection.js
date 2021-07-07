@@ -1,5 +1,4 @@
 import axios from 'axios'
-import router from '../../router'
 
 const collection = {
    namespaced: true,
@@ -149,7 +148,7 @@ const collection = {
          let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/next`
          await axios.get(url).then((response) => {
             let newURL = `/sources/uva_library/items/${response.data}`
-            router.push(newURL)
+            this.router.push(newURL)
          }).finally( ()=> {
             ctx.commit("setLookingUp", false)
          })
@@ -160,7 +159,7 @@ const collection = {
          let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/previous`
          await axios.get(url).then((response) => {
             let newURL = `/sources/uva_library/items/${response.data}`
-            router.push(newURL)
+            this.router.push(newURL)
          }).finally( ()=> {
             ctx.commit("setLookingUp", false)
          })

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import router from '../../router'
 
 import firebase from 'firebase/app'
 import 'firebase/database'
@@ -110,7 +109,7 @@ const system = {
 
       setFatal(state, err) {
          state.fatal = err
-         router.push( "/error" )
+         this.router.push( "/error" )
       },
       clearMessage( state ) {
          state.message.type = "none"
@@ -260,7 +259,7 @@ const system = {
 
       reportError(ctx, data) {
          let err = {
-            url: router.currentRoute.fullPath,
+            url: this.router.currentRoute.fullPath,
             userAgent: navigator.userAgent,
             error: JSON.stringify(data)
          }
