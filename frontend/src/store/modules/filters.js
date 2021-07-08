@@ -1,13 +1,6 @@
 import axios from 'axios'
-
-import Vue from 'vue'
-import Vuex from 'vuex'
-
 import { getField, updateField } from 'vuex-map-fields'
-
 import analytics from '../../analytics'
-
-Vue.use(Vuex)
 
 const filters = {
    namespaced: true,
