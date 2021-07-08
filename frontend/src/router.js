@@ -202,7 +202,12 @@ router.afterEach((to, _from) => {
          document.title = "Virgo"
       }
    }
-   document.getElementById("app").focus()
+   setTimeout( () => {
+      let a = document.getElementById("app")
+      if ( a ) {
+         a.focus()
+      }
+   }, 50)
 })
 
 // This is called before every URL in the SPA is hit
