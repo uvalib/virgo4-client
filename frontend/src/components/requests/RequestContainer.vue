@@ -1,6 +1,13 @@
 <template>
    <div id="active-panel" ref="activePanel" >
-      <component v-bind:is="requests.activePanel" />
+      <OptionsPanel v-if="requests.activePanel == 'OptionsPanel'" />
+      <SignInPanel v-if="requests.activePanel == 'SignInPanel'" />
+      <PlaceHoldPanel v-if="requests.activePanel == 'PlaceHoldPanel'" />
+      <PDAPanel v-if="requests.activePanel == 'PDAPanel'" />
+      <ConfirmationPanel v-if="requests.activePanel == 'ConfirmationPanel'" />
+      <AeonPanel v-if="requests.activePanel == 'AeonPanel'" />
+      <ScanPanel v-if="requests.activePanel == 'ScanPanel'" />
+      <VideoReservePanel v-if="requests.activePanel == 'VideoReservePanel'" />
       <V4Button mode="tertiary" v-if="showReset()" class="reset" @click="reset" v-html="resetLabel()"></V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
    </div>
@@ -22,7 +29,9 @@ export default {
    props: {
       titleId: String,
    },
-   components: {OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel},
+   components: {
+      OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel
+   },
 
    computed: {
       ...mapFields(['requests', 'item/availability' ]),

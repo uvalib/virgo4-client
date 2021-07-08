@@ -21,7 +21,9 @@ export default {
       $route() {
          // this is needed to load details when a grouped image thumb has been clicked; new content
          // needs to be loaded, but the page remains the same (create not called)
-         this.getDetails()
+         if ( this.$route.fullPath.includes("/sources") ) {
+            this.getDetails()
+         }
       }
    },
    components: {
@@ -67,6 +69,7 @@ export default {
             this.$store.commit("hitSelected", id)
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {
+            console.log("LOOKUP IN DETAIL")
             await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }
 
