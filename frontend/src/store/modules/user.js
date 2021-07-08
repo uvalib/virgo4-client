@@ -74,6 +74,9 @@ const user = {
       isGuest: (state) => {
          return (state.role == 'guest' || state.role == '')
        },
+       isUVA: (state) => {
+          return state.claims.isUVA
+       },
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
@@ -287,7 +290,7 @@ const user = {
             canLEOPlus: parsed.canLEOPlus,
             canPlaceReserve: parsed.canPlaceReserve,
             useSIS: parsed.useSIS,
-            isUVA: parsed.isUVA,
+            isUVA: parsed.isUva,
          }
          state.authMessage = ""
          state.lockedOut = false

@@ -122,6 +122,8 @@ div.messsage-box {
       }
 
       .message-body {
+         max-height: 55vh;
+         overflow-y: auto;
          text-align: left;
          padding: 20px 30px 0 30px;
          font-weight: normal;

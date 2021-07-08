@@ -309,7 +309,7 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMetho
 	v4Claims := v4jwt.V4Claims{
 		UserID:     v4User.Virgo4ID,
 		AuthMethod: authMethod,
-		IsUVA:      true,
+		IsUVA:      false,
 		Role:       role,
 	}
 
@@ -330,13 +330,10 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMetho
 	}
 
 	log.Printf("Adding %s claims based on ILS response", v4User.Virgo4ID)
-	// Normally this is HomeLibrary == "LEO"
 
+	v4Claims.IsUVA = !ilsUser.CommunityUser
 	if ilsUser.NoAccount {
 		log.Printf("WARN: User %s has no Sirsi account", v4User.Virgo4ID)
-		if ilsUser.CommunityUser {
-			v4Claims.IsUVA = false
-		}
 		v4Claims.CanLEO = false
 		v4Claims.CanLEOPlus = false
 		v4Claims.CanPurchase = false
