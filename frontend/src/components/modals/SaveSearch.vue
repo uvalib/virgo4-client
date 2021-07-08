@@ -19,8 +19,8 @@
                <div class="message pure-form">
                   <div>
                      <label for="savename">Search Name</label>
-                     <input ref="savename" id="savename" type="text" v-model="searchName" 
-                        @keyup.enter="saveClicked" 
+                     <input ref="savename" id="savename" type="text" v-model="searchName"
+                        @keyup.enter="saveClicked"
                         @keydown.shift.tab.stop.prevent="backTabName"
                         aria-required="true" required="required"
                      />
@@ -56,15 +56,15 @@ export default {
    },
    methods: {
       publicURL() {
-         let base = window.location.href 
+         let base = window.location.href
          if (base.includes("/search")) {
-            return `${base}/${this.savedSearchKey}` 
+            return `${base}/${this.savedSearchKey}`
          } else {
-            return `${base}search/${this.savedSearchKey}` 
+            return `${base}search/${this.savedSearchKey}`
          }
       },
       copyURL() {
-         let URL = this.publicURL()  
+         let URL = this.publicURL()
          this.$copyText(URL).then( ()=> {
             this.isOpen = false
             this.$store.commit("system/setMessage", "Shared search URL copied to clipboard.")
@@ -82,8 +82,14 @@ export default {
          this.$refs.savemodal.lastFocusTabbed()
       },
       opened() {
-         let d = new Date()
-         this.searchName = `search-${this.$moment(d).format('YYYYMMDDHHmm')}`
+         let date = new Date()
+         let hours = date.getHours()
+         let minutes = date.getMinutes()
+         let m = date.getMonth()+1
+         let mStr = (""+m).padStart(2,'0')
+         let day = (""+date.getDate()).padStart(2,'0')
+         let timeStr = `${date.getFullYear()}-${mStr}-${day}:${hours}${minutes}`
+         this.searchName = `search-${timeStr}`
          this.error = ""
       },
       async saveClicked() {
@@ -94,7 +100,7 @@ export default {
          this.working = true
          let searchURL = this.$router.currentRoute.fullPath
          let req = {name: this.searchName, url: searchURL, isPublic: false, userID: this.signedInUser}
-         try { 
+         try {
             await this.$store.dispatch("searches/save", req)
             this.saved = true
             this.showSavePrompt = false
@@ -129,8 +135,8 @@ label {
 }
 #manage:hover {
    text-decoration:underline;
-} 
-.saved{ 
+}
+.saved{
    margin:0;
    padding: 5px 10px;
 }
