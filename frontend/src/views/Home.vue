@@ -359,7 +359,6 @@ export default {
             if (this.selectedResults.pool.id != "none" && query.pool != this.selectedResults.pool.id) {
                let newQ = Object.assign({}, query)
                newQ.pool = this.selectedResults.pool.id
-               console.log(newQ)
                await this.$router.replace({query: newQ})
             }
 

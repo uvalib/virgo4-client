@@ -14,9 +14,9 @@
 <script>
 export default {
    props: {
-      // If the component is passed a v-model, value non-null
+      // If the component is passed a v-model, modelValue non-null
       // otherwise use the checked property
-      value: {
+      modelValue: {
          type: Boolean,
          default: null
       },
@@ -29,6 +29,7 @@ export default {
          default: false
       }
    },
+   emits: ['update:modelValue', 'click'],
    computed: {
       checkClass() {
          if ( this.isChecked )  {
@@ -38,8 +39,8 @@ export default {
          }
       },
       isChecked() {
-         if ( this.value != null ) {
-            return this.value
+         if ( this.modelValue != null ) {
+            return this.modelValue
          }
          return this.checked
       }
@@ -53,9 +54,9 @@ export default {
             return
          }
 
-         if ( this.value != null ) {
-            let state = !this.value
-            this.$emit('input', state)
+         if ( this.modelValue != null ) {
+            let state = !this.modelValue
+            this.$emit('update:modelValue', state)
          }
          this.$emit('click')
       },
