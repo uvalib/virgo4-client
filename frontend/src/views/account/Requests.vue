@@ -9,7 +9,7 @@
          <template v-if="!noILSAccount">
             <h2>Make a New Request</h2>
             <div v-if="!isUVA">
-               {{/* No ILL requests for community borrowers */ }}
+               <!-- No ILL requests for community borrowers  -->
             </div>
             <div v-else-if="isHSLUser" class="subcontent">
                <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
