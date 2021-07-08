@@ -1,7 +1,7 @@
 <template>
    <button tabindex="0" :role="role" class="v4-button"
-      @keydown.exact.tab="tabNext"
-      @keydown.shift.tab="tabBack"
+      @keydown.exact.tab="tabNext(e)"
+      @keydown.shift.tab="tabBack(e)"
       :class="{'text-button': mode=='text', 'icon-button': mode=='icon',
                'link-button': mode=='link',
                'pure-button': isButton,
@@ -37,6 +37,7 @@ export default {
          default: "button"
       },
    },
+   emits: ['click', 'esc', 'tabback', 'tabnext' ],
    computed: {
       isButton() {
          return this.mode != 'text' && this.mode!='icon' && this.mode!='link'
@@ -52,14 +53,14 @@ export default {
          }
          this.$emit('click')
       },
-      tabBack() {
+      tabBack(event) {
          if (this.focusBackOverride ) {
             event.stopPropagation()
             event.preventDefault()
             this.$emit('tabback')
          }
       },
-      tabNext( ) {
+      tabNext( event) {
          if (this.focusNextOverride ) {
             event.stopPropagation()
             event.preventDefault()
