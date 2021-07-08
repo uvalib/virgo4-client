@@ -69,7 +69,6 @@ const item = {
             }
             if ( type == "OCR") {
                if ( status.has_ocr ||  status.has_transcription) {
-                  console.log("SET OCR READY")
                   dc.ocr.status = "READY"
                } else if ( status.ocr_progress ) {
                   dc.ocr.status = status.ocr_progress

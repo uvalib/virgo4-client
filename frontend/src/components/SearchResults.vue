@@ -165,13 +165,12 @@ export default {
       formatFilterValues(values) {
          return values.join(", ")
       },
-      async resultsButtonClicked(resultIdx) {
+
+      resultsButtonClicked(resultIdx) {
          if ( this.selectedResultsIdx != resultIdx) {
             let r = this.results[resultIdx]
             if ( this.poolFailed(r)) return
             this.otherSrcSelection = {id:"", name:""}
-            await this.$store.dispatch("selectPoolResults", resultIdx)
-            this.updateURL( r.pool.id)
             this.poolSelected(r.pool.id)
          }
       },
@@ -184,7 +183,9 @@ export default {
             this.$store.dispatch("selectPoolResults", tgtIdx)
             let newPoolID = this.results[tgtIdx].pool.id
             if ( this.$route.query.pool != newPoolID ) {
+               console.log("UPDATE URL "+Date.now())
                this.updateURL(newPoolID)
+               console.log("DONE UPDATE URL "+Date.now())
             }
          }
       }

@@ -45,7 +45,8 @@ export default {
    },
    computed: {
       ...mapGetters({
-         rawQueryString: 'query/string'
+         rawQueryString: 'query/string',
+         queryEntered: 'query/queryEntered'
       }),
       ...mapFields({
         searchSources: 'query.searchSources',
@@ -56,7 +57,7 @@ export default {
       sourcesClicked( setting ) {
          if ( this.searchSources  != setting ) {
             this.searchSources = setting
-            if ( this.rawQueryString != "") {
+            if (this.queryEntered ) {
                let query = Object.assign({}, this.$route.query)
                delete query.page
                query.q = this.rawQueryString

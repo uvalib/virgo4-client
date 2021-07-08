@@ -51,8 +51,8 @@ export default {
      SearchResults, V4BarcodeScanner, AdvancedSearch, Welcome, SourceSelector
    },
    watch: {
-      currRoute() {
-         console.log("NEW HOME ROUTE "+ this.currRoute)
+      $route() {
+         console.log("NEW HOME ROUTE "+ this.$route.fullPath)
          this.restoreSearchFromQueryParams(this.$route.query)
          this.pageTitle = "Search"
          if (this.searchMode != "basic") {
@@ -74,9 +74,6 @@ export default {
    },
 
    computed: {
-      currRoute() {
-         return this.$route.fullPath
-      },
       ...mapState({
          searching: state => state.searching,
          searchMode: state => state.query.mode,
