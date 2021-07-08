@@ -444,7 +444,7 @@ const user = {
             if ( prefs.searchTemplate ) {
                ctx.commit('query/setTemplate',  prefs.searchTemplate, { root: true })
             }
-            if (response.data.user.noILSAccount && this.router.currentRoute.path != "/account") {
+            if (response.data.user.noILSAccount && this.router.currentRoute.value.path != "/account") {
                this.router.push( "/account" )
             }
             ctx.commit('setLookingUp', false)

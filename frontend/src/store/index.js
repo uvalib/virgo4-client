@@ -217,8 +217,8 @@ export default createStore({
           })
           if ( state.selectedHitIdx != -1 ) {
              // this also gets called on from details page. Only update last if route is home or search
-            if (this.router.currentRoute.path == "/search" ||  this.router.currentRoute.path == "/") {
-               state.lastSearchURL = this.router.currentRoute.fullPath
+            if (this.router.currentRoute.value.path == "/search" ||  this.router.currentRoute.value.path == "/") {
+               state.lastSearchURL = this.router.currentRoute.value.fullPath
                state.lastSearchScrollPosition = window.scrollY
             }
           }
@@ -554,7 +554,7 @@ export default createStore({
             }
             commit('setSearching', false)
             if ( response.data.total_hits == 0) {
-               analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.fullPath)
+               analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
             }
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
@@ -617,7 +617,7 @@ export default createStore({
             // will create them.
             commit('addPoolSearchResults', response.data)
             if ( response.data.pagination.total == 0 ) {
-               analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.fullPath)
+               analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
             }
 
             commit('setSearching', false)

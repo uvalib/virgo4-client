@@ -259,7 +259,7 @@ const system = {
 
       reportError(ctx, data) {
          let err = {
-            url: this.router.currentRoute.fullPath,
+            url: this.router.currentRoute.value.fullPath,
             userAgent: navigator.userAgent,
             error: JSON.stringify(data)
          }
