@@ -8,7 +8,7 @@
                   color: color, 'border': border }">
          <div class="wrap-select">
             <span class="selection">
-               <span v-if="value && value.id" v-html="value.name"></span>
+               <span v-if="currVal && currVal.id" v-html="currVal.name"></span>
                <span v-else v-html="placeholder"></span>
                <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
             </span>
@@ -22,8 +22,9 @@
             v-bind:class="{right: alignment=='right', left: alignment=='left'}"
             :style="{ 'border': optborder }">
             <li v-for="src in selections" @click="optionClicked(src)"
-               :class="{disabled: src.disabled, selected: src.id==value.id, highlighted: highlightedID == src.id}"
-               class="option" :ref="`O${src.id}`" tabindex="-1"
+               :class="{disabled: src.disabled, selected: src.id==currVal.id, highlighted: highlightedID == src.id}"
+               class="option" tabindex="-1"
+               :id="src.id"
                :key="src.id">
                <span v-html="src.name"></span>
             </li>
@@ -71,16 +72,17 @@ export default {
          type: Boolean,
          default: true
       },
-      value: {
+      modelValue: {
          type: Object
       }
    },
+   emits: ['update:modelValue', 'changed'],
    data: function()  {
       return {
          expanded: false,
          highlightedIdx: 0,
          highlightedID: 0,
-         currVal: this.value
+         currVal: this.modelValue
       }
    },
    watch: {
@@ -139,23 +141,24 @@ export default {
       },
       setSelectedItem() {
          this.highlightedID = this.selections[this.highlightedIdx].id
-         let item = this.$refs["O"+this.highlightedID][0]
+         let item = document.getElementById(this.highlightedID)
          item.focus()
          this.currVal =  this.selections[this.highlightedIdx]
-         this.$emit('input', this.currVal)
+         this.$emit('update:modelValue', this.currVal)
          this.$emit('changed', this.currVal.id)
       },
       optionClicked(src) {
          if (src.disabled ) return
-         this.$emit('input', src)
          this.currVal = src
+         this.$emit('update:modelValue', this.currVal)
          this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)
          if (this.highlightedIdx > -1) {
             this.highlightedID = this.selections[this.highlightedIdx].id
-            let item = this.$refs["O"+this.highlightedID][0]
+            let item = document.getElementById(this.highlightedID)
             item.focus()
          }
          this.$emit('changed', this.currVal.id)
+         this.$emit('update:modelValue', this.currVal)
       },
       globalClick() {
          this.expanded = false
@@ -168,7 +171,7 @@ export default {
                   this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)
                   if (this.highlightedIdx > -1) {
                      this.highlightedID = this.selections[this.highlightedIdx].id
-                     let item = this.$refs["O"+this.highlightedID][0]
+                     let item = document.getElementById(this.highlightedID)
                      item.focus()
                   }
                }
