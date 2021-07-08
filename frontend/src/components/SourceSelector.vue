@@ -57,7 +57,7 @@ export default {
       sourcesClicked( setting ) {
          if ( this.searchSources  != setting ) {
             this.searchSources = setting
-            if (this.queryEntered ) {
+            if (this.queryEntered || this.$route.query.filter ) {
                let query = Object.assign({}, this.$route.query)
                delete query.page
                query.q = this.rawQueryString
