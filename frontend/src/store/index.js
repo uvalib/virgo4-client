@@ -21,7 +21,6 @@ import shelf from './modules/shelf'
 import sort from './modules/sort'
 import * as utils from '../utils'
 import { getField, updateField } from 'vuex-map-fields'
-import router from '../router'
 
 import { vuexfireMutations, firebaseAction } from 'vuexfire'
 
@@ -218,8 +217,8 @@ export default createStore({
           })
           if ( state.selectedHitIdx != -1 ) {
              // this also gets called on from details page. Only update last if route is home or search
-            if (router.currentRoute.path == "/search" ||  router.currentRoute.path == "/") {
-               state.lastSearchURL = router.currentRoute.fullPath
+            if (this.router.currentRoute.path == "/search" ||  this.router.currentRoute.path == "/") {
+               state.lastSearchURL = this.router.currentRoute.fullPath
                state.lastSearchScrollPosition = window.scrollY
             }
           }
@@ -555,7 +554,7 @@ export default createStore({
             }
             commit('setSearching', false)
             if ( response.data.total_hits == 0) {
-               analytics.trigger('Results', 'NO_RESULTS', router.currentRoute.fullPath)
+               analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.fullPath)
             }
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
@@ -618,7 +617,7 @@ export default createStore({
             // will create them.
             commit('addPoolSearchResults', response.data)
             if ( response.data.pagination.total == 0 ) {
-               analytics.trigger('Results', 'NO_RESULTS', router.currentRoute.fullPath)
+               analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.fullPath)
             }
 
             commit('setSearching', false)
@@ -674,5 +673,8 @@ export default createStore({
       sort: sort,
    },
 
-   plugins: [versionChecker, errorReporter]
+   plugins: [
+      versionChecker,
+      errorReporter
+   ]
 })

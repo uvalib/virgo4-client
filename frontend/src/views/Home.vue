@@ -51,8 +51,8 @@ export default {
      SearchResults, V4BarcodeScanner, AdvancedSearch, Welcome, SourceSelector
    },
    watch: {
-      $route() {
-         console.log("NEW HOME ROUTE "+ this.$route.fullPath)
+      currRoute() {
+         console.log("NEW HOME ROUTE "+ this.currRoute)
          this.restoreSearchFromQueryParams(this.$route.query)
          this.pageTitle = "Search"
          if (this.searchMode != "basic") {
@@ -74,6 +74,9 @@ export default {
    },
 
    computed: {
+      currRoute() {
+         return this.$route.fullPath
+      },
       ...mapState({
          searching: state => state.searching,
          searchMode: state => state.query.mode,
@@ -126,7 +129,7 @@ export default {
          await this.$store.dispatch("query/loadSearch", token)
       }
 
-      await this.mapLegacyQueries( token )
+      // await this.mapLegacyQueries( token )
       await this.restoreSearchFromQueryParams(this.$route.query)
 
       let bmTarget = this.$store.getters['restore/bookmarkTarget']
@@ -353,10 +356,11 @@ export default {
             }
 
             // make sure the currently selected pool is always in URL
-            let testQ = Object.assign({}, this.$router.currentRoute.query)
-            if (this.selectedResults.pool.id != "none" && testQ.pool != this.selectedResults.pool.id) {
-               testQ.pool = this.selectedResults.pool.id
-               await this.$router.replace({query: testQ})
+            if (this.selectedResults.pool.id != "none" && query.pool != this.selectedResults.pool.id) {
+               let newQ = Object.assign({}, query)
+               newQ.pool = this.selectedResults.pool.id
+               console.log(newQ)
+               await this.$router.replace({query: newQ})
             }
 
             if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {

@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import VueClipboard from 'vue-clipboard2'
+import VueClipboard from 'vue3-clipboard'
 import V4Button from "@/components/V4Button"
 import V4Checkbox from "@/components/V4Checkbox"
 import V4Spinner from "@/components/V4Spinner"
@@ -17,11 +17,8 @@ import SignInRequired from "@/components/SignInRequired"
 store.router = router
 router.store = store
 
-const app = createApp({
-  router,
-  ...App
-})
-
+const app = createApp(App)
+app.use(router)
 app.use(store)
 
 app.component('V4Button', V4Button)
@@ -36,9 +33,6 @@ app.component('SignInRequired', SignInRequired)
 import VueEllipseProgress from 'vue-ellipse-progress'
 app.use(VueEllipseProgress)
 
-import VueMoment from 'vue-moment'
-app.use(VueMoment)
-
 import analytics from './analytics'
 app.config.globalProperties.$analytics = analytics
 
@@ -46,13 +40,12 @@ import * as utils from './utils'
 app.config.globalProperties.$utils = utils
 
 import '@fortawesome/fontawesome-pro/css/all.css'
-import Purecss from 'purecss'
+import 'purecss'
 
-app.use(Purecss)
 app.use(VueClipboard)
 
 import VueAnnouncer from '@vue-a11y/announcer'
-app.use(VueAnnouncer, {}, router)
-
+import '@vue-a11y/announcer/dist/style.css'
+app.use(VueAnnouncer, { router })
 
 app.mount('#app')

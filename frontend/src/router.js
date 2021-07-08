@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+
 import Codes from './views/Codes.vue'
 import Home from './views/Home.vue'
 
@@ -27,11 +27,8 @@ import FatalError from './views/FatalError.vue'
 
 import VueCookies from 'vue-cookies'
 
-Vue.use(Router)
-
-const router = new Router({
-   mode: 'history',
-   base: process.env.BASE_URL,
+const router = createRouter({
+   history: createWebHistory( process.env.BASE_URL ),
    routes: [
       {
          path: '/',
@@ -106,27 +103,6 @@ const router = new Router({
          component: Preferences
       },
       {
-         // NOTES: the signedin route doesn't have a visual representation. It just stores token and redirects
-         path: '/signedin',
-         beforeEnter: async (_to, _from, next) => {
-            let jwtStr = VueCookies.get("v4_jwt")
-            router.store.commit("user/setUserJWT", jwtStr)
-            router.store.commit('restore/load')
-            let tgtURL = "/"
-            if ( router.store.state.user.noILSAccount &&  router.store.state.user.signedInUser != "") {
-               console.log("NetBadge success, but NO ILS ACCOUNT")
-               tgtURL = "/account"
-            } else {
-               tgtURL = router.store.state.restore.url
-               console.log("redirect to "+tgtURL)
-               if (!tgtURL || tgtURL == "") {
-                  tgtURL = "/"
-               }
-            }
-            next( tgtURL )
-         }
-      },
-      {
          path: '/signin',
          name: 'signin',
          component: SignIn,
@@ -182,11 +158,12 @@ const router = new Router({
          component: FatalError
       },
       {
-         path: "*",
+         path: '/:pathMatch(.*)*',
          name: "not_found",
          component: NotFound
       }
    ],
+
    scrollBehavior(to, _from, _savedPosition) {
       let noScrollPages = ["home", "search"]
 
@@ -197,7 +174,7 @@ const router = new Router({
 
       return new Promise(resolve => {
          setTimeout( () => {
-            resolve({x: 0, y: 0})
+            resolve({left: 0, top: 0})
          }, 100)
       })
    },
@@ -209,35 +186,46 @@ router.afterEach((to, _from) => {
       bookmarks: "Bookmarks", requests: "Requests", searches: "Saved Searches",
       preferences: "Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse"
    }
-   Vue.nextTick(() => {
-      let title = titles[to.name]
-      if ( title == "Virgo") {
-         if (to.query.q) {
-            document.title = "Search Results"
-         } else if (to.query.mode=="advanced" ){
-            document.title = "Advanced Search"
-         } else {
-            document.title = title
-         }
+   let title = titles[to.name]
+   if ( title == "Virgo") {
+      if (to.query.q) {
+         document.title = "Search Results"
+      } else if (to.query.mode=="advanced" ){
+         document.title = "Advanced Search"
       } else {
-         if (title) {
-            document.title = title
-         } else {
-            document.title = "Virgo"
-         }
+         document.title = title
       }
-      document.getElementById("app").focus()
-   })
+   } else {
+      if (title) {
+         document.title = title
+      } else {
+         document.title = "Virgo"
+      }
+   }
+   document.getElementById("app").focus()
 })
 
 // This is called before every URL in the SPA is hit
 router.beforeEach( async (to, _from, next) => {
    router.store.commit("system/setILSError", "")
+
+   // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {
-      // signedin page is a temporary redirect after netbadge. don't
-      // do any special handling for at as that page has specific handling
-      // baked into the router above
-      next()
+      let jwtStr = VueCookies.get("v4_jwt")
+      router.store.commit("user/setUserJWT", jwtStr)
+      router.store.commit('restore/load')
+      let tgtURL = "/"
+      if ( router.store.state.user.noILSAccount &&  router.store.state.user.signedInUser != "") {
+         console.log("NetBadge success, but NO ILS ACCOUNT")
+         tgtURL = "/account"
+      } else {
+         tgtURL = router.store.state.restore.url
+         console.log("redirect to "+tgtURL)
+         if (!tgtURL || tgtURL == "") {
+            tgtURL = "/"
+         }
+      }
+      next( tgtURL )
       return
    }
 

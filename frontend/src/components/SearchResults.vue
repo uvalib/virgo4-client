@@ -30,11 +30,11 @@
                      <span :aria-label="`has ${r.total} results`" class="total">({{$utils.formatNum(r.total) || '0'}})</span>
                   </span>
                </V4Button>
-               <V4Select v-if="results.length > maxTabs" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
+               <!-- <V4Select v-if="results.length > maxTabs" :selections="otherSources" v-bind:attached="false" pad="4px 8px"
                   :background="otherSrcBkg" :color="otherSrcColor" alignment="right"
                   placeholder="More"
                   @changed="poolSelected"
-                  v-model="otherSrcSelection"/>
+                  v-model="otherSrcSelection"/> -->
             </div>
             <PoolResultDetail v-if="selectedResultsIdx > -1" />
             <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
