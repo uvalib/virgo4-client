@@ -18,12 +18,10 @@
          </template>
          <template v-slot:content>
             <p>{{signInMessage}}</p>
-            <p>Click
-               <V4Button mode="text" id="link" @click="signInClicked"
+            <p><V4Button mode="text" id="link" @click="signInClicked"
                   :aria-label="signInAria" :focusBackOverride="true" @tabback="linkTabbed">
-                  here
-               </V4Button>
-            to sign in.</p>
+                  Sign in now
+               </V4Button></p>
          </template>
       </V4Modal>
    </span>
