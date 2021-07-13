@@ -9,7 +9,7 @@
       <template v-slot:content>
          <template v-if="saved">
             <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-            <p class="saved">Manage your saved searches <router-link id="savename" tabindex="0" to="/searches">here</router-link>.</p>
+            <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
          </template>
          <template v-else>
             <div v-if="working" class="message working">

@@ -2,11 +2,9 @@
    <div class="signout-content" v-if="isSignedIn == false">
       <h3>You must be signed in to access {{targetPage}}.</h3>
       <p>
-         Click
          <V4Button mode="text" id="link" @click="signInClicked" :aria-label="`Sign in to view ${targetPage}`">
-            here
+            Sign in now
          </V4Button>
-         to sign in.
       </p>
    </div>
 </template>
