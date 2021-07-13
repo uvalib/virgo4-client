@@ -66,7 +66,7 @@
                         </V4Button>
                         <span v-html="rssMessage" class="rss-message"></span>
                         </p>
-                        <p>This RSS feed will provide updates on new UVA Catalog items as they are received.</p>
+                        <p>This feed contains a live search which will include any new items added to the collection.</p>
                         <p>Note: RSS feeds are not able to show updates from third party sources including articles.</p>
                      </template>
                   </V4Modal>
