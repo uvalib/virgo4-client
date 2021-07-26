@@ -34,7 +34,7 @@ export default {
             tab.focus();
 
          } else if (optionSettings.sign_in_required && !this.isSignedIn) {
-            this.$store.commit('restore/setActiveRequest', newActive)
+            this.$store.commit('restore/setActiveRequest', newActive);
             this.requests.activePanel = "signInPanel";
          } else {
             this.requests.activePanel = newActive;
