@@ -244,10 +244,12 @@ export default {
          let text = div.textContent
 
          // message/errors pop up behind the citation modal on details page, so only show one if we have to
-         this.$copyText(text).then( ()=> {
-            this.message = citation.label+" citation copied to clipboard."
-         }, e => {
-            this.error =  "Unable to copy "+citation.label+" citation: "+e.toString()
+         this.$copyText(text, undefined, (error, _event) => {
+            if (error) {
+               this.error =  "Unable to copy "+citation.label+" citation: "+error.toString()
+            } else {
+              this.message = citation.label+" citation copied to clipboard."
+            }
          })
          this.$nextTick( () => {document.getElementById("copy-citation").focus()} )
          setTimeout( () => {

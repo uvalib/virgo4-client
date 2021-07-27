@@ -121,10 +121,12 @@ export default {
       shareClicked() {
          this.$analytics.trigger('Results', 'SHARE_ITEM_CLICKED', this.hit.identifier)
          let URL = window.location.href
-         this.$copyText(URL).then( ()=> {
-            this.$store.commit("system/setMessage", "Item URL copied to clipboard.")
-         }, e => {
-            this.$store.commit("system/setError", "Unable to URL to clipboard: "+e)
+         this.$copyText(URL, undefined, (error, _event) => {
+            if (error) {
+               this.$store.commit("system/setError", "Unable to copy Item URL to clipboard: "+error)
+            } else {
+              this.$store.commit("system/setMessage", "Item URL copied to clipboard.")
+            }
          })
       }
    }

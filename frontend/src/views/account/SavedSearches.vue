@@ -165,18 +165,22 @@ export default {
       },
       copyURL(token) {
          let URL = window.location.protocol + "//" + window.location.host + this.searchURL(token)
-         this.$copyText(URL).then( ()=> {
-            this.$store.commit("system/setMessage", "Public search URL copied to clipboard.")
-         }, e => {
-            this.$store.commit("system/setError", "Unable to copy public search URL: "+e)
+         this.$copyText(URL, undefined, (error, _event) => {
+            if (error) {
+               this.$store.commit("system/setError", "Unable to copy public search URL: "+error)
+            } else {
+               this.$store.commit("system/setMessage", "Public search URL copied to clipboard.")
+            }
          })
       },
       copyRSS(token) {
          let URL = this.rssURL(token)
-         this.$copyText(URL).then( ()=> {
-            this.rssMessage = `Copied!`
-         }, e => {
-            this.rssMessage = `Unable to automatically copy RSS URL: ${e}`
+         this.$copyText(URL, undefined, (error, _event) => {
+            if (error) {
+               this.rssMessage = `Unable to automatically copy RSS URL: ${error}`
+            } else {
+              this.rssMessage = `Copied!`
+            }
          })
       },
       openRSSModal(token){

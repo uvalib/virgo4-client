@@ -196,10 +196,12 @@ export default {
       },
       copyURL( folder ) {
          let URL = this.getPublicURL(folder)
-         this.$copyText(URL).then( ()=> {
-            this.$store.commit("system/setMessage", "Public bookmark URL copied to clipboard.")
-         }, e => {
-            this.$store.commit("system/setError", "Unable to copy public bookmarks URL: "+e)
+         this.$copyText(URL, undefined, (error, _event) => {
+            if (error) {
+               this.$store.commit("system/setError", "Unable to copy public bookmarks URL: "+error)
+            } else {
+               this.$store.commit("system/setMessage", "Public bookmark URL copied to clipboard.")
+            }
          })
       },
       getTitle(folderInfo) {

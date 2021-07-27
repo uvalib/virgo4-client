@@ -55,23 +55,6 @@ export default {
       }
    },
    methods: {
-      publicURL() {
-         let base = window.location.href
-         if (base.includes("/search")) {
-            return `${base}/${this.savedSearchKey}`
-         } else {
-            return `${base}search/${this.savedSearchKey}`
-         }
-      },
-      copyURL() {
-         let URL = this.publicURL()
-         this.$copyText(URL).then( ()=> {
-            this.isOpen = false
-            this.$store.commit("system/setMessage", "Shared search URL copied to clipboard.")
-         }, e => {
-            this.$store.commit("system/setError", "Unable to copy public search URL: "+e)
-         })
-      },
       cancelClicked() {
          this.$refs.savemodal.hide()
       },

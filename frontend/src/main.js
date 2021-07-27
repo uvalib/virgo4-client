@@ -42,7 +42,10 @@ app.config.globalProperties.$utils = utils
 import '@fortawesome/fontawesome-pro/css/all.css'
 import 'purecss'
 
-app.use(VueClipboard)
+app.use(VueClipboard, {
+   autoSetContainer: true,
+   appendToBody: true,
+ })
 
 import VueAnnouncer from '@vue-a11y/announcer'
 import '@vue-a11y/announcer/dist/style.css'
