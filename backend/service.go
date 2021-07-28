@@ -9,7 +9,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/smtp"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -19,6 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 	dbx "github.com/go-ozzo/ozzo-dbx"
 	_ "github.com/lib/pq"
+	"gopkg.in/gomail.v2"
 )
 
 // ServiceContext contains common data used by all handlers
@@ -520,31 +520,34 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 
 // SendEmail will and send an email to the specified recipients
 func (svc *ServiceContext) SendEmail(subjectStr string, to []string, replyTo string, emailBody string) error {
-	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-	subject := fmt.Sprintf("Subject: %s\n", subjectStr)
-	toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
-	replyToHdr := ""
+	mail := gomail.NewMessage()
+	mail.SetHeader("MIME-version", "1.0")
+	mail.SetHeader("Content-Type", "text/plain; charset=\"UTF-8\"")
+	mail.SetHeader("Subject", subjectStr)
+	mail.SetHeader("To", strings.Join(to, ","))
+	mail.SetHeader("From", svc.SMTP.Sender)
 	if replyTo != "" {
-		replyToHdr = fmt.Sprintf("Reply-To: %s\n", replyTo)
+		mail.SetHeader("Reply-To", replyTo)
 	}
-	msg := []byte(subject + toHdr + replyToHdr + mime + emailBody)
+	mail.SetBody("text/plain", emailBody)
 
 	if svc.Dev.FakeSMTP {
 		log.Printf("Email is in dev mode. Logging message instead of sending")
 		log.Printf("==================================================")
-		log.Printf("%s", msg)
+		mail.WriteTo(log.Writer())
 		log.Printf("==================================================")
 		return nil
 	}
 
 	log.Printf("Sending %s email to %s", subjectStr, strings.Join(to, ","))
 	if svc.SMTP.Pass != "" {
-		auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
-		return smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, svc.SMTP.Sender, to, msg)
+		dialer := gomail.Dialer{Host: svc.SMTP.Host, Port: svc.SMTP.Port, Username: svc.SMTP.User, Password: svc.SMTP.Pass}
+		return dialer.DialAndSend(mail)
 	}
 
 	log.Printf("Using SendMail with no auth")
-	return smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, svc.SMTP.Sender, to, msg)
+	dialer := gomail.Dialer{Host: svc.SMTP.Host, Port: svc.SMTP.Port}
+	return dialer.DialAndSend(mail)
 }
 
 func handleAPIResponse(logURL string, resp *http.Response, err error) ([]byte, *RequestError) {

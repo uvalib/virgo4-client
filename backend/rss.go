@@ -108,17 +108,17 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 	log.Printf("search: %+v", searchResult)
 
 	now := time.Now()
-	savedUrl := svc.VirgoURL + "/search/" + search.Token
+	savedURL := svc.VirgoURL + "/search/" + search.Token
 	feed := &feeds.Feed{
 		Title:       "Virgo Feed (" + search.Name + ")",
-		Link:        &feeds.Link{Href: savedUrl},
+		Link:        &feeds.Link{Href: savedURL},
 		Description: "A Virgo RSS feed based on a saved search",
 		//Author:      &feeds.Author{Name: "Jason Moiron", Email: "jmoiron@jmoiron.net"},
 		Created: now,
 	}
 
 	// Set feed items
-	feed.Items = svc.MapFeedItems(searchResult)
+	feed.Items = svc.mapFeedItems(searchResult)
 
 	// Output the feed
 	rss, _ := feed.ToRss()
@@ -129,7 +129,7 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 	c.Writer.Write([]byte(rss))
 
 }
-func (svc *ServiceContext) MapFeedItems(poolResults v4api.PoolResult) []*feeds.Item {
+func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.Item {
 
 	//log.Printf("%+v", poolResults)
 	items := []*feeds.Item{}
@@ -142,10 +142,10 @@ func (svc *ServiceContext) MapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 			for _, field := range record.Fields {
 				switch field.Name {
 				case "id":
-					virgoUrl := svc.VirgoURL + "/items/" + field.Value
+					virgoURL := svc.VirgoURL + "/items/" + field.Value
 					feedItem.Id = field.Value
-					feedItem.Link = &feeds.Link{Rel: "self", Href: virgoUrl}
-					feedItem.Description += "<p>Virgo URL: " + virgoUrl + "</p>"
+					feedItem.Link = &feeds.Link{Rel: "self", Href: virgoURL}
+					feedItem.Description += "<p>Virgo URL: " + virgoURL + "</p>"
 				case "access-url":
 					feedItem.Source = &feeds.Link{Href: field.Value}
 				case "title_subtitle_edition":
