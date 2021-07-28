@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/smtp"
 	"net/url"
-	"strings"
 	"text/template"
 
 	"github.com/gin-gonic/gin"
@@ -176,12 +174,11 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		}
 
 		log.Printf("Generate SMTP message for %s", templateFile)
-		// INFO: https://stackoverflow.com/questions/36485857/sending-emails-with-name-email-from-go
 		// NOTES for recipient: For any reserve library location other than Law, the email should be sent to
 		// svc.CourseReserveEmail with the from address of the patron submitting the request.
 		// For Law it should send the email to svc.LawReserveEmail AND the patron
 		to := []string{}
-		cc := []string{}
+		cc := ""
 		from := svc.SMTP.Sender
 		subjectName := reserveReq.Request.Name
 		if reserveReq.Request.Library == "law" {
@@ -197,46 +194,23 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 			to = append(to, svc.CourseReserveEmail)
 			if reserveReq.Request.InstructorEmail != "" {
 				from = reserveReq.Request.InstructorEmail
-				cc = append(cc, reserveReq.Request.Email)
+				cc = reserveReq.Request.Email
 				subjectName = reserveReq.Request.InstructorName
 			} else {
 				from = reserveReq.Request.Email
 			}
 		}
 
-		mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
-		subject := fmt.Sprintf("Subject: %s: %s\n", subjectName, reserveReq.Request.Course)
-		toHdr := fmt.Sprintf("To: %s\n", strings.Join(to, ","))
-		ccHdr := ""
-		if len(cc) > 0 {
-			ccHdr = fmt.Sprintf("CC: %s\n", strings.Join(cc, ","))
-		}
-		msg := []byte(subject + toHdr + ccHdr + mime + renderedEmail.String())
-
-		if svc.Dev.FakeSMTP {
-			log.Printf("Email is in dev mode. Logging message instead of sending")
-			log.Printf("==================================================")
-			log.Printf("From: %s", from)
-			log.Printf("%s", msg)
-			log.Printf("==================================================")
-		} else {
-			log.Printf("Sending reserve email to %s", strings.Join(to, ","))
-			var err error
-			if svc.SMTP.Pass != "" {
-				auth := smtp.PlainAuth("", svc.SMTP.User, svc.SMTP.Pass, svc.SMTP.Host)
-				err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), auth, from, to, msg)
-			} else {
-				log.Printf("Using SendMail with no auth")
-				err = smtp.SendMail(fmt.Sprintf("%s:%d", svc.SMTP.Host, svc.SMTP.Port), nil, from, to, msg)
-			}
-			if err != nil {
-				log.Printf("ERROR: Unable to send reserve email: %s", err.Error())
-				c.String(http.StatusInternalServerError, err.Error())
-				return
-			}
+		subject := fmt.Sprintf("%s: %s", subjectName, reserveReq.Request.Course)
+		eRequest := emailRequest{Subject: subject, To: to, CC: cc, From: from, Body: renderedEmail.String()}
+		sendErr := svc.SendEmail(&eRequest)
+		if sendErr != nil {
+			log.Printf("ERROR: Unable to send reserve email: %s", sendErr.Error())
+			c.String(http.StatusInternalServerError, sendErr.Error())
+			return
 		}
 	}
-	c.String(http.StatusOK, "Reserve email sent")
+	c.String(http.StatusOK, "Reserve emails sent")
 }
 
 func (svc *ServiceContext) getAvailabity(reqItem *RequestItem, jwt string) {
