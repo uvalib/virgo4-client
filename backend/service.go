@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -542,11 +543,13 @@ func (svc *ServiceContext) SendEmail(subjectStr string, to []string, replyTo str
 	log.Printf("Sending %s email to %s", subjectStr, strings.Join(to, ","))
 	if svc.SMTP.Pass != "" {
 		dialer := gomail.Dialer{Host: svc.SMTP.Host, Port: svc.SMTP.Port, Username: svc.SMTP.User, Password: svc.SMTP.Pass}
+		dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 		return dialer.DialAndSend(mail)
 	}
 
 	log.Printf("Using SendMail with no auth")
 	dialer := gomail.Dialer{Host: svc.SMTP.Host, Port: svc.SMTP.Port}
+	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	return dialer.DialAndSend(mail)
 }
 
