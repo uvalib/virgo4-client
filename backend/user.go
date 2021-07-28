@@ -496,7 +496,8 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 	}
 
 	to := []string{"lib-circ@virginia.edu"}
-	sendErr := svc.SendEmail("New Account Request", to, req.Email, renderedEmail.String())
+	eRequest := emailRequest{Subject: "New Account Request", To: to, ReplyTo: req.Email, From: svc.SMTP.Sender, Body: renderedEmail.String()}
+	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
 		log.Printf("ERROR: Unable to new account request email: %s", err.Error())
 		c.String(http.StatusInternalServerError, err.Error())

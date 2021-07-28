@@ -52,7 +52,8 @@ func (svc *ServiceContext) SendFeedback(c *gin.Context) {
 		return
 	}
 
-	sendErr := svc.SendEmail("Virgo 4 Feedback", to, request.Email, renderedEmail.String())
+	eRequest := emailRequest{Subject: "Virgo 4 Feedback", To: to, ReplyTo: request.Email, From: svc.SMTP.Sender, Body: renderedEmail.String()}
+	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
 		log.Printf("ERROR: Unable to send feedback email: %s", sendErr.Error())
 		c.String(http.StatusInternalServerError, sendErr.Error())

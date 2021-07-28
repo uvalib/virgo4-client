@@ -519,18 +519,30 @@ func (svc *ServiceContext) ILSConnectorDelete(url string, jwt string) ([]byte, *
 	return resp, err
 }
 
+type emailRequest struct {
+	Subject string
+	To      []string
+	ReplyTo string
+	CC      string
+	From    string
+	Body    string
+}
+
 // SendEmail will and send an email to the specified recipients
-func (svc *ServiceContext) SendEmail(subjectStr string, to []string, replyTo string, emailBody string) error {
+func (svc *ServiceContext) SendEmail(request *emailRequest) error {
 	mail := gomail.NewMessage()
 	mail.SetHeader("MIME-version", "1.0")
 	mail.SetHeader("Content-Type", "text/plain; charset=\"UTF-8\"")
-	mail.SetHeader("Subject", subjectStr)
-	mail.SetHeader("To", to...)
-	mail.SetHeader("From", svc.SMTP.Sender)
-	if replyTo != "" {
-		mail.SetHeader("Reply-To", replyTo)
+	mail.SetHeader("Subject", request.Subject)
+	mail.SetHeader("To", request.To...)
+	mail.SetHeader("From", request.From)
+	if request.ReplyTo != "" {
+		mail.SetHeader("Reply-To", request.ReplyTo)
 	}
-	mail.SetBody("text/plain", emailBody)
+	if len(request.CC) > 0 {
+		mail.SetHeader("Cc", request.CC)
+	}
+	mail.SetBody("text/plain", request.Body)
 
 	if svc.Dev.FakeSMTP {
 		log.Printf("Email is in dev mode. Logging message instead of sending")
@@ -540,14 +552,14 @@ func (svc *ServiceContext) SendEmail(subjectStr string, to []string, replyTo str
 		return nil
 	}
 
-	log.Printf("Sending %s email to %s", subjectStr, strings.Join(to, ","))
+	log.Printf("Sending %s email to %s", request.Subject, strings.Join(request.To, ","))
 	if svc.SMTP.Pass != "" {
 		dialer := gomail.Dialer{Host: svc.SMTP.Host, Port: svc.SMTP.Port, Username: svc.SMTP.User, Password: svc.SMTP.Pass}
 		dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 		return dialer.DialAndSend(mail)
 	}
 
-	log.Printf("Using SendMail with no auth")
+	log.Printf("Sending email with no auth")
 	dialer := gomail.Dialer{Host: svc.SMTP.Host, Port: svc.SMTP.Port}
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	return dialer.DialAndSend(mail)
