@@ -525,7 +525,7 @@ func (svc *ServiceContext) SendEmail(subjectStr string, to []string, replyTo str
 	mail.SetHeader("MIME-version", "1.0")
 	mail.SetHeader("Content-Type", "text/plain; charset=\"UTF-8\"")
 	mail.SetHeader("Subject", subjectStr)
-	mail.SetHeader("To", strings.Join(to, ","))
+	mail.SetHeader("To", to...)
 	mail.SetHeader("From", svc.SMTP.Sender)
 	if replyTo != "" {
 		mail.SetHeader("Reply-To", replyTo)
