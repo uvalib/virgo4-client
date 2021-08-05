@@ -205,7 +205,7 @@ export function scrollToItem( tgtEle ) {
  // Pool is the pool where hit is located, origin is the place where the bookmark started.
  // Options: SEARCH, DETAIL, COLLECTION, SHELF_BROWSE
  export function toBookmarkData( pool, hit, origin ) {
-    let bmData = {identifier: hit.identifier, title: hit.header.title, pool: pool, origin: origin}
+    let bmData = {identifier: hit.identifier, title: hit.header.title, author: hit.header.author_display, pool: pool, origin: origin}
     if (hit.groupParent) {
        bmData.groupParent = hit.groupParent
     }
