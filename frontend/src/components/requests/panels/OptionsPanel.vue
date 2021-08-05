@@ -35,7 +35,7 @@ export default {
 
          } else if (optionSettings.sign_in_required && !this.isSignedIn) {
             this.$store.commit('restore/setActiveRequest', newActive);
-            this.requests.activePanel = "signInPanel";
+            this.requests.activePanel = "SignInPanel";
          } else {
             this.requests.activePanel = newActive;
             this.requests.activeOption = optionSettings;
