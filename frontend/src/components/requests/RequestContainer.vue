@@ -101,8 +101,8 @@ export default {
    }
    .reset {
       position: absolute;
-      right: 2vw;
-      top: 2vw;
+      right: 1vw;
+      top: 1vw;
    }
    p.error {
       color: var(--uvalib-red-emergency);
