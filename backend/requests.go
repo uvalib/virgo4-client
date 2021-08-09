@@ -472,7 +472,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 
 	// Only make a hold for certain libraries
 	makeHold := false
-	for _, holdLoc := range []string{"BY-REQUEST", "STACKS", "OVERSIZE"} {
+	for _, holdLoc := range []string{"BY-REQUEST", "STACKS", "OVERSIZE", "RESERVE", "REFERENCE", "CUR-PER", "JOURNALS"} {
 		if scanReq.Location == holdLoc {
 			log.Printf("Making hold for %s", scanReq.ItemBarcode)
 			makeHold = true
@@ -492,9 +492,17 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 
 	// Scans have special pickup libraries
 	PickupLibrary := ""
-	if scanReq.Library == "BY-REQUEST" {
+	switch scanReq.Library {
+	case
+		"FINE-ARTS",
+		"SCI-ENG",
+		"MUSIC",
+		"ASTRONOMY":
+		PickupLibrary = "CLEMONS"
+
+	case "IVY":
 		PickupLibrary = "LEO"
-	} else {
+	default:
 		PickupLibrary = scanReq.Library
 	}
 
