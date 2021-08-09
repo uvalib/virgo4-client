@@ -162,23 +162,13 @@ const user = {
          if (getters.isLawUser) {
             pickupLibraries.push({id: "LAW", name: "Law Library"})
          }
-         //if (getters.canLeoMobile) {
-         //  pickupLibraries.push({id: "LEO", name: 'Central Grounds Parking Garage ("LEO Mobile")' })
-         //}
+         if (getters.canUseLEO) {
+          pickupLibraries.push({id: "LEO", name: 'LEO delivery to my department' })
+         }
 
          return pickupLibraries
        },
-       canLeoMobile: (_state, getters, _rootState) => {
 
-         let undergradLeoEligible = getters.isUndergraduate &&
-                                    Date.now() >= Date.parse("5/24/2021") &&
-                                    Date.now() <= Date.parse("8/12/2021")
-
-         if (getters.isFaculty || getters.isGraduate || undergradLeoEligible ) {
-            return true
-         }
-         return false
-      },
    },
 
    mutations: {

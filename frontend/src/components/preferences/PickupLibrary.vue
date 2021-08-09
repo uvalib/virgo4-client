@@ -9,8 +9,6 @@
       <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a> to request your item.
     </p>
 
-    <p v-if="canLeoMobile"><a target="_blank" href="http://library.virginia.edu/services/pickup">Learn more about options for Paging and Pickup.</a></p>
-
     <label for="pickup-sel">Preferred pickup location:
      <transition name="fade" v-on:after-enter="showSaved = false">
        <span v-if="showSaved" class="success">  Saved</span>
@@ -38,7 +36,6 @@ export default {
     }),
     ...mapGetters({
       librariesForUser: "user/libraries",
-      canLeoMobile: "user/canLeoMobile"
     }),
   },
   methods: {
