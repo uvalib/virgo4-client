@@ -2,12 +2,6 @@
    <div class="availability">
       <div class="availability-content" v-if="showAvailability">
          <h2>Availability</h2>
-         <div class="ra-box ra-fiy" v-if="hasItems || hasRequestOptions">
-            <strong>Please note that stacks browsing is not available because of building restrictions due to COVID-19.</strong>
-            Many items are available for pickup. To make a request, sign in and use the "Request" button in the item record.
-            If you have questions, or need help accessing materials, use Ask a Librarian web chat.
-            <a href="https://www.library.virginia.edu/news/covid-19/" target="_blank">Learn more about Library resources during COVID-19</a>.
-         </div>
          <div class="ra-box ra-fiy" v-if="availabilityStatement" v-html="availabilityStatement"></div>
          <div class="ra-box ra-fiy" v-if="accessRestriction" v-html="accessRestriction"></div>
          <div class="ra-box ra-fiy" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
