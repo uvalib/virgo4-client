@@ -34,10 +34,10 @@ const system = {
       locationCodes: [],
       libraryCodes: [],
       pickupLibraries: [
-         {id: 'SCI-ENG', name: 'Brown Science and Engineering (Clark Hall)'},
-         {id: 'MUSIC', name: 'Music'},
-         {id: 'FINE-ARTS', name: 'Fine Arts'},
-         {id: 'CLEMONS', name: 'Clemons'},
+         {id: 'SCI-ENG', name: 'Brown Science and Engineering Library (Clark Hall)'},
+         {id: 'MUSIC', name: 'Music Library'},
+         {id: 'FINE-ARTS', name: 'Fine Arts Library'},
+         {id: 'CLEMONS', name: 'Clemons Library'},
       ],
       poolMapping: {}
    },
