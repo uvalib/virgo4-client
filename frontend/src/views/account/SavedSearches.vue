@@ -52,24 +52,9 @@
                   <span class="sep">|</span>
                   <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
                   <span class="sep">|</span>
-                  <V4Modal :id="saved.token" ref="rssmodal" :title='`RSS Feed for "${saved.name}"`' :buttonID="`${saved.token}-open`" @closed="closeRSSModal()">
-                     <template v-slot:button>
-                        <V4Button @click="$refs.rssmodal.find(m=> m.id == saved.token).show()" :id="`${saved.token}-open`" mode="text">
+                  <V4Button @click="openRSSModal(saved)" :id="`${saved.token}-open`" mode="text">
                            RSS <i class='link fal fa-rss'></i>
-                        </V4Button>
-                     </template>
-                     <template v-slot:content>
-                        <h3 class="rss-url" v-text="rssURL(saved.token)"></h3>
-                        <p>
-                        <V4Button  mode="primary" @click="copyRSS(saved.token)">
-                           Copy to clipboard
-                        </V4Button>
-                        <span v-html="rssMessage" class="rss-message"></span>
-                        </p>
-                        <p>This feed contains a live search which will include any new items added to the collection.</p>
-                        <p>Note: RSS feeds are not able to show updates from third party sources including articles.</p>
-                     </template>
-                  </V4Modal>
+                  </V4Button>
                </div>
             </div>
                <div class="controls">
@@ -95,7 +80,21 @@
             </div>
          </div>
       </div>
+      <V4Modal :id="'rssModal'" ref="rssmodal" :title='`RSS Feed for "${currentFeed.name}"`' :buttonID="`${currentFeed.token}-open`" @closed="closeRSSModal()">
+         <template v-slot:content>
+            <h3 class="rss-url" v-text="rssURL(currentFeed.token)"></h3>
+            <p>
+            <V4Button  mode="primary" @click="copyRSS(currentFeed.token)">
+               Copy to clipboard
+            </V4Button>
+            <span v-html="rssMessage" class="rss-message"></span>
+            </p>
+            <p>This feed contains a live search which will include any new items added to the collection.</p>
+            <p>Note: RSS feeds are not able to show updates from third party sources including articles.</p>
+         </template>
+      </V4Modal>
    </div>
+
 </template>
 
 <script>
@@ -108,7 +107,8 @@ export default {
    },
    data: ()=>{
       return {
-         rssMessage: ""
+         rssMessage: "",
+         currentFeed: {}
       }
 
    },
@@ -183,9 +183,9 @@ export default {
             }
          })
       },
-      openRSSModal(token){
-         this.$emit("clicked")
-         this.$refs.addbmmodal[token].open()
+      openRSSModal(rss){
+         this.currentFeed = rss
+         this.$refs.rssmodal.show()
       },
       closeRSSModal(){
          this.rssMessage = ""
