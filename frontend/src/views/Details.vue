@@ -17,13 +17,11 @@ import FullPageCollectionView from "@/components/details/FullPageCollectionView"
 
 export default {
    name: "detail",
-   watch: {
-      $route() {
-         // this is needed to load details when a grouped image thumb has been clicked; new content
-         // needs to be loaded, but the page remains the same (create not called)
-         if ( this.$route.fullPath.includes("/sources") ) {
-            this.getDetails()
-         }
+   beforeRouteUpdate(to) {
+      // this is needed to load details when a grouped image thumb has been clicked; new content
+      // needs to be loaded, but the page remains the same (create not called)
+      if ( to.fullPath.includes("/sources") ) {
+         this.getDetails()
       }
    },
    components: {
@@ -66,7 +64,6 @@ export default {
          }
 
          if (src) {
-            this.$store.commit("hitSelected", id)
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {
             console.log("LOOKUP IN DETAIL")

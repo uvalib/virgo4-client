@@ -50,15 +50,15 @@ export default {
    components: {
      SearchResults, V4BarcodeScanner, AdvancedSearch, Welcome, SourceSelector
    },
+   beforeRouteUpdate(to) {
+      console.log("NEW HOME ROUTE "+ to.fullPath)
+      this.restoreSearchFromQueryParams(to.query)
+      this.pageTitle = "Search"
+      if (this.searchMode != "basic") {
+         this.pageTitle = "Advanced Search"
+      }
+   },
    watch: {
-      $route() {
-         console.log("NEW HOME ROUTE "+ this.$route.fullPath)
-         this.restoreSearchFromQueryParams(this.$route.query)
-         this.pageTitle = "Search"
-         if (this.searchMode != "basic") {
-            this.pageTitle = "Advanced Search"
-         }
-      },
       searching (newVal, _oldVal) {
          if (newVal == false && this.restoreURL == "/") {
             this.$nextTick( () => {
@@ -126,20 +126,8 @@ export default {
          await this.$store.dispatch("query/loadSearch", token)
       }
 
-      // await this.mapLegacyQueries( token )
-      await this.restoreSearchFromQueryParams(this.$route.query)
-
-      let bmTarget = this.$store.getters['restore/bookmarkTarget']
-      if (bmTarget.id != "") {
-         this.showAddBookmark(bmTarget)
-         this.$store.commit("restore/clear")
-      } else if ( this.restoreSaveSearch ) {
-         let saveBtn = document.getElementById("save-modal-open")
-         if (saveBtn) {
-            saveBtn.focus()
-            saveBtn.click()
-         }
-      }
+      await this.mapLegacyQueries( token )
+      this.restoreSearchFromQueryParams(this.$route.query)
    },
    mounted() {
       if ( this.searchMode == "basic") {
@@ -364,6 +352,18 @@ export default {
                   top: this.lastSearchScrollPosition,
                   behavior: "auto"
                })
+            }
+
+            let bmTarget = this.$store.getters['restore/bookmarkTarget']
+            if (bmTarget.id != "") {
+               this.showAddBookmark(bmTarget)
+               this.$store.commit("restore/clear")
+            } else if ( this.restoreSaveSearch ) {
+               let saveBtn = document.getElementById("save-modal-open")
+               if (saveBtn) {
+                  saveBtn.focus()
+                  saveBtn.click()
+               }
             }
          }
       },

@@ -72,13 +72,9 @@ export default {
          'openurl.bydate'
       ]),
    },
-   watch: {
-      $route() {
-         if (this.$route.query.submitted) {
-            this.request=""
-         } else {
-            this.initForm(this.$route.query)
-         }
+   beforeRouteUpdate(to) {
+      if (to.query.submitted) {
+         this.request=""
       }
    },
    methods: {
