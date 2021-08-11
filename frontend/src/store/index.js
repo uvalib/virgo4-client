@@ -495,6 +495,7 @@ export default createStore({
          ctx.commit('query/clear')
          ctx.commit('filters/reset')
          ctx.commit('sort/reset')
+         ctx.commit("collection/clearCollectionDetails")
       },
       moreResults(ctx) {
          ctx.commit('incrementPage')
