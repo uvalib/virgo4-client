@@ -247,24 +247,29 @@ const query = {
    actions: {
       async loadSearch(ctx, token) {
          ctx.commit('setSearching', true, { root: true })
-         await axios.get(`/api/searches/${token}`).then((response) => {
-            // See if the filter part is old...
+         try {
+            let response = await axios.get(`/api/searches/${token}`)
             let searchURL = response.data.url
-            let params = new URLSearchParams(response.data.url.split("?")[1])
-            let rawFilter = params.get("filter")
-            if ( rawFilter && rawFilter != "") {
-               if ( rawFilter[0] != "{") {
-                  // really old format; just drop the filter
-                  params.delete("filter")
-                  searchURL = "/search?"+params.toString()
+            if (searchURL == "") {
+               ctx.commit('setSearching', false, { root: true })
+               this.router.push("/not_found")
+            } else {
+               let params = new URLSearchParams(response.data.url.split("?")[1])
+               let rawFilter = params.get("filter")
+               if ( rawFilter && rawFilter != "") {
+                  if ( rawFilter[0] != "{") {
+                     // really old format; just drop the filter
+                     params.delete("filter")
+                     searchURL = "/search?"+params.toString()
+                  }
                }
+               await this.router.replace(searchURL)
             }
-            this.router.replace(searchURL)
-         }).catch((error) => {
+         } catch(error) {
             console.error(error)
             ctx.commit('setSearching', false, { root: true })
             this.router.push("/not_found")
-         })
+         }
       }
    }
 }

@@ -122,12 +122,11 @@ export default {
       // When restoring a saved search, the call will be /search/:token
       let token = this.$route.params.id
       if ( token ) {
-         // Load the search from the :token and restore it
+         // Load the search from the token and restore it
          await this.$store.dispatch("query/loadSearch", token)
       }
 
-      await this.mapLegacyQueries( token )
-      this.restoreSearchFromQueryParams(this.$route.query)
+      this.mapLegacyQueries( this.$route.query, token )
    },
    mounted() {
       if ( this.searchMode == "basic") {
@@ -136,9 +135,9 @@ export default {
    },
 
    methods: {
-      async mapLegacyQueries( token ) {
+      mapLegacyQueries( query, token ) {
          let changed = false
-         let newQ = Object.assign({}, this.$route.query)
+         let newQ = Object.assign({}, query )
 
          // always discard exclude param if it is present
          if (newQ.exclude) {
@@ -230,7 +229,7 @@ export default {
             } else if (newQ.pool == "uva_library") {
                this.searchSources = "uva_library"
             }
-            await this.$router.replace({query: newQ})
+            this.$router.push({query: newQ, replace: true})
          } else {
             if ( this.userSearched == false ) {
                if (newQ.pool == "images") {
@@ -241,6 +240,7 @@ export default {
                   this.searchSources = "uva_library"
                }
             }
+            this.restoreSearchFromQueryParams(this.$route.query)
          }
       },
 
