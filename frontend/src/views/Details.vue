@@ -4,7 +4,7 @@
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <FullPageCollectionView v-if="isDigitalCollection && isFullPage && hasDigitalContent" />
+         <FullPageCollectionView v-if="isDigitalCollection && isFullPage && hasDigitalContent && isDevServer" />
          <ItemView v-else />
       </template>
    </div>

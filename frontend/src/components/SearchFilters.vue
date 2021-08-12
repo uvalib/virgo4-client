@@ -25,7 +25,7 @@
             <div v-else class="no-filter">
                <span>None</span>
             </div>
-            <div class="collection-context" v-if="hasCollectionCtx">
+            <div class="collection-context" v-if="hasCollectionCtx && isDevServer">
                <span class="desc" v-html="collectionDesc"></span>
                <CollectionDates id="coll-dates" :date="collectionDate" />
             </div>
@@ -63,7 +63,8 @@ export default {
          selectedResults: 'selectedResults',
          facetSupport: 'pools/facetSupport',
          filterQueryParam: 'filters/asQueryParam',
-         hasCollectionCtx: 'collection/isAvailable'
+         hasCollectionCtx: 'collection/isAvailable',
+         isDevServer: 'system/isDevServer',
       }),
       ...mapState({
          updatingFacets: state => state.filters.updatingFacets,
