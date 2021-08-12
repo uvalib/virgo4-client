@@ -21,6 +21,8 @@ const reserves = {
          semester: "",
          library: "",
          period: "",
+         lms: "",
+         otherLMS: "",
       },
    },
 
@@ -158,11 +160,10 @@ const reserves = {
                library: item.details.library,
                availability: item.details.availability,
                notes: notes,
-               period: item.period}
-            if (item.pool == 'video') {
-               subItem.audioLanguage = item.audioLanguage
-               subItem.subtitles = item.subtitles
-               subItem.subtitleLanguage = item.subtitleLanguage
+               period: item.period,
+               audioLanguage: item.audioLanguage,
+               subtitles: item.subtitles,
+               subtitleLanguage: item.subtitleLanguage
             }
             data.items.push( subItem )
          })
