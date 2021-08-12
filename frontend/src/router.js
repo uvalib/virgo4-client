@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Codes from './views/Codes.vue'
 import Home from './views/Home.vue'
 
-import CourseReserves from './views/CourseReserves.vue'
+// import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
 import Details from './views/Details.vue'
@@ -61,11 +61,11 @@ const router = createRouter({
          name: 'codes',
          component: Codes
       },
-      {
-         path: '/course-reserves',
-         name: 'course-reserves',
-         component: CourseReserves
-      },
+      // {
+      //    path: '/course-reserves',
+      //    name: 'course-reserves',
+      //    component: CourseReserves
+      // },
       {
          path: '/course-reserves-request',
          name: 'course-reserves-request',
@@ -213,6 +213,12 @@ router.afterEach((to, _from) => {
 // This is called before every URL in the SPA is hit
 router.beforeEach( async (to, _from, next) => {
    router.store.commit("system/setILSError", "")
+
+   if (to.path == "/course-reserves") {
+      console.log("WALRUS")
+      window.location.href = "https://ils.lib.virginia.edu/reserves"
+      return
+   }
 
    // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {

@@ -19,7 +19,7 @@
 <script>
 import CollectionHeader from "@/components/details/CollectionHeader"
 import SearchHitActions from '@/components/SearchHitActions'
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 
 export default {
    name: "fullscreen-collection-view",
@@ -32,6 +32,9 @@ export default {
          loadingDigitalContent : state => state.item.loadingDigitalContent,
          digitalContent : state => state.item.digitalContent,
          details : state => state.item.details,
+      }),
+      ...mapGetters({
+         isDevServer: 'system/isDevServer',
       }),
       curioURL() {
          let selDO = this.digitalContent[0]
