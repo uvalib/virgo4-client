@@ -43,8 +43,8 @@ export default {
       this.$store.dispatch("preferences/savePreferences").then(()=>{this.showSaved = true})
     },
   },
-  mounted: function(){
-    if(this.pickupLibrary != {} && !this.librariesForUser.some(lib => lib.id == this.pickupLibrary.id)){
+  created: function(){
+    if(this.pickupLibrary != {} && !this.librariesForUser.some(lib => lib.id == this.pickupLibrary.id )){
       // Clear the pickup Library if not in the currently available list
       this.$store.commit("preferences/clearPickupLibrary")
     }
