@@ -215,9 +215,8 @@ router.beforeEach( async (to, _from, next) => {
    router.store.commit("system/setILSError", "")
 
    if (to.path == "/course-reserves") {
-      console.log("WALRUS")
       window.location.href = "https://ils.lib.virginia.edu/reserves"
-      return
+      return false
    }
 
    // signedin page is a temporary redirect after netbadge.
