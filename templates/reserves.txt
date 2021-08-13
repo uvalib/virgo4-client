@@ -3,13 +3,17 @@ Course Reserve Information
 _______________________________________________________________________
 Requester Name:      {{.Request.Name}}
 Requester Email:     {{.Request.Email}}
-{{- if eq .Request.OnBehalfOf "yes"}}  
-On Behalf Of       
+{{- if eq .Request.OnBehalfOf "yes"}}
+On Behalf Of
    Instructor Name:  {{.Request.InstructorName}}
    Instructor Email: {{.Request.InstructorEmail}}
 {{- end}}
 Course ID:  {{.Request.Course}}
 Semester:   {{.Request.Semester}}
+LMS: {{.Request.LMS}}
+{{- if eq .Request.LMS "Other"}}
+Other LMS: {{.Request.OtherLMS}}
+{{- end}}
 _______________________________________________________________________
 
 {{- $reserveLib := .Request.Library -}}

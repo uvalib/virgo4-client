@@ -54,6 +54,18 @@
           <p v-if="hasError('semester')" class="error">* semester is required</p>
       </div>
 
+      <div class="entry pure-control-group">
+         <label for="learningManagementSystem">Learning Management System</label>
+         <select v-model="lms" id="learningManagementSystem" aria-required="true" required="required">
+            <option value="">Please indicate in which system your course resides.</option>
+            <option v-for="lmsOption in learningManagementSystems" :key="lmsOption" :value="lmsOption">{{lmsOption}}</option>
+         </select>
+         <p v-if="hasError('lms')" class="error">* learning management system is required.</p>
+      </div>
+      <div class="pure-control-group" v-if="lms == 'Other'">
+         <label  for="otherLMS">Please specify other LMS </label>
+            <input v-model="otherLMS" id="otherLMS" aria-required="true" required="required">
+      </div>
       <div class="video-note">
         <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System.
           If you have questions about video reserves, please email
@@ -113,6 +125,7 @@ export default {
          subtitles: "no",
          subtitleLanguage: "",
          notes: "",
+         learningManagementSystems: ['Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other'],
          fieldMap: {
             "instructorName": "instructor_name",
             "instructorEmail": "instructor_email",
@@ -121,6 +134,7 @@ export default {
             "course": "course",
             "semester": "semester",
             "subtitleLanguage": "subtitle_language",
+            "lms": "lms",
          }
       };
    },
@@ -142,6 +156,8 @@ export default {
          'request.course',
          'request.semester',
          'request.library',
+         'request.lms',
+         'request.otherLMS'
       ]),
    },
    created() {
@@ -174,9 +190,13 @@ export default {
          for (let [key, value] of Object.entries(this.reserveRequest)) {
             if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail")
             || (key=="period" || key=="library")) continue
+            if (key=="otherLMS") continue
             if (value == "") {
               this.errors.push(key)
             }
+         }
+         if (this.lms == "Other" && this.otherLMS == "" ){
+            this.errors.push('lms')
          }
          if (this.subtitles == "yes" && this.subtitleLanguage == "") {
             this.errors.push("subtitleLanguage")

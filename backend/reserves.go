@@ -34,6 +34,8 @@ type RequestParams struct {
 	Semester        string `json:"semester"`
 	Library         string `json:"library"`
 	Period          string `json:"period"`
+	LMS             string `json:"lms"`
+	OtherLMS        string `json:"otherLMS"`
 }
 
 // RequestItem is the details for a particular reserve item
