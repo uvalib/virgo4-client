@@ -183,9 +183,7 @@ export default {
             this.$store.dispatch("selectPoolResults", tgtIdx)
             let newPoolID = this.results[tgtIdx].pool.id
             if ( this.$route.query.pool != newPoolID ) {
-               console.log("UPDATE URL "+Date.now())
                this.updateURL(newPoolID)
-               console.log("DONE UPDATE URL "+Date.now())
             }
          }
       }

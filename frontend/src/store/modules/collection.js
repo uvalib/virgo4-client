@@ -11,8 +11,8 @@ const collection = {
       startDate: "",
       endDate: "",
       selectedDate: "",
-      currentMonth: "",
       currentYear: "",
+      notPublishedDates: [],
       yearPublications: [],
       filter: {
          name: "",
@@ -47,37 +47,45 @@ const collection = {
          }
          return pid
       },
-      notPublishedDays: state => {
-         let yearPubs = state.yearPublications.find( yp => yp.year == state.currentYear)
-         let out = []
-         if (yearPubs) {
-            // get only dates for the current year/month
-            let monthPubs = yearPubs.dates.filter( pub => pub.date.includes(`${state.currentYear}-${state.currentMonth}`))
-            for (let day=1; day<=31; day++) {
-               let idx = monthPubs.findIndex( mp => parseInt(mp.date.split("-")[2],10) == day)
-               if (idx == -1) {
-                  out.push(day)
-               }
-            }
-         } else {
-            // no data. disable all
-            for (let day=1; day<=31; day++) {
-               out.push(day)
-            }
-         }
-         return out
-      }
    },
 
    mutations: {
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
-      setCurrentMonth(state, mm) {
-         state.currentMonth = mm
-      },
       setCurrentYear(state, yyyy) {
          state.currentYear = yyyy
+      },
+      updateNotPublishedDates(state) {
+         state.notPublishedDates.splice(0, state.notPublishedDates.length)
+         let yearPubs = state.yearPublications.find( yp => yp.year == state.currentYear)
+         if (yearPubs) {
+            for (let month=1; month<=12; month++) {
+               let monthStr = `${month}`
+               monthStr = monthStr.padStart(2, "0")
+               for (let day=1; day<=31; day++) {
+                  let dayStr = `${day}`
+                  dayStr = dayStr.padStart(2, "0")
+                  let tgt = `${state.currentYear}-${monthStr}-${dayStr}`
+                  let idx = yearPubs.dates.findIndex( mp => mp.date == tgt)
+                  if (idx == -1) {
+                     state.notPublishedDates.push(tgt)
+                  }
+               }
+            }
+         } else {
+            // no data. disable all
+            for (let month=1; month<=12; month++) {
+               let monthStr = `${month}`
+               monthStr = monthStr.padStart(2, "0")
+               for (let day=1; day<=31; day++) {
+                  let dayStr = `${day}`
+                  dayStr = dayStr.padStart(2, "0")
+                  let tgt = `${state.currentYear}-${monthStr}-${dayStr}`
+                  state.notPublishedDates.push(tgt)
+               }
+            }
+         }
       },
       clearCollectionDetails(state) {
          state.id = ""
@@ -140,6 +148,7 @@ const collection = {
          let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/dates?year=${year}`
          axios.get(url).then((response) => {
             ctx.commit("setYearlyPublications", {year: year, dates: response.data})
+            ctx.commit("updateNotPublishedDates")
          })
       },
       async nextItem(ctx, currDate) {
@@ -147,8 +156,7 @@ const collection = {
          let cname = ctx.state.filter.value
          let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/next`
          await axios.get(url).then((response) => {
-            let newURL = `/sources/uva_library/items/${response.data}`
-            this.router.push(newURL)
+            this.router.push(response.data)
          }).finally( ()=> {
             ctx.commit("setLookingUp", false)
          })
@@ -158,14 +166,10 @@ const collection = {
          let cname = ctx.state.filter.value
          let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/previous`
          await axios.get(url).then((response) => {
-            let newURL = `/sources/uva_library/items/${response.data}`
-            this.router.push(newURL)
+            this.router.push(response.data)
          }).finally( ()=> {
             ctx.commit("setLookingUp", false)
          })
-      },
-      setMonth(ctx, mm) {
-         ctx.commit("setCurrentMonth", mm)
       },
       setYear(ctx, yyyy) {
          if ( ctx.currentYear == yyyy) {

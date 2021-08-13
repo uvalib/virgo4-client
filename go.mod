@@ -20,6 +20,7 @@ require (
 	github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656
 	github.com/uvalib/virgo4-jwt v0.0.0-20210603185225-4637094c1342
 	github.com/zsais/go-gin-prometheus v0.1.0
+	golang.org/x/crypto v0.0.0-20210812204632-0ba0e8f03122 // indirect
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

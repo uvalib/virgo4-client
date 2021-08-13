@@ -10,32 +10,48 @@
             <i class="fal fa-calendar-alt"></i>
          </V4Button>
       </template>
+
       <template v-slot:content>
-         <datepicker :inline="true" format="yyyy-MM-dd"
-            :value="startDate"
-            :disabled-dates="disabledDates"
-            @changedMonth="monthChanged"
-            @changedYear="yearChanged"
-            @selected="dateSelected"
+         <vue-cal
+            id="collection-date-picker"
+            class="vuecal--date-picker"
+            xsmall
+            hide-view-selector
+            click-to-navigate
+            :time="false"
+            :transitions="false"
+            :selectedDate="picked"
+            :minDate="collectionStartDate"
+            :maxDate="collectionEndDate"
+            :disableDays=notPublishedDates
+            active-view="month"
+            :disable-views="['week', 'day']"
+            @view-change="viewChanged"
+            @cell-click="cellClicked"
          >
-         </datepicker>
+         </vue-cal>
+
        </template>
        <template v-slot:controls>
+          <V4Button mode="primary" :id="`${id}-cancelbtn`" @click="cancelClicked">
+            Cancel
+         </V4Button>
          <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
             :focusNextOverride="true" @tabnext="nextTabOK">
-            Close
+            View {{itemLabel}}
          </V4Button>
       </template>
    </V4Modal>
 </template>
 
 <script>
-import Datepicker from 'vuejs-datepicker'
+import VueCal from 'vue-cal'
+import 'vue-cal/dist/vuecal.css'
 import { mapGetters, mapState } from "vuex"
 export default {
    name: "collection-dates",
    components: {
-      Datepicker
+      VueCal
    },
    props: {
       id: {
@@ -47,75 +63,110 @@ export default {
          required: true
       }
    },
+   data: function() {
+      return {
+         picked: this.date
+      }
+   },
    computed: {
-      startDate() {
-         let bits = this.date.split("-")
-         let month = parseInt(bits[1],10) - 1 // NOTE: month is zero based!!!!
-         return new Date( parseInt(bits[0],10), month, parseInt(bits[2],10))
-      },
       ...mapState({
          collectionStartDate : state => state.collection.startDate,
          collectionEndDate : state => state.collection.endDate,
+         currentYear: state => state.collection.currentYear,
+         itemLabel: state => state.collection.itemLabel,
+         notPublishedDates : state => state.collection.notPublishedDates,
       }),
       ...mapGetters({
-         notPublishedDays: 'collection/notPublishedDays',
-         pidByDate: 'collection/getPidForDate'
+         pidByDate: 'collection/getPidForDate',
+         publicationYears: 'collection/publicationYears'
       }),
-      disabledDates() {
-         return {
-            to: new Date(this.collectionStartDate),
-            from: new Date(this.collectionEndDate),
-            daysOfMonth: this.notPublishedDays,
-         }
-      }
    },
    methods: {
-      dateSelected(date) {
-         let ms = ""+(date.getMonth()+1)
-         ms = ms.padStart(2, "0")
-         let ds = ""+date.getDate()
-         ds = ds.padStart(2, "0")
-         let dateStr = `${date.getFullYear()}-${ms}-${ds}`
-         let pid = this.pidByDate(dateStr)
-         this.$router.push(`/sources/uva_library/items/${pid}`)
-      },
-      yearChanged(dateObj) {
-         this.$store.dispatch("collection/setYear", dateObj.year)
-      },
-      monthChanged(dateObj) {
-         // NOTES: when the date is changed with the arrows on top of the calendar, a Date is returned
-         // When changed otherwise, a custom object is returned which contains the timestamp of the new yyyy-mm
-         // In this case, convert the timestamp to a date annd use it for processing
-         let date = dateObj
-         if (dateObj.timestamp) {
-            date = new Date(dateObj.timestamp)
+      viewChanged(e) {
+         let priorYear = this.picked.split("-")[0]
+         let newYear = e.startDate.getFullYear()
+         if (priorYear != newYear) {
+            this.$store.dispatch("collection/setYear", newYear)
          }
-
-         // the arrows can scroll thru years, so extract both month and year from the date
-         let ms = ""+(date.getMonth()+1)
-         ms = ms.padStart(2, "0")
-         this.$store.dispatch("collection/setYear", date.getFullYear())
-         this.$store.dispatch("collection/setMonth", ms)
       },
-      backTabCancel() {
-         this.$refs.calendardlg.firstFocusBackTabbed()
+      cellClicked(e) {
+         let priorYear = this.picked.split("-")[0]
+         let y = e.getFullYear()
+         let m = `${e.getMonth()+1}`
+         m = m.padStart(2,0)
+         let d = `${e.getDate()}`
+         d = d.padStart(2,0)
+         this.picked = `${y}-${m}-${d}`
+         if (priorYear != y) {
+            this.$store.dispatch("collection/setYear", y)
+         }
       },
       nextTabOK() {
          this.$refs.calendardlg.lastFocusTabbed()
       },
       okClicked() {
-         this.$emit('confirmed')
-         setTimeout( () => {
-            if ( this.$refs.calendardlg ) {
-               this.$refs.calendardlg.hide()
-            }
-         }, 300)
+         let pid = this.pidByDate(this.picked)
+         this.$router.push(pid)
+         this.$refs.calendardlg.hide()
+      },
+      cancelClicked() {
+         this.$refs.calendardlg.hide()
       },
    }
 }
 </script>
 
 <style lang="scss" scoped>
+#collection-date-picker {
+   width: 300px;
+   height: 300px;
+   margin: -10px -10px 5px -10px;
+   outline: none;
+   border: none;
+   border-bottom: 1px solid var(--uvalib-grey);
+   box-shadow: none;
+   :deep(.vuecal__cell-content) {
+      word-break: normal;
+      border-radius:2px;
+   }
+   :deep(.vuecal__heading) {
+      opacity: 1;
+      border-bottom: 1px solid var(--uvalib-grey);
+      border-top: 1px solid var(--uvalib-grey);
+      background-color: var(--uvalib-grey-lightest);
+   }
+   :deep(.vuecal__cell-content) {
+      font-weight: normal;
+      color: var(--uvalib-text);
+      font-size:1.15em;
+   }
+   :deep(.vuecal__cell--selected) {
+      .vuecal__cell-content {
+         background-color: var(--uvalib-brand-blue-lighter);
+         color: white;
+      }
+   }
+   :deep(.vuecal__cell--out-of-scope.vuecal__cell--selected) {
+      .vuecal__cell-content {
+         color: white;
+      }
+   }
+   :deep(.vuecal__cell--out-of-scope) {
+      .vuecal__cell-content {
+         opacity: 1;
+         color: var(--uvalib-text);
+         font-size: 0.9em;
+      }
+   }
+   :deep(.vuecal__cell--disabled) {
+      .vuecal__cell-content {
+         opacity: .3;
+         font-weight: 100;
+         pointer-events: none;
+      }
+   }
+}
+
 .v4-button.calendar {
    margin: 0 !important;
 }

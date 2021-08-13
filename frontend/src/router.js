@@ -211,7 +211,7 @@ router.afterEach((to, _from) => {
 })
 
 // This is called before every URL in the SPA is hit
-router.beforeEach( async (to, _from, next) => {
+router.beforeEach( async (to, _from) => {
    router.store.commit("system/setILSError", "")
 
    if (to.path == "/course-reserves") {
@@ -235,8 +235,7 @@ router.beforeEach( async (to, _from, next) => {
             tgtURL = "/"
          }
       }
-      next( tgtURL )
-      return
+      return tgtURL
    }
 
    // Page header is now in the main app template and driven by the pageTitle
@@ -261,11 +260,9 @@ router.beforeEach( async (to, _from, next) => {
          router.store.commit('restore/setURL', to.fullPath)
          router.store.commit('restore/save')
          router.store.dispatch('user/netbadge')
-         return
+         return false
       }
    }
-
-   next()
 })
 
 export default router

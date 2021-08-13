@@ -17,12 +17,10 @@ import FullPageCollectionView from "@/components/details/FullPageCollectionView"
 
 export default {
    name: "detail",
-   beforeRouteUpdate(to) {
+   async beforeRouteUpdate(to, _from) {
       // this is needed to load details when a grouped image thumb has been clicked; new content
       // needs to be loaded, but the page remains the same (create not called)
-      if ( to.fullPath.includes("/sources") ) {
-         this.getDetails()
-      }
+      this.getDetails(to.params.src, to.params.id, to.query.mode)
    },
    components: {
       ItemView, FullPageCollectionView
@@ -44,10 +42,8 @@ export default {
       }),
    },
    methods: {
-      async getDetails() {
-         this.mode = this.$route.query.mode
-         let src = this.$route.params.src
-         let id = this.$route.params.id
+      async getDetails(src, id, mode) {
+         this.mode = mode
          if ( src ) {
             let mapping = this.poolMapping[src]
             if (mapping && mapping.pool != src) {
@@ -66,7 +62,6 @@ export default {
          if (src) {
             await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
          } else {
-            console.log("LOOKUP IN DETAIL")
             await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
          }
 
@@ -119,7 +114,7 @@ export default {
       },
    },
    created() {
-      this.getDetails()
+      this.getDetails(this.$route.params.src, this.$route.params.id, this.$route.query.mode)
    },
    updated() {
       this.zoteroItemUpdated()
