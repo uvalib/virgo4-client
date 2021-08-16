@@ -106,7 +106,7 @@ export default {
       },
       okClicked() {
          let pid = this.pidByDate(this.picked)
-         this.$router.push(pid)
+         this.$router.push('/items/' + pid)
          this.$refs.calendardlg.hide()
       },
       cancelClicked() {
