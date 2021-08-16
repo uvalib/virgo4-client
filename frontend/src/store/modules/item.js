@@ -343,27 +343,28 @@ const item = {
             pagination: { start: 0, rows: 1 },
          }
 
-         return axios.post(`${ctx.rootState.system.searchAPI}/api/search`, req).then((response) => {
-            ctx.commit('clearSearching')
+         try {
+            let response = await axios.post(`${ctx.rootState.system.searchAPI}/api/search`, req)
             if (response.data.total_hits == 1 ) {
                ctx.commit('setCatalogKeyDetails', response.data)
                // NOTE:  the result above only contains basic fields. the redirect below
                // will trigger a full record get
                let redirect = `/sources/${ctx.state.details.source}/items/${ctx.state.details.identifier}`
-               this.router.replace(redirect)
+               await this.router.replace(redirect)
             } else {
                ctx.commit("clearDetails")
                let q = `identifier: {${catalogKey}}`
-               this.router.push(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
+               await this.router.push(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
             }
-         }).catch((error) => {
+            ctx.commit('clearSearching')
+         } catch(error) {
             ctx.commit('clearSearching')
             ctx.commit("clearDetails")
             if ( error.response && error.response.status == 404) {
                console.warn(`Catalog Key ${catalogKey} not found`)
                this.router.push(`/not_found`)
             }
-         })
+         }
       },
 
       async getCitations(ctx, {format, itemURL}) {

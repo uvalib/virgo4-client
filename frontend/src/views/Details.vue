@@ -49,7 +49,7 @@ export default {
             if (mapping && mapping.pool != src) {
                src = mapping.pool
                let fixed = `/sources/${src}/items/${id}`
-               this.$router.replace( fixed )
+               await this.$router.replace( fixed )
                return
             }
          }
