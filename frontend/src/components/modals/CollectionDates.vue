@@ -30,7 +30,9 @@
             @cell-click="cellClicked"
          >
          </vue-cal>
-
+         <div class="error">
+             {{error}}
+          </div>
        </template>
        <template v-slot:controls>
           <V4Button mode="primary" :id="`${id}-cancelbtn`" @click="cancelClicked">
@@ -66,7 +68,8 @@ export default {
    },
    data: function() {
       return {
-         picked: this.date
+         picked: this.date,
+         error: ""
       }
    },
    computed: {
@@ -84,6 +87,7 @@ export default {
    },
    methods: {
       viewChanged(e) {
+         this.error = ""
          let priorYear = this.picked.split("-")[0]
          let newYear = e.startDate.getFullYear()
          if (priorYear != newYear) {
@@ -91,6 +95,7 @@ export default {
          }
       },
       cellClicked(e) {
+         this.error = ""
          let priorYear = this.picked.split("-")[0]
          let y = e.getFullYear()
          let m = `${e.getMonth()+1}`
@@ -106,15 +111,17 @@ export default {
          this.$refs.calendardlg.lastFocusTabbed()
       },
       okClicked() {
+         this.error = ""
          let pid = this.pidByDate(this.picked)
          if ( pid != "") {
             this.$emit('picked', pid)
             this.$refs.calendardlg.hide()
          } else {
-            // TODO
+            this.error = `No ${this.itemLabel.toLowerCase()} was found for ${this.picked}`
          }
       },
       cancelClicked() {
+         this.error = ""
          this.$refs.calendardlg.hide()
       },
    }
@@ -171,7 +178,11 @@ export default {
       }
    }
 }
-
+.error {
+   text-align: center;
+   margin: 10px 0 5px 0;
+   font-size: 0.9em;;
+}
 .v4-button.calendar {
    margin: 0 !important;
 }
