@@ -6,7 +6,7 @@
             <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{itemLabel}}
             </V4Button>
-            <CollectionDates id="coll-dates" :date="publishedDate" />
+            <CollectionDates id="coll-dates" :date="publishedDate" @picked="datePicked" />
             <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${itemLabel}`">
                Next {{itemLabel}}<i class="next fal fa-arrow-right"></i>
             </V4Button>
@@ -68,6 +68,9 @@ export default {
       }
    },
    methods: {
+      datePicked(pid) {
+         this.$router.push(pid)
+      },
       searchClicked() {
          // Set up the search in the store and flag it is user generated
          this.$store.commit("filters/reset")

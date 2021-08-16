@@ -27,7 +27,7 @@
             </div>
             <div class="collection-context" v-if="hasCollectionCtx && isDevServer">
                <span class="desc" v-html="collectionDesc"></span>
-               <CollectionDates id="coll-dates" :date="collectionDate" />
+               <CollectionDates id="coll-dates" :date="collectionDate" @picked="collectionPidPicked" />
             </div>
          </div>
 
@@ -104,6 +104,9 @@ export default {
       },
    },
    methods: {
+      collectionPidPicked(pid) {
+         this.$router.push(`/sources/${this.selectedResults.pool.id}/items/${pid}`)
+      },
       removeFilter( filter ) {
          this.userSearched = true
          let query = Object.assign({}, this.$route.query)

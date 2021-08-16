@@ -50,6 +50,7 @@ import 'vue-cal/dist/vuecal.css'
 import { mapGetters, mapState } from "vuex"
 export default {
    name: "collection-dates",
+   emits: ['picked' ],
    components: {
       VueCal
    },
@@ -106,8 +107,12 @@ export default {
       },
       okClicked() {
          let pid = this.pidByDate(this.picked)
-         this.$router.push('/items/' + pid)
-         this.$refs.calendardlg.hide()
+         if ( pid != "") {
+            this.$emit('picked', pid)
+            this.$refs.calendardlg.hide()
+         } else {
+            // TODO
+         }
       },
       cancelClicked() {
          this.$refs.calendardlg.hide()
