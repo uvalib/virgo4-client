@@ -8,7 +8,7 @@
             <span class="no-thumb" v-else>
                <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
                <br/>
-               <span class="no">(No image available)!!!!</span>
+               <span class="no">(No image available)</span>
             </span>
          </router-link>
       </div>
