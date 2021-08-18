@@ -22,7 +22,7 @@
                   </td>
                </tr>
                <tr>
-                  <td class="label">PIN</td>
+                  <td class="label">Password</td>
                   <td class="value">
                      <input @keyup.enter="signinClicked" v-model="pin" type="password">
                   </td>

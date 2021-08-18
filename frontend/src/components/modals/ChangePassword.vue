@@ -39,7 +39,7 @@
             </ul>
             <div class="message pure-form">
                <div v-if="!hasPasswordToken">
-                  <label for="currpassword">Current PIN/Password</label>
+                  <label for="currpassword">Current Password</label>
                   <input ref="currPassword" id="currPassword" type="password" v-model="currPassword" @keydown.shift.tab.stop.prevent="backTabCP"
                      aria-required="true" required="required"/>
                </div>

@@ -203,7 +203,7 @@ func (svc *ServiceContext) ChangePasswordWithToken(c *gin.Context) {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
-	c.String(http.StatusOK, "pin changed")
+	c.String(http.StatusOK, "Password changed")
 }
 
 // ForgotPassword sends a password reset email via ILS Connector and Sirsi
