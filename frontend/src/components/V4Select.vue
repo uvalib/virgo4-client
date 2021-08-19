@@ -50,7 +50,7 @@ export default {
       },
       background: {
          type: String,
-         default: "var(--uvalib-brand-blue)"
+         default: "var(--uvalib-brand-blue-light)"
       },
       border: {
         type: String,

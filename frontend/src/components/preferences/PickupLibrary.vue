@@ -2,14 +2,14 @@
   <div class="pickup-options pure-form">
     <h2>Pickup Location</h2>
     <p>
-      This pickup location is where you will go to retrieve items you’ve requested from Ivy Stacks or are receiving as a result of a hold or a recall.
+      This pickup location is where you will go to retrieve items you’ve requested.
     </p>
 
     <p>If you cannot pick your item up at the location(s) shown below, please
       <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a> to request your item.
     </p>
 
-    <label for="pickup-sel">Preferred pickup location:
+    <label for="pickup-sel">Pickup location:
      <transition name="fade" v-on:after-enter="showSaved = false">
        <span v-if="showSaved" class="success">  Saved</span>
      </transition>
@@ -57,6 +57,9 @@ export default {
   text-align: left;
   h2 {
     margin:5px 0 10px 0;
+  }
+  a:link {
+    text-decoration: underline !important;
   }
   label {
     font-weight: 500;
