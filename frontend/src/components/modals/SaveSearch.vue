@@ -81,7 +81,7 @@ export default {
             return
          }
          this.working = true
-         let searchURL = this.$router.currentRoute.fullPath
+         let searchURL = this.$route.fullPath
          let req = {name: this.searchName, url: searchURL, isPublic: false, userID: this.signedInUser}
          try {
             await this.$store.dispatch("searches/save", req)
