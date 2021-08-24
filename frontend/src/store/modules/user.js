@@ -165,10 +165,6 @@ const user = {
          if (getters.canUseLEO) {
             pickupLibraries.push({id: "LEO", name: 'LEO delivery to my department' })
          }
-         if ( getters.isUndergraduate) {
-            let idx = pickupLibraries.findIndex( p => p.id == "CLEMONS")
-            pickupLibraries.splice(idx, 1)
-         }
 
          return pickupLibraries
        },
