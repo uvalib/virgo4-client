@@ -35,6 +35,7 @@ const user = {
       lockedOut: false,
       parsedJWT: {},
       noILSAccount: false,
+      noILLiadAccount: false,
       accountRequest: {name: "", id: "", email: "", phone: "", department: "",
          address1: "", address2: "", city: "", state: "", zip: ""},
       accountRequested: false
@@ -310,6 +311,7 @@ const user = {
       setAccountInfo(state, data) {
          state.accountInfo = data.user
          state.accountInfo.leoAddress = data.leoLocation
+         state.noILLiadAccount = !data.hasIlliadAccount
          state.noILSAccount = data.user.noAccount
          if (localStorage.getItem("v4_requested") ) {
             state.accountRequested = true
@@ -347,6 +349,7 @@ const user = {
          localStorage.removeItem("v4_requested")
          state.accountRequested = false
          state.noILSAccount = false
+         state.noILLiadAccount = false
       },
       setBills(state, bills) {
          state.bills = bills

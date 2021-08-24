@@ -47,6 +47,10 @@
             <span v-if="hasError('pickup')" class="error">Pickup location is required</span>
          </div>
       </div>
+      <div v-if="request.pickup == 'LEO' && (noILLiadAccount==true || leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
+         It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
+         <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+      </div>
       <div class="controls">
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
@@ -83,6 +87,8 @@ export default {
       ...mapState({
          buttonDisabled: state => state.requests.buttonDisabled,
          preferredPickupLibrary: state => state.preferences.pickupLibrary,
+         noILLiadAccount: state => state.user.noILLiadAccount,
+         leoAddress: state => state.user.accountInfo.leoAddress,
       }),
       ...mapGetters({
          pickupLibraries: "user/libraries",
@@ -126,6 +132,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.illiad-prompt {
+   margin: 15px;
+   a {
+      text-decoration: underline !important;
+      font-weight: 500;
+   }
+}
 h2 {
    background: var(--uvalib-blue-alt-lightest);
    color: var(--uvalib-text-dark);

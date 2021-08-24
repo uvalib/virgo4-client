@@ -14,15 +14,18 @@
          <p class="error" v-if="errors.item_barcode">{{errors.item_barcode.join(', ')}}</p>
       </div>
       <PickupLibrary />
-
       <V4Button mode="primary" class="request-button" @click="placeHold" :disabled="buttonDisabled">Place Hold</V4Button>
-
+      <div v-if="pickupLibrary.id == 'LEO' && (noILLiadAccount==true || leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
+         It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
+         <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+      </div>
       <p class="error" v-if="errors.sirsi">{{errors.sirsi.join(', ')}}</p>
    </div>
 </template>
 <script>
-import { mapFields } from "vuex-map-fields";
-import PickupLibrary from "@/components/preferences/PickupLibrary";
+import { mapFields } from "vuex-map-fields"
+import { mapState } from "vuex"
+import PickupLibrary from "@/components/preferences/PickupLibrary"
 
 export default {
    components: {
@@ -39,11 +42,16 @@ export default {
       }
    },
    computed: {
+      ...mapState({
+         noILLiadAccount: state => state.user.noILLiadAccount,
+         leoAddress: state => state.user.accountInfo.leoAddress,
+      }),
       ...mapFields({
          hold: "requests.hold",
          itemOptions: "requests.activeOption.item_options",
          errors: "requests.errors",
          buttonDisabled: "requests.buttonDisabled",
+         pickupLibrary: 'preferences.pickupLibrary',
       }),
       items() {
          let items = this.itemOptions;
@@ -78,7 +86,15 @@ export default {
    }
 };
 </script>
-<style>
+<style lang="scss" scoped>
+.illiad-prompt {
+   margin: 15px;
+   min-height: initial !important;
+   a {
+      text-decoration: underline !important;
+      font-weight: 500;
+   }
+}
 div.place-hold {
    display: flex;
    flex-flow: column wrap;

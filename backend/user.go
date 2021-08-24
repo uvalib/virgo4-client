@@ -413,6 +413,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 
 	log.Printf("Get leo delivery address")
 	leoLocation := make([]string, 0)
+	hasIlliad := false
 	respBytes, illErr := svc.ILLiadRequest("GET", fmt.Sprintf("Users/%s", userID), nil)
 	if illErr != nil {
 		log.Printf("WARN: unable to get leo address info: %s", illErr.Message)
@@ -432,6 +433,8 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 			val, ok = resp["Country"].(string)
 			if ok && val != "" {
 				leoLocation = append(leoLocation, val)
+				hasIlliad = true
+				log.Printf("INFO: %s has ILLiad account [%s]", userID, val)
 			}
 		}
 	}
@@ -439,10 +442,11 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	// Combine local V4 database user info with ILS user info and return results to client
 	type fullUser struct {
 		*V4User
-		UserInfo    *ILSUserInfo `json:"user"`
-		LeoLocation string       `json:"leoLocation"`
+		UserInfo      *ILSUserInfo `json:"user"`
+		ILLiadAccount bool         `json:"hasIlliadAccount"`
+		LeoLocation   string       `json:"leoLocation"`
 	}
-	user := fullUser{V4User: v4User, UserInfo: &ilsUser, LeoLocation: strings.Join(leoLocation, ", ")}
+	user := fullUser{V4User: v4User, UserInfo: &ilsUser, LeoLocation: strings.Join(leoLocation, ", "), ILLiadAccount: hasIlliad}
 	c.JSON(http.StatusOK, user)
 }
 
