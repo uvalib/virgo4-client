@@ -6,127 +6,114 @@
       <template v-if="isSignedIn">
          <AccountActivities />
          <V4Spinner v-if="renewing" message="Renew in progress..." v-bind:overlay="true" />
-         <div v-if="lookingUpUVA" class="working">
-            <V4Spinner message="Looking up UVA Checkouts..." />
-         </div>
-         <div v-if="lookingUpILL" class="working">
-            <V4Spinner message="Looking up ILL Checkouts..." />
-         </div>
          <div class="details">
             <div class="barred" v-if="isBarred">
                Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
                If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
             </div>
-            <template v-if="lookingUpUVA == false && checkouts.length > 0">
-               <AccordionContent
-                  class="checkout-accordion"
-                  background="var(--uvalib-blue-alt-lightest)"
-                  borderWidth="0 0 3px 0"
-                  borderColor="var(--uvalib-blue-alt)"
-                  id="uva-checkouts"
-                  :expanded="checkoutsOrder == 'OVERDUE'"
-               >
-                  <template v-slot:title><span class="section-title">UVA Checkouts ({{checkouts.length}})</span></template>
-                  <div class="checkout-list">
-                     <div class="controls">
-                        <span class="sort">
-                           <label>Sort by</label>
-                           <select :value="checkoutsOrder" @change="sortChanged" ref="uvasort">
-                              <option value="AUTHOR_ASC">Author (Ascending)</option>
-                              <option value="AUTHOR_DESC">Author (Descending)</option>
-                              <option value="TITLE_ASC">Title (Ascending)</option>
-                              <option value="TITLE_DESC">Title (Descending)</option>
-                              <option value="DUE_ASC">Due Date (Ascending)</option>
-                              <option value="DUE_DESC">Due Date (Descending)</option>
-                              <option value="OVERDUE">Overdue / Recalled</option>
-                           </select>
-                        </span>
-                        <span class="checkout-options">
-                           <V4Button v-if="checkouts.length" id="download-csv-btn"
-                              mode="icon"
-                              @click="downloadCSV()"
-                              title="Download your checkouts as a CSV file" >
-                              <i class="fal fa-download"></i>
-                           </V4Button>
-                           <V4Button  id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
-
-                        </span>
-                     </div>
-                     <div class="item" v-for="(co,idx) in checkouts" :key="idx">
-                        <h3 class="item-title">
-                           <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
-                           <template v-if="co.id">
-                              <router-link :to="`/catalog/u${co.id}`">{{co.title}}</router-link>
-                           </template>
-                           <template v-else>
-                              {{co.title}}
-                           </template>
-                        </h3>
-                        <dl>
-                        <template v-if="co.author.length > 0">
-                           <dt>Author:</dt>
-                           <dd>{{co.author}}</dd>
-                        </template>
-                        <dt class="label">Call number:</dt>
-                           <dd>{{co.callNumber}}</dd>
-                        <dt class="label">Due Date:</dt>
-                           <dd v-html="formatDueInfo(co)"></dd>
-                        <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
-                           <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
-                        </dl>
-                        <div v-if="co.message" class="co-message">
-                           {{co.message}}
-                        </div>
-                        <div class="renewbar">
-                           <V4Button v-if="!isBarred" mode="primary"
-                              @click="renewItem(co.barcode)" class="renew"
-                              :aria-label="`renew ${co.title}`"
-                           >
-                              Renew
-                           </V4Button>
-                        </div>
-                     </div>
-                  </div>
-               </AccordionContent>
-            </template>
-            <div v-if="lookingUpUVA == false && checkouts.length == 0 && !ilsError" class="none">
-               You have no UVA checkouts.
-            </div>
             <div v-if="lookingUpUVA == false && ilsError" class="error">
                {{ilsError}}
             </div>
-            <template v-if="lookingUpILL == false && illiadCheckouts.length > 0">
-               <AccordionContent
-                  class="checkout-accordion"
-                  background="var(--uvalib-blue-alt-lightest)"
-                  borderWidth="0 0 3px 0"
-                  borderColor="var(--uvalib-blue-alt)"
-                  id="ill-checkouts"
-               >
-                  <template v-slot:title><span class="section-title">ILL Checkouts  ({{illiadCheckouts.length}})</span></template>
-                  <div class="checkout-list">
-                     <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
-                        <h3 class="item-title">{{co.loanTitle}}</h3>
-                        <dl>
-                           <dt>Author:</dt>
-                              <dd>{{co.loanAuthor}}</dd>
-                           <template  v-if="co.callNumber">
-                              <dt class="label">Call number:</dt>
-                                 <dd>{{co.callNumber}}</dd>
-                           </template>
-                           <dt class="label">Due Date:</dt>
-                              <dd>{{formatILLDate(co.dueDate)}}</dd>
-                        </dl>
-                        <div class="renewbar" v-if="co.renewalsAllowed">
-                           <a :href="renewURL(co)" target="_blank">Renew <i class="fal fa-external-link-alt" data-v-3d741f35="" style="margin-left: 5px;"></i></a>
-                        </div>
+            <div class="checkout-tabs">
+               <V4Button mode="primary" @click="visibleTab = 'uva'" v-bind:class="{active: visibleTab == 'uva'}">
+                  UVA Checkouts ({{checkouts.length}})
+                  <V4Spinner v-if="lookingUpUVA" size="12px"/>
+               </V4Button>
+               <V4Button mode="primary" @click="visibleTab = 'ill'" v-bind:class="{active: visibleTab == 'ill'}">
+                  ILL Checkouts ({{illiadCheckouts.length}})
+                  <V4Spinner v-if="lookingUpILL" size="12px"/>
+               </V4Button>
+            </div>
+            <template v-if="lookingUpUVA == false && visibleTab == 'uva'">
+               <div v-if="lookingUpUVA == false && checkouts.length == 0 && !ilsError" class="none">
+                  You have no UVA checkouts.
+               </div>
+
+               <div v-else class="checkout-list">
+                  <div class="controls">
+                     <span class="sort">
+                        <label>Sort by</label>
+                        <select :value="checkoutsOrder" @change="sortChanged" ref="uvasort">
+                           <option value="AUTHOR_ASC">Author (Ascending)</option>
+                           <option value="AUTHOR_DESC">Author (Descending)</option>
+                           <option value="TITLE_ASC">Title (Ascending)</option>
+                           <option value="TITLE_DESC">Title (Descending)</option>
+                           <option value="DUE_ASC">Due Date (Ascending)</option>
+                           <option value="DUE_DESC">Due Date (Descending)</option>
+                           <option value="OVERDUE">Overdue / Recalled</option>
+                        </select>
+                     </span>
+                     <span class="checkout-options">
+                        <V4Button v-if="checkouts.length" id="download-csv-btn"
+                           mode="icon"
+                           @click="downloadCSV()"
+                           title="Download your checkouts as a CSV file" >
+                           <i class="fal fa-download"></i>
+                        </V4Button>
+                        <V4Button  id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
+
+                     </span>
+                  </div>
+                  <div class="item" v-for="(co,idx) in checkouts" :key="idx">
+                     <h3 class="item-title">
+                        <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
+                        <template v-if="co.id">
+                           <router-link :to="`/catalog/u${co.id}`">{{co.title}}</router-link>
+                        </template>
+                        <template v-else>
+                           {{co.title}}
+                        </template>
+                     </h3>
+                     <dl>
+                     <template v-if="co.author.length > 0">
+                        <dt>Author:</dt>
+                        <dd>{{co.author}}</dd>
+                     </template>
+                     <dt class="label">Call number:</dt>
+                        <dd>{{co.callNumber}}</dd>
+                     <dt class="label">Due Date:</dt>
+                        <dd v-html="formatDueInfo(co)"></dd>
+                     <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
+                        <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
+                     </dl>
+                     <div v-if="co.message" class="co-message">
+                        {{co.message}}
+                     </div>
+                     <div class="renewbar">
+                        <V4Button v-if="!isBarred" mode="primary"
+                           @click="renewItem(co.barcode)" class="renew"
+                           :aria-label="`renew ${co.title}`"
+                        >
+                           Renew
+                        </V4Button>
                      </div>
                   </div>
-               </AccordionContent>
+               </div>
             </template>
-            <div v-if="lookingUpILL == false && illiadCheckouts.length == 0" class="none">
-               You have no ILL checkouts.
-            </div>
+            <template v-if="lookingUpILL == false && visibleTab == 'ill'">
+               <div v-if="illiadCheckouts.length == 0" class="none">
+                  You have no ILL checkouts.
+               </div>
+               <div v-else class="checkout-list">
+                  <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
+                     <h3 class="item-title">{{co.loanTitle}}</h3>
+                     <dl>
+                        <dt>Author:</dt>
+                           <dd>{{co.loanAuthor}}</dd>
+                        <template  v-if="co.callNumber">
+                           <dt class="label">Call number:</dt>
+                              <dd>{{co.callNumber}}</dd>
+                        </template>
+                        <dt class="label">Due Date:</dt>
+                           <dd>{{formatILLDate(co.dueDate)}}</dd>
+                     </dl>
+                     <div class="renewbar" v-if="co.renewalsAllowed">
+                        <a :href="renewURL(co)" target="_blank">Renew <i class="fal fa-external-link-alt" data-v-3d741f35="" style="margin-left: 5px;"></i></a>
+                     </div>
+                  </div>
+               </div>
+            </template>
+
          </div>
       </template>
    </div>
@@ -136,17 +123,17 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import AccountActivities from "@/components/AccountActivities"
-import AccordionContent from "@/components/AccordionContent"
 import RenewSummary from "@/components/modals/RenewSummary"
 export default {
    name: "checkouts",
    components: {
-      AccountActivities,AccordionContent,RenewSummary
+      AccountActivities,RenewSummary
    },
    data: function() {
       return {
          lookingUpUVA: true,
          downloading: false,
+         visibleTab: "uva",
       }
    },
    computed: {
@@ -280,7 +267,7 @@ export default {
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey-light);
 
-   .controls{
+   .controls {
       margin: 0;
       text-align: right;
       padding: 5px 5px 5px 10px;
@@ -294,6 +281,9 @@ export default {
       label {
          font-weight: 500;
          margin-right: 10px;
+      }
+      .sort {
+         margin: 5px;
       }
 
       #renew-all-btn {
@@ -388,5 +378,27 @@ v4-button.renew {
    border-radius: 5px;
    color: var(--uvalib-text);
    background-color: var(--uvalib-red-lightest);
+}
+.checkout-tabs {
+   display: inline-flex;
+   justify-content: space-evenly;
+   flex-wrap: wrap;
+   width: 100%;
+   padding: 10px 0;
+
+   background-color: var(--uvalib-grey-lightest);
+   border: 1px solid var(--uvalib-grey-light);
+   .v4-button.pure-button {
+      flex-grow: 1;
+      margin: 5px;
+      .v4-spinner.embed {
+         width: 80px;
+      }
+      &.active {
+         text-decoration: underline;
+         background-color: var(--uvalib-brand-blue-lighter);
+         border: 2px solid var(--uvalib-grey)
+      }
+   }
 }
 </style>
