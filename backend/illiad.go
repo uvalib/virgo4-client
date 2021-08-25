@@ -45,7 +45,7 @@ func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 		PhotoIssueYear             string `json:"photoIssueYear,omitempty"`
 		PhotoJournalInclusivePages string `json:"photoJournalInclusivePages,omitempty"`
 		DueDate                    string `json:"dueDate,omitempty"`
-		RenewalsAllowed            bool   `json:"canRenew,omitempty"`
+		RenewalsAllowed            bool   `json:"renewalsAllowed"`
 	}
 	if err := json.Unmarshal(respBytes, &resp); err != nil {
 		log.Printf("ERROR: unable to parse ILLiad response: %s", err.Error())

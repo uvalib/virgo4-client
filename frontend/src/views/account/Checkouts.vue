@@ -117,6 +117,9 @@
                            <dt class="label">Due Date:</dt>
                               <dd>{{formatILLDate(co.dueDate)}}</dd>
                         </dl>
+                        <div class="renewbar" v-if="co.renewalsAllowed">
+                           <a :href="renewURL(co)" target="_blank">Renew <i class="fal fa-external-link-alt" data-v-3d741f35="" style="margin-left: 5px;"></i></a>
+                        </div>
                      </div>
                   </div>
                </AccordionContent>
@@ -166,6 +169,9 @@ export default {
       }
    },
    methods: {
+      renewURL(item) {
+         return `https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${item.transactionNumber}`
+      },
       signInClicked() {
          this.$router.push("/signin")
       },
