@@ -149,11 +149,6 @@ const item = {
         state.availability.searching = false
       },
       setCatalogKeyDetails(state, data) {
-         if (data.total_hits == 0 || data.total_hits > 1) {
-            state.details.searching = false
-            state.availability.searching = false
-            return
-         }
          let found = false
          data.pool_results.some( pr => {
             if (pr.group_list && pr.group_list.length == 1) {
@@ -163,13 +158,13 @@ const item = {
                   let poolURL = pr.service_url
                   utils.preProcessHitFields( poolURL, [obj] )
                   obj.source = source
-                  obj.searching = true
                   state.details = obj
                   found = true
                }
             }
             return found == true
          })
+         state.details.searching = true
       }
    },
 
@@ -354,9 +349,8 @@ const item = {
             } else {
                ctx.commit("clearDetails")
                let q = `identifier: {${catalogKey}}`
-               await this.router.push(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
+               await this.router.replace(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
             }
-            ctx.commit('clearSearching')
          } catch(error) {
             ctx.commit('clearSearching')
             ctx.commit("clearDetails")

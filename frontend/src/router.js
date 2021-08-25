@@ -87,10 +87,11 @@ const router = createRouter({
          component: Details,
       },
       {
-         // route to details page when pool is not known
          path: '/items/:id',
-         name: 'item',
-         component: Details,
+         beforeEnter(to, _from) {
+            // redirect to /sources/ with a flag trigger a lookup
+            return `/sources/legacy/items/${to.params.id}`
+         }
       },
       {
          path: '/sources/:src/items/:id/browse',
@@ -106,10 +107,9 @@ const router = createRouter({
          path: '/signin',
          name: 'signin',
          component: SignIn,
-         beforeEnter(_to, from, next) {
+         beforeEnter(_to, from) {
             router.store.commit('restore/setURL', from.fullPath)
             router.store.commit('restore/save')
-            next()
          }
       },
       {

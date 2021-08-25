@@ -43,15 +43,21 @@ export default {
    },
    methods: {
       async getDetails(src, id, mode) {
+         // if this was called from an old catalog/id url, the src will get
+         // set to legacy. in this case, lookup the cat key and redirect to full detail
+         // the redirect will trigger a beforeRouteUpdate and that will get fill item detail.
+         if ( src == "legacy" ) {
+            await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
+            return
+         }
+
          this.mode = mode
-         if ( src ) {
-            let mapping = this.poolMapping[src]
-            if (mapping && mapping.pool != src) {
-               src = mapping.pool
-               let fixed = `/sources/${src}/items/${id}`
-               await this.$router.replace( fixed )
-               return
-            }
+         let mapping = this.poolMapping[src]
+         if (mapping && mapping.pool != src) {
+            src = mapping.pool
+            let fixed = `/sources/${src}/items/${id}`
+            await this.$router.replace( fixed )
+            return
          }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
@@ -59,11 +65,7 @@ export default {
             this.browseTarget = bmTarget.id
          }
 
-         if (src) {
-            await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
-         } else {
-            await this.$store.dispatch("item/lookupCatalogKeyDetail", id )
-         }
+         await this.$store.dispatch("item/getDetails", {source:src, identifier:id})
 
          if ( bmTarget.origin == "DETAIL" || bmTarget.origin == "COLLECTION" ) {
             let bmEle = document.getElementById(`bm-modal-${bmTarget.id}-btn`)
