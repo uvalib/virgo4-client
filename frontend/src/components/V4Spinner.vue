@@ -22,9 +22,9 @@
    <div v-else class="v4-spinner embed">
       <h3 v-if="message">{{message}}</h3>
       <div class="spinner-animation">
-         <div class="bounce1" :style="{backgroundColor: color}"></div>
-         <div class="bounce2" :style="{backgroundColor: color}"></div>
-         <div class="bounce3" :style="{backgroundColor: color}"></div>
+         <div class="bounce1" :style="{backgroundColor: color, height: size, width: size}"></div>
+         <div class="bounce2" :style="{backgroundColor: color, height: size, width: size}"></div>
+         <div class="bounce3" :style="{backgroundColor: color, height: size, width: size}"></div>
       </div>
    </div>
 </template>
@@ -48,7 +48,11 @@ export default {
       color: {
          type: String,
          default: "var(--uvalib-brand-orange)"
-      }
+      },
+      size: {
+         type: String,
+         default: "18px"
+      },
    },
    computed: {
       backgroundColor() {
