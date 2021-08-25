@@ -191,25 +191,32 @@ const user = {
          state.checkoutsOrder = order
          state.checkouts.sort( (a,b) => {
             if ( order == "OVERDUE") {
-               if (a.overdue == false && b.overdue == true) return 1
-               if (a.overdue == true && b.overdue == false) return -1
+               // Sort recalls to top, then Due date, others are last
+               // dates are also sorted inside each group
+               let aRecall = new Date(a.recallDate).valueOf()
+               let bRecall = new Date(b.recallDate).valueOf()
+               let aDue = new Date(a.due).valueOf()
+               let bDue = new Date(b.due).valueOf()
 
-               // recall date is like: 2021-03-21
-               if (a.recallDate < b.recallDate ) return 1
-               if (a.recallDate > b.recallDate ) return -1
+               if (!isNaN(aRecall) && isNaN(bRecall)) return -1
+               if (isNaN(aRecall) && !isNaN(bRecall)) return 1
+               if (!isNaN(aDue) && isNaN(bDue)) return -1
+               if (isNaN(aDue) && !isNaN(bDue)) return 1
 
-               return 0
+               return (aRecall - bRecall) || (aDue - bDue)
             }
 
             let keyA = a.author.toUpperCase()
             let keyB = b.author.toUpperCase()
+
             if (order.includes("TITLE")) {
                keyA = a.title.toUpperCase()
                keyB = b.title.toUpperCase()
             }
             if (order.includes("DUE")){
-               keyA = a.due.split("T")[0]
-               keyB = b.due.split("T")[0]
+               // Sort by due date, then recall, then others last
+               keyA = a.due.split("T")[0] || a.recallDate || "a"
+               keyB = b.due.split("T")[0] || b.recallDate || "a"
             }
             if (order.includes("ASC")) {
                if (keyA < keyB) {
@@ -488,7 +495,7 @@ const user = {
          }
          return axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
             ctx.commit('setCheckouts', response.data)
-            ctx.commit('sortCheckouts', "AUTHOR_ASC")
+            ctx.commit('sortCheckouts', ctx.state.checkoutsOrder)
          }).catch((error) => {
             if (error.response && error.response.status == 503) {
                ctx.commit('system/setILSError', error.response.data, { root: true })

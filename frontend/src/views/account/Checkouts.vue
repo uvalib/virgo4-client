@@ -33,14 +33,14 @@
                   <div class="controls">
                      <span class="sort">
                         <label>Sort by</label>
-                        <select :value="checkoutsOrder" @change="sortChanged" ref="uvasort">
+                        <select v-model="checkoutsOrder" @change="sortChanged">
                            <option value="AUTHOR_ASC">Author (Ascending)</option>
                            <option value="AUTHOR_DESC">Author (Descending)</option>
                            <option value="TITLE_ASC">Title (Ascending)</option>
                            <option value="TITLE_DESC">Title (Descending)</option>
                            <option value="DUE_ASC">Due Date (Ascending)</option>
                            <option value="DUE_DESC">Due Date (Descending)</option>
-                           <option value="OVERDUE">Overdue / Recalled</option>
+                           <option value="OVERDUE">Recalled / Overdue</option>
                         </select>
                      </span>
                      <span class="checkout-options">
@@ -122,6 +122,7 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import { mapFields } from 'vuex-map-fields'
 import AccountActivities from "@/components/AccountActivities"
 import RenewSummary from "@/components/modals/RenewSummary"
 export default {
@@ -139,8 +140,6 @@ export default {
    computed: {
       ...mapState({
          userID: state => state.user.userID,
-         checkouts: state => state.user.checkouts,
-         checkoutsOrder: state => state.user.checkoutsOrder,
          requests: state => state.user.requests,
          ilsError: state => state.system.ilsError,
          renewing: state => state.user.renewing,
@@ -150,6 +149,10 @@ export default {
         isBarred: 'user/isBarred',
         isSignedIn: 'user/isSignedIn',
         hasRenewSummary: 'user/hasRenewSummary'
+      }),
+      ...mapFields({
+         checkoutsOrder: 'user.checkoutsOrder',
+         checkouts: 'user.checkouts'
       }),
       illiadCheckouts() {
          return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
@@ -163,7 +166,7 @@ export default {
          this.$router.push("/signin")
       },
       sortChanged() {
-         this.$store.commit("user/sortCheckouts", this.$refs.uvasort.value)
+         this.$store.commit("user/sortCheckouts", this.checkoutsOrder)
       },
       renewItem(barcode) {
          this.$store.dispatch("user/renewItem", barcode)
@@ -201,12 +204,11 @@ export default {
       if ( this.isSignedIn ) {
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
          this.lookingUpUVA = true
-         await this.$store.dispatch("user/getCheckouts")
-         this.lookingUpUVA = false
          if (this.$route.query.overdue) {
             this.checkoutsOrder = "OVERDUE"
-            this.$store.commit("user/sortCheckouts", "OVERDUE")
          }
+         await this.$store.dispatch("user/getCheckouts")
+         this.lookingUpUVA = false
       }
    }
 }
