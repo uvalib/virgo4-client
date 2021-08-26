@@ -94,6 +94,7 @@ func main() {
 		users.POST("/:uid/checkouts/renew", svc.RenewCheckouts)
 		users.POST("/:uid/preferences", svc.SavePreferences)
 		users.GET("/:uid/preferences", svc.GetPreferences)
+		users.POST("/:uid/contact", svc.AuthMiddleware, svc.RequestContactUpdate)
 
 		users.GET("/:uid/searches", svc.GetUserSavedSearches)
 		users.POST("/:uid/searches", svc.SaveSearch)

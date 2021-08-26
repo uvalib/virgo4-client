@@ -21,6 +21,7 @@
                </div>
             </template>
          </div>
+         <UpdateContactInfo />
          <div class="status-info">
             <div v-if="info.standing != 'OK'"><b>Standing:</b> {{info.standing}}</div>
             <div class="standing-info" v-if="info.standing=='BARRED'">
@@ -161,6 +162,7 @@ import AccountRequestForm from '@/components/AccountRequestForm'
 import AccountActivities from "@/components/AccountActivities"
 import AccordionContent from '@/components/AccordionContent'
 import ChangePassword from '@/components/modals/ChangePassword'
+import UpdateContactInfo from '@/components/modals/UpdateContactInfo'
 export default {
    name: "account",
    data: function() {
@@ -169,7 +171,7 @@ export default {
       };
    },
    components: {
-      AccountActivities, AccordionContent, ChangePassword, AccountRequestForm
+      AccountActivities, AccordionContent, ChangePassword, AccountRequestForm, UpdateContactInfo
    },
    computed: {
       ...mapState({
@@ -255,7 +257,6 @@ export default {
    font-weight: bold;
    border-bottom: 1px solid var(--uvalib-brand-blue);
    margin-bottom: 5px;
-   @apply --h2;
 }
 .fines-content {
    margin: 5px 0;

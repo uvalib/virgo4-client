@@ -628,6 +628,9 @@ const user = {
             ctx.commit('setLookingUp', false)
          })
       },
+      updateContactInfo(_ctx, info) {
+         return axios.post(`/api/users/${info.userID}/contact`, info )
+      }
    }
 }
 

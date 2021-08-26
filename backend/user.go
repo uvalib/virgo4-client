@@ -478,6 +478,79 @@ func (svc *ServiceContext) SavePreferences(c *gin.Context) {
 	c.String(http.StatusOK, "OK")
 }
 
+// GetPreferences will save a block of JSON preference data to the user table
+func (svc *ServiceContext) GetPreferences(c *gin.Context) {
+	userID := c.Param("uid")
+	v4User := &V4User{}
+	q := svc.DB.NewQuery(`select id,preferences from users where virgo4_id={:id}`)
+	q.Bind(dbx.Params{"id": userID})
+	err := q.One(v4User)
+	if err != nil {
+		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err)
+		v4User.Preferences = "{}"
+	}
+	// Format preferences as JSON
+	prefStr := []byte(v4User.Preferences)
+	var prefJSON map[string]interface{}
+	if err := json.Unmarshal(prefStr, &prefJSON); err != nil {
+		log.Printf("ERROR: invalid preferences JSON")
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, prefJSON)
+}
+
+// RequestContactUpdate accepts update data and sends it to lib-circ@virginia.edu
+func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
+	userID := c.Param("uid")
+	var req struct {
+		UserID     string `json:"userID"`
+		FirstName  string `json:"firstName"`
+		NickName   string `json:"nickName"`
+		MiddleName string `json:"middleName"`
+		LastName   string `json:"lastName"`
+		Address1   string `json:"address1"`
+		Address2   string `json:"address2"`
+		Address3   string `json:"address3"`
+		City       string `json:"city"`
+		State      string `json:"state"`
+		Zip        string `json:"zip"`
+		Phone      string `json:"phone"`
+		Email      string `json:"email"`
+	}
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: invalid contact info update request payload for %s: %s", userID, err.Error())
+		c.String(http.StatusBadRequest, "Invalid account request")
+		return
+	}
+	log.Printf("INFO: %s has requested a contact info update", userID)
+
+	var renderedEmail bytes.Buffer
+	tpl := template.Must(template.New("contact_info.txt").ParseFiles("templates/contact_info.txt"))
+	err = tpl.Execute(&renderedEmail, req)
+	if err != nil {
+		log.Printf("ERROR: Unable to render contact info request email: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	to := []string{"lib-circ@virginia.edu"}
+	from := req.Email
+	if from == "" {
+		from = svc.SMTP.Sender
+	}
+	eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, ReplyTo: req.Email, From: from, Body: renderedEmail.String()}
+	sendErr := svc.SendEmail(&eRequest)
+	if sendErr != nil {
+		log.Printf("ERROR: Unable to new account request email: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.String(http.StatusOK, "ok")
+}
+
 // CreateAccountRequest accepts a user request for a new Sirsi account and sends it to lib-circ@virginia.edu
 func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 	req := AccountRequest{}
@@ -509,26 +582,4 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, "new account request sent")
-}
-
-// GetPreferences will save a block of JSON preference data to the user table
-func (svc *ServiceContext) GetPreferences(c *gin.Context) {
-	userID := c.Param("uid")
-	v4User := &V4User{}
-	q := svc.DB.NewQuery(`select id,preferences from users where virgo4_id={:id}`)
-	q.Bind(dbx.Params{"id": userID})
-	err := q.One(v4User)
-	if err != nil {
-		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err)
-		v4User.Preferences = "{}"
-	}
-	// Format preferences as JSON
-	prefStr := []byte(v4User.Preferences)
-	var prefJSON map[string]interface{}
-	if err := json.Unmarshal(prefStr, &prefJSON); err != nil {
-		log.Printf("ERROR: invalid preferences JSON")
-		panic(err)
-	}
-
-	c.JSON(http.StatusOK, prefJSON)
 }
