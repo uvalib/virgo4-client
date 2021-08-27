@@ -115,6 +115,10 @@ func (u *ILSUserInfo) IsInstructor() bool {
 // IsStaff returns true if this user is staff
 func (u *ILSUserInfo) IsStaff() bool {
 	match, _ := regexp.MatchString("(?i)staff", u.Description)
+	if match {
+		return true
+	}
+	match, _ = regexp.MatchString("EMPLOYEE", u.Profile)
 	return match
 }
 
