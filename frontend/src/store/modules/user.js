@@ -85,17 +85,14 @@ const user = {
          if ( state.role == 'guest' || state.role == '') return false
          if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.description.toLowerCase().includes("graduate student")) return true
-         if (state.accountInfo.profile.toLowerCase().includes("ugrad") ||
-             state.accountInfo.profile.toLowerCase().includes("undergrad")) return false
-         if (state.accountInfo.profile.toLowerCase().includes("grad")) return true
+         if (state.accountInfo.profile == "GRADUATE") return true
          return false
       },
       isUndergraduate: (state) => {
          if ( state.role == 'guest' || state.role == '' ) return false
          if ( Object.keys(state.accountInfo).length == 0) return false
          if (state.accountInfo.description.toLowerCase().includes("undergraduate")) return true
-         let profile = state.accountInfo.profile.toLowerCase()
-         if (profile.includes("ugrad") || profile.includes("undergrad")) return true
+         if (state.accountInfo.profile == "UNDERGRAD") return true
          return false
       },
       canPurchase: (state) => {
@@ -126,9 +123,6 @@ const user = {
       },
       isLawUser: state => {
          return state.claims.homeLibrary == "LAW"
-      },
-      isFaculty: state => {
-         return state.accountInfo.profile == "Faculty"
       },
       itemsOnNotice: state => {
          return state.checkouts.filter( co=> co.overdue || co.recallDate != "")
