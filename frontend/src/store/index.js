@@ -58,20 +58,22 @@ export default createStore({
             return false
          }
 
-         // if there are more to be loaded, next is definitily active
+         // if there are more to be loaded, next is definitely active
          if (getters.hasMoreHits) {
             return true
          }
 
          // no more results to be loaded, get the currently seleceted hit
-         let tgtResults = state.results[state.selectedResultsIdx]
-         let selHit = tgtResults.hits[state.selectedHitIdx]
+         let selHit = getters.selectedHit
+         if ( !selHit ) return false
+
          if (selHit.grouped == false ) {
             // not grouped; disable if this is the last hit
-            return state.selectedHitIdx < tgtResults.hits.length-1
+            return state.selectedHitIdx < getters.selectedResults.hits.length-1
          }
 
          // grouped; check if the selected group is last
+         if ( !selHit.group ) return false
          return state.selectedHitGroupIdx <= selHit.group.length-1
       },
       prevHitAvailable: state => {
@@ -82,9 +84,6 @@ export default createStore({
       },
       hasResults: state => {
          return state.total >= 0
-      },
-      selectedResultsIdx: state => {
-         return state.selectedResultsIdx
       },
       selectedResults: state => {
          if (state.selectedResultsIdx === -1) {
@@ -416,12 +415,24 @@ export default createStore({
       async nextHit(ctx) {
          if ( ctx.state.selectedHitIdx == -1 || ctx.state.selectedResultsIdx == -1 ) return
 
-         let tgtResults = ctx.state.results[ctx.state.selectedResultsIdx]
-         if (ctx.state.selectedHitIdx == tgtResults.total-1) return
-
-         if ( ctx.state.selectedHitIdx == tgtResults.hits.length-1) {
-            ctx.commit( "item/clearDetails", null, {root:true})
-            await ctx.dispatch( "moreResults")
+         // is this the last hit in the currently available results?
+         let tgtResults = ctx.getters.selectedResults
+         if ( ctx.state.selectedHitIdx == tgtResults.hits.length-1 ) {
+            if (ctx.getters.hasMoreHits == false) {
+               let currHit= ctx.getters.selectedHit
+               if (currHit.grouped ) {
+                  if (ctx.state.selectedHitGroupIdx == currHit.group.length-1 ) {
+                     // last grouped hit. done
+                     return
+                  }
+               } else {
+                  // last hit. done.
+                  return
+               }
+            } else {
+               ctx.commit( "item/clearDetails", null, {root:true})
+               await ctx.dispatch( "moreResults")
+            }
          }
 
          ctx.commit("nextHit")
