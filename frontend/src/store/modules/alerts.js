@@ -121,7 +121,7 @@ const alerts = {
             projectId: cfg.firebase.projectId,
             appId: cfg.firebase.appId
          }).database()
-         state.alertsDB = db.ref('library-alerts')
+         state.alertsDB = db.ref('library-alerts-dev')
          state.regionalAlertsDB = db.ref('regionalalerts')
       }
    },
