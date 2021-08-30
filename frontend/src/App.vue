@@ -27,7 +27,7 @@
                <span class="alert-text" v-html="a.body"></span>
             </div>
             <V4Button mode="icon" v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
-               @click="dismissAlert(a.uuid)" aria-label="dismiss alert">
+               @click="dismissAlert(a.uuid)" aria-label="hide alert">
                <i class="dismiss-icon fal fa-window-close"></i>
             </V4Button>
          </div>
@@ -85,16 +85,16 @@ export default {
          sessionExpired: state => state.system.sessionExpired,
          devServer: state => state.system.devServer,
          pageTitle: state => state.pageTitle,
-         noILSAccount: state => state.user.noILSAccount
+         noILSAccount: state => state.user.noILSAccount,
       }),
       ...mapGetters({
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
          hasMessage: "system/hasMessage",
-         headerAlerts: "headerAlerts",
-         alertCount: 'alertCount',
-         menuAlerts: 'menuAlerts',
-         pageAlerts: 'pageAlerts',
+         headerAlerts: "alerts/headerAlerts",
+         alertCount: 'alerts/alertCount',
+         menuAlerts: 'alerts/menuAlerts',
+         pageAlerts: 'alerts/pageAlerts',
          isSignedIn: 'user/isSignedIn'
       }),
       showDimmer() {
@@ -114,9 +114,10 @@ export default {
       dismissAlert( uuid ) {
          let a = document.getElementById(uuid)
          a.classList.add("dismissed")
-         setTimeout( () => {
-            this.$store.commit("dismissAlert", uuid)
-         }, 200);
+         this.$nextTick( () => {
+            this.$store.commit("alerts/dismissAlert", uuid)
+            document.getElementById("alertmenu").focus()
+         });
       },
       updateClicked() {
           window.location.reload()

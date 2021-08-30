@@ -28,7 +28,6 @@
     "vuejs-datepicker": "^1.6.2",
     "vuex": "^4.0.2",
     "vuex-map-fields": "^1.4.1",
-    "vuexfire": "^3.2.5",
     "xml-beautifier": "^0.4.3"
   },
   "devDependencies": {

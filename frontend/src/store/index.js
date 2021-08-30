@@ -3,6 +3,7 @@ import axios from 'axios'
 import analytics from '../analytics'
 import versionChecker from './plugins/version'
 import errorReporter from './plugins/error_reporter'
+import alerts from './modules/alerts'
 import bookmarks from './modules/bookmarks'
 import collection from './modules/collection'
 import system from './modules/system'
@@ -22,10 +23,6 @@ import sort from './modules/sort'
 import * as utils from '../utils'
 import { getField, updateField } from 'vuex-map-fields'
 
-import { vuexfireMutations, firebaseAction } from 'vuexfire'
-
-const  AlertsStorage = "v4SeenAlerts"
-
 export default createStore({
    state: {
       pageTitle: "Search",
@@ -42,48 +39,10 @@ export default createStore({
       lastSearchScrollPosition: 0,
       lastSearchURL: "",
       otherSrcSelection: { id: "", name: "" },
-      alerts: [],
-      seenAlerts: [],
-      regionalAlerts: []
    },
 
    getters: {
       getField,
-      pageAlerts:  state => tgtPath => {
-         let tgtRegex = new RegExp(`${tgtPath}$`)
-         let out = []
-         state.regionalAlerts.forEach( ra => {
-            let urls = ra.url
-            if ( !Array.isArray(urls) ) urls = [{value:urls}]
-            let matched = false
-            urls.some( u => {
-               if (tgtPath == "/" && u.value.match(/search.lib.virginia.edu$/) ) {
-                  out.push(ra)
-                  matched = true
-               } else {
-                  if ( u.value.match(/search.lib.virginia.edu/) && u.value.match(tgtRegex) ) {
-                     out.push(ra)
-                     matched = true
-                  }
-               }
-               return matched == true
-            })
-
-         })
-         return out
-      },
-      headerAlerts: state => {
-         return state.alerts.filter( a => a.severity == "alert4")
-      },
-      menuAlerts: state => {
-         return state.alerts.filter( a => a.severity != "alert4" && !state.seenAlerts.includes(a.uuid))
-      },
-      alertCount: state => {
-         return state.alerts.filter( a => a.severity != "alert4" && !state.seenAlerts.includes(a.uuid)).length
-      },
-      seenAlertsCount: state => {
-         return state.seenAlerts.length
-      },
       selectedHit: state => {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
             return {}
@@ -154,49 +113,6 @@ export default createStore({
       updateField,
       setPageTitle(state, title) {
          state.pageTitle = title
-      },
-      clearSeenAlerts(state) {
-         localStorage.removeItem(AlertsStorage)
-         state.seenAlerts.splice(0, state.seenAlerts.length)
-      },
-      autoHideAlert3(state) {
-         let alerts = state.alerts.filter( a => a.severity == "alert3" && !state.seenAlerts.includes(a.uuid))
-         alerts.forEach( a=> {
-            state.seenAlerts.push(a.uuid)
-         })
-         let str = JSON.stringify(state.seenAlerts)
-         localStorage.setItem(AlertsStorage, str)
-      },
-      loadSeenAlerts(state) {
-         let seen = localStorage.getItem(AlertsStorage)
-         if ( seen ) {
-            try {
-               let needsUpdate = false
-               state.seenAlerts.splice(0, state.seenAlerts.length)
-               JSON.parse(seen).forEach( saUUID =>  {
-                  if ( state.alerts.find(a => a.uuid == saUUID) ) {
-                     state.seenAlerts.push(saUUID)
-                  } else {
-                     needsUpdate = true
-                  }
-               })
-               if (needsUpdate) {
-                  let str = JSON.stringify(state.seenAlerts)
-                  localStorage.setItem(AlertsStorage, str)
-               }
-            } catch (e) {
-               state.seenAlerts.splice(0, state.seenAlerts.length)
-            }
-         }
-      },
-      dismissAlert(state, uuid) {
-         state.seenAlerts.push(uuid)
-         let str = JSON.stringify(state.seenAlerts)
-         localStorage.setItem(AlertsStorage, str)
-      },
-      unseeAllAlerts(state) {
-         state.seenAlerts.splice(0, state.seenAlerts.length)
-         localStorage.removeItem(AlertsStorage)
       },
       hitSelected(state, identifier) {
          state.selectedHitIdx = -1
@@ -478,18 +394,9 @@ export default createStore({
          state.lastSearchScrollPosition = 0
          state.lastSearchURL = ""
       },
-      ...vuexfireMutations,
    },
 
    actions: {
-      bindAlerts: firebaseAction(async context => {
-         await context.bindFirebaseRef('alerts', context.rootState.system.alertsDB)
-         context.commit("loadSeenAlerts")
-         context.commit("autoHideAlert3")
-      }),
-      bindRegionalAlerts: firebaseAction(async context => {
-         await context.bindFirebaseRef('regionalAlerts', context.rootState.system.regionalAlertsDB)
-      }),
       resetSearch( ctx ) {
          ctx.commit("resetSearchResults")
          ctx.commit('query/clear')
@@ -656,6 +563,7 @@ export default createStore({
    },
 
    modules: {
+      alerts: alerts,
       bookmarks: bookmarks,
       collection: collection,
       filters: filters,

@@ -187,8 +187,8 @@ export default {
         isKiosk: 'system/isKiosk',
         isSignedIn: 'user/isSignedIn',
         itemsOnNotice: 'user/itemsOnNotice',
-        alertCount: 'alertCount',
-        seenAlertsCount: 'seenAlertsCount'
+        alertCount: 'alerts/alertCount',
+        seenAlertsCount: 'alerts/seenAlertsCount'
       }),
    },
    created() {
@@ -223,7 +223,7 @@ export default {
 
       },
       alertClicked() {
-         this.$store.commit("unseeAllAlerts")
+         this.$store.commit("alerts/unseeAllAlerts")
       },
       nextMenu() {
          this.closeSubMenus()

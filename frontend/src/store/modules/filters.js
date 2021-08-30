@@ -345,7 +345,7 @@ const filters = {
          }
          if (req.query == "") {
             let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: ctx.rootGetters['query/getState']}
-            this.dispatch("system/reportError", err)
+            this.dispatch("system/reportError", err, {root: true})
             return
          }
 
@@ -360,7 +360,7 @@ const filters = {
             ctx.commit('setUpdatingFacets', false)
             let f = filterObj.facets.filter( f=>f.facet_id == "FilterDigitalCollection")
             if (f.length == 1) {
-               this.dispatch("collection/getCollectionContext", {collection: f[0].value})
+               this.dispatch("collection/getCollectionContext", {collection: f[0].value}, {root: true})
             }
          }).catch((error) => {
             if (error.response && error.response.status == 501) {
