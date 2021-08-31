@@ -93,7 +93,8 @@ const bookmarks = {
       async getPublicBookmarks(ctx, token) {
          ctx.commit('setSearching', true)
          return axios.get(`/api/bookmarks/${token}`).then((response) => {
-            ctx.commit('setPublicBookmarks', response.data)
+            ctx.commit('setPublicBookmarks', response.data.bookmarks)
+            ctx.commit("setPageTitle", response.data.folder, { root: true })
             ctx.commit('setSearching', false)
           }).catch((_error) => {
             ctx.commit('setSearching', false)
@@ -129,7 +130,7 @@ const bookmarks = {
          })
       },
 
-      addFolder(ctx, folder) {
+      async addFolder(ctx, folder) {
          let v4UID = ctx.rootState.user.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders`
          return axios.post(url, {name: folder}).then((response) => {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -43,9 +44,9 @@ func (u *V4User) GetBookmarks(db *dbx.DB) {
 	q := db.NewQuery(`SELECT f.id as f_id, f.name as folder, f.added_at as f_added_at,
 		f.is_public as is_public, f.token as pub_token,
 		s.name as pool, b.id as b_id, b.identifier, b.details, b.added_at as b_added_at
-	 	FROM bookmark_folders f  
+	 	FROM bookmark_folders f
 			LEFT JOIN bookmarks b ON b.folder_id=f.id
-			LEFT JOIN sources s ON s.id = b.source_id 
+			LEFT JOIN sources s ON s.id = b.source_id
 		WHERE f.user_id={:id} ORDER BY b.added_at ASC`)
 	q.Bind(dbx.Params{"id": u.ID})
 	rows, err := q.Rows()
@@ -397,10 +398,28 @@ func (svc *ServiceContext) MoveBookmarks(c *gin.Context) {
 func (svc *ServiceContext) GetPublicBookmarks(c *gin.Context) {
 	token := c.Param("token")
 	log.Printf("Get public bookmarks for %s", token)
-	q := svc.DB.NewQuery(`SELECT b.*, s.name as pool
-	 	FROM bookmark_folders f  
+	q := svc.DB.NewQuery(`SELECT name from bookmark_folders where token={:tok}`)
+	q.Bind(dbx.Params{"tok": token})
+	var out struct {
+		FolderName string     `json:"folder"`
+		Bookmarks  []Bookmark `json:"bookmarks"`
+	}
+
+	err := q.Row(&out.FolderName)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Printf("INFO: token %s not found", token)
+			c.String(http.StatusNotFound, fmt.Sprintf("token %s not found", token))
+		} else {
+			log.Printf("ERROR: unaable to get token %s: %s", token, err.Error())
+			c.String(http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	q = svc.DB.NewQuery(`SELECT b.*, s.name as pool
+	 	FROM bookmark_folders f
 			LEFT JOIN bookmarks b ON b.folder_id=f.id
-			LEFT JOIN sources s ON s.id = b.source_id 
+			LEFT JOIN sources s ON s.id = b.source_id
 		WHERE f.token={:tok} ORDER BY b.added_at ASC`)
 	q.Bind(dbx.Params{"tok": token})
 	rows, err := q.Rows()
@@ -411,14 +430,14 @@ func (svc *ServiceContext) GetPublicBookmarks(c *gin.Context) {
 	}
 
 	// parse each bookmark row into the V4User structure
-	var bookmarks []Bookmark
+	out.Bookmarks = make([]Bookmark, 0)
 	for rows.Next() {
 		var bm Bookmark
 		rows.ScanStruct(&bm)
-		log.Printf("GOT: %+v", bm)
-		bookmarks = append(bookmarks, bm)
+		out.Bookmarks = append(out.Bookmarks, bm)
 	}
-	c.JSON(http.StatusOK, bookmarks)
+
+	c.JSON(http.StatusOK, out)
 }
 
 // GetBookmarks returns bookmark data for the specified user
