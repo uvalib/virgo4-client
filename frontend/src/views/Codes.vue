@@ -59,9 +59,9 @@ export default {
    methods: {
       getIcon( flag ) {
          if (flag) {
-            return '<i class="fas fa-check-circle"></i>'
+            return '<i class="fas fa-check-circle">Y</i>'
          }
-         return '<i class="fas fa-times-circle"></i>'
+         return '<i class="fas fa-times-circle">N</i>'
       }
    },
    created() {
