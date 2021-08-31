@@ -104,8 +104,11 @@
                            <dt class="label">Call number:</dt>
                               <dd>{{co.callNumber}}</dd>
                         </template>
+                        <dt class="label">Status:</dt>
+                           <dd>{{co.transactionStatus}} {{formatILLDate(co.transactionDate)}}</dd>
                         <dt class="label">Due Date:</dt>
                            <dd>{{formatILLDate(co.dueDate)}}</dd>
+
                      </dl>
                      <div class="renewbar" v-if="co.renewalsAllowed">
                         <a :href="renewURL(co)" target="_blank">Renew <i class="fal fa-external-link-alt" data-v-3d741f35="" style="margin-left: 5px;"></i></a>
@@ -155,7 +158,7 @@ export default {
          checkouts: 'user.checkouts'
       }),
       illiadCheckouts() {
-         return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
+         return this.requests.illiad
       }
    },
    methods: {
@@ -250,7 +253,7 @@ export default {
    .none {
       text-align: center;
       font-size: 1.25em;
-      margin: 20px 0;
+      //margin: 20px 0;
       border: 1px solid var(--uvalib-grey);
       background: var(--uvalib-grey-lightest);
       padding: 10px;
@@ -327,8 +330,6 @@ export default {
       dt {
          font-weight: bold;
          text-align: right;
-      }
-      dd {
          margin: 0 0 10px 0;
       }
       .co-message {
@@ -386,20 +387,36 @@ v4-button.renew {
    justify-content: space-evenly;
    flex-wrap: wrap;
    width: 100%;
-   padding: 10px 0;
-
+   padding: 10px 0 0 0;
    background-color: var(--uvalib-grey-lightest);
-   border: 1px solid var(--uvalib-grey-light);
+   border-bottom: 20px solid var(--uvalib-brand-blue);
+
    .v4-button.pure-button {
       flex-grow: 1;
       margin: 5px;
       .v4-spinner.embed {
          width: 80px;
       }
+      margin: 0;
+      padding: 8px 8px 10px 8px;
+      border-radius: 5px 5px 0 0;
+      color: var(--uvalib-text-dark);
+      border: 1px solid var(--uvalib-grey-light);
+      border-bottom: 1px solid var(--uvalib-brand-blue);
+      text-align: left;
+      flex: 1 1 auto;
+      background: #FFF;
+      outline: none;
+      &:focus {
+         z-index: 1;
+         @include be-accessible();
+      }
+      &:hover {
+         border-bottom: 1px solid var(--uvalib-brand-blue);
+      }
       &.active {
-         text-decoration: underline;
-         background-color: var(--uvalib-brand-blue-lighter);
-         border: 2px solid var(--uvalib-grey)
+         background-color: var(--uvalib-brand-blue);
+         color: #fff;
       }
    }
 }
