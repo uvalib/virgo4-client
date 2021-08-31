@@ -67,9 +67,9 @@
             <input v-model="otherLMS" id="otherLMS" aria-required="true" required="required">
       </div>
       <div class="video-note">
-        <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System.
+        All video reserve requests will be delivered as streaming resources to your class’s Learning Management System.
           If you have questions about video reserves, please email
-          <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.</b>
+          <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.
       </div>
 
 
@@ -264,9 +264,7 @@ div.note {
    text-align: center;
 }
 .video-note, .note.important {
-   color: var(--uvalib-red );
    font-size: 1.1em;
-   font-weight: bold;
 }
 .form {
    margin: 15px;

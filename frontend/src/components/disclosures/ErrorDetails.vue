@@ -1,7 +1,7 @@
 <template>
    <V4Disclosure id="error-detail" :closeOnBlur="false" ref="disclosure"
       backgroundColor="white"
-      borderColor="var(--uvalib-red)"
+      borderColor="white"
       mode="inline"
    >
       <template v-slot:summary>
@@ -30,16 +30,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#error-detail {
-   .content {
-      margin: 15px;
-      padding: 0;
-   }
-   img {
-      height: 15px;
-   }
-   p {
-      margin: 5px 0;
-   }
-}
 </style>

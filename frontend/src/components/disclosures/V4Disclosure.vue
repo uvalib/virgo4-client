@@ -82,7 +82,6 @@ export default {
       margin: 0px 10px 5px 15px;
       padding: 0;
       position: absolute;
-      right: 10%;
       box-shadow: $v4-box-shadow;
       font-size:0.95em;
       color: var(--uvalib-text);
@@ -101,9 +100,8 @@ export default {
       width:100%;
       min-width: auto;
       max-width: inherit;
-      // background-color: var(--uvalib-grey-lightest) !important;
       padding: 10px 20px;
-      border: 1px solid var(--uvalib-grey-light) !important;
+      border: 1px solid var(--uvalib-grey-light);
       box-sizing: border-box;
    }
    .arrow {
