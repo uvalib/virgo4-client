@@ -531,7 +531,7 @@ func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 		return
 	}
 
-	to := []string{"lib-circ@virginia.edu"}
+	to := []string{"lib-circ@virginia.edu", req.Email}
 	from := req.Email
 	if from == "" {
 		from = svc.SMTP.Sender
@@ -568,7 +568,7 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 		return
 	}
 
-	to := []string{"lib-circ@virginia.edu"}
+	to := []string{"lib-circ@virginia.edu", req.Email}
 	eRequest := emailRequest{Subject: "New Account Request", To: to, ReplyTo: req.Email, From: svc.SMTP.Sender, Body: renderedEmail.String()}
 	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
