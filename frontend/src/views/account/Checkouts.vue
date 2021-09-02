@@ -58,7 +58,7 @@
                      <h3 class="item-title">
                         <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
                         <template v-if="co.id">
-                           <router-link :to="`/catalog/u${co.id}`">{{co.title}}</router-link>
+                           <router-link :to="`/sources/uva_library/items/u${co.id}`">{{co.title}}</router-link>
                         </template>
                         <template v-else>
                            {{co.title}}
