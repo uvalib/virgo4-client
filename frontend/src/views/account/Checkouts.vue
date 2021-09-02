@@ -20,7 +20,7 @@
                   <V4Spinner v-if="lookingUpUVA" size="12px"/>
                </V4Button>
                <V4Button mode="primary" @click="visibleTab = 'ill'" v-bind:class="{active: visibleTab == 'ill'}">
-                  ILL Checkouts ({{illiadCheckouts.length}})
+                  ILL Checkouts ({{activeIllCount}})
                   <V4Spinner v-if="lookingUpILL" size="12px"/>
                </V4Button>
             </div>
@@ -159,6 +159,9 @@ export default {
       }),
       illiadCheckouts() {
          return this.requests.illiad
+      },
+      activeIllCount() {
+         return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer").length
       }
    },
    methods: {

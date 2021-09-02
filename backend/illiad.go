@@ -15,7 +15,7 @@ func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 	v4UserID := c.Param("uid")
 	log.Printf("Get all active ILLiad requests for %s", v4UserID)
 
-	orderBy := "$orderby=CreationDate+desc"
+	orderBy := "$orderby=TransactionStatus,CreationDate+desc"
 	// qStr := fmt.Sprintf("Transaction/UserRequests/%s?%s", v4UserID, orderBy)
 	threeYearsAgo := time.Now().AddDate(-3, 0, 0)
 	filter := fmt.Sprintf("$filter=not+startswith(TransactionStatus,'Cancel')+and+TransactionDate+gt+datetime'%s'", threeYearsAgo.Format("2006-01-02"))
