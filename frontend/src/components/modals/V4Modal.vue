@@ -118,9 +118,9 @@ div.v4-modal {
    height: auto;
    z-index: 8000;
    background: white;
-   top: 50%;
+   top: 15%;
    left: 50%;
-   transform: translate(-50%, -50%);
+   transform: translate(-50%, -15%);
    box-shadow: $v4-box-shadow;
    border-radius: 5px;
    min-width: 300px;

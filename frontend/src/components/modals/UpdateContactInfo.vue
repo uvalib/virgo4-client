@@ -13,9 +13,9 @@
                An email has been sent to library staff requesting an update to your contact information.
             </p>
          </template>
-         <template v-else>
+         <div class="scroller" v-else>
             <table class="update-info-form">
-                <tr>
+               <tr>
                   <td colspan="2"><div class="section">Name</div></td>
                </tr>
                <tr>
@@ -84,7 +84,7 @@
 
             </table>
             <p v-if="error" class="error" v-html="error"></p>
-          </template>
+         </div>
       </template>
       <template v-slot:controls>
          <V4Button  mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.updateInfo.hide()" v-if="!emailSent">
@@ -192,6 +192,13 @@ p.error {
       text-decoration: underline !important;;
    }
 }
+.scroller {
+   max-height: 350px;
+   overflow: scroll;
+   padding: 10px;
+    border: 1px solid var(--uvalib-grey-light);
+    background: white;
+}
 .update-info-form{
    margin-bottom:15px;
    font-size: 0.9em;
@@ -248,5 +255,6 @@ p.error {
       margin-bottom: 15px;
       width: 100%;
    }
+
 }
 </style>
