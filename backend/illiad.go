@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,10 +14,10 @@ func (svc *ServiceContext) GetILLiadRequests(c *gin.Context) {
 	v4UserID := c.Param("uid")
 	log.Printf("Get all active ILLiad requests for %s", v4UserID)
 
-	orderBy := "$orderby=TransactionStatus,CreationDate+desc"
+	orderBy := "$orderby=CreationDate+desc"
 	// qStr := fmt.Sprintf("Transaction/UserRequests/%s?%s", v4UserID, orderBy)
-	threeYearsAgo := time.Now().AddDate(-3, 0, 0)
-	filter := fmt.Sprintf("$filter=not+startswith(TransactionStatus,'Cancel')+and+TransactionDate+gt+datetime'%s'", threeYearsAgo.Format("2006-01-02"))
+	filter := "$filter=TransactionStatus+ne+'Request+Finished'+and+not+startswith(TransactionStatus,'Cancel')"
+
 	qStr := fmt.Sprintf("Transaction/UserRequests/%s?%s&%s", v4UserID, orderBy, filter)
 	respBytes, illErr := svc.ILLiadRequest("GET", qStr, nil)
 	if illErr != nil {

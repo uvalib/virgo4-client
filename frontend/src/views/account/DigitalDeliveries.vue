@@ -6,6 +6,9 @@
       <div class="details" v-if="isSignedIn">
          <div class="notice">
             PDF links are available for 30 days after delivery
+            <a href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
+               View Request History <i class="fal fa-external-link-alt"></i>
+            </a>
          </div>
          <template v-if="webDeliveries.length > 0">
             <div class="item" v-for="(co,idx) in webDeliveries" :key="idx">
@@ -106,6 +109,10 @@ div.notice {
    font-weight: bold;
    border: 1px solid var(--uvalib-grey);
    text-align: center;
+   a {
+      margin-top: 10px;
+      display: block;
+   }
 }
 .details {
    margin-bottom: 25px;

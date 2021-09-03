@@ -20,7 +20,7 @@
                   <V4Spinner v-if="lookingUpUVA" size="12px"/>
                </V4Button>
                <V4Button mode="primary" @click="visibleTab = 'ill'" v-bind:class="{active: visibleTab == 'ill'}">
-                  ILL Checkouts ({{activeIllCount}})
+                  ILL Checkouts ({{illiadCheckouts.length}})
                   <V4Spinner v-if="lookingUpILL" size="12px"/>
                </V4Button>
             </div>
@@ -95,6 +95,11 @@
                   You have no ILL checkouts.
                </div>
                <div v-else class="checkout-list">
+                  <div class="controls">
+                     <a class="checkout-options" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
+                     View Request History <i class="fal fa-external-link-alt"></i>
+                     </a>
+                  </div>
                   <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
                      <h3 class="item-title">{{co.loanTitle}}</h3>
                      <dl>
@@ -104,8 +109,6 @@
                            <dt class="label">Call number:</dt>
                               <dd>{{co.callNumber}}</dd>
                         </template>
-                        <dt class="label">Status:</dt>
-                           <dd>{{co.transactionStatus}} {{formatILLDate(co.transactionDate)}}</dd>
                         <dt class="label">Due Date:</dt>
                            <dd>{{formatILLDate(co.dueDate)}}</dd>
 
@@ -158,11 +161,8 @@ export default {
          checkouts: 'user.checkouts'
       }),
       illiadCheckouts() {
-         return this.requests.illiad
+         return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
       },
-      activeIllCount() {
-         return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer").length
-      }
    },
    methods: {
       renewURL(item) {
