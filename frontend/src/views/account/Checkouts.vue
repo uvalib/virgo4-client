@@ -90,16 +90,16 @@
                   </div>
                </div>
             </template>
-            <template v-if="lookingUpILL == false && visibleTab == 'ill'">
+            <div class="checkout-list" v-if="lookingUpILL == false && visibleTab == 'ill'">
+               <div class="controls">
+                  <a class="checkout-options" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
+                  View Request History <i class="fal fa-external-link-alt"></i>
+                  </a>
+               </div>
                <div v-if="illiadCheckouts.length == 0" class="none">
                   You have no ILL checkouts.
                </div>
-               <div v-else class="checkout-list">
-                  <div class="controls">
-                     <a class="checkout-options" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
-                     View Request History <i class="fal fa-external-link-alt"></i>
-                     </a>
-                  </div>
+               <div v-else>
                   <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
                      <h3 class="item-title">{{co.loanTitle}}</h3>
                      <dl>
@@ -118,7 +118,7 @@
                      </div>
                   </div>
                </div>
-            </template>
+            </div>
 
          </div>
       </template>
