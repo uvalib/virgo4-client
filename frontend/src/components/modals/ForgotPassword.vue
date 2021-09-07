@@ -78,7 +78,7 @@ export default {
                this.emailSent = true
             }).catch((e) => {
                this.$refs.userId.focus()
-               this.error = "Library ID not found, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
+               this.error = "There's a problem with your account. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
                if(e.response.data.message){
                   this.error += e.response.data.message
                }
