@@ -71,8 +71,8 @@
                </div>
 
             </fieldset></form>
-            <p v-if="error" class="error" v-html="error"></p>
          </div>
+         <p v-if="error" class="error" v-html="error"></p>
       </template>
       <template v-slot:controls>
          <V4Button  mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.updateInfo.hide()" v-if="!emailSent">
@@ -145,6 +145,25 @@ export default {
            this.$refs.updateInfo.hide()
            return
          }
+
+         let hasData = false
+         for (const [key, value] of Object.entries(this.contact)) {
+            if ( key != "userID" ) {
+               if (value != "") {
+                  hasData = true
+               }
+            }
+         }
+         if (!hasData) {
+            this.error = "Please enter some data in the contact form"
+            return
+         }
+
+         if ( this.contact.email == "") {
+            this.error = "Please enter an email address"
+            return
+         }
+
          this.toggleOK()
          this.$store.dispatch("user/updateContactInfo", this.contact).then(() => {
             this.emailSent = true
