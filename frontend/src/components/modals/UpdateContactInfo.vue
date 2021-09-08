@@ -14,75 +14,63 @@
             </p>
          </template>
          <div class="scroller" v-else>
-            <table class="update-info-form">
-               <tr>
-                  <td colspan="2"><div class="section">Name</div></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="firstname">First:</label></td>
-                  <td>
-                     <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname">
-                  </td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="nickname">Preferred:</label></td>
-                  <td>
-                     <input type="text" v-model="contact.nickName" id="nickname">
-                     <span class="note">We will address you by this name if supplied.</span>
-                  </td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="middlename">Middle:</label></td>
-                  <td><input type="text" v-model="contact.middleName" id="middlename"></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="lastname">Last:</label></td>
-                  <td><input type="text" v-model="contact.lastName" id="lastname"></td>
-               </tr>
-                <tr>
-                  <td colspan="2"><div class="section">Contact</div></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="email">Email:</label></td>
-                  <td><input type="text" v-model="contact.email" id="email"></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="phone">Phone:</label></td>
-                  <td><input type="text" v-model="contact.phone" id="phone"></td>
-               </tr>
-               <tr>
-                  <td colspan="2"><div class="section">Address</div></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="address1">Line 1:</label></td>
-                  <td><input type="text" v-model="contact.address1" id="address1"></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="address2">Line 2:</label></td>
-                  <td><input type="text" v-model="contact.address2" id="address2"></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="address3">Line 3:</label></td>
-                  <td><input type="text" v-model="contact.address3" id="address3"></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="city">City:</label></td>
-                  <td><input type="text" v-model="contact.city" id="city"></td>
-               </tr>
-               <tr>
-                  <td class="label"><label for="state">State:</label></td>
-                  <td>
-                     <div class="multivalue">
-                        <input type="text" v-model="contact.state" id="state">
-                        <span>
-                           <label for="city">Zip:</label>
-                            <input type="text" v-model="contact.zip" id="zip">
-                        </span>
-                     </div>
-                  </td>
-               </tr>
+            <form class="update-info-form pure-form-aligned pure-form"><fieldset>
+               <div class="section">Name</div>
+               <div class="pure-control-group">
+                  <label for="firstname">First:</label>
+                  <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname">
+               </div>
+               <div class="pure-control-group">
+                  <label for="nickname">Preferred:</label>
+                  <input type="text" v-model="contact.nickName" id="nickname">
+                  <span class="pure-form-message right">We will address you by this name if supplied.</span>
+               </div>
+               <div class="pure-control-group">
+                  <label for="middlename">Middle:</label>
+                  <input type="text" v-model="contact.middleName" id="middlename">
+               </div>
+               <div class="pure-control-group">
+                  <label for="lastname">Last:</label>
+                  <input type="text" v-model="contact.lastName" id="lastname">
+               </div>
 
-            </table>
+               <div class="section">Contact</div>
+               <div class="pure-control-group">
+                  <label for="email">Email:</label>
+                  <input type="text" v-model="contact.email" id="email">
+               </div>
+               <div class="pure-control-group">
+                  <label for="phone">Phone:</label>
+                  <input type="text" v-model="contact.phone" id="phone">
+               </div>
+
+               <div class="section">Address</div>
+               <div class="pure-control-group">
+                  <label for="address1">Line 1:</label>
+                  <input type="text" v-model="contact.address1" id="address1">
+               </div>
+               <div class="pure-control-group">
+                  <label for="address2">Line 2:</label>
+                  <input type="text" v-model="contact.address2" id="address2">
+               </div>
+               <div class="pure-control-group">
+                  <label for="address3">Line 3:</label>
+                  <input type="text" v-model="contact.address3" id="address3">
+               </div>
+               <div class="pure-control-group">
+                  <label for="city">City:</label>
+                  <input type="text" v-model="contact.city" id="city">
+               </div>
+               <div class="pure-control-group">
+                  <label for="state">State:</label>
+                  <input type="text" v-model="contact.state" id="state">
+               </div>
+               <div class="pure-control-group">
+                  <label for="city">Zip:</label>
+                  <input type="text" v-model="contact.zip" id="zip">
+               </div>
+
+            </fieldset></form>
             <p v-if="error" class="error" v-html="error"></p>
          </div>
       </template>
@@ -178,6 +166,9 @@ export default {
    button.v4-button.trigger {
       margin: 0 !important;
    }
+   .pure-form-aligned .pure-control-group label {
+      width: 6em;
+   }
 }
 .v4-button {
   margin-top: 2em;
@@ -209,51 +200,15 @@ p.error {
       border-bottom: 1px solid var(--uvalib-grey);
       padding-bottom: 5px;
    }
-   td.label {
-      padding-right: 5px;
-      padding-top: 4px;
-   }
-   td {
-      vertical-align: top;
-      label {
-         text-align: right;
-         margin: 0;
-         width: 100%;
-         display: inline-block;
-      }
-      input {
-         box-sizing: border-box;
-         width: 100%;
-         border:1px solid var(--uvalib-grey);
-         outline: none;
-         border-radius: 4px;
-         padding: 4px;
-         margin-bottom: .3rem;
-      }
-      .multivalue {
-         display: flex;
-         flex-flow: row nowrap;
-         justify-content: space-between;
-         align-content: flex-start;
-         label {
-            display: inline-block;
-            width: auto;
-            vertical-align: top;
-            margin: 5px 4px 0 0;
-         }
-         input {
-            width: auto;
-         }
-      }
-   }
-   .note {
-      font-size: 0.9em;
-      font-style: italic;
-      color: var(--uvalib-grey-dark);
+
+   .pure-form-message.right {
       text-align: right;
-      display: inline-block;
       margin-bottom: 15px;
-      width: 100%;
+      font-style: italic;
+   }
+
+   input {
+      width: 15em;
    }
 
 }
