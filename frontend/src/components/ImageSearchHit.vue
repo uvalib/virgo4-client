@@ -1,10 +1,10 @@
 <template>
    <div class="image-container">
       <div class="toolbar">
-         <span class="short-title">
+         <router-link class="short-title" @mousedown="detailClicked" :to="detailsURL">
             <TruncatedText mode="icon" :id="`title-${hit.identifier}`" :text="hit.header.title" :limit="19"
                style="font-weight:bold;" />
-         </span>
+         </router-link>
          <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`"/>
          <SignInRequired v-else :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
       </div>
