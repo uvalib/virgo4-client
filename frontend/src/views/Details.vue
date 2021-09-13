@@ -20,6 +20,7 @@ export default {
    async beforeRouteUpdate(to, _from) {
       // this is needed to load details when a grouped image thumb has been clicked; new content
       // needs to be loaded, but the page remains the same (create not called)
+      console.log("BEFORE ROUTE UPDATE .. GET")
       this.getDetails(to.params.src, to.params.id, to.query.mode)
    },
    components: {
@@ -116,6 +117,7 @@ export default {
       },
    },
    created() {
+      console.log("CREATED DETAILS... GET DETAL")
       this.getDetails(this.$route.params.src, this.$route.params.id, this.$route.query.mode)
    },
    updated() {

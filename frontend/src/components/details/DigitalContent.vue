@@ -20,9 +20,11 @@
          <template v-if="poolMode=='image'">
             <div v-if="details.related.length > 0" class="related">
                <label>Related Images</label>
-               <a :href="relatedImageURL(r)"  v-for="r in details.related" :key="`r${r.id}`">
+               <router-link :to="relatedImageURL(r)"  @mousedown="relatedImageClicked(r)"
+                  v-for="r in details.related" :key="`r${r.id}`"
+               >
                   <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
-               </a>
+               </router-link>
             </div>
          </template>
 
@@ -179,6 +181,10 @@ export default {
       },
       relatedImageURL( r ) {
          return `/sources/${this.details.source}/items/${r.id}`
+      },
+      relatedImageClicked( hit ) {
+         console.log(hit)
+         this.$store.commit("hitSelected", hit.id)
       },
       viewerClicked(item) {
          this.selectedDigitalObjectIdx = this.digitalContent.findIndex( i => i.pid == item.pid)

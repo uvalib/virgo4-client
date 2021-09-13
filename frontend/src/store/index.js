@@ -72,7 +72,14 @@ export default createStore({
             return state.selectedHitIdx < getters.selectedResults.hits.length-1
          }
 
-         // grouped; check if the selected group is last
+         // children in groups have groupParent set...
+         if ( selHit.groupParent ) {
+            // grouped and this is not the head of the group, just see if the item number
+            // is less than the total number of hits in the selected results
+            return selHit.number < getters.selectedResults.total
+         }
+
+         // grouped and this is the parent; check if the selected group is last
          if ( !selHit.group ) return false
          return state.selectedHitGroupIdx <= selHit.group.length-1
       },
@@ -114,6 +121,7 @@ export default createStore({
          state.pageTitle = title
       },
       hitSelected(state, identifier) {
+         console.log(`hit ${identifier} SELECTED`)
          state.selectedHitIdx = -1
          state.selectedHitGroupIdx = -1
          if ( state.selectedResultsIdx == -1) return
@@ -380,6 +388,7 @@ export default createStore({
       },
 
       resetSearchResults(state) {
+         console.log("RESET RESULTS")
          state.results.splice(0, state.results.length)
          state.total = -1
          state.lastSearchScrollPosition = 0
