@@ -57,37 +57,13 @@ export default createStore({
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
-
-         // if there are more to be loaded, next is definitely active
-         if (getters.hasMoreHits) {
-            return true
-         }
-
-         // no more results to be loaded, get the currently seleceted hit
-         let selHit = getters.selectedHit
-         if ( !selHit ) return false
-
-         if (selHit.grouped == false ) {
-            // not grouped; disable if this is the last hit
-            return state.selectedHitIdx < getters.selectedResults.hits.length-1
-         }
-
-         // children in groups have groupParent set...
-         if ( selHit.groupParent ) {
-            // grouped and this is not the head of the group, just see if the item number
-            // is less than the total number of hits in the selected results
-            return selHit.number < getters.selectedResults.total
-         }
-
-         // grouped and this is the parent; check if the selected group is last
-         if ( !selHit.group ) return false
-         return state.selectedHitGroupIdx <= selHit.group.length-1
+         return getters.selectedHit.number < getters.selectedResults.total
       },
-      prevHitAvailable: state => {
+      prevHitAvailable: (state, getters) => {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
-         return state.selectedHitIdx > 0 || state.selectedHitGroupIdx >=0
+         return getters.selectedHit.number > 1
       },
       hasResults: state => {
          return state.total >= 0
@@ -121,7 +97,6 @@ export default createStore({
          state.pageTitle = title
       },
       hitSelected(state, identifier) {
-         console.log(`hit ${identifier} SELECTED`)
          state.selectedHitIdx = -1
          state.selectedHitGroupIdx = -1
          if ( state.selectedResultsIdx == -1) return
@@ -412,14 +387,14 @@ export default createStore({
          ctx.commit('sort/reset')
          ctx.commit("collection/clearCollectionDetails")
       },
-      moreResults(ctx) {
+      async moreResults(ctx) {
          ctx.commit('incrementPage')
          let sr = ctx.rootGetters.selectedResults
          let params = {
             pool: sr.pool,
             page: sr.page
          }
-         return ctx.dispatch("searchPool", params)
+         await ctx.dispatch("searchPool", params)
       },
       async nextHit(ctx) {
          if ( ctx.state.selectedHitIdx == -1 || ctx.state.selectedResultsIdx == -1 ) return
@@ -439,7 +414,6 @@ export default createStore({
                   return
                }
             } else {
-               ctx.commit( "item/clearDetails", null, {root:true})
                await ctx.dispatch( "moreResults")
             }
          }
