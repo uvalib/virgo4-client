@@ -2,7 +2,24 @@
    <div class="place-hold">
       <div v-if="items.length > 1" class="item-selector">
          <h3>Select the item you want:</h3>
-         <V4Select
+
+
+         <multiselect v-if="isDevServer"
+         id="hold-select"
+         v-model="selectedItem"
+         :options="items"
+         :multiple="false"
+         selectLabel=""
+         deselectLabel="Remove"
+         :preselect-first="false"
+         :close-on-select="true"
+         :clear-on-select="true"
+         :preserve-search="false"
+         placeholder="Make a selection"
+         label="name" track-by="name" >
+         </multiselect>
+
+         <V4Select v-else
             id="hold-select"
             style="height:2em;"
             :selections="items"
@@ -24,21 +41,26 @@
 </template>
 <script>
 import { mapFields } from "vuex-map-fields"
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 import PickupLibrary from "@/components/preferences/PickupLibrary"
+import Multiselect from 'vue-multiselect'
 
 export default {
    components: {
-      PickupLibrary,
+      PickupLibrary,Multiselect
    },
    data: () => {
-      return { selectedItem: {} };
+      return { selectedItem: [] };
    },
    watch: {
       selectedItem(newVal, _oldVal) {
-         this.hold.itemLabel = newVal.label;
-         this.hold.itemBarcode = newVal.barcode;
-         this.errors.item_barcode = null;
+         if(newVal != null){
+            this.hold.itemLabel = newVal.label;
+            this.hold.itemBarcode = newVal.barcode;
+         } else {
+            this.hold = {}
+         }
+            this.errors.item_barcode = null;
       }
    },
    computed: {
@@ -52,6 +74,9 @@ export default {
          errors: "requests.errors",
          buttonDisabled: "requests.buttonDisabled",
          pickupLibrary: 'preferences.pickupLibrary',
+      }),
+      ...mapGetters({
+         isDevServer: 'system/isDevServer',
       }),
       items() {
          let items = this.itemOptions;
@@ -70,11 +95,11 @@ export default {
       setTimeout( () => {
          let ele = document.getElementById("hold-select")
          if ( ele ) {
-            ele.focus()
+            ele.tabIndex = "0"
          } else {
             ele = document.getElementById("pickup-sel")
             if ( ele ) {
-               ele.focus()
+               ele.tabIndex = "0"
             }
          }
       }, 150)
@@ -86,7 +111,8 @@ export default {
    }
 };
 </script>
-<style lang="scss" scoped>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+<style lang="scss" >
 .illiad-prompt {
    margin: 15px;
    min-height: initial !important;
@@ -101,6 +127,18 @@ div.place-hold {
    justify-content: space-around;
    align-items: center;
    align-content: space-around;
+
+   @media only screen and (max-width: 768px) {
+      align-items: flex-start;
+   }
+
+   .multiselect {
+      width: 120%;
+   }
+   .multiselect__option--highlight {
+      background-color: var(--uvalib-brand-blue-light);;
+   }
+
 }
 .place-hold > * {
    margin-bottom: 10px;
@@ -115,4 +153,5 @@ div.place-hold {
 .error {
   color: var(--color-error)
 }
+
 </style>
