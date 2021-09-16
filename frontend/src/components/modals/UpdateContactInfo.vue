@@ -18,30 +18,30 @@
                <div class="section">Name</div>
                <div class="pure-control-group">
                   <label for="firstname">First:</label>
-                  <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname" :placeholder="contact.firstName">
+                  <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname">
                </div>
                <div class="pure-control-group">
                   <label for="nickname">Preferred:</label>
-                  <input type="text" v-model="contact.nickName" id="nickname" :placeholder="contact.nickName">
+                  <input type="text" v-model="contact.nickName" id="nickname">
                   <span class="pure-form-message left">We will address you by this name if supplied.</span>
                </div>
                <div class="pure-control-group">
                   <label for="middlename">Middle:</label>
-                  <input type="text" v-model="contact.middleName" id="middlename" :placeholder="contact.nickname">
+                  <input type="text" v-model="contact.middleName" id="middlename">
                </div>
                <div class="pure-control-group">
                   <label for="lastname">Last:</label>
-                  <input type="text" v-model="contact.lastName" id="lastname" :placeholder="contact.lastName">
+                  <input type="text" v-model="contact.lastName" id="lastname">
                </div>
 
                <div class="section">Contact</div>
                <div class="pure-control-group">
                   <label for="email">Email:</label>
-                  <input type="text" v-model="contact.email" id="email" :placeholder="contact.email">
+                  <input type="text" v-model="contact.email" id="email">
                </div>
                <div class="pure-control-group">
                   <label for="phone">Phone:</label>
-                  <input type="text" v-model="contact.phone" id="phone" :placeholder="contact.phone">
+                  <input type="text" v-model="contact.phone" id="phone">
                </div>
 
                <div class="section">Address</div>
