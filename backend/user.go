@@ -54,6 +54,8 @@ type ILSUserInfo struct {
 	AmountOwed    string `json:"amountOwed"`
 	HomeLibrary   string `json:"homeLibrary"`
 	PrivateLDAP   string `json:"private"`
+	// pass through sirsiProfile objects
+	SirsiProfile map[string]interface{} `json:"sirsiProfile"`
 }
 
 // AccountRequest contains data required to request a Sirsi Account
@@ -499,7 +501,7 @@ func (svc *ServiceContext) GetPreferences(c *gin.Context) {
 // RequestContactUpdate accepts update data and sends it to lib-circ@virginia.edu
 func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 	userID := c.Param("uid")
-	var req struct {
+	type ContactInfo struct {
 		UserID     string `json:"userID"`
 		FirstName  string `json:"firstName"`
 		NickName   string `json:"nickName"`
@@ -514,16 +516,30 @@ func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 		Phone      string `json:"phone"`
 		Email      string `json:"email"`
 	}
+	var req struct {
+		NewContact ContactInfo `json:"newContact"`
+		OldContact ContactInfo `json:"oldContact"`
+	}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		log.Printf("ERROR: invalid contact info update request payload for %s: %s", userID, err.Error())
 		c.String(http.StatusBadRequest, "Invalid account request")
 		return
 	}
-	log.Printf("INFO: %s has requested a contact info update", userID)
+	log.Printf("INFO: %s has requested a contact info update: %+v", userID, req)
+
+	fmap := template.FuncMap{
+		"formatDiff": func(newField string, oldField string) string {
+			if newField != oldField {
+				return fmt.Sprintf("\"%s\" => \"%s\"", oldField, newField)
+			} else {
+				return fmt.Sprintf("No Change")
+			}
+		},
+	}
 
 	var renderedEmail bytes.Buffer
-	tpl := template.Must(template.New("contact_info.txt").ParseFiles("templates/contact_info.txt"))
+	tpl := template.Must(template.New("contact_info.txt").Funcs(fmap).ParseFiles("templates/contact_info.txt"))
 	err = tpl.Execute(&renderedEmail, req)
 	if err != nil {
 		log.Printf("ERROR: Unable to render contact info request email: %s", err.Error())
@@ -531,16 +547,16 @@ func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 		return
 	}
 
-	to := []string{"lib-circ@virginia.edu", req.Email}
-	from := req.Email
+	to := []string{"lib-circ@virginia.edu", req.NewContact.Email}
+	from := req.NewContact.Email
 	if from == "" {
 		from = svc.SMTP.Sender
 	}
-	eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, ReplyTo: req.Email, From: from, Body: renderedEmail.String()}
+	eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, ReplyTo: req.NewContact.Email, From: from, Body: renderedEmail.String()}
 	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
-		log.Printf("ERROR: Unable to new account request email: %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
+		log.Printf("ERROR: Unable to new account request email: %s", sendErr.Error())
+		c.String(http.StatusInternalServerError, sendErr.Error())
 		return
 	}
 
@@ -572,8 +588,8 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 	eRequest := emailRequest{Subject: "New Account Request", To: to, ReplyTo: req.Email, From: svc.SMTP.Sender, Body: renderedEmail.String()}
 	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
-		log.Printf("ERROR: Unable to new account request email: %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
+		log.Printf("ERROR: Unable to new account request email: %s", sendErr.Error())
+		c.String(http.StatusInternalServerError, sendErr.Error())
 		return
 	}
 

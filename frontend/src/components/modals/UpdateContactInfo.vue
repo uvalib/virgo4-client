@@ -18,55 +18,47 @@
                <div class="section">Name</div>
                <div class="pure-control-group">
                   <label for="firstname">First:</label>
-                  <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname">
+                  <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname" :placeholder="contact.firstName">
                </div>
                <div class="pure-control-group">
                   <label for="nickname">Preferred:</label>
-                  <input type="text" v-model="contact.nickName" id="nickname">
-                  <span class="pure-form-message right">We will address you by this name if supplied.</span>
+                  <input type="text" v-model="contact.nickName" id="nickname" :placeholder="contact.nickName">
+                  <span class="pure-form-message left">We will address you by this name if supplied.</span>
                </div>
                <div class="pure-control-group">
                   <label for="middlename">Middle:</label>
-                  <input type="text" v-model="contact.middleName" id="middlename">
+                  <input type="text" v-model="contact.middleName" id="middlename" :placeholder="contact.nickname">
                </div>
                <div class="pure-control-group">
                   <label for="lastname">Last:</label>
-                  <input type="text" v-model="contact.lastName" id="lastname">
+                  <input type="text" v-model="contact.lastName" id="lastname" :placeholder="contact.lastName">
                </div>
 
                <div class="section">Contact</div>
                <div class="pure-control-group">
                   <label for="email">Email:</label>
-                  <input type="text" v-model="contact.email" id="email">
+                  <input type="text" v-model="contact.email" id="email" :placeholder="contact.email">
                </div>
                <div class="pure-control-group">
                   <label for="phone">Phone:</label>
-                  <input type="text" v-model="contact.phone" id="phone">
+                  <input type="text" v-model="contact.phone" id="phone" :placeholder="contact.phone">
                </div>
 
                <div class="section">Address</div>
                <div class="pure-control-group">
                   <label for="address1">Line 1:</label>
-                  <input type="text" v-model="contact.address1" id="address1">
+                  <input type="text" v-model="contact.address1" id="address1" placeholder="Street Address">
                </div>
                <div class="pure-control-group">
                   <label for="address2">Line 2:</label>
-                  <input type="text" v-model="contact.address2" id="address2">
+                  <input type="text" v-model="contact.address2" id="address2" placeholder="Street Address Line 2">
                </div>
                <div class="pure-control-group">
                   <label for="address3">Line 3:</label>
-                  <input type="text" v-model="contact.address3" id="address3">
+                  <input type="text" v-model="contact.address3" id="address3" placeholder="City, State">
                </div>
                <div class="pure-control-group">
-                  <label for="city">City:</label>
-                  <input type="text" v-model="contact.city" id="city">
-               </div>
-               <div class="pure-control-group">
-                  <label for="state">State:</label>
-                  <input type="text" v-model="contact.state" id="state">
-               </div>
-               <div class="pure-control-group">
-                  <label for="city">Zip:</label>
+                  <label for="zip">Zipcode:</label>
                   <input type="text" v-model="contact.zip" id="zip">
                </div>
 
@@ -106,12 +98,11 @@ export default {
             address1: "",
             address2: "",
             address3: "",
-            city: "",
-            state: "",
             zip: "",
             phone: "",
             email: ""
          },
+         originalContact: {},
 
          emailSent: false,
          error: "",
@@ -124,12 +115,22 @@ export default {
       opened(){
          this.contact.userID = this.userID
          this.contact.email = this.account.email
-         let bits = this.account.displayName.split(" ")
-         this.contact.firstName = bits[0]
-         this.contact.lastName = bits[bits.length - 1]
+         this.contact.nickName = this.account.sirsiProfile.address1.preferredName
+         this.contact.firstName = this.account.sirsiProfile.address1.firstName
+         this.contact.middleName = this.account.sirsiProfile.address1.middleName
+         this.contact.lastName = this.account.sirsiProfile.address1.lastName
+         this.contact.address1 = this.account.sirsiProfile.address1.line1
+         this.contact.address2 = this.account.sirsiProfile.address1.line2
+         this.contact.address3 = this.account.sirsiProfile.address1.line3
+         this.contact.zip = this.account.sirsiProfile.address1.zip
+         this.contact.phone = this.account.sirsiProfile.address1.phone
+         this.contact.email = this.account.sirsiProfile.address3Email
          this.emailSent = false
          this.error = ""
          this.okDisabled = false
+         // Shallow clone
+         this.originalContact = {...this.contact}
+
       },
       backTabInput() {
          this.$refs.updateInfo.firstFocusBackTabbed()
@@ -141,21 +142,20 @@ export default {
          this.okDisabled = !this.okDisabled
       },
       okClicked() {
+         this.error = ""
          if (this.emailSent == true){
            this.$refs.updateInfo.hide()
            return
          }
 
-         let hasData = false
+         let hasChanges = false
          for (const [key, value] of Object.entries(this.contact)) {
-            if ( key != "userID" ) {
-               if (value != "") {
-                  hasData = true
-               }
+            if(value != this.originalContact[key]){
+               hasChanges = true
             }
          }
-         if (!hasData) {
-            this.error = "Please enter some data in the contact form"
+         if (!hasChanges) {
+            this.error = "Nothing has changed"
             return
          }
 
@@ -165,7 +165,8 @@ export default {
          }
 
          this.toggleOK()
-         this.$store.dispatch("user/updateContactInfo", this.contact).then(() => {
+         let info = {newContact: this.contact, oldContact: this.originalContact}
+         this.$store.dispatch("user/updateContactInfo", info).then(() => {
             this.emailSent = true
          }).catch((e) => {
             this.error = "Unable to update contact info. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
@@ -220,9 +221,9 @@ p.error {
       padding-bottom: 5px;
    }
 
-   .pure-form-message.right {
-      text-align: right;
-      margin-bottom: 15px;
+   .pure-form-message.left {
+      text-align: left;
+      margin: 0 0 15px 20px;
       font-style: italic;
    }
 

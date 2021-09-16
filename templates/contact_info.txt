@@ -4,26 +4,22 @@ _______________________________________________________________________
 
 Name
 _______________________________________________________________________
-ID:          {{.UserID}}
-First Name:  {{.FirstName}}
-Nickname:    {{.NickName}}
-Middle Name: {{.MiddleName}}
-Last Name:   {{.LastName}}
+ID:          {{.NewContact.UserID}}
+First Name:  {{formatDiff .NewContact.FirstName .OldContact.FirstName}}
+Nickname:    {{formatDiff .NewContact.NickName .OldContact.NickName}}
+Middle Name: {{formatDiff .NewContact.MiddleName .OldContact.MiddleName}}
+Last Name:   {{formatDiff .NewContact.LastName .OldContact.LastName}}
 
 Contact
 _______________________________________________________________________
-Email:       {{.Email}}
-Phone:       {{.Phone}}
+Email:       {{formatDiff .NewContact.Email .OldContact.Email}}
+Phone:       {{formatDiff .NewContact.Phone .OldContact.Phone}}
 
 Address
 _______________________________________________________________________
-{{.Address1}}
-{{- if ne .Address2 ""}}
-{{.Address2}}
-{{- end}}
-{{- if ne .Address3 ""}}
-{{.Address3}}
-{{- end}}
-{{.City}}
-{{.State}}, {{.Zip}}
+Line1: {{formatDiff .NewContact.Address1 .OldContact.Address1}}
+Line2: {{formatDiff .NewContact.Address2 .OldContact.Address2}}
+Line3: {{formatDiff .NewContact.Address3 .OldContact.Address3}}
+Zipcode: {{formatDiff .NewContact.Zip .OldContact.Zip}}
+
 _______________________________________________________________________

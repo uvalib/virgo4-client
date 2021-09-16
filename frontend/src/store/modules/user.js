@@ -623,7 +623,7 @@ const user = {
          })
       },
       updateContactInfo(_ctx, info) {
-         return axios.post(`/api/users/${info.userID}/contact`, info )
+         return axios.post(`/api/users/${info.newContact.userID}/contact`, info )
       }
    }
 }
