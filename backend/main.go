@@ -155,5 +155,5 @@ func main() {
 	portStr := fmt.Sprintf(":%d", cfg.Port)
 	log.Printf("Start service v%s on port %s", version, portStr)
 	// pprof.Register(router)
-	log.Fatal(router.Run(portStr))
+	log.Fatal(router.Run("localhost" + portStr))
 }
