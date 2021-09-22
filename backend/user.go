@@ -379,7 +379,7 @@ func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	c.JSON(http.StatusOK, holds)
 }
 
-// GetUser uses ILS Connector V2 API /users to get details for a user
+// GetUser uses ILS Connector API /users to get details for a user
 func (svc *ServiceContext) GetUser(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get info for user %s with ILS Connector...", userID)

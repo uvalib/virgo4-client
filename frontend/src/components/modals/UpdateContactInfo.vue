@@ -4,7 +4,7 @@
       :buttonID="`${id}-open`">
       <template v-slot:button>
          <V4Button mode="primary" @click="$refs.updateInfo.show()" :id="`${id}-open`" class="trigger">
-            Update Contact Info
+            Update my Virgo contact information
          </V4Button>
       </template>
       <template v-slot:content>
@@ -16,14 +16,10 @@
          <div class="scroller" v-else>
             <form class="update-info-form pure-form-aligned pure-form"><fieldset>
                <div class="section">Name</div>
+
                <div class="pure-control-group">
                   <label for="firstname">First:</label>
                   <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname">
-               </div>
-               <div class="pure-control-group">
-                  <label for="nickname">Preferred:</label>
-                  <input type="text" v-model="contact.nickName" id="nickname">
-                  <span class="pure-form-message left">We will address you by this name if supplied.</span>
                </div>
                <div class="pure-control-group">
                   <label for="middlename">Middle:</label>
@@ -32,6 +28,11 @@
                <div class="pure-control-group">
                   <label for="lastname">Last:</label>
                   <input type="text" v-model="contact.lastName" id="lastname">
+               </div>
+               <div class="pure-control-group">
+                  <label for="nickname">Preferred:</label>
+                  <input type="text" v-model="contact.preferredName" id="nickname">
+                  <span class="pure-form-message left">We will address you by this name if supplied.</span>
                </div>
 
                <div class="section">Contact</div>
@@ -44,7 +45,7 @@
                   <input type="text" v-model="contact.phone" id="phone">
                </div>
 
-               <div class="section">Address</div>
+               <!--<div class="section">Address</div>
                <div class="pure-control-group">
                   <label for="address1">Line 1:</label>
                   <input type="text" v-model="contact.address1" id="address1" placeholder="Street Address">
@@ -60,7 +61,7 @@
                <div class="pure-control-group">
                   <label for="zip">Zipcode:</label>
                   <input type="text" v-model="contact.zip" id="zip">
-               </div>
+               </div>-->
 
             </fieldset></form>
          </div>
@@ -95,10 +96,10 @@ export default {
             nickName: "",
             middleName: "",
             lastName: "",
-            address1: "",
-            address2: "",
-            address3: "",
-            zip: "",
+           //address1: "",
+           //address2: "",
+           //address3: "",
+           // zip: "",
             phone: "",
             email: ""
          },
@@ -115,16 +116,18 @@ export default {
       opened(){
          this.contact.userID = this.userID
          this.contact.email = this.account.email
-         this.contact.nickName = this.account.sirsiProfile.address1.preferredName
-         this.contact.firstName = this.account.sirsiProfile.address1.firstName
-         this.contact.middleName = this.account.sirsiProfile.address1.middleName
-         this.contact.lastName = this.account.sirsiProfile.address1.lastName
-         this.contact.address1 = this.account.sirsiProfile.address1.line1
-         this.contact.address2 = this.account.sirsiProfile.address1.line2
-         this.contact.address3 = this.account.sirsiProfile.address1.line3
-         this.contact.zip = this.account.sirsiProfile.address1.zip
+         this.contact.preferredName = this.account.sirsiProfile.preferredName
+         this.contact.firstName = this.account.sirsiProfile.firstName
+         this.contact.middleName = this.account.sirsiProfile.middleName
+         this.contact.lastName = this.account.sirsiProfile.lastName
+
+         //this.contact.address1 = this.account.sirsiProfile.address1.line1
+         //this.contact.address2 = this.account.sirsiProfile.address1.line2
+         //this.contact.address3 = this.account.sirsiProfile.address1.line3
+         //this.contact.zip = this.account.sirsiProfile.address1.zip
          this.contact.phone = this.account.sirsiProfile.address1.phone
-         this.contact.email = this.account.sirsiProfile.address3Email
+
+         this.contact.email = this.account.email
          this.emailSent = false
          this.error = ""
          this.okDisabled = false
@@ -204,7 +207,7 @@ p.error {
    }
 }
 .scroller {
-   max-height: 350px;
+   max-height: 55vh;
    overflow: scroll;
    padding: 10px;
     border: 1px solid var(--uvalib-grey-light);

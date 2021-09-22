@@ -15,11 +15,12 @@ _______________________________________________________________________
 Email:       {{formatDiff .NewContact.Email .OldContact.Email}}
 Phone:       {{formatDiff .NewContact.Phone .OldContact.Phone}}
 
+{{/*
 Address
 _______________________________________________________________________
 Line1: {{formatDiff .NewContact.Address1 .OldContact.Address1}}
 Line2: {{formatDiff .NewContact.Address2 .OldContact.Address2}}
 Line3: {{formatDiff .NewContact.Address3 .OldContact.Address3}}
 Zipcode: {{formatDiff .NewContact.Zip .OldContact.Zip}}
-
+*/}}
 _______________________________________________________________________

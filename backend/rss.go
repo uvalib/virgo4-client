@@ -113,8 +113,7 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 		Title:       "Virgo Feed (" + search.Name + ")",
 		Link:        &feeds.Link{Href: savedURL},
 		Description: "A Virgo RSS feed based on a saved search",
-		//Author:      &feeds.Author{Name: "Jason Moiron", Email: "jmoiron@jmoiron.net"},
-		Created: now,
+		Created:     now,
 	}
 
 	// Set feed items
