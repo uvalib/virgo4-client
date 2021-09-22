@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapState, mapGetters } from "vuex"
 
 export default {
    props: {
@@ -65,7 +65,9 @@ export default {
    computed: {
       ...mapState({
          digitalContent : state => state.item.digitalContent,
-         userInfo: state => state.user.accountInfo
+      }),
+      ...mapGetters({
+         primaryEmail: 'user/singleEmail'
       }),
       item() {
          return this.digitalContent[this.dcIndex]
@@ -101,7 +103,7 @@ export default {
          }
       },
       opened() {
-         this.email = this.userInfo.email
+         this.email = this.primaryEmail
          this.error = ""
       },
       cancelClicked() {

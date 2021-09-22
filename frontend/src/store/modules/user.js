@@ -163,6 +163,10 @@ const user = {
 
          return pickupLibraries
        },
+       singleEmail: state => {
+         // Email may be comma separated. Use this when only one is required
+          return state.accountInfo.email.split(',')[0].trim()
+       }
 
    },
 
