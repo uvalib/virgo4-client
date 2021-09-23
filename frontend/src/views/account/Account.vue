@@ -19,7 +19,7 @@
                <dt>Profile Type</dt>
                <dd>{{info.profile}}</dd>
             </dl>
-            <UpdateContactInfo />
+            <div class="button-bar"><UpdateContactInfo /></div>
 
             <div class="status-info">
                <div v-if="info.standing != 'OK'"><b>Standing:</b> {{info.standing}}</div>
@@ -154,7 +154,7 @@
          </div>
 
          <div class="account-group">
-            <h2>Illiad</h2>
+            <h2>ILLiad</h2>
             <dl v-if="info.leoAddress">
                <dt>LEO Delivery Location:</dt>
                <dd>
@@ -169,7 +169,12 @@
 
          <div class="account-group">
             <h2>Special Collections</h2>
-            <p><a target="_blank" href="https://virginia.aeon.atlas-sys.com/logon" aria-label="Special Collections Account" >Make Small Special Collections requests</a> using your online researcher account.</p>
+            <p class="sc">
+               <a target="_blank" href="https://virginia.aeon.atlas-sys.com/logon" aria-label="Special Collections Account" >
+                  Make Small Special Collections requests
+               </a>
+               using your online researcher account.
+            </p>
          </div>
 
       </template>
@@ -244,7 +249,8 @@ export default {
 }
 .account-group {
    border: 1px solid var(--uvalib-grey);
-   margin: 10px;
+   margin: 25px 0;
+   box-shadow: $v4-box-shadow-light;
    h2 {
       padding: 12px;
       margin: 0;
@@ -252,16 +258,36 @@ export default {
       color: var(--uvalib-grey-darkest);
       border-bottom: 1px solid var(--uvalib-grey)
    }
-   h2 ~ * {
-      padding-left: 10px;
+   dl {
+      margin: 25px;
+      dt {
+         font-weight: bold;
+         margin-bottom: 5px;
+      }
+      dd {
+         margin: 0 0 20px 10px;
+
+      }
    }
-   dt {
+   .button-bar {
+      padding: 0px 10px;
+      text-align: right;
+   }
+   .fines-head {
       font-weight: bold;
+      border-bottom: 1px solid var(--uvalib-grey);
+      border-top: 1px solid var(--uvalib-grey);
       margin-bottom: 5px;
    }
-   dd {
-      margin: 0 0 20px 10px;
-
+   .fines-content {
+      margin: 20px;
+   }
+   .fines-content label {
+      font-weight: bold;
+      margin-right: 5px;
+   }
+   p.sc {
+      margin:20px;
    }
 }
 .no-leo {
@@ -295,18 +321,6 @@ export default {
 .outstanding-bill {
    margin-top: 15px;
 }
-.fines-head {
-   font-weight: bold;
-   border-bottom: 1px solid var(--uvalib-brand-blue);
-   margin-bottom: 5px;
-}
-.fines-content {
-   margin: 5px 0;
-}
-.fines-content label {
-   font-weight: bold;
-   margin-right: 5px;
-}
 .accordion {
   margin-left: 15px;
 }
@@ -335,7 +349,7 @@ div.notes p {
    margin: 2px 0;
 }
 .payment {
-   margin-top: 15px;
+   margin-top: 35px;
  }
 .payment h3 {
    border-bottom: 1px solid var(--uvalib-brand-blue);
