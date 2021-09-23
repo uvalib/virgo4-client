@@ -19,10 +19,13 @@
                <dt>Profile Type</dt>
                <dd>{{info.profile}}</dd>
             </dl>
-            <div class="button-bar"><UpdateContactInfo /></div>
 
             <div class="status-info">
-               <div v-if="info.standing != 'OK'"><b>Standing:</b> {{info.standing}}</div>
+               <dl v-if="info.standing != 'OK'">
+                  <dt>Standing</dt>
+                  <dd>{{info.standing}}</dd>
+               </dl>
+
                <div class="standing-info" v-if="info.standing=='BARRED'">
                   Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
                   If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
@@ -36,8 +39,9 @@
                   <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a> or 434-924-3021.
                </div>
 
-               <div v-if="canChangePassword" class="password">
-                  <ChangePassword />
+               <div class="button-bar">
+                  <UpdateContactInfo />
+                  <div v-if="canChangePassword" class="password"><ChangePassword /></div>
                </div>
 
                <div v-if="ilsError" class="standing-info">{{ilsError}}</div>
@@ -160,9 +164,11 @@
                <dd>
                   {{info.leoAddress}}
                </dd>
-            <p><a target="_blank" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad Account">Visit ILLiad</a> to change your LEO delivery location.</p>
+            <p class="sc">
+               <a target="_blank" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad Account">Visit ILLiad</a> to change your LEO delivery location.
+            </p>
             </dl>
-            <p v-else>
+            <p class="sc" v-else>
                Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> to set up LEO Delivery.
             </p>
          </div>
@@ -249,7 +255,7 @@ export default {
 }
 .account-group {
    border: 1px solid var(--uvalib-grey);
-   margin: 25px 0;
+   margin: 20px 0;
    box-shadow: $v4-box-shadow-light;
    h2 {
       padding: 12px;
@@ -270,8 +276,11 @@ export default {
       }
    }
    .button-bar {
-      padding: 0px 10px;
+      padding: 0px 20px;
       text-align: right;
+      .password {
+         margin: 10px 0 0px 0;
+      }
    }
    .fines-head {
       font-weight: bold;
@@ -317,6 +326,9 @@ export default {
 }
 .status-info {
    margin: 15px 0;
+   .standing {
+      margin-left: 20px;
+   }
 }
 .outstanding-bill {
    margin-top: 15px;
@@ -367,12 +379,10 @@ div.notes p {
     font-weight: bold;
     text-align: center;
     padding: 10px;
-    margin: 15px 0;
+    margin: 15px 20px;
     border-radius: 5px;
     color: var(--uvalib-text);
     background-color: var(--uvalib-red-lightest);
 }
-.password {
-   margin-top: 15px;
-}
+
 </style>
