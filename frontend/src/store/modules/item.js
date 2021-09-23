@@ -7,6 +7,7 @@ const item = {
       details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[] },
       digitalContent: [],
       googleBooksURL: "",
+      googleBookThumbURL: "",
       loadingDigitalContent: false,
       availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
    },
@@ -121,13 +122,33 @@ const item = {
          })
       },
       setGoogleBooksURL(state, data) {
-         if (data.items[0].accessInfo.webReaderLink) {
-            state.googleBooksURL = data.items[0].accessInfo.webReaderLink
-         }
+         let done = false
+         state.googleBookThumbURL = ""
+         state.googleBooksURL = ""
+         data.items.some( item => {
+            if (item.accessInfo.viewability != "NO_PAGES") {
+               if ( state.details.header.title.includes(item.volumeInfo.title)) {
+                  if ( item.volumeInfo.canonicalVolumeLink ) {
+                     state.googleBooksURL = item.volumeInfo.canonicalVolumeLink
+                  } else if ( item.volumeInfo.infoLink ) {
+                     state.googleBooksURL = item.volumeInfo.infoLink
+                  }
+                  else if (item.accessInfo.webReaderLink) {
+                     state.googleBooksURL = item.accessInfo.webReaderLink
+                  }
+                  if (item.volumeInfo.imageLinks.smallThumbnail) {
+                     state.googleBookThumbURL = item.volumeInfo.imageLinks.smallThumbnail
+                  }
+                  done = true
+               }
+            }
+            return done == true
+         })
       },
       clearDetails(state) {
          state.details = {searching: true, source: "", identifier:"", basicFields:[],
             detailFields:[], related:[]}
+         state.googleBookThumbURL = ""
          state.googleBooksURL = ""
          state.digitalContent.splice(0, state.digitalContent.length)
       },
@@ -244,32 +265,37 @@ const item = {
          })
       },
 
-      async getGoogleBooksURL(ctx) {
+     getGoogleBooksURL(ctx) {
          let detail = ctx.state.details
          let done = false
-         let fields = ["isbn", "oclc", "lccn"]
-         fields.some( name => {
-            let idField = detail.basicFields.find( f => f.name == name )
+         let fields = ["isbn", "lccn", "oclc"]
+         let tgtName = ""
+         let tgtValue = ""
+         fields.some(  fName => {
+            let idField = detail.basicFields.find( f => f.name == fName )
             if (!idField) {
-               idField = detail.detailFields.find( f => f.name == name )
+               idField = detail.detailFields.find( f => f.name == fName )
             }
             if ( idField ) {
-               idField.value.some( async v => {
-                  let url = `https://www.googleapis.com/books/v1/volumes?q=${name}:${v}`
-                  try {
-                     let response = await axios.get(url)
-                     if (response.data.totalItems > 0 && response.data.items[0].accessInfo.viewability != "NO_PAGES") {
-                        ctx.commit('setGoogleBooksURL', response.data)
-                        done = true
-                     }
-                  } catch(_error) {
-                     // NO-OP
-                  }
-                  return done == true
-               })
+               tgtName = fName
+               tgtValue = idField.value[0]
+               done = true
             }
             return done == true
          })
+
+         // no identifier to search. nothing to do
+         if (tgtName == "") return
+
+         let url = `https://www.googleapis.com/books/v1/volumes?q=${tgtName}:${tgtValue}`
+         axios.get(url).then((response) => {
+            if (response.data.totalItems > 0) {
+               ctx.commit('setGoogleBooksURL', response.data)
+            }
+         }).catch( (_error) => {
+            // NO-OP
+         })
+
       },
 
       async getDetails(ctx, { source, identifier }) {

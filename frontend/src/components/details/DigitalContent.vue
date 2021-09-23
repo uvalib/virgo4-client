@@ -78,7 +78,8 @@
 
          <div class="google" v-if="googleBooksURL">
             <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
-               <img alt="Google Books Preview" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
+               <img v-if="googleBookThumbURL" class="google-thumb" alt="Google Books Thumbnail" :src="googleBookThumbURL"/>
+               <img alt="Google Books Preview" class="google-btn" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
             </a>
          </div>
       </div>
@@ -119,6 +120,7 @@ export default {
          details : state => state.item.details,
          digitalContent : state => state.item.digitalContent,
          googleBooksURL : state => state.item.googleBooksURL,
+         googleBookThumbURL: state => state.item.googleBookThumbURL,
          loadingDigitalContent : state => state.item.loadingDigitalContent,
          displayWidth: state => state.system.displayWidth
       }),
@@ -291,6 +293,17 @@ export default {
 
    .google {
       margin-top: 25px;
+      img {
+         display:block;
+         margin: 0 auto;
+      }
+      .google-thumb {
+         border: 1px solid var(--uvalib-grey-light);
+         padding: 0;
+         border-radius: 3px;
+         margin-bottom: 15px;
+         box-shadow: $v4-box-shadow-light;
+      }
    }
 
    div.items {
