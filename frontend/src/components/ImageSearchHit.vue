@@ -1,21 +1,18 @@
 <template>
    <div class="image-container">
       <div class="toolbar">
-         <router-link class="short-title" @mousedown="detailClicked" :to="detailsURL">
-            <TruncatedText mode="icon" :id="`title-${hit.identifier}`" :text="hit.header.title" :limit="19"
-               style="font-weight:bold;" />
-         </router-link>
-         <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`"/>
-         <SignInRequired v-else :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
+         <span class="group-cnt" v-if="hit.grouped">{{hit.count}} images</span>
+         <span class="group-cnt" v-else>1 image</span>
+         <span class="buttons">
+            <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`"/>
+            <SignInRequired v-else :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
+         </span>
       </div>
       <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">
-          <img aria-label=" " class="trigger" :src="iiifURL(hit)">
-          <div class="metadata-popover">
-             <div class="metadata-content">
-                <div>{{hit.header.title}}</div>
-             </div>
-          </div>
-         <div class="group-cnt" v-if="hit.grouped">{{hit.count}} images</div>
+         <img aria-label=" " class="trigger" :src="iiifURL(hit)">
+         <div class="metadata-content">
+            <div>{{hit.header.title}}</div>
+         </div>
       </router-link>
    </div>
 </template>
@@ -23,7 +20,6 @@
 <script>
 import AddBookmark from '@/components/modals/AddBookmark'
 import SignInRequired from '@/components/modals/SignInRequired'
-import TruncatedText from '@/components/TruncatedText'
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {
@@ -32,7 +28,7 @@ export default {
       pool: {type: String, required: true},
    },
    components: {
-      AddBookmark, TruncatedText, SignInRequired
+      AddBookmark, SignInRequired
    },
    computed: {
       detailsURL() {
@@ -88,36 +84,28 @@ img {
    position: relative;
    box-shadow:  $v4-box-shadow-light;
    width: fit-content;
+   // border-radius: 0 0 5px 5px;
+   box-shadow: $v4-box-shadow-light;
 }
 .image-container:hover {
    top: -2px;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
+   box-shadow: $v4-box-shadow;
 }
 .group-cnt {
-   position: absolute;
-   background: var(--uvalib-teal-lightest);
-   padding: 2px 8px;
-   border-radius: 10px;
-   bottom: 8px;
-   right: 8px;
    font-size: 0.8em;
    color: var(--uvalib-text);
-   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 1.24);
 }
-
-.metadata-popover {
+.metadata-content {
+   padding: 10px;
    background: white;
-   box-shadow: $v4-box-shadow-light;
    color: var(--uvalib-text);
    font-size: 0.9em;
    font-weight: normal;
    display: inline-block;
-   border-radius: 5px;
-   border: 1px solid var(--uvalib-grey-light);
-   max-width: 250px;
-}
-.metadata-content {
-   padding: 10px;
+   // border-radius: 0 0 5px 5px;
+   width: 100%;
+   box-sizing: border-box;
+   border-top: 1px solid var(--uvalib-grey-light);
 }
 .toolbar {
    padding: 5px 8px 5px 8px;
@@ -129,9 +117,9 @@ img {
    align-items: center;
    height: 100%;
    z-index: 1;
-}
-.short-title {
-   font-size: 0.85em;
-   flex-grow: 1;
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   .buttons {
+      margin-left: auto;
+   }
 }
 </style>
