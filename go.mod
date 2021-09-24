@@ -20,7 +20,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/ugorji/go v1.2.6 // indirect
 	github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656
-	github.com/uvalib/virgo4-jwt v0.0.0-20210603185225-4637094c1342
+	github.com/uvalib/virgo4-jwt v0.0.0-20210923181633-fe8108b1457d
 	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/sys v0.0.0-20210923061019-b8560ed6a9b7 // indirect
