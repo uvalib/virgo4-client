@@ -547,12 +547,17 @@ func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 		return
 	}
 
-	to := []string{"lib-circ@virginia.edu", req.NewContact.Email}
+	parsedEmails := strings.Split(req.NewContact.Email, ",")
+	to := []string{"lib-circ@virginia.edu", parsedEmails[0]}
+	cc := ""
+	if len(parsedEmails) > 1 {
+		cc = strings.Join(parsedEmails[1:], ",")
+	}
 	from := req.NewContact.Email
 	if from == "" {
 		from = svc.SMTP.Sender
 	}
-	eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, ReplyTo: req.NewContact.Email, From: from, Body: renderedEmail.String()}
+	eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, CC: cc, ReplyTo: parsedEmails[0], From: svc.SMTP.Sender, Body: renderedEmail.String()}
 	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
 		log.Printf("ERROR: Unable to new account request email: %s", sendErr.Error())
