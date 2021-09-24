@@ -1,22 +1,24 @@
 <template>
    <div class="place-hold">
       <div v-if="items.length > 1" class="item-selector">
-         <h3>Select the item you want:</h3>
-
+         <h3>Select the item(s) you want:</h3>
 
          <multiselect v-if="isDevServer"
-         id="hold-select"
-         v-model="selectedItem"
-         :options="items"
-         :multiple="false"
-         selectLabel=""
-         deselectLabel="Remove"
-         :preselect-first="false"
-         :close-on-select="true"
-         :clear-on-select="true"
-         :preserve-search="false"
-         placeholder="Make a selection"
-         label="name" track-by="name" >
+            id="hold-select"
+            v-model="selectedItem"
+            :options="items"
+            :multiple="true"
+            selectLabel=""
+            deselectLabel="Remove"
+            placeholder="Make a selection"
+            label="name"
+            track-by="name"
+            :tabindex="0"
+            :close-on-select="false"
+            >
+            <template v-slot:noResult>
+               <span>No results</span>
+            </template>
          </multiselect>
 
          <V4Select v-else
@@ -93,21 +95,28 @@ export default {
          this.selectedItem = this.items[0];
       }
       setTimeout( () => {
-         let ele = document.getElementById("hold-select")
-         if ( ele ) {
-            ele.tabIndex = "0"
-         } else {
-            ele = document.getElementById("pickup-sel")
-            if ( ele ) {
-               ele.tabIndex = "0"
-            }
-         }
+         this.FocusOnSelector()
+
       }, 150)
    },
    methods: {
       placeHold() {
          this.$store.dispatch("requests/createHold");
+      },
+      FocusOnSelector(){
+         let ele = document.getElementById("hold-select")
+         if(this.isDevServer){ ele = document.getElementById("listbox-hold-select") }
+         if ( ele ) {
+            ele.focus()
+         } else {
+            ele = document.getElementById("pickup-sel")
+            if ( ele ) {
+               ele.focus()
+            }
+         }
+
       }
+
    }
 };
 </script>
@@ -132,11 +141,17 @@ div.place-hold {
       align-items: flex-start;
    }
 
-   .multiselect {
-      width: 120%;
-   }
-   .multiselect__option--highlight {
+   .multiselect__option--highlight, .multiselect__tag {
       background-color: var(--uvalib-brand-blue-light);;
+   }
+   .multiselect__tag-icon:after, .multiselect__tag-icon:focus:after, .multiselect__tag-icon:hover:after {
+      color: var(--uvalib-text-light);
+   }
+   .multiselect__content, .multiselect__tags {
+      border: 1px solid var(--uvalib-grey);
+   }
+   .multiselect__input {
+      padding: 5px 0;
    }
 
 }

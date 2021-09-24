@@ -164,9 +164,9 @@
                <dd>
                   {{info.leoAddress}}
                </dd>
-            <p class="sc">
-               <a target="_blank" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad Account">Visit ILLiad</a> to change your LEO delivery location.
-            </p>
+               <p>
+                  <a target="_blank" href="https://uva.hosts.atlas-sys.com/Logon" aria-label="Illiad Account">Visit ILLiad</a> to change your LEO delivery location.
+               </p>
             </dl>
             <p class="sc" v-else>
                Please contact <a href="mailto:4leo@virginia.edu">4leo@virginia.edu</a> to set up LEO Delivery.

@@ -1,5 +1,6 @@
 <template>
    <div id="active-panel" ref="activePanel" >
+      <V4Button mode="tertiary" v-if="showReset()" class="reset" @click="reset" v-html="resetLabel()"></V4Button>
       <OptionsPanel v-if="requests.activePanel == 'OptionsPanel'" />
       <SignInPanel v-if="requests.activePanel == 'SignInPanel'" />
       <PlaceHoldPanel v-if="requests.activePanel == 'PlaceHoldPanel'" />
@@ -8,7 +9,6 @@
       <AeonPanel v-if="requests.activePanel == 'AeonPanel'" />
       <ScanPanel v-if="requests.activePanel == 'ScanPanel'" />
       <VideoReservePanel v-if="requests.activePanel == 'VideoReservePanel'" />
-      <V4Button mode="tertiary" v-if="showReset()" class="reset" @click="reset" v-html="resetLabel()"></V4Button>
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
    </div>
 </template>
