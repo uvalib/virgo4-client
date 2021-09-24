@@ -165,7 +165,11 @@ const user = {
        },
        singleEmail: state => {
          // Email may be comma separated. Use this when only one is required
-          return state.accountInfo.email.split(',')[0].trim()
+         if (state.accountInfo.email) {
+            return state.accountInfo.email.split(',')[0].trim()
+         } else {
+            return ""
+         }
        }
 
    },
@@ -621,7 +625,7 @@ const user = {
          }).catch ( error => {
             console.log("Unable to request new account: "+error)
             let msg = "System error, we regret the inconvenience. If this problem persists, "
-            msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+            msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
             ctx.commit("system/setError", msg, {root: true})
             ctx.commit('setLookingUp', false)
          })

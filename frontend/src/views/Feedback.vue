@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
+import { mapGetters, mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
 export default {
    name: "feedback",
@@ -57,9 +57,8 @@ export default {
       };
    },
    computed: {
-      ...mapState({
-         status: state => state.feedback.status
-      }),
+      ...mapState({ status: "feedback/status" }),
+      ...mapGetters({ singleEmail: "user/singleEmail" }),
       ...mapFields("feedback", [
          "wantedTo", "explanation", "email", "url"
       ])
@@ -119,14 +118,13 @@ export default {
    },
    mounted() {
       this.$store.commit("feedback/clearFeedback")
-      var userId = this.$store.state.user.signedInUser
-      if (userId && this.$store.state.user.sessionType == "netbadge") {
-         this.email = userId + "@virginia.edu"
-      }
       let query = Object.assign({}, this.$route.query)
       // Assign the url in decending usefulness.
       let url = query.url || document.referrer || window.location.origin
       this.$store.commit("feedback/setRelatedURL", url)
+      this.$store.dispatch("user/getAccountInfo").then(()=>
+         this.email = this.singleEmail
+      )
    }
 }
 </script>
