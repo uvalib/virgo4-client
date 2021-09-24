@@ -9,7 +9,7 @@
          </span>
       </div>
       <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">
-         <img aria-label=" " class="trigger" :src="iiifURL(hit)">
+         <img aria-label=" " :src="iiifURL(hit)">
          <div class="metadata-content">
             <div>{{hit.header.title}}</div>
          </div>
@@ -20,7 +20,6 @@
 <script>
 import AddBookmark from '@/components/modals/AddBookmark'
 import SignInRequired from '@/components/modals/SignInRequired'
-import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {
    props: {
@@ -34,9 +33,6 @@ export default {
       detailsURL() {
          return `/sources/${this.pool}/items/${this.hit.identifier}`
       },
-      ...mapState({
-         searching: state => state.searching,
-      }),
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
       }),
@@ -59,67 +55,70 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.img-link {
-   padding:0;
-   background-color: transparent;
-   display: inline-block;
-}
-
-img {
-   max-width: 100%;
-   height: auto;
-   align-self: center;
-   display: block;
-   min-width: 175px;
-   min-height: 175px;
-   background-image: url('~@/assets/dots.gif');
-   background-repeat:no-repeat;
-   background-position: center center;
-}
 .image-container {
    display: grid;
    grid-template-rows: 30px 1fr;
    justify-items: stretch;
    align-items: stretch;
    position: relative;
-   box-shadow:  $v4-box-shadow-light;
    width: fit-content;
-   // border-radius: 0 0 5px 5px;
    box-shadow: $v4-box-shadow-light;
+
+   .toolbar {
+      padding: 5px 8px 5px 8px;
+      text-align: left;
+      background: white;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      z-index: 1;
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      cursor: default;
+
+      .group-cnt {
+         font-size: 0.8em;
+         color: var(--uvalib-text);
+      }
+
+      .buttons {
+         margin-left: auto;
+      }
+   }
+
+   .img-link {
+      padding:0;
+
+      img {
+         max-width: 100%;
+         height: auto;
+         align-self: center;
+         display: block;
+         min-width: 175px;
+         min-height: 175px;
+         background-image: url('~@/assets/dots.gif');
+         background-repeat:no-repeat;
+         background-position: center center;
+      }
+   }
+
+   .metadata-content {
+      padding: 10px;
+      background: white;
+      color: var(--uvalib-text);
+      font-size: 0.9em;
+      font-weight: normal;
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+      border-top: 1px solid var(--uvalib-grey-light);
+   }
 }
+
 .image-container:hover {
    top: -2px;
    box-shadow: $v4-box-shadow;
 }
-.group-cnt {
-   font-size: 0.8em;
-   color: var(--uvalib-text);
-}
-.metadata-content {
-   padding: 10px;
-   background: white;
-   color: var(--uvalib-text);
-   font-size: 0.9em;
-   font-weight: normal;
-   display: inline-block;
-   // border-radius: 0 0 5px 5px;
-   width: 100%;
-   box-sizing: border-box;
-   border-top: 1px solid var(--uvalib-grey-light);
-}
-.toolbar {
-   padding: 5px 8px 5px 8px;
-   text-align: left;
-   background: white;
-   display: flex;
-   flex-flow: row nowrap;
-   justify-content: space-between;
-   align-items: center;
-   height: 100%;
-   z-index: 1;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   .buttons {
-      margin-left: auto;
-   }
-}
+
 </style>
