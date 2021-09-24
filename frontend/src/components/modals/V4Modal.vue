@@ -11,7 +11,12 @@
       <transition name="fade">
          <div class="v4-modal-dimmer" v-if="isOpen">
             <div role="dialog" :aria-labelledby="`${id}-title`" :id="id" class="v4-modal">
-               <div :id="`${id}-title`" class="v4-modal-title">{{title}}</div>
+               <div :id="`${id}-title`" class="v4-modal-title">
+                  <span>{{title}}</span>
+                  <V4Button aria-label="close modal" mode="icon" @click="hide">
+                     <i class="close-icon fal fa-window-close"></i>
+                  </V4Button>
+               </div>
                <div class="v4-modal-content">
                   <slot name="content"></slot>
                </div>
@@ -140,6 +145,9 @@ div.v4-modal {
       border-radius: 5px 5px 0 0;
       border-bottom: 2px solid  var(--uvalib-blue-alt);
       text-align: left;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
    }
    div.v4-modal-controls {
       padding: 10px;

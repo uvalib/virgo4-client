@@ -9,6 +9,9 @@
          >
             <div class="bar">
                <span tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">{{message.title}}</span>
+               <V4Button aria-label="close message" mode="icon" class="remove" @click="dismiss">
+                  <i class="close-icon fal fa-window-close"></i>
+               </V4Button>
             </div>
             <div class="message-body" id="msgbody" v-html="message.content"></div>
             <div class="details" v-if="message.detail">

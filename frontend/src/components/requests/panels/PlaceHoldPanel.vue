@@ -137,6 +137,13 @@ div.place-hold {
    align-items: center;
    align-content: space-around;
 
+   h2 {
+      margin: 5px 0 10px 0 !important;
+      background: white !important;
+      border: 0 !important;
+      padding: 0px !important;
+   }
+
    @media only screen and (max-width: 768px) {
       align-items: flex-start;
    }

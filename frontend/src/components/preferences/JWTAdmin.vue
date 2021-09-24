@@ -1,10 +1,12 @@
 <template>
   <div v-if="isDevServer && isAdmin" class="jwt-admin">
     <h2>Admin JWT Token Management</h2>
-    <p>Modify your jwt token. This could break your session and you may have to log in again.</p>
-    <div class="form">
-      <textarea aria-label="modify your jwt token" v-model="parsedJWT" rows="20" cols="40"></textarea>
-      <V4Button mode='primary' @click="update">Update</V4Button>
+    <div class="content">
+      <p>Modify your jwt token. This could break your session and you may have to log in again.</p>
+      <div class="form">
+        <textarea aria-label="modify your jwt token" v-model="parsedJWT" rows="20" cols="40"></textarea>
+        <V4Button mode='primary' @click="update">Update</V4Button>
+      </div>
     </div>
   </div>
 </template>
@@ -34,7 +36,14 @@ export default {
 .jwt-admin {
    border: 1px solid  var(--uvalib-red-emergency);
    h2 {
-       margin:5px 0 10px 0;
+      margin: 0;
+      padding: 10px 15px;
+      background: var(--uvalib-grey-lightest);
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      font-size: 1.2em;
+   }
+   .content {
+     padding: 5px 20px 20px 20px;
    }
    p {
       background: var(--uvalib-red-lightest);
@@ -46,6 +55,11 @@ export default {
       display: flex;
       justify-content: space-evenly;
       align-items: center;
+      textarea {
+        border:1px solid var(--uvalib-grey-light);
+        padding: 20px;
+        border-radius: 5px;
+      }
    }
 }
 </style>

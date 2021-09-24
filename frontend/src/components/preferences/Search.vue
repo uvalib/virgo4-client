@@ -32,16 +32,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h2 {
+   margin: 0;
+   padding: 10px 15px;
+   background: var(--uvalib-grey-lightest);
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   font-size: 1.2em;
+}
 .grouping {
+   padding: 5px 20px 20px 20px;
    .choice {
       margin: 5px 10px;
       width: 15px;
       height: 15px;
-   }
-}
-.pool-options {
-   h2 {
-      margin: 5px 0 10px 0;
    }
 }
 div.toggle {

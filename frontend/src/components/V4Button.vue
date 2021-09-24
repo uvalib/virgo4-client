@@ -95,8 +95,17 @@ button.v4-button.icon-button {
    padding:2px;
    margin:0;
    outline: none;
+   cursor: pointer;
    &:focus {
       @include be-accessible();
+   }
+
+   :deep(.close-icon) {
+      font-size: 20px;
+      color: var(--uvalib-blue-alt-darkest);
+      &:hover {
+         color: var(--uvalib-blue-alt);
+      }
    }
 }
 .link-button {
