@@ -4,9 +4,13 @@
          <V4Spinner message="Searching for digital content..." />
       </div>
       <div class="items" v-if="hasDigitalContent || googleBooksURL || hasExternalImages">
-         <h2>View Online</h2>
+         <h2 class="buttons">
+            <span>View Online</span>
+            <V4Button mode="primary" class="small" @click="toggleFullView">View Full Screen</V4Button>
+         </h2>
          <div class="viewer" v-if="hasDigitalContent">
-            <iframe :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
+            <div v-if="fsView" class="restore-view"><V4Button mode="primary" class="small" @click="toggleFullView">Restore View</V4Button></div>
+            <iframe :class="{full: fsView}" :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
@@ -98,7 +102,8 @@ export default {
       return {
          selectedDigitalObjectIdx: 0,
          pdfTimerID: -1,
-         ocrTimerID: -1
+         ocrTimerID: -1,
+         fsView: false
       }
    },
    watch: {
@@ -171,6 +176,9 @@ export default {
       }
    },
    methods: {
+      toggleFullView() {
+         this.fsView = !this.fsView
+      },
       imageURL(size) {
          let iiifField = this.details.detailFields.find( f => f.name=="iiif_image_url")
          if (!iiifField) return ""
@@ -289,6 +297,20 @@ export default {
 
    div.viewer {
       margin-bottom: 25px;
+      iframe.full {
+         position: fixed;
+         width: 100%;
+         top: 40px;
+         height: 100%;
+         left: 0;
+         z-index: 10000;
+      }
+      .restore-view {
+         position: fixed;
+          z-index: 20000;
+          right: 10px;
+          top: 100px;
+      }
    }
 
    .google {
@@ -308,6 +330,20 @@ export default {
 
    div.items {
       margin: 25px 0 0 0;
+      h2.buttons {
+
+         span {
+            display: block;
+         }
+         button.v4-button.small {
+            border-radius: .25rem;
+            font-size: .85rem;
+            padding: .5rem 1rem;
+            display: block;
+            margin: 10px auto 0 auto;
+         }
+      }
+
       .download-card.current {
          border: 3px solid var(--uvalib-brand-blue-light);
       }
