@@ -9,7 +9,9 @@
          >
             <div class="bar">
                <span tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">{{message.title}}</span>
-               <V4Button aria-label="close message" mode="icon" class="remove" @click="dismiss">
+               <V4Button aria-label="close message" mode="icon" class="remove" @click="dismiss"
+                   :focusBackOverride="true" @tabback="closeIconTabBack"
+                  id="v4-msg-close-icon">
                   <i class="close-icon fal fa-window-close"></i>
                </V4Button>
             </div>
@@ -54,8 +56,11 @@ export default {
       btnTabNext() {
          this.setFocus("msgtitle", 1)
       },
-      btnTabBack() {
+      closeIconTabBack() {
          this.setFocus("msgtitle", 1)
+      },
+      btnTabBack() {
+         this.setFocus("v4-msg-close-icon", 1)
       },
       shiftTab() {
          this.setFocus("okbtn", 1)

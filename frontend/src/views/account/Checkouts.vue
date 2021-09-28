@@ -391,7 +391,6 @@ v4-button.renew {
    flex-wrap: wrap;
    width: 100%;
    padding: 10px 0 0 0;
-   background-color: var(--uvalib-grey-lightest);
    border-bottom: 20px solid var(--uvalib-brand-blue);
 
    .v4-button.pure-button {

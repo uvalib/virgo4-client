@@ -1,6 +1,6 @@
 <template>
 <V4Modal :id="id" title="Add Bookmark" ref="addbmmodal"
-      firstFocusID="folder" :buttonID="`${id}-btn`" @opened="opened" >
+      firstFocusID="folder" lastFocusID="addbookmark-ok" :buttonID="`${id}-btn`" @opened="opened" >
       <template v-slot:button>
          <BookmarkButton :data="data" @clicked="bookmarkButtonClicked()" :id="`${id}-btn`" />
       </template>
@@ -86,14 +86,10 @@ export default {
          document.getElementById("new-folder").focus()
       },
       shiftTabSelect() {
-         document.getElementById("addbookmark-ok").focus()
+         this.$refs.addbmmodal.firstFocusBackTabbed()
       },
       okAddTab() {
-         if ( this.showAdd ) {
-            document.getElementById("new-folder").focus()
-         } else {
-            document.getElementById("folder").focus()
-         }
+         this.$refs.addbmmodal.lastFocusTabbed()
       },
       addFolder() {
          this.showAdd = true

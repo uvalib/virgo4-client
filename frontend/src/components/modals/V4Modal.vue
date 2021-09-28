@@ -10,10 +10,13 @@
       <slot name="button"></slot>
       <transition name="fade">
          <div class="v4-modal-dimmer" v-if="isOpen">
-            <div role="dialog" :aria-labelledby="`${id}-title`" :id="id" class="v4-modal">
+            <div role="dialog" :aria-labelledby="`${id}-title`" :id="id" class="v4-modal" @keydown.esc="hide">
                <div :id="`${id}-title`" class="v4-modal-title">
                   <span>{{title}}</span>
-                  <V4Button aria-label="close modal" mode="icon" @click="hide">
+                  <V4Button aria-label="close modal" mode="icon" @click="hide" :id="`${id}-close-icon`"
+                     :focusBackOverride="true" @tabback="closeIconBackTabbed"
+                     :focusNextOverride="true" @tabnext="closeIconTabbed"
+                  >
                      <i class="close-icon fal fa-window-close"></i>
                   </V4Button>
                </div>
@@ -23,8 +26,7 @@
                <div class="v4-modal-controls">
                   <slot v-if="hasControlSlot()" name="controls"></slot>
                   <V4Button v-else mode="tertiary" :id="`${id}-close`" class="close" @click="hide"
-                     :focusNextOverride="true" @tabnext="lastFocusTabbed"
-                     :focusBackOverride="true" @tabback="lastFocusTabbed" >
+                     :focusNextOverride="true" @tabnext="lastFocusTabbed" >
                         Close
                   </V4Button>
                </div>
@@ -84,23 +86,37 @@ export default {
          return this.$slots['controls']
       },
       lastFocusTabbed() {
+         let tgt = this.id+"-close-icon"
+         this.setFocus(tgt)
+      },
+      closeIconTabbed() {
          let tgt = this.firstFocusID
          if (tgt == "") {
-            tgt = this.id+"-close"
+            tgt = this.id+"-close-icon"
+         }
+         this.setFocus(tgt)
+      },
+      closeIconBackTabbed() {
+         let tgt = this.lastFocusID
+         if (tgt == "") {
+            tgt = this.id+"-close-icon"
          }
          this.setFocus(tgt)
       },
       firstFocusBackTabbed() {
-         let tgt = this.lastFocusID
-         if (tgt == "") {
-            tgt = this.id+"-close"
-         }
+         let tgt = this.id+"-close-icon"
          this.setFocus(tgt)
       },
       setFocus(id) {
          let ele = document.getElementById(id)
          if (ele ) {
             ele.focus()
+         } else {
+            let tgt = this.id+"-close"
+            ele = document.getElementById(tgt)
+            if (ele) {
+               ele.focus()
+            }
          }
       },
    },

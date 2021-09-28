@@ -1,6 +1,8 @@
 <template>
    <V4Modal :id="id" title="Rename Bookmark Folder" ref="renamemodal"
-      firstFocusID="rename" :buttonID="`${id}-open`" @opened="opened" >
+      firstFocusID="rename" lastFocusID="rename-ok"
+      @opened="opened" :buttonID="`${id}-open`"
+   >
       <template v-slot:button>
          <V4Button mode="icon" @click="$refs.renamemodal.show()" :id="`${id}-open`"
              :aria-label="`rename bookmark folder ${folderInfo.folder}`"

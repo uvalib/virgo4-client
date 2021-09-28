@@ -1,5 +1,5 @@
 <template>
-   <V4Modal :id="id" :title="title" ref="citationsdlg" :buttonID="`${id}-open`" @opened="opened">
+   <V4Modal :id="id" :title="title" ref="citationsdlg" :buttonID="`${id}-open`" @opened="opened" :lastFocusID="`${id}-dismissbtn`" >
       <template v-slot:button>
          <V4Button v-if="buttonLabel" :mode="buttonMode" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
             class="citations-text-button" :class="{toolbar: toolbarButton}"
@@ -209,11 +209,11 @@ export default {
          btn.focus()
       },
       nextTabClose() {
-         this.setInitialFocus()
+        this.$refs.citationsdlg.lastFocusTabbed()
       },
       backTabCitation( idx ) {
          if ( idx == 0 ) {
-            document.getElementById(`${this.id}-dismissbtn`).focus()
+            this.$refs.citationsdlg.lastFocusTabbed()
          } else {
             idx--
             let btn = document.getElementById(`citation-tab${idx}`)

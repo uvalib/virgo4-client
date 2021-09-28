@@ -1,5 +1,6 @@
 <template>
    <button tabindex="0" :role="role" class="v4-button"
+      @keydown.esc="escClicked"
       @keydown.exact.tab="tabNext"
       @keydown.shift.tab="tabBack"
       :class="{'text-button': mode=='text', 'icon-button': mode=='icon',
@@ -8,7 +9,7 @@
                'pure-button-primary': mode == 'primary',
                'pure-button-small': mode == 'small',
                'pure-button-tertiary': mode == 'tertiary'}"
-      @click.prevent.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked" @keyup.stop.esc="escClicked">
+      @click.prevent.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <slot></slot>
    </button>
 </template>

@@ -363,7 +363,6 @@ export default createStore({
       },
 
       resetSearchResults(state) {
-         console.log("RESET RESULTS")
          state.results.splice(0, state.results.length)
          state.total = -1
          state.lastSearchScrollPosition = 0
