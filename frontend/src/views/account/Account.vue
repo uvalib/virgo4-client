@@ -157,7 +157,7 @@
             </div>
          </div>
 
-         <div class="account-group">
+         <div class="account-group" v-if="canUseLEO">
             <h2>ILLiad</h2>
             <dl v-if="info.leoAddress">
                <dt>LEO Delivery Location:</dt>
@@ -218,6 +218,7 @@ export default {
          itemsWithFines: 'user/itemsWithFines',
          canChangePassword: 'user/canChangePassword',
          useSIS:  'user/useSIS',
+         canUseLEO: 'user/canUseLEO',
          isSignedIn: 'user/isSignedIn',
       }),
       isBillOwed() {
