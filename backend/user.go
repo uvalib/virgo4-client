@@ -553,10 +553,7 @@ func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 	if len(parsedEmails) > 1 {
 		cc = strings.Join(parsedEmails[1:], ",")
 	}
-	from := req.NewContact.Email
-	if from == "" {
-		from = svc.SMTP.Sender
-	}
+
 	eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, CC: cc, ReplyTo: parsedEmails[0], From: svc.SMTP.Sender, Body: renderedEmail.String()}
 	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
