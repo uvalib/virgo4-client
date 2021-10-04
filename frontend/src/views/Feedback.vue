@@ -57,7 +57,9 @@ export default {
       };
    },
    computed: {
-      ...mapState({ status: "feedback/status" }),
+      ...mapState({
+         status : state => state.feedback.status,
+      }),
       ...mapGetters({ singleEmail: "user/singleEmail" }),
       ...mapFields("feedback", [
          "wantedTo", "explanation", "email", "url"
