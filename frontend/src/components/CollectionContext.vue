@@ -56,6 +56,7 @@ export default {
       .thumb {
          width: 100px;
          margin-right: 15px;
+         box-shadow: $v4-box-shadow-light;
       }
       .desc {
          margin-right: 25px;

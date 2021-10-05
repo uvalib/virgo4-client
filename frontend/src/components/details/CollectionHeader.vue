@@ -37,7 +37,7 @@
             </select>
          </div>
 
-         <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
+         <V4Button v-if="lastSearchURL && viewMode=='reader'" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
       </div>
    </section>
 </template>
@@ -135,6 +135,7 @@ export default {
    .thumb {
       display: inline-block;
       max-height:200px;
+      box-shadow: $v4-box-shadow-light;
    }
    .content {
       display: inline-block;
