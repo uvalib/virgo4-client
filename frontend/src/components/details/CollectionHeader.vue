@@ -1,7 +1,15 @@
 <template>
-   <section class="collection-header" v-if="isFullPage">
-      <div class="top-row" >
-         <span class="collection-title">{{collection.title}}</span>
+   <section class="collection-header">
+      <div class="image">
+         <img v-if="collection.images.length > 0" class="thumb" :src="collection.images[0].url" :alt="collection.images[0].alt_text"/>
+      </div>
+
+      <div class="content">
+         <div class="title-row">{{collection.title}}</div>
+         <div class="desc-row">{{collection.description}}</div>
+      </div>
+
+      <div class="actions">
          <span class="seq-nav" v-if="canNavigate">
             <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
@@ -11,39 +19,17 @@
                Next {{collection.itemLabel}}<i class="next fal fa-arrow-right"></i>
             </V4Button>
          </span>
-      </div>
-      <div class="mid-row">
-         <AboutCollection :details="collection.description" />
+
+         <div class="collection-search" v-if="canSearch">
+            <input autocomplete="off" type="text" id="search"
+               @keyup.enter="searchClicked"
+               v-model="basic"
+               placeholder="Search this collection"
+            >
+            <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
+         </div>
+
          <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
-      </div>
-      <div class="collection-search" v-if="canSearch">
-         <input autocomplete="off" type="text" id="search"
-            @keyup.enter="searchClicked"
-            v-model="basic"
-            placeholder="Search this collection"
-         >
-         <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
-      </div>
-   </section>
-   <section class="collection-header border" v-else>
-      <div class="image">
-         <img v-if="collection.images.length > 0" class="thumb" :src="collection.images[0].url" :alt="collection.images[0].alt_text"/>
-      </div>
-      <div class="content">
-         <div class="title-row">
-            <span class="collection-title">{{collection.title}}</span>
-            <div class="collection-search" v-if="canSearch">
-               <input autocomplete="off" type="text" id="search"
-                  @keyup.enter="searchClicked"
-                  v-model="basic"
-                  placeholder="Search this collection"
-               >
-               <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
-            </div>
-         </div>
-         <div class="desc-row">
-            {{collection.description}}
-         </div>
       </div>
    </section>
 </template>
@@ -51,11 +37,10 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import AboutCollection from "@/components/disclosures/AboutCollection"
 import CollectionDates from "@/components/modals/CollectionDates"
 export default {
    components: {
-      AboutCollection, CollectionDates
+      CollectionDates
    },
    data: function() {
       return {
@@ -128,14 +113,15 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.collection-header.border {
-   border-top: 1px solid var(--uvalib-grey-light);
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   margin-bottom: 15px;
-   padding-top:15px;
+.collection-header {
+   background-color: white;
+   padding: 15px 20px;
    display: flex;
    flex-flow: row wrap;
    justify-content: center;
+   border-top: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   margin-bottom: 15px;
 
    .thumb {
       display: inline-block;
@@ -146,55 +132,42 @@ export default {
       flex: 1;
       text-align: left;
       padding: 10px 0px 10px 20px;
-   }
-}
-.collection-header {
-   background-color: white;
-   padding: 15px;
-   .top-row, .title-row  {
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: space-between;
-      margin: 10px 0;
-      align-items: center;
-   }
-   .title-row  {
-      margin: 0;
-      justify-content: flex-start;
-      .collection-title {
-         margin-bottom: 10px;
+
+      .title-row  {
+         margin: 10px 0;
          font-weight: bold;
          color: var(--uvalib-text);
+         font-size: 1.25em;
       }
-      .collection-search {
-         margin: 0 0 10px auto;
-         font-size: 0.9em;
-         .search {
-            padding: 0 20px;
-         }
+
+      .desc-row {
+         text-align: left;
+         padding: 20px 0 0 0px;
+         display: inline-block;
+         min-width: 300px;
+         margin-bottom: 15px;
       }
    }
-   .desc-row {
-      text-align: left;
-      padding: 20px 20px 0 0px;
-      display: inline-block;
-   }
-   .mid-row {
+
+   .actions {
       display: flex;
-      flex-flow: row wrap;
+      flex-direction: column;
       justify-content: flex-start;
-      align-items: center;
+      align-items: flex-end;
+
       .back {
-         margin-left: auto;
+         margin-top: 5px;
       }
    }
+
    .collection-search {
       display: flex;
       flex-flow: row nowrap;
       align-items: stretch;
       justify-content: flex-start;
-      max-width: 800px;
-      margin: 20px auto 0 auto;
+      margin: 0 0 10px auto;
+      font-size: 0.9em;
+      min-width: 300px;
 
       input[type=text] {
          font-size: 1.15em;
@@ -206,19 +179,19 @@ export default {
          flex: 1 1 auto;
          min-width: 100px;
       }
+
       .search {
          border-radius: 0 5px 5px 0;
          margin: 0;
-         padding: 0 40px;
+         padding: 0 20px;
       }
    }
 
-   .collection-title {
-      font-size: 1.25em;
-   }
    .seq-nav {
       display: flex;
       flex-flow: row nowrap;
+      margin: 0px auto 10px 0;
+      justify-content: flex-end;
       .v4-button.pager {
          margin: 0 0 0 5px;
          i.next {
