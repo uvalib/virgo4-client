@@ -26,19 +26,24 @@
       </div>
    </section>
    <section class="collection-header border" v-else>
-      <div class="title-row">
-         <span class="collection-title">{{collection.title}}</span>
-         <div class="collection-search" v-if="canSearch">
-            <input autocomplete="off" type="text" id="search"
-               @keyup.enter="searchClicked"
-               v-model="basic"
-               placeholder="Search this collection"
-            >
-            <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
-         </div>
+      <div class="image">
+         <img v-if="collection.images.length > 0" class="thumb" :src="collection.images[0].url" :alt="collection.images[0].alt_text"/>
       </div>
-      <div class="desc-row">
-         {{collection.description}}
+      <div class="content">
+         <div class="title-row">
+            <span class="collection-title">{{collection.title}}</span>
+            <div class="collection-search" v-if="canSearch">
+               <input autocomplete="off" type="text" id="search"
+                  @keyup.enter="searchClicked"
+                  v-model="basic"
+                  placeholder="Search this collection"
+               >
+               <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
+            </div>
+         </div>
+         <div class="desc-row">
+            {{collection.description}}
+         </div>
       </div>
    </section>
 </template>
@@ -124,8 +129,24 @@ export default {
 </script>
 <style lang="scss" scoped>
 .collection-header.border {
-   border-bottom: 1px solid var(--uvalib-grey);
+   border-top: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid var(--uvalib-grey-light);
    margin-bottom: 15px;
+   padding-top:15px;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: center;
+
+   .thumb {
+      display: inline-block;
+      max-height:200px;
+   }
+   .content {
+      display: inline-block;
+      flex: 1;
+      text-align: left;
+      padding: 10px 0px 10px 20px;
+   }
 }
 .collection-header {
    background-color: white;
@@ -142,6 +163,8 @@ export default {
       justify-content: flex-start;
       .collection-title {
          margin-bottom: 10px;
+         font-weight: bold;
+         color: var(--uvalib-text);
       }
       .collection-search {
          margin: 0 0 10px auto;
@@ -153,7 +176,8 @@ export default {
    }
    .desc-row {
       text-align: left;
-      padding: 10px 20px 0 20px;
+      padding: 20px 20px 0 0px;
+      display: inline-block;
    }
    .mid-row {
       display: flex;

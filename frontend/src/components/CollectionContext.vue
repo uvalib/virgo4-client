@@ -4,7 +4,7 @@
          <span class="title">Collections</span>
       </div>
       <div class="collect-rec">
-         <img v-if="collection.images.length > 0" class="thumb" :src="collection.images[0].url"/>
+         <img v-if="collection.images.length > 0" class="thumb" :src="collection.images[0].url" :alt="collection.images[0].alt_text"/>
          <span class="text">
             <p class="collection">{{collection.title}}</p>
             <span class="desc" v-html="collection.description"></span>
