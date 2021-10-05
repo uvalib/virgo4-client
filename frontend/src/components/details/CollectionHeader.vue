@@ -1,6 +1,6 @@
 <template>
-   <section class="collection-header">
-      <div class="top-row">
+   <section class="collection-header" v-if="isFullPage">
+      <div class="top-row" >
          <span class="collection-title">{{collection.title}}</span>
          <span class="seq-nav" v-if="canNavigate">
             <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
@@ -16,13 +16,29 @@
          <AboutCollection :details="collection.description" />
          <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
       </div>
-      <div class="collection-search">
+      <div class="collection-search" v-if="canSearch">
          <input autocomplete="off" type="text" id="search"
             @keyup.enter="searchClicked"
             v-model="basic"
             placeholder="Search this collection"
          >
          <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
+      </div>
+   </section>
+   <section class="collection-header border" v-else>
+      <div class="title-row">
+         <span class="collection-title">{{collection.title}}</span>
+         <div class="collection-search" v-if="canSearch">
+            <input autocomplete="off" type="text" id="search"
+               @keyup.enter="searchClicked"
+               v-model="basic"
+               placeholder="Search this collection"
+            >
+            <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
+         </div>
+      </div>
+      <div class="desc-row">
+         {{collection.description}}
       </div>
    </section>
 </template>
@@ -49,9 +65,11 @@ export default {
       }),
       ...mapGetters({
          canNavigate: 'collection/canNavigate',
+         canSearch: 'collection/canSearch',
          rawQueryString: 'query/string',
          filtersQueryParam: 'filters/asQueryParam',
          hasCalendar: 'collection/hasCalendar',
+         isFullPage: 'collection/isFullPage',
       }),
       ...mapFields({
          userSearched: 'query.userSearched',
@@ -105,15 +123,37 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.collection-header.border {
+   border-bottom: 1px solid var(--uvalib-grey);
+   margin-bottom: 15px;
+}
 .collection-header {
    background-color: white;
    padding: 15px;
-   .top-row {
+   .top-row, .title-row  {
       display: flex;
       flex-flow: row wrap;
       justify-content: space-between;
       margin: 10px 0;
       align-items: center;
+   }
+   .title-row  {
+      margin: 0;
+      justify-content: flex-start;
+      .collection-title {
+         margin-bottom: 10px;
+      }
+      .collection-search {
+         margin: 0 0 10px auto;
+         font-size: 0.9em;
+         .search {
+            padding: 0 20px;
+         }
+      }
+   }
+   .desc-row {
+      text-align: left;
+      padding: 10px 20px 0 20px;
    }
    .mid-row {
       display: flex;
@@ -151,10 +191,6 @@ export default {
 
    .collection-title {
       font-size: 1.25em;
-      display:flex;
-      flex-flow: row nowrap;
-      align-items: flex-start;
-      justify-content: flex-start;
    }
    .seq-nav {
       display: flex;

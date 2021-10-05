@@ -1,6 +1,5 @@
 <template>
    <div class="full-page-collection-view">
-      <CollectionHeader />
        <div class="working" v-if="loadingDigitalContent">
          <V4Spinner message="Loading digital content..." />
       </div>
@@ -17,14 +16,13 @@
 </template>
 
 <script>
-import CollectionHeader from "@/components/details/CollectionHeader"
 import SearchHitActions from '@/components/SearchHitActions'
 import { mapState, mapGetters } from "vuex"
 
 export default {
    name: "fullscreen-collection-view",
    components: {
-      CollectionHeader, SearchHitActions
+      SearchHitActions
    },
    computed: {
       ...mapState({

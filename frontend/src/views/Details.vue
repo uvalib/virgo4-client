@@ -4,7 +4,8 @@
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <FullPageCollectionView v-if="isCollection && isFullPage && isDevServer" />
+         <CollectionHeader v-if="isCollection && isDevServer"/>
+         <FullPageCollectionView v-if="isFullPage && isCollection && isDevServer" />
          <ItemView v-else />
       </template>
    </div>
@@ -13,6 +14,7 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import ItemView from "@/components/details/ItemView"
+import CollectionHeader from "@/components/details/CollectionHeader"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView"
 
 export default {
@@ -23,7 +25,7 @@ export default {
       this.getDetails(to.params.src, to.params.id, to.query.mode)
    },
    components: {
-      ItemView, FullPageCollectionView
+      ItemView, CollectionHeader, FullPageCollectionView
    },
    computed: {
       ...mapState({
