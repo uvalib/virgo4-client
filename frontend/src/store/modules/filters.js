@@ -311,8 +311,8 @@ const filters = {
          })
       },
       // Get all facets for the selected result set / query / pool
-      // This is called from 3 different places: when all pools are search, when a specifi pool
-      // is search and when a new pool is selected. The first 2 should ALWAYS request new facets
+      // This is called from 3 different places: when all pools are searched, when a specific pool
+      // is searched and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
       getSelectedResultFacets(ctx, paramsChanged) {
          let resultsIdx = ctx.rootState.selectedResultsIdx
@@ -337,6 +337,19 @@ const filters = {
             }
          }
 
+         // this lets a SINGLE collection context show up at the top of the search results
+         ctx.commit("collection/clearCollectionDetails", null, { root: true })
+         let done = false
+         let tgtFilters = ["FilterDigitalCollection", "FilterBookplate"]
+         tgtFilters.some( facet => {
+            let fitters = filterObj.facets.filter( f=>f.facet_id == facet)
+            if (fitters.length == 1) {
+               this.dispatch("collection/getCollectionContext", fitters[0].value, {root: true})
+               done = true
+            }
+            return done == true
+         })
+
          // Recreate the query for the target pool, but include a request for ALL facet info
          let req = {
             query: ctx.rootGetters['query/string'],
@@ -358,10 +371,6 @@ const filters = {
             }
             ctx.commit("setPoolFacets", {pool: pool.id, facets: facets})
             ctx.commit('setUpdatingFacets', false)
-            let f = filterObj.facets.filter( f=>f.facet_id == "FilterDigitalCollection")
-            if (f.length == 1) {
-               this.dispatch("collection/getCollectionContext", {collection: f[0].value}, {root: true})
-            }
          }).catch((error) => {
             if (error.response && error.response.status == 501) {
                ctx.commit("setPoolFacets", {pool: pool.id, facets: false})

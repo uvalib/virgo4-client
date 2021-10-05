@@ -22,8 +22,18 @@ const item = {
       isDigitalCollection: state => {
          return state.details.detailFields.findIndex( f=> f.name == 'digital_collection') > -1
       },
-      collectionName: state => {
+      digitalCollectionName: state => {
          let field = state.details.detailFields.find( f=> f.name == 'digital_collection')
+         if (field) {
+            return field.value
+         }
+         return ""
+      },
+      isCollection: state => {
+         return state.details.detailFields.findIndex( f=> f.name == 'collection_context') > -1
+      },
+      collectionName: state => {
+         let field = state.details.detailFields.find( f=> f.name == 'collection_context')
          if (field) {
             return field.value
          }

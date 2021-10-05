@@ -1,19 +1,19 @@
 <template>
    <section class="collection-header">
       <div class="top-row">
-         <span class="collection-title">{{collectionName}}</span>
+         <span class="collection-title">{{collection.title}}</span>
          <span class="seq-nav" v-if="canNavigate">
-            <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${itemLabel}`">
-               <i class="prior fal fa-arrow-left"></i>Previous {{itemLabel}}
+            <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
+               <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
             </V4Button>
-            <CollectionDates id="coll-dates" :date="publishedDate" @picked="datePicked" />
-            <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${itemLabel}`">
-               Next {{itemLabel}}<i class="next fal fa-arrow-right"></i>
+            <CollectionDates v-if="hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
+            <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${collection.itemLabel}`">
+               Next {{collection.itemLabel}}<i class="next fal fa-arrow-right"></i>
             </V4Button>
          </span>
       </div>
       <div class="mid-row">
-         <AboutCollection :details="description" />
+         <AboutCollection :details="collection.description" />
          <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
       </div>
       <div class="collection-search">
@@ -43,17 +43,15 @@ export default {
    },
    computed: {
       ...mapState({
-         itemLabel: state=>state.collection.itemLabel,
          lastSearchURL: state => state.lastSearchURL,
          details : state => state.item.details,
-         description : state => state.collection.description,
-         collectionFacet : state => state.collection.filter,
+         collection : state => state.collection,
       }),
       ...mapGetters({
          canNavigate: 'collection/canNavigate',
-         collectionName: 'item/collectionName',
          rawQueryString: 'query/string',
          filtersQueryParam: 'filters/asQueryParam',
+         hasCalendar: 'collection/hasCalendar',
       }),
       ...mapFields({
          userSearched: 'query.userSearched',
@@ -74,7 +72,7 @@ export default {
       searchClicked() {
          // Set up the search in the store and flag it is user generated
          this.$store.commit("filters/reset")
-         let data = {pool: "presearch", facetID: this.collectionFacet.name, value: this.collectionFacet.value}
+         let data = {pool: "presearch", facetID: this.collection.filter, value: this.collection.title}
          this.$store.commit("filters/toggleFilter", data)
          this.$store.commit("query/setTargetPool", this.details.source)
          this.userSearched = true

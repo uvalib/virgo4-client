@@ -4,7 +4,7 @@
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <FullPageCollectionView v-if="isDigitalCollection && isFullPage && hasDigitalContent && isDevServer" />
+         <FullPageCollectionView v-if="isCollection && isFullPage && isDevServer" />
          <ItemView v-else />
       </template>
    </div>
@@ -36,10 +36,11 @@ export default {
       ...mapGetters({
          isDevServer: 'system/isDevServer',
          isDigitalCollection: 'item/isDigitalCollection',
+         digitalCollectionName: 'item/digitalCollectionName',
+         isCollection: 'item/isCollection',
          collectionName: 'item/collectionName',
-         hasCollectionContext : 'collection/isAvailable',
          isFullPage: 'collection/isFullPage',
-         hasDigitalContent: 'item/hasDigitalContent',
+         hasCalendar: 'collection/hasCalendar',
       }),
    },
    methods: {
@@ -83,14 +84,22 @@ export default {
          this.$analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
 
          if (this.isDigitalCollection) {
+            this.$analytics.trigger('Results', 'DIGITAL_COLLECTION_ITEM_VIEWED', this.digitalCollectionName )
+         }
+         if (this.isCollection) {
             this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', this.collectionName )
-            if ( this.isDevServer ) {
+         }
+
+         if ( this.isDevServer && this.isCollection) {
+            let name = this.collectionName
+            if (!name) {
+               name = this.digitalCollectionName
+            }
+            await this.$store.dispatch("collection/getCollectionContext", name )
+            if ( this.hasCalendar) {
                let dateField = this.details.detailFields.find( f => f.name == "published_date")
                if (dateField) {
-                  this.$store.dispatch("collection/getCollectionContext",
-                     {collection: this.collectionName, date: dateField.value} )
-               } else {
-                  console.error("Collection with no publication date. Skipping.")
+                  this.$store.dispatch("collection/getPublishedDates", dateField.value)
                }
             }
          }

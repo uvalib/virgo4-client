@@ -4,8 +4,8 @@ const collection = {
    namespaced: true,
    state: {
       lookingUp: false,
-      features: [],
       id: "",
+      title: "",
       description: "",
       itemLabel: "Issue",
       startDate: "",
@@ -14,10 +14,9 @@ const collection = {
       currentYear: "",
       notPublishedDates: [],
       yearPublications: [],
-      filter: {
-         name: "",
-         value: ""
-      }
+      filter: "",
+      features: [],
+      images: []
    },
 
    getters: {
@@ -90,11 +89,13 @@ const collection = {
       clearCollectionDetails(state) {
          state.id = ""
          state.features.splice(0, state.features.length)
+         state.images.splice(0, state.images.length)
+         state.title = ""
          state.description  = ""
          state.itemLabel = "Issue"
          state.startDate = ""
          state.endDate = ""
-         state.filter = {name: "", value: ""}
+         state.filter = ""
          state.selectedDate = ""
          state.currentMonth = ""
          state.currentYear = ""
@@ -103,11 +104,14 @@ const collection = {
          state.id = data.id
          state.features.splice(0, state.features.length)
          data.features.forEach( f=> state.features.push(f) )
+         state.images.splice(0, state.images.length)
+         data.images.forEach( f=> state.images.push(f) )
+         state.title  = data.title
          state.description  = data.description
-         state.itemLabel = data.items_label
+         state.itemLabel = data.item_label
          state.startDate = data.start_date
          state.endDate = data.end_date
-         state.filter = {name: data.filter, value: data.filter_value}
+         state.filter = data.filter_name
       },
       setYearlyPublications(state, {year, dates}) {
          let newYear = {year: year, dates: dates}
@@ -124,28 +128,19 @@ const collection = {
       }
    },
    actions: {
-      async getCollectionContext(ctx, {collection, date}) {
+      async getCollectionContext(ctx, collection) {
          ctx.commit("setLookingUp", true)
          ctx.commit("clearCollectionDetails")
 
-         let url = `${ctx.rootState.system.collectionsURL}/collections/${collection}`
-         await axios.get(url).then((response) => {
+         let url = `${ctx.rootState.system.collectionsURL}/lookup?q=${collection}`
+         return axios.get(url).then((response) => {
             ctx.commit("setCollectionDetails", response.data)
-            let startDate = date
-            if ( !startDate) {
-               startDate = ctx.state.startDate
-               console.log("date not set, using start date: "+startDate)
-            }
-            let year = startDate.split("-")[0]
-            ctx.dispatch("getPublishedDates", year)
-            ctx.commit("setSelectedDate", startDate)
          }).finally( ()=> {
             ctx.commit("setLookingUp", false)
          })
       },
       async getPublishedDates(ctx, year) {
-         let cname = ctx.state.filter.value
-         let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/dates?year=${year}`
+         let url = `${ctx.rootState.system.collectionsURL}/collections/${ctx.state.id}/dates?year=${year}`
          axios.get(url).then((response) => {
             ctx.commit("setYearlyPublications", {year: year, dates: response.data})
             ctx.commit("updateNotPublishedDates")
@@ -153,8 +148,7 @@ const collection = {
       },
       async nextItem(ctx, currDate) {
          ctx.commit("setLookingUp", true)
-         let cname = ctx.state.filter.value
-         let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/next`
+         let url = `${ctx.rootState.system.collectionsURL}/collections/${ctx.state.id}/items/${currDate}/next`
          await axios.get(url).then((response) => {
             this.router.push(response.data)
          }).finally( ()=> {
@@ -163,8 +157,7 @@ const collection = {
       },
       async priorItem(ctx, currDate) {
          ctx.commit("setLookingUp", true)
-         let cname = ctx.state.filter.value
-         let url = `${ctx.rootState.system.collectionsURL}/collections/${cname}/items/${currDate}/previous`
+         let url = `${ctx.rootState.system.collectionsURL}/collections/${ctx.state.id}/items/${currDate}/previous`
          await axios.get(url).then((response) => {
             this.router.push(response.data)
          }).finally( ()=> {

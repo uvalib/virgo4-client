@@ -10,6 +10,7 @@
              <img v-else class ="logo" :src="poolLogo(selectedResults.pool.id)">
          </div>
          <SearchFilters />
+         <CollectionContext />
          <div class="sort-section">
             <V4Sort :pool="selectedResults.pool" />
          </div>
@@ -66,9 +67,10 @@ import ImageSearchHit from "@/components/ImageSearchHit"
 import SearchFilters from "@/components/SearchFilters"
 import V4Sort from "@/components/V4Sort"
 import ExpandSearch from "@/components/ExpandSearch"
+import CollectionContext from "@/components/CollectionContext"
 export default {
    components: {
-      ImageSearchHit, SearchHit, SearchFilters, V4Sort, ExpandSearch
+      ImageSearchHit, SearchHit, SearchFilters, V4Sort, ExpandSearch, CollectionContext
    },
    data: function() {
       return {

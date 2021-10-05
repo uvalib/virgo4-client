@@ -25,12 +25,7 @@
             <div v-else class="no-filter">
                <span>None</span>
             </div>
-            <div class="collection-context" v-if="hasCollectionCtx && isDevServer">
-               <span class="desc" v-html="collectionDesc"></span>
-               <CollectionDates id="coll-dates" :date="collectionDate" @picked="collectionPidPicked" />
-            </div>
          </div>
-
          <div v-if="hasNaFilter" class="filters-section">
             <div class="filters-head">
                <span class="title">Not Applicable Filters</span>
@@ -52,24 +47,16 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
-import CollectionDates from "@/components/modals/CollectionDates"
 export default {
-   components: {
-      CollectionDates
-   },
    computed: {
       ...mapGetters({
          allFilters: 'filters/poolFilter',
          selectedResults: 'selectedResults',
          facetSupport: 'pools/facetSupport',
          filterQueryParam: 'filters/asQueryParam',
-         hasCollectionCtx: 'collection/isAvailable',
-         isDevServer: 'system/isDevServer',
       }),
       ...mapState({
          updatingFacets: state => state.filters.updatingFacets,
-         collectionDesc: state => state.collection.description,
-         collectionDate: state => state.collection.startDate,
       }),
       ...mapFields({
         userSearched: 'query.userSearched',
@@ -104,9 +91,6 @@ export default {
       },
    },
    methods: {
-      collectionPidPicked(pid) {
-         this.$router.push(`/sources/${this.selectedResults.pool.id}/items/${pid}`)
-      },
       removeFilter( filter ) {
          this.userSearched = true
          let query = Object.assign({}, this.$route.query)
@@ -143,14 +127,6 @@ export default {
    margin-top: 5px;
    .working {
       padding: 10px 20px;
-   }
-}
-.collection-context {
-   padding: 20px 10px 10px 10px;
-   display: flex;
-   flex-flow: row nowrap;
-   .desc {
-      margin-right: 25px;
    }
 }
 .filters-section {
