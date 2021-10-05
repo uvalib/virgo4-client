@@ -29,6 +29,14 @@
             <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
          </div>
 
+         <div v-if="isFullPage" class="pure-form">
+            <label>View:</label>
+            <select v-model="viewMode">
+               <option value="virgo">Standard</option>
+               <option value="reader">Full Page</option>
+            </select>
+         </div>
+
          <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
       </div>
    </section>
@@ -64,6 +72,7 @@ export default {
       ...mapFields({
          userSearched: 'query.userSearched',
          basic: 'query.basic',
+         viewMode: 'collection.viewMode',
       }),
       publishedDate() {
          let field = this.details.detailFields.find( f => f.name == "published_date")
@@ -157,6 +166,11 @@ export default {
 
       .back {
          margin-top: 5px;
+      }
+
+      label {
+         font-weight: bold;
+         margin-right: 10px;
       }
    }
 

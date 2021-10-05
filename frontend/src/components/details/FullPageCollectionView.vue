@@ -45,10 +45,10 @@ export default {
          return url
       },
       curioWidth() {
-         return `${this.displayWidth*0.90}px`
+         return `${this.displayWidth*0.95}px`
       },
       curioHeight() {
-         return `${this.displayWidth*0.90*0.75}px`
+         return `${this.displayWidth*0.95*0.75}px`
       },
    }
 }

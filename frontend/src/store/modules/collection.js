@@ -1,9 +1,11 @@
 import axios from 'axios'
+import { getField, updateField } from 'vuex-map-fields'
 
 const collection = {
    namespaced: true,
    state: {
       lookingUp: false,
+      viewMode: "virgo",
       id: "",
       title: "",
       description: "",
@@ -20,6 +22,7 @@ const collection = {
    },
 
    getters: {
+      getField,
       isAvailable: state => {
          return (state.id != "" && state.lookingUp == false)
       },
@@ -49,6 +52,7 @@ const collection = {
    },
 
    mutations: {
+      updateField,
       setLookingUp(state, flag) {
          state.lookingUp = flag
       },
@@ -99,6 +103,7 @@ const collection = {
          state.selectedDate = ""
          state.currentMonth = ""
          state.currentYear = ""
+         state.viewMode = "virgo"
       },
       setCollectionDetails(state, data) {
          state.id = data.id
@@ -112,6 +117,10 @@ const collection = {
          state.startDate = data.start_date
          state.endDate = data.end_date
          state.filter = data.filter_name
+         state.viewMode = "virgo"
+         if (state.features.includes("full_page_view") ) {
+            state.viewMode = "reader"
+         }
       },
       setYearlyPublications(state, {year, dates}) {
          let newYear = {year: year, dates: dates}

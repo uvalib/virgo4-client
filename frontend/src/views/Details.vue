@@ -5,7 +5,7 @@
       </div>
       <template v-else>
          <CollectionHeader v-if="isCollection && isDevServer"/>
-         <FullPageCollectionView v-if="isFullPage && isCollection && isDevServer" />
+         <FullPageCollectionView v-if="isFullPage && isCollection && isDevServer && viewMode=='reader'" />
          <ItemView v-else />
       </template>
    </div>
@@ -34,6 +34,7 @@ export default {
          poolMapping: state=>state.system.poolMapping,
          loadingDigitalContent : state => state.item.loadingDigitalContent,
          searching: state=>state.searching,
+         viewMode: state=>state.collection.viewMode
       }),
       ...mapGetters({
          isDevServer: 'system/isDevServer',

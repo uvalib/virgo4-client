@@ -6,7 +6,9 @@
       <div class="items" v-if="hasDigitalContent || googleBooksURL || hasExternalImages">
          <h2 class="buttons">
             <span>View Online</span>
-            <V4Button mode="primary" class="small" @click="toggleFullView">View Full Screen</V4Button>
+            <V4Button mode="primary" class="small" @click="toggleFullView" v-if="!isFullPageCollection">
+               View Full Screen
+            </V4Button>
          </h2>
          <div class="viewer" v-if="hasDigitalContent">
             <div v-if="fsView" class="restore-view"><V4Button mode="primary" class="small" @click="toggleFullView">Restore View</V4Button></div>
@@ -134,6 +136,7 @@ export default {
          poolDetails: 'pools/poolDetails',
          isSignedIn: 'user/isSignedIn',
          isDevServer: 'system/isDevServer',
+         isFullPageCollection: 'collection/isFullPage',
       }),
       hasExternalImages() {
          let iiifField = this.details.detailFields.find( f => f.name=="iiif_image_url")
