@@ -31,7 +31,7 @@
 
          <div v-if="isFullPage" class="pure-form">
             <label>View:</label>
-            <select v-model="viewMode">
+            <select v-model="viewMode" @change="viewModeChanged">
                <option value="virgo">Standard</option>
                <option value="reader">Full Page</option>
             </select>
@@ -83,6 +83,9 @@ export default {
       }
    },
    methods: {
+      viewModeChanged() {
+         this.$analytics.trigger('Results', 'COLLECTION_VIEW_MODE_CHANGED', this.viewMode )
+      },
       datePicked(pid) {
          this.$router.push(pid)
       },

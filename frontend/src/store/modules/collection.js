@@ -150,7 +150,7 @@ const collection = {
       },
       async getPublishedDates(ctx, year) {
          let url = `${ctx.rootState.system.collectionsURL}/collections/${ctx.state.id}/dates?year=${year}`
-         axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             ctx.commit("setYearlyPublications", {year: year, dates: response.data})
             ctx.commit("updateNotPublishedDates")
          })

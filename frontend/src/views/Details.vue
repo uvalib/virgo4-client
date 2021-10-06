@@ -102,7 +102,9 @@ export default {
             if ( this.hasCalendar) {
                let dateField = this.details.detailFields.find( f => f.name == "published_date")
                if (dateField) {
-                  this.$store.dispatch("collection/getPublishedDates", dateField.value)
+                  let year = dateField.value.split("-")[0]
+                  this.$store.commit("collection/setCurrentYear", year)
+                  this.$store.dispatch("collection/getPublishedDates", year)
                }
             }
          }
