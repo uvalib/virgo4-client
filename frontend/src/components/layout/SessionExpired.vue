@@ -8,15 +8,27 @@
          <div class="session-message">
             <div class="bar">
                <span>Notice</span>
-               <i @click="dismiss" class="close fas fa-times-circle"></i>
+               <V4Button aria-label="close expired dialog" mode="icon" class="remove" @click="dismiss"
+                  :focusBackOverride="true" @tabback="setFocus('dismiss')"
+                  id="v4-msg-close-icon"
+               >
+                  <i class="close-icon fal fa-window-close"></i>
+               </V4Button>
             </div>
-            <div class="message-body">
+            <div class="message-body" id="msgbody">
                Your Virgo session has expired.
-               <br />
-               <router-link id="resignlink" @click="dismiss" to="/signin">Sign in again.</router-link>
+               <p>
+                  <router-link aria-describedby="msgbody" id="resignlink" @click="dismiss" to="/signin">Sign in again.</router-link>
+               </p>
             </div>
             <div class="controls">
-               <V4Button mode="primary" id="dismiss" @esc="dismiss" @click="dismiss">OK</V4Button>
+               <V4Button mode="tertiary" id="dismiss" @esc="dismiss" @click="dismiss"
+                  :focusBackOverride="true" @tabback="setFocus('resignlink')"
+                  :focusNextOverride="true" @tabnext="setFocus('v4-msg-close-icon')"
+                  aria-describedby="msgbody dismiss"
+               >
+                  OK
+               </V4Button>
             </div>
          </div>
       </div>
@@ -29,7 +41,7 @@ export default {
    watch: {
       sessionExpired(newVal, _oldVal) {
          if (newVal) {
-            this.focusButton();
+            this.setFocus("resignlink")
          }
       }
    },
@@ -39,16 +51,19 @@ export default {
       })
    },
    methods: {
-      focusButton() {
-         setTimeout(() => {
-            let ele = document.getElementById("resignlink");
+      setFocus(id) {
+         this.$nextTick(() => {
+            let ele = document.getElementById(id)
             ele.focus();
-         }, 500);
+         })
       },
       dismiss() {
          this.$store.commit("system/clearSessionExpired");
       }
-   }
+   },
+   created() {
+      this.setFocus("resignlink")
+   },
 };
 </script>
 
@@ -60,31 +75,43 @@ div.session {
    z-index: 5000;
    top: 30%;
 
-   div.session-message {
+   .session-message {
       display: inline-block;
-      text-align: center;
+      text-align: left;
       background: white;
       padding: 0px;
-      border: 2px solid var(--uvalib-brand-blue-light);
       box-shadow: $v4-box-shadow;
-
+      min-width: 20%;
+      max-width: 80%;
+      border-radius: 5px;
       .bar {
          padding: 5px;
-         background-color: var(--uvalib-brand-blue-light);
-         color: white;
-         font-weight: bold;
-         text-align: left;
-
-         i {
-            float: right;
-            font-size: 1.3em;
-            cursor: pointer;
-            margin-left: 10px;
-         }
+         color: var(--uvalib-text-dark);
+         font-weight: 500;
+         display: flex;
+         flex-flow: row nowrap;
+         align-items: center;
+         justify-content: space-between;
+         background-color: var(--uvalib-blue-alt-light);
+         border-bottom: 2px solid var(--uvalib-blue-alt);
+         border-radius: 5px 5px 0 0;
+         font-size: 1.1em;
+         padding: 10px;
       }
 
       .message-body {
-         padding: 10px 15px;
+         max-height: 55vh;
+         overflow-y: auto;
+         text-align: left;
+         padding: 20px 30px 0 30px;
+         font-weight: normal;
+         opacity: 1;
+         visibility: visible;
+         text-align: center;
+         word-break: break-word;
+         -webkit-hyphens: auto;
+         -moz-hyphens: auto;
+         hyphens: auto;
          color: var(--uvalib-primary-text);
       }
 

@@ -8,10 +8,11 @@
             @keyup.esc="dismiss"
          >
             <div class="bar">
-               <span tabindex="-1" id="msgtitle" class="title" @keydown.shift.tab.prevent.stop="shiftTab">{{message.title}}</span>
+               <span id="msgtitle" class="title">{{message.title}}</span>
                <V4Button aria-label="close message" mode="icon" class="remove" @click="dismiss"
-                   :focusBackOverride="true" @tabback="closeIconTabBack"
-                  id="v4-msg-close-icon">
+                  :focusBackOverride="true" @tabback="setFocus('okbtn')"
+                  id="v4-msg-close-icon"
+               >
                   <i class="close-icon fal fa-window-close"></i>
                </V4Button>
             </div>
@@ -21,8 +22,10 @@
             </div>
             <div class="controls">
                <V4Button id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
-                  @click="dismiss" :focusBackOverride="true" @tabback="btnTabBack"
-                  :focusNextOverride="true" @tabnext="btnTabNext">
+                  @click="dismiss" :focusBackOverride="true" @tabback="setFocus('v4-msg-close-icon')"
+                  :focusNextOverride="true" @tabnext="setFocus('v4-msg-close-icon')"
+                  aria-describedby="msgtitle msgbody okbtn"
+               >
                   OK
                </V4Button>
             </div>
@@ -53,35 +56,20 @@ export default {
       },
    },
    methods: {
-      btnTabNext() {
-         this.setFocus("msgtitle", 1)
-      },
-      closeIconTabBack() {
-         this.setFocus("msgtitle", 1)
-      },
-      btnTabBack() {
-         this.setFocus("v4-msg-close-icon", 1)
-      },
-      shiftTab() {
-         this.setFocus("okbtn", 1)
-      },
-      setFocus(id, timeout) {
-         if (!timeout) {
-            timeout = 260
-         }
-         setTimeout(()=>{
+      setFocus(id) {
+         this.$nextTick(()=>{
             let ele = document.getElementById(id)
             if (ele ) {
                ele.focus()
             }
-         }, timeout)
+         })
       },
       dismiss() {
          this.$store.commit("system/clearMessage")
       },
    },
    created() {
-      this.setFocus("msgtitle")
+      this.setFocus("okbtn")
    },
 };
 </script>
@@ -123,10 +111,6 @@ div.messsage-box {
          border-radius: 5px 5px 0 0;
          font-size: 1.1em;
          padding: 10px;
-      }
-
-      .title:focus {
-          @include be-accessible();
       }
 
       .message-body {
