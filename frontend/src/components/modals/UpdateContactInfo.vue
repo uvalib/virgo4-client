@@ -73,7 +73,7 @@
          </V4Button>
          <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
             :focusNextOverride="true" @tabnext="nextTabOK" :disabled="okDisabled">
-            OK
+            Submit
          </V4Button>
       </template>
    </V4Modal>
