@@ -141,7 +141,7 @@ const collection = {
          ctx.commit("setLookingUp", true)
          ctx.commit("clearCollectionDetails")
 
-         let url = `${ctx.rootState.system.collectionsURL}/lookup?q=${collection}`
+         let url = `${ctx.rootState.system.collectionsURL}/api/lookup?q=${collection}`
          return axios.get(url).then((response) => {
             ctx.commit("setCollectionDetails", response.data)
          }).finally( ()=> {
@@ -149,7 +149,7 @@ const collection = {
          })
       },
       async getPublishedDates(ctx, year) {
-         let url = `${ctx.rootState.system.collectionsURL}/collections/${ctx.state.id}/dates?year=${year}`
+         let url = `${ctx.rootState.system.collectionsURL}/api/collections/${ctx.state.id}/dates?year=${year}`
          return axios.get(url).then((response) => {
             ctx.commit("setYearlyPublications", {year: year, dates: response.data})
             ctx.commit("updateNotPublishedDates")
@@ -157,7 +157,7 @@ const collection = {
       },
       async nextItem(ctx, currDate) {
          ctx.commit("setLookingUp", true)
-         let url = `${ctx.rootState.system.collectionsURL}/collections/${ctx.state.id}/items/${currDate}/next`
+         let url = `${ctx.rootState.system.collectionsURL}/api/collections/${ctx.state.id}/items/${currDate}/next`
          await axios.get(url).then((response) => {
             this.router.push(response.data)
          }).finally( ()=> {
@@ -166,7 +166,7 @@ const collection = {
       },
       async priorItem(ctx, currDate) {
          ctx.commit("setLookingUp", true)
-         let url = `${ctx.rootState.system.collectionsURL}/collections/${ctx.state.id}/items/${currDate}/previous`
+         let url = `${ctx.rootState.system.collectionsURL}/api/collections/${ctx.state.id}/items/${currDate}/previous`
          await axios.get(url).then((response) => {
             this.router.push(response.data)
          }).finally( ()=> {
