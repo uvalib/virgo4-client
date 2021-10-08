@@ -54,7 +54,9 @@ export default {
       setFocus(id) {
          this.$nextTick(() => {
             let ele = document.getElementById(id)
-            ele.focus();
+            if (ele) {
+               ele.focus()
+            }
          })
       },
       dismiss() {
