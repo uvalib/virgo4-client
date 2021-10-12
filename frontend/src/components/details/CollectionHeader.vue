@@ -6,7 +6,7 @@
 
       <div class="content">
          <div class="title-row">{{collection.title}}</div>
-         <div class="desc-row">{{collection.description}}</div>
+         <div class="desc-row" v-html="collection.description"></div>
       </div>
 
       <div class="actions">
@@ -32,8 +32,8 @@
          <div v-if="isFullPage" class="pure-form">
             <label>View:</label>
             <select v-model="viewMode" @change="viewModeChanged">
-               <option value="virgo">Standard</option>
-               <option value="reader">Full Page</option>
+               <option value="virgo">{{collection.itemLabel}} information</option>
+               <option value="reader">Image only</option>
             </select>
          </div>
 
