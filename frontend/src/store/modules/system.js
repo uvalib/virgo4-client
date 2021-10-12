@@ -33,6 +33,7 @@ const system = {
          {id: 'MUSIC', name: 'Music Library'},
          {id: 'FINE-ARTS', name: 'Fine Arts Library'},
          {id: 'CLEMONS', name: 'Clemons Library'},
+         {id: 'DARDEN', name: 'Darden Library'},
       ],
       poolMapping: {}
    },
