@@ -532,9 +532,8 @@ func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 		"formatDiff": func(newField string, oldField string) string {
 			if newField != oldField {
 				return fmt.Sprintf("\"%s\" => \"%s\"", oldField, newField)
-			} else {
-				return fmt.Sprintf("No Change")
 			}
+			return fmt.Sprintf("No Change")
 		},
 	}
 
@@ -586,7 +585,11 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 		return
 	}
 
-	to := []string{"lib-circ@virginia.edu", req.Email}
+	to := []string{"lib-circ@virginia.edu"}
+	if strings.HasSuffix(req.Email, "virginia.edu") {
+		to = append(to, req.Email)
+	}
+
 	eRequest := emailRequest{Subject: "New Account Request", To: to, ReplyTo: req.Email, From: svc.SMTP.Sender, Body: renderedEmail.String()}
 	sendErr := svc.SendEmail(&eRequest)
 	if sendErr != nil {
