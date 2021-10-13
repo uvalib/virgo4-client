@@ -6,7 +6,7 @@
       <div class="items" v-if="hasDigitalContent || googleBooksURL || hasExternalImages">
          <h2 class="buttons">
             <span>View Online</span>
-            <V4Button mode="primary" class="small" @click="toggleFullView" v-if="!isFullPageCollection">
+            <V4Button mode="primary" class="small" @click="toggleFullView" v-if="!isFullPageCollection && hasDigitalContent">
                View Full Screen
             </V4Button>
          </h2>
