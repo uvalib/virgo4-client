@@ -1,7 +1,7 @@
 <template>
    <section class="collection-header">
       <div class="image">
-         <img v-if="collection.images.length > 0" class="thumb" :src="collection.images[0].url" :alt="collection.images[0].alt_text"/>
+         <img v-if="collection.image" class="thumb" :src="collection.image.url" :alt="collection.image.alt_text"/>
       </div>
 
       <div class="content">

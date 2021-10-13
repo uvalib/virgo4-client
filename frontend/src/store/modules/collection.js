@@ -18,7 +18,7 @@ const collection = {
       yearPublications: [],
       filter: "",
       features: [],
-      images: []
+      image: null
    },
 
    getters: {
@@ -93,7 +93,7 @@ const collection = {
       clearCollectionDetails(state) {
          state.id = ""
          state.features.splice(0, state.features.length)
-         state.images.splice(0, state.images.length)
+         state.image = null
          state.title = ""
          state.description  = ""
          state.itemLabel = "Issue"
@@ -109,8 +109,10 @@ const collection = {
          state.id = data.id
          state.features.splice(0, state.features.length)
          data.features.forEach( f=> state.features.push(f) )
-         state.images.splice(0, state.images.length)
-         data.images.forEach( f=> state.images.push(f) )
+         state.image = null
+         if (data.image) {
+            state.image = data.image
+         }
          state.title  = data.title
          state.description  = data.description
          state.itemLabel = data.item_label
