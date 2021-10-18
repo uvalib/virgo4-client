@@ -2,10 +2,10 @@
    <div class="availability">
       <div class="availability-content" v-if="showAvailability">
          <h2>Availability</h2>
-         <div class="ra-box ra-fiy" v-if="availabilityStatement" v-html="availabilityStatement"></div>
-         <div class="ra-box ra-fiy" v-if="accessRestriction" v-html="accessRestriction"></div>
-         <div class="ra-box ra-fiy" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
-         <div class="ra-box ra-fiy" v-if="specialCollectionsNote" v-html="specialCollectionsNote"></div>
+         <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
+         <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
+         <div class="avail-message" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
+         <div class="avail-message" v-if="specialCollectionsNote" v-html="specialCollectionsNote"></div>
 
          <p class="error" v-if="availability.error" v-html="availability.error"></p>
 
@@ -163,9 +163,6 @@ export default {
       text-align: center;
       margin: 50px 0 30px 0;
    }
-   .ra-box.ra-fiy {
-      margin: 40px 30px 40px 30px;
-   }
    .working {
       margin-bottom: 25px;
       text-align: center;
@@ -175,9 +172,12 @@ export default {
    margin: 0 0 20px 0;
    text-align: left;
 
+   .avail-message {
+      text-align: center;
+      margin-bottom: 2.5rem;
+   }
    div.items {
       border: 1px solid var(--uvalib-grey-light);
-      // border-radius: 5px;
       margin-top: 25px;
       box-shadow: $v4-box-shadow-light;
    }
