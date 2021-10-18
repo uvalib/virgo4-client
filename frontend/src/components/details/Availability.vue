@@ -19,7 +19,7 @@
             <RequestContainer :titleId="titleId" v-if="canMakeRequests" />
             <ul class="holdings" v-if="details.holdings.libraries">
                <li v-for="(lib, idx) in details.holdings.libraries" :key="`lib${idx}`">
-                  {{lib.library}}
+                  <span class="library">{{lib.library}}</span>
                   <ul class="location">
                      <li v-for="(loc, lidx) in lib.locations" :key="`loc${lidx}`">
                         <span class="location">{{loc.location}}</span>
@@ -204,12 +204,16 @@ export default {
       margin: 0;
    }
 
+   span.library {
+      font-size: 1.15em;
+   }
+
    ul.location  {
       font-weight: normal;
       padding-left: 40px;
       padding-bottom: 10px;
       span.location {
-         text-decoration: underline;
+         font-weight: bold;
       }
       li {
          margin-top: 5px;
