@@ -29,6 +29,13 @@ const item = {
          }
          return ""
       },
+      collectionPosition: state => {
+         let field = state.details.detailFields.find( f=> f.name == 'collection_position')
+         if (field) {
+            return field.value.replace(/^\w/, c => c.toUpperCase())
+         }
+         return ""
+      },
       isCollection: state => {
          return state.details.detailFields.findIndex( f=> f.name == 'collection_context') > -1
       },

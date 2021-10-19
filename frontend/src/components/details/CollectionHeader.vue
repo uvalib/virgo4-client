@@ -180,6 +180,7 @@ export default {
          display: inline-block;
          min-width: 300px;
          margin-bottom: 15px;
+         margin-right: 20px;
       }
    }
 

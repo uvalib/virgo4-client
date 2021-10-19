@@ -5,7 +5,10 @@
       </div>
       <div v-else class="details-content" v-bind:style="{width: curioWidth }">
          <div class="image-title-bar">
-            <span class="image-title">{{details.header.title}}</span>
+            <span class="image-title">
+               <span>{{details.header.title}}</span>
+               <div class="position-info" v-if="collectionPosition">{{collectionPosition}}</div>
+            </span>
             <SearchHitActions :hit="details" :pool="details.source" from="COLLECTION" />
          </div>
          <div class="viewer">
@@ -33,6 +36,7 @@ export default {
       }),
       ...mapGetters({
          isDevServer: 'system/isDevServer',
+         collectionPosition: 'item/collectionPosition'
       }),
       curioURL() {
          let selDO = this.digitalContent[0]
@@ -56,6 +60,10 @@ export default {
 
 <style lang="scss" scoped>
 .full-page-collection-view {
+   .position-info {
+      font-weight: normal;
+      margin-top: 5px;
+   }
    .details-content {
       margin: 25px auto;
    }
