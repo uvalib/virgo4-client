@@ -4,8 +4,8 @@
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <CollectionHeader v-if="isCollection && isDevServer"/>
-         <FullPageCollectionView v-if="isFullPage && isCollection && isDevServer && viewMode=='reader'" />
+         <CollectionHeader v-if="isCollection"/>
+         <FullPageCollectionView v-if="isFullPage && isCollection && viewMode=='reader'" />
          <ItemView v-else />
       </template>
    </div>
@@ -37,7 +37,6 @@ export default {
          viewMode: state=>state.collection.viewMode
       }),
       ...mapGetters({
-         isDevServer: 'system/isDevServer',
          isDigitalCollection: 'item/isDigitalCollection',
          digitalCollectionName: 'item/digitalCollectionName',
          isCollection: 'item/isCollection',
@@ -93,7 +92,7 @@ export default {
             this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', this.collectionName )
          }
 
-         if ( this.isDevServer && this.isCollection) {
+         if ( this.isCollection) {
             let name = this.collectionName
             if (!name) {
                name = this.digitalCollectionName

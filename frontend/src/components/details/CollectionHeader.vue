@@ -1,7 +1,8 @@
 <template>
    <section class="collection-header">
-      <div class="image">
-         <img v-if="collection.image" class="thumb" :src="collection.image.url" :alt="collection.image.alt_text"/>
+      <div class="image" v-if="collection.image" >
+         <img class="thumb" :src="collection.image.url" :alt="collection.image.alt_text"/>
+         <a class="viewer" :href="collection.image.url" target="_blank">View full size<i class="fal fa-external-link-alt" style="margin-left: 5px;"></i></a>
       </div>
 
       <div class="content">
@@ -27,6 +28,7 @@
                placeholder="Search this collection"
             >
             <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
+            <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
          </div>
 
          <div v-if="isFullPage" class="pure-form">
@@ -52,7 +54,7 @@ export default {
    },
    data: function() {
       return {
-         collectionQuery: ""
+         collectionQuery: "",
       }
    },
    computed: {
@@ -88,6 +90,23 @@ export default {
       },
       datePicked(pid) {
          this.$router.push(pid)
+      },
+      browseClicked() {
+         // Set up the search in the store and flag it is user generated
+         this.$store.commit("filters/reset")
+         let data = {pool: "presearch", facetID: this.collection.filter, value: this.collection.title}
+         this.$store.commit("filters/toggleFilter", data)
+         this.$store.commit("query/setTargetPool", this.details.source)
+         this.userSearched = true
+
+         // use the model to setup the URL
+         let query = Object.assign({}, this.$route.query)
+         delete query.page
+         delete query.filter
+         delete query.q
+         query.filter = this.filtersQueryParam( "presearch" )
+         query.pool = this.details.source
+         this.$router.push({path: "/search", query: query })
       },
       searchClicked() {
          // Set up the search in the store and flag it is user generated
@@ -135,10 +154,12 @@ export default {
    border-bottom: 1px solid var(--uvalib-grey-light);
    margin-bottom: 15px;
 
-   .thumb {
-      display: inline-block;
-      max-height:200px;
-      box-shadow: $v4-box-shadow-light;
+   .image {
+      .thumb {
+         display: block;
+         max-height:200px;
+         box-shadow: $v4-box-shadow-light;
+      }
    }
    .content {
       display: inline-block;
@@ -180,7 +201,7 @@ export default {
 
    .collection-search {
       display: flex;
-      flex-flow: row nowrap;
+      flex-flow: row wrap;
       align-items: stretch;
       justify-content: flex-start;
       margin: 0 0 10px auto;
@@ -198,17 +219,25 @@ export default {
          min-width: 100px;
       }
 
-      .search {
+      .search, .browse {
          border-radius: 0 5px 5px 0;
          margin: 0;
          padding: 0 20px;
+      }
+      .search {
+         margin-right: 5px;
+      }
+
+      .browse {
+         border-radius: 5px;
+         padding: 4px 20px;
       }
    }
 
    .seq-nav {
       display: flex;
       flex-flow: row nowrap;
-      margin: 0px auto 10px 0;
+      margin: 0 0 10px 0;
       justify-content: flex-end;
       .v4-button.pager {
          margin: 0 0 0 5px;
@@ -223,5 +252,9 @@ export default {
          margin: 0 5px;
       }
    }
+}
+.viewer {
+   margin-top: 10px;
+   display: inline-block;
 }
 </style>

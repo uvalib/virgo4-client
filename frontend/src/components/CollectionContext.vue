@@ -1,5 +1,5 @@
 <template>
-   <div class="collection-context" v-if="collectionCtxAvailable && isDevServer">
+   <div class="collection-context" v-if="collectionCtxAvailable">
       <div class="collect-head">
          <span class="title">Collections</span>
       </div>
@@ -24,7 +24,6 @@ export default {
    computed: {
       ...mapGetters({
          collectionCtxAvailable: 'collection/isAvailable',
-         isDevServer: 'system/isDevServer',
          hasCalendar: 'collection/hasCalendar',
       }),
       ...mapState({

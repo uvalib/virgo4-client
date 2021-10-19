@@ -18,7 +18,8 @@ const collection = {
       yearPublications: [],
       filter: "",
       features: [],
-      image: null
+      image: null,
+      logoViewerOpen: false
    },
 
    getters: {
