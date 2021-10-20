@@ -340,11 +340,11 @@ const filters = {
          // this lets a SINGLE collection context show up at the top of the search results
          ctx.commit("collection/clearCollectionDetails", null, { root: true })
          let done = false
-         let tgtFilters = ["FilterDigitalCollection", "FilterBookplate"]
-         tgtFilters.some( facet => {
-            let fitters = filterObj.facets.filter( f=>f.facet_id == facet)
-            if (fitters.length == 1) {
-               this.dispatch("collection/getCollectionContext", fitters[0].value, {root: true})
+         let collections = ctx.rootState.collection.collections
+         collections.some( c => {
+            let filter = filterObj.facets.find( f=>f.facet_id == c.facet && f.value == c.title)
+            if (filter) {
+               this.dispatch("collection/getCollectionContext", filter.value, {root: true})
                done = true
             }
             return done == true

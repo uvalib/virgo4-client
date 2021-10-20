@@ -5,6 +5,7 @@ const collection = {
    namespaced: true,
    state: {
       lookingUp: false,
+      collections: [],
       viewMode: "virgo",
       id: "",
       title: "",
@@ -56,6 +57,10 @@ const collection = {
       updateField,
       setLookingUp(state, flag) {
          state.lookingUp = flag
+      },
+      setCollections(state, data) {
+         state.collections.splice(0, state.collections.length)
+         data.forEach( c => state.collections.push(c))
       },
       setCurrentYear(state, yyyy) {
          state.currentYear = yyyy
@@ -140,6 +145,13 @@ const collection = {
       }
    },
    actions: {
+      getCollections(ctx) {
+         console.log("GET COLLECTIONS!")
+         let url = `${ctx.rootState.system.collectionsURL}/api/collections`
+         axios.get(url).then((response) => {
+            ctx.commit("setCollections", response.data)
+         })
+      },
       async getCollectionContext(ctx, collection) {
          ctx.commit("setLookingUp", true)
          ctx.commit("clearCollectionDetails")

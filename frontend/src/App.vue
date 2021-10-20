@@ -176,6 +176,7 @@ export default {
       }
 
       this.$store.dispatch("filters/getPreSearchFilters")
+      this.$store.dispatch("collection/getCollections")
    },
    mounted() {
       this.$nextTick( ()=>{
