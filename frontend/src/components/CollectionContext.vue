@@ -4,7 +4,7 @@
          <span class="title">Collections</span>
       </div>
       <div class="collect-rec">
-         <img v-if="collection.image" class="thumb" :src="collection.image.url" :alt="collection.image.alt_text"/>
+         <img v-if="collection.image" class="thumb"  :class="{bookplate: isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
          <span class="text">
             <p class="collection">{{collection.title}}</p>
             <span class="desc" v-html="collection.description"></span>
@@ -25,6 +25,7 @@ export default {
       ...mapGetters({
          collectionCtxAvailable: 'collection/isAvailable',
          hasCalendar: 'collection/hasCalendar',
+         isBookplate: 'collection/isBookplate',
       }),
       ...mapState({
          collection: state => state.collection,
@@ -55,6 +56,8 @@ export default {
       .thumb {
          width: 100px;
          margin-right: 15px;
+      }
+      .thumb.bookplate {
          box-shadow: $v4-box-shadow-light;
       }
       .desc {

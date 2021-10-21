@@ -37,6 +37,9 @@ const collection = {
       isFullPage: state => {
          return state.features.findIndex( f => f == "full_page_view") > -1
       },
+      isBookplate: state => {
+         return state.features.findIndex( f => f == "bookplate") > -1
+      },
       canNavigate: state => {
          return state.features.findIndex( f => f == "sequential_navigation") > -1
       },

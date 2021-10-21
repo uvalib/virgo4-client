@@ -1,8 +1,10 @@
 <template>
    <section class="collection-header">
       <div class="image" v-if="collection.image" >
-         <img class="thumb" :src="collection.image.url" :alt="collection.image.alt_text"/>
-         <a class="viewer" :href="collection.image.url" target="_blank">View full size<i class="fal fa-external-link-alt" style="margin-left: 5px;"></i></a>
+         <img class="thumb" :class="{bookplate: isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
+         <a class="viewer" :href="collection.image.url" target="_blank" v-if="isBookplate">
+            View full size<i class="fal fa-external-link-alt" style="margin-left: 5px;"></i>
+         </a>
       </div>
 
       <div class="content">
@@ -70,6 +72,7 @@ export default {
          filtersQueryParam: 'filters/asQueryParam',
          hasCalendar: 'collection/hasCalendar',
          isFullPage: 'collection/isFullPage',
+         isBookplate: 'collection/isBookplate',
       }),
       ...mapFields({
          userSearched: 'query.userSearched',
@@ -158,6 +161,8 @@ export default {
       .thumb {
          display: block;
          max-height:200px;
+      }
+      .thumb.bookplate {
          box-shadow: $v4-box-shadow-light;
       }
    }
