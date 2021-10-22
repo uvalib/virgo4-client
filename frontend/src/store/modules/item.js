@@ -39,10 +39,18 @@ const item = {
       isCollection: state => {
          return state.details.detailFields.findIndex( f=> f.name == 'collection_context') > -1
       },
+      isCollectionHead: state => {
+         return state.details.detailFields.findIndex( f=> f.name == 'collection_head') > -1
+      },
       collectionName: state => {
          let field = state.details.detailFields.find( f=> f.name == 'collection_context')
          if (field) {
             return field.value
+         } else {
+            field = state.details.detailFields.find( f=> f.name == 'collection_head')
+            if (field) {
+               return field.value
+            }
          }
          return ""
       },

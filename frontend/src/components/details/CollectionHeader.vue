@@ -13,7 +13,7 @@
       </div>
 
       <div class="actions">
-         <span class="seq-nav" v-if="canNavigate">
+         <span class="seq-nav" v-if="canNavigate && !isCollectionHead">
             <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
             </V4Button>
@@ -33,7 +33,7 @@
             <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
          </div>
 
-         <div v-if="isFullPage" class="pure-form">
+         <div v-if="isFullPage && !isCollectionHead" class="pure-form">
             <label>View:</label>
             <select v-model="viewMode" @change="viewModeChanged">
                <option value="virgo">{{collection.itemLabel}} information</option>
@@ -73,6 +73,7 @@ export default {
          hasCalendar: 'collection/hasCalendar',
          isFullPage: 'collection/isFullPage',
          isBookplate: 'collection/isBookplate',
+         isCollectionHead: 'item/isCollectionHead',
       }),
       ...mapFields({
          userSearched: 'query.userSearched',

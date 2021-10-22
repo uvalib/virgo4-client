@@ -4,7 +4,7 @@
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <CollectionHeader v-if="isCollection"/>
+         <CollectionHeader v-if="isCollection || isCollectionHead"/>
          <FullPageCollectionView v-if="isFullPage && isCollection && viewMode=='reader'" />
          <ItemView v-else />
       </template>
@@ -38,6 +38,7 @@ export default {
       }),
       ...mapGetters({
          isDigitalCollection: 'item/isDigitalCollection',
+         isCollectionHead: 'item/isCollectionHead',
          digitalCollectionName: 'item/digitalCollectionName',
          isCollection: 'item/isCollection',
          collectionName: 'item/collectionName',
@@ -92,11 +93,12 @@ export default {
             this.$analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', this.collectionName )
          }
 
-         if ( this.isCollection) {
+         if ( this.isCollection || this.isCollectionHead) {
             let name = this.collectionName
             if (!name) {
                name = this.digitalCollectionName
             }
+
             await this.$store.dispatch("collection/getCollectionContext", name )
             if ( this.hasCalendar) {
                let dateField = this.details.detailFields.find( f => f.name == "published_date")
