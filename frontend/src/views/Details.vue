@@ -4,8 +4,8 @@
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <CollectionHeader v-if="isCollection || isCollectionHead"/>
-         <FullPageCollectionView v-if="isFullPage && isCollection && viewMode=='reader'" />
+         <CollectionHeader v-if="collectionAvailable && (isCollection || isCollectionHead)"/>
+         <FullPageCollectionView v-if="isFullPage && isCollection && viewMode=='reader' && collectionAvailable" />
          <ItemView v-else />
       </template>
    </div>
@@ -44,6 +44,7 @@ export default {
          collectionName: 'item/collectionName',
          isFullPage: 'collection/isFullPage',
          hasCalendar: 'collection/hasCalendar',
+         collectionAvailable: 'collection/isAvailable',
       }),
    },
    methods: {

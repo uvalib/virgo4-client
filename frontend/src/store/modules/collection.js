@@ -20,7 +20,7 @@ const collection = {
       filter: "",
       features: [],
       image: null,
-      logoViewerOpen: false
+      logoViewerOpen: false,
    },
 
    getters: {
@@ -162,6 +162,8 @@ const collection = {
          let url = `${ctx.rootState.system.collectionsURL}/api/lookup?q=${collection}`
          return axios.get(url).then((response) => {
             ctx.commit("setCollectionDetails", response.data)
+         }).catch((_error) => {
+            console.log(collection+" not available")
          }).finally( ()=> {
             ctx.commit("setLookingUp", false)
          })
