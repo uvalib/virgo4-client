@@ -14,7 +14,7 @@
          >
             <i class="pdf fal fa-file-pdf"></i>
          </V4Button>
-         <ve-progress v-if="generatePDFInProgress" :progress="pdfProgress" :size="32" thickness="10%"
+         <ve-progress v-if="generatePDFInProgress" :progress="pdfProgress()" :size="32" thickness="10%"
             style="position: absolute; background: white; top:-2px; left: -6px; cursor: default;"/>
       </span>
       <V4Button v-if="from=='DETAIL' || from=='COLLECTION'"  mode="icon" @click="shareClicked" :id="`share-${hit.identifier}`"
