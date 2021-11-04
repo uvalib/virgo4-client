@@ -30,8 +30,8 @@ app.component('V4Disclosure', V4Disclosure)
 app.component('Confirm', Confirm)
 app.component('SignInRequired', SignInRequired)
 
-import VueEllipseProgress from 'vue-ellipse-progress'
-app.use(VueEllipseProgress)
+import veProgress from "vue-ellipse-progress";
+app.use(veProgress)
 
 import analytics from './analytics'
 app.config.globalProperties.$analytics = analytics

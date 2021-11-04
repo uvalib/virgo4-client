@@ -8,14 +8,15 @@
             </Citations>
          </div>
       </template>
-      <V4Button v-if="from=='COLLECTION'"  mode="icon" :id="`pdf-${hit.identifier}`"
-         @click="pdfClicked" :aria-label="`download pdf for ${hit.header.title}`" style="position:relative"
-      >
-         <vue-ellipse-progress v-if="generatePDFInProgress"
-            :progress="pdfProgress" :size="32" :legend="true" thickness="10%"
-            style="position: absolute; background: white; opacity:0.8; top:1px; left: -4px;"/>
-         <i class="pdf fal fa-file-pdf"></i>
-      </V4Button>
+      <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
+         <V4Button mode="icon" :id="`pdf-${hit.identifier}`"
+            @click="pdfClicked" :aria-label="`download pdf for ${hit.header.title}`" v-if="!generatePDFInProgress"
+         >
+            <i class="pdf fal fa-file-pdf"></i>
+         </V4Button>
+         <ve-progress v-if="generatePDFInProgress" :progress="pdfProgress" :size="32" thickness="10%"
+            style="position: absolute; background: white; top:-2px; left: -6px; cursor: default;"/>
+      </span>
       <V4Button v-if="from=='DETAIL' || from=='COLLECTION'"  mode="icon" @click="shareClicked" :id="`share-${hit.identifier}`"
          :aria-label="`copy link to ${hit.header.title}`"
       >
@@ -48,6 +49,11 @@ export default {
          default: ""
       },
    },
+   data: function() {
+      return  {
+         pdfDownloading: false
+      }
+   },
    components: {
       AddBookmark,SignInRequired,Citations
    },
@@ -69,27 +75,24 @@ export default {
          if ( this.loadingDigitalContent ) return false
          if ( this.from !='COLLECTION' ) return false
          if ( !this.digitalContent ) return false
-         let item = this.digitalContent[0]
-         if ( !item ) return false
-         if ( !item.pdf) return false
-         return !( item.pdf.status == "READY" || item.pdf.status == "ERROR" || item.pdf.status == "FAILED" ||
-            item.pdf.status == "NOT_AVAIL" ||  item.pdf.status == "UNKNOWN")
+         return this.pdfDownloading
       },
+   },
+   methods: {
       pdfProgress() {
          if ( this.loadingDigitalContent == true ) return 0
          if ( !this.digitalContent ) return 0
          let item = this.digitalContent[0]
          let status = item.pdf.status
          if (status == "READY" || status == "100%") {
+            this.pdfDownloading = false
             return 100
          }
          if ( status.includes("%")) {
             return parseInt(status.replace("%", ""),10)
          }
          return 0
-      }
-   },
-   methods: {
+      },
       async pdfClicked( ) {
          let item = this.digitalContent[0]
          await this.$store.dispatch("item/getPDFStatus", item )
@@ -104,6 +107,7 @@ export default {
 
          if ( item.pdf.status == "NOT_AVAIL" || item.pdf.status == "FAILED") {
             this.$analytics.trigger('PDF', 'PDF_GENERATE_CLICKED', item.pid)
+            this.pdfDownloading = true
             await this.$store.dispatch("item/generatePDF", item)
          }
 
@@ -153,6 +157,12 @@ export default {
       &:hover {
          color:var(--uvalib-brand-blue-light);
       }
+   }
+   .pdf-wrap {
+      position: relative;
+      display: inline-block;
+      width: 31px;
+      height: 30px;
    }
 }
 i.pdf {

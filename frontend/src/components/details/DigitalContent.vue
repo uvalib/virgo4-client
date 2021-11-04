@@ -54,7 +54,8 @@
                         />
                         <img v-if="item.thumbnail" :src="item.thumbnail"/>
                         <span class="label">{{item.name}}</span>
-                        <span class="link" tabindex="0"
+                        <span v-if="generatePDFInProgress(item)" class="label">PDF generating...</span>
+                        <span v-else class="link" tabindex="0"
                            @click.stop="pdfClicked(item)"
                            @keyup.stop.enter="pdfClicked(item)"
                            @keydown.space.prevent.stop="pdfClicked(item)"
@@ -103,8 +104,8 @@ export default {
    data: function() {
       return {
          selectedDigitalObjectIdx: 0,
-         pdfTimerID: -1,
-         ocrTimerID: -1,
+         pdfTimerIDs: new Map(),
+         ocrTimerIDs: new Map(),
          fsView: false
       }
    },
@@ -247,37 +248,52 @@ export default {
             await this.$store.dispatch("item/generatePDF", item)
          }
 
-         this.pdfTimerID = setInterval( async () => {
-             await this.$store.dispatch("item/getPDFStatus", item )
-             if (item.pdf.status == "READY" || item.pdf.status == "100%") {
-               clearInterval(this.pdfTimerID)
-               window.location.href=item.pdf.url
-            } else if (item.pdf.status == "ERROR" || item.pdf.status == "FAILED") {
-               clearInterval(this.pdfTimerID)
-               this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable. Please try again later.")
-            }
-         }, 1000)
+         if (this.pdfTimerIDs.has(item.pid) == false) {
+            let pdfTimerID = setInterval( async () => {
+               await this.$store.dispatch("item/getPDFStatus", item )
+               let tgtTimer = this.pdfTimerIDs.get(item.pid)
+               if (item.pdf.status == "READY" || item.pdf.status == "100%") {
+                  clearInterval(tgtTimer)
+                  this.pdfTimerIDs.delete(item.pid)
+                  window.location.href=item.pdf.url
+               } else if (item.pdf.status == "ERROR" || item.pdf.status == "FAILED") {
+                  clearInterval(tgtTimer)
+                  this.pdfTimerIDs.delete(item.pid)
+                  this.store.commit('system/setError', "Sorry, the PDF for "+item.name+" is currently unavailable. Please try again later.")
+               }
+            }, 1000)
+            this.pdfTimerIDs.set(item.pid, pdfTimerID)
+         }
       },
       ocrStarted(item) {
-         this.ocrTimerID = setInterval( async () => {
-             await this.$store.dispatch("item/getOCRStatus", item )
-             if (item.ocr.status == "READY" || item.ocr.status == "100%") {
-               clearInterval(this.ocrTimerID)
-               await this.$store.dispatch("item/downloadOCRText", item)
-            } else if (item.ocr.status == "ERROR" || item.ocr.status == "FAILED") {
-               clearInterval(this.ocrTimerID)
-               this.store.commit('system/setError', "Sorry, unable to extract text for "+item.name+". Please try again later.")
-            }
-         }, 5000)
+         if (this.ocrTimerIDs.has(item.pid) == false) {
+            let ocrTimerID = setInterval( async () => {
+               await this.$store.dispatch("item/getOCRStatus", item )
+               let tgtTimer = this.ocrTimerIDs.get(item.pid)
+               if (item.ocr.status == "READY" || item.ocr.status == "100%") {
+                  clearInterval(tgtTimer)
+                  this.ocrTimerIDs.delete(item.pid)
+                  await this.$store.dispatch("item/downloadOCRText", item)
+               } else if (item.ocr.status == "ERROR" || item.ocr.status == "FAILED") {
+                  clearInterval(tgtTimer)
+                  this.ocrTimerIDs.delete(item.pid)
+                  this.store.commit('system/setError', "Sorry, unable to extract text for "+item.name+". Please try again later.")
+               }
+            }, 5000)
+            this.ocrTimerIDs.set(item.pid, ocrTimerID)
+         }
       },
    },
    unmounted() {
-      if ( this.ocrTimerID > -1) {
-         clearInterval(this.ocrTimerID)
-      }
-      if ( this.pdfTimerID > -1) {
-         clearInterval(this.pdfTimerID)
-      }
+      this.ocrTimerIDs.forEach( (timerID, _pid) => {
+         clearInterval(timerID)
+      })
+      this.ocrTimerIDs.clear()
+
+      this.pdfTimerIDs.forEach( (timerID, _pid) => {
+         clearInterval(timerID)
+      })
+      this.pdfTimerIDs.clear()
    }
 }
 </script>

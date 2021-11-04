@@ -149,7 +149,6 @@ const collection = {
    },
    actions: {
       getCollections(ctx) {
-         console.log("GET COLLECTIONS!")
          let url = `${ctx.rootState.system.collectionsURL}/api/collections`
          axios.get(url).then((response) => {
             ctx.commit("setCollections", response.data)
