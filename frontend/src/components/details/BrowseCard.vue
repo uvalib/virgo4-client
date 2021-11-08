@@ -1,21 +1,21 @@
 <template>
    <div class="browse-card" :class="{current: current, list: mode!='gallery'}" :aria-current="current.toString()">
       <i class="current fas fa-caret-down" v-if="current"></i>
-      <div class="thumb-wrap" v-if="mode=='gallery'">
-         <span v-if="data.status=='ready'" class="vertical-spacer"></span>
-         <router-link @click="browseDetailClicked(data.id)" :to="data.id" aria-hidden="true" tabindex="-1">
-            <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
-            <span class="no-thumb" v-else>
-               <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
-               <br/>
-               <span class="no">(No image available)</span>
-            </span>
-         </router-link>
-      </div>
       <template v-if="mode=='gallery'">
+         <div class="thumb-wrap">
+            <span v-if="data.status=='ready'" class="vertical-spacer"></span>
+            <router-link @click="browseDetailClicked(data.id)" :to="`/sources/${pool}/items/${data.id}`" aria-hidden="true" tabindex="-1">
+               <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
+               <span class="no-thumb" v-else>
+                  <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
+                  <br/>
+                  <span class="no">(No image available)</span>
+               </span>
+            </router-link>
+         </div>
          <div class="details">
             <span class="call">{{data.call_number}}</span>
-            <router-link @click="browseDetailClicked(data.id)" :to="data.id" class="title">
+            <router-link @click="browseDetailClicked(data.id)" :to="`/sources/${pool}/items/${data.id}`" class="title">
                {{$utils.truncateTitle(data.title)}}
             </router-link>
             <span class="year">[{{data.published_date}}]</span>
@@ -32,7 +32,7 @@
          <div class="list details">
             <span class="index">{{index}}.</span>
             <span class="stuff">
-               <router-link @click="browseDetailClicked(data.id)" :to="data.id" class="title">
+               <router-link @click="browseDetailClicked(data.id)" :to="`/sources/${pool}/items/${data.id}`" class="title">
                   {{$utils.truncateTitle(data.title)}}
                </router-link>
                <span class="year">[{{data.published_date}}]</span>
