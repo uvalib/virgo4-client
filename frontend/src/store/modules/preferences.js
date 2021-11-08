@@ -58,7 +58,13 @@ const preferences = {
             }
          }
          if (prefsObj.pickupLibrary ) {
-            state.pickupLibrary = prefsObj.pickupLibrary
+
+            if (!this.getters["user/libraries"].some((lib) => lib.id == prefsObj.pickupLibrary.id) ){
+               // Clear the pickup Library if not in the currently available list
+               this.commit("preferences/clearPickupLibrary");
+            } else {
+               state.pickupLibrary = prefsObj.pickupLibrary
+            }
          }
          if (prefsObj.enableBarcodeScan ) {
             state.enableBarcodeScan = prefsObj.enableBarcodeScan

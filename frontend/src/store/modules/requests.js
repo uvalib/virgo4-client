@@ -231,6 +231,11 @@ const requests = {
          ctx.commit('disableButton', true)
          let hold = ctx.getters.getField('hold')
          hold.pickupLibrary = ctx.rootGetters.getField('preferences.pickupLibrary').id
+         if(hold.pickupLibrary == ""){
+            ctx.commit('setErrors', {sirsi: ["A pickup location is required."]})
+            ctx.commit('disableButton', false)
+            return
+         }
          axios.post('/api/requests/hold', hold)
             .then(response => {
                if (response.data.hold.errors) {

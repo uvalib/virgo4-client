@@ -57,15 +57,7 @@ export default {
          });
       },
    },
-   created: function () {
-      if (
-         this.pickupLibrary != {} &&
-         !this.librariesForUser.some((lib) => lib.id == this.pickupLibrary.id)
-      ) {
-         // Clear the pickup Library if not in the currently available list
-         this.$store.commit("preferences/clearPickupLibrary");
-      }
-   },
+
 };
 </script>
 <style lang="scss" scoped>
