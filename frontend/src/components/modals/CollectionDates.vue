@@ -7,6 +7,7 @@
          <V4Button class="calendar" mode="primary"
             @click="$refs.calendardlg.show()" :id="`${id}-open`"
             :aria-label="`view collection calendar`">
+            <span class="label">Calendar</span>
             <i class="fal fa-calendar-alt"></i>
          </V4Button>
       </template>
@@ -177,6 +178,10 @@ export default {
          pointer-events: none;
       }
    }
+}
+.label {
+   margin-right: 5px;
+   display: inline-block;
 }
 .error {
    text-align: center;

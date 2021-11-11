@@ -2,6 +2,7 @@
    <div class="collection-context" v-if="collectionCtxAvailable">
       <div class="collect-head">
          <span class="title">Collections</span>
+         <CollectionDates id="coll-dates" :date="collection.startDate" @picked="collectionPidPicked" v-if="hasCalendar"/>
       </div>
       <div class="collect-rec">
          <img v-if="collection.image" class="thumb"  :class="{bookplate: isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
@@ -9,7 +10,7 @@
             <p class="collection">{{collection.title}}</p>
             <span class="desc" v-html="collection.description"></span>
          </span>
-         <CollectionDates id="coll-dates" :date="collection.startDate" @picked="collectionPidPicked" v-if="hasCalendar"/>
+
       </div>
    </div>
 </template>
@@ -74,6 +75,9 @@ export default {
       font-weight: bold;
       margin: 0;
       padding: 0;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
       .title {
          padding: 0;
          display: block;

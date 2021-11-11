@@ -211,9 +211,10 @@ export default {
       flex-flow: row wrap;
       align-items: stretch;
       justify-content: flex-start;
-      margin: 0 0 10px auto;
+      margin: 0 0 10px 0;
       font-size: 0.9em;
       min-width: 300px;
+      width: 100%;
 
       input[type=text] {
          font-size: 1.15em;
@@ -224,6 +225,7 @@ export default {
          border-radius: 5px 0 0 5px;
          flex: 1 1 auto;
          min-width: 100px;
+
       }
 
       .search, .browse {
@@ -256,7 +258,7 @@ export default {
          }
       }
       .v4-button.pager.prev {
-         margin: 0 5px;
+         margin: 0 5px 0 0;
       }
    }
 }
