@@ -158,14 +158,27 @@ export default {
                badDate = true
             } else {
                parts.forEach( (p,idx) => {
-                  if (idx == 0) {
+                  switch (idx) {
+                  case 0:
                      if ( p.match(/^\d{4}$/) == null ) {
                         badDate = true
                      }
-                  } else {
-                     if ( p.match(/^\d{2}$/) == null ) {
+                     break
+                  case 1:
+                     // Month
+                     if ( p.match(/^(0[1-9]|(1[0-2]))$/) == null ) {
                            badDate = true
                      }
+                     break
+                  case 2:
+                     // Day
+                    if ( p.match(/^(0[1-9])|([12])([0-9])|(3[01])$/) == null ) {
+                           badDate = true
+                     }
+                     break
+                  default:
+                     badDate = true
+                     break
                   }
                })
             }
