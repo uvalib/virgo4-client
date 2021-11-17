@@ -47,7 +47,9 @@
                               v-model="term.endVal"
                               :aria-label="`end date for search criteria ${idx+1}`"
                            />
-                           <div class="date-hint">Accepted formats: YYYY, YYYY-MM, YYYY-MM-DD</div>
+                           <p class="date-hint">Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/>
+                               where YYYY represents a 4 digit year, MM represents a two digit month (01-12), and DD represents a two digit day (01-31).
+                               </p>
                         </div>
                      </template>
                      <template v-else>
@@ -187,7 +189,10 @@ export default {
          if ( badDate ) {
             this.$store.commit(
                "system/setSearchError",
-               {message:"Dates must match one of the accepted formats: YYYY, YYYY-MM or YYYY-MM-DD"}
+               {message:"Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/> \
+               where YYYY represents a 4 digit year, <br/> \
+               MM represents a two digit month (01-12), and<br/> \
+               DD represents a two digit day (01-31)."}
             )
             return
          }
