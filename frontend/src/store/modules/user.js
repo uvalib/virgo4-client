@@ -557,7 +557,7 @@ const user = {
             ctx.commit('bookmarks/clear', null, { root: true })
             ctx.commit('preferences/clear', null, { root: true })
             ctx.commit('searches/clear', null, { root: true })
-            ctx.commit('clearSeenAlerts', null, { root: true })
+            ctx.commit('alerts/clearSeenAlerts', null, { root: true })
             if ( resetSearch === true) {
                ctx.dispatch('resetSearch', null, { root: true })
             }

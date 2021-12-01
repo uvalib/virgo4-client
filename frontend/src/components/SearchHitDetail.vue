@@ -13,6 +13,10 @@
                      </dd>
                   </template>
                </template>
+               <template v-if="fullTextSnippet">
+                   <dt class="label">Full Text Match:</dt>
+                   <dd class="value"><span class="snippet" v-html="fullTextSnippet"></span></dd>
+               </template>
                <template v-if="accessURLField && !isKiosk">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
@@ -85,6 +89,13 @@ export default {
       truncateLength() {
          if ( this.hit.cover_image ) return 60
          return 80
+      },
+      fullTextSnippet() {
+         let sf = this.hit.basicFields.find( f => f.name == "highlighted_match")
+         if (sf ) {
+            return sf.value
+         }
+         return ""
       }
    },
    methods: {
@@ -131,6 +142,12 @@ export default {
          -webkit-hyphens: auto;
          -moz-hyphens: auto;
          hyphens: auto;
+         .snippet {
+            font-size: 0.9em;
+            :deep(em) {
+               font-weight: bold;
+            }
+         }
       }
    }
 

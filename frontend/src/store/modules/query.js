@@ -14,11 +14,13 @@ const query = {
          { op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" },
+         { op: "AND", value: "", field: "fulltext", comparison: "EQUAL", endVal: "" },
       ],
       advancedFields: [
          { value: "keyword", label: "Keyword", type: "text" },
          { value: "identifier", label: "Identifier", type: "text" },
          { value: "title", label: "Title", type: "text" },
+         { value: "fulltext", label: "Full Text", type: "text" },
          { value: "journal_title", label: "Journal Title", type: "text" },
          { value: "author", label: "Author", type: "text" },
          { value: "subject", label: "Subject", type: "text" },
@@ -121,6 +123,7 @@ const query = {
          state.advanced.push({ op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" })
          state.advanced.push({ op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" })
          state.advanced.push({ op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" })
+         state.advanced.push({ op: "AND", value: "", field: "fulltext", comparison: "EQUAL", endVal: "" })
       },
       setTemplate(state, template) {
          let hasQuery = false
