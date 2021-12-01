@@ -85,7 +85,6 @@
 
          <div class="google" v-if="googleBooksURL">
             <a :href="googleBooksURL" target="_blank" aria-label="google books preview">
-               <img v-if="googleBookThumbURL" class="google-thumb" alt="Google Books Thumbnail" :src="googleBookThumbURL"/>
                <img alt="Google Books Preview" class="google-btn" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
             </a>
          </div>
