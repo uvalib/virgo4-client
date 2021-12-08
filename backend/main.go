@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "1.0.0"
+const version = "1.1.0"
 
 /**
  * MAIN
@@ -93,7 +93,6 @@ func main() {
 		users.GET("/:uid/holds", svc.GetUserHolds)
 		users.POST("/:uid/checkouts/renew", svc.RenewCheckouts)
 		users.POST("/:uid/preferences", svc.SavePreferences)
-		users.GET("/:uid/preferences", svc.GetPreferences)
 		users.POST("/:uid/contact", svc.AuthMiddleware, svc.RequestContactUpdate)
 
 		users.GET("/:uid/searches", svc.GetUserSavedSearches)
@@ -104,11 +103,10 @@ func main() {
 		users.POST("/:uid/searches/:token/publish", svc.PublishSavedSearch)
 		users.DELETE("/:uid/searches/:token/publish", svc.UnpublishSavedSearch)
 
-		users.GET("/:uid/bookmarks", svc.GetBookmarks)
 		users.POST("/:uid/bookmarks/move", svc.MoveBookmarks)
-		users.POST("/:uid/bookmarks/delete", svc.DeleteBookmarks)
 		users.POST("/:uid/bookmarks/folders", svc.AddBookmarkFolder)
 		users.DELETE("/:uid/bookmarks/folders/:id", svc.DeleteBookmarkFolder)
+		users.POST("/:uid/bookmarks/folders/:id/delete", svc.DeleteBookmarks)
 		users.POST("/:uid/bookmarks/folders/:id", svc.UpdateBookmarkFolder)
 		users.DELETE("/:uid/bookmarks/folders/:id/publish", svc.UnpublishBookmarkFolder)
 		users.POST("/:uid/bookmarks/folders/:id/publish", svc.PublishBookmarkFolder)

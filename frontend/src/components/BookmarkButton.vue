@@ -52,7 +52,7 @@ export default {
                if (item.pool == this.data.pool && item.identifier == this.data.identifier) {
                   bookmarkID = item.id
                   this.$analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)
-                  this.$store.dispatch("bookmarks/removeBookmarks", [bookmarkID])
+                  this.$store.dispatch("bookmarks/removeBookmarks", {folderID: folder.id, bookmarkIDs: [bookmarkID]})
                }
                return bookmarkID != -1
             })
