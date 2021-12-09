@@ -104,13 +104,13 @@ func main() {
 		users.DELETE("/:uid/searches/:token/publish", svc.UnpublishSavedSearch)
 
 		users.POST("/:uid/bookmarks/move", svc.MoveBookmarks)
-		users.POST("/:uid/bookmarks/folders", svc.AddBookmarkFolder)
+		users.POST("/:uid/bookmarks/folders/add", svc.AddBookmarkFolder)
 		users.DELETE("/:uid/bookmarks/folders/:id", svc.DeleteBookmarkFolder)
 		users.POST("/:uid/bookmarks/folders/:id/delete", svc.DeleteBookmarks)
 		users.POST("/:uid/bookmarks/folders/:id", svc.UpdateBookmarkFolder)
 		users.DELETE("/:uid/bookmarks/folders/:id/publish", svc.UnpublishBookmarkFolder)
 		users.POST("/:uid/bookmarks/folders/:id/publish", svc.PublishBookmarkFolder)
-		users.POST("/:uid/bookmarks/items", svc.AddBookmark)
+		users.POST("/:uid/bookmarks/add", svc.AddBookmark)
 
 		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
 		api.DELETE("/requests/hold/:holdID", svc.AuthMiddleware, svc.DeleteHold)

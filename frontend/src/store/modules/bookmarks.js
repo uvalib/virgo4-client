@@ -63,12 +63,14 @@ const bookmarks = {
          state.bookmarks.splice(0, state.bookmarks.length)
          state.public.splice(0, state.public.length)
       },
-      // CALLED ONLY FROM BOOKMARKS ACTIONS
       setBookmarks(state, bookmarks) {
          state.bookmarks.splice(0, state.bookmarks.length)
          bookmarks.forEach( b => {
             b.bookmarks.forEach( d => {
                d.details = JSON.parse(d.details)
+               let pn = d.pool.name
+               delete d.pool
+               d.pool = pn
             })
             state.bookmarks.push(b)
          })
@@ -102,7 +104,7 @@ const bookmarks = {
       },
       addFolder(state, folder) {
          state.bookmarks.splice(0, 0, folder)
-      }
+      },
    },
 
    actions: {
@@ -121,7 +123,7 @@ const bookmarks = {
       // bmData Fields: Folder, Pool, ID, Title. Author optional
       async addBookmark(ctx, bmData ) {
          let v4UID = ctx.rootState.user.signedInUser
-         let url = `/api/users/${v4UID}/bookmarks/items`
+         let url = `/api/users/${v4UID}/bookmarks/add`
          let data = {folder: bmData.folder, pool: bmData.pool, identifier: bmData.identifier}
          let detail = {title : bmData.title, author: bmData.author}
          data['details'] = JSON.stringify(detail)
@@ -132,7 +134,7 @@ const bookmarks = {
 
       async addFolder(ctx, folder) {
          let v4UID = ctx.rootState.user.signedInUser
-         let url = `/api/users/${v4UID}/bookmarks/folders`
+         let url = `/api/users/${v4UID}/bookmarks/folders/add`
          return axios.post(url, {name: folder}).then((response) => {
             ctx.commit('addFolder', response.data)
          }).catch((error) => {

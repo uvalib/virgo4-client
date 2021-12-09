@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 // NewV4User creates a new instance of user settings with internal data initialzied
@@ -396,9 +395,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 
 	log.Printf("Load other user settings from v4 internal data source")
 	v4User := NewV4User()
-	err := svc.GDB.Preload("BookmarkFolders", func(db *gorm.DB) *gorm.DB {
-		return db.Order("bookmark_folders.name ASC")
-	}).Preload("BookmarkFolders.Bookmarks").Where("virgo4_id = ?", userID).First(v4User)
+	err := svc.preloadBookmarks().Where("virgo4_id = ?", userID).First(v4User)
 	if err.Error != nil {
 		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err.Error)
 		v4User = &User{ID: 0, Virgo4ID: userID, Preferences: "{}"}

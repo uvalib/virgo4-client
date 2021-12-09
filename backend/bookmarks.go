@@ -1,7 +1,7 @@
 package main
 
 import (
-	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,12 +10,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/rs/xid"
 	"gorm.io/gorm"
 )
-
-// TODO FIX THIS ALOT
 
 // BookmarkFolder contains details for a bookmark folder
 type BookmarkFolder struct {
@@ -28,14 +25,33 @@ type BookmarkFolder struct {
 	Bookmarks []Bookmark `json:"bookmarks" gorm:"foreignKey:FolderID"`
 }
 
+// Source defines search pool
+type Source struct {
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	PrivateURL string `json:"-"`
+	PublicURL  string `json:"url"`
+	Enabled    bool   `json:"-"`
+	Sequence   int    `json:"-"`
+}
+
 // Bookmark contains minimal details on a bookmarked item
 type Bookmark struct {
-	ID         int       `json:"id"`   // this is the unique DB key of the mark
-	FolderID   int       `json:"-"`    // foreign key to the owning folder
-	Pool       string    `json:"pool"` // this is the unique, internal pool name
+	ID         int       `json:"id"`
+	UserID     int       `json:"-"`
+	FolderID   int       `json:"folder_id"` // foreign key to the owning folder
+	SourceID   int       `json:"-"`         // foreign key to source
+	Source     Source    `gorm:"foreignKey:SourceID" json:"pool"`
 	AddedAt    time.Time `json:"addedAt"`
 	Identifier string    `json:"identifier"`
 	Details    string    `json:"details"`
+}
+
+func (svc *ServiceContext) preloadBookmarks() *gorm.DB {
+	return svc.GDB.Preload("BookmarkFolders", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bookmark_folders.name ASC")
+	}).Preload("BookmarkFolders.Bookmarks").
+		Preload("BookmarkFolders.Bookmarks.Source")
 }
 
 // AddBookmarkFolder will add a new blank folder for bookmarks
@@ -161,75 +177,64 @@ func (svc *ServiceContext) DeleteBookmarkFolder(c *gin.Context) {
 
 // AddBookmark will add a bookmark to a folder
 func (svc *ServiceContext) AddBookmark(c *gin.Context) {
-	user := NewV4User()
-	user.Virgo4ID = c.Param("uid")
+	userID := c.GetInt("v4id")
+	v4UserID := c.Param("uid")
 	var item struct {
-		Folder string
-		Bookmark
+		Folder     string
+		Pool       string
+		Identifier string
+		Details    string
 	}
 	err := c.ShouldBindJSON(&item)
 	if err != nil {
-		log.Printf("ERROR: invalid item add payload: %v", err)
+		log.Printf("ERROR: user %s invalid item add bookmark payload: %s", v4UserID, err.Error())
 		c.String(http.StatusBadRequest, "Invalid bookmark request")
 		return
 	}
-	log.Printf("User %s adding bookmark %+v", user.Virgo4ID, item)
+	log.Printf("INFO: user %s:%d add bookmark %+v requested", v4UserID, userID, item)
 
-	// get user ID
-	log.Printf("Lookup user %s ID", user.Virgo4ID)
-	q := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	q.Bind(dbx.Params{"v4id": user.Virgo4ID})
-	q.Row(&user.ID)
+	log.Printf("INFO: looking up source %s", item.Pool)
+	var source Source
+	resp := svc.GDB.Where("name=?", item.Pool).First(&source)
+	if resp.Error != nil {
+		log.Printf("ERROR: unable to find source %s: %s", item.Pool, resp.Error.Error())
+		c.String(http.StatusNotFound, "source %s not found", item.Pool)
+		return
+	}
 
-	// get folder ID
-	folderObj := BookmarkFolder{UserID: user.ID, Name: item.Folder}
-	log.Printf("Lookup user %s folder %s", user.Virgo4ID, item.Folder)
-	q = svc.DB.NewQuery("select * from bookmark_folders where name={:name} and user_id={:user}")
-	q.Bind(dbx.Params{"name": item.Folder})
-	q.Bind(dbx.Params{"user": user.ID})
-	err = q.One(&folderObj)
-	if err != nil {
-		folderObj.AddedAt = time.Now()
-		log.Printf("User %s folder %s not found; creating...", user.Virgo4ID, item.Folder)
-		err := svc.DB.Model(&folderObj).Insert()
-		if err != nil {
-			log.Printf("ERROR: add folder %s%s failed: %v", user.Virgo4ID, folderObj.Name, err)
-			c.String(http.StatusInternalServerError, err.Error())
+	log.Printf("INFO: lookup folder %s", item.Folder)
+	var folder BookmarkFolder
+	resp = svc.GDB.Preload("Bookmarks").Where("name=? and user_id=?", item.Folder, userID).First(&folder)
+	if resp.Error != nil {
+		if errors.Is(resp.Error, gorm.ErrRecordNotFound) == false {
+			log.Printf("ERROR: failed lookup for folder %s: %s", item.Folder, resp.Error.Error())
+			c.String(http.StatusInternalServerError, resp.Error.Error())
+			return
+		}
+		log.Printf("INFO: user %s folder %s not found; creating...", v4UserID, item.Folder)
+		folder.Name = item.Folder
+		folder.AddedAt = time.Now()
+		folder.UserID = userID
+		addResp := svc.GDB.Create(&folder)
+		if addResp.Error != nil {
+			log.Printf("ERROR: user %s create folder %s failed: %s", v4UserID, item.Folder, resp.Error.Error())
+			c.String(http.StatusInternalServerError, addResp.Error.Error())
 			return
 		}
 	}
 
-	// get POOL ID
-	log.Printf("Lookup pool %s ID", item.Pool)
-	q = svc.DB.NewQuery("select id from sources where name={:name}")
-	q.Bind(dbx.Params{"name": item.Pool})
-	var pid int
-	err = q.Row(&pid)
-	if err != nil {
-		log.Printf("ERROR: User %s pool %s not found", user.Virgo4ID, item.Pool)
-		c.String(http.StatusNotFound, "Pool %s not found", item.Pool)
+	log.Printf("INFO: %s adding new bookmark to %s", v4UserID, item.Folder)
+	bm := Bookmark{UserID: userID, FolderID: folder.ID, SourceID: source.ID, AddedAt: time.Now(), Identifier: item.Identifier, Details: item.Details}
+	resp = svc.GDB.Create(&bm)
+	if resp.Error != nil {
+		log.Printf("ERROR: user %s unable to add bookmark %+v: %s", v4UserID, item, resp.Error.Error())
+		c.String(http.StatusInternalServerError, resp.Error.Error())
 		return
 	}
 
-	log.Printf("Adding bew bookmark")
-	q = svc.DB.NewQuery(`insert into bookmarks (user_id,folder_id,source_id,identifier,details,added_at)
-		values ({:uid}, {:fid}, {:pid}, {:bid}, {:detail}, {:added})`)
-	q.Bind(dbx.Params{"uid": user.ID})
-	q.Bind(dbx.Params{"fid": folderObj.ID})
-	q.Bind(dbx.Params{"pid": pid})
-	q.Bind(dbx.Params{"bid": item.Identifier})
-	q.Bind(dbx.Params{"detail": item.Details})
-	q.Bind(dbx.Params{"added": time.Now()})
-	_, err = q.Execute()
-	if err != nil {
-		log.Printf("ERROR: User %s unable to add bookmark %+v: %v", user.Virgo4ID, item, err)
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// get updated bookmarks and return to user
-	// user.GetBookmarks(svc.DB) TODO
-	c.JSON(http.StatusOK, user.BookmarkFolders)
+	var v4User User
+	svc.preloadBookmarks().Find(&v4User, userID)
+	c.JSON(http.StatusOK, v4User.BookmarkFolders)
 }
 
 // DeleteBookmarks will remove a list of bookmarks from a folder
@@ -285,57 +290,22 @@ func (svc *ServiceContext) MoveBookmarks(c *gin.Context) {
 	}
 
 	var v4User User
-	svc.GDB.Preload("BookmarkFolders", func(db *gorm.DB) *gorm.DB {
-		return db.Order("bookmark_folders.name ASC")
-	}).Preload("BookmarkFolders.Bookmarks").Find(&v4User, userID)
-
+	svc.preloadBookmarks().Find(&v4User, userID)
 	c.JSON(http.StatusOK, v4User.BookmarkFolders)
 }
 
 // GetPublicBookmarks returns shared bookmark data identified by the passed token
 func (svc *ServiceContext) GetPublicBookmarks(c *gin.Context) {
 	token := c.Param("token")
-	log.Printf("Get public bookmarks for %s", token)
-	q := svc.DB.NewQuery(`SELECT name from bookmark_folders where token={:tok}`)
-	q.Bind(dbx.Params{"tok": token})
-	var out struct {
-		FolderName string     `json:"folder"`
-		Bookmarks  []Bookmark `json:"bookmarks"`
-	}
-
-	err := q.Row(&out.FolderName)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Printf("INFO: token %s not found", token)
-			c.String(http.StatusNotFound, fmt.Sprintf("token %s not found", token))
-		} else {
-			log.Printf("ERROR: unaable to get token %s: %s", token, err.Error())
-			c.String(http.StatusInternalServerError, err.Error())
-		}
+	log.Printf("INFO: get public bookmarks for %s", token)
+	var folder BookmarkFolder
+	resp := svc.GDB.Preload("Bookmarks").Preload("Bookmarks.Source").Where("is_public=? and token=?", true, token).First(&folder)
+	if resp.Error != nil {
+		log.Printf("INFO: public bookmarks %s not found: %s", token, resp.Error.Error())
+		c.String(http.StatusNotFound, fmt.Sprintf("%s not found", token))
 		return
 	}
-	q = svc.DB.NewQuery(`SELECT b.*, s.name as pool
-	 	FROM bookmark_folders f
-			LEFT JOIN bookmarks b ON b.folder_id=f.id
-			LEFT JOIN sources s ON s.id = b.source_id
-		WHERE f.token={:tok} ORDER BY b.added_at ASC`)
-	q.Bind(dbx.Params{"tok": token})
-	rows, err := q.Rows()
-	if err != nil {
-		log.Printf("Unable to get bookmarks from %s:%v", token, err)
-		c.String(http.StatusNotFound, "%s not found", token)
-		return
-	}
-
-	// parse each bookmark row into the V4User structure
-	out.Bookmarks = make([]Bookmark, 0)
-	for rows.Next() {
-		var bm Bookmark
-		rows.ScanStruct(&bm)
-		out.Bookmarks = append(out.Bookmarks, bm)
-	}
-
-	c.JSON(http.StatusOK, out)
+	c.JSON(http.StatusOK, folder)
 }
 
 func sqlIntSeq(ns []int) string {
