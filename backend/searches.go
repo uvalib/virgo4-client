@@ -11,33 +11,28 @@ import (
 	"github.com/rs/xid"
 )
 
-// SearchTemplate contains details about a user saved advanced search template
-type SearchTemplate struct {
-	ID       int    `db:"id" json:"id"`
-	UserID   int    `db:"user_id" json:"-"`
-	Name     string `db:"name" json:"name"`
-	Template string `db:"template" json:"template"`
-}
-
-// TableName sets the name of the table in the DB that this struct binds to
-func (s SearchTemplate) TableName() string {
-	return "search_templates"
-}
-
 // SavedSearch contains details about a user saved seatch
 type SavedSearch struct {
-	ID        int       `db:"id" json:"-"`
-	UserID    int       `db:"user_id" json:"-"`
-	Token     string    `db:"token" json:"token"`
-	Name      string    `db:"name" json:"name"`
-	Public    bool      `db:"is_public" json:"public"`
-	CreatedAt time.Time `db:"created_at" json:"created"`
-	URL       string    `db:"search_url" json:"url"`
+	ID        int       `json:"id"`
+	UserID    int       `json:"-"`
+	Token     string    `json:"token"`
+	Name      string    `json:"name"`
+	IsPublic  bool      `json:"public"`
+	CreatedAt time.Time `json:"created"`
+	SearchURL string    `json:"url"`
+}
+
+// SearchHistory contains data about a user searching history
+type SearchHistory struct {
+	ID        int       `json:"id"`
+	UserID    int       `json:"-"`
+	URL       string    `json:"url"`
+	CreatedAt time.Time `json:"created"`
 }
 
 // TableName sets the name of the table in the DB that this struct binds to
-func (s SavedSearch) TableName() string {
-	return "saved_searches"
+func (s SearchHistory) TableName() string {
+	return "search_history"
 }
 
 // DeleteAllSavedSearches will remove all saved searches from a user account
@@ -191,7 +186,7 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	if reqObj.Token == "" {
 		// Generate an access token and save it to the saved searches table
 		search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
-			CreatedAt: time.Now(), URL: reqObj.URL, Public: reqObj.IsPublic}
+			CreatedAt: time.Now(), SearchURL: reqObj.URL, IsPublic: reqObj.IsPublic}
 		err := svc.DB.Model(&search).Insert()
 		if err != nil {
 			log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
@@ -232,7 +227,7 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 		return
 	}
 
-	if search.Public {
+	if search.IsPublic {
 		log.Printf("Search %s is public", token)
 		c.JSON(http.StatusOK, search)
 		return
@@ -267,27 +262,23 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 // GetUserSavedSearches will get all of the searches saved by the specified user
 func (svc *ServiceContext) GetUserSavedSearches(c *gin.Context) {
 	v4id := c.Param("uid")
-	userID := c.MustGet("v4id").(int)
+	userID := c.GetInt("v4id")
 	log.Printf("Get saved searches for %s[%d]", v4id, userID)
 
 	var resp struct {
-		Saved   []SavedSearch `json:"saved"`
-		History []string      `json:"history"`
+		Saved   []SavedSearch   `json:"saved"`
+		History []SearchHistory `json:"history"`
 	}
-	resp.History = make([]string, 0)
-	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&resp.Saved)
-	q := svc.DB.NewQuery("select url from search_history where user_id={:uid} order by created_at desc")
-	q.Bind(dbx.Params{"uid": userID})
-	rows, err := q.Rows()
-	if err != nil {
-		log.Printf("ERROR: unable to get search history for %s: %s", v4id, err.Error())
+	resp.Saved = make([]SavedSearch, 0)
+	resp.History = make([]SearchHistory, 0)
+	svc.GDB.Where("user_id=?", userID).Order("name asc").Find(&resp.Saved)
+	dbResp := svc.GDB.Where("user_id=?", userID).Order("created_at desc").Find(&resp.History)
+	if dbResp.Error != nil {
+		log.Printf("ERROR: unable to get history: %s", dbResp.Error.Error())
 	} else {
-		for rows.Next() {
-			var url string
-			rows.Scan(&url)
-			resp.History = append(resp.History, url)
-		}
+		log.Printf("INFO: history %+v", resp.History)
 	}
+
 	c.JSON(http.StatusOK, resp)
 }
 

@@ -3,7 +3,7 @@
       <SignInRequired v-if="isSignedIn == false" targetPage="searches"/>
       <AccountActivities v-if="isSignedIn"/>
       <div class="working" v-if="lookingUp && isSignedIn" >
-         <V4Spinner message="Loading up requests..."/>
+         <V4Spinner message="Loading searches..."/>
       </div>
       <div class="details" v-if="isSignedIn">
          <template v-if="searches.length == 0">

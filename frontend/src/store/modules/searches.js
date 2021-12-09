@@ -23,7 +23,10 @@ const searches = {
          })
          state.history.splice(0, state.history.length)
          data.history.forEach( s => {
-            state.history.push( stripExclude(s) )
+            let url = stripExclude(s)
+            if (url != "/") {
+               state.history.push(  url )
+            }
          })
       },
       updateSearch(state, {token, url}) {
@@ -131,7 +134,8 @@ const searches = {
    }
 }
 
-function stripExclude( url) {
+function stripExclude( history ) {
+   let url = history.url
    let idx1 = url.indexOf("&exclude")
    if (idx1 > -1) {
       let idx2 = url.indexOf("&", idx1+1)
