@@ -14,11 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// NewV4User creates a new instance of user settings with internal data initialzied
-func NewV4User() *User {
-	return &User{BookmarkFolders: make([]BookmarkFolder, 0, 0)}
-}
-
 // User contains virgo4 user data like session token, bookmarks and preferences
 type User struct {
 	ID              int              `json:"-"`
@@ -394,11 +389,11 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	ilsUser.ID = userID
 
 	log.Printf("Load other user settings from v4 internal data source")
-	v4User := NewV4User()
-	err := svc.preloadBookmarks().Where("virgo4_id = ?", userID).First(v4User)
+	var v4User User
+	err := svc.preloadBookmarks().Where("virgo4_id = ?", userID).First(&v4User)
 	if err.Error != nil {
 		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err.Error)
-		v4User = &User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
+		v4User = User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 	}
 
 	log.Printf("Get leo delivery address")
@@ -436,7 +431,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 		ILLiadAccount bool         `json:"hasIlliadAccount"`
 		LeoLocation   string       `json:"leoLocation"`
 	}
-	user := fullUser{User: v4User, UserInfo: &ilsUser, LeoLocation: strings.Join(leoLocation, ", "), ILLiadAccount: hasIlliad}
+	user := fullUser{User: &v4User, UserInfo: &ilsUser, LeoLocation: strings.Join(leoLocation, ", "), ILLiadAccount: hasIlliad}
 	c.JSON(http.StatusOK, user)
 }
 
