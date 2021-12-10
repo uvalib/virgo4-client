@@ -17,7 +17,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	_ "github.com/lib/pq"
 	"gopkg.in/gomail.v2"
 	"gorm.io/driver/postgres"
@@ -42,7 +41,6 @@ type ServiceContext struct {
 	Dev                DevConfig
 	Firebase           FirebaseConfig
 	PendingTranslates  map[string]string
-	DB                 *dbx.DB
 	GDB                *gorm.DB
 	SMTP               SMTPConfig
 	Illiad             IlliadConfig
@@ -79,17 +77,9 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		Dev:                cfg.Dev,
 		Firebase:           cfg.Firebase}
 
-	log.Printf("Connect to Postgres")
+	log.Printf("INFO: connecting GORM to postgress...")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
 		cfg.DB.User, cfg.DB.Pass, cfg.DB.Name, cfg.DB.Host, cfg.DB.Port)
-	db, err := dbx.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	db.LogFunc = log.Printf
-	ctx.DB = db
-
-	log.Printf("INFO: connecting GORM to postgress...")
 	gdb, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
