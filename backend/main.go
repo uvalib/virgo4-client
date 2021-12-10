@@ -97,11 +97,10 @@ func main() {
 
 		users.GET("/:uid/searches", svc.GetUserSavedSearches)
 		users.POST("/:uid/searches", svc.SaveSearch)
-		users.DELETE("/:uid/searches/:token", svc.DeleteSavedSearch)
-		users.PUT("/:uid/searches/:token", svc.UpdateSavedSearch)
+		users.DELETE("/:uid/searches/:id", svc.DeleteSavedSearch)
 		users.DELETE("/:uid/searches", svc.DeleteAllSavedSearches)
-		users.POST("/:uid/searches/:token/publish", svc.PublishSavedSearch)
-		users.DELETE("/:uid/searches/:token/publish", svc.UnpublishSavedSearch)
+		users.POST("/:uid/searches/:id/publish", svc.PublishSavedSearch)
+		users.DELETE("/:uid/searches/:id/publish", svc.UnpublishSavedSearch)
 
 		users.POST("/:uid/bookmarks/move", svc.MoveBookmarks)
 		users.POST("/:uid/bookmarks/folders/add", svc.AddBookmarkFolder)
