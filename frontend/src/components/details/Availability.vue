@@ -5,7 +5,9 @@
          <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
          <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
          <div class="avail-message" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
-         <div class="avail-message" v-if="specialCollectionsNote" v-html="specialCollectionsNote"></div>
+         <template v-if="libraryAvailabilityNotes">
+            <div class="avail-message" v-for="(note, nidx) in libraryAvailabilityNotes.value" v-html="note" :key="`note${nidx}`"></div>
+         </template>
 
          <p class="error" v-if="availability.error" v-html="availability.error"></p>
 
@@ -129,12 +131,8 @@ export default {
          }
          return ""
       },
-      specialCollectionsNote() {
-         let f = this.details.detailFields.find( f=>f.name == "special_collections_note")
-         if (f) {
-            return f.value
-         }
-         return ""
+      libraryAvailabilityNotes() {
+         return this.details.detailFields.find( f => f.name == "library_availability_note")
       },
       availabilityFields() {
          return this.details.detailFields.filter( f => f.display == "availability")
