@@ -443,6 +443,7 @@ const user = {
             ctx.commit('setAccountInfo', response.data)
             let prefs = JSON.parse(response.data.preferences)
             ctx.commit('preferences/setPreferences', prefs, { root: true })
+            ctx.commit('bookmarks/setBookmarks', response.data.bookmarks, { root: true })
             if ( prefs.searchTemplate ) {
                ctx.commit('query/setTemplate',  prefs.searchTemplate, { root: true })
             }

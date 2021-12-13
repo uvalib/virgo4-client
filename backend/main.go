@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "1.0.0"
+const version = "1.1.0"
 
 /**
  * MAIN
@@ -93,26 +93,23 @@ func main() {
 		users.GET("/:uid/holds", svc.GetUserHolds)
 		users.POST("/:uid/checkouts/renew", svc.RenewCheckouts)
 		users.POST("/:uid/preferences", svc.SavePreferences)
-		users.GET("/:uid/preferences", svc.GetPreferences)
 		users.POST("/:uid/contact", svc.AuthMiddleware, svc.RequestContactUpdate)
 
 		users.GET("/:uid/searches", svc.GetUserSavedSearches)
 		users.POST("/:uid/searches", svc.SaveSearch)
-		users.DELETE("/:uid/searches/:token", svc.DeleteSavedSearch)
-		users.PUT("/:uid/searches/:token", svc.UpdateSavedSearch)
+		users.DELETE("/:uid/searches/:id", svc.DeleteSavedSearch)
 		users.DELETE("/:uid/searches", svc.DeleteAllSavedSearches)
-		users.POST("/:uid/searches/:token/publish", svc.PublishSavedSearch)
-		users.DELETE("/:uid/searches/:token/publish", svc.UnpublishSavedSearch)
+		users.POST("/:uid/searches/:id/publish", svc.PublishSavedSearch)
+		users.DELETE("/:uid/searches/:id/publish", svc.UnpublishSavedSearch)
 
-		users.GET("/:uid/bookmarks", svc.GetBookmarks)
 		users.POST("/:uid/bookmarks/move", svc.MoveBookmarks)
-		users.POST("/:uid/bookmarks/delete", svc.DeleteBookmarks)
-		users.POST("/:uid/bookmarks/folders", svc.AddBookmarkFolder)
+		users.POST("/:uid/bookmarks/folders/add", svc.AddBookmarkFolder)
 		users.DELETE("/:uid/bookmarks/folders/:id", svc.DeleteBookmarkFolder)
+		users.POST("/:uid/bookmarks/folders/:id/delete", svc.DeleteBookmarks)
 		users.POST("/:uid/bookmarks/folders/:id", svc.UpdateBookmarkFolder)
 		users.DELETE("/:uid/bookmarks/folders/:id/publish", svc.UnpublishBookmarkFolder)
 		users.POST("/:uid/bookmarks/folders/:id/publish", svc.PublishBookmarkFolder)
-		users.POST("/:uid/bookmarks/items", svc.AddBookmark)
+		users.POST("/:uid/bookmarks/add", svc.AddBookmark)
 
 		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
 		api.DELETE("/requests/hold/:holdID", svc.AuthMiddleware, svc.DeleteHold)

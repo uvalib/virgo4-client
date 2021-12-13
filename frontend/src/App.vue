@@ -165,7 +165,6 @@ export default {
             this.$store.dispatch("user/getCheckouts")
             this.$store.dispatch("user/getRequests")
          }
-         this.$store.dispatch("bookmarks/getBookmarks")
          if ( this.$store.getters["user/isUndergraduate"]) {
             this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
          } else if ( this.$store.getters["user/isGraduate"]) {

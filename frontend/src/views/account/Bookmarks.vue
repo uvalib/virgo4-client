@@ -52,7 +52,7 @@
                                     <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                                        :id="`move-bookmarks-${folderInfo.id}`"
                                        v-on:move-approved="moveBookmarks"/>
-                                    <V4Button @click="removeBookmarks" mode="primary">Delete</V4Button>
+                                    <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
                                     <V4Button v-if="canMakeReserves" class="disabled" mode="primary" @click="reserve">Place on course reserve</V4Button>
                                  </div>
                               </div>
@@ -267,13 +267,13 @@ export default {
       detailsURL(bookmark) {
          return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
       },
-      removeBookmarks() {
+      removeBookmarks(folderID) {
          if ( this.selectedItems.length == 0) {
             this.$store.commit("system/setError","No bookmarks selected for deletion.<br/>Select one or more and try again."
             )
              return
          }
-         this.$store.dispatch("bookmarks/removeBookmarks", this.selectedItems)
+         this.$store.dispatch("bookmarks/removeBookmarks", {folderID: folderID, bookmarkIDs: this.selectedItems})
       },
       async removeFolder(folderID, folderIdx) {
          let focusID = "create-folder-btn"

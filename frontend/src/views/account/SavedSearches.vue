@@ -3,7 +3,7 @@
       <SignInRequired v-if="isSignedIn == false" targetPage="searches"/>
       <AccountActivities v-if="isSignedIn"/>
       <div class="working" v-if="lookingUp && isSignedIn" >
-         <V4Spinner message="Loading up requests..."/>
+         <V4Spinner message="Loading searches..."/>
       </div>
       <div class="details" v-if="isSignedIn">
          <template v-if="searches.length == 0">
@@ -35,7 +35,7 @@
                            <i class="viewsave fal fa-search"></i>
                         </router-link>
                      </span>
-                     <Confirm title="Confirm Delete" v-on:confirmed="removeSavedSearch(saved.token)"
+                     <Confirm title="Confirm Delete" v-on:confirmed="removeSavedSearch(saved.id)"
                         :id="`del-saved-search-${idx+1}`"
                         :ariaLabel="`Delete search named ${saved.name}`"
                      >
@@ -160,8 +160,8 @@ export default {
       clearHistory() {
          this.$store.dispatch("searches/clearHistory", this.signedInUser)
       },
-      removeSavedSearch(token) {
-         this.$store.dispatch("searches/delete", {userID: this.signedInUser, token: token})
+      removeSavedSearch(searchID) {
+         this.$store.dispatch("searches/delete", {userID: this.signedInUser, searchID: searchID})
       },
       copyURL(token) {
          let URL = window.location.protocol + "//" + window.location.host + this.searchURL(token)

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/gorilla/feeds"
 	"github.com/uvalib/virgo4-api/v4api"
 	"github.com/uvalib/virgo4-jwt/v4jwt"
@@ -22,19 +21,19 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 	token := c.Param("token")
 	log.Printf("Get saved search %s", token)
 	var search SavedSearch
-	err := svc.DB.Select().Where(dbx.HashExp{"token": token}).One(&search)
-	if err != nil {
-		log.Printf("Search %s not found", token)
+	resp := svc.GDB.Where("token=?", token).First(&search)
+	if resp.Error != nil {
+		log.Printf("ERROR: search %s not found", token)
 		c.String(http.StatusNotFound, "%s not found", token)
 		return
 	}
 
-	if !search.Public {
+	if !search.IsPublic {
 		c.JSON(http.StatusUnprocessableEntity, nil)
 		return
 	}
 
-	queryStr := search.URL
+	queryStr := search.SearchURL
 	// Remove everything but the query string
 	re := regexp.MustCompile(`^.*\?`)
 	queryStr = re.ReplaceAllLiteralString(queryStr, "")

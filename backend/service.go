@@ -17,9 +17,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	_ "github.com/lib/pq"
 	"gopkg.in/gomail.v2"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // ServiceContext contains common data used by all handlers
@@ -40,7 +41,7 @@ type ServiceContext struct {
 	Dev                DevConfig
 	Firebase           FirebaseConfig
 	PendingTranslates  map[string]string
-	DB                 *dbx.DB
+	GDB                *gorm.DB
 	SMTP               SMTPConfig
 	Illiad             IlliadConfig
 	FastHTTPClient     *http.Client
@@ -76,15 +77,14 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		Dev:                cfg.Dev,
 		Firebase:           cfg.Firebase}
 
-	log.Printf("Connect to Postgres")
+	log.Printf("INFO: connecting GORM to postgress...")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
 		cfg.DB.User, cfg.DB.Pass, cfg.DB.Name, cfg.DB.Host, cfg.DB.Port)
-	db, err := dbx.Open("postgres", connStr)
+	gdb, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.LogFunc = log.Printf
-	ctx.DB = db
+	ctx.GDB = gdb
 
 	if ctx.Dev.FakeSMTP {
 		log.Printf("Using dev mode for SMTP; all messages will be logged instead of delivered")
@@ -207,14 +207,14 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		}
 	}
 
-	tq := svc.DB.NewQuery("select * from schema_migrations order by version desc limit 1")
 	var schema struct {
 		Version int  `db:"version"`
 		Dirty   bool `db:"dirty"`
 	}
-	err := tq.One(&schema)
-	if err != nil {
-		hcMap["postgres"] = hcResp{Healthy: false, Message: err.Error()}
+	tq := svc.GDB.Raw("select version,dirty from schema_migrations order by version desc limit 1")
+	err := tq.Scan(&schema)
+	if err.Error != nil {
+		hcMap["postgres"] = hcResp{Healthy: false, Message: err.Error.Error()}
 	} else {
 		log.Printf("Schema info - Version: %d, Dirty: %t", schema.Version, schema.Dirty)
 		if schema.Dirty {

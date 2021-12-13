@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/rs/xid"
 	"github.com/uvalib/virgo4-jwt/v4jwt"
+	"gorm.io/gorm"
 )
 
 // Authorize is the API for minting JWT for accessing the API as a guest
@@ -122,7 +122,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 			log.Printf("User %s lockout has expired", auth.Barcode)
 			v4User.LockedOut = false
 			v4User.LockedOutUntil = nil
-			svc.DB.Model(&v4User).Exclude("BookMarkFolders").Update()
+			svc.GDB.Model(&v4User).Select("LockedOut", "LockedOutUntil").Updates(v4User)
 		} else {
 			log.Printf("User %s is currently locked out of their account", auth.Barcode)
 			delta := v4User.LockedOutUntil.Sub(now)
@@ -153,7 +153,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 		}
 	}
 	resp.AttemptsLeft = 5 - v4User.AuthTries
-	svc.DB.Model(&v4User).Exclude("BookMarkFolders").Update()
+	svc.GDB.Model(&v4User).Select("AuthStartedAt", "AuthTries", "AttemptsLeft").Updates(v4User)
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
 	authURL := fmt.Sprintf("%s/v4/users/%s/check_pin", svc.ILSAPI, auth.Barcode)
@@ -175,7 +175,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 			later := now.Add(time.Hour)
 			v4User.LockedOut = true
 			v4User.LockedOutUntil = &later
-			svc.DB.Model(&v4User).Exclude("BookMarkFolders").Update()
+			svc.GDB.Model(&v4User).Select("LockedOut", "LockedOutUntil").Updates(v4User)
 		} else {
 			resp.Message = "Authentication failed"
 		}
@@ -285,18 +285,18 @@ func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
 }
 
 // getOrCreateUser finds an existing user. If a user is not found, one is created
-func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
-	var user V4User
-	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
-	q.Bind(dbx.Params{"id": userID})
-	err := q.One(&user)
-	if err != nil {
+func (svc *ServiceContext) getOrCreateUser(userID string) (*User, error) {
+	var user User
+	err := svc.GDB.Where("virgo4_id = ?", userID).First(&user)
+	if err.Error != nil {
+		if errors.Is(err.Error, gorm.ErrRecordNotFound) == false {
+			return nil, err.Error
+		}
 		log.Printf("User %s does not exist, creating and setting auth token", userID)
-		user := V4User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
-		addErr := svc.DB.Model(&user).Exclude("BookMarkFolders").Insert()
-		if addErr != nil {
-			log.Printf("Unable to create user %s: %s", userID, addErr.Error())
-			return nil, addErr
+		user := User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
+		addErr := svc.GDB.Omit("Bookmarks").Create(&user)
+		if addErr.Error != nil {
+			return nil, addErr.Error
 		}
 		return &user, nil
 	}
@@ -305,7 +305,7 @@ func (svc *ServiceContext) getOrCreateUser(userID string) (*V4User, error) {
 	return &user, nil
 }
 
-func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *V4User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
+func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod v4jwt.AuthEnum, role v4jwt.RoleEnum) (string, error) {
 	v4Claims := v4jwt.V4Claims{
 		UserID:     v4User.Virgo4ID,
 		AuthMethod: authMethod,

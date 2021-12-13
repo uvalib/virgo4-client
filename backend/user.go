@@ -12,29 +12,18 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 )
 
-// NewV4User creates a new instance of user settings with internal data initialzied
-func NewV4User() *V4User {
-	return &V4User{Bookmarks: make([]*Folder, 0, 0)}
-}
-
-// V4User contains virgo4 user data like session token, bookmarks and preferences
-type V4User struct {
-	ID             int        `db:"id" json:"-"`
-	Virgo4ID       string     `db:"virgo4_id" json:"id"`
-	LockedOut      bool       `db:"locked_out" json:"-"`
-	LockedOutUntil *time.Time `db:"locked_out_until" json:"-"`
-	AuthStartedAt  *time.Time `db:"auth_started_at" json:"-"`
-	AuthTries      int        `db:"auth_tries" json:"-"`
-	Bookmarks      []*Folder  `db:"-" json:"bookmarks"`
-	Preferences    string     `db:"preferences" json:"preferences"`
-}
-
-// TableName sets the name of the table in the DB that this struct binds to
-func (u V4User) TableName() string {
-	return "users"
+// User contains virgo4 user data like session token, bookmarks and preferences
+type User struct {
+	ID              int              `json:"-"`
+	Virgo4ID        string           `json:"id"`
+	LockedOut       bool             `json:"-"`
+	LockedOutUntil  *time.Time       `json:"-"`
+	AuthStartedAt   *time.Time       `json:"-"`
+	AuthTries       int              `json:"-"`
+	BookmarkFolders []BookmarkFolder `json:"bookmarks"`
+	Preferences     string           `json:"preferences"`
 }
 
 // ILSUserInfo contains ILS connector details for a user
@@ -400,13 +389,11 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	ilsUser.ID = userID
 
 	log.Printf("Load other user settings from v4 internal data source")
-	v4User := NewV4User()
-	q := svc.DB.NewQuery(`select * from users where virgo4_id={:id}`)
-	q.Bind(dbx.Params{"id": userID})
-	err := q.One(v4User)
-	if err != nil {
-		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err)
-		v4User = &V4User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
+	var v4User User
+	err := svc.preloadBookmarks().Where("virgo4_id = ?", userID).First(&v4User)
+	if err.Error != nil {
+		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err.Error)
+		v4User = User{ID: 0, Virgo4ID: userID, Preferences: "{}"}
 	}
 
 	log.Printf("Get leo delivery address")
@@ -439,63 +426,39 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 
 	// Combine local V4 database user info with ILS user info and return results to client
 	type fullUser struct {
-		*V4User
+		*User
 		UserInfo      *ILSUserInfo `json:"user"`
 		ILLiadAccount bool         `json:"hasIlliadAccount"`
 		LeoLocation   string       `json:"leoLocation"`
 	}
-	user := fullUser{V4User: v4User, UserInfo: &ilsUser, LeoLocation: strings.Join(leoLocation, ", "), ILLiadAccount: hasIlliad}
+	user := fullUser{User: &v4User, UserInfo: &ilsUser, LeoLocation: strings.Join(leoLocation, ", "), ILLiadAccount: hasIlliad}
 	c.JSON(http.StatusOK, user)
 }
 
 // SavePreferences will save a block of JSON preference data to the user table
 func (svc *ServiceContext) SavePreferences(c *gin.Context) {
-	uid := c.Param("uid")
-
-	// Bind POST params to interface to be sure they are well formed
+	userID := c.GetInt("v4id")
+	v4UserID := c.Param("uid")
 	var prefs interface{}
 	err := c.ShouldBindJSON(&prefs)
 	if err != nil {
-		log.Printf("ERROR: unable to get preference data from %s: %s", uid, err)
+		log.Printf("ERROR: unable to get preference data from %s[%d]: %s", v4UserID, userID, err)
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
+	log.Printf("INFO: %s[%d] requests preference update %+v", v4UserID, userID, prefs)
 
 	// Data is good. Back to JSON string and save...
 	jsonPrefs, _ := json.Marshal(prefs)
-	uq := svc.DB.NewQuery("update users set preferences={:p} where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uq.Bind(dbx.Params{"p": jsonPrefs})
-	_, err = uq.Execute()
-	if err != nil {
-		log.Printf("ERROR: unable to save preference data for %s: %s", uid, err)
-		c.String(http.StatusBadRequest, err.Error())
+	v4User := User{ID: userID, Virgo4ID: v4UserID, Preferences: string(jsonPrefs)}
+	dbErr := svc.GDB.Model(&v4User).Select("Preferences").Updates(v4User)
+	if dbErr.Error != nil {
+		log.Printf("ERROR: unable to save preference data for %s[%d]: %s", v4UserID, userID, dbErr.Error)
+		c.String(http.StatusBadRequest, dbErr.Error.Error())
 		return
 	}
 
 	c.String(http.StatusOK, "OK")
-}
-
-// GetPreferences will save a block of JSON preference data to the user table
-func (svc *ServiceContext) GetPreferences(c *gin.Context) {
-	userID := c.Param("uid")
-	v4User := &V4User{}
-	q := svc.DB.NewQuery(`select id,preferences from users where virgo4_id={:id}`)
-	q.Bind(dbx.Params{"id": userID})
-	err := q.One(v4User)
-	if err != nil {
-		log.Printf("WARN: No v4 user settings found for %s: %+v, returning defaults", userID, err)
-		v4User.Preferences = "{}"
-	}
-	// Format preferences as JSON
-	prefStr := []byte(v4User.Preferences)
-	var prefJSON map[string]interface{}
-	if err := json.Unmarshal(prefStr, &prefJSON); err != nil {
-		log.Printf("ERROR: invalid preferences JSON")
-		panic(err)
-	}
-
-	c.JSON(http.StatusOK, prefJSON)
 }
 
 // RequestContactUpdate accepts update data and sends it to lib-circ@virginia.edu

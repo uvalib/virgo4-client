@@ -179,9 +179,6 @@ export default {
       async initializeBrowse() {
          this.$store.commit("shelf/setBrowseRange", 10)
          this.$store.commit("shelf/setShowSpinner", true)
-         if ( this.isSignedIn) {
-            this.$store.dispatch("bookmarks/getBookmarks")
-         }
          await this.$store.dispatch("shelf/getBrowseData", this.$route.params.id )
       },
       browseNext() {

@@ -4,64 +4,60 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/rs/xid"
+	"gorm.io/gorm"
 )
-
-// SearchTemplate contains details about a user saved advanced search template
-type SearchTemplate struct {
-	ID       int    `db:"id" json:"id"`
-	UserID   int    `db:"user_id" json:"-"`
-	Name     string `db:"name" json:"name"`
-	Template string `db:"template" json:"template"`
-}
-
-// TableName sets the name of the table in the DB that this struct binds to
-func (s SearchTemplate) TableName() string {
-	return "search_templates"
-}
 
 // SavedSearch contains details about a user saved seatch
 type SavedSearch struct {
-	ID        int       `db:"id" json:"-"`
-	UserID    int       `db:"user_id" json:"-"`
-	Token     string    `db:"token" json:"token"`
-	Name      string    `db:"name" json:"name"`
-	Public    bool      `db:"is_public" json:"public"`
-	CreatedAt time.Time `db:"created_at" json:"created"`
-	URL       string    `db:"search_url" json:"url"`
+	ID        int       `json:"id"`
+	UserID    int       `json:"-"`
+	Token     string    `json:"token"`
+	Name      string    `json:"name"`
+	IsPublic  bool      `json:"public"`
+	CreatedAt time.Time `json:"created"`
+	SearchURL string    `json:"url"`
+}
+
+// SearchHistory contains data about a user searching history
+type SearchHistory struct {
+	ID        int       `json:"id"`
+	UserID    int       `json:"-"`
+	URL       string    `json:"url"`
+	CreatedAt time.Time `json:"created"`
 }
 
 // TableName sets the name of the table in the DB that this struct binds to
-func (s SavedSearch) TableName() string {
-	return "saved_searches"
+func (s SearchHistory) TableName() string {
+	return "search_history"
 }
 
 // DeleteAllSavedSearches will remove all saved searches from a user account
 func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
-	uid := c.Param("uid")
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
 	clearType := c.Query("type")
-	userID := c.MustGet("v4id").(int)
-	log.Printf("Delete searches (%s) for user %s...", clearType, uid)
+	log.Printf("INFO: delete searches (%s) for user %s[%d]...", clearType, v4UserID, userID)
 	if clearType != "history" && clearType != "saved" {
 		log.Printf("ERROR: unsupported search type %s", clearType)
 		c.String(http.StatusBadRequest, fmt.Sprintf("'%s' is not a valid search type", clearType))
 		return
 	}
 
-	qs := "delete from saved_searches where user_id={:uid}"
+	var dbResp *gorm.DB
 	if clearType == "history" {
-		qs = "delete from search_history where user_id={:uid}"
+		dbResp = svc.GDB.Delete(SearchHistory{}, "user_id=?", userID)
+	} else if clearType == "saved" {
+		dbResp = svc.GDB.Delete(SavedSearch{}, "user_id=?", userID)
 	}
-	dq := svc.DB.NewQuery(qs)
-	dq.Bind(dbx.Params{"uid": userID})
-	_, err := dq.Execute()
-	if err != nil {
-		log.Printf("ERROR: unable to delete searches (%s) for %s (%d): %s", clearType, uid, userID, err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
+
+	if dbResp.Error != nil {
+		log.Printf("ERROR: unable to delete searches (%s) for %s[%d]: %s", clearType, v4UserID, userID, dbResp.Error.Error())
+		c.String(http.StatusInternalServerError, dbResp.Error.Error())
 		return
 	}
 
@@ -70,23 +66,26 @@ func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
 
 // PublishSavedSearch will make a private search public
 func (svc *ServiceContext) PublishSavedSearch(c *gin.Context) {
-	uid := c.Param("uid")
-	token := c.Param("token")
-	log.Printf("User %s publish saved search %s...", uid, token)
-	svc.setSearchVisibility(c, uid, token, true)
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	searchID, _ := strconv.Atoi(c.Param("id"))
+	log.Printf("User %s[%d] publish saved search %d...", v4UserID, userID, searchID)
+	svc.setSearchVisibility(c, userID, searchID, true)
 }
 
-func (svc *ServiceContext) setSearchVisibility(c *gin.Context, uid string, token string, public bool) {
-	userID := c.MustGet("v4id").(int)
-	log.Printf("User %s has ID %d", uid, userID)
-
-	sq := svc.DB.NewQuery("update saved_searches set is_public={:pub} where user_id={:uid} and token={:tok}")
-	sq.Bind(dbx.Params{"pub": public})
-	sq.Bind(dbx.Params{"uid": userID})
-	sq.Bind(dbx.Params{"tok": token})
-	_, err := sq.Execute()
-	if err != nil {
-		c.String(http.StatusBadRequest, "Publish failed %s", err.Error())
+func (svc *ServiceContext) setSearchVisibility(c *gin.Context, userID int, searchID int, public bool) {
+	var search SavedSearch
+	resp := svc.GDB.Find(&search, searchID)
+	if resp.Error != nil {
+		log.Printf("Search %d not found: %s", searchID, resp.Error.Error())
+		c.String(http.StatusNotFound, "folder not found")
+		return
+	}
+	search.IsPublic = public
+	resp = svc.GDB.Model(&search).Select("IsPublic").Updates(search)
+	if resp.Error != nil {
+		log.Printf("ERROR: set visibility forsearch %d failed: %s", searchID, resp.Error.Error())
+		c.String(http.StatusInternalServerError, resp.Error.Error())
 		return
 	}
 	c.String(http.StatusOK, "ok")
@@ -94,57 +93,24 @@ func (svc *ServiceContext) setSearchVisibility(c *gin.Context, uid string, token
 
 // UnpublishSavedSearch will make a public search private
 func (svc *ServiceContext) UnpublishSavedSearch(c *gin.Context) {
-	uid := c.Param("uid")
-	token := c.Param("token")
-	log.Printf("User %s unpublish saved search %s...", uid, token)
-	svc.setSearchVisibility(c, uid, token, false)
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	searchID, _ := strconv.Atoi(c.Param("id"))
+	log.Printf("User %s[%d] publish saved search %d...", v4UserID, userID, searchID)
+	svc.setSearchVisibility(c, userID, searchID, false)
 }
 
 // DeleteSavedSearch will delete a saved search with the matching token
 func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
-	uid := c.Param("uid")
-	token := c.Param("token")
-	userID := c.MustGet("v4id").(int)
-	log.Printf("User %s delete search %s...", uid, token)
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	searchID, _ := strconv.Atoi(c.Param("id"))
+	log.Printf("INFO: user %s[%d] delete search %d request", v4UserID, userID, searchID)
 
-	dq := svc.DB.NewQuery("delete from saved_searches where user_id={:userID} and token={:token}")
-	dq.Bind(dbx.Params{"userID": userID})
-	dq.Bind(dbx.Params{"token": token})
-	_, dErr := dq.Execute()
-	if dErr != nil {
-		log.Printf("ERROR: couldn't delete user %s saved search %s: %v", uid, token, dErr)
-		c.JSON(http.StatusInternalServerError, dErr.Error)
-		return
-	}
-
-	c.String(http.StatusOK, "ok")
-}
-
-// UpdateSavedSearch will update URL of a previpously saved search. This is temporary until
-// all searches have been converted
-func (svc *ServiceContext) UpdateSavedSearch(c *gin.Context) {
-	uid := c.Param("uid")
-	v4UserID := c.MustGet("v4id").(int)
-	token := c.Param("token")
-	log.Printf("User %s update saved search request", uid)
-
-	var req struct {
-		URL string `json:"url"`
-	}
-	qpErr := c.ShouldBindJSON(&req)
-	if qpErr != nil {
-		log.Printf("ERROR: invalid saved search payload: %v", qpErr)
-		c.String(http.StatusBadRequest, qpErr.Error())
-		return
-	}
-
-	sq := svc.DB.NewQuery("update saved_searches set search_url={:url} where user_id={:uid} and token={:tok}")
-	sq.Bind(dbx.Params{"url": req.URL})
-	sq.Bind(dbx.Params{"uid": v4UserID})
-	sq.Bind(dbx.Params{"tok": token})
-	_, err := sq.Execute()
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Update failed %s", err.Error())
+	resp := svc.GDB.Delete(&SavedSearch{}, searchID)
+	if resp.Error != nil {
+		log.Printf("ERROR: couldn't delete user %s[%d] saved search %d: %s", v4UserID, userID, searchID, resp.Error.Error())
+		c.JSON(http.StatusInternalServerError, resp.Error.Error())
 		return
 	}
 
@@ -153,9 +119,9 @@ func (svc *ServiceContext) UpdateSavedSearch(c *gin.Context) {
 
 // SaveSearch will save a named search in that saved_searches table along with an access token
 func (svc *ServiceContext) SaveSearch(c *gin.Context) {
-	uid := c.Param("uid")
-	userID := c.MustGet("v4id").(int)
-	log.Printf("User %s[%d] save search request...", uid, userID)
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	log.Printf("INFO: user %s[%d] save search request...", v4UserID, userID)
 
 	// init a reqponse object
 	var resp struct {
@@ -166,7 +132,6 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 
 	// Make sure the passed request object is well formed JSON
 	var reqObj struct {
-		Token    string `json:"token"`
 		Name     string `json:"name"`
 		URL      string `json:"url"`
 		IsPublic bool   `json:"isPublic"`
@@ -188,31 +153,18 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 		return
 	}
 
-	if reqObj.Token == "" {
-		// Generate an access token and save it to the saved searches table
-		search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
-			CreatedAt: time.Now(), URL: reqObj.URL, Public: reqObj.IsPublic}
-		err := svc.DB.Model(&search).Insert()
-		if err != nil {
-			log.Printf("ERROR: User %s unable to add saved search %+v: %v", uid, reqObj, err)
-			resp.Message = err.Error()
-			c.JSON(http.StatusInternalServerError, resp)
-			return
-		}
-		log.Printf("User %s search %s saved as %s", uid, reqObj.Name, search.Token)
-		resp.Token = search.Token
-	} else {
-		log.Printf("Convert old-style search %s to URL", reqObj.Token)
-		q := svc.DB.NewQuery("update saved_searches set search_url={:u} where token={:tok}")
-		q.Bind(dbx.Params{"tok": reqObj.Token})
-		q.Bind(dbx.Params{"u": reqObj.URL})
-		q.Bind(dbx.Params{"empty": "{}"})
-		_, e := q.Execute()
-		if e != nil {
-			log.Printf("ERROR: unable to convert search %s: %s", reqObj.Token, e.Error())
-		}
+	// Generate an access token and save it to the saved searches table
+	search := SavedSearch{Token: xid.New().String(), UserID: userID, Name: reqObj.Name,
+		CreatedAt: time.Now(), SearchURL: reqObj.URL, IsPublic: reqObj.IsPublic}
+	dbResp := svc.GDB.Create(&search)
+	if dbResp.Error != nil {
+		log.Printf("ERROR: user %s unable to add saved search %+v: %s", v4UserID, reqObj, dbResp.Error.Error())
+		resp.Message = dbResp.Error.Error()
+		c.JSON(http.StatusInternalServerError, resp)
+		return
 	}
-
+	log.Printf("User %s search %s saved as %s", v4UserID, reqObj.Name, search.Token)
+	resp.Token = search.Token
 	resp.Success = true
 	resp.Message = "Search saved"
 
@@ -225,39 +177,38 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 	token := c.Param("token")
 	log.Printf("Get saved search %s", token)
 	var search SavedSearch
-	err := svc.DB.Select().Where(dbx.HashExp{"token": token}).One(&search)
-	if err != nil {
-		log.Printf("Search %s not found", token)
+	resp := svc.GDB.Where("token=?", token).First(&search)
+	if resp.Error != nil {
+		log.Printf("ERROR: get search %s failed: %s", token, resp.Error.Error())
 		c.String(http.StatusNotFound, "%s not found", token)
 		return
 	}
 
-	if search.Public {
-		log.Printf("Search %s is public", token)
+	if search.IsPublic {
+		log.Printf("INFO: search %s is public", token)
 		c.JSON(http.StatusOK, search)
 		return
 	}
 
-	log.Printf("Search %s is private to userID %d", token, search.UserID)
-	claims, error := getJWTClaims(c)
-	if error != nil {
-		log.Printf("ERROR: %s", error.Error())
-		c.String(http.StatusUnauthorized, error.Error())
+	log.Printf("INFO: %s is private to userID %d; looking up existing user claims", token, search.UserID)
+	claims, err := getJWTClaims(c)
+	if err != nil {
+		log.Printf("ERROR: %s", err.Error())
+		c.String(http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": claims.UserID})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("Private search couldn't locate user %s: %s", claims.UserID, uErr.Error())
+	log.Printf("INFO: lookup userID for %s", claims.UserID)
+	var user User
+	resp = svc.GDB.Where("virgo4_id=?", claims.UserID).First(&user)
+	if resp.Error != nil {
+		log.Printf("ERROR: private search couldn't locate user %s: %s", claims.UserID, resp.Error.Error())
 		c.String(http.StatusNotFound, "%s not found", token)
 		return
 	}
 
-	if userID != search.UserID {
-		log.Printf("Private search not available to user")
+	if user.ID != search.UserID {
+		log.Printf("INFO: search %s is private to user %d; not available to user %d", token, search.UserID, user.ID)
 		c.String(http.StatusNotFound, "%s not found", token)
 		return
 	}
@@ -267,49 +218,48 @@ func (svc *ServiceContext) GetSearch(c *gin.Context) {
 // GetUserSavedSearches will get all of the searches saved by the specified user
 func (svc *ServiceContext) GetUserSavedSearches(c *gin.Context) {
 	v4id := c.Param("uid")
-	userID := c.MustGet("v4id").(int)
+	userID := c.GetInt("v4id")
 	log.Printf("Get saved searches for %s[%d]", v4id, userID)
 
 	var resp struct {
-		Saved   []SavedSearch `json:"saved"`
-		History []string      `json:"history"`
+		Saved   []SavedSearch   `json:"saved"`
+		History []SearchHistory `json:"history"`
 	}
-	resp.History = make([]string, 0)
-	svc.DB.Select().Where(dbx.HashExp{"user_id": userID}).OrderBy("name asc").All(&resp.Saved)
-	q := svc.DB.NewQuery("select url from search_history where user_id={:uid} order by created_at desc")
-	q.Bind(dbx.Params{"uid": userID})
-	rows, err := q.Rows()
-	if err != nil {
-		log.Printf("ERROR: unable to get search history for %s: %s", v4id, err.Error())
+	resp.Saved = make([]SavedSearch, 0)
+	resp.History = make([]SearchHistory, 0)
+	svc.GDB.Where("user_id=?", userID).Order("name asc").Find(&resp.Saved)
+	dbResp := svc.GDB.Where("user_id=?", userID).Order("created_at desc").Find(&resp.History)
+	if dbResp.Error != nil {
+		log.Printf("ERROR: unable to get history: %s", dbResp.Error.Error())
 	} else {
-		for rows.Next() {
-			var url string
-			rows.Scan(&url)
-			resp.History = append(resp.History, url)
-		}
+		log.Printf("INFO: history %+v", resp.History)
 	}
+
 	c.JSON(http.StatusOK, resp)
 }
 
 func (svc *ServiceContext) updateSearchHistory(userID int, url string) {
-	sq := svc.DB.NewQuery("insert into search_history (user_id, url) values ({:uid}, {:url})")
-	sq.Bind(dbx.Params{"uid": userID})
-	sq.Bind(dbx.Params{"url": url})
-	_, err := sq.Execute()
-	if err != nil {
-		log.Printf("ERROR: Unable to save search history for user %d: %s", userID, err.Error())
+	history := SearchHistory{UserID: userID, URL: url, CreatedAt: time.Now()}
+	log.Printf("INFO: add search history %+v", history)
+	addResp := svc.GDB.Create(&history)
+	if addResp.Error != nil {
+		log.Printf("ERROR: Unable to save search history for user %d: %s", userID, addResp.Error.Error())
 		return
 	}
 
 	// now delete any saves after the 15th (ordered by date descending)
-	log.Printf("Limit saved searches for user %d to 15...", userID)
-	sel := "select id from search_history where user_id={:uid} order by created_at desc offset 15"
-	qStr := fmt.Sprintf("delete from search_history where id in (%s)", sel)
-	sq = svc.DB.NewQuery(qStr)
-	sq.Bind(dbx.Params{"uid": userID})
-	_, err = sq.Execute()
-	if err != nil {
-		log.Printf("ERROR: Unable to limit history for user %d: %s", userID, err.Error())
-		return
+	log.Printf("INFO: limit saved searches for user %d to 15", userID)
+	var old []SearchHistory
+	svc.GDB.Where("user_id=?", userID).Order("created_at desc").Offset(15).Find(&old)
+	log.Printf("INFO: user %d has %d search history entries beyond 15", userID, len(old))
+	if len(old) > 0 {
+		ids := make([]int, 0)
+		for _, h := range old {
+			ids = append(ids, h.ID)
+		}
+		resp := svc.GDB.Delete(SearchHistory{}, ids)
+		if resp.Error != nil {
+			log.Printf("ERROR: unable to limit history for user %d: %s", userID, resp.Error.Error())
+		}
 	}
 }

@@ -23,16 +23,11 @@ const searches = {
          })
          state.history.splice(0, state.history.length)
          data.history.forEach( s => {
-            state.history.push( stripExclude(s) )
+            let url = stripExclude(s)
+            if (url != "/") {
+               state.history.push(  url )
+            }
          })
-      },
-      updateSearch(state, {token, url}) {
-         let sIdx = state.saved.findIndex( s => s.token==token)
-         if ( sIdx > -1 ) {
-            let s = state.saved[sIdx]
-            s.url = url
-            state.saved.splice(sIdx,1,s)
-         }
       },
       clearSavedSearches(state) {
          state.saved.splice(0, state.saved.length)
@@ -44,8 +39,8 @@ const searches = {
          state.saved.splice(0, state.saved.length)
          state.history.splice(0, state.history.length)
       },
-      deleteSavedSearch(state, token) {
-         let idx = state.saved.findIndex(s => s.token == token)
+      deleteSavedSearch(state, searchID) {
+         let idx = state.saved.findIndex(s => s.id == searchID)
          if (idx > -1) {
             state.saved.splice(idx,1)
          }
@@ -58,18 +53,15 @@ const searches = {
    actions: {
       async updateVisibility(ctx, data) {
          ctx.commit('setLookingUp', true)
+         let url = `/api/users/${data.userID}/searches/${data.id}/publish`
+         console.log(url)
          if (data.public) {
-            await axios.post(`/api/users/${data.userID}/searches/${data.token}/publish`)
+            await axios.post(url)
          } else {
-            await axios.delete(`/api/users/${data.userID}/searches/${data.token}/publish`)
+            await axios.delete(url)
          }
          ctx.commit('setLookingUp', false)
       },
-      updateURL(ctx, {userID,token,searchURI}) {
-         axios.put(`/api/users/${userID}/searches/${token}`, {url: searchURI})
-         ctx.commit('updateSearch', {token, searchURI} )
-      },
-
       getAll(ctx, userID) {
          ctx.commit('setLookingUp', true)
          axios.get(`/api/users/${userID}/searches`).then((response) => {
@@ -86,22 +78,21 @@ const searches = {
          ctx.commit('setLastSavedSearchKey', resp.data.token)
       },
 
-      updateHistory(ctx) {
-         if ( ctx.rootGetters['user/isSignedIn'] ) {
-            let searchURL = this.router.currentRoute.value.fullPath
+      updateHistory(ctx, fullPath) {
+         if ( ctx.rootGetters['user/isSignedIn'] && fullPath != "/" ) {
             let userID = ctx.rootState.user.signedInUser
-            let req = {url: searchURL, history: true}
+            let req = {url: fullPath, history: true}
             axios.post(`/api/users/${userID}/searches`, req).catch((error) => {
                console.error("Unable to save search history: "+error)
             })
          }
       },
 
-      async delete(ctx, data) {
+      async delete(ctx, {userID, searchID}) {
          try {
-            await axios.delete(`/api/users/${data.userID}/searches/${data.token}`)
+            await axios.delete(`/api/users/${userID}/searches/${searchID}`)
             ctx.commit('setLastSavedSearchKey', "")
-            ctx.commit('deleteSavedSearch', data.token)
+            ctx.commit('deleteSavedSearch', searchID)
          } catch (e) {
             ctx.commit('system/setError', "Unable to delete saved search. Please try again later.", {root: true})
          }
@@ -131,7 +122,8 @@ const searches = {
    }
 }
 
-function stripExclude( url) {
+function stripExclude( history ) {
+   let url = history.url
    let idx1 = url.indexOf("&exclude")
    if (idx1 > -1) {
       let idx2 = url.indexOf("&", idx1+1)

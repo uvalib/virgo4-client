@@ -52,6 +52,9 @@ export default {
    },
    beforeRouteUpdate(to) {
       console.log("NEW HOME ROUTE "+ to.fullPath)
+      if ( this.userSearched) {
+         this.$store.dispatch("searches/updateHistory", to.fullPath)
+      }
       this.restoreSearchFromQueryParams(to.query)
       this.pageTitle = "Search"
       if (this.searchMode != "basic") {
@@ -126,7 +129,7 @@ export default {
          await this.$store.dispatch("query/loadSearch", token)
       }
 
-      this.mapLegacyQueries( this.$route.query, token )
+      this.mapLegacyQueries( this.$route.query )
    },
    mounted() {
       if ( this.searchMode == "basic") {
@@ -135,7 +138,7 @@ export default {
    },
 
    methods: {
-      mapLegacyQueries( query, token ) {
+      mapLegacyQueries( query ) {
          let changed = false
          let newQ = Object.assign({}, query )
 
@@ -216,10 +219,6 @@ export default {
          }
 
          if ( changed ) {
-            if ( token ) {
-               this.updateSavedSearch(token, newQ)
-            }
-
             // set set of sources searched to widest to ensure currect results shown
             this.searchSources = "all"
             if (newQ.pool == "images") {
@@ -242,16 +241,6 @@ export default {
             }
             this.restoreSearchFromQueryParams(this.$route.query)
          }
-      },
-
-      updateSavedSearch(token, newQuery) {
-         let qs = []
-         for (const [k, v] of Object.entries(newQuery)) {
-            qs.push(`${k}=${encodeURIComponent(v)}`)
-         }
-         let searchURI = `/search?${qs.join("&")}`
-         let userID = this.signedInUser
-         this.$store.dispatch("searches/updateURL", {userID, token, searchURI})
       },
 
       async restoreSearchFromQueryParams( query ) {
@@ -322,10 +311,11 @@ export default {
                let changed = this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam || this.userSearched == true
 
                if ( this.userSearched ) {
-                  this.$store.dispatch("searches/updateHistory")
+                  // this.router.currentRoute.value.fullPath
+                  // this.$store.dispatch("searches/updateHistory")
                   this.userSearched = false
                }
-
+               console.log("DO SEARCH")
                this.$announcer.set(`search in progress`, 'assertive')
                if (this.searchSources == "all") {
                   await this.$store.dispatch("searchAllPools")

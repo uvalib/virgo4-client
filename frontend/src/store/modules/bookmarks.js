@@ -63,12 +63,14 @@ const bookmarks = {
          state.bookmarks.splice(0, state.bookmarks.length)
          state.public.splice(0, state.public.length)
       },
-      // CALLED ONLY FROM BOOKMARKS ACTION
       setBookmarks(state, bookmarks) {
          state.bookmarks.splice(0, state.bookmarks.length)
          bookmarks.forEach( b => {
             b.bookmarks.forEach( d => {
                d.details = JSON.parse(d.details)
+               let pn = d.pool.name
+               delete d.pool
+               d.pool = pn
             })
             state.bookmarks.push(b)
          })
@@ -87,6 +89,22 @@ const bookmarks = {
             }
          })
       },
+      updateFolder(state, folder) {
+         folder.bookmarks.forEach( b => b.details = JSON.parse(b.details) )
+         var idx = state.bookmarks.findIndex( f => f.id == folder.id)
+         if (idx > -1) {
+            state.bookmarks.splice(idx, 1, folder)
+         }
+      },
+      removeFolder(state, folderID) {
+         var idx = state.bookmarks.findIndex( f => f.id == folderID)
+         if (idx > -1) {
+            state.bookmarks.splice(idx, 1)
+         }
+      },
+      addFolder(state, folder) {
+         state.bookmarks.splice(0, 0, folder)
+      },
    },
 
    actions: {
@@ -101,27 +119,11 @@ const bookmarks = {
             this.router.push("/not_found")
           })
       },
-      async getBookmarks(ctx) {
-         if (ctx.getters.hasBookmarks) {
-            return
-         }
-         let v4UID = ctx.rootState.user.signedInUser
-         if ( v4UID) {
-            ctx.commit('setSearching', true)
-            return axios.get(`/api/users/${v4UID}/bookmarks`).then((response) => {
-               ctx.commit('setBookmarks', response.data)
-               ctx.commit('setSearching', false)
-            }).catch((error) => {
-               ctx.commit('system/setError', error, { root: true })
-               ctx.commit('setSearching', false)
-            })
-         }
-      },
 
       // bmData Fields: Folder, Pool, ID, Title. Author optional
       async addBookmark(ctx, bmData ) {
          let v4UID = ctx.rootState.user.signedInUser
-         let url = `/api/users/${v4UID}/bookmarks/items`
+         let url = `/api/users/${v4UID}/bookmarks/add`
          let data = {folder: bmData.folder, pool: bmData.pool, identifier: bmData.identifier}
          let detail = {title : bmData.title, author: bmData.author}
          data['details'] = JSON.stringify(detail)
@@ -132,9 +134,9 @@ const bookmarks = {
 
       async addFolder(ctx, folder) {
          let v4UID = ctx.rootState.user.signedInUser
-         let url = `/api/users/${v4UID}/bookmarks/folders`
+         let url = `/api/users/${v4UID}/bookmarks/folders/add`
          return axios.post(url, {name: folder}).then((response) => {
-            ctx.commit('setBookmarks', response.data)
+            ctx.commit('addFolder', response.data)
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
          })
@@ -143,7 +145,7 @@ const bookmarks = {
          let v4UID = ctx.rootState.user.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folder.id}`
          axios.post(url, {name: folder.name}).then((response) => {
-            ctx.commit('setBookmarks', response.data)
+            ctx.commit('updateFolder', response.data)
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
          })
@@ -152,17 +154,17 @@ const bookmarks = {
          let v4UID = ctx.rootState.user.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}`
          try {
-            let response = await axios.delete(url)
-            ctx.commit('setBookmarks', response.data)
+            await axios.delete(url)
+            ctx.commit('removeFolder', folderID)
          } catch(error)  {
             ctx.commit('system/setError', error, { root: true })
          }
       },
-      removeBookmarks(ctx, bookmarks) {
+      removeBookmarks(ctx, {folderID, bookmarkIDs}) {
          let v4UID = ctx.rootState.user.signedInUser
-         let url = `/api/users/${v4UID}/bookmarks/delete`
-         axios.post(url, {bookmarkIDs: bookmarks}).then((response) => {
-            ctx.commit('setBookmarks', response.data)
+         let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`
+         axios.post(url, {bookmarkIDs: bookmarkIDs}).then((response) => {
+            ctx.commit('updateFolder', response.data)
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
          })
@@ -208,12 +210,7 @@ const bookmarks = {
             let blob = new Blob([response.data], { type: response.headers['content-type'] })
             let href = window.URL.createObjectURL(blob)
             window.open(href)
-
-            // if using dowload.js
-            // const content = response.headers['content-type'];
-            // download(response.data, "results.pdf", content)
          }).catch((error) => {
-             // no negative impact on client; just don't show shelf browse and log error
              ctx.dispatch("system/reportError", error, {root: true})
          })
       },

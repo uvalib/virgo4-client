@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
@@ -16,12 +15,10 @@ import (
 // If one cannot be found, the request will be aborted
 func (svc *ServiceContext) UserMiddleware(c *gin.Context) {
 	uid := c.Param("uid")
-	var userID int
-	uq := svc.DB.NewQuery("select id from users where virgo4_id={:v4id}")
-	uq.Bind(dbx.Params{"v4id": uid})
-	uErr := uq.Row(&userID)
-	if uErr != nil {
-		log.Printf("ERROR: coubdn't find user %s: %v", uid, uErr)
+	var user User
+	resp := svc.GDB.Where("virgo4_id = ?", uid).First(&user)
+	if resp.Error != nil {
+		log.Printf("ERROR: couldn't find user %s: %v", uid, resp.Error.Error())
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
@@ -39,8 +36,8 @@ func (svc *ServiceContext) UserMiddleware(c *gin.Context) {
 		return
 	}
 
-	log.Printf("User %s has virgo_id %d", uid, userID)
-	c.Set("v4id", userID)
+	log.Printf("User %s has virgo_id %d", uid, user.ID)
+	c.Set("v4id", user.ID)
 	c.Next()
 }
 
