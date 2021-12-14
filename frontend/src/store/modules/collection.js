@@ -148,9 +148,9 @@ const collection = {
       }
    },
    actions: {
-      getCollections(ctx) {
+      async getCollections(ctx) {
          let url = `${ctx.rootState.system.collectionsURL}/api/collections`
-         axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             ctx.commit("setCollections", response.data)
          })
       },

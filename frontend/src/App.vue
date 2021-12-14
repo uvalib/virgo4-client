@@ -153,6 +153,7 @@ export default {
       // the flag shows a config spinner until ready
       await this.$store.dispatch('system/getConfig')
       await this.$store.dispatch('pools/getPools')
+      await this.$store.dispatch("collection/getCollections")
       this.configuring = false
 
       // Make sure the session is is kept alive
@@ -175,7 +176,6 @@ export default {
       }
 
       this.$store.dispatch("filters/getPreSearchFilters")
-      this.$store.dispatch("collection/getCollections")
    },
    mounted() {
       this.$nextTick( ()=>{
