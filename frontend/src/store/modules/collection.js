@@ -29,19 +29,19 @@ const collection = {
          return (state.id != "" && state.lookingUp == false)
       },
       canSearch: state => {
-         return state.features.findIndex( f => f == "search_within") > -1
+         return state.features.findIndex( f => f.name == "search_within") > -1
       },
       hasCalendar: state => {
-         return state.features.findIndex( f => f == "calendar_navigation") > -1
+         return state.features.findIndex( f => f.name == "calendar_navigation") > -1
       },
       isFullPage: state => {
-         return state.features.findIndex( f => f == "full_page_view") > -1
+         return state.features.findIndex( f => f.name == "full_page_view") > -1
       },
       isBookplate: state => {
-         return state.features.findIndex( f => f == "bookplate") > -1
+         return state.features.findIndex( f => f.name == "bookplate") > -1
       },
       canNavigate: state => {
-         return state.features.findIndex( f => f == "sequential_navigation") > -1
+         return state.features.findIndex( f => f.name == "sequential_navigation") > -1
       },
       getPidForDate: state => date => {
          let yearPubs = state.yearPublications.find( yp => yp.year == state.currentYear)
@@ -129,7 +129,7 @@ const collection = {
          state.endDate = data.end_date
          state.filter = data.filter_name
          state.viewMode = "virgo"
-         if (state.features.includes("full_page_view") ) {
+         if (state.features.findIndex(f => f.name == "full_page_view") > -1 ) {
             state.viewMode = "reader"
          }
       },

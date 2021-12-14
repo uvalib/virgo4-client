@@ -342,7 +342,7 @@ const filters = {
          let done = false
          let collections = ctx.rootState.collection.collections
          collections.some( c => {
-            let filter = filterObj.facets.find( f=>f.facet_id == c.facet && f.value == c.title)
+            let filter = filterObj.facets.find( f=>f.facet_id == c.filter_name && f.value == c.title)
             if (filter) {
                this.dispatch("collection/getCollectionContext", filter.value, {root: true})
                done = true
