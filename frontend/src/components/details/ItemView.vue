@@ -117,7 +117,6 @@ export default {
          pools: state => state.pools.list,
          selectedHitIdx: state=> state.selectedHitIdx,
          lastSearchURL: state => state.lastSearchURL,
-         poolMapping: state=>state.system.poolMapping,
          searchAPI: state=>state.system.searchAPI,
       }),
       ...mapGetters({
