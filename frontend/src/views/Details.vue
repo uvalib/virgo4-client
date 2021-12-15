@@ -5,7 +5,7 @@
       </div>
       <template v-else>
          <CollectionHeader v-if="collectionAvailable && (isCollection || isCollectionHead)"/>
-         <FullPageCollectionView v-if="isFullPage && isCollection && viewMode=='reader' && collectionAvailable" />
+         <FullPageCollectionView v-if="isFullPage && isCollection && collectionAvailable" />
          <ItemView v-else />
       </template>
    </div>
@@ -34,7 +34,6 @@ export default {
          poolMapping: state=>state.system.poolMapping,
          loadingDigitalContent : state => state.item.loadingDigitalContent,
          searching: state=>state.searching,
-         viewMode: state=>state.collection.viewMode
       }),
       ...mapGetters({
          isDigitalCollection: 'item/isDigitalCollection',

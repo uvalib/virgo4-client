@@ -33,15 +33,7 @@
             <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
          </div>
 
-         <div v-if="isFullPage && !isCollectionHead" class="pure-form">
-            <label>View:</label>
-            <select v-model="viewMode" @change="viewModeChanged">
-               <option value="virgo">{{collection.itemLabel}} information</option>
-               <option value="reader">Image only</option>
-            </select>
-         </div>
-
-         <V4Button v-if="lastSearchURL && viewMode=='reader'" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
+         <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
       </div>
    </section>
 </template>
@@ -78,7 +70,6 @@ export default {
       ...mapFields({
          userSearched: 'query.userSearched',
          basic: 'query.basic',
-         viewMode: 'collection.viewMode',
       }),
       publishedDate() {
          let field = this.details.detailFields.find( f => f.name == "published_date")
@@ -89,9 +80,6 @@ export default {
       }
    },
    methods: {
-      viewModeChanged() {
-         this.$analytics.trigger('Results', 'COLLECTION_VIEW_MODE_CHANGED', this.viewMode )
-      },
       datePicked(pid) {
          this.$router.push(pid)
       },
