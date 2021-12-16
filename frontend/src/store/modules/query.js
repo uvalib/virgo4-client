@@ -257,15 +257,6 @@ const query = {
                ctx.commit('setSearching', false, { root: true })
                this.router.push("/not_found")
             } else {
-               let params = new URLSearchParams(response.data.url.split("?")[1])
-               let rawFilter = params.get("filter")
-               if ( rawFilter && rawFilter != "") {
-                  if ( rawFilter[0] != "{") {
-                     // really old format; just drop the filter
-                     params.delete("filter")
-                     searchURL = "/search?"+params.toString()
-                  }
-               }
                await this.router.replace(searchURL)
             }
          } catch(error) {

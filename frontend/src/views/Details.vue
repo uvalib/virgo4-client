@@ -31,7 +31,6 @@ export default {
       ...mapState({
          details : state => state.item.details,
          citationsURL: state => state.system.citationsURL,
-         poolMapping: state=>state.system.poolMapping,
          loadingDigitalContent : state => state.item.loadingDigitalContent,
          searching: state=>state.searching,
       }),
@@ -57,13 +56,6 @@ export default {
          }
 
          this.mode = mode
-         let mapping = this.poolMapping[src]
-         if (mapping && mapping.pool != src) {
-            src = mapping.pool
-            let fixed = `/sources/${src}/items/${id}`
-            await this.$router.replace( fixed )
-            return
-         }
 
          let bmTarget = this.$store.getters['restore/bookmarkTarget']
          if (bmTarget.origin == "SHELF_BROWSE"  ) {

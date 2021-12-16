@@ -1,5 +1,5 @@
 <template>
-   <div v-if="hasResults" tabindex="-1" id="results-container"
+   <div tabindex="-1" id="results-container"
       class="search-results" aria-describedby="search-summary"
    >
       <SearchSuggestions />
@@ -63,7 +63,6 @@ export default {
    },
    computed: {
       ...mapGetters({
-         hasResults: 'hasResults',
          isSignedIn: 'user/isSignedIn',
          rawQueryString: 'query/string',
          filterQueryParam: 'filters/asQueryParam',

@@ -32,7 +32,6 @@ const system = {
          {id: 'SCI-ENG', name: 'Brown Science and Engineering Library (Clark Hall)'},
          {id: 'CLEMONS', name: 'Clemons Library'}
       ],
-      poolMapping: {}
    },
 
    getters: {
@@ -163,7 +162,6 @@ const system = {
          state.collectionsURL = cfg.collectionsURL
          state.hsILLiadURL = cfg.hsILLiadURL
          state.shelfBrowseURL = cfg.shelfBrowseURL
-         state.poolMapping = cfg.poolMapping
       },
    },
 

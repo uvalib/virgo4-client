@@ -293,17 +293,16 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		Filter string `json:"filter"`
 	}
 	type config struct {
-		SearchAPI        string               `json:"searchAPI"`
-		AvailabilityURL  string               `json:"availabilityURL"`
-		CitationsURL     string               `json:"citationsURL"`
-		ColectionsURL    string               `json:"collectionsURL"`
-		ShelfBrowseURL   string               `json:"shelfBrowseURL"`
-		HealthSciURL     string               `json:"hsILLiadURL"`
-		TranslateMessage string               `json:"translateMessage"`
-		KioskMode        bool                 `json:"kiosk"`
-		DevServer        bool                 `json:"devServer"`
-		PoolMapping      map[string]mapTarget `json:"poolMapping"`
-		Firebase         *FirebaseConfig      `json:"firebase,omitempty"`
+		SearchAPI        string          `json:"searchAPI"`
+		AvailabilityURL  string          `json:"availabilityURL"`
+		CitationsURL     string          `json:"citationsURL"`
+		ColectionsURL    string          `json:"collectionsURL"`
+		ShelfBrowseURL   string          `json:"shelfBrowseURL"`
+		HealthSciURL     string          `json:"hsILLiadURL"`
+		TranslateMessage string          `json:"translateMessage"`
+		KioskMode        bool            `json:"kiosk"`
+		DevServer        bool            `json:"devServer"`
+		Firebase         *FirebaseConfig `json:"firebase,omitempty"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
@@ -329,22 +328,6 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		log.Printf("This request is from a dev server")
 		cfg.DevServer = true
 	}
-
-	cfg.PoolMapping = make(map[string]mapTarget)
-	cfg.PoolMapping["articles"] = mapTarget{Pool: "articles", Filter: "all"}
-	cfg.PoolMapping["books"] = mapTarget{Pool: "uva_library", Filter: "Books"}
-	cfg.PoolMapping["images"] = mapTarget{Pool: "images", Filter: "all"}
-	cfg.PoolMapping["jmrl"] = mapTarget{Pool: "jmrl", Filter: "all"}
-	cfg.PoolMapping["journals"] = mapTarget{Pool: "uva_library", Filter: "Journals"}
-	cfg.PoolMapping["archival"] = mapTarget{Pool: "uva_library", Filter: "Manuscripts & Archival Material"}
-	cfg.PoolMapping["maps"] = mapTarget{Pool: "uva_library", Filter: "Maps"}
-	cfg.PoolMapping["music-recordings"] = mapTarget{Pool: "uva_library", Filter: "Music Recordings"}
-	cfg.PoolMapping["musical-scores"] = mapTarget{Pool: "uva_library", Filter: "Musical Scores"}
-	cfg.PoolMapping["sound-recordings"] = mapTarget{Pool: "uva_library", Filter: "Sound Recordings"}
-	cfg.PoolMapping["thesis"] = mapTarget{Pool: "uva_library", Filter: "Theses"}
-	cfg.PoolMapping["uva_library"] = mapTarget{Pool: "uva_library", Filter: "all"}
-	cfg.PoolMapping["video"] = mapTarget{Pool: "uva_library", Filter: "Video"}
-	cfg.PoolMapping["worldcat"] = mapTarget{Pool: "worldcat", Filter: "all"}
 
 	c.JSON(http.StatusOK, cfg)
 }

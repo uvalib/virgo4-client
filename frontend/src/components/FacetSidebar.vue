@@ -210,8 +210,6 @@ i.check {
    padding: 25px 15px;
    bottom: 0;
    top: 0;
-   z-index: 50;
-   opacity: 0.9;
    font-size: 1.25em;
    font-weight: bold;
 }

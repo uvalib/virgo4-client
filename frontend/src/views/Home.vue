@@ -32,7 +32,7 @@
          <AdvancedSearch v-else/>
       </div>
       <Welcome  v-if="isHomePage && hasResults==false" />
-      <SearchResults/>
+      <SearchResults v-if="hasResults" />
    </div>
 </template>
 
@@ -50,6 +50,11 @@ export default {
    components: {
      SearchResults, V4BarcodeScanner, AdvancedSearch, Welcome, SourceSelector
    },
+   data: function() {
+      return {
+         queryMessage: "",
+      }
+   },
    beforeRouteUpdate(to) {
       console.log("NEW HOME ROUTE "+ to.fullPath)
       if ( this.userSearched) {
@@ -63,15 +68,21 @@ export default {
    },
    watch: {
       searching (newVal, _oldVal) {
-         if (newVal == false && this.restoreURL == "/") {
-            this.$nextTick( () => {
-               let r = document.getElementById("results-container")
-               if (r) {
-                  // sometimes results may not be availble - maybe auth session problems for one
-                  r.focus({preventScroll:true})
-                  this.$utils.scrollToItem(r)
-               }
-            })
+         if (newVal == false) {
+            if (this.restoreURL == "/") {
+               this.$nextTick( () => {
+                  let r = document.getElementById("results-container")
+                  if (r) {
+                     // sometimes results may not be availble - maybe auth session problems for one
+                     r.focus({preventScroll:true})
+                     this.$utils.scrollToItem(r)
+                  }
+               })
+            }
+            if ( this.queryMessage != "") {
+               this.$store.commit("system/setMessage", this.queryMessage)
+               this.queryMessage = ""
+            }
          }
       },
    },
@@ -86,7 +97,6 @@ export default {
          restoreURL: state=>state.restore.url,
          restoreSaveSearch: state=>state.restore.restoreSaveSearch,
          activeSort: state=>state.sort.activeSort,
-         poolMapping: state=>state.system.poolMapping,
          signedInUser: state=>state.user.signedInUser,
       }),
       ...mapGetters({
@@ -110,12 +120,6 @@ export default {
       basicSearch() {
         return this.searchMode != "advanced"
       },
-      // This restore refers to a Saved Search
-      isRestore() {
-         return ( this.$route.params !== undefined &&
-              this.$route.params.id !== undefined &&
-              this.$route.params.id != "")
-      },
       isHomePage() {
          return (this.$route.path == "/")
       },
@@ -129,7 +133,7 @@ export default {
          await this.$store.dispatch("query/loadSearch", token)
       }
 
-      this.mapLegacyQueries( this.$route.query )
+      this.handleLegacyQueries( this.$route.query )
    },
    mounted() {
       if ( this.searchMode == "basic") {
@@ -138,110 +142,78 @@ export default {
    },
 
    methods: {
-      mapLegacyQueries( query ) {
-         let changed = false
+      handleLegacyQueries( query ) {
+         let unsupported = []
+         var changed = false
          let newQ = Object.assign({}, query )
 
-         // always discard exclude param if it is present
+         // Scope and exclude are not used, but preserve the target pool
          if (newQ.exclude) {
+            unsupported.push("exclude="+newQ.exclude)
             delete newQ.exclude
             changed = true
          }
-
-         // Older filters were called Facet*... update name to Filter*
-         // and fix a completely new mapping: FacetCollection => FilterDigitalCollection
-         if (newQ.filter) {
-            if (newQ.filter.indexOf("Facet") > -1) {
-               let f = newQ.filter
-               delete newQ.filter
-               let  fixed = f.replace("FacetCollection", "FilterDigitalCollection")
-               fixed =  fixed.replace(/Facet/g, "Filter")
-               newQ.filter = fixed
-               changed = true
-            }
+         if (newQ.scope ) {
+            unsupported.push("scope="+newQ.scope)
+            delete newQ.scope
+            changed = true
+         }
+         if (newQ.filter && newQ.filter.indexOf("Facet") > -1) {
+            unsupported.push("filter="+newQ.filter)
+            delete newQ.filter
+            changed = true
+         }
+         if (newQ.pool && !this.poolDetails(newQ.pool)) {
+            unsupported.push("pool="+newQ.pool)
+            delete newQ.pool
+            changed = true
          }
 
          let queryStr = newQ.q
          if ( queryStr) {
             let idx0 = queryStr.indexOf(" AND filter:")
             if ( idx0 > -1) {
-               delete newQ.q
-               changed = true
-
+               unsupported.push("q="+newQ.q)
                newQ.q = queryStr.substring(0,idx0).trim()
-               let f = queryStr.substring(idx0)
-               let newFilter =  ""
-               if ( f.indexOf("Special Collections") !== -1) {
-                  newFilter = '{"FilterCollection":["Special Collections"]}'
-               } else if ( f.indexOf("Libra Repository") !== -1) {
-                  newFilter = '{"FilterCollection":["Libra Repository"]}'
-               }
-               if ( newQ.filter ) {
-                  newQ.filter = `{${newQ.filter.replace(/{|}/g, "")},${newFilter.replace(/{|}/g, "")}}`
-               } else {
-                  newQ.filter = newFilter
-               }
+               changed = true
             } else {
-               let idx0 = queryStr.indexOf("filter:")
-               if ( idx0 == 0) {
-                  newQ.q = "keyword:{*}"
-                  let fStr = queryStr.replace(/filter:|{|}|\(|\)/g, "").trim()
-                  fStr = `{"${fStr.split(":")[0]}":[${fStr.split(":")[1]}]}`
-                  newQ.filter = fStr
+               idx0 = queryStr.indexOf("filter:")
+               if ( idx0 > -1) {
+                  unsupported.push("q="+newQ.q)
+                  queryStr = queryStr.replace(/filter:.*AND\s/g, '')
+                  queryStr = queryStr.replace(/filter:.*}/g, '')
+                  newQ.q = queryStr
                   changed = true
                }
             }
          }
 
-         if (newQ.scope || newQ.pool ) {
-            let oldSrc = newQ.pool
-            if (!oldSrc ) {
-               oldSrc = newQ.scope
-            }
-            delete newQ.scope
 
-            // look up a mapping from legacy v4 pool name to current pool name.
-            // this mapping may be one to one for current pools for pools that didn't change
-            let mapping = this.poolMapping[oldSrc]
-            if (mapping && (newQ.pool != mapping.pool) ) {
-
-               newQ.pool = mapping.pool
-               if (mapping.filter != "all") {
-                  if (newQ.filter) {
-                     let stripped = newQ.filter.replace(/{|}/g, "")
-                     newQ.filter = `{${stripped},"FilterResourceType":["${mapping.filter}"]}`
-                  } else {
-                     newQ.filter = `{"FilterResourceType":["${mapping.filter}"]}`
-                  }
-               }
-               changed = true
-            }
+         if ( newQ.q == "" && !newQ.filter ) {
+            let msg = "<p>This query has no supported parameters, and cannot be issued. Please fix the issues below and retry.</p>"
+            msg += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
+            this.$store.commit("system/setMessage", msg)
+            this.$router.push("/")
+            return
          }
 
-         if ( changed ) {
-            // set set of sources searched to widest to ensure currect results shown
-            this.searchSources = "all"
-            if (newQ.pool == "images") {
-               this.searchSources = "images"
-            } else if (newQ.pool == "articles") {
-               this.searchSources = "articles"
-            } else if (newQ.pool == "uva_library") {
-               this.searchSources = "uva_library"
-            }
+         this.searchSources = "all"
+         if (newQ.pool == "images") {
+            this.searchSources = "images"
+         } else if (newQ.pool == "articles") {
+            this.searchSources = "articles"
+         } else if (newQ.pool == "uva_library") {
+            this.searchSources = "uva_library"
+         }
+
+         if ( changed) {
+            this.queryMessage = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
+            this.queryMessage += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
             this.$router.push({query: newQ, replace: true})
          } else {
-            if ( this.userSearched == false ) {
-               if (newQ.pool == "images") {
-                  this.searchSources = "images"
-               } else if (newQ.pool == "articles") {
-                  this.searchSources = "articles"
-               } else if (newQ.pool == "uva_library") {
-                  this.searchSources = "uva_library"
-               }
-            }
             this.restoreSearchFromQueryParams(this.$route.query)
          }
-      },
+   },
 
       async restoreSearchFromQueryParams( query ) {
          if  (!query.q) {
@@ -311,11 +283,9 @@ export default {
                let changed = this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam || this.userSearched == true
 
                if ( this.userSearched ) {
-                  // this.router.currentRoute.value.fullPath
-                  // this.$store.dispatch("searches/updateHistory")
                   this.userSearched = false
                }
-               console.log("DO SEARCH")
+
                this.$announcer.set(`search in progress`, 'assertive')
                if (this.searchSources == "all") {
                   await this.$store.dispatch("searchAllPools")
