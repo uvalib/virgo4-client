@@ -30,7 +30,10 @@ const system = {
       libraryCodes: [],
       pickupLibraries: [
          {id: 'SCI-ENG', name: 'Brown Science and Engineering Library (Clark Hall)'},
-         {id: 'CLEMONS', name: 'Clemons Library'}
+         {id: 'CLEMONS', name: 'Clemons Library'},
+         {id: 'DARDEN', name: 'Darden Library'},
+         {id: 'MUSIC', name: 'Music Library'},
+         {id: 'FINE-ARTS', name: 'Fine Arts Library'}
       ],
    },
 
