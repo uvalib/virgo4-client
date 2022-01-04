@@ -120,7 +120,14 @@ export function preProcessHitFields(poolURL, hits) {
             if (Array.isArray(existing.value) === false) {
                existing.value = [existing.value]
             }
-            existing.value.push(field.value)
+            if ( field.type == "highlighted-match") {
+               // limit highlighted text hits to 5. Note this can be removed when VIRGONEW-2394 is fixed
+               if ( existing.value.length < 5) {
+                  existing.value.push(field.value)
+               }
+            } else {
+               existing.value.push(field.value)
+            }
          } else {
             // for ease of use later, these fields are always an array
             let arrayFields = ["subject", "oclc", "isbn", "lccn"]

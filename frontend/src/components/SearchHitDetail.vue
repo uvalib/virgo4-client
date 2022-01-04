@@ -93,7 +93,7 @@ export default {
       fullTextSnippet() {
          let sf = this.hit.basicFields.find( f => f.name == "highlighted_match")
          if (sf ) {
-            return sf.value
+            return sf.value.join("<br/><br/>")
          }
          return ""
       }
