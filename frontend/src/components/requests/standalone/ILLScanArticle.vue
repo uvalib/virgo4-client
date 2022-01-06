@@ -177,6 +177,10 @@ export default {
          if (isbnF) {
             this.request.issn = isbnF.value.join(", ")
          }
+         let pubF = this.details.basicFields.find( f => f.name == "publication_date")
+         if (pubF) {
+            this.request.year = pubF.value
+         }
       } else {
          this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
       }

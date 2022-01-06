@@ -140,6 +140,10 @@ export default {
          }
          this.request.title = this.details.header.title
          this.request.author = this.details.header.author.value.join("; ")
+         let pubF = this.details.basicFields.find( f => f.name == "publication_date")
+         if (pubF) {
+            this.request.year = pubF.value
+         }
       } else {
          this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
       }
