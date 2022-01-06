@@ -203,7 +203,7 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 			}
 		}
 
-		subject := fmt.Sprintf("%s: %s", subjectName, reserveReq.Request.Course)
+		subject := fmt.Sprintf("%s - %s: %s", reserveReq.Request.Semester, subjectName, reserveReq.Request.Course)
 		eRequest := emailRequest{Subject: subject, To: to, CC: cc, From: from, Body: renderedEmail.String()}
 		sendErr := svc.SendEmail(&eRequest)
 		if sendErr != nil {
