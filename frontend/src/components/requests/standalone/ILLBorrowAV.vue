@@ -133,13 +133,15 @@ export default {
    },
    created() {
       this.request.pickup = this.preferredPickupLibrary.id
-      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
       if ( this.prefill ) {
+         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
          if ( this.generalFormat == "") {
             return
          }
          this.request.title = this.details.header.title
          this.request.author = this.details.header.author.value.join("; ")
+      } else {
+         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
       }
    }
 }

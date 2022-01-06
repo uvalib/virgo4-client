@@ -166,8 +166,8 @@ export default {
       },
    },
    created() {
-      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
       if ( this.prefill ) {
+         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatScan")
          if ( this.generalFormat == "") {
             return
          }
@@ -177,6 +177,8 @@ export default {
          if (isbnF) {
             this.request.issn = isbnF.value.join(", ")
          }
+      } else {
+         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
       }
    }
 }

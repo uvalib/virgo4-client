@@ -186,8 +186,8 @@ export default {
    },
    created() {
       this.request.pickup = this.preferredPickupLibrary.id
-      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
       if ( this.prefill ) {
+         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
          if ( this.generalFormat == "") {
             return
          }
@@ -200,6 +200,8 @@ export default {
          if (isbnF) {
             this.request.issn = isbnF.value.join(", ")
          }
+      } else {
+         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
       }
    }
 }
