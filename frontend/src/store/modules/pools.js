@@ -18,6 +18,14 @@ const pools = {
             return 0
          })
       },
+      hasInterLibraryLoan: (state) => (id) => {
+         let pool = state.list.find( p => p.id == id)
+         if (!pool) return false
+         if (!pool.attributes) return false
+         let attr = pool.attributes.find( a=> a.name=='ill_request')
+         if (!attr) return false
+         return attr.supported
+      },
       hasAvailability: (state) => (id) => {
          let pool = state.list.find( p => p.id == id)
          if (!pool) return false

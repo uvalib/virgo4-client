@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2>ILL Borrow A/V Request</h2>
+      <h2 v-if="prefill==false">ILL Borrow A/V Request</h2>
       <div class="scan pure-form">
          <div class="entry pure-control-group">
             <label for="title">Title<span class="required">*</span></label>
@@ -63,9 +63,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
+import { mapState, mapGetters } from "vuex"
 export default {
+   props: {
+      prefill: {
+         type: Boolean,
+         default: false
+      },
+   },
    data: function()  {
       return {
          error: "",
@@ -89,9 +94,11 @@ export default {
          preferredPickupLibrary: state => state.preferences.pickupLibrary,
          noILLiadAccount: state => state.user.noILLiadAccount,
          leoAddress: state => state.user.accountInfo.leoAddress,
+         details : state => state.item.details,
       }),
       ...mapGetters({
          pickupLibraries: "user/libraries",
+         generalFormat: "item/generalFormat"
       })
    },
    methods: {
@@ -127,6 +134,13 @@ export default {
    created() {
       this.request.pickup = this.preferredPickupLibrary.id
       this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
+      if ( this.prefill ) {
+         if ( this.generalFormat == "") {
+            return
+         }
+         this.request.title = this.details.header.title
+         this.request.author = this.details.header.author.value.join("; ")
+      }
    }
 }
 </script>

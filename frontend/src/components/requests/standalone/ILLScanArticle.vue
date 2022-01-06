@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2>ILL Scan Chapter/Article</h2>
+      <h2  v-if="prefill==false">ILL Scan Chapter/Article</h2>
       <div class="scan pure-form">
          <div class="entry pure-control-group">
             <label for="doctype">What would you like to have scanned?<span class="required">*</span></label>
@@ -82,10 +82,16 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
-import ILLCopyrightNotice from '../ILLCopyrightNotice.vue';
+import { mapState, mapGetters } from "vuex"
+import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
 export default {
    components: {ILLCopyrightNotice},
+   props: {
+      prefill: {
+         type: Boolean,
+         default: false
+      },
+   },
    data: function()  {
       return {
          error: "",
@@ -114,6 +120,10 @@ export default {
       ...mapState({
          sysError: state => state.system.error,
          buttonDisabled: state => state.requests.buttonDisabled,
+         details : state => state.item.details,
+      }),
+      ...mapGetters({
+         generalFormat: "item/generalFormat"
       })
    },
    methods: {
@@ -157,6 +167,17 @@ export default {
    },
    created() {
       this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
+      if ( this.prefill ) {
+         if ( this.generalFormat == "") {
+            return
+         }
+         this.request.title = this.details.header.title
+         this.request.author = this.details.header.author.value.join("; ")
+         let isbnF = this.details.basicFields.find( f => f.name == "isbn")
+         if (isbnF) {
+            this.request.issn = isbnF.value.join(", ")
+         }
+      }
    }
 }
 </script>

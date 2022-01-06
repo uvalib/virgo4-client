@@ -78,6 +78,7 @@
       <DigitalContent />
       <template v-if="details.source != 'images'">
          <Availability v-if="hasAvailability(details.source)" :titleId="details.identifier" />
+         <InterLibraryLoan v-if="hasInterLibraryLoan(details.source)" />
          <ShelfBrowse v-if="!details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
       </template>
    </div>
@@ -87,6 +88,7 @@
 import { mapGetters,mapState } from "vuex"
 import SearchHitHeader from '@/components/SearchHitHeader'
 import Availability from "@/components/details/Availability"
+import InterLibraryLoan from "@/components/details/InterLibraryLoan"
 import AccordionContent from "@/components/AccordionContent"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from '@/components/AccessURLDetails'
@@ -106,7 +108,7 @@ export default {
    },
    components: {
       SearchHitHeader, Availability, TruncatedText, V4Pager, ShelfBrowse, DigitalContent,
-      AccordionContent, AccessURLDetails, V4LinksList, CitationsList
+      AccordionContent, AccessURLDetails, V4LinksList, CitationsList, InterLibraryLoan
    },
    computed: {
       ...mapState({
@@ -129,6 +131,7 @@ export default {
          selectedResults: 'selectedResults',
          itemMessage:  'pools/itemMessage',
          hasAvailability:  'pools/hasAvailability',
+         hasInterLibraryLoan:  'pools/hasInterLibraryLoan',
       }),
       risURL() {
          if (this.citationsURL == "") return ""

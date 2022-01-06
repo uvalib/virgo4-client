@@ -19,6 +19,13 @@ const item = {
       hasDetails: state => (identifier) => {
          return state.identifier == identifier
       },
+      generalFormat: state => {
+         let genTypeF = state.details.basicFields.find( bf => bf.name == "general_format")
+         if (!genTypeF) {
+            return ""
+         }
+         return genTypeF.value
+      },
       isDigitalCollection: state => {
          return state.details.detailFields.findIndex( f=> f.name == 'digital_collection') > -1
       },
@@ -368,7 +375,6 @@ const item = {
                ctx.commit("requests/setRequestOptions", response.data.availability.request_options, { root: true })
             }
          }).catch((error) => {
-            console.log(error)
             ctx.commit('clearSearching')
             if (error.response && error.response.status != 404) {
                ctx.commit("setAvailabilityError", error.response.data)
