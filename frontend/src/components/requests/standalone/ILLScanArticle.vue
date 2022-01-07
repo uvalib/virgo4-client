@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex"
+import { mapState } from "vuex"
 import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
 export default {
    components: {ILLCopyrightNotice},
@@ -122,9 +122,6 @@ export default {
          buttonDisabled: state => state.requests.buttonDisabled,
          details : state => state.item.details,
       }),
-      ...mapGetters({
-         generalFormat: "item/generalFormat"
-      })
    },
    methods: {
       async submitClicked() {
@@ -168,9 +165,6 @@ export default {
    created() {
       if ( this.prefill ) {
          this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatScan")
-         if ( this.generalFormat == "") {
-            return
-         }
          this.request.title = this.details.header.title
          this.request.author = this.details.header.author.value.join("; ")
          let isbnF = this.details.basicFields.find( f => f.name == "isbn")

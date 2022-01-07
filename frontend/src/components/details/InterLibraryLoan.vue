@@ -5,7 +5,8 @@
          <div class="request-content">
             <div class="options-panel" v-if="requests.activePanel == 'OptionsPanel'">
                <V4Button mode="tertiary" @click="requestClicked">Request Item</V4Button>
-               <p class="desc">Make an InterLibrary Loan request for this item</p>
+               <p class="desc">Make an InterLibrary Loan request for this item.</p>
+               <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about InterLibrary Loans.</a></p>
             </div>
             <SignInPanel v-if="requests.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
             <ILLBorrowItem v-if="requests.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" />

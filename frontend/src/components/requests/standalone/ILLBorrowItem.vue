@@ -188,9 +188,6 @@ export default {
       this.request.pickup = this.preferredPickupLibrary.id
       if ( this.prefill ) {
          this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
-         if ( this.generalFormat == "") {
-            return
-         }
          if (this.generalFormat == "Book") {
             this.request.doctype = "Book"
          }

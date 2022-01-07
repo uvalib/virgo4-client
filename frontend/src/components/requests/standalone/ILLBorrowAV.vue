@@ -98,7 +98,6 @@ export default {
       }),
       ...mapGetters({
          pickupLibraries: "user/libraries",
-         generalFormat: "item/generalFormat"
       })
    },
    methods: {
@@ -135,9 +134,6 @@ export default {
       this.request.pickup = this.preferredPickupLibrary.id
       if ( this.prefill ) {
          this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
-         if ( this.generalFormat == "") {
-            return
-         }
          this.request.title = this.details.header.title
          this.request.author = this.details.header.author.value.join("; ")
          let pubF = this.details.basicFields.find( f => f.name == "publication_date")
