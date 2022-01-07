@@ -5,8 +5,8 @@
          <div class="request-content">
             <div class="options-panel" v-if="requests.activePanel == 'OptionsPanel'">
                <V4Button mode="tertiary" @click="requestClicked">Request Item</V4Button>
-               <p class="desc">Make an InterLibrary Loan request for this item.</p>
-               <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about InterLibrary Loans.</a></p>
+               <p class="desc">Make an Interlibrary Loan request for this item.</p>
+               <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a></p>
             </div>
             <SignInPanel v-if="requests.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
             <ILLBorrowItem v-if="requests.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" />
@@ -57,7 +57,7 @@ export default {
          // NOTE: this is crrently specific to WorldCat. If other sources are added, this will need to be generalized
          let genTypeF = this.details.basicFields.find( bf => bf.name == "general_format")
          if (!genTypeF) {
-            this.requests.alertText = "Sorry, this item is not available for an InterLibrary Loan request."
+            this.requests.alertText = "Sorry, this item is not available for an Interlibrary Loan request."
             return
          }
 
