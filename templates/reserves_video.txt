@@ -21,7 +21,6 @@ Other LMS: {{.Request.OtherLMS}}
 {{- end}}
 _______________________________________________________________________
 
-{{- $reserveLib := .Request.Library -}}
 {{- $url := .VirgoURL -}}
 {{ range $index, $item := .Video }}
 {{ add $index 1 }}.
@@ -33,7 +32,6 @@ Location: {{ $avail.Location }}
 Availability: {{ $avail.Availability }}
 Call Number: {{ $avail.CallNumber }}
 {{- end }}
-Reserve Library: {{ $reserveLib }}
 
 Audio Language: {{ $item.AudioLanguage }}
 Subtitles: {{ $item.Subtitles }}
@@ -47,5 +45,5 @@ Virgo URL: {{ $item.VirgoURL }}
 _______________________________________________________________________
 {{ header .MaxAvail }}
 {{- range $index, $item := .Video }}
-{{ row $index $reserveLib $item -}}
+{{ row $index "-" $item -}}
 {{ end -}}

@@ -24,6 +24,7 @@ const reserves = {
          lms: "",
          otherLMS: "",
       },
+      submitted: false
    },
 
    getters: {
@@ -46,10 +47,10 @@ const reserves = {
          state.query = q
       },
       markInvalidReserveItem(state, idx) {
-         // change the value in place, but this doesn't let view know that
-         // the array has changed. Reassigning the list with the updated items will.
          state.requestList[idx].valid = false
-         state.requestList = [...state.requestList]
+      },
+      updateReserveVideoFlag(state, {idx, flag} ) {
+         state.requestList[idx].video = flag
       },
       updateReservedItemsPeriod(state) {
          state.requestList.forEach(item => {
@@ -61,6 +62,7 @@ const reserves = {
          state.request.email = userInfo.email
       },
       setRequestList(state, list) {
+         state.submitted = false
          state.requestList = list.slice(0)
          state.requestList.forEach(item => {
             item.period = ""
@@ -79,6 +81,8 @@ const reserves = {
             semester: "",
             library: "",
             period: "",
+            lms: "",
+            otherLMS: ""
          }
       },
       clearRequestList(state) {
@@ -92,7 +96,12 @@ const reserves = {
             semester: "",
             library: "",
             period: "",
+            lms: "",
+            otherLMS: ""
          }
+      },
+      setSubmitted(state, flag) {
+         state.submitted = flag
       },
       setCourseReserves(state, data) {
          data['hits'].forEach( h=>{
@@ -135,6 +144,8 @@ const reserves = {
             response.data.forEach( (item, idx) => {
                if (item.reserve == false) {
                   ctx.commit("markInvalidReserveItem", idx)
+               } else {
+                  ctx.commit("updateReserveVideoFlag", {idx: idx, flag: item.is_video})
                }
             })
             ctx.commit('setSearching', false, { root: true })
@@ -161,6 +172,7 @@ const reserves = {
                availability: item.details.availability,
                notes: notes,
                period: item.period,
+               isVideo: item.video,
                audioLanguage: item.audioLanguage,
                subtitles: item.subtitles,
                subtitleLanguage: item.subtitleLanguage
@@ -169,26 +181,27 @@ const reserves = {
          })
          axios.post(`/api/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')
+            ctx.commit('setSubmitted', true)
             ctx.commit('setSearching', false, { root: true })
-            this.router.push("/reserved")
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })
          })
       },
       createVideoReserve(ctx, video){
-         ctx.commit('setSearching', true, { root: true })
          let v4UserID = ctx.rootState.user.signedInUser
          let data = { userID: v4UserID, request: ctx.state.request,
             items: [video]}
 
          axios.post(`/api/reserves`, data).then((_response) => {
+            ctx.commit('requests/disableButton', true, { root: true })
             ctx.commit('clearRequestList')
-            ctx.commit('setSearching', false, { root: true })
-            this.router.push("/reserved")
+            ctx.commit('setSubmitted', true)
+            ctx.commit('requests/activePanel', "ReservedPanel", { root: true })
+            ctx.commit('requests/disableButton', false, { root: true })
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setSearching', false, { root: true })
+            ctx.commit('requests/disableButton', false, { root: true })
          })
       },
       nextPage(ctx) {

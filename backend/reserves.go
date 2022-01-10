@@ -41,6 +41,7 @@ type RequestParams struct {
 // RequestItem is the details for a particular reserve item
 type RequestItem struct {
 	Pool             string             `json:"pool"`
+	IsVideo          bool               `json:"isVideo"`
 	CatalogKey       string             `json:"catalogKey"`
 	CallNumber       string             `json:"callNumber"`
 	Title            string             `json:"title"`
@@ -132,9 +133,11 @@ func (svc *ServiceContext) CreateCourseReserves(c *gin.Context) {
 		if len(itm.Availability) > reserveReq.MaxAvail {
 			reserveReq.MaxAvail = len(itm.Availability)
 		}
-		if itm.Pool == "video" {
+		if itm.IsVideo {
+			log.Printf("INFO: %s : %s is a video", itm.CatalogKey, itm.Title)
 			reserveReq.Video = append(reserveReq.Video, itm)
 		} else {
+			log.Printf("INFO: %s : %s is not a video", itm.CatalogKey, itm.Title)
 			reserveReq.NonVideo = append(reserveReq.NonVideo, itm)
 		}
 	}

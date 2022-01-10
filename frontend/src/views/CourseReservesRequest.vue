@@ -1,5 +1,6 @@
 <template>
-   <div class="course-reserves-request">
+   <ReservedPanel v-if="submitted" />
+   <div v-else class="course-reserves-request">
       <div v-if="requestList.length==0" class="reserves-content">
          <p>You currently have no items selected for course reserves.</p>
          <p>
@@ -63,40 +64,42 @@
                </select>
                <span v-if="hasError('semester')" class="error">* semester is required</span>
             </div>
-            <div class="pure-control-group">
-               <label for="library">Reserve Library</label>
-               <select v-model="library" id="library" name="library" aria-required="true" required="required">
-                  <option value="">Please select a location</option>
-                  <option value="astr">Astronomy</option>
-                  <option value="brown">Brown Science &amp; Engineering</option>
-                  <option value="math">Math</option>
-                  <option value="clem">Clemons</option>
-                  <option value="arts">Fine Arts</option>
-                  <option value="law">Law</option>
-                  <option value="music">Music</option>
-                  <option value="physics">Physics</option>
-               </select>
-               <span v-if="hasError('library')" class="error">* library is required</span>
-            </div>
-            <div class="pure-control-group" v-if="nonVideoRequests.length > 0">
-               <label for="period">Loan Period <span class="hint">(for all items)</span></label>
-               <select @change="itemsPeriodChosen" v-model="period" id="period" name="period" aria-required="true" required="required">
-                  <option value="">Please select</option>
-                  <option value="3h">3 hours</option>
-                  <option value="2d">2 days</option>
-                  <option value="na">Not Applicable</option>
-               </select>
-               <span v-if="hasError('period')" class="error">* load period is required</span>
-            </div>
          </div>
 
          <div class="wrapper" v-if="nonVideoRequests.length > 0">
             <h3 class="video">Non-video format items to be placed on reserve</h3>
             <div class="wrapper-content pure-form pure-form-aligned">
+               <div class="item-type-settings">
+                  <div class="pure-control-group">
+                     <label for="library">Reserve Library</label>
+                     <select v-model="library" id="library" name="library" aria-required="true" required="required">
+                        <option value="">Please select a location</option>
+                        <option value="astr">Astronomy</option>
+                        <option value="brown">Brown Science &amp; Engineering</option>
+                        <option value="math">Math</option>
+                        <option value="clem">Clemons</option>
+                        <option value="arts">Fine Arts</option>
+                        <option value="law">Law</option>
+                        <option value="music">Music</option>
+                        <option value="physics">Physics</option>
+                     </select>
+                     <span v-if="hasError('library')" class="error">* library is required</span>
+                  </div>
+                  <div class="pure-control-group" v-if="nonVideoRequests.length > 0">
+                     <label for="period">Loan Period <span class="hint">(for all items)</span></label>
+                     <select @change="itemsPeriodChosen" v-model="period" id="period" name="period" aria-required="true" required="required">
+                        <option value="">Please select</option>
+                        <option value="3h">3 hours</option>
+                        <option value="2d">2 days</option>
+                        <option value="na">Not Applicable</option>
+                     </select>
+                     <span v-if="hasError('period')" class="error">* load period is required</span>
+                  </div>
+               </div>
                <div class="items">
                   <div class="card" v-for="bm in nonVideoRequests" :key="bm.identifier">
                      <div class="title">{{bm.details.title}}</div>
-                     <div class="author">{{bm.details.author}} pool {{bm.pool}}</div>
+                     <div class="author">{{bm.details.author}}</div>
                      <dl>
                         <dt>Loan Period</dt>
                         <dd>
@@ -121,9 +124,25 @@
             <h3>Video-format items to be placed on reserve</h3>
             <div class="wrapper-content pure-form pure-form-aligned">
                <div class="video-note">
-                  <b>All video reserve requests will be delivered as streaming resources to your class’s Learning Management System.
+                  <b>All video reserve requests will be delivered as streaming resources to your class's Learning Management System.
                      If you have questions about video reserves, please email
-                     <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.</b>
+                     <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.
+                  </b>
+               </div>
+               <div class="item-type-settings">
+                  <div class="entry pure-control-group">
+                     <label for="learningManagementSystem">Learning Management System</label>
+                     <select v-model="lms" id="learningManagementSystem" aria-required="true" required="required">
+                        <option value="">Please indicate in which system your course resides.</option>
+                        <option v-for="lmsOption in learningManagementSystems" :key="lmsOption" :value="lmsOption">{{lmsOption}}</option>
+                     </select>
+                     <span v-if="hasError('lms')" class="error">* LMS is required.</span>
+                  </div>
+                  <div class="pure-control-group" v-if="lms == 'Other'">
+                     <label  for="otherLMS">Please specify other LMS </label>
+                        <input v-model="otherLMS" id="otherLMS" aria-required="true" required="required">
+                        <span v-if="hasError('otherLMS')" class="error">* LMS is required.</span>
+                  </div>
                </div>
                <div class="items">
                   <div class="card" v-for="bm in videoRequests" :key="bm.identifier">
@@ -165,15 +184,21 @@
 import { mapState } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import { mapMultiRowFields } from 'vuex-map-fields'
+import ReservedPanel from '@/components/requests/panels/ReservedPanel'
 export default {
    name: "course-reserves-request",
    data: function() {
       return {
          errors: [],
+         learningManagementSystems: ['Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other'],
       };
+   },
+   components: {
+      ReservedPanel
    },
    computed: {
       ...mapState({
+         submitted: state => state.reserves.submitted,
          requestList: state => state.reserves.requestList,
          searching: state => state.searching,
          reserveRequest: state => state.reserves.request,
@@ -189,16 +214,19 @@ export default {
          'request.semester',
          'request.library',
          'request.period',
+         'request.lms',
+         'request.otherLMS',
       ]),
       ...mapMultiRowFields('reserves', ['requestList']),
       videoRequests() {
-        return this.requestList.filter( r=> r.pool == "video")
+        return this.requestList.filter( r=> r.video === true)
       },
       nonVideoRequests() {
-         return this.requestList.filter( r=> r.pool != "video")
+         return this.requestList.filter(  r=> r.video !== true)
       }
    },
    created() {
+      this.$store.commit('reserves/setSubmitted', false)
       this.$store.commit("reserves/setRequestingUser", this.userInfo)
    },
    methods: {
@@ -216,12 +244,27 @@ export default {
          this.errors.splice(0, this.errors.length)
          let proxyRequest = this.reserveRequest.onBehalfOf == "yes"
          for (let [key, value] of Object.entries(this.reserveRequest)) {
-            if ( key == "period" && this.nonVideoRequests == 0) continue
+            console.log(key+"=["+value+"]")
+            // skip lonn/library if there are no non-video items
+            if ( (key == "period" || key == "library") && this.nonVideoRequests.length == 0) continue
+
+            // skip lms if there are no video items. skip other if lms is not other
+            if ( (key == "lms" || key == "otherLMS") && this.videoRequests.length == 0) continue
+            if (  key == "otherLMS" && this.videoRequests.length > 0 ) {
+               if ( this.reserveRequest.lms != "Other") {
+                  continue
+               }
+            }
+
             if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail") ) continue
+
+            // all other values are required
             if (value == "") {
+               console.log("ERROR MISSING "+key)
                this.errors.push(key)
             }
          }
+
          let subtitleError = false
          this.videoRequests.forEach( r => {
             if (r.subtitles == "yes" && r.subtitleLanguage == "") {
@@ -253,17 +296,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+div.reserved {
+   position: relative;
+   margin: 25px auto 50px auto;
+   width:40%;
+   color: var(--uvalib-text);
+   text-align: left;
+}
 .course-reserves {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-}
-.working {
-   text-align: center;
-   font-size: 1.25em;
-}
-.working img {
-   margin: 30px 0;
 }
 .reserves-content {
    width: 80%;
@@ -291,14 +334,14 @@ div.note {
    text-align: center;
 }
 .video-note, .note.important {
-   color: var(--uvalib-red );
-   font-size: 1.1em;
    font-weight: bold;
+   margin: 15px;
 }
 .form {
    margin: 15px;
    padding-top: 15px;
    text-align: left;
+   margin-bottom: 40px;
 }
 input, select {
    width: 50%;
@@ -314,13 +357,6 @@ span.hint {
    font-size: 0.8em;
    display: block;
 }
-h3 {
-   padding: 5px 10px;
-   text-align: left;
-   background-color: var(--color-brand-blue);
-   color: white;
-   margin: 0;
-}
 .video-note {
    text-align: left;
    padding: 10px 10px 0 10px;
@@ -330,14 +366,14 @@ div.items {
    flex-flow: row wrap;
    align-items: stretch;
    justify-content: flex-start;
-   padding: 10px 15px;
+   padding: 15px;
 }
 div.card {
    text-align: left;
    padding: 10px;
    font-size: 0.8em;
-   border: 1px solid #ccc;
-   margin: 5px;
+   border: 1px solid var(--uvalib-grey-light);
+   margin: 10px;
    display: inline-block;
    max-width: 275px;
    background: white;
@@ -356,12 +392,27 @@ div.controls {
    margin: 15px;
 }
 div.wrapper {
-   background: var(--uvalib-grey-lightest);
-   margin-bottom: 20px;
+   background: white;
+   margin-bottom: 30px;
+   border: 1px solid var(--uvalib-grey-light);
+
+   h3 {
+      padding: 10px;
+      text-align: left;
+      margin: 0;
+      font-size: 1em;
+      background: var(--uvalib-grey-lightest);
+      color: var(--uvalib-text);
+      border-bottom: 1px solid var(--uvalib-grey-light);
+   }
+   .item-type-settings {
+      text-align: left;
+      margin-top: 20px;
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      padding-bottom: 10px;
+   }
 }
-div.wrapper-content {
- border: 1px solid var(--uvalib-grey-light);
-}
+
 dl {
    margin: 0;
    display: inline-grid;

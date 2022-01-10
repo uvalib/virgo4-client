@@ -10,10 +10,7 @@ On Behalf Of
 {{- end}}
 Course ID:  {{.Request.Course}}
 Semester:   {{.Request.Semester}}
-LMS: {{.Request.LMS}}
-{{- if eq .Request.LMS "Other"}}
-Other LMS: {{.Request.OtherLMS}}
-{{- end}}
+
 _______________________________________________________________________
 
 {{- $reserveLib := .Request.Library -}}

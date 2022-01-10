@@ -53,7 +53,7 @@
                                        :id="`move-bookmarks-${folderInfo.id}`"
                                        v-on:move-approved="moveBookmarks"/>
                                     <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
-                                    <V4Button v-if="canMakeReserves" class="disabled" mode="primary" @click="reserve">Place on course reserve</V4Button>
+                                    <V4Button v-if="canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
                                  </div>
                               </div>
                            </th>
@@ -236,33 +236,33 @@ export default {
          this.$store.dispatch("bookmarks/moveBookmarks", data);
       },
       async reserve() {
-         // if ( this.selectedItems.length == 0) {
-         //     this.$store.commit("system/setError",
-         //       "No items have been selected to put on reserve.<br/>Please select one or more and try again.")
-         //     return
-         // }
+         if ( this.selectedItems.length == 0) {
+             this.$store.commit("system/setError",
+               "No items have been selected to put on reserve.<br/>Please select one or more and try again.")
+             return
+         }
 
-         // let items = []
-         // let folder = this.bookmarks.find( bm => bm.id == this.expandedFolder )
-         // this.selectedItems.forEach( bmID => {
-         //    let item = folder.bookmarks.find( bm => bm.id == bmID )
-         //    items.push(item)
-         // })
+         let items = []
+         let folder = this.bookmarks.find( bm => bm.id == this.expandedFolder )
+         this.selectedItems.forEach( bmID => {
+            let item = folder.bookmarks.find( bm => bm.id == bmID )
+            items.push(item)
+         })
 
-         // // Set the list, and validate that all items in the list are able to be reserved
-         // this.$store.commit("reserves/setRequestList", items)
-         // await this.$store.dispatch("reserves/validateReservesRequest")
-         // if (this.invalidReserves.length > 0) {
-         //    let msg = "The following items cannot be placed on course reserve: "
-         //    msg += "<ul style='text-align:left;'>"
-         //    this.invalidReserves.forEach( r => {
-         //       msg += `<li>${r.details.title}</l1>`
-         //    })
-         //    msg += "</ul>Please deselect these items and try again."
-         //    this.$store.commit("system/setError", msg)
-         // } else {
-         //    this.$router.push("/course-reserves-request")
-         // }
+         // Set the list, and validate that all items in the list are able to be reserved
+         this.$store.commit("reserves/setRequestList", items)
+         await this.$store.dispatch("reserves/validateReservesRequest")
+         if (this.invalidReserves.length > 0) {
+            let msg = "The following items cannot be placed on course reserve: "
+            msg += "<ul style='text-align:left;'>"
+            this.invalidReserves.forEach( r => {
+               msg += `<li>${r.details.title}</l1>`
+            })
+            msg += "</ul>Please deselect these items and try again."
+            this.$store.commit("system/setError", msg)
+         } else {
+            this.$router.push("/course-reserves-request")
+         }
       },
       detailsURL(bookmark) {
          return `/sources/${bookmark.pool}/items/${bookmark.identifier}`

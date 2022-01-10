@@ -107,7 +107,7 @@
       </dl>
 
       <div class="controls">
-        <V4Button mode="primary" class="request-button" @click="submit" :disabled="buttonDisabled">Submit Request</V4Button>
+        <V4Button mode="primary" class="request-button" @click="submit"  :disabled=buttonDisabled :class="{disabled: buttonDisabled}">Submit Request</V4Button>
       </div>
 
     </div>
@@ -145,9 +145,9 @@ export default {
         reserveRequest: state => state.reserves.request,
         userInfo: state => state.user.accountInfo,
         itemDetails: state => state.item.details,
+        buttonDisabled: state => state.requests.buttonDisabled
       }),
       ...mapFields('reserves',[
-         'buttonDisabled',
          'request.onBehalfOf',
          'request.instructorName',
          'request.instructorEmail',
@@ -210,6 +210,7 @@ export default {
           this.selectedVideo.subtitles = this.subtitles
           this.selectedVideo.subtitleLanguage = this.subtitleLanguage
           this.selectedVideo.notes = this.notes
+          this.selectedVideo.isVideo = true
 
           this.$store.dispatch("reserves/createVideoReserve", this.selectedVideo)
          } else {

@@ -9,6 +9,7 @@
       <AeonPanel v-if="requests.activePanel == 'AeonPanel'" />
       <ScanPanel v-if="requests.activePanel == 'ScanPanel'" />
       <VideoReservePanel v-if="requests.activePanel == 'VideoReservePanel'" />
+      <ReservedPanel v-if="requests.activePanel == 'ReservedPanel'" />
       <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
    </div>
 </template>
@@ -24,13 +25,14 @@ import AeonPanel from './panels/AeonPanel';
 import ScanPanel from './panels/ScanPanel';
 import VideoReservePanel from './panels/VideoReservePanel';
 import ConfirmationPanel from './panels/ConfirmationPanel';
+import ReservedPanel from './panels/ReservedPanel';
 
 export default {
    props: {
       titleId: String,
    },
    components: {
-      OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel
+      OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel, ReservedPanel
    },
 
    computed: {
@@ -82,7 +84,7 @@ export default {
          return !['OptionsPanel'].includes(this.requests.activePanel)
       },
       resetLabel(){
-            if (this.requests.activePanel == 'ConfirmationPanel'){
+            if (this.requests.activePanel == 'ConfirmationPanel' || this.requests.activePanel == "ReservedPanel"){
                return "Back"
             }else{
                return "Reset"

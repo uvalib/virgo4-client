@@ -5,7 +5,6 @@ import Home from './views/Home.vue'
 
 // import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
-import CourseReserveSuccess from './views/CourseReserveSuccess.vue'
 import Details from './views/Details.vue'
 import ShelfBrowse from './views/ShelfBrowse.vue'
 import SignIn from './views/SignIn.vue'
@@ -75,11 +74,6 @@ const router = createRouter({
          path: '/feedback',
          name: 'feedback',
          component: Feedback
-      },
-      {
-         path: '/reserved',
-         name: 'reserved',
-         component: CourseReserveSuccess,
       },
       {
          path: '/sources/:src/items/:id',
