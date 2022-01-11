@@ -36,7 +36,6 @@ const shelf = {
       setBrowseDetails(state, data) {
          state.browse.splice(0, state.browse.length)
          data.forEach( b => {
-            b.cover_image_url = ""
             b.status = "loading"
             state.browse.push(b)
          })
@@ -47,6 +46,9 @@ const shelf = {
             let b = state.browse[idx]
             if (data.status == "not_found" || data.status=="unprocessed") {
                b.status = "not_found"
+            } else if (data.status == "iiif") {
+               b.status = "url"
+               b.cover_image_url = data.image_url
             } else {
                b.status = "ready"
                b.image_base64 = data.image_base64
@@ -84,20 +86,26 @@ const shelf = {
 
          let url = `${ctx.rootState.system.shelfBrowseURL}/api/browse/${centerId}?range=${ctx.state.browseRange}`
          await axios.get(url).then((response) => {
+            ctx.commit("setBrowseDetails", response.data.items)
+
             response.data.items.forEach( b => {
                if ( b.cover_image_url) {
                   let testURL = b.cover_image_url.replace("?", ".json?")
-                  axios.get(testURL).then((ciR) => {
-                     let ciD = ciR.data
+                  if ( testURL.includes("iiif.")) {
                      ctx.commit("setCoverImage", {
-                        id: b.id, image_url: ciD.image_url, image_base64:ciD.image_base64, status: ciD.status})
-                  }).catch(() => {
-                     ctx.commit("setCoverImage", {
-                        id: b.id, image_url: "", image_base64: "", status: "not_found"})
-                  })
+                        id: b.id, image_url: testURL, image_base64: "", status: "iiif"})
+                  } else {
+                     axios.get(testURL).then((ciR) => {
+                        let ciD = ciR.data
+                        ctx.commit("setCoverImage", {
+                           id: b.id, image_url: ciD.image_url, image_base64:ciD.image_base64, status: ciD.status})
+                     }).catch(() => {
+                        ctx.commit("setCoverImage", {
+                           id: b.id, image_url: "", image_base64: "", status: "not_found"})
+                     })
+                  }
                }
             })
-            ctx.commit("setBrowseDetails", response.data.items)
             ctx.commit("setLookingUp", false)
 
          }).catch((error) => {

@@ -5,7 +5,10 @@
          <div class="thumb-wrap">
             <span v-if="data.status=='ready'" class="vertical-spacer"></span>
             <router-link @click="browseDetailClicked(data.id)" :to="`/sources/${pool}/items/${data.id}`" aria-hidden="true" tabindex="-1">
-               <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
+               <template v-if="data.status=='ready' || data.status=='url'">
+                  <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
+                  <img  alt="" class="thumb" v-if="data.status=='url'" :src="data.cover_image_url" />
+               </template>
                <span class="no-thumb" v-else>
                   <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
                   <br/>

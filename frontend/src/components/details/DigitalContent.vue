@@ -155,9 +155,6 @@ export default {
          let idx = selDO.oEmbedURL.indexOf("/oembed")
          let url = selDO.oEmbedURL.substring(0, idx)
          url += "/view/" + selDO.pid
-         if ( this.isDevServer) {
-            url = url.replace("curio", "curio-dev.internal")
-         }
          return url
       },
       curioWidth() {
