@@ -22,6 +22,7 @@ import Feedback from './views/Feedback.vue'
 import PublicBookmarks from './views/PublicBookmarks.vue'
 
 import NotFound from './views/NotFound.vue'
+import Forbidden from './views/Forbidden.vue'
 import FatalError from './views/FatalError.vue'
 
 import VueCookies from 'vue-cookies'
@@ -152,6 +153,11 @@ const router = createRouter({
          component: FatalError
       },
       {
+         path: "/forbidden",
+         name: "forbidden",
+         component: Forbidden
+      },
+      {
          path: '/:pathMatch(.*)*',
          name: "not_found",
          component: NotFound
@@ -177,7 +183,7 @@ const router = createRouter({
 router.afterEach((to, _from) => {
    let titles = {home: "Virgo", search: "Virgo", signin: "Sign In", account: "My Information",
       checkouts: "Checkouts", 'digital-deliveries': "Digital Deliveries",
-      bookmarks: "Bookmarks", requests: "Requests", searches: "Saved Searches",
+      bookmarks: "Bookmarks", requests: "Requests", searches: "Saved Searches", forbidden: "Forbidden",
       preferences: "Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse"
    }
    let title = titles[to.name]
@@ -239,7 +245,7 @@ router.beforeEach( async (to, _from) => {
       bookmarks: "My Account", requests: "My Account", searches: "My Account",
       preferences: "My Account", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
       codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found",
-      'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item",
+      'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item", forbidden: "Forbidden",
       'course-reserves': "Course Reserves", 'course-reserves-request': "Course Reserves Request", reserved: "Course Reserves Request"
    }
    let title =  h1[to.name]
