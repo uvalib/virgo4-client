@@ -62,7 +62,7 @@
                   <dd></dd>
                   <dt class="value more">
                      <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
-                        More Details<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                        Full metadata<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                      </a>
                   </dt>
                </template>
