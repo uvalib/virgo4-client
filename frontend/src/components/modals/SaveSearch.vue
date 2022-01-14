@@ -7,30 +7,32 @@
          </V4Button>
       </template>
       <template v-slot:content>
-         <template v-if="saved">
-            <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-            <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
-         </template>
+         <div v-if="working" class="message working">
+            <V4Spinner message="Working..."/>
+         </div>
          <template v-else>
-            <div v-if="working" class="message working">
-               <V4Spinner message="Working..."/>
-            </div>
-            <div v-else>
-               <div class="message pure-form">
-                  <div>
-                     <label for="savename">Search Name</label>
-                     <input ref="savename" id="savename" type="text" v-model="searchName"
-                        @keyup.enter="saveClicked"
-                        @keydown.shift.tab.stop.prevent="backTabName"
-                        aria-required="true" required="required"
-                     />
-                  </div>
-                  <p class="error">{{error}}</p>
+            <template v-if="saved">
+               <p class="saved">Your search has been saved as '{{searchName}}'.</p>
+               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+            </template>
+            <template v-else-if="duplicateSave">
+               <p class="saved">This search has already been saved as '{{searchName}}'.</p>
+               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+            </template>
+            <div  v-else class="message pure-form">
+               <div>
+                  <label for="savename">Search Name</label>
+                  <input ref="savename" id="savename" type="text" v-model="searchName"
+                     @keyup.enter="saveClicked"
+                     @keydown.shift.tab.stop.prevent="backTabName"
+                     aria-required="true" required="required"
+                  />
                </div>
+               <p class="error">{{error}}</p>
             </div>
          </template>
       </template>
-      <template v-if="saved == false" v-slot:controls>
+      <template v-if="saved == false && duplicateSave == false" v-slot:controls>
          <V4Button mode="tertiary" @click="cancelClicked">Cancel</V4Button>
          <V4Button mode="primary" id="save-ok" @click="saveClicked" :focusNextOverride="true" @tabnext="nextTabOK">Save</V4Button>
       </template>
@@ -51,7 +53,9 @@ export default {
          searchName: "",
          error: "",
          saved: false,
-         working: false
+         working: false,
+         lastSavedURL: "",
+         duplicateSave: false
       }
    },
    methods: {
@@ -65,15 +69,26 @@ export default {
          this.$refs.savemodal.lastFocusTabbed()
       },
       opened() {
-         let date = new Date()
-         let hours = date.getHours()
-         let minutes = date.getMinutes()
-         let m = date.getMonth()+1
-         let mStr = (""+m).padStart(2,'0')
-         let day = (""+date.getDate()).padStart(2,'0')
-         let timeStr = `${date.getFullYear()}-${mStr}-${day}:${hours}${minutes}`
-         this.searchName = `search-${timeStr}`
          this.error = ""
+         this.saved = false
+         if ( this.$route.fullPath == this.lastSavedURL) {
+            this.duplicateSave = true
+         } else {
+            let date = new Date()
+            let hours = date.getHours()
+            let minutes = date.getMinutes()
+            let m = date.getMonth()+1
+            let mStr = (""+m).padStart(2,'0')
+            let day = (""+date.getDate()).padStart(2,'0')
+            let timeStr = `${date.getFullYear()}-${mStr}-${day}:${hours}${minutes}`
+            this.searchName = `search-${timeStr}`
+
+            this.$nextTick( () => {
+               const input = document.getElementById('savename')
+               input.focus()
+               input.select()
+            })
+         }
       },
       async saveClicked() {
          if ( this.searchName == "") {
@@ -88,12 +103,16 @@ export default {
             this.saved = true
             this.showSavePrompt = false
             this.working = false
-            setTimeout(()=>{
+            this.lastSavedURL = searchURL
+            this.duplicateSave = false
+            this.$nextTick( () => {
                document.getElementById("savename").focus()
-            }, 250)
+            })
          } catch(err) {
             this.error = err.message
             this.working = false
+            this.duplicateSave = false
+            this.saved = false
          }
       }
    }
