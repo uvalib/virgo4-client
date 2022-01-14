@@ -142,7 +142,7 @@ const reserves = {
          ctx.commit('setSearching', true, { root: true })
          return axios.post(`/api/reserves/validate`, {items: itemIds}).then((response) => {
             response.data.forEach( (item, idx) => {
-               if (item.reserve == false) {
+               if (item.reserve == false || item.is_video == false ) {
                   ctx.commit("markInvalidReserveItem", idx)
                } else {
                   ctx.commit("updateReserveVideoFlag", {idx: idx, flag: item.is_video})
