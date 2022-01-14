@@ -90,15 +90,18 @@ export default {
 }
 .v4-download-button.text {
    border: none;
-   outline: none;
    background: transparent;
    margin: 0 15px 0 0;
    padding: 2px;
+   border-radius: 0px;
    .download-text {
       color: var(--color-link);
       font-weight: 500;
       margin: 0;
       display: inline-block;
+   }
+   &:focus {
+      @include be-accessible();
    }
 }
 </style>
