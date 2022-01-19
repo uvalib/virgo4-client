@@ -209,9 +209,6 @@ export default {
    .details.list {
       display: grid;
       text-align: left;
-      a.title  {
-         margin: initial;
-      }
       .callinfo {
          display: block;
          margin-top: 5px;;
@@ -250,6 +247,10 @@ export default {
       a.title  {
          font-weight: bold !important;
          margin-bottom: 5px !important;
+         &:focus {
+            outline: 3px dotted var( --uvalib-accessibility-highlight ) !important;
+            outline-offset: 3px !important;
+         }
       }
    }
 }

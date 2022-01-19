@@ -141,11 +141,13 @@ export default {
       margin: 50px 0 10px 0;
       color: var(--color-primary-orange);
       text-align: center;
-      .to-browse {
-         font-size: 0.65em;
-         display: block;
-         margin-left: auto;
-         margin: 10px 0 15px 0;
+   }
+
+   .to-browse {
+      margin: 10px 0 15px 0;
+      &:focus {
+         outline: 3px dotted var( --uvalib-accessibility-highlight ) !important;
+         outline-offset: 3px !important;
       }
    }
 }
