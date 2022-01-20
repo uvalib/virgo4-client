@@ -139,15 +139,34 @@ const reserves = {
             itemIds.push(item.identifier)
          })
 
+         let promises = []
          ctx.commit('setSearching', true, { root: true })
-         return axios.post(`/api/reserves/validate`, {items: itemIds}).then((response) => {
-            response.data.forEach( (item, idx) => {
+         await axios.post(`/api/reserves/validate`, {items: itemIds}).then( async (response) => {
+            response.data.forEach( async (item, idx) => {
+               console.log(item)
                if (item.reserve == false || item.is_video == false ) {
-                  ctx.commit("markInvalidReserveItem", idx)
+                  // ILS says cant reserve, check availabity service to see if the item can do
+                  // a videoREserve; flag those as OK. NOTE: collect all requests in a promise array
+                  // the await all to make the validte call not return untill all info is resolved.
+                  let url = `${ctx.rootState.system.availabilityURL}/item/${item.id}`
+                  promises.push (
+                     axios.get(url).then((response) => {
+                        let vid = response.data.availability.request_options.find( ro => ro.type=="videoReserve")
+                        if (vid) {
+                           ctx.commit("updateReserveVideoFlag", {idx: idx, flag: true})
+                        } else {
+                           ctx.commit("markInvalidReserveItem", idx)
+                        }
+                     }).catch(() => {
+                        ctx.commit("markInvalidReserveItem", idx)
+                     })
+                  )
                } else {
                   ctx.commit("updateReserveVideoFlag", {idx: idx, flag: item.is_video})
                }
             })
+
+            await Promise.all(promises)
             ctx.commit('setSearching', false, { root: true })
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
