@@ -143,7 +143,6 @@ const reserves = {
          ctx.commit('setSearching', true, { root: true })
          await axios.post(`/api/reserves/validate`, {items: itemIds}).then( async (response) => {
             response.data.forEach( async (item, idx) => {
-               console.log(item)
                if (item.reserve == false || item.is_video == false ) {
                   // ILS says cant reserve, check availabity service to see if the item can do
                   // a videoREserve; flag those as OK. NOTE: collect all requests in a promise array
