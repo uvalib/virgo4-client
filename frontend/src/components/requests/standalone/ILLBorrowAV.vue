@@ -123,7 +123,7 @@ export default {
             }
          } else {
             await this.$store.dispatch("requests/submitILLiadBorrowRequest", this.request)
-            this.$emit('submitted')
+            this.$emit('submitted', {title: this.request.title, pickup: this.request.pickup})
          }
       },
       hasError( val) {

@@ -154,7 +154,7 @@ export default {
                }
             } else {
                await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
-               this.$emit('submitted')
+               this.$emit('submitted', {title: this.request.title, pickup: ""})
             }
          }
       },
