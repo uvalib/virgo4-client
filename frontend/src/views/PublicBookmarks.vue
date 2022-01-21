@@ -38,7 +38,7 @@ export default {
          this.$analytics.trigger('Bookmarks', 'FOLLOW_PUBLIC_BOOKMARK', identifier)
       },
       detailsURL(bookmark) {
-         return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
+         return `/sources/${bookmark.pool.name}/items/${bookmark.identifier}`
       },
    }
 }
