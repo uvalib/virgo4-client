@@ -157,37 +157,37 @@ export default {
          let url = selDO.oEmbedURL.substring(0, idx)
          url += "/view/" + selDO.pid
 
-         // // grab the current URL and split of the details page fragment to be left with the transport and host.
-         // // this is needed for curio to trigger events back to V4
-         // let currURL = window.location.href
-         // let domain = currURL.split("/sources")[0]
+         // grab the current URL and split of the details page fragment to be left with the transport and host.
+         // this is needed for curio to trigger events back to V4
+         let currURL = window.location.href
+         let domain = currURL.split("/sources")[0]
 
-         // if ( this.isDevServer) {
-         //    url = url.replace("curio", "curio-dev.internal")
-         //    url += "?domain="+domain
+         if ( this.isDevServer) {
+            url = url.replace("curio", "curio-dev.internal")
+            url += "?domain="+domain
 
-         //    let x = this.$route.query.x
-         //    if (x) {
-         //       url += `&x=${x}`
-         //    }
-         //    let y = this.$route.query.y
-         //    if (y) {
-         //       url += `&y=${y}`
-         //    }
-         //    let zoom = this.$route.query.zoom
-         //    if (zoom) {
-         //       url += `&zoom=${zoom}`
-         //    }
-         //    let rotation = this.$route.query.rotation
-         //    if (rotation) {
-         //       url += `&rotation=${rotation}`
-         //    }
-         //    let page = this.$route.query.page
-         //    if (page) {
-         //       url += `&page=${page}`
-         //    }
-         //    // console.log("URL: "+url)
-         // }
+            let x = this.$route.query.x
+            if (x) {
+               url += `&x=${x}`
+            }
+            let y = this.$route.query.y
+            if (y) {
+               url += `&y=${y}`
+            }
+            let zoom = this.$route.query.zoom
+            if (zoom) {
+               url += `&zoom=${zoom}`
+            }
+            let rotation = this.$route.query.rotation
+            if (rotation) {
+               url += `&rotation=${rotation}`
+            }
+            let page = this.$route.query.page
+            if (page) {
+               url += `&page=${page}`
+            }
+            // console.log("URL: "+url)
+         }
 
          return url
       },
@@ -209,32 +209,32 @@ export default {
          return false
       }
    },
-   // created() {
-   //    window.onmessage = (e) => {
-   //       if ( e.data.name == "curio") {
-   //          // convert the curio params object into a query string and use replaceState to update the URL in place
-   //          // do not use the router as this forces page reloads
-   //          let curio = e.data
-   //          let qp = []
-   //          if ( curio.x) {
-   //             qp.push(`x=${curio.x}`)
-   //          }
-   //          if ( curio.y) {
-   //             qp.push(`y=${curio.y}`)
-   //          }
-   //          if ( curio.zoom) {
-   //             qp.push(`zoom=${curio.zoom}`)
-   //          }
-   //          if ( curio.rotation) {
-   //             qp.push(`rotation=${curio.rotation}`)
-   //          }
-   //          if ( curio.page) {
-   //             qp.push(`page=${curio.page}`)
-   //          }
-   //          history.replaceState(null, null, "?"+qp.join("&"))
-   //       }
-   //    };
-   // },
+   created() {
+      window.onmessage = (e) => {
+         if ( e.data.name == "curio") {
+            // convert the curio params object into a query string and use replaceState to update the URL in place
+            // do not use the router as this forces page reloads
+            let curio = e.data
+            let qp = []
+            if ( curio.x) {
+               qp.push(`x=${curio.x}`)
+            }
+            if ( curio.y) {
+               qp.push(`y=${curio.y}`)
+            }
+            if ( curio.zoom) {
+               qp.push(`zoom=${curio.zoom}`)
+            }
+            if ( curio.rotation) {
+               qp.push(`rotation=${curio.rotation}`)
+            }
+            if ( curio.page) {
+               qp.push(`page=${curio.page}`)
+            }
+            history.replaceState(null, null, "?"+qp.join("&"))
+         }
+      };
+   },
    methods: {
       toggleFullView() {
          this.fsView = !this.fsView
