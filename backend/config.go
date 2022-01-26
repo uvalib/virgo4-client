@@ -49,24 +49,22 @@ type DevConfig struct {
 
 // ServiceConfig defines all of the v4client service configuration parameters
 type ServiceConfig struct {
-	Port               int
-	AvailabilityURL    string
-	VirgoURL           string
-	CitationsURL       string
-	CollectionsURL     string
-	ShelfBrowseURL     string
-	SearchAPI          string
-	CourseReserveEmail string
-	LawReserveEmail    string
-	FeedbackEmail      string
-	ILSAPI             string
-	CatalogPoolURL     string
-	JWTKey             string
-	Dev                DevConfig
-	DB                 DBConfig
-	SMTP               SMTPConfig
-	Illiad             IlliadConfig
-	Firebase           FirebaseConfig
+	Port            int
+	AvailabilityURL string
+	VirgoURL        string
+	CitationsURL    string
+	CollectionsURL  string
+	ShelfBrowseURL  string
+	SearchAPI       string
+	FeedbackEmail   string
+	ILSAPI          string
+	CatalogPoolURL  string
+	JWTKey          string
+	Dev             DevConfig
+	DB              DBConfig
+	SMTP            SMTPConfig
+	Illiad          IlliadConfig
+	Firebase        FirebaseConfig
 }
 
 // LoadConfig will load the service configuration from env/cmdline
@@ -80,8 +78,6 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.ShelfBrowseURL, "shelf", "https://shelf-browse-ws-dev.internal.lib.virginia.edu", "Shelf Browse service URL")
 	flag.StringVar(&cfg.SearchAPI, "search", "", "Search API URL")
 	flag.StringVar(&cfg.JWTKey, "jwtkey", "", "JWT signature key")
-	flag.StringVar(&cfg.CourseReserveEmail, "cremail", "", "Email recipient for course reserves requests")
-	flag.StringVar(&cfg.LawReserveEmail, "lawemail", "", "Law Email recipient for course reserves requests")
 	flag.StringVar(&cfg.FeedbackEmail, "feedbackemail", "", "Email recipient for feedback")
 	flag.StringVar(&cfg.ILSAPI, "ils", "https://ils-connector.lib.virginia.edu", "ILS Connector API URL")
 	flag.StringVar(&cfg.CatalogPoolURL, "catalogPoolURL", "https://pool-solr-ws-uva-library-dev.internal.lib.virginia.edu/api/search", "Catalog Pool API URL")
@@ -134,16 +130,6 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("catalog pool param is required")
 	} else {
 		log.Printf("Catalog Pool API endpoint: %s", cfg.CatalogPoolURL)
-	}
-	if cfg.CourseReserveEmail == "" {
-		log.Fatal("cremail param is required")
-	} else {
-		log.Printf("Course Reserves email recipient: %s", cfg.CourseReserveEmail)
-	}
-	if cfg.LawReserveEmail == "" {
-		log.Fatal("lawemail param is required")
-	} else {
-		log.Printf("Law Course Reserves email recipient: %s", cfg.LawReserveEmail)
 	}
 	if cfg.FeedbackEmail == "" {
 		log.Fatal("feedbackemail param is required")

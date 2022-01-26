@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "1.1.0"
+const version = "1.2.0"
 
 /**
  * MAIN
@@ -119,9 +119,6 @@ func main() {
 		api.POST("/requests/openurl", svc.AuthMiddleware, svc.CreateOpenURLRequest)
 		api.POST("/requests/account", svc.AuthMiddleware, svc.CreateAccountRequest)
 
-		api.POST("/reserves", svc.AuthMiddleware, svc.CreateCourseReserves)
-		api.POST("/reserves/validate", svc.AuthMiddleware, svc.ValidateCourseReserves)
-		api.GET("/reserves/search", svc.AuthMiddleware, svc.SearchReserves)
 		api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
 
 		api.POST("/reauth", svc.RefreshAuthentication)

@@ -25,29 +25,27 @@ import (
 
 // ServiceContext contains common data used by all handlers
 type ServiceContext struct {
-	Version            string
-	AvailabilityURL    string
-	VirgoURL           string
-	CitationsURL       string
-	CollectionsURL     string
-	ShelfBrowseURL     string
-	SearchAPI          string
-	CourseReserveEmail string
-	LawReserveEmail    string
-	FeedbackEmail      string
-	ILSAPI             string
-	CatalogPoolURL     string
-	JWTKey             string
-	Dev                DevConfig
-	Firebase           FirebaseConfig
-	PendingTranslates  map[string]string
-	GDB                *gorm.DB
-	SMTP               SMTPConfig
-	Illiad             IlliadConfig
-	FastHTTPClient     *http.Client
-	HTTPClient         *http.Client
-	SlowHTTPClient     *http.Client
-	RenewHTTPClient    *http.Client
+	Version           string
+	AvailabilityURL   string
+	VirgoURL          string
+	CitationsURL      string
+	CollectionsURL    string
+	ShelfBrowseURL    string
+	SearchAPI         string
+	FeedbackEmail     string
+	ILSAPI            string
+	CatalogPoolURL    string
+	JWTKey            string
+	Dev               DevConfig
+	Firebase          FirebaseConfig
+	PendingTranslates map[string]string
+	GDB               *gorm.DB
+	SMTP              SMTPConfig
+	Illiad            IlliadConfig
+	FastHTTPClient    *http.Client
+	HTTPClient        *http.Client
+	SlowHTTPClient    *http.Client
+	RenewHTTPClient   *http.Client
 }
 
 // RequestError contains http status code and message for a
@@ -60,22 +58,20 @@ type RequestError struct {
 // InitService will initialize the service context based on the config parameters
 func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
-		AvailabilityURL:    cfg.AvailabilityURL,
-		VirgoURL:           cfg.VirgoURL,
-		SearchAPI:          cfg.SearchAPI,
-		CitationsURL:       cfg.CitationsURL,
-		CollectionsURL:     cfg.CollectionsURL,
-		ShelfBrowseURL:     cfg.ShelfBrowseURL,
-		JWTKey:             cfg.JWTKey,
-		CourseReserveEmail: cfg.CourseReserveEmail,
-		LawReserveEmail:    cfg.LawReserveEmail,
-		FeedbackEmail:      cfg.FeedbackEmail,
-		ILSAPI:             cfg.ILSAPI,
-		CatalogPoolURL:     cfg.CatalogPoolURL,
-		SMTP:               cfg.SMTP,
-		Illiad:             cfg.Illiad,
-		Dev:                cfg.Dev,
-		Firebase:           cfg.Firebase}
+		AvailabilityURL: cfg.AvailabilityURL,
+		VirgoURL:        cfg.VirgoURL,
+		SearchAPI:       cfg.SearchAPI,
+		CitationsURL:    cfg.CitationsURL,
+		CollectionsURL:  cfg.CollectionsURL,
+		ShelfBrowseURL:  cfg.ShelfBrowseURL,
+		JWTKey:          cfg.JWTKey,
+		FeedbackEmail:   cfg.FeedbackEmail,
+		ILSAPI:          cfg.ILSAPI,
+		CatalogPoolURL:  cfg.CatalogPoolURL,
+		SMTP:            cfg.SMTP,
+		Illiad:          cfg.Illiad,
+		Dev:             cfg.Dev,
+		Firebase:        cfg.Firebase}
 
 	log.Printf("INFO: connecting GORM to postgress...")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",

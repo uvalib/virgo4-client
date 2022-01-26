@@ -139,33 +139,17 @@ const reserves = {
             itemIds.push(item.identifier)
          })
 
-         let promises = []
          ctx.commit('setSearching', true, { root: true })
-         await axios.post(`/api/reserves/validate`, {items: itemIds}).then( async (response) => {
+         return axios.post(`${ctx.rootState.system.availabilityURL}/reserves/validate`, {items: itemIds}).then( response => {
             response.data.forEach( async (item, idx) => {
+               // for now, only video items can be put on course reserve
                if (item.reserve == false || item.is_video == false ) {
-                  // ILS says cant reserve, check availabity service to see if the item can do
-                  // a videoREserve; flag those as OK. NOTE: collect all requests in a promise array
-                  // the await all to make the validte call not return untill all info is resolved.
-                  let url = `${ctx.rootState.system.availabilityURL}/item/${item.id}`
-                  promises.push (
-                     axios.get(url).then((response) => {
-                        let vid = response.data.availability.request_options.find( ro => ro.type=="videoReserve")
-                        if (vid) {
-                           ctx.commit("updateReserveVideoFlag", {idx: idx, flag: true})
-                        } else {
-                           ctx.commit("markInvalidReserveItem", idx)
-                        }
-                     }).catch(() => {
-                        ctx.commit("markInvalidReserveItem", idx)
-                     })
-                  )
+                  ctx.commit("markInvalidReserveItem", idx)
                } else {
                   ctx.commit("updateReserveVideoFlag", {idx: idx, flag: item.is_video})
                }
             })
 
-            await Promise.all(promises)
             ctx.commit('setSearching', false, { root: true })
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
@@ -197,7 +181,7 @@ const reserves = {
             }
             data.items.push( subItem )
          })
-         axios.post(`/api/reserves`, data).then((_response) => {
+         axios.post(`${ctx.rootState.system.availabilityURL}/reserves`, data).then((_response) => {
             ctx.commit('clearRequestList')
             ctx.commit('setSubmitted', true)
             ctx.commit('setSearching', false, { root: true })
@@ -211,7 +195,7 @@ const reserves = {
          let data = { userID: v4UserID, request: ctx.state.request,
             items: [video]}
 
-         axios.post(`/api/reserves`, data).then((_response) => {
+         axios.post(`${ctx.rootState.system.availabilityURL}/reserves`, data).then((_response) => {
             ctx.commit('requests/disableButton', true, { root: true })
             ctx.commit('clearRequestList')
             ctx.commit('setSubmitted', true)
