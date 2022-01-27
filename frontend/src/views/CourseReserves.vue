@@ -80,6 +80,9 @@ export default {
          this.$store.dispatch("reserves/searchCourseReserves", data)
       },
    },
+   mounted() {
+      this.$store.commit("reserves/resetResults")
+   }
 }
 </script>
 

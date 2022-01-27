@@ -28,6 +28,9 @@
             <div class="search-mode">
                <V4BarcodeScanner @scanned="barcodeScanned"/>
             </div>
+            <div class="search-mode">
+               <router-link tabindex="0" to="/coursereserves">Search course reserves</router-link>
+            </div>
          </template>
          <AdvancedSearch v-else/>
       </div>
