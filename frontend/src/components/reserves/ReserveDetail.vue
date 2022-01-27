@@ -1,17 +1,12 @@
 <template>
    <div class="reserve-detail">
-      <router-link :to="detailsLink(reserve.catalogKey)">
+      <router-link :to="detailsLink(reserve.id)">
          <p>{{reserve.title}}</p>
       </router-link>
       <div class="inset">
          <p>{{reserve.author}}</p>
          <p>{{reserve.callNumber}}</p>
-         <p>Location: {{reserve.reserveDesk}}</p>
-         <p>
-            Available for: {{reserve.circulationRule}} checkout
-            <span v-if="reserve.loanPeriod">for {{reserve.loanPeriod}}</span>
-         </p>
-         <p class="available">Copies Available: {{reserve.copies}}</p>
+         <p v-if="reserve.library" >Library: {{reserve.library}}</p>
       </div>
    </div>
 </template>
@@ -26,7 +21,7 @@ export default {
    },
    methods: {
       detailsLink(catalogKey) {
-         return `/items/${catalogKey}`
+         return `/sources/uva_library/items/${catalogKey}`
       },
    }
 }

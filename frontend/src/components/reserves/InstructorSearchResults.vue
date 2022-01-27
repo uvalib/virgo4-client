@@ -3,18 +3,14 @@
       <h2 v-if="query" class="query-summary">
          Course reserves for instructor '{{query}}'
       </h2>
-      <h2 v-else class="query-summary">
-         My Course Reserves
-      </h2>
-      <div class="instructor" v-for="(inst,idx) in results" :key="idx">
-         <h3 class="value folder">{{inst.name}}</h3>
-         <div class="course" v-for="(course,ci) in inst.courses" :key="course.id">
-            <p v-if="ci>0" class="value folder">{{inst.name}}</p>
+      <div class="instructor" v-for="(ir,idx) in results" :key="idx">
+         <h3 class="value folder">{{ir.instructorName}}</h3>
+         <div class="course" v-for="course in ir.courses" :key="course.id">
             <div class="course-name">
-               <p class="value">{{course.name}}</p>
-               <p class="value-id">{{course.id}}</p>
+               <p class="value">{{course.courseName}}</p>
+               <p class="value-id">{{course.courseID}}</p>
             </div>
-            <div class="reserves" v-for="reserve in course.reserves" :key="reserve.catalogKey">
+           <div class="reserves" v-for="reserve in course.items" :key="reserve.id">
                <ReserveDetail :reserve="reserve" />
             </div>
          </div>
@@ -38,20 +34,37 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss" >
 .results-panel {
-   margin: 15px 0;
+   margin: 15px 0 25px 0;
    color: var(--uvalib-grey-dark);
+   h2 {
+      text-align: left;
+      margin: 30px 0 5px 0;
+      font-size: 1.2em;
+      font-weight: normal;
+   }
+   div.instructor {
+      margin: 10px 0 25px 0;
+      text-align: left;
+      border: 1px solid var(--uvalib-grey-lightest);
+      box-shadow: $v4-box-shadow-light;
+      h3.value {
+         margin: 0;
+         padding: 10px;
+      }
+      .course {
+         padding-bottom: 15px;
+         div.course-name {
+            font-weight: bold;
+            color: var(--uvalib-grey-darkest);
+            padding:  15px 15px 5px 15px;
+            border-top: 4px solid var(--uvalib-teal-light);
+         }
+      }
+   }
 }
-.query-summary {
-  text-align: left;
-  font-weight: bold;
-  margin-bottom: 15px;
-  border-bottom: 1px solid var(--uvalib-grey-light);
-}
-div.instructor {
-   text-align: left;
-}
+
 div.reserves {
    padding: 0 0 0 25px;
 }
@@ -65,13 +78,7 @@ label {
 .value-id {
   font-weight: normal;
 }
-div.course-name {
-  font-weight: bold;
-  color: var(--uvalib-grey-darkest);
-  padding: 0;
-  padding: 8px;
-  border-top: 4px solid var(--uvalib-teal-light);
-}
+
 .folder {
    background: var(--uvalib-teal-lightest);
    margin: 10px 0 0 0;

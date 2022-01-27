@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Codes from './views/Codes.vue'
 import Home from './views/Home.vue'
 
-// import CourseReserves from './views/CourseReserves.vue'
+import CourseReserves from './views/CourseReserves.vue'
 import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import Details from './views/Details.vue'
 import ShelfBrowse from './views/ShelfBrowse.vue'
@@ -61,11 +61,11 @@ const router = createRouter({
          name: 'codes',
          component: Codes
       },
-      // {
-      //    path: '/course-reserves',
-      //    name: 'course-reserves',
-      //    component: CourseReserves
-      // },
+      {
+         path: '/coursereserves',
+         name: 'course-reserves',
+         component: CourseReserves
+      },
       {
          path: '/course-reserves-request',
          name: 'course-reserves-request',
@@ -184,7 +184,8 @@ router.afterEach((to, _from) => {
    let titles = {home: "Virgo", search: "Virgo", signin: "Sign In", account: "My Information",
       checkouts: "Checkouts", 'digital-deliveries': "Digital Deliveries",
       bookmarks: "Bookmarks", requests: "Requests", searches: "Saved Searches", forbidden: "Forbidden",
-      preferences: "Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse"
+      preferences: "Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
+      'course-reserves': "Course Reserves"
    }
    let title = titles[to.name]
    if ( title == "Virgo") {
@@ -213,11 +214,6 @@ router.afterEach((to, _from) => {
 // This is called before every URL in the SPA is hit
 router.beforeEach( async (to, _from) => {
    router.store.commit("system/setILSError", "")
-
-   if (to.path == "/course-reserves") {
-      window.location.href = "https://ils.lib.virginia.edu/reserves"
-      return false
-   }
 
    // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {

@@ -1,7 +1,7 @@
 <template>
    <div class="course-reserves">
       <div class="reserves-content">
-         <V4Spinner v-if="searching && totalReserves == -1" message="Looking up reserved items..." v-bind:overlay="true"/>
+         <V4Spinner v-if="searching" message="Looking up reserved items..." v-bind:overlay="true"/>
          <div class="instructions">
             <p>Search for Course Reserves by...</p>
             <ul>
@@ -15,9 +15,9 @@
          <div class="search-panel pure-form">
             <input id="crsearch" v-model="pendingQuery" autocomplete="off" type="text" aria-required="true" required="required">
             <div class="controls">
-               <V4Button @click="searchInstructorClicked('name')" mode="primary">Search Instructors</V4Button>
-               <V4Button @click="searchCourseClicked('id')" mode="primary">Search Course ID</V4Button>
-               <V4Button @click="searchCourseClicked('name')" mode="primary">Search Course Names</V4Button>
+               <V4Button @click="searchClicked('instructor_name')" mode="primary">Search Instructors</V4Button>
+               <V4Button @click="searchClicked('course_id')" mode="primary">Search Course ID</V4Button>
+               <V4Button @click="searchClicked('course_name')" mode="primary">Search Course Names</V4Button>
             </div>
             <div class="links">
                <a href="https://collab.its.virginia.edu/portal" target="_blank">
@@ -30,14 +30,13 @@
                </a>
             </div>
          </div>
-         <template v-if="totalReserves > -1">
-            <div class="no-match" v-if="totalReserves == 0">
+         <template v-if="searchSuccess">
+            <div class="no-match" v-if="courseReserves.length == 0">
                No course reserves that match your request were found
             </div>
             <template v-else>
                <CourseSearchResults v-if="hasCourseResults"/>
                <InstructorSearchResults v-if="hasInstructorResults"/>
-               <V4Spinner v-if="hasMore" style="padding:20px 20px"/>
             </template>
          </template>
       </div>
@@ -57,15 +56,14 @@ export default {
    },
    data: function() {
       return {
-         loadingMore: false,
          pendingQuery: ""
       }
    },
    computed: {
       ...mapState({
-         totalReserves: state => state.reserves.totalReserves,
+         courseReserves: state => state.reserves.courseReserves,
+         searchSuccess: state => state.reserves.searchSuccess,
          searching: state => state.searching,
-         hasMore: state => state.reserves.hasMore,
       }),
       ...mapGetters({
          hasCourseResults: 'reserves/hasCourseResults',
@@ -76,30 +74,11 @@ export default {
         'query',
       ]),
    },
-   watch: {
-      searching() {
-         if (this.searching === false) {
-            if (this.hasMore) {
-               this.loadingMore = true
-               this.$store.dispatch("reserves/nextPage").finally( ()=> {
-                  this.loadingMore = false
-               })
-            }
-         }
-      }
-   },
    methods: {
-      searchInstructorClicked(type) {
-         let data = {type: type, initial: true, query: this.pendingQuery}
-         this.$store.dispatch("reserves/searchInstructors", data)
+      searchClicked(type) {
+         let data = {type: type, query: this.pendingQuery}
+         this.$store.dispatch("reserves/searchCourseReserves", data)
       },
-      searchCourseClicked(type) {
-         let data = {type: type, initial: true, query: this.pendingQuery}
-         this.$store.dispatch("reserves/searchCourses", data)
-      },
-   },
-   created() {
-      this.$store.dispatch("user/getAccountInfo")
    },
 }
 </script>
@@ -110,6 +89,7 @@ export default {
    position: relative;
    margin-top: 2vw;
    color: var(--uvalib-grey-dark);
+   margin-bottom: 75px;
 }
 .working {
    text-align: center;

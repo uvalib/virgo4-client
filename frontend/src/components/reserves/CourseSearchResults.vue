@@ -3,18 +3,14 @@
       <h2 class="query-summary">
          Course reserves for course '{{query}}'
       </h2>
-      <div class="course" v-for="(course,cidx) in results" :key="`C${cidx}${course.id}`">
+      <div class="course" v-for="(c,cidx) in results" :key="`C${cidx}${c.courseID}`">
          <div class="course-name">
-            <h3 class="value">{{course.name}}</h3>
-            <p class="value-id">{{course.id}}</p>
+            <h3 class="value">{{c.courseName}}</h3>
+            <p class="value-id">{{c.courseID}}</p>
          </div>
-         <div class="instructor" v-for="(inst,idx) in course.instructors" :key="idx">
-            <div v-if="idx>0" class="course-name">
-               <h3 class="value">{{course.name}}</h3>
-               <p class="value-id">{{course.id}}</p>
-            </div>
-            <p class="value folder">{{inst.name}}</p>
-            <div class="reserves" v-for="reserve in inst.reserves" :key="reserve.catalogKey">
+         <div class="instructor" v-for="(inst,idx) in c.instructors" :key="idx">
+            <p class="value folder">{{inst.instructorName}}</p>
+            <div class="reserves" v-for="reserve in inst.items" :key="reserve.id">
                <ReserveDetail :reserve="reserve" />
             </div>
          </div>
@@ -38,59 +34,54 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .results-panel {
    margin: 15px 0;
    color: var(--uvalib-grey-dark);
+   h2 {
+      text-align: left;
+      margin: 30px 0 5px 0;
+      font-size: 1.2em;
+      font-weight: normal;
+   }
+   div.course {
+      margin: 10px 0 25px 0;
+      text-align: left;
+      border: 1px solid var(--uvalib-grey-lightest);
+      box-shadow: $v4-box-shadow-light;
+
+      div.course-name {
+         font-weight: bold;
+         color: var(--uvalib-grey-darkest);
+         padding: 0;
+         padding: 10px;
+         background: var(--uvalib-teal-lightest);
+         border-bottom: 4px solid var(--uvalib-teal-light);
+      }
+      div.instructor {
+         font-weight: bold;
+         color: var(--uvalib-grey-dark);
+         padding: 0;
+         background: white;
+         margin-bottom: 15px;
+         div.reserves {
+            padding: 0 0 0 25px;
+         }
+      }
+      div.instructor .value.folder {
+         padding: 15px 15px 5px 15px;
+         color: var(--uvalib-grey-darkest);
+      }
+   }
 }
-.query-summary {
-   text-align: left;
-   font-weight: bold;
-   margin-bottom: 25px;
-}
-div.reserves {
-   padding: 0 0 0 25px;
-}
-label {
-   font-weight: bold;
-   margin-right: 10px;
-}
+
 .value, .value-id {
    margin: 0;
 }
 .value-id {
   font-weight: normal;
 }
-div.course-name {
-   font-weight: bold;
-   color: var(--uvalib-grey-darkest);
-   padding: 0;
-   padding: 8px;
-   background: var(--uvalib-teal-lightest);
-   margin-top: 10px;
-   border-bottom: 4px solid var(--uvalib-teal-light);
-}
-div.course-name-alt {
-  border-top: none;
-  border-left: none;
-  border-right: none;
-}
-div.course {
-   margin: 10px 0 0 0;
-   text-align: left;
 
-}
-div.instructor {
-   font-weight: bold;
-   color: var(--uvalib-grey-dark);
-   padding: 0;
-   background: white;
-   margin-bottom: 25px;
-}
-div.instructor .value.folder {
-   padding: 8px;
-   color: var(--uvalib-grey-darkest);
-}
 .reserves::after {
   content: " ";
   display: block;

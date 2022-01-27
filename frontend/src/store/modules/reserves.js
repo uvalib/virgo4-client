@@ -6,10 +6,8 @@ const reserves = {
    state: {
       query: "",
       searchType: "",
-      totalReserves: -1,
-      hasMore: false,
-      page: 1,
       courseReserves: [],
+      searchSuccess: false,
       requestList: [],
       request: {
          onBehalfOf: "no",
@@ -34,10 +32,10 @@ const reserves = {
          return out
       },
       hasCourseResults: state => {
-         return state.searchType.includes("COURSE") && state.courseReserves.length > 0
+         return state.searchType.includes("course") && state.courseReserves.length > 0
       },
       hasInstructorResults: state => {
-         return state.searchType.includes("INSTRUCTOR") && state.courseReserves.length > 0
+         return state.searchType.includes("instructor") && state.courseReserves.length > 0
       },
    },
 
@@ -104,31 +102,16 @@ const reserves = {
          state.submitted = flag
       },
       setCourseReserves(state, data) {
-         data['hits'].forEach( h=>{
+         data.forEach( h=>{
             state.courseReserves.push(h)
          })
-         state.totalReserves = state.courseReserves.length
-         state.page = data['page']
-         state.hasMore = data['more']
+         state.searchSuccess = true
       },
       resetResults(state, type) {
+         state.searchSuccess = false
          state.searchType = type
          state.courseReserves.splice(0, state.courseReserves.length)
-         state.totalReserves = -1
-         state.page = 1
-         state.hasMore = false
       },
-      clearReservesResults(state) {
-         state.courseReserves.splice(0, state.courseReserves.length)
-         state.totalReserves = -1
-         state.page = 1
-         state.hasMore = false
-      },
-      nextPage(state) {
-         if ( state.hasMore) {
-            state.page += 1
-         }
-      }
    },
 
    actions: {
@@ -157,6 +140,7 @@ const reserves = {
          })
 
       },
+
       createReserves(ctx) {
          ctx.commit('setSearching', true, { root: true })
          let v4UserID = ctx.rootState.user.signedInUser
@@ -190,6 +174,7 @@ const reserves = {
             ctx.commit('setSearching', false, { root: true })
          })
       },
+
       createVideoReserve(ctx, video){
          let v4UserID = ctx.rootState.user.signedInUser
          let data = { userID: v4UserID, request: ctx.state.request,
@@ -206,103 +191,26 @@ const reserves = {
             ctx.commit('requests/disableButton', false, { root: true })
          })
       },
-      nextPage(ctx) {
-         if (ctx.state.hasMore == false ) {
-            return
-         }
+
+      searchCourseReserves(ctx, data) {
+         ctx.commit("setQuery", data.query)
+         let qs = data.query
          ctx.commit('setSearching', true, { root: true })
-         ctx.commit('nextPage')
-         let qs = ctx.state.query
          if (qs.includes(" ")) {
             qs = `"${qs}"`
          }
-         let typeParam = "type="+ctx.state.searchType
-         let pg = ctx.state.page
-         return axios.get(`/api/reserves/search?${typeParam}&query=${qs}&page=${pg}`).then((response) => {
+
+         ctx.commit('resetResults', data.type)
+         let typeParam = "type="+data.type
+         let url = `${ctx.rootState.system.availabilityURL}/reserves/search?${typeParam}&query=${qs}`
+         axios.get(url).then((response) => {
             ctx.commit('setCourseReserves', response.data)
             ctx.commit('setSearching', false, { root: true })
          }).catch((error) => {
-            ctx.commit('setError', error, { root: true })
-            ctx.commit('setSearching', false, { root: true })
-          })
-      },
-      searchCourses(ctx, data) {
-         ctx.commit("setQuery", data.query)
-         let qs = data.query
-         if ( qs.includes("*")) {
-            ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
-            ctx.commit('clearReservesResults')
-            return
-         }
-         if (qs.length < 3 ) {
-            ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
-            ctx.commit('clearReservesResults')
-            return
-         }
-
-         ctx.commit('setSearching', true, { root: true })
-         let type = "COURSE_NAME"
-         if (data.type == "id") {
-            type = "COURSE_ID"
-         }
-         if (qs.includes(" ")) {
-            qs = `"${qs}"`
-         }
-         if (data.initial === true) {
-            ctx.commit('resetResults', type)
-         }
-         let typeParam = "type="+type
-         let pgParam = "page="+ctx.state.page
-         let url = `/api/reserves/search?${typeParam}&query=${qs}&${pgParam}`
-         axios.get(url).then((response) => {
-            ctx.commit('setCourseReserves', response.data)
-            ctx.commit('setSearching', false, { root: true })
-         }).catch((_error) => {
-            ctx.commit('system/setError', "Sirsi system error", { root: true })
+            ctx.commit('system/setError', error, { root: true })
             ctx.commit('setSearching', false, { root: true })
          })
       },
-
-      searchInstructors(ctx, data) {
-         ctx.commit("setQuery", data.query)
-         let qs = data.query
-         if ( qs.includes("*")) {
-            ctx.commit('system/setError', "Wildcard searches are not supported", { root: true })
-            ctx.commit('clearReservesResults')
-            return
-         }
-         if (qs.length < 3 ) {
-            ctx.commit('system/setError', "A search requires at least 3 characters", { root: true })
-            ctx.commit('clearReservesResults')
-            return
-         }
-
-         ctx.commit('setSearching', true, { root: true })
-         let type = "INSTRUCTOR_NAME"
-         if (data.type == "id") {
-            type = "INSTRUCTOR_ID"
-            qs = ctx.rootState.user.accountInfo.id
-         }
-
-         qs = qs.replace(/,/g, "")
-         qs = qs.trim()
-         if (qs.includes(" ")) {
-            qs = `"${qs}"`
-         }
-         if (data.initial === true) {
-            ctx.commit('resetResults', type)
-         }
-         let typeParam = "type="+type
-         let pgParam = "page="+ctx.state.page
-         let url = `/api/reserves/search?${typeParam}&query=${qs}&${pgParam}`
-         axios.get(url).then((response) => {
-            ctx.commit('setCourseReserves', response.data)
-            ctx.commit('setSearching', false, { root: true })
-         }).catch((_error) => {
-            ctx.commit('system/setError', "Sirsi system error", { root: true })
-            ctx.commit('setSearching', false, { root: true })
-          })
-      }
    }
 }
 
