@@ -188,11 +188,11 @@ export default {
          el.style.height = '0'
       },
       enter: function(el) {
-         el.style.height = (el.scrollHeight-10) + 'px'
+         el.style.height = (el.scrollHeight) + 'px'
          this.expandedItem = el
       },
       beforeLeave: function(el) {
-         el.style.height = (el.scrollHeight-10) + 'px'
+         el.style.height = (el.scrollHeight) + 'px'
          this.expandedItem = el
       },
       leave: function(el) {
@@ -257,8 +257,8 @@ button.v4-select:focus {
   background-color: var(--uvalib-brand-blue);
   color: white;
   cursor: pointer;
-  padding: 0 0 10px 0;
-  border-radius: 0 0 5px 5px;
+  padding: 0;
+  border-radius: 0 0 7px 7px;
   position: absolute;
   border: 1px solid var(--uvalib-light-blue);
   overflow: hidden;
@@ -268,6 +268,7 @@ button.v4-select:focus {
   display: grid;
   grid-auto-rows: auto;
   margin:0;
+  box-shadow: $v4-box-shadow-light;
 }
 
 .v4-select .options.left  {

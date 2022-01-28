@@ -149,16 +149,16 @@ const user = {
          return (state.noILSAccount != true)
       },
       libraries: (_state, getters, rootState) => {
+         // all libraries are available by default. Filter out some based on user criteria
          let pickupLibraries = rootState.system.pickupLibraries.slice()
-
-         if (getters.isHSLUser) {
-            pickupLibraries.push({id: "HEALTHSCI", name: "Health Sciences Library"})
+         if (getters.isHSLUser == false) {
+            pickupLibraries = pickupLibraries.filter( p => p.id != "HEALTHSCI" )
          }
-         if (getters.isLawUser) {
-            pickupLibraries.push({id: "LAW", name: "Law Library"})
+         if (getters.isLawUser == false) {
+            pickupLibraries = pickupLibraries.filter( p => p.id != "LAW")
          }
-         if (getters.canUseLEO) {
-            pickupLibraries.push({id: "LEO", name: 'LEO delivery to my department' })
+         if (getters.canUseLEO == false) {
+            pickupLibraries = pickupLibraries.filter( p => p.id != "LEO")
          }
 
          return pickupLibraries

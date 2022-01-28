@@ -55,6 +55,13 @@ type RequestError struct {
 	Message    string
 }
 
+type pickupLibrary struct {
+	ID      int    `json:"-"`
+	Key     string `json:"id"`
+	Name    string `json:"name"`
+	Enabled bool   `json:"-"`
+}
+
 // InitService will initialize the service context based on the config parameters
 func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
@@ -299,6 +306,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		KioskMode        bool            `json:"kiosk"`
 		DevServer        bool            `json:"devServer"`
 		Firebase         *FirebaseConfig `json:"firebase,omitempty"`
+		PickupLibraries  []pickupLibrary `json:"pickupLibraries"`
 	}
 	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
 	log.Printf("Accept-Language=%s", acceptLang)
@@ -323,6 +331,11 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	if strings.Index(v4HostHeader, "-dev") > -1 || svc.Dev.AuthUser != "" {
 		log.Printf("This request is from a dev server")
 		cfg.DevServer = true
+	}
+
+	dbResp := svc.GDB.Where("enabled=?", true).Order("name asc").Find(&cfg.PickupLibraries)
+	if dbResp.Error != nil {
+		log.Printf("ERROR: unable to get pickup libraries: %s", dbResp.Error.Error())
 	}
 
 	c.JSON(http.StatusOK, cfg)

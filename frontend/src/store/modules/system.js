@@ -28,13 +28,7 @@ const system = {
       displayWidth: window.innerWidth,
       locationCodes: [],
       libraryCodes: [],
-      pickupLibraries: [
-         {id: 'SCI-ENG', name: 'Brown Science and Engineering Library (Clark Hall)'},
-         {id: 'CLEMONS', name: 'Clemons Library'},
-         {id: 'DARDEN', name: 'Darden Library'},
-         {id: 'MUSIC', name: 'Music Library'},
-         {id: 'FINE-ARTS', name: 'Fine Arts Library'}
-      ],
+      pickupLibraries: [],
    },
 
    getters: {
@@ -165,6 +159,8 @@ const system = {
          state.collectionsURL = cfg.collectionsURL
          state.hsILLiadURL = cfg.hsILLiadURL
          state.shelfBrowseURL = cfg.shelfBrowseURL
+         state.pickupLibraries.splice(0, state.pickupLibraries.length)
+         cfg.pickupLibraries.forEach( p => state.pickupLibraries.push(p) )
       },
    },
 
