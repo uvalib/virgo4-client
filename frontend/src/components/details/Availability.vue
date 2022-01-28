@@ -18,7 +18,7 @@
          <BoundWithItems v-if="hasBoundWithItems"/>
 
          <div class="items" v-if="hasItems || hasRequestOptions">
-            <RequestContainer :titleId="titleId" v-if="canMakeRequests" />
+            <RequestContainer :titleId="titleId" v-if="canMakeRequests && !isBarred" />
             <ul class="holdings" v-if="details.holdings.libraries">
                <li v-for="(lib, idx) in details.holdings.libraries" :key="`lib${idx}`">
                   <span class="library">{{lib.library}}</span>
@@ -96,6 +96,7 @@ export default {
          hasRequestOptions: 'requests/hasRequestOptions',
          hasBoundWithItems: 'item/hasBoundWithItems',
          isGuest: 'user/isGuest',
+         isBarred: 'user/isBarred',
       }),
       canMakeRequests() {
          if ( this.noILSAccount) {

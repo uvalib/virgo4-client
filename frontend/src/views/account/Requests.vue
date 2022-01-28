@@ -6,7 +6,7 @@
          <V4Spinner message="Looking up requests..." />
       </div>
       <div class="details" v-if="isSignedIn">
-         <template v-if="!noILSAccount">
+         <template v-if="!noILSAccount && !isBarred">
             <h2>Make a New Request</h2>
             <div v-if="!isUVA">
                <!-- No ILL requests for community borrowers  -->
@@ -205,6 +205,7 @@ export default {
          isSignedIn: 'user/isSignedIn',
          isGuest: 'user/isGuest',
          isUVA: 'user/isUVA',
+         isBarred: 'user/isBarred',
          hasSysError: "system/hasError",
       }),
       illiadRequests() {
@@ -304,7 +305,7 @@ export default {
       padding: 10px;
    }
    .subcontent.links {
-      padding-top: 0;
+      padding-top: 10px;
    }
 
    .subcontent.buttons {
