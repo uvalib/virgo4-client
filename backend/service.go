@@ -56,10 +56,10 @@ type RequestError struct {
 }
 
 type pickupLibrary struct {
-	ID      int    `json:"-"`
+	ID      int    `json:"primaryKey"`
 	Key     string `json:"id"`
 	Name    string `json:"name"`
-	Enabled bool   `json:"-"`
+	Enabled bool   `json:"enabled"`
 }
 
 // InitService will initialize the service context based on the config parameters
@@ -333,7 +333,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		cfg.DevServer = true
 	}
 
-	dbResp := svc.GDB.Where("enabled=?", true).Order("name asc").Find(&cfg.PickupLibraries)
+	dbResp := svc.GDB.Order("name asc").Find(&cfg.PickupLibraries)
 	if dbResp.Error != nil {
 		log.Printf("ERROR: unable to get pickup libraries: %s", dbResp.Error.Error())
 	}
@@ -355,6 +355,30 @@ func (svc *ServiceContext) LogClientError(c *gin.Context) {
 	} else {
 		log.Printf("CLIENT ERROR (Version %s.%s): %s", svc.Version, build, body)
 	}
+}
+
+// UpdatePickupLibrary updates key/name/enabled for the given library
+func (svc *ServiceContext) UpdatePickupLibrary(c *gin.Context) {
+	id := c.Param("id")
+	log.Printf("INFO: update pickup library %s", id)
+	var plReq pickupLibrary
+	err := c.ShouldBindJSON(&plReq)
+	if err != nil {
+		log.Printf("ERROR: invalid update pickup library payload: %s", err.Error())
+		c.String(http.StatusBadRequest, "Invalid update pickup library request")
+		return
+	}
+
+	dbResp := svc.GDB.Debug().Model(&plReq).Select("Key", "Name", "Enabled").Updates(plReq)
+	if dbResp.Error != nil {
+		log.Printf("ERROR: unable to update pickup library %s: %s", id, dbResp.Error.Error())
+		c.String(http.StatusInternalServerError, dbResp.Error.Error())
+		return
+	}
+
+	log.Printf("INFO: pickup library updated: %+v", plReq)
+
+	c.JSON(http.StatusOK, plReq)
 }
 
 // GetCodes will return the raw library and location codes from the ILS connector

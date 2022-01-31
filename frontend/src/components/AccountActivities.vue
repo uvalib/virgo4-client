@@ -14,12 +14,22 @@
       <span class="sep">|</span>
       <router-link id="preferences-submenu" to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
+      <template v-if="isAdmin">
+         <router-link id="preferences-submenu" to="/admin">Admin</router-link>
+         <span class="sep">|</span>
+      </template>
       <V4Button mode="text"  @click="signOut">Sign Out</V4Button>
    </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
+   computed: {
+      ...mapGetters({
+        isAdmin: 'user/isAdmin',
+      }),
+   },
    methods: {
       async signOut() {
          await this.$store.dispatch("user/signout", true)

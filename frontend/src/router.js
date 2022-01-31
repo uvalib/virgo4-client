@@ -13,6 +13,7 @@ import Bookmarks from './views/account/Bookmarks.vue'
 import Checkouts from './views/account/Checkouts.vue'
 import DigitalDeliveries from './views/account/DigitalDeliveries.vue'
 import Preferences from './views/account/Preferences.vue'
+import Admin from './views/account/Admin.vue'
 import Requests from './views/account/Requests.vue'
 import SavedSearches from './views/account/SavedSearches.vue'
 import OpenURLRequest from './views/OpenURLRequest.vue'
@@ -97,6 +98,11 @@ const router = createRouter({
          path: '/preferences',
          name: 'preferences',
          component: Preferences
+      },
+      {
+         path: '/admin',
+         name: 'admin',
+         component: Admin
       },
       {
          path: '/signin',
@@ -185,7 +191,7 @@ router.afterEach((to, _from) => {
       checkouts: "Checkouts", 'digital-deliveries': "Digital Deliveries",
       bookmarks: "Bookmarks", requests: "Requests", searches: "Saved Searches", forbidden: "Forbidden",
       preferences: "Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
-      'course-reserves': "Course Reserves"
+      'course-reserves': "Course Reserves", admin: "Admin",
    }
    let title = titles[to.name]
    if ( title == "Virgo") {
@@ -238,7 +244,7 @@ router.beforeEach( async (to, _from) => {
    // model variable. Ensure it is set correctly for each new page
    let h1 = {home: "Search", search: "Search", signin: "User Sign In", account: "My Account",
       checkouts: "My Account", 'digital-deliveries': "My Account",
-      bookmarks: "My Account", requests: "My Account", searches: "My Account",
+      bookmarks: "My Account", requests: "My Account", searches: "My Account", admin: "My Account",
       preferences: "My Account", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
       codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found",
       'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item", forbidden: "Forbidden",

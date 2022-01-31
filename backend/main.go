@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "1.2.0"
+const version = "1.3.0"
 
 /**
  * MAIN
@@ -118,6 +118,8 @@ func main() {
 		api.POST("/requests/standalone/borrow", svc.AuthMiddleware, svc.CreateBorrowRequest)
 		api.POST("/requests/openurl", svc.AuthMiddleware, svc.CreateOpenURLRequest)
 		api.POST("/requests/account", svc.AuthMiddleware, svc.CreateAccountRequest)
+
+		api.POST("/pickuplibraries/:id/update", svc.AuthMiddleware, svc.UpdatePickupLibrary)
 
 		api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
 

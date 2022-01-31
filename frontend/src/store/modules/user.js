@@ -148,9 +148,9 @@ const user = {
          if (state.accountInfo.id != state.signedInUser) return false
          return (state.noILSAccount != true)
       },
-      libraries: (_state, getters, rootState) => {
+      libraries: (_state, getters, _rootState, rootGetters) => {
          // all libraries are available by default. Filter out some based on user criteria
-         let pickupLibraries = rootState.system.pickupLibraries.slice()
+         let pickupLibraries = rootGetters['system/pickupLibraries'].slice()
          if (getters.isHSLUser == false) {
             pickupLibraries = pickupLibraries.filter( p => p.id != "HEALTHSCI" )
          }

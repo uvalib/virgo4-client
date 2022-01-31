@@ -1,16 +1,13 @@
 <template>
-   <div class="preferences">
-      <SignInRequired v-if="isSignedIn == false" targetPage="preferences"/>
+   <div class="admin" v-if="isAdmin">
       <AccountActivities v-if="isSignedIn"/>
       <div class="working" v-if="(lookingUpPools || lookingUpAccount) && isSignedIn" >
-         <V4Spinner message="Loading preferences..."/>
+         <V4Spinner message="Loading admin settings..."/>
       </div>
       <div v-else>
          <template v-if="isSignedIn">
-            <Search class="section"/>
-            <PickupLibrary class="section"/>
-            <BarcodeScan class="section"/>
-            <V4Privacy class="section"/>
+            <PickupLibraries class="section"/>
+            <JWTAdmin class="section"/>
          </template>
       </div>
    </div>
@@ -18,15 +15,13 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
+import JWTAdmin from "@/components/admin/JWTAdmin"
+import PickupLibraries from "@/components/admin/PickupLibraries"
 import AccountActivities from "@/components/AccountActivities"
-import Search from "@/components/preferences/Search"
-import PickupLibrary from "@/components/preferences/PickupLibrary"
-import V4Privacy from "@/components/preferences/V4Privacy"
-import BarcodeScan from "@/components/preferences/BarcodeScan"
 export default {
-   name: "preferences",
+   name: "admin",
    components: {
-      AccountActivities, Search, PickupLibrary, V4Privacy, BarcodeScan
+      JWTAdmin, AccountActivities, PickupLibraries
    },
    computed: {
       ...mapState({
@@ -35,22 +30,34 @@ export default {
       }),
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
+        isAdmin: 'user/isAdmin',
       }),
    },
    created() {
-      if ( this.isSignedIn) {
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
+      if ( this.isAdmin == false) {
+         this.$router.replace("/forbidden")
+      } else {
+         if ( this.isSignedIn) {
+            this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Admin")
+         }
       }
    }
 }
 </script>
 <style lang="scss" scoped>
-.preferences {
+.admin {
    min-height: 400px;
    position: relative;
    color: var(--color-primary-text);
    width: 60%;
    margin: 2vw auto 0 auto;
+   .section {
+      margin: 15px 0;
+      border: 1px solid var(--uvalib-grey-light);
+      padding: 0;
+      box-shadow: $v4-box-shadow-light;
+      text-align: left;
+   }
 }
 .working {
    text-align: center;
@@ -68,12 +75,5 @@ export default {
    div.preferences  {
       width: 95%;
    }
-}
-.section {
-   margin: 15px 0;
-   border: 1px solid var(--uvalib-grey-light);
-   padding: 0;
-   box-shadow: $v4-box-shadow-light;
-   text-align: left;
 }
 </style>

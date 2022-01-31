@@ -28,7 +28,7 @@ const system = {
       displayWidth: window.innerWidth,
       locationCodes: [],
       libraryCodes: [],
-      pickupLibraries: [],
+      allPickupLibraries: [],
    },
 
    getters: {
@@ -47,6 +47,9 @@ const system = {
       hasError: state => {
          return state.message.type == "error"
       },
+      pickupLibraries: state => {
+         return state.allPickupLibraries.filter( p => p.enabled == true)
+      }
    },
 
    mutations: {
@@ -159,9 +162,15 @@ const system = {
          state.collectionsURL = cfg.collectionsURL
          state.hsILLiadURL = cfg.hsILLiadURL
          state.shelfBrowseURL = cfg.shelfBrowseURL
-         state.pickupLibraries.splice(0, state.pickupLibraries.length)
-         cfg.pickupLibraries.forEach( p => state.pickupLibraries.push(p) )
+         state.allPickupLibraries.splice(0, state.allPickupLibraries.length)
+         cfg.pickupLibraries.forEach( p => state.allPickupLibraries.push(p) )
       },
+      updatePickupLibrary(state, rec) {
+         let recIdx = state.allPickupLibraries.findIndex( p => p.primaryKey == rec.primaryKey)
+         if (recIdx > -1) {
+            state.allPickupLibraries.splice(recIdx,1,rec)
+         }
+      }
    },
 
    actions: {
@@ -256,6 +265,17 @@ const system = {
             err.signedIn = false
          }
          axios.post("/api/error", err)
+      },
+
+      async updatePickupLibrary(ctx, lib) {
+         ctx.commit('setSearching', true, {root: true})
+         return axios.post(`/api/pickuplibraries/${lib.primaryKey}/update`, lib).then((response) => {
+            ctx.commit("updatePickupLibrary", response.data)
+            ctx.commit('setSearching', false, {root: true})
+         }).catch((error) => {
+            ctx.commit('setError', "Unable to update pickup librar: " + error.response.data)
+            ctx.commit('setSearching', false, {root: true})
+         })
       }
    }
 }

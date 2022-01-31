@@ -122,6 +122,11 @@
                            Preferences
                         </router-link>
                      </li>
+                     <li v-if="isAdmin" class="submenu">
+                        <router-link role="menuitem" tabindex="-1" to="/admin"  id="adminsub">
+                           Admin
+                        </router-link>
+                     </li>
                      <li class="submenu">
                         <div role="menuitem" tabindex="-1"  id="outsub" @click="signOut" @keydown.stop.enter="signOut">
                            Sign out
@@ -171,7 +176,7 @@ export default {
                submenu:["guides", "journalsub", "databasesub", "spacesub", "moresub"],
                expanded: false, subMenuIdx: 0},
             {id: "accountmenu", submenu:
-               ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub", "outsub"],
+               ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub", "adminsub", "outsub"],
                expanded: false, subMenuIdx: 0},
             {id: "alertmenu", submenu:[], expanded: false},
          ],
@@ -188,7 +193,8 @@ export default {
         isSignedIn: 'user/isSignedIn',
         itemsOnNotice: 'user/itemsOnNotice',
         alertCount: 'alerts/alertCount',
-        seenAlertsCount: 'alerts/seenAlertsCount'
+        seenAlertsCount: 'alerts/seenAlertsCount',
+        isAdmin: 'user/isAdmin'
       }),
    },
    created() {
