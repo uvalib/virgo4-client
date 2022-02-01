@@ -12,7 +12,7 @@
             rows="20"
             cols="40"
          ></textarea>
-         <V4Button mode="primary" @click="update">Update</V4Button>
+         <V4Button mode="primary" @click="update">Update JWT</V4Button>
       </div>
    </div>
 </template>

@@ -52,7 +52,7 @@ export default {
    width: 60%;
    margin: 2vw auto 0 auto;
    .section {
-      margin: 15px 0;
+      margin: 15px 0 40px 0;
       border: 1px solid var(--uvalib-grey-light);
       padding: 0;
       box-shadow: $v4-box-shadow-light;
