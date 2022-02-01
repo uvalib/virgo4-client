@@ -395,7 +395,7 @@ const user = {
          if (ctx.getters.isAdmin){
             ctx.commit('setAuthorizing', true)
             let claims = ctx.state.parsedJWT
-            return axios.post("api/admin/claims", claims).then((_response) => {
+            return axios.post("/api/admin/claims", claims).then((_response) => {
                let jwtStr = VueCookies.get("v4_jwt")
                ctx.commit("setUserJWT", jwtStr )
                setTimeout(() => {
