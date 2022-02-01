@@ -242,6 +242,7 @@ func (svc *ServiceContext) SignOut(c *gin.Context) {
 func (svc *ServiceContext) SetAdminClaims(c *gin.Context) {
 	//Dev server only
 	v4HostHeader := c.Request.Header.Get("V4Host")
+	log.Printf("INFO: update claims host header [%s], dev user [%s]", v4HostHeader, svc.Dev.AuthUser)
 	if !strings.Contains(v4HostHeader, "-dev") && svc.Dev.AuthUser == "" {
 		log.Printf("ERROR: Setting admin claim is dev only.")
 		c.AbortWithStatus(http.StatusUnauthorized)
