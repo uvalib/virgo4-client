@@ -13,8 +13,7 @@
                </li>
             </ul>
          </div>
-         <div v-else class="message">
-            {{message}}
+         <div v-else class="message" v-html="message">
          </div>
        </template>
    </V4Disclosure>
@@ -37,12 +36,12 @@ export default {
          return this.message.split("\n").length > 1
       },
       mainMessage() {
-         return this.message.split("\n")[0]   
+         return this.message.split("\n")[0]
       },
       messageParts() {
          let parts = this.message.split("\n")
          parts.shift()
-         let out = [] 
+         let out = []
          parts.forEach( p => {
             if (p.split(":")[1].trim().length > 0) {
                out.push(p)

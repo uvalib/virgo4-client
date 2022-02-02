@@ -1,5 +1,8 @@
 <template>
    <div class="availability">
+      <div class="working" v-if="availability.searching" >
+         <V4Spinner message="Loading Availability..."/>
+      </div>
       <div class="availability-content" v-if="showAvailability">
          <h2>Availability</h2>
          <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
@@ -11,9 +14,6 @@
 
          <p class="error" v-if="availability.error" v-html="availability.error"></p>
 
-         <div class="working" v-if="availability.searching" >
-            <V4Spinner message="Loading Availability..."/>
-         </div>
 
          <BoundWithItems v-if="hasBoundWithItems"/>
 
