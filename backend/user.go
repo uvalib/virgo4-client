@@ -549,7 +549,7 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 	}
 
 	to := []string{"lib-circ@virginia.edu"}
-	if strings.HasSuffix(req.Email, "virginia.edu") {
+	if strings.HasSuffix(req.Email, "@virginia.edu") {
 		to = append(to, req.Email)
 	}
 
