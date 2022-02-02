@@ -5,9 +5,9 @@
          <div class="instructions">
             <p>Search for Course Reserves by...</p>
             <ul>
-               <li>Entering the <b>instructor's last name</b>, or</li>
-               <li>Entering the <b>full course ID</b> (ex: MUSI 2090, LAW9-286), or</li>
-               <li>Entering the <b>beginning of the course name</b> (ex: "The Art of Scientific Writing", “The Parthenon", “History of").</li>
+               <li>Entering the <b>instructor's name</b> (ex: rossman; freeman, rob), or</li>
+               <li>Entering the <b>course ID</b> (ex: MUSI 2090, LAW9-286, CHEM), or</li>
+               <li>Entering the <b>beginning of the course name</b> (ex: The Art of Scientific Writing, History of).</li>
             </ul>
             <p>Click the corresponding button to search for reserves.</p>
          </div>

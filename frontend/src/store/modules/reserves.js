@@ -196,9 +196,6 @@ const reserves = {
          ctx.commit("setQuery", data.query)
          let qs = data.query
          ctx.commit('setSearching', true, { root: true })
-         if (qs.includes(" ")) {
-            qs = `"${qs}"`
-         }
 
          ctx.commit('resetResults', data.type)
          let typeParam = "type="+data.type
