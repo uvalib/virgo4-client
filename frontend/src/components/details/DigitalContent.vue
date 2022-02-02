@@ -164,30 +164,31 @@ export default {
 
          if ( this.isDevServer) {
             url = url.replace("curio", "curio-dev.internal")
-            url += "?domain="+domain
-
-            let x = this.$route.query.x
-            if (x) {
-               url += `&x=${x}`
-            }
-            let y = this.$route.query.y
-            if (y) {
-               url += `&y=${y}`
-            }
-            let zoom = this.$route.query.zoom
-            if (zoom) {
-               url += `&zoom=${zoom}`
-            }
-            let rotation = this.$route.query.rotation
-            if (rotation) {
-               url += `&rotation=${rotation}`
-            }
-            let page = this.$route.query.page
-            if (page) {
-               url += `&page=${page}`
-            }
-            // console.log("URL: "+url)
          }
+
+         url += "?domain="+domain
+
+         let x = this.$route.query.x
+         if (x) {
+            url += `&x=${x}`
+         }
+         let y = this.$route.query.y
+         if (y) {
+            url += `&y=${y}`
+         }
+         let zoom = this.$route.query.zoom
+         if (zoom) {
+            url += `&zoom=${zoom}`
+         }
+         let rotation = this.$route.query.rotation
+         if (rotation) {
+            url += `&rotation=${rotation}`
+         }
+         let page = this.$route.query.page
+         if (page) {
+            url += `&page=${page}`
+         }
+         // console.log("URL: "+url)
 
          return url
       },
