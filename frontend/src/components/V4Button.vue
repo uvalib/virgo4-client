@@ -33,6 +33,10 @@ export default {
          type: String,
          default: ""
       },
+      target: {
+         type: String,
+         default: ""
+      },
       role: {
          type: String,
          default: "button"
@@ -49,8 +53,12 @@ export default {
          this.$emit('esc')
       },
       clicked() {
-         if ( this.mode == 'link' && this.utl != "") {
-            window.location.href = this.url
+         if ( this.url != "") {
+            if (this.target != ""){
+               window.open(this.url, this.target)
+            } else{
+               window.location.href = this.url
+            }
          }
          this.$emit('click')
       },

@@ -92,9 +92,9 @@
             </template>
             <div class="checkout-list" v-if="lookingUpILL == false && visibleTab == 'ill'">
                <div class="controls">
-                  <a class="checkout-options" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
+                  <V4Button mode="primary" class="checkout-options" target="_blank" url="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60">
                   View Request History <i class="fal fa-external-link-alt"></i>
-                  </a>
+                  </V4Button>
                </div>
                <div v-if="illiadCheckouts.length == 0" class="none">
                   You have no ILL checkouts.
@@ -114,7 +114,7 @@
 
                      </dl>
                      <div class="renewbar" v-if="co.renewalsAllowed">
-                        <a :href="renewURL(co)" target="_blank">Renew <i class="fal fa-external-link-alt" data-v-3d741f35="" style="margin-left: 5px;"></i></a>
+                        <V4Button mode="primary" target="_blank" :url="renewURL(co)">Renew <i class="fal fa-external-link-alt"></i></V4Button>
                      </div>
                   </div>
                </div>
