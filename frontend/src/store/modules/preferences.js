@@ -41,7 +41,6 @@ const preferences = {
          } else {
             VueCookies.remove("v4_optout")
          }
-         this.router.go()
       },
       setPreferences(state, prefsObj) {
          if (prefsObj.collapseGroups ) {
@@ -96,6 +95,7 @@ const preferences = {
       toggleOptOut(ctx) {
          ctx.commit("toggleOptOut")
          ctx.dispatch("savePreferences")
+         window.location.reload()
       },
       toggleBarcodeScan(ctx) {
          ctx.commit("toggleBarcodeScan")
