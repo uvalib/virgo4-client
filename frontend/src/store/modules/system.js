@@ -170,6 +170,15 @@ const system = {
          if (recIdx > -1) {
             state.allPickupLibraries.splice(recIdx,1,rec)
          }
+      },
+      addPickupLibrary(state, rec) {
+         state.allPickupLibraries.push(rec)
+      },
+      deletePickupLibrary(state, id) {
+         let idx = state.allPickupLibraries.findIndex( p => p.primaryKey == id )
+         if ( idx > -1) {
+            state.allPickupLibraries.splice(idx,1)
+         }
       }
    },
 
@@ -274,6 +283,28 @@ const system = {
             ctx.commit('setSearching', false, {root: true})
          }).catch((error) => {
             ctx.commit('setError', "Unable to update pickup librar: " + error.response.data)
+            ctx.commit('setSearching', false, {root: true})
+         })
+      },
+
+      async addPickupLibrary(ctx, lib) {
+         ctx.commit('setSearching', true, {root: true})
+         return axios.post(`/api/pickuplibraries`, lib).then((response) => {
+            ctx.commit("addPickupLibrary", response.data)
+            ctx.commit('setSearching', false, {root: true})
+         }).catch((error) => {
+            ctx.commit('setError', "Unable to add pickup librar: " + error.response.data)
+            ctx.commit('setSearching', false, {root: true})
+         })
+      },
+
+      deletePickupLibrary(ctx, id) {
+         ctx.commit('setSearching', true, {root: true})
+         axios.delete(`/api/pickuplibraries/${id}`).then(() => {
+            ctx.commit("deletePickupLibrary", id)
+            ctx.commit('setSearching', false, {root: true})
+         }).catch((error) => {
+            ctx.commit('setError', "Unable to delete pickup library: " + error.response)
             ctx.commit('setSearching', false, {root: true})
          })
       }
