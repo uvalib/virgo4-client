@@ -92,9 +92,9 @@ const preferences = {
          ctx.commit("setSearchTemplate", template)
          ctx.dispatch("savePreferences")
       },
-      toggleOptOut(ctx) {
+      async toggleOptOut(ctx) {
          ctx.commit("toggleOptOut")
-         ctx.dispatch("savePreferences")
+         await ctx.dispatch("savePreferences")
          window.location.reload()
       },
       toggleBarcodeScan(ctx) {
