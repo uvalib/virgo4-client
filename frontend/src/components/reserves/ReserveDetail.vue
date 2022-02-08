@@ -6,7 +6,6 @@
       <div class="inset">
          <p>{{reserve.author}}</p>
          <p>{{reserve.callNumber}}</p>
-         <p v-if="reserve.library" >Library: {{reserve.library}}</p>
       </div>
    </div>
 </template>

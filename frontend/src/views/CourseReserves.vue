@@ -77,6 +77,7 @@ export default {
    methods: {
       searchClicked(type) {
          let data = {type: type, query: this.pendingQuery}
+         this.$analytics.trigger('Search', 'COURSE_RESERVES_SEARCH', type)
          this.$store.dispatch("reserves/searchCourseReserves", data)
       },
    },
