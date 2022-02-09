@@ -7,7 +7,6 @@
             <ul>
                <li>Entering the <b>instructor's name</b> (ex: rossman; freeman, rob), or</li>
                <li>Entering the <b>course ID</b> (ex: MUSI 2090, LAW9-286, CHEM), or</li>
-               <!-- <li>Entering the <b>beginning of the course name</b> (ex: The Art of Scientific Writing, History of).</li> -->
             </ul>
             <p>Click the corresponding button to search for reserves.</p>
          </div>
@@ -17,7 +16,6 @@
             <div class="controls">
                <V4Button @click="searchClicked('instructor_name')" mode="primary">Search Instructors</V4Button>
                <V4Button @click="searchClicked('course_id')" mode="primary">Search Course ID</V4Button>
-               <!-- <V4Button @click="searchClicked('course_name')" mode="primary">Search Course Names</V4Button> -->
             </div>
             <div class="links">
                <a href="https://collab.its.virginia.edu/portal" target="_blank">

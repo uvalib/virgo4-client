@@ -28,7 +28,7 @@ export default {
 
 <style scoped>
 .reserve-detail {
-   margin: 0;
+   margin: 0 0 10px 0;
    padding: 4px 8px;
    font-weight: normal;
 }
@@ -36,7 +36,7 @@ p {
    margin: 2px 0;
 }
 .inset {
-   margin-left: 10px;
+   margin-left: 0px;
 }
 .available {
   margin-top: 10px;

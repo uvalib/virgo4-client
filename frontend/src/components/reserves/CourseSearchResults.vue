@@ -47,7 +47,6 @@ export default {
    div.course {
       margin: 10px 0 25px 0;
       text-align: left;
-      border: 1px solid var(--uvalib-grey-lightest);
       box-shadow: $v4-box-shadow-light;
 
       div.course-name {
@@ -56,14 +55,14 @@ export default {
          padding: 0;
          padding: 10px;
          background: var(--uvalib-teal-lightest);
-         border-bottom: 4px solid var(--uvalib-teal-light);
+         border-bottom: 4px solid var(--uvalib-teal);
       }
       div.instructor {
          font-weight: bold;
          color: var(--uvalib-grey-dark);
-         padding: 0;
+         padding: 0 0 10px 0;
          background: white;
-         margin-bottom: 15px;
+         border-top: 2px solid var(--uvalib-grey-lightest);
          div.reserves {
             padding: 0 0 0 25px;
          }
@@ -80,19 +79,5 @@ export default {
 }
 .value-id {
   font-weight: normal;
-}
-
-.reserves::after {
-  content: " ";
-  display: block;
-  width: 100%;
-  height: 1em;
-  margin: 0 auto;
-  padding: 5px 0;
-  background: linear-gradient(to right, #FFF, var(--uvalib-grey-light), #FFF) center / 100% 2px no-repeat;
-}
-.reserves:last-of-type::after {
-  height: 0px;
-  padding: 0;
 }
 </style>

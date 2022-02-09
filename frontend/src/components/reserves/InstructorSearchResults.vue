@@ -47,11 +47,11 @@ export default {
    div.instructor {
       margin: 10px 0 25px 0;
       text-align: left;
-      border: 1px solid var(--uvalib-grey-lightest);
       box-shadow: $v4-box-shadow-light;
       h3.value {
          margin: 0;
          padding: 10px;
+         border-bottom: 4px solid var(--uvalib-teal);
       }
       .course {
          padding-bottom: 15px;
@@ -59,14 +59,14 @@ export default {
             font-weight: bold;
             color: var(--uvalib-grey-darkest);
             padding:  15px 15px 5px 15px;
-            border-top: 4px solid var(--uvalib-teal-light);
+            border-top: 2px solid var(--uvalib-grey-lightest);
          }
       }
    }
 }
 
 div.reserves {
-   padding: 0 0 0 25px;
+   padding: 0 0 0 35px;
 }
 label {
    font-weight: bold;
@@ -85,18 +85,5 @@ label {
    padding: 8px;
    color: var(--uvalib-grey-darkest);
    font-weight: bold;
-}
-.reserves::after {
-  content: " ";
-  display: block;
-  width: 100%;
-  height: 1em;
-  margin: 0 auto;
-  padding: 5px 0;
-  background: linear-gradient(to right, #FFF, var(--uvalib-grey-light), #FFF) center / 100% 2px no-repeat;
-}
-.reserves:last-of-type::after {
-  height: 0px;
-  padding: 0;
 }
 </style>
