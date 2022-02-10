@@ -298,11 +298,12 @@ const system = {
          })
       },
 
-      deletePickupLibrary(ctx, id) {
+      deletePickupLibrary(ctx, library) {
          ctx.commit('setSearching', true, {root: true})
-         axios.delete(`/api/pickuplibraries/${id}`).then(() => {
-            ctx.commit("deletePickupLibrary", id)
+         axios.delete(`/api/pickuplibraries/${library.primaryKey}`).then(() => {
+            ctx.commit("deletePickupLibrary", library.primaryKey)
             ctx.commit('setSearching', false, {root: true})
+            ctx.dispatch('preferences/pickupLibraryDeleted', library.id, {root: true})
          }).catch((error) => {
             ctx.commit('setError', "Unable to delete pickup library: " + error.response)
             ctx.commit('setSearching', false, {root: true})

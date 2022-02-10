@@ -69,5 +69,20 @@ func (svc *ServiceContext) DeletePickupLibrary(c *gin.Context) {
 		c.String(http.StatusInternalServerError, dbResp.Error.Error())
 		return
 	}
+
+	log.Printf("INFO: remove default pickup library %s from all user preferences", id)
+	var users []User
+	dbResp = svc.GDB.Raw("select id,(preferences-'pickupLibrary') as preferences from users where preferences->'pickupLibrary'->>'id' = ?", id).Scan(&users)
+	if dbResp.Error != nil {
+		log.Printf("ERROR: unable to get user pickup library preferences: %s", dbResp.Error.Error())
+	} else {
+		log.Printf("INFO: updating preferences for %d users", len(users))
+		for _, u := range users {
+			dbResp = svc.GDB.Model(&u).Select("Preferences").Updates(u)
+			if dbResp.Error != nil {
+				log.Printf("ERROR: unable to update user %d preferences: %s", u.ID, dbResp.Error.Error())
+			}
+		}
+	}
 	c.String(http.StatusOK, "deleted")
 }

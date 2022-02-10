@@ -20,7 +20,7 @@
                <div class="actions">
                   <V4Checkbox :disabled="editIndex > -1" :checked="pl.enabled" @click="enableClicked(pl)">Enabled</V4Checkbox>
                   <V4Button :disabled="editIndex > -1" class="edit-pl" mode="tertiary" @click="editClicked(idx, pl)">Edit</V4Button>
-                  <Confirm class="delete" title="Confirm Delete" v-on:confirmed="deleteLibrary(pl.primaryKey)"
+                  <Confirm class="delete" title="Confirm Delete" v-on:confirmed="deleteLibrary(pl)"
                      :id="`delete-${pl.id}`" style="margin-right: 10px"
                      :ariaLabel="`delete pickup library ${pl.name}`">
                      <div>
@@ -72,8 +72,8 @@ export default {
           await this.$store.dispatch("system/addPickupLibrary", this.editRec)
           this.cancelClicked()
       },
-      deleteLibrary(id) {
-         this.$store.dispatch("system/deletePickupLibrary", id)
+      deleteLibrary(library) {
+         this.$store.dispatch("system/deletePickupLibrary", library)
       },
       async updateClicked() {
          await this.$store.dispatch("system/updatePickupLibrary", this.editRec)

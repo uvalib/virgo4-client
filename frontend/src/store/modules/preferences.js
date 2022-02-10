@@ -115,6 +115,11 @@ const preferences = {
             searchTemplate: ctx.state.searchTemplate,
          }
          return axios.post(url, data)
+      },
+      pickupLibraryDeleted(ctx, id) {
+         if (ctx.state.pickupLibrary.id == id) {
+            ctx.commit("clearPickupLibrary")
+         }
       }
    }
 }
