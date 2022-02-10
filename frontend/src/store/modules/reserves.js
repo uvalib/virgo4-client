@@ -6,6 +6,7 @@ const reserves = {
    state: {
       query: "",
       searchType: "",
+      targetInstructor: "",
       courseReserves: [],
       searchSuccess: false,
       requestList: [],
@@ -101,8 +102,17 @@ const reserves = {
       setSubmitted(state, flag) {
          state.submitted = flag
       },
+      setTargetInstructor(state, inst) {
+         state.targetInstructor = ""
+         if (inst) {
+            state.targetInstructor = inst
+         }
+      },
       setCourseReserves(state, data) {
          data.forEach( h=>{
+            if (state.targetInstructor && state.searchType == "course_id") {
+                  h.instructors = h.instructors.filter( i => i.instructorName.toLowerCase().indexOf(state.targetInstructor.toLowerCase()) == 0 )
+            }
             state.courseReserves.push(h)
          })
          state.searchSuccess = true
@@ -196,6 +206,7 @@ const reserves = {
          ctx.commit("setQuery", data.query)
          let qs = data.query
          ctx.commit('setSearching', true, { root: true })
+         ctx.commit('setTargetInstructor', data.instructor)
 
          ctx.commit('resetResults', data.type)
          let typeParam = "type="+data.type

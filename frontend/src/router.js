@@ -63,7 +63,7 @@ const router = createRouter({
          component: Codes
       },
       {
-         path: '/coursereserves',
+         path: '/coursereserves/:id?',
          name: 'course-reserves',
          component: CourseReserves
       },

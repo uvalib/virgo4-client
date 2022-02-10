@@ -1,6 +1,6 @@
 <template>
    <div class="results-panel">
-      <h2 class="query-summary">
+      <h2 class="query-summary" v-if="tgtInstructor == ''">
          Course reserves for course '{{query}}'
       </h2>
       <div class="course" v-for="(c,cidx) in results" :key="`C${cidx}${c.courseID}`">
@@ -9,7 +9,10 @@
             <p class="value-id">{{c.courseID}}</p>
          </div>
          <div class="instructor" v-for="(inst,idx) in c.instructors" :key="idx">
-            <p class="value folder">{{inst.instructorName}}</p>
+            <p class="value folder">
+               <span>{{inst.instructorName}}</span>
+               <V4Button mode="text" v-if="!isExactLookup" @click="copyURL(c.courseID, inst.instructorName )">Copy link to reserves</V4Button>
+            </p>
             <div class="reserves" v-for="reserve in inst.items" :key="reserve.id">
                <ReserveDetail :reserve="reserve" />
             </div>
@@ -29,7 +32,26 @@ export default {
       ...mapState({
          results: state => state.reserves.courseReserves,
          query: state => state.reserves.query,
+         tgtInstructor: state => state.reserves.targetInstructor,
       }),
+      isExactLookup() {
+         if (this.$route.params.id) {
+            return true
+         }
+         return false
+      }
+   },
+   methods: {
+      copyURL( courseID, instructor ) {
+         let URL = `${window.location.href}/${encodeURIComponent(courseID)}?instructor=${encodeURIComponent(instructor)}`
+         this.$copyText(URL, undefined, (error, _event) => {
+            if (error) {
+               this.$store.commit("system/setError", "Unable to copy reserves URL: "+error)
+            } else {
+               this.$store.commit("system/setMessage", "Reserves URL copied to clipboard.")
+            }
+         })
+      },
    }
 }
 </script>
@@ -70,6 +92,10 @@ export default {
       div.instructor .value.folder {
          padding: 15px 15px 5px 15px;
          color: var(--uvalib-grey-darkest);
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: space-between;
+         align-items: flex-start;
       }
    }
 }

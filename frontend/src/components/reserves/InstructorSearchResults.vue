@@ -7,8 +7,11 @@
          <h3 class="value folder">{{ir.instructorName}}</h3>
          <div class="course" v-for="course in ir.courses" :key="course.id">
             <div class="course-name">
-               <p class="value">{{course.courseName}}</p>
-               <p class="value-id">{{course.courseID}}</p>
+               <span>
+                  <p class="value">{{course.courseName}}</p>
+                  <p class="value-id">{{course.courseID}}</p>
+               </span>
+               <V4Button mode="text" v-if="!isExactLookup" @click="copyURL(course.courseID, ir.instructorName )">Copy link to reserves</V4Button>
             </div>
            <div class="reserves" v-for="reserve in course.items" :key="reserve.id">
                <ReserveDetail :reserve="reserve" />
@@ -30,6 +33,24 @@ export default {
          results: state => state.reserves.courseReserves,
          query: state => state.reserves.query,
       }),
+      isExactLookup() {
+         if (this.$route.params.id) {
+            return true
+         }
+         return false
+      }
+   },
+   methods: {
+      copyURL( courseID, instructor ) {
+         let URL = `${window.location.href}/${encodeURIComponent(courseID)}?instructor=${encodeURIComponent(instructor)}`
+         this.$copyText(URL, undefined, (error, _event) => {
+            if (error) {
+               this.$store.commit("system/setError", "Unable to copy reserves URL: "+error)
+            } else {
+               this.$store.commit("system/setMessage", "Reserves URL copied to clipboard.")
+            }
+         })
+      },
    }
 }
 </script>
@@ -60,6 +81,10 @@ export default {
             color: var(--uvalib-grey-darkest);
             padding:  15px 15px 5px 15px;
             border-top: 2px solid var(--uvalib-grey-lightest);
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+            align-items: flex-start;
          }
       }
    }

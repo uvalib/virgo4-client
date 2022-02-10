@@ -2,32 +2,34 @@
    <div class="course-reserves">
       <div class="reserves-content">
          <V4Spinner v-if="searching" message="Looking up reserved items..." v-bind:overlay="true"/>
-         <div class="instructions">
-            <p>Search for Course Reserves by...</p>
-            <ul>
-               <li>Entering the <b>instructor's name</b> (ex: rossman; freeman, rob), or</li>
-               <li>Entering the <b>course ID</b> (ex: MUSI 2090, LAW9-286, CHEM), or</li>
-            </ul>
-            <p>Click the corresponding button to search for reserves.</p>
-         </div>
-         <label class="screen-reader-text" for="crsearch">Search course reserves by instructor last name, course name or course ID.</label>
-         <div class="search-panel pure-form">
-            <input id="crsearch" v-model="pendingQuery" autocomplete="off" type="text" aria-required="true" required="required">
-            <div class="controls">
-               <V4Button @click="searchClicked('instructor_name')" mode="primary">Search Instructors</V4Button>
-               <V4Button @click="searchClicked('course_id')" mode="primary">Search Course ID</V4Button>
+         <template v-if="lookupID == false">
+            <div class="instructions">
+               <p>Search for Course Reserves by...</p>
+               <ul>
+                  <li>Entering the <b>instructor's name</b> (ex: rossman; freeman, rob), or</li>
+                  <li>Entering the <b>course ID</b> (ex: MUSI 2090, LAW9-286, CHEM), or</li>
+               </ul>
+               <p>Click the corresponding button to search for reserves.</p>
             </div>
-            <div class="links">
-               <a href="https://collab.its.virginia.edu/portal" target="_blank">
-                  UVA Collab<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
-               </a>
+            <label class="screen-reader-text" for="crsearch">Search course reserves by instructor last name, course name or course ID.</label>
+            <div class="search-panel pure-form">
+               <input id="crsearch" v-model="pendingQuery" autocomplete="off" type="text" aria-required="true" required="required">
+               <div class="controls">
+                  <V4Button @click="searchClicked('instructor_name')" mode="primary">Search Instructors</V4Button>
+                  <V4Button @click="searchClicked('course_id')" mode="primary">Search Course ID</V4Button>
+               </div>
+               <div class="links">
+                  <a href="https://collab.its.virginia.edu/portal" target="_blank">
+                     UVA Collab<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                  </a>
+               </div>
+               <div class="links">
+                  <a href="http://www.library.virginia.edu/services/course-reserves/" target="_blank">
+                     Place a Reserve (Instructors only)<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                  </a>
+               </div>
             </div>
-            <div class="links">
-               <a href="http://www.library.virginia.edu/services/course-reserves/" target="_blank">
-                  Place a Reserve (Instructors only)<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
-               </a>
-            </div>
-         </div>
+         </template>
          <template v-if="searchSuccess">
             <div class="no-match" v-if="courseReserves.length == 0">
                No course reserves that match your request were found
@@ -54,7 +56,8 @@ export default {
    },
    data: function() {
       return {
-         pendingQuery: ""
+         pendingQuery: "",
+         lookupID: false
       }
    },
    computed: {
@@ -79,6 +82,14 @@ export default {
          this.$store.dispatch("reserves/searchCourseReserves", data)
       },
    },
+   mounted() {
+      if ( this.$route.params.id ) {
+         this.lookupID = true
+         let data = {type: "course_id", query:this.$route.params.id, instructor: this.$route.query.instructor}
+         this.$analytics.trigger('Search', 'COURSE_RESERVES_CLASS', `${this.$route.params.id}: ${this.$route.query.instructor}`)
+         this.$store.dispatch("reserves/searchCourseReserves", data)
+      }
+   }
 }
 </script>
 
