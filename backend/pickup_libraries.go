@@ -33,7 +33,10 @@ func (svc *ServiceContext) UpdatePickupLibrary(c *gin.Context) {
 		return
 	}
 
-	log.Printf("INFO: pickup library updated: %+v", plReq)
+	if plReq.Enabled == false {
+		log.Printf("INFO: %s has been disabled; remove it from user preferences", plReq.Key)
+		svc.removePickupLibraryPreferences(plReq.Key)
+	}
 
 	c.JSON(http.StatusOK, plReq)
 }
@@ -70,9 +73,15 @@ func (svc *ServiceContext) DeletePickupLibrary(c *gin.Context) {
 		return
 	}
 
-	log.Printf("INFO: remove default pickup library %s from all user preferences", id)
+	svc.removePickupLibraryPreferences(id)
+
+	c.String(http.StatusOK, "deleted")
+}
+
+func (svc *ServiceContext) removePickupLibraryPreferences(pickupLibraryID string) {
+	log.Printf("INFO: remove disabled/deleted pickup library %s from all user preferences", pickupLibraryID)
 	var users []User
-	dbResp = svc.GDB.Raw("select id,(preferences-'pickupLibrary') as preferences from users where preferences->'pickupLibrary'->>'id' = ?", id).Scan(&users)
+	dbResp := svc.GDB.Raw("select id,(preferences-'pickupLibrary') as preferences from users where preferences->'pickupLibrary'->>'id' = ?", pickupLibraryID).Scan(&users)
 	if dbResp.Error != nil {
 		log.Printf("ERROR: unable to get user pickup library preferences: %s", dbResp.Error.Error())
 	} else {
@@ -84,5 +93,4 @@ func (svc *ServiceContext) DeletePickupLibrary(c *gin.Context) {
 			}
 		}
 	}
-	c.String(http.StatusOK, "deleted")
 }

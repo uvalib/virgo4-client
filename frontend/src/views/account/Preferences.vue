@@ -37,9 +37,10 @@ export default {
         isSignedIn: 'user/isSignedIn',
       }),
    },
-   created() {
+   async created() {
       if ( this.isSignedIn) {
          this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
+         await this.$store.dispatch("preferences/loadPreferences")
       }
    }
 }

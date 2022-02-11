@@ -435,32 +435,6 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// SavePreferences will save a block of JSON preference data to the user table
-func (svc *ServiceContext) SavePreferences(c *gin.Context) {
-	userID := c.GetInt("v4id")
-	v4UserID := c.Param("uid")
-	var prefs interface{}
-	err := c.ShouldBindJSON(&prefs)
-	if err != nil {
-		log.Printf("ERROR: unable to get preference data from %s[%d]: %s", v4UserID, userID, err)
-		c.String(http.StatusBadRequest, err.Error())
-		return
-	}
-	log.Printf("INFO: %s[%d] requests preference update %+v", v4UserID, userID, prefs)
-
-	// Data is good. Back to JSON string and save...
-	jsonPrefs, _ := json.Marshal(prefs)
-	v4User := User{ID: userID, Virgo4ID: v4UserID, Preferences: string(jsonPrefs)}
-	dbErr := svc.GDB.Model(&v4User).Select("Preferences").Updates(v4User)
-	if dbErr.Error != nil {
-		log.Printf("ERROR: unable to save preference data for %s[%d]: %s", v4UserID, userID, dbErr.Error)
-		c.String(http.StatusBadRequest, dbErr.Error.Error())
-		return
-	}
-
-	c.String(http.StatusOK, "OK")
-}
-
 // RequestContactUpdate accepts update data and sends it to lib-circ@virginia.edu
 func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 	userID := c.Param("uid")

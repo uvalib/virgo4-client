@@ -282,7 +282,7 @@ const system = {
             ctx.commit("updatePickupLibrary", response.data)
             ctx.commit('setSearching', false, {root: true})
          }).catch((error) => {
-            ctx.commit('setError', "Unable to update pickup librar: " + error.response.data)
+            ctx.commit('setError', "Unable to update pickup library: " + error.response.data)
             ctx.commit('setSearching', false, {root: true})
          })
       },
@@ -293,7 +293,7 @@ const system = {
             ctx.commit("addPickupLibrary", response.data)
             ctx.commit('setSearching', false, {root: true})
          }).catch((error) => {
-            ctx.commit('setError', "Unable to add pickup librar: " + error.response.data)
+            ctx.commit('setError', "Unable to add pickup library: " + error.response.data)
             ctx.commit('setSearching', false, {root: true})
          })
       },

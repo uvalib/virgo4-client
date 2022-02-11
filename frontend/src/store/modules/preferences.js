@@ -57,13 +57,14 @@ const preferences = {
             }
          }
          if (prefsObj.pickupLibrary ) {
-
             if (!this.getters["user/libraries"].some((lib) => lib.id == prefsObj.pickupLibrary.id) ){
                // Clear the pickup Library if not in the currently available list
                this.commit("preferences/clearPickupLibrary");
             } else {
                state.pickupLibrary = prefsObj.pickupLibrary
             }
+         } else {
+            state.pickupLibrary = {id: "", name: ""}
          }
          if (prefsObj.enableBarcodeScan ) {
             state.enableBarcodeScan = prefsObj.enableBarcodeScan
@@ -104,6 +105,15 @@ const preferences = {
       toggleCollapseGroups(ctx) {
          ctx.commit("toggleCollapseGroups")
          ctx.dispatch("savePreferences")
+      },
+      async loadPreferences(ctx) {
+         let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
+         return axios.get(url).then((response) => {
+            ctx.commit("setPreferences", response.data)
+         }).catch((error) => {
+            ctx.commit('system/setError', error, { root: true })
+            ctx.dispatch("system/reportError", error, {root: true})
+        })
       },
       savePreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`

@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "1.3.1"
+const version = "1.4.0"
 
 /**
  * MAIN
@@ -92,8 +92,9 @@ func main() {
 		users.GET("/:uid/checkouts", svc.GetUserCheckouts)
 		users.GET("/:uid/holds", svc.GetUserHolds)
 		users.POST("/:uid/checkouts/renew", svc.RenewCheckouts)
+		users.GET("/:uid/preferences", svc.GetPreferences)
 		users.POST("/:uid/preferences", svc.SavePreferences)
-		users.POST("/:uid/contact", svc.AuthMiddleware, svc.RequestContactUpdate)
+		users.POST("/:uid/contact", svc.RequestContactUpdate)
 
 		users.GET("/:uid/searches", svc.GetUserSavedSearches)
 		users.POST("/:uid/searches", svc.SaveSearch)
