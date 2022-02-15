@@ -29,6 +29,7 @@ const system = {
       locationCodes: [],
       libraryCodes: [],
       allPickupLibraries: [],
+      printing: false,
    },
 
    getters: {
@@ -53,6 +54,9 @@ const system = {
    },
 
    mutations: {
+      setPrinting(state, flag) {
+         state.printing = flag
+      },
       setVersionIntervalID(state, tid) {
          state.versionIntervalID = tid
       },

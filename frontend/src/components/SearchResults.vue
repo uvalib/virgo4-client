@@ -1,4 +1,5 @@
 <template>
+   <PrintedSearchResults v-if="printing" />
    <div tabindex="-1" id="results-container"
       class="search-results" aria-describedby="search-summary"
    >
@@ -13,6 +14,7 @@
                <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
                <SaveSearch v-if="isSignedIn"/>
                <SignInRequired v-else id="save-signin-modal" act="save-search"/>
+               <V4Button v-if="selectedResults.pool.id=='uva_library'" mode="primary" @click="printResults">Print Results</V4Button>
             </span>
          </template>
       </div>
@@ -50,13 +52,14 @@ import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import PoolResultDetail from "@/components/PoolResultDetail"
+import PrintedSearchResults from "@/components/PrintedSearchResults"
 import FacetSidebar from "@/components/FacetSidebar"
 import SaveSearch from "@/components/modals/SaveSearch"
 import SearchSuggestions from "@/components/SearchSuggestions"
 import SignInRequired from '@/components/modals/SignInRequired'
 export default {
    components: {
-      PoolResultDetail, FacetSidebar, SaveSearch, SearchSuggestions, SignInRequired
+      PoolResultDetail, FacetSidebar, SaveSearch, SearchSuggestions, SignInRequired, PrintedSearchResults
    },
    props: {
       showSummary: { type: Boolean, default: true},
@@ -77,6 +80,7 @@ export default {
          searchMode: state=>state.query.mode,
          maxTabs: state=>state.preferences.maxTabs,
          searchTemplate: state=>state.preferences.searchTemplate,
+         printing: state=>state.system.printing,
       }),
       ...mapFields([
         'otherSrcSelection'
@@ -123,6 +127,31 @@ export default {
       }
    },
    methods: {
+      printResults() {
+         this.$store.commit("system/setPrinting", true)
+         this.$nextTick( () => {
+            let contents = document.getElementById("print-results").innerHTML
+            let printFrame = document.createElement('iframe')
+            printFrame.name = "printFrame"
+            printFrame.style.position = "absolute"
+            printFrame.style.right = "1000000px"
+            document.body.appendChild(printFrame)
+            let frameDoc = printFrame.contentWindow.document
+            frameDoc.open()
+            frameDoc.write('<html lang="en"><head><title>Search Results</title>')
+            frameDoc.write('<link rel="stylesheet" type="text/css" href="/print.css"/>')
+            frameDoc.write('</head><body>')
+            frameDoc.write(contents)
+            frameDoc.write('</body></html>')
+            frameDoc.close()
+            setTimeout( () => {
+               window.frames["printFrame"].focus()
+               window.frames["printFrame"].print()
+               document.body.removeChild(printFrame)
+               this.$store.commit("system/setPrinting", false)
+            }, 500)
+         })
+      },
       async resetSearch(){
          this.$store.dispatch('resetSearch')
          if ( this.searchMode == "basic") {
