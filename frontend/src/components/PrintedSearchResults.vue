@@ -19,6 +19,26 @@
                   </tr>
                </template>
             </table>
+            <template  v-if="hit.grouped">
+               <div class="hit-wrapper group" v-for="(groupHit,idx) in hit.group" :key="`pg${idx}`">
+                  <div class="title">
+                     <div class="hit-title">
+                        <span class="number">{{groupHit.number}}.</span>
+                        <span v-html="groupHit.header.title"></span>
+                     </div>
+                     <div v-if="groupHit.header.subtitle" class="hit-subtitle" v-html="groupHit.header.subtitle"></div>
+                  </div>
+                  <div class="author" v-if="groupHit.header.author_display">{{groupHit.header.author_display}}</div>
+                  <table class="fields">
+                     <template v-for="(field,idx) in groupHit.basicFields">
+                        <tr :key="`pf${idx}`" class="field" v-if="shouldDisplay(field)">
+                           <td class="label">{{field.label}}:</td>
+                           <td>{{$utils.fieldValueString(field)}}</td>
+                        </tr>
+                     </template>
+                  </table>
+               </div>
+            </template>
          </div>
       </div>
    </div>
@@ -49,6 +69,12 @@ export default {
    margin-left: 10px;
    position: absolute;
    right: 50000px;
+   .hit-wrapper.group {
+      border-bottom: 0;
+      margin: 15px 0 0 0;
+      padding: 15px 0 0 0;
+      border-top: 1px solid black;
+   }
    .hit-wrapper {
       margin-bottom: 15px;
       padding-bottom: 15px;
