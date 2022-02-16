@@ -14,7 +14,7 @@
                <template v-for="(field,idx) in hit.basicFields">
                   <tr :key="`pf${idx}`" class="field" v-if="shouldDisplay(field)">
                      <td class="label">{{field.label}}:</td>
-                     <td>{{$utils.fieldValueString(field)}}</td>
+                     <td>{{fieldValue(field)}}</td>
                   </tr>
                </template>
             </table>
@@ -32,7 +32,7 @@
                      <template v-for="(field,idx) in groupHit.basicFields">
                         <tr :key="`pf${idx}`" class="field" v-if="shouldDisplay(field)">
                            <td class="label">{{field.label}}:</td>
-                           <td>{{$utils.fieldValueString(field)}}</td>
+                           <td>{{fieldValue(field)}}</td>
                         </tr>
                      </template>
                   </table>
@@ -52,9 +52,17 @@ export default {
       })
    },
    methods: {
+      fieldValue(field) {
+         let limit=100
+         let txt = this.$utils.fieldValueString(field)
+         if (txt.length <= limit) return txt
+         var trunc = txt.substr(0, limit-1)
+         var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()+"..."
+         return out
+      },
       shouldDisplay(field) {
          if (field.display == 'optional' || field.type == "url" || field.type == "availability" ||
-            field.name == "location" || field.name== 'abstract' ||
+            field.name == "location" ||
             field.type == "access-url" || field.name.includes("_download_url") ) return false
          return true
       },
