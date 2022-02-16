@@ -14,7 +14,7 @@
                <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
                <SaveSearch v-if="isSignedIn"/>
                <SignInRequired v-else id="save-signin-modal" act="save-search"/>
-               <V4Button v-if="selectedResults.pool.id=='uva_library'" mode="primary" @click="printResults">Print Results</V4Button>
+               <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
             </span>
          </template>
       </div>
@@ -85,6 +85,9 @@ export default {
       ...mapFields([
         'otherSrcSelection'
       ]),
+      showPrintButton() {
+         return this.selectedResults.pool.id=='uva_library' || this.selectedResults.pool.id=='articles'
+      },
       queryString() {
          return this.rawQueryString.replace(/\{|\}/g, "")
       },

@@ -1,6 +1,5 @@
 <template>
    <div id="print-results">
-      <h3>Search Results</h3>
       <div class="list">
          <div v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
             <div class="title">
@@ -54,7 +53,8 @@ export default {
    },
    methods: {
       shouldDisplay(field) {
-         if (field.display == 'optional' || field.type == "url" ||
+         if (field.display == 'optional' || field.type == "url" || field.type == "availability" ||
+            field.name == "location" || field.name== 'abstract' ||
             field.type == "access-url" || field.name.includes("_download_url") ) return false
          return true
       },
