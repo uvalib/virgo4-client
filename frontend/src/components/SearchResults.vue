@@ -231,7 +231,7 @@ export default {
       margin-left: auto;
    }
    .total.error {
-      color: var(--uvalib-red-emergency);
+      color: var( --uvalib-text-dark );
       font-weight: bold;
    }
    .pool {
