@@ -66,7 +66,7 @@
                      <i class="fas fa-plus-circle"></i>
                      <span class="btn-label">Add criteria</span>
                   </V4Button>
-                  <Confirm  v-if="isSignedIn" title="Save Search Form" v-on:confirmed="saveSearchForm"
+                  <Confirm  v-if="isSignedIn && hasResults==false" title="Save Search Form" v-on:confirmed="saveSearchForm"
                      id="savesearch" buttonLabel="Save Form" buttonMode="tertiary"
                   >
                      <div>
@@ -79,6 +79,14 @@
                </div>
                <PreSearchFilters v-if="hasResults==false"/>
                <div class="controls">
+                  <div class="v4-sort" v-if="hasResults==false">
+                     <label class="sort" for="sort-opt">Sort by:</label>
+                     <select v-model="preSearchSort" id="sort-opt" name="sort-opt" @change="sortChanged">
+                        <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
+                           {{ option.name }}
+                        </option>
+                     </select>
+                  </div>
                   <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
                </div>
             </div>
@@ -116,10 +124,12 @@ export default {
          preSearchFilterApplied: 'filters/preSearchFilterApplied',
          filterQueryString: 'filters/asQueryParam',
          preSearchFilters: 'filters/preSearchFilters',
-         rawQueryString: 'query/string'
+         rawQueryString: 'query/string',
+         poolSortOptions: 'pools/sortOptions',
       }),
       ...mapFields({
         userSearched: 'query.userSearched',
+        preSearchSort: 'sort.preSearchSort'
       }),
       ...mapMultiRowFields("query", ["advanced"]),
       canDeleteCriteria() {
@@ -127,9 +137,15 @@ export default {
       },
       advancedTerms() {
          return this.advanced.filter( t => t.field != "filter")
+      },
+      sortOptions() {
+         return this.poolSortOptions("uva_library")
       }
    },
    methods: {
+      sortChanged() {
+         console.log(this.preSearchSort)
+      },
       saveSearchForm() {
          this.$store.dispatch("preferences/saveAdvancedSearchTemplate", this.advancedSearchTemplate)
       },
@@ -217,6 +233,7 @@ export default {
             this.$store.dispatch("filters/promotePreSearchFilters")
             newQ.filter = this.filterQueryString('presearch')
          }
+         this.$store.dispatch("sort/promotePreSearchSort")
          this.userSearched = true
          await this.$router.replace({query: newQ})
       },
@@ -373,10 +390,19 @@ div.query {
 }
 .controls {
    padding: 10px 0;
-   text-align: right;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: flex-start;
+   label {
+      font-weight: bold;
+      margin-right: 5px;
+   }
+   button.v4-button {
+      margin-left: auto;
+   }
 }
 .controls .v4-button.clear {
-   margin-right: 5px;
+   margin-right: 10px;
 }
 div.search-term {
    padding: 10px;

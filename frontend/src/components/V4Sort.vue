@@ -2,7 +2,7 @@
    <div class="v4-sort">
       <label class="sort" for="sort-opt">Sort by</label>
       <select v-if="canSort" v-model="activeSort" id="sort-opt" name="sort-opt" @change="sortChanged">
-         <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
+         <option v-for="(option) in poolSortOptions(pool.id)" :key="option.id" :value="option.id ">
             {{ option.name }}
          </option>
       </select>
@@ -30,6 +30,7 @@ export default {
    computed: {
       ...mapGetters({
          sortingSupport: 'pools/sortingSupport',
+         poolSortOptions: 'pools/sortOptions',
          currentPoolSort: 'sort/currentPoolSort'
       }),
       ...mapFields({
@@ -37,30 +38,7 @@ export default {
       }),
       canSort() {
          return this.sortingSupport(this.pool.id)
-      },
-
-      sortOptions() {
-         let out = []
-         this.pool.sort_options.forEach( so => {
-            if (/relevance/gi.test(so.id)) {
-               out.push({id: so.id+"_desc", name: so.label })
-            } else {
-               let asc_label = "ascending"
-               if (so.asc && so.asc != "") {
-                  asc_label = so.asc
-               }
-
-               let desc_label = "descending"
-               if (so.desc && so.desc != "") {
-                  desc_label = so.desc
-               }
-
-               out.push({id: so.id+"_desc", name: so.label+": "+desc_label })
-               out.push({id: so.id+"_asc", name: so.label+": "+asc_label })
-            }
-         })
-         return out
-      },
+      }
    }
 }
 </script>

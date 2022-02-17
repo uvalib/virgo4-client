@@ -250,7 +250,7 @@ export default {
                this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: query.sort})
                this.$store.commit("sort/setActivePool", targetPool)
             } else {
-               this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: "SortRelevance_desc"})
+               this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: oldSort})
                this.$store.commit("sort/setActivePool", targetPool)
             }
          }
@@ -261,11 +261,6 @@ export default {
             this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
          } else {
             this.$store.commit("filters/resetPoolFilters", targetPool)
-         }
-
-         // If no sort detecetd, set it to the default relevance sort
-         if (oldSort == "") {
-            oldSort = "SortRelevance_desc"
          }
 
          if ( query.q ) {
@@ -307,6 +302,13 @@ export default {
             if (this.selectedResults.pool.id != "none" && query.pool != this.selectedResults.pool.id) {
                let newQ = Object.assign({}, query)
                newQ.pool = this.selectedResults.pool.id
+               await this.$router.replace({query: newQ})
+            }
+
+            // make sure the currently selected pool SORT is always in URL. This should only happen the first time a search is made
+            if ( oldSort != "" && query.sort === undefined ) {
+               let newQ = Object.assign({}, query)
+               newQ.sort = oldSort
                await this.$router.replace({query: newQ})
             }
 
