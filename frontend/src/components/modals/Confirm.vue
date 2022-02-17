@@ -20,7 +20,7 @@
          <p>Continue?</p>
        </template>
        <template v-slot:controls>
-         <V4Button mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.confirmdlg.hide()"
+         <V4Button mode="tertiary" :id="`${id}-cancelbtn`" class="cancelbtn" @click="$refs.confirmdlg.hide()"
             :focusBackOverride="true" @tabback="backTabCancel">
             Cancel
          </V4Button>
@@ -76,6 +76,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.cancelbtn {
+   margin-right: 5px;
+}
 i.trash {
    color: black;
    cursor: pointer;

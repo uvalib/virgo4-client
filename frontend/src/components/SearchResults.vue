@@ -160,11 +160,7 @@ export default {
          if ( this.searchMode == "basic") {
             this.$router.push(`/search`)
          } else {
-            this.$store.commit("query/resetAdvancedForm")
             this.$router.push('/search?mode=advanced')
-            if ( this.hasSearchTemplate ) {
-               this.$store.commit("query/setTemplate", this.searchTemplate)
-            }
          }
       },
       updateURL( poolID) {

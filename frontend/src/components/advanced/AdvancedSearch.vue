@@ -250,11 +250,6 @@ export default {
          this.$store.commit("query/removeCriteria", idx);
       },
    },
-   created() {
-      if ( this.hasSearchTemplate ) {
-         this.$store.commit("query/setTemplate", this.searchTemplate)
-      }
-   },
    mounted() {
       this.$announcer.set(`virgo advanced search has loaded`, 'assertive')
    }
@@ -314,10 +309,6 @@ h2 {
          color: var(--uvalib-text);
       }
    }
-}
-
-:deep(.form-acts button.v4-button.pure-button) {
-   margin: 0 !important;
 }
 
 div.criteria {

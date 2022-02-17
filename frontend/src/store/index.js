@@ -381,10 +381,14 @@ export default createStore({
    actions: {
       resetSearch( ctx ) {
          ctx.commit("resetSearchResults")
+         ctx.commit('query/resetAdvancedForm')
          ctx.commit('query/clear')
          ctx.commit('filters/reset')
          ctx.commit('sort/reset')
          ctx.commit("collection/clearCollectionDetails")
+         if ( ctx.rootGetters["preferences/hasSearchTemplate"] ) {
+            ctx.commit("query/setTemplate", ctx.rootState.preferences.searchTemplate)
+         }
       },
       async moreResults(ctx) {
          ctx.commit('incrementPage')

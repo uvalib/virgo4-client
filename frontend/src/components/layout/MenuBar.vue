@@ -10,11 +10,6 @@
             </router-link>
          </li>
          <template v-if="isKiosk==false">
-            <!-- <li>
-               <router-link tabindex="-1" role="menuitem" id="reservemenu" to="/course-reserves" @mousedown="closeSubMenus">
-                  <span class="menu-item"><i class="icon fal fa-university"></i>Course Reserves</span>
-               </router-link>
-            </li> -->
             <li role="none">
                <a tabindex="-1" id="feedbackmenu" role="menuitem"
                   href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
