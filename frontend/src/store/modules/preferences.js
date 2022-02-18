@@ -59,7 +59,7 @@ const preferences = {
          if (prefsObj.pickupLibrary ) {
             if (!this.getters["user/libraries"].some((lib) => lib.id == prefsObj.pickupLibrary.id) ){
                // Clear the pickup Library if not in the currently available list
-               this.commit("preferences/clearPickupLibrary");
+               state.pickupLibrary = {id: "", name: ""}
             } else {
                state.pickupLibrary = prefsObj.pickupLibrary
             }
@@ -109,7 +109,7 @@ const preferences = {
       async loadPreferences(ctx) {
          let url = `/api/users/${ctx.rootState.user.signedInUser}/preferences`
          return axios.get(url).then((response) => {
-            ctx.commit("setPreferences", response.data)
+            ctx.commit("setPreferences", JSON.parse(response.data))
          }).catch((error) => {
             ctx.commit('system/setError', error, { root: true })
             ctx.dispatch("system/reportError", error, {root: true})
