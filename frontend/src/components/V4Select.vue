@@ -17,9 +17,7 @@
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
          <ul tabindex="-1" ref="selectOptions" class="options" role="listbox" v-show="expanded"
-            @keyup.stop='handleKeypress'
-            v-bind:class="{right: alignment=='right', left: alignment=='left'}"
-            :style="{ 'border': optborder }">
+            @keyup.stop='handleKeypress'>
             <li v-for="src in selections" @click="optionClicked(src)"
                :class="{disabled: src.disabled, selected: src.id==currVal.id, highlighted: highlightedID == src.id}"
                class="option" tabindex="-1"
@@ -35,10 +33,6 @@
 <script>
 export default {
    props: {
-      alignment: {
-         type: String,
-         default: "left"
-      },
       placeholder: {
          type: String,
          default: "Make a selection"
@@ -48,10 +42,6 @@ export default {
          default: "var(--uvalib-brand-blue-light)"
       },
       border: {
-        type: String,
-        default: "1px solid var(--uvalib-grey-light)"
-      },
-      optborder: {
         type: String,
         default: "1px solid var(--uvalib-grey-light)"
       },
