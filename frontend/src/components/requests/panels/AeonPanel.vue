@@ -1,11 +1,12 @@
 <template>
-  <div class='request-aeon'>
+  <div class='request-aeon pure-form'>
     <h2>Special Collections Request</h2>
-    <div v-if="items.length > 1" class="item-selector">
+    <div v-if="itemOptions.length > 1" class="item-selector">
       <h3>Select the item you want:</h3>
-      <V4Select style="height:2em;" :selections="items"
-                v-model="selectedItem" v-bind:attached="false" />
-
+      <select v-model="selectedItem" @change="itemSelected">
+          <option :value="{}">Select an item</option>
+          <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
+      </select>
     </div>
     <p class="error" v-if="errors.barcode">{{errors.barcode}}</p>
 
@@ -33,39 +34,27 @@ export default {
   data: ()=> {
     return {selectedItem: {}}
   },
-  watch: {
-      selectedItem (newVal, _oldVal) {
-        this.aeon.callNumber = newVal.label
-        this.aeon.barcode = newVal.barcode
-        this.aeon.notes = newVal.notes
-        this.aeon.location = newVal.location
-      }
-  },
   computed: {
     ...mapFields({
       itemOptions: 'requests.activeOption.item_options',
       aeon: 'requests.aeon',
       errors: 'requests.errors',
       buttonDisabled: 'requests.buttonDisabled',
-
     }),
-    items() {
-      let items = this.itemOptions
-      // id and name are required in V4Select
-      for(let i in items) {
-        items[i].id = items[i].barcode
-        items[i].name = items[i].label
-      }
-      return items
-    },
   },
   created() {
-    if (this.items.length == 1){
-      this.selectedItem = this.items[0]
+    if (this.itemOptions.length == 1){
+      this.selectedItem = this.itemOptions[0]
     }
     this.$analytics.trigger('Requests', 'REQUEST_STARTED', "aeon")
   },
   methods: {
+    itemSelected() {
+      this.aeon.callNumber = this.selectedItem.label
+      this.aeon.barcode = this.selectedItem.barcode
+      this.aeon.notes = this.selectedItem.notes
+      this.aeon.location = this.selectedItem.location
+    },
     submitAeon() {
       this.$store.dispatch('requests/submitAeon')
     }
@@ -83,27 +72,24 @@ div.request-aeon {
 
   h2 {
     margin-top: 2em;
-    padding-bottom: 1em
+    padding-bottom: 0;
   }
-
-  h2, label, .request-button  {
-    border-bottom: 1px solid gray;
+  .item-selector {
+    padding:0;
+    margin-bottom: 10px;
   }
-}
-.item-selector {
-  padding-bottom: 20px;
-}
-.special-instructions-input {
-  padding: 2em 0;
-  width: 75%;
-  textarea {
-    width: 100%;
+  .special-instructions-input {
+    padding: 15px 0 0 0;
+    width: 75%;
+    textarea {
+      width: 100%;
+    }
   }
-}
-.request-button {
-  padding: 10px;
-}
-.notice {
-  color: var(--uvalib-red);
+  p {
+    margin: 20px 0;
+  }
+  .notice {
+    color: var(--uvalib-red);
+  }
 }
 </style>

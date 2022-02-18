@@ -64,7 +64,7 @@
       </div>
       <div class="pure-control-group" v-if="lms == 'Other'">
          <label  for="otherLMS">Please specify other LMS </label>
-            <input v-model="otherLMS" id="otherLMS" aria-required="true" required="required">
+         <input v-model="otherLMS" id="otherLMS" aria-required="true" required="required">
       </div>
       <div class="video-note">
         All video reserve requests will be delivered as streaming resources to your class’s Learning Management System.
@@ -74,14 +74,15 @@
 
 
       <dl>
-        <template v-if="items().length > 1" >
+        <template v-if="itemOptions.length > 1" >
           <dt class="label">Select the item you want:</dt>
           <dd>
-          <V4Select style="height:2em;" :selections="items()"
-                    v-model="selectedVideo" v-bind:attached="false" />
-                    </dd>
-
-          <p class="error" v-if="errors.barcode">{{errors.barcode}}</p>
+            <select v-model="selectedVideo" aria-required="true" required="required">
+               <option :value="{}">Select an item</option>
+               <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
+            </select>
+             <p class="error" v-if="hasError('barcode')">* an item selection is required.</p>
+          </dd>
         </template>
 
         <template v-if="!streamingReserve">
@@ -162,24 +163,24 @@ export default {
    },
    created() {
       this.$store.commit("reserves/setRequestingUser", this.userInfo)
-      if(this.items().length == 1){
-        this.selectedVideo = this.items()[0]
+      if(this.itemOptions.length == 1){
+        this.selectedVideo = this.itemOptions[0]
       }
       setTimeout( ()=> {
          document.getElementById("behalf_of").focus()
       }, 100)
    },
    methods: {
-      items() {
-        let items = this.itemOptions
-        // id and name are required in V4Select
-        for(let i in items) {
-          items[i].id = items[i].barcode
-          items[i].name = items[i].label
-          items[i].callNumber = items[i].label
-        }
-        return items
-      },
+      // items() {
+      //   let items = this.itemOptions
+      //   // id and name are required in V4Select
+      //   for(let i in items) {
+      //     items[i].id = items[i].barcode
+      //     items[i].name = items[i].label
+      //     items[i].callNumber = items[i].label
+      //   }
+      //   return items
+      // },
 
       hasError( val) {
          return this.errors.includes(val)
@@ -202,17 +203,20 @@ export default {
             this.errors.push("subtitleLanguage")
          }
 
-        if ( this.errors.length == 0) {
-          this.selectedVideo.pool = this.itemDetails.source
-          this.selectedVideo.catalogKey = this.itemDetails.identifier
-          this.selectedVideo.title = this.itemDetails.header.title
-          this.selectedVideo.audioLanguage = this.audioLanguage
-          this.selectedVideo.subtitles = this.subtitles
-          this.selectedVideo.subtitleLanguage = this.subtitleLanguage
-          this.selectedVideo.notes = this.notes
-          this.selectedVideo.isVideo = true
+         if ( this.itemOptions.length > 1 && !this.selectedVideo.barcode) {
+            this.errors.push("barcode")
+         }
 
-          this.$store.dispatch("reserves/createVideoReserve", this.selectedVideo)
+        if ( this.errors.length == 0) {
+            this.selectedVideo.pool = this.itemDetails.source
+            this.selectedVideo.catalogKey = this.itemDetails.identifier
+            this.selectedVideo.title = this.itemDetails.header.title
+            this.selectedVideo.audioLanguage = this.audioLanguage
+            this.selectedVideo.subtitles = this.subtitles
+            this.selectedVideo.subtitleLanguage = this.subtitleLanguage
+            this.selectedVideo.notes = this.notes
+            this.selectedVideo.isVideo = true
+            this.$store.dispatch("reserves/createVideoReserve", this.selectedVideo)
          } else {
             let err = this.errors[0]
             let eleID = this.fieldMap[err]

@@ -1,35 +1,11 @@
 <template>
-   <div class="place-hold">
-      <div v-if="items.length > 1" class="item-selector">
-         <h3>Select the item(s) you want:</h3>
-
-         <multiselect v-if="isDevServer"
-            id="hold-select"
-            v-model="selectedItem"
-            :options="items"
-            :multiple="true"
-            selectLabel=""
-            deselectLabel="Remove"
-            placeholder="Make a selection"
-            label="name"
-            track-by="name"
-            :tabindex="0"
-            :close-on-select="false"
-            >
-            <template v-slot:noResult>
-               <span>No results</span>
-            </template>
-         </multiselect>
-
-         <V4Select v-else
-            id="hold-select"
-            style="height:2em;"
-            :selections="items"
-            v-model="selectedItem"
-            v-bind:attached="false"
-            placeholder="Make a selection"
-            aria-required="true" required="required"
-         />
+   <div class="place-hold  pure-form">
+      <div v-if="itemOptions.length > 1" class="item-selector">
+         <h3>Select the item you want:</h3>
+         <select id="hold-select" v-model="selectedItem" @change="itemSelected" aria-required="true" required="required">
+            <option :value="{}">Select an item</option>
+            <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
+         </select>
          <p class="error" v-if="errors.item_barcode">{{errors.item_barcode.join(', ')}}</p>
       </div>
       <PickupLibrary />
@@ -45,25 +21,13 @@
 import { mapFields } from "vuex-map-fields"
 import { mapState, mapGetters } from "vuex"
 import PickupLibrary from "@/components/preferences/PickupLibrary"
-import Multiselect from 'vue-multiselect'
 
 export default {
    components: {
-      PickupLibrary,Multiselect
+      PickupLibrary
    },
    data: () => {
-      return { selectedItem: [] };
-   },
-   watch: {
-      selectedItem(newVal, _oldVal) {
-         if(newVal != null){
-            this.hold.itemLabel = newVal.label;
-            this.hold.itemBarcode = newVal.barcode;
-         } else {
-            this.hold = {}
-         }
-            this.errors.item_barcode = null;
-      }
+      return { selectedItem: {} };
    },
    computed: {
       ...mapState({
@@ -80,32 +44,14 @@ export default {
       ...mapGetters({
          isDevServer: 'system/isDevServer',
       }),
-      items() {
-         let items = this.itemOptions;
-         for (let i in items) {
-            items[i].id = items[i].barcode;
-            items[i].name = items[i].label;
-         }
-         return items;
-      }
    },
    created() {
       this.$analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
-      if (this.items.length == 1) {
-         this.selectedItem = this.items[0];
+      if (this.itemOptions.length == 1) {
+         this.selectedItem = this.itemOptions[0];
       }
       setTimeout( () => {
-         this.FocusOnSelector()
-
-      }, 150)
-   },
-   methods: {
-      placeHold() {
-         this.$store.dispatch("requests/createHold");
-      },
-      FocusOnSelector(){
          let ele = document.getElementById("hold-select")
-         if(this.isDevServer){ ele = document.getElementById("listbox-hold-select") }
          if ( ele ) {
             ele.focus()
          } else {
@@ -114,13 +60,20 @@ export default {
                ele.focus()
             }
          }
-
-      }
-
+      }, 150)
+   },
+   methods: {
+      itemSelected() {
+         this.hold.itemLabel = this.selectedItem.label
+         this.hold.itemBarcode = this.selectedItem.barcode
+         this.errors.item_barcode = null;
+      },
+      placeHold() {
+         this.$store.dispatch("requests/createHold");
+      },
    }
 };
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss" >
 .illiad-prompt {
    margin: 15px;
@@ -147,20 +100,6 @@ div.place-hold {
    @media only screen and (max-width: 768px) {
       align-items: flex-start;
    }
-
-   .multiselect__option--highlight, .multiselect__tag {
-      background-color: var(--uvalib-brand-blue-light);;
-   }
-   .multiselect__tag-icon:after, .multiselect__tag-icon:focus:after, .multiselect__tag-icon:hover:after {
-      color: var(--uvalib-text-light);
-   }
-   .multiselect__content, .multiselect__tags {
-      border: 1px solid var(--uvalib-grey);
-   }
-   .multiselect__input {
-      padding: 5px 0;
-   }
-
 }
 .place-hold > * {
    margin-bottom: 10px;

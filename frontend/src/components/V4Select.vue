@@ -3,9 +3,8 @@
       <button ref="v4select" @click.stop="toggleExpand" class="v4-select" tabindex="0"
            @keyup.up.stop="handleKeypress"
            @keyup.down.stop="handleKeypress"
-         :class="{attached: attached}" :aria-pressed="expanded" aria-haspopup="listbox"
-         :style="{ 'background-color': background, padding: pad,
-                  color: color, 'border': border }">
+         :aria-pressed="expanded" aria-haspopup="listbox"
+         :style="{ 'background-color': background, color: color, 'border': border }">
          <div class="wrap-select">
             <span class="selection">
                <span v-if="currVal && currVal.id" v-html="currVal.name"></span>
@@ -44,10 +43,6 @@ export default {
          type: String,
          default: "Make a selection"
       },
-      pad: {
-         type: String,
-         default: "0 10px"
-      },
       background: {
          type: String,
          default: "var(--uvalib-brand-blue-light)"
@@ -67,10 +62,6 @@ export default {
       selections: {
          type: Array,
          required: true
-      },
-      attached: {
-         type: Boolean,
-         default: true
       },
       modelValue: {
          type: Object
@@ -214,7 +205,7 @@ button.v4-select {
   cursor: pointer;
   color: white;
   text-align: left;
-  padding: 0 10px;
+  padding: 5px 10px;
   text-align: left;
   height:100%;
   width:100%;
@@ -228,9 +219,6 @@ button.v4-select:focus {
    align-items: center;
    justify-content: left;
    display: flex;
-}
-.v4-select.attached {
-   border-radius: 5px 0 0 5px;
 }
 .v4-select .selection {
    display: inline-block;

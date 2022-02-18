@@ -1,11 +1,13 @@
 <template>
-   <div class="request-scan">
+   <div class="request-scan pure-form">
       <h2>Scan Request</h2>
 
-      <div v-if="items.length > 1" class="item-selector">
-         <label for="scan-use">Select the item you want<span class="required">*</span></label>
-         <V4Select id="item-select" style="height:2.5em;margin-top:5px;" :selections="items"
-            v-model="selectedItem" :attached="false"/>
+      <div v-if="itemOptions.length > 1" class="item-selector">
+         <label for="item-select">Select the item you want<span class="required">*</span></label>
+         <select id="item-select" v-model="selectedItem" @change="itemSelected" aria-required="true" required="required">
+            <option :value="{}">Select an item</option>
+            <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
+         </select>
          <span v-if="hasError('item')" class="error">Item selection is required</span>
       </div>
 
@@ -89,45 +91,36 @@ export default {
          required: ['title', 'chapter', 'author', 'pages']
       }
    },
-   watch: {
-      selectedItem(newVal, _oldVal) {
-         this.scan.barcode = newVal.barcode
-         this.scan.library = newVal.library
-         this.scan.location = newVal.location_id
-         this.scan.callNumber = newVal.label
-      }
-   },
    computed: {
       ...mapState({
          details : state => state.item.details,
          scan: state => state.requests.scan,
          sysError: state => state.error
       }),
-      ...mapFields('requests',[
-         'buttonDisabled',
-         'scan',
-         'activeOption.item_options'
-      ]),
-      items() {
-         let items = this.item_options
-         for (let i in items) {
-            items[i].id = items[i].barcode
-            items[i].name = items[i].label
-         }
-         return items;
-      }
+      ...mapFields({
+         itemOptions: 'requests.activeOption.item_options',
+         scan: 'requests.scan',
+         buttonDisabled: 'requests.buttonDisabled',
+      }),
    },
    created() {
       this.$analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
-      if (this.items.length == 1) {
-         this.selectedItem = this.items[0]
+      if (this.itemOptions.length == 1) {
+         this.selectedItem = this.itemOptions[0]
       }
       setTimeout( () => {
-         if (this.items.length == 1) {
-            document.getElementById("scan-use").focus()
+         if (this.itemOptions.length == 1) {
+            let ele = document.getElementById("scan-use")
+            if ( ele ) {
+               ele.focus()
+            }
          } else {
-            document.getElementById("item-select").focus()
+            let ele = document.getElementById("item-select")
+            if ( ele ) {
+               ele.focus()
+            }
          }
+
          this.scan.title = this.details.header.title
          if (this.details.header.author) {
             this.scan.author = this.details.header.author.value.join(this.details.header.author.separator)
@@ -149,6 +142,12 @@ export default {
       }, 150)
    },
    methods: {
+      itemSelected() {
+         this.scan.barcode = this.selectedItem.barcode
+         this.scan.library = this.selectedItem.library
+         this.scan.location = this.selectedItem.location_id
+         this.scan.callNumber = this.selectedItem.label
+      },
       hasError( val) {
          return this.errors.includes(val)
       },
