@@ -9,7 +9,7 @@
             <span class="selection">
                <span v-if="currVal && currVal.id" v-html="currVal.name"></span>
                <span v-else v-html="placeholder"></span>
-               <i class="options-arrow fas fa-angle-down" :style="{ transform: rotation, color: color }"></i>
+               <i class="options-arrow fal fa-caret-down" :style="{ transform: rotation, color: color }"></i>
             </span>
          </div>
       </button>
