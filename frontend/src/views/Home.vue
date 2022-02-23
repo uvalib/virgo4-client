@@ -154,8 +154,14 @@ export default {
             changed = true
          }
          if (newQ.scope ) {
-            unsupported.push("scope="+newQ.scope)
+            if (newQ.scope != "all") {
+               unsupported.push("scope="+newQ.scope)
+            }
+            changed = true
             delete newQ.scope
+         }
+         if ( newQ.mode == "basic") {
+            delete newQ.mode
             changed = true
          }
          if (newQ.filter && newQ.filter.indexOf("Facet") > -1) {
@@ -189,7 +195,7 @@ export default {
          }
 
 
-         if ( newQ.q == "" && !newQ.filter ) {
+         if ( newQ.q == "" && !newQ.filter) {
             let msg = "<p>This query has no supported parameters, and cannot be issued. Please fix the issues below and retry.</p>"
             msg += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
             this.$store.commit("system/setMessage", msg)
@@ -207,8 +213,10 @@ export default {
          }
 
          if ( changed) {
-            this.queryMessage = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
-            this.queryMessage += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
+            if (  unsupported.length > 0) {
+               this.queryMessage = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
+               this.queryMessage += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
+            }
             this.$router.push({query: newQ, replace: true})
          } else {
             this.restoreSearchFromQueryParams(this.$route.query)
