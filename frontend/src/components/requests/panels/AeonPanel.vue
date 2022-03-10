@@ -45,6 +45,7 @@ export default {
   created() {
     if (this.itemOptions.length == 1){
       this.selectedItem = this.itemOptions[0]
+      this.itemSelected()
     }
     this.$analytics.trigger('Requests', 'REQUEST_STARTED', "aeon")
   },
