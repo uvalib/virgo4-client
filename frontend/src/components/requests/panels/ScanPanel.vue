@@ -107,6 +107,7 @@ export default {
       this.$analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
       if (this.itemOptions.length == 1) {
          this.selectedItem = this.itemOptions[0]
+         this.itemSelected()
       }
       setTimeout( () => {
          if (this.itemOptions.length == 1) {

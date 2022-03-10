@@ -48,7 +48,8 @@ export default {
    created() {
       this.$analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
       if (this.itemOptions.length == 1) {
-         this.selectedItem = this.itemOptions[0];
+         this.selectedItem = this.itemOptions[0]
+         this.itemSelected()
       }
       setTimeout( () => {
          let ele = document.getElementById("hold-select")
