@@ -46,7 +46,9 @@ export default {
 
    },
    async mounted() {
-      await this.$store.dispatch("preferences/loadPreferences")
+      if ( this.isSignedIn) {
+         await this.$store.dispatch("preferences/loadPreferences")
+      }
       this.$store.commit('requests/reset')
       this.restore()
    },
