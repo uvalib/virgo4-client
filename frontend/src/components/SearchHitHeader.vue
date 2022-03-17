@@ -24,8 +24,8 @@
 </template>
 
 <script>
-import TruncatedText from '@/components/TruncatedText'
-import SearchHitActions from '@/components/SearchHitActions'
+import TruncatedText from "@/components/TruncatedText.vue"
+import SearchHitActions from "@/components/SearchHitActions.vue"
 export default {
    props: {
       hit: {

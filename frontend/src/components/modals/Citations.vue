@@ -74,7 +74,7 @@
 <script>
 
 import { mapState } from "vuex"
-import V4DownloadButton from '@/components/V4DownloadButton'
+import V4DownloadButton from "@/components/V4DownloadButton.vue"
 
 export default {
    props: {

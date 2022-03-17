@@ -15,17 +15,17 @@
 </template>
 
 <script>
-import { mapFields } from 'vuex-map-fields';
+import { mapFields } from "vuex-map-fields"
 import { mapGetters } from "vuex";
-import OptionsPanel from './panels/OptionsPanel'
-import SignInPanel from './panels/SignInPanel'
-import PlaceHoldPanel from './panels/PlaceHoldPanel';
-import PDAPanel from './panels/PDAPanel';
-import AeonPanel from './panels/AeonPanel';
-import ScanPanel from './panels/ScanPanel';
-import VideoReservePanel from './panels/VideoReservePanel';
-import ConfirmationPanel from './panels/ConfirmationPanel';
-import ReservedPanel from './panels/ReservedPanel';
+import OptionsPanel from "./panels/OptionsPanel.vue"
+import SignInPanel from "./panels/SignInPanel.vue"
+import PlaceHoldPanel from "./panels/PlaceHoldPanel.vue"
+import PDAPanel from "./panels/PDAPanel.vue"
+import AeonPanel from "./panels/AeonPanel.vue"
+import ScanPanel from "./panels/ScanPanel.vue"
+import VideoReservePanel from "./panels/VideoReservePanel.vue"
+import ConfirmationPanel from "./panels/ConfirmationPanel.vue"
+import ReservedPanel from "./panels/ReservedPanel.vue"
 
 export default {
    props: {

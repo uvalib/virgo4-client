@@ -2,7 +2,7 @@
     <SignIn/>
 </template>
 <script>
-import SignIn from '@/views/SignIn';
+import SignIn from "@/views/SignIn.vue"
 export default {
   components: {
     SignIn

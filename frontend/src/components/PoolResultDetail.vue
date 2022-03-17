@@ -62,12 +62,12 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
-import SearchHit from "@/components/SearchHit"
-import ImageSearchHit from "@/components/ImageSearchHit"
-import SearchFilters from "@/components/SearchFilters"
-import V4Sort from "@/components/V4Sort"
-import ExpandSearch from "@/components/ExpandSearch"
-import CollectionContext from "@/components/CollectionContext"
+import SearchHit from "@/components/SearchHit.vue"
+import ImageSearchHit from "@/components/ImageSearchHit.vue"
+import SearchFilters from "@/components/SearchFilters.vue"
+import V4Sort from "@/components/V4Sort.vue"
+import ExpandSearch from "@/components/ExpandSearch.vue"
+import CollectionContext from "@/components/CollectionContext.vue"
 export default {
    components: {
       ImageSearchHit, SearchHit, SearchFilters, V4Sort, ExpandSearch, CollectionContext

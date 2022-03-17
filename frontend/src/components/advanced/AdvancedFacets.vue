@@ -40,7 +40,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import AccordionContent from "@/components/AccordionContent"
+import AccordionContent from "@/components/AccordionContent.vue"
 export default {
    components: {
       AccordionContent

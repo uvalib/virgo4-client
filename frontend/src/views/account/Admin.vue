@@ -15,9 +15,9 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import JWTAdmin from "@/components/admin/JWTAdmin"
-import PickupLibraries from "@/components/admin/PickupLibraries"
-import AccountActivities from "@/components/AccountActivities"
+import JWTAdmin from "@/components/admin/JWTAdmin.vue"
+import PickupLibraries from "@/components/admin/PickupLibraries.vue"
+import AccountActivities from "@/components/AccountActivities.vue"
 export default {
    name: "admin",
    components: {

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import SearchHitActions from '@/components/SearchHitActions'
+import SearchHitActions from "@/components/SearchHitActions.vue"
 import { mapState, mapGetters } from "vuex"
 
 export default {

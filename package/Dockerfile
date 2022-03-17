@@ -2,7 +2,7 @@
 # build the target application
 #
 FROM golang:1.16.5-alpine3.13 as builder
-RUN apk update && apk upgrade && apk add make yarn
+RUN apk update && apk upgrade && apk add make npm yarn
 
 # needed for the build
 ARG FONT_AWESOME_TOKEN
@@ -29,7 +29,7 @@ RUN addgroup webservice && adduser webservice -G webservice -D
 ENV TZ=UTC
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Specify home 
+# Specify home
 ENV APP_HOME /virgo4-client
 WORKDIR $APP_HOME
 

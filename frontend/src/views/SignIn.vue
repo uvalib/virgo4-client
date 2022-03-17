@@ -68,8 +68,8 @@
 
 <script>
 import { mapState } from "vuex"
-import ForgotPassword from '@/components/modals/ForgotPassword'
-import ChangePassword from '@/components/modals/ChangePassword'
+import ForgotPassword from "@/components/modals/ForgotPassword.vue"
+import ChangePassword from "@/components/modals/ChangePassword.vue"
 export default {
    name: "signin",
    components: {

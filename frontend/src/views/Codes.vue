@@ -42,7 +42,7 @@
 
 <script>
 import { mapState } from "vuex"
-import AccordionContent from '@/components/AccordionContent'
+import AccordionContent from "@/components/AccordionContent.vue"
 
 export default {
    name: "codes",

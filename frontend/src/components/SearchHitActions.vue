@@ -30,9 +30,9 @@
 </template>
 
 <script>
-import AddBookmark from '@/components/modals/AddBookmark'
-import SignInRequired from '@/components/modals/SignInRequired'
-import Citations from '@/components/modals/Citations'
+import AddBookmark from "@/components/modals/AddBookmark.vue"
+import SignInRequired from "@/components/modals/SignInRequired.vue"
+import Citations from "@/components/modals/Citations.vue"
 import { mapGetters,mapState } from "vuex"
 export default {
    props: {

@@ -32,7 +32,7 @@
 <script>
 import { mapFields } from 'vuex-map-fields'
 import { mapGetters } from "vuex"
-import SearchTips from "@/components/disclosures/SearchTips"
+import SearchTips from "@/components/disclosures/SearchTips.vue"
 export default {
     components: {
      SearchTips

@@ -23,9 +23,9 @@
 
 <script>
 import { mapState } from "vuex"
-import SearchHitHeader from '@/components/SearchHitHeader'
-import SearchHitDetail from '@/components/SearchHitDetail'
-import AccordionContent from '@/components/AccordionContent'
+import SearchHitHeader from "@/components/SearchHitHeader.vue"
+import SearchHitDetail from "@/components/SearchHitDetail.vue"
+import AccordionContent from "@/components/AccordionContent.vue"
 export default {
    props: {
       hit: { type: Object, required: true},

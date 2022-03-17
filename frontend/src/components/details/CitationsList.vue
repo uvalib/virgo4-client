@@ -25,8 +25,8 @@
 
 <script>
 import { mapState } from "vuex"
-import V4DownloadButton from '@/components/V4DownloadButton'
-import Citations from '@/components/modals/Citations'
+import V4DownloadButton from "@/components/V4DownloadButton.vue"
+import Citations from "@/components/modals/Citations.vue"
 
 export default {
    components: {

@@ -47,9 +47,9 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import TruncatedText from '@/components/TruncatedText'
-import V4DownloadButton from '@/components/V4DownloadButton'
-import AccessURLDetails from '@/components/AccessURLDetails'
+import TruncatedText from "@/components/TruncatedText.vue"
+import V4DownloadButton from "@/components/V4DownloadButton.vue"
+import AccessURLDetails from "@/components/AccessURLDetails.vue"
 export default {
    props: {
       hit: { type: Object, required: true},

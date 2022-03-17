@@ -99,9 +99,9 @@
 import { mapMultiRowFields, mapFields } from "vuex-map-fields"
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import AdvancedFacets from "@/components/advanced/AdvancedFacets"
-import SourceSelector from "@/components/SourceSelector"
-import PreSearchFilters from "@/components/advanced/PreSearchFilters"
+import AdvancedFacets from "@/components/advanced/AdvancedFacets.vue"
+import SourceSelector from "@/components/SourceSelector.vue"
+import PreSearchFilters from "@/components/advanced/PreSearchFilters.vue"
 
 export default {
    components: {

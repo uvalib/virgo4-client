@@ -18,11 +18,11 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities"
-import Search from "@/components/preferences/Search"
-import PickupLibrary from "@/components/preferences/PickupLibrary"
-import V4Privacy from "@/components/preferences/V4Privacy"
-import BarcodeScan from "@/components/preferences/BarcodeScan"
+import AccountActivities from "@/components/AccountActivities.vue"
+import Search from "@/components/preferences/Search.vue"
+import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
+import V4Privacy from "@/components/preferences/V4Privacy.vue"
+import BarcodeScan from "@/components/preferences/BarcodeScan.vue"
 export default {
    name: "preferences",
    components: {

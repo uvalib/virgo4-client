@@ -34,11 +34,11 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import { mapFields } from 'vuex-map-fields'
-import SignInPanel from '../requests/panels/SignInPanel'
-import ILLBorrowItem from '../requests/standalone/ILLBorrowItem'
-import ILLBorrowAV from '../requests/standalone/ILLBorrowAV'
-import ILLScanArticle from '../requests/standalone/ILLScanArticle'
+import { mapFields } from "vuex-map-fields"
+import SignInPanel from "../requests/panels/SignInPanel.vue"
+import ILLBorrowItem from "../requests/standalone/ILLBorrowItem.vue"
+import ILLBorrowAV from "../requests/standalone/ILLBorrowAV.vue"
+import ILLScanArticle from "../requests/standalone/ILLScanArticle.vue"
 export default {
    data: function()  {
       return {

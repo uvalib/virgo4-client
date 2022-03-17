@@ -13,9 +13,9 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import ItemView from "@/components/details/ItemView"
-import CollectionHeader from "@/components/details/CollectionHeader"
-import FullPageCollectionView from "@/components/details/FullPageCollectionView"
+import ItemView from "@/components/details/ItemView.vue"
+import CollectionHeader from "@/components/details/CollectionHeader.vue"
+import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
 
 export default {
    name: "detail",

@@ -20,7 +20,7 @@
 <script>
 import { mapFields } from "vuex-map-fields"
 import { mapState, mapGetters } from "vuex"
-import PickupLibrary from "@/components/preferences/PickupLibrary"
+import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
 
 export default {
    components: {

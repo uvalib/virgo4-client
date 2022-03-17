@@ -26,13 +26,13 @@ darwin:
 
 web:
 	mkdir -p bin/
-	cd frontend && yarn install && yarn build
+	cd frontend && npm install && npm run build
 	rm -rf bin/public
 	mv frontend/dist bin/public
 
 linux:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -a -installsuffix cgo -o bin/v4srv.linux backend/*.go
-	
+
 clean:
 	$(GOCLEAN) ./backend/...
 	rm -rf bin
@@ -44,7 +44,7 @@ vet:
 	cd backend; $(GOVET)
 
 dep:
-	cd frontend && yarn upgrade 
+	cd frontend && npm upgrade
 	$(GOGET) -u ./backend/...
 	$(GOMOD) tidy
 	$(GOMOD) verify

@@ -45,8 +45,8 @@
 
 <script>
 import { mapGetters } from "vuex"
-import TruncatedText from '@/components/TruncatedText'
-import BookmarkButton from '@/components/BookmarkButton'
+import TruncatedText from "@/components/TruncatedText.vue"
+import BookmarkButton from "@/components/BookmarkButton.vue"
 export default {
    components: {
       TruncatedText, BookmarkButton

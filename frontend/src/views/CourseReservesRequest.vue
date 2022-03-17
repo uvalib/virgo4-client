@@ -184,7 +184,7 @@
 import { mapState } from "vuex"
 import { mapFields } from 'vuex-map-fields'
 import { mapMultiRowFields } from 'vuex-map-fields'
-import ReservedPanel from '@/components/requests/panels/ReservedPanel'
+import ReservedPanel from "@/components/requests/panels/ReservedPanel.vue"
 export default {
    name: "course-reserves-request",
    data: function() {

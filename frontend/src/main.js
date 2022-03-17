@@ -3,14 +3,14 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import VueClipboard from 'vue3-clipboard'
-import V4Button from "@/components/V4Button"
-import V4Checkbox from "@/components/V4Checkbox"
-import V4Spinner from "@/components/V4Spinner"
-import V4Select from "@/components/V4Select"
-import V4Modal from "@/components/modals/V4Modal"
-import V4Disclosure from "@/components/disclosures/V4Disclosure"
-import Confirm from "@/components/modals/Confirm"
-import SignInRequired from "@/components/SignInRequired"
+import V4Button from "@/components/V4Button.vue"
+import V4Checkbox from "@/components/V4Checkbox.vue"
+import V4Spinner from "@/components/V4Spinner.vue"
+import V4Select from "@/components/V4Select.vue"
+import V4Modal from "@/components/modals/V4Modal.vue"
+import V4Disclosure from "@/components/disclosures/V4Disclosure.vue"
+import Confirm from "@/components/modals/Confirm.vue"
+import SignInRequired from "@/components/SignInRequired.vue"
 
 
 // provide store access to the router and router to store

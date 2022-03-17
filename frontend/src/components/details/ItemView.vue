@@ -86,18 +86,18 @@
 
 <script>
 import { mapGetters,mapState } from "vuex"
-import SearchHitHeader from '@/components/SearchHitHeader'
-import Availability from "@/components/details/Availability"
-import InterLibraryLoan from "@/components/details/InterLibraryLoan"
-import AccordionContent from "@/components/AccordionContent"
+import SearchHitHeader from "@/components/SearchHitHeader.vue"
+import Availability from "@/components/details/Availability.vue"
+import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
+import AccordionContent from "@/components/AccordionContent.vue"
 import beautify from 'xml-beautifier'
-import AccessURLDetails from '@/components/AccessURLDetails'
-import TruncatedText from '@/components/TruncatedText'
-import V4LinksList from '@/components/V4LinksList'
-import V4Pager from '@/components/V4Pager'
-import CitationsList from '@/components/details/CitationsList'
-import ShelfBrowse from "@/components/details/ShelfBrowse"
-import DigitalContent from "@/components/details/DigitalContent"
+import AccessURLDetails from "@/components/AccessURLDetails.vue"
+import TruncatedText from "@/components/TruncatedText.vue"
+import V4LinksList from "@/components/V4LinksList.vue"
+import V4Pager from "@/components/V4Pager.vue"
+import CitationsList from "@/components/details/CitationsList.vue"
+import ShelfBrowse from "@/components/details/ShelfBrowse.vue"
+import DigitalContent from "@/components/details/DigitalContent.vue"
 
 export default {
    name: "item-view",

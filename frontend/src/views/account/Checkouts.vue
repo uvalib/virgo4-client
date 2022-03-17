@@ -129,8 +129,8 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import AccountActivities from "@/components/AccountActivities"
-import RenewSummary from "@/components/modals/RenewSummary"
+import AccountActivities from "@/components/AccountActivities.vue"
+import RenewSummary from "@/components/modals/RenewSummary.vue"
 export default {
    name: "checkouts",
    components: {

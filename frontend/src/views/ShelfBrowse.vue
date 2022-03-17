@@ -67,7 +67,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import BrowseCard from '@/components/details/BrowseCard'
+import BrowseCard from "@/components/details/BrowseCard.vue"
 export default {
    name: "shelf-browse",
    components: {

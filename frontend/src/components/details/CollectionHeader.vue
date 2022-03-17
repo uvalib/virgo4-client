@@ -41,7 +41,7 @@
 <script>
 import { mapGetters, mapState } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import CollectionDates from "@/components/modals/CollectionDates"
+import CollectionDates from "@/components/modals/CollectionDates.vue"
 export default {
    components: {
       CollectionDates

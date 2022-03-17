@@ -47,8 +47,8 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import CourseSearchResults from "@/components/reserves/CourseSearchResults"
-import InstructorSearchResults from "@/components/reserves/InstructorSearchResults"
+import CourseSearchResults from "@/components/reserves/CourseSearchResults.vue"
+import InstructorSearchResults from "@/components/reserves/InstructorSearchResults.vue"
 export default {
    name: "course-reserves",
    components: {

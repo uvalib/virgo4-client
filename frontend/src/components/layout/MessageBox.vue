@@ -36,7 +36,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import ErrorDetails from "@/components/disclosures/ErrorDetails"
+import ErrorDetails from "@/components/disclosures/ErrorDetails.vue"
 export default {
    components: {
       ErrorDetails

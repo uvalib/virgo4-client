@@ -64,7 +64,7 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities"
+import AccountActivities from "@/components/AccountActivities.vue"
 export default {
    name: "digital-deliveries",
    components: {

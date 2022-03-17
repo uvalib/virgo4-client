@@ -94,8 +94,8 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import V4ProgressBar from "@/components/V4ProgressBar"
-import OCRRequest from "@/components/modals/OCRRequest"
+import V4ProgressBar from "@/components/V4ProgressBar.vue"
+import OCRRequest from "@/components/modals/OCRRequest.vue"
 export default {
    components: {
       V4ProgressBar, OCRRequest

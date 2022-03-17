@@ -136,11 +136,11 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import PrintBookmarks from "@/components/modals/PrintBookmarks"
-import MoveBookmark from "@/components/modals/MoveBookmark"
-import RenameBookmark from "@/components/modals/RenameBookmark"
-import AccordionContent from "@/components/AccordionContent"
-import AccountActivities from "@/components/AccountActivities"
+import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
+import MoveBookmark from "@/components/modals/MoveBookmark.vue"
+import RenameBookmark from "@/components/modals/RenameBookmark.vue"
+import AccordionContent from "@/components/AccordionContent.vue"
+import AccountActivities from "@/components/AccountActivities.vue"
 export default {
    name: "bookmarks",
    components: {

@@ -58,13 +58,13 @@
 </template>
 
 <script>
-import ScrollToTop from "@/components/ScrollToTop"
-import LibraryFooter from "@/components/layout/LibraryFooter"
-import MessageBox from "@/components/layout/MessageBox"
-import VirgoHeader from "@/components/layout/VirgoHeader"
-import MenuBar from "@/components/layout/MenuBar"
-import SkipToNavigation from "@/components/layout/SkipToNavigation"
-import SessionExpired from "@/components/layout/SessionExpired"
+import ScrollToTop from "@/components/ScrollToTop.vue"
+import LibraryFooter from "@/components/layout/LibraryFooter.vue"
+import MessageBox from "@/components/layout/MessageBox.vue"
+import VirgoHeader from "@/components/layout/VirgoHeader.vue"
+import MenuBar from "@/components/layout/MenuBar.vue"
+import SkipToNavigation from "@/components/layout/SkipToNavigation.vue"
+import SessionExpired from "@/components/layout/SessionExpired.vue"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 export default {

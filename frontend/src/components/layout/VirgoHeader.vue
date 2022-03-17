@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import UvaLibraryLogo from "@/components/UvaLibraryLogo"
+import UvaLibraryLogo from "@/components/UvaLibraryLogo.vue"
 import { mapGetters } from "vuex"
 export default {
    components: {

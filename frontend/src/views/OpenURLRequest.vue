@@ -33,9 +33,9 @@
 
 import { mapState } from "vuex"
 import { mapFields } from "vuex-map-fields"
-import Article from "@/components/requests/openurl/Article"
-import BookChapter from "@/components/requests/openurl/BookChapter"
-import Book from "@/components/requests/openurl/Book"
+import Article from "@/components/requests/openurl/Article.vue"
+import BookChapter from "@/components/requests/openurl/BookChapter.vue"
+import Book from "@/components/requests/openurl/Book.vue"
 export default {
    name: "openurl",
    components: {

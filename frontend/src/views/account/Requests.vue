@@ -174,12 +174,12 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities"
-import AccordionContent from "@/components/AccordionContent"
-import InstructionalScan from "@/components/requests/standalone/InstructionalScan"
-import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem"
-import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV"
-import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle"
+import AccountActivities from "@/components/AccountActivities.vue"
+import AccordionContent from "@/components/AccordionContent.vue"
+import InstructionalScan from "@/components/requests/standalone/InstructionalScan.vue"
+import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem.vue"
+import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV.vue"
+import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle.vue"
 export default {
    name: "requests",
    components: {

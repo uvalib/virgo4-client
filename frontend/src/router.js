@@ -29,7 +29,7 @@ import FatalError from './views/FatalError.vue'
 import VueCookies from 'vue-cookies'
 
 const router = createRouter({
-   history: createWebHistory( process.env.BASE_URL ),
+   history: createWebHistory( import.meta.env.BASE_URL ),
    routes: [
       {
          path: '/',

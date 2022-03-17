@@ -39,11 +39,11 @@
 <script>
 import { mapState, mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import SearchResults from "@/components/SearchResults"
-import AdvancedSearch from "@/components/advanced/AdvancedSearch"
-import Welcome from "@/components/Welcome"
-import V4BarcodeScanner from "@/components/V4BarcodeScanner"
-import SourceSelector from "@/components/SourceSelector"
+import SearchResults from "@/components/SearchResults.vue"
+import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
+import Welcome from "@/components/Welcome.vue"
+import V4BarcodeScanner from "@/components/V4BarcodeScanner.vue"
+import SourceSelector from "@/components/SourceSelector.vue"
 
 export default {
    name: "home",

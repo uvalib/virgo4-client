@@ -51,12 +51,12 @@
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import PoolResultDetail from "@/components/PoolResultDetail"
-import PrintedSearchResults from "@/components/PrintedSearchResults"
-import FacetSidebar from "@/components/FacetSidebar"
-import SaveSearch from "@/components/modals/SaveSearch"
-import SearchSuggestions from "@/components/SearchSuggestions"
-import SignInRequired from '@/components/modals/SignInRequired'
+import PoolResultDetail from "@/components/PoolResultDetail.vue"
+import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
+import FacetSidebar from "@/components/FacetSidebar.vue"
+import SaveSearch from "@/components/modals/SaveSearch.vue"
+import SearchSuggestions from "@/components/SearchSuggestions.vue"
+import SignInRequired from "@/components/modals/SignInRequired.vue"
 export default {
    components: {
       PoolResultDetail, FacetSidebar, SaveSearch, SearchSuggestions, SignInRequired, PrintedSearchResults

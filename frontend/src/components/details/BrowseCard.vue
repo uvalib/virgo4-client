@@ -59,8 +59,8 @@
 
 <script>
 import { mapGetters } from "vuex"
-import AddBookmark from '@/components/modals/AddBookmark'
-import SignInRequired from '@/components/modals/SignInRequired'
+import AddBookmark from "@/components/modals/AddBookmark.vue"
+import SignInRequired from "@/components/modals/SignInRequired.vue"
 
 export default {
    components: {

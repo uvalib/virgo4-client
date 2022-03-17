@@ -24,8 +24,8 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import BrowseCard from '@/components/details/BrowseCard'
-import BrowsePager from '@/components/details/BrowsePager'
+import BrowseCard from "@/components/details/BrowseCard.vue"
+import BrowsePager from "@/components/details/BrowsePager.vue"
 export default {
    props: {
       hit: {

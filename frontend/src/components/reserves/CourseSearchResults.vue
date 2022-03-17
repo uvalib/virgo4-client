@@ -23,7 +23,7 @@
 
 <script>
 import { mapState } from "vuex"
-import ReserveDetail from "@/components/reserves/ReserveDetail"
+import ReserveDetail from "@/components/reserves/ReserveDetail.vue"
 export default {
    components: {
       ReserveDetail

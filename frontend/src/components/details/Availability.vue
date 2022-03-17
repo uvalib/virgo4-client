@@ -72,9 +72,9 @@
 <script>
 import { mapGetters } from "vuex"
 import { mapState } from "vuex"
-import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice"
-import RequestContainer from "@/components/requests/RequestContainer"
-import BoundWithItems from "@/components/details/BoundWithItems"
+import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
+import RequestContainer from "@/components/requests/RequestContainer.vue"
+import BoundWithItems from "@/components/details/BoundWithItems.vue"
 export default {
   components: {
     AvailabilityNotice, RequestContainer, BoundWithItems

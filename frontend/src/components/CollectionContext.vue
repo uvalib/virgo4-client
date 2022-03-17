@@ -17,7 +17,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex"
-import CollectionDates from "@/components/modals/CollectionDates"
+import CollectionDates from "@/components/modals/CollectionDates.vue"
 export default {
    components: {
       CollectionDates

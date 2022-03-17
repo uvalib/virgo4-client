@@ -189,11 +189,11 @@
 
 <script>
 import { mapState, mapGetters } from "vuex"
-import AccountRequestForm from '@/components/AccountRequestForm'
-import AccountActivities from "@/components/AccountActivities"
-import AccordionContent from '@/components/AccordionContent'
-import ChangePassword from '@/components/modals/ChangePassword'
-import UpdateContactInfo from '@/components/modals/UpdateContactInfo'
+import AccountRequestForm from "@/components/AccountRequestForm.vue"
+import AccountActivities from "@/components/AccountActivities.vue"
+import AccordionContent from "@/components/AccordionContent.vue"
+import ChangePassword from "@/components/modals/ChangePassword.vue"
+import UpdateContactInfo from "@/components/modals/UpdateContactInfo.vue"
 export default {
    name: "account",
    data: function() {

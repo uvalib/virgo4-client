@@ -56,7 +56,7 @@
 <script>
 import { mapState, mapGetters } from "vuex"
 import { mapFields } from 'vuex-map-fields'
-import AccordionContent from "@/components/AccordionContent"
+import AccordionContent from "@/components/AccordionContent.vue"
 export default {
    components: {
       AccordionContent
