@@ -27,8 +27,8 @@
             :disableDays=notPublishedDates
             active-view="month"
             :disable-views="['week', 'day']"
-            @view-change="viewChanged"
-            @cell-click="cellClicked"
+            @view-change="viewChanged($event)"
+            @cell-focus="cellClicked($event)"
          >
          </vue-cal>
          <div class="error">
@@ -37,11 +37,7 @@
        </template>
        <template v-slot:controls>
           <V4Button mode="primary" :id="`${id}-cancelbtn`" @click="cancelClicked">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
-            :focusNextOverride="true" @tabnext="nextTabOK">
-            View {{itemLabel}}
+            Close
          </V4Button>
       </template>
    </V4Modal>
@@ -70,7 +66,8 @@ export default {
    data: function() {
       return {
          picked: this.date,
-         error: ""
+         error: "",
+         currentCalView: "month"
       }
    },
    computed: {
@@ -88,6 +85,7 @@ export default {
    },
    methods: {
       viewChanged(e) {
+         this.currentCalView = e.view
          this.error = ""
          let priorYear = this.picked.split("-")[0]
          let newYear = e.startDate.getFullYear()
@@ -95,7 +93,7 @@ export default {
             this.$store.dispatch("collection/setYear", newYear)
          }
       },
-      cellClicked(e) {
+      async cellClicked(e) {
          this.error = ""
          let priorYear = this.picked.split("-")[0]
          let y = e.getFullYear()
@@ -105,13 +103,16 @@ export default {
          d = d.padStart(2,0)
          this.picked = `${y}-${m}-${d}`
          if (priorYear != y) {
-            this.$store.dispatch("collection/setYear", y)
+            await this.$store.dispatch("collection/setYear", y)
+         }
+         if (this.currentCalView == "month") {
+            this.navigateToDate()
          }
       },
       nextTabOK() {
          this.$refs.calendardlg.lastFocusTabbed()
       },
-      okClicked() {
+      navigateToDate() {
          this.error = ""
          let pid = this.pidByDate(this.picked)
          if ( pid != "") {

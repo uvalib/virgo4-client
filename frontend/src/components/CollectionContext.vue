@@ -27,6 +27,7 @@ export default {
          collectionCtxAvailable: 'collection/isAvailable',
          hasCalendar: 'collection/hasCalendar',
          isBookplate: 'collection/isBookplate',
+         selectedResults: 'selectedResults',
       }),
       ...mapState({
          collection: state => state.collection,

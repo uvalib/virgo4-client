@@ -154,6 +154,9 @@ const collection = {
          let url = `${ctx.rootState.system.collectionsURL}/api/lookup?q=${collection}`
          return axios.get(url).then((response) => {
             ctx.commit("setCollectionDetails", response.data)
+            if (ctx.state.startDate != "" && ctx.state.currentYear == "" ) {
+               ctx.dispatch("setYear", ctx.state.startDate.split("-")[0])
+            }
          }).catch((_error) => {
             console.log(collection+" not available")
          }).finally( ()=> {
@@ -190,7 +193,7 @@ const collection = {
             return
          }
          ctx.commit("setCurrentYear", yyyy)
-         ctx.dispatch("getPublishedDates", yyyy)
+         return ctx.dispatch("getPublishedDates", yyyy)
       }
    }
 }
