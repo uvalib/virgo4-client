@@ -35,12 +35,15 @@ export default {
    methods: {
       onBarcodeDecode(result) {
          this.showVideo = false
+          this.$analytics.trigger('Search', 'BARCODE_SCAN', "success")
          this.$emit('scanned', result)
       },
       videoShow() {
+         this.$analytics.trigger('Search', 'BARCODE_SCAN', "started")
          this.showVideo = true
       },
       cancelScan() {
+         this.$analytics.trigger('Search', 'BARCODE_SCAN', "canceled")
          this.showVideo = false
       }
    }
