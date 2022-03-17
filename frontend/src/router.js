@@ -1,30 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Codes from './views/Codes.vue'
 import Home from './views/Home.vue'
 
-import CourseReserves from './views/CourseReserves.vue'
-import CourseReservesRequest from './views/CourseReservesRequest.vue'
 import Details from './views/Details.vue'
-import ShelfBrowse from './views/ShelfBrowse.vue'
 import SignIn from './views/SignIn.vue'
-import Account from './views/account/Account.vue'
-import Bookmarks from './views/account/Bookmarks.vue'
-import Checkouts from './views/account/Checkouts.vue'
-import DigitalDeliveries from './views/account/DigitalDeliveries.vue'
-import Preferences from './views/account/Preferences.vue'
-import Admin from './views/account/Admin.vue'
-import Requests from './views/account/Requests.vue'
-import SavedSearches from './views/account/SavedSearches.vue'
-import OpenURLRequest from './views/OpenURLRequest.vue'
-
-import SignedOut from './views/SignedOut.vue'
-import Feedback from './views/Feedback.vue'
-import PublicBookmarks from './views/PublicBookmarks.vue'
-
-import NotFound from './views/NotFound.vue'
-import Forbidden from './views/Forbidden.vue'
-import FatalError from './views/FatalError.vue'
 
 import VueCookies from 'vue-cookies'
 
@@ -55,27 +34,27 @@ const router = createRouter({
       {
          path: '/bookmarks/:key',
          name: 'public-bookmarks',
-         component: PublicBookmarks
+         component: () => import('./views/PublicBookmarks.vue')
       },
       {
          path: '/codes',
          name: 'codes',
-         component: Codes
+         component: () => import('./views/Codes.vue')
       },
       {
          path: '/coursereserves/:id?',
          name: 'course-reserves',
-         component: CourseReserves
+         component: () => import('./views/CourseReserves.vue')
       },
       {
          path: '/course-reserves-request',
          name: 'course-reserves-request',
-         component: CourseReservesRequest
+         component: () => import('./views/CourseReservesRequest.vue')
       },
       {
          path: '/feedback',
          name: 'feedback',
-         component: Feedback
+         component: () => import('./views/Feedback.vue')
       },
       {
          path: '/sources/:src/items/:id',
@@ -92,17 +71,17 @@ const router = createRouter({
       {
          path: '/sources/:src/items/:id/browse',
          name: 'shelf-browse',
-         component: ShelfBrowse,
+         component: () => import('./views/ShelfBrowse.vue')
       },
       {
          path: '/preferences',
          name: 'preferences',
-         component: Preferences
+         component: () => import('./views/account/Preferences.vue')
       },
       {
          path: '/admin',
          name: 'admin',
-         component: Admin
+         component: () => import('./views/account/Admin.vue')
       },
       {
          path: '/signin',
@@ -116,57 +95,57 @@ const router = createRouter({
       {
          path: '/account',
          name: 'account',
-         component: Account
+         component: () => import('./views/account/Account.vue')
       },
       {
          path: '/bookmarks',
          name: 'bookmarks',
-         component: Bookmarks
+         component: () => import('./views/account/Bookmarks.vue')
       },
       {
          path: '/checkouts',
          name: 'checkouts',
-         component: Checkouts
+         component: () => import('./views/account/Checkouts.vue')
       },
       {
          path: '/digital-deliveries',
          name: 'digital-deliveries',
-         component: DigitalDeliveries
+         component: () => import('./views/account/DigitalDeliveries.vue')
       },
       {
          path: '/requests',
          name: 'requests',
-         component: Requests
+         component: () => import('./views/account/Requests.vue')
       },
       {
          path: '/searches',
          name: 'searches',
-         component: SavedSearches
+         component: () => import('./views/account/SavedSearches.vue')
       },
       {
          path: '/requests/openurl',
          name: 'openurl',
-         component: OpenURLRequest
+         component: () => import('./views/OpenURLRequest.vue')
       },
       {
          path: '/signedout',
          name: 'signedout',
-         component: SignedOut
+         component: () => import('./views/SignedOut.vue')
       },
       {
          path: "/error",
          name: "fatal_error",
-         component: FatalError
+         component: () => import('./views/FatalError.vue')
       },
       {
          path: "/forbidden",
          name: "forbidden",
-         component: Forbidden
+         component: () => import('./views/Forbidden.vue')
       },
       {
          path: '/:pathMatch(.*)*',
          name: "not_found",
-         component: NotFound
+         component: () => import('./views/NotFound.vue')
       }
    ],
 
