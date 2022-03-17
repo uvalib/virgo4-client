@@ -1,6 +1,7 @@
 import { getField, updateField } from 'vuex-map-fields'
 import axios from 'axios'
 import analytics from '../../analytics'
+import urlModule from 'url'
 
 const requests = {
    namespaced: true,
@@ -295,8 +296,7 @@ const requests = {
             return
          }
 
-         const url = require('url')
-         let aeonLink = url.parse(optionSettings.create_url, true)
+         let aeonLink = urlModule.parse(optionSettings.create_url, true)
          aeonLink.query["CallNumber"] = selected.callNumber
          aeonLink.query["ItemVolume"] = selected.callNumber
          aeonLink.query["ItemNumber"] = selected.barcode
@@ -306,12 +306,12 @@ const requests = {
 
          // search needs to be null to regenerate query below
          aeonLink.search = null
-         let aeonUrl = url.format(aeonLink)
+         let aeonUrl = aeonLink.format(aeonLink)
          if (aeonUrl.length > 650){
             aeonLink.query["Notes"] = selected.notes.substring(0,650) + '...'
             aeonLink.search = null
          }
-         window.open(url.format(aeonLink), "_blank")
+         window.open(aeonLink.format(aeonLink), "_blank")
 
          ctx.commit('disableButton', false)
          ctx.commit('activePanel', "ConfirmationPanel")
