@@ -40,6 +40,7 @@ type ServiceContext struct {
 	Firebase          FirebaseConfig
 	PendingTranslates map[string]string
 	GDB               *gorm.DB
+	PDADB             *gorm.DB
 	SMTP              SMTPConfig
 	Illiad            IlliadConfig
 	FastHTTPClient    *http.Client
@@ -81,6 +82,16 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		log.Fatal(err)
 	}
 	ctx.GDB = gdb
+
+	log.Printf("INFO: connecting GORM to PDA DB...")
+	connStr = fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
+		cfg.PDADB.User, cfg.PDADB.Pass, cfg.PDADB.Name, cfg.PDADB.Host, cfg.PDADB.Port)
+
+	pda, pdaErr := gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	if pdaErr != nil {
+		log.Fatal(err)
+	}
+	ctx.PDADB = pda
 
 	if ctx.Dev.FakeSMTP {
 		log.Printf("Using dev mode for SMTP; all messages will be logged instead of delivered")
@@ -233,6 +244,17 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	} else {
 		hcMap["illiad"] = hcResp{Healthy: true}
 		log.Printf("ILLiad version: %s", respBytes)
+	}
+
+	hcMap["pdadb"] = hcResp{Healthy: true}
+	pdaDB, pdaErr := svc.GDB.DB()
+	if pdaErr != nil {
+		hcMap["pdadb"] = hcResp{Healthy: false, Message: pdaErr.Error()}
+	} else {
+		err := pdaDB.Ping()
+		if err != nil {
+			hcMap["database"] = hcResp{Healthy: false, Message: err.Error()}
+		}
 	}
 
 	c.JSON(http.StatusOK, hcMap)

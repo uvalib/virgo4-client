@@ -342,6 +342,8 @@ github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656 h1:iTL8x10EXEyBt
 github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656/go.mod h1:p+LmQBQahBom6DErthL8iGZU6NgRJ9aN2wM7EE6VBSE=
 github.com/uvalib/virgo4-jwt v0.0.0-20210923181633-fe8108b1457d h1:XM7ZK/ykL5bBx89O9aZhT2fjsev75+BEQXpSPDCcO+0=
 github.com/uvalib/virgo4-jwt v0.0.0-20210923181633-fe8108b1457d/go.mod h1:3pcQ+XdN3q29AExajOiWzASmTGOXsfeEDOKh5VxEKXU=
+github.com/uvalib/virgo4-jwt v0.0.0-20220318142334-66f23f952ff4 h1:vsOkr/6OE+/Bo84UUcI4rJFan1J2DFOhR2kHd39oYg8=
+github.com/uvalib/virgo4-jwt v0.0.0-20220318142334-66f23f952ff4/go.mod h1:3pcQ+XdN3q29AExajOiWzASmTGOXsfeEDOKh5VxEKXU=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

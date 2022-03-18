@@ -62,6 +62,7 @@ type ServiceConfig struct {
 	JWTKey          string
 	Dev             DevConfig
 	DB              DBConfig
+	PDADB           DBConfig
 	SMTP            SMTPConfig
 	Illiad          IlliadConfig
 	Firebase        FirebaseConfig
@@ -99,6 +100,13 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.DB.Name, "dbname", "virgo4", "Database name")
 	flag.StringVar(&cfg.DB.User, "dbuser", "v4user", "Database user")
 	flag.StringVar(&cfg.DB.Pass, "dbpass", "pass", "Database password")
+
+	// PDA DB connection params
+	flag.StringVar(&cfg.PDADB.Host, "pdadbhost", "", "PDA Database host")
+	flag.IntVar(&cfg.PDADB.Port, "pdadbport", 5432, "PDA Database port")
+	flag.StringVar(&cfg.PDADB.Name, "pdadbname", "", "PDA Database name")
+	flag.StringVar(&cfg.PDADB.User, "pdadbuser", "", "PDA Database user")
+	flag.StringVar(&cfg.PDADB.Pass, "pdadbpass", "", "PDA Database password")
 
 	// SMTP settings
 	flag.StringVar(&cfg.SMTP.Host, "smtphost", "", "SMTP Host")

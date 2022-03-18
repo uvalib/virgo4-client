@@ -372,7 +372,10 @@ func parseMembership(membershipStr string) v4jwt.RoleEnum {
 	out := v4jwt.User
 	// for now, only admins are suported. They are identified by lib-virgo4-admin
 	if strings.Contains(membershipStr, "lib-virgo4-admin") {
+		// NOTE: a user can be members of both admin and pda. admin takes precedence
 		out = v4jwt.Admin
+	} else if strings.Contains(membershipStr, "lib-virgo4-pda") {
+		out = v4jwt.PDAAdmin
 	}
 	return out
 }

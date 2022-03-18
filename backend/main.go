@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "1.4.0"
+const version = "1.5.0"
 
 /**
  * MAIN
@@ -123,6 +123,8 @@ func main() {
 		api.POST("/pickuplibraries", svc.AuthMiddleware, svc.AddPickupLibrary)
 		api.POST("/pickuplibraries/:id/update", svc.AuthMiddleware, svc.UpdatePickupLibrary)
 		api.DELETE("/pickuplibraries/:id", svc.AuthMiddleware, svc.DeletePickupLibrary)
+
+		api.GET("/pda", svc.AuthMiddleware, svc.getPdaReport)
 
 		api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
 
