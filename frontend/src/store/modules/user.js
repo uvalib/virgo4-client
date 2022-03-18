@@ -81,6 +81,9 @@ const user = {
       isAdmin: (state) => {
         return (state.role == 'admin')
       },
+      isPDAAdmin: (state) => {
+         return (state.role == 'pdaadmin')
+       },
       isGraduate: (state) => {
          if ( state.role == 'guest' || state.role == '') return false
          if ( Object.keys(state.accountInfo).length == 0) return false

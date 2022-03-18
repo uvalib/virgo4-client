@@ -370,12 +370,15 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 // Membership format: cn=group_name1;cn=group_name2;...
 func parseMembership(membershipStr string) v4jwt.RoleEnum {
 	out := v4jwt.User
+	log.Printf("INFO: memberships [%s]", membershipStr)
 	// for now, only admins are suported. They are identified by lib-virgo4-admin
 	if strings.Contains(membershipStr, "lib-virgo4-admin") {
 		// NOTE: a user can be members of both admin and pda. admin takes precedence
 		out = v4jwt.Admin
+		log.Printf("INFO: this is an admin user")
 	} else if strings.Contains(membershipStr, "lib-virgo4-pda") {
 		out = v4jwt.PDAAdmin
+		log.Printf("INFO: this is a PDA admin user: %s", out.String())
 	}
 	return out
 }

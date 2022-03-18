@@ -117,7 +117,7 @@
                            Preferences
                         </router-link>
                      </li>
-                     <li v-if="isAdmin" class="submenu">
+                     <li v-if="isAdmin || isPDAAdmin" class="submenu">
                         <router-link role="menuitem" tabindex="-1" to="/admin"  id="adminsub">
                            Admin
                         </router-link>
@@ -189,7 +189,8 @@ export default {
         itemsOnNotice: 'user/itemsOnNotice',
         alertCount: 'alerts/alertCount',
         seenAlertsCount: 'alerts/seenAlertsCount',
-        isAdmin: 'user/isAdmin'
+        isAdmin: 'user/isAdmin',
+        isPDAAdmin: 'user/isPDAAdmin'
       }),
    },
    created() {

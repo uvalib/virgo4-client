@@ -1,13 +1,14 @@
 <template>
-   <div class="admin" v-if="isAdmin">
+   <div class="admin">
       <AccountActivities v-if="isSignedIn"/>
       <div class="working" v-if="(lookingUpPools || lookingUpAccount) && isSignedIn" >
          <V4Spinner message="Loading admin settings..."/>
       </div>
       <div v-else>
          <template v-if="isSignedIn">
-            <PickupLibraries class="section"/>
-            <JWTAdmin class="section"/>
+            <PickupLibraries class="section" v-if="isAdmin"/>
+            <JWTAdmin class="section" v-if="isAdmin"/>
+            <PDAReport class="section"  v-if="isPDAAdmin"/>
          </template>
       </div>
    </div>
@@ -18,11 +19,17 @@ import { mapState, mapGetters } from "vuex"
 import JWTAdmin from "@/components/admin/JWTAdmin.vue"
 import PickupLibraries from "@/components/admin/PickupLibraries.vue"
 import AccountActivities from "@/components/AccountActivities.vue"
+import PDAPanel from "../../components/requests/panels/PDAPanel.vue"
+import PDAReport from "../../components/admin/PDAReport.vue"
 export default {
    name: "admin",
    components: {
-      JWTAdmin, AccountActivities, PickupLibraries
-   },
+    JWTAdmin,
+    AccountActivities,
+    PickupLibraries,
+    PDAPanel,
+    PDAReport
+},
    computed: {
       ...mapState({
          lookingUpPools : state => state.pools.lookingUp,
@@ -31,10 +38,11 @@ export default {
       ...mapGetters({
         isSignedIn: 'user/isSignedIn',
         isAdmin: 'user/isAdmin',
+        isPDAAdmin: 'user/isPDAAdmin'
       }),
    },
    created() {
-      if ( this.isAdmin == false) {
+      if ( !this.isAdmin &&  !this.isPDAAdmin ) {
          this.$router.replace("/forbidden")
       } else {
          if ( this.isSignedIn) {

@@ -14,7 +14,7 @@
       <span class="sep">|</span>
       <router-link id="preferences-submenu" to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
-      <template v-if="isAdmin">
+      <template v-if="isAdmin || isPDAAdmin">
          <router-link id="preferences-submenu" to="/admin">Admin</router-link>
          <span class="sep">|</span>
       </template>
@@ -28,6 +28,7 @@ export default {
    computed: {
       ...mapGetters({
         isAdmin: 'user/isAdmin',
+        isPDAAdmin: 'user/isPDAAdmin',
       }),
    },
    methods: {
