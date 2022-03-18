@@ -8,7 +8,7 @@
          <template v-if="isSignedIn">
             <PickupLibraries class="section" v-if="isAdmin"/>
             <JWTAdmin class="section" v-if="isAdmin"/>
-            <PDAReport class="section"  v-if="isPDAAdmin"/>
+            <PDADashboard class="section"  v-if="isAdmin || isPDAAdmin"/>
          </template>
       </div>
    </div>
@@ -20,7 +20,7 @@ import JWTAdmin from "@/components/admin/JWTAdmin.vue"
 import PickupLibraries from "@/components/admin/PickupLibraries.vue"
 import AccountActivities from "@/components/AccountActivities.vue"
 import PDAPanel from "../../components/requests/panels/PDAPanel.vue"
-import PDAReport from "../../components/admin/PDAReport.vue"
+import PDADashboard from "../../components/admin/PDADashboard.vue"
 export default {
    name: "admin",
    components: {
@@ -28,7 +28,7 @@ export default {
     AccountActivities,
     PickupLibraries,
     PDAPanel,
-    PDAReport
+    PDADashboard
 },
    computed: {
       ...mapState({

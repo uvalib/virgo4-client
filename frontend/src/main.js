@@ -1,7 +1,7 @@
-import { createApp } from 'vue'
+import { createApp, markRaw } from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './store'
+import store from './stores'
 import VueClipboard from 'vue3-clipboard'
 import V4Button from "@/components/V4Button.vue"
 import V4Checkbox from "@/components/V4Checkbox.vue"
@@ -12,6 +12,12 @@ import V4Disclosure from "@/components/disclosures/V4Disclosure.vue"
 import Confirm from "@/components/modals/Confirm.vue"
 import SignInRequired from "@/components/SignInRequired.vue"
 
+import { createPinia } from 'pinia'
+
+const pinia = createPinia()
+pinia.use(({ store }) => {
+   store.router = markRaw(router)
+})
 
 // provide store access to the router and router to store
 store.router = router
@@ -20,6 +26,7 @@ router.store = store
 const app = createApp(App)
 app.use(router)
 app.use(store)
+app.use(pinia)
 
 app.component('V4Button', V4Button)
 app.component('V4Checkbox', V4Checkbox)

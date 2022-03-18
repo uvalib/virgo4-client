@@ -17,13 +17,13 @@ func (svc *ServiceContext) getPdaReport(c *gin.Context) {
 		Title             string    `json:"title"`
 		ComputingID       string    `json:"computingID"`
 		HoldLibrary       string    `json:"holdLibrary"`
-		FundCode          string    `json:"fund_code"`
+		FundCode          string    `json:"fundCode"`
 		LoanType          string    `json:"loanType"`
 		VendorOrderNumber string    `json:"orderNumber"`
 		CreatedAt         time.Time `json:"dateOrdered"`
 	}
 	var orders []order
-	err := svc.PDADB.Where("created_at >= NOW() - INTERVAL '7 DAYS'").Find(&orders).Error
+	err := svc.PDADB.Where("created_at >= NOW() - INTERVAL '7 DAYS'").Order("created_at desc").Find(&orders).Error
 	if err != nil {
 		log.Printf("ERROR: unable to get PDA report: %s", err.Error())
 		c.String(http.StatusInternalServerError, err.Error())
