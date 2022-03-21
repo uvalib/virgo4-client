@@ -8,8 +8,8 @@
       </transition>
       <div role="banner" class="site-header" id="v4-header">
          <SkipToNavigation />
-         <div class="header-alert" v-if="headerAlerts.length > 0">
-            <div v-for="ha in headerAlerts" :key="ha.uuid" class="alert-body">
+         <div class="header-alert" v-if="alertStore.headerAlerts.length > 0">
+            <div v-for="ha in alertStore.headerAlerts" :key="ha.uuid" class="alert-body">
                <span class="lead">{{ha.title}}:&nbsp;</span>
                <span class="alert-text" v-html="ha.body"></span>
             </div>
@@ -18,7 +18,7 @@
          <MenuBar id="v4-navbar"/>
       </div>
       <div class="alerts-list" v-if="!isKiosk" id="alerts">
-         <div v-for="a in menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
+         <div v-for="a in alertStore.menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
             <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
             <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
             <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
@@ -37,8 +37,8 @@
          <VueAnnouncer />
          <h1>{{pageTitle}}</h1>
          <template v-if="configuring==false">
-            <div v-if="pageAlerts($route.path).length > 0" class="regional-alerts">
-               <div v-for="ra in pageAlerts($route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
+            <div v-if="alertStore.pageAlerts($route.path).length > 0" class="regional-alerts">
+               <div v-for="ra in alertStore.pageAlerts($route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
                   <span class="alert-text" v-html="ra.body"></span>
                </div>
             </div>
@@ -67,13 +67,25 @@ import SkipToNavigation from "@/components/layout/SkipToNavigation.vue"
 import SessionExpired from "@/components/layout/SessionExpired.vue"
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import { useAlertStore } from "@/stores/alert"
+import { ref, nextTick } from 'vue'
 export default {
-   data: function() {
-      return {
-         headerHeight: 0,
-         menuHeight: 0,
-         configuring: true
-      };
+   setup() {
+      const alertStore = useAlertStore()
+      const headerHeight = ref(0)
+      const menuHeight = ref(0)
+      const configuring = ref(true)
+
+      alertStore.$subscribe( () => {
+         // when header alerts change, need to recalc height of header so menu bar sticks properly
+         nextTick( ()=>{
+            headerHeight.value = document.getElementById("v4-header").offsetHeight
+            headerHeight.value -= menuHeight.value
+         })
+      })
+
+
+      return {alertStore, headerHeight, menuHeight, configuring}
    },
    components: {
       VirgoHeader, LibraryFooter, MenuBar, ScrollToTop, MessageBox, SessionExpired, SkipToNavigation
@@ -91,24 +103,11 @@ export default {
          hasTranslateMessage: "system/hasTranslateMessage",
          isKiosk: "system/isKiosk",
          hasMessage: "system/hasMessage",
-         headerAlerts: "alerts/headerAlerts",
-         alertCount: 'alerts/alertCount',
-         menuAlerts: 'alerts/menuAlerts',
-         pageAlerts: 'alerts/pageAlerts',
          isSignedIn: 'user/isSignedIn'
       }),
       showDimmer() {
          return this.hasMessage|| this.sessionExpired
       }
-   },
-   watch: {
-      headerAlerts() {
-         // when header alerts change, need to recalc height of header so menu bar sticks properly
-         this.$nextTick( ()=>{
-            this.headerHeight = document.getElementById("v4-header").offsetHeight
-            this.headerHeight -= this.menuHeight
-         })
-      },
    },
    methods: {
       dismissAlert( uuid ) {
@@ -126,14 +125,14 @@ export default {
          let alerts = document.getElementById("alerts")
          if ( window.scrollY <= this.headerHeight ) {
             document.getElementById("v4-navbar").classList.remove("sticky")
-            if ( !alerts || this.isKiosk || this.headerAlerts.length == 0) {
+            if ( !alerts || this.isKiosk || this.alertStore.headerAlerts.length == 0) {
                document.getElementById("v4-main").style.paddingTop = '0px'
             } else {
                alerts.style.paddingTop = '0px'
             }
          } else {
             document.getElementById("v4-navbar").classList.add("sticky")
-            if ( !alerts || this.isKiosk || this.headerAlerts.length == 0 ) {
+            if ( !alerts || this.isKiosk || this.alertStore.headerAlerts.length == 0 ) {
                document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
             } else {
               alerts.style.paddingTop = `${this.menuHeight}px`

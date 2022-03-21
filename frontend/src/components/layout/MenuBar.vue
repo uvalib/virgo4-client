@@ -1,5 +1,7 @@
 <template>
-   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu" :class="{shadow: seenAlertsCount>0 && alertCount==0 || alertCount == 0}">
+   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu"
+      :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
+   >
       <ul class="menu-right"
          @keydown.right.prevent.stop="nextMenu" @keyup.left.prevent.stop="prevMenu"
          @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
@@ -143,12 +145,12 @@
                </router-link>
             </li>
             <li v-if="!isKiosk" class="menu-item alert-wrap"
-               :class="{dim: alertCount==0 && seenAlertsCount==0 || alertCount>0}" tabindex="-1" role="menuitem" id="alertmenu"
+               :class="{dim: alertStore.menuCount==0 && alertStore.seenCount==0 || alertStore.menuCount>0}" tabindex="-1" role="menuitem" id="alertmenu"
                @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
                @keydown.space.prevent.stop="alertClicked"
             >
                <div class="alert-bell icon fal fa-bell">
-                  <span v-if="seenAlertsCount" class="alert-count">{{seenAlertsCount}}</span>
+                  <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
                </div>
             </li>
          </template>
@@ -159,8 +161,13 @@
 <script>
 import { mapState } from "vuex"
 import { mapGetters } from "vuex"
+import { useAlertStore } from "@/stores/alert"
 
 export default {
+   setup() {
+       const alertStore = useAlertStore()
+       return { alertStore }
+   },
    data: function() {
       return {
          noFocus: false,
@@ -187,8 +194,6 @@ export default {
         isKiosk: 'system/isKiosk',
         isSignedIn: 'user/isSignedIn',
         itemsOnNotice: 'user/itemsOnNotice',
-        alertCount: 'alerts/alertCount',
-        seenAlertsCount: 'alerts/seenAlertsCount',
         isAdmin: 'user/isAdmin',
         isPDAAdmin: 'user/isPDAAdmin'
       }),
@@ -225,7 +230,7 @@ export default {
 
       },
       alertClicked() {
-         this.$store.commit("alerts/unseeAllAlerts")
+         this.$store.commit("alerts/clearSeenAlerts")
       },
       nextMenu() {
          this.closeSubMenus()

@@ -3,7 +3,6 @@ import axios from 'axios'
 import analytics from '../analytics'
 import versionChecker from './plugins/version'
 import errorReporter from './plugins/error_reporter'
-import alerts from './modules/alerts'
 import bookmarks from './modules/bookmarks'
 import collection from './modules/collection'
 import system from './modules/system'
@@ -560,7 +559,6 @@ export default createStore({
    },
 
    modules: {
-      alerts: alerts,
       bookmarks: bookmarks,
       collection: collection,
       filters: filters,

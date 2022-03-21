@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useAlertStore } from "@/stores/alert"
 
 const system = {
    namespaced: true,
@@ -196,7 +197,8 @@ const system = {
          return axios.get("/config", {headers: {V4Host:host}}).then((response) => {
             ctx.commit('setConfig', response.data)
             if (response.data.firebase) {
-               ctx.dispatch('alerts/setConfig', response.data, {root: true})
+               const alertStore = useAlertStore()
+               alertStore.setConfig(response.data)
             }
 
             // append credentials to header if needed
