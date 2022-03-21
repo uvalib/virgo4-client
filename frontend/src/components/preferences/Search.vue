@@ -1,3 +1,4 @@
+
 <template>
    <div class="pool-options">
       <h2>Search Preferences</h2>
@@ -8,27 +9,20 @@
          </p>
          <div class="check">
             <label>
-               <input id="collapse-pref" @change="collapseGroupsClicked" class="choice" :checked="collapseGroups" type="checkbox"
+               <input id="collapse-pref" @change="collapseGroupsClicked" class="choice" :checked="preferencesStore.collapseGroups" type="checkbox"
                   aria-label="toggle barcode group collapse functionality"/>Collapse Grouped Results
             </label>
          </div>
       </div>
    </div>
 </template>
-<script>
-import { mapState } from "vuex"
-export default {
-   computed: {
-      ...mapState({
-         collapseGroups: state => state.preferences.collapseGroups,
-      }),
-   },
-   methods: {
-      collapseGroupsClicked() {
-         this.$store.dispatch("preferences/toggleCollapseGroups")
-      },
-   }
-};
+
+<script setup>
+import { usePreferencesStore } from "@/stores/preferences"
+const preferencesStore = usePreferencesStore()
+function collapseGroupsClicked() {
+   preferencesStore.toggleCollapseGroups()
+}
 </script>
 
 <style lang="scss" scoped>

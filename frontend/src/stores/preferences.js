@@ -40,7 +40,7 @@ export const usePreferencesStore = defineStore('preferences', {
             }
          }
          if (prefsObj.pickupLibrary ) {
-            if (!this.getters["user/libraries"].some((lib) => lib.id == prefsObj.pickupLibrary.id) ){
+            if (!this.userStore.libraries.some((lib) => lib.id == prefsObj.pickupLibrary.id) ){
                // Clear the pickup Library if not in the currently available list
                this.pickupLibrary = {id: "", name: ""}
             } else {

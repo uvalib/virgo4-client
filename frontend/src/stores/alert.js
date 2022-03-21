@@ -88,7 +88,7 @@ export const useAlertStore = defineStore('alert', {
                   localStorage.setItem(AlertsStorage, str)
                }
             } catch (e) {
-               this.seenAlerts.splice(0, state.seenAlerts.length)
+               this.seenAlerts.splice(0, this.seenAlerts.length)
             }
          }
       },

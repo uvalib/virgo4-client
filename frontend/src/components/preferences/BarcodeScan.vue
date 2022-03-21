@@ -12,7 +12,7 @@
          </p>
          <div class="check">
             <label>
-               <input @change="scanClicked" class="scan" :checked="enableBarcodeScan" type="checkbox"
+               <input @change="scanClicked" class="scan" :checked="preferencesStore.enableBarcodeScan" type="checkbox"
                   aria-label="toggle barcode scanning functionality"/>Barcode Scanning enabled
             </label>
             <p>Once enabled, the Barcode Scanning option will appear under the main Search bar.</p>
@@ -21,20 +21,12 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-export default {
-   computed: {
-      ...mapState({
-         enableBarcodeScan: state => state.preferences.enableBarcodeScan,
-      })
-   },
-   methods: {
-      scanClicked() {
-         this.$store.dispatch("preferences/toggleBarcodeScan")
-      }
-   }
-};
+<script setup>
+import { usePreferencesStore } from "@/stores/preferences"
+const preferencesStore = usePreferencesStore()
+function scanClicked() {
+   preferencesStore.toggleBarcodeScan()
+}
 </script>
 
 <style lang="scss" scoped>

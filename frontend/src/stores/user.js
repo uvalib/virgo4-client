@@ -20,7 +20,7 @@ export const useUserStore = defineStore('user', {
 	state: () => ({
       systemStore: useSystemStore(),
       alertStore: useAlertStore(),
-      preferences: usePreferencesStore(),
+      preferencesStore: usePreferencesStore(),
       authToken: "",
       authorizing: false,
       signedInUser: "",
@@ -412,7 +412,7 @@ export const useUserStore = defineStore('user', {
          return axios.get(`/api/users/${this.signedInUser}`).then((response) => {
             this.setAccountInfo(response.data)
             let prefs = JSON.parse(response.data.preferences)
-            this.usePreferencesStore.setPreferences(prefs)
+            this.preferencesStore.setPreferences(prefs)
             // FIXME
             // ctx.commit('bookmarks/setBookmarks', response.data.bookmarks)
             // if ( prefs.searchTemplate ) {

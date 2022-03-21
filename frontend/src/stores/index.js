@@ -4,7 +4,6 @@ import analytics from '../analytics'
 import errorReporter from './plugins/error_reporter'
 import bookmarks from './modules/bookmarks'
 import collection from './modules/collection'
-import pools from './modules/pools'
 import query from './modules/query'
 import filters from './modules/filters'
 import item from './modules/item'
@@ -555,7 +554,6 @@ export default createStore({
       collection: collection,
       filters: filters,
       item: item,
-      pools: pools,
       query: query,
       reserves: reserves,
       feedback: feedback,

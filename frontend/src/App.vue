@@ -68,6 +68,7 @@ import SessionExpired from "@/components/layout/SessionExpired.vue"
 import { useAlertStore } from "@/stores/alert"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
+import { usePoolStore } from "@/stores/pool"
 import { ref, nextTick, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
@@ -75,6 +76,7 @@ import analytics from '@/analytics'
 const alertStore = useAlertStore()
 const userStore = useUserStore()
 const systemStore = useSystemStore()
+const poolStore = usePoolStore()
 
 const headerHeight = ref(0)
 const menuHeight = ref(0)
@@ -96,29 +98,29 @@ alertStore.$subscribe( () => {
 function dismissAlert( uuid ) {
    let a = document.getElementById(uuid)
    a.classList.add("dismissed")
-   this.$nextTick( () => {
-      this.$store.commit("alerts/dismissAlert", uuid)
+   nextTick( () => {
+      alertStore.dismissAlert(uuid)
       document.getElementById("alertmenu").focus()
    });
 }
 function updateClicked() {
-      window.location.reload()
+   window.location.reload()
 }
 function scrollHandler( ) {
    let alerts = document.getElementById("alerts")
-   if ( window.scrollY <= this.headerHeight ) {
+   if ( window.scrollY <= headerHeight.value ) {
       document.getElementById("v4-navbar").classList.remove("sticky")
-      if ( !alerts || systemStore.isKiosk || this.alertStore.headerAlerts.length == 0) {
+      if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0) {
          document.getElementById("v4-main").style.paddingTop = '0px'
       } else {
          alerts.style.paddingTop = '0px'
       }
    } else {
       document.getElementById("v4-navbar").classList.add("sticky")
-      if ( !alerts || systemStore.isKiosk || this.alertStore.headerAlerts.length == 0 ) {
-         document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
+      if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0 ) {
+         document.getElementById("v4-main").style.paddingTop = `${menuHeight.value}px`
       } else {
-         alerts.style.paddingTop = `${this.menuHeight}px`
+         alerts.style.paddingTop = `${menuHeight.value}px`
       }
    }
 }
@@ -134,8 +136,8 @@ async function initVirgo() {
    // First time app is being created, request all common config
    // the flag shows a config spinner until ready
    await systemStore.getConfig()
+   await poolStore.getPools()
    // FIXME
-   // await this.$store.dispatch('pools/getPools')
    // await this.$store.dispatch("collection/getCollections")
    configuring.value = false
 
