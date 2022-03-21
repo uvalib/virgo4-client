@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useSystemStore } from "@/stores/system"
 import firebase from 'firebase/app'
 import 'firebase/database'
 
@@ -6,6 +7,7 @@ const  AlertsStorage = "v4SeenAlerts"
 
 export const useAlertStore = defineStore('alert', {
 	state: () => ({
+      systemStore: useSystemStore(),
       alertsDB: null,
       regionalAlertsDB:  null,
       alerts: [],
@@ -133,9 +135,7 @@ export const useAlertStore = defineStore('alert', {
                })
             })
          } catch(e){
-            console.error(e)
-            // TODO
-            //this.dispatch('system/reportError', e, {root: true})
+            this.systemStore.reportError(e)
          }
       },
    }

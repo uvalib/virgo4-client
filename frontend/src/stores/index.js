@@ -1,13 +1,10 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
 import analytics from '../analytics'
-import versionChecker from './plugins/version'
 import errorReporter from './plugins/error_reporter'
 import bookmarks from './modules/bookmarks'
 import collection from './modules/collection'
-import system from './modules/system'
 import pools from './modules/pools'
-import user from './modules/user'
 import query from './modules/query'
 import filters from './modules/filters'
 import item from './modules/item'
@@ -24,7 +21,6 @@ import { getField, updateField } from 'vuex-map-fields'
 
 export default createStore({
    state: {
-      pageTitle: "Search",
       noSpinner: false,
       searching: false,
       pageSize: 20,
@@ -92,9 +88,6 @@ export default createStore({
 
    mutations: {
       updateField,
-      setPageTitle(state, title) {
-         state.pageTitle = title
-      },
       hitSelected(state, identifier) {
          state.selectedHitIdx = -1
          state.selectedHitGroupIdx = -1
@@ -567,8 +560,6 @@ export default createStore({
       preferences: preferences,
       query: query,
       reserves: reserves,
-      system: system,
-      user: user,
       feedback: feedback,
       restore: restore,
       requests: requests,
@@ -578,7 +569,6 @@ export default createStore({
    },
 
    plugins: [
-      versionChecker,
       errorReporter
    ]
 })

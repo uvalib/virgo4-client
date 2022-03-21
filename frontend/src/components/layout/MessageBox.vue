@@ -2,13 +2,13 @@
    <transition name="message-transition"
       enter-active-class="animated faster fadeIn"
       leave-active-class="animated faster fadeOut">
-      <div v-if="hasMessage" class="messsage-box">
+      <div v-if="systemStore.hasMessage" class="messsage-box">
          <div class="message" :role="msgRole" aria-modal="true"
             aria-labelledby="msgtitle" aria-describedby="msgbody"
             @keyup.esc="dismiss"
          >
             <div class="bar">
-               <span id="msgtitle" class="title">{{message.title}}</span>
+               <span id="msgtitle" class="title">{{systemStore.message.title}}</span>
                <V4Button aria-label="close message" mode="icon" class="remove" @click="dismiss"
                   :focusBackOverride="true" @tabback="setFocus('okbtn')"
                   id="v4-msg-close-icon"
@@ -16,9 +16,9 @@
                   <i class="close-icon fal fa-window-close"></i>
                </V4Button>
             </div>
-            <div class="message-body" id="msgbody" v-html="message.content"></div>
-            <div class="details" v-if="message.detail">
-               <ErrorDetails :details="message.detail"/>
+            <div class="message-body" id="msgbody" v-html="systemStore.message.content"></div>
+            <div class="details" v-if="systemStore.message.detail">
+               <ErrorDetails :details="systemStore.message.detail"/>
             </div>
             <div class="controls">
                <V4Button id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
@@ -34,44 +34,36 @@
    </transition>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
+<script setup>
+import { useSystemStore } from "@/stores/system"
 import ErrorDetails from "@/components/disclosures/ErrorDetails.vue"
-export default {
-   components: {
-      ErrorDetails
-   },
-   computed: {
-      ...mapState({
-         message: state => state.system.message,
-      }),
-      ...mapGetters({
-         hasMessage: "system/hasMessage",
-      }),
-      msgRole() {
-         if ( this.message.type == "error") {
-            return "alertdialog"
-         }
-         return "dialog"
-      },
-   },
-   methods: {
-      setFocus(id) {
-         this.$nextTick(()=>{
-            let ele = document.getElementById(id)
-            if (ele ) {
-               ele.focus()
-            }
-         })
-      },
-      dismiss() {
-         this.$store.commit("system/clearMessage")
-      },
-   },
-   created() {
-      this.setFocus("okbtn")
-   },
-};
+import { computed, onMounted, nextTick } from 'vue'
+
+const systemStore = useSystemStore()
+
+const msgRole = computed( ()=> {
+   if ( systemStore.message.type == "error") {
+      return "alertdialog"
+   }
+   return "dialog"
+})
+
+function setFocus(id) {
+   nextTick(()=>{
+      let ele = document.getElementById(id)
+      if (ele ) {
+         ele.focus()
+      }
+   })
+}
+
+function dismiss() {
+   systemStore.clearMessage()
+}
+
+onMounted(() => {
+   setFocus("okbtn")
+})
 </script>
 
 <style lang="scss" scoped>

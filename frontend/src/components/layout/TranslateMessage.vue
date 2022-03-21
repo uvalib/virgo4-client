@@ -1,25 +1,17 @@
 <template>
    <div class="translate-msg">
-      <h2>{{message}}</h2>
+      <h2>{{systemStore.message}}</h2>
       <div class="controls">
          <V4Button mode="primary" @click="ackMessage">OK</V4Button>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-export default {
-   computed: {
-      ...mapState({
-         message: state => state.system.translateMessage,
-      }),
-   },
-   methods: {
-      ackMessage() {
-         this.$store.commit("system/closeTraslateMessage")
-      }
-   }
+<script setup>
+import { useSystemStore } from "@/stores/system"
+const systemStore = useSystemStore()
+function ackMessage() {
+   systemStore.closeTraslateMessage()
 }
 </script>
 

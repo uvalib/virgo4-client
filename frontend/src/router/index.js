@@ -5,6 +5,7 @@ import Home from '../views/Home.vue'
 import Details from '../views/Details.vue'
 import SignIn from '../views/SignIn.vue'
 
+import { useSystemStore } from "@/stores/system"
 import VueCookies from 'vue-cookies'
 
 const router = createRouter({
@@ -198,7 +199,9 @@ router.afterEach((to, _from) => {
 
 // This is called before every URL in the SPA is hit
 router.beforeEach( async (to, _from) => {
-   router.store.commit("system/setILSError", "")
+   const systemStore  = useSystemStore()
+   systemStore.setILSError = ""
+
 
    // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {
@@ -231,7 +234,7 @@ router.beforeEach( async (to, _from) => {
    }
    let title =  h1[to.name]
    if (title) {
-      router.store.commit("setPageTitle", title)
+      systemStore.pageTitle = title
    }
 
    // These pages require signed in user and will automatically netbadge in if not signed in

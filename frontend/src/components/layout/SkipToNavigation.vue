@@ -42,111 +42,106 @@
    </span>
 </template>
 
-<script>
-export default {
-   data: function() {
-      return {
-         menuOpen: false,
-         menuIdx: 0,
-         menuItem: ["skipnav", "skipmain", "skipsearch"],
-      }
-   },
-   computed: {
-      isSearchPage() {
-         return this.$route.path == "/" || this.$route.path == "/search"
-      },
-      rotation() {
-         if ( this.menuOpen ) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
-      },
-   },
-   methods: {
-      skipToMain() {
-         this.toggleNavMenu()
-         let m = document.getElementById("v4-main")
-         m.focus( {preventScroll:true} )
-      },
-      skipToNav() {
-         let m = document.getElementById("searchmenu")
-         m.focus( {preventScroll:true} )
-         this.toggleNavMenu()
-      },
-      skipToSearch() {
-         let s = document.getElementById("search")
-         if ( s) {
-            s.focus( {preventScroll:true} )
-         } else {
-            s = document.getElementsByClassName("field")[0]
-            if ( s ) {
-               s.focus( {preventScroll:true} )
-            }
-         }
-         this.toggleNavMenu()
-      },
-      focusCurrentSubmenu() {
-         this.$nextTick( () => {
-            let menu = document.getElementById(this.menuItem[this.menuIdx])
-            menu.focus()
-         })
-      },
-      nextMenu() {
-         if ( this.menuOpen) {
-            this.menuIdx++
-            if (this.menuIdx == this.menuItem.length) {
-               this.menuIdx = 0
-            }
-         } else {
-            this.toggleNavMenu()
-         }
-         this.focusCurrentSubmenu()
-      },
-      prevMenu() {
-         if ( this.menuOpen) {
-            this.menuIdx--
-            if (this.menuIdx < 0) {
-               this.menuIdx = this.menuItem.length-1
-            }
-         } else {
-            this.toggleNavMenu()
-            this.menuIdx = this.menuItem.length-1
-         }
-         this.focusCurrentSubmenu()
-      },
-      globalClick() {
-         this.menuOpen = false
-         document.getElementById("skip-to").blur()
-      },
-      toggleNavMenu() {
-         this.menuOpen = !this.menuOpen
-         this.menuIdx = 0
-         if (this.menuOpen) {
-            this.focusCurrentSubmenu()
-         }
-      },
-      beforeEnter: function(el) {
-         el.style.height = '0'
-      },
-      enter: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      beforeLeave: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      leave: function(el) {
-         el.style.height = '0'
-      }
-   },
-   created() {
-      window.addEventListener("click", this.globalClick)
-   },
-   unmounted() {
-      window.removeEventListener("click", this.globalClick)
-   },
+<script setup>
+import {ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const menuOpen = ref(false)
+const menuIdx = ref(0)
+const menuItem = ref(["skipnav", "skipmain", "skipsearch"])
+
+const isSearchPage = computed( () => {
+   return route.path == "/" || route.path == "/search"
+})
+const rotation = computed( () => {
+   if ( menuOpen.value ) {
+      return "rotate(180deg)"
+   }
+   return "rotate(0deg)"
+})
+
+function skipToMain() {
+   toggleNavMenu()
+   let m = document.getElementById("v4-main")
+   m.focus( {preventScroll:true} )
 }
+function skipToNav() {
+   let m = document.getElementById("searchmenu")
+   m.focus( {preventScroll:true} )
+   toggleNavMenu()
+}
+function skipToSearch() {
+   let s = document.getElementById("search")
+   if ( s) {
+      s.focus( {preventScroll:true} )
+   } else {
+      s = document.getElementsByClassName("field")[0]
+      if ( s ) {
+         s.focus( {preventScroll:true} )
+      }
+   }
+   toggleNavMenu()
+}
+function focusCurrentSubmenu() {
+   nextTick( () => {
+      let menu = document.getElementById(menuItem.value[menuIdx.value])
+      menu.focus()
+   })
+}
+function nextMenu() {
+   if ( menuOpen.value ) {
+      menuIdx.value++
+      if (menuIdx.value == menuItem.value.length) {
+         menuIdx.value = 0
+      }
+   } else {
+      toggleNavMenu()
+   }
+   focusCurrentSubmenu()
+}
+function prevMenu() {
+   if ( menuOpen.value ) {
+      menuIdx.value--
+      if (menuIdx.value < 0) {
+         menuIdx.value = menuItem.value.length-1
+      }
+   } else {
+      toggleNavMenu()
+      menuIdx.value = menuItem.value.length-1
+   }
+   focusCurrentSubmenu()
+}
+function globalClick() {
+   menuOpen.value = false
+   document.getElementById("skip-to").blur()
+}
+function toggleNavMenu() {
+   menuOpen.value = !menuOpen.value
+   menuIdx.value = 0
+   if (menuOpen.value) {
+      focusCurrentSubmenu()
+   }
+}
+function beforeEnter(el) {
+   el.style.height = '0'
+}
+function enter(el) {
+   el.style.height = el.scrollHeight + 'px'
+}
+function beforeLeave(el) {
+   el.style.height = el.scrollHeight + 'px'
+}
+function leave(el) {
+   el.style.height = '0'
+}
+
+onMounted(() => {
+   window.addEventListener("click", globalClick)
+}),
+onUnmounted(() => {
+   window.removeEventListener("click", globalClick)
+})
 </script>
 
 <style scoped lang="scss">
