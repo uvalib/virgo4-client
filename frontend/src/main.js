@@ -16,6 +16,7 @@ import { createPinia } from 'pinia'
 
 const pinia = createPinia()
 pinia.use(({ store }) => {
+   // all stores can access router with this.router
    store.router = markRaw(router)
 })
 

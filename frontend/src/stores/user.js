@@ -4,6 +4,7 @@ import analytics from '../analytics'
 import VueCookies from 'vue-cookies'
 import { useSystemStore } from "@/stores/system"
 import { useAlertStore } from "@/stores/alert"
+import { usePreferencesStore } from "@/stores/preferences"
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -19,6 +20,7 @@ export const useUserStore = defineStore('user', {
 	state: () => ({
       systemStore: useSystemStore(),
       alertStore: useAlertStore(),
+      preferences: usePreferencesStore(),
       authToken: "",
       authorizing: false,
       signedInUser: "",
@@ -409,9 +411,9 @@ export const useUserStore = defineStore('user', {
          this.lookingUp = true
          return axios.get(`/api/users/${this.signedInUser}`).then((response) => {
             this.setAccountInfo(response.data)
+            let prefs = JSON.parse(response.data.preferences)
+            this.usePreferencesStore.setPreferences(prefs)
             // FIXME
-            // let prefs = JSON.parse(response.data.preferences)
-            // ctx.commit('preferences/setPreferences', prefs)
             // ctx.commit('bookmarks/setBookmarks', response.data.bookmarks)
             // if ( prefs.searchTemplate ) {
             //    ctx.commit('query/setTemplate',  prefs.searchTemplate)
@@ -524,9 +526,9 @@ export const useUserStore = defineStore('user', {
          try {
             await axios.post("/signout", null)
             this.clear()
+            this.usePreferencesStore.clear()
             // FIXME
             // ctx.commit('bookmarks/clear', null)
-            // ctx.commit('preferences/clear', null)
             // ctx.commit('searches/clear', null)
             this.alertStore.clearSeenAlerts()
             if ( resetSearch === true) {

@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 import { useAlertStore } from "@/stores/alert"
 import { useUserStore } from "@/stores/user"
+import { usePreferencesStore } from "@/stores/preferences"
 import axios from 'axios'
 
 export const useSystemStore = defineStore('system', {
 	state: () => ({
       userStore: useUserStore(),
+      preferencesStore: usePreferencesStore(),
       pageTitle: "Search",
       newVersion: false,
       kiosk: false,
@@ -255,8 +257,7 @@ export const useSystemStore = defineStore('system', {
             if ( idx > -1) {
                this.allPickupLibraries.splice(idx,1)
             }
-            // FIXME
-            //ctx.dispatch('preferences/pickupLibraryDeleted', library.id, {root: true})
+            this.preferencesStore.pickupLibraryDeleted(library.id)
          }).catch((error) => {
             this.setError("Unable to delete pickup library: " + error.response)
          })

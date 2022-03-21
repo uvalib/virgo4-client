@@ -9,7 +9,6 @@ import query from './modules/query'
 import filters from './modules/filters'
 import item from './modules/item'
 import reserves from './modules/reserves'
-import preferences from './modules/preferences'
 import feedback from './modules/feedback'
 import restore from './modules/restore'
 import requests from './modules/requests'
@@ -557,7 +556,6 @@ export default createStore({
       filters: filters,
       item: item,
       pools: pools,
-      preferences: preferences,
       query: query,
       reserves: reserves,
       feedback: feedback,
