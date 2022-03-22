@@ -22,7 +22,6 @@ pinia.use(({ store }) => {
 
 // provide store access to the router and router to store
 store.router = router
-router.store = store
 
 const app = createApp(App)
 app.use(router)

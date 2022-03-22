@@ -164,12 +164,10 @@ import { useUserStore } from "@/stores/user"
 import { useAlertStore } from "@/stores/alert"
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import analytics from '@/analytics'
-import { useRouter } from 'vue-router'
 
 const alertStore = useAlertStore()
 const systemStore = useSystemStore()
 const userStore = useUserStore()
-const router = useRouter()
 
 const noFocus = ref(false)
 const menuBarIdx = ref(0)
@@ -300,9 +298,8 @@ function searchClicked() {
    })
 }
 
-async function signOut() {
-   await userStore.signout(true)
-   router.push("/signedout")
+function signOut() {
+   userStore.signout(true)
 }
 function beforeEnter(el) {
    el.style.height = '0'

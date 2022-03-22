@@ -334,7 +334,7 @@ export const useUserStore = defineStore('user', {
          delete  this.accountInfo.noAccount
       },
       clear() {
-         this.$reset
+         this.$reset()
       },
       flagAccountRequested() {
          this.accountRequested = true
@@ -523,20 +523,18 @@ export const useUserStore = defineStore('user', {
       async signout(resetSearch) {
          if ( this.signedInUser == "") return
 
-         try {
-            await axios.post("/signout", null)
-            this.clear()
-            this.usePreferencesStore.clear()
-            // FIXME
-            // ctx.commit('bookmarks/clear', null)
-            // ctx.commit('searches/clear', null)
-            this.alertStore.clearSeenAlerts()
-            if ( resetSearch === true) {
-            //    ctx.dispatch('resetSearch', null)
-            }
-         } catch (e) {
-            console.error("Signout failed: "+e)
+         await axios.post("/signout", null)
+         this.clear()
+         this.preferencesStore.clear()
+         // FIXME
+         // ctx.commit('bookmarks/clear', null)
+         // ctx.commit('searches/clear', null)
+         this.alertStore.clearSeenAlerts()
+         if ( resetSearch === true) {
+         //    ctx.dispatch('resetSearch', null)
          }
+         localStorage.removeItem("v4_jwt")
+         this.router.push("/signedout")
       },
 
       signin(data) {
@@ -565,7 +563,7 @@ export const useUserStore = defineStore('user', {
             // ctx.dispatch('requests/reload', null, {root: true})
          }).catch((error) => {
             if (error.response && error.response.status == 503) {
-               this.this.useSystemStore.ilsError =  error.response.data
+               this.systemStore.ilsError =  error.response.data
             } else {
                this.setAuthFailure(error)
             }

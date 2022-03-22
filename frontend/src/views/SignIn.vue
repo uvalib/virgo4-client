@@ -32,19 +32,19 @@
                      <transition name="message-transition"
                         enter-active-class="animated faster fadeIn"
                         leave-active-class="animated faster fadeOut">
-                        <div v-if="authMessage" class="authMessage">
-                           <div v-if="lockedOut" class="locked-out">
-                              {{ authMessage }}
+                        <div v-if="userStore.authMessage" class="authMessage">
+                           <div v-if="userStore.lockedOut" class="locked-out">
+                              {{ userStore.authMessage }}
                            </div>
                            <div v-else class="tries">
-                              <div class="auth-msg">{{ authMessage }}</div>
-                              You have <b>{{authTriesLeft}}</b> more tries before your account is locked.
+                              <div class="auth-msg">{{ userStore.authMessage }}</div>
+                              You have <b>{{userStore.authTriesLeft}}</b> more tries before your account is locked.
                            </div>
                         </div>
                      </transition>
                   </td>
                </tr>
-               <tr v-if="!ilsError">
+               <tr v-if="!systemStore.ilsError">
                   <td colspan="2">
                      <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
                   </td>
@@ -56,7 +56,7 @@
                   </td>
                </tr>
             </table>
-            <div class="ils-error" v-if="ilsError">{{ilsError}}</div>
+            <div class="ils-error" v-if="systemStore.ilsError">{{systemStore.ilsError}}</div>
          </div>
       </div>
       <div class="community">
@@ -66,47 +66,35 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
+<script setup>
 import ForgotPassword from "@/components/modals/ForgotPassword.vue"
 import ChangePassword from "@/components/modals/ChangePassword.vue"
-export default {
-   name: "signin",
-   components: {
-      ForgotPassword, ChangePassword
-   },
-   computed: {
-      ...mapState({
-         authTriesLeft: state => state.user.authTriesLeft,
-         authMessage: state => state.user.authMessage,
-         lockedOut: state => state.user.lockedOut,
-         ilsError: state => state.system.ilsError,
-      }),
-      hasPasswordToken: function(){
-         return this.$route.query.token && this.$route.query.token.length > 0
-      }
-   },
-   data: function()  {
-      return {
-         user: '',
-         pin: ''
-      }
-   },
-   watch: {
-      authTriesLeft (newVal, oldVal) {
-         if (newVal < oldVal ) {
-            this.pin = ""
-         }
-      }
-   },
-   methods: {
-      signinClicked() {
-         this.$store.dispatch("user/signin", {barcode: this.user.trim(), password: this.pin})
-      },
-      netbadgeLogin() {
-         this.$store.dispatch("user/netbadge")
-      },
-   },
+import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const systemStore = useSystemStore()
+const userStore = useUserStore()
+const user = ref('')
+const pin = ref('')
+
+const hasPasswordToken = computed( ()=> {
+   return route.query.token &&route.query.token.length > 0
+})
+
+userStore.$subscribe((mutation) => {
+   if (mutation.events.key == "authTriesLeft")  {
+      console.log("AUTH TRY "+mutation.events.oldValue+" -> "+mutation.events.newValue)
+   }
+})
+
+function signinClicked() {
+  userStore.signin({barcode: user.value.trim(), password: pin.value})
+}
+function netbadgeLogin() {
+   userStore.netbadge()
 }
 </script>
 

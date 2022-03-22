@@ -50,7 +50,7 @@ function setFocus(id) {
    })
 }
 function dismiss() {
-   systemStore.clearSessionExpired()
+   systemStore.sessionExpired = false
 }
 
 onMounted(() => {

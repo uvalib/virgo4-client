@@ -1,16 +1,16 @@
 <template>
-   <span v-if="isKiosk==false" class="notice-container">
-      <V4Modal :id="id" title="Sign In Required" ref="signinmodal"
-         firstFocusID="link" :buttonID="`${id}-btn`"
+   <span v-if="systemStore.isKiosk==false" class="notice-container">
+      <V4Modal :id="props.id" title="Sign In Required" ref="signinmodal"
+         firstFocusID="link" :buttonID="`${props.id}-btn`"
       >
          <template v-slot:button>
-            <V4Button v-if="act == 'bookmark'" mode="icon" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
+            <V4Button v-if="act == 'bookmark'" mode="icon" @click="$refs.signinmodal.show()" :id="`${props.id}-btn`"
                role="switch" aria-checked="false"
-               :aria-label="`bookmark ${data.title}`"
+               :aria-label="`bookmark ${props.data.title}`"
             >
                <i class="disabled bookmark fal fa-bookmark trigger"></i>
             </V4Button>
-            <V4Button v-else mode="primary" @click="$refs.signinmodal.show()" :id="`${id}-btn`"
+            <V4Button v-else mode="primary" @click="$refs.signinmodal.show()" :id="`${props.id}-btn`"
                role="button" aria-label="save search"
             >
                Save Search
@@ -27,50 +27,45 @@
    </span>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-export default {
-   props: {
-      data: { type: Object},
-      id:  {type: String, required: true},
-      act: {type: String, required: true}
-   },
-   data: function() {
-      return {
-         isOpen: false
-      }
-   },
-   computed: {
-      ...mapGetters({
-        isKiosk: 'system/isKiosk',
-      }),
-      signInMessage() {
-         if (this.act == "bookmark") {
-            return "You must be signed in to use bookmarks."
-         }
-         return "You must be signed in to save searches."
-      },
-      signInAria() {
-         if (this.act == "bookmark") {
-            return "Sign in to bookmark item"
-         }
-         return "sign in to save search"
-      }
-   },
-   methods: {
-      linkTabbed() {
-         this.$refs.signinmodal.firstFocusBackTabbed()
-      },
-      signInClicked() {
-         if ( this.act == "bookmark") {
-            this.$store.commit("restore/setBookmarkRecord", this.data)
-         } else {
-            this.$store.commit("restore/setRestoreSaveSearch")
-         }
-         this.$router.push("/signin")
-      },
+<script setup>
+import { computed, ref } from 'vue'
+import { useRestoreStore } from '@/stores/restore'
+import { useSystemStore } from '@/stores/system'
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
+   data: { type: Object},
+   id:  {type: String, required: true},
+   act: {type: String, required: true}
+})
+
+const router = useRouter()
+const restore = useRestoreStore()
+const systemStore = useSystemStore()
+const signInMessage = computed( ()=> {
+   if (props.act == "bookmark") {
+      return "You must be signed in to use bookmarks."
    }
-};
+   return "You must be signed in to save searches."
+})
+const signInAria = computed( ()=> {
+   if (props.act == "bookmark") {
+      return "Sign in to bookmark item"
+   }
+   return "sign in to save search"
+})
+
+function linkTabbed() {
+   ref.signinmodal.firstFocusBackTabbed()
+}
+function signInClicked() {
+   if ( props.act == "bookmark") {
+      restore.setBookmarkRecord(props.data)
+   } else {
+      restore.setRestoreSaveSearch()
+   }
+   router.push("/signin")
+}
 </script>
 
 <style lang="scss" scoped>

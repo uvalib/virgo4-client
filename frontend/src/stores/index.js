@@ -6,7 +6,6 @@ import bookmarks from './modules/bookmarks'
 import query from './modules/query'
 import item from './modules/item'
 import reserves from './modules/reserves'
-import restore from './modules/restore'
 import requests from './modules/requests'
 import searches from './modules/searches'
 import shelf from './modules/shelf'
@@ -551,7 +550,6 @@ export default createStore({
       item: item,
       query: query,
       reserves: reserves,
-      restore: restore,
       requests: requests,
       searches: searches,
       shelf: shelf,

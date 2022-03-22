@@ -6,17 +6,20 @@
    </div>
 </template>
 
-<script>
-export default {
-   name: "signedout",
-   created() {
-      setTimeout( ()=>{
-         if ( this.$route.name == "signedout" ) {
-            this.$router.push("/")
-         }
-      }, 5000)
-   }
-}
+<script setup>
+import { useRoute, useRouter } from 'vue-router'
+import { onMounted } from 'vue'
+
+const route = useRoute()
+const router = useRouter()
+
+onMounted( () => {
+   setTimeout( ()=>{
+      if ( route.name == "signedout" ) {
+         router.push("/")
+      }
+   }, 5000)
+})
 </script>
 
 <style scoped>

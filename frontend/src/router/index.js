@@ -6,6 +6,9 @@ import Details from '../views/Details.vue'
 import SignIn from '../views/SignIn.vue'
 
 import { useSystemStore } from "@/stores/system"
+import { useRestoreStore } from "@/stores/restore"
+import { useUserStore } from "@/stores/user"
+
 import VueCookies from 'vue-cookies'
 
 const router = createRouter({
@@ -89,8 +92,9 @@ const router = createRouter({
          name: 'signin',
          component: SignIn,
          beforeEnter(_to, from) {
-            router.store.commit('restore/setURL', from.fullPath)
-            router.store.commit('restore/save')
+            const restore = useRestoreStore()
+            restore.setURL(from.fullPath)
+            restore.save()
          }
       },
       {
@@ -200,20 +204,21 @@ router.afterEach((to, _from) => {
 // This is called before every URL in the SPA is hit
 router.beforeEach( async (to, _from) => {
    const systemStore  = useSystemStore()
+   const restore = useRestoreStore()
+   const userStore = useUserStore()
    systemStore.setILSError = ""
-
 
    // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {
       let jwtStr = VueCookies.get("v4_jwt")
-      router.store.commit("user/setUserJWT", jwtStr)
-      router.store.commit('restore/load')
+      userStore.setUserJWT(jwtStr)
+      restore.load()
       let tgtURL = "/"
-      if ( router.store.state.user.noILSAccount &&  router.store.state.user.signedInUser != "") {
+      if ( userStore.noILSAccount &&  userStore.signedInUser != "") {
          console.log("NetBadge success, but NO ILS ACCOUNT")
          tgtURL = "/account"
       } else {
-         tgtURL = router.store.state.restore.url
+         tgtURL = restore.url
          console.log("redirect to "+tgtURL)
          if (!tgtURL || tgtURL == "") {
             tgtURL = "/"
@@ -240,10 +245,10 @@ router.beforeEach( async (to, _from) => {
    // These pages require signed in user and will automatically netbadge in if not signed in
    let autoAuth = ["openurl"]
    if (autoAuth.includes(to.name)) {
-      if (router.store.getters["user/isSignedIn"] == false) {
-         router.store.commit('restore/setURL', to.fullPath)
-         router.store.commit('restore/save')
-         router.store.dispatch('user/netbadge')
+      if (userStore.isSignedIn == false) {
+         restore.setURL(to.fullPath)
+         restore.save()
+         userStore.netbadge()
          return false
       }
    }

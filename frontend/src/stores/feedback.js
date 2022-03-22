@@ -16,7 +16,7 @@ export const useFeedbackStore = defineStore('feedback', {
 
    actions: {
       clear() {
-         this.$reset
+         this.$reset()
       },
       async submitFeedback() {
          this.status="submit"
