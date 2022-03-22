@@ -3,9 +3,7 @@ import axios from 'axios'
 import analytics from '../analytics'
 import errorReporter from './plugins/error_reporter'
 import bookmarks from './modules/bookmarks'
-import collection from './modules/collection'
 import query from './modules/query'
-import filters from './modules/filters'
 import item from './modules/item'
 import reserves from './modules/reserves'
 import feedback from './modules/feedback'
@@ -551,8 +549,6 @@ export default createStore({
 
    modules: {
       bookmarks: bookmarks,
-      collection: collection,
-      filters: filters,
       item: item,
       query: query,
       reserves: reserves,

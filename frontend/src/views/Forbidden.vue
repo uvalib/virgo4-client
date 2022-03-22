@@ -4,12 +4,7 @@
    </div>
 </template>
 
-<script>
-export default {
-   name: "forbidden",
-   components: {
-   },
-};
+<script setup>
 </script>
 
 <style scoped lang="scss">

@@ -96,8 +96,7 @@ export default {
                let dateField = this.details.detailFields.find( f => f.name == "published_date")
                if (dateField) {
                   let year = dateField.value.split("-")[0]
-                  this.$store.commit("collection/setCurrentYear", year)
-                  this.$store.dispatch("collection/getPublishedDates", year)
+                  this.$store.dispatch("collection/setYear", year)
                }
             }
          }

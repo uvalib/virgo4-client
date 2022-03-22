@@ -69,6 +69,8 @@ import { useAlertStore } from "@/stores/alert"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
+import { useFilterStore } from "@/stores/filter"
+import { useCollectionStore } from "@/stores/collection"
 import { ref, nextTick, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
@@ -77,6 +79,8 @@ const alertStore = useAlertStore()
 const userStore = useUserStore()
 const systemStore = useSystemStore()
 const poolStore = usePoolStore()
+const filterStore = useFilterStore()
+const collectionStore = useCollectionStore()
 
 const headerHeight = ref(0)
 const menuHeight = ref(0)
@@ -137,8 +141,7 @@ async function initVirgo() {
    // the flag shows a config spinner until ready
    await systemStore.getConfig()
    await poolStore.getPools()
-   // FIXME
-   // await this.$store.dispatch("collection/getCollections")
+   await collectionStore.getCollections()
    configuring.value = false
 
    // Make sure the session is is kept alive
@@ -160,8 +163,7 @@ async function initVirgo() {
       }
    }
 
-   // FIXME
-   // this.$store.dispatch("filters/getPreSearchFilters")
+   filterStore.getPreSearchFilters()
 }
 
 function initVersionChecker() {
