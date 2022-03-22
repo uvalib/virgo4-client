@@ -51,7 +51,7 @@
                </tr>
                <tr>
                   <td colspan="2">
-                     <ForgotPassword v-bind:user="user" />
+                     <ForgotPassword />
                      <ChangePassword v-if="hasPasswordToken" />
                   </td>
                </tr>
