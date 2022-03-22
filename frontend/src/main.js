@@ -2,7 +2,6 @@ import { createApp, markRaw } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './stores'
-import VueClipboard from 'vue3-clipboard'
 import V4Button from "@/components/V4Button.vue"
 import V4Checkbox from "@/components/V4Checkbox.vue"
 import V4Spinner from "@/components/V4Spinner.vue"
@@ -21,6 +20,7 @@ pinia.use(({ store }) => {
 })
 
 // provide store access to the router and router to store
+// FIXME
 store.router = router
 
 const app = createApp(App)
@@ -48,11 +48,6 @@ app.config.globalProperties.$utils = utils
 
 import '@fortawesome/fontawesome-pro/css/all.css'
 import 'purecss'
-
-app.use(VueClipboard, {
-   autoSetContainer: true,
-   appendToBody: true,
- })
 
 import VueAnnouncer from '@vue-a11y/announcer'
 import '@vue-a11y/announcer/dist/style.css'

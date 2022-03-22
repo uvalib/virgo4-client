@@ -5,8 +5,6 @@ import errorReporter from './plugins/error_reporter'
 import bookmarks from './modules/bookmarks'
 import query from './modules/query'
 import item from './modules/item'
-import reserves from './modules/reserves'
-import requests from './modules/requests'
 import searches from './modules/searches'
 import shelf from './modules/shelf'
 import sort from './modules/sort'
@@ -549,8 +547,6 @@ export default createStore({
       bookmarks: bookmarks,
       item: item,
       query: query,
-      reserves: reserves,
-      requests: requests,
       searches: searches,
       shelf: shelf,
       sort: sort,
