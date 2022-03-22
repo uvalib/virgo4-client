@@ -5,6 +5,7 @@ import VueCookies from 'vue-cookies'
 import { useSystemStore } from "@/stores/system"
 import { useAlertStore } from "@/stores/alert"
 import { usePreferencesStore } from "@/stores/preferences"
+import { useRestoreStore } from "@/stores/restore"
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -20,6 +21,7 @@ export const useUserStore = defineStore('user', {
 	state: () => ({
       systemStore: useSystemStore(),
       alertStore: useAlertStore(),
+      restore: useRestoreStore(),
       preferencesStore: usePreferencesStore(),
       authToken: "",
       authorizing: false,
@@ -543,8 +545,7 @@ export const useUserStore = defineStore('user', {
             let jwtStr = VueCookies.get("v4_jwt")
             this.setUserJWT(jwtStr )
             this.authorizing = false
-            // FIXME
-            // ctx.commit('restore/load', null)
+            this.restore.load()
             await this.getAccountInfo()   // needed for search preferences
             this.getCheckouts()           // needed so the alert icon can show in menubar
             if ( this.isUndergraduate) {
@@ -554,12 +555,14 @@ export const useUserStore = defineStore('user', {
             } else {
                analytics.trigger('User', 'PIN_SIGNIN', "other")
             }
+
+            this.router.push( this.restore.url ).catch((e)=>{
+               if (e.name !== 'NavigationDuplicated') {
+                  throw e;
+              }
+            })
+
             // FIXME
-            // this.router.push( ctx.rootState.restore.url ).catch((e)=>{
-            //    if (e.name !== 'NavigationDuplicated') {
-            //       throw e;
-            //   }
-            // })
             // ctx.dispatch('requests/reload', null, {root: true})
          }).catch((error) => {
             if (error.response && error.response.status == 503) {
