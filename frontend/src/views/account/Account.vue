@@ -1,12 +1,12 @@
 <template>
    <div class="account">
-      <SignInRequired v-if="isSignedIn == false" targetPage="account information"/>
-      <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="!expandBilling && lookingUp" >
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="account information"/>
+      <AccountActivities v-if="userStore.isSignedIn"/>
+      <div class="working" v-if="!expandBilling && userStore.lookingUp" >
          <V4Spinner message="Looking up account details..."/>
       </div>
-      <AccountRequestForm v-if="noILSAccount == true" />
-      <template v-if="hasAccountInfo">
+      <AccountRequestForm v-if="userStore.noILSAccount == true" />
+      <template v-if="userStore.hasAccountInfo">
          <div class="account-group">
             <h2>Virgo</h2>
             <dl>
@@ -41,12 +41,12 @@
 
                <div class="button-bar">
                   <UpdateContactInfo />
-                  <div v-if="canChangePassword" class="password"><ChangePassword /></div>
+                  <div v-if="userStore.canChangePassword" class="password"><ChangePassword /></div>
                </div>
 
-               <div v-if="ilsError" class="standing-info">{{ilsError}}</div>
+               <div v-if="systemStore.ilsError" class="standing-info">{{systemStore.ilsError}}</div>
 
-               <div v-if="isBillOwed || totalFines>0" class="outstanding-bill">
+               <div v-if="isBillOwed || userStore.totalFines>0" class="outstanding-bill">
                   <h2 class="fines-head">Billing</h2>
                   <div class="fines-content">
                      <div class="notes">
@@ -72,7 +72,7 @@
                                     The Library reserves the right to refuse a replacement copy.
                                  </p>
                               </div>
-                              <div class="bill" v-for="(bill,idx) in bills" :key="idx">
+                              <div class="bill" v-for="(bill,idx) in userStore.bills" :key="idx">
                                  <table>
                                     <tr>
                                        <td class="label">Date:</td>
@@ -99,7 +99,7 @@
                         <AccordionContent layout="narrow" borderWidth="0" id="fines">
                            <template v-slot:title>
                               <label style='font-weight:bold;margin-right:5px'>Total Fines:</label>
-                              <span>${{totalFines}}</span>
+                              <span>${{userStore.totalFines}}</span>
                            </template>
                            <div class="fines">
                               <div class="info">
@@ -113,7 +113,7 @@
                                     </a>
                                  </p>
                               </div>
-                              <div class="fine" v-for="(fine,idx) in itemsWithFines" :key="idx">
+                              <div class="fine" v-for="(fine,idx) in userStore.itemsWithFines" :key="idx">
                                  <table>
                                     <tr>
                                        <td class="label">Due Date:</td>
@@ -134,7 +134,7 @@
 
                      <div class="payment">
                         <h3>Payment Information</h3>
-                        <div v-if="useSIS">
+                        <div v-if="userStore.useSIS">
                            All bills must be paid using SIS.
                            <a target="_blank" href="https://sisuva.admin.virginia.edu/ihprd/signon.html">
                            Access the SIS system to pay now.</a>
@@ -157,7 +157,7 @@
             </div>
          </div>
 
-         <div class="account-group" v-if="canUseLEO">
+         <div class="account-group" v-if="userStore.canUseLEO">
             <h2>ILLiad</h2>
             <dl v-if="info.leoAddress">
                <dt>LEO Delivery Location:</dt>
@@ -187,51 +187,33 @@
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-import AccountRequestForm from "@/components/AccountRequestForm.vue"
-import AccountActivities from "@/components/AccountActivities.vue"
+<script setup>
+import AccountRequestForm from "@/components/account/AccountRequestForm.vue"
+import AccountActivities from "@/components/account/AccountActivities.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import ChangePassword from "@/components/modals/ChangePassword.vue"
 import UpdateContactInfo from "@/components/modals/UpdateContactInfo.vue"
-export default {
-   name: "account",
-   data: function() {
-      return {
-         expandBilling: false
-      };
-   },
-   components: {
-      AccountActivities, AccordionContent, ChangePassword, AccountRequestForm, UpdateContactInfo
-   },
-   computed: {
-      ...mapState({
-         info: state => state.user.accountInfo,
-         lookingUp: state => state.user.lookingUp,
-         bills: state => state.user.bills,
-         ilsError: state => state.system.ilsError,
-         noILSAccount: state => state.user.noILSAccount,
-      }),
-      ...mapGetters({
-         hasAccountInfo: 'user/hasAccountInfo',
-         totalFines:  'user/totalFines',
-         itemsWithFines: 'user/itemsWithFines',
-         canChangePassword: 'user/canChangePassword',
-         useSIS:  'user/useSIS',
-         canUseLEO: 'user/canUseLEO',
-         isSignedIn: 'user/isSignedIn',
-      }),
-      isBillOwed() {
-         let amtStr = this.info['amountOwed']
-         return parseFloat(amtStr) > 0
-      },
-   },
-   created() {
-      if ( this.isSignedIn ) {
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "My Information")
-      }
+import { ref, computed, onMounted } from 'vue'
+import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
+import analytics from '@/analytics'
+
+const userStore = useUserStore()
+const systemStore = useSystemStore()
+const expandBilling = ref(false)
+const isBillOwed = computed(() => {
+   let amtStr = userStore.accountInfo['amountOwed']
+   return parseFloat(amtStr) > 0
+})
+const info = computed(() => {
+   return userStore.accountInfo
+})
+
+onMounted(() =>{
+   if ( userStore.isSignedIn ) {
+      analytics.trigger('Navigation', 'MY_ACCOUNT', "My Information")
    }
-}
+})
 </script>
 <style lang="scss" scoped>
 @media only screen and (min-width: 768px) {

@@ -14,7 +14,7 @@
       <span class="sep">|</span>
       <router-link id="preferences-submenu" to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
-      <template v-if="isAdmin || isPDAAdmin">
+      <template v-if="systemStore.isAdmin || systemStore.isPDAAdmin">
          <router-link id="preferences-submenu" to="/admin">Admin</router-link>
          <span class="sep">|</span>
       </template>
@@ -22,21 +22,17 @@
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-export default {
-   computed: {
-      ...mapGetters({
-        isAdmin: 'user/isAdmin',
-        isPDAAdmin: 'user/isPDAAdmin',
-      }),
-   },
-   methods: {
-      async signOut() {
-         await this.$store.dispatch("user/signout", true)
-         this.$router.push("/signedout")
-      },
-   },
+<script setup>
+import { useSystemStore } from '../../stores/system'
+import { useUserStore } from '../../stores/user'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const systemStore = useSystemStore()
+async function signOut() {
+   const user = useUserStore()
+   user.signout(true)
+   router.push("/signedout")
 }
 </script>
 

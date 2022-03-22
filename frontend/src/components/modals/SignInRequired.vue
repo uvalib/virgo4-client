@@ -4,13 +4,13 @@
          firstFocusID="link" :buttonID="`${props.id}-btn`"
       >
          <template v-slot:button>
-            <V4Button v-if="act == 'bookmark'" mode="icon" @click="$refs.signinmodal.show()" :id="`${props.id}-btn`"
+            <V4Button v-if="act == 'bookmark'" mode="icon" @click="signinmodal.show()" :id="`${props.id}-btn`"
                role="switch" aria-checked="false"
                :aria-label="`bookmark ${props.data.title}`"
             >
                <i class="disabled bookmark fal fa-bookmark trigger"></i>
             </V4Button>
-            <V4Button v-else mode="primary" @click="$refs.signinmodal.show()" :id="`${props.id}-btn`"
+            <V4Button v-else mode="primary" @click="signinmodal.show()" :id="`${props.id}-btn`"
                role="button" aria-label="save search"
             >
                Save Search
@@ -42,6 +42,7 @@ const props = defineProps({
 const router = useRouter()
 const restore = useRestoreStore()
 const systemStore = useSystemStore()
+const signinmodal = ref(null)
 const signInMessage = computed( ()=> {
    if (props.act == "bookmark") {
       return "You must be signed in to use bookmarks."
@@ -56,7 +57,7 @@ const signInAria = computed( ()=> {
 })
 
 function linkTabbed() {
-   ref.signinmodal.firstFocusBackTabbed()
+   signinmodal.value.firstFocusBackTabbed()
 }
 function signInClicked() {
    if ( props.act == "bookmark") {
