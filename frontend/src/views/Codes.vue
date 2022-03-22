@@ -1,6 +1,6 @@
 <template>
    <div class="codes">
-      <div class="working" v-if="working" >
+      <div class="working" v-if="systemStore.working" >
          <V4Spinner message="Looking up codes..."/>
       </div>
       <AccordionContent id="lib-codes">
@@ -10,7 +10,7 @@
                <th>ID</th><th>Code</th><th>Name</th>
                <th class="center">On Shelf</th><th class="center">Circulating</th>
             </tr>
-            <tr v-for="lc in libraryCodes" :key="`loc${lc.id}`">
+            <tr v-for="lc in systemStore.libraryCodes" :key="`loc${lc.id}`">
                <td>{{lc.id}}</td>
                <td>{{lc.key}}</td>
                <td>{{lc.description}}</td>
@@ -26,7 +26,7 @@
                <th>ID</th><th>Code</th><th>Description</th><th>Online</th>
                <th>Shadowed</th><th>On Shelf</th><th>Circulating</th>
             </tr>
-            <tr v-for="lc in locationCodes" :key="`loc${lc.id}`">
+            <tr v-for="lc in systemStore.locationCodes" :key="`loc${lc.id}`">
                <td>{{lc.id}}</td>
                <td>{{lc.key}}</td>
                <td>{{lc.description}}</td>
@@ -40,35 +40,25 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
+<script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
+import { useSystemStore } from "@/stores/system"
+import { onMounted } from "vue"
 
-export default {
-   name: "codes",
-   components: {
-      AccordionContent
-   },
-   computed: {
-      ...mapState({
-         working: state => state.searching,
-         libraryCodes: state => state.system.libraryCodes,
-         locationCodes: state => state.system.locationCodes
-      }),
-   },
-   methods: {
-      getIcon( flag ) {
-         if (flag) {
-            return '<i class="fas fa-check-circle">Y</i>'
-         }
-         return '<i class="fas fa-times-circle">N</i>'
-      }
-   },
-   created() {
-      this.$store.dispatch('system/getCodes')
+const systemStore = useSystemStore()
+
+function getIcon( flag ) {
+   if (flag) {
+      return '<i class="fas fa-check-circle">Y</i>'
    }
+   return '<i class="fas fa-times-circle">N</i>'
 }
+
+onMounted(() => {
+  systemStore.getCodes()
+})
 </script>
+
 <style scoped>
 .codes {
    min-height: 400px;

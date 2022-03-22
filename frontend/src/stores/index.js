@@ -6,7 +6,6 @@ import bookmarks from './modules/bookmarks'
 import query from './modules/query'
 import item from './modules/item'
 import reserves from './modules/reserves'
-import feedback from './modules/feedback'
 import restore from './modules/restore'
 import requests from './modules/requests'
 import searches from './modules/searches'
@@ -552,7 +551,6 @@ export default createStore({
       item: item,
       query: query,
       reserves: reserves,
-      feedback: feedback,
       restore: restore,
       requests: requests,
       searches: searches,

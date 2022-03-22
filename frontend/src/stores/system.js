@@ -35,6 +35,7 @@ export const useSystemStore = defineStore('system', {
       libraryCodes: [],
       allPickupLibraries: [],
       printing: false,
+      working: false
    }),
 
    getters: {

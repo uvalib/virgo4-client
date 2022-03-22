@@ -1,35 +1,35 @@
 <template>
    <div class="feedback">
-      <V4Spinner message="Submitting feedback..." v-if="status=='submit'" v-bind:overlay="true" />
-      <div v-if="status!='success'" class="feedback-content">
+      <V4Spinner message="Submitting feedback..." v-if="feedbackStore.status=='submit'" v-bind:overlay="true" />
+      <div v-if="feedbackStore.status!='success'" class="feedback-content">
          <div class="feedback-form pure-form">
             <div class="pure-control-group">
                <label for="wantedTo">
                   First, explain what you wanted to do.
                   <span v-if="hasError('wantedTo')" class="error">This information is required</span>
                </label>
-               <textarea rows="3" name="wantedTo" v-model="wantedTo" />
+               <textarea rows="3" name="wantedTo" v-model="feedbackStore.wantedTo" />
             </div>
             <div class="pure-control-group">
                <label for="explanation">
                   How did it go?
                   <span v-if="hasError('explanation')" class="error">This information is required</span>
                </label>
-               <textarea rows="3" name="explanation" v-model="explanation" />
+               <textarea rows="3" name="explanation" v-model="feedbackStore.explanation" />
             </div>
             <div class="pure-control-group">
                <label for="email">
                   Contact Email
                   <span v-if="hasError('email')" class="error">A valid email is required</span>
                </label>
-               <input v-model="email" type="email" name="email" />
+               <input v-model="feedbackStore.email" type="email" name="email" />
             </div>
             <div class="pure-control-group">
                <label for="url">
                   Relevant URL
                   <span v-if="hasError('url')" class="error">This information is required</span>
                </label>
-               <input v-model="url" name="url" />
+               <input v-model="feedbackStore.url" name="url" />
             </div>
          </div>
 
@@ -46,89 +46,82 @@
    </div>
 </template>
 
-<script>
-import { mapGetters, mapState } from "vuex"
-import { mapFields } from "vuex-map-fields"
-export default {
-   name: "feedback",
-   data: function() {
-      return {
-         errors: [],
-      };
-   },
-   computed: {
-      ...mapState({
-         status : state => state.feedback.status,
-      }),
-      ...mapGetters({ singleEmail: "user/singleEmail" }),
-      ...mapFields("feedback", [
-         "wantedTo", "explanation", "email", "url"
-      ])
-   },
-   methods: {
-      hasError( val) {
-         return this.errors.includes(val)
-      },
-      async submit() {
-         if (this.validate()) {
-            await this.$store.dispatch("feedback/submitFeedback")
-            if ( this.status=="success" ) {
-               this.scrollTop()
-            }
-         }
-      },
-      scrollTop() {
-         var scrollStep = -window.scrollY / (500 / 10),
-         scrollInterval = setInterval(()=> {
-            if ( window.scrollY != 0 ) {
-               window.scrollBy( 0, scrollStep )
-            } else {
-               clearInterval(scrollInterval)
-            }
-         },10)
-      },
-      validate() {
-         this.errors.splice(0, this.errors.length)
-         if (this.wantedTo == "" ) {
-            this.errors.push("wantedTo")
-         }
-         if (this.explanation == ""  ) {
-            this.errors.push("explanation")
-         }
-         if (this.email == ""  ) {
-            this.errors.push("email")
-         }
-         if (this.url == "") {
-            this.errors.push("url")
-         }
+<script setup>
+import { useFeedbackStore } from "@/stores/feedback"
+import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
+import { onMounted, ref } from "vue"
+import { useRoute } from "vue-router"
 
-         if ( this.errors.length > 0) {
-            this.$store.commit("system/setError", "Required fields are missing or invalid. Please correct the errors and try again.")
-            this.scrollTop()
-            return false
-         }
+const userStore = useUserStore()
+const feedbackStore = useFeedbackStore()
+const systemStore = useSystemStore()
+const route = useRoute()
+const errors = ref([])
 
-         var re = /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
-         var invalidEmail = !re.test(this.email)
-         if (invalidEmail) {
-            this.$store.commit("system/setError", "Please enter a valid email")
-            this.errors.push("email")
-            return false
-         }
-         return true
+function hasError( val) {
+   return errors.value.includes(val)
+}
+async function submit() {
+   if (validate()) {
+      await feedbackStore.submitFeedback()
+      if ( feedbackStore.status=="success" ) {
+         scrollTop()
       }
-   },
-   mounted() {
-      this.$store.commit("feedback/clearFeedback")
-      let query = Object.assign({}, this.$route.query)
-      // Assign the url in decending usefulness.
-      let url = query.url || document.referrer || window.location.origin
-      this.$store.commit("feedback/setRelatedURL", url)
-      this.$store.dispatch("user/getAccountInfo").then(()=>
-         this.email = this.singleEmail
-      )
    }
 }
+function scrollTop() {
+   var scrollStep = -window.scrollY / (500 / 10),
+   scrollInterval = setInterval(()=> {
+      if ( window.scrollY != 0 ) {
+         window.scrollBy( 0, scrollStep )
+      } else {
+         clearInterval(scrollInterval)
+      }
+   },10)
+}
+function validate() {
+   errors.value.splice(0, errors.value.length)
+   if (feedbackStore.wantedTo == "" ) {
+      errors.value.push("wantedTo")
+   }
+   if (feedbackStore.explanation == ""  ) {
+      errors.value.push("explanation")
+   }
+   if (feedbackStore.email == ""  ) {
+      errors.value.push("email")
+   }
+   if (feedbackStore.url == "") {
+      errors.value.push("url")
+   }
+
+   if ( errors.value.length > 0) {
+      systemStore.setError("Required fields are missing or invalid. Please correct the errors and try again.")
+      scrollTop()
+      return false
+   }
+
+   var re = /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
+   var invalidEmail = !re.test(feedbackStore.email)
+   if (invalidEmail) {
+       systemStore.setError("Please enter a valid email")
+      errors.value.push("email")
+      return false
+   }
+   return true
+}
+
+onMounted(() => {
+   feedbackStore.clear()
+   let query = Object.assign({}, route.query)
+
+   // Assign the url in decending usefulness.
+   let url = query.url || document.referrer || window.location.origin
+   feedbackStore.url = url
+   userStore.getAccountInfo().then(()=>
+      feedbackStore.email = userStore.singleEmail
+   )
+})
 </script>
 
 <style lang="scss" scoped>
