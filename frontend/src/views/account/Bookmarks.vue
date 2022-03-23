@@ -1,15 +1,14 @@
 <template>
    <div class="bookmarks">
-      <SignInRequired v-if="isSignedIn == false" targetPage="bookmarks"/>
-      <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="lookingUpBookmarks && isSignedIn">
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="bookmarks"/>
+      <AccountActivities v-if="userStore.isSignedIn"/>
+      <div class="working" v-if="bookmarkStore.searching && userStore.isSignedIn || userStore.lookingUp">
          <V4Spinner message="Looking up bookmark information..."/>
       </div>
-      <div v-else-if="isSignedIn">
-         <div class="none" v-if="hasBookmarks == false">You have no bookmarks</div>
+      <div v-else-if="userStore.isSignedIn">
+         <div class="none" v-if="bookmarkStore.hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
-            <V4Spinner message="Please wait..." v-if="working" v-bind:overlay="true" />
-            <div class="folder" v-for="(folderInfo,idx) in bookmarks" :key="folderInfo.id">
+            <div class="folder" v-for="(folderInfo,idx) in bookmarkStore.bookmarks" :key="folderInfo.id">
                <AccordionContent
                   class="boxed bookmark-folder"
                   color="var(--uvalib-grey-darkest)"
@@ -53,7 +52,7 @@
                                        :id="`move-bookmarks-${folderInfo.id}`"
                                        v-on:move-approved="moveBookmarks"/>
                                     <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
-                                    <V4Button v-if="canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
+                                    <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
                                  </div>
                               </div>
                            </th>
@@ -133,200 +132,185 @@
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-import { mapState } from "vuex"
+<script setup>
+import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import MoveBookmark from "@/components/modals/MoveBookmark.vue"
 import RenameBookmark from "@/components/modals/RenameBookmark.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-import AccountActivities from "@/components/AccountActivities.vue"
-export default {
-   name: "bookmarks",
-   components: {
-      AccordionContent,
-      AccountActivities,
-      MoveBookmark,
-      RenameBookmark,
-      PrintBookmarks
-   },
-   data: function() {
-      return {
-         createOpen: false,
-         newFolder: "",
-         submitting: false,
-         selectedItems: [],
-         expandedFolder: -1
-      };
-   },
-   computed: {
-      ...mapState({
-         lookingUpBookmarks: state => state.bookmarks.searching,
-         working: state => state.searching,
-      }),
-      ...mapGetters({
-         hasBookmarks: "bookmarks/hasBookmarks",
-         bookmarks: "bookmarks/bookmarks",
-         canMakeReserves: "user/canMakeReserves",
-         invalidReserves: "reserves/getInvalidReserveItems",
-         isSignedIn: 'user/isSignedIn',
-      })
-   },
-   methods: {
-      exportBookmarks(folder) {
-         this.$store.dispatch("bookmarks/exportBookmarks", folder )
-      },
-      bookmarkFollowed(identifier) {
-         this.$analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
-      },
-      isSelected(bm) {
-         let idx = this.selectedItems.findIndex( bmid => bmid == bm.id)
-         return idx != -1
-      },
-      toggleBookmarkSelected(bm) {
-         let idx = this.selectedItems.findIndex( bmid => bmid == bm.id)
-         if ( idx == -1 ) {
-            this.selectedItems.push(bm.id)
-         } else {
-            this.selectedItems.splice(idx,1)
-         }
-      },
-      ariaLabel(bm) {
-         return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
-      },
-      copyURL( folder ) {
-         let URL = this.getPublicURL(folder)
-         this.$copyText(URL, undefined, (error, _event) => {
-            if (error) {
-               this.$store.commit("system/setError", "Unable to copy public bookmarks URL: "+error)
-            } else {
-               this.$store.commit("system/setMessage", "Public bookmark URL copied to clipboard.")
-            }
-         })
-      },
-      getTitle(folderInfo) {
-         let out = folderInfo.folder
-         if (folderInfo.public ){
-            out += ` <span style="font-weight:normal; font-size:0.9em;">(public)</span>`
-         }
-         return out
-      },
-      async publicClicked(folder) {
-         await this.$store.dispatch("bookmarks/toggleFolderVisibility", {id: folder.id, public: !folder.public})
-      },
-      getPublicURL(folder) {
-         let base = window.location.href
-         return `${base}/${folder.token}`
-      },
-      folderOpened(folderID) {
-         this.selectedItems = []
-         this.expandedFolder = folderID
-      },
-      clearAll() {
-         this.selectedItems = []
-      },
-      selectAll(items) {
-         this.selectedItems = []
-         items.forEach(bm=>{
-            this.selectedItems.push(bm.id)
-         })
-      },
-      moveBookmarks(folderID) {
-         let data = { bookmarks: this.selectedItems, folderID: folderID }
-         this.$store.dispatch("bookmarks/moveBookmarks", data);
-      },
-      async reserve() {
-         if ( this.selectedItems.length == 0) {
-             this.$store.commit("system/setError",
-               "No items have been selected to put on reserve.<br/>Please select one or more and try again.")
-             return
-         }
+import { ref, onMounted, nextTick } from 'vue'
+import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
+import { useBookmarkStore } from "@/stores/bookmark"
+import { useReserveStore } from "@/stores/reserve"
+import analytics from '@/analytics'
+import { copyText } from 'vue3-clipboard'
+import { useRouter } from 'vue-router'
 
-         let items = []
-         let folder = this.bookmarks.find( bm => bm.id == this.expandedFolder )
-         this.selectedItems.forEach( bmID => {
-            let item = folder.bookmarks.find( bm => bm.id == bmID )
-            items.push(item)
-         })
+const userStore = useUserStore()
+const systemStore = useSystemStore()
+const bookmarkStore = useBookmarkStore()
+const reserveStore = useReserveStore()
 
-         // Set the list, and validate that all items in the list are able to be reserved
-         this.$store.commit("reserves/setRequestList", items)
-         await this.$store.dispatch("reserves/validateReservesRequest")
-         if (this.invalidReserves.length > 0) {
-            let msg = "The following items cannot be placed on course reserve: "
-            msg += "<ul style='text-align:left;'>"
-            this.invalidReserves.forEach( r => {
-               msg += `<li>${r.details.title}</l1>`
-            })
-            msg += "</ul>Please deselect these items and try again."
-            this.$store.commit("system/setError", msg)
-         } else {
-            this.$router.push("/course-reserves-request")
-         }
-      },
-      detailsURL(bookmark) {
-         return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
-      },
-      removeBookmarks(folderID) {
-         if ( this.selectedItems.length == 0) {
-            this.$store.commit("system/setError","No bookmarks selected for deletion.<br/>Select one or more and try again."
-            )
-             return
-         }
-         this.$store.dispatch("bookmarks/removeBookmarks", {folderID: folderID, bookmarkIDs: this.selectedItems})
-      },
-      async removeFolder(folderID, folderIdx) {
-         let focusID = "create-folder-btn"
-         if ( folderIdx < this.bookmarks.length-1) {
-            focusID = this.bookmarks[folderIdx+1].id.toString()+"-header"
-         }
-         await this.$store.dispatch("bookmarks/removeFolder", folderID)
-         let ele = document.getElementById(focusID)
-         if (ele ) {
-            ele.focus()
-         }
-      },
-      openCreate() {
-         this.createOpen = true;
-         setTimeout( () => {
-            this.$refs.folderInput.focus()
-         }, 150)
-      },
-      cancelCreate() {
-         if (this.submitting) return;
-         this.createOpen = false;
-         this.$store.commit("system/clearMessage")
-      },
-      async createFolder() {
-         if (this.submitting) return
-         this.submitting = true
-         this.$store.commit("system/clearMessage")
-         if (this.newFolder == "") {
-            this.$store.commit(
-               "system/setError",
-               "A new folder name is required.<br/>Please add one and try again."
-            )
-            this.submitting = false
-            return
-         }
-         await this.$store.dispatch("bookmarks/addFolder", this.newFolder)
-         this.createOpen = false
-         this.submitting = false
-         this.newFolder = ""
-         this.$nextTick( () => {
-            let btn = document.getElementById("create-folder-btn")
-            if (btn) {
-               btn.focus()
-            }
-         })
-      }
-   },
-   created() {
-      if (this.isSignedIn) {
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
-      }
+// html element ref
+const folderInput = ref(null)
+
+// local data
+const createOpen = ref(false)
+const newFolder = ref("")
+const submitting = ref(false)
+const selectedItems = ref([])
+const expandedFolder = ref(-1)
+
+function exportBookmarks(folder) {
+   bookmarkStore.exportBookmarks(folder )
+}
+function bookmarkFollowed(identifier) {
+   analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
+}
+function isSelected(bm) {
+   let idx = selectedItems.value.findIndex( bmid => bmid == bm.id)
+   return idx != -1
+}
+function toggleBookmarkSelected(bm) {
+   let idx = selectedItems.value.findIndex( bmid => bmid == bm.id)
+   if ( idx == -1 ) {
+      selectedItems.value.push(bm.id)
+   } else {
+      selectedItems.value.splice(idx,1)
    }
-};
+}
+function ariaLabel(bm) {
+   return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
+}
+function copyURL( folder ) {
+   let URL = getPublicURL(folder)
+   copyText(URL, undefined, (error, _event) => {
+      if (error) {
+         systemStore.setError("Unable to copy public bookmarks URL: "+error)
+      } else {
+         systemStore.setMessage("Public bookmark URL copied to clipboard.")
+      }
+   })
+}
+function getTitle(folderInfo) {
+   let out = folderInfo.folder
+   if (folderInfo.public ){
+      out += ` <span style="font-weight:normal; font-size:0.9em;">(public)</span>`
+   }
+   return out
+}
+async function publicClicked(folder) {
+   await bookmarkStore.toggleFolderVisibility({id: folder.id, public: !folder.public})
+}
+function getPublicURL(folder) {
+   let base = window.location.href
+   return `${base}/${folder.token}`
+}
+function folderOpened(folderID) {
+   selectedItems.value = []
+   expandedFolder.value = folderID
+}
+function clearAll() {
+   selectedItems.value = []
+}
+function selectAll(items) {
+   selectedItems.value = []
+   items.forEach(bm=>{
+      selectedItems.value.push(bm.id)
+   })
+}
+function moveBookmarks(folderID) {
+   let data = { bookmarks: selectedItems.value, folderID: folderID }
+   bookmarkStore.moveBookmarks(data);
+}
+async function reserve() {
+   if ( selectedItems.value.length == 0) {
+      systemStore.setError("No items have been selected to put on reserve.<br/>Please select one or more and try again.")
+      return
+   }
+
+   let items = []
+   let folder = bookmarkStore.bookmarks.find( bm => bm.id == expandedFolder.value )
+   selectedItems.value.forEach( bmID => {
+      let item = folder.bookmarks.find( bm => bm.id == bmID )
+      items.push(item)
+   })
+
+   // Set the list, and validate that all items in the list are able to be reserved
+   reserveStore.setRequestList(items)
+   await reserveStore.validateReservesRequest()
+   if (reserveStore.invalidReserves.length > 0) {
+      let msg = "The following items cannot be placed on course reserve: "
+      msg += "<ul style='text-align:left;'>"
+      reserveStore.invalidReserves.forEach( r => {
+         msg += `<li>${r.details.title}</l1>`
+      })
+      msg += "</ul>Please deselect these items and try again."
+      systemStore.setError(msg)
+   } else {
+      const router = useRouter()
+      router.push("/course-reserves-request")
+   }
+}
+function detailsURL(bookmark) {
+   return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
+}
+function removeBookmarks(folderID) {
+   if ( selectedItems.value.length == 0) {
+      systemStore.setError("No bookmarks selected for deletion.<br/>Select one or more and try again.")
+      return
+   }
+   bookmarkStore.removeBookmarks({folderID: folderID, bookmarkIDs: selectedItems.value})
+}
+async function removeFolder(folderID, folderIdx) {
+   let focusID = "create-folder-btn"
+   if ( folderIdx < bookmarkStore.bookmarks.length-1) {
+      focusID = bookmarkStore.bookmarks[folderIdx+1].id.toString()+"-header"
+   }
+   await bookmarkStore.removeFolder(folderID)
+   let ele = document.getElementById(focusID)
+   if (ele ) {
+      ele.focus()
+   }
+}
+function openCreate() {
+   createOpen.value = true
+   nextTick( () => {
+      folderInput.value.focus()
+   })
+}
+function cancelCreate() {
+   if (submitting.value) return
+   createOpen.value = false
+   systemStore.clearMessage()
+}
+async function createFolder() {
+   if (submitting.value) return
+   submitting.value = true
+   systemStore.clearMessage()
+   if (newFolder.value == "") {
+      systemStore.setError("A new folder name is required.<br/>Please add one and try again.")
+      submitting.value = false
+      return
+   }
+   await bookmarkStore.addFolder(newFolder.value)
+   createOpen.value = false
+   submitting.value = false
+   newFolder.value = ""
+   nextTick( () => {
+      let btn = document.getElementById("create-folder-btn")
+      if (btn) {
+         btn.focus()
+      }
+   })
+}
+
+onMounted(()=>{
+   if (userStore.isSignedIn) {
+      analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
+   }
+})
 </script>
 
 <style lang="scss" scoped>

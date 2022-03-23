@@ -1,12 +1,12 @@
 <template>
    <div class="public-bookmarks">
       <div class="bookmarks-content">
-         <div class="working" v-if="searching">
+         <div class="working" v-if="bookmarkStore.searching">
             <V4Spinner message="Looking up bookmark information..."/>
          </div>
          <div v-else>
             <ul class="bookmarks">
-               <li class="bookmark-wrapper" v-for="(bookmark,idx) in bookmarks" :key="`BM${idx}`">
+               <li class="bookmark-wrapper" v-for="(bookmark,idx) in bookmarkStore.public" :key="`BM${idx}`">
                   <div class="title">
                      <router-link @click="bookmarkFollowed(bookmark.identifier)"  :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
                   </div>
@@ -20,27 +20,23 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-export default {
-   name: "public-bookmarks",
-   computed: {
-      ...mapState({
-         searching: state => state.bookmarks.searching,
-         bookmarks: state => state.bookmarks.public,
-      }),
-   },
-   created() {
-      this.$store.dispatch("bookmarks/getPublicBookmarks", this.$route.params.key)
-   },
-   methods: {
-      bookmarkFollowed(identifier) {
-         this.$analytics.trigger('Bookmarks', 'FOLLOW_PUBLIC_BOOKMARK', identifier)
-      },
-      detailsURL(bookmark) {
-         return `/sources/${bookmark.pool.name}/items/${bookmark.identifier}`
-      },
-   }
+<script setup>
+import { useBookmarkStore } from "@/stores/bookmark"
+import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import analytics from '@/analytics'
+
+const route = useRoute()
+const bookmarkStore = useBookmarkStore()
+
+onMounted(()=>{
+   bookmarkStore.getPublicBookmarks(route.params.key)
+})
+function bookmarkFollowed(identifier) {
+   analytics.trigger('Bookmarks', 'FOLLOW_PUBLIC_BOOKMARK', identifier)
+}
+function detailsURL(bookmark) {
+   return `/sources/${bookmark.pool.name}/items/${bookmark.identifier}`
 }
 </script>
 

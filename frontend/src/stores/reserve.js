@@ -33,7 +33,7 @@ export const useReserveStore = defineStore('reserve', {
    }),
 
    getters: {
-      getInvalidReserveItems: state => {
+      invalidReserves: state => {
          return state.requestList.filter( r => r.valid == false)
       },
       hasCourseResults: state => {

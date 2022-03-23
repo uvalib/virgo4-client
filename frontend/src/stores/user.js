@@ -6,6 +6,7 @@ import { useSystemStore } from "@/stores/system"
 import { useAlertStore } from "@/stores/alert"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useRestoreStore } from "@/stores/restore"
+import { useBookmarkStore } from "@/stores/bookmark"
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -23,6 +24,7 @@ export const useUserStore = defineStore('user', {
       alertStore: useAlertStore(),
       restore: useRestoreStore(),
       preferencesStore: usePreferencesStore(),
+      bookmarkStore: useBookmarkStore(),
       authToken: "",
       authorizing: false,
       signedInUser: "",
@@ -415,8 +417,9 @@ export const useUserStore = defineStore('user', {
             this.setAccountInfo(response.data)
             let prefs = JSON.parse(response.data.preferences)
             this.preferencesStore.setPreferences(prefs)
+            this.bookmarkStore.setBookmarks(response.data.bookmarks)
+
             // FIXME
-            // ctx.commit('bookmarks/setBookmarks', response.data.bookmarks)
             // if ( prefs.searchTemplate ) {
             //    ctx.commit('query/setTemplate',  prefs.searchTemplate)
             // }

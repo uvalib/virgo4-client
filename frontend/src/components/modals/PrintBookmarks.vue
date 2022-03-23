@@ -1,8 +1,8 @@
 <template>
-   <V4Modal :id="id" title="Print Details" ref="printmodal"
-      firstFocusID="titleinput" lastFocusID="print-ok" :buttonID="`${id}-open`" @opened="opened">
+   <V4Modal :id="props.id" title="Print Details" ref="printmodal"
+      firstFocusID="titleinput" lastFocusID="print-ok" :buttonID="`${props.id}-open`" @opened="opened">
       <template v-slot:button>
-         <V4Button mode="primary" @click="$refs.printmodal.show()" :id="`${id}-open`"
+         <V4Button mode="primary" @click="printmodal.show()" :id="`${props.id}-open`"
             aria-label="print details about selected bookmarks"
          >
             Print
@@ -25,7 +25,7 @@
                   @keyup.enter="printClicked"
                   @keydown.shift.tab.stop.prevent="backTabTitle"/>
                <label for="notes">Notes (optional)</label>
-               <textarea ref="notes" id="notes" v-model="notes" @keyup.enter="printClicked"></textarea>
+               <textarea id="notes" v-model="notes" @keyup.enter="printClicked"></textarea>
                <p class="note">After clicking Print, your printable results will open in another browser tab.</p>
             </div>
          </template>
@@ -41,56 +41,54 @@
    </V4Modal>
 </template>
 
-<script>
-export default {
-   props: {
-      bookmarks: {
-         type: Array,
-         required: true
-      },
-      srcFolder: {
-         type: Number,
-         required: true
-      },
-      id: {
-         type: String,
-         required: true
-      }
+<script setup>
+import { useBookmarkStore } from "@/stores/bookmark"
+import { ref } from 'vue'
+import analytics from '@/analytics'
+
+const bookmarkStore = useBookmarkStore()
+const props = defineProps({
+   bookmarks: {
+      type: Array,
+      required: true
    },
-   data: function()  {
-      return {
-         title: "",
-         notes: ""
-      }
+   srcFolder: {
+      type: Number,
+      required: true
    },
-   computed: {
-   },
-   methods: {
-      opened() {
-         this.title = ""
-         this.notes = ""
-         if (this.bookmarks.length == 0 ){
-            let btn = document.getElementById(this.id+"-close")
-            btn.focus()
-         }
-      },
-      async printClicked() {
-         this.$analytics.trigger('Bookmarks', 'PRINT_CLICKED')
-         let data = { title: this.title, notes: this.notes, folderID: this.srcFolder, bookmarkIDs: this.bookmarks}
-         await this.$store.dispatch("bookmarks/printBookmarks", data )
-         this.$refs.printmodal.hide()
-      },
-      cancelClicked() {
-         this.$refs.printmodal.hide()
-      },
-      backTabTitle() {
-         this.$refs.printmodal.firstFocusBackTabbed()
-      },
-      nextTabOK() {
-         this.$refs.printmodal.lastFocusTabbed()
-      },
+   id: {
+      type: String,
+      required: true
    }
-};
+})
+
+const printmodal = ref(null)
+const title = ref("")
+const notes = ref("")
+
+function opened() {
+   title.value = ""
+   notes.value = ""
+   if (props.bookmarks.length == 0 ){
+      let btn = document.getElementById(props.id+"-close")
+      btn.focus()
+   }
+}
+async function printClicked() {
+   analytics.trigger('Bookmarks', 'PRINT_CLICKED')
+   let data = { title: title.value, notes: notes.value, folderID: props.srcFolder, bookmarkIDs: props.bookmarks}
+   await bookmarkStore.printBookmarks( data )
+   printmodal.value.hide()
+}
+function cancelClicked() {
+   printmodal.value.hide()
+}
+function backTabTitle() {
+   printmodal.value.firstFocusBackTabbed()
+}
+function nextTabOK() {
+   printmodal.value.lastFocusTabbed()
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,10 +1,10 @@
 <template>
-   <V4Modal :id="id" title="Rename Bookmark Folder" ref="renamemodal"
+   <V4Modal :id="props.id" title="Rename Bookmark Folder" ref="renamemodal"
       firstFocusID="rename" lastFocusID="rename-ok"
-      @opened="opened" :buttonID="`${id}-open`"
+      @opened="opened" :buttonID="`${props.id}-open`"
    >
       <template v-slot:button>
-         <V4Button mode="icon" @click="$refs.renamemodal.show()" :id="`${id}-open`"
+         <V4Button mode="icon" @click="renamemodal.show()" :id="`${props.id}-open`"
              :aria-label="`rename bookmark folder ${folderInfo.folder}`"
              style="margin: 0 5px"
          >
@@ -20,7 +20,7 @@
          <p class="error" v-if="error">{{error}}</p>
        </template>
        <template v-slot:controls>
-         <V4Button mode="tertiary" id="rename-cancel" @click="$refs.renamemodal.hide()">
+         <V4Button mode="tertiary" id="rename-cancel" @click="renamemodal.hide()">
             Cancel
          </V4Button>
          <V4Button mode="primary" id="rename-ok" @click="okClicked" :focusNextOverride="true" @tabnext="nextTabOK">
@@ -30,45 +30,44 @@
    </V4Modal>
 </template>
 
-<script>
-export default {
-   props: {
-      id: {
-         type: String,
-         required: true
-      },
-      folderInfo: {
-         type: Object,
-         required: true
-      },
+<script setup>
+import { useBookmarkStore } from "@/stores/bookmark"
+import { ref } from 'vue'
+
+const bookmarkStore = useBookmarkStore()
+const props = defineProps({
+   id: {
+      type: String,
+      required: true
    },
-   data: function()  {
-      return {
-         folderName: this.folderInfo.folder,
-         error: ""
-      }
+   folderInfo: {
+      type: Object,
+      required: true
    },
-   methods: {
-      opened() {
-         this.folderName = this.folderInfo.folder
-         this.error = ""
-      },
-      async okClicked() {
-         this.error = ""
-         if ( this.folderName == "") {
-           this.error =  "A folder name is required"
-         } else {
-            await this.$store.dispatch("bookmarks/renameFolder",  {id: this.folderInfo.id, name: this.folderName})
-            this.$refs.renamemodal.hide()
-         }
-      },
-      nextTabOK() {
-         this.$refs.renamemodal.lastFocusTabbed()
-      },
-      backTabInput() {
-         this.$refs.renamemodal.firstFocusBackTabbed()
-      }
+})
+
+const renamemodal = ref(null)
+const folderName = ref(props.folderInfo.folder)
+const error = ref("")
+
+function opened() {
+   folderName.value = props.folderInfo.folder
+   error.value = ""
+}
+async function okClicked() {
+   error.value = ""
+   if ( folderName.value == "") {
+      error.value =  "A folder name is required"
+   } else {
+      await bookmarkStore.renameFolder({id: props.folderInfo.id, name: folderName.value})
+      renamemodal.value.hide()
    }
+}
+function nextTabOK() {
+   renamemodal.value.lastFocusTabbed()
+}
+function backTabInput() {
+   renamemodal.value.firstFocusBackTabbed()
 }
 </script>
 

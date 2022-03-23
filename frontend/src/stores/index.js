@@ -2,7 +2,6 @@ import { createStore } from 'vuex'
 import axios from 'axios'
 import analytics from '../analytics'
 import errorReporter from './plugins/error_reporter'
-import bookmarks from './modules/bookmarks'
 import query from './modules/query'
 import item from './modules/item'
 import searches from './modules/searches'
@@ -544,7 +543,6 @@ export default createStore({
    },
 
    modules: {
-      bookmarks: bookmarks,
       item: item,
       query: query,
       searches: searches,
