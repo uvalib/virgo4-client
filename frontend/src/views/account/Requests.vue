@@ -1,18 +1,18 @@
 <template>
    <div class="requests">
-      <SignInRequired v-if="isSignedIn == false" targetPage="request information"/>
-      <AccountActivities  v-if="isSignedIn"/>
-      <div class="working" v-if="lookingUp && isSignedIn">
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="request information"/>
+      <AccountActivities  v-if="userStore.isSignedIn"/>
+      <div class="working" v-if="userStore.lookingUp && userStore.isSignedIn">
          <V4Spinner message="Looking up requests..." />
       </div>
-      <div class="details" v-if="isSignedIn">
-         <template v-if="!noILSAccount && !isBarred">
+      <div class="details" v-if="userStore.isSignedIn">
+         <template v-if="!userStore.noILSAccount && !userStore.isBarred">
             <h2>Make a New Request</h2>
-            <div v-if="!isUVA">
+            <div v-if="!userStore.isUVA">
                <!-- No ILL requests for community borrowers  -->
             </div>
-            <div v-else-if="isHSLUser" class="subcontent">
-               <a :href="hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
+            <div v-else-if="userStore.isHSLUser" class="subcontent">
+               <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
             </div>
             <div v-else class="subcontent buttons">
                <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
@@ -29,10 +29,10 @@
             <h2>Outstanding Requests</h2>
          </template>
          <div class="subcontent">
-            <template v-if="lookingUp == false && ilsError">
-               <div class="ils-error">{{ilsError}}</div>
+            <template v-if="userStore.lookingUp == false && systemStore.ilsError">
+               <div class="ils-error">{{systemStore.ilsError}}</div>
             </template>
-            <template v-if="lookingUp == false && !ilsError && requests.holds.length > 0">
+            <template v-if="userStore.lookingUp == false && !systemStore.ilsError && userStore.requests.holds.length > 0">
                <AccordionContent
                      class="requests-accordion"
                      background="var(--uvalib-blue-alt-lightest)"
@@ -42,7 +42,7 @@
                >
                   <template v-slot:title><span class="section-title">UVA Holds</span></template>
                   <div class="request-list">
-                     <div class="request" v-for="(req,idx) in requests.holds" :key="`ils-${idx}`">
+                     <div class="request" v-for="(req,idx) in userStore.requests.holds" :key="`ils-${idx}`">
                         <h3 class="title">{{req.title}}</h3>
                         <dl>
                            <template v-if="req.author">
@@ -62,7 +62,7 @@
                            <dt>Item Status:</dt>
                            <dd>{{req.itemStatus}}</dd>
                         </dl>
-                        <p  v-if="isDevServer">
+                        <p  v-if="systemStore.isDevServer">
                            <V4Button
                               mode="tertiary"
                               @click="deleteHold(req.id)"
@@ -77,7 +77,7 @@
                </AccordionContent>
             </template>
 
-            <template v-if="lookingUp == false && illLoans.length > 0">
+            <template v-if="userStore.lookingUp == false && illLoans.length > 0">
                <AccordionContent
                      class="requests-accordion"
                      background="var(--uvalib-blue-alt-lightest)"
@@ -106,7 +106,7 @@
                </AccordionContent>
             </template>
 
-            <template v-if="lookingUp == false && digitalRequests.length > 0">
+            <template v-if="userStore.lookingUp == false && digitalRequests.length > 0">
                <AccordionContent
                      class="requests-accordion"
                      background="var(--uvalib-blue-alt-lightest)"
@@ -165,120 +165,97 @@
                </AccordionContent>
             </template>
             <template v-if="hasNoRequests()">
-               <div v-if="!lookingUp" class="none">You currently have no outstanding requests</div>
+               <div v-if="!userStore.lookingUp" class="none">You currently have no outstanding requests</div>
             </template>
          </div>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities.vue"
+<script setup>
+import AccountActivities from "@/components/account/AccountActivities.vue"
+import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
+import { ref, computed, onMounted } from 'vue'
+import analytics from '@/analytics'
 import AccordionContent from "@/components/AccordionContent.vue"
-import InstructionalScan from "@/components/requests/standalone/InstructionalScan.vue"
-import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem.vue"
-import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV.vue"
-import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle.vue"
-export default {
-   name: "requests",
-   components: {
-      AccountActivities, AccordionContent, InstructionalScan, ILLBorrowItem, ILLBorrowAV, ILLScanArticle
-   },
-    data: function()  {
-      return {
-         request: ""
-      }
-    },
-   computed: {
-      ...mapState({
-         requests: state => state.user.requests,
-         lookingUp: state => state.user.lookingUp,
-         devServer: state => state.system.devServer,
-         hsILLiadURL: state => state.system.hsILLiadURL,
-         ilsError: state => state.system.ilsError,
-         noILSAccount: state => state.user.noILSAccount,
-      }),
-      ...mapGetters({
-         isDevServer: "system/isDevServer",
-         isHSLUser: "user/isHSLUser",
-         isSignedIn: 'user/isSignedIn',
-         isGuest: 'user/isGuest',
-         isUVA: 'user/isUVA',
-         isBarred: 'user/isBarred',
-         hasSysError: "system/hasError",
-      }),
-      illiadRequests() {
-         return this.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&
-          h.transactionStatus != "Request Finished" && h.transactionStatus != "Delivered to Web" )
-      },
-      illLoans() {
-         let out = []
-         this.illiadRequests.forEach( r => {
-            // console.log(`PT=${r.processType} RT=${r.requestType}`)
-            if (r.processType=="Borrowing" && r.requestType=="Loan") {
-               out.push(r)
-               // console.log("ADD LOAN")
-            }
-         })
-         return out
-      },
-      digitalRequests() {
-         let out = []
-         this.illiadRequests.forEach( r => {
-            // console.log(`PT=${r.processType} RT=${r.requestType} DT=${r.documentType}`)
-            if ((r.processType=="Borrowing" && r.requestType=="Article") ||
-                ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article") ||
-                ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article" && r.documentType=="Collab")) {
-               out.push(r)
-               // console.log("ADD DIGITAL")
-            }
-         })
-         return out
-      }
-   },
-   methods: {
-      instructionalScanClick() {
-         this.request = "InstructionalScan"
-      },
-      illBorrowClick() {
-         this.request = "ILLBorrowItem"
-      },
-      illBorrowAVClick() {
-         this.request = "ILLBorrowAV"
-      },
-      illScanClick() {
-         this.request = "ILLScanArticle"
-      },
-      cancelRequest() {
-         this.request = ""
-      },
-      requestSubmitted() {
-         if (this.hasSysError){
-            return
-         }
 
-         this.request = ""
-         this.$store.dispatch("user/getRequests")
-         this.$store.commit("system/setMessage", "Your request has been submitted.")
-         window.scrollTo(0,0)
-      },
-      formatDate(date) {
-         return date.split("T")[0];
-      },
-      hasNoRequests() {
-         return this.illLoans.length == 0 && this.requests.holds.length == 0 && this.digitalRequests == 0 && this.ilsError == ""
-      },
-      deleteHold(id) {
-         this.$store.dispatch("requests/deleteHold", id);
+
+const systemStore = useSystemStore()
+const userStore = useUserStore()
+const request = ref("")
+
+const illiadRequests = computed(()=>{
+   return userStore.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&
+      h.transactionStatus != "Request Finished" && h.transactionStatus != "Delivered to Web" )
+})
+
+const illLoans = computed(()=>{
+   let out = []
+   illiadRequests.value.forEach( r => {
+      // console.log(`PT=${r.processType} RT=${r.requestType}`)
+      if (r.processType=="Borrowing" && r.requestType=="Loan") {
+         out.push(r)
+         // console.log("ADD LOAN")
       }
-   },
-   created() {
-      if ( this.isSignedIn) {
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
+   })
+   return out
+})
+
+const digitalRequests = computed(()=>{
+   let out = []
+   illiadRequests.value.forEach( r => {
+      // console.log(`PT=${r.processType} RT=${r.requestType} DT=${r.documentType}`)
+      if ((r.processType=="Borrowing" && r.requestType=="Article") ||
+            ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article") ||
+            ((r.processType=="Doc Del" || r.processType=="DocDel") && r.requestType=="Article" && r.documentType=="Collab")) {
+         out.push(r)
+         // console.log("ADD DIGITAL")
       }
-   }
+   })
+   return out
+})
+
+function instructionalScanClick() {
+   request.value = "InstructionalScan"
 }
+function illBorrowClick() {
+   request.value = "ILLBorrowItem"
+}
+function illBorrowAVClick() {
+   request.value = "ILLBorrowAV"
+}
+function illScanClick() {
+   request.value = "ILLScanArticle"
+}
+function cancelRequest() {
+   request.value = ""
+}
+function requestSubmitted() {
+   if ( systemStore.hasError ) {
+      return
+   }
+
+   request.value = ""
+   userStore.getRequests()
+   systemStore.setMessage("Your request has been submitted.")
+   window.scrollTo(0,0)
+}
+function formatDate(date) {
+   return date.split("T")[0];
+}
+function hasNoRequests() {
+   return illLoans.value.length == 0 && userStore.requests.holds.length == 0 && digitalRequests.value == 0 && systemStore.ilsError == ""
+}
+function deleteHold(id) {
+   this.$store.dispatch("requests/deleteHold", id);
+}
+
+onMounted(() =>{
+   if ( userStore.isSignedIn) {
+      analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
+   }
+})
 </script>
 
 <style lang="scss" scoped>
