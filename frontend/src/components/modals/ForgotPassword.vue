@@ -1,5 +1,5 @@
 <template>
-   <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened" @show-forgot-password="forgotPassword.show()"
+   <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened"
       firstFocusID="userId" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`">
       <template v-slot:button>
@@ -39,7 +39,20 @@
 
 <script setup>
 import { useUserStore } from "@/stores/user"
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+
+const props = defineProps({
+   trigger: {
+      type: Boolean,
+      default: false,
+   },
+})
+
+watch(() => props.trigger, (newtrigger) => {
+   if ( newtrigger ) {
+      forgotPassword.value.show()
+   }
+})
 
 const forgotPassword = ref(null)
 const id = ref("forgot-password")

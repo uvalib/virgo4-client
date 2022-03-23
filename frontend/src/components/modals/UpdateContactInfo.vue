@@ -1,7 +1,6 @@
 <template>
    <V4Modal :id="id" title="Update Contact Info" class="update-modal" ref="updateInfo"
       @opened="opened"
-      @show-forgot-password="updateInfo.show()"
       firstFocusID="firstname" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`">
       <template v-slot:button>

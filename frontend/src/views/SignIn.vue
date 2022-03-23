@@ -51,8 +51,8 @@
                </tr>
                <tr>
                   <td colspan="2">
-                     <ForgotPassword />
-                     <ChangePassword v-if="hasPasswordToken" />
+                     <ForgotPassword :trigger="showForgotModal" @closed="onForgotPassClosed" />
+                     <ChangePassword v-if="hasPasswordToken" @show-forgot-password="onShowForgotPassword"/>
                   </td>
                </tr>
             </table>
@@ -79,17 +79,27 @@ const systemStore = useSystemStore()
 const userStore = useUserStore()
 const user = ref('')
 const pin = ref('')
+const showForgotModal = ref(false)
 
 const hasPasswordToken = computed( ()=> {
-   return route.query.token &&route.query.token.length > 0
+   return route.query.token && route.query.token.length > 0
 })
 
 userStore.$subscribe((mutation) => {
    if (mutation.events.key == "authTriesLeft")  {
-      console.log("AUTH TRY "+mutation.events.oldValue+" -> "+mutation.events.newValue)
+      console.log("AUTH TRIES "+mutation.events.oldValue+" -> "+mutation.events.newValue)
+      if (mutation.events.newValue < mutation.events.oldValue ) {
+         pin.value = ""
+      }
    }
 })
 
+function onForgotPassClosed() {
+   showForgotModal.value = false
+}
+function onShowForgotPassword() {
+   showForgotModal.value = true
+}
 function signinClicked() {
   userStore.signin({barcode: user.value.trim(), password: pin.value})
 }
