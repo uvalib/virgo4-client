@@ -1,16 +1,16 @@
 <template>
-   <V4Modal :id="id" :title="title" ref="confirmdlg"
-      :firstFocusID="`${id}-cancelbtn`" :lastFocusID="`${id}-okbtn`"
-      :buttonID="`${id}-open`"
+   <V4Modal :id="props.id" :title="props.title" ref="confirmdlg"
+      :firstFocusID="`${props.id}-cancelbtn`" :lastFocusID="`${props.id}-okbtn`"
+      :buttonID="`${props.id}-open`"
    >
       <template v-slot:button>
-         <V4Button v-if="buttonLabel" :mode="buttonMode" @click="$refs.confirmdlg.show()" :id="`${id}-open`"
-             :aria-label="ariaLabel"
+         <V4Button v-if="props.buttonLabel" :mode="props.buttonMode" @click="confirmdlg.show()" :id="`${props.id}-open`"
+             :aria-label="props.ariaLabel"
          >
-            {{buttonLabel}}
+            {{props.buttonLabel}}
          </V4Button>
-         <V4Button v-else mode="icon" @click="$refs.confirmdlg.show()" :id="`${id}-open`"
-             :aria-label="ariaLabel"
+         <V4Button v-else mode="icon" @click="confirmdlg.show()" :id="`${props.id}-open`"
+             :aria-label="props.ariaLabel"
          >
             <i class="trash fal fa-trash-alt"></i>
          </V4Button>
@@ -20,11 +20,11 @@
          <p>Continue?</p>
        </template>
        <template v-slot:controls>
-         <V4Button mode="tertiary" :id="`${id}-cancelbtn`" class="cancelbtn" @click="$refs.confirmdlg.hide()"
+         <V4Button mode="tertiary" :id="`${props.id}-cancelbtn`" class="cancelbtn" @click="confirmdlg.hide()"
             :focusBackOverride="true" @tabback="backTabCancel">
             Cancel
          </V4Button>
-         <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
+         <V4Button mode="primary" :id="`${props.id}-okbtn`" @click="okClicked"
             :focusNextOverride="true" @tabnext="nextTabOK">
             OK
          </V4Button>
@@ -32,46 +32,48 @@
    </V4Modal>
 </template>
 
-<script>
-export default {
-   props: {
-      title: {
-         type: String,
-         required: true
-      },
-      id: {
-         type: String,
-         required: true
-      },
-      buttonLabel: {
-         type: String,
-         default: ""
-      },
-      buttonMode: {
-         type: String,
-         default: "text"
-      },
-      ariaLabel: {
-         type: String,
-         default: ""
-      }
+<script setup>
+import { ref } from 'vue'
+
+const emit = defineEmits( ['confirmed'] )
+const props = defineProps({
+   title: {
+      type: String,
+      required: true
    },
-   methods: {
-      backTabCancel() {
-         this.$refs.confirmdlg.firstFocusBackTabbed()
-      },
-      nextTabOK() {
-         this.$refs.confirmdlg.lastFocusTabbed()
-      },
-      okClicked() {
-         this.$emit('confirmed')
-         setTimeout( () => {
-            if ( this.$refs.confirmdlg ) {
-               this.$refs.confirmdlg.hide()
-            }
-         }, 300)
-      },
+   id: {
+      type: String,
+      required: true
+   },
+   buttonLabel: {
+      type: String,
+      default: ""
+   },
+   buttonMode: {
+      type: String,
+      default: "text"
+   },
+   ariaLabel: {
+      type: String,
+      default: ""
    }
+})
+
+const confirmdlg = ref(null)
+
+function backTabCancel() {
+   confirmdlg.value.firstFocusBackTabbed()
+}
+function nextTabOK() {
+   confirmdlg.value.lastFocusTabbed()
+}
+function okClicked() {
+   emit('confirmed')
+   setTimeout( () => {
+      if ( confirmdlg.value ) {
+         confirmdlg.value.hide()
+      }
+   }, 300)
 }
 </script>
 
