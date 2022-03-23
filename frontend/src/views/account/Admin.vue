@@ -1,56 +1,43 @@
 <template>
    <div class="admin">
-      <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="(lookingUpPools || lookingUpAccount) && isSignedIn" >
+      <AccountActivities v-if="userStore.isSignedIn"/>
+      <div class="working" v-if="(poolStore.lookingUp || userStore.lookingUp) && userStore.isSignedIn" >
          <V4Spinner message="Loading admin settings..."/>
       </div>
       <div v-else>
-         <template v-if="isSignedIn">
-            <PickupLibraries class="section" v-if="isAdmin"/>
-            <JWTAdmin class="section" v-if="isAdmin"/>
-            <PDADashboard class="section"  v-if="isAdmin || isPDAAdmin"/>
+         <template v-if="userStore.isSignedIn">
+            <PickupLibraries class="section" v-if="userStore.isAdmin"/>
+            <JWTAdmin class="section" v-if="userStore.isAdmin"/>
+            <PDADashboard class="section"  v-if="userStore.isAdmin || userStore.isPDAAdmin"/>
          </template>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
+<script setup>
 import JWTAdmin from "@/components/admin/JWTAdmin.vue"
 import PickupLibraries from "@/components/admin/PickupLibraries.vue"
-import AccountActivities from "@/components/AccountActivities.vue"
-import PDAPanel from "../../components/requests/panels/PDAPanel.vue"
-import PDADashboard from "../../components/admin/PDADashboard.vue"
-export default {
-   name: "admin",
-   components: {
-    JWTAdmin,
-    AccountActivities,
-    PickupLibraries,
-    PDAPanel,
-    PDADashboard
-},
-   computed: {
-      ...mapState({
-         lookingUpPools : state => state.pools.lookingUp,
-         lookingUpAccount : state => state.user.lookingUp,
-      }),
-      ...mapGetters({
-        isSignedIn: 'user/isSignedIn',
-        isAdmin: 'user/isAdmin',
-        isPDAAdmin: 'user/isPDAAdmin'
-      }),
-   },
-   created() {
-      if ( !this.isAdmin &&  !this.isPDAAdmin ) {
-         this.$router.replace("/forbidden")
-      } else {
-         if ( this.isSignedIn) {
-            this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Admin")
-         }
+import AccountActivities from "@/components/account/AccountActivities.vue"
+import PDADashboard from "@/components/admin/PDADashboard.vue"
+import { useUserStore } from "@/stores/user"
+import { usePoolStore } from "@/stores/pool"
+import { onMounted } from 'vue'
+import analytics from '@/analytics'
+import { useRouter } from 'vue-router'
+
+const userStore = useUserStore()
+const poolStore = usePoolStore()
+const router = useRouter()
+
+onMounted(() => {
+   if ( !userStore.isAdmin &&  !userStore.isPDAAdmin ) {
+      router.replace("/forbidden")
+   } else {
+      if ( userStore.isSignedIn) {
+         analytics.trigger('Navigation', 'MY_ACCOUNT', "Admin")
       }
    }
-}
+})
 </script>
 <style lang="scss" scoped>
 .admin {

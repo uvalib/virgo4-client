@@ -14,7 +14,7 @@
       <span class="sep">|</span>
       <router-link id="preferences-submenu" to="/preferences">Preferences</router-link>
       <span class="sep">|</span>
-      <template v-if="systemStore.isAdmin || systemStore.isPDAAdmin">
+      <template v-if="userStore.isAdmin || userStore.isPDAAdmin">
          <router-link id="preferences-submenu" to="/admin">Admin</router-link>
          <span class="sep">|</span>
       </template>
@@ -23,12 +23,11 @@
 </template>
 
 <script setup>
-import { useSystemStore } from '../../stores/system'
 import { useUserStore } from '../../stores/user'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const systemStore = useSystemStore()
+const userStore = useUserStore()
 async function signOut() {
    const user = useUserStore()
    user.signout(true)

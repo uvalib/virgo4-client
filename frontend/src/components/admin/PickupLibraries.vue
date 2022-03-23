@@ -1,14 +1,14 @@
 <template>
-   <div v-if="isAdmin" class="libary-admin">
+   <div v-if="userStore.isAdmin" class="libary-admin">
       <h2>
          <span>Pickup Library Management</span>
          <V4Button class="edit-pl" mode="primary" @click="addClicked">Add</V4Button>
       </h2>
       <div class="content form">
-         <div class="row" v-for="(pl,idx) in pickupLibraries" :key="`pl${pl.primaryKey}`">
+         <div class="row" v-for="(pl,idx) in systemStore.allPickupLibraries" :key="`pl${pl.primaryKey}`">
             <template v-if="idx == editIndex">
-               <input class="edit id" v-model="editRec.id" />
-               <input class="edit name" v-model="editRec.name" />
+               <input class="edit id" v-model="editRec.value.id" />
+               <input class="edit name" v-model="editRec.value.name" />
                <div class="actions">
                   <V4Button class="edit-pl" mode="tertiary" @click="cancelClicked">Cancel</V4Button>
                   <V4Button class="edit-pl" mode="tertiary" @click="updateClicked">Update</V4Button>
@@ -31,9 +31,9 @@
                </div>
             </template>
          </div>
-         <div class="row" v-if="editIndex == pickupLibraries.length">
-            <input class="edit id" v-model="editRec.id" />
-            <input class="edit name" v-model="editRec.name" />
+         <div class="row" v-if="editIndex == systemStore.allPickupLibraries.length">
+            <input class="edit id" v-model="editRec.value.id" />
+            <input class="edit name" v-model="editRec.value.name" />
             <div class="actions">
                <V4Button class="edit-pl" mode="tertiary" @click="cancelClicked">Cancel</V4Button>
                <V4Button class="edit-pl" mode="tertiary" @click="addConfirmed">Add</V4Button>
@@ -42,61 +42,53 @@
       </div>
    </div>
 </template>
-<script>
-import { mapState, mapGetters } from "vuex";
 
-export default {
-   data: function()  {
-      return {
-         editIndex: -1,
-         editRec: {primaryKey: 0, id: "", name: "", enabled: false}
-      }
-   },
-   computed: {
-      ...mapState({
-          pickupLibraries : state => state.system.allPickupLibraries,
-      }),
-      ...mapGetters({
-         isAdmin: "user/isAdmin",
-      })
-   },
-   methods: {
-      addClicked() {
-         this.editIndex = this.pickupLibraries.length
-         this.editRec.primaryKey = 0
-         this.editRec.id = ""
-         this.editRec.name = ""
-         this.editRec.enabled = true
-      },
-      async addConfirmed() {
-          await this.$store.dispatch("system/addPickupLibrary", this.editRec)
-          this.cancelClicked()
-      },
-      deleteLibrary(library) {
-         this.$store.dispatch("system/deletePickupLibrary", library)
-      },
-      async updateClicked() {
-         await this.$store.dispatch("system/updatePickupLibrary", this.editRec)
-         this.cancelClicked()
-      },
-      cancelClicked() {
-         this.editIndex = -1
-         this.editRec = {primaryKey: 0, id: "", name: "", enabled: false}
-      },
-      enableClicked(pl) {
-         pl.enabled = !pl.enabled
-         this.$store.dispatch("system/updatePickupLibrary", pl)
-      },
-      editClicked(idx, rec) {
-         this.editIndex = idx
-         this.editRec.primaryKey = rec.primaryKey
-         this.editRec.id = rec.id
-         this.editRec.name = rec.name
-         this.editRec.enabled = rec.enabled
-      },
-   },
-};
+<script setup>
+import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
+import { ref } from 'vue'
+
+const userStore = useUserStore()
+const systemStore = useSystemStore()
+
+const editIndex = ref(-1)
+const editRec = ref({primaryKey: 0, id: "", name: "", enabled: false})
+
+function addClicked() {
+   editIndex.value = systemStore.allPickupLibraries.length
+   editRec.value.primaryKey = 0
+   editRec.value.id = ""
+   editRec.value.name = ""
+   editRec.value.enabled = true
+}
+async function addConfirmed() {
+   await systemStore.addPickupLibrary(editRec)
+   cancelClicked()
+}
+function deleteLibrary(library) {
+   systemStore.deletePickupLibrary(library)
+}
+async function updateClicked() {
+   await systemStore.updatePickupLibrary(editRec)
+   cancelClicked()
+}
+function cancelClicked() {
+   editIndex.value = -1
+   editRec.value = {primaryKey: 0, id: "", name: "", enabled: false}
+}
+function enableClicked(pl) {
+   pl.enabled = !pl.enabled
+   systemStore.updatePickupLibrary(pl)
+}
+function editClicked(idx, rec) {
+   editIndex.value = idx
+   editRec.value.primaryKey = rec.primaryKey
+   editRec.value.id = rec.id
+   editRec.value.name = rec.name
+   editRec.value.enabled = rec.enabled
+}
 </script>
+
 <style lang="scss" scoped>
 .libary-admin {
    h2 {

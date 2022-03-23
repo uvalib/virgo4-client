@@ -180,7 +180,6 @@ function okClicked() {
          userStore.changePasswordWithToken(data).then(() => {
             passwordChanged.value = true
          }).catch((e) => {
-            console.log(e)
             expiredToken.value = true
 
             if(e.response.data.message){
