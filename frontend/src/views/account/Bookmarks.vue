@@ -151,6 +151,7 @@ const userStore = useUserStore()
 const systemStore = useSystemStore()
 const bookmarkStore = useBookmarkStore()
 const reserveStore = useReserveStore()
+const router = useRouter()
 
 // html element ref
 const folderInput = ref(null)
@@ -249,7 +250,6 @@ async function reserve() {
       msg += "</ul>Please deselect these items and try again."
       systemStore.setError(msg)
    } else {
-      const router = useRouter()
       router.push("/course-reserves-request")
    }
 }

@@ -1,7 +1,7 @@
 <template>
-   <ReservedPanel v-if="submitted" />
+   <ReservedPanel v-if="reserveStore.submitted" />
    <div v-else class="course-reserves-request">
-      <div v-if="requestList.length==0" class="reserves-content">
+      <div v-if="reserveStore.requestList.length==0" class="reserves-content">
          <p>You currently have no items selected for course reserves.</p>
          <p>
             Please return to your <router-link to="/bookmarks">bookmarks</router-link>
@@ -9,7 +9,7 @@
          </p>
       </div>
       <div v-else class="reserves-content">
-         <V4Spinner  v-if="searching" message="Submitting your request..." v-bind:overlay="true"/>
+         <V4Spinner  v-if="reserveStore.working" message="Submitting your request..." v-bind:overlay="true"/>
          <div class="note important">
             Please allow 14 days to process requests
          </div>
@@ -19,41 +19,43 @@
          <div class="pure-form pure-form-aligned form">
             <div class="pure-control-group">
                <label for="behalf_of">Is this request on behalf of an instructor?</label>
-               <select v-model="onBehalfOf" id="behalf_of" name="behalf_of">
+               <select v-model="reserveStore.request.onBehalfOf" id="behalf_of" name="behalf_of">
                   <option value="no">No</option>
                   <option value="yes">Yes</option>
                </select>
             </div>
-            <template v-if="onBehalfOf=='yes'">
+            <template v-if="reserveStore.request.onBehalfOf=='yes'">
                <div class="pure-control-group">
                   <label for="instructor_name">Instructor Name</label>
-                  <input v-model="instructorName" name="instructor_name" id="instructor_name" type="text" aria-required="true" required="required">
+                  <input v-model="reserveStore.request.instructorName" name="instructor_name" id="instructor_name" type="text"
+                     aria-required="true" required="required">
                   <span v-if="hasError('instructorName')" class="error">* instructor name is required</span>
                </div>
                <div class="pure-control-group">
                   <label for="instructor_email">Instructor Email Address</label>
-                  <input v-model="instructorEmail" id="instructor_email" type="email" aria-required="true" required="required">
+                  <input v-model="reserveStore.request.instructorEmail" id="instructor_email"
+                     type="email" aria-required="true" required="required">
                   <span v-if="hasError('instructorEmail')" class="error">* instructor email is required</span>
                </div>
             </template>
             <div class="pure-control-group">
                <label for="name">Your Name</label>
-               <input v-model="name" id="name" type="text" aria-required="true" required="required">
+               <input v-model="reserveStore.request.name" id="name" type="text" aria-required="true" required="required">
                <span v-if="hasError('name')" class="error">* name is required</span>
             </div>
             <div class="pure-control-group">
                <label for="email">Your  Email Address</label>
-               <input v-model="email" id="email" type="email" aria-required="true" required="required">
+               <input v-model="reserveStore.request.email" id="email" type="email" aria-required="true" required="required">
                <span v-if="hasError('email')" class="error">* email is required</span>
             </div>
             <div class="pure-control-group">
                <label for="course">Course ID<span class="hint">(e.g. MDST 3840)</span></label>
-               <input v-model="course" id="course" type="text" aria-required="true" required="required">
+               <input v-model="reserveStore.request.course" id="course" type="text" aria-required="true" required="required">
                <span v-if="hasError('course')" class="error">* course ID is required</span>
             </div>
             <div class="pure-control-group">
                <label for="semester">Semester</label>
-               <select v-model="semester" id="semester" name="semester" aria-required="true" required="required">
+               <select v-model="reserveStore.request.semester" id="semester" name="semester" aria-required="true" required="required">
                   <option value="">Please select a semester</option>
                   <option value="Fall">Fall</option>
                   <option value="January">January</option>
@@ -72,7 +74,7 @@
                <div class="item-type-settings">
                   <div class="pure-control-group">
                      <label for="library">Reserve Library</label>
-                     <select v-model="library" id="library" name="library" aria-required="true" required="required">
+                     <select v-model="reserveStore.request.library" id="library" name="library" aria-required="true" required="required">
                         <option value="">Please select a location</option>
                         <option value="astr">Astronomy</option>
                         <option value="brown">Brown Science &amp; Engineering</option>
@@ -87,7 +89,9 @@
                   </div>
                   <div class="pure-control-group" v-if="nonVideoRequests.length > 0">
                      <label for="period">Loan Period <span class="hint">(for all items)</span></label>
-                     <select @change="itemsPeriodChosen" v-model="period" id="period" name="period" aria-required="true" required="required">
+                     <select @change="itemsPeriodChosen" v-model="reserveStore.request.period" id="period"
+                        name="period" aria-required="true" required="required"
+                     >
                         <option value="">Please select</option>
                         <option value="3h">3 hours</option>
                         <option value="2d">2 days</option>
@@ -132,15 +136,15 @@
                <div class="item-type-settings">
                   <div class="entry pure-control-group">
                      <label for="learningManagementSystem">Learning Management System</label>
-                     <select v-model="lms" id="learningManagementSystem" aria-required="true" required="required">
+                     <select v-model="reserveStore.request.lms" id="learningManagementSystem" aria-required="true" required="required">
                         <option value="">Please indicate in which system your course resides.</option>
                         <option v-for="lmsOption in learningManagementSystems" :key="lmsOption" :value="lmsOption">{{lmsOption}}</option>
                      </select>
                      <span v-if="hasError('lms')" class="error">* LMS is required.</span>
                   </div>
-                  <div class="pure-control-group" v-if="lms == 'Other'">
+                  <div class="pure-control-group" v-if="reserveStore.request.lms == 'Other'">
                      <label  for="otherLMS">Please specify other LMS </label>
-                        <input v-model="otherLMS" id="otherLMS" aria-required="true" required="required">
+                        <input v-model="reserveStore.request.otherLMS" id="otherLMS" aria-required="true" required="required">
                         <span v-if="hasError('otherLMS')" class="error">* LMS is required.</span>
                   </div>
                </div>
@@ -174,124 +178,98 @@
          </div>
          <div class="controls">
             <V4Button mode="tertiary" @click="cancelRequest">Cancel Request</V4Button>
-         <V4Button mode="primary" @click="submitRequest">Submit Request</V4Button>
+            <V4Button mode="primary" @click="submitRequest">Submit Request</V4Button>
          </div>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-import { mapFields } from 'vuex-map-fields'
-import { mapMultiRowFields } from 'vuex-map-fields'
+<script setup>
+import { computed, ref, onMounted } from 'vue'
 import ReservedPanel from "@/components/requests/panels/ReservedPanel.vue"
-export default {
-   name: "course-reserves-request",
-   data: function() {
-      return {
-         errors: [],
-         learningManagementSystems: ['Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other'],
-      };
-   },
-   components: {
-      ReservedPanel
-   },
-   computed: {
-      ...mapState({
-         submitted: state => state.reserves.submitted,
-         requestList: state => state.reserves.requestList,
-         searching: state => state.searching,
-         reserveRequest: state => state.reserves.request,
-         userInfo: state => state.user.accountInfo
-      }),
-      ...mapFields('reserves',[
-         'request.onBehalfOf',
-         'request.instructorName',
-         'request.instructorEmail',
-         'request.name',
-         'request.email',
-         'request.course',
-         'request.semester',
-         'request.library',
-         'request.period',
-         'request.lms',
-         'request.otherLMS',
-      ]),
-      ...mapMultiRowFields('reserves', ['requestList']),
-      videoRequests() {
-        return this.requestList.filter( r=> r.video === true)
-      },
-      nonVideoRequests() {
-         return this.requestList.filter(  r=> r.video !== true)
+import { useReserveStore } from '@/stores/reserve'
+import { useUserStore } from '@/stores/user'
+import { useSystemStore } from '@/stores/system'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const userStore = useUserStore()
+const reserveStore = useReserveStore()
+const systemStore = useSystemStore()
+const errors = ref([])
+const learningManagementSystems = ['Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other']
+
+const videoRequests = computed(()=>{
+   return reserveStore.requestList.filter( r=> r.video === true)
+})
+const nonVideoRequests = computed(()=>{
+   return reserveStore.requestList.filter(  r=> r.video !== true)
+})
+
+onMounted(()=>{
+   reserveStore.submitted = false
+   reserveStore.setRequestingUser(userStore.accountInfo)
+})
+
+function hasSubtitleError( item ) {
+   if (errors.value.includes("subtitleLanguage") == false) return false
+   return (item.subtitles == "yes" && item.subtitleLanguage == "")
+}
+function hasError( val ) {
+   return errors.value.includes(val)
+}
+function cancelRequest() {
+   router.push("/bookmarks")
+}
+function submitRequest() {
+   errors.value = []
+   let proxyRequest = reserveStore.request.onBehalfOf == "yes"
+   for (let [key, value] of Object.entries(reserveStore.request)) {
+      console.log(key+"=["+value+"]")
+      // skip lonn/library if there are no non-video items
+      if ( (key == "period" || key == "library") && nonVideoRequests.value.length == 0) continue
+
+      // skip lms if there are no video items. skip other if lms is not other
+      if ( (key == "lms" || key == "otherLMS") && videoRequests.value.length == 0) continue
+      if (  key == "otherLMS" && videoRequests.value.length > 0 ) {
+         if ( reserveStore.request.lms != "Other") {
+            continue
+         }
       }
-   },
-   created() {
-      this.$store.commit('reserves/setSubmitted', false)
-      this.$store.commit("reserves/setRequestingUser", this.userInfo)
-   },
-   methods: {
-      hasSubtitleError( item) {
-         if (this.errors.includes("subtitleLanguage") == false) return false
-         return (item.subtitles == "yes" && item.subtitleLanguage == "")
-      },
-      hasError( val) {
-         return this.errors.includes(val)
-      },
-      cancelRequest() {
-         this.$router.push("/bookmarks")
-      },
-      submitRequest() {
-         this.errors.splice(0, this.errors.length)
-         let proxyRequest = this.reserveRequest.onBehalfOf == "yes"
-         for (let [key, value] of Object.entries(this.reserveRequest)) {
-            console.log(key+"=["+value+"]")
-            // skip lonn/library if there are no non-video items
-            if ( (key == "period" || key == "library") && this.nonVideoRequests.length == 0) continue
 
-            // skip lms if there are no video items. skip other if lms is not other
-            if ( (key == "lms" || key == "otherLMS") && this.videoRequests.length == 0) continue
-            if (  key == "otherLMS" && this.videoRequests.length > 0 ) {
-               if ( this.reserveRequest.lms != "Other") {
-                  continue
-               }
-            }
+      if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail") ) continue
 
-            if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail") ) continue
-
-            // all other values are required
-            if (value == "") {
-               console.log("ERROR MISSING "+key)
-               this.errors.push(key)
-            }
-         }
-
-         let subtitleError = false
-         this.videoRequests.forEach( r => {
-            if (r.subtitles == "yes" && r.subtitleLanguage == "") {
-               subtitleError = true
-            }
-         })
-         if (subtitleError) {
-            this.errors.push("subtitleLanguage")
-         }
-         if ( this.errors.length == 0) {
-            this.$store.dispatch("reserves/createReserves")
-         } else {
-            this.$store.commit("system/setError", "Some required fields are missing")
-            var scrollStep = -window.scrollY / (500 / 10),
-            scrollInterval = setInterval(()=> {
-               if ( window.scrollY != 0 ) {
-                  window.scrollBy( 0, scrollStep )
-               } else {
-                  clearInterval(scrollInterval)
-               }
-            },10)
-         }
-      },
-      itemsPeriodChosen() {
-         this.$store.commit("reserves/updateReservedItemsPeriod")
+      // all other values are required
+      if (value == "") {
+         errors.value.push(key)
       }
    }
+
+   let subtitleError = false
+   videoRequests.value.forEach( r => {
+      if (r.subtitles == "yes" && r.subtitleLanguage == "") {
+         subtitleError = true
+      }
+   })
+   if (subtitleError) {
+      errors.value.push("subtitleLanguage")
+   }
+   if ( errors.value.length == 0) {
+      reserveStore.createReserves()
+   } else {
+      systemStore.setError("Some required fields are missing")
+      var scrollStep = -window.scrollY / (500 / 10),
+      scrollInterval = setInterval(()=> {
+         if ( window.scrollY != 0 ) {
+            window.scrollBy( 0, scrollStep )
+         } else {
+            clearInterval(scrollInterval)
+         }
+      }, 10)
+   }
+}
+function itemsPeriodChosen() {
+   reserveStore.updateReservedItemsPeriod()
 }
 </script>
 

@@ -9,7 +9,7 @@ export const useReserveStore = defineStore('reserve', {
       systemStore: useSystemStore(),
       userStore: useUserStore(),
       requestStore: useRequestStore(),
-      searching: false,
+      working: false,
       query: "",
       searchType: "",
       targetInstructor: "",
@@ -129,7 +129,7 @@ export const useReserveStore = defineStore('reserve', {
             itemIds.push(item.identifier)
          })
 
-         this.searching = true
+         this.working = true
          return axios.post(`${this.systemStore.availabilityURL}/reserves/validate`, {items: itemIds}).then( response => {
             response.data.forEach( async (item, idx) => {
                // for now, only video items can be put on course reserve
@@ -140,16 +140,16 @@ export const useReserveStore = defineStore('reserve', {
                }
             })
 
-            this.searching = false
+            this.working = false
          }).catch((error) => {
             this.systemStore.setError(error)
-            this.searching = false
+            this.working = false
          })
 
       },
 
       createReserves() {
-         this.searching = true
+         this.working = true
          let v4UserID = this.userStore.signedInUser
          let data = {userID: v4UserID, request: this.request, items: []}
          this.requestList.forEach( item=>{
@@ -175,10 +175,10 @@ export const useReserveStore = defineStore('reserve', {
          axios.post(`${this.systemStore.availabilityURL}/reserves`, data).then((_response) => {
             this.clearRequestList()
             this.submitted = true
-            this.searching = false
+            this.working = false
          }).catch((error) => {
             this.systemStore.setError(error)
-            this.searching = false
+            this.working = false
          })
       },
 
@@ -201,7 +201,7 @@ export const useReserveStore = defineStore('reserve', {
       searchCourseReserves( data) {
          this.query = data.query
          let qs = data.query
-         this.searching = true
+         this.working = true
          this.setTargetInstructor(data.instructor)
 
          this.resetResults(data.type)
@@ -209,10 +209,10 @@ export const useReserveStore = defineStore('reserve', {
          let url = `${this.systemStore.availabilityURL}/reserves/search?${typeParam}&query=${qs}`
          axios.get(url).then((response) => {
             this.setCourseReserves(response.data)
-            this.searching = false
+            this.working = false
          }).catch((error) => {
             this.systemStore.setError(error)
-            this.searching = false
+            this.working = false
          })
       },
    }
