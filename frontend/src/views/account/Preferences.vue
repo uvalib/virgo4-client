@@ -1,7 +1,7 @@
 <template>
    <div class="preferences">
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="preferences"/>
-      <AccountActivities v-if="isSignedIn"/>
+      <AccountActivities v-if="userStore.isSignedIn"/>
       <div class="working" v-if="(poolStore.lookingUp || userStore.lookingUp) && userStore.isSignedIn" >
          <V4Spinner message="Loading preferences..."/>
       </div>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import AccountActivities from "@/components/AccountActivities.vue"
+import AccountActivities from "@/components/account/AccountActivities.vue"
 import Search from "@/components/preferences/Search.vue"
 import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
 import V4Privacy from "@/components/preferences/V4Privacy.vue"

@@ -16,7 +16,7 @@
          <div class="line">We retain this aggregate information for a limited time.
          </div>
          <div class="opt-out">
-            <span v-if="trackingOptOut">
+            <span v-if="preferencesStore.trackingOptOut">
                You have opted out. Uncheck the box below to opt in.
             </span>
             <span v-else>
