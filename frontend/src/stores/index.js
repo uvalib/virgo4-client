@@ -4,7 +4,6 @@ import analytics from '../analytics'
 import errorReporter from './plugins/error_reporter'
 import query from './modules/query'
 import item from './modules/item'
-import searches from './modules/searches'
 import shelf from './modules/shelf'
 import sort from './modules/sort'
 import * as utils from '../utils'
@@ -545,7 +544,6 @@ export default createStore({
    modules: {
       item: item,
       query: query,
-      searches: searches,
       shelf: shelf,
       sort: sort,
    },
