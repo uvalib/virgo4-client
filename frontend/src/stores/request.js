@@ -4,13 +4,9 @@ import urlModule from 'url'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
-import { usePreferencesStore } from "@/stores/preferences"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
-      systemStore: useSystemStore(),
-      userStore: useUserStore(),
-      preferencestore: usePreferencesStore(),
       alertText: '',
       requestOptions: [],
       errors: {},
@@ -124,7 +120,7 @@ export const useRequestStore = defineStore('request', {
          this.buttonDisabled = true
          await axios.post('/api/requests/openurl', ctx.this.openurl
          ).catch(e =>
-            this.systemStore.setError(e)
+            useSystemStore().setError(e)
          ).finally(()=>
             this.buttonDisabled = false
          )
@@ -134,7 +130,7 @@ export const useRequestStore = defineStore('request', {
          this.buttonDisabled = true
          await axios.post('/api/requests/standalone/borrow', req
          ).catch(e =>
-            this.systemStore.setError(e)
+            useSystemStore().setError(e)
          ).finally(()=>
             this.buttonDisabled = false
          )
@@ -144,7 +140,7 @@ export const useRequestStore = defineStore('request', {
          this.buttonDisabled = true
          await axios.post('/api/requests/standalone/scan', req
          ).catch(e =>
-            this.systemStore.setError(e)
+            useSystemStore().setError(e)
          ).finally(()=>
             this.buttonDisabled = false
          )
@@ -155,7 +151,7 @@ export const useRequestStore = defineStore('request', {
          axios.post('/api/requests/scan', this.scan).then(_response => {
             this.activePanel = "ConfirmationPanel"
          }).catch(e =>
-            this.systemStore.setError(e)
+            useSystemStore().setError(e)
          ).finally(()=>
             this.buttonDisabled = false
          )
@@ -178,22 +174,23 @@ export const useRequestStore = defineStore('request', {
                }
             }).catch(e =>
                // Connenction problem
-               this.systemStore.setError(e)
+               useSystemStore().setError(e)
             ).finally(()=>
                this.buttonDisabled = false
             )
       },
       deleteHold(holdId) {
+         const userStore = useUserStore()
          this.buttonDisabled = true
          axios.delete('/api/requests/hold/' + holdId)
             .then(response => {
                if (response.status == 200) {
-                  this.userStore.getRequests()
+                  userStore.getRequests()
                } else {
-                  this.systemStore.setError(response.data)
+                  useSystemStore().setError(response.data)
                }
             }).catch(e =>
-               this.systemStore.setError(e)
+               useSystemStore().setError(e)
             ).finally(()=>
                this.buttonDisabled = false
             )
@@ -207,7 +204,7 @@ export const useRequestStore = defineStore('request', {
             }).catch(e => {
                this.activePanel = "OptionsPanel"
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
-               this.systemStore.setError(message)
+               useSystemStore().setError(message)
             }).finally(()=>{
                this.buttonDisabled = false
             })

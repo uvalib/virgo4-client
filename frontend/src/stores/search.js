@@ -4,7 +4,6 @@ import { useSystemStore } from "@/stores/system"
 
 export const useSearchStore = defineStore('search', {
 	state: () => ({
-      systemStore: useSystemStore(),
       saved: [],
       history: [],
       lookingUp: false,
@@ -42,7 +41,8 @@ export const useSearchStore = defineStore('search', {
             this.setSearches(response.data)
             this.lookingUp = false
           }).catch((error) => {
-            this.systemStore.setError(error)
+            const system = useSystemStore()
+            system.setError(error)
             this.lookingUp = false
           })
       },
@@ -70,7 +70,8 @@ export const useSearchStore = defineStore('search', {
                this.saved.splice(idx,1)
             }
          } catch (e) {
-            this.systemStore.setError("Unable to delete saved search. Please try again later.")
+            const system = useSystemStore()
+            system.setError("Unable to delete saved search. Please try again later.")
          }
       },
 
@@ -80,7 +81,8 @@ export const useSearchStore = defineStore('search', {
             this.saved.splice(0, this.saved.length)
             this.lookingUp = false
           }).catch((error) => {
-            this.systemStore.setError(error)
+            const system = useSystemStore()
+            system.setError(error)
             this.lookingUp = false
           })
       },
@@ -91,7 +93,8 @@ export const useSearchStore = defineStore('search', {
             this.history.splice(0, this.history.length)
             this.lookingUp = false
           }).catch((error) => {
-            this.systemStore.setError(error)
+            const system = useSystemStore()
+            system.setError(error)
             this.lookingUp = false
           })
       }

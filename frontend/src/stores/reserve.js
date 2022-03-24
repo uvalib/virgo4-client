@@ -6,9 +6,6 @@ import { useRequestStore } from "@/stores/request"
 
 export const useReserveStore = defineStore('reserve', {
 	state: () => ({
-      systemStore: useSystemStore(),
-      userStore: useUserStore(),
-      requestStore: useRequestStore(),
       working: false,
       query: "",
       searchType: "",
@@ -129,8 +126,9 @@ export const useReserveStore = defineStore('reserve', {
             itemIds.push(item.identifier)
          })
 
+         const system = useSystemStore()
          this.working = true
-         return axios.post(`${this.systemStore.availabilityURL}/reserves/validate`, {items: itemIds}).then( response => {
+         return axios.post(`${system.availabilityURL}/reserves/validate`, {items: itemIds}).then( response => {
             response.data.forEach( async (item, idx) => {
                // for now, only video items can be put on course reserve
                if (item.reserve == false || item.is_video == false ) {
@@ -142,15 +140,16 @@ export const useReserveStore = defineStore('reserve', {
 
             this.working = false
          }).catch((error) => {
-            this.systemStore.setError(error)
+            system.setError(error)
             this.working = false
          })
 
       },
 
       createReserves() {
+         const userStore = useUserStore()
          this.working = true
-         let v4UserID = this.userStore.signedInUser
+         let v4UserID = userStore.signedInUser
          let data = {userID: v4UserID, request: this.request, items: []}
          this.requestList.forEach( item=>{
             let notes = item.notes
@@ -172,29 +171,35 @@ export const useReserveStore = defineStore('reserve', {
             }
             data.items.push( subItem )
          })
-         axios.post(`${this.systemStore.availabilityURL}/reserves`, data).then((_response) => {
+
+         const system = useSystemStore()
+         axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
             this.clearRequestList()
             this.submitted = true
             this.working = false
          }).catch((error) => {
-            this.systemStore.setError(error)
+            system.setError(error)
             this.working = false
          })
       },
 
       createVideoReserve(video){
-         let v4UserID = this.userStore.signedInUser
+         const requestStore = useRequestStore()
+         const userStore = useUserStore()
+
+         let v4UserID = userStore.signedInUser
          let data = { userID: v4UserID, request: this.request, items: [video] }
 
-         axios.post(`${this.systemStore.availabilityURL}/reserves`, data).then((_response) => {
-            this.requestStore.buttonDisabled = true
+         const system = useSystemStore()
+         axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
+            requestStore.buttonDisabled = true
             this.clearRequestList()
             this.submitted = true
-            this.requestStore.activePanel = "ReservedPanel"
-            this.requestStore.buttonDisabled = false
+            requestStore.activePanel = "ReservedPanel"
+            requestStore.buttonDisabled = false
          }).catch((error) => {
-            this.systemStore.setError(error)
-            this.requestStore.buttonDisabled = false
+            system.setError(error)
+            requestStore.buttonDisabled = false
          })
       },
 
@@ -204,14 +209,15 @@ export const useReserveStore = defineStore('reserve', {
          this.working = true
          this.setTargetInstructor(data.instructor)
 
+         const system = useSystemStore()
          this.resetResults(data.type)
          let typeParam = "type="+data.type
-         let url = `${this.systemStore.availabilityURL}/reserves/search?${typeParam}&query=${qs}`
+         let url = `${system.availabilityURL}/reserves/search?${typeParam}&query=${qs}`
          axios.get(url).then((response) => {
             this.setCourseReserves(response.data)
             this.working = false
          }).catch((error) => {
-            this.systemStore.setError(error)
+            system.setError(error)
             this.working = false
          })
       },

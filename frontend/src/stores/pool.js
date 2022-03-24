@@ -4,7 +4,6 @@ import { useSystemStore } from "@/stores/system"
 
 export const usePoolStore = defineStore('pool', {
 	state: () => ({
-      systemStore: useSystemStore(),
       list: [],
       lookingUp: false,
    }),
@@ -172,15 +171,16 @@ export const usePoolStore = defineStore('pool', {
       },
 
       async getPools() {
+         const system = useSystemStore()
          this.lookingUp = true
-         await axios.get( `${this.systemStore.searchAPI}/api/pools` ).then( response => {
+         await axios.get( `${system.searchAPI}/api/pools` ).then( response => {
             this.setPools(response.data)
             this.lookingUp = false
             if (this.list.length == 0) {
-               this.systemStore.setFatal("No search sources found")
+               system.setFatal("No search sources found")
             }
          }).catch ( error => {
-            this.systemStore.setFatal(error)
+            system.setFatal(error)
             this.lookingUp = false
          })
       },

@@ -4,7 +4,6 @@ import { useSystemStore } from "@/stores/system"
 
 export const useCollectionStore = defineStore('collection', {
 	state: () => ({
-      systemStore: useSystemStore(),
       lookingUp: false,
       collections: [],
       id: "",
@@ -132,16 +131,18 @@ export const useCollectionStore = defineStore('collection', {
       },
 
       async getCollections() {
-         let url = `${this.systemStore.collectionsURL}/api/collections`
+         const system = useSystemStore()
+         let url = `${system.collectionsURL}/api/collections`
          return axios.get(url).then((response) => {
             this.collections = response.data
          })
       },
       async getCollectionContext(collection) {
+         const system = useSystemStore()
          this.lookingUp = true
          this.clearCollectionDetails()
 
-         let url = `${this.systemStore.collectionsURL}/api/lookup?q=${collection}`
+         let url = `${system.collectionsURL}/api/lookup?q=${collection}`
          return axios.get(url).then((response) => {
             this.setCollectionDetails(response.data)
             if (this.startDate != "" &&this.currentYear == "" ) {
@@ -154,15 +155,17 @@ export const useCollectionStore = defineStore('collection', {
          })
       },
       async getPublishedDates(year) {
-         let url = `${this.systemStore.collectionsURL}/api/collections/${this.id}/dates?year=${year}`
+         const system = useSystemStore()
+         let url = `${system.collectionsURL}/api/collections/${this.id}/dates?year=${year}`
          return axios.get(url).then((response) => {
             this.setYearlyPublications({year: year, dates: response.data})
             this.updateNotPublishedDates()
          })
       },
       async nextItem(currDate) {
+         const system = useSystemStore()
          this.lookingUp = true
-         let url = `${this.systemStore.collectionsURL}/api/collections/${this.id}/items/${currDate}/next`
+         let url = `${system.collectionsURL}/api/collections/${this.id}/items/${currDate}/next`
          await axios.get(url).then((response) => {
             this.router.push(response.data)
          }).finally( ()=> {
@@ -170,8 +173,9 @@ export const useCollectionStore = defineStore('collection', {
          })
       },
       async priorItem(currDate) {
+         const system = useSystemStore()
          this.lookingUp = true
-         let url = `${this.systemStorecollectionsURL}/api/collections/${this.id}/items/${currDate}/previous`
+         let url = `${system.collectionsURL}/api/collections/${this.id}/items/${currDate}/previous`
          await axios.get(url).then((response) => {
             this.router.push(response.data)
          }).finally( ()=> {

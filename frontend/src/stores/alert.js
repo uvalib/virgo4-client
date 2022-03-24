@@ -7,7 +7,6 @@ const  AlertsStorage = "v4SeenAlerts"
 
 export const useAlertStore = defineStore('alert', {
 	state: () => ({
-      systemStore: useSystemStore(),
       alertsDB: null,
       regionalAlertsDB:  null,
       alerts: [],
@@ -135,7 +134,8 @@ export const useAlertStore = defineStore('alert', {
                })
             })
          } catch(e){
-            this.systemStore.reportError(e)
+            const system = useSystemStore()
+            system.reportError(e)
          }
       },
    }

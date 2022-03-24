@@ -6,8 +6,6 @@ import { usePoolStore } from "@/stores/pool"
 
 export const useFilterStore = defineStore('filter', {
 	state: () => ({
-      systemStore: useSystemStore(),
-      poolStore: usePoolStore(),
       facets: [],
       updatingFacets: false,
       getPresearchFacets: false,
@@ -91,9 +89,10 @@ export const useFilterStore = defineStore('filter', {
       },
 
       // This is only used to get the filter map for use in global search
-      allPoolFilters: (state) =>  {
+      allPoolFilters: () =>  {
          let out = []
-         state.poolStore.list.forEach( p => {
+         const pools = usePoolStore()
+         pools.list.forEach( p => {
             let filter = this.poolFilter(p.id)
             if (filter.length > 0) {
                let add = {pool_id: p.id, facets: filter}
@@ -276,8 +275,9 @@ export const useFilterStore = defineStore('filter', {
       },
 
       promotePreSearchFilters() {
+         const pools = usePoolStore()
          let psf = this.facets.find( pf => pf.pool == "presearch")
-         this.poolStore.list.forEach( pool => {
+         pools.list.forEach( pool => {
             let tgtPFObj = this.facets.find( pf => pf.pool == pool.id)
             if ( !tgtPFObj ) {
                tgtPFObj = {pool: pool.id, facets: [], placeholder: true}
@@ -299,8 +299,9 @@ export const useFilterStore = defineStore('filter', {
       },
 
       async getPreSearchFilters() {
+         const system = useSystemStore()
          this.getPresearchFacets = true
-         let url = `${this.systemStore.searchAPI}/api/filters`
+         let url = `${system.searchAPI}/api/filters`
          return axios.get(url).then((response) => {
             this.setPreSearchFilters(response.data)
             this.getPresearchFacets = false

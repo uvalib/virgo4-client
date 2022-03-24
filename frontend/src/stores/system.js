@@ -6,8 +6,6 @@ import axios from 'axios'
 
 export const useSystemStore = defineStore('system', {
 	state: () => ({
-      userStore: useUserStore(),
-      preferencesStore: usePreferencesStore(),
       pageTitle: "Search",
       newVersion: false,
       kiosk: false,
@@ -155,13 +153,14 @@ export const useSystemStore = defineStore('system', {
             }
 
             // append credentials to header if needed
+            const user = useUserStore()
             axios.interceptors.request.use( async config => {
                let url = config.url
                if ( (url.match(/\/api\//) && !url.match(/\/api\/pools/)) ||
                      url.match(this.availabilityURL) ||
                      url.match(this.citationsURL) ||
                      url.match("pda-ws") ) {
-                  config.headers['Authorization'] = 'Bearer ' + this.userStore.authToken
+                  config.headers['Authorization'] = 'Bearer ' + user.authToken
                }
                return config
             }, error => {
@@ -178,9 +177,9 @@ export const useSystemStore = defineStore('system', {
                      if (err.response && err.response.status == 401 && origConfig._retry !== true) {
                         origConfig._retry = true
                         console.log("REFRESH AUTHENTICATION")
-                        await this.userStore.refreshAuth()
-                        origConfig.headers['Authorization'] = 'Bearer ' + this.userStore.authToken
-                        console.log("RETRY "+origConfig.url+" AS "+this.userStore.role)
+                        await user.refreshAuth()
+                        origConfig.headers['Authorization'] = 'Bearer ' + user.authToken
+                        console.log("RETRY "+origConfig.url+" AS "+user.role)
                         return axios(origConfig)
                      }
                   }
@@ -223,9 +222,10 @@ export const useSystemStore = defineStore('system', {
             return
          }
 
-         if (this.userStore.sSignedIn()) {
+         const user = useUserStore()
+         if (user.isSignedIn()) {
             err.signedIn = true
-            err.user = this.userStore.signedInUser
+            err.user = user.signedInUser
          } else {
             err.signedIn = false
          }
@@ -258,7 +258,8 @@ export const useSystemStore = defineStore('system', {
             if ( idx > -1) {
                this.allPickupLibraries.splice(idx,1)
             }
-            this.preferencesStore.pickupLibraryDeleted(library.id)
+            const preferences = usePreferencesStore()
+            preferences.pickupLibraryDeleted(library.id)
          }).catch((error) => {
             this.setError("Unable to delete pickup library: " + error.response)
          })

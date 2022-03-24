@@ -6,8 +6,6 @@ import VueCookies from 'vue-cookies'
 
 export const usePreferencesStore = defineStore('preferences', {
 	state: () => ({
-      systemStore: useSystemStore(),
-      userStore: useUserStore(),
       maxTabs: 4,
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
@@ -40,7 +38,8 @@ export const usePreferencesStore = defineStore('preferences', {
             }
          }
          if (prefsObj.pickupLibrary ) {
-            if (!this.userStore.libraries.some((lib) => lib.id == prefsObj.pickupLibrary.id) ){
+            const system = useSystemStore()
+            if (!system.pickupLibraries.some((lib) => lib.id == prefsObj.pickupLibrary.id) ){
                // Clear the pickup Library if not in the currently available list
                this.pickupLibrary = {id: "", name: ""}
             } else {
@@ -86,16 +85,19 @@ export const usePreferencesStore = defineStore('preferences', {
          this.savePreferences()
       },
       async loadPreferences() {
-         let url = `/api/users/${this.userStore.signedInUser}/preferences`
+         const userStore = useUserStore()
+         let url = `/api/users/${userStore.signedInUser}/preferences`
          return axios.get(url).then((response) => {
             this.setPreferences(JSON.parse(response.data))
          }).catch((error) => {
-            this.systemStore.setError(error)
-            this.systemStore.reportError(error)
+            const system = useSystemStore()
+            system.setError(error)
+            system.reportError(error)
         })
       },
       savePreferences() {
-         let url = `/api/users/${this.userStore.signedInUser}/preferences`
+         const userStore = useUserStore()
+         let url = `/api/users/${userStore.signedInUser}/preferences`
          let data = {
             trackingOptOut: this.trackingOptOut,
             pickupLibrary: this.pickupLibrary,

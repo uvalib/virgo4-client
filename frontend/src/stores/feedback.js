@@ -5,8 +5,6 @@ import { useUserStore } from "@/stores/user"
 
 export const useFeedbackStore = defineStore('feedback', {
 	state: () => ({
-      systemStore: useSystemStore(),
-      userStore: useUserStore(),
       email: "",
       wantedTo: "",
       explanation: "",
@@ -19,9 +17,12 @@ export const useFeedbackStore = defineStore('feedback', {
          this.$reset()
       },
       async submitFeedback() {
+         const user = useUserStore()
+         const system = useSystemStore()
+
          this.status="submit"
-         let v4UserID = this.userStore.signedInUser
-         let name = this.userStore.accountInfo.displayName
+         let v4UserID = user.signedInUser
+         let name = user.accountInfo.displayName
          let data = { userID: v4UserID,
             email: this.email,
             name: name,
@@ -35,7 +36,7 @@ export const useFeedbackStore = defineStore('feedback', {
          }).catch((_error) => {
             this.status="fail"
             let msg = 'There was a problem sending your feedback.<br/>Please send an email to <a  href="mailto:lib-virgo4-feedback@virginia.edu" class="feedback">lib-virgo4-feedback@virginia.edu</a>'
-            this.systemStore.setError(msg)
+            system.setError(msg)
          })
       }
    }

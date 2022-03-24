@@ -5,8 +5,6 @@ import axios from 'axios'
 
 export const useBookmarkStore = defineStore('bookmark', {
 	state: () => ({
-      systemStore: useSystemStore(),
-      userStore: useUserStore(),
       searching: false,
       public: [],
       bookmarks: [],
@@ -90,7 +88,7 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.searching = true
          return axios.get(`/api/bookmarks/${token}`).then((response) => {
             this.setPublicBookmarks(response.data.bookmarks)
-            this.systemStore.pageTitle = response.data.folder
+            useSystemStore().pageTitle = response.data.folder
             this.searching = false
           }).catch((error) => {
              console.error(error)
@@ -101,7 +99,8 @@ export const useBookmarkStore = defineStore('bookmark', {
 
       // bmData Fields: Folder, Pool, ID, Title. Author optional
       async addBookmark(bmData ) {
-         let v4UID = this.userStore.signedInUser
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/add`
          let data = {folder: bmData.folder, pool: bmData.pool, identifier: bmData.identifier}
          let detail = {title : bmData.title, author: bmData.author}
@@ -112,25 +111,28 @@ export const useBookmarkStore = defineStore('bookmark', {
       },
 
       async addFolder(folder) {
-         let v4UID = this.userStore.signedInUser
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/add`
          return axios.post(url, {name: folder}).then((response) => {
             this.bookmarks.splice(0, 0, response.data)
          }).catch((error) => {
-            this.systemStore.setError(error)
+            useSystemStore().setError(error)
          })
       },
       renameFolder(folder) {
-         let v4UID = this.userStore.signedInUser
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folder.id}`
          axios.post(url, {name: folder.name}).then((response) => {
             this.updateFolder(response.data)
          }).catch((error) => {
-            this.systemStore.setError(error)
+            useSystemStore().setError(error)
          })
       },
       async removeFolder(folderID) {
-         let v4UID = this.userStore.signedInUser
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}`
          try {
             await axios.delete(url)
@@ -139,27 +141,29 @@ export const useBookmarkStore = defineStore('bookmark', {
                this.bookmarks.splice(idx, 1)
             }
          } catch(error)  {
-            this.systemStore.setError(error)
+            useSystemStore().setError(error)
          }
       },
       removeBookmarks( {folderID, bookmarkIDs} ) {
-         let v4UID = this.userStore.signedInUser
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`
          axios.post(url, {bookmarkIDs: bookmarkIDs}).then((response) => {
             this.updateFolder(response.data)
          }).catch((error) => {
-            this.systemStore.setError(error)
+            useSystemStore().setError(error)
          })
       },
       moveBookmarks(data) {
-         let v4UID = this.userStore.signedInUser
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
          let bookmarkIDs = data.bookmarks
          let folderID = data.folderID
          let url = `/api/users/${v4UID}/bookmarks/move`
          axios.post(url, {folderID: folderID, bookmarkIDs: bookmarkIDs}).then((response) => {
             this.setBookmarks(response.data)
          }).catch((error) => {
-            this.systemStore.setError(error)
+            useSystemStore().setError(error)
          })
       },
       async toggleFolderVisibility(folderVisibility) {
@@ -169,7 +173,8 @@ export const useBookmarkStore = defineStore('bookmark', {
             }
          })
          try {
-            let usrID = this.userStore.signedInUser
+            const userStore = useUserStore()
+            let usrID = userStore.signedInUser
             if (folderVisibility.public) {
                let resp = await axios.post(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
                folderVisibility.token = resp.data
@@ -178,7 +183,7 @@ export const useBookmarkStore = defineStore('bookmark', {
                axios.delete(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
             }
          } catch (error)  {
-            this.systemStore.setError(error)
+            useSystemStore().setError(error)
          }
       },
       async printBookmarks(data) {
@@ -190,14 +195,16 @@ export const useBookmarkStore = defineStore('bookmark', {
             let bm = folder.bookmarks.find( bm => bm.id == bid)
             items.push( {pool: bm.pool, identifier: bm.identifier} )
          })
+
+         const system = useSystemStore()
          let req = {title: data.title, notes: data.notes, items: items}
-         let url = this.systemStore.searchAPI + "/api/pdf"
+         let url = system.searchAPI + "/api/pdf"
          await axios.post(url, req, {responseType: "blob"}).then((response) => {
             let blob = new Blob([response.data], { type: response.headers['content-type'] })
             let href = window.URL.createObjectURL(blob)
             window.open(href)
          }).catch((error) => {
-             this.systemStore.reportError(error)
+             system.reportError(error)
          })
       },
       async exportBookmarks(folderName) {
@@ -206,9 +213,11 @@ export const useBookmarkStore = defineStore('bookmark', {
           folder.bookmarks.forEach( bm =>{
             items.push( {pool: bm.pool, identifier: bm.identifier} )
          })
+
+         const system = useSystemStore()
          let v4URL = window.location.href.replace("/bookmarks", "")
          let req = {title: folderName, notes: v4URL, items: items}
-         let url = this.systemStore.searchAPI + "/api/csv"
+         let url = system.searchAPI + "/api/csv"
          await axios.post(url, req, {responseType: "blob"}).then((response) => {
             const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }))
             const fileLink = document.createElement('a')
@@ -218,7 +227,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             fileLink.click()
             window.URL.revokeObjectURL(fileURL)
          }).catch((error) => {
-            this.systemStore.reportError(error)
+            system.reportError(error)
          })
       }
    }

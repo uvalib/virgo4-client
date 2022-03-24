@@ -7,6 +7,8 @@ import { useAlertStore } from "@/stores/alert"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
+import { useSearchStore } from "@/stores/search"
+import { useRequestStore } from "@/stores/request"
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -20,11 +22,6 @@ function parseJwt(token) {
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
-      systemStore: useSystemStore(),
-      alertStore: useAlertStore(),
-      restore: useRestoreStore(),
-      preferencesStore: usePreferencesStore(),
-      bookmarkStore: useBookmarkStore(),
       authToken: "",
       authorizing: false,
       signedInUser: "",
@@ -159,9 +156,10 @@ export const useUserStore = defineStore('user', {
          if (state.accountInfo.id != state.signedInUser) return false
          return (state.noILSAccount != true)
       },
-      libraries(state) {
+      libraries() {
          // all libraries are available by default. Filter out some based on user criteria
-         let pickupLibraries = state.systemStore.pickupLibraries.slice()
+         const system = useSystemStore()
+         let pickupLibraries = system.pickupLibraries.slice()
          if (this.isHSLUser == false) {
             pickupLibraries = pickupLibraries.filter( p => p.id != "HEALTHSCI" )
          }
@@ -359,9 +357,10 @@ export const useUserStore = defineStore('user', {
                console.log(`Session refreshed`)
             }).catch( async () => {
                // Signout, but preserve the search as it will be retried as guest
+               const system = useSystemStore()
                console.log("reauth failed, signing out")
                await this.signout(false)
-               this.systemStore.setSessionExpired()
+               system.setSessionExpired()
             })
          }
       },
@@ -376,7 +375,8 @@ export const useUserStore = defineStore('user', {
                this.setUserJWT(jwtStr)
                this.authorizing = false
              }).catch((error) => {
-               this.systemStore.setError( error + '<br/>' + error.response.data)
+               const system = useSystemStore()
+               system.setError( error + '<br/>' + error.response.data)
                this.authorizing = false
              })
          }
@@ -396,10 +396,11 @@ export const useUserStore = defineStore('user', {
                illiad: illiadResponse.data
             }
          })).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               this.systemStore.ilsError = error.response.data
+               system.ilsError = error.response.data
             } else {
-               this.systemStore.setError( error)
+               system.setError( error)
             }
          }).finally(() => { this.lookingUp = false })
       },
@@ -414,10 +415,13 @@ export const useUserStore = defineStore('user', {
 
          this.lookingUp = true
          return axios.get(`/api/users/${this.signedInUser}`).then((response) => {
+            const bookmarks = useBookmarkStore()
+            const preferences = usePreferencesStore()
+
             this.setAccountInfo(response.data)
             let prefs = JSON.parse(response.data.preferences)
-            this.preferencesStore.setPreferences(prefs)
-            this.bookmarkStore.setBookmarks(response.data.bookmarks)
+            preferences.setPreferences(prefs)
+            bookmarks.setBookmarks(response.data.bookmarks)
 
             // FIXME
             // if ( prefs.searchTemplate ) {
@@ -428,7 +432,8 @@ export const useUserStore = defineStore('user', {
             }
             this.lookingUp = false
           }).catch((error) => {
-            this.systemStore.setError( error)
+            const system = useSystemStore()
+            system.setError( error)
             this.lookingUp = false
           })
       },
@@ -444,7 +449,8 @@ export const useUserStore = defineStore('user', {
             this.setRenewResults(response.data.renewResults)
             this.renewing = false
           }).catch((error) => {
-            this.systemStore.setError( error)
+            const system = useSystemStore()
+            system.setError( error)
             this.renewing = false
           })
       },
@@ -460,7 +466,8 @@ export const useUserStore = defineStore('user', {
             this.setRenewResults(response.data.renewResults)
             this.renewing = false
           }).catch((error) => {
-            this.systemStore.setError( error)
+            const system = useSystemStore()
+            system.setError( error)
             this.renewing = false
           })
       },
@@ -476,10 +483,11 @@ export const useUserStore = defineStore('user', {
             this.setCheckouts(response.data)
             this.sortCheckouts(this.checkoutsOrder)
          }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               this.systemStore.ilsError = error.response.data
+               system.ilsError = error.response.data
             } else {
-               this.systemStore.setError( error)
+               system.setError( error)
             }
          })
       },
@@ -499,10 +507,11 @@ export const useUserStore = defineStore('user', {
             window.URL.revokeObjectURL(fileURL);
 
          }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               this.systemStore.ilsError = error.response.data
+               system.ilsError = error.response.data
             } else {
-               this.systemStore.setError( error)
+               system.setError( error)
             }
          })
       },
@@ -516,10 +525,11 @@ export const useUserStore = defineStore('user', {
             this.bills = response.data
             this.lookingUp = false
           }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               this.systemStore.ilsError = error.response.data
+               system.ilsError = error.response.data
             } else {
-               this.systemStore.setError( error)
+               system.setError( error)
             }
             this.lookingUp = false
           })
@@ -528,15 +538,20 @@ export const useUserStore = defineStore('user', {
       async signout(resetSearch) {
          if ( this.signedInUser == "") return
 
+         const alerts = useAlertStore()
+         const savedSearches = useSearchStore()
+         const bookmarks = useBookmarkStore()
+         const preferences = usePreferencesStore()
+
          await axios.post("/signout", null)
          this.clear()
-         this.preferencesStore.clear()
-         // FIXME
-         // ctx.commit('bookmarks/clear', null)
-         // ctx.commit('searches/clear', null)
-         this.alertStore.clearSeenAlerts()
+         preferences.clear()
+         bookmarks.clear()
+         savedSearches.clear()
+         alerts.clearSeenAlerts()
          if ( resetSearch === true) {
-         //    ctx.dispatch('resetSearch', null)
+            // FIXME
+            // ctx.dispatch('resetSearch', null)
          }
          localStorage.removeItem("v4_jwt")
          this.router.push("/signedout")
@@ -545,10 +560,13 @@ export const useUserStore = defineStore('user', {
       signin(data) {
          this.authorizing = true
          axios.post("/authenticate/public", data).then( async (_response) => {
+            const restore = useRestoreStore()
+            const requests = useRequestStore()
+
             let jwtStr = VueCookies.get("v4_jwt")
             this.setUserJWT(jwtStr )
             this.authorizing = false
-            this.restore.load()
+            restore.load()
             await this.getAccountInfo()   // needed for search preferences
             this.getCheckouts()           // needed so the alert icon can show in menubar
             if ( this.isUndergraduate) {
@@ -559,17 +577,17 @@ export const useUserStore = defineStore('user', {
                analytics.trigger('User', 'PIN_SIGNIN', "other")
             }
 
-            this.router.push( this.restore.url ).catch((e)=>{
+            this.router.push( restore.url ).catch((e)=>{
                if (e.name !== 'NavigationDuplicated') {
                   throw e;
               }
             })
 
-            // FIXME
-            // ctx.dispatch('requests/reload', null, {root: true})
+            requests.reload()
          }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               this.systemStore.ilsError =  error.response.data
+               system.ilsError =  error.response.data
             } else {
                this.setAuthFailure(error)
             }
@@ -602,10 +620,11 @@ export const useUserStore = defineStore('user', {
                behavior: "auto"
             })
          }).catch ( error => {
+            const system = useSystemStore()
             console.log("Unable to request new account: "+error)
             let msg = "System error, we regret the inconvenience. If this problem persists, "
             msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-            this.systemStore.setError(msg)
+            system.setError(msg)
             this.lookingUp = false
          })
       },
