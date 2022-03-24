@@ -20,12 +20,13 @@
 <script setup>
 import UvaLibraryLogo from "@/components/UvaLibraryLogo.vue"
 import { useSystemStore } from "@/stores/system"
+import { useResultStore } from "@/stores/result"
 
+const results = useResultStore()
 const systemStore = useSystemStore()
 
 function homeClicked() {
-   // FIXME
-   // this.$store.dispatch('resetSearch')
+   results.resetSearch()
 }
 
 </script>

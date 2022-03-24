@@ -3,25 +3,25 @@
          <label class="screen-reader-text">search mode:</label>
          <label for="search-all">
             <input @click="sourcesClicked('all')" id="search-all" type="radio"
-               v-model="searchSources" value="all" name="sources"
+               v-model="queryStore.searchSources" value="all" name="sources"
             >
             <span>Everything</span>
          </label>
-         <label for="search-catalog" name="sources" :class="{curr_scope: searchSources=='uva_library'}" >
+         <label for="search-catalog" name="sources" :class="{curr_scope: queryStore.searchSources=='uva_library'}" >
             <input  @click="sourcesClicked('uva_library')" id="search-catalog" type="radio"
-               v-model="searchSources" value="uva_library"
+               v-model="queryStore.searchSources" value="uva_library"
             >
             <span>Catalog Only</span>
          </label>
          <label for="search-articles">
             <input @click="sourcesClicked('articles')" id="search-articles" type="radio"
-               v-model="searchSources" value="articles" name="sources"
+               v-model="queryStore.searchSources" value="articles" name="sources"
             >
             <span>Articles Only</span>
          </label>
          <label for="search-images">
             <input @click="sourcesClicked('images')" id="search-images" type="radio"
-               v-model="searchSources" value="images" name="sources"
+               v-model="queryStore.searchSources" value="images" name="sources"
             >
             <span>Images Only</span>
          </label>
@@ -29,45 +29,27 @@
       </div>
 </template>
 
-<script>
-import { mapFields } from 'vuex-map-fields'
-import { mapGetters } from "vuex"
+<script setup>
 import SearchTips from "@/components/disclosures/SearchTips.vue"
-export default {
-    components: {
-     SearchTips
-   },
-   props: {
-      mode: {
-         type: String,
-         default: "basic"
-      },
-   },
-   computed: {
-      ...mapGetters({
-         rawQueryString: 'query/string',
-         queryEntered: 'query/queryEntered'
-      }),
-      ...mapFields({
-        searchSources: 'query.searchSources',
-        userSearched: 'query.userSearched',
-      }),
-   },
-   methods: {
-      sourcesClicked( setting ) {
-         if ( this.searchSources  != setting ) {
-            this.searchSources = setting
-            if (this.queryEntered || this.$route.query.filter ) {
-               let query = Object.assign({}, this.$route.query)
-               delete query.page
-               query.q = this.rawQueryString
-               query.pool = setting
-               this.userSearched = true
-               this.$router.push({ query })
-            }
-         }
-      },
-   },
+import { useQueryStore } from "@/stores/query"
+import { useRouter, useRoute } from 'vue-router'
+
+const queryStore = useQueryStore()
+const router = useRouter()
+const route = useRoute()
+
+function sourcesClicked( setting ) {
+   if ( queryStore.searchSources  != setting ) {
+      queryStore.searchSources = setting
+      if (queryStore.queryEntered || route.query.filter ) {
+         let query = Object.assign({}, this.$route.query)
+         delete query.page
+         query.q = queryStore.string
+         query.pool = setting
+         queryStore.userSearched = true
+         router.push({ query })
+      }
+   }
 }
 </script>
 

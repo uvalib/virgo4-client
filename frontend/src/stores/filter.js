@@ -3,6 +3,9 @@ import analytics from '../analytics'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { usePoolStore } from "@/stores/pool"
+import { useResultStore } from "@/stores/result"
+import { useQueryStore } from "@/stores/query"
+import { useCollectionStore } from "@/stores/collection"
 
 export const useFilterStore = defineStore('filter', {
 	state: () => ({
@@ -12,7 +15,7 @@ export const useFilterStore = defineStore('filter', {
    }),
 
    getters: {
-      asQueryParam: () => {
+      asQueryParam() {
          return (poolID) => {
             let filter = this.poolFilter(poolID)
             let outObj = {}
@@ -240,12 +243,11 @@ export const useFilterStore = defineStore('filter', {
          this.updatingFacets = false
       },
 
-      restoreFromURL( data ) {
-         let filterStr = data.filter
-         let pfIdx = this.facets.findIndex( pf => pf.pool == data.pool)
+      restoreFromURL( filterStr, pool ) {
+         let pfIdx = this.facets.findIndex( pf => pf.pool == pool)
          let pfObj = null
          if (pfIdx == -1) {
-            pfObj = {pool: data.pool, facets: []}
+            pfObj = {pool: pool, facets: []}
          } else {
             pfObj = this.poolFafacetscets[pfIdx]
          }
@@ -305,80 +307,83 @@ export const useFilterStore = defineStore('filter', {
          return axios.get(url).then((response) => {
             this.setPreSearchFilters(response.data)
             this.getPresearchFacets = false
-         })/*.catch((error) => {
+         }).catch((error) => {
             this.getPresearchFacets = false
             console.warn("Unable to get pre-search filters: "+JSON.stringify(error))
-         })*/
+         })
       },
 
       // Get all facets for the selected result set / query / pool
       // This is called from 3 different places: when all pools are searched, when a specific pool
       // is searched and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
-      // FIXME
-      getSelectedResultFacets(_paramsChanged) {
-      //    let resultsIdx = ctx.rootState.selectedResultsIdx
-      //    if ( resultsIdx == -1) {
-      //       return
-      //    }
-      //    if ( ctx.state.updatingFacets) {
-      //       return
-      //    }
+      getSelectedResultFacets(paramsChanged) {
+         const resultStore = useResultStore()
+         const query = useQueryStore()
+         const collectionStore = useCollectionStore()
 
-      //    let pool = ctx.rootState.results[resultsIdx].pool
-      //    let filters = ctx.getters.poolFilter(pool.id)
-      //    let filterObj = {pool_id: pool.id, facets: filters}
-      //    if (paramsChanged == false) {
-      //       // check filter for either: no filters or placeholder filters (presearch promotions or restored from url)
-      //       let poolFacetObj = ctx.state.poolFacets.find( pf => pf.pool == pool.id)
-      //       if ( poolFacetObj ) {
-      //          if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
-      //             console.log("Facets are current, do not refresh")
-      //             return
-      //          }
-      //       }
-      //    }
+         let resultsIdx = resultStore.selectedResultsIdx
+         if ( resultsIdx == -1) {
+            return
+         }
+         if (this.updatingFacets) {
+            return
+         }
 
-      //    // this lets a SINGLE collection context show up at the top of the search results
-      //    ctx.commit("collection/clearCollectionDetails", null, { root: true })
-      //    let done = false
-      //    let collections = ctx.rootState.collection.collections
-      //    collections.some( c => {
-      //       let filter = filterObj.facets.find( f=>f.facet_id == c.filter_name && f.value == c.title)
-      //       if (filter) {
-      //          this.dispatch("collection/getCollectionContext", filter.value, {root: true})
-      //          done = true
-      //       }
-      //       return done == true
-      //    })
+         let pool = resultStore.results[resultsIdx].pool
+         let filters = this.poolFilter(pool.id)
+         let filterObj = {pool_id: pool.id, facets: filters}
+         if (paramsChanged == false) {
+            // check filter for either: no filters or placeholder filters (presearch promotions or restored from url)
+            let poolFacetObj = this.poolFacets.find( pf => pf.pool == pool.id)
+            if ( poolFacetObj ) {
+               if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
+                  console.log("Facets are current, do not refresh")
+                  return
+               }
+            }
+         }
 
-      //    // Recreate the query for the target pool, but include a request for ALL facet info
-      //    let req = {
-      //       query: ctx.rootGetters['query/string'],
-      //       pagination: { start: 0, rows: 0 },
-      //       filters: [filterObj]
-      //    }
-      //    if (req.query == "") {
-      //       let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: ctx.rootGetters['query/getState']}
-      //       this.dispatch("system/reportError", err, {root: true})
-      //       return
-      //    }
+         // this lets a SINGLE collection context show up at the top of the search results
+         collectionStore.clearCollectionDetails()
+         let done = false
+         collectionStore.collections.some( c => {
+            let filter = filterObj.facets.find( f=>f.facet_id == c.filter_name && f.value == c.title)
+            if (filter) {
+               collectionStore.getCollectionContext(filter.value)
+               done = true
+            }
+            return done == true
+         })
 
-      //    let tgtURL = pool.url+"/api/search/facets"
-      //    this.updatingFacets = true
-      //    axios.post(tgtURL, req).then((response) => {
-      //       let facets = response.data.facet_list
-      //       if (!facets) {
-      //          facets = []
-      //       }
-      //       ctx.commit("setPoolFacets", {pool: pool.id, facets: facets})
-      //       this.updatingFacets = false
-      //    }).catch((error) => {
-      //       if (error.response && error.response.status == 501) {
-      //          ctx.commit("setPoolFacets", {pool: pool.id, facets: false})
-      //       }
-      //       this.updatingFacets = false
-      //     })
+         // Recreate the query for the target pool, but include a request for ALL facet info
+         let req = {
+            query: query.string,
+            pagination: { start: 0, rows: 0 },
+            filters: [filterObj]
+         }
+         if (req.query == "") {
+            const system = useSystemStore()
+            let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: query.stateObject}
+            system.reportError(err)
+            return
+         }
+
+         let tgtURL = pool.url+"/api/search/facets"
+         this.updatingFacets = true
+         axios.post(tgtURL, req).then((response) => {
+            let facets = response.data.facet_list
+            if (!facets) {
+               facets = []
+            }
+            this.setPoolFacets({pool: pool.id, facets: facets})
+            this.updatingFacets = false
+         }).catch((error) => {
+            if (error.response && error.response.status == 501) {
+               this.setPoolFacets({pool: pool.id, facets: false})
+            }
+            this.updatingFacets = false
+          })
       }
    }
 })

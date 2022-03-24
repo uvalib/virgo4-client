@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-export const usqQueryStore = defineStore('query', {
+export const useQueryStore = defineStore('query', {
 	state: () => ({
       userSearched: false,
       mode: "basic",

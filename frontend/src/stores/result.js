@@ -3,7 +3,7 @@ import axios from 'axios'
 import analytics from '../analytics'
 import * as utils from '../utils'
 import { useSystemStore } from "@/stores/system"
-import { usePreferenceStore } from "@/stores/preference"
+import { usePreferencesStore } from "@/stores/preferences"
 import { useSortStore } from "@/stores/sort"
 import { useQueryStore } from "@/stores/query"
 import { useFilterStore } from "@/stores/filter"
@@ -319,7 +319,7 @@ export const useResultStore = defineStore('result', {
 
       resetSearch() {
          const query = useQueryStore()
-         const prefs = usePreferenceStore()
+         const prefs = usePreferencesStore()
          this.resetSearchResults()
          query.resetAdvancedForm()
          query.clear()
@@ -512,7 +512,7 @@ export const useResultStore = defineStore('result', {
       // Select pool results and get all facet info for the result
       selectPoolResults(resultIdx) {
          if (this.selectedResultsIdx != resultIdx) {
-            const preferences = usePreferenceStore()
+            const preferences = usePreferencesStore()
             let otherIdx = preferences.maxTabs - 2 // -1 xero index and -1 for 'other'
             this.selectedResultsIdx = resultIdx
 

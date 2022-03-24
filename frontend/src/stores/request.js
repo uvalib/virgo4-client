@@ -4,6 +4,7 @@ import urlModule from 'url'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
+import { useItemStore } from "@/stores/item"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
@@ -239,11 +240,11 @@ export const useRequestStore = defineStore('request', {
          this.activePanel = "ConfirmationPanel"
       },
       reload(){
-         // FIXME
-         // let ident = ctx.rootGetters['item/identifier']
-         // if(ident){
-         //    ctx.dispatch('item/getAvailability', ident, {root: true})
-         // }
+         const itemStore = useItemStore()
+         let ident = itemStore.identifier
+         if (ident) {
+            itemStore.getAvailability(ident)
+         }
       }
    }
 })

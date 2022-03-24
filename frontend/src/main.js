@@ -30,20 +30,8 @@ app.component('V4Disclosure', V4Disclosure)
 app.component('Confirm', Confirm)
 app.component('SignInRequired', SignInRequired)
 
-import veProgress from "vue-ellipse-progress";
-app.use(veProgress)
-
-import analytics from './analytics'
-app.config.globalProperties.$analytics = analytics
-
-import * as utils from './utils'
-app.config.globalProperties.$utils = utils
-
-import '@fortawesome/fontawesome-pro/css/all.css'
 import 'purecss'
-
-import VueAnnouncer from '@vue-a11y/announcer'
+import '@fortawesome/fontawesome-pro/css/all.css'
 import '@vue-a11y/announcer/dist/style.css'
-app.use(VueAnnouncer, { router })
 
 app.mount('#app')

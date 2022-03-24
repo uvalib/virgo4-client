@@ -9,6 +9,8 @@ import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { useSearchStore } from "@/stores/search"
 import { useRequestStore } from "@/stores/request"
+import { useQueryStore } from "@/stores/query"
+import { useResultStore } from "@/stores/result"
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -417,16 +419,15 @@ export const useUserStore = defineStore('user', {
          return axios.get(`/api/users/${this.signedInUser}`).then((response) => {
             const bookmarks = useBookmarkStore()
             const preferences = usePreferencesStore()
+            const queryStore = useQueryStore()
 
             this.setAccountInfo(response.data)
             let prefs = JSON.parse(response.data.preferences)
             preferences.setPreferences(prefs)
             bookmarks.setBookmarks(response.data.bookmarks)
-
-            // FIXME
-            // if ( prefs.searchTemplate ) {
-            //    ctx.commit('query/setTemplate',  prefs.searchTemplate)
-            // }
+            if ( preferences.searchTemplate ) {
+               queryStore.setTemplate(preferences.searchTemplate)
+            }
             if (response.data.user.noILSAccount && this.router.currentRoute.value.path != "/account") {
                this.router.push( "/account" )
             }
@@ -550,8 +551,8 @@ export const useUserStore = defineStore('user', {
          savedSearches.clear()
          alerts.clearSeenAlerts()
          if ( resetSearch === true) {
-            // FIXME
-            // ctx.dispatch('resetSearch', null)
+            const results = useResultStore()
+            results.resetSearch()
          }
          localStorage.removeItem("v4_jwt")
          this.router.push("/signedout")

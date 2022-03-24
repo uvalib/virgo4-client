@@ -67,6 +67,7 @@ import { ref, onMounted } from 'vue'
 import { useUserStore } from "@/stores/user"
 import { useRequestStore } from "@/stores/request"
 import { usePreferencesStore } from "@/stores/preferences"
+import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
 
 const props = defineProps({
@@ -79,6 +80,7 @@ const emit = defineEmits( ['submitted', 'canceled'] )
 
 const preferences = usePreferencesStore()
 const userStore = useUserStore()
+const itemStore = useItemStore()
 const requestStore = useRequestStore()
 const required = ['date', 'title', 'pickup']
 const errors = ref([])
@@ -127,13 +129,12 @@ onMounted(()=>{
    request.value.pickup = preferences.pickupLibrary.id
    if ( props.prefill ) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
-      // FIXME (item store)
-      // request.value.title = this.details.header.title
-      // request.value.author = this.details.header.author.value.join("; ")
-      // let pubF = this.details.basicFields.find( f => f.name == "publication_date")
-      // if (pubF) {
-      //    request.value.year = pubF.value
-      // }
+      request.value.title = itemStore.details.header.title
+      request.value.author = itemStore.details.header.author.value.join("; ")
+      let pubF = itemStore.details.basicFields.find( f => f.name == "publication_date")
+      if (pubF) {
+         request.value.year = pubF.value
+      }
    } else {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
    }

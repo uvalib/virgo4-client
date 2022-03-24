@@ -160,6 +160,7 @@
 
 <script setup>
 import { useSystemStore } from "@/stores/system"
+import { useResultStore } from "@/stores/result"
 import { useUserStore } from "@/stores/user"
 import { useAlertStore } from "@/stores/alert"
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
@@ -168,6 +169,7 @@ import analytics from '@/analytics'
 const alertStore = useAlertStore()
 const systemStore = useSystemStore()
 const userStore = useUserStore()
+const results = useResultStore()
 
 const noFocus = ref(false)
 const menuBarIdx = ref(0)
@@ -290,8 +292,7 @@ function setMenuFocus() {
    }
 }
 function searchClicked() {
-   // FIXME
-   // $store.dispatch('resetSearch')
+   results.resetSearch()
    window.scrollTo({
       top: 0,
       behavior: "auto"

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 const DefaultSort = "SortRelevance_desc"
 
-export const useStortStore = defineStore('sort', {
+export const useSortStore = defineStore('sort', {
 	state: () => ({
       pools: [],
 
@@ -39,20 +39,19 @@ export const useStortStore = defineStore('sort', {
             this.activeSort = DefaultSort
          }
       },
-      setPoolSort(data) {
-         let sortString = data.sort
-         if (!sortString || sortString == "" || data.sort === undefined ) {
+      setPoolSort(poolID, sortString) {
+         if (!sortString || sortString == "" || sortString === undefined ) {
             return
          }
          let sort = {
             sort_id: sortString.split("_")[0],
             order: sortString.split("_")[1]
          }
-         let tgtPool = this.pools.find( p => p.poolID == data.poolID )
+         let tgtPool = this.pools.find( p => p.poolID == poolID )
          if (tgtPool) {
             tgtPool.sort = sort
          } else {
-            let ps = {poolID: data.poolID, sort: sort }
+            let ps = {poolID: poolID, sort: sort }
             this.pools.push(ps)
          }
       },

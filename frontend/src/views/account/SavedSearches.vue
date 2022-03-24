@@ -109,9 +109,11 @@ import { ref, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useSearchStore } from "@/stores/search"
+import { useResultStore } from "@/stores/result"
 import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 
+const results = useResultStore()
 const userStore = useUserStore()
 const systemStore = useSystemStore()
 const searchStore = useSearchStore()
@@ -126,8 +128,7 @@ async function savedSearchClicked(searchType) {
    } else {
       analytics.trigger('Navigation', 'SAVED_SEARCH_CLICKED')
    }
-   // FIXME
-   // await this.$store.dispatch('resetSearch')
+   await results.resetSearch()
 }
 
 function urlToText(url) {
