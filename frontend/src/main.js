@@ -30,8 +30,11 @@ app.component('V4Disclosure', V4Disclosure)
 app.component('Confirm', Confirm)
 app.component('SignInRequired', SignInRequired)
 
-import 'purecss'
 import '@fortawesome/fontawesome-pro/css/all.css'
+import 'purecss'
+
+import VueAnnouncer from '@vue-a11y/announcer'
 import '@vue-a11y/announcer/dist/style.css'
+app.use(VueAnnouncer, { router })
 
 app.mount('#app')

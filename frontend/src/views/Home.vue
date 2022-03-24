@@ -42,7 +42,7 @@ import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner.vue"
 import SourceSelector from "@/components/SourceSelector.vue"
-// import { useAnnouncer } from '@vue-a11y/announcer'
+import { useAnnouncer } from '@vue-a11y/announcer'
 import * as utils from '../utils'
 import analytics from '@/analytics'
 import { ref, onMounted, computed, nextTick } from 'vue'
@@ -69,7 +69,7 @@ const userStore = useUserStore()
 const poolStore = usePoolStore()
 const sortStore = useSortStore()
 const filters = useFilterStore()
-// const announcer = useAnnouncer()
+const { polite, assertive } = useAnnouncer()
 
 const queryMessage = ref("")
 
@@ -121,8 +121,7 @@ onMounted( async () =>{
    handleLegacyQueries( route.query )
 
    if ( queryStore.searchMode == "basic") {
-      //polite(`virgo search has loaded`)
-      // console.log(announcer)
+      polite(`virgo search has loaded`)
    }
 })
 
@@ -272,7 +271,7 @@ async function restoreSearchFromQueryParams( query ) {
             queryStore.userSearched = false
          }
 
-         //polite(`search in progress`, 'assertive')
+         assertive(`search in progress`)
          if (queryStore.searchSources == "all") {
             await resultStore.searchAllPools()
          } else {

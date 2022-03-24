@@ -34,6 +34,7 @@
       </div>
       <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
+         <VueAnnouncer />
          <h1>{{systemStore.pageTitle}}</h1>
          <template v-if="configuring==false">
             <div v-if="alertStore.pageAlerts($route.path).length > 0" class="regional-alerts">
