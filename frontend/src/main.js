@@ -1,7 +1,6 @@
 import { createApp, markRaw } from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './stores'
 import V4Button from "@/components/V4Button.vue"
 import V4Checkbox from "@/components/V4Checkbox.vue"
 import V4Spinner from "@/components/V4Spinner.vue"
@@ -12,20 +11,14 @@ import Confirm from "@/components/modals/Confirm.vue"
 import SignInRequired from "@/components/SignInRequired.vue"
 
 import { createPinia } from 'pinia'
-
 const pinia = createPinia()
 pinia.use(({ store }) => {
    // all stores can access router with this.router
    store.router = markRaw(router)
 })
 
-// provide store access to the router and router to store
-// FIXME
-store.router = router
-
 const app = createApp(App)
 app.use(router)
-app.use(store)
 app.use(pinia)
 
 app.component('V4Button', V4Button)

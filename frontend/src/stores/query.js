@@ -29,7 +29,7 @@ export const usqQueryStore = defineStore('query', {
       targetPool: ""
    }),
    getters: {
-      getState: state => {
+      stateObject: state => {
          return {
             mode: state.mode,
             basic: state.basic,
