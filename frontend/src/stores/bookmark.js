@@ -204,7 +204,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             let href = window.URL.createObjectURL(blob)
             window.open(href)
          }).catch((error) => {
-             system.reportError(error)
+             system.setError(error)
          })
       },
       async exportBookmarks(folderName) {
@@ -227,7 +227,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             fileLink.click()
             window.URL.revokeObjectURL(fileURL)
          }).catch((error) => {
-            system.reportError(error)
+            system.setError(error)
          })
       }
    }

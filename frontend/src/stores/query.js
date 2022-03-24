@@ -1,9 +1,8 @@
-import { getField, updateField } from 'vuex-map-fields'
+import { defineStore } from 'pinia'
 import axios from 'axios'
 
-const query = {
-   namespaced: true,
-   state: {
+export const usqQueryStore = defineStore('query', {
+	state: () => ({
       userSearched: false,
       mode: "basic",
       basic: "",
@@ -28,13 +27,19 @@ const query = {
          { value: "published", label: "Publisher/Place of Publication", type: "text"}
       ],
       targetPool: ""
-   },
+   }),
    getters: {
-      getField,
       getState: state => {
-         return state
+         return {
+            mode: state.mode,
+            basic: state.basic,
+            searchSources: state.searchSources,
+            advanced: state.advanced,
+            advancedFields: state.advancedFields,
+            targetPool: state.targetPool,
+         }
       },
-      advancedSearchTemplate( state ) {
+      advancedSearchTemplate: state => {
          let out = { fields: []}
          state.advanced.forEach(  af => {
             let tpl =  {op: af.op, field: af.field, comparison: af.comparison}
@@ -42,12 +47,14 @@ const query = {
          })
          return out
       },
-      idQuery: () => id => {
-         return `identifier: {${id}}`
+      idQuery: () => {
+         return (id) => {
+            return `identifier: {${id}}`
+         }
       },
-      queryURLParams: (state, getters) => {
+      queryURLParams: state => {
          let qs = `mode=${state.mode}`
-         qs += `&q=${encodeURIComponent(getters.string)}`
+         qs += `&q=${encodeURIComponent(this.string)}`
          return qs
       },
       queryEntered: state => {
@@ -104,10 +111,9 @@ const query = {
          return qs
       },
    },
-   mutations: {
-      updateField,
-      fixDateSearches(state) {
-         state.advanced.filter( f => f.field == "date" && f.comparison == "BETWEEN").forEach( df => {
+   actions: {
+      fixDateSearches() {
+         this.advanced.filter( f => f.field == "date" && f.comparison == "BETWEEN").forEach( df => {
             if ( df.value == "" && df.endVal != "") {
                df.comparison = "BEFORE"
             }
@@ -116,44 +122,43 @@ const query = {
             }
          })
       },
-      resetAdvancedForm(state) {
-         state.advanced.splice(0, state.advanced.length)
-         state.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
-         state.advanced.push({ op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" })
-         state.advanced.push({ op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" })
-         state.advanced.push({ op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" })
-         state.advanced.push({ op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" })
-         state.advanced.push({ op: "AND", value: "", field: "fulltext", comparison: "EQUAL", endVal: "" })
+      resetAdvancedForm() {
+         this.advanced.splice(0, this.advanced.length)
+         this.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
+         this.advanced.push({ op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" })
+         this.advanced.push({ op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" })
+         this.advanced.push({ op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" })
+         this.advanced.push({ op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" })
+         this.advanced.push({ op: "AND", value: "", field: "fulltext", comparison: "EQUAL", endVal: "" })
       },
-      setTemplate(state, template) {
+      setTemplate(template) {
          let hasQuery = false
-         state.advanced.some( t => {
+         this.advanced.some( t => {
             if (t.value != "") {
                hasQuery = true
             }
             return hasQuery == true
          })
          if ( hasQuery == false) {
-            state.advanced.splice(0, state.advanced.length)
+            this.advanced.splice(0, this.advanced.length)
             template.fields.forEach( f => {
                let newField = { op: f.op, value: "", field: f.field, comparison: f.comparison, endVal: "" }
                if (f.value ) {
                   newField.value = f.value
                }
-               state.advanced.push(newField)
+               this.advanced.push(newField)
             })
          }
       },
-
-      restoreFromURL(state, queryParams) {
+      restoreFromURL(queryParams) {
          // Clear out all existing data
-         state.basic = ""
-         state.advanced.splice(0, state.advanced.length)
+         this.basic = ""
+         this.advanced.splice(0, this.advanced.length)
 
          // queries should be formatted like 'field: {...', but some older queries lack the field and braces
          // look for these and turn them into a basic keyword seatch
          if ( !queryParams.match(/^\w+:\s?{/) ) {
-            state.basic = queryParams
+            this.basic = queryParams
             return
          }
 
@@ -192,10 +197,10 @@ const query = {
                continue
             }
 
-            if (state.mode == "basic") {
+            if (this.mode == "basic") {
                // basic only supports keyword
                if ( term.field == "keyword" ) {
-                  state.basic = value
+                  this.basic = value
                }
                continue
             }
@@ -214,58 +219,51 @@ const query = {
                   term.endVal = value.split("TO")[1].trim()
                }
             }
-            state.advanced.push(term)
+            this.advanced.push(term)
          }
       },
 
-      setAdvancedSearch(state) {
-         state.mode = "advanced"
+      setAdvancedSearch() {
+         this.mode = "advanced"
       },
-      setTargetPool(state, pool) {
-         state.targetPool = pool
+      setTargetPool(pool) {
+         this.targetPool = pool
       },
-      advancedBarcodeSearch(state, barcode) {
-         state.advanced.splice(0, state.advanced.length)
-         state.advanced.push({ op: "AND", value: barcode, field: "identifier", comparison: "EQUAL", endVal: "" })
+      advancedBarcodeSearch(barcode) {
+         this.advanced.splice(0, this.advanced.length)
+         this.advanced.push({ op: "AND", value: barcode, field: "identifier", comparison: "EQUAL", endVal: "" })
       },
-      setBasicSearch(state) {
-         state.mode = "basic"
+      setBasicSearch() {
+         this.mode = "basic"
       },
-      addCriteria(state) {
-         state.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
+      addCriteria() {
+         this.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
       },
-      removeCriteria(state, idx) {
-         state.advanced.splice(idx, 1)
+      removeCriteria(idx) {
+         this.advanced.splice(idx, 1)
       },
-
-      clear(state) {
-         state.basic = ""
-         state.advanced.forEach( a => {
+      clear() {
+         this.basic = ""
+         this.advanced.forEach( a => {
             a.op = "AND"
             a.value = ""
          })
-         state.targetPool = ""
+         this.targetPool = ""
       },
-   },
-   actions: {
-      async loadSearch(ctx, token) {
-         ctx.commit('setSearching', true, { root: true })
+
+      async loadSearch(token) {
          try {
             let response = await axios.get(`/api/searches/${token}`)
             let searchURL = response.data.url
             if (searchURL == "") {
-               ctx.commit('setSearching', false, { root: true })
                this.router.push("/not_found")
             } else {
                await this.router.replace(searchURL)
             }
          } catch(error) {
             console.error(error)
-            ctx.commit('setSearching', false, { root: true })
             this.router.push("/not_found")
          }
       }
    }
-}
-
-export default query
+})

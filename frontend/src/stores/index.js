@@ -2,7 +2,6 @@ import { createStore } from 'vuex'
 import axios from 'axios'
 import analytics from '../analytics'
 import errorReporter from './plugins/error_reporter'
-import query from './modules/query'
 import item from './modules/item'
 import shelf from './modules/shelf'
 import sort from './modules/sort'
@@ -543,7 +542,6 @@ export default createStore({
 
    modules: {
       item: item,
-      query: query,
       shelf: shelf,
       sort: sort,
    },

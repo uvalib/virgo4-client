@@ -398,7 +398,7 @@ export const useUserStore = defineStore('user', {
          })).catch((error) => {
             const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               system.ilsError = error.response.data
+               system.setILSError(error.response.data)
             } else {
                system.setError( error)
             }
@@ -485,7 +485,7 @@ export const useUserStore = defineStore('user', {
          }).catch((error) => {
             const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               system.ilsError = error.response.data
+               system.setILSError(error.response.data)
             } else {
                system.setError( error)
             }
@@ -509,7 +509,7 @@ export const useUserStore = defineStore('user', {
          }).catch((error) => {
             const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               system.ilsError = error.response.data
+               system.setILSError(error.response.data)
             } else {
                system.setError( error)
             }
@@ -527,7 +527,7 @@ export const useUserStore = defineStore('user', {
           }).catch((error) => {
             const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               system.ilsError = error.response.data
+               system.setILSError(error.response.data)
             } else {
                system.setError( error)
             }
@@ -587,7 +587,7 @@ export const useUserStore = defineStore('user', {
          }).catch((error) => {
             const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               system.ilsError =  error.response.data
+               system.setILSError(error.response.data)
             } else {
                this.setAuthFailure(error)
             }

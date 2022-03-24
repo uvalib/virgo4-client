@@ -92,7 +92,6 @@ export const usePreferencesStore = defineStore('preferences', {
          }).catch((error) => {
             const system = useSystemStore()
             system.setError(error)
-            system.reportError(error)
         })
       },
       savePreferences() {

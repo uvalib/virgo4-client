@@ -11,7 +11,6 @@ export const useSystemStore = defineStore('system', {
       kiosk: false,
       devServer: false,
       fatal: "",
-      ilsError: "",
       message: {
          type: "none",
          title: "",
@@ -37,6 +36,12 @@ export const useSystemStore = defineStore('system', {
    }),
 
    getters: {
+      ilsError: state => {
+         if (state.message.type == "ilsError") {
+            return state.message.content
+         }
+         return ""
+      },
       isKiosk: state => {
          return state.kiosk
       },
@@ -47,7 +52,7 @@ export const useSystemStore = defineStore('system', {
          return state.translateMessage.length > 0 && state.seenTranslateMsg == false
       },
       hasMessage: state => {
-         return state.message.type != "none" && state.message.content != ""
+         return state.message.type == "info" && state.message.content != ""
       },
       hasError: state => {
          return state.message.type == "error"
@@ -81,6 +86,7 @@ export const useSystemStore = defineStore('system', {
       },
       setFatal(err) {
          this.fatal = err
+         this.reportError(this.fatal)
          this.router.push( "/error" )
       },
       clearMessage() {
@@ -100,6 +106,14 @@ export const useSystemStore = defineStore('system', {
          this.message.title = "Virgo Search Error",
          this.message.content = errorInfo.message,
          this.message.detail = errorInfo.detail
+         this.reportError(this.message)
+      },
+      setILSError(error) {
+         this.message.type = "ilsError"
+         this.message.title = "ILS Error",
+         this.message.content = error,
+         this.message.detail = ""
+         this.reportError(this.message)
       },
       setError(error) {
          this.message.type = "none"
@@ -126,6 +140,7 @@ export const useSystemStore = defineStore('system', {
             this.message.title = "Virgo Error"
             this.message.content = error
          }
+         this.reportError(this.message)
       },
 
       setConfig(cfg) {

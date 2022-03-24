@@ -206,7 +206,7 @@ router.beforeEach( async (to, _from) => {
    const systemStore  = useSystemStore()
    const restore = useRestoreStore()
    const userStore = useUserStore()
-   systemStore.setILSError = ""
+   systemStore.clearMessage()
 
    // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {
