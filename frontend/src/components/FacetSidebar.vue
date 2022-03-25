@@ -17,7 +17,7 @@
             <div v-if="facets.length == 0" class="none">
                Filters are not available for this search
             </div>
-            <dl v-else>
+            <dl v-else-if="filterStore.updatingFacets == false">
                <template v-for="facetInfo in facets" :key="facetInfo.id">
                   <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
                   <div role="group" :aria-labelledby="facetInfo.id">
@@ -28,7 +28,7 @@
                         </V4Checkbox>
                         <span class="cnt" v-if="utils.formatNum(fv.count)">({{utils.formatNum(fv.count)}})</span>
                      </dd>
-                     <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
+                     <dd v-if="facetValuesCount(facetInfo) > 5" :key="`more${facetInfo.id}`">
                         <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
                            <template v-slot:title>
                               <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
@@ -102,9 +102,6 @@ function facetValues(facet, start, end) {
    if (!facet.buckets) return []
    let out = facet.buckets.filter(b=> b.value && b.na != true).slice(start,end)
    return out
-}
-function moreKey(id) {
-   return "more"+id
 }
 function valueKey(idx, facetID) {
    return facetID+"_val_"+idx
