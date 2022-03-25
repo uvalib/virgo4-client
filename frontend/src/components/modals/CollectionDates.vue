@@ -22,9 +22,9 @@
             :time="false"
             :transitions="false"
             :selectedDate="picked"
-            :minDate="collectionStartDate"
-            :maxDate="collectionEndDate"
-            :disableDays=notPublishedDates
+            :minDate="collection.collectionStartDate"
+            :maxDate="collection.collectionEndDate"
+            :disableDays=collection.notPublishedDates
             active-view="month"
             :disable-views="['week', 'day']"
             @view-change="viewChanged($event)"
@@ -43,90 +43,68 @@
    </V4Modal>
 </template>
 
-<script>
+<script setup>
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
-import { mapGetters, mapState } from "vuex"
-export default {
-   name: "collection-dates",
-   emits: ['picked' ],
-   components: {
-      VueCal
+import { ref } from 'vue'
+import { useCollectionStore } from "@/stores/collection"
+
+const emit = defineEmits( ['picked' ] )
+const props = defineProps({
+   id: {
+      type: String,
+      required: true
    },
-   props: {
-      id: {
-         type: String,
-         required: true
-      },
-      date: {
-         type: String,
-         required: true
-      }
-   },
-   data: function() {
-      return {
-         picked: this.date,
-         error: "",
-         currentCalView: "month"
-      }
-   },
-   computed: {
-      ...mapState({
-         collectionStartDate : state => state.collection.startDate,
-         collectionEndDate : state => state.collection.endDate,
-         currentYear: state => state.collection.currentYear,
-         itemLabel: state => state.collection.itemLabel,
-         notPublishedDates : state => state.collection.notPublishedDates,
-      }),
-      ...mapGetters({
-         pidByDate: 'collection/getPidForDate',
-         publicationYears: 'collection/publicationYears'
-      }),
-   },
-   methods: {
-      viewChanged(e) {
-         this.currentCalView = e.view
-         this.error = ""
-         let priorYear = this.picked.split("-")[0]
-         let newYear = e.startDate.getFullYear()
-         if (priorYear != newYear) {
-            this.$store.dispatch("collection/setYear", newYear)
-         }
-      },
-      async cellClicked(e) {
-         this.error = ""
-         let priorYear = this.picked.split("-")[0]
-         let y = e.getFullYear()
-         let m = `${e.getMonth()+1}`
-         m = m.padStart(2,0)
-         let d = `${e.getDate()}`
-         d = d.padStart(2,0)
-         this.picked = `${y}-${m}-${d}`
-         if (priorYear != y) {
-            await this.$store.dispatch("collection/setYear", y)
-         }
-         if (this.currentCalView == "month") {
-            this.navigateToDate()
-         }
-      },
-      nextTabOK() {
-         this.$refs.calendardlg.lastFocusTabbed()
-      },
-      navigateToDate() {
-         this.error = ""
-         let pid = this.pidByDate(this.picked)
-         if ( pid != "") {
-            this.$emit('picked', pid)
-            this.$refs.calendardlg.hide()
-         } else {
-            this.error = `No ${this.itemLabel.toLowerCase()} was found for ${this.picked}`
-         }
-      },
-      cancelClicked() {
-         this.error = ""
-         this.$refs.calendardlg.hide()
-      },
+   date: {
+      type: String,
+      required: true
    }
+})
+
+const collection = useCollectionStore()
+const calendardlg = ref(null)
+const picked = ref(props.date)
+const error = ref("")
+const currentCalView = ref("month")
+
+function viewChanged(e) {
+   currentCalView.value = e.view
+   error.value = ""
+   let priorYear = picked.value.split("-")[0]
+   let newYear = e.startDate.getFullYear()
+   if (priorYear != newYear) {
+      collection.setYear(newYear)
+   }
+}
+async function cellClicked(e) {
+   error.value = ""
+   let priorYear = picked.value.split("-")[0]
+   let y = e.getFullYear()
+   let m = `${e.getMonth()+1}`
+   m = m.padStart(2,0)
+   let d = `${e.getDate()}`
+   d = d.padStart(2,0)
+   picked.value = `${y}-${m}-${d}`
+   if (priorYear != y) {
+      await collection.setYear(y)
+   }
+   if (currentCalView.value == "month") {
+      navigateToDate()
+   }
+}
+function navigateToDate() {
+   error.value = ""
+   let pid = collection.pidByDate(picked.value)
+   if ( pid != "") {
+      emit('picked', pid)
+      calendardlg.value.hide()
+   } else {
+      error.value = `No ${collection.itemLabel.toLowerCase()} was found for ${picked.value}`
+   }
+}
+function cancelClicked() {
+   error.value = ""
+   calendardlg.value.hide()
 }
 </script>
 
