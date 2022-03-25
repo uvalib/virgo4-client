@@ -1,10 +1,6 @@
 <template>
    <div class="confirmation-panel">
       <h2>We have received your request.</h2>
-      <div class="ra-box ra-notice" v-if="showClosedMessage">
-         Please note that the Library is closed from December 19, 2020 - January 3, 2021. No staff will be available to process
-         requests during this time. Your request will be processed as soon as possible after we reopen.
-      </div>
       <dl>
          <dt>User ID:</dt>
          <dd>{{userId}}</dd>

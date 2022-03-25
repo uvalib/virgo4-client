@@ -64,9 +64,8 @@
          If you are a current student, staff, or faculty and need an account, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
       </p>
       <p class="light left">
-         If you are an alum, we apologize for the inconvenience. Once the libraries reopen to the public,
-         please visit one in person and we will be happy to register you. For information about library access,
-         please visit
+         If you are an alum, we apologize for the inconvenience. Please visit a library in person with a state ID to create an account.  
+         For information about library access, please visit
          <a target="_blank" href="https://www.library.virginia.edu/news/covid-19/#access">
             https://www.library.virginia.edu/news/covid-19/#access</a>.
       </p>
