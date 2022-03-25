@@ -334,7 +334,7 @@ export const useFilterStore = defineStore('filter', {
          let filterObj = {pool_id: pool.id, facets: filters}
          if (paramsChanged == false) {
             // check filter for either: no filters or placeholder filters (presearch promotions or restored from url)
-            let poolFacetObj = this.poolFacets.find( pf => pf.pool == pool.id)
+            let poolFacetObj = this.facets.find( pf => pf.pool == pool.id)
             if ( poolFacetObj ) {
                if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
                   console.log("Facets are current, do not refresh")

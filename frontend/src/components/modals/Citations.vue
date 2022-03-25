@@ -1,7 +1,7 @@
 <template>
    <V4Modal :id="props.id" :title="props.title" ref="citationsdlg" :buttonID="`${props.id}-open`" @opened="opened" :lastFocusID="`${props.id}-dismissbtn`" >
       <template v-slot:button>
-         <V4Button v-if="props.buttonLabel" :mode="props.buttonMode" @click="citationsdlg.value.show()" :id="`${props.id}-open`"
+         <V4Button v-if="props.buttonLabel" :mode="props.buttonMode" @click="citationsdlg.show()" :id="`${props.id}-open`"
             class="citations-text-button" :class="{toolbar: props.toolbarButton}"
              :icon="citationIcon" :aria-label="props.ariaLabel"
          >
@@ -181,10 +181,9 @@ function opened() {
    citations.value = null
 
    itemStore.getCitations({format: props.format, itemURL: props.itemURL}).then( (response) => {
-      var citations = response.data
       loading.value = false
       failed.value = false
-      citations.value = citations
+      citations.value = response.data
    }).catch((error) => {
       loading.value = false
       failed.value = true

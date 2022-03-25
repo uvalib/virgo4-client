@@ -1,7 +1,7 @@
 <template>
    <div id="print-results">
       <div class="list">
-         <div v-for="hit in selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
+         <div v-for="hit in resultStore.selectedResults.hits" class="hit-wrapper" :key="`hit-${hit.number}-${hit.identifier}`">
             <div class="title">
                <div class="hit-title">
                   <span class="number">{{hit.number}}.</span>
@@ -43,30 +43,25 @@
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-export default {
-   computed: {
-      ...mapGetters({
-         selectedResults: 'selectedResults',
-      })
-   },
-   methods: {
-      fieldValue(field) {
-         let limit=100
-         let txt = this.$utils.fieldValueString(field)
-         if (txt.length <= limit) return txt
-         var trunc = txt.substr(0, limit-1)
-         var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()+"..."
-         return out
-      },
-      shouldDisplay(field) {
-         if (field.display == 'optional' || field.type == "url" || field.type == "availability" ||
-            field.name == "location" ||
-            field.type == "access-url" || field.name.includes("_download_url") ) return false
-         return true
-      },
-   }
+<script setup>
+import { useResultStore } from "@/stores/result"
+import * as utils from '../utils'
+
+const resultStore = useResultStore()
+
+function fieldValue(field) {
+   let limit = 100
+   let txt = utils.fieldValueString(field)
+   if (txt.length <= limit) return txt
+   var trunc = txt.substr(0, limit-1)
+   var out = trunc.substr(0, trunc.lastIndexOf(' ')).trim()+"..."
+   return out
+}
+function shouldDisplay(field) {
+   if (field.display == 'optional' || field.type == "url" || field.type == "availability" ||
+      field.name == "location" ||
+      field.type == "access-url" || field.name.includes("_download_url") ) return false
+   return true
 }
 </script>
 

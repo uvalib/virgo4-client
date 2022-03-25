@@ -262,7 +262,7 @@ function removeBookmarks(folderID) {
       systemStore.setError("No bookmarks selected for deletion.<br/>Select one or more and try again.")
       return
    }
-   bookmarkStore.removeBookmarks({folderID: folderID, bookmarkIDs: selectedItems.value})
+   bookmarkStore.removeBookmarks(folderID, selectedItems.value)
 }
 async function removeFolder(folderID, folderIdx) {
    let focusID = "create-folder-btn"

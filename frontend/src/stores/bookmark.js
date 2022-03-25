@@ -144,7 +144,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          }
       },
-      removeBookmarks( {folderID, bookmarkIDs} ) {
+      removeBookmarks( folderID, bookmarkIDs) {
          const userStore = useUserStore()
          let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`

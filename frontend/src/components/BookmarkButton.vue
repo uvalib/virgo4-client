@@ -1,69 +1,70 @@
 <template>
-   <span v-if="isKiosk==false" class="bookmark-container">
+   <span v-if="system.isKiosk==false" class="bookmark-container">
       <V4Button v-if="isBookmarked" mode="icon" @click="removeBookmarkClicked"
-         :id="id"
+         :id="props.id"
          role="switch" aria-checked="true"
-         :aria-label="`remove bookmark on ${data.title}`"
+         :aria-label="`remove bookmark on ${props.data.title}`"
       >
          <i class="bookmark fas fa-bookmark"></i>
       </V4Button>
       <V4Button v-else mode="icon" @click="addBookmarkClicked"
          :id="id"
          role="switch" aria-checked="false"
-         :aria-label="`bookmark ${data.title}`"
+         :aria-label="`bookmark ${props.data.title}`"
       >
          <i class="bookmark fal fa-bookmark"></i>
       </V4Button>
    </span>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-export default {
-   props: {
-      // Fields: Pool, ID, Title. Author optional
-      data: { type: Object, required: true},
-      id:  {type: String, required: true},
-   },
-   computed: {
-      ...mapGetters({
-         isKiosk: 'system/isKiosk',
-         bookmarks: 'bookmarks/bookmarks',
-      }),
-      isBookmarked() {
-         let found = false
-         this.bookmarks.some( folder => {
-            folder.bookmarks.some( item => {
-               if (item.pool == this.data.pool && item.identifier == this.data.identifier) {
-                  found = true
-               }
-               return found == true
-            })
-            return found == true
-         })
-         return found
-      }
-   },
-   methods: {
-      removeBookmarkClicked() {
-         let bookmarkID = -1
-         this.bookmarks.some( folder => {
-            folder.bookmarks.some( item => {
-               if (item.pool == this.data.pool && item.identifier == this.data.identifier) {
-                  bookmarkID = item.id
-                  this.$analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)
-                  this.$store.dispatch("bookmarks/removeBookmarks", {folderID: folder.id, bookmarkIDs: [bookmarkID]})
-               }
-               return bookmarkID != -1
-            })
-            return bookmarkID != -1
-         })
-      },
-      addBookmarkClicked() {
-         this.$emit('clicked')
-      },
-   }
-};
+<script setup>
+import { computed } from 'vue'
+import { useSystemStore } from "@/stores/system"
+import { useBookmarkStore } from "@/stores/bookmark"
+import analytics from '@/analytics'
+
+const emit = defineEmits( ['clicked'] )
+
+const props = defineProps({
+   // Fields: Pool, ID, Title. Author optional
+   data: { type: Object, required: true},
+   id:  {type: String, required: true},
+})
+
+const system = useSystemStore()
+const bookmarkStore = useBookmarkStore()
+
+const isBookmarked = computed(()=>{
+   let found = false
+   bookmarkStore.bookmarks.some( folder => {
+      folder.bookmarks.some( item => {
+         if (item.pool == props.data.pool && item.identifier == props.data.identifier) {
+            found = true
+         }
+         return found == true
+      })
+      return found == true
+   })
+   return found
+})
+
+function removeBookmarkClicked() {
+   let bookmarkID = -1
+   bookmarkStore.bookmarks.some( folder => {
+      folder.bookmarks.some( item => {
+         if (item.pool == props.data.pool && item.identifier == bookmarkStore.data.identifier) {
+            bookmarkID = item.id
+            analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)
+            bookmarkStore.removeBookmarks(folder.id, [bookmarkID])
+         }
+         return bookmarkID != -1
+      })
+      return bookmarkID != -1
+   })
+}
+function addBookmarkClicked() {
+   emit('clicked')
+}
 </script>
 
 <style lang="scss" scoped>
