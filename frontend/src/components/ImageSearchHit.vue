@@ -1,57 +1,55 @@
 <template>
    <div class="image-container">
       <div class="toolbar">
-         <span class="group-cnt" v-if="hit.grouped">{{hit.count}} images</span>
+         <span class="group-cnt" v-if="props.hit.grouped">{{props.hit.count}} images</span>
          <span class="group-cnt" v-else>1 image</span>
          <span class="buttons">
-            <AddBookmark v-if="isSignedIn" :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`"/>
-            <SignInRequired v-else :data="$utils.toBookmarkData(pool,hit,'SEARCH')" :id="`bm-modal-${hit.identifier}`" act="bookmark"/>
+            <AddBookmark v-if="userStore.isSignedIn" :data="utils.toBookmarkData(props.pool, props.hit, 'SEARCH')" :id="`bm-modal-${props.hit.identifier}`"/>
+            <SignInRequired v-else :data="utils.toBookmarkData(props.pool, props.hit, 'SEARCH')" :id="`bm-modal-${props.hit.identifier}`" act="bookmark"/>
          </span>
       </div>
       <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">
-         <img aria-label=" " :src="iiifURL(hit)">
+         <img aria-label=" " :src="iiifURL(props.hit)">
          <div class="metadata-content">
-            <div>{{hit.header.title}}</div>
+            <div>{{props.hit.header.title}}</div>
          </div>
       </router-link>
    </div>
 </template>
 
-<script>
+<script setup>
 import AddBookmark from "@/components/modals/AddBookmark.vue"
 import SignInRequired from "@/components/modals/SignInRequired.vue"
-import { mapGetters } from "vuex"
-export default {
-   props: {
-      hit: { type: Object, required: true},
-      pool: {type: String, required: true},
-   },
-   components: {
-      AddBookmark, SignInRequired
-   },
-   computed: {
-      detailsURL() {
-         return `/sources/${this.pool}/items/${this.hit.identifier}`
-      },
-      ...mapGetters({
-        isSignedIn: 'user/isSignedIn',
-      }),
-   },
-   methods: {
-      detailClicked() {
-         this.$store.commit("hitSelected", this.hit.identifier)
-         this.$analytics.trigger('Results', 'DETAILS_CLICKED', this.hit.identifier)
-      },
-      iiifURL(item) {
-         let iiifField = item.basicFields.find( f=>f.name=="iiif_image_url")
-         if (iiifField) {
-            let iiif = iiifField.value
-            return `${iiif}/square/250,250/0/default.jpg`
-         }
-         return ""
-      },
+import { computed } from 'vue'
+import { useResultStore } from "@/stores/result"
+import { useUserStore } from "@/stores/user"
+import analytics from '@/analytics'
+import * as utils from '../utils'
+
+const props = defineProps({
+   hit: { type: Object, required: true},
+   pool: {type: String, required: true},
+})
+
+const resultStore = useResultStore()
+const userStore = useUserStore()
+
+const detailsURL = computed(()=>{
+   return `/sources/${props.pool}/items/${props.hit.identifier}`
+})
+
+function detailClicked() {
+   resultStore.hitSelected(props.hit.identifier)
+   analytics.trigger('Results', 'DETAILS_CLICKED', props.hit.identifier)
+}
+function iiifURL(item) {
+   let iiifField = item.basicFields.find( f=>f.name=="iiif_image_url")
+   if (iiifField) {
+      let iiif = iiifField.value
+      return `${iiif}/square/250,250/0/default.jpg`
    }
-};
+   return ""
+}
 </script>
 
 <style lang="scss" scoped>
@@ -97,7 +95,7 @@ export default {
          display: block;
          min-width: 175px;
          min-height: 175px;
-         background-image: url('~@/assets/dots.gif');
+         background-image: url('/src/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
       }
