@@ -17,6 +17,7 @@
 </template>
 
 <script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import Search from "@/components/preferences/Search.vue"
 import PickupLibrary from "@/components/preferences/PickupLibrary.vue"

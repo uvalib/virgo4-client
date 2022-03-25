@@ -133,6 +133,7 @@
 </template>
 
 <script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import MoveBookmark from "@/components/modals/MoveBookmark.vue"

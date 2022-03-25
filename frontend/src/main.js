@@ -8,7 +8,6 @@ import V4Select from "@/components/V4Select.vue"
 import V4Modal from "@/components/modals/V4Modal.vue"
 import V4Disclosure from "@/components/disclosures/V4Disclosure.vue"
 import Confirm from "@/components/modals/Confirm.vue"
-import SignInRequired from "@/components/SignInRequired.vue"
 
 import { createPinia } from 'pinia'
 const pinia = createPinia()
@@ -28,7 +27,6 @@ app.component('V4Select', V4Select)
 app.component('V4Modal', V4Modal)
 app.component('V4Disclosure', V4Disclosure)
 app.component('Confirm', Confirm)
-app.component('SignInRequired', SignInRequired)
 
 import '@fortawesome/fontawesome-pro/css/all.css'
 import 'purecss'

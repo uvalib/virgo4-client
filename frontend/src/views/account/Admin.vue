@@ -1,5 +1,6 @@
 <template>
    <div class="admin">
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="admin"/>
       <AccountActivities v-if="userStore.isSignedIn"/>
       <div class="working" v-if="(poolStore.lookingUp || userStore.lookingUp) && userStore.isSignedIn" >
          <V4Spinner message="Loading admin settings..."/>
@@ -15,6 +16,7 @@
 </template>
 
 <script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
 import JWTAdmin from "@/components/admin/JWTAdmin.vue"
 import PickupLibraries from "@/components/admin/PickupLibraries.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"

@@ -126,6 +126,7 @@
 </template>
 
 <script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import RenewSummary from "@/components/modals/RenewSummary.vue"
 import { ref, computed, onMounted } from 'vue'

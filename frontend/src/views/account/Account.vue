@@ -188,6 +188,7 @@
 </template>
 
 <script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountRequestForm from "@/components/account/AccountRequestForm.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import AccordionContent from "@/components/AccordionContent.vue"

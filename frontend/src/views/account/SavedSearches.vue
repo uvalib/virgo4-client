@@ -104,6 +104,7 @@
 </template>
 
 <script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import { ref, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"

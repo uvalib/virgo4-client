@@ -63,6 +63,7 @@
 </template>
 
 <script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import { useUserStore } from "@/stores/user"
 import { computed, onMounted } from 'vue'

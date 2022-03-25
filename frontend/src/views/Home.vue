@@ -57,7 +57,6 @@ import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
 
-
 const router = useRouter()
 const route = useRoute()
 const queryStore = useQueryStore()
@@ -106,7 +105,7 @@ function setPageTitle() {
 onBeforeRouteUpdate((to) => {
    console.log("NEW HOME ROUTE "+ to.fullPath)
    if ( queryStore.userSearched) {
-      searchStore.updateHistory(to.fullPath)
+      searchStore.updateHistory(useUserStore.signedInUser, to.fullPath)
    }
    restoreSearchFromQueryParams(to.query)
    setPageTitle()
