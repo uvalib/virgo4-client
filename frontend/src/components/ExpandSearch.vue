@@ -1,36 +1,34 @@
 <template>
-   <div v-if="searchSources != 'all'" class="expand-search">
+   <div v-if="query.searchSources != 'all'" class="expand-search">
       <div>You are currently searching {{scopeLabel}}. There may be more results if you search everything.</div>
       <div><V4Button mode="text" aria-label="broaden search" @click="widenSearch">Click to broaden your search to Everything.</V4Button></div>
    </div>
 </template>
 
-<script>
-import { mapFields } from 'vuex-map-fields'
-export default {
-   computed: {
-      ...mapFields({
-        searchSources: 'query.searchSources',
-        userSearched: 'query.userSearched',
-      }),
-      scopeLabel() {
-         if ( this.searchSources == 'articles') return "Articles only"
-         if ( this.searchSources == 'images') return "Images only"
-         if ( this.searchSources == 'uva_library') return "Catalog only"
-         return "Everything"
-      }
-   },
-   methods: {
-      widenSearch() {
-         this.searchSources = "all"
-         let query = Object.assign({}, this.$route.query)
-         if (query.q) {
-            delete query.page
-            delete query.pool
-            this.userSearched = true
-            this.$router.push({ query })
-         }
-      },
+<script setup>
+import { computed } from 'vue'
+import { useQueryStore } from "@/stores/query"
+import { useRouter, useRoute } from 'vue-router'
+
+const query = useQueryStore()
+const router = useRouter()
+const route = useRoute()
+
+const scopeLabel = computed(()=>{
+   if ( query.searchSources == 'articles') return "Articles only"
+   if ( query.searchSources == 'images') return "Images only"
+   if ( query.searchSources == 'uva_library') return "Catalog only"
+   return "Everything"
+})
+
+function widenSearch() {
+   query.searchSources = "all"
+   let qp = Object.assign({}, route.query)
+   if (qp.q) {
+      delete qp.page
+      delete qp.pool
+      query.userSearched = true
+      router.push({ qp })
    }
 }
 </script>

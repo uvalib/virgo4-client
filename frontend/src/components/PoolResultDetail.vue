@@ -4,10 +4,10 @@
          <div class="desc" v-html="selectedResults.pool.description">
          </div>
          <div v-if="hasLogo" class="source-logo">
-            <a v-if="hasURL" :href="poolExtURL(selectedResults.pool.id)" target="_blank">
-               <img class ="logo" :src="poolLogo(selectedResults.pool.id)">
+            <a v-if="hasURL" :href="poolStore.externalURL(selectedResults.pool.id)" target="_blank">
+               <img class ="logo" :src="poolStore.logo(selectedResults.pool.id)">
             </a>
-             <img v-else class ="logo" :src="poolLogo(selectedResults.pool.id)">
+             <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
          </div>
          <SearchFilters />
          <CollectionContext />
@@ -15,7 +15,7 @@
             <V4Sort :pool="selectedResults.pool" />
          </div>
       </div>
-      <template v-if="!searching">
+      <template v-if="!resultStore.searching">
          <div  v-if="selectedResults.hits.length == 0" class="hit-wrapper none">
             <div class="timeout" v-if="selectedResults.statusCode == 408">
                <span>Search timed out</span>
@@ -48,7 +48,7 @@
          <span role="toolbar"  v-if="selectedResults.hits.length > 0">
             <ExpandSearch class="expand-panel" />
 
-            <V4Button v-if="hasMoreHits" mode="primary" @click="loadMoreResults">
+            <V4Button v-if="resultStore.hasMoreHits" mode="primary" @click="loadMoreResults">
                <span v-if="loadingMore">
                   <V4Spinner v-if="loadingMore" color="white"/>
                </span>
@@ -59,67 +59,54 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
+<script setup>
 import SearchHit from "@/components/SearchHit.vue"
 import ImageSearchHit from "@/components/ImageSearchHit.vue"
 import SearchFilters from "@/components/SearchFilters.vue"
 import V4Sort from "@/components/V4Sort.vue"
 import ExpandSearch from "@/components/ExpandSearch.vue"
 import CollectionContext from "@/components/CollectionContext.vue"
-export default {
-   components: {
-      ImageSearchHit, SearchHit, SearchFilters, V4Sort, ExpandSearch, CollectionContext
-   },
-   data: function() {
-      return {
-         loadingMore: false
-      }
-   },
-   computed: {
-      ...mapState({
-         results: state=>state.results,
-         searching: state=>state.searching,
-         selectedResultsIdx: state => state.selectedResultsIdx,
-         addingFilter: state => state.filters.adding,
-         updatingFacets: state => state.filters.updatingFacets,
-      }),
-      ...mapGetters({
-         selectedResults: 'selectedResults',
-         hasMoreHits: 'hasMoreHits',
-         poolLogo: 'pools/logo',
-         poolExtURL: 'pools/externalURL',
-      }),
-      hasLogo() {
-         return this.poolLogo(this.selectedResults.pool.id) != ""
-      },
-      hasURL() {
-         return this.poolExtURL(this.selectedResults.pool.id) != ""
-      },
-   },
-   methods: {
-      async retrySearch() {
-         this.$store.commit("clearSelectedPoolResults")
-         let params = {
-            pool: this.selectedResults.pool,
-            page: this.selectedResults.page
-         }
-         await this.$store.dispatch("searchPool", params)
-         this.$store.dispatch("filters/getSelectedResultFacets", false)
-      },
-      async loadMoreResults() {
-         if ( this.searching) return
+import {ref,computed} from 'vue'
+import {useRoute} from 'vue-router'
+import { useResultStore } from "@/stores/result"
+import { usePoolStore } from "@/stores/pool"
+import { useFilterStore } from "@/stores/filter"
 
-         if (this.hasMoreHits) {
-            this.loadingMore = true
-            this.$store.dispatch("moreResults").finally( ()=> {
-                this.loadingMore = false
-                 let query = Object.assign({}, this.$route.query)
-                 query.page = this.selectedResults.page+1 // page is 0 based internally
-            })
-         }
-      }
+const route = useRoute()
+const resultStore = useResultStore()
+const poolStore = usePoolStore()
+const filters = useFilterStore()
+
+const loadingMore = ref(false)
+const hasLogo = computed(()=>{
+   return poolStore.logo(resultStore.selectedResults.pool.id) != ""
+})
+const hasURL = computed(()=>{
+   return poolStore.externalURL(resultStore.selectedResults.pool.id) != ""
+})
+const selectedResults = computed(()=>{
+   return resultStore.selectedResults
+})
+
+async function retrySearch() {
+   resultStore.clearSelectedPoolResults()
+   let params = {
+      pool: resultStore.selectedResults.pool,
+      page: resultStore.selectedResults.page
+   }
+   await resultStore.searchPool(params)
+   filters.getSelectedResultFacets(false)
+}
+async function loadMoreResults() {
+   if ( resultStore.searching) return
+
+   if (resultStore.hasMoreHits) {
+      loadingMore.value = true
+      resultStore.moreResults().finally( ()=> {
+         loadingMore.value = false
+         let query = Object.assign({}, route.query)
+         query.page = resultStore.selectedResults.page+1 // page is 0 based internally
+      })
    }
 }
 </script>

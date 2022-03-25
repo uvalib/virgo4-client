@@ -1,17 +1,17 @@
 <template>
-   <div class="inner-hit-wrapper" :class="{group: hit.grouped}">
-      <div class="hit" v-bind:data-identifier="hit.identifier">
-         <SearchHitHeader :maxLen="60" :count="count" :hit="hit" :pool="pool" from="SEARCH"/>
-         <SearchHitDetail :hit="hit" :pool="pool"/>
+   <div class="inner-hit-wrapper" :class="{group: props.hit.grouped}">
+      <div class="hit" v-bind:data-identifier="props.hit.identifier">
+         <SearchHitHeader :maxLen="60" :count="props.count" :hit="props.hit" :pool="props.pool" from="SEARCH"/>
+         <SearchHitDetail :hit="props.hit" :pool="props.pool"/>
       </div>
-      <AccordionContent v-if="hit.grouped" :id="hit.identifier"
-         :autoExpandID="autoExpandGroupID" :expanded="!collapseGroups" :heightOffset="5"
+      <AccordionContent v-if="props.hit.grouped" :id="props.hit.identifier"
+         :autoExpandID="results.autoExpandGroupID" :expanded="!preferences.collapseGroups" :heightOffset="5"
          backgroundContent="none" background="var(--uvalib-blue-alt-light)"
          borderColor="var(--uvalib-blue-alt-light)" class="group">
          <template v-slot:title>{{groupTitle}}</template>
-         <div v-for="(groupHit,idx) in hit.group" :key="`g${idx}`"
+         <div v-for="(groupHit,idx) in props.hit.group" :key="`g${idx}`"
             class="group-hit" v-bind:data-identifier="groupHit.identifier"
-            :class="{last: idx==hit.group.length-1, first: idx==0}"
+            :class="{last: idx==props.hit.group.length-1, first: idx==0}"
          >
             <SearchHitHeader :maxLen="60" :count="groupHit.number" :hit="groupHit" :pool="pool" from="SEARCH"/>
             <SearchHitDetail :hit="groupHit" :pool="pool"/>
@@ -21,33 +21,29 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
+<script setup>
+import { computed } from 'vue'
 import SearchHitHeader from "@/components/SearchHitHeader.vue"
 import SearchHitDetail from "@/components/SearchHitDetail.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-export default {
-   props: {
-      hit: { type: Object, required: true},
-      pool: {type: String, required: true},
-      count: {type: Number, required: true}
-   },
-   components: {
-      SearchHitHeader, SearchHitDetail, AccordionContent
-   },
-   computed: {
-      groupTitle() {
-         return `Show this group (${this.hit.group.length})`
-      },
-      closeGroupTitle() {
-         return `Collapse this group (${this.hit.group.length})`
-      },
-      ...mapState({
-         autoExpandGroupID: state => state.autoExpandGroupID,
-         collapseGroups: state => state.preferences.collapseGroups,
-      })
-   }
-};
+import { useResultStore } from "@/stores/result"
+import { usePreferencesStore } from "@/stores/preferences"
+
+const results = useResultStore()
+const preferences = usePreferencesStore()
+
+const props = defineProps({
+   hit: { type: Object, required: true},
+   pool: {type: String, required: true},
+   count: {type: Number, required: true}
+})
+
+const groupTitle = computed(()=>{
+   return `Show this group (${props.hit.group.length})`
+})
+const closeGroupTitle = computed(()=>{
+   return `Collapse this group (${props.hit.group.length})`
+})
 </script>
 
 <style lang="scss" scoped>
