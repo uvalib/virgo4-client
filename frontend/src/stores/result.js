@@ -221,6 +221,7 @@ export const useResultStore = defineStore('result', {
 
       setSearchResults(data, tgtPool) {
          // this is called from top level search; resets results from all pools
+         const pools = usePoolStore()
          this.total = -1
          this.results.splice(0, this.results.length)
          let firstPoolWithHits = -1
@@ -254,7 +255,7 @@ export const useResultStore = defineStore('result', {
             // record list is a list of fields in the hit. field is {name,label,type,value,visibility,display}
             pr.group_list.forEach(group => {
 
-               let poolObj = this.pools.list.find( p => p.id == pr.pool_id)
+               let poolObj = pools.list.find( p => p.id == pr.pool_id)
 
                // for each hit in the list, merge repeated fields into arrays, pull out
                // key fields like identifer to top-level named field and split others into basic and detail

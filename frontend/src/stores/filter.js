@@ -92,7 +92,7 @@ export const useFilterStore = defineStore('filter', {
       },
 
       // This is only used to get the filter map for use in global search
-      allPoolFilters: () =>  {
+      allPoolFilters()  {
          let out = []
          const pools = usePoolStore()
          pools.list.forEach( p => {
