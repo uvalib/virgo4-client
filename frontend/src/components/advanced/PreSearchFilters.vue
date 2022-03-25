@@ -1,12 +1,12 @@
 <template>
-   <div class="filters" v-if="hasResults == false">
+   <div class="filters" v-if="resultStore.hasResults == false">
       <div class="filters-head clearfix">
          <span class="title">Selected Filters</span>
          <V4Button v-if="anyFiltersSet" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
       </div>
-      <template v-if="loadingFilters == false && anyFiltersSet">
+      <template v-if="filters.getPresearchFacets == false && anyFiltersSet">
          <dl class="filter-display">
-            <template v-for="psf in preSearchFilters">
+            <template v-for="psf in filters.preSearchFilters">
                <template v-if="hasSelections(psf)">
                   <dt :key="psf.value" class="label">{{psf.name}}</dt>
                   <dd :key="`filters-${psf.id}`" class="filter">
@@ -27,51 +27,45 @@
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-export default {
-   computed: {
-      ...mapGetters({
-         hasResults: 'hasResults',
-         preSearchFilters: 'filters/preSearchFilters',
-      }),
-      ...mapState({
-         loadingFilters: state => state.filters.getPresearchFacets,
-      }),
-      anyFiltersSet() {
-         let filters = false
-         this.preSearchFilters.some( pf => {
-            pf.buckets.some( c => {
-               filters = c.selected
-               return filters == true
-            })
-            return filters == true
-         })
-         return filters
-      },
-   },
-   methods: {
-      hasSelections( filter ) {
-         let filtered = false
-         filter.buckets.some( c => {
-            filtered = c.selected
-            return filtered == true
-         })
-         return filtered
-      },
-      selections( filter ) {
-         let out = filter.buckets.filter( c=> c.selected)
-         return out
-      },
-      async clearClicked() {
-         this.preSearchFilters.forEach( pf => {
-            let sel = pf.buckets.filter( c => c.selected)
-            sel.forEach( fv=>{
-               fv.selected = false
-            })
-         })
-      },
-   }
+<script setup>
+import { computed } from 'vue'
+import { useResultStore } from "@/stores/result"
+import { useFilterStore } from "@/stores/filter"
+
+const resultStore = useResultStore()
+const filters = useFilterStore()
+
+const anyFiltersSet = computed(()=>{
+   let filterSet = false
+   filters.preSearchFilters.some( pf => {
+      pf.buckets.some( c => {
+         filterSet = c.selected
+         return filterSet == true
+      })
+      return filterSet == true
+   })
+   return filterSet
+})
+
+function hasSelections( filter ) {
+   let filtered = false
+   filter.buckets.some( c => {
+      filtered = c.selected
+      return filtered == true
+   })
+   return filtered
+}
+function selections( filter ) {
+   let out = filter.buckets.filter( c=> c.selected)
+   return out
+}
+async function clearClicked() {
+   filters.preSearchFilters.forEach( pf => {
+      let sel = pf.buckets.filter( c => c.selected)
+      sel.forEach( fv=>{
+         fv.selected = false
+      })
+   })
 }
 </script>
 

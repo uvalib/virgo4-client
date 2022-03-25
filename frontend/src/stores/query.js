@@ -52,7 +52,8 @@ export const useQueryStore = defineStore('query', {
             return `identifier: {${id}}`
          }
       },
-      queryURLParams: state => {
+      // NOTE: in order to access the string getter, arrow notaion cannot be used
+      queryURLParams(state) {
          let qs = `mode=${state.mode}`
          qs += `&q=${encodeURIComponent(this.string)}`
          return qs

@@ -1,5 +1,5 @@
 <template>
-   <div class="advanced-panel" :class="{narrow: hasResults}">
+   <div class="advanced-panel" :class="{narrow: resultStore.hasResults}">
       <div class="advanced-controls">
          <AdvancedFacets />
          <div class="advanced-wrap">
@@ -15,7 +15,7 @@
                      </template>
                      <select class="field" v-model="term.field" :aria-label="` field name for search criteria number ${idx+1}`">
                         <option
-                           v-for="fieldObj in advancedFields"
+                           v-for="fieldObj in queryStore.advancedFields"
                            :key="fieldObj.value"
                            :value="fieldObj.value"
                         >{{fieldObj.label}}</option>
@@ -66,7 +66,7 @@
                      <i class="fas fa-plus-circle"></i>
                      <span class="btn-label">Add criteria</span>
                   </V4Button>
-                  <Confirm  v-if="isSignedIn && hasResults==false" title="Save Search Form" v-on:confirmed="saveSearchForm"
+                  <Confirm  v-if="userStore.isSignedIn && resultStore.hasResults==false" title="Save Search Form" v-on:confirmed="saveSearchForm"
                      id="savesearch" buttonLabel="Save Form" buttonMode="tertiary"
                   >
                      <div>
@@ -77,11 +77,11 @@
                   </Confirm>
 
                </div>
-               <PreSearchFilters v-if="hasResults==false"/>
+               <PreSearchFilters v-if="resultStore.hasResults==false"/>
                <div class="controls">
-                  <div class="v4-sort" v-if="hasResults==false">
+                  <div class="v4-sort" v-if="resultStore.hasResults==false">
                      <label class="sort" for="sort-opt">Sort by:</label>
-                     <select v-model="preSearchSort" id="sort-opt" name="sort-opt" @change="sortChanged">
+                     <select v-model="sortStore.preSearchSort" id="sort-opt" name="sort-opt">
                         <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
                            {{ option.name }}
                         </option>
@@ -95,165 +95,148 @@
    </div>
 </template>
 
-<script>
-import { mapMultiRowFields, mapFields } from "vuex-map-fields"
-import { mapGetters } from "vuex"
-import { mapState } from "vuex"
+<script setup>
 import AdvancedFacets from "@/components/advanced/AdvancedFacets.vue"
 import SourceSelector from "@/components/SourceSelector.vue"
 import PreSearchFilters from "@/components/advanced/PreSearchFilters.vue"
+import { useAnnouncer } from '@vue-a11y/announcer'
+import analytics from '@/analytics'
+import { nextTick, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useQueryStore } from "@/stores/query"
+import { useResultStore } from "@/stores/result"
+import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
+import { usePoolStore } from "@/stores/pool"
+import { useSortStore } from "@/stores/sort"
+import { useFilterStore } from "@/stores/filter"
+import { usePreferencesStore } from "@/stores/preferences"
 
-export default {
-   components: {
-      AdvancedFacets, SourceSelector, PreSearchFilters
-   },
-   computed: {
-      ...mapState({
-         advancedFields: state => state.query.advancedFields,
-         pools: state => state.pools.list,
-         searchTemplate: state=>state.preferences.searchTemplate,
-         signedInUser: state => state.user.signedInUser
-      }),
-      ...mapGetters({
-         advancedSearchTemplate: 'query/advancedSearchTemplate',
-         queryURLParams: 'query/queryURLParams',
-         queryEntered: "query/queryEntered",
-         isSignedIn: 'user/isSignedIn',
-         hasSearchTemplate: 'preferences/hasSearchTemplate',
-         hasResults: 'hasResults',
-         preSearchFilterApplied: 'filters/preSearchFilterApplied',
-         filterQueryString: 'filters/asQueryParam',
-         preSearchFilters: 'filters/preSearchFilters',
-         rawQueryString: 'query/string',
-         poolSortOptions: 'pools/sortOptions',
-      }),
-      ...mapFields({
-        userSearched: 'query.userSearched',
-        preSearchSort: 'sort.preSearchSort'
-      }),
-      ...mapMultiRowFields("query", ["advanced"]),
-      canDeleteCriteria() {
-         return this.advanced.length > 1
-      },
-      advancedTerms() {
-         return this.advanced.filter( t => t.field != "filter")
-      },
-      sortOptions() {
-         return this.poolSortOptions("uva_library")
-      }
-   },
-   methods: {
-      sortChanged() {
-         console.log(this.preSearchSort)
-      },
-      saveSearchForm() {
-         this.$store.dispatch("preferences/saveAdvancedSearchTemplate", this.advancedSearchTemplate)
-      },
-      getTermType( term ) {
-         let tgtField = this.advancedFields.find( af=> af.value == term.field)
-         if (tgtField) {
-            return tgtField.type
-         }
-         return "text"
-      },
+const router = useRouter()
+const route = useRoute()
+const queryStore = useQueryStore()
+const resultStore = useResultStore()
+const systemStore = useSystemStore()
+const userStore = useUserStore()
+const poolStore = usePoolStore()
+const sortStore = useSortStore()
+const filters = useFilterStore()
+const preferences = usePreferencesStore()
+const { assertive } = useAnnouncer()
 
-      async doAdvancedSearch() {
-         this.$store.commit("query/fixDateSearches")
-         let fields = this.advanced.filter( f=>f.value != "")
-         if ( fields.length == 1 && fields[0].op == "NOT") {
-            this.$store.commit(
-               "system/setSearchError",
-               {message:"The NOT operator requires more than one search critera"}
-            )
-            return
-         }
+const canDeleteCriteria = computed(()=>{
+   return queryStore.advanced.length > 1
+})
+const advancedTerms = computed(()=>{
+   return queryStore.advanced.filter( t => t.field != "filter")
+})
+const sortOptions = computed(()=>{
+   return poolStore.sortOptions("uva_library")
+})
 
-         let badDate = false
-         this.advanced.filter( f=>f.field == "date" && f.value != "").some( df => {
-            let dateStr = df.value
-            let parts = dateStr.split("-")
-            if (parts.length > 3) {
-               badDate = true
-            } else {
-               parts.forEach( (p,idx) => {
-                  switch (idx) {
-                  case 0:
-                     if ( p.match(/^\d{4}$/) == null ) {
-                        badDate = true
-                     }
-                     break
-                  case 1:
-                     // Month
-                     if ( p.match(/^(0[1-9]|(1[0-2]))$/) == null ) {
-                           badDate = true
-                     }
-                     break
-                  case 2:
-                     // Day
-                    if ( p.match(/^(0[1-9])|([12])([0-9])|(3[01])$/) == null ) {
-                           badDate = true
-                     }
-                     break
-                  default:
-                     badDate = true
-                     break
-                  }
-               })
-            }
-            return badDate == true
-         })
-         if ( badDate ) {
-            this.$store.commit(
-               "system/setSearchError",
-               {message:"Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/> \
-               where YYYY represents a 4 digit year, <br/> \
-               MM represents a two digit month (01-12), and<br/> \
-               DD represents a two digit day (01-31)."}
-            )
-            return
-         }
-
-         if ( this.isSignedIn ) {
-            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', "SIGNED_IN")
-         } else {
-            this.$analytics.trigger('Search', 'ADVANCED_SEARCH', "SIGNED_OUT")
-         }
-
-         let coll = this.preSearchFilters.find( psf => psf.id == "FilterCollection")
-         if (coll) {
-            let uvad = coll.buckets.find(b => b.value == "UVA Library Digital Repository")
-            if (uvad && uvad.selected) {
-               this.$analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')
-            }
-         }
-
-         let newQ = Object.assign({}, this.$route.query)
-         newQ.q = this.rawQueryString
-         if ( this.hasResults == false && this.preSearchFilterApplied ) {
-            this.$store.dispatch("filters/promotePreSearchFilters")
-            newQ.filter = this.filterQueryString('presearch')
-         }
-         this.$store.dispatch("sort/promotePreSearchSort")
-         this.userSearched = true
-         await this.$router.replace({query: newQ})
-      },
-      addClicked() {
-         this.$store.commit("query/addCriteria")
-         setTimeout( () => {
-            let out = document.querySelectorAll(".field:last-of-type")
-            if (out.length > 0) {
-               out[out.length-1].focus()
-            }
-         }, 100)
-      },
-      removeCriteria(idx) {
-         this.$store.commit("query/removeCriteria", idx);
-      },
-   },
-   mounted() {
-      this.$announcer.set(`virgo advanced search has loaded`, 'assertive')
+function saveSearchForm() {
+   preferences.saveAdvancedSearchTemplate(queryStore.advancedSearchTemplate)
+}
+function getTermType( term ) {
+   let tgtField = queryStore.advancedFields.find( af=> af.value == term.field)
+   if (tgtField) {
+      return tgtField.type
    }
-};
+   return "text"
+}
+
+async function doAdvancedSearch() {
+   queryStore.fixDateSearches()
+   let fields = queryStore.advanced.filter( f=>f.value != "")
+   if ( fields.length == 1 && fields[0].op == "NOT") {
+      systemStore.setSearchError( {message:"The NOT operator requires more than one search critera"} )
+      return
+   }
+
+   let badDate = false
+   queryStore.advanced.filter( f=>f.field == "date" && f.value != "").some( df => {
+      let dateStr = df.value
+      let parts = dateStr.split("-")
+      if (parts.length > 3) {
+         badDate = true
+      } else {
+         parts.forEach( (p,idx) => {
+            switch (idx) {
+            case 0:
+               if ( p.match(/^\d{4}$/) == null ) {
+                  badDate = true
+               }
+               break
+            case 1:
+               // Month
+               if ( p.match(/^(0[1-9]|(1[0-2]))$/) == null ) {
+                     badDate = true
+               }
+               break
+            case 2:
+               // Day
+               if ( p.match(/^(0[1-9])|([12])([0-9])|(3[01])$/) == null ) {
+                     badDate = true
+               }
+               break
+            default:
+               badDate = true
+               break
+            }
+         })
+      }
+      return badDate == true
+   })
+   if ( badDate ) {
+      systemStore.setSearchError(
+         { message:"Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/> \
+         where YYYY represents a 4 digit year, <br/> \
+         MM represents a two digit month (01-12), and<br/> \
+         DD represents a two digit day (01-31)." }
+      )
+      return
+   }
+
+   if ( userStore.isSignedIn ) {
+      analytics.trigger('Search', 'ADVANCED_SEARCH', "SIGNED_IN")
+   } else {
+      analytics.trigger('Search', 'ADVANCED_SEARCH', "SIGNED_OUT")
+   }
+
+   let coll = filters.preSearchFilters.find( psf => psf.id == "FilterCollection")
+   if (coll) {
+      let uvad = coll.buckets.find(b => b.value == "UVA Library Digital Repository")
+      if (uvad && uvad.selected) {
+         analytics.trigger('Search', 'DIGITAL_COLLECTION_SELECTED')
+      }
+   }
+
+   let newQ = Object.assign({}, route.query)
+   newQ.q = queryStore.string
+   if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
+      filters.promotePreSearchFilters()
+      newQ.filter = filters.asQueryParm('presearch')
+   }
+   sortStore.promotePreSearchSort()
+   queryStore.userSearched = true
+   await router.replace({query: newQ})
+}
+function addClicked() {
+   queryStore.addCriteria()
+   nextTick( () => {
+      let out = document.querySelectorAll(".field:last-of-type")
+      if (out.length > 0) {
+         out[out.length-1].focus()
+      }
+   })
+}
+function removeCriteria(idx) {
+   queryStore.removeCriteria(idx)
+}
+
+onMounted(()=>{
+   assertive(`virgo advanced search has loaded`)
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,18 +1,18 @@
 <template>
-   <div class="filter-sidebar" :class="{overlay: !startExpanded}" v-if="hasResults == false && !searching">
+   <div class="filter-sidebar" :class="{overlay: !startExpanded}" v-if="resultStore.hasResults == false && !resultStore.searching">
       <div class="filters">
           <AccordionContent class="filter" id="acc-filter-sidebar"
-            :background="filterColor"
+            background="var(--uvalib-brand-blue)"
             color="white" :expanded="startExpanded"
             borderColor="var(--uvalib-brand-blue)"
-            :layoutChange="loadingFilters"  :invert="!startExpanded">
+            :layoutChange="filters.getPresearchFacets" :invert="!startExpanded">
             <template v-slot:title>Filters</template>
             <div class="body">
-               <div v-if="loadingFilters" class="working">
+               <div v-if="filters.getPresearchFacets" class="working">
                   <V4Spinner message="Loading filters..."/>
                </div>
 
-               <template v-else v-for="filterInfo in filters.filter( f=> f.hidden !== true)" :key="filterInfo.id">
+               <template v-else v-for="filterInfo in filters.preSearchFilters.filter( f=> f.hidden !== true)" :key="filterInfo.id">
                   <AccordionContent
                      :id="`${filterInfo.id}-acc`"
                      class="filter-list"
@@ -27,7 +27,7 @@
                            @click="filterClicked(filterInfo.id, fv.value)">
                            {{fv.value}}
                         </V4Checkbox>
-                        <span class="cnt" v-if="fv.count">({{$utils.formatNum(fv.count)}})</span>
+                        <span class="cnt" v-if="fv.count">({{utils.formatNum(fv.count)}})</span>
                      </div>
                   </AccordionContent>
                </template>
@@ -38,36 +38,24 @@
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
+<script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
-export default {
-   components: {
-      AccordionContent
-   },
-   computed: {
-      ...mapState({
-         displayWidth: state => state.system.displayWidth,
-         loadingFilters: state => state.filters.getPresearchFacets,
-         searching: state => state.searching,
-      }),
-      ...mapGetters({
-         hasResults: 'hasResults',
-         filters: 'filters/preSearchFilters',
-      }),
-      filterColor() {
-         return "var(--uvalib-brand-blue)"
-      },
-      startExpanded() {
-         return this.displayWidth > 810
-      },
-   },
-   methods: {
-      filterClicked(facetID, value) {
-         let data = {pool: "presearch", facetID: facetID, value: value}
-         this.$store.commit("filters/toggleFilter", data)
-      },
-   }
+import { computed } from 'vue'
+import * as utils from '@/utils'
+import { useSystemStore } from "@/stores/system"
+import { useResultStore } from "@/stores/result"
+import { useFilterStore } from "@/stores/filter"
+
+const resultStore = useResultStore()
+const systemStore = useSystemStore()
+const filters = useFilterStore()
+
+const startExpanded = computed(()=>{
+   return systemStore.displayWidth > 810
+})
+
+function filterClicked(facetID, value) {
+   filters.toggleFilter("presearch", facetID, value)
 }
 </script>
 <style lang="scss" scoped>

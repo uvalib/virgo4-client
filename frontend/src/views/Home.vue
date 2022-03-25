@@ -2,7 +2,7 @@
    <div class="home">
       <V4Spinner  v-if="resultStore.searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel pure-form">
-         <template v-if="basicSearch">
+         <template v-if="queryStore.mode=='basic'">
             <div v-if="systemStore.hasTranslateMessage" class="translate-message">
                {{systemStore.translateMessage}}
             </div>
@@ -73,9 +73,6 @@ const { polite, assertive } = useAnnouncer()
 
 const queryMessage = ref("")
 
-const basicSearch = computed(()=>{
-   return queryStore.searchMode != "advanced"
-})
 const isHomePage = computed(()=>{
    return (route.path == "/")
 })
@@ -99,16 +96,20 @@ resultStore.$subscribe((mutation) => {
    }
 })
 
+function setPageTitle() {
+   systemStore.pageTitle = "Search"
+   if (queryStore.mode != "basic") {
+      systemStore.pageTitle = "Advanced Search"
+   }
+}
+
 onBeforeRouteUpdate((to) => {
    console.log("NEW HOME ROUTE "+ to.fullPath)
    if ( queryStore.userSearched) {
       searchStore.updateHistory(to.fullPath)
    }
-   this.restoreSearchFromQueryParams(to.query)
-   systemStore.pageTitle = "Search"
-   if (queryStore.searchMode != "basic") {
-      systemStore.pageTitle = "Advanced Search"
-   }
+   restoreSearchFromQueryParams(to.query)
+   setPageTitle()
 })
 
 onMounted( async () =>{
@@ -119,8 +120,9 @@ onMounted( async () =>{
       await queryStore.loadSearch(token)
    }
    handleLegacyQueries( route.query )
+   setPageTitle()
 
-   if ( queryStore.searchMode == "basic") {
+   if ( queryStore.mode == "basic") {
       polite(`virgo search has loaded`)
    }
 })
@@ -226,7 +228,7 @@ async function restoreSearchFromQueryParams( query ) {
    let poolChanged = false
 
    if ( query.pool ) {
-      poolChanged = (query.pool != this.currentPool)
+      poolChanged = (query.pool != queryStore.targetPool)
       targetPool = query.pool
       queryStore.setTargetPool(targetPool)
 
@@ -344,7 +346,7 @@ function showAddBookmark( bmRestore ) {
          let sel = `.hit[data-identifier="${identifier}"]`
          let tgtEle = document.body.querySelector(sel)
          if ( tgtEle) {
-            this.$utils.scrollToItem(tgtEle)
+            utils.scrollToItem(tgtEle)
             bmData.data = resultStore.selectedResults.hits.find( r=> r.identifier == identifier)
          }
    }

@@ -181,25 +181,25 @@ export const useFilterStore = defineStore('filter', {
          })
       },
 
-      toggleFilter(data) {
-         let idx = this.facets.findIndex(pf => pf.pool == data.pool)
+      toggleFilter(pool, facetID, value) {
+         let idx = this.facets.findIndex(pf => pf.pool == pool)
          let pfObj = this.facets[idx]
-         let fIdx = pfObj.facets.findIndex(f => f.id === data.facetID)
+         let fIdx = pfObj.facets.findIndex(f => f.id === facetID)
          let facetInfo = pfObj.facets[fIdx]
-         let bIdx = facetInfo.buckets.findIndex( b=> b.value == data.value )
+         let bIdx = facetInfo.buckets.findIndex( b=> b.value == value )
          let bucket = facetInfo.buckets[bIdx]
          bucket.selected = !bucket.selected
          if ( bucket.selected ) {
-            if ( data.pool == "presearch") {
-               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_SET', `${data.facetID}:${data.value}`)
+            if ( pool == "presearch") {
+               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_SET', `${facetID}:${value}`)
             } else {
-               analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${data.facetID}:${data.value}`)
+               analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${value}`)
             }
          } else {
-            if ( data.pool == "presearch") {
-               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_REMOVED', `${data.facetID}:${data.value}`)
+            if ( pool == "presearch") {
+               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_REMOVED', `${facetID}:${value}`)
             } else {
-               analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${data.facetID}:${data.value}`)
+               analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${value}`)
             }
          }
          if ( bucket.na ) {
@@ -234,7 +234,7 @@ export const useFilterStore = defineStore('filter', {
                   b.selected = false
                })
             })
-            this.facets.splice(0, this.poofacetslFacets.length)
+            this.facets.splice(0, this.facets.length)
             this.facets.push(pre)
          } else {
             this.facets.splice(0, this.facets.length)
@@ -249,7 +249,7 @@ export const useFilterStore = defineStore('filter', {
          if (pfIdx == -1) {
             pfObj = {pool: pool, facets: []}
          } else {
-            pfObj = this.poolFafacetscets[pfIdx]
+            pfObj = this.facets[pfIdx]
          }
 
          let decoded = decodeURIComponent(filterStr).trim()
