@@ -225,7 +225,6 @@ function submitRequest() {
    errors.value = []
    let proxyRequest = reserveStore.request.onBehalfOf == "yes"
    for (let [key, value] of Object.entries(reserveStore.request)) {
-      console.log(key+"=["+value+"]")
       // skip lonn/library if there are no non-video items
       if ( (key == "period" || key == "library") && nonVideoRequests.value.length == 0) continue
 

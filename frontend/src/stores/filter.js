@@ -38,7 +38,6 @@ export const useFilterStore = defineStore('filter', {
             if (!pfObj) {
                return []
             }
-            console.log(pfObj.facets)
             return pfObj.facets
          }
       },

@@ -27,7 +27,6 @@ export const useSearchStore = defineStore('search', {
       async updateVisibility(data) {
          this.lookingUp = true
          let url = `/api/users/${data.userID}/searches/${data.id}/publish`
-         console.log(url)
          if (data.public) {
             await axios.post(url)
          } else {
