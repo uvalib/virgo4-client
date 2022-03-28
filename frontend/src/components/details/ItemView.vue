@@ -77,8 +77,8 @@
       </div>
       <DigitalContent />
       <template v-if="details.source != 'images'">
-         <!-- <Availability v-if="poolStore.hasAvailability(details.source)" :titleId="details.identifier" />
-         <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" /> -->
+         <!-- <Availability v-if="poolStore.hasAvailability(details.source)" :titleId="details.identifier" /> -->
+         <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
          <ShelfBrowse v-if="!details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
       </template>
    </div>
@@ -87,7 +87,7 @@
 <script setup>
 import SearchHitHeader from "@/components/SearchHitHeader.vue"
 // import Availability from "@/components/details/Availability.vue"
-// import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
+import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from "@/components/AccessURLDetails.vue"
