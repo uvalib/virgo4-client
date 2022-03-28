@@ -37,6 +37,21 @@ onBeforeRouteUpdate( async (to) => {
    getDetails(to.params.src, to.params.id)
 })
 
+item.$subscribe((mutation) => {
+   if (mutation.events.key == "loadingDigitalContent")  {
+      if (mutation.events.newValue == false && item.hasDigitalContent ) {
+         item.digitalContent.forEach( dc => {
+            if (dc.pdf ) {
+               analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
+            }
+            if (dc.ocr ) {
+               analytics.trigger('OCR', 'OCR_LINK_PRESENTED', dc.pid)
+            }
+         })
+      }
+   }
+})
+
 async function getDetails(src, id) {
    // if this was called from an old catalog/id url, the src will get
    // set to legacy. in this case, lookup the cat key and redirect to full detail

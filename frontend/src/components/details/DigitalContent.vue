@@ -118,22 +118,6 @@ const pdfTimerIDs = ref(new Map())
 const ocrTimerIDs = ref(new Map())
 const fsView = ref(false)
 
-
-item.$subscribe((mutation) => {
-   if (mutation.events.key == "loadingDigitalContent")  {
-      if (mutation.events.newValue == false && item.hasDigitalContent ) {
-         item.digitalContent.forEach( dc => {
-            if (dc.pdf ) {
-               analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
-            }
-            if (dc.ocr ) {
-               analytics.trigger('OCR', 'OCR_LINK_PRESENTED', dc.pid)
-            }
-         })
-      }
-   }
-})
-
 const details = computed(()=>{
    return item.details
 })
