@@ -97,6 +97,7 @@ import V4ProgressBar from "@/components/V4ProgressBar.vue"
 import OCRRequest from "@/components/modals/OCRRequest.vue"
 import analytics from '@/analytics'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useCollectionStore } from "@/stores/collection"
 import { useItemStore } from "@/stores/item"
 import { usePoolStore } from "@/stores/pool"
@@ -110,6 +111,7 @@ const poolStore = usePoolStore()
 const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
+const route = useRoute()
 
 const selectedDigitalObjectIdx = ref(0)
 const pdfTimerIDs = ref(new Map())
@@ -141,7 +143,7 @@ const hasExternalImages = computed(()=>{
    return false
 })
 const pdfContent = computed(()=>{
-   return this.digitalContent.filter( dc => dc.pdf)
+   return item.digitalContent.filter( dc => dc.pdf)
 })
 const poolMode = computed(()=>{
    let poolDetail = poolStore.poolDetails(details.value.source)
@@ -149,7 +151,7 @@ const poolMode = computed(()=>{
 })
 const curioURL = computed(()=>{
    // change the oembed url to view
-   let selDO = this.digitalContent[selectedDigitalObjectIdx.value]
+   let selDO = item.digitalContent[selectedDigitalObjectIdx.value]
    let idx = selDO.oEmbedURL.indexOf("/oembed")
    let url = selDO.oEmbedURL.substring(0, idx)
    url += "/view/" + selDO.pid
@@ -165,23 +167,23 @@ const curioURL = computed(()=>{
 
    url += "?domain="+domain
 
-   let x = this.$route.query.x
+   let x = route.query.x
    if (x) {
       url += `&x=${x}`
    }
-   let y = this.$route.query.y
+   let y = route.query.y
    if (y) {
       url += `&y=${y}`
    }
-   let zoom = this.$route.query.zoom
+   let zoom = route.query.zoom
    if (zoom) {
       url += `&zoom=${zoom}`
    }
-   let rotation = this.$route.query.rotation
+   let rotation = route.query.rotation
    if (rotation) {
       url += `&rotation=${rotation}`
    }
-   let page = this.$route.query.page
+   let page = route.query.page
    if (page) {
       url += `&page=${page}`
    }
@@ -288,7 +290,7 @@ function generateOCRInProgress(tgtItem) {
 async function pdfClicked( tgtItem ) {
    await item.getPDFStatus(tgtItem )
    if (tgtItem.pdf.status == "READY" || tgtItem.pdf.status == "100%") {
-      this.$analytics.trigger('PDF', 'PDF_DOWNLOAD_CLICKED', tgtItem.pid)
+      analytics.trigger('PDF', 'PDF_DOWNLOAD_CLICKED', tgtItem.pid)
       window.location.href=tgtItem.pdf.url
       return
    } else if (tgtItem.pdf.status == "ERROR" ) {
@@ -301,7 +303,7 @@ async function pdfClicked( tgtItem ) {
       await item.generatePDF(tgtItem)
    }
 
-   if (this.pdfTimerIDs.has(tgtItem.pid) == false) {
+   if (pdfTimerIDs.value.has(tgtItem.pid) == false) {
       let pdfTimerID = setInterval( async () => {
          await item.getPDFStatus(tgtItem )
          let tgtTimer = pdfTimerIDs.value.get(tgtItem.pid)
