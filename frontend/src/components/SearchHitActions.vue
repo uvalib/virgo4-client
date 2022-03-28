@@ -105,7 +105,7 @@ async function pdfClicked( ) {
    if ( itemDC.pdf.status == "NOT_AVAIL" || itemDC.pdf.status == "FAILED") {
       analytics.trigger('PDF', 'PDF_GENERATE_CLICKED', itemDC.pid)
       pdfDownloading.value = true
-      await this.$store.dispatch("item/generatePDF", itemDC)
+      await item.generatePDF(itemDC)
    }
 
    pdfTimerID.value = setInterval( async () => {
