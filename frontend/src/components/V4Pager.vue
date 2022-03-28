@@ -1,39 +1,38 @@
 <template>
    <span class=v4-pager>
-      <V4Button mode="small" :disabled="!prevAvailable"  @click="$emit('prior')" aria-label="previous result">
+      <V4Button mode="small" :disabled="!props.prevAvailable"  @click="emit('prior')" aria-label="previous result">
          <i class="fal fa-arrow-left"></i>
       </V4Button>
       <span class="page-info">
-         {{$utils.formatNum(page)}} of {{$utils.formatNum(total)}}
+         {{utils.formatNum(props.page)}} of {{utils.formatNum(props.total)}}
       </span>
-      <V4Button mode="small"  :disabled="!nextAvailable" @click="$emit('next')" aria-label="next result">
+      <V4Button mode="small"  :disabled="!props.nextAvailable" @click="emit('next')" aria-label="next result">
          <i class="fal fa-arrow-right"></i>
       </V4Button>
    </span>
 </template>
 
-<script>
-export default {
-   props: {
-      total: {
-         type: Number,
-         required: true
-      },
-      page: {
-         type: Number,
-         required: true
-      },
-      prevAvailable: {
-         type: Boolean,
-         required: true
-      },
-      nextAvailable: {
-         type: Boolean,
-         required: true
-      }
+<script setup>
+import * as utils from '@/utils'
+const props = defineProps({
+   total: {
+      type: Number,
+      required: true
    },
-   emits: ['prior', 'next' ],
-}
+   page: {
+      type: Number,
+      required: true
+   },
+   prevAvailable: {
+      type: Boolean,
+      required: true
+   },
+   nextAvailable: {
+      type: Boolean,
+      required: true
+   }
+})
+const emit = defineEmits( ['prior', 'next' ] )
 </script>
 
 <style lang="scss" scoped>

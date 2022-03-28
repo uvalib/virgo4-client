@@ -38,17 +38,17 @@ export const useResultStore = defineStore('result', {
          }
          return hit
       },
-      nextHitAvailable: (state, getters) => {
+      nextHitAvailable(state) {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
-         return getters.selectedHit.number < getters.selectedResults.total
+         return this.selectedHit.number < this.selectedResults.total
       },
-      prevHitAvailable: (state, getters) => {
+      prevHitAvailable(state) {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
-         return getters.selectedHit.number > 1
+         return this.selectedHit.number > 1
       },
       hasResults: state => {
          return state.total >= 0

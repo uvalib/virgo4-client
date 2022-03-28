@@ -80,8 +80,10 @@ const viewModes = [ {id: 'gallery', title: "<i class='fas fa-grip-horizontal'></
 const currViewMode = ref('gallery')
 const currFocus = ref('gallery')
 const viewModeOpen = ref(false)
-const browseTarget = ref(null)
 
+const browseTarget = computed(()=>{
+   return shelfStore.browse.find(b=> b.id == route.params.id)
+})
 const viewMode = computed(() =>{
    var m = viewModes.find( vm => vm.id == currViewMode.value)
    return m.title
@@ -100,15 +102,6 @@ const firstCall = computed(() =>{
 })
 const lastCall = computed(() =>{
    return shelfStore.browse[shelfStore.browse.length-1].call_number
-})
-
-shelfStore.$subscribe((mutation) => {
-   if (mutation.events.key == "lookingUp")  {
-      if (mutation.events.newValue == false && browseTarget.value == null) {
-         console.log("SET BROWSE TARGET ")
-         browseTarget.value = shelfStore.browse.find(b=> b.id == route.params.id)
-      }
-   }
 })
 
 function selectView( mode ) {
@@ -163,11 +156,6 @@ function isCurrent(idx) {
    let item = shelfStore.browse[idx]
    return item.id == browseTarget.value.id
 }
-async function initializeBrowse() {
-   shelfStore.browseRange = 10
-   shelfStore.showSpinner = true
-   await shelfStore.getBrowseData(route.params.id )
-}
 function browseNext() {
    shelfStore.browseNext()
    analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
@@ -189,8 +177,10 @@ function leave(el) {
    el.style.height = '0'
 }
 
-onMounted(()=>{
-   initializeBrowse()
+onMounted( async ()=>{
+   shelfStore.lookingUp = true
+   shelfStore.browseRange = 10
+   await shelfStore.getBrowseData(route.params.id )
 })
 
 </script>

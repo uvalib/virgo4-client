@@ -4,7 +4,7 @@ import { useSystemStore } from "@/stores/system"
 
 export const useShelfStore = defineStore('shelf', {
 	state: () => ({
-      lookingUp: false,
+      lookingUp: true,
       browse: [],
       browseRange: 3,
       showSpinner: true

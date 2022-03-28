@@ -154,14 +154,14 @@ function returnToSearch() {
    router.push( resultStore.lastSearchURL )
 }
 async function nextHitClicked() {
-   await this.$store.dispatch("nextHit")
+   await resultStore.nextHit()
    let url = route.fullPath
    let lastSlash = url.lastIndexOf("/")
    url = url.substring(0,lastSlash )+"/"+resultStore.selectedHit.identifier
    router.push(url)
 }
 async function priorHitClicked() {
-   await this.$store.dispatch("priorHit")
+   await resultStore.priorHit()
    let url = route.fullPath
    let lastSlash = url.lastIndexOf("/")
    url = url.substring(0,lastSlash )+"/"+resultStore.selectedHit.identifier
