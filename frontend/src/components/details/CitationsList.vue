@@ -23,30 +23,27 @@
    </span>
 </template>
 
-<script>
-import { mapState } from "vuex"
+<script setup>
 import V4DownloadButton from "@/components/V4DownloadButton.vue"
 import Citations from "@/components/modals/Citations.vue"
+import { useItemStore } from "@/stores/item"
+import { useSystemStore } from "@/stores/system"
+import analytics from '@/analytics'
+import { computed } from 'vue'
 
-export default {
-   components: {
-      V4DownloadButton, Citations
-   },
-   computed: {
-      ...mapState({
-         details : state => state.item.details,
-         citationsURL: state => state.system.citationsURL,
-      }),
-      risURL() {
-         if (this.citationsURL == "") return ""
-         return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
-      },
-   },
-   methods: {
-      downloadRISClicked() {
-         this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
-      },
-   },
+const item = useItemStore()
+const system = useSystemStore()
+
+const details = computed(()=>{
+   return item.details
+})
+const risURL = computed(()=>{
+   if (system.citationsURL == "") return ""
+   return `${system.citationsURL}/format/ris?item=${encodeURI(details.value.itemURL)}`
+})
+
+function downloadRISClicked() {
+   analytics.trigger('Export', 'RIS_FROM_DETAIL', details.value.identifier)
 }
 </script>
 

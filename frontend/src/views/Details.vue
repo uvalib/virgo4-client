@@ -6,13 +6,13 @@
       <template v-else>
          <CollectionHeader v-if="collection.isAvailable && (item.isCollection || item.isCollectionHead)"/>
          <FullPageCollectionView v-if="collection.isFullPage && item.isCollection && collection.isAvailable" />
-         <!-- <ItemView v-else /> -->
+         <ItemView v-else />
       </template>
    </div>
 </template>
 
 <script setup>
-// import ItemView from "@/components/details/ItemView.vue"
+import ItemView from "@/components/details/ItemView.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
 import { onMounted, onUpdated } from 'vue'

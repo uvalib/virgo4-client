@@ -68,7 +68,7 @@ export const useShelfStore = defineStore('shelf', {
             nextIdx =  0
          }
          this.showSpinner = false
-         this.dispatch("getBrowseData", this.browse[nextIdx].id)
+         this.getBrowseData(this.browse[nextIdx].id)
       },
       async getBrowseData(centerId) {
          const system = useSystemStore()

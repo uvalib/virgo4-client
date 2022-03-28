@@ -1,13 +1,13 @@
 <template>
    <section class="shelf-browse" aria-live="polite">
-      <div class="working" v-if="working" aria-hidden="true">
+      <div class="working" v-if="shelfStore.lookingUp" aria-hidden="true">
          <V4Spinner message="Getting shelf browse data..." />
       </div>
-      <nav aria-labelledby="shelf-title" v-if="!working && hasBrowseData">
+      <nav aria-labelledby="shelf-title" v-if="!shelfStore.lookingUp && shelfStore.hasBrowseData">
          <h2 id="shelf-title">Shelf Browse</h2>
          <ul class="browse-cards" role="list">
-            <li v-for="(b,idx) in shelfBrowse" class="card-wrap" :key="`b${b.id}`">
-               <BrowseCard :current="isCurrent(idx)" :pool="pool" :data="b" style="height:100%"/>
+            <li v-for="(b,idx) in shelfStore.browse" class="card-wrap" :key="`b${b.id}`">
+               <BrowseCard :current="isCurrent(idx)" :pool="props.pool" :data="b" style="height:100%"/>
             </li>
          </ul>
          <router-link @click="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
@@ -21,92 +21,80 @@
    </section>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-import { mapState } from "vuex"
+<script setup>
 import BrowseCard from "@/components/details/BrowseCard.vue"
 import BrowsePager from "@/components/details/BrowsePager.vue"
-export default {
-   props: {
-      hit: {
-         type: Object,
-         required: true
-      },
-      target: {
-         type: String,
-         default: ""
-      },
-      pool: {
-         type: String,
-         required: true
+import { computed, onMounted } from 'vue'
+import { useShelfStore } from "@/stores/shelf"
+import analytics from '@/analytics'
+
+const props = defineProps({
+   hit: {
+      type: Object,
+      required: true
+   },
+   target: {
+      type: String,
+      default: ""
+   },
+   pool: {
+      type: String,
+      required: true
+   }
+})
+
+const shelfStore = useShelfStore()
+
+
+const currentCallNumber = computed(()=>{
+   let f =  props.hit.detailFields.find( f => f.name == "call_number")
+   if ( f) {
+      return f.value
+   }
+   return props.hit.identifier
+})
+const showRestore = computed(()=>{
+   let center = shelfStore.browse[shelfStore.browseRange]
+   return center.id != props.hit.identifier
+})
+const browseURL = computed(()=>{
+   return `/sources/${props.pool}/items/${props.hit.identifier}/browse`
+})
+
+function fullScreenBrowseClicked() {
+   analytics.trigger('ShelfBrowse', 'FULL_SCREEN_BROWSE_CLICKED', props.hit.identifier)
+}
+function isCurrent(idx) {
+   if ( shelfStore.lookingUp ) return false
+   let item = shelfStore.browse[idx]
+   return item.id == props.hit.identifier
+}
+function browseRestore() {
+   shelfStore.showSpinner = false
+   shelfStore.getBrowseData(props.hit.identifier )
+   analytics.trigger('ShelfBrowse', 'BROWSE_RESTORE_CLICKED', props.hit.identifier)
+}
+async function getBrowseData() {
+   shelfStore.browseRange = 3
+   let tgt = props.hit.identifier
+   if ( props.target && props.target != "")  {
+      tgt = props.target
+   }
+   await shelfStore.getBrowseData( tgt )
+   if ( shelfStore.hasBrowseData) {
+      analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', props.hit.identifier)
+   }
+   if ( props.target && props.target != "")  {
+      let bmEle = document.getElementById(`bm-modal-${props.target}-btn`)
+      if (bmEle) {
+         bmEle.focus()
+         bmEle.click()
       }
-   },
-   components: {
-      BrowseCard, BrowsePager
-   },
-   computed: {
-      ...mapState({
-         shelfBrowse : state => state.shelf.browse,
-         working: state => state.shelf.lookingUp,
-         browseRange: state => state.shelf.browseRange,
-         devServer: state => state.system.devServer
-      }),
-      ...mapGetters({
-         hasBrowseData: 'shelf/hasBrowseData',
-         isSignedIn: 'user/isSignedIn',
-      }),
-      currentCallNumber() {
-         let f =  this.hit.detailFields.find( f => f.name == "call_number")
-         if ( f) {
-            return f.value
-         }
-         return this.hit.identifier
-      },
-      showRestore() {
-         let center = this.shelfBrowse[this.browseRange]
-         return center.id != this.hit.identifier
-      },
-      browseURL() {
-         return `/sources/${this.pool}/items/${this.hit.identifier}/browse`
-      }
-   },
-   methods: {
-      fullScreenBrowseClicked() {
-         this.$analytics.trigger('ShelfBrowse', 'FULL_SCREEN_BROWSE_CLICKED', this.hit.identifier)
-      },
-      isCurrent(idx) {
-         if ( this.working) return false
-         let item = this.shelfBrowse[idx]
-         return item.id == this.hit.identifier
-      },
-      browseRestore() {
-         this.$store.commit("shelf/setShowSpinner", false)
-         this.$store.dispatch("shelf/getBrowseData", this.hit.identifier )
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_RESTORE_CLICKED', this.hit.identifier)
-      },
-      async getBrowseData() {
-         this.$store.commit("shelf/setBrowseRange", 3)
-         let tgt = this.hit.identifier
-         if ( this.target && this.target != "")  {
-            tgt = this.target
-         }
-         await this.$store.dispatch("shelf/getBrowseData", tgt )
-         if ( this.hasBrowseData) {
-            this.$analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', this.hit.identifier)
-         }
-         if ( this.target && this.target != "")  {
-            let bmEle = document.getElementById(`bm-modal-${this.target}-btn`)
-            if (bmEle) {
-               bmEle.focus()
-               bmEle.click()
-            }
-         }
-      }
-   },
-   mounted() {
-      this.getBrowseData()
    }
 }
+onMounted(()=>{
+   getBrowseData()
+})
 </script>
 
 <style lang="scss" scoped>

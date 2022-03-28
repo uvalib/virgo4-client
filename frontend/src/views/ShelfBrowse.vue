@@ -1,6 +1,6 @@
 <template>
    <div class="shelf-browse">
-      <div class="working" v-if="working" >
+      <div class="working" v-if="shelfStore.lookingUp" >
          <V4Spinner message="Looking up items..."/>
       </div>
       <template v-else>
@@ -56,8 +56,8 @@
          </div>
          <div class="browse-detail" >
             <div class="browse-cards" :class="currViewMode">
-               <BrowseCard  v-for="(b,idx) in shelfBrowse" :current="isCurrent(idx)"
-                  :pool="$route.params.src" :data="b"  :key="`b${b.id}`" :mode="currViewMode" :index="idx+1"
+               <BrowseCard  v-for="(b,idx) in shelfStore.browse" :current="isCurrent(idx)"
+                  :pool="route.params.src" :data="b"  :key="`b${b.id}`" :mode="currViewMode" :index="idx+1"
                />
             </div>
          </div>
@@ -65,149 +65,134 @@
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
+<script setup>
 import BrowseCard from "@/components/details/BrowseCard.vue"
-export default {
-   name: "shelf-browse",
-   components: {
-      BrowseCard
-   },
+import { ref, onMounted, computed, nextTick } from 'vue'
+import { useShelfStore } from "@/stores/shelf"
+import { useRoute } from 'vue-router'
+import analytics from '@/analytics'
 
-   data: function() {
-      return {
-         viewModes: [{id: 'gallery', title: "<i class='fas fa-grip-horizontal'></i>&nbsp;View gallery"},
-                     {id: 'list', title: "<i class='fal fa-list'></i>&nbsp;View list"}],
-         currViewMode: 'gallery',
-         currFocus: 'gallery',
-         viewModeOpen: false,
-         browseTarget: null
-      };
-   },
-   watch: {
-      working(newVal) {
-         // when browse search is done and the current target is not set, find it
-         // in browse data and set it
-         if ( newVal == false && this.browseTarget == null) {
-            this.browseTarget = this.shelfBrowse.find(b=> b.id == this.$route.params.id)
-         }
-      }
-   },
+const route = useRoute()
+const shelfStore = useShelfStore()
 
-   computed: {
-      viewMode() {
-         var m = this.viewModes.find( vm => vm.id == this.currViewMode)
-         return m.title
-      },
-      ...mapState({
-         shelfBrowse : state => state.shelf.browse,
-         working: state => state.shelf.lookingUp,
-      }),
-      ...mapGetters({
-         isSignedIn: 'user/isSignedIn',
-      }),
-      rotation() {
-         if ( this.viewModeOpen ) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
-      },
-      backURL() {
-         return `/sources/${this.$route.params.src}/items/${this.$route.params.id}`
-      },
-      firstCall() {
-         return this.shelfBrowse[0].call_number
-      },
-      lastCall() {
-         return this.shelfBrowse[this.shelfBrowse.length-1].call_number
+const viewModes = [ {id: 'gallery', title: "<i class='fas fa-grip-horizontal'></i>&nbsp;View gallery"},
+                    {id: 'list', title: "<i class='fal fa-list'></i>&nbsp;View list"}]
+const currViewMode = ref('gallery')
+const currFocus = ref('gallery')
+const viewModeOpen = ref(false)
+const browseTarget = ref(null)
+
+const viewMode = computed(() =>{
+   var m = viewModes.find( vm => vm.id == currViewMode.value)
+   return m.title
+})
+const rotation = computed(() =>{
+   if ( viewModeOpen.value ) {
+      return "rotate(180deg)"
+   }
+   return "rotate(0deg)"
+})
+const backURL= computed(() =>{
+   return `/sources/${route.params.src}/items/${route.params.id}`
+})
+const firstCall = computed(() =>{
+   return shelfStore.browse[0].call_number
+})
+const lastCall = computed(() =>{
+   return shelfStore.browse[shelfStore.browse.length-1].call_number
+})
+
+shelfStore.$subscribe((mutation) => {
+   if (mutation.events.key == "lookingUp")  {
+      if (mutation.events.newValue == false && browseTarget.value == null) {
+         console.log("SET BROWSE TARGET ")
+         browseTarget.value = shelfStore.browse.find(b=> b.id == route.params.id)
       }
-   },
-   methods: {
-      selectView( mode) {
-         this.currViewMode = mode
-         this.viewModeOpen = false
-         this.$nextTick( () => {
-            let dd = document.getElementById("view")
-            dd.focus()
-         })
-      },
-      toggleViewMenu() {
-         this.viewModeOpen = !this.viewModeOpen
-      },
-      nextMenu() {
-         if ( !this.viewModeOpen ) {
-            this.viewModeOpen = true
-            this.currFocus = 'gallery'
-         } else {
-            if ( this.currFocus =='gallery' ) {
-               this.currFocus = 'list'
-            } else {
-               this.currFocus = 'gallery'
-            }
-         }
-         this.focusMenuItem()
-      },
-      prevMenu() {
-         if ( !this.viewModeOpen ) {
-            this.viewModeOpen = true
-            this.currFocus = 'list'
-         } else {
-            if ( this.currFocus =='gallery' ) {
-               this.currFocus = 'list'
-            } else {
-               this.currFocus = 'gallery'
-            }
-         }
-         this.focusMenuItem()
-      },
-      focusMenuItem() {
-         this.$nextTick( () => {
-            let menu = document.getElementById(this.currFocus)
-            if (menu) {
-               menu.focus()
-            }
-         })
-      },
-      closeViewMenu() {
-         this.viewModeOpen = false
-      },
-      isCurrent(idx) {
-         if ( this.working) return false
-         let item = this.shelfBrowse[idx]
-         return item.id == this.browseTarget.id
-      },
-      async initializeBrowse() {
-         this.$store.commit("shelf/setBrowseRange", 10)
-         this.$store.commit("shelf/setShowSpinner", true)
-         await this.$store.dispatch("shelf/getBrowseData", this.$route.params.id )
-      },
-      browseNext() {
-         this.$store.dispatch("shelf/browseNext")
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
-      },
-      browsePrior() {
-         this.$store.dispatch("shelf/browsePrior")
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
-      },
-      beforeEnter: function(el) {
-         el.style.height = '0'
-      },
-      enter: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      beforeLeave: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      leave: function(el) {
-         el.style.height = '0'
-      }
-   },
-   created() {
-      this.initializeBrowse()
-   },
+   }
+})
+
+function selectView( mode ) {
+   currViewMode.value = mode
+   viewModeOpen.value = false
+   nextTick( () => {
+      let dd = document.getElementById("view")
+      dd.focus()
+   })
 }
+function toggleViewMenu() {
+   viewModeOpen.value = !viewModeOpen.value
+}
+function nextMenu() {
+   if ( !viewModeOpen.value ) {
+      viewModeOpen.value = true
+      currFocus.value = 'gallery'
+   } else {
+      if ( currFocus.value =='gallery' ) {
+         currFocus.value = 'list'
+      } else {
+         currFocus.value = 'gallery'
+      }
+   }
+   focusMenuItem()
+}
+function prevMenu() {
+   if ( !viewModeOpen.value ) {
+      viewModeOpen.value = true
+      currFocus.value = 'list'
+   } else {
+      if ( currFocus.value =='gallery' ) {
+         currFocus.value = 'list'
+      } else {
+         currFocus.value = 'gallery'
+      }
+   }
+   focusMenuItem()
+}
+function focusMenuItem() {
+   nextTick( () => {
+      let menu = document.getElementById(currFocus.value)
+      if (menu) {
+         menu.focus()
+      }
+   })
+}
+function closeViewMenu() {
+   viewModeOpen.value = false
+}
+function isCurrent(idx) {
+   let item = shelfStore.browse[idx]
+   return item.id == browseTarget.value.id
+}
+async function initializeBrowse() {
+   shelfStore.browseRange = 10
+   shelfStore.showSpinner = true
+   await shelfStore.getBrowseData(route.params.id )
+}
+function browseNext() {
+   shelfStore.browseNext()
+   analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
+}
+function browsePrior() {
+   shelfStore.browsePrior()
+   analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
+}
+function beforeEnter(el) {
+   el.style.height = '0'
+}
+function enter(el) {
+   el.style.height = el.scrollHeight + 'px'
+}
+function beforeLeave(el) {
+   el.style.height = el.scrollHeight + 'px'
+}
+function leave(el) {
+   el.style.height = '0'
+}
+
+onMounted(()=>{
+   initializeBrowse()
+})
+
 </script>
 <style lang="scss" scoped>
 .shelf-browse {
