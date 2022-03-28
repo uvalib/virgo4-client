@@ -65,10 +65,6 @@ export const useItemStore = defineStore('item', {
          if ( !state.digitalContent) return false
          return state.digitalContent.length > 0
       },
-      availability: state => {
-        if ( state.availability == null ) return []
-        return state.availability
-      },
       hasBoundWithItems: state => {
          return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
       },
@@ -290,7 +286,7 @@ export const useItemStore = defineStore('item', {
          })
       },
 
-      async getDetails({ source, identifier }) {
+      async getDetails( source, identifier ) {
          this.clearDetails()
          this.clearAvailability()
 

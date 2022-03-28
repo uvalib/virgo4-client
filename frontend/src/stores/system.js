@@ -238,7 +238,7 @@ export const useSystemStore = defineStore('system', {
          }
 
          const user = useUserStore()
-         if (user.isSignedIn()) {
+         if (user.isSignedIn) {
             err.signedIn = true
             err.user = user.signedInUser
          } else {

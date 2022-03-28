@@ -1,8 +1,8 @@
 <template>
    <section class="collection-header">
       <div class="image" v-if="collection.image" >
-         <img class="thumb" :class="{bookplate: isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
-         <a class="viewer" :href="collection.image.url" target="_blank" v-if="isBookplate">
+         <img class="thumb" :class="{bookplate: collection.isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
+         <a class="viewer" :href="collection.image.url" target="_blank" v-if="collection.isBookplate">
             View full size<i class="fal fa-external-link-alt" style="margin-left: 5px;"></i>
          </a>
       </div>
@@ -13,126 +13,106 @@
       </div>
 
       <div class="actions">
-         <span class="seq-nav" v-if="canNavigate && !isCollectionHead">
+         <span class="seq-nav" v-if="collection.canNavigate && !item.isCollectionHead">
             <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
             </V4Button>
-            <CollectionDates v-if="hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
+            <CollectionDates v-if="collection.hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
             <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${collection.itemLabel}`">
                Next {{collection.itemLabel}}<i class="next fal fa-arrow-right"></i>
             </V4Button>
          </span>
 
-         <div class="collection-search" v-if="canSearch">
+         <div class="collection-search" v-if="collection.canSearch">
             <input autocomplete="off" type="text" id="search"
                @keyup.enter="searchClicked"
-               v-model="basic"
+               v-model="queryStore.basic"
                placeholder="Search this collection"
             >
             <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
             <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
          </div>
 
-         <V4Button v-if="lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
+         <V4Button v-if="resultStore.lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
       </div>
    </section>
 </template>
 
-<script>
-import { mapGetters, mapState } from "vuex"
-import { mapFields } from 'vuex-map-fields'
+<script setup>
 import CollectionDates from "@/components/modals/CollectionDates.vue"
-export default {
-   components: {
-      CollectionDates
-   },
-   data: function() {
-      return {
-         collectionQuery: "",
-      }
-   },
-   computed: {
-      ...mapState({
-         lastSearchURL: state => state.lastSearchURL,
-         details : state => state.item.details,
-         collection : state => state.collection,
-      }),
-      ...mapGetters({
-         canNavigate: 'collection/canNavigate',
-         canSearch: 'collection/canSearch',
-         rawQueryString: 'query/string',
-         filtersQueryParam: 'filters/asQueryParam',
-         hasCalendar: 'collection/hasCalendar',
-         isFullPage: 'collection/isFullPage',
-         isBookplate: 'collection/isBookplate',
-         isCollectionHead: 'item/isCollectionHead',
-      }),
-      ...mapFields({
-         userSearched: 'query.userSearched',
-         basic: 'query.basic',
-      }),
-      publishedDate() {
-         let field = this.details.detailFields.find( f => f.name == "published_date")
-         if (field) {
-            return field.value
-         }
-         return ""
-      }
-   },
-   methods: {
-      datePicked(pid) {
-         this.$router.push(pid)
-      },
-      browseClicked() {
-         // Set up the search in the store and flag it is user generated
-         this.$store.commit("filters/reset")
-         let data = {pool: "presearch", facetID: this.collection.filter, value: this.collection.title}
-         this.$store.commit("filters/toggleFilter", data)
-         this.$store.commit("query/setTargetPool", this.details.source)
-         this.userSearched = true
+import { computed } from 'vue'
+import { useCollectionStore } from "@/stores/collection"
+import { useFilterStore } from "@/stores/filter"
+import { useItemStore } from "@/stores/item"
+import { useResultStore } from "@/stores/result"
+import { useQueryStore } from "@/stores/query"
+import { useRoute, useRouter } from 'vue-router'
 
-         // use the model to setup the URL
-         let query = Object.assign({}, this.$route.query)
-         delete query.page
-         delete query.filter
-         delete query.q
-         query.filter = this.filtersQueryParam( "presearch" )
-         query.pool = this.details.source
-         this.$router.push({path: "/search", query: query })
-      },
-      searchClicked() {
-         // Set up the search in the store and flag it is user generated
-         this.$store.commit("filters/reset")
-         let data = {pool: "presearch", facetID: this.collection.filter, value: this.collection.title}
-         this.$store.commit("filters/toggleFilter", data)
-         this.$store.commit("query/setTargetPool", this.details.source)
-         this.userSearched = true
+const collection = useCollectionStore ()
+const filter = useFilterStore()
+const item = useItemStore()
+const resultStore = useResultStore()
+const queryStore = useQueryStore()
+const route = useRoute()
+const router = useRouter()
 
-         // use the model to setup the URL
-         let query = Object.assign({}, this.$route.query)
-         delete query.page
-         delete query.filter
-         query.q = this.rawQueryString
-         query.filter = this.filtersQueryParam( "presearch" )
-         query.pool = this.details.source
-         this.$router.push({path: "/search", query: query })
-      },
-      returnToSearch() {
-         this.$router.push( this.lastSearchURL )
-      },
-      nextItem() {
-         let date = this.publishedDate
-         if (date) {
-            this.$store.dispatch("collection/nextItem", date)
-         }
-      },
-      prevItem() {
-         let date = this.publishedDate
-         if (date) {
-            this.$store.dispatch("collection/priorItem", date)
-         }
-      },
-   },
+const publishedDate = computed(()=>{
+   let field = item.details.detailFields.find( f => f.name == "published_date")
+   if (field) {
+      return field.value
+   }
+   return ""
+})
+
+function datePicked(pid) {
+   router.push(pid)
+}
+function browseClicked() {
+   // Set up the search in the store and flag it is user generated
+   filter.reset()
+   filter.toggleFilter("presearch", collection.filter, collection.title)
+   queryStore.setTargetPool(item.details.source)
+   queryStore.userSearched = true
+
+   // use the model to setup the URL
+   let query = Object.assign({}, route.query)
+   delete query.page
+   delete query.filter
+   delete query.q
+   query.filter = filter.asQueryParam( "presearch" )
+   query.pool = item.details.source
+   router.push({path: "/search", query: query })
+}
+function searchClicked() {
+   // Set up the search in the store and flag it is user generated
+   filter.reset()
+   filter.toggleFilter("presearch", collection.filter, collection.title)
+   queryStore.setTargetPool(item.details.source)
+   queryStore.userSearched = true
+
+   // use the model to setup the URL
+   let query = Object.assign({}, route.query)
+   delete query.page
+   delete query.filter
+   query.q = queryStore.string
+   query.filter = filter.asQueryParam( "presearch" )
+   query.pool = item.details.source
+   router.push({path: "/search", query: query })
+}
+function returnToSearch() {
+   router.push( resultStore.lastSearchURL )
+}
+function nextItem() {
+   let date = this.publishedDate
+   if (date) {
+      collection.nextItem(date)
+   }
+}
+function prevItem() {
+   let date = this.publishedDate
+   if (date) {
+      collection.priorItem(date)
+   }
 }
 </script>
 <style lang="scss" scoped>
