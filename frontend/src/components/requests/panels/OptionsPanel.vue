@@ -31,10 +31,10 @@ function setActive(option) {
 
    } else if (optionSettings.sign_in_required && !user.isSignedIn) {
       restore.setActiveRequest(newActive)
-      this.requests.activePanel = "SignInPanel"
+      requestStore.activePanel = "SignInPanel"
    } else {
-      this.requests.activePanel = newActive
-      this.requests.activeOption = optionSettings
+      requestStore.activePanel = newActive
+      requestStore.activeOption = optionSettings
    }
 }
 </script>

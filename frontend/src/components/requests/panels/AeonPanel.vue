@@ -8,16 +8,16 @@
           <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
       </select>
     </div>
-    <p class="error" v-if="errors.barcode">{{errors.barcode}}</p>
+    <p class="error" v-if="request.errors.barcode">{{request.errors.barcode}}</p>
 
     <label class="special-instructions-input">
       <p>Add additional instructions if necessary:</p>
-      <textarea v-model="aeon.specialRequest" placeholder="250 character limit" maxlength="250" rows="5"/>
+      <textarea v-model="request.aeon.specialRequest" placeholder="250 character limit" maxlength="250" rows="5"/>
     </label>
 
     <p>Click "Request" to proceed to the Special Collections request system, where you will be asked to select a visit date.</p>
 
-    <V4Button mode="primary" class="request-button" @click="submitAeon" :disabled="buttonDisabled">Request</V4Button>
+    <V4Button mode="primary" class="request-button" @click="submitAeon" :disabled="request.buttonDisabled">Request</V4Button>
 
     <p class="notice" v-html="selectedItem.notice" v-if="selectedItem.notice"></p>
 
@@ -27,42 +27,37 @@
 
   </div>
 </template>
-<script>
-import { mapFields } from 'vuex-map-fields';
 
-export default {
-  data: ()=> {
-    return {selectedItem: {}}
-  },
-  computed: {
-    ...mapFields({
-      itemOptions: 'requests.activeOption.item_options',
-      aeon: 'requests.aeon',
-      errors: 'requests.errors',
-      buttonDisabled: 'requests.buttonDisabled',
-    }),
-  },
-  created() {
-    if (this.itemOptions.length == 1){
-      this.selectedItem = this.itemOptions[0]
-      this.itemSelected()
-    }
-    this.$analytics.trigger('Requests', 'REQUEST_STARTED', "aeon")
-  },
-  methods: {
-    itemSelected() {
-      this.aeon.callNumber = this.selectedItem.label
-      this.aeon.barcode = this.selectedItem.barcode
-      this.aeon.notes = this.selectedItem.notes
-      this.aeon.location = this.selectedItem.location
-    },
-    submitAeon() {
-      this.$store.dispatch('requests/submitAeon')
-    }
+<script setup>
+import { ref, onMounted, computed } from "vue"
+import { useRequestStore } from "@/stores/request"
+import analytics from '@/analytics'
+
+const request = useRequestStore()
+const selectedItem = ref({})
+const itemOptions = computed(()=>{
+  return request.activeOption.item_options
+})
+
+onMounted(()=>{
+  if (itemOptions.value.length == 1){
+    selectedItem.value = itemOptions.value[0]
+    itemSelected()
   }
-}
+  analytics.trigger('Requests', 'REQUEST_STARTED', "aeon")
+})
 
+function itemSelected() {
+  request.aeon.callNumber = selectedItem.value.label
+  request.aeon.barcode = selectedItem.value.barcode
+  request.aeon.notes = selectedItem.value.notes
+  request.aeon.location = selectedItem.value.location
+}
+function submitAeon() {
+  request.submitAeon()
+}
 </script>
+
 <style lang="scss" scoped>
 div.request-aeon {
    display: flex;
