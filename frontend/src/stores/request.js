@@ -5,6 +5,7 @@ import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useItemStore } from "@/stores/item"
+import { usePreferencesStore } from "@/stores/preferences"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
@@ -161,9 +162,10 @@ export const useRequestStore = defineStore('request', {
          )
       },
       createHold() {
+         const preferences = usePreferencesStore()
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "createHold")
          this.buttonDisabled = true
-         this.hold.pickupLibrary = this.preferencesStore.pickupLibrary.id
+         this.hold.pickupLibrary = preferences.pickupLibrary.id
          if(this.hold.pickupLibrary == ""){
             this.errors = {sirsi: ["A pickup location is required."]}
             this.buttonDisabled = false
