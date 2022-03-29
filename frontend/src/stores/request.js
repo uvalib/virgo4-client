@@ -116,10 +116,10 @@ export const useRequestStore = defineStore('request', {
          this.$reset()
       },
 
-      async submitOpenURLRequest(ctx) {
+      async submitOpenURLRequest() {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "openURL")
          this.buttonDisabled = true
-         await axios.post('/api/requests/openurl', ctx.this.openurl
+         await axios.post('/api/requests/openurl', this.openurl
          ).catch(e =>
             useSystemStore().setError(e)
          ).finally(()=>

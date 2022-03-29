@@ -235,16 +235,15 @@ export const useItemStore = defineStore('item', {
          })
       },
 
-     getGoogleBooksURL(ctx) {
-         let detail = ctx.state.details
+     getGoogleBooksURL() {
          let done = false
          let fields = ["isbn", "lccn", "oclc"]
          let tgtName = ""
          let tgtValue = ""
          fields.some(  fName => {
-            let idField = detail.basicFields.find( f => f.name == fName )
+            let idField = this.details.basicFields.find( f => f.name == fName )
             if (!idField) {
-               idField = detail.detailFields.find( f => f.name == fName )
+               idField = this.details.detailFields.find( f => f.name == fName )
             }
             if ( idField ) {
                tgtName = fName
