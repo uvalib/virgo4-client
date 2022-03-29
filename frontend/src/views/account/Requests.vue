@@ -24,7 +24,12 @@
                <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
             </div>
 
-            <component v-if="request" v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+            <template v-if="request">
+               <ILLBorrowAV v-if="request == 'ILLBorrowAV'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+               <ILLBorrowItem v-if="request == 'ILLBorrowItem'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+               <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+               <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+            </template>
 
             <h2>Outstanding Requests</h2>
          </template>
@@ -175,6 +180,10 @@
 <script setup>
 import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
+import ILLBorrowAV from "@/components/requests/standalone/ILLBorrowAV.vue"
+import ILLBorrowItem from "@/components/requests/standalone/ILLBorrowItem.vue"
+import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle.vue"
+import InstructionalScan from "@/components/requests/standalone/InstructionalScan.vue"
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import { ref, computed, onMounted } from 'vue'

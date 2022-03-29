@@ -1,6 +1,6 @@
 <template>
   <div class="notice">
-    <template v-if="type == 'research'">
+    <template v-if="props.type == 'research'">
       <p class="head">
         <strong>Important Copyright Information<br/>
         NOTICE OF WARNING CONCERNING COPYRIGHT RESTRICTIONS
@@ -25,7 +25,7 @@
       </div>
     </template>
 
-    <template v-else-if="type == 'instruction'">
+    <template v-else-if="props.type == 'instruction'">
       <p class="head">
         <strong>Important Copyright Information<br/>
         NOTICE OF WARNING CONCERNING COPYRIGHT RESTRICTIONS
@@ -71,23 +71,22 @@
     </template>
   </div>
 </template>
-<script>
-export default {
-  props: {
+
+<script setup>
+const props = defineProps({
     type: {
       validator: (value)=>{
         return ['instruction', 'research'].indexOf(value) !== -1
       }
     }
-  }
-
-}
+})
 </script>
 <style lang="scss" scoped>
 .notice {
    font-size:0.95em;
    padding: 0;
    border: 1px solid var(--uvalib-red-emergency);
+   margin: 10px;
    p {
       margin: 10px 15px;
    }
