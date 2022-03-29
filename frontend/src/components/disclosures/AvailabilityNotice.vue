@@ -1,7 +1,7 @@
 <template>
    <V4Disclosure id="availability-info">
       <template v-slot:summary>
-         <span>{{label}}</span>
+         <span>{{props.label}}</span>
          <i class="icon fas fa-exclamation-triangle"></i>
       </template>
       <template v-slot:content>
@@ -13,44 +13,42 @@
                </li>
             </ul>
          </div>
-         <div v-else class="message" v-html="message">
+         <div v-else class="message" v-html="props.message">
          </div>
        </template>
    </V4Disclosure>
 </template>
 
-<script>
-export default {
-   props: {
-      label: {
-         type: String,
-         required: true,
-      },
-      message: {
-         type: String,
-         reqtired: true
-      }
-   },
-   methods: {
-      hasReserveInfo() {
-         return this.message.split("\n").length > 1
-      },
-      mainMessage() {
-         return this.message.split("\n")[0]
-      },
-      messageParts() {
-         let parts = this.message.split("\n")
-         parts.shift()
-         let out = []
-         parts.forEach( p => {
-            if (p.split(":")[1].trim().length > 0) {
-               out.push(p)
-            }
+<script setup>
 
-         })
-         return out
-      }
+const props = defineProps({
+   label: {
+      type: String,
+      required: true,
+   },
+   message: {
+      type: String,
+      reqtired: true
    }
+})
+
+function hasReserveInfo() {
+   return props.message.split("\n").length > 1
+}
+function mainMessage() {
+   return props.message.split("\n")[0]
+}
+function messageParts() {
+   let parts = props.message.split("\n")
+   parts.shift()
+   let out = []
+   parts.forEach( p => {
+      if (p.split(":")[1].trim().length > 0) {
+         out.push(p)
+      }
+
+   })
+   return out
 }
 </script>
 
