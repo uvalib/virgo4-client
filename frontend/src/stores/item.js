@@ -132,10 +132,6 @@ export const useItemStore = defineStore('item', {
       clearAvailability() {
         this.availability = {searching: true, titleId: '', display: [], items: [], bound_with: [], error: ""}
       },
-      clearSearching() {
-        this.details.searching = false
-        this.availability.searching = false
-      },
       setCatalogKeyDetails(data) {
          let found = false
          data.pool_results.some( pr => {
@@ -288,6 +284,7 @@ export const useItemStore = defineStore('item', {
       async getDetails( source, identifier ) {
          this.clearDetails()
          this.clearAvailability()
+         this.details.searching = true
 
          // get source from poolID
          const poolStore = usePoolStore()
@@ -297,7 +294,7 @@ export const useItemStore = defineStore('item', {
          pool = pools.find( p => p.id == source)
 
          if (!pool) {
-           this.clearSearching()
+           this.details.searching = false
            this.router.push(`/not_found`)
            return
          }
@@ -312,19 +309,18 @@ export const useItemStore = defineStore('item', {
                details.related = details.related.filter(  r => r.id != details.identifier)
             }
             details.source = source
-            details.searching = true
             this.details = details
             this.digitalContent.splice(0, this.digitalContent.length)
 
             this.getDigitalContent()
             this.getGoogleBooksURL()
-            this.clearSearching()
+            this.details.searching = false
          }).catch( async (error) => {
             if ( error.response && error.response.status == 404) {
                console.warn(`Item ID ${identifier} not found in ${source}; try a lookup`)
                await this.lookupCatalogKeyDetail(identifier)
             } else {
-               this.clearSearching()
+               this.details.searching = false
                useSystemStore().setError(error)
             }
          })
@@ -342,12 +338,11 @@ export const useItemStore = defineStore('item', {
                this.availability.display = response.data.availability.display
                this.availability.items = response.data.availability.items
                this.availability.bound_with = response.data.availability.bound_with
-               this.availability.searching = false
-               requestStore.setRequestOptions(response.data.availability.request_options)
+               requestStore.requestOptions = response.data.availability.request_options
             }
-            this.clearSearching()
+            this.availability.searching = false
          }).catch((error) => {
-            this.clearSearching()
+            this.details.searching = false
             if (error.response && error.response.status != 404) {
                this.availability.error = error.response.data
             }
@@ -382,7 +377,7 @@ export const useItemStore = defineStore('item', {
                await this.router.replace(`/search?mode=advanced&q=${encodeURIComponent(q)}`)
             }
          } catch(error) {
-            this.clearSearching()
+            this.details.searching = false
             this.clearDetails()
             if ( error.response && error.response.status == 404) {
                console.warn(`Catalog Key ${catalogKey} not found`)

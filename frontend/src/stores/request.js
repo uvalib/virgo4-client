@@ -82,7 +82,7 @@ export const useRequestStore = defineStore('request', {
    }),
 
    getters: {
-      hasRequestOptions(store) {
+      hasRequestOptions: (store) => {
          return Array.isArray(store.requestOptions) && store.requestOptions.length > 0
       },
       findOption: (store) => {
@@ -113,7 +113,10 @@ export const useRequestStore = defineStore('request', {
          }
       },
       reset() {
+         // preserve the request options and restore them after the reset
+         let saved = this.requestOptions.slice(0)
          this.$reset()
+         this.requestOptions = saved
       },
 
       async submitOpenURLRequest() {
