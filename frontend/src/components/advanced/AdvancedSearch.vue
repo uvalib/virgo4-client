@@ -215,9 +215,9 @@ async function doAdvancedSearch() {
    newQ.q = queryStore.string
    if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
       filters.promotePreSearchFilters()
-      newQ.filter = filters.asQueryParm('presearch')
+      newQ.filter = filters.asQueryParam('presearch')
    }
-   sortStore.promotePreSearchSort()
+   sortStore.promotePreSearchSort( poolStore.list )
    queryStore.userSearched = true
    await router.replace({query: newQ})
 }

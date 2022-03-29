@@ -167,7 +167,7 @@ export const useItemStore = defineStore('item', {
             this.setDigitalContentStatus(item.pid, "PDF", "NOT_AVAIL")
          }
       },
-      async generateOCR({item, email} ) {
+      async generateOCR(item, email) {
          let url = `${item.ocr.generateURL}?email=${email}`
          await axios.get(url).catch( () => {
             this.setDigitalContentStatus( item.pid, "PDF", "ERROR")

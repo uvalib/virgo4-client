@@ -37,8 +37,8 @@
          <VueAnnouncer />
          <h1>{{systemStore.pageTitle}}</h1>
          <template v-if="configuring==false">
-            <div v-if="alertStore.pageAlerts($route.path).length > 0" class="regional-alerts">
-               <div v-for="ra in alertStore.pageAlerts($route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
+            <div v-if="alertStore.pageAlerts(route.path).length > 0" class="regional-alerts">
+               <div v-for="ra in alertStore.pageAlerts(route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
                   <span class="alert-text" v-html="ra.body"></span>
                </div>
             </div>
@@ -74,7 +74,9 @@ import { useCollectionStore } from "@/stores/collection"
 import { ref, nextTick, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const alertStore = useAlertStore()
 const userStore = useUserStore()
 const systemStore = useSystemStore()

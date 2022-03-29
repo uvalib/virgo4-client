@@ -42,7 +42,7 @@ function sourcesClicked( setting ) {
    if ( queryStore.searchSources  != setting ) {
       queryStore.searchSources = setting
       if (queryStore.queryEntered || route.query.filter ) {
-         let query = Object.assign({}, this.$route.query)
+         let query = Object.assign({}, route.query)
          delete query.page
          query.q = queryStore.string
          query.pool = setting

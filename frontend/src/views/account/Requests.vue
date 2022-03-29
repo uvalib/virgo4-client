@@ -186,6 +186,7 @@ import ILLScanArticle from "@/components/requests/standalone/ILLScanArticle.vue"
 import InstructionalScan from "@/components/requests/standalone/InstructionalScan.vue"
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
+import { useRequestStore } from "@/stores/request"
 import { ref, computed, onMounted } from 'vue'
 import analytics from '@/analytics'
 import AccordionContent from "@/components/AccordionContent.vue"
@@ -193,6 +194,8 @@ import AccordionContent from "@/components/AccordionContent.vue"
 
 const systemStore = useSystemStore()
 const userStore = useUserStore()
+const requestStore = useRequestStore()
+
 const request = ref("")
 
 const illiadRequests = computed(()=>{
@@ -258,7 +261,7 @@ function hasNoRequests() {
    return illLoans.value.length == 0 && userStore.requests.holds.length == 0 && digitalRequests.value == 0 && systemStore.ilsError == ""
 }
 function deleteHold(id) {
-   this.$store.dispatch("requests/deleteHold", id);
+   requestStore.deleteHold(id)
 }
 
 onMounted(() =>{

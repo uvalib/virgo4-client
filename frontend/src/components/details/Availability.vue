@@ -143,9 +143,7 @@ function formatValue(val) {
 }
 
 onMounted(()=>{
-   console.log("GET AVAIL")
    item.getAvailability( props.titleId )
-   console.log("GOT A+AVAL")
 })
 </script>
 <style lang="scss" scoped>

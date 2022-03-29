@@ -1,6 +1,6 @@
 <template>
    <footer role="contentinfo">
-      <div class="pre-footer" v-if="$route.name != 'feedback'">
+      <div class="pre-footer" v-if="route.name != 'feedback'">
          This is the newest version of the Library catalog.
          <router-link id="feedback"
             :to="`/feedback?url=${feedbackURL()}`"
@@ -87,7 +87,9 @@
 
 <script setup>
 import { useSystemStore } from "@/stores/system"
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const systemStore = useSystemStore()
 
 function feedbackURL() {
