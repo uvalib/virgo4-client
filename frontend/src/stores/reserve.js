@@ -186,11 +186,12 @@ export const useReserveStore = defineStore('reserve', {
       createVideoReserve(video){
          const requestStore = useRequestStore()
          const userStore = useUserStore()
+         const system = useSystemStore()
 
          let v4UserID = userStore.signedInUser
          let data = { userID: v4UserID, request: this.request, items: [video] }
+         console.log(data)
 
-         const system = useSystemStore()
          axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
             requestStore.buttonDisabled = true
             this.clearRequestList()
