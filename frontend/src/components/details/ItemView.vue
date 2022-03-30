@@ -79,7 +79,7 @@
       <template v-if="details.source != 'images'">
          <Availability v-if="poolStore.hasAvailability(details.source)" :titleId="details.identifier" />
          <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
-         <ShelfBrowse v-if="!details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
+         <ShelfBrowse v-if="!details.searching && query.targetPool=='uva_library'" :hit="details" :pool="details.source" :target="browseTarget"/>
       </template>
    </div>
 </template>
@@ -106,6 +106,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useResultStore } from "@/stores/result"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
+import { useQueryStore } from "@/stores/query"
 
 const router = useRouter()
 const route = useRoute()
@@ -114,7 +115,10 @@ const poolStore = usePoolStore()
 const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
+const query = useQueryStore()
+
 const browseTarget = ref("")
+
 
 // details : state => state.item.details,
 const details = computed(()=>{
