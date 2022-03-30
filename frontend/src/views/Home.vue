@@ -45,7 +45,7 @@ import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import * as utils from '../utils'
 import analytics from '@/analytics'
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, onMounted, computed, watch, nextTick } from 'vue'
 import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -75,9 +75,12 @@ const queryMessage = ref("")
 const isHomePage = computed(()=>{
    return (route.path == "/")
 })
+const isSearching = computed(()=>{
+   return resultStore.searching
+})
 
-resultStore.$subscribe((mutation) => {
-   if (mutation.events.key == "searching" && mutation.events.newValue === false)  {
+watch(isSearching, async (newValue, oldValue) => {
+   if (oldValue == true && newValue == false) {
       if (restore.url == "/") {
          nextTick( () => {
             let r = document.getElementById("results-container")
