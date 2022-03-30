@@ -71,10 +71,11 @@ import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
-import { ref, nextTick, computed, onMounted, onUnmounted } from 'vue'
+import { ref, nextTick, computed, onMounted, onUnmounted, watch } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
+import { storeToRefs } from "pinia"
 
 const route = useRoute()
 const alertStore = useAlertStore()
@@ -90,7 +91,9 @@ const configuring = ref(true)
 
 const showDimmer = computed( () => systemStore.hasMessage || systemStore.sessionExpired )
 
-alertStore.$subscribe( () => {
+// extract a ref to headerAlerts from the alertStore so it can be watched directly
+const { headerAlerts } = storeToRefs(alertStore)
+watch ( headerAlerts, () => {
    // when header alerts change, need to recalc height of header so menu bar sticks properly
    nextTick( ()=>{
       let hdr = document.getElementById("v4-header")

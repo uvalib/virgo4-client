@@ -71,8 +71,9 @@ import ForgotPassword from "@/components/modals/ForgotPassword.vue"
 import ChangePassword from "@/components/modals/ChangePassword.vue"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { storeToRefs } from "pinia"
 
 const route = useRoute()
 const systemStore = useSystemStore()
@@ -85,12 +86,11 @@ const hasPasswordToken = computed( ()=> {
    return route.query.token && route.query.token.length > 0
 })
 
-userStore.$subscribe((mutation) => {
-   if (mutation.events.key == "authTriesLeft")  {
-      console.log("AUTH TRIES "+mutation.events.oldValue+" -> "+mutation.events.newValue)
-      if (mutation.events.newValue < mutation.events.oldValue ) {
-         pin.value = ""
-      }
+// pull a ref to authTriesLeft from the user store so it can be watched directly
+const { authTriesLeft } = storeToRefs(userStore)
+watch(authTriesLeft, (newValue, oldValue) => {
+   if (newValue < oldValue ) {
+      pin.value = ""
    }
 })
 

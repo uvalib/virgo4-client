@@ -15,7 +15,7 @@
 import ItemView from "@/components/details/ItemView.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { onMounted, onUpdated } from 'vue'
+import { onMounted, onUpdated, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
@@ -23,6 +23,7 @@ import { useResultStore } from "@/stores/result"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
 import analytics from '@/analytics'
+import { storeToRefs } from "pinia"
 
 const collection = useCollectionStore()
 const system = useSystemStore()
@@ -37,18 +38,18 @@ onBeforeRouteUpdate( async (to) => {
    getDetails(to.params.src, to.params.id)
 })
 
-item.$subscribe((mutation) => {
-   if (mutation.events.key == "loadingDigitalContent")  {
-      if (mutation.events.newValue == false && item.hasDigitalContent ) {
-         item.digitalContent.forEach( dc => {
-            if (dc.pdf ) {
-               analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
-            }
-            if (dc.ocr ) {
-               analytics.trigger('OCR', 'OCR_LINK_PRESENTED', dc.pid)
-            }
-         })
-      }
+const { loadingDigitalContent } = storeToRefs(item)
+watch(loadingDigitalContent, (newValue, oldValue) => {
+   if (oldValue == true && newValue == false && item.hasDigitalContent ) {
+      item.digitalContent.forEach( dc => {
+         if (dc.pdf ) {
+            console.log("PDF")
+            analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
+         }
+         if (dc.ocr ) {
+            analytics.trigger('OCR', 'OCR_LINK_PRESENTED', dc.pid)
+         }
+      })
    }
 })
 

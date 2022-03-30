@@ -1,6 +1,6 @@
 <template>
    <div class="home">
-      <V4Spinner  v-if="resultStore.searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
+      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel pure-form">
          <template v-if="queryStore.mode=='basic'">
             <div v-if="systemStore.hasTranslateMessage" class="translate-message">
@@ -56,6 +56,7 @@ import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
+import { storeToRefs } from "pinia"
 
 const router = useRouter()
 const route = useRoute()
@@ -75,11 +76,10 @@ const queryMessage = ref("")
 const isHomePage = computed(()=>{
    return (route.path == "/")
 })
-const isSearching = computed(()=>{
-   return resultStore.searching
-})
 
-watch(isSearching, async (newValue, oldValue) => {
+// pull a ref to searching from the result store so it can be watched directly
+const { searching } = storeToRefs(resultStore)
+watch(searching, (newValue, oldValue) => {
    if (oldValue == true && newValue == false) {
       if (restore.url == "/") {
          nextTick( () => {
