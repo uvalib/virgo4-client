@@ -18,7 +18,7 @@
                <div class="col id">{{pl.id}}</div>
                <div class="col name">{{pl.name}}</div>
                <div class="actions">
-                  <V4Checkbox :disabled="editIndex > -1" :checked="pl.enabled" @click="enableClicked(pl)">Enabled</V4Checkbox>
+                  <V4Checkbox :disabled="editIndex > -1" :checked="pl.enabled" @click="enableClicked(pl)" label="Enabled"/>
                   <V4Button :disabled="editIndex > -1" class="edit-pl" mode="tertiary" @click="editClicked(idx, pl)">Edit</V4Button>
                   <Confirm class="delete" title="Confirm Delete" v-on:confirmed="deleteLibrary(pl)"
                      :id="`delete-${pl.id}`" style="margin-right: 10px"

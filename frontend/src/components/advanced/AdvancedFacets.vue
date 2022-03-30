@@ -23,10 +23,8 @@
                         <span :aria-label="`see more ${filterInfo.name} filters`">{{filterInfo.name}}</span>
                      </template>
                      <div class="expanded-item" v-for="fv in filterInfo.buckets.filter(f => f.value)" :key="fv.value">
-                        <V4Checkbox :checked="fv.selected"
-                           @click="filterClicked(filterInfo.id, fv.value)">
-                           {{fv.value}}
-                        </V4Checkbox>
+                        <V4Checkbox :checked="fv.selected" :label="fv.value"
+                           @click="filterClicked(filterInfo.id, fv.value)"/>
                         <span class="cnt" v-if="fv.count">({{utils.formatNum(fv.count)}})</span>
                      </div>
                   </AccordionContent>

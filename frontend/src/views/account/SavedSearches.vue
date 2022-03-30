@@ -15,9 +15,7 @@
                <div class="saved-search">
                   <span class="num">{{idx+1}}.</span>
                   <V4Checkbox class="public" :checked="saved.public" @click="publicClicked(saved)"
-                     :aria-label="`Toggle public visibility of ${saved.name}`">
-                     Public
-                  </V4Checkbox>
+                     :aria-label="`Toggle public visibility of ${saved.name}`" label="Public"/>
                   <span>
                      <router-link :aria-label="`perform search named ${saved.name}`"
                         @mousedown="savedSearchClicked('saved')"

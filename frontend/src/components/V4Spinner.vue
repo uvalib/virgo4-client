@@ -1,12 +1,12 @@
 <template>
-   <div v-if="overlay" class="v4-spinner-overlay">
-      <div class="v4-spinner"  :class="{border: dots}">
-         <template v-if="dots">
-            <h3 v-if="message">{{message}}</h3>
+   <div v-if="props.overlay" class="v4-spinner-overlay">
+      <div class="v4-spinner"  :class="{border: props.dots}">
+         <template v-if="props.dots">
+            <h3 v-if="props.message">{{props.message}}</h3>
             <div class="spinner-animation">
-               <div class="bounce1" :style="{backgroundColor: color}"></div>
-               <div class="bounce2" :style="{backgroundColor: color}"></div>
-               <div class="bounce3" :style="{backgroundColor: color}"></div>
+               <div class="bounce1" :style="{backgroundColor: props.color}"></div>
+               <div class="bounce2" :style="{backgroundColor: props.color}"></div>
+               <div class="bounce3" :style="{backgroundColor: props.color}"></div>
             </div>
          </template>
          <template v-else>
@@ -20,47 +20,38 @@
       </div>
    </div>
    <div v-else class="v4-spinner embed">
-      <h3 v-if="message">{{message}}</h3>
+      <h3 v-if="props.message">{{props.message}}</h3>
       <div class="spinner-animation">
-         <div class="bounce1" :style="{backgroundColor: color, height: size, width: size}"></div>
-         <div class="bounce2" :style="{backgroundColor: color, height: size, width: size}"></div>
-         <div class="bounce3" :style="{backgroundColor: color, height: size, width: size}"></div>
+         <div class="bounce1" :style="{backgroundColor: props.color, height: props.size, width: props.size}"></div>
+         <div class="bounce2" :style="{backgroundColor: props.color, height: props.size, width: props.size}"></div>
+         <div class="bounce3" :style="{backgroundColor: props.color, height: props.size, width: props.size}"></div>
       </div>
    </div>
 </template>
 
-<script>
-export default {
-   name: "V4Spinner",
-   props: {
-      message: {
-         type: String,
-         default: ""
-      },
-      overlay: {
-         type: Boolean,
-         default: false
-      },
-      dots: {
-         type: Boolean,
-         default: true
-      },
-      color: {
-         type: String,
-         default: "var(--uvalib-brand-orange)"
-      },
-      size: {
-         type: String,
-         default: "18px"
-      },
+<script setup>
+const props = defineProps({
+   message: {
+      type: String,
+      default: ""
    },
-   computed: {
-      backgroundColor() {
-         if ( this.transparent) return "transparent"
-         return "white"
-      }
-   }
-}
+   overlay: {
+      type: Boolean,
+      default: false
+   },
+   dots: {
+      type: Boolean,
+      default: true
+   },
+   color: {
+      type: String,
+      default: "var(--uvalib-brand-orange)"
+   },
+   size: {
+      type: String,
+      default: "18px"
+   },
+})
 </script>
 
 <style lang="scss" scoped>

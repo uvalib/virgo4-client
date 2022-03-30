@@ -60,9 +60,7 @@
                         <tr>
                            <th colspan="3">
                               <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                                 :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder} `">
-                                 Public
-                              </V4Checkbox>
+                                 :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
                               <span v-if="folderInfo.public" class="public-url">
                                  <a :href="getPublicURL(folderInfo)" target="_blank">
                                     <span>View</span><i class="link fal fa-external-link-alt"></i></a>
@@ -77,9 +75,9 @@
                            <th>Author</th>
                         </tr>
                         <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
-                           <td>
+                           <td class="cb">
                               <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
-                                 :aria-label="ariaLabel(bookmark)" />
+                                 :aria-label="ariaLabel(bookmark)"/>
                            </td>
                            <td>
                               <router-link @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
@@ -413,15 +411,16 @@ td.actions {
    text-align: right;
    padding: 5px;
 }
-table td,
-th {
-   padding: 2px 8px;
-   text-align: left;
-   /* background-color: white; */
-}
-table th {
-   padding: 10px 5px;
-   background-color: white;
+table {
+   border-collapse: collapse;
+   td, th {
+      padding: 2px 8px;
+      text-align: left;
+   }
+   th {
+      padding: 10px 5px;
+      background-color: white;
+   }
 }
 table tr:nth-child(2) {
    border-bottom: 1px solid var(--uvalib-grey-light);

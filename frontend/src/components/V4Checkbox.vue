@@ -1,66 +1,63 @@
 <template>
    <div tabindex="0" role="checkbox" class="v4-checkbox"
-      :class="{inline: !hasLabelSlot(), disabled: disabled}"
+      :class="{inline: props.label == '', disabled: props.disabled}"
       :aria-checked="isChecked"
-      :aria-disabled="disabled"
+      :aria-disabled="props.disabled"
       @click.stop="clicked" @keyup.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <i class="box" :class="checkClass"></i>
-      <label v-if="hasLabelSlot()">
-         <slot></slot>
-      </label>
+      <label v-if="props.label">{{props.label}}</label>
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      // If the component is passed a v-model, modelValue non-null
-      // otherwise use the checked property
-      modelValue: {
-         type: Boolean,
-         default: null
-      },
-      checked: {
-         type: Boolean,
-         default: false
-      },
-      disabled: {
-         type: Boolean,
-         default: false
-      }
-   },
-   emits: ['update:modelValue', 'click'],
-   computed: {
-      checkClass() {
-         if ( this.isChecked )  {
-            return "fal fa-check-square"
-         } else {
-            return "fal fa-square"
-         }
-      },
-      isChecked() {
-         if ( this.modelValue != null ) {
-            return this.modelValue
-         }
-         return this.checked
-      }
-   },
-   methods: {
-      hasLabelSlot() {
-         return !(typeof this.$slots.default === 'undefined')
-      },
-      clicked() {
-         if ( this.disabled) {
-            return
-         }
+<script setup>
+import { computed } from 'vue'
 
-         if ( this.modelValue != null ) {
-            let state = !this.modelValue
-            this.$emit('update:modelValue', state)
-         }
-         this.$emit('click')
-      },
+const emit = defineEmits( ['update:modelValue', 'click'] )
+const props = defineProps({
+   // If the component is passed a v-model, modelValue non-null
+   // otherwise use the checked property
+   modelValue: {
+      type: Boolean,
+      default: null
    },
+   checked: {
+      type: Boolean,
+      default: false
+   },
+   disabled: {
+      type: Boolean,
+      default: false
+   },
+   label: {
+      type: String,
+      default: ""
+   }
+})
+
+const checkClass = computed(() =>{
+   if ( isChecked.value )  {
+      return "fal fa-check-square"
+   } else {
+      return "fal fa-square"
+   }
+})
+const isChecked = computed(() =>{
+   if ( props.modelValue != null ) {
+      return props.modelValue
+   }
+   return props.checked
+})
+
+function clicked() {
+   if ( props.disabled) {
+      return
+   }
+
+   if ( props.modelValue != null ) {
+      let state = !props.modelValue
+      emit('update:modelValue', state)
+   }
+   emit('click')
 }
 </script>
 

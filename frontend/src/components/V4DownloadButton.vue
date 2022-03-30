@@ -1,49 +1,47 @@
 <template>
-   <button tabindex="0" role="button" class="v4-download-button" :class="{text: mode != 'button'}"
+   <button tabindex="0" role="button" class="v4-download-button" :class="{text: props.mode != 'button'}"
       @click.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
-      <template v-if="icon && iconInline">
+      <template v-if="props.icon && props.iconInline">
          <span class="download-text">
-            {{label}}<i class="icon-inline" :class="icon"></i>
+            {{props.label}}<i class="icon-inline" :class="props.icon"></i>
          </span>
       </template>
-      <template v-else-if="icon">
-         <i class="icon" :class="icon"></i>
-         <label>{{label}}</label>
+      <template v-else-if="props.icon">
+         <i class="icon" :class="props.icon"></i>
+         <label>{{props.label}}</label>
       </template>
-      <span v-else class="download-text">{{label}}</span>
+      <span v-else class="download-text">{{props.label}}</span>
    </button>
 </template>
 
-<script>
-export default {
-   props: {
-      icon: {
-         type: String,
-         default: ""
-      },
-      iconInline: {
-         type: Boolean,
-         default: false
-      },
-      url: {
-         type: String,
-         required: true
-      },
-      label: {
-         type: String,
-         required: true
-      },
-      mode: {
-         type: String,
-         default: "text"
-      }
+<script setup>
+const emit = defineEmits( ['click'] )
+const props = defineProps({
+   icon: {
+      type: String,
+      default: ""
    },
-   methods: {
-      clicked() {
-         this.$emit('click')
-         window.location.href = this.url
-      }
+   iconInline: {
+      type: Boolean,
+      default: false
    },
+   url: {
+      type: String,
+      required: true
+   },
+   label: {
+      type: String,
+      required: true
+   },
+   mode: {
+      type: String,
+      default: "text"
+   }
+})
+
+function clicked() {
+   emit('click')
+   window.location.href = props.url
 }
 </script>
 

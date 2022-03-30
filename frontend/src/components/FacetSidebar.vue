@@ -22,10 +22,8 @@
                   <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
                   <div role="group" :aria-labelledby="facetInfo.id">
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                        <V4Checkbox :checked="fv.selected"
-                           @click="filterClicked(facetInfo.id, fv.value)">
-                           {{fv.value}}
-                        </V4Checkbox>
+                        <V4Checkbox :checked="fv.selected" :label="fv.value"
+                           @click="filterClicked(facetInfo.id, fv.value)" />
                         <span class="cnt" v-if="utils.formatNum(fv.count)">({{utils.formatNum(fv.count)}})</span>
                      </dd>
                      <dd v-if="facetValuesCount(facetInfo) > 5" :key="`more${facetInfo.id}`">
@@ -34,10 +32,8 @@
                               <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
                            </template>
                            <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                              <V4Checkbox :checked="fv.selected"
-                                 @click="filterClicked(facetInfo.id, fv.value)">
-                                 {{fv.value}}
-                              </V4Checkbox>
+                              <V4Checkbox :checked="fv.selected" :label="fv.value"
+                                 @click="filterClicked(facetInfo.id, fv.value)"/>
                               <span class="cnt">({{utils.formatNum(fv.count)}})</span>
                            </div>
                            <template v-slot:footer>

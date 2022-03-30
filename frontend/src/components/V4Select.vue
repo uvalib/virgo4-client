@@ -4,12 +4,12 @@
            @keyup.up.stop="handleKeypress"
            @keyup.down.stop="handleKeypress"
          :aria-pressed="expanded" aria-haspopup="listbox"
-         :style="{ 'background-color': background, color: color, 'border': border }">
+         :style="{ 'background-color': props.background, color: props.color }">
          <div class="wrap-select">
             <span class="selection">
                <span v-if="currVal && currVal.id" v-html="currVal.name"></span>
-               <span v-else v-html="placeholder"></span>
-               <i class="options-arrow fal fa-caret-down" :style="{ transform: rotation, color: color }"></i>
+               <span v-else v-html="props.placeholder"></span>
+               <i class="options-arrow fal fa-caret-down" :style="{ transform: rotation, color: props.color }"></i>
             </span>
          </div>
       </button>
@@ -18,7 +18,7 @@
          v-on:before-leave="beforeLeave" v-on:leave="leave">
          <ul tabindex="-1" ref="selectOptions" class="options" role="listbox" v-show="expanded"
             @keyup.stop='handleKeypress'>
-            <li v-for="src in selections" @click="optionClicked(src)"
+            <li v-for="src in props.selections" @click="optionClicked(src)"
                :class="{disabled: src.disabled, selected: src.id==currVal.id, highlighted: highlightedID == src.id}"
                class="option" tabindex="-1"
                :id="src.id"
@@ -30,157 +30,140 @@
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      placeholder: {
-         type: String,
-         default: "Make a selection"
-      },
-      background: {
-         type: String,
-         default: "var(--uvalib-brand-blue-light)"
-      },
-      border: {
-        type: String,
-        default: "1px solid var(--uvalib-grey-light)"
-      },
-      color: {
-         type: String,
-         default: "white"
-      },
-      selections: {
-         type: Array,
-         required: true
-      },
-      modelValue: {
-         type: Object
-      }
+<script setup>
+import { computed, ref, watch } from "vue"
+const props = defineProps({
+   placeholder: {
+      type: String,
+      default: "Make a selection"
    },
-   emits: ['update:modelValue', 'changed'],
-   data: function()  {
-      return {
-         expanded: false,
-         highlightedIdx: 0,
-         highlightedID: 0,
-         currVal: this.modelValue
-      }
+   background: {
+      type: String,
+      default: "var(--uvalib-brand-blue-light)"
    },
-   watch: {
-      expanded() {
-         if (this.expanded === false) {
-            window.removeEventListener("click", this.globalClick)
-         } else {
-            window.addEventListener("click", this.globalClick)
-         }
-      }
+   color: {
+      type: String,
+      default: "white"
    },
-   computed: {
-      rotation() {
-         if (this.expanded) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
-      },
+   selections: {
+      type: Array,
+      required: true
    },
-   methods: {
-      handleKeypress(event) {
-         //console.log("KEY "+event.keyCode)
-         if (event.keyCode == 38 && this.highlightedIdx > 0) {
-            // up arrow
-            this.highlightedIdx--
-            if ( this.expanded == false ) {
-               this.toggleExpand()
-            } else {
-               this.setSelectedItem()
-            }
-         } else if (event.keyCode == 40 && this.highlightedIdx < this.selections.length-1) {
-            // down arrow
-            this.highlightedIdx++
-            if ( this.expanded == false ) {
-               this.expanded = true
-            }
-               this.setSelectedItem()
-
-         } else if (event.keyCode == 13 ) {
-            // enter toggles expand
-            this.toggleExpand()
-         } else if ( event.keyCode == 27 && this.expanded) {
-            // esc closes
-            this.expanded = false
-            let v4sel = this.$refs.v4select
-            v4sel.focus()
-         } else if ( event.keyCode == 36  && this.expanded ) {
-            // Home selects the first
-            this.highlightedIdx = 0
-            this.setSelectedItem()
-         } else if ( event.keyCode == 35 && this.expanded ) {
-            // end selects the last
-            this.highlightedIdx = this.selections.length - 1
-            this.setSelectedItem()
-         }
-      },
-      setSelectedItem() {
-         this.highlightedID = this.selections[this.highlightedIdx].id
-         let item = document.getElementById(this.highlightedID)
-         item.focus()
-         this.currVal =  this.selections[this.highlightedIdx]
-         this.$emit('update:modelValue', this.currVal)
-         this.$emit('changed', this.currVal.id)
-      },
-      optionClicked(src) {
-         if (src.disabled ) return
-         this.currVal = src
-         this.$emit('update:modelValue', this.currVal)
-         this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)
-         if (this.highlightedIdx > -1) {
-            this.highlightedID = this.selections[this.highlightedIdx].id
-            let item = document.getElementById(this.highlightedID)
-            item.focus()
-         }
-         this.$emit('changed', this.currVal.id)
-         this.$emit('update:modelValue', this.currVal)
-      },
-      globalClick() {
-         this.expanded = false
-      },
-      toggleExpand() {
-         this.expanded = !this.expanded
-         setTimeout(() => {
-            if (this.expanded) {
-               if ( this.currVal ) {
-                  this.highlightedIdx = this.selections.findIndex( o => o.id == this.currVal.id)
-                  if (this.highlightedIdx > -1) {
-                     this.highlightedID = this.selections[this.highlightedIdx].id
-                     let item = document.getElementById(this.highlightedID)
-                     item.focus()
-                  }
-               }
-            } else {
-               let v4sel = this.$refs.v4select
-               v4sel.focus()
-            }
-         }, 260)
-      },
-      closeSources() {
-        this.expanded = false;
-      },
-      beforeEnter: function(el) {
-         el.style.height = '0'
-      },
-      enter: function(el) {
-         el.style.height = (el.scrollHeight) + 'px'
-         this.expandedItem = el
-      },
-      beforeLeave: function(el) {
-         el.style.height = (el.scrollHeight) + 'px'
-         this.expandedItem = el
-      },
-      leave: function(el) {
-         el.style.height = '0'
-      }
+   modelValue: {
+      type: Object
    }
-};
+})
+const emit = defineEmits(['update:modelValue', 'changed'])
+
+const expanded = ref(false)
+const highlightedIdx = ref(0)
+const highlightedID = ref(0)
+const currVal = ref(props.modelValue)
+const v4select = ref(null)
+
+watch( expanded, () => {
+   if (expanded.value === false) {
+      window.removeEventListener("click", globalClick)
+   } else {
+      window.addEventListener("click", globalClick)
+   }
+})
+
+const rotation  = computed(() =>{
+   if (expanded.value) {
+      return "rotate(180deg)"
+   }
+   return "rotate(0deg)"
+})
+
+function handleKeypress(event) {
+   //console.log("KEY "+event.keyCode)
+   if (event.keyCode == 38 && highlightedIdx.value > 0) {
+      // up arrow
+      highlightedIdx.value--
+      if ( expanded.value == false ) {
+         toggleExpand()
+      } else {
+         setSelectedItem()
+      }
+   } else if (event.keyCode == 40 && highlightedIdx.value < props.selections.length-1) {
+      // down arrow
+      highlightedIdx.value++
+      if ( expanded.value == false ) {
+         expanded.value = true
+      }
+         setSelectedItem()
+
+   } else if (event.keyCode == 13 ) {
+      // enter toggles expand
+      toggleExpand()
+   } else if ( event.keyCode == 27 && expanded.value) {
+      // esc closes
+      expanded.value = false
+      v4select.value.focus()
+   } else if ( event.keyCode == 36  && expanded.value ) {
+      // Home selects the first
+      highlightedIdx.value = 0
+      setSelectedItem()
+   } else if ( event.keyCode == 35 && expanded.value ) {
+      // end selects the last
+      highlightedIdx.value = props.selections.length - 1
+      setSelectedItem()
+   }
+}
+function setSelectedItem() {
+   highlightedID.value = props.selections[highlightedIdx.value].id
+   let item = document.getElementById(highlightedID.value)
+   item.focus()
+   currVal.value =  props.selections[highlightedIdx.value]
+   emit('update:modelValue', currVal.value)
+   emit('changed', currVal.value.id)
+}
+function optionClicked(src) {
+   if (src.disabled ) return
+   currVal.value = src
+   emit('update:modelValue', currVal.value)
+   highlightedIdx.value = props.selections.findIndex( o => o.id == currVal.value.id)
+   if (highlightedIdx.value > -1) {
+      highlightedID.value = props.selections[highlightedIdx.value].id
+      let item = document.getElementById(highlightedID.value)
+      item.focus()
+   }
+   emit('changed', currVal.value.id)
+   emit('update:modelValue', currVal.value)
+}
+function globalClick() {
+   expanded.value = false
+}
+function toggleExpand() {
+   expanded.value = !expanded.value
+   setTimeout(() => {
+      if (expanded.value) {
+         if ( currVal.value ) {
+            highlightedIdx.value = props.selections.findIndex( o => o.id == currVal.value.id)
+            if (highlightedIdx.value > -1) {
+               highlightedID.value = props.selections[highlightedIdx.value].id
+               let item = document.getElementById(highlightedID.value)
+               item.focus()
+            }
+         }
+      } else {
+         v4select.value.focus()
+      }
+   }, 260)
+}
+function beforeEnter(el) {
+   el.style.height = '0'
+}
+function enter(el) {
+   el.style.height = (el.scrollHeight) + 'px'
+}
+function beforeLeave(el) {
+   el.style.height = (el.scrollHeight) + 'px'
+}
+function leave(el) {
+   el.style.height = '0'
+}
 </script>
 
 <style lang="scss" scoped>
@@ -199,6 +182,7 @@ button.v4-select {
   text-align: left;
   height:100%;
   width:100%;
+   border: 1px solid var(--uvalib-grey-light);
 }
 button.v4-select:focus {
 @include be-accessible();
@@ -238,7 +222,9 @@ button.v4-select:focus {
   padding: 0;
   border-radius: 0 0 7px 7px;
   position: absolute;
-  border: 1px solid var(--uvalib-light-blue);
+  top: 48px;
+  border: none;
+  border-top: 1px solid var(--uvalib-brand-blue);
   overflow: hidden;
   transition: 200ms ease-out;
   z-index: 5000;
