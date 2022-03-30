@@ -1,14 +1,14 @@
 <template>
-   <V4Modal :id="id" :title="title" ref="citationsdlg" :buttonID="`${id}-open`" @opened="opened" :lastFocusID="`${id}-dismissbtn`" >
+   <V4Modal :id="props.id" :title="props.title" ref="citationsdlg" :buttonID="`${props.id}-open`" @opened="opened" :lastFocusID="`${props.id}-dismissbtn`" >
       <template v-slot:button>
-         <V4Button v-if="buttonLabel" :mode="buttonMode" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
-            class="citations-text-button" :class="{toolbar: toolbarButton}"
-             :icon="citationIcon" :aria-label="ariaLabel"
+         <V4Button v-if="props.buttonLabel" :mode="props.buttonMode" @click="citationsdlg.show()" :id="`${props.id}-open`"
+            class="citations-text-button" :class="{toolbar: props.toolbarButton}"
+             :icon="citationIcon" :aria-label="props.ariaLabel"
          >
-            {{buttonLabel}}<i class="icon-inline" :class="citationIcon" v-if="iconInline || toolbarButton"></i>
+            {{props.buttonLabel}}<i class="icon-inline" :class="citationIcon" v-if="props.iconInline || props.toolbarButton"></i>
          </V4Button>
-         <V4Button v-else mode="icon" @click="$refs.citationsdlg.show()" :id="`${id}-open`"
-             :icon="citationIcon" :aria-label="ariaLabel"
+         <V4Button v-else mode="icon" @click="citationsdlg.value.show()" :id="`${props.id}-open`"
+             :icon="citationIcon" :aria-label="props.ariaLabel"
          >
          </V4Button>
       </template>
@@ -21,7 +21,7 @@
                <p class="error">{{citations}}</p>
             </template>
             <template v-else>
-               <div class="citations" v-if="format=='all'">
+               <div class="citations" v-if="props.format=='all'">
                   <label>Choose a citation format</label>
                   <ul class="list">
                      <li v-for="(citation,idx) in citations" :key="citation.label">
@@ -53,7 +53,7 @@
          </div>
       </template>
       <template v-slot:controls>
-         <V4DownloadButton v-if="format == 'all'" style="padding-left:0" label="Download RIS" :url="risURL"
+         <V4DownloadButton v-if="props.format == 'all'" style="padding-left:0" label="Download RIS" :url="risURL"
             @click="downloadRISClicked" id="download-citation"
             icon="fas fa-file-export" :iconInline="true" mode="button"
             aria-label="download RIS citation"
@@ -63,7 +63,7 @@
             @click="copyCitation()">
             Copy Citation
          </V4Button>
-         <V4Button mode="primary" :id="`${id}-dismissbtn`" @click="dismissClicked"
+         <V4Button mode="primary" :id="`${props.id}-dismissbtn`" @click="dismissClicked"
             :focusNextOverride="true" @tabnext="nextTabClose">
             Close
          </V4Button>
@@ -71,193 +71,185 @@
    </V4Modal>
 </template>
 
-<script>
-
-import { mapState } from "vuex"
+<script setup>
 import V4DownloadButton from "@/components/V4DownloadButton.vue"
+import { useItemStore } from "@/stores/item"
+import { useSystemStore } from "@/stores/system"
+import { ref, nextTick, computed} from 'vue'
+import analytics from '@/analytics'
+import { copyText } from 'vue3-clipboard'
 
-export default {
-   props: {
-      title: {
-         type: String,
-         required: true
-      },
-      id: {
-         type: String,
-         required: true
-      },
-      itemURL: {
-         type: String,
-         required: true
-      },
-      format: {
-         type: String,
-         required: true
-      },
-      from: {
-         type: String,
-         default: ""
-      },
-      icon: {
-         type: String,
-         default: ""
-      },
-      iconInline: {
-         type: Boolean,
-         default: false
-      },
-      toolbarButton: {
-         type: Boolean,
-         default: false
-      },
-      buttonLabel: {
-         type: String,
-         default: ""
-      },
-      buttonMode: {
-         type: String,
-         default: "text"
-      },
-      ariaLabel: {
-         type: String,
-         default: ""
-      }
+const props = defineProps({
+   title: {
+      type: String,
+      required: true
    },
-   data: function() {
-      return {
-         loading: true,
-         failed: false,
-         citations: null,
-         selectedIdx: 0,
-         error: "",
-         message: ""
-      };
+   id: {
+      type: String,
+      required: true
    },
-   components: {
-      V4DownloadButton
+   itemURL: {
+      type: String,
+      required: true
    },
-   computed: {
-      ...mapState({
-         citationsURL: state => state.system.citationsURL,
-      }),
-      itemID() {
-         let parts = this.itemURL.split("/")
-         return parts[parts.length - 1]
-      },
-      risURL() {
-         if (this.citationsURL == "") return ""
-         return `${this.citationsURL}/format/ris?item=${encodeURI(this.itemURL)}`
-      },
-      citationIcon() {
-         let icon = this.icon
-         if (icon == "") {
-            icon = "fas fa-quote-right"
-         }
-         return icon
-      },
-      singleFormat() {
-         if (this.format == "all") {
-            return false
-         }
-         return true
-      },
-      risFrom() {
-         if (this.singleFormat) {
-            return ""
-         }
-
-         let from = this.from.toUpperCase()
-         if (from == "") {
-            from = 'MODAL'
-         }
-
-         return 'RIS_FROM_' + from
-      },
+   format: {
+      type: String,
+      required: true
    },
-   methods: {
-      citationSelected(idx) {
-         this.selectedIdx = idx
-      },
-      opened() {
-         this.error = ""
-         this.message = ""
-         this.loading = true
-         this.failed = false
-         this.citations = null
-
-         this.$store.dispatch("item/getCitations", {format: this.format, itemURL: this.itemURL}).then( (response) => {
-            var citations = response.data
-            this.loading = false
-            this.failed = false
-            this.citations = citations
-         }).catch((error) => {
-            this.loading = false
-            this.failed = true
-            this.citations = error
-         }).finally( ()=> {
-            this.setInitialFocus()
-         })
-      },
-      setInitialFocus() {
-         let btn = document.getElementById("copy-citation")
-         if ( this.format == 'all') {
-            btn = document.getElementById("citation-tab0")
-         }
-         if ( !btn ) {
-            btn = document.getElementById(`${this.id}-dismissbtn`)
-         }
-         btn.focus()
-      },
-      nextTabClose() {
-        this.$refs.citationsdlg.lastFocusTabbed()
-      },
-      backTabCitation( idx ) {
-         if ( idx == 0 ) {
-            this.$refs.citationsdlg.lastFocusTabbed()
-         } else {
-            idx--
-            let btn = document.getElementById(`citation-tab${idx}`)
-            btn.focus()
-         }
-      },
-      backTabCopy() {
-         let btn = document.getElementById(`${this.id}-dismissbtn`)
-         if ( this.format == 'all') {
-            btn = document.getElementById("download-citation")
-            if ( !btn ) {
-               document.getElementById(`${this.id}-dismissbtn`)
-            }
-         }
-         btn.focus()
-      },
-      dismissClicked() {
-         this.$refs.citationsdlg.hide()
-      },
-      downloadRISClicked() {
-         this.$analytics.trigger('Export', this.risFrom, this.itemID)
-      },
-      copyCitation() {
-         // strip html from citation.  this is safe since the source of the citation is trusted
-         let citation = this.citations[this.selectedIdx]
-         var div = document.createElement("div")
-         div.innerHTML = citation.value
-         let text = div.textContent
-
-         // message/errors pop up behind the citation modal on details page, so only show one if we have to
-         this.$copyText(text, undefined, (error, _event) => {
-            if (error) {
-               this.error =  "Unable to copy "+citation.label+" citation: "+error.toString()
-            } else {
-              this.message = citation.label+" citation copied to clipboard."
-            }
-         })
-         this.$nextTick( () => {document.getElementById("copy-citation").focus()} )
-         setTimeout( () => {
-            this.error = ""
-            this.message = ""
-         }, 5000)
-      },
+   from: {
+      type: String,
+      default: ""
+   },
+   icon: {
+      type: String,
+      default: ""
+   },
+   iconInline: {
+      type: Boolean,
+      default: false
+   },
+   toolbarButton: {
+      type: Boolean,
+      default: false
+   },
+   buttonLabel: {
+      type: String,
+      default: ""
+   },
+   buttonMode: {
+      type: String,
+      default: "text"
+   },
+   ariaLabel: {
+      type: String,
+      default: ""
    }
+})
+
+const system = useSystemStore()
+const itemStore = useItemStore()
+const loading = ref(true)
+const failed = ref(false)
+const citations = ref(null)
+const selectedIdx = ref(0)
+const error = ref("")
+const message = ref("")
+const citationsdlg = ref("")
+
+const itemID = computed(()=>{
+   let parts = props.itemURL.split("/")
+   return parts[parts.length - 1]
+})
+const risURL = computed(()=>{
+   if (system.citationsURL == "") return ""
+   return `${system.citationsURL}/format/ris?item=${encodeURI(props.itemURL)}`
+})
+const citationIcon = computed(()=>{
+   let icon = props.icon
+   if (icon == "") {
+      icon = "fas fa-quote-right"
+   }
+   return icon
+})
+const singleFormat = computed(()=>{
+   if (props.format == "all") {
+      return false
+   }
+   return true
+})
+const risFrom = computed(()=>{
+   if (singleFormat.value) {
+      return ""
+   }
+
+   let from = props.from.toUpperCase()
+   if (from == "") {
+      from = 'MODAL'
+   }
+
+   return 'RIS_FROM_' + from
+})
+
+function citationSelected(idx) {
+   selectedIdx.value = idx
+}
+function opened() {
+   error.value = ""
+   message.value = ""
+   loading.value = true
+   failed.value = false
+   citations.value = null
+
+   itemStore.getCitations({format: props.format, itemURL: props.itemURL}).then( (response) => {
+      loading.value = false
+      failed.value = false
+      citations.value = response.data
+   }).catch((error) => {
+      loading.value = false
+      failed.value = true
+      citations.value = error
+   }).finally( ()=> {
+      setInitialFocus()
+   })
+}
+function setInitialFocus() {
+   let btn = document.getElementById("copy-citation")
+   if ( props.format == 'all') {
+      btn = document.getElementById("citation-tab0")
+   }
+   if ( !btn ) {
+      btn = document.getElementById(`${props.id}-dismissbtn`)
+   }
+   btn.focus()
+}
+function nextTabClose() {
+   citationsdlg.value.lastFocusTabbed()
+}
+function backTabCitation( idx ) {
+   if ( idx == 0 ) {
+      citationsdlg.value.lastFocusTabbed()
+   } else {
+      idx--
+      let btn = document.getElementById(`citation-tab${idx}`)
+      btn.focus()
+   }
+}
+function backTabCopy() {
+   let btn = document.getElementById(`${props.id}-dismissbtn`)
+   if ( props.format == 'all') {
+      btn = document.getElementById("download-citation")
+      if ( !btn ) {
+         document.getElementById(`${props.id}-dismissbtn`)
+      }
+   }
+   btn.focus()
+}
+function dismissClicked() {
+   citationsdlg.value.hide()
+}
+function downloadRISClicked() {
+   analytics.trigger('Export', risFrom.value, itemID.value)
+}
+function copyCitation() {
+   // strip html from citation.  this is safe since the source of the citation is trusted
+   let citation = citations.value[selectedIdx.value]
+   var div = document.createElement("div")
+   div.innerHTML = citation.value
+   let text = div.textContent
+
+   // message/errors pop up behind the citation modal on details page, so only show one if we have to
+   copyText(text, undefined, (error, _event) => {
+      if (error) {
+         error.value =  "Unable to copy "+citation.label+" citation: "+error.toString()
+      } else {
+         message.value = citation.label+" citation copied to clipboard."
+      }
+   })
+   nextTick( () => {document.getElementById("copy-citation").focus()} )
+   setTimeout( () => {
+      error.value = ""
+      message.value = ""
+   }, 5000)
 }
 </script>
 

@@ -9,72 +9,63 @@
          <p class="error" v-if="errors.item_barcode">{{errors.item_barcode.join(', ')}}</p>
       </div>
       <PickupLibrary />
-      <V4Button mode="primary" class="request-button" @click="placeHold" :disabled="buttonDisabled">Place Hold</V4Button>
-      <div v-if="pickupLibrary.id == 'LEO' && (noILLiadAccount==true || leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
+      <V4Button mode="primary" class="request-button" @click="placeHold" :disabled="request.buttonDisabled">Place Hold</V4Button>
+      <div v-if="preferences.pickupLibrary.id == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')"
+         class="illiad-prompt ra-box ra-fiy"
+      >
          It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
          <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
       </div>
-      <p class="error" v-if="errors.sirsi">{{errors.sirsi.join(', ')}}</p>
+      <p class="error" v-if="request.errors.sirsi">{{request.errors.sirsi.join(', ')}}</p>
    </div>
 </template>
-<script>
-import { mapFields } from "vuex-map-fields"
-import { mapState, mapGetters } from "vuex"
-import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
 
-export default {
-   components: {
-      PickupLibrary
-   },
-   data: () => {
-      return { selectedItem: {} };
-   },
-   computed: {
-      ...mapState({
-         noILLiadAccount: state => state.user.noILLiadAccount,
-         leoAddress: state => state.user.accountInfo.leoAddress,
-      }),
-      ...mapFields({
-         hold: "requests.hold",
-         itemOptions: "requests.activeOption.item_options",
-         errors: "requests.errors",
-         buttonDisabled: "requests.buttonDisabled",
-         pickupLibrary: 'preferences.pickupLibrary',
-      }),
-      ...mapGetters({
-         isDevServer: 'system/isDevServer',
-      }),
-   },
-   created() {
-      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
-      if (this.itemOptions.length == 1) {
-         this.selectedItem = this.itemOptions[0]
-         this.itemSelected()
-      }
-      setTimeout( () => {
-         let ele = document.getElementById("hold-select")
+<script setup>
+import { ref, onMounted, computed } from "vue"
+import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
+import { useRequestStore } from "@/stores/request"
+import { usePreferencesStore } from "@/stores/preferences"
+import { useUserStore } from "@/stores/user"
+import analytics from '@/analytics'
+
+const request = useRequestStore()
+const preferences = usePreferencesStore()
+const user = useUserStore()
+const selectedItem = ref({})
+
+const itemOptions = computed(()=>{
+  return request.activeOption.item_options
+})
+
+onMounted(()=>{
+   analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
+   if (itemOptions.value.length == 1) {
+      selectedItem.value = itemOptions.value[0]
+      itemSelected()
+   }
+   setTimeout( () => {
+      let ele = document.getElementById("hold-select")
+      if ( ele ) {
+         ele.focus()
+      } else {
+         ele = document.getElementById("pickup-sel")
          if ( ele ) {
             ele.focus()
-         } else {
-            ele = document.getElementById("pickup-sel")
-            if ( ele ) {
-               ele.focus()
-            }
          }
-      }, 150)
-   },
-   methods: {
-      itemSelected() {
-         this.hold.itemLabel = this.selectedItem.label
-         this.hold.itemBarcode = this.selectedItem.barcode
-         this.errors.item_barcode = null;
-      },
-      placeHold() {
-         this.$store.dispatch("requests/createHold");
-      },
-   }
-};
+      }
+   }, 150)
+})
+
+function itemSelected() {
+   request.hold.itemLabel = selectedItem.value.label
+   request.hold.itemBarcode = selectedItem.value.barcode
+   request.errors.item_barcode = null
+}
+function placeHold() {
+   request.createHold()
+}
 </script>
+
 <style lang="scss" >
 .illiad-prompt {
    margin: 15px;

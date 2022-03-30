@@ -3,12 +3,12 @@
       <div class="details">
          <div class="basic">
             <dl class="fields">
-               <template v-for="(field,idx) in hit.basicFields">
+               <template v-for="(field,idx) in props.hit.basicFields">
                   <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
                      <dd :key="getKey(field,`v${idx}`)" >
-                        <TruncatedText :id="`${hit.identifier}-${field.name}`"
-                           :text="$utils.fieldValueString(field)" :limit="truncateLength"
+                        <TruncatedText :id="`${props.hit.identifier}-${field.name}`"
+                           :text="utils.fieldValueString(field)" :limit="truncateLength"
                         />
                      </dd>
                   </template>
@@ -17,102 +17,95 @@
                    <dt class="label">Full Text Match:</dt>
                    <dd class="value"><span class="snippet" v-html="fullTextSnippet"></span></dd>
                </template>
-               <template v-if="accessURLField && !isKiosk">
+               <template v-if="accessURLField && !system.isKiosk">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
-                     <AccessURLDetails mode="brief" :title="hit.header.title" :pool="pool" :urls="accessURLField.value" />
+                     <AccessURLDetails mode="brief" :title="props.hit.header.title" :pool="props.pool" :urls="accessURLField.value" />
                   </dd>
                </template>
             </dl>
          </div>
-         <router-link v-if="hit.cover_image" @mousedown="detailClicked"
-            class="img-link" :to="detailsURL"  :aria-label="`${hit.header.title}`"
+         <router-link v-if="props.hit.cover_image" @mousedown="detailClicked"
+            class="img-link" :to="detailsURL"  :aria-label="`${props.hit.header.title}`"
          >
-            <img class="cover-img" v-if="hit.cover_image" aria-label=" " :src="hit.cover_image"/>
+            <img class="cover-img" v-if="props.hit.cover_image" aria-label=" " :src="props.hit.cover_image"/>
          </router-link>
       </div>
       <div class="digital-content">
          <V4DownloadButton v-if="pdfDownloadURL"
             icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"
-            :aria-label="`download pdf for ${hit.header.title}`"
+            :aria-label="`download pdf for ${props.hit.header.title}`"
          />
          <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt"
             label="Download OCR" :url="ocrDownloadURL"
-            :aria-label="`download ocr for ${hit.header.title}`"
+            :aria-label="`download ocr for ${props.hit.header.title}`"
          />
       </div>
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-import { mapState } from "vuex"
+<script setup>
 import TruncatedText from "@/components/TruncatedText.vue"
 import V4DownloadButton from "@/components/V4DownloadButton.vue"
 import AccessURLDetails from "@/components/AccessURLDetails.vue"
-export default {
-   props: {
-      hit: { type: Object, required: true},
-      pool: {type: String, required: true},
-   },
-   components: {
-      TruncatedText, AccessURLDetails, V4DownloadButton
-   },
-   computed: {
-      pdfDownloadURL() {
-         let dc = this.hit.basicFields.find(f => f.name=="pdf_download_url")
-         if (dc)  {
-            return dc.value
-         }
-         return ""
-      },
-      ocrDownloadURL() {
-         let dc = this.hit.basicFields.find(f => f.name=="ocr_download_url")
-         if (dc)  {
-            return dc.value
-         }
-         return ""
-      },
-      accessURLField() {
-         return this.hit.basicFields.find(f => f.name=="access_url")
-      },
-      detailsURL() {
-         return `/sources/${this.pool}/items/${this.hit.identifier}`
-      },
-      ...mapState({
-         citationsURL: state => state.system.citationsURL,
-         pools: state => state.pools.list
-      }),
-      ...mapGetters({
-         isKiosk: "system/isKiosk",
-      }),
-      truncateLength() {
-         if ( this.hit.cover_image ) return 60
-         return 80
-      },
-      fullTextSnippet() {
-         let sf = this.hit.basicFields.find( f => f.name == "highlighted_match")
-         if (sf ) {
-            return sf.value.join("<br/><br/>")
-         }
-         return ""
-      }
-   },
-   methods: {
-      detailClicked() {
-         this.$store.commit("hitSelected", this.hit.identifier)
-         this.$analytics.trigger('Results', 'DETAILS_CLICKED', this.hit.identifier)
-      },
-      getKey(field,idx) {
-         return this.hit.identifier+field.value+idx
-      },
-      shouldDisplay(field) {
-         if (field.display == 'optional' || field.type == "url" ||
-            field.type == "access-url" || field.name.includes("_download_url") ) return false
-         return true
-      },
+import analytics from '@/analytics'
+import * as utils from '../utils'
+import { computed } from 'vue'
+import { useSystemStore } from "@/stores/system"
+import { useResultStore } from "@/stores/result"
+
+const props = defineProps({
+   hit: { type: Object, required: true},
+   pool: {type: String, required: true},
+})
+
+const system = useSystemStore()
+const resultStore = useResultStore()
+
+const pdfDownloadURL = computed(()=>{
+   let dc = props.hit.basicFields.find(f => f.name=="pdf_download_url")
+   if (dc)  {
+      return dc.value
    }
-};
+   return ""
+})
+const ocrDownloadURL = computed(()=>{
+   let dc = props.hit.basicFields.find(f => f.name=="ocr_download_url")
+   if (dc)  {
+      return dc.value
+   }
+   return ""
+})
+const accessURLField = computed(()=>{
+   return props.hit.basicFields.find(f => f.name=="access_url")
+})
+const detailsURL = computed(()=>{
+   return `/sources/${props.pool}/items/${props.hit.identifier}`
+})
+const truncateLength = computed(()=>{
+   if ( props.hit.cover_image ) return 60
+   return 80
+})
+const fullTextSnippet = computed(()=>{
+   let sf = props.hit.basicFields.find( f => f.name == "highlighted_match")
+   if (sf ) {
+      return sf.value.join("<br/><br/>")
+   }
+   return ""
+})
+
+function detailClicked() {
+   resultStore.hitSelected(props.hit.identifier)
+   analytics.trigger('Results', 'DETAILS_CLICKED', props.hit.identifier)
+}
+function getKey(field,idx) {
+   return props.hit.identifier+field.value+idx
+}
+function shouldDisplay(field) {
+   if (field.display == 'optional' || field.type == "url" ||
+      field.type == "access-url" || field.name.includes("_download_url") ) return false
+   return true
+}
 </script>
 
 <style lang="scss" scoped>

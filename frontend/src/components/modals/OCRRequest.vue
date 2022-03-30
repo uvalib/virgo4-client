@@ -1,9 +1,9 @@
 <template>
-   <V4Modal :id="id" title="Extract Item Text" ref="ocrmodal"
+   <V4Modal :id="props.id" title="Extract Item Text" ref="ocrmodal"
       firstFocusID="wmail" :buttonID="`${id}-open`" @opened="opened" >
       <template v-slot:button>
-         <V4Button mode="text" @click="ocrClicked" :id="`${id}-open`"
-             :aria-label="`dowload full text for ${item.name}`" style="margin: 0 0 10px 0; font-size: 0.9em;"
+         <V4Button mode="text" @click="ocrClicked" :id="`${props.id}-open`"
+             :aria-label="`dowload full text for ${digitalItem.name}`" style="margin: 0 0 10px 0; font-size: 0.9em;"
          >
             Download Full Text
          </V4Button>
@@ -14,7 +14,7 @@
          </div>
          <div class="message pure-form"  v-else-if="mode=='request'">
             <p>
-               We will attempt to extract the full text from '{{item.name}}'. This process
+               We will attempt to extract the full text from '{{digitalItem.name}}'. This process
                can take several minutes to over an hour depending on the size and condition
                of the document.
             </p>
@@ -48,104 +48,99 @@
    </V4Modal>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
+<script setup>
+import { ref, computed, nextTick } from "vue"
+import { useItemStore } from "@/stores/item"
+import { useUserStore } from "@/stores/user"
+import analytics from '@/analytics'
 
-export default {
-   props: {
-      id: {
-         type: String,
-         required: true
-      },
-      dcIndex: {
-         type: Number,
-         required: true
-      },
+const emit = defineEmits( ["ocr-started"] )
+const props = defineProps({
+   id: {
+      type: String,
+      required: true
    },
-   computed: {
-      ...mapState({
-         digitalContent : state => state.item.digitalContent,
-      }),
-      ...mapGetters({
-         primaryEmail: 'user/singleEmail'
-      }),
-      item() {
-         return this.digitalContent[this.dcIndex]
-      }
+   dcIndex: {
+      type: Number,
+      required: true
    },
-   data: function()  {
-      return {
-         email: "",
-         error: "",
-         mode: "init",
-      }
-   },
-   methods: {
-      async ocrClicked() {
-         if (this.item.ocr.status == "NOT_AVAIL") {
-            this.$refs.ocrmodal.show()
-            this.$analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', this.item.pid)
-            this.mode = "request"
-            this.$nextTick( () => {
-               document.getElementById("email").focus()
-            })
-         } else if (this.item.ocr.status == "READY") {
-            this.$analytics.trigger('OCR', 'OCR_DOWNLOAD_CLICKED', this.item.pid)
-            await this.$store.dispatch("item/downloadOCRText", this.item)
-            this.mode = "init"
-         } else {
-            this.$refs.ocrmodal.show()
-            this.$analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', this.item.pid)
-            this.mode = "request"
-            this.$nextTick( () => {
-               document.getElementById("email").focus()
-            })
-         }
-      },
-      opened() {
-         this.email = this.primaryEmail
-         this.error = ""
-      },
-      cancelClicked() {
-         this.$refs.ocrmodal.hide()
-         this.mode = "init"
-      },
-      async okClicked() {
-         if ( this.mode == "submitted") {
-            this.$refs.ocrmodal.hide()
-            this.mode = "init"
-            return
-         }
-         if ( this.mode == "request") {
-            this.error = ""
-            if ( this.email == "") {
-               this.error =  "An email address is required"
-               document.getElementById("email").focus()
-            } else {
-               await this.$store.dispatch("item/generateOCR", {item: this.item, email: this.email})
-               this.mode="submitted"
-               this.$emit("ocr-started")
-            }
-         }
-      },
-      nextTabOK() {
-         if ( this.mode == "request") {
-            document.getElementById("email").focus()
-         } else {
-            document.getElementById("ocr-ok").focus()
-         }
-      },
-      backTabOK() {
-         if ( this.mode == "request") {
-            document.getElementById("ocr-cancel").focus()
-         } else {
-            document.getElementById("ocr-ok").focus()
-         }
-      },
-      backTabInput() {
-         document.getElementById("ocr-ok").focus()
+})
+
+const user = useUserStore()
+const item = useItemStore()
+
+const digitalItem = computed(()=> {
+   return item.digitalContent[props.dcIndex]
+})
+
+const ocrmodal = ref(null)
+const email = ref("")
+const error = ref("")
+const mode = ref("init")
+
+async function ocrClicked() {
+   if (digitalItem.value.ocr.status == "NOT_AVAIL") {
+      ocrmodal.value.show()
+      analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
+      mode.value = "request"
+      nextTick( () => {
+         document.getElementById("email").focus()
+      })
+   } else if (digitalItem.value.ocr.status == "READY") {
+      analytics.trigger('OCR', 'OCR_DOWNLOAD_CLICKED', digitalItem.value.pid)
+      await item.downloadOCRText(digitalItem.value)
+      mode.value = "init"
+   } else {
+      ocrmodal.value.show()
+      analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
+      mode.value = "request"
+      nextTick( () => {
+         document.getElementById("email").focus()
+      })
+   }
+}
+function opened() {
+   email.value = user.singleEmail
+   error.value = ""
+}
+function cancelClicked() {
+   ocrmodal.value.hide()
+   mode.value = "init"
+}
+async function okClicked() {
+   if ( mode.value == "submitted") {
+      ocrmodal.value.hide()
+      mode.value = "init"
+      return
+   }
+   if ( mode.value == "request") {
+      error.value = ""
+      if ( email.value == "") {
+         error.value =  "An email address is required"
+         document.getElementById("email").focus()
+      } else {
+         await item.generateOCR( digitalItem.value, email.value )
+         mode.value ="submitted"
+         emit("ocr-started")
       }
    }
+}
+function nextTabOK() {
+   if ( mode.value == "request") {
+      document.getElementById("email").focus()
+   } else {
+      document.getElementById("ocr-ok").focus()
+   }
+}
+function backTabOK() {
+   if ( mode.value == "request") {
+      document.getElementById("ocr-cancel").focus()
+   } else {
+      document.getElementById("ocr-ok").focus()
+   }
+}
+function backTabInput() {
+   document.getElementById("ocr-ok").focus()
 }
 </script>
 

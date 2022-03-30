@@ -22,8 +22,6 @@
     "vue-ellipse-progress": "^2.0.0",
     "vue-router": "^4.0.0",
     "vue3-clipboard": "^1.0.0",
-    "vuex": "^4.0.2",
-    "vuex-map-fields": "^1.4.1",
     "xml-beautifier": "^0.4.3"
   },
   "devDependencies": {

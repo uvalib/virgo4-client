@@ -1,7 +1,7 @@
 <template>
    <div class="header" role="banner">
       <div class="library-link">
-         <UvaLibraryLogo v-if="isKiosk" />
+         <UvaLibraryLogo v-if="systemStore.isKiosk" />
          <a v-else target="_blank" href="https://library.virginia.edu">
             <UvaLibraryLogo />
          </a>
@@ -17,24 +17,18 @@
    </div>
 </template>
 
-<script>
+<script setup>
 import UvaLibraryLogo from "@/components/UvaLibraryLogo.vue"
-import { mapGetters } from "vuex"
-export default {
-   components: {
-      UvaLibraryLogo
-   },
-   computed: {
-      ...mapGetters({
-         isKiosk: "system/isKiosk",
-      }),
-   },
-   methods: {
-      homeClicked() {
-         this.$store.dispatch('resetSearch')
-      }
-   }
+import { useSystemStore } from "@/stores/system"
+import { useResultStore } from "@/stores/result"
+
+const results = useResultStore()
+const systemStore = useSystemStore()
+
+function homeClicked() {
+   results.resetSearch()
 }
+
 </script>
 
 <style scoped lang="scss">

@@ -1,8 +1,8 @@
 <template>
    <div class="v4-sort">
       <label class="sort" for="sort-opt">Sort by</label>
-      <select v-if="canSort" v-model="activeSort" id="sort-opt" name="sort-opt" @change="sortChanged">
-         <option v-for="(option) in poolSortOptions(pool.id)" :key="option.id" :value="option.id ">
+      <select v-if="canSort" v-model="sortStore.activeSort" id="sort-opt" name="sort-opt" @change="sortChanged">
+         <option v-for="(option) in poolStore.sortOptions(pool.id)" :key="option.id" :value="option.id ">
             {{ option.name }}
          </option>
       </select>
@@ -10,36 +10,32 @@
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-import { mapFields } from 'vuex-map-fields'
-export default {
-   props: {
-      pool: {
-         type: Object,
-         required: true
-      },
+<script setup>
+import { computed } from 'vue'
+import { usePoolStore } from "@/stores/pool"
+import { useSortStore } from "@/stores/sort"
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
+const poolStore = usePoolStore()
+const sortStore = useSortStore()
+
+const props = defineProps({
+   pool: {
+      type: Object,
+      required: true
    },
-   methods: {
-      async sortChanged() {
-         let query = Object.assign({}, this.$route.query)
-         query.sort = this.activeSort
-         this.$router.push({query})
-      }
-   },
-   computed: {
-      ...mapGetters({
-         sortingSupport: 'pools/sortingSupport',
-         poolSortOptions: 'pools/sortOptions',
-         currentPoolSort: 'sort/currentPoolSort'
-      }),
-      ...mapFields({
-         activeSort: 'sort.activeSort',
-      }),
-      canSort() {
-         return this.sortingSupport(this.pool.id)
-      }
-   }
+})
+
+const canSort = computed(() => {
+   return poolStore.sortingSupport(props.pool.id)
+})
+
+async function sortChanged() {
+   let query = Object.assign({}, route.query)
+   query.sort = sortStore.activeSort
+   router.push({query})
 }
 </script>
 

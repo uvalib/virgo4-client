@@ -1,7 +1,9 @@
 <template>
    <div class="request">
       <template v-if="request">
-         <component v-bind:is="request" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+         <Article v-if="request=='Article'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+         <Book v-if="request=='Book'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+         <BookChapter v-if="request=='BookChapter'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
       </template>
       <div v-else class="submitted">
          <h2>Request Submitted</h2>
@@ -9,7 +11,7 @@
          <table>
             <tr>
                <td class="label">User ID:</td>
-               <td>{{userId}}</td>
+               <td>{{user.userId}}</td>
             </tr>
             <tr>
                <td class="label">Title:</td>
@@ -29,180 +31,173 @@
    </div>
 </template>
 
-<script>
-
-import { mapState } from "vuex"
-import { mapFields } from "vuex-map-fields"
+<script setup>
+import { onMounted, ref } from 'vue'
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
+import analytics from '@/analytics'
 import Article from "@/components/requests/openurl/Article.vue"
 import BookChapter from "@/components/requests/openurl/BookChapter.vue"
 import Book from "@/components/requests/openurl/Book.vue"
-export default {
-   name: "openurl",
-   components: {
-      Article, BookChapter, Book
-   },
-   data: function()  {
-      return {
-         request: "pending"
+import { useRequestStore } from "@/stores/request"
+import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
+
+const router = useRouter()
+const route = useRoute()
+const requestStore = useRequestStore()
+const user = useUserStore()
+const system = useSystemStore()
+
+const request = ref("pending")
+
+// sysError: state => state.system.error,
+// ...mapFields('requests',[
+// 'openurl.title',
+// 'openurl.article',
+// 'openurl.author',
+// 'openurl.publisher',
+// 'openurl.edition',
+// 'openurl.anylanguage',
+// 'openurl.citedin',
+// 'openurl.volume',
+// 'openurl.issue',
+// 'openurl.month',
+// 'openurl.year',
+// 'openurl.issn',
+// 'openurl.oclc',
+// 'openurl.pages',
+// 'openurl.bydate'
+
+onBeforeRouteUpdate((to) => {
+   if (to.query.submitted) {
+      request.value=""
+   }
+})
+
+function initForm( queryParams ) {
+   let genre = queryParams['rtf.genre']
+   if ( !genre ) {
+      genre = queryParams['genre']
+      if (!genre) {
+         router.push("/not_found")
+         return
       }
-   },
-   computed: {
-      ...mapState({
-         sysError: state => state.system.error,
-         buttonDisabled: state => state.requests.buttonDisabled,
-         preferredPickupLibrary: state => state.preferences.pickupLibrary,
-         documentType: state=> state.requests.openurl.documentType,
-         userId: state => state.user.signedInUser
-      }),
-      ...mapFields('requests',[
-         'openurl.title',
-         'openurl.article',
-         'openurl.author',
-         'openurl.publisher',
-         'openurl.edition',
-         'openurl.anylanguage',
-         'openurl.citedin',
-         'openurl.volume',
-         'openurl.issue',
-         'openurl.month',
-         'openurl.year',
-         'openurl.issn',
-         'openurl.oclc',
-         'openurl.pages',
-         'openurl.bydate'
-      ]),
-   },
-   beforeRouteUpdate(to) {
-      if (to.query.submitted) {
-         this.request=""
-      }
-   },
-   methods: {
-      initForm( queryParams ) {
-         let genre = queryParams['rtf.genre']
-         if ( !genre ) {
-            genre = queryParams['genre']
-            if (!genre) {
-               this.$router.push("/not_found")
-               return
+   }
+   if (Array.isArray(genre) ) {
+      genre = genre[0]
+   }
+   requestStore.setOpenURLRequestGenre(genre)
+   request.value = requestStore.openurl.documentType.replace(" ", "")
+
+   // OCLC
+   requestStore.openurl.oclc = getParam(queryParams, "rfe_dat").join(", ")
+
+   // ISSN/ISBN
+   let vals = getMultParam( queryParams, ["rft.isbn", "rft.issn", "rft.eissn", 'issn', 'isbn'])
+   requestStore.openurl.issn = vals.join(", ")
+
+   if (requestStore.openurl.documentType == "Article" || requestStore.openurl.documentType == "BookChapter") {
+      // Journal/book title
+      vals = getMultParam( queryParams, ['rft.jtitle', 'rft.title', 'title', 'rft.stitle'])
+      requestStore.openurl.title = vals.join("; ")
+
+      // Article/chapter title
+      vals = getMultParam( queryParams, ['rft.atitle', 'atitle'])
+      requestStore.openurl.article = vals.join("; ")
+
+      // volume
+      vals = getMultParam(queryParams, ['rft.volume', 'volume'])
+      requestStore.openurl.volume = vals.join(", ")
+
+      // issue
+      vals = getMultParam(queryParams, ['rft.issue', 'issue'])
+      requestStore.openurl.issue = vals.join(", ")
+
+      // year
+      vals = getMultParam(queryParams, ['rft.date', 'date'])
+      requestStore.openurl.year = vals.join(", ")
+
+      // pages
+         vals = getMultParam(queryParams, ['rft.pages', 'rft.spage', 'rft.epage', 'pages', 'spage', 'epage'])
+         requestStore.openurl.pages = vals.join(", ")
+   } else {
+      // book title
+      vals = getMultParam( queryParams, ['rft.btitle', 'rft.title', 'title'])
+      requestStore.openurl.title = vals.join("; ")
+
+      // publisher
+      vals = getParam(queryParams, "rft.pub")
+      requestStore.openurl.publisher = vals.join(", ")
+
+      // publication date
+      vals = getMultParam(queryParams, ['rft.date', 'date'])
+      requestStore.openurl.year = vals.join(", ")
+   }
+
+   // author; first see if its just au
+   vals = getParam(queryParams, "rft.au")
+   if (vals.length > 0) {
+      requestStore.openurl.author = vals.join("; ")
+   } else {
+      let last = getMultParam(queryParams, ["rft.aulast", "aulast"])
+      let first = getMultParam(queryParams, ["rft.aufirst", "aufirst"])
+      let mi = getMultParam(queryParams, ["rft.auinitm", "auinitm"])
+      let authors = []
+      last.forEach( (ln, idx) => {
+         let name = ln
+         if (idx < first.length) {
+            name += `, ${first[idx]}`
+            if (idx < mi.length) {
+               name += ` ${mi[idx]}`
             }
          }
-         if (Array.isArray(genre) ) {
-            genre = genre[0]
-         }
-         this.$store.commit("requests/setOpenURLRequestGenre", genre)
-         this.request = this.documentType.replace(" ", "")
+         authors.push(name)
+      })
+      requestStore.openurl.author = authors.join("; ")
+   }
 
-         // OCLC
-         this.oclc = this.getParam(queryParams, "rfe_dat").join(", ")
+   // cited-in
+   vals = getMultParam( queryParams, ['sid', 'rft_id'])
+   requestStore.openurl.citedin = vals.join(", ")
+}
 
-         // ISSN/ISBN
-         let vals = this.getMultParam( queryParams, ["rft.isbn", "rft.issn", "rft.eissn", 'issn', 'isbn'])
-         this.issn = vals.join(", ")
+function getMultParam( params, keys ) {
+   let val = []
+   keys.forEach( k => {
+      let v = getParam(params, k)
+      val = val.concat(v)
+   })
+   return [...new Set(val)]
+}
 
-         if (this.documentType == "Article" || this.documentType == "BookChapter") {
-            // Journal/book title
-            vals = this.getMultParam( queryParams, ['rft.jtitle', 'rft.title', 'title', 'rft.stitle'])
-            this.title = vals.join("; ")
-
-            // Article/chapter title
-            vals = this.getMultParam( queryParams, ['rft.atitle', 'atitle'])
-            this.article = vals.join("; ")
-
-            // volume
-            vals = this.getMultParam(queryParams, ['rft.volume', 'volume'])
-            this.volume = vals.join(", ")
-
-            // issue
-            vals = this.getMultParam(queryParams, ['rft.issue', 'issue'])
-            this.issue = vals.join(", ")
-
-            // year
-            vals = this.getMultParam(queryParams, ['rft.date', 'date'])
-            this.year = vals.join(", ")
-
-            // pages
-             vals = this.getMultParam(queryParams, ['rft.pages', 'rft.spage', 'rft.epage', 'pages', 'spage', 'epage'])
-             this.pages = vals.join(", ")
-         } else {
-            // book title
-            vals = this.getMultParam( queryParams, ['rft.btitle', 'rft.title', 'title'])
-            this.title = vals.join("; ")
-
-            // publisher
-            vals = this.getParam(queryParams, "rft.pub")
-            this.publisher = vals.join(", ")
-
-            // publication date
-            vals = this.getMultParam(queryParams, ['rft.date', 'date'])
-            this.year = vals.join(", ")
-         }
-
-         // author; first see if its just au
-         vals = this.getParam(queryParams, "rft.au")
-         if (vals.length > 0) {
-            this.author = vals.join("; ")
-         } else {
-            let last = this.getMultParam(queryParams, ["rft.aulast", "aulast"])
-            let first = this.getMultParam(queryParams, ["rft.aufirst", "aufirst"])
-            let mi = this.getMultParam(queryParams, ["rft.auinitm", "auinitm"])
-            let authors = []
-            last.forEach( (ln, idx) => {
-               let name = ln
-               if (idx < first.length) {
-                  name += `, ${first[idx]}`
-                  if (idx < mi.length) {
-                     name += ` ${mi[idx]}`
-                  }
-               }
-               authors.push(name)
-            })
-            this.author = authors.join("; ")
-         }
-
-         // cited-in
-         vals = this.getMultParam( queryParams, ['sid', 'rft_id'])
-         this.citedin = vals.join(", ")
-      },
-
-      getMultParam( params, keys ) {
-         let val = []
-         keys.forEach( k => {
-            let v = this.getParam(params, k)
-            val = val.concat(v)
-         })
+function getParam( params, name) {
+   let val = params[name]
+   if ( val ) {
+      if (Array.isArray(val) ) {
          return [...new Set(val)]
-      },
-
-      getParam( params, name) {
-         let val = params[name]
-         if ( val ) {
-            if (Array.isArray(val) ) {
-               return [...new Set(val)]
-            }
-            return [val.replace( /(<([^>]+)>)/ig, '')]
-         }
-         return []
-      },
-
-      cancelRequest() {
-         this.$router.push("/")
-      },
-      async requestSubmitted() {
-         await this.$store.dispatch("requests/submitOpenURLRequest")
-         if ( this.sysError == "" || this.sysError == null) {
-            this.request = ""
-            let p = this.$route.fullPath
-            p = p.split("?")[0] + "?submitted=true"
-            this.$router.replace(p)
-         }
       }
-   },
-   created() {
-      this.initForm(this.$route.query)
-      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "openURL")
+      return [val.replace( /(<([^>]+)>)/ig, '')]
+   }
+   return []
+}
+
+function cancelRequest() {
+   router.push("/")
+}
+async function requestSubmitted() {
+   await requestStore.submitOpenURLRequest()
+   if ( system.error == "" || system.error == null) {
+      request.value = ""
+      let p = route.fullPath
+      p = p.split("?")[0] + "?submitted=true"
+      router.replace(p)
    }
 }
+
+onMounted(() => {
+   initForm(route.query)
+   analytics.trigger('Requests', 'REQUEST_STARTED', "openURL")
+})
 </script>
 <style lang="scss" scoped>
 .request {

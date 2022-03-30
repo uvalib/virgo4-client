@@ -1,17 +1,17 @@
 <template>
    <div class="searches">
-      <SignInRequired v-if="isSignedIn == false" targetPage="searches"/>
-      <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="lookingUp && isSignedIn" >
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="searches"/>
+      <AccountActivities v-if="userStore.isSignedIn"/>
+      <div class="working" v-if="searchStore.lookingUp && userStore.isSignedIn" >
          <V4Spinner message="Loading searches..."/>
       </div>
-      <div class="details" v-if="isSignedIn">
-         <template v-if="searches.length == 0">
-            <div v-if="!lookingUp" class="none">You currently have no saved searches</div>
+      <div class="details" v-if="userStore.isSignedIn">
+         <template v-if="searchStore.saved.length == 0">
+            <div v-if="!searchStore.lookingUp" class="none">You currently have no saved searches</div>
          </template>
          <div class="saved" v-else>
             <h3>Saved Searches</h3>
-            <div class="row" v-for="(saved,idx) in searches"  :key="saved.token">
+            <div class="row" v-for="(saved,idx) in searchStore.saved"  :key="saved.token">
                <div class="saved-search">
                   <span class="num">{{idx+1}}.</span>
                   <V4Checkbox class="public" :checked="saved.public" @click="publicClicked(saved)"
@@ -53,7 +53,7 @@
                   <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
                   <span class="sep">|</span>
                   <V4Button @click="openRSSModal(saved)" :id="`${saved.token}-open`" mode="text">
-                           RSS <i class='link fal fa-rss'></i>
+                     RSS <i class='link fal fa-rss'></i>
                   </V4Button>
                </div>
             </div>
@@ -64,9 +64,9 @@
                </Confirm>
             </div>
          </div>
-         <div v-if="history.length > 0" class="history">
+         <div v-if="searchStore.history.length > 0" class="history">
             <h3>Recent Searches <span class="info">(Newest to oldest)</span></h3>
-            <div class="row" v-for="(h,idx) in history"  :key="`h${idx}`">
+            <div class="row" v-for="(h,idx) in searchStore.history"  :key="`h${idx}`">
                <template v-if="urlToText(h).length > 0">
                   <span class="num">{{idx+1}}.</span>
                   <router-link @mousedown="savedSearchClicked('history')" class="history" :to="h">{{urlToText(h)}}</router-link>
@@ -80,143 +80,141 @@
             </div>
          </div>
       </div>
-      <V4Modal :id="'rssModal'" ref="rssmodal" :title='`RSS Feed for "${currentFeed.name}"`' :buttonID="`${currentFeed.token}-open`" @closed="closeRSSModal()">
+      <V4Modal id="rss-modal" ref="rssmodal" :title='`RSS Feed for "${currentFeed.name}"`'
+         firstFocusID="rssCopy" lastFocusID="rssCopy" :buttonID="`${currentFeed.token}-open`"
+      >
          <template v-slot:content>
             <h3 class="rss-url" v-text="rssURL(currentFeed.token)"></h3>
-            <p>
-            <V4Button  mode="primary" @click="copyRSS(currentFeed.token)">
-               Copy to clipboard
-            </V4Button>
-            <span v-html="rssMessage" class="rss-message"></span>
-            </p>
             <p>This feed contains a live search which will include any new items added to the collection.</p>
             <p>Note: RSS feeds are not able to show updates from third party sources including articles.</p>
+         </template>
+          <template v-slot:controls>
+            <span v-html="rssMessage" class="rss-message"></span>
+            <V4Button mode="tertiary" id="rss-modal-close" @click="rssmodal.hide()">
+               Close
+            </V4Button>
+            <V4Button  mode="primary" id="rssCopy" @click="copyRSS(currentFeed.token)"
+               :focusNextOverride="true" @tabnext="rssmodal.lastFocusTabbed()">
+               Copy to clipboard
+            </V4Button>
          </template>
       </V4Modal>
    </div>
 
 </template>
 
-<script>
-import { mapState,mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities.vue"
-export default {
-   name: "requests",
-   components: {
-      AccountActivities
-   },
-   data: ()=>{
-      return {
-         rssMessage: "",
-         currentFeed: {}
-      }
+<script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
+import AccountActivities from "@/components/account/AccountActivities.vue"
+import { ref, onMounted } from 'vue'
+import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
+import { useSearchStore } from "@/stores/search"
+import { useResultStore } from "@/stores/result"
+import analytics from '@/analytics'
+import { copyText } from 'vue3-clipboard'
 
-   },
-   computed: {
-      ...mapState({
-         searches: state => state.searches.saved,
-         history: state => state.searches.history,
-         lookingUp: state => state.searches.lookingUp,
-         signedInUser: state => state.user.signedInUser
-      }),
-      ...mapGetters({
-        isSignedIn: 'user/isSignedIn',
-      }),
-   },
-   methods: {
-      async savedSearchClicked(searchType) {
-         if (searchType == "history") {
-            this.$analytics.trigger('Navigation', 'SEARCH_HISTORY_CLICKED')
-         } else {
-            this.$analytics.trigger('Navigation', 'SAVED_SEARCH_CLICKED')
-         }
-         await this.$store.dispatch('resetSearch')
-      },
-      urlToText(url) {
-         if (url.split("?").length === 1) {
-            return ""
-         }
-         let out = url.split("?")[1].replace(/%3a/gi, ":")
-         out = out.replace("&filter=", ", filter: ")
-         out = out.replace("&pool=", ", target: ")
-         out = out.replace("&sort=", ", sort: ")
-         if (url.includes("=basic")) {
-            let stripped = out.replace("mode=basic&", "")
-            let i0 = stripped.indexOf("scope=")
-            let i1 = stripped.indexOf("&", i0)
-            let scope = stripped.substring(i0+6,i1)
-            stripped = stripped.substring(i1+1).replace("q=", "")
-            out = `Basic Search (${scope}) - ${decodeURI(stripped).replace("|", ", ")}`
-         } else {
-            let stripped = out.replace("mode=advanced&", "").replace("q=", "")
-            stripped = stripped.replace("&filter=", ", Filter: ")
-            out = `Advanced Search - ${decodeURI(stripped).replace("|", ", ")}`
-         }
-         return out
-      },
-      removeAllSearches() {
-         this.$store.dispatch("searches/deleteAll", this.signedInUser)
-      },
-      clearHistory() {
-         this.$store.dispatch("searches/clearHistory", this.signedInUser)
-      },
-      removeSavedSearch(searchID) {
-         this.$store.dispatch("searches/delete", {userID: this.signedInUser, searchID: searchID})
-      },
-      copyURL(token) {
-         let URL = window.location.protocol + "//" + window.location.host + this.searchURL(token)
-         this.$copyText(URL, undefined, (error, _event) => {
-            if (error) {
-               this.$store.commit("system/setError", "Unable to copy public search URL: "+error)
-            } else {
-               this.$store.commit("system/setMessage", "Public search URL copied to clipboard.")
-            }
-         })
-      },
-      copyRSS(token) {
-         let URL = this.rssURL(token)
-         this.$copyText(URL, undefined, (error, _event) => {
-            if (error) {
-               this.rssMessage = `Unable to automatically copy RSS URL: ${error}`
-            } else {
-              this.rssMessage = `Copied!`
-            }
-         })
-      },
-      openRSSModal(rss){
-         this.currentFeed = rss
-         this.$refs.rssmodal.show()
-      },
-      closeRSSModal(){
-         this.rssMessage = ""
+const results = useResultStore()
+const userStore = useUserStore()
+const systemStore = useSystemStore()
+const searchStore = useSearchStore()
 
-      },
-      publicClicked(saved) {
-         saved.public = !saved.public
-         saved.userID = this.signedInUser
-         this.$store.dispatch("searches/updateVisibility", saved)
-      },
-      formatDate(date) {
-         return date.split("T")[0];
-      },
-      publicURL(key) {
-         let base = window.location.href
-         return `${base}/${key}`
-      },
-      searchURL(key) {
-         return `/search/${key}`
-      },
-      rssURL(key){
-         return `${window.location.protocol}//${window.location.host}/api/searches/${key}/rss`
-      }
-   },
-   created() {
-      if ( this.isSignedIn) {
-         this.$store.dispatch("searches/getAll", this.signedInUser)
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Saved Searches")
-      }
+const rssmodal = ref(null)
+const rssMessage = ref("")
+const currentFeed = ref({})
+
+async function savedSearchClicked(searchType) {
+   if (searchType == "history") {
+      analytics.trigger('Navigation', 'SEARCH_HISTORY_CLICKED')
+   } else {
+      analytics.trigger('Navigation', 'SAVED_SEARCH_CLICKED')
    }
-};
+   await results.resetSearch()
+}
+
+function urlToText(url) {
+   if (url.split("?").length === 1) {
+      return ""
+   }
+   let out = url.split("?")[1].replace(/%3a/gi, ":")
+   out = out.replace("&filter=", ", filter: ")
+   out = out.replace("&pool=", ", target: ")
+   out = out.replace("&sort=", ", sort: ")
+   if (url.includes("=basic")) {
+      let stripped = out.replace("mode=basic&", "")
+      let i0 = stripped.indexOf("scope=")
+      let i1 = stripped.indexOf("&", i0)
+      let scope = stripped.substring(i0+6,i1)
+      stripped = stripped.substring(i1+1).replace("q=", "")
+      out = `Basic Search (${scope}) - ${decodeURI(stripped).replace("|", ", ")}`
+   } else {
+      let stripped = out.replace("mode=advanced&", "").replace("q=", "")
+      stripped = stripped.replace("&filter=", ", Filter: ")
+      out = `Advanced Search - ${decodeURI(stripped).replace("|", ", ")}`
+   }
+   return out
+}
+
+function removeAllSearches() {
+   searchStore.deleteAll(userStore.signedInUser)
+}
+
+function clearHistory() {
+   searchStore.clearHistory(userStore.signedInUser)
+}
+
+function removeSavedSearch(searchID) {
+   searchStore.delete({userID: userStore.signedInUser, searchID: searchID})
+}
+
+function copyURL(token) {
+   let URL = window.location.protocol + "//" + window.location.host + this.searchURL(token)
+   copyText(URL, undefined, (error, _event) => {
+      if (error) {
+         systemStore.setError("Unable to copy public search URL: "+error)
+      } else {
+         systemStore.setMessage("Public search URL copied to clipboard.")
+      }
+   })
+}
+
+function copyRSS(token) {
+   let URL = this.rssURL(token)
+   copyText(URL, undefined, (error, _event) => {
+      if (error) {
+         rssMessage.value = `Unable to automatically copy RSS URL: ${error}`
+      } else {
+         rssMessage.value = `Copied!`
+      }
+   })
+}
+
+function openRSSModal(rss) {
+   rssMessage.value = ""
+   currentFeed.value = rss
+   rssmodal.value.show()
+}
+
+function publicClicked(saved) {
+   saved.public = !saved.public
+   saved.userID = userStore.signedInUser
+   searchStore.updateVisibility(saved)
+}
+
+function searchURL(key) {
+   return `/search/${key}`
+}
+
+function rssURL(key){
+   return `${window.location.protocol}//${window.location.host}/api/searches/${key}/rss`
+}
+
+onMounted(()=>{
+   if ( userStore.isSignedIn) {
+      searchStore.getAll(userStore.signedInUser)
+      analytics.trigger('Navigation', 'MY_ACCOUNT', "Saved Searches")
+   }
+})
 </script>
 
 <style scoped>
@@ -313,23 +311,21 @@ span.num {
 }
 .controls {
    padding: 10px 0;
-   text-align: right;
+   /* text-align: right; */
 }
-h3 {
-   background:  var(--uvalib-blue-alt-light);
+h3.rss-url  {
+   background:  var(--uvalib-grey-lightest);
    padding: 5px 10px;
-   border-bottom: 3px solid  var(--uvalib-blue-alt);
-}
-.rss-url {
+   border-bottom: 1px solid  var(--uvalib-grey-light);
+   border-top: 1px solid  var(--uvalib-grey-light);
    -webkit-user-select: all; /* for Safari */
   user-select: all;
 }
 .rss-message {
-   margin-left: 1em;
-   color: var(--uvalib-grey);
-
-}
-.v4-modal-wrapper{
-   display: inline;
+   margin-right: auto;
+   margin-left: 30%;
+   color: var(--uvalib-green-dark);
+   font-weight: bold;
+   margin-top: 4px;
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
    <div class="preferences">
-      <SignInRequired v-if="isSignedIn == false" targetPage="preferences"/>
-      <AccountActivities v-if="isSignedIn"/>
-      <div class="working" v-if="(lookingUpPools || lookingUpAccount) && isSignedIn" >
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="preferences"/>
+      <AccountActivities v-if="userStore.isSignedIn"/>
+      <div class="working" v-if="(poolStore.lookingUp || userStore.lookingUp) && userStore.isSignedIn" >
          <V4Spinner message="Loading preferences..."/>
       </div>
       <div v-else>
-         <template v-if="isSignedIn">
+         <template v-if="userStore.isSignedIn">
             <Search class="section"/>
             <PickupLibrary class="section"/>
             <BarcodeScan class="section"/>
@@ -16,34 +16,29 @@
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities.vue"
+<script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
+import AccountActivities from "@/components/account/AccountActivities.vue"
 import Search from "@/components/preferences/Search.vue"
 import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
 import V4Privacy from "@/components/preferences/V4Privacy.vue"
 import BarcodeScan from "@/components/preferences/BarcodeScan.vue"
-export default {
-   name: "preferences",
-   components: {
-      AccountActivities, Search, PickupLibrary, V4Privacy, BarcodeScan
-   },
-   computed: {
-      ...mapState({
-         lookingUpPools : state => state.pools.lookingUp,
-         lookingUpAccount : state => state.user.lookingUp,
-      }),
-      ...mapGetters({
-        isSignedIn: 'user/isSignedIn',
-      }),
-   },
-   async created() {
-      if ( this.isSignedIn) {
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
-         await this.$store.dispatch("preferences/loadPreferences")
-      }
+import { useUserStore } from "@/stores/user"
+import { usePoolStore } from "@/stores/pool"
+import { usePreferencesStore } from "@/stores/preferences"
+import { onMounted } from 'vue'
+import analytics from '@/analytics'
+
+const userStore = useUserStore()
+const preferencesStore = usePreferencesStore()
+const poolStore = usePoolStore()
+
+onMounted( async () => {
+   if ( userStore.isSignedIn) {
+      analytics.trigger('Navigation', 'MY_ACCOUNT', "Preferences")
+      await preferencesStore.loadPreferences()
    }
-}
+})
 </script>
 <style lang="scss" scoped>
 .preferences {

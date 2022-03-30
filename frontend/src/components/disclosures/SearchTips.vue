@@ -39,14 +39,13 @@
    </V4Disclosure>
 </template>
 
-<script>
-export default {
-   methods: {
-      clicked() {
-         if ( this.$refs.tipsdisclose.showFull) {
-            this.$analytics.trigger('Help', 'SEARCH_TIPS')
-         }
-      }
+<script setup>
+import analytics from '@/analytics'
+import { ref } from 'vue'
+const tipsdisclose = ref(null)
+function clicked() {
+   if ( tipsdisclose.value.showFull) {
+      analytics.trigger('Help', 'SEARCH_TIPS')
    }
 }
 </script>

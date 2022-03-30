@@ -1,9 +1,9 @@
 <template>
    <div class="results-panel">
-      <h2 v-if="query" class="query-summary">
-         Course reserves for instructor '{{query}}'
+      <h2 v-if="reserveStore.query" class="query-summary">
+         Course reserves for instructor '{{reserveStore.query}}'
       </h2>
-      <div class="instructor" v-for="(ir,idx) in results" :key="idx">
+      <div class="instructor" v-for="(ir,idx) in reserveStore.courseReserves" :key="idx">
          <h3 class="value folder">{{ir.instructorName}}</h3>
          <div class="course" v-for="course in ir.courses" :key="course.id">
             <div class="course-name">
@@ -21,38 +21,35 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
+<script setup>
 import ReserveDetail from "@/components/reserves/ReserveDetail.vue"
-export default {
-   components: {
-      ReserveDetail
-   },
-   computed: {
-      ...mapState({
-         results: state => state.reserves.courseReserves,
-         query: state => state.reserves.query,
-      }),
-      isExactLookup() {
-         if (this.$route.params.id) {
-            return true
-         }
-         return false
-      }
-   },
-   methods: {
-      copyURL( courseID, instructor ) {
-         let URL = `${window.location.href}/${encodeURIComponent(courseID)}?instructor=${encodeURIComponent(instructor)}`
-         this.$copyText(URL, undefined, (error, _event) => {
-            if (error) {
-               this.$store.commit("system/setError", "Unable to copy reserves URL: "+error)
-            } else {
-               this.$store.commit("system/setMessage", "Reserves URL copied to clipboard.")
-            }
-         })
-      },
+import { useReserveStore } from "@/stores/reserve"
+import { useSystemStore } from "@/stores/system"
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { copyText } from 'vue3-clipboard'
+
+const route = useRoute()
+const reserveStore = useReserveStore()
+const systemStore = useSystemStore()
+const isExactLookup = computed(() => {
+   if (route.params.id) {
+      return true
    }
+   return false
+})
+
+function copyURL( courseID, instructor ) {
+   let URL = `${window.location.href}/${encodeURIComponent(courseID)}?instructor=${encodeURIComponent(instructor)}`
+   copyText(URL, undefined, (error, _event) => {
+      if (error) {
+         systemStore.setError("Unable to copy reserves URL: "+error)
+      } else {
+         systemStore.setMessage("Reserves URL copied to clipboard.")
+      }
+   })
 }
+
 </script>
 
 <style scoped lang="scss" >

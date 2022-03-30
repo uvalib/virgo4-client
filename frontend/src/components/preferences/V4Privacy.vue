@@ -16,7 +16,7 @@
          <div class="line">We retain this aggregate information for a limited time.
          </div>
          <div class="opt-out">
-            <span v-if="trackingOptOut">
+            <span v-if="preferencesStore.trackingOptOut">
                You have opted out. Uncheck the box below to opt in.
             </span>
             <span v-else>
@@ -24,7 +24,7 @@
             </span>
             <div>
                <label>
-                  <input @change="optOutClicked" class="opt-out" :checked="trackingOptOut" type="checkbox"
+                  <input @change="optOutClicked" class="opt-out" :checked="preferencesStore.trackingOptOut" type="checkbox"
                      aria-label="toggle opt out of analytics collection"/>Opt out
                </label>
             </div>
@@ -33,19 +33,12 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-export default {
-   computed: {
-      ...mapState({
-         trackingOptOut: state => state.preferences.trackingOptOut,
-      })
-   },
-   methods: {
-      optOutClicked() {
-         this.$store.dispatch("preferences/toggleOptOut")
-      }
-   }
+<script setup>
+import { usePreferencesStore } from "@/stores/preferences"
+const preferencesStore = usePreferencesStore()
+
+function optOutClicked() {
+   preferencesStore.toggleOptOut()
 }
 </script>
 

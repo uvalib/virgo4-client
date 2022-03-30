@@ -1,17 +1,17 @@
 <template>
    <div class="home">
-      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
+      <V4Spinner  v-if="resultStore.searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel pure-form">
-         <template v-if="basicSearch">
-            <div v-if="hasTranslateMessage" class="translate-message">
-               {{translateMessage}}
+         <template v-if="queryStore.mode=='basic'">
+            <div v-if="systemStore.hasTranslateMessage" class="translate-message">
+               {{systemStore.translateMessage}}
             </div>
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <label class="screen-reader-text" for="source-select">Search in</label>
             <div class="basic-search">
                <input class="basic"
                   @keyup.enter="searchClicked"
-                  v-model="basic"
+                  v-model="queryStore.basic"
                   autocomplete="off"
                   type="text"
                   id="search"
@@ -31,366 +31,347 @@
          </template>
          <AdvancedSearch v-else/>
       </div>
-      <Welcome  v-if="isHomePage && hasResults==false" />
-      <SearchResults v-if="hasResults" />
+      <Welcome  v-if="isHomePage && resultStore.hasResults==false" />
+      <SearchResults v-if="resultStore.hasResults" />
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-import { mapFields } from 'vuex-map-fields'
+<script setup>
 import SearchResults from "@/components/SearchResults.vue"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"
 import V4BarcodeScanner from "@/components/V4BarcodeScanner.vue"
 import SourceSelector from "@/components/SourceSelector.vue"
+import { useAnnouncer } from '@vue-a11y/announcer'
+import * as utils from '../utils'
+import analytics from '@/analytics'
+import { ref, onMounted, computed, nextTick } from 'vue'
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useQueryStore } from "@/stores/query"
+import { useResultStore } from "@/stores/result"
+import { useRestoreStore } from "@/stores/restore"
+import { useSystemStore } from "@/stores/system"
+import { useSearchStore } from "@/stores/search"
+import { useUserStore } from "@/stores/user"
+import { usePoolStore } from "@/stores/pool"
+import { useSortStore } from "@/stores/sort"
+import { useFilterStore } from "@/stores/filter"
 
-export default {
-   name: "home",
-   components: {
-     SearchResults, V4BarcodeScanner, AdvancedSearch, Welcome, SourceSelector
-   },
-   data: function() {
-      return {
-         queryMessage: "",
+const router = useRouter()
+const route = useRoute()
+const queryStore = useQueryStore()
+const resultStore = useResultStore()
+const restore = useRestoreStore()
+const systemStore = useSystemStore()
+const searchStore = useSearchStore()
+const userStore = useUserStore()
+const poolStore = usePoolStore()
+const sortStore = useSortStore()
+const filters = useFilterStore()
+const { polite, assertive } = useAnnouncer()
+
+const queryMessage = ref("")
+
+const isHomePage = computed(()=>{
+   return (route.path == "/")
+})
+
+resultStore.$subscribe((mutation) => {
+   if (mutation.events.key == "searching" && mutation.events.newValue === false)  {
+      if (restore.url == "/") {
+         nextTick( () => {
+            let r = document.getElementById("results-container")
+            if (r) {
+               // sometimes results may not be availble - maybe auth session problems for one
+               r.focus({preventScroll:true})
+               utils.scrollToItem(r)
+            }
+         })
       }
-   },
-   beforeRouteUpdate(to) {
-      console.log("NEW HOME ROUTE "+ to.fullPath)
-      if ( this.userSearched) {
-         this.$store.dispatch("searches/updateHistory", to.fullPath)
+      if ( queryMessage.value != "") {
+         systemStore.setMessage(queryMessage.value)
+         queryMessage.value = ""
       }
-      this.restoreSearchFromQueryParams(to.query)
-      this.pageTitle = "Search"
-      if (this.searchMode != "basic") {
-         this.pageTitle = "Advanced Search"
-      }
-   },
-   watch: {
-      searching (newVal, _oldVal) {
-         if (newVal == false) {
-            if (this.restoreURL == "/") {
-               this.$nextTick( () => {
-                  let r = document.getElementById("results-container")
-                  if (r) {
-                     // sometimes results may not be availble - maybe auth session problems for one
-                     r.focus({preventScroll:true})
-                     this.$utils.scrollToItem(r)
-                  }
-               })
-            }
-            if ( this.queryMessage != "") {
-               this.$store.commit("system/setMessage", this.queryMessage)
-               this.queryMessage = ""
-            }
-         }
-      },
-   },
-
-   computed: {
-      ...mapState({
-         searching: state => state.searching,
-         searchMode: state => state.query.mode,
-         currentPool: state => state.query.targetPool,
-         translateMessage: state => state.system.translateMessage,
-         total: state=>state.total,
-         restoreURL: state=>state.restore.url,
-         restoreSaveSearch: state=>state.restore.restoreSaveSearch,
-         activeSort: state=>state.sort.activeSort,
-         signedInUser: state=>state.user.signedInUser,
-      }),
-      ...mapGetters({
-        queryURLParams: 'query/queryURLParams',
-        rawQueryString: 'query/string',
-        filterQueryString: 'filters/asQueryParam',
-        hasResults: 'hasResults',
-        hasTranslateMessage: 'system/hasTranslateMessage',
-        selectedResults: 'selectedResults',
-        isSignedIn: 'user/isSignedIn',
-        poolSort: 'sort/poolSort',
-        poolDetails: 'pools/poolDetails',
-      }),
-      ...mapFields({
-        basic: 'query.basic',
-        searchSources: 'query.searchSources',
-        userSearched: 'query.userSearched',
-        lastSearchScrollPosition: 'lastSearchScrollPosition',
-        pageTitle: 'pageTitle'
-      }),
-      basicSearch() {
-        return this.searchMode != "advanced"
-      },
-      isHomePage() {
-         return (this.$route.path == "/")
-      },
-   },
-
-   created: async function() {
-      // When restoring a saved search, the call will be /search/:token
-      let token = this.$route.params.id
-      if ( token ) {
-         // Load the search from the token and restore it
-         await this.$store.dispatch("query/loadSearch", token)
-      }
-
-      this.handleLegacyQueries( this.$route.query )
-   },
-   mounted() {
-      if ( this.searchMode == "basic") {
-         this.$announcer.set(`virgo search has loaded`)
-      }
-   },
-
-   methods: {
-      handleLegacyQueries( query ) {
-         let unsupported = []
-         var changed = false
-         let newQ = Object.assign({}, query )
-
-         // Scope and exclude are not used, but preserve the target pool
-         if (newQ.exclude) {
-            unsupported.push("exclude="+newQ.exclude)
-            delete newQ.exclude
-            changed = true
-         }
-         if (newQ.scope ) {
-            if (newQ.scope != "all") {
-               unsupported.push("scope="+newQ.scope)
-            }
-            changed = true
-            delete newQ.scope
-         }
-         if ( newQ.mode == "basic") {
-            delete newQ.mode
-            changed = true
-         }
-         if (newQ.filter && newQ.filter.indexOf("Facet") > -1) {
-            unsupported.push("filter="+newQ.filter)
-            delete newQ.filter
-            changed = true
-         }
-         if (newQ.pool && !this.poolDetails(newQ.pool)) {
-            unsupported.push("pool="+newQ.pool)
-            delete newQ.pool
-            changed = true
-         }
-
-         let queryStr = newQ.q
-         if ( queryStr) {
-            let idx0 = queryStr.indexOf(" AND filter:")
-            if ( idx0 > -1) {
-               unsupported.push("q="+newQ.q)
-               newQ.q = queryStr.substring(0,idx0).trim()
-               changed = true
-            } else {
-               idx0 = queryStr.indexOf("filter:")
-               if ( idx0 > -1) {
-                  unsupported.push("q="+newQ.q)
-                  queryStr = queryStr.replace(/filter:.*AND\s/g, '')
-                  queryStr = queryStr.replace(/filter:.*}/g, '')
-                  newQ.q = queryStr
-                  changed = true
-               }
-            }
-         }
-
-
-         if ( newQ.q == "" && !newQ.filter) {
-            let msg = "<p>This query has no supported parameters, and cannot be issued. Please fix the issues below and retry.</p>"
-            msg += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
-            this.$store.commit("system/setMessage", msg)
-            this.$router.push("/")
-            return
-         }
-
-         this.searchSources = "all"
-         if (newQ.pool == "images") {
-            this.searchSources = "images"
-         } else if (newQ.pool == "articles") {
-            this.searchSources = "articles"
-         } else if (newQ.pool == "uva_library") {
-            this.searchSources = "uva_library"
-         }
-
-         if ( changed) {
-            if (  unsupported.length > 0) {
-               this.queryMessage = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
-               this.queryMessage += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
-            }
-            this.$router.push({query: newQ, replace: true})
-         } else {
-            this.restoreSearchFromQueryParams(this.$route.query)
-         }
-   },
-
-      async restoreSearchFromQueryParams( query ) {
-         if  (!query.q) {
-            // only reset the search when there is NO query present,
-            // otherwise the search is re-excuted each time a tab changes
-            this.$store.dispatch('resetSearch')
-         }
-
-         // Interrogate query params and convert them to a search in the model (if present)
-         let oldQ = this.rawQueryString
-         if (query.mode == 'advanced') {
-            this.$store.commit("query/setAdvancedSearch")
-         } else {
-            this.$store.commit("query/setBasicSearch")
-         }
-
-         let targetPool = "presearch"
-         let oldFilterParam = ""
-         let oldSort = ""
-         let poolChanged = false
-
-         if ( query.pool ) {
-            poolChanged = (query.pool != this.currentPool)
-            targetPool = query.pool
-            this.$store.commit("query/setTargetPool", targetPool)
-
-            // get sort from URL (but preserve current sort)...
-            let oldSortObj = this.poolSort(targetPool)
-            oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
-            if (query.sort  ) {
-               this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: query.sort})
-               this.$store.commit("sort/setActivePool", targetPool)
-            } else {
-               this.$store.commit("sort/setPoolSort", {poolID: targetPool, sort: oldSort})
-               this.$store.commit("sort/setActivePool", targetPool)
-            }
-         }
-
-         // get pool filters from URL (but preserve current)...
-         oldFilterParam = this.filterQueryString(targetPool)
-         if (query.filter) {
-            this.$store.commit("filters/restoreFromURL", {filter: query.filter, pool: targetPool} )
-         } else {
-            this.$store.commit("filters/resetPoolFilters", targetPool)
-         }
-
-         if ( query.q ) {
-            this.$store.commit("query/restoreFromURL", query.q)
-         }
-
-         // If there is a query or filter in params it may be necessary to run a search
-         if ( query.q || query.filter) {
-            // console.log(`Q: ${this.rawQueryString} vs ${oldQ}`)
-            // console.log(`F: ${this.filterQueryString(targetPool)} vs ${oldFilterParam}`)
-            // console.log(`S: ${this.activeSort} vs ${oldSort}`)
-            // console.log(`U: ${this.userSearched}`)
-
-            // only re-run search when query, sort or filtering has changed
-            if ( this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam ||
-                 this.activeSort != oldSort || this.userSearched == true ) {
-               this.$store.commit("resetSearchResults")
-               let changed = this.rawQueryString != oldQ || this.filterQueryString(targetPool) != oldFilterParam || this.userSearched == true
-
-               if ( this.userSearched ) {
-                  this.userSearched = false
-               }
-
-               this.$announcer.set(`search in progress`, 'assertive')
-               if (this.searchSources == "all") {
-                  await this.$store.dispatch("searchAllPools")
-               } else {
-                  let p = this.poolDetails(this.searchSources)
-                  await this.$store.dispatch("searchPool", {pool: p})
-               }
-               this.$store.dispatch("filters/getSelectedResultFacets", changed)
-            } else {
-               if (poolChanged) {
-                  this.$store.dispatch("filters/getSelectedResultFacets", false)
-               }
-            }
-
-            // make sure the currently selected pool is always in URL
-            if (this.selectedResults.pool.id != "none" && query.pool != this.selectedResults.pool.id) {
-               let newQ = Object.assign({}, query)
-               newQ.pool = this.selectedResults.pool.id
-               await this.$router.replace({query: newQ})
-            }
-
-            // make sure the currently selected pool SORT is always in URL. This should only happen the first time a search is made
-            if ( oldSort != "" && query.sort === undefined ) {
-               let newQ = Object.assign({}, query)
-               newQ.sort = oldSort
-               await this.$router.replace({query: newQ})
-            }
-
-            if ( this.lastSearchScrollPosition > 0 && (this.$route.path == "/" || this.$route.path == "/search")) {
-               window.scrollTo({
-                  top: this.lastSearchScrollPosition,
-                  behavior: "auto"
-               })
-            }
-
-            let bmTarget = this.$store.getters['restore/bookmarkTarget']
-            if (bmTarget.id != "") {
-               this.showAddBookmark(bmTarget)
-               this.$store.commit("restore/clear")
-            } else if ( this.restoreSaveSearch ) {
-               let saveBtn = document.getElementById("save-modal-open")
-               if (saveBtn) {
-                  saveBtn.focus()
-                  saveBtn.click()
-               }
-            }
-         }
-      },
-
-      showAddBookmark( bmRestore ) {
-         let identifier = bmRestore.id
-         let bmData = {pool: this.selectedResults.pool.id, data: null}
-         if ( bmRestore.parent && bmRestore.parent != "") {
-            // find the item in the group that was targeted for a bookmark
-            let parent = this.selectedResults.hits.find( r=> r.identifier == bmRestore.parent)
-            bmData.data = parent.group.find( r=> r.identifier == identifier)
-
-            // The group accordion watches this value. When set, the accordion will auto-expand
-            this.$store.commit('setAutoExpandGroupID', bmRestore.parent)
-
-            // once the group is expanded, scroll to the target group item
-            setTimeout( ()=>{
-               let sel = `.group-hit[data-identifier="${identifier}"]`
-               let tgtEle = document.body.querySelector(sel)
-               if ( tgtEle ) {
-                  this.$utils.scrollToItem(tgtEle)
-               }
-            }, 250)
-
-         } else {
-               let sel = `.hit[data-identifier="${identifier}"]`
-               let tgtEle = document.body.querySelector(sel)
-               if ( tgtEle) {
-                  this.$utils.scrollToItem(tgtEle)
-                  bmData.data = this.selectedResults.hits.find( r=> r.identifier == identifier)
-               }
-         }
-         let bmEle = document.getElementById(`bm-modal-${identifier}-btn`)
-         if (bmEle) {
-            bmEle.focus()
-            bmEle.click()
-         }
-      },
-
-      async searchClicked() {
-         if ( this.isSignedIn ) {
-            this.$analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_IN")
-         } else {
-            this.$analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_OUT")
-         }
-         let newQ = Object.assign({}, this.$route.query)
-         newQ.q = this.rawQueryString
-         this.userSearched = true
-         await this.$router.replace({query: newQ})
-      },
-
-      barcodeScanned( barcode ) {
-         this.basic = barcode
-         this.searchClicked()
-      },
    }
-};
+})
+
+function setPageTitle() {
+   systemStore.pageTitle = "Search"
+   if (queryStore.mode != "basic") {
+      systemStore.pageTitle = "Advanced Search"
+   }
+}
+
+onBeforeRouteUpdate((to) => {
+   console.log("NEW HOME ROUTE "+ to.fullPath)
+   if ( queryStore.userSearched) {
+      searchStore.updateHistory(userStore.signedInUser, to.fullPath)
+   }
+   restoreSearchFromQueryParams(to.query)
+   setPageTitle()
+})
+
+onMounted( async () =>{
+   // When restoring a saved search, the call will be /search/:token
+   let token = route.params.id
+   if ( token ) {
+      // Load the search from the token and restore it
+      await queryStore.loadSearch(token)
+   }
+   handleLegacyQueries( route.query )
+   setPageTitle()
+
+   if ( queryStore.mode == "basic") {
+      polite(`virgo search has loaded`)
+   }
+})
+
+function handleLegacyQueries( query ) {
+   let unsupported = []
+   var changed = false
+   let newQ = Object.assign({}, query )
+
+   // Scope and exclude are not used, but preserve the target pool
+   if (newQ.exclude) {
+      unsupported.push("exclude="+newQ.exclude)
+      delete newQ.exclude
+      changed = true
+   }
+   if (newQ.scope ) {
+      if (newQ.scope != "all") {
+         unsupported.push("scope="+newQ.scope)
+      }
+      changed = true
+      delete newQ.scope
+   }
+   if ( newQ.mode == "basic") {
+      delete newQ.mode
+      changed = true
+   }
+   if (newQ.filter && newQ.filter.indexOf("Facet") > -1) {
+      unsupported.push("filter="+newQ.filter)
+      delete newQ.filter
+      changed = true
+   }
+   if (newQ.pool && !poolStore.poolDetails(newQ.pool)) {
+      unsupported.push("pool="+newQ.pool)
+      delete newQ.pool
+      changed = true
+   }
+
+   let queryStr = newQ.q
+   if ( queryStr) {
+      let idx0 = queryStr.indexOf(" AND filter:")
+      if ( idx0 > -1) {
+         unsupported.push("q="+newQ.q)
+         newQ.q = queryStr.substring(0,idx0).trim()
+         changed = true
+      } else {
+         idx0 = queryStr.indexOf("filter:")
+         if ( idx0 > -1) {
+            unsupported.push("q="+newQ.q)
+            queryStr = queryStr.replace(/filter:.*AND\s/g, '')
+            queryStr = queryStr.replace(/filter:.*}/g, '')
+            newQ.q = queryStr
+            changed = true
+         }
+      }
+   }
+
+   if ( newQ.q == "" && !newQ.filter) {
+      let msg = "<p>This query has no supported parameters, and cannot be issued. Please fix the issues below and retry.</p>"
+      msg += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
+      systemStore.setMessage(msg)
+      router.push("/")
+      return
+   }
+
+   queryStore.searchSources = "all"
+   if (newQ.pool == "images") {
+      queryStore.searchSources = "images"
+   } else if (newQ.pool == "articles") {
+      queryStore.searchSources = "articles"
+   } else if (newQ.pool == "uva_library") {
+      queryStore.searchSources = "uva_library"
+   }
+
+   if ( changed) {
+      if ( unsupported.length > 0) {
+         queryMessage.value = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
+         queryMessage.value += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
+      }
+      router.push({query: newQ, replace: true})
+   } else {
+      restoreSearchFromQueryParams(route.query)
+   }
+}
+
+async function restoreSearchFromQueryParams( query ) {
+   if  (!query.q) {
+      // only reset the search when there is NO query present,
+      // otherwise the search is re-excuted each time a tab changes
+      resultStore.resetSearch()
+   }
+
+   // Interrogate query params and convert them to a search in the model (if present)
+   let oldQ = queryStore.string
+   if (query.mode == 'advanced') {
+      queryStore.setAdvancedSearch()
+   } else {
+      queryStore.setBasicSearch()
+   }
+
+   let targetPool = "presearch"
+   let oldFilterParam = ""
+   let oldSort = ""
+   let poolChanged = false
+
+   if ( query.pool ) {
+      poolChanged = (query.pool != queryStore.targetPool)
+      targetPool = query.pool
+      queryStore.setTargetPool(targetPool)
+
+      // get sort from URL (but preserve current sort)...
+      let oldSortObj = sortStore.poolSort(targetPool)
+      oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
+      if (query.sort  ) {
+         sortStore.setPoolSort(targetPool, query.sort)
+         sortStore.setActivePool(targetPool)
+      } else {
+         sortStore.setPoolSort(targetPool, oldSort)
+         sortStore.setActivePool(targetPool)
+      }
+   }
+
+   // get pool filters from URL (but preserve current)...
+   oldFilterParam = filters.asQueryParam(targetPool)
+   if (query.filter) {
+      filters.restoreFromURL(query.filter, targetPool )
+   } else {
+      filters.resetPoolFilters(targetPool)
+   }
+
+   if ( query.q ) {
+      queryStore.restoreFromURL(query.q)
+   }
+
+   // If there is a query or filter in params it may be necessary to run a search
+   if ( query.q || query.filter) {
+      // console.log(`Q: ${queryStore.string} vs ${oldQ}`)
+      // console.log(`F: ${filters.asQueryParam(targetPool)} vs ${oldFilterParam}`)
+      // console.log(`S: ${sortStore.activeSort} vs ${oldSort}`)
+      // console.log(`U: ${queryStore.userSearched}`)
+
+      // only re-run search when query, sort or filtering has changed
+      if ( queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam ||
+            sortStore.activeSort != oldSort || queryStore.userSearched == true ) {
+         resultStore.resetSearchResults()
+         let changed = queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam || queryStore.userSearched == true
+
+         if ( queryStore.userSearched ) {
+            queryStore.userSearched = false
+         }
+
+         assertive(`search in progress`)
+         if (queryStore.searchSources == "all") {
+            await resultStore.searchAllPools()
+         } else {
+            let p = poolStore.poolDetails(queryStore.searchSources)
+            await resultStore.searchPool({pool: p})
+         }
+         filters.getSelectedResultFacets(changed)
+      } else {
+         if (poolChanged) {
+            filters.getSelectedResultFacets(false)
+         }
+      }
+
+      // make sure the currently selected pool is always in URL
+      if (resultStore.selectedResults.pool.id != "none" && query.pool != resultStore.selectedResults.pool.id) {
+         let newQ = Object.assign({}, query)
+         newQ.pool = resultStore.selectedResults.pool.id
+         await router.replace({query: newQ})
+      }
+
+      // make sure the currently selected pool SORT is always in URL. This should only happen the first time a search is made
+      if ( oldSort != "" && query.sort === undefined ) {
+         let newQ = Object.assign({}, query)
+         newQ.sort = oldSort
+         await router.replace({query: newQ})
+      }
+
+      if ( resultStore.lastSearchScrollPosition > 0 && (route.path == "/" || route.path == "/search")) {
+         window.scrollTo({
+            top: resultStore.lastSearchScrollPosition,
+            behavior: "auto"
+         })
+      }
+
+      let bmTarget = restore.bookmarkTarget
+      if (bmTarget.id != "") {
+         showAddBookmark(bmTarget)
+         restore.clear()
+      } else if ( restore.restoreSaveSearch ) {
+         let saveBtn = document.getElementById("save-modal-open")
+         if (saveBtn) {
+            saveBtn.focus()
+            saveBtn.click()
+         }
+      }
+   }
+}
+
+function showAddBookmark( bmRestore ) {
+   let identifier = bmRestore.id
+   let bmData = {pool: resultStore.selectedResults.pool.id, data: null}
+   if ( bmRestore.parent && bmRestore.parent != "") {
+      // find the item in the group that was targeted for a bookmark
+      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == bmRestore.parent)
+      bmData.data = parent.group.find( r=> r.identifier == identifier)
+
+      // The group accordion watches this value. When set, the accordion will auto-expand
+      resultStore.setAutoExpandGroupID(bmRestore.parent)
+
+      // once the group is expanded, scroll to the target group item
+      setTimeout( ()=>{
+         let sel = `.group-hit[data-identifier="${identifier}"]`
+         let tgtEle = document.body.querySelector(sel)
+         if ( tgtEle ) {
+            utils.scrollToItem(tgtEle)
+         }
+      }, 250)
+
+   } else {
+         let sel = `.hit[data-identifier="${identifier}"]`
+         let tgtEle = document.body.querySelector(sel)
+         if ( tgtEle) {
+            utils.scrollToItem(tgtEle)
+            bmData.data = resultStore.selectedResults.hits.find( r=> r.identifier == identifier)
+         }
+   }
+   let bmEle = document.getElementById(`bm-modal-${identifier}-btn`)
+   if (bmEle) {
+      bmEle.focus()
+      bmEle.click()
+   }
+}
+
+async function searchClicked() {
+   if ( userStore.isSignedIn ) {
+      analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_IN")
+   } else {
+      analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_OUT")
+   }
+   let newQ = Object.assign({}, route.query)
+   newQ.q = queryStore.string
+   queryStore.userSearched = true
+   await router.replace({query: newQ})
+}
+
+function barcodeScanned( barcode ) {
+   queryStore.basic = barcode
+   searchClicked()
+}
 </script>
 
 <style lang="scss" scoped>

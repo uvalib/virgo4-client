@@ -9,11 +9,11 @@
                </V4Button>
             </div>
              <div class="renew-content">
-                <div v-if="summary.renewed > 0"><strong>{{summary.renewed}}</strong> items successfully renewed.</div>
-                <div v-if="summary.failed > 0" class="fails">
-                   <div><strong>{{summary.failed}}</strong> items failed renewal: </div>
+                <div v-if="userStore.renewSummary.renewed > 0"><strong>{{userStore.renewSummary.renewed}}</strong> items successfully renewed.</div>
+                <div v-if="userStore.renewSummary.failed > 0" class="fails">
+                   <div><strong>{{userStore.renewSummary.failed}}</strong> items failed renewal: </div>
                    <ul>
-                     <li v-for="(f,idx) in summary.failures" :key="`fail-${idx}`">
+                     <li v-for="(f,idx) in userStore.renewSummary.failures" :key="`fail-${idx}`">
                         <strong class="bc">{{f.barcode}}:</strong><span>&nbsp;{{f.message}}</span>
                      </li>
                    </ul>
@@ -32,32 +32,27 @@
    </transition>
 </template>
 
-<script>
-import { mapState } from "vuex"
-export default {
-   computed: {
-      ...mapState({
-         summary: state => state.user.renewSummary
-      })
-   },
-   methods: {
-      closeSummary() {
-         this.$store.commit("user/clearRenewSummary")
-      },
-      lastFocusTabbed() {
-         let ele = document.getElementById("close-summary")
+<script setup>
+import { onMounted } from 'vue'
+import { useUserStore } from "@/stores/user"
+const userStore = useUserStore()
+
+function closeSummary() {
+  userStore.clearRenewSummary()
+}
+function lastFocusTabbed() {
+   let ele = document.getElementById("close-summary")
+   ele.focus()
+}
+
+onMounted(() =>{
+   setTimeout(()=>{
+      let ele = document.getElementById("renew-summary")
+      if (ele ) {
          ele.focus()
       }
-   },
-   created() {
-      setTimeout(()=>{
-         let ele = document.getElementById("renew-summary")
-         if (ele ) {
-            ele.focus()
-         }
-      }, 250)
-   },
-}
+   }, 250)
+})
 </script>
 
 <style lang="scss" scoped>

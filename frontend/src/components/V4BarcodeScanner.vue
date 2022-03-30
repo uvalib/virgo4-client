@@ -1,5 +1,5 @@
 <template>
-   <div v-if="enableBarcodeScan" class="v4-barcode-scanner">
+   <div v-if="preferencesStore.enableBarcodeScan" class="v4-barcode-scanner">
       <V4Button v-if="showVideo==false" @click="videoShow" mode="text">
          Scan Barcode
       </V4Button>
@@ -15,38 +15,31 @@
    </div>
 </template>
 
-<script>
+<script setup>
+import { usePreferencesStore } from "@/stores/preferences"
 import { StreamBarcodeReader } from "vue-barcode-reader"
-import { mapState } from "vuex"
-export default {
-   components: {
-     StreamBarcodeReader
-   },
-   computed: {
-      ...mapState({
-         enableBarcodeScan: state => state.preferences.enableBarcodeScan,
-      })
-   },
-   data: function() {
-      return {
-         showVideo: false
-      }
-   },
-   methods: {
-      onBarcodeDecode(result) {
-         this.showVideo = false
-          this.$analytics.trigger('Search', 'BARCODE_SCAN', "success")
-         this.$emit('scanned', result)
-      },
-      videoShow() {
-         this.$analytics.trigger('Search', 'BARCODE_SCAN', "started")
-         this.showVideo = true
-      },
-      cancelScan() {
-         this.$analytics.trigger('Search', 'BARCODE_SCAN', "canceled")
-         this.showVideo = false
-      }
-   }
+import analytics from '@/analytics'
+import { ref } from 'vue'
+
+const emit = defineEmits( ['scanned'] )
+
+const preferencesStore = usePreferencesStore()
+const showVideo = ref(false)
+
+function onBarcodeDecode(result) {
+   showVideo.value = false
+   analytics.trigger('Search', 'BARCODE_SCAN', "success")
+   emit('scanned', result)
+}
+
+function videoShow() {
+   analytics.trigger('Search', 'BARCODE_SCAN', "started")
+   showVideo.value = true
+}
+
+function cancelScan() {
+   analytics.trigger('Search', 'BARCODE_SCAN', "canceled")
+   showVideo.value = false
 }
 </script>
 

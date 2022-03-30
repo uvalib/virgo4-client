@@ -2,70 +2,69 @@
    <div class="header-wrapper">
       <div class="title-wrapper">
          <div class="full-title">
-            <span class="count-wrap" v-if="count">
-               <span class="count">{{count}}</span>
+            <span class="count-wrap" v-if="props.count">
+               <span class="count">{{props.count}}</span>
             </span>
-            <template v-if="link == false">
-               <span class="hit-title" v-html="hit.header.title"></span>
-               <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
+            <template v-if="props.link == false">
+               <span class="hit-title" v-html="props.hit.header.title"></span>
+               <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
             </template>
             <router-link @mousedown="detailClicked" v-else :to="detailsURL">
-               <span class="hit-title" v-html="hit.header.title"></span>
-               <span v-if="hit.header.subtitle" class="hit-subtitle" v-html="hit.header.subtitle"></span>
+               <span class="hit-title" v-html="props.hit.header.title"></span>
+               <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
             </router-link>
          </div>
-         <SearchHitActions :hit="hit" :pool="pool" :from="from" />
+         <SearchHitActions :hit="props.hit" :pool="props.pool" :from="props.from" />
       </div>
-      <div v-if="hit.header.author_display" class="author-wrapper">
-         <TruncatedText :id="`${hit.identifier}-author`"
-            :text="hit.header.author_display" :limit="authorTruncateLength" />
+      <div v-if="props.hit.header.author_display" class="author-wrapper">
+         <TruncatedText :id="`${props.hit.identifier}-author`"
+            :text="props.hit.header.author_display" :limit="authorTruncateLength" />
       </div>
    </div>
 </template>
 
-<script>
+<script setup>
 import TruncatedText from "@/components/TruncatedText.vue"
 import SearchHitActions from "@/components/SearchHitActions.vue"
-export default {
-   props: {
-      hit: {
-         type: Object,
-         required: true
-      },
-      pool: {
-         type: String,
-         required: true
-      },
-      link: {
-         type: Boolean,
-         default: true
-      },
-      count: {
-         type: Number,
-         default: 0
-      },
-      from: {
-         type: String,
-         default: ""
-      },
+import { computed } from 'vue'
+import analytics from '@/analytics'
+import { useResultStore } from "@/stores/result"
+
+const props = defineProps({
+   hit: {
+      type: Object,
+      required: true
    },
-   components: {
-      TruncatedText,SearchHitActions
+   pool: {
+      type: String,
+      required: true
    },
-   computed: {
-      detailsURL() {
-         return `/sources/${this.pool}/items/${this.hit.identifier}`
-      },
-      authorTruncateLength() {
-         return 150
-      },
+   link: {
+      type: Boolean,
+      default: true
    },
-   methods: {
-      detailClicked() {
-         this.$store.commit("hitSelected", this.hit.identifier)
-         this.$analytics.trigger('Results', 'DETAILS_CLICKED', this.hit.identifier)
-      },
-   }
+   count: {
+      type: Number,
+      default: 0
+   },
+   from: {
+      type: String,
+      default: ""
+   },
+})
+
+const resultStore = useResultStore()
+
+const detailsURL = computed(()=>{
+      return `/sources/${props.pool}/items/${props.hit.identifier}`
+   })
+const authorTruncateLength = computed(()=>{
+   return 150
+})
+
+function detailClicked() {
+   resultStore.hitSelected(props.hit.identifier)
+   analytics.trigger('Results', 'DETAILS_CLICKED', props.hit.identifier)
 }
 </script>
 

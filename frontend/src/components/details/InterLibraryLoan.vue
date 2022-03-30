@@ -3,20 +3,20 @@
       <div class="ill-content" v-if="canMakeRequests">
          <h2>Availability</h2>
          <div class="request-content">
-            <div class="options-panel" v-if="requests.activePanel == 'OptionsPanel'">
+            <div class="options-panel" v-if="requestStore.activePanel == 'OptionsPanel'">
                <V4Button mode="tertiary" @click="requestClicked">Request Item</V4Button>
                <p class="desc">Make an Interlibrary Loan request for this item.</p>
                <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a></p>
             </div>
-            <SignInPanel v-if="requests.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
-            <ILLBorrowItem v-if="requests.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <ILLScanArticle v-if="requests.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <ILLBorrowAV v-if="requests.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <div  v-if="requests.activePanel == 'SubmittedILL'" class="confirmation-panel">
+            <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
+            <ILLBorrowItem v-if="requestStore.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+            <ILLScanArticle v-if="requestStore.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+            <ILLBorrowAV v-if="requestStore.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+            <div  v-if="requestStore.activePanel == 'SubmittedILL'" class="confirmation-panel">
                <h3>We have received your request.</h3>
                <dl>
                   <dt>User ID:</dt>
-                  <dd>{{userId}}</dd>
+                  <dd>{{user.userId}}</dd>
                   <dt>Item:</dt>
                   <dd>{{submittedTitle}}</dd>
                   <template v-if="submittedTitle">
@@ -26,107 +26,96 @@
                </dl>
                <V4Button mode="tertiary" class="reset" id="ill-reset" @click="reset">Back</V4Button>
             </div>
-            <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
+            <p class="error" v-if="requestStore.alertText" >{{requestStore.alertText}}</p>
          </div>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-import { mapFields } from "vuex-map-fields"
+<script setup>
 import SignInPanel from "../requests/panels/SignInPanel.vue"
 import ILLBorrowItem from "../requests/standalone/ILLBorrowItem.vue"
 import ILLBorrowAV from "../requests/standalone/ILLBorrowAV.vue"
 import ILLScanArticle from "../requests/standalone/ILLScanArticle.vue"
-export default {
-   data: function()  {
-      return {
-         submittedTitle: "",
-         submittedPickupLocation: "",
-      }
-   },
-   components: {
-      SignInPanel, ILLBorrowItem, ILLScanArticle, ILLBorrowAV
-   },
-   computed: {
-      ...mapFields(['requests']),
-      ...mapState({
-         details : state => state.item.details,
-         noILSAccount: state => state.user.noILSAccount,
-         userId: state => state.user.signedInUser
-      }),
-      ...mapGetters({
-         isSignedIn: "user/isSignedIn",
-         generalFormat: "item/generalFormat"
-      }),
-      canMakeRequests() {
-         if ( this.noILSAccount) {
-            return false
-         }
-         if ( this.generalFormat == "") {
-            return false
-         }
-         return true
-      },
-   },
-   methods: {
-      reset(){
-         this.$store.commit('requests/reset')
-         setTimeout( () => {
-            let opts = document.getElementById("option-button")
-            if (opts.length > 0) {
-               opts[0].focus()
-            }
-         },150)
-      },
-      requestSubmitted( data ) {
-         this.requests.activePanel = 'SubmittedILL'
-         this.submittedTitle = data.title
-         this.submittedPickupLocation = data.pickup
-         this.$nextTick( () => {
-            let btn = document.getElementById("ill-reset")
-            if (btn) {
-               btn.focus()
-            }
-         })
-      },
-      cancelRequest() {
-         this.requests.activePanel = 'OptionsPanel'
-      },
-      requestClicked() {
-         // NOTE: this is crrently specific to WorldCat. If other sources are added, this will need to be generalized
-         let genTypeF = this.details.basicFields.find( bf => bf.name == "general_format")
-         if (!genTypeF) {
-            this.requests.alertText = "Sorry, this item is not available for an Interlibrary Loan request."
-            return
-         }
+import { ref, computed, nextTick, onMounted } from "vue"
+import { useItemStore } from "@/stores/item"
+import { useRequestStore } from "@/stores/request"
+import { useRestoreStore } from "@/stores/restore"
+import { useUserStore } from "@/stores/user"
 
-         let tgtForm = "ILLBorrowItem"
-         if ( genTypeF.value == "ArtChap") {
-            tgtForm = "ILLScanArticle"
-         } else if ( genTypeF.value == "Music" || genTypeF.value == "Video") {
-            tgtForm = "ILLBorrowAV"
-         }
+const user = useUserStore()
+const item = useItemStore()
+const requestStore = useRequestStore()
+const restore = useRestoreStore()
 
-         if ( this.isSignedIn ) {
-            this.requests.activePanel = tgtForm
-         } else {
-            this.$store.commit('restore/setActiveRequest', tgtForm)
-            this.requests.activePanel = "SignInPanel"
-         }
+const submittedTitle = ref("")
+const submittedPickupLocation = ref("")
+
+const canMakeRequests = computed(()=>{
+   if ( user.noILSAccount) {
+      return false
+   }
+   if ( item.generalFormat == "") {
+      return false
+   }
+   return true
+})
+
+function reset(){
+   requestStore.reset()
+   nextTick( () => {
+      let opts = document.getElementById("option-button")
+      if (opts.length > 0) {
+         opts[0].focus()
       }
-   },
-   mounted() {
-      let restoredPanel = this.$store.state.restore.activeRequest
-      if (restoredPanel) {
-         this.requests.activePanel = restoredPanel
-         this.$store.commit("restore/clear")
-      } else {
-         this.requests.activePanel = 'OptionsPanel'
+   },150)
+}
+function requestSubmitted( data ) {
+   requestStore.activePanel = 'SubmittedILL'
+   submittedTitle.value = data.title
+   submittedPickupLocation.value = data.pickup
+   nextTick( () => {
+      let btn = document.getElementById("ill-reset")
+      if (btn) {
+         btn.focus()
       }
+   })
+}
+function cancelRequest() {
+   requestStore.activePanel = 'OptionsPanel'
+}
+function requestClicked() {
+   // NOTE: this is crrently specific to WorldCat. If other sources are added, this will need to be generalized
+   let genTypeF = item.details.basicFields.find( bf => bf.name == "general_format")
+   if (!genTypeF) {
+      requestStore.alertText = "Sorry, this item is not available for an Interlibrary Loan request."
+      return
+   }
+
+   let tgtForm = "ILLBorrowItem"
+   if ( genTypeF.value == "ArtChap") {
+      tgtForm = "ILLScanArticle"
+   } else if ( genTypeF.value == "Music" || genTypeF.value == "Video") {
+      tgtForm = "ILLBorrowAV"
+   }
+
+   if ( user.isSignedIn ) {
+      requestStore.activePanel = tgtForm
+   } else {
+      restore.setActiveRequest(tgtForm)
+      requestStore.activePanel = "SignInPanel"
    }
 }
+
+onMounted(()=>{
+   let restoredPanel = restore.activeRequest
+   if (restoredPanel) {
+      requestStore.activePanel = restoredPanel
+      restore.clear()
+   } else {
+      requestStore.activePanel = 'OptionsPanel'
+   }
+})
 </script>
 <style lang="scss" scoped>
 .ill {

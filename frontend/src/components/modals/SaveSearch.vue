@@ -39,84 +39,79 @@
    </V4Modal>
 </template>
 
-<script>
-import { mapState } from "vuex"
-export default {
-   computed: {
-      ...mapState({
-         savedSearchKey: state => state.searches.lastSavedSearchKey,
-         signedInUser: state => state.user.signedInUser
-      }),
-   },
-   data: function()  {
-      return {
-         searchName: "",
-         error: "",
-         saved: false,
-         working: false,
-         lastSavedURL: "",
-         duplicateSave: false
-      }
-   },
-   methods: {
-      cancelClicked() {
-         this.$refs.savemodal.hide()
-      },
-      backTabName() {
-         this.$refs.savemodal.firstFocusBackTabbed()
-      },
-      nextTabOK() {
-         this.$refs.savemodal.lastFocusTabbed()
-      },
-      opened() {
-         this.error = ""
-         this.saved = false
-         if ( this.$route.fullPath == this.lastSavedURL) {
-            this.duplicateSave = true
-         } else {
-            let date = new Date()
-            let hours = date.getHours()
-            let minutes = date.getMinutes()
-            let m = date.getMonth()+1
-            let mStr = (""+m).padStart(2,'0')
-            let day = (""+date.getDate()).padStart(2,'0')
-            let timeStr = `${date.getFullYear()}-${mStr}-${day}:${hours}${minutes}`
-            this.searchName = `search-${timeStr}`
+<script setup>
+import { ref, nextTick } from 'vue'
+import { useSearchStore } from "@/stores/search"
+import { useUserStore } from "@/stores/user"
+import { useRoute } from 'vue-router'
 
-            this.$nextTick( () => {
-               const input = document.getElementById('savename')
-               input.focus()
-               input.select()
-            })
-         }
-      },
-      async saveClicked() {
-         if ( this.searchName == "") {
-             this.error = "A name is required"
-            return
-         }
-         this.working = true
-         let searchURL = this.$route.fullPath
-         let req = {name: this.searchName, url: searchURL, isPublic: false, userID: this.signedInUser}
-         try {
-            await this.$store.dispatch("searches/save", req)
-            this.saved = true
-            this.showSavePrompt = false
-            this.working = false
-            this.lastSavedURL = searchURL
-            this.duplicateSave = false
-            this.$nextTick( () => {
-               document.getElementById("savename").focus()
-            })
-         } catch(err) {
-            this.error = err.message
-            this.working = false
-            this.duplicateSave = false
-            this.saved = false
-         }
-      }
+const userStore = useUserStore()
+const searches = useSearchStore()
+const route = useRoute()
+
+const savemodal = ref (null)
+const searchName = ref("")
+const error = ref("")
+const saved = ref(false)
+const working = ref(false)
+const lastSavedURL = ref("")
+const duplicateSave = ref(false)
+
+function cancelClicked() {
+   savemodal.value.hide()
+}
+function backTabName() {
+   savemodal.value.firstFocusBackTabbed()
+}
+function nextTabOK() {
+   savemodal.value.lastFocusTabbed()
+}
+function opened() {
+   error.value = ""
+   saved.value = false
+   if ( route.fullPath == lastSavedURL.value) {
+      duplicateSave.value = true
+   } else {
+      let date = new Date()
+      let hours = date.getHours()
+      let minutes = date.getMinutes()
+      let m = date.getMonth()+1
+      let mStr = (""+m).padStart(2,'0')
+      let day = (""+date.getDate()).padStart(2,'0')
+      let timeStr = `${date.getFullYear()}-${mStr}-${day}:${hours}${minutes}`
+      searchName.value = `search-${timeStr}`
+
+      nextTick( () => {
+         const input = document.getElementById('savename')
+         input.focus()
+         input.select()
+      })
    }
-};
+}
+async function saveClicked() {
+   if ( searchName.value == "") {
+         error.value = "A name is required"
+      return
+   }
+   working.value = true
+   let searchURL = route.fullPath
+   let req = {name: searchName.value, url: searchURL, isPublic: false, userID: userStore.signedInUser}
+   try {
+      searches.save(req)
+      saved.value = true
+      working.value = false
+      lastSavedURL.value = searchURL
+      duplicateSave.value = false
+      nextTick( () => {
+         document.getElementById("savename").focus()
+      })
+   } catch(err) {
+      error.value = err.message
+      working.value = false
+      duplicateSave.value = false
+      saved.value = false
+   }
+}
 </script>
 
 <style lang="scss" scoped>

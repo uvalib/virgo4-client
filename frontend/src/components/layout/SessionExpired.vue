@@ -4,7 +4,7 @@
       enter-active-class="animated faster fadeIn"
       leave-active-class="animated faster fadeOut"
    >
-      <div v-if="sessionExpired" class="session">
+      <div v-if="systemStore.sessionExpired" class="session">
          <div class="session-message">
             <div class="bar">
                <span>Notice</span>
@@ -35,38 +35,27 @@
    </transition>
 </template>
 
-<script>
-import { mapState } from "vuex";
-export default {
-   watch: {
-      sessionExpired(newVal, _oldVal) {
-         if (newVal) {
-            this.setFocus("resignlink")
-         }
+<script setup>
+import { useSystemStore } from "@/stores/system"
+import { onMounted, nextTick } from 'vue'
+
+const systemStore = useSystemStore()
+
+function setFocus(id) {
+   nextTick(() => {
+      let ele = document.getElementById(id)
+      if (ele) {
+         ele.focus()
       }
-   },
-   computed: {
-      ...mapState({
-         sessionExpired: state => state.system.sessionExpired
-      })
-   },
-   methods: {
-      setFocus(id) {
-         this.$nextTick(() => {
-            let ele = document.getElementById(id)
-            if (ele) {
-               ele.focus()
-            }
-         })
-      },
-      dismiss() {
-         this.$store.commit("system/clearSessionExpired");
-      }
-   },
-   created() {
-      this.setFocus("resignlink")
-   },
-};
+   })
+}
+function dismiss() {
+   systemStore.sessionExpired = false
+}
+
+onMounted(() => {
+   setFocus("resignlink")
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
 <template>
    <div class="filters" aria-live="polite">
-      <div class="working" v-if="updatingFacets" aria-hidden="true">
+      <div class="working" v-if="filters.updatingFacets" aria-hidden="true">
          Loading filters...
       </div>
       <template v-else>
@@ -44,78 +44,68 @@
    </div>
 </template>
 
-<script>
-import { mapGetters, mapState } from "vuex"
-import { mapFields } from "vuex-map-fields"
-export default {
-   computed: {
-      ...mapGetters({
-         allFilters: 'filters/poolFilter',
-         selectedResults: 'selectedResults',
-         facetSupport: 'pools/facetSupport',
-         filterQueryParam: 'filters/asQueryParam',
-      }),
-      ...mapState({
-         updatingFacets: state => state.filters.updatingFacets,
-      }),
-      ...mapFields({
-        userSearched: 'query.userSearched',
-      }),
-      naFilters() {
-         let out = []
-         this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na === true).forEach(pf=>{
-            let val = pf.value
-            out.push( {facet_id: pf.facet_id, value: val} )
-         })
-         return out
-      },
-      hasFilter() {
-         return this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
-      },
-      hasNaFilter() {
-         return this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na === true).length > 0
-      },
-      appliedFilters() {
-         // display is grouped by facet, raw data is just a series of
-         // facet_id/value pairs. Convert to display
-         let out = {}
-         this.allFilters(this.selectedResults.pool.id).filter(pf => pf.na != true).forEach(pf=>{
-            let val = pf.value
-            let facetName = pf.facet_name
-            if ( Object.prototype.hasOwnProperty.call(out, facetName) == false ) {
-               out[facetName] = []
-            }
-            out[facetName].push( {facet_id: pf.facet_id, value: val} )
-         })
-         return out
-      },
-   },
-   methods: {
-      removeFilter( filter ) {
-         this.userSearched = true
-         let query = Object.assign({}, this.$route.query)
-         delete query.page
-         delete query.filter
-         let data = {}
+<script setup>
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useResultStore } from "@/stores/result"
+import { useFilterStore } from "@/stores/filter"
+import { useQueryStore } from "@/stores/query"
 
-         data = {pool: this.selectedResults.pool.id, facetID: filter.facet_id, value: filter.value}
-         this.$store.commit("filters/toggleFilter", data)
-         this.$store.commit("clearSelectedPoolResults")
-         let fqp = this.filterQueryParam( this.selectedResults.pool.id )
-         if (fqp) {
-            query.filter = fqp
-         }
-         this.$router.push({ query })
-      },
+const route = useRoute()
+const router = useRouter()
+const resultStore = useResultStore()
+const filters = useFilterStore()
+const queryStore = useQueryStore()
 
-      async clearClicked() {
-         this.$store.commit("filters/resetPoolFilters", this.selectedResults.pool.id)
-         let query = Object.assign({}, this.$route.query)
-         delete query.filter
-         this.userSearched = true
-         this.$router.push({ query })
-      },
+const naFilters = computed(()=>{
+   let out = []
+   filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).forEach(pf=>{
+      let val = pf.value
+      out.push( {facet_id: pf.facet_id, value: val} )
+   })
+   return out
+})
+const hasFilter = computed(()=>{
+   return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).length > 0
+})
+const hasNaFilter = computed(()=>{
+   return filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na === true).length > 0
+})
+const appliedFilters = computed(()=>{
+   // display is grouped by facet, raw data is just a series of
+   // facet_id/value pairs. Convert to display
+   let out = {}
+   filters.poolFilter(resultStore.selectedResults.pool.id).filter(pf => pf.na != true).forEach(pf=>{
+      let val = pf.value
+      let facetName = pf.facet_name
+      if ( Object.prototype.hasOwnProperty.call(out, facetName) == false ) {
+         out[facetName] = []
+      }
+      out[facetName].push( {facet_id: pf.facet_id, value: val} )
+   })
+   return out
+})
+
+function removeFilter( filter ) {
+   queryStore.userSearched = true
+   let query = Object.assign({}, route.query)
+   delete query.page
+   delete query.filter
+   filters.toggleFilter(resultStore.selectedResults.pool.id, filter.facet_id, filter.value)
+   resultStore.clearSelectedPoolResults()
+   let fqp = filters.asQueryParam( resultStore.selectedResults.pool.id )
+   if (fqp) {
+      query.filter = fqp
    }
+   router.push({ query })
+}
+
+async function clearClicked() {
+   filters.resetPoolFilters(resultStore.selectedResults.pool.id)
+   let query = Object.assign({}, route.query)
+   delete query.filter
+   queryStore.userSearched = true
+   router.push({ query })
 }
 </script>
 

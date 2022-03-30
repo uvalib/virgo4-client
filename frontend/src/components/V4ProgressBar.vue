@@ -1,29 +1,27 @@
 <template>
-   <div class="v4-progress-bar" :id="id" >
-      <span class="label" v-if="label" v-html="label"></span>
+   <div class="v4-progress-bar" :id="props.id" >
+      <span class="label" v-if="label" v-html="props.label"></span>
       <div class="progress-bar-container">
-         <div id="progress" class="progress-bar" :style="{width: `${percent}`}"></div>
+         <div id="progress" class="progress-bar" :style="{width: `${props.percent}`}"></div>
       </div>
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      id: {
-         type: String,
-         required: true
-      },
-      label: {
-         type: String,
-         default: ""
-      },
-      percent: {
-         type: String,
-         required: true
-      }
+<script setup>
+const props = defineProps({
+   id: {
+      type: String,
+      required: true
    },
-}
+   label: {
+      type: String,
+      default: ""
+   },
+   percent: {
+      type: String,
+      required: true
+   }
+})
 </script>
 
 <style lang="scss" scoped>

@@ -9,18 +9,19 @@
    </section>
 </template>
 
-<script>
-export default {
-   methods: {
-      browseNext() {
-         this.$store.dispatch("shelf/browseNext")
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
-      },
-      browsePrior() {
-         this.$store.dispatch("shelf/browsePrior")
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
-      },
-   },
+<script setup >
+import analytics from '@/analytics'
+import { useShelfStore } from "@/stores/shelf"
+
+const shelfStore = useShelfStore()
+
+function browseNext() {
+   shelfStore.browseNext()
+   analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
+}
+function browsePrior() {
+   shelfStore.browsePrior()
+   analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
 }
 </script>
 <style lang="scss" scoped>

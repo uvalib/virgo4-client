@@ -14,11 +14,11 @@
       <div class="scan pure-form">
          <div class="entry pure-control-group">
             <label for="scan-use">Scan Purpose</label>
-            <select v-model="scan.type" id="scan-use">
+            <select v-model="request.scan.type" id="scan-use">
                <option value="Article">Research</option>
                <option value="Collab">Instruction</option>
             </select>
-            <div class="scan-use-note" v-if="scan.type == 'Article'">
+            <div class="scan-use-note" v-if="request.scan.type == 'Article'">
                Use this form to request a scan for your coursework or personal academic research.
             </div>
             <div v-else class="scan-use-note" >
@@ -28,167 +28,160 @@
          </div>
          <div class="entry pure-control-group">
             <label for="scan-title">Book or Journal Title<span class="required">*</span></label>
-            <input readonly type="text" v-model="scan.title" id="scan-title" aria-required="true" required="required">
+            <input readonly type="text" v-model="request.scan.title" id="scan-title" aria-required="true" required="required">
             <span v-if="hasError('title')" class="error">Title is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-chapter">Chapter or Article Title<span class="required">*</span></label>
-            <input type="text" v-model="scan.chapter" id="scan-chapter" aria-required="true" required="required">
+            <input type="text" v-model="request.scan.chapter" id="scan-chapter" aria-required="true" required="required">
             <span v-if="hasError('chapter')" class="error">Chapter or article is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-author">Chapter or Article Author<span class="required">*</span></label>
-            <input type="text" v-model="scan.author" id="scan-author" aria-required="true" required="required">
+            <input type="text" v-model="request.scan.author" id="scan-author" aria-required="true" required="required">
             <span v-if="hasError('author')" class="error">Author is required</span>
          </div>
          <div class="entry pure-control-group">
             <label for="scan-year">Year</label>
-            <input type="text" v-model="scan.year" id="scan-year">
+            <input type="text" v-model="request.scan.year" id="scan-year">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-volume">Volume</label>
-            <input type="text" v-model="scan.volume" id="scan-volume">
+            <input type="text" v-model="request.scan.volume" id="scan-volume">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-issue">Issue</label>
-            <input type="text" v-model="scan.issue" id="scan-issue">
+            <input type="text" v-model="request.scan.issue" id="scan-issue">
          </div>
          <div class="entry pure-control-group">
             <label for="scan-pages">Pages<span class="required">*</span></label>
-            <input type="text" v-model="scan.pages" id="scan-pages" aria-required="true" required="required">
+            <input type="text" v-model="request.scan.pages" id="scan-pages" aria-required="true" required="required">
             <span class="note">(ex: 1-15)</span>
             <span v-if="pageLengthError" class="error">Please limit page information to 25 characters</span>
             <span v-if="hasError('pages')" class="error">Pages are required</span>
          </div>
-         <div v-if="scan.type=='Article'" class="entry pure-control-group">
+         <div v-if="request.scan.type=='Article'" class="entry pure-control-group">
             <label for="scan-notes">Notes</label>
-            <textarea id="scan-notes" v-model="scan.notes"></textarea>
+            <textarea id="scan-notes" v-model="request.scan.notes"></textarea>
          </div>
          <div v-else class="entry pure-control-group">
             <label for="scan-course">Course Information<span class="required">*</span></label>
-            <textarea id="scan-course" v-model="scan.notes"  aria-required="true" required="required"></textarea>
+            <textarea id="scan-course" v-model="request.scan.notes"  aria-required="true" required="required"></textarea>
             <span v-if="hasError('course')" class="error">Course information is required</span>
          </div>
-         <span v-if="sysError" class="error">{{sysError}}</span>
+         <span v-if="system.err" class="error">{{system.error}}</span>
       </div>
-      <ILLCopyrightNotice :type="scan.type === 'Article' ? 'research' : 'instruction' " />
+      <ILLCopyrightNotice :type="request.scan.type === 'Article' ? 'research' : 'instruction' " />
       <div class="controls">
-         <V4Button mode="primary" class="request-button" @click="submit" :disabled="buttonDisabled">Submit Request</V4Button>
+         <V4Button mode="primary" class="request-button" @click="submit" :disabled="request.buttonDisabled">Submit Request</V4Button>
       </div>
    </div>
 </template>
-<script>
-import { mapFields } from "vuex-map-fields"
-import { mapState } from "vuex"
+
+<script setup>
 import ILLCopyrightNotice from '../ILLCopyrightNotice.vue';
-export default {
-   components: {ILLCopyrightNotice},
-   data: () => {
-      return {
-         selectedItem: {},
-         errors: [],
-         pageLengthError: false,
-         required: ['title', 'chapter', 'author', 'pages']
-      }
-   },
-   computed: {
-      ...mapState({
-         details : state => state.item.details,
-         scan: state => state.requests.scan,
-         sysError: state => state.error
-      }),
-      ...mapFields({
-         itemOptions: 'requests.activeOption.item_options',
-         scan: 'requests.scan',
-         buttonDisabled: 'requests.buttonDisabled',
-      }),
-   },
-   created() {
-      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
-      if (this.itemOptions.length == 1) {
-         this.selectedItem = this.itemOptions[0]
-         this.itemSelected()
-      }
-      setTimeout( () => {
-         if (this.itemOptions.length == 1) {
-            let ele = document.getElementById("scan-use")
-            if ( ele ) {
-               ele.focus()
-            }
-         } else {
-            let ele = document.getElementById("item-select")
-            if ( ele ) {
-               ele.focus()
-            }
-         }
+import { ref, onMounted, computed } from "vue"
+import { useRequestStore } from "@/stores/request"
+import { useItemStore } from "@/stores/item"
+import { useSystemStore } from "@/stores/system"
+import analytics from '@/analytics'
 
-         this.scan.title = this.details.header.title
-         if (this.details.header.author) {
-            this.scan.author = this.details.header.author.value.join(this.details.header.author.separator)
-         } else {
-            this.scan.author = "Unknown"
-         }
-         let isbn = this.details.detailFields.find( f=>f.name=="isbn")
-         if (isbn) {
-            this.scan.issn = isbn.value.find( i => i.length == 13)
-            if (this.scan.issn == "") {
-               this.scan.issn = isbn.value[0]
-            }
-         }
+const request = useRequestStore()
+const item = useItemStore()
+const system = useSystemStore()
 
-         let pubDate = this.details.basicFields.find( f=>f.name=="published_date")
-         if (pubDate) {
-            this.scan.year = pubDate.value
-         }
-      }, 150)
-   },
-   methods: {
-      itemSelected() {
-         this.scan.barcode = this.selectedItem.barcode
-         this.scan.library = this.selectedItem.library
-         this.scan.location = this.selectedItem.location_id
-         this.scan.callNumber = this.selectedItem.label
-      },
-      hasError( val) {
-         return this.errors.includes(val)
-      },
-      submit() {
-         this.errors.splice(0, this.errors.length)
-         for (let [key, value] of Object.entries(this.scan)) {
-            if ( this.required.includes(key) && value == "") {
-               this.errors.push(key)
-            }
-         }
-         if ( this.scan.type == "Collab" && this.scan.notes == "") {
-            this.errors.push("course")
-         }
-         if ( JSON.stringify(this.selectedItem) === JSON.stringify({})) {
-            this.errors.push("item")
-         }
+const required = ['title', 'chapter', 'author', 'pages']
+const selectedItem = ref({})
+const errors = ref([])
+const pageLengthError = ref(false)
+const itemOptions = computed(()=>{
+  return request.activeOption.item_options
+})
 
-         if (this.errors.length > 0) {
-            let tgtID = `scan-${this.errors[0]}`
-            let first = document.getElementById(tgtID)
-            if ( first ) {
-               first.focus()
-            }
-         } else {
-            this.pageLengthError =  (this.scan.pages.length > 25)
-            if ( this.pageLengthError) {
-               let tgtID = `scan-pages`
-               let first = document.getElementById(tgtID)
-               if ( first ) {
-                  first.focus()
-               }
-            } else {
-               this.$store.dispatch("requests/submitScan")
-            }
-         }
-
-      },
+onMounted(()=>{
+   analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
+   if (itemOptions.value.length == 1) {
+      selectedItem.value = itemOptions.value[0]
+      itemSelected()
    }
-};
+   setTimeout( () => {
+      if (itemOptions.value.length == 1) {
+         let ele = document.getElementById("scan-use")
+         if ( ele ) {
+            ele.focus()
+         }
+      } else {
+         let ele = document.getElementById("item-select")
+         if ( ele ) {
+            ele.focus()
+         }
+      }
+
+      request.scan.title = item.details.header.title
+      if (item.details.header.author) {
+         request.scan.author = item.details.header.author.value.join(item.details.header.author.separator)
+      } else {
+         request.scan.author = "Unknown"
+      }
+      let isbn = item.details.detailFields.find( f=>f.name=="isbn")
+      if (isbn) {
+         request.scan.issn = isbn.value.find( i => i.length == 13)
+         if (request.scan.issn == "") {
+            request.scan.issn = isbn.value[0]
+         }
+      }
+
+      let pubDate = item.details.basicFields.find( f=>f.name=="published_date")
+      if (pubDate) {
+         request.scan.year = pubDate.value
+      }
+   }, 150)
+})
+
+function itemSelected() {
+   request.scan.barcode = selectedItem.value.barcode
+   request.scan.library = selectedItem.value.library
+   request.scan.location = selectedItem.value.location_id
+   request.scan.callNumber = selectedItem.value.label
+}
+function hasError( val) {
+   return errors.value.includes(val)
+}
+function submit() {
+   errors.value.splice(0, errors.value.length)
+   for (let [key, value] of Object.entries(request.scan)) {
+      if ( required.includes(key) && value == "") {
+         errors.value.push(key)
+      }
+   }
+   if ( request.scan.type == "Collab" && request.scan.notes == "") {
+      errors.value.push("course")
+   }
+   if ( JSON.stringify(selectedItem.value) === JSON.stringify({})) {
+      errors.value.push("item")
+   }
+
+   if (errors.value.length > 0) {
+      let tgtID = `scan-${errors.value[0]}`
+      let first = document.getElementById(tgtID)
+      if ( first ) {
+         first.focus()
+      }
+   } else {
+      pageLengthError.value =  (request.scan.pages.length > 25)
+      if ( pageLengthError.value) {
+         let tgtID = `scan-pages`
+         let first = document.getElementById(tgtID)
+         if ( first ) {
+            first.focus()
+         }
+      } else {
+         request.submitScan()
+      }
+   }
+}
 </script>
+
 <style lang="scss" scoped>
 .request-scan {
    text-align: left;

@@ -1,11 +1,11 @@
 <template>
-   <div class="collection-context" v-if="collectionCtxAvailable">
+   <div class="collection-context" v-if="collection.isAvailable">
       <div class="collect-head">
          <span class="title">Collections</span>
-         <CollectionDates id="coll-dates" :date="collection.startDate" @picked="collectionPidPicked" v-if="hasCalendar"/>
+         <CollectionDates id="coll-dates" :date="collection.startDate" @picked="collectionPidPicked" v-if="collection.hasCalendar"/>
       </div>
       <div class="collect-rec">
-         <img v-if="collection.image" class="thumb"  :class="{bookplate: isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
+         <img v-if="collection.image" class="thumb"  :class="{bookplate: collection.isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
          <span class="text">
             <p class="collection">{{collection.title}}</p>
             <span class="desc" v-html="collection.description"></span>
@@ -15,29 +15,18 @@
    </div>
 </template>
 
-<script>
-import { mapGetters, mapState } from "vuex"
+<script setup>
 import CollectionDates from "@/components/modals/CollectionDates.vue"
-export default {
-   components: {
-      CollectionDates
-   },
-   computed: {
-      ...mapGetters({
-         collectionCtxAvailable: 'collection/isAvailable',
-         hasCalendar: 'collection/hasCalendar',
-         isBookplate: 'collection/isBookplate',
-         selectedResults: 'selectedResults',
-      }),
-      ...mapState({
-         collection: state => state.collection,
-      }),
-   },
-   methods: {
-      collectionPidPicked(pid) {
-         this.$router.push(`/sources/${this.selectedResults.pool.id}/items/${pid}`)
-      },
-   }
+import { useResultStore } from "@/stores/result"
+import { useCollectionStore } from "@/stores/collection"
+import { useRouter} from 'vue-router'
+
+const router = useRouter()
+const resultStore = useResultStore()
+const collection = useCollectionStore()
+
+function collectionPidPicked(pid) {
+   router.push(`/sources/${resultStore.selectedResults.pool.id}/items/${pid}`)
 }
 </script>
 

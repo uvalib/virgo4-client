@@ -17,39 +17,28 @@
             <transition name="fade" v-on:after-enter="showSaved = false">
                <span v-if="showSaved" class="success"> Saved</span>
             </transition>
-            <select v-model="pickupLibrary" id="pickup-sel"  @change="update">
+            <select v-model="preferencesStore.pickupLibrary" id="pickup-sel"  @change="update">
                <option :value="{id:'', name:''}">Select a location</option>
-               <option v-for="l in librariesForUser" :key="l.id" :value="l">{{l.name}}</option>
+               <option v-for="l in userStore.libraries" :key="l.id" :value="l">{{l.name}}</option>
             </select>
          </label>
       </div>
    </div>
 </template>
 
-<script>
-import { mapFields } from "vuex-map-fields";
-import { mapGetters } from "vuex";
-export default {
-   data: () => {
-      return {
-         showSaved: false,
-      };
-   },
-   computed: {
-      ...mapFields({
-         pickupLibrary: "preferences.pickupLibrary",
-      }),
-      ...mapGetters({
-         librariesForUser: "user/libraries",
-      }),
-   },
-   methods: {
-      update() {
-         this.$store.dispatch("preferences/savePreferences").then(() => {
-            this.showSaved = true
-         })
-      },
-   },
+<script setup>
+import { usePreferencesStore } from "@/stores/preferences"
+import { useUserStore }  from "@/stores/user"
+import { ref } from 'vue'
+
+const preferencesStore = usePreferencesStore()
+const userStore = useUserStore()
+const showSaved = ref(false)
+
+function update() {
+   preferencesStore.savePreferences().then(() => {
+      showSaved.value = true
+   })
 }
 </script>
 

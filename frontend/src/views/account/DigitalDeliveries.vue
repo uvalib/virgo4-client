@@ -1,9 +1,9 @@
 <template>
    <div class="digital-deliveries">
-      <SignInRequired v-if="isSignedIn == false" targetPage="digital deliveries"/>
-      <AccountActivities v-if="isSignedIn"/>
-      <V4Spinner v-if="lookingUp && isSignedIn" message="Working..." v-bind:overlay="true"/>
-      <div class="details" v-if="isSignedIn">
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="digital deliveries"/>
+      <AccountActivities v-if="userStore.isSignedIn"/>
+      <V4Spinner v-if="userStore.lookingUp && userStore.isSignedIn" message="Working..." v-bind:overlay="true"/>
+      <div class="details" v-if="userStore.isSignedIn">
          <div class="notice">
             PDF links are available for 30 days after delivery
             <a href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
@@ -53,7 +53,7 @@
                </dl>
             </div>
          </template>
-         <template v-if="!lookingUp && webDeliveries.length == 0" >
+         <template v-if="!userStore.lookingUp && webDeliveries.length == 0" >
             <div class="none">
                You currently have no digital deliveries available
             </div>
@@ -62,43 +62,34 @@
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-import AccountActivities from "@/components/AccountActivities.vue"
-export default {
-   name: "digital-deliveries",
-   components: {
-      AccountActivities
-   },
-   computed: {
-      ...mapState({
-         lookingUp: state => state.user.lookingUp,
-         requests: state => state.user.requests,
-      }),
-      ...mapGetters({
-        isSignedIn: 'user/isSignedIn',
-      }),
-      webDeliveries() {
-         return this.requests.illiad.filter( h=> h.transactionStatus == "Delivered to Web")
-      }
-   },
-   methods: {
-      formatDate(date) {
-         return date.split("T")[0];
-      },
-      getDownloadLink(req) {
-         let url = `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`
-         let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`
-         let aria = `aria-label="download pdf for ${req.photoJournalTitle}"`
-         return `<a class='pdf-link' href='${url}' ${aria} target='_blank'>${icon}Download</a>`;
-      },
-   },
-   created() {
-      if ( this.isSignedIn) {
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Digital Deliveries")
-      }
-   }
+<script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
+import AccountActivities from "@/components/account/AccountActivities.vue"
+import { useUserStore } from "@/stores/user"
+import { computed, onMounted } from 'vue'
+import analytics from '@/analytics'
+
+const userStore = useUserStore()
+const webDeliveries = computed(()=>{
+   return userStore.requests.illiad.filter( h=> h.transactionStatus == "Delivered to Web")
+})
+
+function formatDate(date) {
+   return date.split("T")[0];
 }
+function getDownloadLink(req) {
+   let url = `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`
+   let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`
+   let aria = `aria-label="download pdf for ${req.photoJournalTitle}"`
+   return `<a class='pdf-link' href='${url}' ${aria} target='_blank'>${icon}Download</a>`;
+}
+
+onMounted(()=>{
+   if ( userStore.isSignedIn) {
+      analytics.trigger('Navigation', 'MY_ACCOUNT', "Digital Deliveries")
+   }
+})
+
 </script>
 
 <style lang="scss" scoped>

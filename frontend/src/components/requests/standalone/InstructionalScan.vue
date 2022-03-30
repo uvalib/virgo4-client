@@ -112,91 +112,83 @@
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="buttonDisabled">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="requestStore.buttonDisabled">
             Submit
          </V4Button>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-import ILLCopyrightNotice from '../ILLCopyrightNotice.vue';
-export default {
-   components: {ILLCopyrightNotice},
-   data: function()  {
-      return {
-         error: "",
-         pageLengthError: false,
-         errors: [],
-         required: ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage', 'year'],
-         request: {
-            scanType: "INSTRUCTIONAL",
-            course: "",
-            date: "",
-            personalCopy: "",
-            title: "",
-            author: "",
-            work: "",
-            volume: "",
-            issue: "",
-            month: "",
-            year: "",
-            pages: "",
-            issn: "",
-            oclc: "",
-            anyLanguage: ""
-         }
+<script setup>
+import { onMounted, ref } from 'vue'
+import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
+import { useRequestStore } from "@/stores/request"
+import analytics from '@/analytics'
+
+const required = ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage', 'year']
+const pageLengthError = ref(false)
+const errors = ref([])
+const request = ref({
+   scanType: "INSTRUCTIONAL",
+   course: "",
+   date: "",
+   personalCopy: "",
+   title: "",
+   author: "",
+   work: "",
+   volume: "",
+   issue: "",
+   month: "",
+   year: "",
+   pages: "",
+   issn: "",
+   oclc: "",
+   anyLanguage: ""
+})
+
+const requestStore = useRequestStore
+
+async function submitClicked() {
+   errors.value.splice(0, errors.value.length)
+   for (let [key, value] of Object.entries(request.value)) {
+      if ( required.includes(key) && value == "") {
+         errors.value.push(key)
       }
-   },
-   computed: {
-      ...mapState({
-         buttonDisabled: state => state.requests.buttonDisabled,
-      }),
-   },
-   methods: {
-      async submitClicked() {
-         this.errors.splice(0, this.errors.length)
-         for (let [key, value] of Object.entries(this.request)) {
-            if ( this.required.includes(key) && value == "") {
-               this.errors.push(key)
-            }
+   }
+   let d = new Date(request.value.date).toLocaleDateString("en-US")
+   if ( d == "Invalid Date" ){
+      errors.value.push('date')
+   }
+
+   if (errors.value.length > 0) {
+      let tgtID = errors.value[0]
+      if (tgtID == "anyLanguage") {
+         tgtID = "any-language-yes"
+      }
+      let first = document.getElementById(tgtID)
+      if ( first ) {
+         first.focus()
+      }
+   } else {
+      pageLengthError.value =  (request.value.pages.length > 25)
+      if ( pageLengthError.value) {
+         let first = document.getElementById("pages")
+         if ( first ) {
+            first.focus()
          }
-         let d = new Date(this.request.date).toLocaleDateString("en-US")
-         if ( d == "Invalid Date" ){
-            this.errors.push('date')
-         }
-         console.log(this.errors)
-         if (this.errors.length > 0) {
-            let tgtID = this.errors[0]
-            if (tgtID == "anyLanguage") {
-               tgtID = "any-language-yes"
-            }
-            let first = document.getElementById(tgtID)
-            if ( first ) {
-               first.focus()
-            }
-         } else {
-            this.pageLengthError =  (this.request.pages.length > 25)
-            if ( this.pageLengthError) {
-               let first = document.getElementById("pages")
-               if ( first ) {
-                  first.focus()
-               }
-            } else {
-               await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
-               this.$emit('submitted')
-            }
-         }
-      },
-      hasError( val) {
-         return this.errors.includes(val)
-      },
-   },
-   created() {
-      this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
+      } else {
+         await requestStore.submitILLiadScanRequest(request.value)
+         this.$emit('submitted')
+      }
    }
 }
+function hasError( val) {
+   return errors.value.includes(val)
+}
+
+onMounted(()=>{
+   analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
+})
 </script>
 
 <style lang="scss" scoped>

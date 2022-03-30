@@ -14,7 +14,7 @@
                   <select v-model="selectedFolder" id="folder" name="folder"
                      @keydown.shift.tab.prevent.stop="shiftTabSelect"
                   >
-                     <option v-for="(folder) in folders" selected=false
+                     <option v-for="(folder) in bookmarks.folders" selected=false
                         :key="folder.id" :value="folder.name ">
                         {{ folder.name }}
                      </option>
@@ -43,96 +43,86 @@
    </V4Modal>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
+<script setup>
 import TruncatedText from "@/components/TruncatedText.vue"
 import BookmarkButton from "@/components/BookmarkButton.vue"
-export default {
-   components: {
-      TruncatedText, BookmarkButton
-   },
-   props: {
-      // Fields: Pool, ID, Title. Author optional
-      data: { type: Object, required: true},
-      id: {type: String, required: true}
-   },
-   data: function() {
-      return {
-         selectedFolder: "",
-         bookmarkError: "",
-         showAdd: false,
-         newFolder: "",
-         bookmarkData: this.data,
-      };
-   },
-   computed: {
-       ...mapGetters({
-         folders: 'bookmarks/folders',
-      }),
-   },
-   methods: {
-      bookmarkButtonClicked() {
-         this.$emit("clicked")
-         this.$refs.addbmmodal.show()
-      },
-      opened() {
-         this.selectedFolder = this.folders[0].name
-         this.bookmarkError = ""
-         this.showAdd = false
-         this.newFolder = ""
-         document.getElementById("folder").focus()
-      },
-      newFolderTab() {
-         document.getElementById("new-folder").focus()
-      },
-      shiftTabSelect() {
-         this.$refs.addbmmodal.firstFocusBackTabbed()
-      },
-      okAddTab() {
-         this.$refs.addbmmodal.lastFocusTabbed()
-      },
-      addFolder() {
-         this.showAdd = true
-         setTimeout( () => {
-            document.getElementById("new-folder").focus()
-         }, 150)
-      },
-      okBookmark() {
-         this.bookmarkError = ""
-         if ( this.showAdd ) {
-            if ( !this.newFolder) {
-               this.bookmarkError = "A bookmark folder name is required"
-               return
-            }
-            this.bookmarkData.folder = this.newFolder
-            this.$store.dispatch("bookmarks/addBookmark", this.bookmarkData).then( () => {
-               this.$refs.addbmmodal.hide()
-            }).catch((error) => {
-               this.bookmarkError = error
-            })
-         } else {
-            if ( !this.selectedFolder) {
-               this.bookmarkError = "A bookmark folder selection is required"
-               return
-            }
-            this.bookmarkData.folder = this.selectedFolder
-            this.$analytics.trigger('Bookmarks', 'ADD_BOOKMARK', this.bookmarkData.identifier)
-            this.$store.dispatch("bookmarks/addBookmark", this.bookmarkData).then( () => {
-               this.$refs.addbmmodal.hide()
-            }).catch((error) => {
-               this.bookmarkError = error
-            })
-         }
-      },
-      cancelBookmark() {
-         this.bookmarkError = ""
-         if (this.showAdd) {
-            this.showAdd = false
-         } else {
-            this.$refs.addbmmodal.hide()
-         }
+import { ref } from 'vue'
+import analytics from '@/analytics'
+import { useBookmarkStore } from "@/stores/bookmark"
+
+const emit = defineEmits( ['clicked'])
+
+const props = defineProps({
+   // Fields: Pool, ID, Title. Author optional
+   data: { type: Object, required: true},
+   id: {type: String, required: true}
+})
+
+const bookmarks = useBookmarkStore()
+const selectedFolder = ref("")
+const bookmarkError = ref("")
+const showAdd = ref(false)
+const newFolder = ref("")
+const addbmmodal = ref(null)
+const bookmarkData = ref(props.data)
+
+function bookmarkButtonClicked() {
+   emit("clicked")
+   addbmmodal.value.show()
+}
+function opened() {
+   selectedFolder.value = bookmarks.folders[0].name
+   bookmarkError.value = ""
+   showAdd.value = false
+   newFolder.value = ""
+   document.getElementById("folder").focus()
+}
+function shiftTabSelect() {
+   addbmmodal.value.firstFocusBackTabbed()
+}
+function okAddTab() {
+   addbmmodal.value.lastFocusTabbed()
+}
+function addFolder() {
+   showAdd.value = true
+   setTimeout( () => {
+      document.getElementById("new-folder").focus()
+   }, 150)
+}
+function okBookmark() {
+   bookmarkError.value = ""
+   if ( showAdd.value ) {
+      if ( !newFolder.value) {
+         bookmarkError.value = "A bookmark folder name is required"
+         return
       }
-   },
+      bookmarkData.value.folder = newFolder.value
+      bookmarks.addBookmark(bookmarkData.value).then( () => {
+         addbmmodal.value.hide()
+      }).catch((error) => {
+         bookmarkError.value = error
+      })
+   } else {
+      if ( !selectedFolder.value) {
+         bookmarkError.value = "A bookmark folder selection is required"
+         return
+      }
+      bookmarkData.value.folder = selectedFolder.value
+      analytics.trigger('Bookmarks', 'ADD_BOOKMARK', bookmarkData.value.identifier)
+      bookmarks.addBookmark(bookmarkData.value).then( () => {
+         addbmmodal.value.hide()
+      }).catch((error) => {
+         bookmarkError.value = error
+      })
+   }
+}
+function cancelBookmark() {
+   bookmarkError.value = ""
+   if (showAdd.value) {
+      showAdd.value = false
+   } else {
+      addbmmodal.value.hide()
+   }
 }
 </script>
 

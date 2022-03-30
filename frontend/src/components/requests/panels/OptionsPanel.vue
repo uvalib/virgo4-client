@@ -1,6 +1,6 @@
 <template>
    <div class="options">
-      <div class="option" v-for="option in requests.requestOptions" :key="option.type">
+      <div class="option" v-for="option in requestStore.requestOptions" :key="option.type">
          <V4Button
             mode="tertiary"
             class="option-button"
@@ -11,39 +11,34 @@
       </div>
    </div>
 </template>
-<script>
-import { mapFields } from "vuex-map-fields";
-import { mapGetters } from "vuex";
 
-export default {
-   computed: {
-      ...mapFields(["requests"]),
-      ...mapGetters({
-         findOption: "requests/findOption",
-         isSignedIn: "user/isSignedIn"
-      })
-   },
-   methods: {
-      setActive(option) {
+<script setup>
+import { useRestoreStore } from "@/stores/restore"
+import { useRequestStore } from "@/stores/request"
+import { useUserStore } from "@/stores/user"
 
-         let newActive = this.requests.optionMap[option.type];
-         let optionSettings = this.findOption(newActive);
-         this.requests.alertText = ""
-         if (option.type == "directLink"){
-            let tab = window.open(option.create_url, '_blank');
-            tab.focus();
+const requestStore = useRequestStore()
+const user = useUserStore()
+const restore = useRestoreStore()
 
-         } else if (optionSettings.sign_in_required && !this.isSignedIn) {
-            this.$store.commit('restore/setActiveRequest', newActive);
-            this.requests.activePanel = "SignInPanel";
-         } else {
-            this.requests.activePanel = newActive;
-            this.requests.activeOption = optionSettings;
-         }
-      }
+function setActive(option) {
+   let newActive = requestStore.optionMap[option.type]
+   let optionSettings = requestStore.findOption(newActive)
+   requestStore.alertText = ""
+   if (option.type == "directLink"){
+      let tab = window.open(option.create_url, '_blank')
+      tab.focus()
+
+   } else if (optionSettings.sign_in_required && !user.isSignedIn) {
+      restore.setActiveRequest(newActive)
+      requestStore.activePanel = "SignInPanel"
+   } else {
+      requestStore.activePanel = newActive
+      requestStore.activeOption = optionSettings
    }
-};
+}
 </script>
+
 <style lang="scss" scoped>
 .options {
    display: flex;

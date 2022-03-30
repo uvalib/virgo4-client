@@ -1,15 +1,16 @@
 <template>
     <SignIn/>
 </template>
-<script>
+<script setup>
 import SignIn from "@/views/SignIn.vue"
-export default {
-  components: {
-    SignIn
-  },
-  created(){
-      this.$store.commit('restore/setURL', this.$route.fullPath)
-      this.$store.commit('restore/save')
-  }
-}
+import { onMounted } from "vue"
+import { useRestoreStore } from "@/stores/restore"
+import { useRoute } from "vue-router"
+
+onMounted(()=>{
+  const restore = useRestoreStore()
+  const route = useRoute()
+  restore.setURL(route.fullPath)
+  restore.save()
+})
 </script>

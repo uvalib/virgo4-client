@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2  v-if="prefill==false">ILL Scan Chapter/Article</h2>
+      <h2  v-if="props.prefill==false">ILL Scan Chapter/Article</h2>
       <div class="scan pure-form">
          <div class="entry pure-control-group">
             <label for="doctype">What would you like to have scanned?<span class="required">*</span></label>
@@ -74,112 +74,105 @@
          <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="buttonDisabled">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="requestStore.buttonDisabled">
             Submit
          </V4Button>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
+<script setup>
+import { onMounted, ref } from 'vue'
 import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
-export default {
-   components: {ILLCopyrightNotice},
-   props: {
-      prefill: {
-         type: Boolean,
-         default: false
-      },
-   },
-   data: function()  {
-      return {
-         error: "",
-         pageLengthError: false,
-         errors: [],
-         required: ['doctype', 'title', "article", "year", "pages", "date"],
-         request: {
-            scanType: "ARTICLE",
-            doctype: "",
-            title: "",
-            article: "",
-            author: "",
-            volume: "",
-            issue: "",
-            month: "",
-            year: "",
-            pages: "",
-            issn: "",
-            oclc: "",
-            notes: "",
-            date: ""
-         }
-      }
-   },
-   computed: {
-      ...mapState({
-         sysError: state => state.system.error,
-         buttonDisabled: state => state.requests.buttonDisabled,
-         details : state => state.item.details,
-      }),
-   },
-   methods: {
-      async submitClicked() {
-         this.errors.splice(0, this.errors.length)
-         for (let [key, value] of Object.entries(this.request)) {
-            if ( this.required.includes(key) && value == "") {
-               this.errors.push(key)
-            }
-         }
-         let d = new Date(this.request.date).toLocaleDateString("en-US")
-         if ( d == "Invalid Date" ){
-            this.errors.push('date')
-         }
+import { useRequestStore } from "@/stores/request"
+import { useItemStore } from "@/stores/item"
+import analytics from '@/analytics'
 
-         if (this.errors.length > 0) {
-            let tgtID = this.errors[0]
-            if (tgtID == "anyLanguage") {
-               tgtID = "any-language-yes"
-            }
-            let first = document.getElementById(tgtID)
-            if ( first ) {
-               first.focus()
-            }
-         } else {
-            this.pageLengthError =  (this.request.pages.length > 25)
-            if ( this.pageLengthError) {
-               let first = document.getElementById("pages")
-               if ( first ) {
-                  first.focus()
-               }
-            } else {
-               await this.$store.dispatch("requests/submitILLiadScanRequest", this.request)
-               this.$emit('submitted', {title: this.request.title, pickup: ""})
-            }
-         }
-      },
-      hasError( val) {
-         return this.errors.includes(val)
-      },
+const props = defineProps({
+   prefill: {
+      type: Boolean,
+      default: false
    },
-   created() {
-      if ( this.prefill ) {
-         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatScan")
-         this.request.title = this.details.header.title
-         this.request.author = this.details.header.author.value.join("; ")
-         let isbnF = this.details.basicFields.find( f => f.name == "isbn")
-         if (isbnF) {
-            this.request.issn = isbnF.value.join(", ")
-         }
-         let pubF = this.details.basicFields.find( f => f.name == "publication_date")
-         if (pubF) {
-            this.request.year = pubF.value
+})
+
+const requestStore = useRequestStore()
+const item = useItemStore()
+
+const required = ['doctype', 'title', "article", "year", "pages", "date"]
+const pageLengthError = ref(false)
+const errors = ref([])
+const request = ref({
+   scanType: "ARTICLE",
+   doctype: "",
+   title: "",
+   article: "",
+   author: "",
+   volume: "",
+   issue: "",
+   month: "",
+   year: "",
+   pages: "",
+   issn: "",
+   oclc: "",
+   notes: "",
+   date: ""
+})
+
+async function submitClicked() {
+   errors.value.splice(0, errors.value.length)
+   for (let [key, value] of Object.entries(request.value)) {
+      if ( required.includes(key) && value == "") {
+         errors.value.push(key)
+      }
+   }
+   let d = new Date(request.value.date).toLocaleDateString("en-US")
+   if ( d == "Invalid Date" ){
+      errors.value.push('date')
+   }
+
+   if (errors.value.length > 0) {
+      let tgtID = errors.value[0]
+      if (tgtID == "anyLanguage") {
+         tgtID = "any-language-yes"
+      }
+      let first = document.getElementById(tgtID)
+      if ( first ) {
+         first.focus()
+      }
+   } else {
+      pageLengthError.value =  (request.value.pages.length > 25)
+      if ( pageLengthError.value) {
+         let first = document.getElementById("pages")
+         if ( first ) {
+            first.focus()
          }
       } else {
-         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
+         await requestStore.submitILLiadScanRequest(request.value)
+         this.$emit('submitted', {title: request.value.title, pickup: ""})
       }
    }
 }
+function hasError( val) {
+   return errors.value.includes(val)
+}
+
+onMounted(()=>{
+   if ( props.prefill ) {
+      analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatScan")
+      request.value.title = item.details.header.title
+      request.value.author = item.details.header.author.value.join("; ")
+      let isbnF = item.details.basicFields.find( f => f.name == "isbn")
+      if (isbnF) {
+         request.value.issn = isbnF.value.join(", ")
+      }
+      let pubF = item.details.basicFields.find( f => f.name == "publication_date")
+      if (pubF) {
+         request.value.year = pubF.value
+      }
+   } else {
+      analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
+   }
+})
 </script>
 
 <style lang="scss" scoped>

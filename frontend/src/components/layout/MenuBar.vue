@@ -1,5 +1,7 @@
 <template>
-   <nav v-if="!fatal" class="menu" role="menubar" aria-label="Virgo Menu" :class="{shadow: seenAlertsCount>0 && alertCount==0 || alertCount == 0}">
+   <nav v-if="!systemStore.$datafatal" class="menu" role="menubar" aria-label="Virgo Menu"
+      :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
+   >
       <ul class="menu-right"
          @keydown.right.prevent.stop="nextMenu" @keyup.left.prevent.stop="prevMenu"
          @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
@@ -9,7 +11,7 @@
                <span class="menu-item no-pad"><i class="icon fal fa-search"></i>Search</span>
             </router-link>
          </li>
-         <template v-if="isKiosk==false">
+         <template v-if="systemStore.isKiosk==false">
             <li role="none">
                <a tabindex="-1" id="feedbackmenu" role="menuitem"
                   href="https://www.library.virginia.edu/askalibrarian/" target="_blank">
@@ -67,14 +69,14 @@
                   </ul>
                </transition>
             </li>
-            <li v-if="isSignedIn" role="none"
+            <li v-if="userStore.isSignedIn" role="none"
                @click.stop="toggleSubMenu('accountmenu')" @keydown.enter="toggleSubMenu()"
                @keydown.space="toggleSubMenu()" @keydown.up.prevent.stop="prevSubMenu"
                @keydown.down.prevent.stop="nextSubMenu">
                <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1"
                   :aria-expanded="isOpen('accountmenu').toString()">
                   <i class="icon fal fa-user-circle"></i>
-                  &nbsp;Signed in as {{signedInUser}}&nbsp;
+                  &nbsp;Signed in as {{userStore.signedInUser}}&nbsp;
                   <i class="fas fa-caret-down submenu-arrow" :class="{ rotated: isOpen('accountmenu') }"></i>
                </span>
                <transition name="grow"
@@ -117,7 +119,7 @@
                            Preferences
                         </router-link>
                      </li>
-                     <li v-if="isAdmin || isPDAAdmin" class="submenu">
+                     <li v-if="userStore.isAdmin || userStore.isPDAAdmin" class="submenu">
                         <router-link role="menuitem" tabindex="-1" to="/admin"  id="adminsub">
                            Admin
                         </router-link>
@@ -130,25 +132,25 @@
                   </ul>
                </transition>
             </li>
-            <li v-if="isSignedIn && itemsOnNotice.length > 0" role="none">
+            <li v-if="userStore.isSignedIn && userStore.itemsOnNotice.length > 0" role="none">
                <router-link to="/checkouts?overdue=1" role="menuitem" >
                   <span  class="menu-item notice">
-                     <i class="fas fa-exclamation-triangle"></i><span class="cnt">{{itemsOnNotice.length}}</span>
+                     <i class="fas fa-exclamation-triangle"></i><span class="cnt">{{userStore.itemsOnNotice.length}}</span>
                   </span>
                </router-link>
             </li>
-            <li v-if="isSignedIn == false" role="none">
+            <li v-if="userStore.isSignedIn == false" role="none">
                <router-link tabindex="-1" role="menuitem" id="accountmenu" to="/signin">
                   <span tabindex="-1" class="menu-item"><i class="icon fal fa-user-circle"></i>Sign In</span>
                </router-link>
             </li>
-            <li v-if="!isKiosk" class="menu-item alert-wrap"
-               :class="{dim: alertCount==0 && seenAlertsCount==0 || alertCount>0}" tabindex="-1" role="menuitem" id="alertmenu"
+            <li v-if="systemStore.isKiosk == false" class="menu-item alert-wrap"
+               :class="{dim: alertStore.menuCount==0 && alertStore.seenCount==0 || alertStore.menuCount>0}" tabindex="-1" role="menuitem" id="alertmenu"
                @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
                @keydown.space.prevent.stop="alertClicked"
             >
                <div class="alert-bell icon fal fa-bell">
-                  <span v-if="seenAlertsCount" class="alert-count">{{seenAlertsCount}}</span>
+                  <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
                </div>
             </li>
          </template>
@@ -156,181 +158,161 @@
    </nav>
 </template>
 
-<script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
+<script setup>
+import { useSystemStore } from "@/stores/system"
+import { useResultStore } from "@/stores/result"
+import { useUserStore } from "@/stores/user"
+import { useAlertStore } from "@/stores/alert"
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import analytics from '@/analytics'
 
-export default {
-   data: function() {
-      return {
-         noFocus: false,
-         menuBar: [
-            {id: "searchmenu", submenu:[], expanded: false},
-            {id: "feedbackmenu", submenu:[], expanded: false},
-            {id: "servicemenu",
-               submenu:["guides", "journalsub", "databasesub", "spacesub", "moresub"],
-               expanded: false, subMenuIdx: 0},
-            {id: "accountmenu", submenu:
-               ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub", "adminsub", "outsub"],
-               expanded: false, subMenuIdx: 0},
-            {id: "alertmenu", submenu:[], expanded: false},
-         ],
-         menuBarIdx: 0,
+const alertStore = useAlertStore()
+const systemStore = useSystemStore()
+const userStore = useUserStore()
+const results = useResultStore()
+
+const noFocus = ref(false)
+const menuBarIdx = ref(0)
+const menuBar = ref([
+   {id: "searchmenu", submenu:[], expanded: false},
+   {id: "feedbackmenu", submenu:[], expanded: false},
+   {id: "servicemenu",
+      submenu:["guides", "journalsub", "databasesub", "spacesub", "moresub"],
+      expanded: false, subMenuIdx: 0},
+   {id: "accountmenu", submenu:
+      ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub", "adminsub", "outsub"],
+      expanded: false, subMenuIdx: 0},
+   {id: "alertmenu", submenu:[], expanded: false},
+])
+
+onMounted(() => {
+   window.addEventListener("click", resetMenus)
+}),
+onUnmounted(() => {
+   window.removeEventListener("click", resetMenus)
+})
+
+function resetMenus() {
+   menuBarIdx.value = 0
+   closeSubMenus()
+}
+function closeSubMenus() {
+   menuBar.value.forEach( mb => {
+      if (mb.submenu.length > 0) {
+         mb.expanded = false
+         mb.idx = 0
       }
-   },
-   computed: {
-      ...mapState({
-         signedInUser: state => state.user.signedInUser,
-         fatal: state => state.system.fatal,
-      }),
-      ...mapGetters({
-        isKiosk: 'system/isKiosk',
-        isSignedIn: 'user/isSignedIn',
-        itemsOnNotice: 'user/itemsOnNotice',
-        alertCount: 'alerts/alertCount',
-        seenAlertsCount: 'alerts/seenAlertsCount',
-        isAdmin: 'user/isAdmin',
-        isPDAAdmin: 'user/isPDAAdmin'
-      }),
-   },
-   created() {
-      window.addEventListener("click", this.resetMenus)
-   },
-   unmounted() {
-      window.removeEventListener("click", this.resetMenus)
-   },
-   methods: {
-      linkClicked() {
-         this.noFocus = true
-      },
-      isOpen( menuID ) {
-         let m = this.menuBar.find( mb => mb.id == menuID)
-         return m.expanded
-      },
-      resetMenus() {
-         this.menuBarIdx = 0
-         this.closeSubMenus()
-      },
-      closeSubMenus() {
-         this.menuBar.forEach( mb => {
-            if (mb.submenu.length > 0) {
-               mb.expanded = false
-               mb.idx = 0
-            }
-         })
-      },
-      libServiceClicked(serviceName) {
-         this.resetMenus()
-         this.$analytics.trigger('Navigation', 'LIBRARY_SERVICE_CLICKED', serviceName)
-
-      },
-      alertClicked() {
-         this.$store.commit("alerts/unseeAllAlerts")
-      },
-      nextMenu() {
-         this.closeSubMenus()
-         this.menuBarIdx++
-         if (this.menuBarIdx == this.menuBar.length) {
-            this.menuBarIdx = 0
-         }
-         this.setMenuFocus()
-      },
-      prevMenu() {
-         this.closeSubMenus()
-         this.menuBarIdx--
-         if (this.menuBarIdx < 0) {
-            this.menuBarIdx = this.menuBar.length - 1
-         }
-         this.setMenuFocus()
-      },
-      toggleSubMenu( targetMenu ) {
-         if ( targetMenu ) {
-            this.menuBarIdx = this.menuBar.findIndex( mb => mb.id == targetMenu)
-         }
-         let menu = this.menuBar[this.menuBarIdx]
-         if ( menu.submenu.length == 0) {
-            return
-         }
-         menu.expanded = !menu.expanded
-         menu.subMenuIdx = 0
-         this.setMenuFocus()
-      },
-      nextSubMenu() {
-         let currMenu = this.menuBar[this.menuBarIdx]
-         if ( currMenu.submenu.length == 0) {
-            return
-         }
-         if ( currMenu.expanded ) {
-            currMenu.subMenuIdx++
-         } else {
-            currMenu.expanded = true
-         }
-         if ( currMenu.subMenuIdx == currMenu.submenu.length) {
-            currMenu.subMenuIdx = 0
-         }
-         this.setMenuFocus()
-      },
-      prevSubMenu() {
-         let currMenu = this.menuBar[this.menuBarIdx]
-         if ( currMenu.submenu.length == 0) {
-            return
-         }
-         if ( currMenu.expanded ) {
-            currMenu.subMenuIdx--
-         } else {
-            currMenu.expanded = true
-         }
-         if ( currMenu.subMenuIdx < 0) {
-            currMenu.subMenuIdx = currMenu.submenu.length-1
-         }
-         this.setMenuFocus()
-      },
-      setMenuFocus() {
-         if ( this.noFocus === true) {
-            this.noFocus = false
-            return
-         }
-         let menu = this.menuBar[this.menuBarIdx]
-         if (menu.submenu.length == 0 || menu.expanded == false) {
-            document.getElementById(menu.id).focus({preventScroll:true})
-         } else {
-            this.$nextTick( () => {
-               let subMenuEle = document.getElementById(menu.submenu[menu.subMenuIdx])
-               subMenuEle.focus({preventScroll:true})
-            })
-         }
-      },
-      searchClicked() {
-         this.$store.dispatch('resetSearch')
-         window.scrollTo({
-            top: 0,
-            behavior: "auto"
-         })
-      },
-      signinClicked() {
-         this.closeSubMenus()
-         this.$router.push("/signin")
-      },
-
-      async signOut() {
-         await this.$store.dispatch("user/signout", true)
-         this.$router.push("/signedout")
-      },
-      beforeEnter: function(el) {
-         el.style.height = '0'
-      },
-      enter: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      beforeLeave: function(el) {
-         el.style.height = el.scrollHeight + 'px'
-         this.expandedItem = el
-      },
-      leave: function(el) {
-         el.style.height = '0'
-      }
+   })
+}
+function linkClicked() {
+   noFocus.value = true
+}
+function isOpen( menuID ) {
+   let m = menuBar.value.find( mb => mb.id == menuID)
+   return m.expanded
+}
+function libServiceClicked(serviceName) {
+   resetMenus()
+   analytics.trigger('Navigation', 'LIBRARY_SERVICE_CLICKED', serviceName)
+}
+function alertClicked() {
+   alertStore.clearSeenAlerts()
+}
+function nextMenu() {
+   closeSubMenus()
+   menuBarIdx.value++
+   if (menuBarIdx.value == menuBar.value.length) {
+      menuBarIdx.value = 0
    }
+   setMenuFocus()
+}
+function prevMenu() {
+   closeSubMenus()
+   menuBarIdx.value--
+   if (menuBarIdx.value < 0) {
+      menuBarIdx.value = menuBar.value.length - 1
+   }
+   setMenuFocus()
+}
+function toggleSubMenu( targetMenu ) {
+   if ( targetMenu ) {
+      menuBarIdx.value = menuBar.value.findIndex( mb => mb.id == targetMenu)
+   }
+   let menu = menuBar.value[menuBarIdx.value]
+   if ( menu.submenu.length == 0) {
+      return
+   }
+   menu.expanded = !menu.expanded
+   menu.subMenuIdx = 0
+   setMenuFocus()
+}
+function nextSubMenu() {
+   let currMenu = menuBar.value[menuBarIdx.value]
+   if ( currMenu.submenu.length == 0) {
+      return
+   }
+   if ( currMenu.expanded ) {
+      currMenu.subMenuIdx++
+   } else {
+      currMenu.expanded = true
+   }
+   if ( currMenu.subMenuIdx == currMenu.submenu.length) {
+      currMenu.subMenuIdx = 0
+   }
+   setMenuFocus()
+}
+function prevSubMenu() {
+   let currMenu = menuBar.value[menuBarIdx.value]
+   if ( currMenu.submenu.length == 0) {
+      return
+   }
+   if ( currMenu.expanded ) {
+      currMenu.subMenuIdx--
+   } else {
+      currMenu.expanded = true
+   }
+   if ( currMenu.subMenuIdx < 0) {
+      currMenu.subMenuIdx = currMenu.submenu.length-1
+   }
+   setMenuFocus()
+}
+function setMenuFocus() {
+   if ( noFocus.value === true) {
+      noFocus.value = false
+      return
+   }
+   let menu = menuBar.value[menuBarIdx.value]
+   if (menu.submenu.length == 0 || menu.expanded == false) {
+      document.getElementById(menu.id).focus({preventScroll:true})
+   } else {
+      nextTick( () => {
+         let subMenuEle = document.getElementById(menu.submenu[menu.subMenuIdx])
+         subMenuEle.focus({preventScroll:true})
+      })
+   }
+}
+function searchClicked() {
+   results.resetSearch()
+   window.scrollTo({
+      top: 0,
+      behavior: "auto"
+   })
+}
+
+function signOut() {
+   userStore.signout(true)
+}
+function beforeEnter(el) {
+   el.style.height = '0'
+}
+function enter(el) {
+   el.style.height = el.scrollHeight + 'px'
+}
+function beforeLeave(el) {
+   el.style.height = el.scrollHeight + 'px'
+}
+function leave(el) {
+   el.style.height = '0'
 }
 </script>
 

@@ -1,9 +1,9 @@
 <template>
-   <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened" @show-forgot-password="refs.forgotPassword.show()"
+   <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened"
       firstFocusID="userId" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`">
       <template v-slot:button>
-         <V4Button mode="text" @click="$refs.forgotPassword.show()" :id="`${id}-open`">
+         <V4Button mode="text" @click="forgotPassword.show()" :id="`${id}-open`">
             Forgot your password?
          </V4Button>
       </template>
@@ -18,16 +18,15 @@
            <div class="password-reset-form pure-form">
               <div>
                <label for="userId">Library ID</label>
-               <input id="userId" ref="userId" v-model="userId" />
+               <input id="userId" v-model="userId" />
               </div>
-                <p class="hint">Driver's License Number,<br>eg: A12345678</p>
-
+               <p class="hint">Driver's License Number,<br>eg: A12345678</p>
             </div>
             <p v-if="error" class="error" v-html="error"></p>
           </template>
       </template>
       <template v-slot:controls>
-         <V4Button  mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.forgotPassword.hide()" v-if="!emailSent">
+         <V4Button  mode="tertiary" :id="`${id}-cancelbtn`" @click="forgotPassword.hide()" v-if="!emailSent">
             Cancel
          </V4Button>
          <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
@@ -38,55 +37,59 @@
    </V4Modal>
 </template>
 
-<script>
-export default {
-   data: function() {
-      return {
-         id: "forgot-password",
-         userId: "",
-         emailSent: false,
-         error: "",
-         okDisabled: false
-      }
-   },
-   props: ['user'],
-   methods: {
-      opened(){
-         this.userId = this.user
-         this.emailSent = false
-         this.error = ""
-         this.okDisabled = false
-      },
-      backTabCP() {
-         this.$refs.forgotPassword.firstFocusBackTabbed()
-      },
-      nextTabOK() {
-         this.$refs.forgotPassword.lastFocusTabbed()
-      },
-      toggleOK(){
-         this.okDisabled = !this.okDisabled
-      },
-      okClicked() {
-         if (this.emailSent == true){
-           this.$refs.forgotPassword.hide()
-           return
-         }
+<script setup>
+import { useUserStore } from "@/stores/user"
+import { ref, watch } from 'vue'
 
-        this.toggleOK()
-        // Send email
-        this.$store.dispatch("user/forgotPassword", this.userId).then(() => {
-               this.emailSent = true
-            }).catch((e) => {
-               this.$refs.userId.focus()
-               this.error = "There's a problem with your account. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
-               if(e.response.data.message){
-                  this.error += e.response.data.message
-               }
-            }).finally(()=>{
-               this.toggleOK()
-            })
-      },
+const props = defineProps({
+   trigger: {
+      type: Boolean,
+      default: false,
+   },
+})
+
+watch(() => props.trigger, (newtrigger) => {
+   if ( newtrigger ) {
+      forgotPassword.value.show()
    }
+})
+
+const forgotPassword = ref(null)
+const id = ref("forgot-password")
+const userId = ref("")
+const emailSent = ref(false)
+const error = ref("")
+const okDisabled = ref(false)
+
+function opened() {
+   userId.value = ""
+   emailSent.value = false
+   error.value = ""
+   okDisabled.value = false
+}
+function nextTabOK() {
+   forgotPassword.value.lastFocusTabbed()
+}
+function toggleOK(){
+   okDisabled.value = !okDisabled.value
+}
+function okClicked() {
+   if (emailSent.value == true){
+      forgotPassword.value.hide()
+      return
+   }
+   const userStore = useUserStore()
+   toggleOK()
+   userStore.forgotPassword(userId.value).then(() => {
+      emailSent.value = true
+   }).catch((e) => {
+      error.value = "There's a problem with your account. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
+      if(e.response.data.message){
+         error.value += e.response.data.message
+      }
+   }).finally(()=>{
+      toggleOK()
+   })
 }
 </script>
 

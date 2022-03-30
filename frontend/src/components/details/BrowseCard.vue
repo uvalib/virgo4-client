@@ -1,109 +1,102 @@
 <template>
-   <div class="browse-card" :class="{current: current, list: mode!='gallery'}" :aria-current="current.toString()">
-      <i class="current fas fa-caret-down" v-if="current"></i>
-      <template v-if="mode=='gallery'">
+   <div class="browse-card" :class="{current: props.current, list: props.mode!='gallery'}" :aria-current="props.current.toString()">
+      <i class="current fas fa-caret-down" v-if="props.current"></i>
+      <template v-if="props.mode=='gallery'">
          <div class="thumb-wrap">
-            <span v-if="data.status=='ready'" class="vertical-spacer"></span>
-            <router-link @click="browseDetailClicked(data.id)" :to="`/sources/${pool}/items/${data.id}`" aria-hidden="true" tabindex="-1">
-               <template v-if="data.status=='ready' || data.status=='url'">
-                  <img  alt="" class="thumb" v-if="data.status=='ready'" :src="data.image_base64" />
-                  <img  alt="" class="thumb" v-if="data.status=='url'" :src="data.cover_image_url" />
+            <span v-if="props.data.status=='ready'" class="vertical-spacer"></span>
+            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" aria-hidden="true" tabindex="-1">
+               <template v-if="props.data.status=='ready' || props.data.status=='url'">
+                  <img  alt="" class="thumb" v-if="props.data.status=='ready'" :src="props.data.image_base64" />
+                  <img  alt="" class="thumb" v-if="props.data.status=='url'" :src="props.data.cover_image_url" />
                </template>
                <span class="no-thumb" v-else>
-                  <span class="title" v-html="$utils.truncateTitle(data.title)"></span>
+                  <span class="title" v-html="utils.truncateTitle(props.data.title)"></span>
                   <br/>
                   <span class="no">(No image available)</span>
                </span>
             </router-link>
          </div>
          <div class="details">
-            <span class="call">{{data.call_number}}</span>
-            <router-link @click="browseDetailClicked(data.id)" :to="`/sources/${pool}/items/${data.id}`" class="title">
-               {{$utils.truncateTitle(data.title)}}
+            <span class="call">{{props.data.call_number}}</span>
+            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" class="title">
+               {{utils.truncateTitle(props.data.title)}}
             </router-link>
-            <span class="year">[{{data.published_date}}]</span>
-            <span class="loc">{{data.location}}</span>
+            <span class="year">[{{props.data.published_date}}]</span>
+            <span class="loc">{{props.data.location}}</span>
          </div>
          <div class="bm-control">
-            <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
-               @clicked="bookmarkClicked(data.id)"
+            <AddBookmark v-if="user.isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${props.data.id}`"
+               @clicked="bookmarkClicked(props.data.id)"
             />
-            <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
+            <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${props.data.id}`" act="bookmark" />
          </div>
       </template>
       <template v-else>
          <div class="list details">
-            <span class="index">{{index}}.</span>
+            <span class="index">{{props.index}}.</span>
             <span class="stuff">
-               <router-link @click="browseDetailClicked(data.id)" :to="`/sources/${pool}/items/${data.id}`" class="title">
-                  {{$utils.truncateTitle(data.title)}}
+               <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" class="title">
+                  {{utils.truncateTitle(props.data.title)}}
                </router-link>
-               <span class="year">[{{data.published_date}}]</span>
+               <span class="year">[{{props.data.published_date}}]</span>
                <span class="callinfo">
-                  {{data.call_number}}&nbsp;&nbsp;
-                  <template v-if="data.location">
-                     <span class="bar">|&nbsp;&nbsp;</span><span class="list-loc">{{data.location}}</span>
+                  {{props.data.call_number}}&nbsp;&nbsp;
+                  <template v-if="props.data.location">
+                     <span class="bar">|&nbsp;&nbsp;</span><span class="list-loc">{{props.data.location}}</span>
                   </template>
                </span>
             </span>
             <span class="listbm">
-               <AddBookmark v-if="isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`"
-                  @clicked="bookmarkClicked(data.id)"
+               <AddBookmark v-if="user.isSignedIn" :data="bookmarkData(data)" :id="`sb-bm-modal-${props.data.id}`"
+                  @clicked="bookmarkClicked(props.data.id)"
                />
-               <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${data.id}`" act="bookmark" />
+               <SignInRequired v-else :data="bookmarkData(data)" :id="`sb-bm-modal-${props.data.id}`" act="bookmark" />
             </span>
          </div>
       </template>
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
+<script setup>
 import AddBookmark from "@/components/modals/AddBookmark.vue"
 import SignInRequired from "@/components/modals/SignInRequired.vue"
+import analytics from '@/analytics'
+import * as utils from '@/utils'
+import { useUserStore } from "@/stores/user"
 
-export default {
-   components: {
-      AddBookmark, SignInRequired
+const user = useUserStore()
+
+const props = defineProps({
+   current: {
+      type: Boolean,
+      required: true
    },
-   props: {
-      current: {
-         type: Boolean,
-         required: true
-      },
-      pool: {
-         type: String,
-         required: true
-      },
-      data: {
-         type: Object,
-         required: true
-      },
-      mode: {
-         type: String,
-         default: "gallery"
-      },
-      index: {
-         type: Number,
-         default: 0
-      }
+   pool: {
+      type: String,
+      required: true
    },
-   computed: {
-      ...mapGetters({
-         isSignedIn: 'user/isSignedIn',
-      }),
+   data: {
+      type: Object,
+      required: true
    },
-   methods: {
-      bookmarkData( item ) {
-         return {pool: this.pool, identifier: item.id, title: item.title, origin: "SHELF_BROWSE" }
-      },
-      browseDetailClicked(id) {
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_DETAIL_CLICKED', id)
-      },
-      bookmarkClicked(id) {
-         this.$analytics.trigger('ShelfBrowse', 'BROWSE_BOOKMARK_CLICKED', id)
-      },
+   mode: {
+      type: String,
+      default: "gallery"
+   },
+   index: {
+      type: Number,
+      default: 0
    }
+})
+
+function bookmarkData( item ) {
+   return {pool: props.pool, identifier: item.id, title: item.title, origin: "SHELF_BROWSE" }
+}
+function browseDetailClicked(id) {
+   analytics.trigger('ShelfBrowse', 'BROWSE_DETAIL_CLICKED', id)
+}
+function bookmarkClicked(id) {
+   analytics.trigger('ShelfBrowse', 'BROWSE_BOOKMARK_CLICKED', id)
 }
 </script>
 

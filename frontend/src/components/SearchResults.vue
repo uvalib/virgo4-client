@@ -1,18 +1,18 @@
 <template>
-   <PrintedSearchResults v-if="printing" />
+   <PrintedSearchResults v-if="systemStore.printing" />
    <div tabindex="-1" id="results-container"
       class="search-results" aria-describedby="search-summary"
    >
       <SearchSuggestions />
       <div class="results-header" role="heading" aria-level="2">
-         <template v-if="showSummary">
+         <template v-if="props.showSummary">
             <div id="search-summary" class="summary">
-               <div class="query">Showing {{$utils.formatNum(total)}} results for:</div>
+               <div class="query">Showing {{utils.formatNum(resultStore.total)}} results for:</div>
                <div class="qs">{{queryString}}</div>
             </div>
             <span class="buttons" role="toolbar">
                <V4Button mode="text" @click="resetSearch" >Reset Search</V4Button>
-               <SaveSearch v-if="isSignedIn"/>
+               <SaveSearch v-if="userStore.isSignedIn"/>
                <SignInRequired v-else id="save-signin-modal" act="save-search"/>
                <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
             </span>
@@ -24,22 +24,22 @@
          <div class="results-main">
             <div class="pool-tabs">
                <V4Button v-for="(r,idx) in sourceTabs" :key="idx"
-                  class="pool" v-bind:class="{showing: idx == selectedResultsIdx}"
+                  class="pool" v-bind:class="{showing: idx == resultStore.selectedResultsIdx}"
                   mode="text" @click="resultsButtonClicked(idx)"
                >
                   <span>
                      <span class="pool">{{r.pool.name}}</span>
-                     <span :aria-label="`has ${r.total} results`" class="total">({{$utils.formatNum(r.total) || '0'}})</span>
+                     <span :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</span>
                   </span>
                </V4Button>
-               <V4Select v-if="results.length > maxTabs" :selections="otherSources"
+               <V4Select v-if="resultStore.results.length > preferences.maxTabs" :selections="otherSources"
                   :background="otherSrcBkg" :color="otherSrcColor"
                   placeholder="More"
                   @changed="poolSelected"
-                  v-model="otherSrcSelection"/>
+                  v-model="resultStore.otherSrcSelection"/>
             </div>
-            <PoolResultDetail v-if="selectedResultsIdx > -1" />
-            <div  v-if="total == 0 && selectedResultsIdx == -1" class="none">
+            <PoolResultDetail v-if="resultStore.selectedResultsIdx > -1" />
+            <div  v-if="resultStore.total == 0 && resultStore.selectedResultsIdx == -1" class="none">
                No results found
             </div>
          </div>
@@ -47,174 +47,163 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
-import { mapFields } from 'vuex-map-fields'
+<script setup>
 import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
 import FacetSidebar from "@/components/FacetSidebar.vue"
 import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import SignInRequired from "@/components/modals/SignInRequired.vue"
-export default {
-   components: {
-      PoolResultDetail, FacetSidebar, SaveSearch, SearchSuggestions, SignInRequired, PrintedSearchResults
-   },
-   props: {
-      showSummary: { type: Boolean, default: true},
-   },
-   computed: {
-      ...mapGetters({
-         isSignedIn: 'user/isSignedIn',
-         rawQueryString: 'query/string',
-         filterQueryParam: 'filters/asQueryParam',
-         selectedResults: 'selectedResults',
-         hasSearchTemplate: 'preferences/hasSearchTemplate',
-      }),
-      ...mapState({
-         selectedResultsIdx: state=>state.selectedResultsIdx,
-         activeSort: state=>state.sort.activeSort,
-         total: state=>state.total,
-         results: state=>state.results,
-         searchMode: state=>state.query.mode,
-         maxTabs: state=>state.preferences.maxTabs,
-         searchTemplate: state=>state.preferences.searchTemplate,
-         printing: state=>state.system.printing,
-      }),
-      ...mapFields([
-        'otherSrcSelection'
-      ]),
-      showPrintButton() {
-         return this.selectedResults.pool.id=='uva_library' || this.selectedResults.pool.id=='articles'
-      },
-      queryString() {
-         return this.rawQueryString.replace(/\{|\}/g, "")
-      },
-      otherSrcBkg() {
-         if (this.otherSrcSelection.id == "") return "#FFF"
-         return "var(--uvalib-brand-blue)"
-      },
-      otherSrcColor() {
-         if (this.otherSrcSelection.id == "") return "#666"
-         return "white"
-      },
-      sourceTabs() {
-         if (this.results.length <= this.maxTabs) {
-            return this.results
-         }
-         return this.results.slice(0, this.maxTabs-1 )
-      },
-      otherSources() {
-         let opts = []
-         let others = this.results.slice(this.maxTabs-1).sort( (a,b) => {
-            if (a.pool.name < b.pool.name) return -1
-            if (a.pool.name > b.pool.name) return 1
-            return 0
-         })
+import * as utils from '../utils'
+import analytics from '@/analytics'
+import { useRouter, useRoute } from 'vue-router'
+import { computed, nextTick } from 'vue'
+import { useSystemStore } from "@/stores/system"
+import { useQueryStore } from "@/stores/query"
+import { useResultStore } from "@/stores/result"
+import { useFilterStore } from "@/stores/filter"
+import { useUserStore } from "@/stores/user"
+import { useSortStore } from "@/stores/sort"
+import { usePreferencesStore } from "@/stores/preferences"
 
-         others.forEach( r=>{
-            let name = `<span class='other-src'><span class='pool'>${r.pool.name}</span>`
-            if (this.poolFailed(r)) {
-               name += "<span class='total error'>Failed</span>"
-            } else if (this.wasPoolSkipped(r)) {
-               name += "<span class='total'>Skipped</span>"
-            } else {
-               let t = this.$utils.formatNum(r.total)
-               name += `<span class='total'>(${t || '0'})</span>`
-            }
-            name += "</span>"
-            opts.push({id: r.pool.id, name: name})
-         })
-         return opts
+const router = useRouter()
+const route = useRoute()
+const queryStore = useQueryStore()
+const resultStore = useResultStore()
+const systemStore = useSystemStore()
+const userStore = useUserStore()
+const preferences = usePreferencesStore()
+const sortStore = useSortStore()
+const filters = useFilterStore()
+
+const props = defineProps({
+   showSummary: { type: Boolean, default: true},
+})
+
+const showPrintButton = computed(()=>{
+   return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
+})
+const queryString = computed(()=>{
+   return queryStore.string.replace(/\{|\}/g, "")
+})
+const otherSrcBkg = computed(()=>{
+   if (resultStore.otherSrcSelection.id == "") return "#FFF"
+   return "var(--uvalib-brand-blue)"
+})
+const otherSrcColor = computed(()=>{
+   if (resultStore.otherSrcSelection.id == "") return "#666"
+   return "white"
+})
+const sourceTabs = computed(()=>{
+   if (resultStore.results.length <= preferences.maxTabs) {
+      return resultStore.results
+   }
+   return resultStore.results.slice(0, preferences.maxTabs-1 )
+})
+const otherSources = computed(()=>{
+   let opts = []
+   let others = resultStore.results.slice(preferences.maxTabs-1).sort( (a,b) => {
+      if (a.pool.name < b.pool.name) return -1
+      if (a.pool.name > b.pool.name) return 1
+      return 0
+   })
+
+   others.forEach( r=>{
+      let name = `<span class='other-src'><span class='pool'>${r.pool.name}</span>`
+      if (poolFailed(r)) {
+         name += "<span class='total error'>Failed</span>"
+      } else if (wasPoolSkipped(r)) {
+         name += "<span class='total'>Skipped</span>"
+      } else {
+         let t = utils.formatNum(r.total)
+         name += `<span class='total'>(${t || '0'})</span>`
       }
-   },
-   methods: {
-      printResults() {
-         this.$store.commit("system/setPrinting", true)
-         this.$nextTick( () => {
-            let contents = document.getElementById("print-results").innerHTML
-            let printFrame = document.createElement('iframe')
-            printFrame.name = "printFrame"
-            printFrame.style.position = "absolute"
-            printFrame.style.right = "1000000px"
-            document.body.appendChild(printFrame)
-            let frameDoc = printFrame.contentWindow.document
-            frameDoc.open()
-            frameDoc.write('<html lang="en"><head><title>Search Results</title>')
-            frameDoc.write('<link rel="stylesheet" type="text/css" href="/print.css"/>')
-            frameDoc.write('</head><body>')
-            frameDoc.write(contents)
-            frameDoc.write('</body></html>')
-            frameDoc.close()
-            setTimeout( () => {
-               window.frames["printFrame"].focus()
-               window.frames["printFrame"].print()
-               document.body.removeChild(printFrame)
-               this.$store.commit("system/setPrinting", false)
-            }, 500)
-         })
-      },
-      async resetSearch(){
-         this.$store.dispatch('resetSearch')
-         if ( this.searchMode == "basic") {
-            this.$router.push(`/search`)
-         } else {
-            this.$router.push('/search?mode=advanced')
-         }
-      },
-      updateURL( poolID) {
-         let query = Object.assign({}, this.$route.query)
-         query.pool = poolID
-         delete query.filter
-         delete query.sort
-         delete query.page
-         let fqp = this.filterQueryParam( poolID )
-         if (fqp.length > 0) {
-            query.filter = fqp
-         }
-         if (this.activeSort.length > 0) {
-            query.sort = this.activeSort
-         }
-         if (this.selectedResults.page > 0) {
-            query.page = this.selectedResults.page +1
-         }
-         if ( this.$route.query != query ) {
-            this.$router.push({query})
-         }
-      },
-      poolFailed(p) {
-         return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
-      },
-      wasPoolSkipped(p) {
-         return p.statusCode == 408 && p.total == 0
-      },
-      formatFilterValues(values) {
-         return values.join(", ")
-      },
+      name += "</span>"
+      opts.push({id: r.pool.id, name: name})
+   })
+   return opts
+})
 
-      resultsButtonClicked(resultIdx) {
-         if ( this.selectedResultsIdx != resultIdx) {
-            let r = this.results[resultIdx]
-            if ( this.poolFailed(r)) return
-            this.otherSrcSelection = {id:"", name:""}
-            this.poolSelected(r.pool.id)
-         }
-      },
+function printResults() {
+   systemStore.printing = true
+   nextTick( () => {
+      let contents = document.getElementById("print-results").innerHTML
+      let printFrame = document.createElement('iframe')
+      printFrame.name = "printFrame"
+      printFrame.style.position = "absolute"
+      printFrame.style.right = "1000000px"
+      document.body.appendChild(printFrame)
+      let frameDoc = printFrame.contentWindow.document
+      frameDoc.open()
+      frameDoc.write('<html lang="en"><head><title>Search Results</title>')
+      frameDoc.write('<link rel="stylesheet" type="text/css" href="/print.css"/>')
+      frameDoc.write('</head><body>')
+      frameDoc.write(contents)
+      frameDoc.write('</body></html>')
+      frameDoc.close()
+      setTimeout( () => {
+         window.frames["printFrame"].focus()
+         window.frames["printFrame"].print()
+         document.body.removeChild(printFrame)
+         systemStore.printing = false
+      }, 500)
+   })
+}
+async function resetSearch(){
+   resultStore.resetSearch()
+   if ( queryStore.mode == "basic") {
+      router.push(`/search`)
+   } else {
+      router.push('/search?mode=advanced')
+   }
+}
+function updateURL( poolID) {
+   let query = Object.assign({}, route.query)
+   query.pool = poolID
+   delete query.filter
+   delete query.sort
+   delete query.page
+   let fqp = filters.asQueryParam( poolID )
+   if (fqp.length > 0) {
+      query.filter = fqp
+   }
+   if (sortStore.activeSort.length > 0) {
+      query.sort = sortStore.activeSort
+   }
+   if (resultStore.selectedResults.page > 0) {
+      query.page = resultStore.selectedResults.page +1
+   }
+   if ( route.query != query ) {
+      router.push({query})
+   }
+}
+function poolFailed(p) {
+   return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
+}
+function wasPoolSkipped(p) {
+   return p.statusCode == 408 && p.total == 0
+}
 
-      poolSelected( id ) {
-         this.$analytics.trigger('Results', 'POOL_SELECTED', id)
+function resultsButtonClicked(resultIdx) {
+   if ( resultStore.selectedResultsIdx != resultIdx) {
+      let r = resultStore.results[resultIdx]
+      if ( poolFailed(r)) return
+      resultStore.otherSrcSelection = {id:"", name:""}
+      poolSelected(r.pool.id)
+   }
+}
 
-         let tgtIdx = this.results.findIndex( r => r.pool.id ==id )
-         if (tgtIdx > -1 ) {
-            this.$store.dispatch("selectPoolResults", tgtIdx)
-            let newPoolID = this.results[tgtIdx].pool.id
-            if ( this.$route.query.pool != newPoolID ) {
-               this.updateURL(newPoolID)
-            }
-         }
+function poolSelected( id ) {
+   analytics.trigger('Results', 'POOL_SELECTED', id)
+
+   let tgtIdx = resultStore.results.findIndex( r => r.pool.id ==id )
+   if (tgtIdx > -1 ) {
+      resultStore.selectPoolResults(tgtIdx)
+      let newPoolID = resultStore.results[tgtIdx].pool.id
+      if ( route.query.pool != newPoolID ) {
+         updateURL(newPoolID)
       }
-   },
+   }
 }
 </script>
 

@@ -1,31 +1,17 @@
-import { createStore } from 'vuex'
+import { defineStore } from 'pinia'
 import axios from 'axios'
 import analytics from '../analytics'
-import versionChecker from './plugins/version'
-import errorReporter from './plugins/error_reporter'
-import alerts from './modules/alerts'
-import bookmarks from './modules/bookmarks'
-import collection from './modules/collection'
-import system from './modules/system'
-import pools from './modules/pools'
-import user from './modules/user'
-import query from './modules/query'
-import filters from './modules/filters'
-import item from './modules/item'
-import reserves from './modules/reserves'
-import preferences from './modules/preferences'
-import feedback from './modules/feedback'
-import restore from './modules/restore'
-import requests from './modules/requests'
-import searches from './modules/searches'
-import shelf from './modules/shelf'
-import sort from './modules/sort'
 import * as utils from '../utils'
-import { getField, updateField } from 'vuex-map-fields'
+import { useSystemStore } from "@/stores/system"
+import { usePreferencesStore } from "@/stores/preferences"
+import { useSortStore } from "@/stores/sort"
+import { useQueryStore } from "@/stores/query"
+import { useFilterStore } from "@/stores/filter"
+import { useCollectionStore } from "@/stores/collection"
+import { usePoolStore } from "@/stores/pool"
 
-export default createStore({
-   state: {
-      pageTitle: "Search",
+export const useResultStore = defineStore('result', {
+   state: () => ({
       noSpinner: false,
       searching: false,
       pageSize: 20,
@@ -39,10 +25,9 @@ export default createStore({
       lastSearchScrollPosition: 0,
       lastSearchURL: "",
       otherSrcSelection: { id: "", name: "" },
-   },
+   }),
 
    getters: {
-      getField,
       selectedHit: state => {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
             return {}
@@ -53,17 +38,17 @@ export default createStore({
          }
          return hit
       },
-      nextHitAvailable: (state, getters) => {
+      nextHitAvailable(state) {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
-         return getters.selectedHit.number < getters.selectedResults.total
+         return this.selectedHit.number < this.selectedResults.total
       },
-      prevHitAvailable: (state, getters) => {
+      prevHitAvailable(state) {
          if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
             return false
          }
-         return getters.selectedHit.number > 1
+         return this.selectedHit.number > 1
       },
       hasResults: state => {
          return state.total >= 0
@@ -91,122 +76,86 @@ export default createStore({
       },
    },
 
-   mutations: {
-      updateField,
-      setPageTitle(state, title) {
-         state.pageTitle = title
-      },
-      hitSelected(state, identifier) {
-         state.selectedHitIdx = -1
-         state.selectedHitGroupIdx = -1
-         if ( state.selectedResultsIdx == -1) return
+   actions: {
+      hitSelected(identifier) {
+         this.selectedHitIdx = -1
+         this.selectedHitGroupIdx = -1
+         if ( this.selectedResultsIdx == -1) return
 
-         state.results[state.selectedResultsIdx].hits.some( (h,idx) => {
+         this.results[this.selectedResultsIdx].hits.some( (h,idx) => {
             if (h.identifier == identifier) {
-               state.selectedHitIdx = idx
+               this.selectedHitIdx = idx
             } else if ( h.grouped == true) {
                let gIdx = h.group.findIndex( g => g.identifier == identifier)
                if ( gIdx > -1 ) {
-                  state.selectedHitIdx = idx
-                  state.selectedHitGroupIdx = gIdx
+                  this.selectedHitIdx = idx
+                  this.selectedHitGroupIdx = gIdx
                }
             }
-            return state.selectedHitIdx != -1
+            return this.selectedHitIdx != -1
           })
-          if ( state.selectedHitIdx != -1 ) {
+          if ( this.selectedHitIdx != -1 ) {
              // this also gets called on from details page. Only update last if route is home or search
             if (this.router.currentRoute.value.path == "/search" ||  this.router.currentRoute.value.path == "/") {
-               state.lastSearchURL = this.router.currentRoute.value.fullPath
-               state.lastSearchScrollPosition = window.scrollY
+               this.lastSearchURL = this.router.currentRoute.value.fullPath
+               this.lastSearchScrollPosition = window.scrollY
             }
           }
       },
-      nextHit(state) {
-         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) return
-         let currHit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
-         if ( currHit.grouped) {
-            if ( state.selectedHitGroupIdx == currHit.group.length-1) {
-               state.selectedHitIdx++
-               state.selectedHitGroupIdx = -1
-            } else {
-               state.selectedHitGroupIdx++
-            }
-         } else {
-            state.selectedHitIdx++
-         }
-      },
-      priorHit(state) {
-         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) return
-         let currHit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
+      priorHit() {
+         if ( this.selectedResultsIdx == -1 || this.selectedHitIdx == -1) return
+         let currHit = this.results[this.selectedResultsIdx].hits[this.selectedHitIdx]
 
          // are we currently on a grouped result and not on the head?
-         if ( currHit.grouped && state.selectedHitGroupIdx >= 0) {
+         if ( currHit.grouped && this.selectedHitGroupIdx >= 0) {
             // just go to prior item in the group
-            state.selectedHitGroupIdx--
+            this.selectedHitGroupIdx--
          } else {
             // paging back to a new hit; must check if it is grouped and select
             // the last member of the group if so
-            state.selectedHitGroupIdx = -1
-            state.selectedHitIdx--
-            currHit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
+            this.selectedHitGroupIdx = -1
+            this.selectedHitIdx--
+            currHit = this.results[this.selectedResultsIdx].hits[this.selectedHitIdx]
             if ( currHit.grouped ) {
-               state.selectedHitGroupIdx = currHit.group.length-1
+               this.selectedHitGroupIdx = currHit.group.length-1
             }
          }
       },
-      setAutoExpandGroupID(state, id) {
-         state.autoExpandGroupID = id
+      setAutoExpandGroupID(id) {
+         this.autoExpandGroupID = id
       },
-      setSearching(state, flag) {
-         if (state.noSpinner) {
-            state.noSpinner = false
+      setSearching(flag) {
+         if (this.noSpinner) {
+            this.noSpinner = false
          } else {
-            state.searching = flag
+            this.searching = flag
          }
       },
-      updateOtherPoolLabel(state) {
+      updateOtherPoolLabel() {
          // when a pool is selected from the 'Other' tab and a filter has been applied
          // this method method is used to update the count in the tab label
-         if (state.otherSrcSelection.id == "") return
-         let res = state.results.find(r => r.pool.id == state.otherSrcSelection.id)
+         if (this.otherSrcSelection.id == "") return
+         let res = this.results.find(r => r.pool.id == this.otherSrcSelection.id)
          let name = `<span class='pool'>${res.pool.name}</span>`
          name += `<span class='total'>${res.total} hits</span>`
-         state.otherSrcSelection.name = name
+         this.otherSrcSelection.name = name
       },
 
-      selectPoolResults(state, data) {
-         let resultIdx = data.resultIdx
-         let maxTabs = data.maxTabs
-         let otherIdx = maxTabs - 2 // -1 xero index and -1 for 'other'
-         state.selectedResultsIdx = resultIdx
-
-         if (resultIdx > otherIdx && state.otherSrcSelection.id == "") {
-            // this happens when a search is restored. otherSrcSelection is used
-            // to drive the selected option in the other sources tab. Make sure it is
-            /// set correctly
-            let r = state.results[resultIdx]
-            let name = `<span class='pool'>${r.pool.name}</span>`
-            name += `<span class='total'>${r.total} hits</span>`
-            let sel = { id: r.pool.id, name: name, disabled: false }
-            state.otherSrcSelection = sel
-         }
-      },
-
-      clearSelectedPoolResults(state) {
+      clearSelectedPoolResults() {
          // When the results are cleared, reset pagination, remove pool
          // total from overal total and reset pool total to 0
-         let tgtPool = state.results[state.selectedResultsIdx]
+         let tgtPool = this.results[this.selectedResultsIdx]
          let oldPoolTotal = tgtPool.total
          tgtPool.total = 0
          tgtPool.page = 0
-         state.results[state.selectedResultsIdx].hits = []
-         state.total -= oldPoolTotal
-         state.lastSearchScrollPosition = 0
-         state.lastSearchURL = ""
+         this.results[this.selectedResultsIdx].hits = []
+         this.total -= oldPoolTotal
+         this.lastSearchScrollPosition = 0
+         this.lastSearchURL = ""
       },
 
-      addPoolSearchResults(state, poolResults) {
-         let tgtPool = state.results[state.selectedResultsIdx]
+      addPoolSearchResults(poolResults) {
+         let tgtPool = this.results[this.selectedResultsIdx]
          if ( !tgtPool) {
             let result = {
                pool: poolResults.pool,
@@ -217,17 +166,17 @@ export default createStore({
                hits: [],
                statusCode: poolResults.status_code, statusMessage: poolResults.status_msg
             }
-            state.results.push(result)
-            state.selectedResultsIdx = 0
-            state.otherSrcSelection = { id: "", name: "" }
-            state.total = poolResults.pagination.total
-            tgtPool = state.results[0]
+            this.results.push(result)
+            this.selectedResultsIdx = 0
+            this.otherSrcSelection = { id: "", name: "" }
+            this.total = poolResults.pagination.total
+            tgtPool = this.results[0]
          } else {
             // Update total
             tgtPool.total = poolResults.pagination.total
             // Only update overall total when paging if searching 1 pool.
-            if(state.results.length == 1){
-               state.total = poolResults.pagination.total
+            if(this.results.length == 1){
+               this.total = poolResults.pagination.total
             }
          }
          let lastHit = tgtPool.hits[tgtPool.hits.length-1]
@@ -247,7 +196,7 @@ export default createStore({
          if (tgtPool.total == 0) {
             // if pool total is zero add the new results total to overall
             tgtPool.total = poolResults.pagination.total
-            state.total += poolResults.pagination.total
+            this.total += poolResults.pagination.total
          }
 
          if (poolResults.group_list) {
@@ -270,14 +219,15 @@ export default createStore({
          }
       },
 
-      setSearchResults(state, data) {
+      setSearchResults(data, tgtPool) {
          // this is called from top level search; resets results from all pools
-         state.total = -1
-         state.results.splice(0, state.results.length)
+         const pools = usePoolStore()
+         this.total = -1
+         this.results.splice(0, this.results.length)
          let firstPoolWithHits = -1
          let tgtPoolIdx = -1
 
-         data.results.pool_results.forEach((pr, idx) => {
+         data.pool_results.forEach((pr, idx) => {
             if (!pr.group_list) {
                pr.group_list = []
             }
@@ -287,12 +237,12 @@ export default createStore({
 
             // if a preffered pool was set in prefs (or url) track its index in results
             // so it can be selected after all results are updated
-            if (pr.pool_id == data.tgtPool) {
+            if (pr.pool_id == tgtPool) {
                tgtPoolIdx = idx
             }
 
             // Find the pool the results are associated with and populate some top level response info
-            let pool = data.results.pools.find(p => p.id == pr.pool_id)
+            let pool = data.pools.find(p => p.id == pr.pool_id)
             let result = {
                pool: pool, sort: pr.sort, total: pr.pagination.total, page: 0, timeMS: pr.elapsed_ms,
                hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg
@@ -305,7 +255,7 @@ export default createStore({
             // record list is a list of fields in the hit. field is {name,label,type,value,visibility,display}
             pr.group_list.forEach(group => {
 
-               let poolObj = state.pools.list.find( p => p.id == pr.pool_id)
+               let poolObj = pools.list.find( p => p.id == pr.pool_id)
 
                // for each hit in the list, merge repeated fields into arrays, pull out
                // key fields like identifer to top-level named field and split others into basic and detail
@@ -329,86 +279,79 @@ export default createStore({
                }
             })
 
-            state.results.push(result)
+            this.results.push(result)
          })
 
          if (tgtPoolIdx > -1) {
-            state.selectedResultsIdx = tgtPoolIdx
+            this.selectedResultsIdx = tgtPoolIdx
          } else {
             if (firstPoolWithHits == -1) {
                firstPoolWithHits = 0
             }
-            state.selectedResultsIdx = firstPoolWithHits
-            state.otherSrcSelection = { id: "", name: "" }
+            this.selectedResultsIdx = firstPoolWithHits
+            this.otherSrcSelection = { id: "", name: "" }
          }
 
-         state.total = data.results.total_hits
+         this.total = data.total_hits
       },
 
-      setSuggestions(state, data) {
-         state.suggestions.splice(0, state.suggestions.length)
+      setSuggestions(data) {
+         this.suggestions.splice(0, this.suggestions.length)
          data.forEach(d => {
-            state.suggestions.push(d)
+            this.suggestions.push(d)
          })
       },
 
-      incrementPage(state) {
-         state.noSpinner = true
-         state.results[state.selectedResultsIdx].page++
+      setPage(pageOveride) {
+         this.noSpinner = true
+         this.results[this.selectedResultsIdx].page = pageOveride
       },
 
-      setPage(state, pageOveride) {
-         state.noSpinner = true
-         state.results[state.selectedResultsIdx].page = pageOveride
+      resetSearchResults() {
+         this.results.splice(0, this.results.length)
+         this.total = -1
+         this.lastSearchScrollPosition = 0
+         this.lastSearchURL = ""
+         this.selectedHitIdx = -1
+         this.selectedHitGroupIdx = -1
+         this.selectedResultsIdx = -1
+         this.otherSrcSelection = { id: "", name: "" }
       },
 
-      resetSearchResults(state) {
-         state.results.splice(0, state.results.length)
-         state.total = -1
-         state.lastSearchScrollPosition = 0
-         state.lastSearchURL = ""
-         state.selectedHitIdx = -1
-         state.selectedHitGroupIdx = -1
-         state.selectedResultsIdx = -1
-         state.otherSrcSelection = { id: "", name: "" }
-      },
-      clearLastSearch(state) {
-         state.lastSearchScrollPosition = 0
-         state.lastSearchURL = ""
-      },
-   },
-
-   actions: {
-      resetSearch( ctx ) {
-         ctx.commit("resetSearchResults")
-         ctx.commit('query/resetAdvancedForm')
-         ctx.commit('query/clear')
-         ctx.commit('filters/reset')
-         ctx.commit('sort/reset')
-         ctx.commit("collection/clearCollectionDetails")
-         if ( ctx.rootGetters["preferences/hasSearchTemplate"] ) {
-            ctx.commit("query/setTemplate", ctx.rootState.preferences.searchTemplate)
+      resetSearch() {
+         const query = useQueryStore()
+         const prefs = usePreferencesStore()
+         this.resetSearchResults()
+         query.resetAdvancedForm()
+         query.clear()
+         useFilterStore().reset()
+         useSortStore().reset()
+         useCollectionStore().clearCollectionDetails()
+         if ( prefs.hasSearchTemplate ) {
+            query.setTemplate(prefs.searchTemplate)
          }
       },
-      async moreResults(ctx) {
-         ctx.commit('incrementPage')
-         let sr = ctx.rootGetters.selectedResults
+
+      async moreResults() {
+         this.noSpinner = true
+         this.results[this.selectedResultsIdx].page++
+         let sr = this.selectedResults
          let params = {
             pool: sr.pool,
             page: sr.page
          }
-         await ctx.dispatch("searchPool", params)
+         await this.searchPool(params)
       },
-      async nextHit(ctx) {
-         if ( ctx.state.selectedHitIdx == -1 || ctx.state.selectedResultsIdx == -1 ) return
+      async nextHit() {
+         if ( this.selectedHitIdx == -1 || this.selectedResultsIdx == -1 ) return
 
          // is this the last hit in the currently available results?
-         let tgtResults = ctx.getters.selectedResults
-         if ( ctx.state.selectedHitIdx == tgtResults.hits.length-1 ) {
-            if (ctx.getters.hasMoreHits == false) {
-               let currHit= ctx.getters.selectedHit
+         let tgtResults = this.selectedResults
+         if ( this.selectedHitIdx == tgtResults.hits.length-1 ) {
+            if (this.hasMoreHits == false) {
+               let currHit= this.selectedHit
                if (currHit.grouped ) {
-                  if (ctx.state.selectedHitGroupIdx == currHit.group.length-1 ) {
+                  if (this.selectedHitGroupIdx == currHit.group.length-1 ) {
                      // last grouped hit. done
                      return
                   }
@@ -417,53 +360,67 @@ export default createStore({
                   return
                }
             } else {
-               await ctx.dispatch( "moreResults")
+               await this.moreResults()
             }
          }
 
-         ctx.commit("nextHit")
+         if ( this.selectedResultsIdx == -1 || this.selectedHitIdx == -1) return
+         let currHit = this.results[this.selectedResultsIdx].hits[this.selectedHitIdx]
+         if ( currHit.grouped) {
+            if ( this.selectedHitGroupIdx == currHit.group.length-1) {
+               this.selectedHitIdx++
+               this.selectedHitGroupIdx = -1
+            } else {
+               this.selectedHitGroupIdx++
+            }
+         } else {
+            this.selectedHitIdx++
+         }
 
-      },
-      async priorHit(ctx) {
-         ctx.commit("priorHit")
       },
 
       // Search ALL configured pools. This is the initial search call using only the basic or
       // advanced search parameters and will always start at page 1.
-      // CTX: commit: ƒ boundCommit(type, payload, options)
-      async searchAllPools({ state, commit, rootState, rootGetters, dispatch }) {
-         commit('system/clearMessage')
+      async searchAllPools() {
+         const system = useSystemStore()
+         const query = useQueryStore()
+         const filters = useFilterStore()
+         const poolStore = usePoolStore()
+         const sorting = useSortStore()
+
+         system.clearMessage()
          let req = {
-            query: rootGetters['query/string'],
-            pagination: { start: 0, rows: state.pageSize },
-            filters: rootGetters['filters/allPoolFilters'],
-            pool_sorting: rootState.sort.pools
+            query: query.string,
+            pagination: { start: 0, rows: this.pageSize },
+            filters: filters.allPoolFilters,
+            pool_sorting: sorting.pools
          }
 
          if (req.query == "") {
-            let err = {message: 'EMPTY QUERY', caller: 'searchAllPools', query: rootGetters['query/getState']}
-            dispatch("system/reportError", err)
+            let err = {message: 'EMPTY QUERY', caller: 'searchAllPools', query: query.stateObject}
+            system.reportError(err)
          }
 
-         commit('setSearching', true)
-         commit("clearLastSearch")
+         this.setSearching(true)
+         this.lastSearchScrollPosition = 0
+         this.lastSearchURL = ""
 
          // POST the search query and wait for the response
-         await axios.post(`${rootState.system.searchAPI}/api/search`, req).then((response) => {
-            commit('pools/setPools', response.data.pools)
-            commit('setSearchResults', { results: response.data, tgtPool: rootState.query.targetPool })
-            commit('sort/setActivePool', state.results[state.selectedResultsIdx].pool.id)
-            commit('setSuggestions', response.data.suggestions)
-            if (state.otherSrcSelection.id != "") {
-               commit('updateOtherPoolLabel')
+         await axios.post(`${system.searchAPI}/api/search`, req).then((response) => {
+            poolStore.setPools(response.data.pools)
+            this.setSearchResults( response.data, query.targetPool )
+            sorting.setActivePool( this.results[this.selectedResultsIdx].pool.id )
+            this.setSuggestions(response.data.suggestions)
+            if (this.otherSrcSelection.id != "") {
+               this.updateOtherPoolLabel()
             }
-            commit('setSearching', false)
+            this.setSearching(false)
             if ( response.data.total_hits == 0) {
                analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
             }
          }).catch((error) => {
             console.error("SEARCH FAILED: " + error)
-            commit('setSearching', false)
+            this.setSearching(false)
             if (error.response && error.response.status != 401) {
                if (error.response && error.response.data && error.response.data.message) {
                   let msg =  error.response.data.message
@@ -473,12 +430,11 @@ export default createStore({
                      message: msg,
                      detail: error.response.data.details
                   }
-                  commit('system/setSearchError', err)
+                  system.setSearchError(err)
                } else {
                   let msg = "System error, we regret the inconvenience. If this problem persists, "
                   msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-                  commit('system/setError', msg)
-                  dispatch("system/reportError", error)
+                  system.setError(msg)
                }
             }
          })
@@ -486,52 +442,58 @@ export default createStore({
 
       // searchPool wil search only the pool specified. It can be used to filter, sort and page
       // existing results or as a standalone query to a single pool
-      async searchPool({ state, commit, rootState, rootGetters, dispatch }, params) {
-         commit('setSearching', true)
-         let filters = rootGetters['filters/poolFilter'](params.pool.id)
-         let sort = rootGetters['sort/poolSort'](params.pool.id)
+      async searchPool(params) {
+         const system = useSystemStore()
+         const query = useQueryStore()
+         const filterStore = useFilterStore()
+         const poolStore = usePoolStore()
+         const sortStore = useSortStore()
+
+         this.setSearching(true)
+         let filters = filterStore.poolFilter(params.pool.id)
+         let sort = sortStore.poolSort(params.pool.id)
          let filterObj = { pool_id: params.pool.id, facets: filters }
          let startPage = params.page
          if (!startPage) {
             startPage = 0
          }
-         let pagination = { start: startPage * state.pageSize, rows: state.pageSize }
+         let pagination = { start: startPage * this.pageSize, rows: this.pageSize }
 
          let req = {
-            query: rootGetters['query/string'],
+            query: query.string,
             pagination: pagination,
             sort: sort,
             filters: [filterObj]
          }
 
          if (req.query == "") {
-            let err = {message: 'EMPTY QUERY', caller: 'searchSelectedPool', query: rootGetters['query/getState']}
-            dispatch("system/reportError", err)
+            let err = {message: 'EMPTY QUERY', caller: 'searchSelectedPool', query: query.stateObject}
+            system.reportError(err)
          }
 
          let url = params.pool.url + "/api/search"
          await axios.post(url, req).then( response => {
             if ( startPage == 0 ) {
                // when single pool seach is called to start a search, pool is required in response.
-               let pool = rootState.pools.list.find( p => p.id == params.pool.id)
+               let pool = poolStore.list.find( p => p.id == params.pool.id)
                response.data.pool = pool
             }
 
             // Note: for pagination, filtering, etc, the existing pool results will be appended.
             // if this is a direct single pool search, there will be no existing results. This call
             // will create them.
-            commit('addPoolSearchResults', response.data)
+            this.addPoolSearchResults(response.data)
             if ( response.data.pagination.total == 0 ) {
                analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
             }
 
-            commit('setSearching', false)
-            if (state.otherSrcSelection.id != "") {
-               commit('updateOtherPoolLabel')
+            this.setSearching(false)
+            if (this.otherSrcSelection.id != "") {
+               this.updateOtherPoolLabel()
             }
          }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
-            commit('setSearching', false)
+            this.setSearching(false)
             if (error.response && error.response.status == 400) {
                let msg = "This query is malformed or unsupported. Please ensure that all quotes and parenthesis are matched."
                msg += "<p>We regret the inconvenience. If this problem persists, "
@@ -539,48 +501,36 @@ export default createStore({
                let err = {
                   message: msg,
                }
-               commit('system/setSearchError', err)
+               system.setSearchError(err)
             } else if (error.response && error.response.status != 401) {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-               commit('system/setError', msg)
-               dispatch("system/reportError", error)
+               system.setError(msg)
             }
          })
       },
 
       // Select pool results and get all facet info for the result
-      selectPoolResults(ctx, resultIdx) {
-         if (ctx.state.selectedResultsIdx != resultIdx) {
-            let data = {resultIdx: resultIdx, maxTabs: ctx.rootState.preferences.maxTabs }
-            ctx.commit('selectPoolResults', data)
-            ctx.commit('sort/setActivePool', ctx.state.results[ctx.state.selectedResultsIdx].pool.id)
+      selectPoolResults(resultIdx) {
+         if (this.selectedResultsIdx != resultIdx) {
+            const preferences = usePreferencesStore()
+            let otherIdx = preferences.maxTabs - 2 // -1 xero index and -1 for 'other'
+            this.selectedResultsIdx = resultIdx
+
+            if (resultIdx > otherIdx && this.otherSrcSelection.id == "") {
+               // this happens when a search is restored. otherSrcSelection is used
+               // to drive the selected option in the other sources tab. Make sure it is
+               /// set correctly
+               let r = this.results[resultIdx]
+               let name = `<span class='pool'>${r.pool.name}</span>`
+               name += `<span class='total'>${r.total} hits</span>`
+               let sel = { id: r.pool.id, name: name, disabled: false }
+               this.otherSrcSelection = sel
+            }
+
+            const sortStore = useSortStore()
+            sortStore.setActivePool(this.results[this.selectedResultsIdx].pool.id)
          }
       },
    },
-
-   modules: {
-      alerts: alerts,
-      bookmarks: bookmarks,
-      collection: collection,
-      filters: filters,
-      item: item,
-      pools: pools,
-      preferences: preferences,
-      query: query,
-      reserves: reserves,
-      system: system,
-      user: user,
-      feedback: feedback,
-      restore: restore,
-      requests: requests,
-      searches: searches,
-      shelf: shelf,
-      sort: sort,
-   },
-
-   plugins: [
-      versionChecker,
-      errorReporter
-   ]
 })

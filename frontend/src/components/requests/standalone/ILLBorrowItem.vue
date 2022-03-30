@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2 v-if="prefill==false">ILL Borrow Item Request</h2>
+      <h2 v-if="props.refill==false">ILL Borrow Item Request</h2>
       <div class="scan pure-form">
          <div class="entry pure-control-group">
             <label for="doctype">What would you like to borrow?<span class="required">*</span></label>
@@ -88,124 +88,117 @@
             <label for="doctype">Preferred pickup location<span class="required">*</span></label>
             <select v-model="request.pickup" id="pickup">
                <option value="">Select a location</option>
-               <option v-for="l in pickupLibraries" :key="l.id" :value="l.id">{{l.name}}</option>
+               <option v-for="l in user.libraries" :key="l.id" :value="l.id">{{l.name}}</option>
             </select>
             <span v-if="hasError('pickup')" class="error">Pickup location is required</span>
          </div>
       </div>
-      <div v-if="request.pickup == 'LEO' && (noILLiadAccount==true || leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
+      <div v-if="request.pickup == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
          It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
          <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
       </div>
       <div class="controls">
-         <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
+         <V4Button mode="tertiary" id="scan-cancel" @click="emit('canceled')">
             Cancel
          </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="buttonDisabled">
+         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="requestStore.buttonDisabled">
             Submit
          </V4Button>
       </div>
    </div>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-export default {
-   props: {
-      prefill: {
-         type: Boolean,
-         default: false
-      },
+<script setup>
+import { ref, onMounted } from "vue"
+import analytics from '@/analytics'
+import { useItemStore } from "@/stores/item"
+import { useUserStore } from "@/stores/user"
+import { usePreferencesStore } from "@/stores/preferences"
+import { useRequestStore } from "@/stores/request"
+
+const props = defineProps({
+   prefill: {
+      type: Boolean,
+      default: false
    },
-   data: function()  {
-      return {
-         error: "",
-         errors: [],
-         required: ['doctype', 'date', 'title', 'year', 'anyLanguage', 'pickup'],
-         request: {
-            borrowType: "ITEM",
-            doctype: "",
-            date: "",
-            title: "",
-            author: "",
-            publisher: "",
-            volume: "",
-            year: "",
-            edition: "",
-            issn: "",
-            oclc: "",
-            cited: "",
-            anyLanguage: "",
-            notes: "",
-            pickup: "",
-         }
-      }
-   },
-   computed: {
-      ...mapState({
-         buttonDisabled: state => state.requests.buttonDisabled,
-         preferredPickupLibrary: state => state.preferences.pickupLibrary,
-         noILLiadAccount: state => state.user.noILLiadAccount,
-         leoAddress: state => state.user.accountInfo.leoAddress,
-         details : state => state.item.details,
-      }),
-      ...mapGetters({
-         pickupLibraries: "user/libraries",
-         generalFormat: "item/generalFormat"
-      })
-   },
-   methods: {
-      async submitClicked() {
-         this.errors.splice(0, this.errors.length)
-         for (let [key, value] of Object.entries(this.request)) {
-            if ( this.required.includes(key) && value == "") {
-               this.errors.push(key)
-            }
-         }
-         let d = new Date(this.request.date).toLocaleDateString("en-US")
-         if ( d == "Invalid Date" ){
-            this.errors.push('date')
-         }
-         if (this.errors.length > 0) {
-            let tgtID = this.errors[0]
-            if (tgtID == "anyLanguage") {
-               tgtID = "any-language-yes"
-            }
-            let first = document.getElementById(tgtID)
-            if ( first ) {
-               first.focus()
-            }
-         } else {
-            await this.$store.dispatch("requests/submitILLiadBorrowRequest", this.request)
-            this.$emit('submitted', {title: this.request.title, pickup: this.request.pickup})
-         }
-      },
-      hasError( val) {
-         return this.errors.includes(val)
-      },
-   },
-   created() {
-      this.request.pickup = this.preferredPickupLibrary.id
-      if ( this.prefill ) {
-         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
-         if (this.generalFormat == "Book") {
-            this.request.doctype = "Book"
-         }
-         this.request.title = this.details.header.title
-         this.request.author = this.details.header.author.value.join("; ")
-         let isbnF = this.details.basicFields.find( f => f.name == "isbn")
-         if (isbnF) {
-            this.request.issn = isbnF.value.join(", ")
-         }
-         let pubF = this.details.basicFields.find( f => f.name == "publication_date")
-         if (pubF) {
-            this.request.year = pubF.value
-         }
-      } else {
-         this.$analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
+})
+const emit = defineEmits( ['submitted', 'canceled'] )
+
+const item = useItemStore()
+const user = useUserStore()
+const preferences = usePreferencesStore()
+const requestStore = useRequestStore()
+
+const required = ['doctype', 'date', 'title', 'year', 'anyLanguage', 'pickup']
+const errors = ref([])
+const request = ref({
+   borrowType: "ITEM",
+   doctype: "",
+   date: "",
+   title: "",
+   author: "",
+   publisher: "",
+   volume: "",
+   year: "",
+   edition: "",
+   issn: "",
+   oclc: "",
+   cited: "",
+   anyLanguage: "",
+   notes: "",
+   pickup: "",
+})
+
+async function submitClicked() {
+   errors.value.splice(0, errors.value.length)
+   for (let [key, value] of Object.entries(request.value)) {
+      if ( required.includes(key) && value == "") {
+         errors.value.push(key)
       }
    }
+   let d = new Date(request.value.date).toLocaleDateString("en-US")
+   if ( d == "Invalid Date" ){
+      errors.value.push('date')
+   }
+   if (errors.value.length > 0) {
+      let tgtID = errors.value[0]
+      if (tgtID == "anyLanguage") {
+         tgtID = "any-language-yes"
+      }
+      let first = document.getElementById(tgtID)
+      if ( first ) {
+         first.focus()
+      }
+   } else {
+      await requestStore.submitILLiadBorrowRequest(request.value)
+      emit('submitted', {title: request.value.title, pickup: request.value.pickup})
+   }
 }
+function hasError( val) {
+   return errors.value.includes(val)
+}
+
+onMounted(()=>{
+   request.value.pickup = preferences.pickupLibrary.id
+   if ( props.prefill ) {
+      analytics.trigger('Requests', 'REQUEST_STARTED', "illiadWorldcatBorrow")
+      if (item.generalFormat == "Book") {
+         request.value.doctype = "Book"
+      }
+      request.value.title = item.details.header.title
+      request.value.author = item.details.header.author.value.join("; ")
+      let isbnF = item.details.basicFields.find( f => f.name == "isbn")
+      if (isbnF) {
+         request.value.issn = isbnF.value.join(", ")
+      }
+      let pubF = item.details.basicFields.find( f => f.name == "publication_date")
+      if (pubF) {
+         request.value.year = pubF.value
+      }
+   } else {
+      analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
+   }
+})
 </script>
 
 <style lang="scss" scoped>

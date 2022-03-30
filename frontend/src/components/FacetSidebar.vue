@@ -4,20 +4,20 @@
          :background="filterColor"
          color="white" :expanded="startExpanded"
          borderColor="var(--uvalib-brand-blue)"
-         :layoutChange="updatingFacets"  :invert="!startExpanded">
+         :layoutChange="filterStore.updatingFacets"  :invert="!startExpanded">
          <template v-slot:title>{{poolFilterTitle}}</template>
 
          <div v-if="!hasFacets" class="none">
-            {{selectedResults.pool.name}} does not support filtering
+            {{resultStore.selectedResults.pool.name}} does not support filtering
          </div>
          <div v-else class="body">
-            <div v-if="updatingFacets" class="working">
+            <div v-if="filterStore.updatingFacets" class="working">
                <V4Spinner message="Loading filters..."/>
             </div>
             <div v-if="facets.length == 0" class="none">
                Filters are not available for this search
             </div>
-            <dl v-else>
+            <dl v-else-if="filterStore.updatingFacets == false">
                <template v-for="facetInfo in facets" :key="facetInfo.id">
                   <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
                   <div role="group" :aria-labelledby="facetInfo.id">
@@ -26,9 +26,9 @@
                            @click="filterClicked(facetInfo.id, fv.value)">
                            {{fv.value}}
                         </V4Checkbox>
-                        <span class="cnt" v-if="$utils.formatNum(fv.count)">({{$utils.formatNum(fv.count)}})</span>
+                        <span class="cnt" v-if="utils.formatNum(fv.count)">({{utils.formatNum(fv.count)}})</span>
                      </dd>
-                     <dd v-if="facetValuesCount(facetInfo) > 5" :key="moreKey(facetInfo.id)">
+                     <dd v-if="facetValuesCount(facetInfo) > 5" :key="`more${facetInfo.id}`">
                         <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
                            <template v-slot:title>
                               <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
@@ -38,7 +38,7 @@
                                  @click="filterClicked(facetInfo.id, fv.value)">
                                  {{fv.value}}
                               </V4Checkbox>
-                              <span class="cnt">({{$utils.formatNum(fv.count)}})</span>
+                              <span class="cnt">({{utils.formatNum(fv.count)}})</span>
                            </div>
                            <template v-slot:footer>
                               <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
@@ -53,90 +53,76 @@
    </section>
 </template>
 
-<script>
-import { mapState, mapGetters } from "vuex"
-import { mapFields } from 'vuex-map-fields'
+<script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
-export default {
-   components: {
-      AccordionContent
-   },
-   computed: {
-      ...mapState({
-         results: state => state.results,
-         updatingFacets: state => state.filters.updatingFacets,
-         displayWidth: state => state.system.displayWidth,
-      }),
-      ...mapGetters({
-          allFacets: 'filters/poolFacets',
-          selectedResults: 'selectedResults',
-          filterQueryParam: 'filters/asQueryParam',
-          facetSupport: 'pools/facetSupport',
-      }),
-      ...mapFields({
-        userSearched: 'query.userSearched'
-      }),
-      hasFacets() {
-         return this.facetSupport(this.selectedResults.pool.id)
-      },
-      filterColor() {
-         if ( !this.startExpanded ) {
-            return "var(--uvalib-brand-blue)"
-         }
-         return "var(--uvalib-brand-blue)"
-      },
-      startExpanded() {
-         return this.displayWidth > 810
-      },
-      poolFilterTitle() {
-         if ( !this.startExpanded ) {
-            return `Filter ${this.selectedResults.pool.name}`
-         }
-         return `Filter ${this.selectedResults.pool.name} By`
-      },
-      facets() {
-         return this.allFacets(this.selectedResults.pool.id).filter( f=> f.hidden !== true && f.na !== true)
-      },
-   },
-   methods: {
-      facetValuesCount(facet) {
-         if (!facet.buckets) return 0
-         return facet.buckets.filter(b=>b.value && b.na != true).length
-      },
-      facetValues(facet, start, end) {
-         if (!facet.buckets) return []
-         let out = facet.buckets.filter(b=> b.value && b.na != true).slice(start,end)
-         return out
-      },
-      moreKey(id) {
-         return "more"+id
-      },
-      valueKey(idx, facetID) {
-         return facetID+"_val_"+idx
-      },
-      addFilterToURL() {
-         // changing the filter resetes paging
-         let query = Object.assign({}, this.$route.query)
-         delete query.page
-         let fqp = this.filterQueryParam( this.selectedResults.pool.id )
-         if (fqp.length == 0) {
-            delete query.filter
-         } else if ( this.$route.query.filter != fqp ) {
-            query.filter = fqp
-         }
-         this.$router.push({ query })
-      },
-      filterClicked(facetID,value) {
-         let data = {pool: this.selectedResults.pool.id, facetID: facetID, value: value}
-         this.toggleFacet(data)
-      },
-      async toggleFacet(data) {
-         this.$store.commit("filters/toggleFilter", data)
-         this.$store.commit("clearSelectedPoolResults")
-         this.userSearched = true
-         this.addFilterToURL()
-      },
+import { computed } from 'vue'
+import { useQueryStore } from "@/stores/query"
+import { useResultStore } from "@/stores/result"
+import { useFilterStore } from "@/stores/filter"
+import { useSystemStore } from "@/stores/system"
+import { usePoolStore } from "@/stores/pool"
+import { useRouter, useRoute } from 'vue-router'
+import * as utils from '../utils'
+
+const route = useRoute()
+const router = useRouter()
+const queryStore = useQueryStore()
+const resultStore = useResultStore()
+const filterStore = useFilterStore()
+const system = useSystemStore()
+const poolStore = usePoolStore()
+
+const hasFacets = computed(()=>{
+   return poolStore.facetSupport(resultStore.selectedResults.pool.id)
+})
+const filterColor = computed(()=>{
+   if ( !startExpanded.value ) {
+      return "var(--uvalib-brand-blue)"
    }
+   return "var(--uvalib-brand-blue)"
+})
+const startExpanded = computed(()=>{
+   return system.displayWidth > 810
+})
+const poolFilterTitle = computed(()=>{
+   if ( !startExpanded.value ) {
+      return `Filter ${resultStore.selectedResults.pool.name}`
+   }
+   return `Filter ${resultStore.selectedResults.pool.name} By`
+})
+const facets = computed(()=>{
+   return filterStore.poolFacets(resultStore.selectedResults.pool.id).filter( f=> f.hidden !== true && f.na !== true)
+})
+
+function facetValuesCount(facet) {
+   if (!facet.buckets) return 0
+   return facet.buckets.filter(b=>b.value && b.na != true).length
+}
+function facetValues(facet, start, end) {
+   if (!facet.buckets) return []
+   let out = facet.buckets.filter(b=> b.value && b.na != true).slice(start,end)
+   return out
+}
+function valueKey(idx, facetID) {
+   return facetID+"_val_"+idx
+}
+function addFilterToURL() {
+   // changing the filter resetes paging
+   let query = Object.assign({}, route.query)
+   delete query.page
+   let fqp = filterStore.asQueryParam( resultStore.selectedResults.pool.id )
+   if (fqp.length == 0) {
+      delete query.filter
+   } else if ( route.query.filter != fqp ) {
+      query.filter = fqp
+   }
+   router.push({ query })
+}
+async function filterClicked(facetID,value) {
+   filterStore.toggleFilter(resultStore.selectedResults.pool.id, facetID, value)
+   resultStore.clearSelectedPoolResults()
+   queryStore.userSearched = true
+   addFilterToURL()
 }
 </script>
 <style lang="scss" scoped>

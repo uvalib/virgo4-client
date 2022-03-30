@@ -1,10 +1,10 @@
 <template>
    <div class="item-view">
       <div class="detail-header">
-         <span v-if="selectedHitIdx > -1" class="hidden-spacer"></span>
-         <span class="paging" v-if="selectedHitIdx > -1">
-            <V4Pager :total="selectedResults.total" :page="selectedHit.number"
-               :prevAvailable="prevHitAvailable" :nextAvailable="nextHitAvailable"
+         <span v-if="resultStore.selectedHitIdx > -1" class="hidden-spacer"></span>
+         <span class="paging" v-if="resultStore.selectedHitIdx > -1">
+            <V4Pager :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
+               :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
                @next="nextHitClicked" @prior="priorHitClicked"
             />
             <div class="back">
@@ -16,7 +16,7 @@
          <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source" from="DETAIL"/>
          <abbr class="unapi-id" :title="details.itemURL"></abbr>
          <div class="info">
-            <div v-if="itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="itemMessage(details.source)">
+            <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
             </div>
             <dl class="fields">
                <template v-if="details.header.author">
@@ -45,10 +45,10 @@
                         </a>
                      </span>
                      <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
-                        :text="$utils.fieldValueString(field)" :limit="fieldLimit(field)" />
+                        :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
                   </dd>
                </template>
-               <template v-if="accessURLField && !isKiosk">
+               <template v-if="accessURLField && !system.isKiosk">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
                      <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
@@ -77,15 +77,14 @@
       </div>
       <DigitalContent />
       <template v-if="details.source != 'images'">
-         <Availability v-if="hasAvailability(details.source)" :titleId="details.identifier" />
-         <InterLibraryLoan v-if="hasInterLibraryLoan(details.source)" />
+         <Availability v-if="poolStore.hasAvailability(details.source)" :titleId="details.identifier" />
+         <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
          <ShelfBrowse v-if="!details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
       </template>
    </div>
 </template>
 
-<script>
-import { mapGetters,mapState } from "vuex"
+<script setup>
 import SearchHitHeader from "@/components/SearchHitHeader.vue"
 import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
@@ -98,130 +97,108 @@ import V4Pager from "@/components/V4Pager.vue"
 import CitationsList from "@/components/details/CitationsList.vue"
 import ShelfBrowse from "@/components/details/ShelfBrowse.vue"
 import DigitalContent from "@/components/details/DigitalContent.vue"
+import analytics from '@/analytics'
+import * as utils from '@/utils'
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useItemStore } from "@/stores/item"
+import { usePoolStore } from "@/stores/pool"
+import { useResultStore } from "@/stores/result"
+import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
 
-export default {
-   name: "item-view",
-   data: function() {
-      return {
-         browseTarget: ""
-      };
-   },
-   components: {
-      SearchHitHeader, Availability, TruncatedText, V4Pager, ShelfBrowse, DigitalContent,
-      AccordionContent, AccessURLDetails, V4LinksList, CitationsList, InterLibraryLoan
-   },
-   computed: {
-      ...mapState({
-         details : state => state.item.details,
-         googleBooksURL : state => state.item.googleBooksURL,
-         activeRequest: state => state.restore.activeRequest,
-         citationsURL: state => state.system.citationsURL,
-         pools: state => state.pools.list,
-         selectedHitIdx: state=> state.selectedHitIdx,
-         lastSearchURL: state => state.lastSearchURL,
-         searchAPI: state=>state.system.searchAPI,
-      }),
-      ...mapGetters({
-         isAdmin: 'user/isAdmin',
-         isKiosk: 'system/isKiosk',
-         poolDetails: 'pools/poolDetails',
-         nextHitAvailable: 'nextHitAvailable',
-         prevHitAvailable: 'prevHitAvailable',
-         selectedHit: 'selectedHit',
-         selectedResults: 'selectedResults',
-         itemMessage:  'pools/itemMessage',
-         hasAvailability:  'pools/hasAvailability',
-         hasInterLibraryLoan:  'pools/hasInterLibraryLoan',
-      }),
-      risURL() {
-         if (this.citationsURL == "") return ""
-         return `${this.citationsURL}/format/ris?item=${encodeURI(this.details.itemURL)}`
-      },
-      allFields() {
-         return [...this.details.basicFields.concat(this.details.detailFields)]
-      },
-      allDisplayFields() {
-         return this.allFields.filter(f => this.shouldDisplay(f))
-      },
-      accessURLField() {
-         return this.allFields.find(f => f.name=="access_url")
-      },
-      hasExtLink() {
-         let idx = this.allFields.findIndex( f=> f.name=="sirsi_url")
-         if (idx == -1) {
-             idx = this.allFields.findIndex( f=> f.name=="worldcat_url")
-         }
-         return idx > -1
-      },
-      extDetailURL() {
-         let extLink = this.allFields.find( f=> f.name=="sirsi_url")
-         if (!extLink) {
-             extLink = this.allFields.find( f=> f.name=="worldcat_url")
-         }
-         return extLink.value
-      },
-      marcXML() {
-         if ( !this.isAdmin ) return ""
-         let xml = this.allFields.find( f => f.type == "marc-xml")
-         if ( !xml) return ""
-         return beautify(xml.value).trim()
-      }
-   },
-   methods: {
-      returnToSearch() {
-         this.$router.push( this.lastSearchURL )
-      },
-      async nextHitClicked() {
-         await this.$store.dispatch("nextHit")
-         let url = this.$route.fullPath
-         let lastSlash = url.lastIndexOf("/")
-         url = url.substring(0,lastSlash )+"/"+this.selectedHit.identifier
-         this.$router.push(url)
-      },
-      async priorHitClicked() {
-         await this.$store.dispatch("priorHit")
-         let url = this.$route.fullPath
-         let lastSlash = url.lastIndexOf("/")
-         url = url.substring(0,lastSlash )+"/"+this.selectedHit.identifier
-         this.$router.push(url)
-      },
-      copyrightIconSrc( info ) {
-         let details = this.poolDetails(this.details.source)
-         return details.url+info.icon
-      },
-      extDetailClicked() {
-         this.$analytics.trigger('Results', 'MORE_DETAILS_CLICKED', this.details.identifier)
-      },
-      downloadRISClicked() {
-         this.$analytics.trigger('Export', 'RIS_FROM_DETAIL', this.details.identifier)
-      },
-      getBrowseLinks( name, values ) {
-         let out = []
-         values.forEach( v => {
-            let qp = `${name}: {"${encodeURIComponent(v)}"}`
-            let link = {label: v, url: `/search?mode=advanced&q=${qp}`}
-            out.push(link)
-         })
-         return out
-      },
-      shouldDisplay(field) {
-         if ( field.display == 'availability') return false
-         if (field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
-             field.type == "access-url" || field.type == "sirsi-url" ||
-             field.name.includes("_download_url")  ) {
-            return false
-         }
+const router = useRouter()
+const route = useRoute()
+const item = useItemStore()
+const poolStore = usePoolStore()
+const resultStore = useResultStore()
+const system = useSystemStore()
+const user = useUserStore()
+const browseTarget = ref("")
 
-         if ( this.isKiosk &&  field.type == "related-url" ) return false
-         return true
-      },
-      fieldLimit( field ) {
-         if (field.name == "subject_summary" ) {
-            return 900
-         }
-         return 300
-      },
-   },
+// details : state => state.item.details,
+const details = computed(()=>{
+   return item.details
+})
+const allFields = computed(()=>{
+   return [...details.value.basicFields.concat(details.value.detailFields)]
+})
+const allDisplayFields = computed(()=>{
+   return allFields.value.filter(f => shouldDisplay(f))
+})
+const accessURLField = computed(()=>{
+   return allFields.value.find(f => f.name=="access_url")
+})
+const hasExtLink = computed(()=>{
+   let idx = allFields.value.findIndex( f=> f.name=="sirsi_url")
+   if (idx == -1) {
+         idx = allFields.value.findIndex( f=> f.name=="worldcat_url")
+   }
+   return idx > -1
+})
+const extDetailURL = computed(()=>{
+   let extLink = allFields.value.find( f=> f.name=="sirsi_url")
+   if (!extLink) {
+         extLink = allFields.value.find( f=> f.name=="worldcat_url")
+   }
+   return extLink.value
+})
+const marcXML = computed(()=>{
+   if ( !user.isAdmin ) return ""
+   let xml = allFields.value.find( f => f.type == "marc-xml")
+   if ( !xml) return ""
+   return beautify(xml.value).trim()
+})
+
+function returnToSearch() {
+   router.push( resultStore.lastSearchURL )
+}
+async function nextHitClicked() {
+   await resultStore.nextHit()
+   let url = route.fullPath
+   let lastSlash = url.lastIndexOf("/")
+   url = url.substring(0,lastSlash )+"/"+resultStore.selectedHit.identifier
+   router.push(url)
+}
+async function priorHitClicked() {
+   await resultStore.priorHit()
+   let url = route.fullPath
+   let lastSlash = url.lastIndexOf("/")
+   url = url.substring(0,lastSlash )+"/"+resultStore.selectedHit.identifier
+   router.push(url)
+}
+function copyrightIconSrc( info ) {
+   let poolDetail = poolStore.poolDetails(details.value.source)
+   return poolDetail.url+info.icon
+}
+function extDetailClicked() {
+   analytics.trigger('Results', 'MORE_DETAILS_CLICKED', details.value.identifier)
+}
+function getBrowseLinks( name, values ) {
+   let out = []
+   values.forEach( v => {
+      let qp = `${name}: {"${encodeURIComponent(v)}"}`
+      let link = {label: v, url: `/search?mode=advanced&q=${qp}`}
+      out.push(link)
+   })
+   return out
+}
+function shouldDisplay(field) {
+   if ( field.display == 'availability') return false
+   if (field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
+         field.type == "access-url" || field.type == "sirsi-url" ||
+         field.name.includes("_download_url")  ) {
+      return false
+   }
+
+   if ( system.isKiosk &&  field.type == "related-url" ) return false
+   return true
+}
+function fieldLimit( field ) {
+   if (field.name == "subject_summary" ) {
+      return 900
+   }
+   return 300
 }
 </script>
 <style lang="scss" scoped>

@@ -1,22 +1,21 @@
 <template>
    <div id="active-panel" ref="activePanel" >
       <V4Button mode="tertiary" v-if="showReset()" class="reset" @click="reset" v-html="resetLabel()"></V4Button>
-      <OptionsPanel v-if="requests.activePanel == 'OptionsPanel'" />
-      <SignInPanel v-if="requests.activePanel == 'SignInPanel'" />
-      <PlaceHoldPanel v-if="requests.activePanel == 'PlaceHoldPanel'" />
-      <PDAPanel v-if="requests.activePanel == 'PDAPanel'" />
-      <ConfirmationPanel v-if="requests.activePanel == 'ConfirmationPanel'" />
-      <AeonPanel v-if="requests.activePanel == 'AeonPanel'" />
-      <ScanPanel v-if="requests.activePanel == 'ScanPanel'" />
-      <VideoReservePanel v-if="requests.activePanel == 'VideoReservePanel'" />
-      <ReservedPanel v-if="requests.activePanel == 'ReservedPanel'" />
-      <p class="error" v-if="requests.alertText" >{{requests.alertText}}</p>
+      <OptionsPanel v-if="requestStore.activePanel == 'OptionsPanel'" />
+      <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" />
+      <PlaceHoldPanel v-if="requestStore.activePanel == 'PlaceHoldPanel'" />
+      <PDAPanel v-if="requestStore.activePanel == 'PDAPanel'" />
+      <ConfirmationPanel v-if="requestStore.activePanel == 'ConfirmationPanel'" />
+      <AeonPanel v-if="requestStore.activePanel == 'AeonPanel'" />
+      <ScanPanel v-if="requestStore.activePanel == 'ScanPanel'" />
+      <VideoReservePanel v-if="requestStore.activePanel == 'VideoReservePanel'" />
+      <ReservedPanel v-if="requestStore.activePanel == 'ReservedPanel'" />
+      <p class="error" v-if="requestStore.alertText" >{{requestStore.alertText}}</p>
    </div>
 </template>
 
-<script>
-import { mapFields } from "vuex-map-fields"
-import { mapGetters } from "vuex";
+<script setup>
+import { onMounted, ref } from 'vue'
 import OptionsPanel from "./panels/OptionsPanel.vue"
 import SignInPanel from "./panels/SignInPanel.vue"
 import PlaceHoldPanel from "./panels/PlaceHoldPanel.vue"
@@ -26,77 +25,64 @@ import ScanPanel from "./panels/ScanPanel.vue"
 import VideoReservePanel from "./panels/VideoReservePanel.vue"
 import ConfirmationPanel from "./panels/ConfirmationPanel.vue"
 import ReservedPanel from "./panels/ReservedPanel.vue"
+import { useRequestStore } from "@/stores/request"
+import { useUserStore } from "@/stores/user"
+import { useRestoreStore } from "@/stores/restore"
+import { usePreferencesStore } from "@/stores/preferences"
 
-export default {
-   props: {
-      titleId: String,
-   },
-   components: {
-      OptionsPanel, SignInPanel, PlaceHoldPanel, PDAPanel, ConfirmationPanel, AeonPanel,ScanPanel, VideoReservePanel, ReservedPanel
-   },
+const user = useUserStore()
+const restore = useRestoreStore()
+const preferences = usePreferencesStore()
+const requestStore = useRequestStore()
 
-   computed: {
-      ...mapFields(['requests', 'item/availability' ]),
-      ...mapGetters({
-         isSignedIn: 'user/isSignedIn',
-         isAdmin: 'user/isAdmin',
-         restoredPanel: 'restore/activeRequest',
-         findOption: "requests/findOption",
-      }),
+const activePanel = ref(null)
 
-   },
-   async mounted() {
-      if ( this.isSignedIn) {
-         await this.$store.dispatch("preferences/loadPreferences")
+onMounted(async ()=>{
+   if ( user.isSignedIn) {
+      await preferences.loadPreferences()
+   }
+   requestStore.reset()
+   let restoredPanel = restore.activeRequest
+   if ( restoredPanel ) {
+      requestStore.activePanel = restoredPanel
+      let optionSettings = requestStore.findOption(restoredPanel)
+      if (optionSettings) {
+         requestStore.activeOption = optionSettings
+      } else {
+         // selected option not found
+         requestStore.alertText = "Sorry, the selected request type ("+restoredPanel.replace('Panel','')+") is not available for your account."
+         requestStore.activePanel = 'OptionsPanel'
       }
-      this.$store.commit('requests/reset')
-      this.restore()
-   },
-   methods: {
-      restore(){
-         let restoredPanel = this.$store.state.restore.activeRequest
-         if (restoredPanel) {
-            this.requests.activePanel = restoredPanel
-            let optionSettings = this.findOption(restoredPanel)
-            if (optionSettings){
-               this.requests.activeOption = optionSettings
-            } else {
-               // selected option not found
-               this.requests.alertText = "Sorry, the selected request type ("+restoredPanel.replace('Panel','')+") is not available for your account."
-               this.requests.activePanel = 'OptionsPanel'
-            }
-            let requestPanel = this.$refs.activePanel
-            requestPanel.scrollIntoView({behavior: 'smooth', block: 'center'})
-            this.$store.commit("restore/clear")
-         }
-         if (!this.requests.activePanel){
-            this.requests.activePanel = 'OptionsPanel'
-         }
-      },
-      reset(){
-         this.$store.commit('requests/reset')
-         setTimeout( () => {
-            let opts = document.getElementsByClassName("option-button")
-            if (opts.length > 0) {
-               opts[0].focus()
-            }
-         },150)
-      },
-      showReset(){
-         // Don't show reset on first and last panel
-         return !['OptionsPanel'].includes(this.requests.activePanel)
-      },
-      resetLabel(){
-            if (this.requests.activePanel == 'ConfirmationPanel' || this.requests.activePanel == "ReservedPanel"){
-               return "Back"
-            }else{
-               return "Reset"
-            }
-      }
-   },
+      let requestPanel = activePanel.value
+      requestPanel.scrollIntoView({behavior: 'smooth', block: 'center'})
+      restore.clear()
+   }
+   if (!requestStore.activePanel){
+      requestStore.activePanel = 'OptionsPanel'
+   }
+})
 
+function reset() {
+   requestStore.reset()
+   setTimeout( () => {
+      let opts = document.getElementsByClassName("option-button")
+      if (opts.length > 0) {
+         opts[0].focus()
+      }
+   },150)
+}
+function showReset() {
+   return requestStore.activePanel != "OptionsPanel"
+}
+function resetLabel() {
+   if (requestStore.activePanel == 'ConfirmationPanel' || requestStore.activePanel == "ReservedPanel"){
+      return "Back"
+   } else {
+      return "Reset"
+   }
 }
 </script>
+
 <style lang="scss" scoped>
 #active-panel {
    padding: 10px;

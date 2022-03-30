@@ -1,22 +1,22 @@
 <template>
    <div class="checkout">
       <V4Spinner v-if="downloading" message="Downloading..." v-bind:overlay="true" />
-      <RenewSummary v-if="hasRenewSummary"/>
-      <SignInRequired v-if="isSignedIn == false" targetPage="checkout information"/>
-      <template v-if="isSignedIn">
+      <RenewSummary v-if="userStore.hasRenewSummary"/>
+      <SignInRequired v-if="userStore.isSignedIn == false" targetPage="checkout information"/>
+      <template v-if="userStore.isSignedIn">
          <AccountActivities />
-         <V4Spinner v-if="renewing" message="Renew in progress..." v-bind:overlay="true" />
+         <V4Spinner v-if="userStore.renewing" message="Renew in progress..." v-bind:overlay="true" />
          <div class="details">
-            <div class="barred" v-if="isBarred">
+            <div class="barred" v-if="userStore.isBarred">
                Your account is suspended until all bills are paid and/or the overdue items are returned.<br/>
                If you need assistance, please email <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
             </div>
-            <div v-if="lookingUpUVA == false && ilsError" class="error">
-               {{ilsError}}
+            <div v-if="lookingUpUVA == false && systemStore.ilsError" class="error">
+               {{systemStore.ilsError}}
             </div>
             <div class="checkout-tabs">
                <V4Button mode="primary" @click="visibleTab = 'uva'" v-bind:class="{active: visibleTab == 'uva'}">
-                  UVA Checkouts ({{checkouts.length}})
+                  UVA Checkouts ({{userStore.checkouts.length}})
                   <V4Spinner v-if="lookingUpUVA" size="12px"/>
                </V4Button>
                <V4Button mode="primary" @click="visibleTab = 'ill'" v-bind:class="{active: visibleTab == 'ill'}">
@@ -25,7 +25,7 @@
                </V4Button>
             </div>
             <template v-if="lookingUpUVA == false && visibleTab == 'uva'">
-               <div v-if="lookingUpUVA == false && checkouts.length == 0 && !ilsError" class="none">
+               <div v-if="lookingUpUVA == false && userStore.checkouts.length == 0 && !systemStore.ilsError" class="none">
                   You have no UVA checkouts.
                </div>
 
@@ -33,7 +33,7 @@
                   <div class="controls">
                      <span class="sort">
                         <label>Sort by</label>
-                        <select v-model="checkoutsOrder" @change="sortChanged">
+                        <select v-model="userStore.checkoutsOrder" @change="sortChanged">
                            <option value="AUTHOR_ASC">Author (Ascending)</option>
                            <option value="AUTHOR_DESC">Author (Descending)</option>
                            <option value="TITLE_ASC">Title (Ascending)</option>
@@ -44,7 +44,7 @@
                         </select>
                      </span>
                      <span class="checkout-options">
-                        <V4Button v-if="checkouts.length" id="download-csv-btn"
+                        <V4Button v-if="userStore.checkouts.length" id="download-csv-btn"
                            mode="icon"
                            @click="downloadCSV()"
                            title="Download your checkouts as a CSV file" >
@@ -54,7 +54,7 @@
 
                      </span>
                   </div>
-                  <div class="item" v-for="(co,idx) in checkouts" :key="idx">
+                  <div class="item" v-for="(co,idx) in userStore.checkouts" :key="idx">
                      <h3 class="item-title">
                         <i v-if="itemOnNotice(co)" class="notice fas fa-exclamation-triangle"></i>
                         <template v-if="co.id">
@@ -80,7 +80,7 @@
                         {{co.message}}
                      </div>
                      <div class="renewbar">
-                        <V4Button v-if="!isBarred" mode="primary"
+                        <V4Button v-if="!userStore.isBarred" mode="primary"
                            @click="renewItem(co.barcode)" class="renew"
                            :aria-label="`renew ${co.title}`"
                         >
@@ -125,99 +125,77 @@
    </div>
 </template>
 
-<script>
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
-import { mapFields } from 'vuex-map-fields'
-import AccountActivities from "@/components/AccountActivities.vue"
+<script setup>
+import SignInRequired from "@/components/account/SignInRequired.vue"
+import AccountActivities from "@/components/account/AccountActivities.vue"
 import RenewSummary from "@/components/modals/RenewSummary.vue"
-export default {
-   name: "checkouts",
-   components: {
-      AccountActivities,RenewSummary
-   },
-   data: function() {
-      return {
-         lookingUpUVA: true,
-         downloading: false,
-         visibleTab: "uva",
-      }
-   },
-   computed: {
-      ...mapState({
-         userID: state => state.user.userID,
-         requests: state => state.user.requests,
-         ilsError: state => state.system.ilsError,
-         renewing: state => state.user.renewing,
-         lookingUpILL: state => state.user.lookingUp,
-      }),
-      ...mapGetters({
-        isBarred: 'user/isBarred',
-        isSignedIn: 'user/isSignedIn',
-        hasRenewSummary: 'user/hasRenewSummary'
-      }),
-      ...mapFields({
-         checkoutsOrder: 'user.checkoutsOrder',
-         checkouts: 'user.checkouts'
-      }),
-      illiadCheckouts() {
-         return this.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
-      },
-   },
-   methods: {
-      renewURL(item) {
-         return `https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${item.transactionNumber}`
-      },
-      signInClicked() {
-         this.$router.push("/signin")
-      },
-      sortChanged() {
-         this.$store.commit("user/sortCheckouts", this.checkoutsOrder)
-      },
-      renewItem(barcode) {
-         this.$store.dispatch("user/renewItem", barcode)
-      },
-      renewAll() {
-         this.$store.dispatch("user/renewAll")
-      },
-      async downloadCSV(){
-         this.downloading = true
-         await this.$store.dispatch("user/downloadCheckoutsCSV")
-         this.downloading = false
-      },
-      formatILLDate(dateStr) {
-         if (!dateStr) {
-            return "N/A"
-         }
-         return dateStr.split("T")[0]
-      },
-      formatDueInfo(checkout) {
-         let out =  `<div>${checkout.due.split("T")[0]}</div>`
-         if (checkout.overdue) {
-            out += "<div class='overdue'>Overdue</div>"
-         }
-         if ( checkout.recallDate != "") {
-             out += `<div class='recall'>Recalled ${checkout.recallDate}</div>`
-         }
-         return out
-      },
-      itemOnNotice(co) {
-         return co.overdue || co.recallDate != ""
-      }
-   },
-   async created() {
-      this.lookingUpUVA = false
-      if ( this.isSignedIn ) {
-         this.$analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
-         this.lookingUpUVA = true
-         if (this.$route.query.overdue) {
-            this.checkoutsOrder = "OVERDUE"
-         }
-         await this.$store.dispatch("user/getCheckouts")
-         this.lookingUpUVA = false
-      }
-   }
+import { ref, computed, onMounted } from 'vue'
+import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
+import analytics from '@/analytics'
+import { useRoute } from 'vue-router'
+
+const systemStore = useSystemStore()
+const userStore = useUserStore()
+const route = useRoute()
+const lookingUpUVA = ref(true)
+const downloading = ref(false)
+const visibleTab = ref("uva")
+const lookingUpILL = computed(() => userStore.lookingUp)
+const illiadCheckouts = computed(()=>{
+   return userStore.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
+})
+
+function renewURL(item) {
+   return `https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${item.transactionNumber}`
 }
+function sortChanged() {
+   userStore.sortCheckouts(userStore.checkoutsOrder)
+}
+function renewItem(barcode) {
+   userStore.renewItem(barcode)
+}
+function renewAll() {
+   userStore.renewAll()
+}
+async function downloadCSV(){
+   downloading.value = true
+   await userStore.downloadCheckoutsCSV()
+   downloading.value = false
+}
+function formatILLDate(dateStr) {
+   if (!dateStr) {
+      return "N/A"
+   }
+   return dateStr.split("T")[0]
+}
+function formatDueInfo(checkout) {
+   let out =  `<div>${checkout.due.split("T")[0]}</div>`
+   if (checkout.overdue) {
+      out += "<div class='overdue'>Overdue</div>"
+   }
+   if ( checkout.recallDate != "") {
+      out += `<div class='recall'>Recalled ${checkout.recallDate}</div>`
+   }
+   return out
+}
+function itemOnNotice(co) {
+   return co.overdue || co.recallDate != ""
+}
+
+onMounted(async () => {
+   lookingUpUVA.value = false
+   if ( userStore.isSignedIn ) {
+      analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
+      lookingUpUVA.value = true
+      if (route.query.overdue) {
+         userStore.checkoutsOrder = "OVERDUE"
+      }
+      await userStore.getCheckouts()
+      lookingUpUVA.value = false
+   }
+})
+
 </script>
 
 <style lang="scss" scoped>

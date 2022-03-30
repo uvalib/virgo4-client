@@ -1,6 +1,6 @@
 <template>
    <footer role="contentinfo">
-      <div class="pre-footer" v-if="$route.name != 'feedback'">
+      <div class="pre-footer" v-if="route.name != 'feedback'">
          This is the newest version of the Library catalog.
          <router-link id="feedback"
             :to="`/feedback?url=${feedbackURL()}`"
@@ -78,34 +78,22 @@
             <p class="copy">
                <span>Copyright {{ new Date().getFullYear() }} by the Rector and Visitors of the
                   <a href="http://www.virginia.edu/">University of Virginia</a></span>
-               <span class="version">&nbsp;-&nbsp;v{{version}}</span>
+               <span class="version">&nbsp;-&nbsp;v{{systemStore.version}}</span>
             </p>
          </div>
       </div>
    </footer>
 </template>
 
-<script>
-import { mapState } from "vuex"
-export default {
-   computed: {
-      ...mapState({
-         version: state => state.system.version
-      })
-   },
-   data: function() {
-      return {
-         showFeedbackLinks: false,
-      }
-   },
-   methods: {
-     feedbackURL(){
-       return encodeURIComponent(window.location.href)
-     }
-   },
-   mounted() {
-      this.$store.dispatch("system/getVersion")
-   }
+<script setup>
+import { useSystemStore } from "@/stores/system"
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const systemStore = useSystemStore()
+
+function feedbackURL() {
+   return encodeURIComponent(window.location.href)
 }
 </script>
 

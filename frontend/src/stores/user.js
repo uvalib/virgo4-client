@@ -1,7 +1,16 @@
+import { defineStore } from 'pinia'
 import axios from 'axios'
-import analytics from '../../analytics'
-import { getField, updateField } from 'vuex-map-fields'
+import analytics from '../analytics'
 import VueCookies from 'vue-cookies'
+import { useSystemStore } from "@/stores/system"
+import { useAlertStore } from "@/stores/alert"
+import { usePreferencesStore } from "@/stores/preferences"
+import { useRestoreStore } from "@/stores/restore"
+import { useBookmarkStore } from "@/stores/bookmark"
+import { useSearchStore } from "@/stores/search"
+import { useRequestStore } from "@/stores/request"
+import { useQueryStore } from "@/stores/query"
+import { useResultStore } from "@/stores/result"
 
 function parseJwt(token) {
    var base64Url = token.split('.')[1]
@@ -13,9 +22,8 @@ function parseJwt(token) {
    return JSON.parse(jsonPayload);
 }
 
-const user = {
-   namespaced: true,
-   state: {
+export const useUserStore = defineStore('user', {
+	state: () => ({
       authToken: "",
       authorizing: false,
       signedInUser: "",
@@ -39,15 +47,14 @@ const user = {
       accountRequest: {name: "", id: "", email: "", phone: "", department: "",
          address1: "", address2: "", city: "", state: "", zip: ""},
       accountRequested: false
-   },
+   }),
 
    getters: {
-      getField,
       hasRenewSummary: (state) => {
          return state.renewSummary.renewed >= 0
       },
-      canChangePassword: (state, getters) => {
-         if (getters.hasAccountInfo == false ) return false
+      canChangePassword(state) {
+         if ( this.hasAccountInfo == false ) return false
          if ( state.sessionType == "netbadge") return false
          return true
       },
@@ -151,16 +158,17 @@ const user = {
          if (state.accountInfo.id != state.signedInUser) return false
          return (state.noILSAccount != true)
       },
-      libraries: (_state, getters, _rootState, rootGetters) => {
+      libraries() {
          // all libraries are available by default. Filter out some based on user criteria
-         let pickupLibraries = rootGetters['system/pickupLibraries'].slice()
-         if (getters.isHSLUser == false) {
+         const system = useSystemStore()
+         let pickupLibraries = system.pickupLibraries.slice()
+         if (this.isHSLUser == false) {
             pickupLibraries = pickupLibraries.filter( p => p.id != "HEALTHSCI" )
          }
-         if (getters.isLawUser == false) {
+         if (this.isLawUser == false) {
             pickupLibraries = pickupLibraries.filter( p => p.id != "LAW")
          }
-         if (getters.canUseLEO == false) {
+         if (this.canUseLEO == false) {
             pickupLibraries = pickupLibraries.filter( p => p.id != "LEO")
          }
 
@@ -177,24 +185,17 @@ const user = {
 
    },
 
-   mutations: {
-      updateField,
-      clearRenewSummary(state) {
-         state.renewSummary = {renewed: -1, failed: -1, failures: []}
+   actions: {
+      clearRenewSummary() {
+         this.renewSummary = {renewed: -1, failed: -1, failures: []}
       },
-      setLookingUp(state, flag) {
-         state.lookingUp = flag
+      setCheckouts(co) {
+         this.checkouts = co
+         this.renewSummary = {renewed: -1, failed: -1, failures: []}
       },
-      setRenewing(state, flag) {
-         state.renewing = flag
-      },
-      setCheckouts(state, co) {
-         state.checkouts = co
-         state.renewSummary = {renewed: -1, failed: -1, failures: []}
-      },
-      sortCheckouts(state, order) {
-         state.checkoutsOrder = order
-         state.checkouts.sort( (a,b) => {
+      sortCheckouts(order) {
+         this.checkoutsOrder = order
+         this.checkouts.sort( (a,b) => {
             if ( order == "OVERDUE") {
                // Sort recalls to top, then Due date, others are last
                // dates are also sorted inside each group
@@ -242,51 +243,45 @@ const user = {
             }
          })
       },
-      setRequests(state, reqs) {
-         state.requests = reqs
-      },
-      setRenewResults(state, renewResults) {
-         state.renewSummary.renewed = 0
-         state.renewSummary.failed = 0
+      setRenewResults(renewResults) {
+         this.renewSummary.renewed = 0
+         this.renewSummary.failed = 0
          renewResults.results.forEach( renew => {
             if (renew.success == false) {
-               state.renewSummary.failed++
-               state.renewSummary.failures.push({barcode: renew.barcode, message: renew.message})
-               let co = state.checkouts.find( co => co.barcode == renew.barcode)
+               this.renewSummary.failed++
+               this.renewSummary.failures.push({barcode: renew.barcode, message: renew.message})
+               let co = this.checkouts.find( co => co.barcode == renew.barcode)
                if ( co ) {
                   co.message = renew.message
                }
             } else {
-               state.renewSummary.renewed++
+               this.renewSummary.renewed++
             }
          })
       },
-      setAuthorizing(state, auth) {
-         state.authorizing = auth
-      },
-      setAuthFailure(state, data) {
+      setAuthFailure(data) {
          if (data.response && data.response.data) {
             //barcode, signedId, message, attemptsLeft
             let resp = data.response.data
-            state.authTriesLeft = resp.attemptsLeft
-            state.authMessage = resp.message
-            state.lockedOut =  resp.lockedOut
+            this.authTriesLeft = resp.attemptsLeft
+            this.authMessage = resp.message
+            this.lockedOut =  resp.lockedOut
          } else {
-            state.authMessage = "Sign in failed: "+data
+            this.authMessage = "Sign in failed: "+data
          }
       },
-      clearAuthMessages(state) {
-         state.authMessage = ""
-         state.lockedOut = false
-         state.authTriesLeft = 5
+      clearAuthMessages() {
+         this.authMessage = ""
+         this.lockedOut = false
+         this.authTriesLeft = 5
       },
-      setUserJWT(state, jwtStr) {
+      setUserJWT(jwtStr) {
          let parsed = parseJwt(jwtStr)
          if( parsed.role === "admin" ) {
-            state.parsedJWT = JSON.stringify(parsed,undefined, 2);
+            this.parsedJWT = JSON.stringify(parsed,undefined, 2);
          }
 
-         state.claims = {
+         this.claims = {
             canPurchase: parsed.canPurchase,
             homeLibrary: parsed.homeLibrary,
             canLEO: parsed.canLEO,
@@ -295,225 +290,213 @@ const user = {
             useSIS: parsed.useSIS,
             isUVA: parsed.isUva,
          }
-         state.authMessage = ""
-         state.lockedOut = false
-         state.signedInUser = parsed.userId
-         state.authToken = jwtStr
-         state.sessionType =  parsed.authMethod
-         state.role = parsed.role
+         this.authMessage = ""
+         this.lockedOut = false
+         this.signedInUser = parsed.userId
+         this.authToken = jwtStr
+         this.sessionType =  parsed.authMethod
+         this.role = parsed.role
 
-         if (state.role == "guest" && state.sessionType == "netbadge" && state.signedInUser != "anonymous") {
-            state.noILSAccount = true
-            state.accountRequest.name = ""
-            state.accountRequest.id = parsed.userId
-            state.accountRequest.email = parsed.userId+"@virginia.edu"
-            state.accountRequest.phone = ""
-            state.accountRequest.department = ""
-            state.accountRequest.address1 = ""
-            state.accountRequest.address2 = ""
-            state.accountRequest.city = ""
-            state.accountRequest.state = ""
-            state.accountRequest.zip = ""
+         if (this.role == "guest" && this.sessionType == "netbadge" && this.signedInUser != "anonymous") {
+            this.noILSAccount = true
+            this.accountRequest.name = ""
+            this.accountRequest.id = parsed.userId
+            this.accountRequest.email = parsed.userId+"@virginia.edu"
+            this.accountRequest.phone = ""
+            this.accountRequest.department = ""
+            this.accountRequest.address1 = ""
+            this.accountRequest.address2 = ""
+            this.accountRequest.city = ""
+            this.accountRequest.state = ""
+            this.accountRequest.zip = ""
             if (localStorage.getItem("v4_requested") ) {
-               state.accountRequested = true
+               this.accountRequested = true
             }
          }
          localStorage.setItem("v4_jwt", jwtStr)
       },
-      setAccountInfo(state, data) {
-         state.accountInfo = data.user
-         state.accountInfo.leoAddress = data.leoLocation
-         state.noILLiadAccount = !data.hasIlliadAccount
-         state.noILSAccount = data.user.noAccount
+      setAccountInfo(data) {
+         this.accountInfo = data.user
+         this.accountInfo.leoAddress = data.leoLocation
+         this.noILLiadAccount = !data.hasIlliadAccount
+         this.noILSAccount = data.user.noAccount
          if (localStorage.getItem("v4_requested") ) {
-            state.accountRequested = true
+            this.accountRequested = true
          }
-         if ( state.noILSAccount) {
-            state.accountRequest.name = data.user.displayName
-            state.accountRequest.id = data.user.id
-            state.accountRequest.email = data.user.email
-            state.accountRequest.phone = ""
-            state.accountRequest.department = data.user.department
-            state.accountRequest.address1 = ""
-            state.accountRequest.address2 = ""
-            state.accountRequest.city = ""
-            state.accountRequest.state = ""
-            state.accountRequest.zip = ""
+         if ( this.noILSAccount) {
+            this.accountRequest.name = data.user.displayName
+            this.accountRequest.id = data.user.id
+            this.accountRequest.email = data.user.email
+            this.accountRequest.phone = ""
+            this.accountRequest.department = data.user.department
+            this.accountRequest.address1 = ""
+            this.accountRequest.address2 = ""
+            this.accountRequest.city = ""
+            this.accountRequest.state = ""
+            this.accountRequest.zip = ""
          }
-         delete  state.accountInfo.noAccount
+         delete  this.accountInfo.noAccount
       },
-      clear(state) {
-         state.accountRequest =  {name: "", id: "", email: "", phone: "", department: "",
-            address1: "", address2: "", city: "", state: ""}
-         state.signedInUser = ""
-         state.sessionType = ""
-         state.accountInfo = {}
-         state.authTriesLeft = 5
-         state.authMessage = ""
-         state.authToken = ""
-         state.role = "guest"
-         state.lockedOut = false
-         state.checkouts.splice(0, state.checkouts.length)
-         state.renewSummary = {renewed: 0, failed: 0, failures: []}
-         state.bills.splice(0, state.bills.length)
-         VueCookies.remove("v4_optout")
-         localStorage.removeItem("v4_jwt")
-         localStorage.removeItem("v4_requested")
-         state.accountRequested = false
-         state.noILSAccount = false
-         state.noILLiadAccount = false
+      clear() {
+         this.$reset()
       },
-      setBills(state, bills) {
-         state.bills = bills
-      },
-      flagAccountRequested(state) {
-         state.accountRequested = true
+      flagAccountRequested() {
+         this.accountRequested = true
          localStorage.setItem("v4_requested", "yes")
-      }
-   },
+      },
 
-   actions: {
-      async refreshAuth(ctx) {
+      async refreshAuth() {
          console.log("Refresh authentication...")
-         if ( ctx.state.sessionType != "netbadge" && (ctx.state.role == "" || ctx.state.role == "guest") ) {
+         if ( this.sessionType != "netbadge" && (this.role == "" || this.role == "guest") ) {
             console.log("Get GUEST authorization token")
             await axios.post("/authorize", null).then( response => {
-               ctx.commit("setUserJWT", response.data)
+               this.setUserJWT(response.data)
             })
          } else {
             console.log("Refreshing sign-in session")
             await axios.post("/api/reauth", null).then( response => {
-               ctx.commit("setUserJWT", response.data )
+               this.setUserJWT(response.data )
                console.log(`Session refreshed`)
             }).catch( async () => {
                // Signout, but preserve the search as it will be retried as guest
+               const system = useSystemStore()
                console.log("reauth failed, signing out")
-               await ctx.dispatch("signout", false)
-               ctx.commit('system/setSessionExpired', null, { root: true })
+               await this.signout(false)
+               system.setSessionExpired()
             })
          }
       },
 
-      overrideClaims(ctx) {
-         if (ctx.getters.isAdmin){
-            ctx.commit('setAuthorizing', true)
-            let claims = ctx.state.parsedJWT
+      async overrideClaims() {
+         if (this.isAdmin){
+            this.authorizing = true
+            let claims = this.parsedJWT
             let host = window.location.hostname
             return axios.post("/api/admin/claims", claims, {headers: {V4Host:host}} ).then((_response) => {
                let jwtStr = VueCookies.get("v4_jwt")
-               ctx.commit("setUserJWT", jwtStr )
-               ctx.commit('setAuthorizing', false)
+               this.setUserJWT(jwtStr)
+               this.authorizing = false
              }).catch((error) => {
-               ctx.commit('system/setError', error + '<br/>' + error.response.data, { root: true })
-               ctx.commit('setAuthorizing', false)
+               const system = useSystemStore()
+               system.setError( error + '<br/>' + error.response.data)
+               this.authorizing = false
              })
          }
       },
 
-      getRequests(ctx) {
-         if (ctx.rootGetters["user/isSignedIn"] == false) return
-         if (ctx.rootGetters["user/isGuest"]) return
-         ctx.commit('setLookingUp', true)
+      getRequests() {
+         if (this.isSignedIn == false) return
+         if (this.isGuest) return
+         this.lookingUp = true
 
          return axios.all([
-            axios.get(`/api/users/${ctx.state.signedInUser}/holds`),
-            axios.get(`/api/users/${ctx.state.signedInUser}/illiad`),
+            axios.get(`/api/users/${this.signedInUser}/holds`),
+            axios.get(`/api/users/${this.signedInUser}/illiad`),
          ]).then(axios.spread((holdResponse, illiadResponse) => {
-            ctx.commit('setRequests', {
+            this.requests = {
                holds: holdResponse.data.holds,
                illiad: illiadResponse.data
-            })
-         })).catch((error) => {
-            if (error.response && error.response.status == 503) {
-               ctx.commit('system/setILSError', error.response.data, { root: true })
-            } else {
-               ctx.commit('system/setError', error, { root: true })
             }
-         }).finally(() => { ctx.commit('setLookingUp', false) })
+         })).catch((error) => {
+            const system = useSystemStore()
+            if (error.response && error.response.status == 503) {
+               system.setILSError(error.response.data)
+            } else {
+               system.setError( error)
+            }
+         }).finally(() => { this.lookingUp = false })
       },
 
-      async getAccountInfo(ctx) {
-         if (ctx.getters.isSignedIn == false) {
+      async getAccountInfo() {
+         if (this.isSignedIn == false) {
             return
          }
-         if (ctx.getters.hasAccountInfo ){
+         if (this.hasAccountInfo ){
             return
          }
 
-         ctx.commit('setLookingUp', true)
-         return axios.get(`/api/users/${ctx.state.signedInUser}`).then((response) => {
-            ctx.commit('setAccountInfo', response.data)
+         this.lookingUp = true
+         return axios.get(`/api/users/${this.signedInUser}`).then((response) => {
+            const bookmarks = useBookmarkStore()
+            const preferences = usePreferencesStore()
+            const queryStore = useQueryStore()
+
+            this.setAccountInfo(response.data)
             let prefs = JSON.parse(response.data.preferences)
-            ctx.commit('preferences/setPreferences', prefs, { root: true })
-            ctx.commit('bookmarks/setBookmarks', response.data.bookmarks, { root: true })
-            if ( prefs.searchTemplate ) {
-               ctx.commit('query/setTemplate',  prefs.searchTemplate, { root: true })
+            preferences.setPreferences(prefs)
+            bookmarks.setBookmarks(response.data.bookmarks)
+            if ( preferences.searchTemplate ) {
+               queryStore.setTemplate(preferences.searchTemplate)
             }
             if (response.data.user.noILSAccount && this.router.currentRoute.value.path != "/account") {
                this.router.push( "/account" )
             }
-            ctx.commit('setLookingUp', false)
+            this.lookingUp = false
           }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setLookingUp', false)
+            const system = useSystemStore()
+            system.setError( error)
+            this.lookingUp = false
           })
       },
 
-      renewItem(ctx, barcode) {
-         if (ctx.rootGetters["user/isSignedIn"] == false) return
-         if (ctx.rootGetters["user/isGuest"]) return
+      renewItem(barcode) {
+         if (this.isSignedIn == false) return
+         if (this.isGuest) return
 
-         ctx.commit('setRenewing', true)
+         this.renewing = true
          let data = {item_barcode: barcode}
-         axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
-            ctx.commit('setCheckouts', response.data.checkouts)
-            ctx.commit('setRenewResults', response.data.renewResults)
-            ctx.commit('setRenewing', false)
+         axios.post(`/api/users/${this.signedInUser}/checkouts/renew`, data).then((response) => {
+            this.setCheckouts(response.data.checkouts)
+            this.setRenewResults(response.data.renewResults)
+            this.renewing = false
           }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setRenewing', false)
+            const system = useSystemStore()
+            system.setError( error)
+            this.renewing = false
           })
       },
 
-      renewAll(ctx) {
-         if (ctx.rootGetters["user/isSignedIn"] == false) return
-         if (ctx.rootGetters["user/isGuest"]) return
+      renewAll() {
+         if (this.isSignedIn == false) return
+         if (this.isGuest) return
 
-         ctx.commit('setRenewing', true)
+         this.renewing = true
          let data = {item_barcode: "all"}
-         axios.post(`/api/users/${ctx.state.signedInUser}/checkouts/renew`, data).then((response) => {
-            ctx.commit('setCheckouts', response.data.checkouts)
-            ctx.commit('setRenewResults', response.data.renewResults)
-            ctx.commit('setRenewing', false)
+         axios.post(`/api/users/${this.signedInUser}/checkouts/renew`, data).then((response) => {
+            this.setCheckouts(response.data.checkouts)
+            this.setRenewResults(response.data.renewResults)
+            this.renewing = false
           }).catch((error) => {
-            ctx.commit('system/setError', error, { root: true })
-            ctx.commit('setRenewing', false)
+            const system = useSystemStore()
+            system.setError( error)
+            this.renewing = false
           })
       },
 
-      async getCheckouts(ctx) {
-         if ( ctx.state.checkouts.length > 0) {
+      async getCheckouts() {
+         if ( this.checkouts.length > 0) {
             return
          }
-         if (ctx.state.signedInUser.length == 0 || ctx.state.noILSAccount) {
+         if (this.signedInUser.length == 0 || this.noILSAccount) {
             return
          }
-         return axios.get(`/api/users/${ctx.state.signedInUser}/checkouts`).then((response) => {
-            ctx.commit('setCheckouts', response.data)
-            ctx.commit('sortCheckouts', ctx.state.checkoutsOrder)
+         return axios.get(`/api/users/${this.signedInUser}/checkouts`).then((response) => {
+            this.setCheckouts(response.data)
+            this.sortCheckouts(this.checkoutsOrder)
          }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               ctx.commit('system/setILSError', error.response.data, { root: true })
+               system.setILSError(error.response.data)
             } else {
-               ctx.commit('system/setError', error, { root: true })
+               system.setError( error)
             }
          })
       },
-      async downloadCheckoutsCSV(ctx) {
-         if ( ctx.state.checkouts.length == 0) {
+      async downloadCheckoutsCSV() {
+         if ( this.checkouts.length == 0) {
             return
          }
-         return axios.get(`/api/users/${ctx.state.signedInUser}/checkouts.csv`).then((response) => {
+         return axios.get(`/api/users/${this.signedInUser}/checkouts.csv`).then((response) => {
             const fileURL = window.URL.createObjectURL(new Blob([response.data]));
             const fileLink = document.createElement('a');
 
@@ -525,118 +508,129 @@ const user = {
             window.URL.revokeObjectURL(fileURL);
 
          }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               ctx.commit('system/setILSError', error.response.data, { root: true })
+               system.setILSError(error.response.data)
             } else {
-               ctx.commit('system/setError', error, { root: true })
+               system.setError( error)
             }
          })
       },
 
-      getBillDetails(ctx) {
-         if ( ctx.state.bills.length > 0) return
-         if (ctx.rootGetters["user/isGuest"]) return
+      getBillDetails() {
+         if ( this.bills.length > 0) return
+         if ( this.isGuest ) return
 
-         ctx.commit('setLookingUp', true)
-         axios.get(`/api/users/${ctx.state.signedInUser}/bills`).then((response) => {
-            ctx.commit('setBills', response.data)
-            ctx.commit('setLookingUp', false)
+         this.lookingUp = true
+         axios.get(`/api/users/${this.signedInUser}/bills`).then((response) => {
+            this.bills = response.data
+            this.lookingUp = false
           }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               ctx.commit('system/setILSError', error.response.data, { root: true })
+               system.setILSError(error.response.data)
             } else {
-               ctx.commit('system/setError', error, { root: true })
+               system.setError( error)
             }
-            ctx.commit('setLookingUp', false)
+            this.lookingUp = false
           })
       },
 
-      async signout(ctx, resetSearch) {
-         if ( ctx.state.signedInUser == "") return
+      async signout(resetSearch) {
+         if ( this.signedInUser == "") return
 
-         try {
-            await axios.post("/signout", null)
-            ctx.commit('clear')
-            ctx.commit('bookmarks/clear', null, { root: true })
-            ctx.commit('preferences/clear', null, { root: true })
-            ctx.commit('searches/clear', null, { root: true })
-            ctx.commit('alerts/clearSeenAlerts', null, { root: true })
-            if ( resetSearch === true) {
-               ctx.dispatch('resetSearch', null, { root: true })
-            }
-         } catch (e) {
-            console.error("Signout failed: "+e)
+         const alerts = useAlertStore()
+         const savedSearches = useSearchStore()
+         const bookmarks = useBookmarkStore()
+         const preferences = usePreferencesStore()
+
+         await axios.post("/signout", null)
+         this.clear()
+         preferences.clear()
+         bookmarks.clear()
+         savedSearches.clear()
+         alerts.clearSeenAlerts()
+         if ( resetSearch === true) {
+            const results = useResultStore()
+            results.resetSearch()
          }
+         localStorage.removeItem("v4_jwt")
+         this.router.push("/signedout")
       },
 
-      signin(ctx, data) {
-         ctx.commit('setAuthorizing', true)
+      signin(data) {
+         this.authorizing = true
          axios.post("/authenticate/public", data).then( async (_response) => {
+            const restore = useRestoreStore()
+            const requests = useRequestStore()
+
             let jwtStr = VueCookies.get("v4_jwt")
-            ctx.commit("setUserJWT", jwtStr )
-            ctx.commit('setAuthorizing', false)
-            ctx.commit('restore/load', null, { root: true })
-            await ctx.dispatch("getAccountInfo")   // needed for search preferences
-            ctx.dispatch("getCheckouts")     // needed so the alert icon can show in menubar
-            if ( ctx.getters.isUndergraduate) {
+            this.setUserJWT(jwtStr )
+            this.authorizing = false
+            restore.load()
+            await this.getAccountInfo()   // needed for search preferences
+            this.getCheckouts()           // needed so the alert icon can show in menubar
+            if ( this.isUndergraduate) {
                analytics.trigger('User', 'PIN_SIGNIN', "undergraduate")
-            } else if ( ctx.getters.isGraduate) {
+            } else if ( this.isGraduate) {
                analytics.trigger('User', 'PIN_SIGNIN', "graduate")
             } else {
                analytics.trigger('User', 'PIN_SIGNIN', "other")
             }
-            this.router.push( ctx.rootState.restore.url ).catch((e)=>{
+
+            this.router.push( restore.url ).catch((e)=>{
                if (e.name !== 'NavigationDuplicated') {
                   throw e;
               }
             })
-            ctx.dispatch('requests/reload', null, {root: true})
+
+            requests.reload()
          }).catch((error) => {
+            const system = useSystemStore()
             if (error.response && error.response.status == 503) {
-               ctx.commit('system/setILSError', error.response.data, { root: true })
+               system.setILSError(error.response.data)
             } else {
-               ctx.commit('setAuthFailure', error)
+               this.setAuthFailure(error)
             }
-            ctx.commit('setAuthorizing', false)
+            this.authorizing = false
           })
       },
 
-      netbadge(ctx) {
-         ctx.commit('setAuthorizing', true)
+      netbadge() {
+         this.authorizing = true
          window.location.href = "/authenticate/netbadge"
       },
 
-      changePassword(ctx, data) {
-         data['barcode'] = ctx.state.accountInfo['barcode']
+      changePassword(data) {
+         data['barcode'] = this.accountInfo['barcode']
          return axios.post("/api/change_pin", data)
       },
-      changePasswordWithToken(_ctx, data) {
+      changePasswordWithToken(data) {
          return axios.post("/api/change_password_token", data)
       },
-      forgotPassword(_ctx, barcode) {
+      forgotPassword(barcode) {
          return axios.post("/api/forgot_password", {userBarcode: barcode} )
       },
-      async submitNewAccountRequest(ctx) {
-         ctx.commit('setLookingUp', true)
-         await axios.post("/api/requests/account", ctx.state.accountRequest ).then( _resp => {
-            ctx.commit('setLookingUp', false)
-            ctx.commit('flagAccountRequested')
+      async submitNewAccountRequest() {
+         this.lookingUp = true
+         await axios.post("/api/requests/account", this.accountRequest ).then( _resp => {
+            this.lookingUp = false
+            this.flagAccountRequested()
             window.scrollTo({
                top: 0,
                behavior: "auto"
             })
          }).catch ( error => {
+            const system = useSystemStore()
             console.log("Unable to request new account: "+error)
             let msg = "System error, we regret the inconvenience. If this problem persists, "
             msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
-            ctx.commit("system/setError", msg, {root: true})
-            ctx.commit('setLookingUp', false)
+            system.setError(msg)
+            this.lookingUp = false
          })
       },
-      updateContactInfo(_ctx, info) {
+      updateContactInfo(info) {
          return axios.post(`/api/users/${info.newContact.userID}/contact`, info )
       }
    }
-}
-
-export default user
+})

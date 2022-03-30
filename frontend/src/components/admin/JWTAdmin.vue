@@ -1,5 +1,5 @@
 <template>
-   <div v-if="isDevServer && isAdmin" class="jwt-admin">
+   <div v-if="systemStore.isDevServer && userStore.isAdmin" class="jwt-admin">
       <h2>JWT Management</h2>
       <div class="content form">
          <p>
@@ -8,7 +8,7 @@
          </p>
          <textarea
             aria-label="modify your jwt token"
-            v-model="parsedJWT"
+            v-model="userStore.parsedJWT"
             rows="20"
             cols="40"
          ></textarea>
@@ -16,28 +16,19 @@
       </div>
    </div>
 </template>
-<script>
-import { mapFields } from "vuex-map-fields";
-import { mapGetters } from "vuex";
 
-export default {
-   computed: {
-      ...mapFields({
-         parsedJWT: "user.parsedJWT",
-         authorizing: "user.authorizing",
-      }),
-      ...mapGetters({
-         isDevServer: "system/isDevServer",
-         isAdmin: "user/isAdmin",
-      }),
-   },
-   methods: {
-      update() {
-         this.$store.dispatch("user/overrideClaims");
-      },
-   },
-};
+<script setup>
+import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
+
+const userStore = useUserStore()
+const systemStore = useSystemStore()
+
+function update() {
+   userStore.overrideClaims()
+}
 </script>
+
 <style lang="scss" scoped>
 .jwt-admin {
    border: 1px solid var(--uvalib-red-emergency);

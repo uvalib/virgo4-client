@@ -1,63 +1,72 @@
 import axios from 'axios'
-import { getField, updateField } from 'vuex-map-fields'
-import analytics from '../../analytics'
+import analytics from '../analytics'
+import { defineStore } from 'pinia'
+import { useSystemStore } from "@/stores/system"
+import { usePoolStore } from "@/stores/pool"
+import { useResultStore } from "@/stores/result"
+import { useQueryStore } from "@/stores/query"
+import { useCollectionStore } from "@/stores/collection"
 
-const filters = {
-   namespaced: true,
-   state: {
-      poolFacets: [],
+export const useFilterStore = defineStore('filter', {
+	state: () => ({
+      facets: [],
       updatingFacets: false,
       getPresearchFacets: false,
-   },
+   }),
 
    getters: {
-      getField,
-      asQueryParam:  (_state, getters) => (poolID) => {
-         let filter = getters.poolFilter(poolID)
-         let outObj = {}
-         filter.forEach(f => {
-            if (Object.prototype.hasOwnProperty.call(outObj, f.facet_id) == false) {
-               outObj[f.facet_id] = []
-            }
-            if ( f.value.length > 0) {
-               outObj[f.facet_id].push(f.value)
-            }
-         })
-         let outStr = JSON.stringify(outObj)
-         return outStr
-      },
-
-      poolFacets: (state) => (poolID) => {
-         let pfObj = state.poolFacets.find( pf => pf.pool == poolID)
-         if (!pfObj) {
-            return []
-         }
-         return pfObj.facets
-      },
-
-      poolFilter: (state) => (poolID) => {
-         let pfObj = state.poolFacets.find( pf => pf.pool == poolID)
-         if (!pfObj) {
-            pfObj = {pool: poolID, facets: []}
-         }
-         let filter = []
-         pfObj.facets.forEach( f => {
-            f.buckets.forEach( bucket => {
-               if (bucket.selected == true ) {
-                  let na = (bucket.na === true)
-                  filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value, na: na})
+      asQueryParam() {
+         return (poolID) => {
+            let filter = this.poolFilter(poolID)
+            let outObj = {}
+            filter.forEach(f => {
+               if (Object.prototype.hasOwnProperty.call(outObj, f.facet_id) == false) {
+                  outObj[f.facet_id] = []
+               }
+               if ( f.value.length > 0) {
+                  outObj[f.facet_id].push(f.value)
                }
             })
-         })
+            let outStr = JSON.stringify(outObj)
+            return outStr
+         }
+      },
 
-         return filter
+      poolFacets: state => {
+         return (poolID) => {
+            let pfObj = state.facets.find( pf => pf.pool == poolID)
+            if (!pfObj) {
+               return []
+            }
+            return pfObj.facets
+         }
+      },
+
+      poolFilter: (state) => {
+         return (poolID) => {
+            let pfObj = state.facets.find( pf => pf.pool == poolID)
+            if (!pfObj) {
+               pfObj = {pool: poolID, facets: []}
+            }
+            let filter = []
+            pfObj.facets.forEach( f => {
+               f.buckets.forEach( bucket => {
+                  if (bucket.selected == true ) {
+                     let na = (bucket.na === true)
+                     filter.push( {facet_id: f.id, facet_name: f.name, value: bucket.value, na: na})
+                  }
+               })
+            })
+
+            return filter
+         }
       },
 
       preSearchFilterApplied: state => {
          if ( state.updatingFacets) return false
 
          let found = false
-         let psf = state.poolFacets.find( pf => pf.pool == "presearch")
+         let psf = state.facets.find( pf => pf.pool == "presearch")
          if (psf) {
             psf.facets.some( pf => {
                pf.buckets.some( b => {
@@ -74,7 +83,7 @@ const filters = {
 
       preSearchFilters: state => {
          if ( state.updatingFacets) return []
-         let psf = state.poolFacets.find( pf => pf.pool == "presearch")
+         let psf = state.facets.find( pf => pf.pool == "presearch")
          if (psf) {
             return psf.facets
          }
@@ -82,10 +91,11 @@ const filters = {
       },
 
       // This is only used to get the filter map for use in global search
-      allPoolFilters: (_state, getters, rootState) =>  {
+      allPoolFilters()  {
          let out = []
-         rootState.pools.list.forEach( p => {
-            let filter = getters.poolFilter(p.id)
+         const pools = usePoolStore()
+         pools.list.forEach( p => {
+            let filter = this.poolFilter(p.id)
             if (filter.length > 0) {
                let add = {pool_id: p.id, facets: filter}
                out.push(add)
@@ -95,14 +105,13 @@ const filters = {
       }
    },
 
-   mutations: {
-      updateField,
-      setPreSearchFilters(state, filters) {
+   actions: {
+      setPreSearchFilters(filters) {
          // Clear out PRESEARCH filter only. Leave others alone because they
          // may have been restored from query params
-         let psfIdx = state.poolFacets.findIndex( pf => pf.pool == "presearch")
+         let psfIdx = this.facets.findIndex( pf => pf.pool == "presearch")
          if ( psfIdx > -1) {
-            state.poolFacets.splice(psfIdx, 1)
+            this.facets.splice(psfIdx, 1)
          }
 
          // Place all of this data into a transient 'presearch' pool that can be
@@ -117,17 +126,17 @@ const filters = {
             })
             tgtPFObj.facets.push(newF)
          })
-         state.poolFacets.push(tgtPFObj)
+         this.facets.push(tgtPFObj)
 
       },
 
-      setPoolFacets(state, data) {
+      setPoolFacets(data) {
          // Get currently selected facets (both valid and N/A), then clear everything out
          // repopulate with data from API call, and restore prior selected state
-         let tgtPFObj = state.poolFacets.find(pf => pf.pool == data.pool)
+         let tgtPFObj = this.facets.find(pf => pf.pool == data.pool)
          if (!tgtPFObj) {
             tgtPFObj = {pool: data.pool, facets: []}
-            state.poolFacets.push(tgtPFObj)
+            this.facets.push(tgtPFObj)
          }
          delete tgtPFObj.placeholder
          let tgtFacets = tgtPFObj.facets
@@ -171,25 +180,25 @@ const filters = {
          })
       },
 
-      toggleFilter(state, data) {
-         let idx = state.poolFacets.findIndex(pf => pf.pool == data.pool)
-         let pfObj = state.poolFacets[idx]
-         let fIdx = pfObj.facets.findIndex(f => f.id === data.facetID)
+      toggleFilter(pool, facetID, value) {
+         let idx = this.facets.findIndex(pf => pf.pool == pool)
+         let pfObj = this.facets[idx]
+         let fIdx = pfObj.facets.findIndex(f => f.id === facetID)
          let facetInfo = pfObj.facets[fIdx]
-         let bIdx = facetInfo.buckets.findIndex( b=> b.value == data.value )
+         let bIdx = facetInfo.buckets.findIndex( b=> b.value == value )
          let bucket = facetInfo.buckets[bIdx]
          bucket.selected = !bucket.selected
          if ( bucket.selected ) {
-            if ( data.pool == "presearch") {
-               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_SET', `${data.facetID}:${data.value}`)
+            if ( pool == "presearch") {
+               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_SET', `${facetID}:${value}`)
             } else {
-               analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${data.facetID}:${data.value}`)
+               analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${value}`)
             }
          } else {
-            if ( data.pool == "presearch") {
-               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_REMOVED', `${data.facetID}:${data.value}`)
+            if ( pool == "presearch") {
+               analytics.trigger('Filters', 'PRE_SEARCH_FILTER_REMOVED', `${facetID}:${value}`)
             } else {
-               analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${data.facetID}:${data.value}`)
+               analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${value}`)
             }
          }
          if ( bucket.na ) {
@@ -198,18 +207,11 @@ const filters = {
                pfObj.facets.splice(fIdx,1)
             }
          }
-         state.poolFacets.splice(idx, 1, pfObj)
+         this.facets.splice(idx, 1, pfObj)
       },
 
-      setUpdatingFacets(state, flag) {
-         state.updatingFacets = flag
-      },
-      setUpdatingPresearchFacets(state, flag) {
-         state.getPresearchFacets = flag
-      },
-
-      resetPoolFilters(state, pool) {
-         let pfObj = state.poolFacets.find( pf => pf.pool == pool)
+      resetPoolFilters(pool) {
+         let pfObj = this.facets.find( pf => pf.pool == pool)
          if (pfObj ) {
             pfObj.facets.forEach( f => {
                if ( f.buckets) {
@@ -221,8 +223,8 @@ const filters = {
          }
       },
 
-      reset(state) {
-         let pre = state.poolFacets.find( pf => pf.pool=="presearch")
+      reset() {
+         let pre = this.facets.find( pf => pf.pool=="presearch")
          if (pre) {
             // if presearch filters exist, just flag them all as unselected instead of removing
             // this is because they are only requested once at initial search page load
@@ -231,23 +233,22 @@ const filters = {
                   b.selected = false
                })
             })
-            state.poolFacets.splice(0, state.poolFacets.length)
-            state.poolFacets.push(pre)
+            this.facets.splice(0, this.facets.length)
+            this.facets.push(pre)
          } else {
-            state.poolFacets.splice(0, state.poolFacets.length)
+            this.facets.splice(0, this.facets.length)
          }
-         state.setUpdatingPresearchFacets = false
-         state.updatingFacets = false
+         this.setUpdatingPresearchFacets = false
+         this.updatingFacets = false
       },
 
-      restoreFromURL(state, data ) {
-         let filterStr = data.filter
-         let pfIdx = state.poolFacets.findIndex( pf => pf.pool == data.pool)
+      restoreFromURL( filterStr, pool ) {
+         let pfIdx = this.facets.findIndex( pf => pf.pool == pool)
          let pfObj = null
          if (pfIdx == -1) {
-            pfObj = {pool: data.pool, facets: []}
+            pfObj = {pool: pool, facets: []}
          } else {
-            pfObj = state.poolFacets[pfIdx]
+            pfObj = this.facets[pfIdx]
          }
 
          let decoded = decodeURIComponent(filterStr).trim()
@@ -268,21 +269,20 @@ const filters = {
             })
          })
          if ( pfIdx > -1) {
-            state.poolFacets.splice(pfIdx,1, pfObj)
+            this.facets.splice(pfIdx,1, pfObj)
          } else {
-            state.poolFacets.push(pfObj)
+            this.facets.push(pfObj)
          }
       },
-   },
 
-   actions: {
-      promotePreSearchFilters(ctx) {
-         let psf = ctx.state.poolFacets.find( pf => pf.pool == "presearch")
-         ctx.rootState.pools.list.forEach( pool => {
-            let tgtPFObj = ctx.state.poolFacets.find( pf => pf.pool == pool.id)
+      promotePreSearchFilters() {
+         const pools = usePoolStore()
+         let psf = this.facets.find( pf => pf.pool == "presearch")
+         pools.list.forEach( pool => {
+            let tgtPFObj = this.facets.find( pf => pf.pool == pool.id)
             if ( !tgtPFObj ) {
                tgtPFObj = {pool: pool.id, facets: [], placeholder: true}
-               ctx.state.poolFacets.push(tgtPFObj)
+               this.facets.push(tgtPFObj)
             }
             psf.facets.forEach( pf => {
                pf.buckets.forEach( b => {
@@ -299,36 +299,42 @@ const filters = {
          })
       },
 
-      async getPreSearchFilters(ctx) {
-         ctx.commit('setUpdatingPresearchFacets', true)
-         let url = `${ctx.rootState.system.searchAPI}/api/filters`
+      async getPreSearchFilters() {
+         const system = useSystemStore()
+         this.getPresearchFacets = true
+         let url = `${system.searchAPI}/api/filters`
          return axios.get(url).then((response) => {
-            ctx.commit('setPreSearchFilters', response.data)
-            ctx.commit('setUpdatingPresearchFacets', false)
+            this.setPreSearchFilters(response.data)
+            this.getPresearchFacets = false
          }).catch((error) => {
-            ctx.commit('setUpdatingPresearchFacets', false)
+            this.getPresearchFacets = false
             console.warn("Unable to get pre-search filters: "+JSON.stringify(error))
          })
       },
+
       // Get all facets for the selected result set / query / pool
       // This is called from 3 different places: when all pools are searched, when a specific pool
       // is searched and when a new pool is selected. The first 2 should ALWAYS request new facets
       // as the query has changed. The pool select should only change of there are no facets yet.
-      getSelectedResultFacets(ctx, paramsChanged) {
-         let resultsIdx = ctx.rootState.selectedResultsIdx
+      getSelectedResultFacets(paramsChanged) {
+         const resultStore = useResultStore()
+         const query = useQueryStore()
+         const collectionStore = useCollectionStore()
+
+         let resultsIdx = resultStore.selectedResultsIdx
          if ( resultsIdx == -1) {
             return
          }
-         if ( ctx.state.updatingFacets) {
+         if (this.updatingFacets) {
             return
          }
 
-         let pool = ctx.rootState.results[resultsIdx].pool
-         let filters = ctx.getters.poolFilter(pool.id)
+         let pool = resultStore.results[resultsIdx].pool
+         let filters = this.poolFilter(pool.id)
          let filterObj = {pool_id: pool.id, facets: filters}
          if (paramsChanged == false) {
             // check filter for either: no filters or placeholder filters (presearch promotions or restored from url)
-            let poolFacetObj = ctx.state.poolFacets.find( pf => pf.pool == pool.id)
+            let poolFacetObj = this.facets.find( pf => pf.pool == pool.id)
             if ( poolFacetObj ) {
                if ( !(poolFacetObj.placeholder === true || poolFacetObj.facets.length == 0) ) {
                   console.log("Facets are current, do not refresh")
@@ -338,13 +344,12 @@ const filters = {
          }
 
          // this lets a SINGLE collection context show up at the top of the search results
-         ctx.commit("collection/clearCollectionDetails", null, { root: true })
+         collectionStore.clearCollectionDetails()
          let done = false
-         let collections = ctx.rootState.collection.collections
-         collections.some( c => {
+         collectionStore.collections.some( c => {
             let filter = filterObj.facets.find( f=>f.facet_id == c.filter_name && f.value == c.title)
             if (filter) {
-               this.dispatch("collection/getCollectionContext", filter.value, {root: true})
+               collectionStore.getCollectionContext(filter.value)
                done = true
             }
             return done == true
@@ -352,33 +357,32 @@ const filters = {
 
          // Recreate the query for the target pool, but include a request for ALL facet info
          let req = {
-            query: ctx.rootGetters['query/string'],
+            query: query.string,
             pagination: { start: 0, rows: 0 },
             filters: [filterObj]
          }
          if (req.query == "") {
-            let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: ctx.rootGetters['query/getState']}
-            this.dispatch("system/reportError", err, {root: true})
+            const system = useSystemStore()
+            let err = {message: 'EMPTY QUERY', caller: 'getSelectedResultFacets', query: query.stateObject}
+            system.reportError(err)
             return
          }
 
          let tgtURL = pool.url+"/api/search/facets"
-         ctx.commit('setUpdatingFacets', true)
+         this.updatingFacets = true
          axios.post(tgtURL, req).then((response) => {
             let facets = response.data.facet_list
             if (!facets) {
                facets = []
             }
-            ctx.commit("setPoolFacets", {pool: pool.id, facets: facets})
-            ctx.commit('setUpdatingFacets', false)
+            this.setPoolFacets({pool: pool.id, facets: facets})
+            this.updatingFacets = false
          }).catch((error) => {
             if (error.response && error.response.status == 501) {
-               ctx.commit("setPoolFacets", {pool: pool.id, facets: false})
+               this.setPoolFacets({pool: pool.id, facets: false})
             }
-            ctx.commit('setUpdatingFacets', false)
+            this.updatingFacets = false
           })
       }
    }
-}
-
-export default filters
+})

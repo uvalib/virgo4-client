@@ -1,6 +1,6 @@
 <template>
    <div tabindex="-1" id="app" role="application">
-      <V4Spinner v-if="authorizing" message="Authorizing..." v-bind:overlay="true" />
+      <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
       <transition name="fade">
          <div class="dimmer" v-if="showDimmer">
              <MessageBox />
@@ -8,8 +8,8 @@
       </transition>
       <div role="banner" class="site-header" id="v4-header">
          <SkipToNavigation />
-         <div class="header-alert" v-if="headerAlerts.length > 0">
-            <div v-for="ha in headerAlerts" :key="ha.uuid" class="alert-body">
+         <div class="header-alert" v-if="alertStore.headerAlerts.length > 0">
+            <div v-for="ha in alertStore.headerAlerts" :key="ha.uuid" class="alert-body">
                <span class="lead">{{ha.title}}:&nbsp;</span>
                <span class="alert-text" v-html="ha.body"></span>
             </div>
@@ -17,8 +17,8 @@
          <VirgoHeader />
          <MenuBar id="v4-navbar"/>
       </div>
-      <div class="alerts-list" v-if="!isKiosk" id="alerts">
-         <div v-for="a in menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
+      <div class="alerts-list" v-if="!systemStore.isKiosk" id="alerts">
+         <div v-for="a in alertStore.menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
             <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
             <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
             <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
@@ -35,10 +35,10 @@
       <main tabindex="-1" class="v4-content" id="v4-main" role="main">
          <SessionExpired />
          <VueAnnouncer />
-         <h1>{{pageTitle}}</h1>
+         <h1>{{systemStore.pageTitle}}</h1>
          <template v-if="configuring==false">
-            <div v-if="pageAlerts($route.path).length > 0" class="regional-alerts">
-               <div v-for="ra in pageAlerts($route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
+            <div v-if="alertStore.pageAlerts(route.path).length > 0" class="regional-alerts">
+               <div v-for="ra in alertStore.pageAlerts(route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
                   <span class="alert-text" v-html="ra.body"></span>
                </div>
             </div>
@@ -47,17 +47,17 @@
          <div v-else  class="configure">
             <V4Spinner message="Configuring system..."/>
          </div>
-         <div v-if="newVersion" class="update-pop">
+         <div v-if="systemStore.newVersion" class="update-pop">
             <div class="msg">A new version of Virgo is available.</div>
             <V4Button mode="primary" @click="updateClicked">Update Now</V4Button>
          </div>
          <ScrollToTop />
       </main>
-      <LibraryFooter v-if="isKiosk == false"/>
+      <LibraryFooter v-if="systemStore.isKiosk == false"/>
    </div>
 </template>
 
-<script>
+<script setup>
 import ScrollToTop from "@/components/ScrollToTop.vue"
 import LibraryFooter from "@/components/layout/LibraryFooter.vue"
 import MessageBox from "@/components/layout/MessageBox.vue"
@@ -65,133 +65,145 @@ import VirgoHeader from "@/components/layout/VirgoHeader.vue"
 import MenuBar from "@/components/layout/MenuBar.vue"
 import SkipToNavigation from "@/components/layout/SkipToNavigation.vue"
 import SessionExpired from "@/components/layout/SessionExpired.vue"
-import { mapState } from "vuex"
-import { mapGetters } from "vuex"
-export default {
-   data: function() {
-      return {
-         headerHeight: 0,
-         menuHeight: 0,
-         configuring: true
-      };
-   },
-   components: {
-      VirgoHeader, LibraryFooter, MenuBar, ScrollToTop, MessageBox, SessionExpired, SkipToNavigation
-   },
-   computed: {
-      ...mapState({
-         newVersion: state => state.system.newVersion,
-         authorizing: state => state.user.authorizing,
-         sessionExpired: state => state.system.sessionExpired,
-         devServer: state => state.system.devServer,
-         pageTitle: state => state.pageTitle,
-         noILSAccount: state => state.user.noILSAccount,
-      }),
-      ...mapGetters({
-         hasTranslateMessage: "system/hasTranslateMessage",
-         isKiosk: "system/isKiosk",
-         hasMessage: "system/hasMessage",
-         headerAlerts: "alerts/headerAlerts",
-         alertCount: 'alerts/alertCount',
-         menuAlerts: 'alerts/menuAlerts',
-         pageAlerts: 'alerts/pageAlerts',
-         isSignedIn: 'user/isSignedIn'
-      }),
-      showDimmer() {
-         return this.hasMessage|| this.sessionExpired
-      }
-   },
-   watch: {
-      headerAlerts() {
-         // when header alerts change, need to recalc height of header so menu bar sticks properly
-         this.$nextTick( ()=>{
-            this.headerHeight = document.getElementById("v4-header").offsetHeight
-            this.headerHeight -= this.menuHeight
-         })
-      },
-   },
-   methods: {
-      dismissAlert( uuid ) {
-         let a = document.getElementById(uuid)
-         a.classList.add("dismissed")
-         this.$nextTick( () => {
-            this.$store.commit("alerts/dismissAlert", uuid)
-            document.getElementById("alertmenu").focus()
-         });
-      },
-      updateClicked() {
-          window.location.reload()
-      },
-      scrollHandler( ) {
-         let alerts = document.getElementById("alerts")
-         if ( window.scrollY <= this.headerHeight ) {
-            document.getElementById("v4-navbar").classList.remove("sticky")
-            if ( !alerts || this.isKiosk || this.headerAlerts.length == 0) {
-               document.getElementById("v4-main").style.paddingTop = '0px'
-            } else {
-               alerts.style.paddingTop = '0px'
-            }
-         } else {
-            document.getElementById("v4-navbar").classList.add("sticky")
-            if ( !alerts || this.isKiosk || this.headerAlerts.length == 0 ) {
-               document.getElementById("v4-main").style.paddingTop = `${this.menuHeight}px`
-            } else {
-              alerts.style.paddingTop = `${this.menuHeight}px`
-            }
-         }
-      },
-   },
-   async beforeCreate() {
-      // anon and signed in users will always have a localstore with JWT in it. be sure
-      // to restore it first, as everything that follows depends upon it
-      let jwtStr = localStorage.getItem('v4_jwt')
-      if ( jwtStr  ) {
-         this.$store.commit("user/setUserJWT", jwtStr)
-      }
+import { useAlertStore } from "@/stores/alert"
+import { useSystemStore } from "@/stores/system"
+import { useUserStore } from "@/stores/user"
+import { usePoolStore } from "@/stores/pool"
+import { useFilterStore } from "@/stores/filter"
+import { useCollectionStore } from "@/stores/collection"
+import { ref, nextTick, computed, onMounted, onUnmounted } from 'vue'
+import axios from 'axios'
+import analytics from '@/analytics'
+import { useRoute } from 'vue-router'
 
-      // First time app is being created, request all common config
-      // the flag shows a config spinner until ready
-      await this.$store.dispatch('system/getConfig')
-      await this.$store.dispatch('pools/getPools')
-      await this.$store.dispatch("collection/getCollections")
-      this.configuring = false
+const route = useRoute()
+const alertStore = useAlertStore()
+const userStore = useUserStore()
+const systemStore = useSystemStore()
+const poolStore = usePoolStore()
+const filterStore = useFilterStore()
+const collectionStore = useCollectionStore()
 
-      // Make sure the session is is kept alive
-      await this.$store.dispatch('user/refreshAuth')
+const headerHeight = ref(0)
+const menuHeight = ref(0)
+const configuring = ref(true)
 
-      if ( this.isSignedIn ) {
-         await this.$store.dispatch("user/getAccountInfo")
-         if ( this.noILSAccount == false ) {
-            this.$store.dispatch("user/getBillDetails")
-            this.$store.dispatch("user/getCheckouts")
-            this.$store.dispatch("user/getRequests")
-         }
-         if ( this.$store.getters["user/isUndergraduate"]) {
-            this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
-         } else if ( this.$store.getters["user/isGraduate"]) {
-            this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
-         } else {
-            this.$analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
-         }
+const showDimmer = computed( () => systemStore.hasMessage || systemStore.sessionExpired )
+
+alertStore.$subscribe( () => {
+   // when header alerts change, need to recalc height of header so menu bar sticks properly
+   nextTick( ()=>{
+      let hdr = document.getElementById("v4-header")
+      if ( hdr ) {
+         headerHeight.value = hdr.offsetHeight
+         headerHeight.value -= menuHeight.value
       }
+   })
+})
 
-      this.$store.dispatch("filters/getPreSearchFilters")
-   },
-   mounted() {
-      this.$nextTick( ()=>{
-         this.menuHeight = document.getElementById("v4-navbar").offsetHeight
-         this.headerHeight = document.getElementById("v4-header").offsetHeight
-         this.headerHeight -= this.menuHeight
-      })
-      window.addEventListener("scroll", this.scrollHandler)
-      window.onresize = () => {
-         this.$store.commit("system/setDisplayWidth",window.innerWidth)
+function dismissAlert( uuid ) {
+   let a = document.getElementById(uuid)
+   a.classList.add("dismissed")
+   nextTick( () => {
+      alertStore.dismissAlert(uuid)
+      document.getElementById("alertmenu").focus()
+   });
+}
+function updateClicked() {
+   window.location.reload()
+}
+function scrollHandler( ) {
+   let alerts = document.getElementById("alerts")
+   if ( window.scrollY <= headerHeight.value ) {
+      document.getElementById("v4-navbar").classList.remove("sticky")
+      if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0) {
+         document.getElementById("v4-main").style.paddingTop = '0px'
+      } else {
+         alerts.style.paddingTop = '0px'
       }
-   },
-   unmounted: function() {
-      window.removeEventListener("scroll", this.scrollHandler)
+   } else {
+      document.getElementById("v4-navbar").classList.add("sticky")
+      if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0 ) {
+         document.getElementById("v4-main").style.paddingTop = `${menuHeight.value}px`
+      } else {
+         alerts.style.paddingTop = `${menuHeight.value}px`
+      }
    }
-};
+}
+
+async function initVirgo() {
+   // anon and signed in users will always have a localstore with JWT in it. be sure
+   // to restore it first, as everything that follows depends upon it
+   let jwtStr = localStorage.getItem('v4_jwt')
+   if ( jwtStr  ) {
+     userStore.setUserJWT(jwtStr)
+   }
+
+   // First time app is being created, request all common config
+   // the flag shows a config spinner until ready
+   await systemStore.getConfig()
+   await poolStore.getPools()
+   await collectionStore.getCollections()
+   configuring.value = false
+
+   // Make sure the session is is kept alive
+   await userStore.refreshAuth()
+
+   if ( userStore.isSignedIn ) {
+      await userStore.getAccountInfo()
+      if ( userStore.noILSAccount == false ) {
+         userStore.getBillDetails()
+         userStore.getCheckouts()
+         userStore.getRequests()
+      }
+      if ( userStore.isUndergraduate ) {
+         analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")
+      } else if ( userStore.isGraduate) {
+         analytics.trigger('User', 'NETBADGE_SIGNIN', "graduate")
+      } else {
+         analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
+      }
+   }
+
+   filterStore.getPreSearchFilters()
+}
+
+function initVersionChecker() {
+   systemStore.getVersion()
+   var currBuild = "unknown"
+   setInterval(() => {
+      axios.get("/version").then((response) => {
+         if ( currBuild == "unknown" ) {
+            currBuild = response.data.build
+         }
+         else if (currBuild != response.data.build) {
+            systemStore.newVersion = true
+         }
+      }).catch((error) => {
+         // no need to show a big error box; just try again later. If there is
+         // really a connectivity problem, other calls will fail and provide more information
+         console.error("Version check failed "+ JSON.stringify(error))
+      })
+   }, 1000*60*5)
+}
+
+onMounted(() => {
+   initVirgo()
+   initVersionChecker()
+   nextTick( ()=>{
+      menuHeight.value = document.getElementById("v4-navbar").offsetHeight
+      headerHeight.value = document.getElementById("v4-header").offsetHeight
+      headerHeight.value -= menuHeight.value
+   })
+   window.addEventListener("scroll", scrollHandler)
+   window.onresize = () => {
+      systemStore.displayWidth = window.innerWidth
+   }
+})
+
+onUnmounted(() => {
+   window.removeEventListener("scroll", scrollHandler)
+})
 </script>
 
 <style lang="scss">

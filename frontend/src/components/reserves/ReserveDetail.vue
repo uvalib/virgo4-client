@@ -1,28 +1,24 @@
 <template>
    <div class="reserve-detail">
-      <router-link :to="detailsLink(reserve.id)">
-         <p>{{reserve.title}}</p>
+      <router-link :to="detailsLink(props.reserve.id)">
+         <p>{{props.reserve.title}}</p>
       </router-link>
       <div class="inset">
-         <p>{{reserve.author}}</p>
-         <p>{{reserve.callNumber}}</p>
+         <p>{{props.reserve.author}}</p>
+         <p>{{props.reserve.callNumber}}</p>
       </div>
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      reserve: {
-         type: Object,
-         required:  true
-      }
-   },
-   methods: {
-      detailsLink(catalogKey) {
-         return `/sources/uva_library/items/${catalogKey}`
-      },
+<script setup>
+const props = defineProps({
+   reserve: {
+      type: Object,
+      required:  true
    }
+})
+function detailsLink(catalogKey) {
+   return `/sources/uva_library/items/${catalogKey}`
 }
 </script>
 

@@ -1,9 +1,9 @@
 <template>
    <div class="availability">
-      <div class="working" v-if="availability.searching" >
+      <div class="working" v-if="item.availability.searching" >
          <V4Spinner message="Loading Availability..."/>
       </div>
-      <div class="availability-content" v-if="showAvailability">
+      <div class="availability-content" v-else-if="showAvailability">
          <h2>Availability</h2>
          <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
          <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
@@ -12,15 +12,14 @@
             <div class="avail-message" v-for="(note, nidx) in libraryAvailabilityNotes" v-html="note" :key="`note${nidx}`"></div>
          </template>
 
-         <p class="error" v-if="availability.error" v-html="availability.error"></p>
+         <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
 
 
-         <BoundWithItems v-if="hasBoundWithItems"/>
-
-         <div class="items" v-if="hasItems || hasRequestOptions">
-            <RequestContainer :titleId="titleId" v-if="canMakeRequests && !isBarred" />
-            <ul class="holdings" v-if="details.holdings.libraries">
-               <li v-for="(lib, idx) in details.holdings.libraries" :key="`lib${idx}`">
+         <BoundWithItems v-if="item.hasBoundWithItems"/>
+         <div class="items" v-if="hasItems || request.hasRequestOptions">
+            <RequestContainer v-if="canMakeRequests && !user.isBarred" />
+            <ul class="holdings" v-if="item.details.holdings.libraries">
+               <li v-for="(lib, idx) in item.details.holdings.libraries" :key="`lib${idx}`">
                   <span class="library">{{lib.library}}</span>
                   <ul class="location">
                      <li v-for="(loc, lidx) in lib.locations" :key="`loc${lidx}`">
@@ -50,16 +49,16 @@
                   </tr>
                </thead>
 
-               <tr v-for="(item,idx) in availability.items" :key="`val-${idx}`">
-                  <td class="value">{{formatValue(item.library)}}</td>
-                  <td class="value">{{formatValue(item.current_location)}}</td>
-                  <td class="value">{{formatValue(item.call_number)}}</td>
+               <tr v-for="(avalItem,idx) in item.availability.items" :key="`val-${idx}`">
+                  <td class="value">{{formatValue(avalItem.library)}}</td>
+                  <td class="value">{{formatValue(avalItem.current_location)}}</td>
+                  <td class="value">{{formatValue(avalItem.call_number)}}</td>
                   <td class="value">
-                     <template v-if="item.notice">
-                        <AvailabilityNotice :label="formatValue(item.barcode)" :message="item.notice" />
+                     <template v-if="avalItem.notice">
+                        <AvailabilityNotice :label="formatValue(avalItem.barcode)" :message="avalItem.notice" />
                      </template>
                      <template v-else>
-                        {{formatValue(item.barcode)}}
+                        {{formatValue(avalItem.barcode)}}
                      </template>
                   </td>
                </tr>
@@ -69,95 +68,83 @@
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-import { mapState } from "vuex"
+<script setup>
+import { computed, onMounted } from "vue"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 import RequestContainer from "@/components/requests/RequestContainer.vue"
 import BoundWithItems from "@/components/details/BoundWithItems.vue"
-export default {
-  components: {
-    AvailabilityNotice, RequestContainer, BoundWithItems
-  },
-   props: {
-      titleId: String
-   },
-   computed: {
-      showAvailability() {
-         return this.availability.searching == false && (this.hasItems || this.hasRequestOptions || this.availabilityFields.length > 0 || this.hasBoundWithItems)
-      },
-      ...mapState({
-         details : state => state.item.details,
-         requestOptions: state => state.requests.requestOptions,
-         noILSAccount: state => state.user.noILSAccount,
-      }),
-      ...mapGetters({
-         availability: 'item/availability',
-         hasRequestOptions: 'requests/hasRequestOptions',
-         hasBoundWithItems: 'item/hasBoundWithItems',
-         isGuest: 'user/isGuest',
-         isBarred: 'user/isBarred',
-      }),
-      canMakeRequests() {
-         if ( this.noILSAccount) {
-            if (this.requestOptions.find( ro => ro.sign_in_required === false)) {
-               return true
-            }
-            return false
-         }
-         return this.hasRequestOptions
-      },
-      hasItems(){
-         return Array.isArray(this.availability.items) && this.availability.items.length > 0
+import { useItemStore } from "@/stores/item"
+import { useRequestStore } from "@/stores/request"
+import { useUserStore } from "@/stores/user"
 
-      },
-      availabilityStatement() {
-         let f = this.details.detailFields.find( f=>f.name == "availability_statement")
-         if (f) {
-            return f.value
-         }
-         return ""
-      },
-      accessRestriction() {
-         let f = this.details.detailFields.find( f=>f.name == "access_note")
-         if (f) {
-            return f.value
-         }
-         return ""
-      },
-      extentOfDigitization() {
-         let f = this.details.detailFields.find( f=>f.name == "extent_of_digitization")
-         if (f) {
-            return f.label + ": " + f.value
-         }
-         return ""
-      },
-      libraryAvailabilityNotes() {
-         let af = this.details.detailFields.find( f => f.name == "library_availability_note")
-         if (af ) {
-            if (Array.isArray(af.value) == false) {
-               return [af.value]
-            }
-            return af.value
-         }
-         return []
-      },
-      availabilityFields() {
-         return this.details.detailFields.filter( f => f.display == "availability")
+const props = defineProps({
+   titleId: String
+})
+
+const item = useItemStore()
+const request = useRequestStore()
+const user = useUserStore()
+
+const hasItems = computed(()=>{
+   return Array.isArray(item.availability.items) && item.availability.items.length > 0
+})
+const availabilityFields = computed(()=>{
+   return item.details.detailFields.filter( f => f.display == "availability")
+})
+const showAvailability = computed(()=>{
+   return hasItems.value || request.hasRequestOptions || availabilityFields.value.length > 0 || item.hasBoundWithItems
+})
+const canMakeRequests = computed(()=>{
+   if ( user.noILSAccount) {
+      if (request.requestOptions.find( ro => ro.sign_in_required === false)) {
+         return true
       }
-   },
-   methods: {
-      formatValue(val) {
-         if ( val == "On Shelf" ) {
-            return "On Shelf Now"
-         }
-         return val
-      },
-   },
-   created() {
-      this.$store.dispatch("item/getAvailability", this.titleId )
+      return false
    }
+   return request.hasRequestOptions
+})
+const availabilityStatement = computed(()=>{
+   let f = item.details.detailFields.find( f=>f.name == "availability_statement")
+   if (f) {
+      return f.value
+   }
+   return ""
+})
+const accessRestriction = computed(()=>{
+   let f = item.details.detailFields.find( f=>f.name == "access_note")
+   if (f) {
+      return f.value
+   }
+   return ""
+})
+const extentOfDigitization = computed(()=>{
+   let f = item.details.detailFields.find( f=>f.name == "extent_of_digitization")
+   if (f) {
+      return f.label + ": " + f.value
+   }
+   return ""
+})
+const libraryAvailabilityNotes = computed(()=>{
+   let af = item.details.detailFields.find( f => f.name == "library_availability_note")
+   if (af ) {
+      if (Array.isArray(af.value) == false) {
+         return [af.value]
+      }
+      return af.value
+   }
+   return []
+})
+
+function formatValue(val) {
+   if ( val == "On Shelf" ) {
+      return "On Shelf Now"
+   }
+   return val
 }
+
+onMounted(()=>{
+   item.getAvailability( props.titleId )
+})
 </script>
 <style lang="scss" scoped>
 .availability {
@@ -170,7 +157,7 @@ export default {
       margin: 50px 0 30px 0;
    }
    .working {
-      margin-bottom: 25px;
+      margin: 25px;
       text-align: center;
    }
 }

@@ -19,13 +19,9 @@
    </div>
 </template>
 
-<script>
-export default {
-   name: "not_found",
-   mounted() {
-      this.$analytics.trigger('Navigation', 'NOT_FOUND')
-   }
-}
+<script setup>
+import analytics from '@/analytics'
+analytics.trigger('Navigation', 'NOT_FOUND')
 </script>
 
 <style scoped lang="scss">

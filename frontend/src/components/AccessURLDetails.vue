@@ -4,7 +4,7 @@
          <div class='provider'>
             <template v-if="p.links.length==1">
                <a class="link-button" :href="p.links[0].url" target='_blank'
-                  :aria-label="`access ${title} online with ${providerLabel(p.provider)}`"
+                  :aria-label="`access ${props.title} online with ${providerLabel(p.provider)}`"
                >
                   {{ providerLabel(p.provider) }}
                   <template v-if="p.links[0].label && hasProviderInfo(p.provider)">
@@ -16,10 +16,10 @@
                </a>
             </template>
             <template v-else>
-               <div v-if="hasProviderInfo(p.provider)" class="header" :class="{full: mode=='full'}">
+               <div v-if="hasProviderInfo(p.provider)" class="header" :class="{full: props.mode=='full'}">
                   <template v-if="providerHomepage(p.provider)">
                      <a class="provider-link" :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
-                        <img v-if="mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
+                        <img v-if="props.mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
                         {{ providerLabel(p.provider) }}
                      </a>
                   </template>
@@ -27,14 +27,14 @@
                      <span class='provider'>{{ providerLabel(p.provider) }}</span>
                   </template>
                </div>
-               <div class="links" :class="{full: mode=='full', indent: hasProviderInfo}">
+               <div class="links" :class="{full: props.mode=='full', indent: hasProviderInfo}">
                   <div v-for="(l,idx) in providerLinks(p)" :key="`${l.url}-${idx}`">
-                     <a class="link-button" :href="l.url" target="_blank" :aria-label="`access ${title} ${l.label} with ${providerLabel(p.provider)}`">
+                     <a class="link-button" :href="l.url" target="_blank" :aria-label="`access ${props.title} ${l.label} with ${providerLabel(p.provider)}`">
                         <template v-if="l.label">{{l.label}}</template>
                         <template v-else>{{l.url}}</template>
                      </a>
                   </div>
-                  <template v-if="mode=='brief' && remainingLinks(p)">
+                  <template v-if="props.mode=='brief' && remainingLinks(p)">
                      <div>see {{remainingLinks(p)}} more on details page</div>
                   </template>
                </div>
@@ -44,62 +44,56 @@
    </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-export default {
-   name: "AccessURLDisplay",
-   props: {
-      mode: {
-         type: String,
-         default: "brief",
-      },
-      title: {
-         type: String,
-         required: true
-      },
-      pool: {
-         type: String,
-         required: true
-      },
-      urls: {
-         type: Array,
-         required: true
-      }
+<script setup>
+import { usePoolStore } from "@/stores/pool"
+
+const props = defineProps({
+   mode: {
+      type: String,
+      default: "brief",
    },
-   computed: {
-      ...mapGetters({
-         findProvider: 'pools/findProvider'
-      }),
+   title: {
+      type: String,
+      required: true
    },
-   methods: {
-      hasProviderInfo(provider) {
-         return this.findProvider(this.pool, provider) != null
-      },
-      providerLabel(provider) {
-         let p = this.findProvider(this.pool, provider)
-         if ( p ) return p.label
-         return provider
-      },
-      providerLogo(provider) {
-         let p = this.findProvider(this.pool, provider)
-         if ( p ) return p.logo_url
-         return ""
-      },
-      providerHomepage(provider) {
-         let p = this.findProvider(this.pool, provider)
-         if ( p ) return p.homepage_url
-         return ""
-      },
-      providerLinks( details ) {
-         if ( this.mode == "full") return details.links
-         return details.links.slice(0,10)
-      },
-      remainingLinks( details ) {
-         if ( this.mode == "full") return 0
-         if ( details.links.length <= 10) return 0
-         return details.links.length - 10
-      }
+   pool: {
+      type: String,
+      required: true
+   },
+   urls: {
+      type: Array,
+      required: true
    }
+})
+
+const poolStore = usePoolStore()
+
+function hasProviderInfo(provider) {
+   return poolStore.findProvider(props.pool, provider) != null
+}
+function providerLabel(provider) {
+   let p = poolStore.findProvider(props.pool, provider)
+   if ( p ) return p.label
+   return provider
+}
+function providerLogo(provider) {
+   let p = poolStore.findProvider(props.pool, provider)
+   if ( p ) return p.logo_url
+   return ""
+}
+function providerHomepage(provider) {
+   let p = poolStore.findProvider(props.pool, provider)
+   if ( p ) return p.homepage_url
+   return ""
+}
+function providerLinks( details ) {
+   if ( props.mode == "full") return details.links
+   return details.links.slice(0,10)
+}
+function remainingLinks( details ) {
+   if ( props.mode == "full") return 0
+   if ( details.links.length <= 10) return 0
+   return details.links.length - 10
 }
 </script>
 
@@ -118,7 +112,7 @@ export default {
       padding: .5em 1em;
       border-radius: 5px;
       display: inline-block;
-  margin: 0px 5px 5px 0 ;
+      margin: 0px 5px 5px 0 ;
 
       &:hover {
          background-color: var(--uvalib-brand-blue-lighter);
