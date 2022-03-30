@@ -8,12 +8,12 @@
             <div class="line">
                <span class="label">Title Searched:</span>
                <router-link :to="backURL" class="to-item`">
-                  <span class="item-title" v-html="browseTarget.title"></span>
+                  <span class="item-title" v-html="origTitle"></span>
                </router-link>
             </div>
             <div class="line">
                <span class="label">Call Number:</span>
-               <span class="item-call" v-html="browseTarget.call_number"></span>
+               <span class="item-call" v-html="origCallNumber"></span>
             </div>
          </div>
          <div class="browse-controls full">
@@ -80,10 +80,10 @@ const viewModes = [ {id: 'gallery', title: "<i class='fas fa-grip-horizontal'></
 const currViewMode = ref('gallery')
 const currFocus = ref('gallery')
 const viewModeOpen = ref(false)
+const origTitle = ref("")
+const origCallNumber = ref("")
+const origID = ref("")
 
-const browseTarget = computed(()=>{
-   return shelfStore.browse.find(b=> b.id == route.params.id)
-})
 const viewMode = computed(() =>{
    var m = viewModes.find( vm => vm.id == currViewMode.value)
    return m.title
@@ -154,7 +154,7 @@ function closeViewMenu() {
 }
 function isCurrent(idx) {
    let item = shelfStore.browse[idx]
-   return item.id == browseTarget.value.id
+   return item.id == origID.value
 }
 function browseNext() {
    shelfStore.browseNext()
@@ -181,6 +181,13 @@ onMounted( async ()=>{
    shelfStore.lookingUp = true
    shelfStore.browseRange = 10
    await shelfStore.getBrowseData(route.params.id )
+
+   // once data is available, lookup title, call and ID or the
+   // item that started the browse
+   let origItem = shelfStore.browse.find(b=> b.id == route.params.id)
+   origID.value = origItem.id
+   origTitle.value = origItem.title
+   origCallNumber.value = origItem.call_number
 })
 
 </script>
