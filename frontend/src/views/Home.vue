@@ -107,7 +107,7 @@ function setPageTitle() {
 
 onBeforeRouteUpdate((to) => {
    console.log("NEW HOME ROUTE "+ to.fullPath)
-   if ( queryStore.userSearched) {
+   if ( queryStore.userSearched && userStore.isSignedIn) {
       searchStore.updateHistory(userStore.signedInUser, to.fullPath)
    }
    restoreSearchFromQueryParams(to.query)
