@@ -168,7 +168,7 @@ function removeSavedSearch(searchID) {
 }
 
 function copyURL(token) {
-   let URL = window.location.protocol + "//" + window.location.host + this.searchURL(token)
+   let URL = window.location.protocol + "//" + window.location.host + searchURL(token)
    copyText(URL, undefined, (error, _event) => {
       if (error) {
          systemStore.setError("Unable to copy public search URL: "+error)
@@ -179,7 +179,7 @@ function copyURL(token) {
 }
 
 function copyRSS(token) {
-   let URL = this.rssURL(token)
+   let URL = rssURL(token)
    copyText(URL, undefined, (error, _event) => {
       if (error) {
          rssMessage.value = `Unable to automatically copy RSS URL: ${error}`
