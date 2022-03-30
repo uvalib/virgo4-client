@@ -55,7 +55,7 @@ export const useSystemStore = defineStore('system', {
          return state.message.type == "info" && state.message.content != ""
       },
       hasError: state => {
-         return state.message.type == "error"
+         return state.message.type == "error" || state.message.type == "ilsError"
       },
       pickupLibraries: state => {
          return state.allPickupLibraries.filter( p => p.enabled == true)

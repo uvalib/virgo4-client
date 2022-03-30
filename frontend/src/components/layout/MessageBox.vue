@@ -2,7 +2,7 @@
    <transition name="message-transition"
       enter-active-class="animated faster fadeIn"
       leave-active-class="animated faster fadeOut">
-      <div v-if="systemStore.hasMessage" class="messsage-box">
+      <div v-if="systemStore.hasMessage || systemStore.hasError" class="messsage-box">
          <div class="message" :role="msgRole" aria-modal="true"
             aria-labelledby="msgtitle" aria-describedby="msgbody"
             @keyup.esc="dismiss"

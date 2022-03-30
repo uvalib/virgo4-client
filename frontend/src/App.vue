@@ -89,7 +89,7 @@ const headerHeight = ref(0)
 const menuHeight = ref(0)
 const configuring = ref(true)
 
-const showDimmer = computed( () => systemStore.hasMessage || systemStore.sessionExpired )
+const showDimmer = computed( () => systemStore.hasMessage || systemStore.sessionExpired || systemStore.hasError )
 
 // extract a ref to headerAlerts from the alertStore so it can be watched directly
 const { headerAlerts } = storeToRefs(alertStore)
