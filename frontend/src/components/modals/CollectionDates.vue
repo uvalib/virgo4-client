@@ -94,7 +94,7 @@ async function cellClicked(e) {
 }
 function navigateToDate() {
    error.value = ""
-   let pid = collection.pidByDate(picked.value)
+   let pid = collection.getPidForDate(picked.value)
    if ( pid != "") {
       emit('picked', pid)
       calendardlg.value.hide()
