@@ -1,10 +1,12 @@
 <template>
-   <div class="accordion" :id="id"
+   <div class="accordion" :id="props.id"
       @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
-      <div v-if="showHeader" :id="`${id}-header`"
+      <div v-if="showHeader" :id="`${props.id}-header`"
          tabindex="0"
-         :class="layout" class="title" role="button"
-         :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }"
+         :class="props.layout" class="title" role="button"
+         :style="{ background: props.background, color: props.color,
+                   borderWidth: props.borderWidth, borderStyle: props.borderStyle,
+                   borderColor: props.borderColor }"
          :aria-expanded="expandedStr" :aria-controls="contentID">
          <slot name="title"></slot>
          <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
@@ -13,12 +15,14 @@
             v-on:before-enter="beforeEnter" v-on:enter="enter"
             v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div :id="contentID" class="accordion-content" v-show="isExpanded"
-            :aria-labelledby="`${id}-header`" role="region"
-            :style="{ background: backgroundContent, color: color }"
+            :aria-labelledby="`${props.id}-header`" role="region"
+            :style="{ background: props.backgroundContent, color: props.color }"
             @click.stop @keyup.stop.enter @keydown.space.stop>
             <slot></slot>
             <div v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
-               :style="{ background: background, color: color, borderWidth: borderWidth, borderStyle: borderStyle, borderColor: borderColor }" >
+               :style="{ background: props.background, color: props.color,
+                         borderWidth: props.borderWidth, borderStyle: props.borderStyle,
+                         borderColor: props.borderColor }" >
                <slot name="footer"></slot>
                <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
             </div>
@@ -27,164 +31,152 @@
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      id: {
-         type: String,
-         reqired: true
-      },
-      layoutChange: {
-         default: null,
-      },
-      heightOffset: {
-         type: Number,
-         default: 0,
-      },
-      closeOthers: {
-         type: Number,
-         default: null,
-      },
-      autoExpandID: {
-         type: String,
-         default: ""
-      },
-      layout: {
-         type: String,
-         default: "normal"
-      },
-      background: {
-         type: String,
-         default: "#fff"
-      },
-      backgroundContent: {
-         type: String,
-         default: "#fff"
-      },
-      color: {
-         type: String,
-         default: "var(--uvalib-text-dark)"
-      },
-      borderWidth: {
-         type: String,
-         default: "1px 1px 1px 1px"
-      },
-      borderColor: {
-         type: String,
-         default: "var(--uvalib-grey-light)"
-      },
-      borderStyle: {
-         type: String,
-         default: "solid"
-      },
-      expanded: {
-         default: false,
-         type: Boolean
-      },
-      invert: {
-         default: false,
-         type: Boolean
-      }
+<script setup>
+import { ref, computed, watch, useSlots } from 'vue'
+const emit = defineEmits( ['accordion-clicked', 'accordion-expanded', 'accordion-collapsed'])
+const props = defineProps({
+   id: {
+      type: String,
+      reqired: true
    },
-   watch: {
-      closeOthers() {
-         if ( this.closeOthers > -1) {
-            if ( this.closeOthers.toString() != this.id)
-            this.isExpanded = false
-         }
-      },
-      layoutChange() {
-         if (this.isExpanded && this.id) {
-            setTimeout( ()=> {
-               let content = document.getElementById(this.id)
-               if ( content) {
-                  content.setAttribute("style", "height: inherit;")
-               }
-            })
-         }
-      },
-      autoExpandID(newVal, _oldVal) {
-         if (this.isExpanded === false && this.id && newVal != "") {
-            if (this.id == newVal) {
-               this.isExpanded = true
-            }
-         }
-      }
+   layoutChange: {
+      default: null,
    },
-   data: function() {
-      return {
-         isExpanded: this.expanded,
-      };
+   closeOthers: {
+      type: Number,
+      default: null,
    },
-   computed: {
-      expandedStr() {
-         if ( this.isExpanded ) {
-            return "true"
-         }
-         return "false"
-      },
-      rotation() {
-         if ( this.invert) {
-            if (this.isExpanded) {
-               return "rotate(0deg)"
-            }
-            return "rotate(180deg)"
-         }
-         if (this.isExpanded) {
-            return "rotate(180deg)"
-         }
-         return "rotate(0deg)"
-      },
-      showHeader() {
-         return !this.isExpanded ||  this.isExpanded && !this.hasFooterSlot
-      },
-      contentID() {
-         return `accordion-conttent-${this.id}`
-      },
-      hasControlSlot() {
-         return Object.prototype.hasOwnProperty.call(this.$slots, 'controls')
-      },
-      hasFooterSlot() {
-         return Object.prototype.hasOwnProperty.call(this.$slots, 'footer')
-      },
+   autoExpandID: {
+      type: String,
+      default: ""
    },
-   methods: {
-      accordionClicked() {
-         this.$emit('accordion-clicked')
-         this.isExpanded = !this.isExpanded
-      },
-      accordionFooterClicked() {
-         this.accordionClicked()
-         setTimeout( ()=> {
-            let hdr = document.getElementById(`${this.id}-header`)
-            if (hdr) {
-               hdr.focus()
-            }
-         }, 250)
-      },
-      beforeEnter: function(el) {
-         document.getElementById(this.contentID).style.overflow = "hidden"
-         el.style.height = '0'
-      },
-      enter: function(el) {
-         el.style.height = `${el.scrollHeight - this.heightOffset}px`
-         setTimeout( ()=> {
-            this.$emit('accordion-expanded')
-             document.getElementById(this.contentID).style.overflow = "visible"
-         }, 250)
-      },
-      beforeLeave: function(el) {
-         el.style.height = `${el.scrollHeight - this.heightOffset}px`
-      },
-      leave: function(el) {
-         document.getElementById(this.contentID).style.overflow = "hidden"
-         el.style.height = '0'
-         setTimeout( ()=> {
-            this.$emit('accordion-collapsed')
-         }, 250)
+   layout: {
+      type: String,
+      default: "normal"
+   },
+   background: {
+      type: String,
+      default: "#fff"
+   },
+   backgroundContent: {
+      type: String,
+      default: "#fff"
+   },
+   color: {
+      type: String,
+      default: "var(--uvalib-text-dark)"
+   },
+   borderWidth: {
+      type: String,
+      default: "1px 1px 1px 1px"
+   },
+   borderColor: {
+      type: String,
+      default: "var(--uvalib-grey-light)"
+   },
+   borderStyle: {
+      type: String,
+      default: "solid"
+   },
+   expanded: {
+      default: false,
+      type: Boolean
+   },
+   invert: {
+      default: false,
+      type: Boolean
+   }
+})
+
+watch(() => props.closeOthers, () => {
+   if ( props.closeOthers > -1) {
+      if ( props.closeOthers.toString() != props.id)
+      isExpanded.value = false
+   }
+})
+watch(() => props.layoutChange, () => {
+   if (isExpanded.value && props.id) {
+      setTimeout( ()=> {
+         let content = document.getElementById(props.id)
+         if ( content) {
+            content.setAttribute("style", "height: inherit;")
+         }
+      })
+   }
+})
+watch(() => props.autoExpandID, (newVal) => {
+   if (isExpanded.value === false && props.id && newVal != "") {
+      if (props.id == newVal) {
+         isExpanded.value = true
       }
    }
-};
+})
+
+const slots = useSlots()
+const isExpanded = ref(props.expanded)
+
+const expandedStr = computed(()=>{
+   if ( isExpanded.value ) {
+      return "true"
+   }
+   return "false"
+})
+const rotation = computed(()=>{
+   if ( props.invert) {
+      if (isExpanded.value) {
+         return "rotate(0deg)"
+      }
+      return "rotate(180deg)"
+   }
+   if (isExpanded.value) {
+      return "rotate(180deg)"
+   }
+   return "rotate(0deg)"
+})
+const showHeader = computed(()=>{
+   return !isExpanded.value ||  isExpanded.value && !hasFooterSlot.value
+})
+const contentID = computed(()=>{
+   return `accordion-conttent-${props.id}`
+})
+const hasFooterSlot = computed(()=>{
+   return Object.prototype.hasOwnProperty.call(slots, 'footer')
+})
+
+function accordionClicked() {
+   emit('accordion-clicked')
+   isExpanded.value = !isExpanded.value
+}
+function accordionFooterClicked() {
+   accordionClicked()
+   setTimeout( ()=> {
+      let hdr = document.getElementById(`${props.id}-header`)
+      if (hdr) {
+         hdr.focus()
+      }
+   }, 250)
+}
+function beforeEnter(el) {
+   document.getElementById(contentID.value).style.overflow = "hidden"
+   el.style.height = '0'
+}
+function enter(el) {
+   el.style.height = `${el.scrollHeight}px`
+   setTimeout( ()=> {
+      emit('accordion-expanded')
+         document.getElementById(contentID.value).style.overflow = "visible"
+   }, 250)
+}
+function beforeLeave(el) {
+   el.style.height = `${el.scrollHeight}px`
+}
+function leave(el) {
+   document.getElementById(contentID.value).style.overflow = "hidden"
+   el.style.height = '0'
+   setTimeout( ()=> {
+      emit('accordion-collapsed')
+   }, 250)
+}
 </script>
 
 <style lang="scss" scoped>

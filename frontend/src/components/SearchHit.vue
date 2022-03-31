@@ -5,7 +5,7 @@
          <SearchHitDetail :hit="props.hit" :pool="props.pool"/>
       </div>
       <AccordionContent v-if="props.hit.grouped" :id="props.hit.identifier"
-         :autoExpandID="results.autoExpandGroupID" :expanded="!preferences.collapseGroups" :heightOffset="5"
+         :autoExpandID="results.autoExpandGroupID" :expanded="!preferences.collapseGroups"
          backgroundContent="none" background="var(--uvalib-blue-alt-light)"
          borderColor="var(--uvalib-blue-alt-light)" class="group">
          <template v-slot:title>{{groupTitle}}</template>
