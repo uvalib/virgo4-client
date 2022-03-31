@@ -10,10 +10,10 @@
       <slot name="button"></slot>
       <transition name="fade">
          <div class="v4-modal-dimmer" v-if="isOpen">
-            <div role="dialog" :aria-labelledby="`${id}-title`" :id="id" class="v4-modal" @keydown.esc="hide">
-               <div :id="`${id}-title`" class="v4-modal-title">
-                  <span>{{title}}</span>
-                  <V4Button aria-label="close modal" mode="icon" @click="hide" :id="`${id}-close-icon`"
+            <div role="dialog" :aria-labelledby="`${props.id}-title`" :id="props.id" class="v4-modal" @keydown.esc="hide">
+               <div :id="`${props.id}-title`" class="v4-modal-title">
+                  <span>{{props.title}}</span>
+                  <V4Button aria-label="close modal" mode="icon" @click="hide" :id="`${props.id}-close-icon`"
                      :focusBackOverride="true" @tabback="closeIconBackTabbed"
                      :focusNextOverride="true" @tabnext="closeIconTabbed"
                   >
@@ -25,7 +25,7 @@
                </div>
                <div class="v4-modal-controls">
                   <slot v-if="hasControlSlot()" name="controls"></slot>
-                  <V4Button v-else mode="tertiary" :id="`${id}-close`" class="close" @click="hide"
+                  <V4Button v-else mode="tertiary" :id="`${props.id}-close`" class="close" @click="hide"
                      :focusNextOverride="true" @tabnext="lastFocusTabbed" >
                         Close
                   </V4Button>
@@ -36,90 +36,91 @@
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      id: {
-         type: String,
-         required: true
-      },
-      title: {
-         type: String,
-         required: true
-      },
-      firstFocusID: {
-         type: String,
-         default: ""
-      },
-      lastFocusID: {
-         type: String,
-         default: ""
-      },
-      buttonID: {
-         type: String,
-         required: true
+<script setup>
+import { ref, useSlots } from 'vue'
+const props = defineProps({
+   id: {
+      type: String,
+      required: true
+   },
+   title: {
+      type: String,
+      required: true
+   },
+   firstFocusID: {
+      type: String,
+      default: ""
+   },
+   lastFocusID: {
+      type: String,
+      default: ""
+   },
+   buttonID: {
+      type: String,
+      required: true
+   }
+})
+const emit = defineEmits( ['opened', 'closed'] )
+
+defineExpose({
+   show, hide, lastFocusTabbed, firstFocusBackTabbed
+})
+
+const slots = useSlots()
+const isOpen = ref(false)
+
+function hide() {
+   isOpen.value =false
+   setFocus(props.buttonID)
+   emit('closed')
+}
+function show() {
+   isOpen.value =true
+   setTimeout(()=>{
+      let tgt = this.firstFocusID
+      if (tgt == "") {
+         tgt = props.id+"-close"
       }
-   },
-   data: function()  {
-      return {
-         isOpen: false
+      setFocus(tgt)
+      emit('opened')
+   }, 150)
+}
+function hasControlSlot() {
+   return Object.prototype.hasOwnProperty.call(slots, 'controls')
+}
+function lastFocusTabbed() {
+   let tgt = props.id+"-close-icon"
+   setFocus(tgt)
+}
+function closeIconTabbed() {
+   let tgt = props.firstFocusID
+   if (tgt == "") {
+      tgt = props.id+"-close-icon"
+   }
+   setFocus(tgt)
+}
+function closeIconBackTabbed() {
+   let tgt = props.lastFocusID
+   if (tgt == "") {
+      tgt = props.id+"-close-icon"
+   }
+   setFocus(tgt)
+}
+function firstFocusBackTabbed() {
+   let tgt = props.id+"-close-icon"
+   setFocus(tgt)
+}
+function setFocus(id) {
+   let ele = document.getElementById(id)
+   if (ele ) {
+      ele.focus()
+   } else {
+      let tgt = props.id+"-close"
+      ele = document.getElementById(tgt)
+      if (ele) {
+         ele.focus()
       }
-   },
-   methods: {
-      hide() {
-         this.isOpen=false
-         this.setFocus(this.buttonID)
-         this.$emit('closed')
-      },
-      show() {
-         this.isOpen=true
-         setTimeout(()=>{
-            let tgt = this.firstFocusID
-            if (tgt == "") {
-               tgt = this.id+"-close"
-            }
-            this.setFocus(tgt)
-            this.$emit('opened')
-         }, 150)
-      },
-      hasControlSlot() {
-         return this.$slots['controls']
-      },
-      lastFocusTabbed() {
-         let tgt = this.id+"-close-icon"
-         this.setFocus(tgt)
-      },
-      closeIconTabbed() {
-         let tgt = this.firstFocusID
-         if (tgt == "") {
-            tgt = this.id+"-close-icon"
-         }
-         this.setFocus(tgt)
-      },
-      closeIconBackTabbed() {
-         let tgt = this.lastFocusID
-         if (tgt == "") {
-            tgt = this.id+"-close-icon"
-         }
-         this.setFocus(tgt)
-      },
-      firstFocusBackTabbed() {
-         let tgt = this.id+"-close-icon"
-         this.setFocus(tgt)
-      },
-      setFocus(id) {
-         let ele = document.getElementById(id)
-         if (ele ) {
-            ele.focus()
-         } else {
-            let tgt = this.id+"-close"
-            ele = document.getElementById(tgt)
-            if (ele) {
-               ele.focus()
-            }
-         }
-      },
-   },
+   }
 }
 </script>
 
