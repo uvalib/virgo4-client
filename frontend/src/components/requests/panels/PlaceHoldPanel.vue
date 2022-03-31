@@ -6,7 +6,7 @@
             <option :value="{}">Select an item</option>
             <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
          </select>
-         <p class="error" v-if="errors.item_barcode">{{errors.item_barcode.join(', ')}}</p>
+         <p class="error" v-if="request.errors.item_barcode">{{request.errors.item_barcode.join(', ')}}</p>
       </div>
       <PickupLibrary />
       <V4Button mode="primary" class="request-button" @click="placeHold" :disabled="request.buttonDisabled">Place Hold</V4Button>
@@ -60,6 +60,7 @@ function itemSelected() {
    request.hold.itemLabel = selectedItem.value.label
    request.hold.itemBarcode = selectedItem.value.barcode
    request.errors.item_barcode = null
+   request.errors.sirsi = null
 }
 function placeHold() {
    request.createHold()
