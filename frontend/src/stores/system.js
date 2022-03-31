@@ -177,6 +177,11 @@ export const useSystemStore = defineStore('system', {
                      url.match("pda-ws") ) {
                   config.headers['Authorization'] = 'Bearer ' + user.authToken
                }
+               // any requests to the client API should include the host to toggle features
+               // on staging and production
+               if ( url.indexOf("/api") == 0) {
+                  config.headers['V4Host']= window.location.hostname
+               }
                return config
             }, error => {
                return Promise.reject(error)

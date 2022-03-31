@@ -371,8 +371,7 @@ export const useUserStore = defineStore('user', {
          if (this.isAdmin){
             this.authorizing = true
             let claims = this.parsedJWT
-            let host = window.location.hostname
-            return axios.post("/api/admin/claims", claims, {headers: {V4Host:host}} ).then((_response) => {
+            return axios.post("/api/admin/claims", claims ).then((_response) => {
                let jwtStr = VueCookies.get("v4_jwt")
                this.setUserJWT(jwtStr)
                this.authorizing = false

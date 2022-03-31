@@ -545,8 +545,9 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 
 	// v4-dev only
 	v4HostHeader := c.Request.Header.Get("V4Host")
+	log.Printf("INFO: delete hold V4Host header: [%s]", v4HostHeader)
 	if !strings.Contains(v4HostHeader, "-dev") && svc.Dev.AuthUser == "" {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.String(http.StatusNotImplemented, "Hold deletion is only available on the staging server")
 		return
 	}
 
