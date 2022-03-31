@@ -1,14 +1,14 @@
 <template>
-   <div :id="id" class="disclosure">
-      <V4Button mode="text" :aria-expanded="showFull.toString()" :aria-controls="`${id}-full`"
+   <div :id="props.id" class="disclosure">
+      <V4Button mode="text" :aria-expanded="showFull.toString()" :aria-controls="`${props.id}-full`"
          @click="toggle" @esc="hide" @blur="blurred">
          <i class="arrow fas fa-caret-right" :style="{ transform: rotation }"></i>
          <slot name="summary"></slot>
       </V4Button>
       <transition name="fade">
-         <div aria-live="polite" v-show="showFull" :id="`${id}-full`" class="full-text"
-            :class="{inline: mode!='overlay', left: align=='left'}"
-            :style="{background: backgroundColor, 'border-color': borderColor}"
+         <div aria-live="polite" v-show="showFull" :id="`${props.id}-full`" class="full-text"
+            :class="{inline: props.mode!='overlay', left: props.align=='left'}"
+            :style="{background: props.backgroundColor, 'border-color': props.borderColor}"
             @keyup.stop.esc="hide">
             <slot name="content"></slot>
          </div>
@@ -16,61 +16,55 @@
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      id: {
-         type: String,
-         required: true
-      },
-      align: {
-         type: String,
-         default: "default"
-      },
-      closeOnBlur: {
-         type: Boolean,
-         default: true
-      },
-      backgroundColor: {
-         type: String,
-         default: "var(--uvalib-blue-alt-light)"
-      },
-      borderColor: {
-         type: String,
-         default: "var(--uvalib-blue-alt)"
-      },
-      mode: {
-         type: String,
-         default: "overlay"
-      }
+<script setup>
+import { computed, ref } from 'vue'
+const props = defineProps({
+   id: {
+      type: String,
+      required: true
    },
-   data: function() {
-      return {
-         showFull: false
-      }
+   align: {
+      type: String,
+      default: "default"
    },
-   computed: {
-      rotation() {
-         if (this.showFull) {
-            return "rotate(90deg)"
-         }
-         return "rotate(0deg)"
-      },
+   closeOnBlur: {
+      type: Boolean,
+      default: true
    },
-   methods: {
-      blurred() {
-         if (this.closeOnBlur) {
-            this.hide()
-         }
-      },
-      hide() {
-         this.showFull = false
-      },
-      toggle() {
-         this.showFull = !this.showFull
-         this.$emit("click")
-      },
+   backgroundColor: {
+      type: String,
+      default: "var(--uvalib-blue-alt-light)"
+   },
+   borderColor: {
+      type: String,
+      default: "var(--uvalib-blue-alt)"
+   },
+   mode: {
+      type: String,
+      default: "overlay"
    }
+})
+const emit = defineEmits( ['click'] )
+
+const showFull = ref(false)
+const rotation = computed(() =>{
+   if (showFull.value) {
+      return "rotate(90deg)"
+   }
+   return "rotate(0deg)"
+})
+
+function blurred() {
+   if (props.closeOnBlur) {
+      hide()
+   }
+}
+function hide() {
+   showFull.value = false
+}
+function toggle() {
+   showFull.value = !showFull.value
+   emit("click")
 }
 </script>
 
