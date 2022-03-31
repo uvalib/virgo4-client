@@ -157,7 +157,6 @@ async function initVirgo() {
       if ( userStore.noILSAccount == false ) {
          userStore.getBillDetails()
          userStore.getCheckouts()
-         userStore.getRequests()
       }
       if ( userStore.isUndergraduate ) {
          analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")

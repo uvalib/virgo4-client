@@ -267,6 +267,7 @@ function deleteHold(id) {
 onMounted(() =>{
    if ( userStore.isSignedIn) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Requests")
+      userStore.getRequests()
    }
 })
 </script>
