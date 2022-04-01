@@ -194,12 +194,20 @@ const hasImage = computed(()=>{
 })
 
 onMounted(()=>{
+   // if the selected digital object index is present in the URL, apply it
+   let tgtIdx = route.query.idx
+   if (tgtIdx) {
+      selectedDigitalObjectIdx.value = parseInt(tgtIdx, 10)
+      console.log("set idx to "+selectedDigitalObjectIdx.value)
+   }
+
+    // listen for events posted from the embedded instance of curio
    window.onmessage = (e) => {
       if ( e.data.name == "curio") {
          // convert the curio params object into a query string and use replaceState to update the URL in place
          // do not use the router as this forces page reloads
          let curio = e.data
-         let qp = []
+         let qp = [`idx=${selectedDigitalObjectIdx.value}`]
          if ( curio.x) {
             qp.push(`x=${curio.x}`)
          }
@@ -241,6 +249,7 @@ function relatedImageClicked( hit ) {
 }
 function viewerClicked(tgtItem) {
    selectedDigitalObjectIdx.value = item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
+   history.replaceState(null, null, "?idx="+selectedDigitalObjectIdx.value)
 }
 function isCurrent(tgtItem) {
    let curr = item.digitalContent[selectedDigitalObjectIdx.value]
