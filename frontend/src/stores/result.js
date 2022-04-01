@@ -510,6 +510,13 @@ export const useResultStore = defineStore('result', {
          })
       },
 
+      dropOtherResults( keepPoolID ) {
+         this.searching = true
+         this.results = this.results.filter( r => r.pool.id == keepPoolID)
+         this.selectPoolResults(0)
+         this.searching = false
+      },
+
       // Select pool results and get all facet info for the result
       selectPoolResults(resultIdx) {
          if (this.selectedResultsIdx != resultIdx) {

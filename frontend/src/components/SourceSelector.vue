@@ -32,8 +32,10 @@
 <script setup>
 import SearchTips from "@/components/disclosures/SearchTips.vue"
 import { useQueryStore } from "@/stores/query"
+import { useResultStore } from "@/stores/result"
 import { useRouter, useRoute } from 'vue-router'
 
+const results = useResultStore()
 const queryStore = useQueryStore()
 const router = useRouter()
 const route = useRoute()
@@ -44,10 +46,14 @@ function sourcesClicked( setting ) {
       if (queryStore.queryEntered || route.query.filter ) {
          let query = Object.assign({}, route.query)
          delete query.page
-         query.q = queryStore.string
-         query.pool = setting
-         queryStore.userSearched = true
-         router.push({ query })
+         if (queryStore.searchSources == query.pool && queryStore.searchSources != "all") {
+            results.dropOtherResults(queryStore.searchSources)
+         } else {
+            query.q = queryStore.string
+            query.pool = setting
+            queryStore.userSearched = true
+            router.push({ query })
+         }
       }
    }
 }
