@@ -70,9 +70,9 @@
                            </th>
                         </tr>
                         <tr>
-                           <th></th>
-                           <th>Title</th>
-                           <th>Author</th>
+                           <th class="heading"></th>
+                           <th class="heading">Title</th>
+                           <th class="heading">Author</th>
                         </tr>
                         <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
                            <td class="cb">
@@ -413,13 +413,18 @@ td.actions {
 }
 table {
    border-collapse: collapse;
-   td, th {
-      padding: 2px 8px;
+   td {
+      padding: 5px 8px;
       text-align: left;
+      vertical-align: text-top;
    }
    th {
       padding: 10px 5px;
       background-color: white;
+      text-align: left;
+   }
+   th.heading {
+      border-bottom: 1px solid var(--uvalib-grey-light);
    }
 }
 table tr:nth-child(2) {

@@ -77,7 +77,12 @@ export const useBookmarkStore = defineStore('bookmark', {
          })
       },
       updateFolder(folder) {
-         folder.bookmarks.forEach( b => b.details = JSON.parse(b.details) )
+         folder.bookmarks.forEach( b => {
+            b.details = JSON.parse(b.details)
+            let pn = b.pool.name
+            delete b.pool
+            b.pool = pn
+         })
          var idx = this.bookmarks.findIndex( f => f.id == folder.id)
          if (idx > -1) {
             this.bookmarks.splice(idx, 1, folder)

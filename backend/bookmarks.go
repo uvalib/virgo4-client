@@ -139,7 +139,7 @@ func (svc *ServiceContext) UpdateBookmarkFolder(c *gin.Context) {
 	log.Printf("User %s:%d updating folderID %s name to %s", v4UserID, userID, folderID, updateInfo.Name)
 
 	var folder BookmarkFolder
-	resp := svc.GDB.Preload("Bookmarks").Find(&folder, folderID)
+	resp := svc.GDB.Preload("Bookmarks").Preload("Bookmarks.Source").Find(&folder, folderID)
 	if resp.Error != nil {
 		log.Printf("Folder %s not found: %s", folderID, resp.Error.Error())
 		c.String(http.StatusNotFound, "folder not found")
@@ -259,7 +259,7 @@ func (svc *ServiceContext) DeleteBookmarks(c *gin.Context) {
 	}
 
 	var folder BookmarkFolder
-	svc.GDB.Preload("Bookmarks").Find(&folder, folderID)
+	svc.GDB.Preload("Bookmarks").Preload("Bookmarks.Source").Find(&folder, folderID)
 	c.JSON(http.StatusOK, folder)
 }
 
