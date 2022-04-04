@@ -165,9 +165,6 @@ export const useUserStore = defineStore('user', {
          if (this.isHSLUser == false) {
             pickupLibraries = pickupLibraries.filter( p => p.id != "HEALTHSCI" )
          }
-         if (this.isLawUser == false) {
-            pickupLibraries = pickupLibraries.filter( p => p.id != "LAW")
-         }
          if (this.canUseLEO == false) {
             pickupLibraries = pickupLibraries.filter( p => p.id != "LEO")
          }
