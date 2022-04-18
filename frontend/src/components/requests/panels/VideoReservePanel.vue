@@ -187,7 +187,7 @@ function submit() {
       errors.value.push("subtitleLanguage")
    }
 
-   if ( itemOptions.value.length > 1 && !selectedVideo.value.barcode) {
+   if ( itemOptions.value.length > 1 && selectedVideo.value.barcode == "") {
       errors.value.push("barcode")
    }
 
