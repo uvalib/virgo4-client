@@ -61,6 +61,16 @@ export const usePoolStore = defineStore('pool', {
             return attr.supported
          }
       },
+      shelfBrowseSupport: state => {
+         return (id) => {
+            let pool = state.list.find( p => p.id == id)
+            if (!pool) return false
+            if (!pool.attributes) return false
+            let attr = pool.attributes.find( a=> a.name=='shelf_browse')
+            if (!attr) return false
+            return attr.supported
+         }
+      },
       sortingSupport: state => {
          return (id) => {
             let pool = state.list.find( p => p.id == id)

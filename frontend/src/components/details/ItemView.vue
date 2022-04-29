@@ -79,7 +79,7 @@
       <template v-if="details.source != 'images'">
          <Availability v-if="poolStore.hasAvailability(details.source)" :titleId="details.identifier" />
          <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
-         <ShelfBrowse v-if="!details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
+         <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
       </template>
    </div>
 </template>
