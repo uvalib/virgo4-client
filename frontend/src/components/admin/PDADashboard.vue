@@ -13,7 +13,7 @@
          </p>
          <table>
             <tr>
-               <th>Date Ordered</th>
+               <th>Created At</th>
                <th>Ordered By</th>
                <th>Hold Library</th>
                <th>Fund Code</th>
@@ -23,7 +23,7 @@
                <th class="wide">Title</th>
             </tr>
             <tr v-for="o in pdaStore.orders" :key="o.barcode">
-               <td style="width:max-content;">{{o.created_at.split("T")[0]}}</td>
+               <td style="width:max-content;">{{convertTZ(o.created_at)}}</td>
                <td>{{o.computing_id}}</td>
                <td>{{o.hold_library}}</td>
                <td>{{o.fund_code}}</td>
@@ -43,10 +43,14 @@ import { usePDAStore } from "@/stores/pda"
 import { onMounted } from 'vue'
 
 const pdaStore = usePDAStore()
+const tz = "America/New_York"
 
 onMounted( async () => {
-      pdaStore.getOrders()
+   pdaStore.getOrders()
 })
+function convertTZ(date) {
+   return new Date(date).toLocaleString("en-US", {year: "numeric", month: "2-digit", day: "2-digit", timeZone: tz})
+}
 </script>
 
 <style lang="scss" scoped>
