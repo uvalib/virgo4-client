@@ -58,11 +58,11 @@ type ServiceConfig struct {
 	SearchAPI       string
 	FeedbackEmail   string
 	ILSAPI          string
+	PDAAPI          string
 	CatalogPoolURL  string
 	JWTKey          string
 	Dev             DevConfig
 	DB              DBConfig
-	PDADB           DBConfig
 	SMTP            SMTPConfig
 	Illiad          IlliadConfig
 	Firebase        FirebaseConfig
@@ -101,12 +101,8 @@ func LoadConfig() *ServiceConfig {
 	flag.StringVar(&cfg.DB.User, "dbuser", "v4user", "Database user")
 	flag.StringVar(&cfg.DB.Pass, "dbpass", "pass", "Database password")
 
-	// PDA DB connection params
-	flag.StringVar(&cfg.PDADB.Host, "pdadbhost", "", "PDA Database host")
-	flag.IntVar(&cfg.PDADB.Port, "pdadbport", 5432, "PDA Database port")
-	flag.StringVar(&cfg.PDADB.Name, "pdadbname", "", "PDA Database name")
-	flag.StringVar(&cfg.PDADB.User, "pdadbuser", "", "PDA Database user")
-	flag.StringVar(&cfg.PDADB.Pass, "pdadbpass", "", "PDA Database password")
+	// PDA API connection params
+	flag.StringVar(&cfg.PDAAPI, "pda", "https://pda-ws-dev.internal.lib.virginia.edu", "Patron Driven Acquisition API URL")
 
 	// SMTP settings
 	flag.StringVar(&cfg.SMTP.Host, "smtphost", "", "SMTP Host")
@@ -133,6 +129,11 @@ func LoadConfig() *ServiceConfig {
 		log.Fatal("ils param is required")
 	} else {
 		log.Printf("ILS Connector API endpoint: %s", cfg.ILSAPI)
+	}
+	if cfg.PDAAPI == "" {
+		log.Fatal("pda param is required")
+	} else {
+		log.Printf("PDA API endpoint: %s", cfg.PDAAPI)
 	}
 	if cfg.CatalogPoolURL == "" {
 		log.Fatal("catalog pool param is required")

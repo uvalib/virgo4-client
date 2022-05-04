@@ -3,8 +3,14 @@
       <h2>
          <span>PDA Dashboard</span>
       </h2>
-      <div class="content form">
-         <h3>Orders from the last 7 days</h3>
+      <div class="content form" >
+         <h3>Order History</h3>
+         <p class="error" v-html="pdaStore.error" v-if="pdaStore.error"></p>
+         <p>
+            <V4Button class="pager" mode="tertiary" @click="pdaStore.getOrders(pdaStore.pagination.prev_page)" :disabled="!pdaStore.pagination.prev_page">Prev</V4Button>
+            Page {{pdaStore.pagination.current_page}} of {{pdaStore.pagination.total_pages}}
+            <V4Button class="pager" mode="tertiary" @click="pdaStore.getOrders(pdaStore.pagination.next_page)" :disabled="!pdaStore.pagination.next_page">Next</V4Button>
+         </p>
          <table>
             <tr>
                <th>Date Ordered</th>
@@ -13,18 +19,21 @@
                <th>Fund Code</th>
                <th>Loan Type</th>
                <th>Barcode</th>
+               <th>Order Number</th>
                <th class="wide">Title</th>
             </tr>
-            <tr v-for="o in pdaStore.report" :key="o.barcode">
-               <td style="width:max-content;">{{o.dateOrdered.split("T")[0]}}</td>
-               <td>{{o.computingID}}</td>
-               <td>{{o.holdLibrary}}</td>
-               <td>{{o.fundCode}}</td>
-               <td>{{o.loanType}}</td>
+            <tr v-for="o in pdaStore.orders" :key="o.barcode">
+               <td style="width:max-content;">{{o.created_at.split("T")[0]}}</td>
+               <td>{{o.computing_id}}</td>
+               <td>{{o.hold_library}}</td>
+               <td>{{o.fund_code}}</td>
+               <td>{{o.loan_type}}</td>
                <td>{{o.barcode}}</td>
+               <td>{{o.vendor_order_number}}</td>
                <td class="wrap">{{o.title}}</td>
             </tr>
          </table>
+         <p>{{pdaStore.pagination.total_count}} total orders</p>
       </div>
    </div>
 </template>
@@ -35,10 +44,8 @@ import { onMounted } from 'vue'
 
 const pdaStore = usePDAStore()
 
-onMounted( () => {
-   if (pdaStore.report.length == 0) {
-      pdaStore.getRecentOrders()
-   }
+onMounted( async () => {
+      pdaStore.getOrders()
 })
 </script>
 

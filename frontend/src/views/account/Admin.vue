@@ -46,7 +46,7 @@ onMounted(() => {
    min-height: 400px;
    position: relative;
    color: var(--color-primary-text);
-   width: 60%;
+   width: 80%;
    margin: 2vw auto 0 auto;
    .section {
       margin: 15px 0 40px 0;

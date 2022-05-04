@@ -34,13 +34,13 @@ type ServiceContext struct {
 	SearchAPI         string
 	FeedbackEmail     string
 	ILSAPI            string
+	PDAAPI            string
 	CatalogPoolURL    string
 	JWTKey            string
 	Dev               DevConfig
 	Firebase          FirebaseConfig
 	PendingTranslates map[string]string
 	GDB               *gorm.DB
-	PDADB             *gorm.DB
 	SMTP              SMTPConfig
 	Illiad            IlliadConfig
 	FastHTTPClient    *http.Client
@@ -68,6 +68,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		JWTKey:          cfg.JWTKey,
 		FeedbackEmail:   cfg.FeedbackEmail,
 		ILSAPI:          cfg.ILSAPI,
+		PDAAPI:          cfg.PDAAPI,
 		CatalogPoolURL:  cfg.CatalogPoolURL,
 		SMTP:            cfg.SMTP,
 		Illiad:          cfg.Illiad,
@@ -82,16 +83,6 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		log.Fatal(err)
 	}
 	ctx.GDB = gdb
-
-	log.Printf("INFO: connecting GORM to PDA DB...")
-	connStr = fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
-		cfg.PDADB.User, cfg.PDADB.Pass, cfg.PDADB.Name, cfg.PDADB.Host, cfg.PDADB.Port)
-
-	pda, pdaErr := gorm.Open(postgres.Open(connStr), &gorm.Config{})
-	if pdaErr != nil {
-		log.Fatal(err)
-	}
-	ctx.PDADB = pda
 
 	if ctx.Dev.FakeSMTP {
 		log.Printf("Using dev mode for SMTP; all messages will be logged instead of delivered")
@@ -199,6 +190,19 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 			hcMap["ils_connector"] = hcResp{Healthy: true}
 		}
 	}
+	if svc.PDAAPI != "" {
+		apiURL := fmt.Sprintf("%s/version", svc.PDAAPI)
+		resp, err := svc.FastHTTPClient.Get(apiURL)
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+		if err != nil {
+			log.Printf("ERROR: Failed response from PDA Service PING: %s - %s", err.Error(), svc.PDAAPI)
+			hcMap["pda"] = hcResp{Healthy: false, Message: err.Error()}
+		} else {
+			hcMap["pda"] = hcResp{Healthy: true}
+		}
+	}
 
 	if svc.AvailabilityURL != "" {
 		apiURL := fmt.Sprintf("%s/version", svc.AvailabilityURL)
@@ -244,17 +248,6 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 	} else {
 		hcMap["illiad"] = hcResp{Healthy: true}
 		log.Printf("ILLiad version: %s", respBytes)
-	}
-
-	hcMap["pdadb"] = hcResp{Healthy: true}
-	pdaDB, pdaErr := svc.GDB.DB()
-	if pdaErr != nil {
-		hcMap["pdadb"] = hcResp{Healthy: false, Message: pdaErr.Error()}
-	} else {
-		err := pdaDB.Ping()
-		if err != nil {
-			hcMap["database"] = hcResp{Healthy: false, Message: err.Error()}
-		}
 	}
 
 	c.JSON(http.StatusOK, hcMap)
@@ -477,6 +470,34 @@ func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt 
 			url, err.StatusCode, err.Message, elapsedMS)
 	} else {
 		log.Printf("Successful response from ILS POST %s. Elapsed Time: %d (ms)", url, elapsedMS)
+	}
+	return resp, err
+}
+
+// PDAGet sends a GET request to the PDA API and returns the response
+func (svc *ServiceContext) PDAGet(path string, jwt string) ([]byte, *RequestError) {
+	url := fmt.Sprintf("%s%s", svc.PDAAPI, path)
+	logURL := sanitizeURL(url)
+	log.Printf("PDA GET request: %s, timeout  %.0f sec", logURL, svc.HTTPClient.Timeout.Seconds())
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
+
+	startTime := time.Now()
+	rawResp, rawErr := svc.HTTPClient.Do(req)
+	resp, err := handleAPIResponse(logURL, rawResp, rawErr)
+	elapsedNanoSec := time.Since(startTime)
+	elapsedMS := int64(elapsedNanoSec / time.Millisecond)
+
+	if err != nil {
+		if shouldLogAsError(err.StatusCode) {
+			log.Printf("ERROR: Failed response from PDA GET %s - %d:%s. Elapsed Time: %d (ms)",
+				logURL, err.StatusCode, err.Message, elapsedMS)
+		} else {
+			log.Printf("INFO: Response from PDA GET %s - %d:%s. Elapsed Time: %d (ms)",
+				logURL, err.StatusCode, err.Message, elapsedMS)
+		}
+	} else {
+		log.Printf("Successful response from PDA GET %s. Elapsed Time: %d (ms)", logURL, elapsedMS)
 	}
 	return resp, err
 }
