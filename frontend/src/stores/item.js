@@ -69,10 +69,18 @@ export const useItemStore = defineStore('item', {
          return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
       },
       boundIn: state => {
-         return state.availability.bound_with.filter(item => item.is_parent == true)
+         if (state.availability){
+            return state.availability.bound_with.filter(item => item.is_parent == true)
+         }else{
+            return []
+         }
       },
       boundWith: state => {
-         return state.availability.bound_with.filter(item => item.is_parent == false)
+         if (state.availability){
+            return state.availability.bound_with.filter(item => item.is_parent == false)
+         }else{
+            return []
+         }
       }
    },
 
@@ -314,6 +322,9 @@ export const useItemStore = defineStore('item', {
 
             this.getDigitalContent()
             this.getGoogleBooksURL()
+            if (poolStore.hasAvailability(this.details.source)){
+               this.getAvailability()
+            }
             this.details.searching = false
          }).catch( async (error) => {
             if ( error.response && error.response.status == 404) {
@@ -326,15 +337,15 @@ export const useItemStore = defineStore('item', {
          })
       },
 
-      async getAvailability(titleId) {
+      async getAvailability() {
          const system = useSystemStore()
          const requestStore = useRequestStore()
 
          this.clearAvailability()
-         let url = `${system.availabilityURL}/item/${titleId}`
+         let url = `${system.availabilityURL}/item/${this.identifier}`
          axios.get(url).then((response) => {
             if (response.data) {
-               this.availability.titleId = titleId
+               this.availability.titleId = response.data.availability.title_id
                this.availability.display = response.data.availability.display
                this.availability.items = response.data.availability.items
                this.availability.bound_with = response.data.availability.bound_with

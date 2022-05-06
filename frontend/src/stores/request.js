@@ -244,12 +244,5 @@ export const useRequestStore = defineStore('request', {
          this.buttonDisabled = false
          this.activePanel = "ConfirmationPanel"
       },
-      reload(){
-         const itemStore = useItemStore()
-         let ident = itemStore.identifier
-         if (ident) {
-            itemStore.getAvailability(ident)
-         }
-      }
    }
 })

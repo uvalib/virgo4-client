@@ -77,10 +77,6 @@ import { useItemStore } from "@/stores/item"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 
-const props = defineProps({
-   titleId: String
-})
-
 const item = useItemStore()
 const request = useRequestStore()
 const user = useUserStore()
@@ -142,9 +138,6 @@ function formatValue(val) {
    return val
 }
 
-onMounted(()=>{
-   item.getAvailability( props.titleId )
-})
 </script>
 <style lang="scss" scoped>
 .availability {
