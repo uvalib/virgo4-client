@@ -69,7 +69,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue"
+import { computed } from "vue"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 import RequestContainer from "@/components/requests/RequestContainer.vue"
 import BoundWithItems from "@/components/details/BoundWithItems.vue"
