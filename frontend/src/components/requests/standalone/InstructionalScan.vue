@@ -109,7 +109,7 @@
       </div>
       <ILLCopyrightNotice type="instruction" />
       <div class="controls">
-         <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
+         <V4Button mode="tertiary" id="scan-cancel" @click="emit('canceled')">
             Cancel
          </V4Button>
          <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="requestStore.buttonDisabled">
@@ -124,6 +124,8 @@ import { onMounted, ref } from 'vue'
 import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
+
+const emit = defineEmits( ['submitted', 'canceled'] )
 
 const required = ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage', 'year']
 const pageLengthError = ref(false)
@@ -178,7 +180,7 @@ async function submitClicked() {
          }
       } else {
          await requestStore.submitILLiadScanRequest(request.value)
-         this.$emit('submitted')
+         emit('submitted')
       }
    }
 }

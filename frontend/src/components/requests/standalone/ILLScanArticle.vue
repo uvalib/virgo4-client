@@ -71,7 +71,7 @@
       </div>
       <ILLCopyrightNotice type="research" />
       <div class="controls">
-         <V4Button mode="tertiary" id="scan-cancel" @click="$emit('canceled')">
+         <V4Button mode="tertiary" id="scan-cancel" @click="emit('canceled')">
             Cancel
          </V4Button>
          <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="requestStore.buttonDisabled">
@@ -94,6 +94,7 @@ const props = defineProps({
       default: false
    },
 })
+const emit = defineEmits( ['submitted', 'canceled'])
 
 const requestStore = useRequestStore()
 const item = useItemStore()
@@ -148,7 +149,7 @@ async function submitClicked() {
          }
       } else {
          await requestStore.submitILLiadScanRequest(request.value)
-         this.$emit('submitted', {title: request.value.title, pickup: ""})
+         emit('submitted', {title: request.value.title, pickup: ""})
       }
    }
 }

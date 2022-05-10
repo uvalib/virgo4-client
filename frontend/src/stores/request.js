@@ -4,7 +4,6 @@ import urlModule from 'url'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
-import { useItemStore } from "@/stores/item"
 import { usePreferencesStore } from "@/stores/preferences"
 
 export const useRequestStore = defineStore('request', {
