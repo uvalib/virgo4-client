@@ -6,7 +6,6 @@
       <div v-else class="details-content" v-bind:style="{width: curioWidth }">
          <div class="image-title-bar">
             <span class="image-title">
-               <b>FULL</b>
                <span>{{item.details.header.title}}</span>
                <div class="position-info" v-if="item.collectionPosition">{{item.collectionPosition}}</div>
             </span>
