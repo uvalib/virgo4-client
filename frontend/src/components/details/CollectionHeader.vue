@@ -20,7 +20,7 @@
          </div>
       </div>
 
-      <div class="cal">
+      <div class="cal" v-if="collection.canNavigate && !item.isCollectionHead">
          <CollectionDates v-if="collection.hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
       </div>
 
