@@ -1,27 +1,6 @@
 <template>
    <section class="collection-header">
-      <div class="image" v-if="collection.image" >
-         <img class="thumb" :class="{bookplate: collection.isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
-         <a class="viewer" :href="collection.image.url" target="_blank" v-if="collection.isBookplate">
-            View full size<i class="fal fa-external-link-alt" style="margin-left: 5px;"></i>
-         </a>
-      </div>
 
-      <div class="content">
-         <div class="title-row">{{collection.title}}</div>
-         <div class="desc-row" v-html="collection.description"></div>
-      </div>
-
-      <div class="actions">
-         <span class="seq-nav" v-if="collection.canNavigate && !item.isCollectionHead">
-            <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
-               <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
-            </V4Button>
-            <CollectionDates v-if="collection.hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
-            <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${collection.itemLabel}`">
-               Next {{collection.itemLabel}}<i class="next fal fa-arrow-right"></i>
-            </V4Button>
-         </span>
 
          <div class="collection-search" v-if="collection.canSearch">
             <input autocomplete="off" type="text" id="search"
@@ -33,8 +12,31 @@
             <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
          </div>
 
-         <V4Button v-if="resultStore.lastSearchURL" mode="text" @click="returnToSearch" class="back">Return to search results</V4Button>
+      <div class="text-info">
+         <div class="image" v-if="collection.image" >
+            <img class="thumb" :class="{bookplate: collection.isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
+            <a class="viewer" :href="collection.image.url" target="_blank" v-if="collection.isBookplate">
+               View full size<i class="fal fa-external-link-alt" style="margin-left: 5px;"></i>
+            </a>
+         </div>
+
+         <div class="content">
+            <div class="title-row">{{collection.title}}</div>
+            <div class="desc-row" v-html="collection.description"></div>
+         </div>
       </div>
+
+      <div class="cal">
+         <CollectionDates v-if="collection.hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
+      </div>
+      <div class="seq-nav" v-if="collection.canNavigate && !item.isCollectionHead">
+            <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
+               <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
+            </V4Button>
+            <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${collection.itemLabel}`">
+               Next {{collection.itemLabel}}<i class="next fal fa-arrow-right"></i>
+            </V4Button>
+         </div>
    </section>
 </template>
 
@@ -44,14 +46,12 @@ import { computed } from 'vue'
 import { useCollectionStore } from "@/stores/collection"
 import { useFilterStore } from "@/stores/filter"
 import { useItemStore } from "@/stores/item"
-import { useResultStore } from "@/stores/result"
 import { useQueryStore } from "@/stores/query"
 import { useRoute, useRouter } from 'vue-router'
 
 const collection = useCollectionStore ()
 const filter = useFilterStore()
 const item = useItemStore()
-const resultStore = useResultStore()
 const queryStore = useQueryStore()
 const route = useRoute()
 const router = useRouter()
@@ -99,9 +99,6 @@ function searchClicked() {
    query.pool = item.details.source
    router.push({path: "/search", query: query })
 }
-function returnToSearch() {
-   router.push( resultStore.lastSearchURL )
-}
 function nextItem() {
    let date = this.publishedDate
    if (date) {
@@ -118,13 +115,16 @@ function prevItem() {
 <style lang="scss" scoped>
 .collection-header {
    background-color: white;
-   padding: 15px 20px;
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: center;
    border-top: 1px solid var(--uvalib-grey-light);
    border-bottom: 1px solid var(--uvalib-grey-light);
    margin-bottom: 15px;
+
+   .text-info {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      padding: 5px 20px;
+   }
 
    .image {
       .thumb {
@@ -157,36 +157,16 @@ function prevItem() {
          margin-right: 20px;
       }
    }
-
-   .actions {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-end;
-
-      .back {
-         margin-top: 5px;
-      }
-
-      label {
-         font-weight: bold;
-         margin-right: 10px;
-      }
-   }
-
    .collection-search {
       display: flex;
       flex-flow: row wrap;
-      align-items: stretch;
+      // align-items: stretch;
       justify-content: flex-start;
-      margin: 0 0 10px 0;
+      margin: 10px 10px 0 auto;
       font-size: 0.9em;
-      min-width: 300px;
-      width: 100%;
 
       input[type=text] {
-         font-size: 1.15em;
-         padding: 0.5vw 0.75vw;
+         padding: 5px 10px;
          border: 1px solid var(--uvalib-grey);
          border-right: 0;
          margin: 0 !important;
@@ -199,7 +179,7 @@ function prevItem() {
       .search, .browse {
          border-radius: 0 5px 5px 0;
          margin: 0;
-         padding: 0 20px;
+         padding: 5px 20px;
       }
       .search {
          margin-right: 5px;
@@ -207,17 +187,30 @@ function prevItem() {
 
       .browse {
          border-radius: 5px;
-         padding: 4px 20px;
+         padding: 5px 20px;
+      }
+   }
+
+   .cal {
+       font-size: 0.9em;
+      text-align: right;
+      margin: 0 10px 5px 0;
+      :deep(.v4-button) {
+         width:160px;
+         padding: 5px 20px;
       }
    }
 
    .seq-nav {
       display: flex;
       flex-flow: row nowrap;
-      margin: 0 0 10px 0;
       justify-content: flex-end;
+      margin: 5px 10px 10px 0;
+       font-size: 0.9em;
       .v4-button.pager {
-         margin: 0 0 0 5px;
+         margin: 0 0 0 0;
+         width:160px;
+         padding: 5px 20px;
          i.next {
             margin: 0 0 0 5px;
          }
@@ -233,5 +226,21 @@ function prevItem() {
 .viewer {
    margin-top: 10px;
    display: inline-block;
+}
+
+@media only screen and (min-width: 768px) {
+   .collection-search {
+       width: 40%;
+   }
+}
+@media only screen and (max-width: 935px) {
+    .collection-search {
+       width: 75%;
+   }
+}
+@media only screen and (max-width: 768px) {
+    .collection-search {
+       width: 95%;
+   }
 }
 </style>
