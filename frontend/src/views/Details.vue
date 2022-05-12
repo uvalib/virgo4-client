@@ -4,9 +4,13 @@
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <CollectionHeader v-if="collection.isAvailable && (item.isCollection || item.isCollectionHead)"/>
+         <CollectionHeader v-if="collection.isBookplate == false && collection.isAvailable && (item.isCollection || item.isCollectionHead)"/>
          <FullPageCollectionView v-if="collection.isFullPage && item.isCollection && collection.isAvailable" />
          <ItemView v-else />
+         <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
+            <h2>Bookplates Fund</h2>
+            <CollectionHeader :border="false"/>
+         </template>
       </template>
    </div>
 </template>
@@ -145,6 +149,11 @@ onUpdated(()=>{
    }
    .working img {
       margin: 30px 0;
+   }
+    h2 {
+      color: var(--color-primary-orange);
+      text-align: center;
+      margin: 50px 0 30px 0;
    }
 }
 </style>

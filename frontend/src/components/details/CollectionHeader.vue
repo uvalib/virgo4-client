@@ -1,25 +1,19 @@
 <template>
-   <section class="collection-header">
-
-
-         <div class="collection-search" v-if="collection.canSearch">
-            <input autocomplete="off" type="text" id="search"
-               @keyup.enter="searchClicked"
-               v-model="queryStore.basic"
-               placeholder="Search this collection"
-            >
-            <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
-            <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
-         </div>
+   <section class="collection-header" :class="{noborder: !props.border}">
+      <div class="collection-search" v-if="collection.canSearch">
+         <input autocomplete="off" type="text" id="search"
+            @keyup.enter="searchClicked"
+            v-model="queryStore.basic"
+            placeholder="Search this collection"
+         >
+         <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
+         <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
+      </div>
 
       <div class="text-info">
          <div class="image" v-if="collection.image" >
             <img class="thumb" :class="{bookplate: collection.isBookplate}" :src="collection.image.url" :alt="collection.image.alt_text"/>
-            <a class="viewer" :href="collection.image.url" target="_blank" v-if="collection.isBookplate">
-               View full size<i class="fal fa-external-link-alt" style="margin-left: 5px;"></i>
-            </a>
          </div>
-
          <div class="content">
             <div class="title-row">{{collection.title}}</div>
             <div class="desc-row" v-html="collection.description"></div>
@@ -29,6 +23,7 @@
       <div class="cal">
          <CollectionDates v-if="collection.hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
       </div>
+
       <div class="seq-nav" v-if="collection.canNavigate && !item.isCollectionHead">
             <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
                <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
@@ -55,6 +50,13 @@ const item = useItemStore()
 const queryStore = useQueryStore()
 const route = useRoute()
 const router = useRouter()
+
+const props = defineProps({
+   mode: {
+      border: Boolean,
+      default: true,
+   },
+})
 
 const publishedDate = computed(()=>{
    let field = item.details.detailFields.find( f => f.name == "published_date")
@@ -113,6 +115,10 @@ function prevItem() {
 }
 </script>
 <style lang="scss" scoped>
+.collection-header.noborder {
+   border-top: none;
+   border-bottom: none;
+}
 .collection-header {
    background-color: white;
    border-top: 1px solid var(--uvalib-grey-light);
@@ -132,6 +138,11 @@ function prevItem() {
          max-height:200px;
       }
       .thumb.bookplate {
+         max-width: 100%;
+         height: auto;
+         min-width: 230px;
+         max-width: 330px;
+         max-height: none;
          box-shadow: $v4-box-shadow-light;
       }
    }
