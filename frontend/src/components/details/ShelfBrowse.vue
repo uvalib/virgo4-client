@@ -54,8 +54,12 @@ const currentCallNumber = computed(()=>{
    return props.hit.identifier
 })
 const showRestore = computed(()=>{
-   let center = shelfStore.browse[shelfStore.browseRange]
-   return center.id != props.hit.identifier
+   let origIdx = shelfStore.originalIndex
+   if (origIdx > shelfStore.browse.length - 1) {
+      return false
+   }
+   let orig = shelfStore.browse[origIdx]
+   return orig.id != props.hit.identifier
 })
 const browseURL = computed(()=>{
    return `/sources/${props.pool}/items/${props.hit.identifier}/browse`

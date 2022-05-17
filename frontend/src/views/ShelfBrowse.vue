@@ -17,11 +17,11 @@
             </div>
          </div>
          <div class="browse-controls full">
-            <V4Button class="pager" mode="primary" @click="browsePrior()" aria-label="previous shelf">
+            <V4Button class="pager" mode="primary" :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="previous shelf">
                <i class="prior pager fal fa-arrow-left"></i>
             </V4Button>
             <span class="range" aria-live="polite"><b>CATALOG RANGE:</b>{{firstCall}}&nbsp;-&nbsp;{{lastCall}}</span>
-            <V4Button class="pager" mode="primary" @click="browseNext()"  aria-label="next shelf">
+            <V4Button class="pager" mode="primary" :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="next shelf">
                <i class="next pager fal fa-arrow-right"></i>
             </V4Button>
          </div>

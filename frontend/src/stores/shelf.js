@@ -7,12 +7,23 @@ export const useShelfStore = defineStore('shelf', {
       lookingUp: true,
       browse: [],
       browseRange: 3,
-      showSpinner: true
+      showSpinner: true,
+      origIdx: -1,
+      currIdx: -1
    }),
 
    getters: {
       hasBrowseData: state => {
          return (state.browse.length > 0 && state.lookingUp == false)
+      },
+      hasNextItem: state => {
+         return (state.currIdx < state.browse.length - 1)
+      },
+      hasPriorItem: state => {
+         return (state.currIdx > 0)
+      },
+      originalIndex: state => {
+         return state.origIdx
       }
    },
 
@@ -26,11 +37,17 @@ export const useShelfStore = defineStore('shelf', {
       clearBrowseDetails() {
          this.browse.splice(0, this.browse.length)
       },
-      setBrowseDetails(data) {
+      setBrowseDetails(data, id) {
          this.browse.splice(0, this.browse.length)
-         data.forEach( b => {
+         data.forEach( (b, idx) => {
             b.status = "loading"
             this.browse.push(b)
+            if (b.id == id) {
+               this.currIdx = idx
+               if (this.origIdx < 0) {
+                  this.origIdx = idx
+               }
+            }
          })
       },
       setCoverImage(data) {
@@ -51,34 +68,28 @@ export const useShelfStore = defineStore('shelf', {
          }
       },
       browseNext() {
-         let nextIdx = this.browseRange
-         if ( this.browseRange == 3) {
-            nextIdx++
-         } else {
-            nextIdx =  this.browse.length -1
+         if (this.currIdx == this.browse.length - 1) {
+            return
          }
          this.showSpinner = false
-         this.getBrowseData(this.browse[nextIdx].id)
+         this.getBrowseData(this.browse[this.currIdx + 1].id)
       },
       browsePrior() {
-         let nextIdx = this.browseRange
-         if ( this.browseRange == 3) {
-            nextIdx--
-         } else {
-            nextIdx =  0
+         if (this.currIdx == 0) {
+            return
          }
          this.showSpinner = false
-         this.getBrowseData(this.browse[nextIdx].id)
+         this.getBrowseData(this.browse[this.currIdx - 1].id)
       },
-      async getBrowseData(centerId) {
+      async getBrowseData(id) {
          const system = useSystemStore()
          if ( this.showSpinner) {
             this.setLookingUp(true)
          }
 
-         let url = `${system.shelfBrowseURL}/api/browse/${centerId}?range=${this.browseRange}`
+         let url = `${system.shelfBrowseURL}/api/browse/${id}?range=${this.browseRange}`
          await axios.get(url).then((response) => {
-            this.setBrowseDetails(response.data.items)
+            this.setBrowseDetails(response.data.items, id)
 
             response.data.items.forEach( b => {
                if ( b.cover_image_url) {
@@ -100,7 +111,7 @@ export const useShelfStore = defineStore('shelf', {
             this.setLookingUp(false)
             this.clearBrowseDetails()
             if ( error.response && error.response.status == 404) {
-               console.warn("No browse data available for "+centerId)
+               console.warn("No browse data available for "+id)
             } else {
                // no negative impact on client; just don't show shelf browse and log error
                system.reportError(error)
