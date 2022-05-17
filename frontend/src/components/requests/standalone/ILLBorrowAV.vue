@@ -99,7 +99,7 @@ const request = ref({
 async function submitClicked() {
    errors.value.splice(0, errors.value.length)
    for (let [key, value] of Object.entries(request.value)) {
-      if ( required.value.includes(key) && value == "") {
+      if ( required.includes(key) && value == "") {
          errors.value.push(key)
       }
    }
