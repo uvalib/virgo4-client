@@ -37,14 +37,14 @@ export const useShelfStore = defineStore('shelf', {
       clearBrowseDetails() {
          this.browse.splice(0, this.browse.length)
       },
-      setBrowseDetails(data, id) {
+      setBrowseDetails(data, id, initial) {
          this.browse.splice(0, this.browse.length)
          data.forEach( (b, idx) => {
             b.status = "loading"
             this.browse.push(b)
             if (b.id == id) {
                this.currentIndex = idx
-               if (this.originalId == "") {
+               if (initial) {
                   this.originalId = id
                }
             }
@@ -93,7 +93,7 @@ export const useShelfStore = defineStore('shelf', {
       browsePriorPage() {
          this.browseNext(0)
       },
-      async getBrowseData(id) {
+      async getBrowseData(id, initial = false) {
          const system = useSystemStore()
          if ( this.showSpinner) {
             this.setLookingUp(true)
@@ -101,7 +101,7 @@ export const useShelfStore = defineStore('shelf', {
 
          let url = `${system.shelfBrowseURL}/api/browse/${id}?range=${this.browseRange}`
          await axios.get(url).then((response) => {
-            this.setBrowseDetails(response.data.items, id)
+            this.setBrowseDetails(response.data.items, id, initial)
 
             response.data.items.forEach( b => {
                if ( b.cover_image_url) {
@@ -129,6 +129,9 @@ export const useShelfStore = defineStore('shelf', {
                system.reportError(error)
             }
          })
+      },
+      async getInitialBrowseData(id) {
+         this.getBrowseData(id, true)
       },
    }
 })

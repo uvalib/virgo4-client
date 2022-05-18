@@ -70,13 +70,13 @@ function browseRestore() {
    shelfStore.getBrowseData(props.hit.identifier )
    analytics.trigger('ShelfBrowse', 'BROWSE_RESTORE_CLICKED', props.hit.identifier)
 }
-async function getBrowseData() {
+async function getInitialBrowseData() {
    shelfStore.browseRange = 3
    let tgt = props.hit.identifier
    if ( props.target && props.target != "")  {
       tgt = props.target
    }
-   await shelfStore.getBrowseData( tgt )
+   await shelfStore.getInitialBrowseData( tgt )
    if ( shelfStore.hasBrowseData) {
       analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', props.hit.identifier)
    }
@@ -89,7 +89,7 @@ async function getBrowseData() {
    }
 }
 onMounted(()=>{
-   getBrowseData()
+   getInitialBrowseData()
 })
 </script>
 
