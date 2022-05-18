@@ -75,7 +75,6 @@ div.v4-checkbox {
    justify-content: flex-start;
    cursor: pointer;
    outline:none;
-   padding: 1px;
 
    label {
       font-weight: normal;
@@ -86,6 +85,7 @@ div.v4-checkbox {
       margin-right: 10px;
       color: var(--uvalib-text);
       font-size: 1.2em;
+      background: white;
    }
    &:focus {
       @include be-accessible();

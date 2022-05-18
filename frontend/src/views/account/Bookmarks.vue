@@ -26,56 +26,41 @@
                      There are no bookmarks in this folder.
                   </div>
                   <div v-else class="bookmark-folder-details">
+                     <div class="folder-menu">
+                        <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder)">
+                           Export
+                        </V4Button>
+                        <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                           :id="`print-bookmarks-${folderInfo.id}`"
+                        />
+                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                           :id="`move-bookmarks-${folderInfo.id}`"
+                           v-on:move-approved="moveBookmarks"/>
+                        <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
+                        <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
+                     </div>
+
+                     <div class="publish">
+                        <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
+                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
+                        <span v-if="folderInfo.public" class="public-url">
+                           <V4Button class="copy-link" mode="icon" @click="copyURL(folderInfo)"><i class="share fal fa-share-alt"></i></V4Button>
+                           <a :href="getPublicURL(folderInfo)" target="_blank">
+                              <span>View</span><i class="link fal fa-external-link-alt"></i>
+                           </a>
+                        </span>
+                     </div>
+
                      <table>
                         <tr>
-                           <th colspan="3">
-                              <div class="folder-menu">
-                                 <div style="margin-bottom:5px;">
-                                    <V4Button mode="text" @click="selectAll(folderInfo.bookmarks)"
-                                       :aria-label="`select all bookmarks in folder ${folderInfo.folder}`">
-                                       select all
-                                    </V4Button>
-                                    <span class="spacer">|</span>
-                                    <V4Button mode="text" @click="clearAll"
-                                       :aria-label="`deselect all bookmarks in folder ${folderInfo.folder}`">
-                                       clear all
-                                    </V4Button>
-                                 </div>
-                                 <div class="button-group">
-                                    <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder)">
-                                       Export
-                                    </V4Button>
-                                    <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                                       :id="`print-bookmarks-${folderInfo.id}`"
-                                    />
-                                    <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                                       :id="`move-bookmarks-${folderInfo.id}`"
-                                       v-on:move-approved="moveBookmarks"/>
-                                    <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
-                                    <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
-                                 </div>
-                              </div>
+                           <th  class="heading" stype="padding:5px 8px;">
+                              <V4Checkbox @click="toggleAllClicked(folderInfo.bookmarks)" :checked="selectAllChecked" aria-label="toggle select all bookmarks"/>
                            </th>
-                        </tr>
-                        <tr>
-                           <th colspan="3">
-                              <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                                 :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
-                              <span v-if="folderInfo.public" class="public-url">
-                                 <a :href="getPublicURL(folderInfo)" target="_blank">
-                                    <span>View</span><i class="link fal fa-external-link-alt"></i></a>
-                                 <span class="sep">|</span>
-                                 <V4Button mode="text" @click="copyURL(folderInfo)">Copy URL to clipboard</V4Button>
-                              </span>
-                           </th>
-                        </tr>
-                        <tr>
-                           <th class="heading"></th>
                            <th class="heading">Title</th>
                            <th class="heading">Author</th>
                         </tr>
                         <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
-                           <td class="cb">
+                           <td>
                               <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
                                  :aria-label="ariaLabel(bookmark)"/>
                            </td>
@@ -161,6 +146,7 @@ const newFolder = ref("")
 const submitting = ref(false)
 const selectedItems = ref([])
 const expandedFolder = ref(-1)
+const selectAllChecked = ref(false)
 
 function exportBookmarks(folder) {
    bookmarkStore.exportBookmarks(folder )
@@ -210,15 +196,18 @@ function getPublicURL(folder) {
 function folderOpened(folderID) {
    selectedItems.value = []
    expandedFolder.value = folderID
+   selectAllChecked.value = false
 }
-function clearAll() {
-   selectedItems.value = []
-}
-function selectAll(items) {
-   selectedItems.value = []
-   items.forEach(bm=>{
-      selectedItems.value.push(bm.id)
-   })
+function toggleAllClicked(items) {
+   selectAllChecked.value = !selectAllChecked.value
+   if (selectAllChecked.value == false ) {
+         selectedItems.value = []
+   } else {
+      selectedItems.value = []
+      items.forEach(bm=>{
+         selectedItems.value.push(bm.id)
+      })
+   }
 }
 function moveBookmarks(folderID) {
    let data = { bookmarks: selectedItems.value, folderID: folderID }
@@ -324,29 +313,14 @@ div.notice {
    padding: 5px;
    font-weight: bold;
 }
-.spacer {
-   margin: 0 5px;
-   color: var(--uvalib-grey-light);
-}
 .folder-menu {
    display: flex;
    flex-flow: row wrap;
-   justify-content: space-between;
-   align-items: flex-start;
-}
-.folder-menu div:nth-child(1) {
-   order: 0;
-   flex: 0 1 auto;
-   align-self: auto;
-}
-
-.folder-menu div:nth-child(2) {
-   order: 0;
-   flex: 0 1 auto;
-   align-self: auto;
-}
-.sep {
-   margin: 0 5px;
+   justify-content: flex-end;
+   margin: 10px 0;
+   .v4-button {
+      margin-bottom: 5px;
+   }
 }
 i.fas {
    color: var(--uvalib-grey-dark);
@@ -417,36 +391,19 @@ table {
       padding: 5px 8px;
       text-align: left;
       vertical-align: text-top;
+       border: 1px solid var(--uvalib-grey-light);
    }
    th {
-      padding: 10px 5px;
-      background-color: white;
+      padding: 10px 8px;
+      background-color: #f0f0f0;
       text-align: left;
    }
    th.heading {
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      border: 1px solid var(--uvalib-grey-light);
    }
-}
-table tr:nth-child(2) {
-   border-bottom: 1px solid var(--uvalib-grey-light);
 }
 table tr {
    background-color: white;
-}
-table tr:hover {
-   background-color: var(--uvalib-grey-lightest);
-}
-table tr:nth-child(2):hover {
-   background-color: white;
-}
-td.icon {
-   text-align: right;
-   padding: 5px 5px 0 5px;
-}
-table {
-   margin: 0px;
-   border-top: 0;
-   width: 100%;
 }
 i.details {
    font-size: 1.25em;
@@ -472,39 +429,35 @@ i.details {
    font-weight: bold;
    margin-right: 10px;
 }
-.public {
-   cursor: pointer;
-   color: var(--uvalib-grey-dark);
-}
-.public span {
-   font-weight: normal;
-}
-.public i.check {
-   margin: 0 5px 0 0;
-   cursor: pointer;
-   font-size: 1em;
-}
-.public-url {
-   font-weight: normal;
-   display: inline-block;
-   color: var(--uvalib-grey-dark);
-   margin-left: 20px;
-   margin-top: 10px;
-   i {
-      margin: 0 2px 0 7px;
-   }
-}
-.folder-menu .v4-button {
-   margin-bottom: 5px;
-   flex-grow: 1;
-}
-.button-group {
-   text-align: right;
+.publish {
    display: flex;
    flex-flow: row wrap;
-   margin: 0;
+   margin: 15px 0;
+
+   .public span {
+      font-weight: normal;
+   }
+   .public i.check {
+      margin: 0 5px 0 0;
+      cursor: pointer;
+      font-size: 1em;
+   }
+   .public-url {
+      font-weight: normal;
+      display: inline-block;
+      color: var(--uvalib-grey-dark);
+      margin-left: auto;
+      i {
+         margin: 0 2px 0 7px;
+      }
+
+      .copy-link {
+         margin-right: 15px;
+      }
+   }
 }
+
 .bookmark-folder-details {
-   padding: 0 5px 10px 10px;
+   padding: 0 0 10px 0px;
 }
 </style>
