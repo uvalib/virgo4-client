@@ -1,31 +1,32 @@
 <template>
-   <div class="accordion" :id="props.id"
-      @click="accordionClicked" @keyup.stop.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
-      <div v-if="showHeader" :id="`${props.id}-header`"
-         tabindex="0"
-         :class="props.layout" class="title" role="button"
-         :style="{ background: props.background, color: props.color,
-                   borderWidth: props.borderWidth, borderStyle: props.borderStyle,
-                   borderColor: props.borderColor }"
-         :aria-expanded="expandedStr" :aria-controls="contentID">
-         <slot name="title"></slot>
-         <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
-      </div>
+   <div class="accordion" :id="props.id" @click="accordionClicked" @keydown.prevent.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
+      <h3 v-if="showHeader" :id="`${props.id}-header`">
+         <button
+            :class="props.layout" class="title"
+            :style="{ background: props.background, color: props.color,
+                     borderWidth: props.borderWidth, borderStyle: props.borderStyle,
+                     borderColor: props.borderColor }"
+            :aria-expanded="expandedStr"
+            :aria-controls="contentID">
+            <slot name="title"></slot>
+            <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
+         </button>
+      </h3>
       <transition name="accordion"
-            v-on:before-enter="beforeEnter" v-on:enter="enter"
-            v-on:before-leave="beforeLeave" v-on:leave="leave">
+         v-on:before-enter="beforeEnter" v-on:enter="enter"
+         v-on:before-leave="beforeLeave" v-on:leave="leave">
          <div :id="contentID" class="accordion-content" v-show="isExpanded"
             :aria-labelledby="`${props.id}-header`" role="region"
             :style="{ background: props.backgroundContent, color: props.color }"
             @click.stop @keyup.stop.enter @keydown.space.stop>
             <slot></slot>
-            <div v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
+            <button v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
                :style="{ background: props.background, color: props.color,
-                         borderWidth: props.borderWidth, borderStyle: props.borderStyle,
-                         borderColor: props.borderColor }" >
+                           borderWidth: props.borderWidth, borderStyle: props.borderStyle,
+                           borderColor: props.borderColor }" >
                <slot name="footer"></slot>
                <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
-            </div>
+            </button>
          </div>
       </transition>
    </div>
@@ -183,20 +184,20 @@ function leave(el) {
 .accordion {
    margin:0;
    font-size: 1em;
-
-   .header-wrap {
-      display: flex;
-      flex-flow: row nowrap;
-      align-content: center;
-      justify-content: space-between;
-      align-items: stretch;
-      height: 100%;
+   h3 {
+      font-size: 1em;
+      font-weight: normal;
+      margin: 0;
+      button {
+         width: 100%;
+         padding: 0;
+      }
    }
 
    .title, .footer {
       cursor: pointer;
       margin: 0;
-      padding: 5px 10px;
+      padding: 5px 5px;
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
@@ -210,19 +211,21 @@ function leave(el) {
          font-size: 1.25em;
          transform: rotate(0deg);
          transition-duration: 250ms;
+         margin-right: 5px;
+         display: inline-block;
       }
    }
 
    .footer {
-      padding: 3px 12px 3px 5px;
+      padding: 3px 0px 3px 5px;
       font-weight: normal;
+      width: 100%;
    }
 
    .title.narrow {
       justify-content: flex-start;
       padding: 0;
    }
-
    .accordion-content {
       overflow: hidden;
       transition: 250ms ease-out;
@@ -231,7 +234,7 @@ function leave(el) {
       text-align: left;
    }
 }
-.title {
+.title, .footer {
    &:focus {
       @include be-accessible();
    }
