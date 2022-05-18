@@ -187,6 +187,7 @@ onMounted(async () => {
    lookingUpUVA.value = false
    if ( userStore.isSignedIn ) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
+      userStore.getRequests()
       lookingUpUVA.value = true
       if (route.query.overdue) {
          userStore.checkoutsOrder = "OVERDUE"
