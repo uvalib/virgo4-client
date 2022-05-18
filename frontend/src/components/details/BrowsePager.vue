@@ -16,11 +16,11 @@ import { useShelfStore } from "@/stores/shelf"
 const shelfStore = useShelfStore()
 
 function browseNext() {
-   shelfStore.browseNext()
+   shelfStore.browseNextItem()
    analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
 }
 function browsePrior() {
-   shelfStore.browsePrior()
+   shelfStore.browsePriorItem()
    analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
 }
 </script>

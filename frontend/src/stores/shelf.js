@@ -67,19 +67,31 @@ export const useShelfStore = defineStore('shelf', {
             this.browse.splice(idx, 1, b)
          }
       },
-      browseNext() {
+      browseNext(idx) {
          if (this.currentIndex == this.browse.length - 1) {
             return
          }
          this.showSpinner = false
-         this.getBrowseData(this.browse[this.currentIndex + 1].id)
+         this.getBrowseData(this.browse[idx].id)
       },
-      browsePrior() {
+      browsePrior(idx) {
          if (this.currentIndex == 0) {
             return
          }
          this.showSpinner = false
-         this.getBrowseData(this.browse[this.currentIndex - 1].id)
+         this.getBrowseData(this.browse[idx].id)
+      },
+      browseNextItem() {
+         this.browseNext(this.currentIndex + 1)
+      },
+      browsePriorItem() {
+         this.browseNext(this.currentIndex - 1)
+      },
+      browseNextPage() {
+         this.browseNext(this.browse.length - 1)
+      },
+      browsePriorPage() {
+         this.browseNext(0)
       },
       async getBrowseData(id) {
          const system = useSystemStore()

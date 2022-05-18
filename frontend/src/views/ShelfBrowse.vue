@@ -157,11 +157,11 @@ function isCurrent(idx) {
    return item.id == origID.value
 }
 function browseNext() {
-   shelfStore.browseNext()
+   shelfStore.browseNextPage()
    analytics.trigger('ShelfBrowse', 'BROWSE_NEXT_CLICKED')
 }
 function browsePrior() {
-   shelfStore.browsePrior()
+   shelfStore.browsePriorPage()
    analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
 }
 function beforeEnter(el) {
