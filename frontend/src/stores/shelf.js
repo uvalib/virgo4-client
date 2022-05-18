@@ -8,8 +8,8 @@ export const useShelfStore = defineStore('shelf', {
       browse: [],
       browseRange: 3,
       showSpinner: true,
-      origIdx: -1,
-      currIdx: -1
+      originalId: "",
+      currentIndex: -1
    }),
 
    getters: {
@@ -17,13 +17,13 @@ export const useShelfStore = defineStore('shelf', {
          return (state.browse.length > 0 && state.lookingUp == false)
       },
       hasNextItem: state => {
-         return (state.currIdx < state.browse.length - 1)
+         return (state.currentIndex < state.browse.length - 1)
       },
       hasPriorItem: state => {
-         return (state.currIdx > 0)
+         return (state.currentIndex > 0)
       },
-      originalIndex: state => {
-         return state.origIdx
+      isOriginalItem: state => {
+         return (state.browse[state.currentIndex].id == state.originalId)
       }
    },
 
@@ -43,9 +43,9 @@ export const useShelfStore = defineStore('shelf', {
             b.status = "loading"
             this.browse.push(b)
             if (b.id == id) {
-               this.currIdx = idx
-               if (this.origIdx < 0) {
-                  this.origIdx = idx
+               this.currentIndex = idx
+               if (this.originalId == "") {
+                  this.originalId = id
                }
             }
          })
@@ -68,18 +68,18 @@ export const useShelfStore = defineStore('shelf', {
          }
       },
       browseNext() {
-         if (this.currIdx == this.browse.length - 1) {
+         if (this.currentIndex == this.browse.length - 1) {
             return
          }
          this.showSpinner = false
-         this.getBrowseData(this.browse[this.currIdx + 1].id)
+         this.getBrowseData(this.browse[this.currentIndex + 1].id)
       },
       browsePrior() {
-         if (this.currIdx == 0) {
+         if (this.currentIndex == 0) {
             return
          }
          this.showSpinner = false
-         this.getBrowseData(this.browse[this.currIdx - 1].id)
+         this.getBrowseData(this.browse[this.currentIndex - 1].id)
       },
       async getBrowseData(id) {
          const system = useSystemStore()

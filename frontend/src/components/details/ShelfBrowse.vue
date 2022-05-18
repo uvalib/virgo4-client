@@ -14,7 +14,7 @@
             View full page
          </router-link>
          <BrowsePager />
-         <div class="centered" v-if="showRestore">
+         <div class="centered" v-if="!shelfStore.isOriginalItem">
             <V4Button mode="primary" @click="browseRestore()">Return to {{currentCallNumber}}</V4Button>
          </div>
       </nav>
@@ -52,14 +52,6 @@ const currentCallNumber = computed(()=>{
       return f.value
    }
    return props.hit.identifier
-})
-const showRestore = computed(()=>{
-   let origIdx = shelfStore.originalIndex
-   if (origIdx > shelfStore.browse.length - 1) {
-      return false
-   }
-   let orig = shelfStore.browse[origIdx]
-   return orig.id != props.hit.identifier
 })
 const browseURL = computed(()=>{
    return `/sources/${props.pool}/items/${props.hit.identifier}/browse`
