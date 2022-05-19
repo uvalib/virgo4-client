@@ -1,41 +1,41 @@
 <template>
    <span tabindex="0" class="skip-to" id="skip-to"
-      role="menu" :aria-expanded="menuOpen.toString()"
-      aria-label="Skip to menu"
+      role="complimentary"
+      aria-labelledby="skip-to-label"
       @click.stop="toggleNavMenu" @keyup.prevent.stop.enter="toggleNavMenu"
       @keyup.esc="globalClick"
       @keydown.space.prevent.stop="toggleNavMenu"
       @keydown.down.prevent.stop="nextMenu" @keydown.up.prevent.stop="prevMenu"
       @keyup.down.prevent.stop @keyup.up.prevent.stop
    >
-      <span class="menu-header">
-         <span>Skip To</span>
+      <span class="menu-header" role="button" aria-haspopup="true" :aria-expanded="menuOpen.toString()">
+         <span id="skip-to-label">Skip To</span>
          <i class="fas fa-caret-down submenu-arrow" v-bind:style="{ transform: rotation }"></i>
       </span>
       <transition name="grow"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
          v-on:before-leave="beforeLeave" v-on:leave="leave">
-         <ul v-if="menuOpen" class="skip-menu"  @keydown.space.prevent.stop role="group">
-            <li class="submenu" role="menuitem" tabindex="-1" id="skipnav"
+         <ul v-if="menuOpen" class="skip-menu"  @keydown.space.prevent.stop role="menu">
+            <li class="submenu" id="skipnav" role="none" tabindex="-1"
                @click.prevent.stop="skipToNav"
                @keydown.space.prevent.stop="skipToNav"
                @keyup.prevent.stop.enter="skipToNav"
             >
-               Navigation
+               <a tabindex="-1" role="menuitem" href>Navigation</a>
             </li>
-            <li class="submenu" role="menuitem" tabindex="-1" id="skipmain"
+            <li class="submenu" role="none" id="skipmain" tabindex="-1"
                @click.prevent.stop="skipToMain"
                @keydown.space.prevent.stop="skipToMain"
                @keyup.prevent.stop.enter="skipToMain"
             >
-               Main Content
+               <a tabindex="-1" role="menuitem" href>Main Content</a>
             </li>
-             <li v-if="isSearchPage" class="submenu" role="menuitem" tabindex="-1" id="skipsearch"
+             <li v-if="isSearchPage" class="submenu" role="none" id="skipsearch" tabindex="-1"
                @click.prevent.stop="skipToSearch"
                @keydown.space.prevent.stop="skipToSearch"
                @keyup.prevent.stop.enter="skipToSearch"
             >
-               Search
+               <a tabindex="-1" role="menuitem" href>Search</a>
             </li>
          </ul>
       </transition>
