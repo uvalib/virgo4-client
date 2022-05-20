@@ -138,17 +138,20 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 			var feedItem feeds.Item
 
 			for _, field := range record.Fields {
-				switch field.Name {
-				case "id":
+				switch {
+				case field.Name == "id" || field.Type == "identifier":
 					virgoURL := svc.VirgoURL + "/items/" + field.Value
 					feedItem.Id = field.Value
 					feedItem.Link = &feeds.Link{Rel: "self", Href: virgoURL}
 					feedItem.Description += "<p>Virgo URL: " + virgoURL + "</p>"
-				case "access-url":
+
+				case field.Name == "access_url" || field.Type == "access-url":
 					feedItem.Source = &feeds.Link{Href: field.Value}
-				case "title_subtitle_edition":
+
+				case field.Name == "title_subtitle_edition" || field.Type == "title":
 					feedItem.Title = field.Value
-				case "author":
+
+				case field.Name == "author" || field.Type == "author":
 					a := feeds.Author{}
 					if feedItem.Author != nil {
 						a.Name = (feedItem.Author.Name + "; " + field.Value)
@@ -157,15 +160,19 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 					}
 					feedItem.Author = &a
 
-				case "date_received":
+				case field.Name == "date_received":
 					var parseErr error
 					feedItem.Created, parseErr = time.ParseInLocation("20060102", field.Value, tz)
 					if parseErr != nil {
 						log.Printf("RSS Date parse error: %+v", parseErr)
 					}
+
+				case field.Name == "isbn":
+					feedItem.Description += fmt.Sprintf("<p>%s: %s</p>", field.Label, field.Value)
 				}
+
 				log.Printf("Field: %+v", field)
-				if field.Display != "optional" && field.Name != "id" {
+				if field.Display != "optional" && !(field.Name == "id" || field.Type == "identifier") {
 					feedItem.Description += fmt.Sprintf("<p>%s: %s</p>", field.Label, field.Value)
 
 				}
