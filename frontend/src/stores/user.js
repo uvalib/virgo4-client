@@ -8,7 +8,6 @@ import { usePreferencesStore } from "@/stores/preferences"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { useSearchStore } from "@/stores/search"
-import { useRequestStore } from "@/stores/request"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 
@@ -558,7 +557,6 @@ export const useUserStore = defineStore('user', {
          this.authorizing = true
          axios.post("/authenticate/public", data).then( async (_response) => {
             const restore = useRestoreStore()
-            const requests = useRequestStore()
 
             let jwtStr = VueCookies.get("v4_jwt")
             this.setUserJWT(jwtStr )
@@ -579,8 +577,6 @@ export const useUserStore = defineStore('user', {
                   throw e;
               }
             })
-
-            requests.reload()
          }).catch((error) => {
             const system = useSystemStore()
             if (error.response && error.response.status == 503) {
