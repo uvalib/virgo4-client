@@ -1,60 +1,58 @@
 <template>
-   <div tabindex="-1" id="app" role="application">
-      <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
-      <transition name="fade">
-         <div class="dimmer" v-if="showDimmer">
-             <MessageBox />
-         </div>
-      </transition>
-      <div role="banner" class="site-header" id="v4-header">
-         <SkipToNavigation />
-         <div class="header-alert" v-if="alertStore.headerAlerts.length > 0">
-            <div v-for="ha in alertStore.headerAlerts" :key="ha.uuid" class="alert-body">
-               <span class="lead">{{ha.title}}:&nbsp;</span>
-               <span class="alert-text" v-html="ha.body"></span>
-            </div>
-         </div>
-         <VirgoHeader />
-         <MenuBar id="v4-navbar"/>
+   <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
+   <transition name="fade">
+      <div class="dimmer" v-if="showDimmer">
+            <MessageBox />
       </div>
-      <div class="alerts-list" v-if="!systemStore.isKiosk" id="alerts">
-         <div v-for="a in alertStore.menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
-            <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
-            <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
-            <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
-            <div class="alert-body">
-               <h3 class="lead">{{a.title}}</h3>
-               <span class="alert-text" v-html="a.body"></span>
-            </div>
-            <V4Button mode="icon" v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
-               @click="dismissAlert(a.uuid)" aria-label="hide alert">
-               <i class="dismiss-icon fal fa-window-close"></i>
-            </V4Button>
+   </transition>
+   <div role="banner" class="site-header" id="v4-header">
+      <SkipToNavigation />
+      <div class="header-alert" v-if="alertStore.headerAlerts.length > 0">
+         <div v-for="ha in alertStore.headerAlerts" :key="ha.uuid" class="alert-body">
+            <span class="lead">{{ha.title}}:&nbsp;</span>
+            <span class="alert-text" v-html="ha.body"></span>
          </div>
       </div>
-      <main tabindex="-1" class="v4-content" id="v4-main" role="main">
-         <SessionExpired />
-         <VueAnnouncer />
-         <h1>{{systemStore.pageTitle}}</h1>
-         <template v-if="configuring==false">
-            <div v-if="alertStore.pageAlerts(route.path).length > 0" class="regional-alerts">
-               <div v-for="ra in alertStore.pageAlerts(route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
-                  <span class="alert-text" v-html="ra.body"></span>
-               </div>
-            </div>
-            <router-view />
-         </template>
-         <div v-else  class="configure">
-            <V4Spinner message="Configuring system..."/>
-         </div>
-         <div v-if="systemStore.newVersion" class="update-pop">
-            <div class="msg">A new version of Virgo is available.</div>
-            <V4Button mode="primary" @click="updateClicked">Update Now</V4Button>
-         </div>
-         <ScrollToTop />
-      </main>
-      <LibraryFooter v-if="systemStore.isKiosk == false"/>
+      <VirgoHeader />
+      <MenuBar id="v4-navbar"/>
    </div>
+   <div class="alerts-list" v-if="!systemStore.isKiosk" id="alerts">
+      <div v-for="a in alertStore.menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
+         <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
+         <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
+         <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
+         <div class="alert-body">
+            <h3 class="lead">{{a.title}}</h3>
+            <span class="alert-text" v-html="a.body"></span>
+         </div>
+         <V4Button mode="icon" v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
+            @click="dismissAlert(a.uuid)" aria-label="hide alert">
+            <i class="dismiss-icon fal fa-window-close"></i>
+         </V4Button>
+      </div>
+   </div>
+   <main tabindex="-1" class="v4-content" id="v4-main" role="main">
+      <SessionExpired />
+      <VueAnnouncer />
+      <h1>{{systemStore.pageTitle}}</h1>
+      <template v-if="configuring==false">
+         <div v-if="alertStore.pageAlerts(route.path).length > 0" class="regional-alerts">
+            <div v-for="ra in alertStore.pageAlerts(route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
+               <span class="alert-text" v-html="ra.body"></span>
+            </div>
+         </div>
+         <router-view />
+      </template>
+      <div v-else  class="configure">
+         <V4Spinner message="Configuring system..."/>
+      </div>
+      <div v-if="systemStore.newVersion" class="update-pop">
+         <div class="msg">A new version of Virgo is available.</div>
+         <V4Button mode="primary" @click="updateClicked">Update Now</V4Button>
+      </div>
+      <ScrollToTop />
+   </main>
+   <LibraryFooter v-if="systemStore.isKiosk == false"/>
 </template>
 
 <script setup>
