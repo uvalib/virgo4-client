@@ -79,6 +79,10 @@
       <template v-if="details.source != 'images'">
          <Availability v-if="poolStore.hasAvailability(details.source)" />
          <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
+         <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
+            <h2>Bookplates Fund</h2>
+            <CollectionHeader :border="false"/>
+         </template>
          <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
       </template>
    </div>
@@ -89,6 +93,7 @@ import SearchHitHeader from "@/components/SearchHitHeader.vue"
 import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
+import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from "@/components/AccessURLDetails.vue"
 import TruncatedText from "@/components/TruncatedText.vue"
@@ -106,7 +111,9 @@ import { usePoolStore } from "@/stores/pool"
 import { useResultStore } from "@/stores/result"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
+import { useCollectionStore } from "@/stores/collection"
 
+const collection = useCollectionStore()
 const router = useRouter()
 const route = useRoute()
 const item = useItemStore()
@@ -205,6 +212,11 @@ function fieldLimit( field ) {
 </script>
 <style lang="scss" scoped>
 .item-view {
+   h2 {
+      color: var(--color-primary-orange);
+      text-align: center;
+      margin: 50px 0 30px 0;
+   }
    div.details-content  {
       width: 95%;
       margin: 0 auto;
