@@ -13,9 +13,11 @@
                <li><a href="tel:14349243021">(434) 924-3021</a></li>
                <li><a href="mailto:library@virginia.edu">library@virginia.edu</a></li>
                <li><a href="https://www.library.virginia.edu/askalibrarian/">Ask a Librarian</a></li>
-               <li><a href="https://www.instagram.com/uvalibrary/" aria-label="Library Instagram Account"><i class="fab fa-instagram"></i></a>
-               <a href="https://www.facebook.com/University-of-Virginia-Library-136530559704906/" aria-label="Library Facebook Account"><i class="fab fa-facebook-square"></i></a>
-               <a href="https://twitter.com/UVaLibrary"><i class="fab fa-twitter-square" aria-label="Library Twitter Account"></i></a></li>
+               <li>
+                  <a href="https://www.instagram.com/uvalibrary/" aria-label="Library Instagram Account"><i class="fab fa-instagram"></i></a>
+                  <a href="https://www.facebook.com/University-of-Virginia-Library-136530559704906/" aria-label="Library Facebook Account"><i class="fab fa-facebook-square"></i></a>
+                  <a href="https://twitter.com/UVaLibrary" aria-label="Library Twitter Account"><i class="fab fa-twitter-square"></i></a>
+               </li>
                <li>
                   <address>
                   University of Virginia Library<br />
@@ -106,6 +108,7 @@ footer {
    color: white;
    padding:20px 20px 0 20px;
    #give {
+      font-weight: bold;
       &:focus {
           @include be-accessible-light();
       }
