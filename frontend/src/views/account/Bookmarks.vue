@@ -22,6 +22,23 @@
                   <template v-slot:title>
                      <span class="folder-title" v-html="getTitle(folderInfo)"></span>
                   </template>
+                  <template v-slot:toolbar>
+                     <div class="folder-buttons">
+                        <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'" style="display: inline-block;"/>
+                        <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
+                           :id="`delete-${folderInfo.id}`" style="display: inline-block;"
+                           :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
+                           <div>
+                              Delete bookmark folder
+                              <b>{{folderInfo.folder}}</b>? All bookmarks
+                           </div>
+                           <div>contained within it will also be deleted.</div>
+                           <div>
+                              <br />This cannot be reversed.
+                           </div>
+                        </Confirm>
+                     </div>
+                  </template>
                   <div class="none" v-if="folderInfo.bookmarks.length == 0">
                      There are no bookmarks in this folder.
                   </div>
@@ -78,21 +95,6 @@
                      </table>
                   </div>
                </AccordionContent>
-               <div class="folder-buttons">
-                  <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'"/>
-                  <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
-                     :id="`delete-${folderInfo.id}`" style="margin-right: 10px"
-                     :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
-                     <div>
-                        Delete bookmark folder
-                        <b>{{folderInfo.folder}}</b>? All bookmarks
-                     </div>
-                     <div>contained within it will also be deleted.</div>
-                     <div>
-                        <br />This cannot be reversed.
-                     </div>
-                  </Confirm>
-               </div>
             </div>
          </template>
          <div class="controls">
@@ -340,16 +342,7 @@ div.folder {
    align-items: flex-start;
    margin-bottom: 15px;
    .folder-buttons {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--uvalib-blue-alt-light);
-      color: var(--uvalib-grey-darkest);
-      border-width: 0px 0px 3px;
-      border-style: solid;
-      border-color: var(--uvalib-blue-alt);
-      padding: 6px 0 5px 0;
+      display: inline-block;
    }
 }
 div.folder .remove-folder {

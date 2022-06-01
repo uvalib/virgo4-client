@@ -9,7 +9,10 @@
             :aria-expanded="expandedStr"
             :aria-controls="contentID">
             <slot name="title"></slot>
-            <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
+            <div class="accordion-controls">
+               <slot name="toolbar"></slot>
+               <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
+            </div>
          </button>
       </h3>
       <transition name="accordion"
@@ -197,29 +200,32 @@ function leave(el) {
    .title, .footer {
       cursor: pointer;
       margin: 0;
-      padding: 5px 5px;
+      padding: 5px;
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       position: relative;
-      flex-grow: 1;
       text-align: left;
+      font-weight: normal;
+      width: 100%;
 
-      .accordion-icon {
+      .accordion-controls {
          margin-left: auto;
-         font-size: 1.25em;
-         transform: rotate(0deg);
-         transition-duration: 250ms;
-         margin-right: 5px;
-         display: inline-block;
+         .accordion-icon {
+            font-size: 1.25em;
+            transform: rotate(0deg);
+            transition-duration: 250ms;
+            margin: 0 0 0 10px;
+            display: inline-block;
+         }
       }
    }
 
    .footer {
-      padding: 3px 0px 3px 5px;
-      font-weight: normal;
-      width: 100%;
+      .accordion-icon {
+         margin-left: auto;
+      }
    }
 
    .title.narrow {

@@ -146,9 +146,3 @@ span.cnt {
    font-size: 0.8em;
 }
 </style>
-<style>
-#app .accordion.filter .title {
-   padding: 5px 10px;
-   font-weight: bold;
-}
-</style>

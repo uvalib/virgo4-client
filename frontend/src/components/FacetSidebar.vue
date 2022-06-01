@@ -224,16 +224,11 @@ i.check {
       overflow: scroll;
    }
 }
-</style>
-<style>
-#app .accordion.filter .title {
-   padding: 5px 10px;
-}
-#app .accordion.more .title {
-   padding: 5px 0;
-   font-weight: bold;
-}
-#app .accordion.more {
+:deep(.accordion.more) {
    width: 100%;
+   .title, .footer {
+      padding: 5px 0;
+      font-weight: bold;
+   }
 }
 </style>
