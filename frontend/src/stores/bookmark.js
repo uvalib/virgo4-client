@@ -66,6 +66,7 @@ export const useBookmarkStore = defineStore('bookmark', {
                delete d.pool
                d.pool = pn
             })
+            b.settingsOpen = false
             this.bookmarks.push(b)
          })
       },
@@ -85,7 +86,14 @@ export const useBookmarkStore = defineStore('bookmark', {
          })
          var idx = this.bookmarks.findIndex( f => f.id == folder.id)
          if (idx > -1) {
+            folder.settingsOpen = this.bookmarks[idx].settingsOpen
             this.bookmarks.splice(idx, 1, folder)
+         }
+      },
+      toggleSettings(folderName) {
+         let f = this.bookmarks.find( f => f.folder == folderName )
+         if (f) {
+            f.settingsOpen = !f.settingsOpen
          }
       },
 

@@ -14,6 +14,13 @@
                <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
             </div>
          </button>
+         <transition name="accordion"
+            v-on:before-enter="beforeEnter" v-on:enter="enter"
+            v-on:before-leave="beforeLeave" v-on:leave="leave">
+            <div class="settings" v-if="showSettings">
+               <slot name="settings"></slot>
+            </div>
+         </transition>
       </h3>
       <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
@@ -28,7 +35,9 @@
                            borderWidth: props.borderWidth, borderStyle: props.borderStyle,
                            borderColor: props.borderColor }" >
                <slot name="footer"></slot>
-               <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
+               <div class="accordion-controls">
+                  <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
+               </div>
             </button>
          </div>
       </transition>
@@ -83,6 +92,10 @@ const props = defineProps({
       default: "solid"
    },
    expanded: {
+      default: false,
+      type: Boolean
+   },
+   showSettings: {
       default: false,
       type: Boolean
    },
@@ -195,6 +208,14 @@ function leave(el) {
          width: 100%;
          padding: 0;
       }
+      .settings {
+         padding: 5px 10px;
+         border: 1px solid var(--uvalib-grey-light);
+         border-top: none;
+         background: var(--uvalib-grey-lightest);
+         text-align: left;
+         border-radius: 0 0 6px 6px;
+      }
    }
 
    .title, .footer {
@@ -209,6 +230,9 @@ function leave(el) {
       text-align: left;
       font-weight: normal;
       width: 100%;
+      &:focus {
+         @include be-accessible();
+      }
 
       .accordion-controls {
          margin-left: auto;
@@ -216,15 +240,9 @@ function leave(el) {
             font-size: 1.25em;
             transform: rotate(0deg);
             transition-duration: 250ms;
-            margin: 0 0 0 10px;
+            margin: 0 5px 0 10px;
             display: inline-block;
          }
-      }
-   }
-
-   .footer {
-      .accordion-icon {
-         margin-left: auto;
       }
    }
 
@@ -238,11 +256,6 @@ function leave(el) {
       margin:0;
       padding:0;
       text-align: left;
-   }
-}
-.title, .footer {
-   &:focus {
-      @include be-accessible();
    }
 }
 </style>
