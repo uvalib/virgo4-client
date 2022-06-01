@@ -1,8 +1,8 @@
 <template>
-   <nav v-if="!systemStore.$datafatal" class="menu" role="menubar" aria-label="Virgo Menu"
+   <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu"
       :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
    >
-      <ul class="menu-right"
+      <ul class="menu-right" role="menubar" aria-label="Virgo Menu"
          @keydown.right.prevent.stop="nextMenu" @keyup.left.prevent.stop="prevMenu"
          @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
          @keydown.down.prevent.stop @keydown.up.prevent.stop>
@@ -22,7 +22,8 @@
                @click.stop="toggleSubMenu('servicemenu')" @keyup.enter="toggleSubMenu()"
                @keydown.space="toggleSubMenu()" @keydown.up.prevent.stop="prevSubMenu"
                @keydown.down.prevent.stop="nextSubMenu">
-               <span role="menu" id="servicemenu" class="menu-item service" tabindex="-1"
+               <span id="servicemenu" class="menu-item service" tabindex="-1"
+                  role="menuitem" aria-haspopup="true"
                   :aria-expanded="isOpen('servicemenu').toString()">
                   Library Services
                   <i class="fas fa-caret-down submenu-arrow" :class="{ rotated: isOpen('servicemenu') }"></i>
@@ -30,36 +31,39 @@
                <transition name="grow"
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
-                  <ul v-if="isOpen('servicemenu')" class="dropdown-menu" @keydown.space.stop.prevent @click.stop>
-                     <li class="submenu">
-                        <a @click="libServiceClicked('Subject Guides')"
-                           href="https://www.library.virginia.edu/research/" role="menuitem"
+                  <ul v-if="isOpen('servicemenu')"
+                     aria-label="Library Services" role="menu" id="library-services"
+                     class="dropdown-menu" @keydown.space.stop.prevent @click.stop
+                  >
+                     <li class="submenu" role="none">
+                        <a @click="libServiceClicked('Subject Guides')" role="menuitem"
+                           href="https://www.library.virginia.edu/research/"
                            tabindex="-1" id="guides">
                            Subject Guides
                         </a>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <a @click="libServiceClicked('Journal Finder')" target="_blank"
                            href="https://guides.lib.virginia.edu/journalfinder" role="menuitem"
                            tabindex="-1" id="journalsub">
                            Journal Finder
                         </a>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <a @click="libServiceClicked('Databases A-Z')" target="_blank"
                            href="https://guides.lib.virginia.edu/az.php" role="menuitem"
                            tabindex="-1" id="databasesub">
                            Databases A-Z
                         </a>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <a @click="libServiceClicked('Spaces & Equipment')" target="_blank"
                            href="https://cal.lib.virginia.edu/" role="menuitem"
                            tabindex="-1" id="spacesub">
                            Spaces & Equipment
                         </a>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <a @click="libServiceClicked('More Library Services')" target="_blank"
                            href="https://www.library.virginia.edu/services" role="menuitem"
                            tabindex="-1" id="moresub">
@@ -72,59 +76,63 @@
             <li v-if="userStore.isSignedIn" role="none"
                @click.stop="toggleSubMenu('accountmenu')" @keydown.enter="toggleSubMenu()"
                @keydown.space="toggleSubMenu()" @keydown.up.prevent.stop="prevSubMenu"
-               @keydown.down.prevent.stop="nextSubMenu">
-               <span role="menu" id="accountmenu" class="menu-item account" tabindex="-1"
-                  :aria-expanded="isOpen('accountmenu').toString()">
+               @keydown.down.prevent.stop="nextSubMenu"
+            >
+               <span role="menuitem" id="accountmenu" class="menu-item account" tabindex="-1"
+                  aria-haspopup="true" :aria-expanded="isOpen('accountmenu').toString()"
+               >
                   <i class="icon fal fa-user-circle"></i>
-                  &nbsp;Signed in as {{userStore.signedInUser}}&nbsp;
+                  <span class="signed-in-label">{{signedInLabel}}</span>
                   <i class="fas fa-caret-down submenu-arrow" :class="{ rotated: isOpen('accountmenu') }"></i>
                </span>
                <transition name="grow"
                   v-on:before-enter="beforeEnter" v-on:enter="enter"
                   v-on:before-leave="beforeLeave" v-on:leave="leave">
-                  <ul v-if="isOpen('accountmenu')" class="dropdown-menu"
-                     @keydown.space.prevent.stop @keydown.enter.stop="linkClicked">
-                     <li class="submenu">
+                  <ul v-if="isOpen('accountmenu')" class="dropdown-menu"  id="acct-menu"
+                     role="menu" :aria-label="signedInLabel"
+                     @keydown.space.prevent.stop @keydown.enter.stop="linkClicked"
+                  >
+                     <li class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/account" id="accountsub">
                            My Information
                         </router-link>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/checkouts" id="checkoutsub">
                            Checkouts
                         </router-link>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/digital-deliveries" id="digitalsub">
                            Digital Deliveries
                         </router-link>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/requests"  id="requestsub">
                            Requests
                         </router-link>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/bookmarks" id="bookmarksub">
                            Bookmarks
                         </router-link>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/searches" id="savesub">
                            Searches
                         </router-link>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/preferences"  id="prefsub">
                            Preferences
                         </router-link>
                      </li>
-                     <li v-if="userStore.isAdmin || userStore.isPDAAdmin" class="submenu">
+                     <li v-if="userStore.isAdmin || userStore.isPDAAdmin" class="submenu" role="none">
                         <router-link role="menuitem" tabindex="-1" to="/admin"  id="adminsub">
                            Admin
                         </router-link>
                      </li>
-                     <li class="submenu">
+                     <li class="submenu" role="none">
                         <div role="menuitem" tabindex="-1"  id="outsub" @click="signOut" @keydown.stop.enter="signOut">
                            Sign out
                         </div>
@@ -144,12 +152,12 @@
                   <span tabindex="-1" class="menu-item"><i class="icon fal fa-user-circle"></i>Sign In</span>
                </router-link>
             </li>
-            <li v-if="systemStore.isKiosk == false" class="menu-item alert-wrap"
-               :class="{dim: alertStore.menuCount==0 && alertStore.seenCount==0 || alertStore.menuCount>0}" tabindex="-1" role="menuitem" id="alertmenu"
+            <li v-if="systemStore.isKiosk == false" class="menu-item alert-wrap" role="none"
+               :class="{dim: alertStore.menuCount==0 && alertStore.seenCount==0 || alertStore.menuCount>0}" tabindex="-1" id="alertmenu"
                @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
                @keydown.space.prevent.stop="alertClicked"
             >
-               <div class="alert-bell icon fal fa-bell">
+               <div class="alert-bell icon fal fa-bell" role="menuitem" aria-label="virgo alerts">
                   <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
                </div>
             </li>
@@ -163,13 +171,17 @@ import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
 import { useUserStore } from "@/stores/user"
 import { useAlertStore } from "@/stores/alert"
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import analytics from '@/analytics'
 
 const alertStore = useAlertStore()
 const systemStore = useSystemStore()
 const userStore = useUserStore()
 const results = useResultStore()
+
+const signedInLabel = computed(()=>{
+   return `Signed in as ${userStore.signedInUser}`
+})
 
 const noFocus = ref(false)
 const menuBarIdx = ref(0)
@@ -235,16 +247,16 @@ function prevMenu() {
    setMenuFocus()
 }
 function toggleSubMenu( targetMenu ) {
-   if ( targetMenu ) {
-      menuBarIdx.value = menuBar.value.findIndex( mb => mb.id == targetMenu)
-   }
-   let menu = menuBar.value[menuBarIdx.value]
-   if ( menu.submenu.length == 0) {
-      return
-   }
-   menu.expanded = !menu.expanded
-   menu.subMenuIdx = 0
-   setMenuFocus()
+   menuBar.value.forEach( (m,idx) => {
+      if (m.id != targetMenu) {
+         m.expanded = false
+      } else {
+         m.expanded = !m.expanded
+         m.subMenuIdx = 0
+         menuBarIdx.value = idx
+         setMenuFocus()
+      }
+   })
 }
 function nextSubMenu() {
    let currMenu = menuBar.value[menuBarIdx.value]
@@ -351,7 +363,10 @@ function leave(el) {
          position: relative;
       }
    }
-
+   .signed-in-label {
+      display: inline-block;
+      margin: 0 5px 0 2px;
+   }
    ul.menu-right {
       margin: 0 0 0 auto;
       padding: 10px;
@@ -360,6 +375,12 @@ function leave(el) {
       }
    }
 
+   #library-services {
+      top: 29px;
+   }
+   #acct-menu {
+      top: 32px;
+   }
    ul.dropdown-menu {
       position: absolute;
       z-index: 1000;
@@ -368,7 +389,6 @@ function leave(el) {
       border-radius: 0 0 5px 5px;
       border: 1px solid var(--uvalib-grey-light);
       border-top: none;
-      top: 29px;
       right: 0;
       overflow: hidden;
       transition: 200ms ease-out;
