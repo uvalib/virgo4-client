@@ -1,6 +1,6 @@
 <template>
    <span tabindex="0" class="skip-to" id="skip-to"
-      role="complimentary"
+      role="complementary"
       aria-labelledby="skip-to-label"
       @click.stop="toggleNavMenu" @keyup.prevent.stop.enter="toggleNavMenu"
       @keyup.esc="globalClick"
