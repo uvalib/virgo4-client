@@ -9,7 +9,7 @@
             </a>
              <img v-else class ="logo" :src="poolStore.log(selectedResults.pool.id)">
          </div>
-         <SearchFilters />
+         <SearchFilters v-if="hasFacets" />
          <CollectionContext />
          <div class="sort-section">
             <V4Sort :pool="selectedResults.pool" />
@@ -78,6 +78,9 @@ const poolStore = usePoolStore()
 const filters = useFilterStore()
 
 const loadingMore = ref(false)
+const hasFacets = computed(()=>{
+   return poolStore.facetSupport(resultStore.selectedResults.pool.id)
+})
 const hasLogo = computed(()=>{
    return poolStore.logo(resultStore.selectedResults.pool.id) != ""
 })

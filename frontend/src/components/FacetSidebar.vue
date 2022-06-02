@@ -7,14 +7,14 @@
          :invert="!startExpanded">
          <template v-slot:title>{{poolFilterTitle}}</template>
 
-         <div v-if="!hasFacets" class="none">
+         <div v-if="!hasFacets" class="no-facets">
             {{resultStore.selectedResults.pool.name}} does not support filtering
          </div>
          <div v-else class="body">
             <div v-if="filterStore.updatingFacets" class="working">
                <V4Spinner message="Loading filters..."/>
             </div>
-            <div v-if="facets.length == 0" class="none">
+            <div v-if="facets.length == 0" class="no-facets">
                Filters are not available for this search
             </div>
             <dl v-else-if="filterStore.updatingFacets == false">
@@ -147,13 +147,13 @@ async function filterClicked(facetID,value) {
          margin-left: auto;
          font-size: 0.8em;
       }
-      div.none {
-         text-align: center;
-         margin:25px 5px;
-         font-size: 1.25em;
-         color: var(--uvalib-text);
-      }
    }
+}
+div.no-facets {
+   text-align: center;
+   margin:25px 5px;
+   font-size: 1.25em;
+   color: var(--uvalib-text);
 }
 dl  {
    margin: 0;
