@@ -152,14 +152,15 @@
                   <span tabindex="-1" class="menu-item"><i class="icon fal fa-user-circle"></i>Sign In</span>
                </router-link>
             </li>
-            <li v-if="systemStore.isKiosk == false" class="menu-item alert-wrap" role="none"
-               :class="{dim: alertStore.menuCount==0 && alertStore.seenCount==0 || alertStore.menuCount>0}" tabindex="-1" id="alertmenu"
-               @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
-               @keydown.space.prevent.stop="alertClicked"
-            >
-               <div class="alert-bell icon fal fa-bell" role="menuitem" aria-label="virgo alerts">
+            <li v-if="systemStore.isKiosk == false" role="none">
+               <a role="menuitem" id="alertmenu" class="menu-item" tabindex="-1"
+                  @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
+                  @keydown.space.prevent.stop="alertClicked"
+                  aria-label="virgo alerts"
+               >
+                  <i class="alert-bell icon fal fa-bell" :class="{dim: alertStore.menuCount==0 && alertStore.seenCount==0 || alertStore.menuCount>0}"></i>
                   <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
-               </div>
+               </a>
             </li>
          </template>
       </ul>
@@ -247,16 +248,26 @@ function prevMenu() {
    setMenuFocus()
 }
 function toggleSubMenu( targetMenu ) {
-   menuBar.value.forEach( (m,idx) => {
-      if (m.id != targetMenu) {
-         m.expanded = false
-      } else {
-         m.expanded = !m.expanded
-         m.subMenuIdx = 0
-         menuBarIdx.value = idx
-         setMenuFocus()
+   if (!targetMenu) {
+       let menu = menuBar.value[menuBarIdx.value]
+      if ( menu.submenu.length == 0) {
+         return
       }
-   })
+      menu.expanded = !menu.expanded
+      menu.subMenuIdx = 0
+      setMenuFocus()
+   } else {
+      menuBar.value.forEach( (m,idx) => {
+         if (m.id != targetMenu) {
+            m.expanded = false
+         } else {
+            m.expanded = !m.expanded
+            m.subMenuIdx = 0
+            menuBarIdx.value = idx
+            setMenuFocus()
+         }
+      })
+   }
 }
 function nextSubMenu() {
    let currMenu = menuBar.value[menuBarIdx.value]
@@ -459,8 +470,20 @@ function leave(el) {
 
    .alert-bell {
       position: relative;
-      .alert-count {
-         font-size: 0.7em;
+      color: white;
+      cursor: pointer;
+      display: inline-block;
+      margin-left:0px;
+   }
+   .alert-bell.dim {
+      opacity: 0.4;
+      cursor: default;
+      &:hover {
+         border-bottom: none;
+      }
+   }
+   .alert-count {
+         font-size: 1em;
          font-weight: bold;
          background: var(--uvalib-yellow);
          color: var(--uvalib-text-dark);
@@ -472,29 +495,21 @@ function leave(el) {
          border-radius: 15px;
          padding: 1px;
          position: absolute;
-         right: -12px;
+         right: -8px;
          top: -8px;
       }
-   }
-   .alert-wrap.dim  {
-      opacity: 0.4;
-      cursor: default;
-      &:hover {
-         border-bottom: none;
-      }
-   }
-   .alert-wrap {
-      cursor: pointer;
-      color: white;
-      display: inline-block;
-      margin-left:20px;
-      &:focus {
-         @include be-accessible-light();
-      }
-      &::hover {
-         border-bottom:1px solid white;
-      }
-   }
+   // .alert-wrap {
+   //    cursor: pointer;
+   //    color: white;
+   //    display: inline-block;
+   //    margin-left:20px;
+   //    &:focus {
+   //       @include be-accessible-light();
+   //    }
+   //    &::hover {
+   //       border-bottom:1px solid white;
+   //    }
+   // }
 }
 
 @media only screen and (max-width: 800px) {
