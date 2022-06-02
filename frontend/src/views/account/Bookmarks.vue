@@ -80,6 +80,7 @@
                            <td>
                               <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
                                  :aria-label="ariaLabel(bookmark)"/>
+                              <abbr class="unapi-id" :title="itemURL(bookmark)"></abbr>
                            </td>
                            <td>
                               <router-link @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
@@ -124,11 +125,12 @@ import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import MoveBookmark from "@/components/modals/MoveBookmark.vue"
 import RenameBookmark from "@/components/modals/RenameBookmark.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-import { ref, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted, onUpdated } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { useReserveStore } from "@/stores/reserve"
+import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 import { useRouter } from 'vue-router'
@@ -138,6 +140,7 @@ const userStore = useUserStore()
 const systemStore = useSystemStore()
 const bookmarkStore = useBookmarkStore()
 const reserveStore = useReserveStore()
+const itemStore = useItemStore()
 const router = useRouter()
 
 // html element ref
@@ -247,6 +250,10 @@ async function reserve() {
 function detailsURL(bookmark) {
    return `/sources/${bookmark.pool}/items/${bookmark.identifier}`
 }
+function itemURL(bookmark) {
+   return itemStore.getItemURL(bookmark.pool, bookmark.identifier)
+}
+
 function removeBookmarks(folderID) {
    if ( selectedItems.value.length == 0) {
       systemStore.setError("No bookmarks selected for deletion.<br/>Select one or more and try again.")
@@ -302,6 +309,14 @@ function browserSizeChanged() {
    console.log("EXPANEDED FOLDER "+ expandedFolder.value)
 }
 
+function zoteroItemUpdated() {
+   // notify zotero connector of item change(s)
+   document.dispatchEvent(new Event('ZoteroItemUpdated', {
+      bubbles: true,
+      cancelable: true
+   }))
+}
+
 onMounted(()=>{
    if (userStore.isSignedIn) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
@@ -311,6 +326,10 @@ onMounted(()=>{
 
 onUnmounted(() => {
     window.removeEventListener('resize',  browserSizeChanged)
+})
+
+onUpdated(()=>{
+   zoteroItemUpdated()
 })
 </script>
 

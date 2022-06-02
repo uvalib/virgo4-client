@@ -289,6 +289,24 @@ export const useItemStore = defineStore('item', {
          })
       },
 
+      getItemURL( source, identifier ) {
+         // get source from poolID
+         const poolStore = usePoolStore()
+         let baseURL = ""
+         let pool = null
+         let pools = poolStore.list
+         pool = pools.find( p => p.id == source)
+
+         if (!pool) {
+           return ""
+         }
+
+         baseURL = pool.url
+         let url = baseURL + "/api/resource/" + identifier
+
+         return url
+      },
+
       async getDetails( source, identifier ) {
          this.clearDetails()
          this.clearAvailability()

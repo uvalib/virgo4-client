@@ -69,7 +69,7 @@ import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
-import { ref, nextTick, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, nextTick, computed, onMounted, onUnmounted, onUpdated, watch } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
@@ -187,6 +187,22 @@ function initVersionChecker() {
    }, 1000*60*5)
 }
 
+function initZotero() {
+   // add unapi URL to document header for Zotero, if not already present
+   let unapiID = 'unapi'
+   let citeURL = systemStore.citationsURL
+   if (!document.getElementById(unapiID) && citeURL != "") {
+      let unapiURL = citeURL + '/unapi'
+      var link = document.createElement('link')
+      link.id = unapiID
+      link.rel = 'unapi-server'
+      link.type = 'application/xml'
+      link.title = 'unAPI'
+      link.href = unapiURL
+      document.head.appendChild(link)
+   }
+}
+
 onMounted(() => {
    initVirgo()
    initVersionChecker()
@@ -203,6 +219,10 @@ onMounted(() => {
 
 onUnmounted(() => {
    window.removeEventListener("scroll", scrollHandler)
+})
+
+onUpdated(() => {
+   initZotero()
 })
 </script>
 

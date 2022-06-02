@@ -105,19 +105,6 @@ async function getDetails(src, id) {
 }
 
 function zoteroItemUpdated() {
-   // add unapi URL to document header for Zotero, if not already present
-   let unapiID = 'unapi'
-   if (!document.getElementById(unapiID)) {
-      let unapiURL = system.citationsURL + '/unapi'
-      var link = document.createElement('link')
-      link.id = unapiID
-      link.rel = 'unapi-server'
-      link.type = 'application/xml'
-      link.title = 'unAPI'
-      link.href = unapiURL
-      document.head.appendChild(link)
-   }
-
    // notify zotero connector of an item change
    document.dispatchEvent(new Event('ZoteroItemUpdated', {
       bubbles: true,
@@ -128,6 +115,7 @@ function zoteroItemUpdated() {
 onMounted(()=>{
    getDetails(route.params.src, route.params.id)
 })
+
 onUpdated(()=>{
    zoteroItemUpdated()
 })
