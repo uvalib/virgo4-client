@@ -5,7 +5,7 @@
             background="var(--uvalib-brand-blue)"
             color="white" :expanded="startExpanded"
             borderColor="var(--uvalib-brand-blue)"
-            :layoutChange="filters.getPresearchFacets" :invert="!startExpanded">
+            :invert="!startExpanded">
             <template v-slot:title>Filters</template>
             <div class="body">
                <div v-if="filters.getPresearchFacets" class="working">

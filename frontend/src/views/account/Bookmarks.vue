@@ -124,7 +124,7 @@ import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import MoveBookmark from "@/components/modals/MoveBookmark.vue"
 import RenameBookmark from "@/components/modals/RenameBookmark.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useBookmarkStore } from "@/stores/bookmark"
@@ -297,10 +297,20 @@ async function createFolder() {
    })
 }
 
+function browserSizeChanged() {
+   expandedFolder.value = -1
+   console.log("EXPANEDED FOLDER "+ expandedFolder.value)
+}
+
 onMounted(()=>{
    if (userStore.isSignedIn) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
    }
+   window.addEventListener('resize',  browserSizeChanged)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize',  browserSizeChanged)
 })
 </script>
 

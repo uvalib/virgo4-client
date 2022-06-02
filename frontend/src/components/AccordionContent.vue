@@ -44,9 +44,6 @@ const props = defineProps({
       type: String,
       reqired: true
    },
-   layoutChange: {
-      default: null,
-   },
    closeOthers: {
       type: Number,
       default: null,
@@ -94,20 +91,8 @@ const props = defineProps({
 })
 
 watch(() => props.closeOthers, () => {
-   if ( props.closeOthers > -1) {
-      if ( props.closeOthers.toString() != props.id)
-      isExpanded.value = false
-   }
-})
-watch(() => props.layoutChange, () => {
-   if (isExpanded.value && props.id) {
-      setTimeout( ()=> {
-         let content = document.getElementById(props.id)
-         if ( content) {
-            content.setAttribute("style", "height: inherit;")
-         }
-      })
-   }
+   if ( props.closeOthers.toString() != props.id)
+   isExpanded.value = false
 })
 watch(() => props.autoExpandID, (newVal) => {
    if (isExpanded.value === false && props.id && newVal != "") {

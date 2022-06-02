@@ -4,7 +4,7 @@
          :background="filterColor"
          color="white" :expanded="startExpanded"
          borderColor="var(--uvalib-brand-blue)"
-         :layoutChange="filterStore.updatingFacets"  :invert="!startExpanded">
+         :invert="!startExpanded">
          <template v-slot:title>{{poolFilterTitle}}</template>
 
          <div v-if="!hasFacets" class="none">
