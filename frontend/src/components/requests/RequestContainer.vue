@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import OptionsPanel from "./panels/OptionsPanel.vue"
 import SignInPanel from "./panels/SignInPanel.vue"
 import PlaceHoldPanel from "./panels/PlaceHoldPanel.vue"
@@ -29,6 +29,7 @@ import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 import { useRestoreStore } from "@/stores/restore"
 import { usePreferencesStore } from "@/stores/preferences"
+import { storeToRefs } from 'pinia'
 
 const user = useUserStore()
 const restore = useRestoreStore()
@@ -37,7 +38,15 @@ const requestStore = useRequestStore()
 
 const activePanel = ref(null)
 
-onMounted(async ()=>{
+// pull a ref to authorizing from the user store so it can be watched directly
+const { authorizing } = storeToRefs(user)
+watch(authorizing, (newValue) => {
+   if (newValue == false) {
+      setupActivePanel()
+   }
+})
+
+async function setupActivePanel() {
    if ( user.isSignedIn) {
       await preferences.loadPreferences()
    }
@@ -60,6 +69,10 @@ onMounted(async ()=>{
    if (!requestStore.activePanel){
       requestStore.activePanel = 'OptionsPanel'
    }
+}
+
+onMounted(()=>{
+   setupActivePanel()
 })
 
 function reset() {

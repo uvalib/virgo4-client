@@ -560,7 +560,6 @@ export const useUserStore = defineStore('user', {
 
             let jwtStr = VueCookies.get("v4_jwt")
             this.setUserJWT(jwtStr )
-            this.authorizing = false
             restore.load()
             await this.getAccountInfo()   // needed for search preferences
             this.getCheckouts()           // needed so the alert icon can show in menubar
@@ -577,6 +576,7 @@ export const useUserStore = defineStore('user', {
                   throw e;
               }
             })
+            this.authorizing = false
          }).catch((error) => {
             const system = useSystemStore()
             if (error.response && error.response.status == 503) {
