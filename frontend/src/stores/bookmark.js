@@ -91,10 +91,13 @@ export const useBookmarkStore = defineStore('bookmark', {
          }
       },
       toggleSettings(folderName) {
-         let f = this.bookmarks.find( f => f.folder == folderName )
-         if (f) {
-            f.settingsOpen = !f.settingsOpen
-         }
+         this.bookmarks.forEach( f => {
+            if (f.folder == folderName ) {
+               f.settingsOpen = !f.settingsOpen
+            } else {
+               f.settingsOpen = false
+            }
+         })
       },
 
       async getPublicBookmarks(token) {

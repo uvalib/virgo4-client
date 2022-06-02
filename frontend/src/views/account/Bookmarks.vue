@@ -18,44 +18,27 @@
                   :id="folderInfo.id.toString()"
                   v-bind:closeOthers="expandedFolder"
                   @accordion-clicked="folderOpened(folderInfo.id)"
-                  :showSettings="folderInfo.settingsOpen"
                >
                   <template v-slot:title>
                      <span class="folder-title" v-html="getTitle(folderInfo)"></span>
                   </template>
                   <template v-slot:toolbar>
                      <div class="folder-buttons">
-                        <V4Button mode="icon" @click="toggleSettings(folderInfo.folder)" :aria-label="`${folderInfo.folder} settings`">
-                           <i class="fal fa-cog"></i>
-                        </V4Button>
+                        <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'" style="display: inline-block;"/>
+                        <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
+                           :id="`delete-${folderInfo.id}`" style="display: inline-block;"
+                           :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
+                           <div>
+                              Delete bookmark folder
+                              <b>{{folderInfo.folder}}</b>? All bookmarks
+                           </div>
+                           <div>contained within it will also be deleted.</div>
+                           <div>
+                              <br />This cannot be reversed.
+                           </div>
+                        </Confirm>
                      </div>
                   </template>
-                  <template v-slot:settings>
-                     <div class="publish">
-                        <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
-                        <span v-if="folderInfo.public" class="public-url">
-                           <V4Button class="copy-link" mode="icon" @click="copyURL(folderInfo)"><i class="share fal fa-share-alt"></i></V4Button>
-                           <a :href="getPublicURL(folderInfo)" target="_blank">
-                              <span>View</span><i class="link fal fa-external-link-alt"></i>
-                           </a>
-                        </span>
-                     </div>
-                     <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'" style="display: inline-block;"/>
-                     <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
-                        :id="`delete-${folderInfo.id}`" style="display: inline-block;"
-                        :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
-                        <div>
-                           Delete bookmark folder
-                           <b>{{folderInfo.folder}}</b>? All bookmarks
-                        </div>
-                        <div>contained within it will also be deleted.</div>
-                        <div>
-                           <br />This cannot be reversed.
-                        </div>
-                     </Confirm>
-                  </template>
-
                   <div class="none" v-if="folderInfo.bookmarks.length == 0">
                      There are no bookmarks in this folder.
                   </div>
@@ -72,6 +55,17 @@
                            v-on:move-approved="moveBookmarks"/>
                         <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
                         <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
+                     </div>
+
+                     <div class="publish">
+                        <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
+                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
+                        <span v-if="folderInfo.public" class="public-url">
+                           <V4Button class="copy-link" mode="icon" @click="copyURL(folderInfo)"><i class="share fal fa-share-alt"></i></V4Button>
+                           <a :href="getPublicURL(folderInfo)" target="_blank">
+                              <span>View</span><i class="link fal fa-external-link-alt"></i>
+                           </a>
+                        </span>
                      </div>
 
                      <table>
@@ -157,9 +151,6 @@ const selectedItems = ref([])
 const expandedFolder = ref(-1)
 const selectAllChecked = ref(false)
 
-function toggleSettings(folderName) {
-   bookmarkStore.toggleSettings(folderName)
-}
 function exportBookmarks(folder) {
    bookmarkStore.exportBookmarks(folder )
 }
@@ -334,6 +325,13 @@ div.notice {
       margin-bottom: 5px;
    }
 }
+i.fas {
+   color: var(--uvalib-grey-dark);
+   cursor: pointer;
+   font-size: 1.2em;
+   top: 4px;
+   margin-right: 10px;
+}
 i.link.fas {
    margin: 0 0 0 5px;
    font-size:0.8em;
@@ -345,10 +343,9 @@ div.folder {
    align-items: flex-start;
    margin-bottom: 15px;
    .folder-buttons {
-      display: inline-block;
-      .v4-button {
-         font-size: 1.25em;
-      }
+      display: flex;
+      flex-flow: row nowrap;
+      padding-right: 5px;
    }
 }
 div.folder .remove-folder {

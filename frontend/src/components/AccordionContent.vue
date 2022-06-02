@@ -1,26 +1,20 @@
 <template>
-   <div class="accordion" :id="props.id" @click="accordionClicked" @keydown.prevent.enter="accordionClicked" @keydown.space.prevent="accordionClicked">
-      <h3 v-if="showHeader" :id="`${props.id}-header`">
-         <button
+   <div class="accordion" :id="props.id">
+      <h3 v-if="showHeader" :id="`${props.id}-header`"
+         :style="{ background: props.background, color: props.color,
+                   borderWidth: props.borderWidth, borderStyle: props.borderStyle,
+                   borderColor: props.borderColor }"
+      >
+         <button  @click="accordionClicked" @keydown.prevent.enter="accordionClicked" @keydown.space.prevent="accordionClicked"
             :class="props.layout" class="title"
-            :style="{ background: props.background, color: props.color,
-                     borderWidth: props.borderWidth, borderStyle: props.borderStyle,
-                     borderColor: props.borderColor }"
             :aria-expanded="expandedStr"
-            :aria-controls="contentID">
+            :aria-controls="contentID"
+            :style="{color: props.color}"
+         >
             <slot name="title"></slot>
-            <div class="accordion-controls">
-               <slot name="toolbar"></slot>
-               <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
-            </div>
+            <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
          </button>
-         <transition name="accordion"
-            v-on:before-enter="beforeEnter" v-on:enter="enter"
-            v-on:before-leave="beforeLeave" v-on:leave="leave">
-            <div class="settings" v-if="showSettings">
-               <slot name="settings"></slot>
-            </div>
-         </transition>
+         <slot name="toolbar"></slot>
       </h3>
       <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
@@ -35,9 +29,7 @@
                            borderWidth: props.borderWidth, borderStyle: props.borderStyle,
                            borderColor: props.borderColor }" >
                <slot name="footer"></slot>
-               <div class="accordion-controls">
-                  <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
-               </div>
+               <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
             </button>
          </div>
       </transition>
@@ -92,10 +84,6 @@ const props = defineProps({
       default: "solid"
    },
    expanded: {
-      default: false,
-      type: Boolean
-   },
-   showSettings: {
       default: false,
       type: Boolean
    },
@@ -204,17 +192,15 @@ function leave(el) {
       font-size: 1em;
       font-weight: normal;
       margin: 0;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
       button {
-         width: 100%;
+         flex-grow: 1;
          padding: 0;
-      }
-      .settings {
-         padding: 5px 10px;
-         border: 1px solid var(--uvalib-grey-light);
-         border-top: none;
-         background: var(--uvalib-grey-lightest);
-         text-align: left;
-         border-radius: 0 0 6px 6px;
+         background: transparent;
+         border: none;
+         outline: none;
       }
    }
 
@@ -234,15 +220,13 @@ function leave(el) {
          @include be-accessible();
       }
 
-      .accordion-controls {
+      .accordion-icon {
+         font-size: 1.25em;
+         transform: rotate(0deg);
+         transition-duration: 250ms;
+         margin: 0 5px 0 10px;
+         display: inline-block;
          margin-left: auto;
-         .accordion-icon {
-            font-size: 1.25em;
-            transform: rotate(0deg);
-            transition-duration: 250ms;
-            margin: 0 5px 0 10px;
-            display: inline-block;
-         }
       }
    }
 
