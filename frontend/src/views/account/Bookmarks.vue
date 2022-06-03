@@ -18,6 +18,8 @@
                   :id="folderInfo.id.toString()"
                   v-bind:closeOthers="expandedFolder"
                   @accordion-clicked="folderOpened(folderInfo.id)"
+                  @accordion-expanded="folderExpanded(folderInfo.id)"
+                  @accordion-collapsed="folderCollapsed(folderInfo.id)"
                >
                   <template v-slot:title>
                      <span class="folder-title" v-html="getTitle(folderInfo)"></span>
@@ -80,7 +82,7 @@
                            <td>
                               <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
                                  :aria-label="ariaLabel(bookmark)"/>
-                              <abbr class="unapi-id" :title="itemURL(bookmark)"></abbr>
+                              <abbr class="" :title="itemURL(bookmark)" :data-folder-id="folderInfo.id"></abbr>
                            </td>
                            <td>
                               <router-link @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
@@ -125,7 +127,7 @@ import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import MoveBookmark from "@/components/modals/MoveBookmark.vue"
 import RenameBookmark from "@/components/modals/RenameBookmark.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-import { ref, onMounted, nextTick, onUnmounted, onUpdated } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useBookmarkStore } from "@/stores/bookmark"
@@ -203,6 +205,12 @@ function folderOpened(folderID) {
    selectedItems.value = []
    expandedFolder.value = folderID
    selectAllChecked.value = false
+}
+function folderExpanded(folderID) {
+   exposeFolderItemsForZotero(folderID)
+}
+function folderCollapsed(folderID) {
+   exposeFolderItemsForZotero("-1")
 }
 function toggleAllClicked(items) {
    selectAllChecked.value = !selectAllChecked.value
@@ -309,6 +317,21 @@ function browserSizeChanged() {
    console.log("EXPANEDED FOLDER "+ expandedFolder.value)
 }
 
+function exposeFolderItemsForZotero(folderID) {
+   const cells = document.getElementsByTagName('abbr')
+
+   for (let cell of cells) {
+      let id = cell.getAttribute("data-folder-id")
+      if (id == folderID) {
+         cell.className = "unapi-id"
+      } else {
+         cell.className = ""
+      }
+   }
+
+   zoteroItemUpdated()
+}
+
 function zoteroItemUpdated() {
    // notify zotero connector of item change(s)
    document.dispatchEvent(new Event('ZoteroItemUpdated', {
@@ -326,10 +349,6 @@ onMounted(()=>{
 
 onUnmounted(() => {
     window.removeEventListener('resize',  browserSizeChanged)
-})
-
-onUpdated(()=>{
-   zoteroItemUpdated()
 })
 </script>
 
