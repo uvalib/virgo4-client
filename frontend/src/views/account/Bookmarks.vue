@@ -207,10 +207,10 @@ function folderOpened(folderID) {
    selectAllChecked.value = false
 }
 function folderExpanded(folderID) {
-   exposeFolderItemsForZotero(folderID)
+   showFolderItemsForZotero(folderID)
 }
 function folderCollapsed(folderID) {
-   exposeFolderItemsForZotero("-1")
+   hideFolderItemsForZotero(folderID)
 }
 function toggleAllClicked(items) {
    selectAllChecked.value = !selectAllChecked.value
@@ -317,15 +317,21 @@ function browserSizeChanged() {
    console.log("EXPANEDED FOLDER "+ expandedFolder.value)
 }
 
-function exposeFolderItemsForZotero(folderID) {
+function showFolderItemsForZotero(folderID) {
+   updateFolderItemsForZotero(folderID, "unapi-id")
+}
+
+function hideFolderItemsForZotero(folderID) {
+   updateFolderItemsForZotero(folderID, "")
+}
+
+function updateFolderItemsForZotero(folderID, className) {
    const cells = document.getElementsByTagName('abbr')
 
    for (let cell of cells) {
       let id = cell.getAttribute("data-folder-id")
       if (id == folderID) {
-         cell.className = "unapi-id"
-      } else {
-         cell.className = ""
+         cell.className = className
       }
    }
 
