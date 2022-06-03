@@ -65,8 +65,10 @@ export const useBookmarkStore = defineStore('bookmark', {
                let pn = d.pool.name
                delete d.pool
                d.pool = pn
+               d.selected = false
             })
-            b.settingsOpen = false
+            b.expanded = false
+            b.selected = false
             this.bookmarks.push(b)
          })
       },
@@ -83,23 +85,40 @@ export const useBookmarkStore = defineStore('bookmark', {
             let pn = b.pool.name
             delete b.pool
             b.pool = pn
+            // FIXME lose selecetd status
          })
          var idx = this.bookmarks.findIndex( f => f.id == folder.id)
          if (idx > -1) {
-            folder.settingsOpen = this.bookmarks[idx].settingsOpen
+            folder.expanded = this.bookmarks[idx].expanded
+            folder.selected = this.bookmarks[idx].selected
             this.bookmarks.splice(idx, 1, folder)
          }
       },
-      toggleSettings(folderName) {
+      setFolderExpanded(folderID, expanded) {
+         let folder = this.bookmarks.find( f => f.id == folderID )
+         if (folder) {
+            folder.expanded = expanded
+            this.selectFolder(folderID)
+         }
+      },
+      toggleBookmarkSelected(bm) {
+         let bmFolder = this.bookmarks.find( f => f.id == bm.folder_id)
+         if (bmFolder) {
+            let tgtBm = bmFolder.bookmarks.find( b => b.id == bm.id)
+            if (tgtBm) {
+               tgtBm.selected = !tgtBm.selected
+            }
+         }
+      },
+      selectFolder(folderID) {
          this.bookmarks.forEach( f => {
-            if (f.folder == folderName ) {
-               f.settingsOpen = !f.settingsOpen
+            if (f.id == folderID ) {
+               f.selected = true
             } else {
-               f.settingsOpen = false
+               f.selected = false
             }
          })
       },
-
       async getPublicBookmarks(token) {
          this.searching = true
          return axios.get(`/api/bookmarks/${token}`).then((response) => {

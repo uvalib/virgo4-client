@@ -108,6 +108,11 @@ const router = createRouter({
          component: () => import('../views/account/Bookmarks.vue')
       },
       {
+         path: '/bookmarks2',
+         name: 'bookmarks2',
+         component: () => import('../views/account/Bookmarks2.vue')
+      },
+      {
          path: '/checkouts',
          name: 'checkouts',
          component: () => import('../views/account/Checkouts.vue')

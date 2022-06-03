@@ -8,6 +8,9 @@
       <div v-else-if="userStore.isSignedIn">
          <div class="none" v-if="bookmarkStore.hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
+            <div class="alt-view" v-if="systemStore.isDevServer">
+               <router-link to="/bookmarks2">Testing Alternate Boomkarks View</router-link>
+            </div>
             <div class="folder" v-for="(folderInfo,idx) in bookmarkStore.bookmarks" :key="folderInfo.id">
                <AccordionContent
                   class="boxed bookmark-folder"
@@ -350,7 +353,7 @@ onMounted(()=>{
    if (userStore.isSignedIn) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
    }
-   window.addEventListener('resize',  browserSizeChanged)
+   // window.addEventListener('resize',  browserSizeChanged)
 })
 
 onUnmounted(() => {
@@ -359,6 +362,10 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.alt-view {
+   text-align: right;
+   padding: 20px 0;
+}
 div.notice {
    padding: 10px 10px;
    background: var(--uvalib-yellow-light);

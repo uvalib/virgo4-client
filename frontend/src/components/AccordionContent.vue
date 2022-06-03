@@ -16,9 +16,9 @@
          </button>
          <slot name="toolbar"></slot>
       </h3>
-      <transition name="accordion"
+      <!-- <transition name="accordion"
          v-on:before-enter="beforeEnter" v-on:enter="enter"
-         v-on:before-leave="beforeLeave" v-on:leave="leave">
+         v-on:before-leave="beforeLeave" v-on:leave="leave"> -->
          <div :id="contentID" class="accordion-content" v-show="isExpanded"
             :aria-labelledby="`${props.id}-header`" role="region"
             :style="{ background: props.backgroundContent, color: props.color }"
@@ -32,7 +32,7 @@
                <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
             </button>
          </div>
-      </transition>
+      <!-- </transition> -->
    </div>
 </template>
 
@@ -146,27 +146,27 @@ function accordionFooterClicked() {
       }
    }, 250)
 }
-function beforeEnter(el) {
-   document.getElementById(contentID.value).style.overflow = "hidden"
-   el.style.height = '0'
-}
-function enter(el) {
-   el.style.height = `${el.scrollHeight}px`
-   setTimeout( ()=> {
-      emit('accordion-expanded')
-         document.getElementById(contentID.value).style.overflow = "visible"
-   }, 250)
-}
-function beforeLeave(el) {
-   el.style.height = `${el.scrollHeight}px`
-}
-function leave(el) {
-   document.getElementById(contentID.value).style.overflow = "hidden"
-   el.style.height = '0'
-   setTimeout( ()=> {
-      emit('accordion-collapsed')
-   }, 250)
-}
+// function beforeEnter(el) {
+//    document.getElementById(contentID.value).style.overflow = "hidden"
+//    el.style.height = '0'
+// }
+// function enter(el) {
+//    el.style.height = `${el.scrollHeight}px`
+//    setTimeout( ()=> {
+//       emit('accordion-expanded')
+//          document.getElementById(contentID.value).style.overflow = "visible"
+//    }, 250)
+// }
+// function beforeLeave(el) {
+//    el.style.height = `${el.scrollHeight}px`
+// }
+// function leave(el) {
+//    document.getElementById(contentID.value).style.overflow = "hidden"
+//    el.style.height = '0'
+//    setTimeout( ()=> {
+//       emit('accordion-collapsed')
+//    }, 250)
+// }
 </script>
 
 <style lang="scss" scoped>
