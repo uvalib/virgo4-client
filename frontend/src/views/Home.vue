@@ -196,6 +196,12 @@ function handleLegacyQueries( query ) {
       queryStore.searchSources = "articles"
    } else if (newQ.pool == "uva_library") {
       queryStore.searchSources = "uva_library"
+   } if (newQ.pool == "hathitrust") {
+      queryStore.searchSources = "hathitrust"
+   } if (newQ.pool == "jmrl") {
+      queryStore.searchSources = "jmrl"
+   } if (newQ.pool == "worldcat") {
+      queryStore.searchSources = "worldcat"
    }
 
    if ( changed) {
@@ -260,10 +266,10 @@ async function restoreSearchFromQueryParams( query ) {
 
    // If there is a query or filter in params it may be necessary to run a search
    if ( query.q || query.filter) {
-      // console.log(`Q: ${queryStore.string} vs ${oldQ}`)
-      // console.log(`F: ${filters.asQueryParam(targetPool)} vs ${oldFilterParam}`)
-      // console.log(`S: ${sortStore.activeSort} vs ${oldSort}`)
-      // console.log(`U: ${queryStore.userSearched}`)
+      console.log(`Q: ${queryStore.string} vs ${oldQ}`)
+      console.log(`F: ${filters.asQueryParam(targetPool)} vs ${oldFilterParam}`)
+      console.log(`S: ${sortStore.activeSort} vs ${oldSort}`)
+      console.log(`U: ${queryStore.userSearched}`)
 
       // only re-run search when query, sort or filtering has changed
       if ( queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam ||
