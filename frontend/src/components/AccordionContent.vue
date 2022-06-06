@@ -16,9 +16,14 @@
          </button>
          <slot name="toolbar"></slot>
       </h3>
-      <!-- <transition name="accordion"
-         v-on:before-enter="beforeEnter" v-on:enter="enter"
-         v-on:before-leave="beforeLeave" v-on:leave="leave"> -->
+      <transition
+         @before-enter="onBeforeEnter"
+         @enter="onEnter"
+         @after-enter="onAfterEnter"
+         @before-leave="onBeforeLeave"
+         @leave="onLeave"
+         @after-leave="onAfterLeave"
+      >
          <div :id="contentID" class="accordion-content" v-show="isExpanded"
             :aria-labelledby="`${props.id}-header`" role="region"
             :style="{ background: props.backgroundContent, color: props.color }"
@@ -32,12 +37,12 @@
                <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
             </button>
          </div>
-      <!-- </transition> -->
+      </transition>
    </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, useSlots } from 'vue'
+import { ref, computed, watch, useSlots, nextTick } from 'vue'
 const emit = defineEmits( ['accordion-clicked', 'accordion-expanded', 'accordion-collapsed'])
 const props = defineProps({
    id: {
@@ -104,6 +109,7 @@ watch(() => props.autoExpandID, (newVal) => {
 
 const slots = useSlots()
 const isExpanded = ref(props.expanded)
+const animationDone = ref(true)
 
 const expandedStr = computed(()=>{
    if ( isExpanded.value ) {
@@ -124,7 +130,11 @@ const rotation = computed(()=>{
    return "rotate(0deg)"
 })
 const showHeader = computed(()=>{
-   return !isExpanded.value ||  isExpanded.value && !hasFooterSlot.value
+   if (hasFooterSlot.value ) {
+      if (!animationDone.value) return false
+      return !isExpanded.value
+   }
+   return true
 })
 const contentID = computed(()=>{
    return `accordion-conttent-${props.id}`
@@ -146,27 +156,32 @@ function accordionFooterClicked() {
       }
    }, 250)
 }
-// function beforeEnter(el) {
-//    document.getElementById(contentID.value).style.overflow = "hidden"
-//    el.style.height = '0'
-// }
-// function enter(el) {
-//    el.style.height = `${el.scrollHeight}px`
-//    setTimeout( ()=> {
-//       emit('accordion-expanded')
-//          document.getElementById(contentID.value).style.overflow = "visible"
-//    }, 250)
-// }
-// function beforeLeave(el) {
-//    el.style.height = `${el.scrollHeight}px`
-// }
-// function leave(el) {
-//    document.getElementById(contentID.value).style.overflow = "hidden"
-//    el.style.height = '0'
-//    setTimeout( ()=> {
-//       emit('accordion-collapsed')
-//    }, 250)
-// }
+function onBeforeEnter(el) {
+   el.style.height = '0'
+   animationDone.value = false
+}
+function onEnter(el) {
+    el.style.height =  `${el.scrollHeight}px`
+}
+function onAfterEnter(el) {
+   el.style.height = null
+   nextTick( ()=> {
+      animationDone.value = true
+      emit('accordion-expanded')
+   })
+}
+function onBeforeLeave(el) {
+   animationDone.value = false
+   el.style.height = `${el.scrollHeight}px`
+}
+function onLeave(el) {
+    el.style.height = '0'
+}
+function onAfterLeave(el) {
+   el.style.height = '0'
+   animationDone.value = true
+   emit('accordion-collapsed')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -221,7 +236,7 @@ function accordionFooterClicked() {
    }
    .accordion-content {
       overflow: hidden;
-      transition: 250ms ease-out;
+      transition: all 250ms ease-out;
       margin:0;
       padding:0;
       text-align: left;
