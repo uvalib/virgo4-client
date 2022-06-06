@@ -14,8 +14,22 @@
             <slot name="title"></slot>
             <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
          </button>
-         <slot name="toolbar"></slot>
+         <V4Button v-if="hasSettings" mode="icon" aria-label="folder settings" @click="emit('settingsClicked')">
+            <i class="settings-icon fa-cog" :class="{fal: !props.showSettings, fas: props.showSettings}"></i>
+         </V4Button>
       </h3>
+      <transition
+         @before-enter="onBeforeEnter"
+         @enter="onEnter"
+         @after-enter="onAfterEnter"
+         @before-leave="onBeforeLeave"
+         @leave="onLeave"
+         @after-leave="onAfterLeave"
+      >
+      <div class="accordion-settings" v-show="props.showSettings" role="region">
+         <slot name="settings"></slot>
+      </div>
+      </transition>
       <transition
          @before-enter="onBeforeEnter"
          @enter="onEnter"
@@ -43,7 +57,7 @@
 
 <script setup>
 import { ref, computed, watch, useSlots, nextTick } from 'vue'
-const emit = defineEmits( ['accordion-clicked', 'accordion-expanded', 'accordion-collapsed'])
+const emit = defineEmits( ['accordion-clicked', 'accordion-expanded', 'accordion-collapsed', 'settingsClicked'])
 const props = defineProps({
    id: {
       type: String,
@@ -90,6 +104,14 @@ const props = defineProps({
       type: Boolean
    },
    invert: {
+      default: false,
+      type: Boolean
+   },
+   hasSettings: {
+      default: false,
+      type: Boolean
+   },
+   showSettings: {
       default: false,
       type: Boolean
    }
@@ -202,6 +224,17 @@ function onAfterLeave(el) {
          border: none;
          outline: none;
       }
+   }
+   .settings-icon {
+      font-size: 1.25em;
+      margin-right: 5px;
+   }
+   .accordion-settings {
+      padding: 0 10px 10px 10px;
+      background: var(--uvalib-grey-lightest);
+      border: 1px solid var(--uvalib-grey-light);
+      border-radius: 0 0 5px 5px;
+      text-align: right;
    }
 
    .title, .footer {

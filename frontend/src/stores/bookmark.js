@@ -69,6 +69,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             })
             b.expanded = false
             b.selected = false
+            b.settingsOpen = false
             this.bookmarks.push(b)
          })
       },
@@ -91,8 +92,29 @@ export const useBookmarkStore = defineStore('bookmark', {
          if (idx > -1) {
             folder.expanded = this.bookmarks[idx].expanded
             folder.selected = this.bookmarks[idx].selected
+            folder.settingsOpen = this.bookmarks[idx].settingsOpen
             this.bookmarks.splice(idx, 1, folder)
          }
+      },
+      toggleBookmarkSettings(folderID) {
+         let folder = this.bookmarks.find( f => f.id == folderID )
+         if (folder) {
+            folder.settingsOpen = !folder.settingsOpen
+            if (folder.settingsOpen ) {
+               this.bookmarks.forEach( f => {
+                  if (f.id != folderID) {
+                     f.settingsOpen = false
+                  }
+               })
+            }
+         }
+      },
+      closeOtherSettings(folderID) {
+         this.bookmarks.forEach( f => {
+            if (f.id != folderID) {
+               f.settingsOpen = false
+            }
+         })
       },
       setFolderExpanded(folderID, expanded) {
          let folder = this.bookmarks.find( f => f.id == folderID )

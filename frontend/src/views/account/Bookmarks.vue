@@ -19,29 +19,53 @@
                   borderWidth="0 0 3px 0"
                   borderColor="var(--uvalib-blue-alt)"
                   :id="folderInfo.id.toString()"
-                  v-bind:closeOthers="expandedFolder"
+                  :closeOthers="expandedFolder"
                   @accordion-clicked="folderOpened(folderInfo.id)"
                   @accordion-expanded="folderExpanded(folderInfo.id)"
                   @accordion-collapsed="folderCollapsed(folderInfo.id)"
+                  :hasSettings="true" :showSettings="folderInfo.settingsOpen" @settingsClicked="bookmarkStore.toggleBookmarkSettings(folderInfo.id)"
                >
                   <template v-slot:title>
                      <span class="folder-title" v-html="getTitle(folderInfo)"></span>
                   </template>
-                  <template v-slot:toolbar>
-                     <div class="folder-buttons">
-                        <RenameBookmark :id="`rename-${folderInfo.id}`" :folderInfo="folderInfo" v-if="folderInfo.folder != 'General'" style="display: inline-block;"/>
-                        <Confirm title="Confirm Delete" v-on:confirmed="removeFolder(folderInfo.id, idx)"
-                           :id="`delete-${folderInfo.id}`" style="display: inline-block;"
-                           :ariaLabel="`delete bookmark folder ${folderInfo.folder}`" v-if="folderInfo.folder != 'General'" >
-                           <div>
-                              Delete bookmark folder
-                              <b>{{folderInfo.folder}}</b>? All bookmarks
-                           </div>
-                           <div>contained within it will also be deleted.</div>
-                           <div>
-                              <br />This cannot be reversed.
-                           </div>
-                        </Confirm>
+                  <template v-slot:settings>
+                     <div class="publish">
+                        <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
+                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
+                        <span v-if="folderInfo.public" class="public-url">
+                           <a :href="getPublicURL(folderInfo)" target="_blank">
+                              <span>View</span><i class="link fal fa-external-link-alt"></i>
+                           </a>
+                        </span>
+                     </div>
+                     <div v-if="folderInfo.folder != 'General'" class="folder-actions">
+                        <template v-if="!renaming">
+                           <V4Button v-if="folderInfo.public" class="copy-link" mode="primary" @click="copyURL(folderInfo)">Copy public URL</V4Button>
+                           <V4Button mode="primary" @click="renameClicked(folderInfo)">Rename</V4Button>
+                           <Confirm title="Confirm Delete" buttonLabel="Delete" buttonMode="primary"
+                              v-on:confirmed="removeFolder(folderInfo.id, idx)" style="display: inline-block;"
+                              class="confirm-delete"
+                              :id="`delete-${folderInfo.id}`" >
+                              <div>
+                                 Delete bookmark folder
+                                 <b>{{folderInfo.folder}}</b>? All bookmarks
+                              </div>
+                              <div>contained within it will also be deleted.</div>
+                              <div>
+                                 <br />This cannot be reversed.
+                              </div>
+                           </Confirm>
+                        </template>
+                        <div v-else class="rename  pure-form">
+                           <input @keyup.enter="doRename(folderInfo)"  :id="`rename-folder-${folderInfo.id}`" type="text" v-model="newFolderName"
+                               aria-required="true" aria-label="new folder name" required="required"/>
+                           <V4Button mode="tertiary" id="rename-cancel" @click="renaming=false">
+                              Cancel
+                           </V4Button>
+                           <V4Button mode="primary" id="rename-ok" @click="doRename(folderInfo)">
+                              OK
+                           </V4Button>
+                        </div>
                      </div>
                   </template>
                   <div class="none" v-if="folderInfo.bookmarks.length == 0">
@@ -60,17 +84,6 @@
                            v-on:move-approved="moveBookmarks"/>
                         <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
                         <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
-                     </div>
-
-                     <div class="publish">
-                        <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
-                        <span v-if="folderInfo.public" class="public-url">
-                           <V4Button class="copy-link" mode="icon" @click="copyURL(folderInfo)"><i class="share fal fa-share-alt"></i></V4Button>
-                           <a :href="getPublicURL(folderInfo)" target="_blank">
-                              <span>View</span><i class="link fal fa-external-link-alt"></i>
-                           </a>
-                        </span>
                      </div>
 
                      <table>
@@ -128,7 +141,6 @@ import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import MoveBookmark from "@/components/modals/MoveBookmark.vue"
-import RenameBookmark from "@/components/modals/RenameBookmark.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
@@ -152,6 +164,8 @@ const router = useRouter()
 const folderInput = ref(null)
 
 // local data
+const renaming = ref(false)
+const newFolderName = ref("")
 const createOpen = ref(false)
 const newFolder = ref("")
 const submitting = ref(false)
@@ -159,6 +173,21 @@ const selectedItems = ref([])
 const expandedFolder = ref(-1)
 const selectAllChecked = ref(false)
 
+function renameClicked( folderInfo) {
+   renaming.value = true
+   newFolderName.value = folderInfo.folder
+   nextTick( () => {
+      let ele = document.getElementById("rename-folder-"+folderInfo.id)
+      if (ele) {
+         ele.select()
+         ele.focus()
+      }
+   })
+}
+async function doRename(folderInfo) {
+   await bookmarkStore.renameFolder({id: folderInfo.id, name: newFolderName.value})
+   renaming.value = false
+}
 function exportBookmarks(folder) {
    bookmarkStore.exportBookmarks(folder )
 }
@@ -210,6 +239,7 @@ function folderOpened(folderID) {
    selectAllChecked.value = false
 }
 function folderExpanded(folderID) {
+   bookmarkStore.closeOtherSettings(folderID)
    showFolderItemsForZotero(folderID)
 }
 function folderCollapsed(folderID) {
@@ -366,12 +396,12 @@ onUnmounted(() => {
    text-align: right;
    padding: 20px 0;
 }
-div.notice {
-   padding: 10px 10px;
-   background: var(--uvalib-yellow-light);
-   margin: 0 0 15px 0;
-   border: 1px solid var(--uvalib-yellow);
-   text-align: center;
+.rename {
+   display:flex;
+   flex-flow: row wrap;
+   input {
+      flex-grow: 1;
+   }
 }
 .folder-title {
    padding: 5px;
