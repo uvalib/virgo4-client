@@ -148,7 +148,7 @@ const request = ref({
    anyLanguage: ""
 })
 
-const requestStore = useRequestStore
+const requestStore = useRequestStore()
 
 async function submitClicked() {
    errors.value.splice(0, errors.value.length)
