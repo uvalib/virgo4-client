@@ -14,9 +14,13 @@
             <slot name="title"></slot>
             <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
          </button>
-         <V4Button v-if="hasSettings" mode="icon" aria-label="folder settings" @click="emit('settingsClicked')">
+         <button v-if="hasSettings" aria-label="folder settings" class="settings-btn"
+            @click="emit('settingsClicked')" @keydown.prevent.enter="emit('settingsClicked')" @keydown.space.prevent="emit('settingsClicked')"
+            :aria-expanded="settingsExpandedStr"
+            :aria-controls="`${props.id}-settings`"
+         >
             <i class="settings-icon fa-cog" :class="{fal: !props.showSettings, fas: props.showSettings}"></i>
-         </V4Button>
+         </button>
       </h3>
       <transition
          @before-enter="onBeforeEnter"
@@ -26,7 +30,7 @@
          @leave="onLeave"
          @after-leave="onAfterLeave"
       >
-      <div class="accordion-settings" v-show="props.showSettings" role="region">
+      <div class="accordion-settings" :id="`${props.id}-settings`" v-show="props.showSettings" role="region">
          <slot name="settings"></slot>
       </div>
       </transition>
@@ -45,8 +49,8 @@
             <slot></slot>
             <button v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
                :style="{ background: props.background, color: props.color,
-                           borderWidth: props.borderWidth, borderStyle: props.borderStyle,
-                           borderColor: props.borderColor }" >
+                         borderWidth: props.borderWidth, borderStyle: props.borderStyle,
+                         borderColor: props.borderColor }" >
                <slot name="footer"></slot>
                <i class="accordion-icon fal" :style="{ transform: rotation }" :class="{'fa-minus': isExpanded,'fa-plus': !isExpanded}"></i>
             </button>
@@ -139,6 +143,12 @@ const expandedStr = computed(()=>{
    }
    return "false"
 })
+const settingsExpandedStr = computed(()=>{
+   if ( props.showSettings) {
+      return "true"
+   }
+   return "false"
+})
 const rotation = computed(()=>{
    if ( props.invert) {
       if (isExpanded.value) {
@@ -224,10 +234,16 @@ function onAfterLeave(el) {
          border: none;
          outline: none;
       }
-   }
-   .settings-icon {
-      font-size: 1.25em;
-      margin-right: 5px;
+      .settings-btn {
+         cursor: pointer;
+         margin-right: 5px;
+         &:focus {
+            @include be-accessible();
+         }
+         .settings-icon {
+            font-size: 1.25em;
+         }
+      }
    }
    .accordion-settings {
       padding: 0 10px 10px 10px;
