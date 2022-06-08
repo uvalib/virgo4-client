@@ -13,7 +13,7 @@
             </div>
             <div class="folder" v-for="(folderInfo,idx) in bookmarkStore.bookmarks" :key="folderInfo.id">
                <AccordionContent
-                  class="boxed bookmark-folder"
+                  class="bookmark-folder"
                   color="var(--uvalib-grey-darkest)"
                   background="var(--uvalib-blue-alt-light)"
                   borderWidth="0 0 3px 0"
@@ -23,7 +23,7 @@
                   @accordion-clicked="folderOpened(folderInfo.id)"
                   @accordion-expanded="folderExpanded(folderInfo.id)"
                   @accordion-collapsed="folderCollapsed(folderInfo.id)"
-                  :hasSettings="true" :showSettings="folderInfo.settingsOpen" @settingsClicked="bookmarkStore.toggleBookmarkSettings(folderInfo.id)"
+                  :hasSettings="true" :showSettings="folderInfo.settingsOpen" @settingsClicked="toggleSettings(folderInfo.id)"
                >
                   <template v-slot:title>
                      <span class="folder-title" v-html="getTitle(folderInfo)"></span>
@@ -88,14 +88,14 @@
 
                      <table>
                         <tr>
-                           <th  class="heading" stype="padding:5px 8px;">
+                           <th  class="heading checkbox">
                               <V4Checkbox @click="toggleAllClicked(folderInfo.bookmarks)" :checked="selectAllChecked" aria-label="toggle select all bookmarks"/>
                            </th>
                            <th class="heading">Title</th>
                            <th class="heading">Author</th>
                         </tr>
                         <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
-                           <td>
+                           <td class="checkbox">
                               <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
                                  :aria-label="ariaLabel(bookmark)"/>
                               <abbr class="" :title="itemURL(bookmark)" :data-folder-id="folderInfo.id"></abbr>
@@ -106,7 +106,7 @@
                               </router-link>
                            </td>
                            <td>
-                              <router-link  @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
+                              <router-link v-if="bookmark.details.author" @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
                                  {{bookmark.details.author}}
                               </router-link>
                            </td>
@@ -172,6 +172,11 @@ const submitting = ref(false)
 const selectedItems = ref([])
 const expandedFolder = ref(-1)
 const selectAllChecked = ref(false)
+
+function toggleSettings(folderID) {
+   expandedFolder.value = folderID
+   bookmarkStore.toggleBookmarkSettings(folderID)
+}
 
 function renameClicked( folderInfo) {
    renaming.value = true
@@ -412,21 +417,6 @@ onUnmounted(() => {
    flex-flow: row wrap;
    justify-content: flex-end;
    margin: 10px 0;
-   .v4-button {
-      margin-bottom: 5px;
-   }
-}
-i.fas {
-   color: var(--uvalib-grey-dark);
-   cursor: pointer;
-   font-size: 1.2em;
-   top: 4px;
-   margin-right: 10px;
-}
-i.link.fas {
-   margin: 0 0 0 5px;
-   font-size:0.8em;
-   color: var(   --color-link);
 }
 div.folder {
    display: flex;
@@ -438,10 +428,6 @@ div.folder {
       flex-flow: row nowrap;
       padding-right: 5px;
    }
-}
-div.folder .remove-folder {
-   flex: 0 0 auto;
-   padding-top: 4px;
 }
 .accordion {
    flex: 1 1 auto;
@@ -468,10 +454,6 @@ div.folder .remove-folder {
       width: 95%;
    }
 }
-td.actions {
-   text-align: right;
-   padding: 5px;
-}
 table {
    border-collapse: collapse;
    td {
@@ -491,10 +473,6 @@ table {
 }
 table tr {
    background-color: white;
-}
-i.details {
-   font-size: 1.25em;
-   color: var(--color-light-blue);
 }
 .none {
    text-align: center;
@@ -545,6 +523,9 @@ i.details {
 }
 
 .bookmark-folder-details {
-   padding: 0 0 10px 0px;
+   padding: 0 0 10px 10px;
+   .checkbox {
+       padding: 5px 10px;
+   }
 }
 </style>
