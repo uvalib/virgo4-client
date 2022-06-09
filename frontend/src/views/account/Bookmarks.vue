@@ -8,9 +8,6 @@
       <div v-else-if="userStore.isSignedIn">
          <div class="none" v-if="bookmarkStore.hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
-            <div class="alt-view" v-if="systemStore.isDevServer">
-               <router-link to="/bookmarks2">Testing Alternate Boomkarks View</router-link>
-            </div>
             <div class="folder" v-for="(folderInfo,idx) in bookmarkStore.bookmarks" :key="folderInfo.id">
                <AccordionContent
                   class="bookmark-folder"
@@ -29,6 +26,7 @@
                      <span class="folder-title" v-html="getTitle(folderInfo)"></span>
                   </template>
                   <template v-slot:settings>
+                     <h4>Folder Settings</h4>
                      <div class="publish">
                         <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
                            :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
@@ -397,10 +395,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.alt-view {
-   text-align: right;
-   padding: 20px 0;
-}
 .rename {
    display:flex;
    flex-flow: row wrap;
@@ -431,6 +425,10 @@ div.folder {
 }
 .accordion {
    flex: 1 1 auto;
+   h4 {
+      margin: 10px 0 20px 0;
+      text-align: left;
+   }
 }
 .bookmarks {
    min-height: 400px;

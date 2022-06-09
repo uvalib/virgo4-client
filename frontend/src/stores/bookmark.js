@@ -65,10 +65,7 @@ export const useBookmarkStore = defineStore('bookmark', {
                let pn = d.pool.name
                delete d.pool
                d.pool = pn
-               d.selected = false
             })
-            b.expanded = false
-            b.selected = false
             b.settingsOpen = false
             this.bookmarks.push(b)
          })
@@ -86,12 +83,9 @@ export const useBookmarkStore = defineStore('bookmark', {
             let pn = b.pool.name
             delete b.pool
             b.pool = pn
-            // FIXME lose selecetd status
          })
          var idx = this.bookmarks.findIndex( f => f.id == folder.id)
          if (idx > -1) {
-            folder.expanded = this.bookmarks[idx].expanded
-            folder.selected = this.bookmarks[idx].selected
             folder.settingsOpen = this.bookmarks[idx].settingsOpen
             this.bookmarks.splice(idx, 1, folder)
          }
@@ -113,31 +107,6 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.bookmarks.forEach( f => {
             if (f.id != folderID) {
                f.settingsOpen = false
-            }
-         })
-      },
-      setFolderExpanded(folderID, expanded) {
-         let folder = this.bookmarks.find( f => f.id == folderID )
-         if (folder) {
-            folder.expanded = expanded
-            this.selectFolder(folderID)
-         }
-      },
-      toggleBookmarkSelected(bm) {
-         let bmFolder = this.bookmarks.find( f => f.id == bm.folder_id)
-         if (bmFolder) {
-            let tgtBm = bmFolder.bookmarks.find( b => b.id == bm.id)
-            if (tgtBm) {
-               tgtBm.selected = !tgtBm.selected
-            }
-         }
-      },
-      selectFolder(folderID) {
-         this.bookmarks.forEach( f => {
-            if (f.id == folderID ) {
-               f.selected = true
-            } else {
-               f.selected = false
             }
          })
       },
