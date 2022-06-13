@@ -52,7 +52,7 @@ function removeBookmarkClicked() {
    let bookmarkID = -1
    bookmarkStore.bookmarks.some( folder => {
       folder.bookmarks.some( item => {
-         if (item.pool == props.data.pool && item.identifier == bookmarkStore.data.identifier) {
+         if (item.pool == props.data.pool && item.identifier == props.data.identifier) {
             bookmarkID = item.id
             analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)
             bookmarkStore.removeBookmarks(folder.id, [bookmarkID])
