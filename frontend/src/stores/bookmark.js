@@ -243,12 +243,12 @@ export const useBookmarkStore = defineStore('bookmark', {
          const system = useSystemStore()
          let v4URL = window.location.href.replace("/bookmarks", "")
          let req = {title: folderName, notes: v4URL, items: items}
-         let url = system.searchAPI + "/api/csv"
+         let url = system.searchAPI + "/api/export"
          await axios.post(url, req, {responseType: "blob"}).then((response) => {
-            const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }))
+            const fileURL = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.ms-excel' }))
             const fileLink = document.createElement('a')
             fileLink.href =  fileURL
-            fileLink.setAttribute('download', `bookmarks-${folderName}.csv`)
+            fileLink.setAttribute('download', `bookmarks-${folderName}.xlsx`)
             document.body.appendChild(fileLink)
             fileLink.click()
             window.URL.revokeObjectURL(fileURL)

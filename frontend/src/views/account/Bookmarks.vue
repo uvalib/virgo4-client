@@ -72,7 +72,7 @@
                   <div v-else class="bookmark-folder-details">
                      <div class="folder-menu">
                         <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder)">
-                           Export
+                           Export all
                         </V4Button>
                         <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
                            :id="`print-bookmarks-${folderInfo.id}`"
