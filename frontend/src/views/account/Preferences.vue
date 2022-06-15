@@ -9,7 +9,6 @@
          <template v-if="userStore.isSignedIn">
             <Search class="section"/>
             <PickupLibrary class="section"/>
-            <BarcodeScan class="section"/>
             <V4Privacy class="section"/>
          </template>
       </div>
@@ -22,7 +21,6 @@ import AccountActivities from "@/components/account/AccountActivities.vue"
 import Search from "@/components/preferences/Search.vue"
 import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
 import V4Privacy from "@/components/preferences/V4Privacy.vue"
-import BarcodeScan from "@/components/preferences/BarcodeScan.vue"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { usePreferencesStore } from "@/stores/preferences"

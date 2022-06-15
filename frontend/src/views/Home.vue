@@ -25,9 +25,6 @@
             <div class="search-mode">
                <router-link tabindex="0" to="/search?mode=advanced">Advanced Search</router-link>
             </div>
-            <div class="search-mode">
-               <V4BarcodeScanner @scanned="barcodeScanned"/>
-            </div>
          </template>
          <AdvancedSearch v-else/>
       </div>
@@ -40,7 +37,6 @@
 import SearchResults from "@/components/SearchResults.vue"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"
-import V4BarcodeScanner from "@/components/V4BarcodeScanner.vue"
 import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import * as utils from '../utils'
@@ -375,11 +371,6 @@ async function searchClicked() {
    newQ.q = queryStore.string
    queryStore.userSearched = true
    await router.replace({query: newQ})
-}
-
-function barcodeScanned( barcode ) {
-   queryStore.basic = barcode
-   searchClicked()
 }
 </script>
 

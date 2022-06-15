@@ -230,10 +230,6 @@ export const useQueryStore = defineStore('query', {
       setTargetPool(pool) {
          this.targetPool = pool
       },
-      advancedBarcodeSearch(barcode) {
-         this.advanced.splice(0, this.advanced.length)
-         this.advanced.push({ op: "AND", value: barcode, field: "identifier", comparison: "EQUAL", endVal: "" })
-      },
       setBasicSearch() {
          this.mode = "basic"
       },

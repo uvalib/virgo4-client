@@ -9,7 +9,6 @@ export const usePreferencesStore = defineStore('preferences', {
       maxTabs: 4,
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
-      enableBarcodeScan: false,
       collapseGroups: false,
       searchTemplate: {
          fields: [],
@@ -48,9 +47,6 @@ export const usePreferencesStore = defineStore('preferences', {
          } else {
             this.pickupLibrary = {id: "", name: ""}
          }
-         if (prefsObj.enableBarcodeScan ) {
-            this.enableBarcodeScan = prefsObj.enableBarcodeScan
-         }
          if (prefsObj.searchTemplate ) {
             this.searchTemplate = prefsObj.searchTemplate
          }
@@ -76,10 +72,6 @@ export const usePreferencesStore = defineStore('preferences', {
          await this.savePreferences()
          window.location.reload()
       },
-      toggleBarcodeScan() {
-         this.enableBarcodeScan = !this.enableBarcodeScan
-         this.savePreferences()
-      },
       toggleCollapseGroups() {
          this.collapseGroups = !this.collapseGroups
          this.savePreferences()
@@ -100,7 +92,6 @@ export const usePreferencesStore = defineStore('preferences', {
          let data = {
             trackingOptOut: this.trackingOptOut,
             pickupLibrary: this.pickupLibrary,
-            enableBarcodeScan: this.enableBarcodeScan,
             collapseGroups: this.collapseGroups,
             searchTemplate: this.searchTemplate,
          }
