@@ -118,6 +118,8 @@ function prevItem() {
 .collection-header.noborder {
    border-top: none;
    border-bottom: none;
+   margin: 0 auto;
+   width: 95%;
 }
 .collection-header {
    background-color: white;
@@ -140,8 +142,8 @@ function prevItem() {
       .thumb.bookplate {
          max-width: 100%;
          height: auto;
-         min-width: 230px;
-         max-width: 330px;
+         min-width: 150;
+         max-width: 190px;
          max-height: none;
          box-shadow: $v4-box-shadow-light;
       }
