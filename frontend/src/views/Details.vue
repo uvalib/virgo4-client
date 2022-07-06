@@ -17,7 +17,6 @@ import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
 import { onMounted, onUpdated, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
-import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
 import { useResultStore } from "@/stores/result"
 import { useCollectionStore } from "@/stores/collection"
@@ -26,7 +25,6 @@ import analytics from '@/analytics'
 import { storeToRefs } from "pinia"
 
 const collection = useCollectionStore()
-const system = useSystemStore()
 const item = useItemStore()
 const resultStore = useResultStore()
 const restore = useRestoreStore()
