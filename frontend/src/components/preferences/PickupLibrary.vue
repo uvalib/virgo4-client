@@ -45,6 +45,10 @@ function update() {
 <style lang="scss" scoped>
 .pickup-options {
    text-align: left;
+    @media only screen and (max-width: 768px) {
+      // prevent overflow on small screens
+      width: 100%;
+    }
    h2 {
       margin: 0;
       padding: 10px 15px;
@@ -66,7 +70,7 @@ function update() {
       margin-top: 30px;
    }
    #pickup-sel {
-      width: fit-content;
+      max-width: 100%;
       margin-bottom: 30px;
       display: block;
    }
