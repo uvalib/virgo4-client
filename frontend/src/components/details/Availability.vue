@@ -14,6 +14,7 @@
 
          <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
 
+         <DiBSViewer v-if="systemStore.isDevServer && item.identifier == 'u1310239' "></DiBSViewer>
 
          <BoundWithItems v-if="item.hasBoundWithItems"/>
          <div class="items" v-if="hasItems || request.hasRequestOptions">
@@ -73,6 +74,8 @@ import { computed } from "vue"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 import RequestContainer from "@/components/requests/RequestContainer.vue"
 import BoundWithItems from "@/components/details/BoundWithItems.vue"
+import DiBSViewer from "@/components/details/DiBSViewer.vue"
+import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
@@ -80,6 +83,7 @@ import { useUserStore } from "@/stores/user"
 const item = useItemStore()
 const request = useRequestStore()
 const user = useUserStore()
+const systemStore = useSystemStore()
 
 const hasItems = computed(()=>{
    return Array.isArray(item.availability.items) && item.availability.items.length > 0
