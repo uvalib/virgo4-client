@@ -138,6 +138,7 @@ function prevItem() {
       .thumb {
          display: block;
          max-height:200px;
+         margin-top: 25px;
       }
       .thumb.bookplate {
          max-width: 100%;
