@@ -14,7 +14,7 @@
 
          <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
 
-         <DiBSViewer v-if="systemStore.isDevServer && item.identifier == 'u1310239' "></DiBSViewer>
+         <DiBSViewer :barcode="dibsBarcode" v-if="systemStore.isDevServer && dibsBarcode "></DiBSViewer>
 
          <BoundWithItems v-if="item.hasBoundWithItems"/>
          <div class="items" v-if="hasItems || request.hasRequestOptions">
@@ -133,6 +133,11 @@ const libraryAvailabilityNotes = computed(()=>{
       return af.value
    }
    return []
+})
+
+const dibsBarcode = computed(()=>{
+  let f = item.availability.items.find( f => f.home_location_id == "DIBS")
+  return f.barcode
 })
 
 function formatValue(val) {
