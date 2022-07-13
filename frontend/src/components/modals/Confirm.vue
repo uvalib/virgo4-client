@@ -12,7 +12,7 @@
          <V4Button v-else mode="icon" @click="confirmdlg.show()" :id="`${props.id}-open`"
              :aria-label="props.ariaLabel"
          >
-            <i class="trash fal fa-trash-alt"></i>
+            <i :class="icon"></i>
          </V4Button>
       </template>
       <template v-slot:content>
@@ -52,6 +52,10 @@ const props = defineProps({
    buttonMode: {
       type: String,
       default: "text"
+   },
+   icon: {
+      type: String,
+      default: "trash fal fa-trash-alt"
    },
    ariaLabel: {
       type: String,

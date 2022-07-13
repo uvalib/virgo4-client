@@ -78,8 +78,9 @@
                            :id="`print-bookmarks-${folderInfo.id}`"
                         />
                         <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                           :id="`move-bookmarks-${folderInfo.id}`"
-                           v-on:move-approved="moveBookmarks"/>
+                           :id="`move-bookmarks-${folderInfo.id}`"/>
+                        <CopyBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
+                           :id="`copy-bookmarks-${folderInfo.id}`"/>
                         <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
                         <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
                      </div>
@@ -139,6 +140,7 @@ import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import MoveBookmark from "@/components/modals/MoveBookmark.vue"
+import CopyBookmarks from "@/components/modals/CopyBookmarks.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
@@ -258,10 +260,6 @@ function toggleAllClicked(items) {
          selectedItems.value.push(bm.id)
       })
    }
-}
-function moveBookmarks(folderID) {
-   let data = { bookmarks: selectedItems.value, folderID: folderID }
-   bookmarkStore.moveBookmarks(data);
 }
 async function reserve() {
    if ( selectedItems.value.length == 0) {

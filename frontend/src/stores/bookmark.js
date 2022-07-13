@@ -180,13 +180,25 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          })
       },
-      moveBookmarks(data) {
+      async moveBookmarks(data) {
          const userStore = useUserStore()
          let v4UID = userStore.signedInUser
          let bookmarkIDs = data.bookmarks
          let folderID = data.folderID
          let url = `/api/users/${v4UID}/bookmarks/move`
-         axios.post(url, {folderID: folderID, bookmarkIDs: bookmarkIDs}).then((response) => {
+         return axios.post(url, {folderID: folderID, bookmarkIDs: bookmarkIDs}).then((response) => {
+            this.setBookmarks(response.data)
+         }).catch((error) => {
+            useSystemStore().setError(error)
+         })
+      },
+      async copyBookmarks(data) {
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
+         let bookmarkIDs = data.bookmarks
+         let destFolders = data.folderIDs
+         let url = `/api/users/${v4UID}/bookmarks/copy`
+         return axios.post(url, {folderIDs: destFolders, bookmarkIDs: bookmarkIDs}).then((response) => {
             this.setBookmarks(response.data)
          }).catch((error) => {
             useSystemStore().setError(error)

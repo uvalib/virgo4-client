@@ -42,8 +42,6 @@ import { ref, computed } from 'vue'
 
 const bookmarkStore = useBookmarkStore()
 
-
-const emit = defineEmits( ['move-approved' ])
 const props = defineProps({
    bookmarks: {
       type: Array,
@@ -72,8 +70,9 @@ function opened() {
       btn.focus()
    }
 }
-function moveClicked() {
-   emit('move-approved', selectedFolder.value)
+async function moveClicked() {
+   let data = { bookmarks: props.bookmarks, folderID: selectedFolder.value }
+   await bookmarkStore.moveBookmarks(data);
    movemodal.value.hide()
 }
 function cancelClicked() {

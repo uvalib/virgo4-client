@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "2.0.0"
+const version = "2.1.0"
 
 /**
  * MAIN
@@ -103,6 +103,7 @@ func main() {
 		users.POST("/:uid/searches/:id/publish", svc.PublishSavedSearch)
 		users.DELETE("/:uid/searches/:id/publish", svc.UnpublishSavedSearch)
 
+		users.POST("/:uid/bookmarks/copy", svc.CopyBookmarks)
 		users.POST("/:uid/bookmarks/move", svc.MoveBookmarks)
 		users.POST("/:uid/bookmarks/folders/add", svc.AddBookmarkFolder)
 		users.DELETE("/:uid/bookmarks/folders/:id", svc.DeleteBookmarkFolder)

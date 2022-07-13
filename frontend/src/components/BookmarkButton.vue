@@ -1,12 +1,19 @@
 <template>
    <span v-if="system.isKiosk==false" class="bookmark-container">
-      <V4Button v-if="isBookmarked" mode="icon" @click="removeBookmarkClicked"
+      <V4Button v-if="bookmarkCount == 1" mode="icon" @click="removeBookmarkClicked"
          :id="props.id"
          role="switch" aria-checked="true"
          :aria-label="`remove bookmark on ${props.data.title}`"
       >
          <i class="bookmark fas fa-bookmark"></i>
       </V4Button>
+      <Confirm v-else-if="bookmarkCount > 1" buttonMode="icon" icon="bookmark fas fa-bookmark"
+         title="Remove multiple bookmarks"
+         v-on:confirmed="removeBookmarkClicked()" :id="`del-multi-bookmark`"
+      >
+         <div>This item is bookmarked in '<b>{{bookmarkCount}}</b> folders. Remove all?</div>
+         <div class="del-detail">This cannot be reversed.</div>
+      </Confirm>
       <V4Button v-else mode="icon" @click="addBookmarkClicked"
          :id="id"
          role="switch" aria-checked="false"
@@ -34,33 +41,27 @@ const props = defineProps({
 const system = useSystemStore()
 const bookmarkStore = useBookmarkStore()
 
-const isBookmarked = computed(()=>{
-   let found = false
-   bookmarkStore.bookmarks.some( folder => {
-      folder.bookmarks.some( item => {
+const bookmarkCount = computed(()=>{
+   let count = 0
+   bookmarkStore.bookmarks.forEach( folder => {
+      folder.bookmarks.forEach( item => {
          if (item.pool == props.data.pool && item.identifier == props.data.identifier) {
-            found = true
+            count++
          }
-         return found == true
       })
-      return found == true
    })
-   return found
+   return count
 })
 
 function removeBookmarkClicked() {
-   let bookmarkID = -1
-   bookmarkStore.bookmarks.some( folder => {
-      folder.bookmarks.some( item => {
+   bookmarkStore.bookmarks.forEach( folder => {
+      folder.bookmarks.forEach( item => {
          if (item.pool == props.data.pool && item.identifier == props.data.identifier) {
-            bookmarkID = item.id
-            analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', item.identifier)
-            bookmarkStore.removeBookmarks(folder.id, [bookmarkID])
+            bookmarkStore.removeBookmarks(folder.id, [item.id])
          }
-         return bookmarkID != -1
       })
-      return bookmarkID != -1
    })
+   analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', props.data.identifier)
 }
 function addBookmarkClicked() {
    emit('clicked')
@@ -73,7 +74,7 @@ function addBookmarkClicked() {
    display: inline-block;
    box-sizing: border-box;
 
-   i.bookmark {
+   :deep(i.bookmark) {
       color: #444;
       cursor: pointer;
       font-size: 1.4em;
@@ -89,11 +90,11 @@ function addBookmarkClicked() {
       }
    }
 
-   i.bookmark.disabled {
+   :deep(i.bookmark.disabled) {
       color: #ccc;
    }
 
-   i.fas.bookmark {
+   :deep(i.fas.bookmark) {
       color: var(--uvalib-brand-blue-light);
    }
 }

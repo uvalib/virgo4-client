@@ -263,6 +263,47 @@ func (svc *ServiceContext) DeleteBookmarks(c *gin.Context) {
 	c.JSON(http.StatusOK, folder)
 }
 
+// CopyBookmarks will copy a list bookmarks to one or more target folders contained in FolderIDs
+func (svc *ServiceContext) CopyBookmarks(c *gin.Context) {
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	log.Printf("User %s:%d copies bookmarks", v4UserID, userID)
+
+	var copyInfo struct {
+		FolderIDs   []int
+		BookmarkIDs []int
+	}
+	err := c.ShouldBindJSON(&copyInfo)
+	if err != nil {
+		log.Printf("ERROR: invalid item copy payload: %v", err)
+		c.String(http.StatusBadRequest, "Invalid copy bookmark request")
+		return
+	}
+
+	var srcBookmarks []*Bookmark
+	err = svc.GDB.Find(&srcBookmarks, copyInfo.BookmarkIDs).Error
+	if err != nil {
+		log.Printf("ERROR: unable to get source bookmarks %v for copy: %s", copyInfo.BookmarkIDs, err.Error())
+		c.String(http.StatusInternalServerError, fmt.Sprintf("Unable to retrieve source bookmarks: %s", err.Error()))
+		return
+	}
+
+	for _, folderID := range copyInfo.FolderIDs {
+		for _, bm := range srcBookmarks {
+			bm.ID = 0
+			bm.FolderID = folderID
+		}
+		err = svc.GDB.Create(&srcBookmarks).Error
+		if err != nil {
+			log.Printf("ERROR: create bookmarks failed: %s", err.Error())
+		}
+	}
+
+	var v4User User
+	svc.preloadBookmarks().Find(&v4User, userID)
+	c.JSON(http.StatusOK, v4User.BookmarkFolders)
+}
+
 // MoveBookmarks will move a list bookmarks to a new folder
 func (svc *ServiceContext) MoveBookmarks(c *gin.Context) {
 	v4UserID := c.Param("uid")
