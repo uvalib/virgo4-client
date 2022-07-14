@@ -137,7 +137,11 @@ const libraryAvailabilityNotes = computed(()=>{
 
 const dibsBarcode = computed(()=>{
   let f = item.availability.items.find( f => f.home_location_id == "DIBS")
-  return f.barcode
+  if (f){
+   return f.barcode
+  } else {
+   return null
+  }
 })
 
 function formatValue(val) {

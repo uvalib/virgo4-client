@@ -1,19 +1,20 @@
 <template>
    <div class="dibs">
-      <template v-if="userStore.isSignedIn">
-         <iframe :src="'https://reserves-dev.library.virginia.edu/item/' + props.barcode"></iframe>
+      <template v-if="activeIframe">
+         <iframe title="Digital reserves viewer" :src="systemStore.dibsURL + '/item/' + props.barcode"></iframe>
       </template>
-      <SignInRequired v-else targetPage="electronic reserves">
-
-
-      </SignInRequired>
+      <div v-else>
+         <p>This item is available with electronic reserves. You may be required to sign in.</p>
+         <V4Button @click="activeIframe = true">View</V4Button>
+      </div>
    </div>
 </template>
 <script setup>
-import { useUserStore } from "@/stores/user"
-import SignInRequired from "../account/SignInRequired.vue";
+import { useSystemStore } from "@/stores/system"
+import { ref } from "vue"
+import V4Button from "../V4Button.vue";
 
-const userStore = useUserStore()
+const systemStore = useSystemStore()
 
 const props = defineProps({
    barcode: {
@@ -21,6 +22,8 @@ const props = defineProps({
       required: true,
    }
 })
+const activeIframe = ref(false)
+
 </script>
 <style lang="scss" scoped>
 .dibs {

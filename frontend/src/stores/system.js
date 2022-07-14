@@ -23,6 +23,7 @@ export const useSystemStore = defineStore('system', {
       citationsURL: "",
       collectionsURL: "",
       shelfBrowseURL: "",
+      dibsURL: "",
       searchAPI: "",
       seenTranslateMsg: false,
       translateMessage: "",
@@ -153,6 +154,7 @@ export const useSystemStore = defineStore('system', {
          this.collectionsURL = cfg.collectionsURL
          this.hsILLiadURL = cfg.hsILLiadURL
          this.shelfBrowseURL = cfg.shelfBrowseURL
+         this.dibsURL = cfg.dibsURL
          this.allPickupLibraries = cfg.pickupLibraries
       },
       async getConfig() {

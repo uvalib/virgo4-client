@@ -47,6 +47,7 @@ type ServiceContext struct {
 	HTTPClient        *http.Client
 	SlowHTTPClient    *http.Client
 	RenewHTTPClient   *http.Client
+	DibsURL           string
 }
 
 // RequestError contains http status code and message for a
@@ -73,7 +74,9 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		SMTP:            cfg.SMTP,
 		Illiad:          cfg.Illiad,
 		Dev:             cfg.Dev,
-		Firebase:        cfg.Firebase}
+		Firebase:        cfg.Firebase,
+		DibsURL:         cfg.DibsURL,
+	}
 
 	log.Printf("INFO: connecting GORM to postgress...")
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
@@ -310,6 +313,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		ColectionsURL    string          `json:"collectionsURL"`
 		ShelfBrowseURL   string          `json:"shelfBrowseURL"`
 		HealthSciURL     string          `json:"hsILLiadURL"`
+		DibsURL          string          `json:"dibsURL"`
 		TranslateMessage string          `json:"translateMessage"`
 		KioskMode        bool            `json:"kiosk"`
 		DevServer        bool            `json:"devServer"`
@@ -321,7 +325,9 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL,
 		ColectionsURL:   svc.CollectionsURL,
 		AvailabilityURL: svc.AvailabilityURL, ShelfBrowseURL: svc.ShelfBrowseURL,
-		HealthSciURL: svc.Illiad.HealthSciURL, KioskMode: false}
+		HealthSciURL: svc.Illiad.HealthSciURL, KioskMode: false,
+		DibsURL: svc.DibsURL,
+	}
 	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
 		log.Printf("Adding translate message to config")
 		cfg.TranslateMessage = msg
