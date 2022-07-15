@@ -263,73 +263,73 @@ func (svc *ServiceContext) DeleteBookmarks(c *gin.Context) {
 	c.JSON(http.StatusOK, folder)
 }
 
-// CopyBookmarks will copy a list bookmarks to one or more target folders contained in FolderIDs
-func (svc *ServiceContext) CopyBookmarks(c *gin.Context) {
+// ManageBookmarkStorage will copy/move seleceted bookmarks from the source folder to the destinations
+func (svc *ServiceContext) ManageBookmarkStorage(c *gin.Context) {
 	v4UserID := c.Param("uid")
 	userID := c.GetInt("v4id")
-	log.Printf("User %s:%d copies bookmarks", v4UserID, userID)
+	log.Printf("User %s:%d manage bookmarks", v4UserID, userID)
 
-	var copyInfo struct {
-		FolderIDs   []int
-		BookmarkIDs []int
+	var req struct {
+		SourceFolderID int
+		DestFolderIDs  []int
+		BookmarkIDs    []int
 	}
-	err := c.ShouldBindJSON(&copyInfo)
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		log.Printf("ERROR: invalid item copy payload: %v", err)
-		c.String(http.StatusBadRequest, "Invalid copy bookmark request")
+		log.Printf("ERROR: invalid manage bookmarks payload: %v", err)
+		c.String(http.StatusBadRequest, fmt.Sprintf("Invalid request: %s", err.Error()))
 		return
 	}
 
-	var srcBookmarks []*Bookmark
-	err = svc.GDB.Find(&srcBookmarks, copyInfo.BookmarkIDs).Error
+	log.Printf("INFO: get bookmarks data for bookmarks %v", req.BookmarkIDs)
+	var srcBookmarks []Bookmark
+	err = svc.GDB.Find(&srcBookmarks, req.BookmarkIDs).Error
 	if err != nil {
-		log.Printf("ERROR: unable to get source bookmarks %v for copy: %s", copyInfo.BookmarkIDs, err.Error())
+		log.Printf("ERROR: unable to get bookmarks %v: %s", req.BookmarkIDs, err.Error())
 		c.String(http.StatusInternalServerError, fmt.Sprintf("Unable to retrieve source bookmarks: %s", err.Error()))
 		return
 	}
 
-	for _, folderID := range copyInfo.FolderIDs {
-		for _, bm := range srcBookmarks {
-			bm.ID = 0
-			bm.FolderID = folderID
+	removeOriginal := true
+	for _, folderID := range req.DestFolderIDs {
+		if folderID == req.SourceFolderID {
+			removeOriginal = false
+			break
 		}
-		err = svc.GDB.Create(&srcBookmarks).Error
+	}
+	if removeOriginal {
+		log.Printf("INFO: remove original version of bookmarks %v", req.BookmarkIDs)
+		err = svc.GDB.Delete(&Bookmark{}, req.BookmarkIDs).Error
 		if err != nil {
-			log.Printf("ERROR: create bookmarks failed: %s", err.Error())
+			log.Printf("ERROR: unable to remove bookmarks %v: %s", req.BookmarkIDs, err.Error())
+			c.String(http.StatusInternalServerError, fmt.Sprintf("Unable to retrieve source bookmarks: %s", err.Error()))
+			return
 		}
 	}
 
-	var v4User User
-	svc.preloadBookmarks().Find(&v4User, userID)
-	c.JSON(http.StatusOK, v4User.BookmarkFolders)
-}
-
-// MoveBookmarks will move a list bookmarks to a new folder
-func (svc *ServiceContext) MoveBookmarks(c *gin.Context) {
-	v4UserID := c.Param("uid")
-	userID := c.GetInt("v4id")
-	log.Printf("User %s:%d moving bookmarks", v4UserID, userID)
-
-	var moveInfo struct {
-		FolderID    int
-		BookmarkIDs []int
-	}
-	err := c.ShouldBindJSON(&moveInfo)
-	if err != nil {
-		log.Printf("ERROR: invalid item move payload: %v", err)
-		c.String(http.StatusBadRequest, "Invalid move bookmark request")
-		return
-	}
-
-	rawQ := fmt.Sprintf("update bookmarks set folder_id=%d where id in (%s)",
-		moveInfo.FolderID, sqlIntSeq(moveInfo.BookmarkIDs))
-	resp := svc.GDB.Exec(rawQ)
-	if resp.Error != nil {
-		log.Printf("ERROR: unable to move bookmarks: %s", resp.Error.Error())
-		c.String(http.StatusInternalServerError, resp.Error.Error())
-		return
+	log.Printf("INFO: add bookmarks to new folders")
+	for _, bm := range srcBookmarks {
+		for _, folderID := range req.DestFolderIDs {
+			if folderID != bm.FolderID {
+				var cnt int64
+				svc.GDB.Model(Bookmark{}).Where("user_id=? and folder_id=? and identifier=?", userID, folderID, bm.Identifier).Count(&cnt)
+				if cnt == 0 {
+					bm.ID = 0
+					bm.FolderID = folderID
+					bm.AddedAt = time.Now()
+					log.Printf("INFO: add %s to folderID %d", bm.Identifier, folderID)
+					err = svc.GDB.Create(&bm).Error
+					if err != nil {
+						log.Printf("ERROR: add bookmark %+v failed: %s", bm, err.Error())
+					}
+				} else {
+					log.Printf("INFO: folder %d already has bookmark %s; skipping copy/move", folderID, bm.Identifier)
+				}
+			}
+		}
 	}
 
+	log.Printf("INFO: reload updated bookmarks")
 	var v4User User
 	svc.preloadBookmarks().Find(&v4User, userID)
 	c.JSON(http.StatusOK, v4User.BookmarkFolders)

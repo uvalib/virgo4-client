@@ -9,14 +9,8 @@
          </V4Button>
       </template>
       <template v-slot:content>
-         <template v-if="bookmarks.length == 0">
+         <template v-if="hasSelectedBookmarks() == false">
             <p>No bookmarks have been selected to print.</p>
-         </template>
-          <template v-else-if="bookmarks.length > 100">
-            <p>
-               Printing is currently limted to 100 items.<br/>
-               Please limit your selections and try again.
-            </p>
          </template>
          <template v-else>
             <div class="print message pure-form">
@@ -30,7 +24,7 @@
             </div>
          </template>
       </template>
-      <template v-if="bookmarks.length > 0" v-slot:controls>
+      <template v-if="hasSelectedBookmarks()" v-slot:controls>
          <V4Button mode="tertiary" id="print-cancel" @click="cancelClicked">
             Cancel
          </V4Button>
@@ -48,10 +42,6 @@ import analytics from '@/analytics'
 
 const bookmarkStore = useBookmarkStore()
 const props = defineProps({
-   bookmarks: {
-      type: Array,
-      required: true
-   },
    srcFolder: {
       type: Number,
       required: true
@@ -66,17 +56,21 @@ const printmodal = ref(null)
 const title = ref("")
 const notes = ref("")
 
+function hasSelectedBookmarks() {
+   return bookmarkStore.selectedBookmarks(props.srcFolder).length > 0
+}
+
 function opened() {
    title.value = ""
    notes.value = ""
-   if (props.bookmarks.length == 0 ){
+   if ( hasSelectedBookmarks() == false ){
       let btn = document.getElementById(props.id+"-close")
       btn.focus()
    }
 }
 async function printClicked() {
    analytics.trigger('Bookmarks', 'PRINT_CLICKED')
-   let data = { title: title.value, notes: notes.value, folderID: props.srcFolder, bookmarkIDs: props.bookmarks}
+   let data = { title: title.value, notes: notes.value, folderID: props.srcFolder}
    await bookmarkStore.printBookmarks( data )
    printmodal.value.hide()
 }

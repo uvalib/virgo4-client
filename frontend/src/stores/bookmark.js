@@ -15,7 +15,20 @@ export const useBookmarkStore = defineStore('bookmark', {
          if ( state.bookmarks.length === 0) return false
          return true
       },
-
+      selectedBookmarks: state => {
+         return (folderID) => {
+            let selected = []
+            let folder = state.bookmarks.find( f => f.id == folderID )
+            if (folder) {
+               folder.bookmarks.forEach( bm => {
+                  if (bm.selected) {
+                     selected.push(bm)
+                  }
+               })
+            }
+            return selected
+         }
+      },
       folders: state => {
          let out = []
          let foundGeneral = false
@@ -59,15 +72,16 @@ export const useBookmarkStore = defineStore('bookmark', {
       },
       setBookmarks(bmData) {
          this.bookmarks.splice(0, this.bookmarks.length)
-         bmData.forEach( b => {
-            b.bookmarks.forEach( d => {
-               d.details = JSON.parse(d.details)
-               let pn = d.pool.name
-               delete d.pool
-               d.pool = pn
+         bmData.forEach( f => {
+            f.bookmarks.forEach( bm => {
+               bm.details = JSON.parse(bm.details)
+               let pn = bm.pool.name
+               delete bm.pool
+               bm.pool = pn
+               bm.selected = false
             })
-            b.settingsOpen = false
-            this.bookmarks.push(b)
+            f.settingsOpen = false
+            this.bookmarks.push(f)
          })
       },
       setFolderToken(data) {
@@ -88,6 +102,32 @@ export const useBookmarkStore = defineStore('bookmark', {
          if (idx > -1) {
             folder.settingsOpen = this.bookmarks[idx].settingsOpen
             this.bookmarks.splice(idx, 1, folder)
+         }
+      },
+      toggleBookmarkSelected(folderID, bmID) {
+         let folder = this.bookmarks.find( f => f.id == folderID )
+         if (folder) {
+            folder.bookmarks.forEach(bm => {
+               if ( bm.id == bmID) {
+                  bm.selected = !bm.selected
+               }
+            })
+         }
+      },
+      selectAll(folderID) {
+         let folder = this.bookmarks.find( f => f.id == folderID )
+         if (folder) {
+            folder.bookmarks.forEach( bm => {
+               bm.selected = true
+            })
+         }
+      },
+      clearAll(folderID) {
+         let folder = this.bookmarks.find( f => f.id == folderID )
+         if (folder) {
+            folder.bookmarks.forEach( bm => {
+               bm.selected = false
+            })
          }
       },
       toggleBookmarkSettings(folderID) {
@@ -170,35 +210,43 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          }
       },
-      removeBookmarks( folderID, bookmarkIDs) {
+      removeSelectedBookmarks( folderID) {
          const userStore = useUserStore()
          let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`
+         let folder = this.bookmarks.find( f => f.id == folderID )
+         if (!folder) {
+            return
+         }
+         var bookmarkIDs = []
+         folder.bookmarks.forEach(bm => {
+            if (bm.selected) {
+               bookmarkIDs.push(bm.id)
+            }
+         })
          axios.post(url, {bookmarkIDs: bookmarkIDs}).then((response) => {
             this.updateFolder(response.data)
          }).catch((error) => {
             useSystemStore().setError(error)
          })
       },
-      async moveBookmarks(data) {
+      async manageSelectedBookmarks(data) {
          const userStore = useUserStore()
          let v4UID = userStore.signedInUser
-         let bookmarkIDs = data.bookmarks
-         let folderID = data.folderID
-         let url = `/api/users/${v4UID}/bookmarks/move`
-         return axios.post(url, {folderID: folderID, bookmarkIDs: bookmarkIDs}).then((response) => {
-            this.setBookmarks(response.data)
-         }).catch((error) => {
-            useSystemStore().setError(error)
+         let folder = this.bookmarks.find( f => f.id == data.sourceFolderID )
+         if (!folder) {
+            return
+         }
+         var bookmarkIDs = []
+         folder.bookmarks.forEach(bm => {
+            if (bm.selected) {
+               bookmarkIDs.push(bm.id)
+            }
          })
-      },
-      async copyBookmarks(data) {
-         const userStore = useUserStore()
-         let v4UID = userStore.signedInUser
-         let bookmarkIDs = data.bookmarks
-         let destFolders = data.folderIDs
-         let url = `/api/users/${v4UID}/bookmarks/copy`
-         return axios.post(url, {folderIDs: destFolders, bookmarkIDs: bookmarkIDs}).then((response) => {
+
+         let url = `/api/users/${v4UID}/bookmarks/manage`
+         let req = {sourceFolderID: data.sourceFolderID, bookmarkIDs: bookmarkIDs, destFolderIDs: data.destFolderIDs}
+         return axios.post(url, req).then((response) => {
             this.setBookmarks(response.data)
          }).catch((error) => {
             useSystemStore().setError(error)
@@ -226,12 +274,12 @@ export const useBookmarkStore = defineStore('bookmark', {
       },
       async printBookmarks(data) {
          let items = []
-         let bookmarkIDs = data.bookmarkIDs
          let folderID = data.folderID
          let folder = this.bookmarks.find( folder => folder.id == folderID)
-         bookmarkIDs.forEach( bid => {
-            let bm = folder.bookmarks.find( bm => bm.id == bid)
-            items.push( {pool: bm.pool, identifier: bm.identifier} )
+         folder.bookmarks.forEach( bm=> {
+            if (bm.selected) {
+               items.push({pool: bm.pool, identifier: bm.identifier} )
+            }
          })
 
          const system = useSystemStore()

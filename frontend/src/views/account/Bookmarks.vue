@@ -74,28 +74,23 @@
                         <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder)">
                            Export all
                         </V4Button>
-                        <PrintBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                           :id="`print-bookmarks-${folderInfo.id}`"
-                        />
-                        <MoveBookmark :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                           :id="`move-bookmarks-${folderInfo.id}`"/>
-                        <CopyBookmarks :bookmarks="selectedItems" :srcFolder="folderInfo.id"
-                           :id="`copy-bookmarks-${folderInfo.id}`"/>
+                        <PrintBookmarks :srcFolder="folderInfo.id" :id="`print-bookmarks-${folderInfo.id}`"/>
+                        <ManageBookmarks :srcFolder="folderInfo.id" :id="`manage-bookmarks-${folderInfo.id}`"/>
                         <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
                         <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
                      </div>
 
                      <table>
                         <tr>
-                           <th  class="heading checkbox">
-                              <V4Checkbox @click="toggleAllClicked(folderInfo.bookmarks)" :checked="selectAllChecked" aria-label="toggle select all bookmarks"/>
+                           <th class="heading checkbox">
+                              <V4Checkbox @click="toggleAllClicked()" :checked="selectAllChecked" aria-label="toggle select all bookmarks"/>
                            </th>
                            <th class="heading">Title</th>
                            <th class="heading">Author</th>
                         </tr>
                         <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
                            <td class="checkbox">
-                              <V4Checkbox :checked="isSelected(bookmark)"  @click="toggleBookmarkSelected(bookmark)"
+                              <V4Checkbox :checked="bookmark.selected"  @click="toggleBookmarkSelected(bookmark)"
                                  :aria-label="ariaLabel(bookmark)"/>
                               <abbr class="" :title="itemURL(bookmark)" :data-folder-id="folderInfo.id"></abbr>
                            </td>
@@ -139,8 +134,7 @@
 import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
-import MoveBookmark from "@/components/modals/MoveBookmark.vue"
-import CopyBookmarks from "@/components/modals/CopyBookmarks.vue"
+import ManageBookmarks from "@/components/modals/ManageBookmarks.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
@@ -169,9 +163,12 @@ const newFolderName = ref("")
 const createOpen = ref(false)
 const newFolder = ref("")
 const submitting = ref(false)
-const selectedItems = ref([])
 const expandedFolder = ref(-1)
 const selectAllChecked = ref(false)
+
+function hasSelectedBookmarks() {
+   return bookmarkStore.selectedBookmarks(expandedFolder.value ).length > 0
+}
 
 function toggleSettings(folderID) {
    expandedFolder.value = folderID
@@ -199,17 +196,8 @@ function exportBookmarks(folder) {
 function bookmarkFollowed(identifier) {
    analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
 }
-function isSelected(bm) {
-   let idx = selectedItems.value.findIndex( bmid => bmid == bm.id)
-   return idx != -1
-}
 function toggleBookmarkSelected(bm) {
-   let idx = selectedItems.value.findIndex( bmid => bmid == bm.id)
-   if ( idx == -1 ) {
-      selectedItems.value.push(bm.id)
-   } else {
-      selectedItems.value.splice(idx,1)
-   }
+   bookmarkStore.toggleBookmarkSelected(expandedFolder.value, bm.id)
 }
 function ariaLabel(bm) {
    return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
@@ -239,7 +227,7 @@ function getPublicURL(folder) {
    return `${base}/${folder.token}`
 }
 function folderOpened(folderID) {
-   selectedItems.value = []
+   bookmarkStore.clearAll( expandedFolder.value )
    expandedFolder.value = folderID
    selectAllChecked.value = false
 }
@@ -250,31 +238,22 @@ function folderExpanded(folderID) {
 function folderCollapsed(folderID) {
    hideFolderItemsForZotero(folderID)
 }
-function toggleAllClicked(items) {
+function toggleAllClicked() {
    selectAllChecked.value = !selectAllChecked.value
    if (selectAllChecked.value == false ) {
-         selectedItems.value = []
+      bookmarkStore.clearAll( expandedFolder.value )
    } else {
-      selectedItems.value = []
-      items.forEach(bm=>{
-         selectedItems.value.push(bm.id)
-      })
+      bookmarkStore.selectAll( expandedFolder.value )
    }
 }
 async function reserve() {
-   if ( selectedItems.value.length == 0) {
+   if ( hasSelectedBookmarks() == false) {
       systemStore.setError("No items have been selected to put on reserve.<br/>Please select one or more and try again.")
       return
    }
 
-   let items = []
-   let folder = bookmarkStore.bookmarks.find( bm => bm.id == expandedFolder.value )
-   selectedItems.value.forEach( bmID => {
-      let item = folder.bookmarks.find( bm => bm.id == bmID )
-      items.push(item)
-   })
-
    // Set the list, and validate that all items in the list are able to be reserved
+   let items = bookmarkStore.selectedBookmarks(expandedFolder.value)
    reserveStore.setRequestList(items)
    await reserveStore.validateReservesRequest()
    if (reserveStore.invalidReserves.length > 0) {
@@ -297,11 +276,11 @@ function itemURL(bookmark) {
 }
 
 function removeBookmarks(folderID) {
-   if ( selectedItems.value.length == 0) {
+   if ( hasSelectedBookmarks() == false) {
       systemStore.setError("No bookmarks selected for deletion.<br/>Select one or more and try again.")
       return
    }
-   bookmarkStore.removeBookmarks(folderID, selectedItems.value)
+   bookmarkStore.removeSelectedBookmarks(folderID)
 }
 async function removeFolder(folderID, folderIdx) {
    let focusID = "create-folder-btn"
@@ -452,6 +431,7 @@ div.folder {
 }
 table {
    border-collapse: collapse;
+   width: 100%;
    td {
       padding: 5px 8px;
       text-align: left;
