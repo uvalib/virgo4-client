@@ -76,7 +76,15 @@
                         </V4Button>
                         <PrintBookmarks :srcFolder="folderInfo.id" :id="`print-bookmarks-${folderInfo.id}`"/>
                         <ManageBookmarks :srcFolder="folderInfo.id" :id="`manage-bookmarks-${folderInfo.id}`"/>
-                        <V4Button @click="removeBookmarks(folderInfo.id)" mode="primary">Delete</V4Button>
+                        <Confirm title="Confirm Delete" buttonLabel="Delete" buttonMode="primary"
+                           v-on:confirmed="removeBookmarks(folderInfo.id)" style="display: inline-block;"
+                           class="confirm-delete"
+                           :id="`delete-bookmarks-${folderInfo.id}`" >
+                           <div>All selected bookmarks in {{folderInfo.folder}} will be deleted.</div>
+                           <div>
+                              <br />This cannot be reversed.
+                           </div>
+                        </Confirm>
                         <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
                      </div>
 
@@ -136,7 +144,7 @@ import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import ManageBookmarks from "@/components/modals/ManageBookmarks.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-import { ref, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useBookmarkStore } from "@/stores/bookmark"
@@ -276,11 +284,13 @@ function itemURL(bookmark) {
 }
 
 function removeBookmarks(folderID) {
-   if ( hasSelectedBookmarks() == false) {
-      systemStore.setError("No bookmarks selected for deletion.<br/>Select one or more and try again.")
-      return
-   }
-   bookmarkStore.removeSelectedBookmarks(folderID)
+   nextTick( ()=>{
+      if ( hasSelectedBookmarks() == false) {
+         systemStore.setError("No bookmarks selected for deletion.<br/>Select one or more and try again.")
+         return
+      }
+      bookmarkStore.removeSelectedBookmarks(folderID)
+   })
 }
 async function removeFolder(folderID, folderIdx) {
    let focusID = "create-folder-btn"
@@ -325,11 +335,6 @@ async function createFolder() {
    })
 }
 
-function browserSizeChanged() {
-   expandedFolder.value = -1
-   console.log("EXPANEDED FOLDER "+ expandedFolder.value)
-}
-
 function showFolderItemsForZotero(folderID) {
    updateFolderItemsForZotero(folderID, "unapi-id")
 }
@@ -363,11 +368,6 @@ onMounted(()=>{
    if (userStore.isSignedIn) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Bookmarks")
    }
-   // window.addEventListener('resize',  browserSizeChanged)
-})
-
-onUnmounted(() => {
-    window.removeEventListener('resize',  browserSizeChanged)
 })
 </script>
 
