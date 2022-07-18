@@ -210,7 +210,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          }
       },
-      removeSelectedBookmarks( folderID) {
+      removeSelectedBookmarks( folderID ) {
          const userStore = useUserStore()
          let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`
@@ -225,6 +225,16 @@ export const useBookmarkStore = defineStore('bookmark', {
             }
          })
          axios.post(url, {bookmarkIDs: bookmarkIDs}).then((response) => {
+            this.updateFolder(response.data)
+         }).catch((error) => {
+            useSystemStore().setError(error)
+         })
+      },
+      removeBookmark( folderID, bookmarkID ) {
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
+         let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`
+         axios.post(url, {bookmarkIDs: [bookmarkID]}).then((response) => {
             this.updateFolder(response.data)
          }).catch((error) => {
             useSystemStore().setError(error)

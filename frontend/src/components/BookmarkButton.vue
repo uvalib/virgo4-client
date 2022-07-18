@@ -57,7 +57,7 @@ function removeBookmarkClicked() {
    bookmarkStore.bookmarks.forEach( folder => {
       folder.bookmarks.forEach( item => {
          if (item.pool == props.data.pool && item.identifier == props.data.identifier) {
-            bookmarkStore.removeBookmarks(folder.id, [item.id])
+            bookmarkStore.removeBookmark(folder.id, item.id)
          }
       })
    })
