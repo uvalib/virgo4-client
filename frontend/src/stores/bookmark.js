@@ -182,6 +182,11 @@ export const useBookmarkStore = defineStore('bookmark', {
          let url = `/api/users/${v4UID}/bookmarks/folders/add`
          return axios.post(url, {name: folder}).then((response) => {
             this.bookmarks.splice(0, 0, response.data)
+            this.bookmarks.sort( (a,b) => {
+               if (a.folder > b.folder) return 1
+               if (a.folder < b.folder) return -1
+               return 0
+            })
          }).catch((error) => {
             useSystemStore().setError(error)
          })

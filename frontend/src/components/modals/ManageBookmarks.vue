@@ -24,9 +24,9 @@
                <p>Select the folders where you wish to store the bookmark(s):</p>
                <div class="scroller">
                   <ul class="folders">
-                     <li v-for="(folder) in bookmarkStore.folders" :key="folder.id">
-                        <V4Checkbox :checked="isSelected(folder.id)" :label="folder.name"
-                           @click="folderClicked(folder.id)" />
+                     <li v-for="(fi) in bookmarkStore.bookmarks" :key="fi.id">
+                        <V4Checkbox :checked="isSelected(fi.id)" :label="fi.folder"
+                           @click="folderClicked(fi.id)" />
                      </li>
                   </ul>
                </div>
