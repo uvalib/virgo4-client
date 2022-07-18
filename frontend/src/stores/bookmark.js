@@ -29,7 +29,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             return selected
          }
       },
-      folders: state => {
+      sortedFolders: state => {
          let out = []
          let foundGeneral = false
          state.bookmarks.forEach( (folderObj) => {

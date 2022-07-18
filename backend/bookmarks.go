@@ -48,10 +48,11 @@ type Bookmark struct {
 }
 
 func (svc *ServiceContext) preloadBookmarks() *gorm.DB {
-	return svc.GDB.Preload("BookmarkFolders", func(db *gorm.DB) *gorm.DB {
+	return svc.GDB.Debug().Preload("BookmarkFolders", func(db *gorm.DB) *gorm.DB {
 		return db.Order("bookmark_folders.name ASC")
-	}).Preload("BookmarkFolders.Bookmarks").
-		Preload("BookmarkFolders.Bookmarks.Source")
+	}).Preload("BookmarkFolders.Bookmarks", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bookmarks.added_at ASC")
+	}).Preload("BookmarkFolders.Bookmarks.Source")
 }
 
 // AddBookmarkFolder will add a new blank folder for bookmarks

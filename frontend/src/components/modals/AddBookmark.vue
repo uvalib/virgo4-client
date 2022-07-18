@@ -14,7 +14,7 @@
                   <select v-model="selectedFolder" id="folder" name="folder"
                      @keydown.shift.tab.prevent.stop="shiftTabSelect"
                   >
-                     <option v-for="(folder) in bookmarks.folders" selected=false
+                     <option v-for="(folder) in bookmarkStore.sortedFolders" selected=false
                         :key="folder.id" :value="folder.name ">
                         {{ folder.name }}
                      </option>
@@ -58,7 +58,7 @@ const props = defineProps({
    id: {type: String, required: true}
 })
 
-const bookmarks = useBookmarkStore()
+const bookmarkStore = useBookmarkStore()
 const selectedFolder = ref("")
 const bookmarkError = ref("")
 const showAdd = ref(false)
@@ -71,7 +71,7 @@ function bookmarkButtonClicked() {
    addbmmodal.value.show()
 }
 function opened() {
-   selectedFolder.value = bookmarks.folders[0].name
+   selectedFolder.value = bookmarkStore.sortedFolders[0].name
    bookmarkError.value = ""
    showAdd.value = false
    newFolder.value = ""
@@ -97,7 +97,7 @@ function okBookmark() {
          return
       }
       bookmarkData.value.folder = newFolder.value
-      bookmarks.addBookmark(bookmarkData.value).then( () => {
+      bookmarkStore.addBookmark(bookmarkData.value).then( () => {
          addbmmodal.value.hide()
       }).catch((error) => {
          bookmarkError.value = error
@@ -109,7 +109,7 @@ function okBookmark() {
       }
       bookmarkData.value.folder = selectedFolder.value
       analytics.trigger('Bookmarks', 'ADD_BOOKMARK', bookmarkData.value.identifier)
-      bookmarks.addBookmark(bookmarkData.value).then( () => {
+      bookmarkStore.addBookmark(bookmarkData.value).then( () => {
          addbmmodal.value.hide()
       }).catch((error) => {
          bookmarkError.value = error
