@@ -15,7 +15,7 @@
             <iframe :class="{full: fsView}" :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
-            <img :src="imageURL('med')" :data-src="imageURL('full')" class="pure-img thumb large">
+            <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large">
             <div class="img-toolbar">
                <a target="_blank" :href="imageURL('max')">
                   View full size<i class="fal fa-external-link-alt"></i>
@@ -474,6 +474,11 @@ onUnmounted(()=>{
    .img-view {
       display: inline-block;
       margin: 0 auto;
+      .large {
+         max-width: 100%;
+         height: auto;
+         display: block;
+      }
       .img-toolbar {
          padding: 10px 0;
          text-align: right;

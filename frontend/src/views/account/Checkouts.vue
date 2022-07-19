@@ -372,7 +372,7 @@ v4-button.renew {
    padding: 10px 0 0 0;
    border-bottom: 20px solid var(--uvalib-brand-blue);
 
-   .v4-button.pure-button {
+   .v4-button {
       flex-grow: 1;
       margin: 5px;
       .v4-spinner.embed {

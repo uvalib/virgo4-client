@@ -304,7 +304,7 @@ onMounted(() =>{
       flex-flow: row wrap;
       justify-content: flex-start;
       align-content: center;
-      button.v4-button.pure-button-primary {
+      .v4-button {
          margin:0 10px 10px 0;
          min-width: 275px;
          width: 40%;
