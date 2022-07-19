@@ -24,7 +24,6 @@ export default defineConfig({
     }
    },
    server: { // this is used in dev mode only
-      port: 8080,
       proxy: {
          '/api': {
             target: process.env.V4_CONFIG, // export V4_CONFIG=http://localhost:8095

@@ -6,17 +6,15 @@
       :class="{'text-button': props.mode=='text',
                'icon-button': props.mode=='icon',
                'link-button': props.mode=='link',
-               'pure-button': isButton,
-               'pure-button-primary': props.mode == 'primary',
-               'pure-button-small': props.mode == 'small',
-               'pure-button-tertiary': props.mode == 'tertiary'}"
+               'primary-button': props.mode == 'primary',
+               'small-button': props.mode == 'small',
+               'tertiary-button': props.mode == 'tertiary'}"
       @click.prevent.stop="clicked" @keydown.prevent.stop.enter="clicked" @keydown.space.prevent.stop="clicked">
       <slot></slot>
    </button>
 </template>
 
 <script setup>
-import { computed } from 'vue'
 const props = defineProps({
    mode: {
       type: String,
@@ -44,9 +42,6 @@ const props = defineProps({
    },
 })
 const emit = defineEmits( ['click', 'esc', 'tabback', 'tabnext' ] )
-const isButton = computed(()=>{
-   return props.mode != 'text' && props.mode!='icon' && props.mode!='link'
-})
 
 function escClicked() {
    emit('esc')
@@ -78,6 +73,23 @@ function tabNext(event) {
 </script>
 
 <style lang="scss" scoped>
+button.v4-button {
+   font-family: inherit;
+   font-size: 100%;
+   padding: 0.5em 1em;
+   color: #000c;
+   border: none transparent;
+   background-color: #e6e6e6;
+   text-decoration: none;
+   margin: 0;
+   border-radius: 5px;
+   font-weight: 400;
+
+   &:hover {
+      background-image: -webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(40%,rgba(0,0,0,.05)),to(rgba(0,0,0,.1)));
+      background-image: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
+   }
+}
 button.text-button {
    border: none;
    background: none;
@@ -89,6 +101,7 @@ button.text-button {
    &:hover {
       opacity: 1;
       text-decoration: underline;
+      background: none;
    }
    &:focus {
       @include be-accessible();
@@ -114,7 +127,7 @@ button.v4-button.icon-button {
       }
    }
 }
-.link-button {
+button.v4-button.link-button {
   border-radius: 5px;
   font-weight: normal;
   text-transform: uppercase;
@@ -130,9 +143,11 @@ button.v4-button.icon-button {
       @include be-accessible();
    }
 }
-.pure-button.pure-button-primary, .pure-button.pure-button-small {
+.v4-button.primary-button, .v4-button.small-button {
+   color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
+   margin: 0 0 5px 10px;
    &:hover {
       background-color: var(--uvalib-brand-blue-lighter);
       border: 1px solid var(--uvalib-brand-blue-lighter);
@@ -140,25 +155,32 @@ button.v4-button.icon-button {
    }
 }
 
-.pure-button.pure-button-tertiary {
+.v4-button.small-button {
+   padding: 4px 12px;
+   color: white;
+   border-radius: 5px;
+   font-weight: normal;
+   margin: 0;
+}
+
+.v4-button.tertiary-button {
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey);
    color: black;
-}
-.pure-button.pure-button-tertiary:hover {
-   background-color: var(--uvalib-grey-light);
-}
-.pure-button.pure-button-primary,
-.pure-button.pure-button-small,
-.pure-button.pure-button-tertiary {
    margin: 0 0 5px 10px;
    border-radius: 5px;
    font-weight: normal;
    &:focus {
       @include be-accessible();
    }
+   &:hover {
+      background-color: var(--uvalib-grey-light);
+      background-image: -webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(40%,rgba(0,0,0,.05)),to(rgba(0,0,0,.1)));
+      background-image: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
+   }
 }
-.pure-button.disabled {
+
+.v4-button.disabled, .v4-button:disabled {
    cursor: default;
    opacity: 0.25;
 }

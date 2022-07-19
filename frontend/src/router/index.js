@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from '../views/Home.vue'
 
-import Details from '../views/Details.vue'
+// import Details from '../views/Details.vue'
 import SignIn from '../views/SignIn.vue'
 
 import { useSystemStore } from "@/stores/system"
@@ -63,7 +63,7 @@ const router = createRouter({
       {
          path: '/sources/:src/items/:id',
          name: 'details',
-         component: Details,
+         component: () => import('../views/Details.vue')
       },
       {
          path: '/items/:id',
