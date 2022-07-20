@@ -19,7 +19,7 @@
                <p class="saved">This search has already been saved as '{{searchName}}'.</p>
                <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
             </template>
-            <div  v-else class="message pure-form">
+            <div  v-else class="message">
                <div>
                   <label for="savename">Search Name</label>
                   <input ref="savename" id="savename" type="text" v-model="searchName"
@@ -120,7 +120,7 @@ input[type=text] {
 }
 label {
    display: block;
-   margin: 10px 0 2px 0;
+   margin: 10px 0 5px 0;
    font-weight: 500;
 }
 #manage {

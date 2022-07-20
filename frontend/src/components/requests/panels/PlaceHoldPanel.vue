@@ -1,5 +1,5 @@
 <template>
-   <div class="place-hold  pure-form">
+   <div class="place-hold">
       <div v-if="itemOptions.length > 1" class="item-selector">
          <h3>Select the item you want:</h3>
          <select id="hold-select" v-model="selectedItem" @change="itemSelected" aria-required="true" required="required">

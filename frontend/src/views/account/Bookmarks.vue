@@ -54,7 +54,7 @@
                               </div>
                            </Confirm>
                         </template>
-                        <div v-else class="rename  pure-form">
+                        <div v-else class="rename">
                            <input @keyup.enter="doRename(folderInfo)"  :id="`rename-folder-${folderInfo.id}`" type="text" v-model="newFolderName"
                                aria-required="true" aria-label="new folder name" required="required"/>
                            <V4Button mode="tertiary" id="rename-cancel" @click="renaming=false">
@@ -120,7 +120,7 @@
          </template>
          <div class="controls">
             <V4Button v-if="createOpen==false" @click="openCreate" id="create-folder-btn" mode="primary">Create Folder</V4Button>
-            <div v-else class="create-folder pure-form">
+            <div v-else class="create-folder">
                <label for="newname">New Folder:</label>
                <input
                   id="newname"
@@ -463,8 +463,11 @@ table tr {
    color: var(--uvalib-grey-dark);
    display: flex;
    flex-flow: row nowrap;
-   align-items: flex-start;
+   align-items: baseline;
    justify-content: flex-end;
+   input {
+      flex-grow: 1;
+   }
 }
 .create-folder label {
    font-weight: bold;
