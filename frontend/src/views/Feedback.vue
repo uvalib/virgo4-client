@@ -1,18 +1,12 @@
 <template>
    <div class="feedback" v-if="!submitted">
-      <FormKit
-         type="form"
-         id="user-feedback"
-         :actions="false"
-         @submit="submitHandler"
-         :config="{ validationVisibility: 'submit' }"
-      >
+      <FormKit type="form" id="feedback" :actions="false" @submit="submitHandler">
          <FormKit label="Explain what you wanted to do" id="explain" type="textarea" v-model="feedbackStore.wantedTo" validation="required" rows="3"/>
          <FormKit label="How did it go?" type="textarea" v-model="feedbackStore.explanation" validation="required" rows="3"/>
          <FormKit label="Contact Email" type="email" v-model="feedbackStore.email" validation="required|email"/>
          <FormKit label="Relevant URL" type="text" v-model="feedbackStore.url" validation="required"/>
+         <V4FormActions :hasCancel="false" submitLabel="Leave Feedback"/>
       </FormKit>
-      <V4FormActions :hasCancel="false" submitLabel="Leave Feedback" @submitted="$formkit.submit('user-feedback')"/>
    </div>
    <div class="thanks" v-else>
       <h3>Thanks for your feedback!</h3>
@@ -59,10 +53,10 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 
-:deep(#user-feedback label) {
+:deep(#feedback label) {
     margin-top: 15px;
 }
-:deep(#user-feedback input) {
+:deep(#feedback input) {
    width: 100%;
 }
 

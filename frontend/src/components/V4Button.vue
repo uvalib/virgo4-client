@@ -74,21 +74,7 @@ function tabNext(event) {
 
 <style lang="scss" scoped>
 button.v4-button {
-   font-family: inherit;
-   font-size: 100%;
-   padding: 0.5em 1em;
-   color: #000c;
-   border: none transparent;
-   background-color: #e6e6e6;
-   text-decoration: none;
-   margin: 0;
-   border-radius: 5px;
-   font-weight: 400;
-
-   &:hover {
-      background-image: -webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(40%,rgba(0,0,0,.05)),to(rgba(0,0,0,.1)));
-      background-image: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));
-   }
+   @include base-button();
 }
 button.text-button {
    border: none;
@@ -98,6 +84,7 @@ button.text-button {
    color: var(--color-link);
    cursor: pointer;
    display: inline-block;
+   border-radius: 0;
    &:hover {
       opacity: 1;
       text-decoration: underline;
@@ -144,15 +131,7 @@ button.v4-button.link-button {
    }
 }
 .v4-button.primary-button, .v4-button.small-button {
-   color: #ffffff;
-   background-color: var(--uvalib-brand-blue-light);
-   border: 1px solid var(--uvalib-brand-blue-light);
-   margin: 0 0 5px 10px;
-   &:hover {
-      background-color: var(--uvalib-brand-blue-lighter);
-      border: 1px solid var(--uvalib-brand-blue-lighter);
-      transition: all 0.3s ease;
-   }
+   @include primary-button();
 }
 
 .v4-button.small-button {

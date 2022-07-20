@@ -26,6 +26,13 @@ select,
    box-sizing: border-box;
    box-shadow: none;
    margin-bottom: 0.3em;
+   width: 100%;
+}
+
+.v4-form-help {
+   margin: 5px 0;
+   font-size: 0.9em;
+   color: var(--uvalib-grey);
 }
 
 .v4-form-invalid {
@@ -38,6 +45,7 @@ select,
 .v4-form-label {
    display: block;
    margin-bottom: 0.3em;
+   margin-top: 20px;
 }
 
 textarea.v4-form-input {

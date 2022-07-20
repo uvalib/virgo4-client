@@ -2,7 +2,7 @@
    <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
    <transition name="fade">
       <div class="dimmer" v-if="showDimmer">
-            <MessageBox />
+         <MessageBox />
       </div>
    </transition>
    <div role="banner" class="site-header" id="v4-header">
@@ -455,15 +455,16 @@ body {
    box-shadow: $v4-box-shadow;
    text-align: right;
    font-size: 0.85em;
+   .msg {
+      margin-bottom: 10px;
+      font-weight: bold;
+   }
+   .v4-button {
+      width: 100%;
+      margin:0 !important;
+   }
 }
-.update-pop .msg {
-   margin-bottom: 10px;
-   font-weight: bold;
-}
-.update-pop span.pure-button.pure-button-primary {
-   margin: 0;
-   width:100%;
-}
+
 @media only screen and (min-width: 768px) {
    div.error-message {
       max-width: 40%;

@@ -1,61 +1,40 @@
 <template>
    <div class="signin">
       <div class="netbadge">
-         <span class="netbadge">
-            <h2>UVA Users</h2>
-            <p class="subhead">(UVA students, faculty, and staff)</p>
-            <div class="indent">
-               <V4Button id="netbadge" mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
-            </div>
-         </span>
+         <h2>UVA Users</h2>
+         <p class="subhead">(UVA students, faculty, and staff)</p>
+         <div class="section centered">
+            <V4Button id="netbadge" mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
+         </div>
       </div>
       <div>
          <h2>All Other Users</h2>
          <p>(All other researchers, including UVA alumni or retirees)</p>
-         <div class="indent">
-            <table class="pure-form form">
-               <tr>
-                  <td class="label">Library ID</td>
-                  <td class="value">
-                     <input v-model="user" type="text">
-                     <p class="hint">Driver's License Number, eg: A12345678</p>
-                  </td>
-               </tr>
-               <tr>
-                  <td class="label">Password</td>
-                  <td class="value">
-                     <input @keyup.enter="signinClicked" v-model="pin" type="password">
-                  </td>
-               </tr>
-               <tr>
-                  <td colspan="2">
-                     <transition name="message-transition"
-                        enter-active-class="animated faster fadeIn"
-                        leave-active-class="animated faster fadeOut">
-                        <div v-if="userStore.authMessage" class="authMessage">
-                           <div v-if="userStore.lockedOut" class="locked-out">
-                              {{ userStore.authMessage }}
-                           </div>
-                           <div v-else class="tries">
-                              <div class="auth-msg">{{ userStore.authMessage }}</div>
-                              You have <b>{{userStore.authTriesLeft}}</b> more tries before your account is locked.
-                           </div>
-                        </div>
-                     </transition>
-                  </td>
-               </tr>
-               <tr v-if="!systemStore.ilsError">
-                  <td colspan="2">
-                     <V4Button mode="primary" @click="signinClicked">Sign in</V4Button>
-                  </td>
-               </tr>
-               <tr>
-                  <td colspan="2">
-                     <ForgotPassword :trigger="showForgotModal" @closed="onForgotPassClosed" />
-                     <ChangePassword v-if="hasPasswordToken" @show-forgot-password="onShowForgotPassword"/>
-                  </td>
-               </tr>
-            </table>
+         <div class="section">
+            <FormKit type="form" id="signin" :actions="false" @submit="signinClicked">
+               <FormKit label="Library ID" type="text" v-model="user" validation="required" help="Driver's License Number, eg: A12345678" />
+               <FormKit label="Password" type="password" v-model="pin" />
+               <V4FormActions :hasCancel="false" submitLabel="Sign in" buttonAlign="center" />
+            </FormKit>
+            <transition name="message-transition"
+               enter-active-class="animated faster fadeIn"
+               leave-active-class="animated faster fadeOut">
+               <div v-if="userStore.authMessage" class="auth-message">
+                  <div v-if="userStore.lockedOut" class="locked-out">
+                     {{ userStore.authMessage }}
+                  </div>
+                  <div v-else class="tries">
+                     <div class="auth-msg">{{ userStore.authMessage }}</div>
+                     You have <b>{{userStore.authTriesLeft}}</b> more tries before your account is locked.
+                  </div>
+               </div>
+            </transition>
+            <template v-if="!systemStore.ilsError">
+               <div class="changes">
+                  <ForgotPassword :trigger="showForgotModal" @closed="onForgotPassClosed" />
+                  <ChangePassword v-if="hasPasswordToken" @show-forgot-password="onShowForgotPassword"/>
+               </div>
+            </template>
             <div class="ils-error" v-if="systemStore.ilsError">{{systemStore.ilsError}}</div>
          </div>
       </div>
@@ -71,7 +50,7 @@ import ForgotPassword from "@/components/modals/ForgotPassword.vue"
 import ChangePassword from "@/components/modals/ChangePassword.vue"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
-import { ref, computed, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from "pinia"
 
@@ -108,13 +87,35 @@ function netbadgeLogin() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .signin {
-   min-height: 400px;
    position: relative;
    margin: 2vw auto 6vw;
    color: var(--uvalib-text);
    text-align: left;
+   div.netbadge {
+      padding-bottom: 25px;
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      margin: 25px 0;
+   }
+   div.section {
+      text-align: left;
+   }
+   .section.centered {
+      text-align: center;
+      .v4-button {
+         margin: 0;
+      }
+   }
+   .changes {
+      margin-top: 10px;
+      text-align: center;
+   }
+   .community {
+      padding-top: 25px;
+      border-top: 1px solid var(--uvalib-grey-light);
+      margin: 15px 0;
+   }
 }
 .ils-error {
     font-size: 1em;
@@ -126,51 +127,8 @@ function netbadgeLogin() {
     color: var(--uvalib-text);
     background-color: var(--uvalib-red-lightest);
 }
-.sign-in-content {
-   width: 60%;
-   margin: 0 auto;
-   text-align: left;
-}
 h2 {
   margin-bottom: 0;
-}
-td.label {
-  font-weight: 500;
-  text-align: right;
-  padding: 8px 5px 0 5px;
-  width:1%;
-  white-space: nowrap;
-  vertical-align: text-top;
-}
-td.value {
-   padding: 3px 0 10px 0;
-   width: 100%;
-}
-#app .signin .pure-form input {
-   width:100%;
-   box-sizing: border-box;
-   padding: 6px;
-}
-p.hint {
-   margin: 5px 10px;
-   color: var(--uvalib-grey-dark);
-   text-align: left;
-}
-.controls {
-   margin-top: 5px;
-}
-div.netbadge {
-   padding-bottom: 25px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   margin: 25px 0;
-}
-.community {
-   padding-top: 25px;
-   border-top: 1px solid var(--uvalib-grey-light);
-   margin: 25px 0;
-}
-div.indent {
-   text-align: center;
 }
 @media only screen and (min-width: 768px) {
    .signin {
@@ -181,15 +139,15 @@ div.indent {
    .signin {
       width: 95%;
    }
-   div.indent {
+   div.section {
      margin-left: 0;
    }
 }
-.authMessage {
+.auth-message {
    font-weight: bold;
    color: var(--uvalib-red-emergency);
    text-align: center;
-   margin: 0 0 15px 0;
+   margin: 15px 0 15px;
 }
 .tries {
    font-weight: normal;

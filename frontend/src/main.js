@@ -23,15 +23,19 @@ const app = createApp(App)
 app.use(router)
 app.use(pinia)
 
-app.use(plugin, defaultConfig({
+const dc = defaultConfig({
    config: {
       classes: {
          input: '$reset v4-form-input',
          label: '$reset v4-form-label',
-         messages: '$reset v4-form-invalid'
-      }
+         messages: '$reset v4-form-invalid',
+         help: '$reset v4-form-help',
+      },
+      incompleteMessage: false,
+      validationVisibility: 'submit'
    }
-}))
+})
+app.use(plugin, dc)
 
 app.component('V4Button', V4Button)
 app.component('V4Checkbox', V4Checkbox)
