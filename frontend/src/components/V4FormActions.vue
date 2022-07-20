@@ -1,5 +1,5 @@
 <template>
-   <div class="controls" :class="props.buttonAlign">
+   <div class="form-controls" :class="props.buttonAlign">
       <V4Button v-if="props.hasCancel" mode="tertiary" @click="emit('canceled')">
          Cancel
       </V4Button>
@@ -30,7 +30,7 @@ const emit = defineEmits( ['canceled'] )
 </script>
 
 <style lang="scss">
-.controls {
+.form-controls {
    display: flex;
    flex-flow: row nowrap;
    justify-content: flex-end;
@@ -44,10 +44,10 @@ const emit = defineEmits( ['canceled'] )
       width: auto;
    }
 }
-.controls.center {
+.form-controls.center {
    justify-content: center;
 }
-.controls.right {
+.form-controls.right {
    justify-content: flex-end;
 }
 </style>

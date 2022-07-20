@@ -26,7 +26,6 @@ select,
    box-sizing: border-box;
    box-shadow: none;
    margin-bottom: 0.3em;
-   width: 100%;
 }
 
 .v4-form-help {
@@ -48,6 +47,6 @@ select,
    margin-top: 20px;
 }
 
-textarea.v4-form-input {
+.v4-form-input {
    width: 100%
 }

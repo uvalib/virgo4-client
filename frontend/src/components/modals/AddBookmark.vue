@@ -8,7 +8,7 @@
          <div class="add-content">
             <div>{{data.identifier}} : <b>{{data.title}}</b></div>
             <TruncatedText v-if="data.author" id="bookmark-author" :text="data.author" :limit="120" ></TruncatedText>
-            <div class="select pure-form" >
+            <div class="select" >
                <template v-if="showAdd==false">
                   <label for="folder">Select a folder for the bookmark</label>
                   <select v-model="selectedFolder" id="folder" name="folder"

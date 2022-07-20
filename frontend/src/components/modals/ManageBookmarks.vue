@@ -20,7 +20,7 @@
                   </li>
                </ul>
             </div>
-            <div class="move message pure-form">
+            <div class="move message">
                <p>Select the folders where you wish to store the bookmark(s):</p>
                <div class="scroller">
                   <ul class="folders">
@@ -109,7 +109,7 @@ function nextTabOK() {
 </script>
 
 <style lang="scss" scoped>
-.move.message.pure-form {
+.move.message {
    p {
       margin: 20px 0 10px 5px;
    }
