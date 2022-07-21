@@ -49,4 +49,7 @@
       border: 1px solid var(--uvalib-brand-blue-lighter);
       transition: all 0.3s ease;
    }
+   &:focus {
+      @include be-accessible();
+   }
 }

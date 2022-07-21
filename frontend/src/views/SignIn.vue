@@ -14,7 +14,7 @@
             <FormKit type="form" id="signin" :actions="false" @submit="signinClicked">
                <FormKit label="Library ID" type="text" v-model="user" validation="required" help="Driver's License Number, eg: A12345678" />
                <FormKit label="Password" type="password" v-model="pin" />
-               <V4FormActions :hasCancel="false" submitLabel="Sign in" buttonAlign="center" />
+               <V4FormActions :hasCancel="false" submitLabel="Sign in" submitID="submit-signin" buttonAlign="center" />
             </FormKit>
             <transition name="message-transition"
                enter-active-class="animated faster fadeIn"

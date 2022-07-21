@@ -3,7 +3,7 @@
       <V4Button v-if="props.hasCancel" mode="tertiary" @click="emit('canceled')">
          Cancel
       </V4Button>
-      <FormKit type="submit" :label="props.submitLabel" wrapper-class="submit-button"/>
+      <FormKit :id="props.submitID" type="submit" :label="props.submitLabel" wrapper-class="submit-button"  @keydown.exact.tab="tabNext"/>
    </div>
 </template>
 
@@ -24,12 +24,27 @@ const props = defineProps({
    buttonAlign: {
       type: String,
       default: "right"
+   },
+   tabNextOverride: {
+      type: Boolean,
+      default: false
+   },
+   submitID: {
+      type: String,
+      required: true
    }
 })
-const emit = defineEmits( ['canceled'] )
+const emit = defineEmits( ['canceled', 'tabnext'] )
+function tabNext(event) {
+   if (props.tabNextOverride) {
+      event.stopPropagation()
+      event.preventDefault()
+      emit('tabnext')
+   }
+}
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .form-controls {
    display: flex;
    flex-flow: row nowrap;
@@ -39,7 +54,7 @@ const emit = defineEmits( ['canceled'] )
    .v4-button {
       margin-left: 5px;
    }
-   .submit-button button {
+   :deep(.submit-button button) {
       @include primary-button();
       width: auto;
    }

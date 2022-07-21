@@ -1,11 +1,11 @@
 <template>
    <div class="feedback" v-if="!submitted">
       <FormKit type="form" id="feedback" :actions="false" @submit="submitHandler">
-         <FormKit label="Explain what you wanted to do" id="explain" type="textarea" v-model="feedbackStore.wantedTo" validation="required" rows="3"/>
-         <FormKit label="How did it go?" type="textarea" v-model="feedbackStore.explanation" validation="required" rows="3"/>
+         <FormKit label="Explain what you wanted to do" id="explain" type="textarea" v-model="feedbackStore.wantedTo" validation="required" :rows="5"/>
+         <FormKit label="How did it go?" type="textarea" v-model="feedbackStore.explanation" validation="required" :rows="5"/>
          <FormKit label="Contact Email" type="email" v-model="feedbackStore.email" validation="required|email"/>
          <FormKit label="Relevant URL" type="text" v-model="feedbackStore.url" validation="required"/>
-         <V4FormActions :hasCancel="false" submitLabel="Leave Feedback"/>
+         <V4FormActions :hasCancel="false" submitLabel="Leave Feedback" submitID="submit-feedback"/>
       </FormKit>
    </div>
    <div class="thanks" v-else>
