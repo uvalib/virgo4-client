@@ -85,7 +85,7 @@
                               <br />This cannot be reversed.
                            </div>
                         </Confirm>
-                        <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on course reserve</V4Button>
+                        <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on video reserves</V4Button>
                      </div>
 
                      <table>
@@ -265,12 +265,13 @@ async function reserve() {
    reserveStore.setRequestList(items)
    await reserveStore.validateReservesRequest()
    if (reserveStore.invalidReserves.length > 0) {
-      let msg = "The following items cannot be placed on course reserve: "
+      let msg = "This button is for use with video reserves only. The following items cannot be placed on video reserves: "
       msg += "<ul style='text-align:left;'>"
       reserveStore.invalidReserves.forEach( r => {
          msg += `<li>${r.details.title}</l1>`
       })
-      msg += "</ul>Please deselect these items and try again."
+      msg += "</ul>Please deselect these items and try again." +
+         "<p><a target=\"_blank\" href=\"https://www.library.virginia.edu/services/course-reserves\">Learn more about placing various types of course reserves.</a> </p>"
       systemStore.setError(msg)
    } else {
       router.push("/course-reserves-request")
