@@ -28,6 +28,22 @@ select,
    margin-bottom: 0.3em;
 }
 
+span.req {
+   margin-left: 5px;
+   color: var(--uvalib-grey);
+   font-size: 0.8em;
+}
+i.req {
+   font-size: 0.5em;
+   margin-right: 3px;
+   position: relative;
+   top: -2px;
+   color: var(--uvalib-grey);
+}
+span.req-label {
+   color: var(--uvalib-text);
+}
+
 .v4-form-help {
    margin: 5px 0;
    font-size: 0.9em;
@@ -42,9 +58,14 @@ select,
 }
 
 .v4-form-label {
-   display: block;
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: flex-start;
+   align-items: center;
    margin-bottom: 0.3em;
    margin-top: 20px;
+   // color: var(--uvalib-text-dark);
+   font-weight: normal;
 }
 
 .v4-form-input {

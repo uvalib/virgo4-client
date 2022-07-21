@@ -1,13 +1,18 @@
 <template>
    <div class="form-controls" :class="props.buttonAlign">
-      <V4Button v-if="props.hasCancel" mode="tertiary" @click="emit('canceled')">
+      <FormKit :id="props.submitID" type="submit" :label="props.submitLabel" wrapper-class="submit-button"  @keydown.exact.tab="tabNext"/>
+      <V4Button v-if="props.hasCancel" mode="tertiary" @click="emit('canceled')" >
          Cancel
       </V4Button>
-      <FormKit :id="props.submitID" type="submit" :label="props.submitLabel" wrapper-class="submit-button"  @keydown.exact.tab="tabNext"/>
    </div>
 </template>
 
 <script setup>
+// NOTES: when a user is an a form and presses enter, the default button on the form is triggered.
+// This is the first button in the layout... but the standard we have been using is cancel | ok, so
+// cancel gets triggered on enter. Not good. To work around this, the buttons above are swapped so enter
+// triggers submit. To make the layout match the rest of Virgo, the layout is row-reverse and justify-content
+// is reversed; flex-start causes right align.
 const props = defineProps({
    hasCancel: {
       type: Boolean,
@@ -47,7 +52,7 @@ function tabNext(event) {
 <style scoped lang="scss">
 .form-controls {
    display: flex;
-   flex-flow: row nowrap;
+   flex-flow: row-reverse nowrap;
    justify-content: flex-end;
    margin-top: 15px;
    text-align: right;
@@ -63,6 +68,6 @@ function tabNext(event) {
    justify-content: center;
 }
 .form-controls.right {
-   justify-content: flex-end;
+   justify-content: flex-start;
 }
 </style>

@@ -24,6 +24,7 @@ app.use(router)
 app.use(pinia)
 
 const dc = defaultConfig({
+   plugins: [addErrorAlertIconPlugin, addRequiredNotePlugin],
    config: {
       classes: {
          input: '$reset v4-form-input',
@@ -57,3 +58,51 @@ import '@vue-a11y/announcer/dist/style.css'
 app.use(VueAnnouncer, { router })
 
 app.mount('#app')
+
+// Plugins for formkit -------
+
+function addRequiredNotePlugin(node) {
+   var showRequired = true
+   node.on('created', () => {
+      if (node.config.disableRequiredDecoration == true) {
+         showRequired = false
+      }
+      const schemaFn = node.props.definition.schema
+      node.props.definition.schema = (sectionsSchema = {}) => {
+         const isRequired = node.props.parsedRules.some(rule => rule.name === 'required')
+
+         if (isRequired && showRequired) {
+            // this input has the required rule so we modify
+            // the schema to add an astrics to the label.
+            sectionsSchema.label = {
+               attrs: {
+                  innerHTML: `<i class="req fas fa-asterisk"></i><span class="req-label">${node.props.label}</span><span class="req">(required)</span>`
+               },
+               children: null//['$label', '*']
+            }
+         } else {
+            console.log("NOT REQUIRED")
+            console.log(node)
+         }
+         return schemaFn(sectionsSchema)
+      }
+   })
+}
+
+function addErrorAlertIconPlugin(node) {
+   node.on('created', () => {
+      const schemaFn = node.props.definition.schema
+      node.context.warningIcon = '<i class="fas fa-exclamation-triangle"></i>'
+      node.props.definition.schema = (extensions) => {
+         if (!extensions.message) {
+            extensions.message = {
+               attrs: {
+                  innerHTML: '$warningIcon + " " + $message.value'
+               },
+               children: null
+            }
+         }
+         return schemaFn(extensions)
+      }
+   })
+}
