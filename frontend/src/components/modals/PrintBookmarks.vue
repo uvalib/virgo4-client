@@ -12,26 +12,17 @@
          <template v-if="hasSelectedBookmarks() == false">
             <p>No bookmarks have been selected to print.</p>
          </template>
-         <template v-else>
-            <div class="print message pure-form">
-               <label for="titleinput">Title for Printout (optional)</label>
-               <input ref="titleinput" id="titleinput" type="text" v-model="title"
-                  @keyup.enter="printClicked"
-                  @keydown.shift.tab.stop.prevent="backTabTitle"/>
-               <label for="notes">Notes (optional)</label>
-               <textarea id="notes" v-model="notes" @keyup.enter="printClicked"></textarea>
-               <p class="note">After clicking Print, your printable results will open in another browser tab.</p>
-            </div>
-         </template>
+         <div class="print" v-else>
+            <FormKit type="form" id="print" :actions="false" @submit="printClicked">
+               <FormKit id="titleinput" label="Title for printout (optional)" type="text" v-model="title"/>
+               <FormKit label="Notes (optional)" type="textarea" v-model="notes" :rows="5" />
+               <V4FormActions :hasCancel="true" submitLabel="Print" submitID="print-ok"
+                  :tabNextOverride="true" @tabnext="nextTabOK"
+                  @canceled="cancelClicked"/>
+            </FormKit>
+         </div>
       </template>
-      <template v-if="hasSelectedBookmarks()" v-slot:controls>
-         <V4Button mode="tertiary" id="print-cancel" @click="cancelClicked">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" id="print-ok" @click="printClicked" :focusNextOverride="true" @tabnext="nextTabOK">
-            Print
-         </V4Button>
-      </template>
+      <template v-if="hasSelectedBookmarks()" v-slot:controls></template>
    </V4Modal>
 </template>
 
@@ -66,6 +57,9 @@ function opened() {
    if ( hasSelectedBookmarks() == false ){
       let btn = document.getElementById(props.id+"-close")
       btn.focus()
+   } else {
+      let ele = document.getElementById("titleinput")
+      ele.focus()
    }
 }
 async function printClicked() {
@@ -77,26 +71,13 @@ async function printClicked() {
 function cancelClicked() {
    printmodal.value.hide()
 }
-function backTabTitle() {
-   printmodal.value.firstFocusBackTabbed()
-}
 function nextTabOK() {
    printmodal.value.lastFocusTabbed()
 }
 </script>
 
 <style lang="scss" scoped>
-.print.message.pure-form {
-   textarea, input {
-      width: 100%;
-      margin: 5px 0 35px 0;
-      min-width: 400px;
-   }
-   label {
-      display: block;
-   }
-   .note {
-      margin: 10px 25px;
-   }
+.print {
+   width: 450px;
 }
 </style>

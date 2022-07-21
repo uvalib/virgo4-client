@@ -1,5 +1,5 @@
 <template>
-   <div class="pickup-options pure-form">
+   <div class="pickup-options">
       <h2>Pickup Location</h2>
       <div class="content">
          <p>

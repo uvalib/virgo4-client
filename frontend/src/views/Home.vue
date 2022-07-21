@@ -1,7 +1,7 @@
 <template>
    <div class="home">
       <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
-      <div class="search-panel pure-form">
+      <div class="search-panel">
          <template v-if="queryStore.mode=='basic'">
             <div v-if="systemStore.hasTranslateMessage" class="translate-message">
                {{systemStore.translateMessage}}

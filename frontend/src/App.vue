@@ -2,7 +2,7 @@
    <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
    <transition name="fade">
       <div class="dimmer" v-if="showDimmer">
-            <MessageBox />
+         <MessageBox />
       </div>
    </transition>
    <div role="banner" class="site-header" id="v4-header">
@@ -349,65 +349,6 @@ onUpdated(() => {
    }
 }
 
-/* Color variable definitions */
-:root {
-   /* OFFICIAL BRAND COLORS */
-   --uvalib-brand-blue-lightest: #87b9d9;
-   --uvalib-brand-blue-lighter: #3395d4;
-   --uvalib-brand-blue-light: #0370b7;
-   --uvalib-brand-blue: #232d4b;
-
-   --uvalib-brand-orange-lightest: #ffead6;
-   --uvalib-brand-orange: #e57200;
-   --uvalib-brand-orange-dark: #b35900;
-
-   --uvalib-blue-alt-light: #bfe7f7;
-   --uvalib-blue-alt: #007bac;
-   --uvalib-blue-alt-dark: #005679;
-   --uvalib-blue-alt-darkest: #141E3C;
-
-   --uvalib-teal-lightest: #C8F2F4;
-   --uvalib-teal-light: #5BD7DE;
-   --uvalib-teal: #25CAD3;
-   --uvalib-teal-dark: #1DA1A8;
-   --uvalib-teal-darker: #16777C;
-
-   --uvalib-green-lightest: #89cc74;
-   --uvalib-green: #62bb46;
-   --uvalib-green-dark: #4e9737;
-
-   --uvalib-red-lightest: #FBCFDA;
-   --uvalib-red: #ef3f6b;
-   --uvalib-red-emergency: #df1e43;
-   --uvalib-red-darker: #B30000;
-   --uvalib-red-dark: #DF1E43;
-
-   --uvalib-yellow-light: #fef6c8;
-   --uvalib-yellow: #ecc602;
-   --uvalib-yellow-dark: #b99c02;
-
-   --uvalib-beige: #f7efe1;
-   --uvalib-beige-dark: #c0b298;
-
-   --uvalib-grey-lightest: #f1f1f1;
-   --uvalib-grey-light: #dadada;
-   --uvalib-grey: #808080;
-   --uvalib-grey-dark: #565656;
-   --uvalib-grey-darkest: #2b2b2b;
-
-   --uvalib-text-light: #FFFFFF;
-   --uvalib-text: var(--uvalib-grey-dark);
-   --uvalib-text-dark: var(--uvalib-grey-darkest);
-
-   --uvalib-accessibility-highlight: var(--uvalib-brand-blue-light);
-
-   --color-primary-orange: var(--uvalib-brand-orange);
-   --color-link: var(--uvalib-blue-alt-dark);
-   --color-link-darker: var(--uvalib-blue-alt-dark);
-   --color-primary-text: var(--uvalib-grey-dark);
-   --color-error: var(--uvalib-red-emergency);
-}
-
 .fade-enter-active, .fade-leave-active {
   transition: opacity .2s;
 }
@@ -484,13 +425,6 @@ body {
    background: white;
 }
 
-#app .pure-form input,
-#app .pure-form select,
-#app .pure-form textarea {
-   box-shadow: none;
-   margin-bottom: 0.3em;
-}
-
 #app h1 {
    color: var(--uvalib-brand-orange);
    margin: 25px 0;
@@ -521,15 +455,16 @@ body {
    box-shadow: $v4-box-shadow;
    text-align: right;
    font-size: 0.85em;
+   .msg {
+      margin-bottom: 10px;
+      font-weight: bold;
+   }
+   .v4-button {
+      width: 100%;
+      margin:0 !important;
+   }
 }
-.update-pop .msg {
-   margin-bottom: 10px;
-   font-weight: bold;
-}
-.update-pop span.pure-button.pure-button-primary {
-   margin: 0;
-   width:100%;
-}
+
 @media only screen and (min-width: 768px) {
    div.error-message {
       max-width: 40%;

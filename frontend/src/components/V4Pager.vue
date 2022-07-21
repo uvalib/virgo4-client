@@ -50,11 +50,5 @@ const emit = defineEmits( ['prior', 'next' ] )
       margin: 0 10px;
       font-size: 12px;
    }
-   .v4-button {
-      padding: 4px 12px;
-      color: white;
-      border-radius: 5px;
-      font-weight: normal;
-   }
 }
 </style>

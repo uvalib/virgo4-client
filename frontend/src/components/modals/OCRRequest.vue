@@ -12,7 +12,7 @@
          <div v-if="mode=='init'" class="searching">
             <V4Spinner message="Searching for item text..." />
          </div>
-         <div class="message pure-form"  v-else-if="mode=='request'">
+         <div class="message"  v-else-if="mode=='request'">
             <p>
                We will attempt to extract the full text from '{{digitalItem.name}}'. This process
                can take several minutes to over an hour depending on the size and condition
