@@ -1,121 +1,46 @@
 <template>
    <div class="request-panel">
       <h2>Instructional Scanning Request</h2>
-      <div class="scan pure-form">
-         <div class="entry pure-control-group">
-            <label for="course">Course Information<span class="required">*</span></label>
-            <textarea id="course" v-model="request.course"></textarea>
-            <span class="note">Please supply the Course Instructor, Course Name, Number, Section and Semester</span>
-            <span v-if="hasError('course')" class="error">Course information is required</span>
+       <FormKit type="form" id="instructional-scan" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
+         <FormKit label="Course Information" type="textarea" :rows="2" v-model="request.course" id="course"
+            validation="required" help="Please supply the Course Instructor, Course Name, Number, Section and Semester"
+         />
+         <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
+         <FormKit label="Will you be providing a copy of this material for the Library to scan?" type="radio"
+            v-model="request.personalCopy" :options="{true: 'Yes', false: 'No'}"
+         />
+         <div class="instruct" v-if="request.personalCopy=='true'">
+            <p>Personal copies can be dropped off at a Library Circulation Desk, deposited in a Book Drop, or sent via campus mail to:</p>
+            <p class="addy">
+               Instructional Scanning Services<br/>
+               PO BOX 400109
+            </p>
+            <p>
+               <b>** Please include a note with instructor name and course information in the item when dropping off a personal copy.</b>
+            </p>
          </div>
-         <div class="entry pure-control-group">
-            <label for="date">Need By Date<span class="required">*</span></label>
-            <input type="date" v-model="request.date" id="date" aria-required="true" required="required" aria-placeholder="mm/dd/yyyy">
-            <span v-if="hasError('date')" class="error">Date is required</span>
-         </div>
-         <div role="radiogroup" class="entry pure-control-group" aria-labelledby="personal-label">
-            <label id="personal-label">Will you be providing a copy of this material for the Library to scan?</label>
-            <V4Button id="personal-yes" class="radio" mode="icon" @click="request.personalCopy='true'" role="radio"
-               :aria-checked="(request.personalCopy=='true').toString()">
-               <i v-if="request.personalCopy=='true'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               Yes
-            </V4Button>
-            <V4Button class="radio" mode="icon" @click="request.personalCopy='false'" role="radio"
-               :aria-checked="(request.personalCopy=='false').toString()">
-               <i v-if="request.personalCopy=='false'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               No
-            </V4Button>
-            <div class="instruct" v-if="request.personalCopy=='true'">
-               <p>Personal copies can be dropped off at a Library Circulation Desk, deposited in a Book Drop, or sent via campus mail to:</p>
-               <p class="addy">
-                  Instructional Scanning Services<br/>
-                  PO BOX 400109
-               </p>
-               <p>
-                  <b>** Please include a note with instructor name and course information in the item when dropping off a personal copy.</b>
-               </p>
-            </div>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="title">Article or Chapter Title<span class="required">*</span></label>
-            <input type="text" v-model="request.title" id="title" aria-required="true" required="required">
-            <span class="note">One article or chapter per request, please</span>
-            <span v-if="hasError('title')" class="error">Article or chapter title is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="author">Article or Chapter Author<span class="required">*</span></label>
-            <input type="text" v-model="request.author" id="author" aria-required="true" required="required">
-            <span v-if="hasError('author')" class="error">Author is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="work">Title of work<span class="required">*</span></label>
-            <input type="text" v-model="request.work" id="work" aria-required="true" required="required">
-            <span class="note">Journal, Book, Conference Proceedings or Newspaper</span>
-            <span v-if="hasError('title')" class="error">Title of work is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="volume">Volume</label>
-            <input type="text" v-model="request.volume" id="volume">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="issue">Issue</label>
-            <input type="text" v-model="request.issue" id="issue">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="month">Month</label>
-            <input type="text" v-model="request.month" id="month">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="year">Year<span class="required">*</span></label>
-            <input type="text" v-model="request.year" id="year">
-            <span v-if="hasError('year')" class="error">Year is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="pages">Pages<span class="required">*</span></label>
-            <input type="text" v-model="request.pages" id="pages" aria-required="true" required="required">
-            <span class="note">(ex: 1-15)</span>
-            <span v-if="pageLengthError" class="error">Please limt page information to 25 characters</span>
-            <span v-if="hasError('pages')" class="error">Pages are required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="issn">ISBN/ISSN</label>
-            <input type="text" v-model="request.issn" id="issn">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="oclc">OCLC Number</label>
-            <input type="text" v-model="request.oclc" id="oclc">
-         </div>
-         <div role="radiogroup" class="entry pure-control-group" aria-labelledby="language-label">
-            <label id="language-label">
-               Will you accept the item in a language other than English?
-               <span class="required">*</span>
-            </label>
-            <V4Button id="any-language-yes" class="radio" mode="icon" @click="request.anyLanguage='true'" role="radio"
-               :aria-checked="(request.anyLanguage=='true').toString()">
-               <i v-if="request.anyLanguage=='true'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               Yes
-            </V4Button>
-            <V4Button class="radio" mode="icon" @click="request.anyLanguage='false'" role="radio"
-               :aria-checked="(request.anyLanguage=='false').toString()">
-               <i v-if="request.anyLanguage=='false'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               No
-            </V4Button>
-            <span v-if="hasError('anyLanguage')" class="error">Language choice is required</span>
-         </div>
-      </div>
-      <ILLCopyrightNotice type="instruction" />
-      <div class="controls">
-         <V4Button mode="tertiary" id="scan-cancel" @click="emit('canceled')">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="requestStore.buttonDisabled">
-            Submit
-         </V4Button>
-      </div>
+         <FormKit label="Article or Chapter Title" type="text" v-model="request.title" validation="required"
+            help="One article or chapter per request, please"
+         />
+         <FormKit label="Article or Chapter Author" type="text" v-model="request.author" validation="required"/>
+         <FormKit label="Title of Work" type="text" v-model="request.work" validation="required"
+            help="Journal, Book, Conference Proceedings or Newspaper"
+         />
+         <FormKit label="Volume" type="text" v-model="request.volume"/>
+         <FormKit label="Issue" type="text" v-model="request.issue"/>
+         <FormKit label="Month" type="text" v-model="request.month"/>
+         <FormKit label="Year" type="text" v-model="request.year" placeholder="yyyy" validation="required|date_format:YYYY"/>
+         <FormKit label="Pages" type="text" v-model="request.pages" validation="required|max:25" help="(ex: 1-15)"/>
+         <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
+         <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
+         <FormKit label="Will you accept the item in a language other than English?" type="radio"
+            v-model="request.anyLanguage" :options="{true: 'Yes', false: 'No'}"
+         />
+
+         <ILLCopyrightNotice type="instruction" />
+         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-av"
+            :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+      </FormKit>
    </div>
 </template>
 
@@ -127,14 +52,11 @@ import analytics from '@/analytics'
 
 const emit = defineEmits( ['submitted', 'canceled'] )
 
-const required = ['course', 'date', 'title', 'author', 'work', 'pages', 'anyLanguage', 'year']
-const pageLengthError = ref(false)
-const errors = ref([])
 const request = ref({
    scanType: "INSTRUCTIONAL",
    course: "",
    date: "",
-   personalCopy: "",
+   personalCopy: "false",
    title: "",
    author: "",
    work: "",
@@ -145,119 +67,47 @@ const request = ref({
    pages: "",
    issn: "",
    oclc: "",
-   anyLanguage: ""
+   anyLanguage: "true"
 })
 
 const requestStore = useRequestStore()
 
 async function submitClicked() {
-   errors.value.splice(0, errors.value.length)
-   for (let [key, value] of Object.entries(request.value)) {
-      if ( required.includes(key) && value == "") {
-         errors.value.push(key)
-      }
-   }
-   let d = new Date(request.value.date).toLocaleDateString("en-US")
-   if ( d == "Invalid Date" ){
-      errors.value.push('date')
-   }
-
-   if (errors.value.length > 0) {
-      let tgtID = errors.value[0]
-      if (tgtID == "anyLanguage") {
-         tgtID = "any-language-yes"
-      }
-      let first = document.getElementById(tgtID)
-      if ( first ) {
-         first.focus()
-      }
-   } else {
-      pageLengthError.value =  (request.value.pages.length > 25)
-      if ( pageLengthError.value) {
-         let first = document.getElementById("pages")
-         if ( first ) {
-            first.focus()
-         }
-      } else {
-         await requestStore.submitILLiadScanRequest(request.value)
-         emit('submitted')
-      }
-   }
-}
-function hasError( val) {
-   return errors.value.includes(val)
+   await requestStore.submitILLiadScanRequest(request.value)
+   emit('submitted')
 }
 
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
+   let ele = document.getElementById("course")
+   ele.focus()
 })
 </script>
 
 <style lang="scss" scoped>
-h2 {
-   background: var(--uvalib-blue-alt-lightest);
-   color: var(--uvalib-text-dark);
-   border-width: 1px 0px;
-   border-style: solid;
-   font-weight: 500;
-   padding: 5px;
-   border-color: var(--uvalib-blue-alt);
-   margin: 0 0 20px 0px;
-   font-size: 1.2em;
-}
-.scan {
-   padding: 0 5px;
+.request-panel {
+   padding: 15px;
    margin-bottom: 25px;
    border-bottom: 1px solid var(--uvalib-grey-light);
-
-   button.v4-button.radio {
-      margin-right: 15px;
-   }
-   .required {
-      margin-left: 5px;
-      font-weight: bold;
-      color: var(--uvalib-red-emergency);
+   h2 {
+      color: var(--uvalib-text-dark);
+      font-weight: 500;
+      padding: 0;
+      margin: 0 0 15px 0px;
+      font-size: 1.2em;
    }
    .instruct {
-      margin: 0;
-      p {
-         margin: 5px 0;
+      margin: 10px 0;
+      background: var(--uvalib-grey-lightest);
+      padding: 5px 15px;
+      border-radius: 5px;
+      border: 1px solid var(--uvalib-grey-light);
+      .addy {
+         margin-left: 20px;
       }
-      p.addy {
-         margin: 10px 25px 20px 25px;
-      }
    }
-   label {
-      font-weight: 500;
-      display: block;
+   .notice {
+      margin-top: 25px;
    }
-   .note {
-      font-style: italic;
-   }
-   input, select, textarea {
-      box-sizing: border-box;
-      width: 100%;
-   }
-   .entry {
-      margin-bottom: 15px;
-   }
-   span.error {
-      margin: 0px;
-      font-weight: normal;
-      font-style: italic;
-      color: var(--color-error);
-      display: block;
-   }
-}
-.controls {
-   margin: 10px 10px;
-   text-align: right;
-}
-p.error {
-   font-size: 0.9em;
-   color: var(--uvalib-red-emergency);
-   text-align: center;
-   padding: 0;
-   margin: 10px;
 }
 </style>

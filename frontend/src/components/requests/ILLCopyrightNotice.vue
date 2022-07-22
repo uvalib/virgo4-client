@@ -86,7 +86,7 @@ const props = defineProps({
    font-size:0.95em;
    padding: 0;
    border: 1px solid var(--uvalib-red-emergency);
-   margin: 10px;
+   margin: 0;
    p {
       margin: 10px 15px;
    }

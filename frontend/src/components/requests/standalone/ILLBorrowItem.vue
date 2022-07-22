@@ -80,7 +80,7 @@ const request = ref({
    issn: "",
    oclc: "",
    cited: "",
-   anyLanguage: "false",
+   anyLanguage: "true",
    notes: "",
    pickup: "",
 })
