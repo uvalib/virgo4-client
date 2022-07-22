@@ -2,7 +2,7 @@
    <div class="form-controls" :class="props.buttonAlign">
       <FormKit :id="props.submitID" type="submit" :label="props.submitLabel" wrapper-class="submit-button"  @keydown.exact.tab="tabNext"/>
       <V4Button v-if="props.hasCancel" mode="tertiary" @click="emit('canceled')" >
-         Cancel
+         {{props.cancelLabel}}
       </V4Button>
    </div>
 </template>
@@ -21,6 +21,10 @@ const props = defineProps({
    submitLabel: {
       type: String,
       default: "Submit"
+   },
+   cancelLabel: {
+      type: String,
+      default: "Cancel"
    },
    disabled: {
       type: Boolean,
