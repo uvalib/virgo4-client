@@ -58,8 +58,9 @@ function tabNext(event) {
    display: flex;
    flex-flow: row-reverse nowrap;
    justify-content: flex-end;
-   margin-top: 15px;
+   margin-top: 5px;
    text-align: right;
+   padding: 10px 0;
    .v4-button {
       margin-left: 5px;
    }

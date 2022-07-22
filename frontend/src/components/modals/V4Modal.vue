@@ -23,7 +23,7 @@
                <div class="v4-modal-content">
                   <slot name="content"></slot>
                </div>
-               <div class="v4-modal-controls">
+               <div class="v4-modal-controls" v-if="props.controls">
                   <slot v-if="hasControlSlot()" name="controls"></slot>
                   <V4Button v-else mode="tertiary" :id="`${props.id}-close`" class="close" @click="hide"
                      :focusNextOverride="true" @tabnext="lastFocusTabbed" >
@@ -58,6 +58,10 @@ const props = defineProps({
    buttonID: {
       type: String,
       required: true
+   },
+   controls: {
+      type: Boolean,
+      default: true
    }
 })
 const emit = defineEmits( ['opened', 'closed'] )

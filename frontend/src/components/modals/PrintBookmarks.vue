@@ -1,5 +1,5 @@
 <template>
-   <V4Modal :id="props.id" title="Print Details" ref="printmodal"
+   <V4Modal :id="props.id" title="Print Details" ref="printmodal" :controls="hasSelectedBookmarks() == false"
       firstFocusID="titleinput" lastFocusID="print-ok" :buttonID="`${props.id}-open`" @opened="opened">
       <template v-slot:button>
          <V4Button mode="primary" @click="printmodal.show()" :id="`${props.id}-open`"
@@ -22,7 +22,6 @@
             </FormKit>
          </div>
       </template>
-      <template v-if="hasSelectedBookmarks()" v-slot:controls></template>
    </V4Modal>
 </template>
 

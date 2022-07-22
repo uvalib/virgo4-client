@@ -1,6 +1,6 @@
 <template>
    <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened"
-      firstFocusID="userId" :lastFocusID="`${id}-okbtn`"
+      firstFocusID="forgot-id" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`">
       <template v-slot:button>
          <V4Button mode="text" @click="forgotPassword.show()" :id="`${id}-open`">
@@ -14,25 +14,22 @@
             </p>
          </template>
          <template v-else>
-             <p>An email will be sent to the address on file with a link to reset your password. If you need assistance, please <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.</p>
-           <div class="password-reset-form pure-form">
-              <div>
-               <label for="userId">Library ID</label>
-               <input id="userId" v-model="userId" />
-              </div>
-               <p class="hint">Driver's License Number,<br>eg: A12345678</p>
-            </div>
+             <p>
+               An email will be sent to the address on file with a link to reset your password. If you need assistance, please
+               <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
+            </p>
+            <FormKit type="form" id="forgot-pass" :actions="false" @submit="okClicked">
+               <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Driver's License Number, eg: A12345678" />
+               <V4FormActions :hasCancel="!emailSent" submitLabel="OK" :submitID="`${id}-okbtn`"
+                  :tabNextOverride="true" @tabnext="nextTabOK"
+                  :disabled="okDisabled"
+                  @canceled="forgotPassword.hide()"/>
+            </FormKit>
             <p v-if="error" class="error" v-html="error"></p>
           </template>
       </template>
       <template v-slot:controls>
-         <V4Button  mode="tertiary" :id="`${id}-cancelbtn`" @click="forgotPassword.hide()" v-if="!emailSent">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
-            :focusNextOverride="true" @tabnext="nextTabOK" :disabled="okDisabled">
-            OK
-         </V4Button>
+         <!-- no dialog controls; the V4FormActions are used instead-->
       </template>
    </V4Modal>
 </template>
@@ -66,6 +63,8 @@ function opened() {
    emailSent.value = false
    error.value = ""
    okDisabled.value = false
+   let ele = document.getElementById("forgot-id")
+   ele.focus()
 }
 function nextTabOK() {
    forgotPassword.value.lastFocusTabbed()
