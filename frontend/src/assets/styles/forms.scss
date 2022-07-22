@@ -28,6 +28,35 @@ select,
    margin-bottom: 0.3em;
 }
 
+.formkit-outer[data-type="radio"] {
+   margin-top: 20px;
+   fieldset {
+      border: 1px solid var(--uvalib-grey-light);
+      border-radius: 5px;
+      legend {
+         padding: 0 5px;
+      }
+      ul.formkit-options {
+         list-style-type: none;
+         padding: 0;
+         margin: 5px 10px;
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: flex-start;
+         li {
+            margin: 5px 0;
+            .formkit-inner {
+               display: inline-block;
+            }
+         }
+      }
+      .v4-form-label  {
+         display: inline-block;
+         margin: 0 20px 0 5px;
+      }
+   }
+ }
+
 span.req {
    margin-left: 5px;
    color: var(--uvalib-grey);

@@ -80,9 +80,6 @@ function addRequiredNotePlugin(node) {
                },
                children: null//['$label', '*']
             }
-         } else {
-            console.log("NOT REQUIRED")
-            console.log(node)
          }
          return schemaFn(sectionsSchema)
       }

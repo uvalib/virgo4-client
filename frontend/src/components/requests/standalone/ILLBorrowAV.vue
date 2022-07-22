@@ -1,7 +1,7 @@
 <template>
    <div class="request-panel">
       <h2 v-if="props.prefill==false">ILL Borrow A/V Request</h2>
-      <FormKit type="form" id="borrow-av" :actions="false" @submit="submitClicked">
+      <FormKit type="form" id="borrow-av" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
          <FormKit label="Title" type="text" v-model="request.title" validation="required"  id="av-title"
             help="All audio/video materials not owned by UVA will be reviewed for purchase before being requested via ILL."
          />
@@ -14,7 +14,9 @@
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: will accept other formats, library-use only okay)"
          />
-         <FormKit type="select" label="Preferred pickup location" v-model="request.pickup" :options="pickupLibraries" validataion="required"/>
+         <FormKit type="select" label="Preferred pickup location" v-model="request.pickup"
+            placeholder="Select a location"
+            :options="pickupLibraries" validataion="required"/>
 
          <div v-if="request.pickup == 'LEO' && (userStore.noILLiadAccount==true || userStore.leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
             It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
@@ -94,23 +96,19 @@ onMounted(()=>{
    padding: 15px;
    margin-bottom: 25px;
    border-bottom: 1px solid var(--uvalib-grey-light);
-
-   button.v4-button.radio {
-      margin-right: 15px;
-   }
-}
-.illiad-prompt {
-   margin: 15px;
-   a {
-      text-decoration: underline !important;
+   h2 {
+      color: var(--uvalib-text-dark);
       font-weight: 500;
+      padding: 0;
+      margin: 0 0 15px 0px;
+      font-size: 1.2em;
    }
-}
-h2 {
-   color: var(--uvalib-text-dark);
-   font-weight: 500;
-   padding: 0;
-   margin: 0 0 15px 0px;
-   font-size: 1.2em;
+   .illiad-prompt {
+      margin: 15px;
+      a {
+         text-decoration: underline !important;
+         font-weight: 500;
+      }
+   }
 }
 </style>

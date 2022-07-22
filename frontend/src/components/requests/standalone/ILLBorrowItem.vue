@@ -1,115 +1,45 @@
 <template>
    <div class="request-panel">
-      <h2 v-if="props.refill==false">ILL Borrow Item Request</h2>
-      <div class="scan pure-form">
-         <div class="entry pure-control-group">
-            <label for="doctype">What would you like to borrow?<span class="required">*</span></label>
-            <select v-model="request.doctype" id="doctype">
-               <option value="">Select an item type</option>
-               <option value="Book">Book</option>
-               <option value="Bound Journal Volume">Bound Journal Volume</option>
-               <option value="Thesis or Dissertation">Thesis or Dissertation</option>
-               <option value="Newspapers">Newspapers</option>
-               <option value="Microform">Microform</option>
-               <option value="Government Document ">Government Document </option>
-               <option value="Music Score">Music Score</option>
-            </select>
-            <span v-if="hasError('doctype')" class="error">Item type is required</span>
+      <h2 v-if="props.prefill==false">ILL Borrow Item Request</h2>
+      <FormKit type="form" id="borrow-item" :actions="false" incompleteMessage="Sorry, not all fields are filled out correctly." @submit="submitClicked">
+         <FormKit type="select" label="What would you like to borrow?" v-model="request.doctype" id="item-type" validation="required"
+            placeholder="Select an item type"
+            :options="['Book', 'Bound Journal Volume', 'Thesis or Dissertation', 'Newspapers', 'Microform', 'Government Document', 'Music Score']"
+         />
+         <FormKit label="Title" type="text" v-model="request.title" validation="required" help="Please do not abbreviate title"/>
+         <FormKit label="Author/Editor" type="text" v-model="request.author"/>
+         <FormKit label="Publisher" type="text" v-model="request.publisher"/>
+         <FormKit label="Volume" type="text" v-model="request.volume"/>
+         <FormKit label="Year" type="text" v-model="request.year" placeholder="yyyy" validation="required|date_format:YYYY"/>
+         <FormKit label="Edition" type="text" v-model="request.edition"/>
+         <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
+         <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
+         <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
+         <FormKit label="Cited In" type="text" v-model="request.cited"/>
+         <FormKit label="Will you accept the item in a language other than English?" type="radio"
+            v-model="request.anyLanguage"  validataion="required"
+            :options="{true: 'Yes', false: 'No'}"
+         />
+
+         <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
+            help="(ex: missing from shelf, specific edition needed)"
+         />
+         <FormKit type="select" label="Preferred pickup location" v-model="request.pickup"
+            placeholder="Select a location"
+            :options="pickupLibraries" validataion="required"
+         />
+         <div v-if="request.pickup == 'LEO' && (userStore.noILLiadAccount==true || userStore.leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
+            It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
+            <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
          </div>
-         <div class="entry pure-control-group">
-            <label for="title">Title<span class="required">*</span></label>
-            <input type="text" v-model="request.title" id="title" aria-required="true" required="required">
-            <span class="note">Please do not abbreviate title</span>
-            <span v-if="hasError('title')" class="error">Article or chapter title is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="author">Author/Editor</label>
-            <input type="text" v-model="request.author" id="author">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="publisher">Publisher</label>
-            <input type="text" v-model="request.publisher" id="publisher">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="volume">Volume</label>
-            <input type="text" v-model="request.volume" id="volume">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="year">Year<span class="required">*</span></label>
-            <input type="text" v-model="request.year" id="year"  aria-required="true" required="required">
-            <span v-if="hasError('date')" class="error">Year is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="edition">Edition</label>
-            <input type="text" v-model="request.edition" id="edition">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="oclc">OCLC Number</label>
-            <input type="text" v-model="request.oclc" id="oclc">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="issn">ISBN/ISSN</label>
-            <input type="text" v-model="request.issn" id="issn">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="date">Need By Date<span class="required">*</span></label>
-            <input type="date" v-model="request.date" id="date" aria-required="true" required="required" aria-placeholder="mm/dd/yyyy">
-            <span v-if="hasError('date')" class="error">Need by date is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="cited">Cited In</label>
-            <input type="text" v-model="request.cited" id="cited">
-         </div>
-         <div role="radiogroup" class="entry pure-control-group" aria-labelledby="language-label">
-            <label id="language-label">
-               Will you accept the item in a language other than English?
-               <span class="required">*</span>
-            </label>
-            <V4Button id="any-language-yes" class="radio" mode="icon" @click="request.anyLanguage='true'" role="radio"
-               :aria-checked="(request.anyLanguage=='true').toString()">
-               <i v-if="request.anyLanguage=='true'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               Yes
-            </V4Button>
-            <V4Button class="radio" mode="icon" @click="request.anyLanguage='false'" role="radio"
-               :aria-checked="(request.anyLanguage=='false').toString()">
-               <i v-if="request.anyLanguage=='false'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               No
-            </V4Button>
-            <span v-if="hasError('anyLanguage')" class="error">Language choice is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="notes">Notes or Special Instructions</label>
-            <textarea id="notes" v-model="request.notes"></textarea>
-            <span class="note">(ex: missing from shelf, specific edition needed)</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="doctype">Preferred pickup location<span class="required">*</span></label>
-            <select v-model="request.pickup" id="pickup">
-               <option value="">Select a location</option>
-               <option v-for="l in user.libraries" :key="l.id" :value="l.id">{{l.name}}</option>
-            </select>
-            <span v-if="hasError('pickup')" class="error">Pickup location is required</span>
-         </div>
-      </div>
-      <div v-if="request.pickup == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
-         It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
-         <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
-      </div>
-      <div class="controls">
-         <V4Button mode="tertiary" id="scan-cancel" @click="emit('canceled')">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" id="scan-ok" @click="submitClicked" :disabled="requestStore.buttonDisabled">
-            Submit
-         </V4Button>
-      </div>
+         <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-item"
+            :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+      </FormKit>
    </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import analytics from '@/analytics'
 import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
@@ -125,12 +55,18 @@ const props = defineProps({
 const emit = defineEmits( ['submitted', 'canceled'] )
 
 const item = useItemStore()
-const user = useUserStore()
+const userStore = useUserStore()
 const preferences = usePreferencesStore()
 const requestStore = useRequestStore()
 
-const required = ['doctype', 'date', 'title', 'year', 'anyLanguage', 'pickup']
-const errors = ref([])
+const pickupLibraries = computed(()=>{
+   let out = {}
+   userStore.libraries.forEach(l => {
+      out[l.id] = l.name
+   })
+   return out
+})
+
 const request = ref({
    borrowType: "ITEM",
    doctype: "",
@@ -144,38 +80,14 @@ const request = ref({
    issn: "",
    oclc: "",
    cited: "",
-   anyLanguage: "",
+   anyLanguage: "false",
    notes: "",
    pickup: "",
 })
 
 async function submitClicked() {
-   errors.value.splice(0, errors.value.length)
-   for (let [key, value] of Object.entries(request.value)) {
-      if ( required.includes(key) && value == "") {
-         errors.value.push(key)
-      }
-   }
-   let d = new Date(request.value.date).toLocaleDateString("en-US")
-   if ( d == "Invalid Date" ){
-      errors.value.push('date')
-   }
-   if (errors.value.length > 0) {
-      let tgtID = errors.value[0]
-      if (tgtID == "anyLanguage") {
-         tgtID = "any-language-yes"
-      }
-      let first = document.getElementById(tgtID)
-      if ( first ) {
-         first.focus()
-      }
-   } else {
-      await requestStore.submitILLiadBorrowRequest(request.value)
-      emit('submitted', {title: request.value.title, pickup: request.value.pickup})
-   }
-}
-function hasError( val) {
-   return errors.value.includes(val)
+   await requestStore.submitILLiadBorrowRequest(request.value)
+   emit('submitted', {title: request.value.title, pickup: request.value.pickup})
 }
 
 onMounted(()=>{
@@ -198,95 +110,29 @@ onMounted(()=>{
    } else {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
    }
+   let ele = document.getElementById("item-type")
+   ele.focus()
 })
 </script>
 
 <style lang="scss" scoped>
-.illiad-prompt {
-   margin: 15px;
-   a {
-      text-decoration: underline !important;
-      font-weight: 500;
-   }
-}
-h2 {
-   background: var(--uvalib-blue-alt-lightest);
-   color: var(--uvalib-text-dark);
-   border-width: 1px 0px;
-   border-style: solid;
-   font-weight: 500;
-   padding: 5px;
-   border-color: var(--uvalib-blue-alt);
-   margin: 0 0 20px 0px;
-   font-size: 1.2em;
-}
-.scan {
-   padding: 0 5px;
+.request-panel {
+   padding: 15px;
    margin-bottom: 25px;
    border-bottom: 1px solid var(--uvalib-grey-light);
-
-   button.v4-button.radio {
-      margin-right: 15px;
-   }
-   .required {
-      margin-left: 5px;
-      font-weight: bold;
-      color: var(--uvalib-red-emergency);
-   }
-   .instruct {
-      margin: 0;
-      p {
-         margin: 5px 0;
-      }
-      p.addy {
-         margin: 10px 25px 20px 25px;
-      }
-   }
-   label {
+   h2 {
+      color: var(--uvalib-text-dark);
       font-weight: 500;
-      display: block;
+      padding: 0;
+      margin: 0 0 15px 0px;
+      font-size: 1.2em;
    }
-   .note {
-      font-style: italic;
-   }
-   input, select, textarea {
-      box-sizing: border-box;
-      width: 100%;
-   }
-   .entry {
-      margin-bottom: 15px;
-   }
-   span.error {
-      margin: 0px;
-      font-weight: normal;
-      font-style: italic;
-      color: var(--color-error);
-      display: block;
-   }
-}
-.controls {
-   margin: 10px 10px;
-   text-align: right;
-}
-p.error {
-   font-size: 0.9em;
-   color: var(--uvalib-red-emergency);
-   text-align: center;
-   padding: 0;
-   margin: 10px;
-}
-.notice {
-   font-size:0.95em;
-   padding: 0;
-   border: 1px solid var(--uvalib-red-emergency);
-   p {
-      margin: 10px 15px;
-   }
-   p.head {
-      margin: 0;
-      padding: 5px 15px;
-      background: var(--uvalib-red-lightest);
-      border-bottom: 1px solid var(--uvalib-red-emergency);
+   .illiad-prompt {
+      margin: 15px;
+      a {
+         text-decoration: underline !important;
+         font-weight: 500;
+      }
    }
 }
 </style>
