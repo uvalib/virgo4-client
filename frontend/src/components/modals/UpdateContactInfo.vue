@@ -1,6 +1,6 @@
 <template>
    <V4Modal :id="id" title="Update Contact Info" class="update-modal" ref="updateInfo"
-      @opened="opened"
+      @opened="opened" :controls="emailSent"
       firstFocusID="firstname" :lastFocusID="`${id}-okbtn`"
       :buttonID="`${id}-open`">
       <template v-slot:button>
@@ -14,48 +14,36 @@
                An email has been sent to library staff requesting an update to your contact information.
             </p>
          </template>
-         <div class="scroller" v-else>
-            <form class="update-info-form pure-form-aligned pure-form"><fieldset>
-               <div class="section">Name</div>
-
-               <div class="pure-control-group">
-                  <label for="firstname">First:</label>
-                  <input @keydown.shift.tab.stop.prevent="backTabInput" type="text" v-model="contact.firstName" id="firstname">
+         <FormKit v-else type="form" id="update-contact" :actions="false" @submit="okClicked">
+            <div class="scroller">
+               <div class="section">
+                 <p class="section-name">Name</p>
+                 <div class="content">
+                     <FormKit type="text" label="First" v-model="contact.firstName" id="firstname"/>
+                     <FormKit type="text" label="Middle" v-model="contact.middleName"/>
+                     <FormKit type="text" label="Last" v-model="contact.lastName"/>
+                     <FormKit type="text" label="Preferred" v-model="contact.preferredName" help="We will address you by this name if supplied."/>
+                  </div>
                </div>
-               <div class="pure-control-group">
-                  <label for="middlename">Middle:</label>
-                  <input type="text" v-model="contact.middleName" id="middlename">
+               <div class="section">
+                  <p class="section-name pad-top">Contact</p>
+                  <div class="content">
+                     <FormKit type="email" label="Email" v-model="contact.email" validation="required"/>
+                     <FormKit type="text" label="Phone" v-model="contact.phone"/>
+                  </div>
                </div>
-               <div class="pure-control-group">
-                  <label for="lastname">Last:</label>
-                  <input type="text" v-model="contact.lastName" id="lastname">
-               </div>
-               <div class="pure-control-group">
-                  <label for="nickname">Preferred:</label>
-                  <input type="text" v-model="contact.preferredName" id="nickname">
-                  <span class="pure-form-message left">We will address you by this name if supplied.</span>
-               </div>
-
-               <div class="section">Contact</div>
-               <div class="pure-control-group">
-                  <label for="email">Email:</label>
-                  <input type="text" v-model="contact.email" id="email">
-               </div>
-               <div class="pure-control-group">
-                  <label for="phone">Phone:</label>
-                  <input type="text" v-model="contact.phone" id="phone">
-               </div>
-            </fieldset></form>
-         </div>
-         <p v-if="error" class="error" v-html="error"></p>
+            </div>
+            <p v-if="error" class="error" v-html="error"></p>
+            <V4FormActions :hasCancel="true" submitLabel="OK" :submitID="`${id}-okbtn`"
+               :tabNextOverride="true" @tabnext="nextTabOK"
+               @canceled="updateInfo.hide()"
+            />
+         </FormKit>
       </template>
-      <template v-slot:controls>
-         <V4Button  mode="tertiary" :id="`${id}-cancelbtn`" @click="updateInfo.hide()" v-if="!emailSent">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" :id="`${id}-okbtn`" @click="okClicked"
-            :focusNextOverride="true" @tabnext="nextTabOK" :disabled="okDisabled">
-            {{okButtonText()}}
+      <template v-if="emailSent"  v-slot:controls>
+         <V4Button mode="tertiary" :id="`${id}-okbtn`" @click="okClicked"
+             :focusNextOverride="true" @tabnext="nextTabOK">
+            OK
          </V4Button>
       </template>
    </V4Modal>
@@ -97,13 +85,8 @@ function opened(){
    okDisabled.value = false
    // Shallow clone
    originalContact.value = {...contact.value}
-}
-function okButtonText() {
-   if (emailSent.value) return "OK"
-   return "Submit"
-}
-function backTabInput() {
-   updateInfo.value.firstFocusBackTabbed()
+   let ele = document.getElementById("firstname")
+   ele.focus()
 }
 function nextTabOK() {
    updateInfo.value.lastFocusTabbed()
@@ -129,11 +112,6 @@ function okClicked() {
       return
    }
 
-   if ( contact.value.email == "") {
-      error.value = "Please enter an email address"
-      return
-   }
-
    toggleOK()
    let info = {newContact: contact.value, oldContact: originalContact.value}
    userStore.updateContactInfo(info).then(() => {
@@ -147,7 +125,6 @@ function okClicked() {
       toggleOK()
    })
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -155,12 +132,6 @@ function okClicked() {
    button.v4-button.trigger {
       margin: 0 !important;
    }
-   .pure-form-aligned .pure-control-group label {
-      width: 6em;
-   }
-}
-.v4-button {
-  margin-top: 2em;
 }
 p.error {
    text-align: center;
@@ -173,32 +144,28 @@ p.error {
    }
 }
 .scroller {
+   width: 400px;
    max-height: 55vh;
    overflow: scroll;
    padding: 10px;
-    border: 1px solid var(--uvalib-grey-light);
-    background: white;
-}
-.update-info-form{
-   margin-bottom:15px;
+   border: 1px solid var(--uvalib-grey-light);
+   background: white;
    font-size: 0.9em;
-   div.section {
+    div.section {
       font-size: 1em;
       font-weight: bold;
-      margin: 10px 0 15px 0;
-      border-bottom: 1px solid var(--uvalib-grey);
-      padding-bottom: 5px;
+      margin: 0;
+      .section-name {
+         border-bottom: 1px solid var(--uvalib-grey);
+         padding: 0 0 5px 0;
+         margin:0;
+      }
+      .content {
+         margin-left: 15px;
+      }
    }
-
-   .pure-form-message.left {
-      text-align: left;
-      margin: 0 0 15px 20px;
-      font-style: italic;
+   .pad-top {
+      margin-top: 15px;
    }
-
-   input {
-      width: 15em;
-   }
-
 }
 </style>
