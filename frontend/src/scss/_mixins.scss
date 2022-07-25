@@ -23,13 +23,14 @@
    font-family: inherit;
    font-size: 100%;
    padding: 0.5em 1em;
-   color: #000c;
-   border: none transparent;
-   background-color: #e6e6e6;
    text-decoration: none;
    margin: 0;
    border-radius: 5px;
    font-weight: 400;
+   background-color: var(--uvalib-grey-lightest);
+   border: 1px solid var(--uvalib-grey);
+   color: #000;
+
    &:focus {
       @include be-accessible();
    }

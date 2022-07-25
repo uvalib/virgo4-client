@@ -1,10 +1,10 @@
 <template>
-   <V4Modal :id="id" title="Change Password" ref="changePassword"  @opened="opened"
-      firstFocusID="currPassword" :lastFocusID="`${id}-okbtn`"
-      :buttonID="`${id}-open`">
+   <V4Modal :id="id" title="Change Password" ref="changePassword" @opened="opened"
+      firstFocusID="curr-password" :lastFocusID="`${id}-okbtn`"
+      :buttonID="`${id}-open`" :controls="passwordChanged || expiredToken"
+   >
       <template v-slot:button>
-         <V4Button mode="primary" @click="$refs.changePassword.show()"
-            v-if="!hasPasswordToken" :id="`${id}-open`" >
+         <V4Button mode="primary" @click="$refs.changePassword.show()" v-if="!hasPasswordToken" :id="`${id}-open`" >
             Change Password
          </V4Button>
       </template>
@@ -37,32 +37,33 @@
                   Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
                </li>
             </ul>
-            <div class="message pure-form">
-               <div v-if="!hasPasswordToken">
-                  <label for="currpassword">Current Password</label>
-                  <input ref="currPassword" id="currPasswordInput" type="password" v-model="currPassword" @keydown.shift.tab.stop.prevent="backTabCP"
-                     aria-required="true" required="required"/>
-               </div>
-               <div>
-                  <label for="newPassword">New Password</label>
-                  <input id="newPassword" ref="newPasswordInput" type="password" v-model="newPassword"
-                     aria-required="true" required="required"/>
-               </div>
-               <div>
-                  <label for="confirm">Confirm Password</label>
-                  <input id="confirm" ref="confirm" type="password" v-model="newPasswordConfirm"
-                     aria-required="true" required="required"/>
-               </div>
+             <p>{{newPassword}}</p>
+            <div class="message">
+               <FormKit type="form" id="change-password" :actions="false" @submit="okClicked">
+                  <FormKit v-if="!hasPasswordToken" id="curr-password" label="Current Password" type="password" v-model="currPassword" validation="required" />
+                  <FormKit type="password" name="password" label="New Password" id="new-password"
+                     :validation="[
+                        ['required'],
+                        ['length',12,25],
+                        ['matches', /^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[a-z])[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
+                     ]"
+                     validation-visibility="blur"
+                     :validation-messages="{
+                        matches: 'Password does not match requirements listed above.',
+                     }"
+                     v-model="newPassword"
+                  />
+                  <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm"/>
 
-               <p v-if="error" class="error" v-html="error"></p>
+                  <V4FormActions :hasCancel="true" submitLabel="OK" :submitID="`${id}-okbtn`"
+                     :tabNextOverride="true" @tabnext="nextTabOK"
+                     @canceled="$refs.changePassword.hide()"/>
+               </FormKit>
             </div>
          </template>
       </template>
-      <template v-slot:controls>
-         <V4Button v-if="passwordChanged == false && !expiredToken" mode="tertiary" :id="`${id}-cancelbtn`" @click="$refs.changePassword.hide()">
-            Cancel
-         </V4Button>
-         <V4Button :disabled="okDisabled" mode="primary" :id="`${id}-okbtn`" @click="okClicked"
+      <template v-if="passwordChanged || expiredToken"  v-slot:controls>
+         <V4Button mode="tertiary" :id="`${id}-okbtn`" @click="okClicked"
              :focusNextOverride="true" @tabnext="nextTabOK">
             OK
          </V4Button>
@@ -83,14 +84,11 @@ const userStore = useUserStore()
 
 // html element refs
 const changePassword = ref(null)
-const currPasswordInput = ref(null)
-const newPasswordInput = ref(null)
 
 // data
 const id = ref("change-password")
 const currPassword = ref("")
 const newPassword = ref("")
-const newPasswordConfirm = ref("")
 const passwordToken = ref("")
 const error = ref("")
 const passwordChanged = ref(false)
@@ -111,14 +109,19 @@ const hasPasswordToken = computed(() => {
 function opened() {
    currPassword.value = ""
    newPassword.value = ""
-   newPasswordConfirm.value = ""
    error.value = ""
    passwordChanged.value = false
    okDisabled.value = false
+   let ele = document.getElementById("curr-password")
+   if (hasPasswordToken.value) {
+      console.log("HAS TOKEN")
+      ele = document.getElementById("new-password")
+   }
+   if ( ele ) {
+      ele.focus()
+   }
 }
-function backTabCP() {
-   changePassword.value.firstFocusBackTabbed()
-}
+
 function nextTabOK() {
    changePassword.value.lastFocusTabbed()
 }
@@ -143,37 +146,6 @@ function okClicked() {
       return
 
    } else {
-      error.value = ""
-      if ( !hasPasswordToken.value && (currPassword.value == "" ||
-            newPassword.value == "" || newPasswordConfirm.value == ""))  {
-         currPasswordInput.value.focus()
-         error.value = "All three fields are required"
-         return
-      }
-      if ( newPassword.value != newPasswordConfirm.value )  {
-         newPasswordInput.value.focus()
-         error.value = "New password confirmation did not match"
-         return
-      }
-      if (newPassword.value.length < 12 || newPassword.value.length > 25){
-         newPasswordInput.value.focus()
-         error.value = "New password must be between 12 and 25 characters"
-         return
-      }
-      // Check caps & numerals
-      const regex = RegExp('^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[a-z]).*$')
-      if (!regex.test(newPassword.value)) {
-         newPasswordInput.value.focus()
-         error.value = "New password must meet the complexity requirements."
-         return
-      }
-      const restrictedChars = RegExp(/[^a-zA-Z0-9!,@#$%&*+()_\-? ]/)
-      if ( restrictedChars.test(newPassword.value) ) {
-         newPasswordInput.value.focus()
-         error.value = "Please only use the allowed special characters."
-         return
-      }
-
       toggleOk()
       if (hasPasswordToken.value) {
          let data = {reset_password_token: passwordToken.value, new_password: newPassword.value}
@@ -206,14 +178,13 @@ function okClicked() {
             toggleOk()
          })
       }
-      return
    }
 }
 </script>
 
 <style lang="scss" scoped>
 .message {
-   margin-bottom:15px;
+   margin: 0;
 }
 input[type=password] {
    width: 100%;
