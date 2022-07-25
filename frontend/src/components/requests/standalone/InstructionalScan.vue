@@ -30,7 +30,7 @@
          <FormKit label="Issue" type="text" v-model="request.issue"/>
          <FormKit label="Month" type="text" v-model="request.month"/>
          <FormKit label="Year" type="text" v-model="request.year" placeholder="yyyy" validation="required|date_format:YYYY"/>
-         <FormKit label="Pages" type="text" v-model="request.pages" validation="required|max:25" help="(ex: 1-15)"/>
+         <FormKit label="Pages" type="text" v-model="request.pages" validation="required|length:1,25" help="(ex: 1-15)"/>
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
          <FormKit label="Will you accept the item in a language other than English?" type="radio"

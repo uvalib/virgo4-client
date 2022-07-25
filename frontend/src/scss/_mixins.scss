@@ -41,6 +41,7 @@
 }
 
 @mixin primary-button() {
+   @include base-button();
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);

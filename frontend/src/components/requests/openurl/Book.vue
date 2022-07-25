@@ -1,181 +1,72 @@
 <template>
-   <div class="request-wrap">
-      <div class="request-content pure-form">
-         <div class="entry pure-control-group">
-            <label for="title">Title<span class="required">*</span></label>
-            <input type="text" v-model="request.openurl.title" id="title" aria-required="true" required="required">
-            <span class="note">Please do not abbreviate title</span>
-            <span v-if="hasError('title')" class="error">Title is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="author">Author/Editor</label>
-            <input type="text" v-model="request.openurl.author" id="author">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="publisher">Publisher</label>
-            <input type="text" v-model="request.openurl.publisher" id="publisher">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="volume">Volume</label>
-            <input type="text" v-model="request.openurl.volume" id="volume">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="year">Year<span class="required">*</span></label>
-            <input type="text" v-model="request.openurl.year" id="year" aria-required="true" required="required">
-            <span v-if="hasError('year')" class="error">Year is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="edition">Edition</label>
-            <input type="text" v-model="request.openurl.edition" id="edition">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="issn">ISSN/ISBN</label>
-            <input type="text" v-model="request.openurl.issn" id="issn">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="oclc">OCLC Number</label>
-            <input type="text" v-model="request.openurl.oclc" id="oclc">
-         </div>
-         <div class="entry pure-control-group">
-            <label for="bydate">Need By Date<span class="required">*</span></label>
-            <input type="text" v-model="request.openurl.bydate" id="bydate">
-            <span v-if="hasError('bydate')" class="error">Need By Date is required</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="citedin">Cited In</label>
-            <textarea id="citedin" v-model="request.openurl.citedin"></textarea>
-         </div>
-         <div role="radiogroup" class="entry pure-control-group" aria-labelledby="language-label">
-            <label id="language-label">
-               Will you accept the item in a language other than English?
-            </label>
-            <V4Button id="any-language-yes" class="radio" mode="icon"
-               @click="request.openurl.anylanguage='true'"
-               role="radio"
-               :aria-checked="(request.openurl.anylanguage=='true').toString()">
-               <i v-if="request.openurl.anylanguage=='true'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               Yes
-            </V4Button>
-            <V4Button class="radio" mode="icon"
-               @click="request.openurl.anylanguage='false'"
-               role="radio"
-               :aria-checked="(request.openurl.anylanguage=='false').toString()">
-               <i v-if="request.openurl.anylanguage=='false'" class="check fas fa-check-circle"></i>
-               <i v-else class="check far fa-circle"></i>
-               No
-            </V4Button>
-            <span class="note">If yes, specify acceptable languages in the notes field.</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="notes">Notes or Special Instructions</label>
-            <textarea id="notes" v-model="request.openurl.notes"></textarea>
-            <span class="note">(ex: special edition)</span>
-         </div>
-         <div class="entry pure-control-group">
-            <label for="doctype">Preferred pickup location</label>
-            <select v-model="request.openurl.pickup" id="pickup">
-               <option value="">Select a location</option>
-               <option v-for="l in user.libraries" :key="l.id" :value="l.id">{{l.name}}</option>
-            </select>
-         </div>
+   <FormKit type="form" id="openurl-book" :actions="false" @submit="submitClicked"
+      incompleteMessage="Sorry, not all fields are filled out correctly."
+   >
+      <FormKit label="Title" type="text" v-model="openurl.title" validation="required"
+         id="title" help="Please do not abbreviate title"
+      />
+      <FormKit label="Author/Editor" type="text" v-model="openurl.author"/>
+      <FormKit label="Publisher" type="text" v-model="openurl.publisher"/>
+      <FormKit label="Volume" type="text" v-model="openurl.volume"/>
+      <FormKit label="Year" type="text" v-model="openurl.year" placeholder="yyyy" validation="required|date_format:YYYY"/>
+      <FormKit label="Edition" type="text" v-model="openurl.edition"/>
+      <FormKit label="ISSN/ISBN" type="text" v-model="openurl.issn"/>
+      <FormKit label="OCLC" type="text" v-model="openurl.oclc"/>
+      <FormKit label="Need By Date" type="date" v-model="openurl.bydate" validation="required|date_after"/>
+      <FormKit label="Cited In" type="text" v-model="openurl.citedin"/>
+      <FormKit label="Will you accept the item in a language other than English?" type="radio"
+         help="If yes, specify acceptable languages in the notes field."
+         v-model="openurl.anylanguage" :options="{'true': 'Yes', 'false': 'No'}"
+      />
+      <FormKit label="Notes or Special Instructions" type="textarea" v-model="openurl.notes" :rows="2"
+            help="(ex: special edition)"
+      />
+      <FormKit type="select" label="Preferred pickup location" v-model="openurl.pickup"
+         placeholder="Select a location"
+         :options="pickupLibraries" validataion="required"
+      />
+      <div v-if="openurl.pickup == 'LEO' && (userStore.noILLiadAccount==true || userStore.leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
+         It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
+         <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
       </div>
-      <div class="controls">
-         <V4Button mode="tertiary" @click="emit('canceled')">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" @click="submitClicked" :disabled="request.buttonDisabled">
-            Submit
-         </V4Button>
-      </div>
-   </div>
+
+      <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-openurl-book"
+         :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
+   </FormKit>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { storeToRefs } from "pinia"
+import { onMounted, computed } from 'vue'
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 import { usePreferencesStore } from "@/stores/preferences"
 
 const emit = defineEmits( ['submitted', 'canceled'] )
 
-const request = useRequestStore()
-const user = useUserStore()
+const requestStore = useRequestStore()
+const userStore = useUserStore()
 const preferences = usePreferencesStore()
 
-const required = ['title', 'year', 'bydate']
-const errors = ref([])
+const { openurl } = storeToRefs(requestStore)
 
-onMounted(()=>{
-   setTimeout(() => {
-      request.openurl.pickup = preferences.pickupLibrary
-      document.getElementById("title").focus()
-   }, 150)
+const pickupLibraries = computed(()=>{
+   let out = {}
+   userStore.libraries.forEach(l => {
+      out[l.id] = l.name
+   })
+   return out
 })
 
-function hasError(val) {
-   return errors.value.includes(val)
-}
-function submitClicked() {
-   errors.value.splice(0, errors.value.length)
-   for (let [key, value] of Object.entries(request.openurl)) {
-      if ( required.includes(key) && value == "") {
-         errors.value.push(key)
-      }
-   }
+onMounted(()=>{
+   openurl.pickup = preferences.pickupLibrary
+   document.getElementById("title").focus()
+})
 
-   if (errors.value.length > 0) {
-      console.error(errors.value)
-      let tgtID = errors.value[0]
-      let first = document.getElementById(tgtID)
-      if ( first ) {
-         first.focus()
-      }
-   } else {
-      emit("submitted")
-   }
+function submitClicked() {
+   emit("submitted")
 }
 </script>
+
 <style lang="scss" scoped>
-.request-content {
-   width: 100%;
-   margin: 0;
-   text-align: left;
-   margin-bottom: 25px;
-   .required {
-      margin-left: 5px;
-      font-weight: bold;
-      color: var(--uvalib-red-emergency);
-   }
-   button.v4-button.radio {
-      margin-right: 15px;
-      margin-bottom: 5px;
-   }
-   label {
-      font-weight: 500;
-      display: block;
-   }
-   input, select, textarea {
-      box-sizing: border-box;
-      width: 100%;
-   }
-   .note {
-      font-style: italic;
-      display: block;
-   }
-   .entry {
-      margin-bottom: 15px;
-   }
-   span.error {
-      margin: 0px;
-      font-weight: normal;
-      font-style: italic;
-      color: var(--color-error);
-      display: block;
-   }
-}
-.controls {
-   margin: 10px 0;
-   text-align: right;
-}
 </style>

@@ -30,6 +30,9 @@ select,
 
 .formkit-outer[data-type="radio"] {
    margin-top: 20px;
+   .v4-form-help {
+      margin: 5px 0 20px 5px;
+   }
    fieldset {
       border: 1px solid var(--uvalib-grey-light);
       border-radius: 5px;
