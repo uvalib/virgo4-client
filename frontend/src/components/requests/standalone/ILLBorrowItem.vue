@@ -17,7 +17,7 @@
          <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
          <FormKit label="Cited In" type="text" v-model="request.cited"/>
          <FormKit label="Will you accept the item in a language other than English?" type="radio"
-            v-model="request.anyLanguage"  validataion="required"
+            v-model="request.anyLanguage"  validation="required"
             :options="{true: 'Yes', false: 'No'}"
          />
 
@@ -26,7 +26,7 @@
          />
          <FormKit type="select" label="Preferred pickup location" v-model="request.pickup"
             placeholder="Select a location"
-            :options="pickupLibraries" validataion="required"
+            :options="pickupLibraries" validation="required"
          />
          <div v-if="request.pickup == 'LEO' && (userStore.noILLiadAccount==true || userStore.leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
             It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go

@@ -16,7 +16,7 @@
          />
          <FormKit type="select" label="Preferred pickup location" v-model="request.pickup"
             placeholder="Select a location"
-            :options="pickupLibraries" validataion="required"/>
+            :options="pickupLibraries" validation="required"/>
 
          <div v-if="request.pickup == 'LEO' && (userStore.noILLiadAccount==true || userStore.leoAddress=='')" class="illiad-prompt ra-box ra-fiy">
             It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
