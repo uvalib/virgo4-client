@@ -1,118 +1,53 @@
 <template>
-  <div class='course-reserves'>
-    <h2>Video Reserve Request</h2>
+   <div class='course-reserves'>
+      <h2>Video Reserve Request</h2>
+      <div class="note important">
+         Please allow 14 days to process requests.
+      </div>
+      <FormKit type="form" id="video-request" :actions="false" @submit="submit"
+         incompleteMessage="Sorry, not all fields are filled out correctly.">
+         <FormKit type="select" label="Is this request on behalf of an instructor?" v-model="reserveRequest.onBehalfOf"
+            id="behalf_of" :options="{ no: 'No', yes: 'Yes' }" />
+         <template v-if="reserveRequest.onBehalfOf == 'yes'">
+            <FormKit label="Instructor Name" type="text" v-model="reserveRequest.instructorName"
+               validation="required" />
+            <FormKit label="Instructor Email" type="email" v-model="reserveRequest.instructorEmail"
+               validation="required" />
+         </template>
+         <FormKit label="Your Name" type="text" v-model="reserveRequest.name" validation="required" />
+         <FormKit label="Your Email" type="email" v-model="reserveRequest.email" validation="required" />
+         <FormKit label="Course ID" type="text" v-model="reserveRequest.course" validation="required"
+            help="(e.g. MDST 3840)" />
+         <FormKit type="select" label="Semester" v-model="reserveRequest.semester" validation="required"
+            placeholder="Please select a semester"
+            :options="['Fall', 'January', 'Spring', 'Summer I', 'Summer II', 'Summer III']" />
+         <FormKit type="select" label="Learning Management System" v-model="reserveRequest.lms" validation="required"
+            placeholder="Please select an LMS"
+            :options="['Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other']" />
+         <FormKit v-if="reserveRequest.lms == 'Other'" label="Please specify other LMS" type="text"
+            v-model="reserveRequest.otherLMS" validation="required" />
 
-    <div class="note important">
-        Please allow 14 days to process requests.
-    </div>
-    <div class="pure-form pure-form-aligned form">
-      <div class="pure-control-group">
-          <label for="behalf_of">Is this request on behalf of an instructor?</label>
-          <select v-model="reserveRequest.onBehalfOf" id="behalf_of" name="behalf_of">
-            <option value="no">No</option>
-            <option value="yes">Yes</option>
-          </select>
-      </div>
-      <template v-if="reserveRequest.onBehalfOf=='yes'">
-          <div class="pure-control-group">
-            <label for="instructor_name">Instructor Name</label>
-            <input v-model="reserveRequest.instructorName" name="instructor_name" id="instructor_name" type="text" aria-required="true" required="required">
-            <p v-if="hasError('instructorName')" class="error">* instructor name is required</p>
-          </div>
-          <div class="pure-control-group">
-            <label for="instructor_email">Instructor Email Address</label>
-            <input v-model="reserveRequest.instructorEmail" id="instructor_email" type="email" aria-required="true" required="required">
-            <p v-if="hasError('instructorEmail')" class="error">* instructor email is required</p>
-          </div>
-      </template>
-      <div class="pure-control-group">
-          <label for="name">Your Name</label>
-          <input v-model="reserveRequest.name" id="name" type="text" aria-required="true" required="required">
-          <p v-if="hasError('name')" class="error">* name is required</p>
-      </div>
-      <div class="pure-control-group">
-          <label for="email">Your  Email Address</label>
-          <input v-model="reserveRequest.email" id="email" type="email" aria-required="true" required="required">
-          <p v-if="hasError('email')" class="error">* email is required</p>
-      </div>
-      <div class="pure-control-group">
-          <label for="course">Course ID<span class="hint">(e.g. MDST 3840)</span></label>
-          <input v-model="reserveRequest.course" id="course" type="text" aria-required="true" required="required">
-          <p v-if="hasError('course')" class="error">* course ID is required</p>
-      </div>
-      <div class="pure-control-group">
-          <label for="semester">Semester</label>
-          <select v-model="reserveRequest.semester" id="semester" name="semester" aria-required="true" required="required">
-            <option value="">Please select a semester</option>
-            <option value="Fall">Fall</option>
-            <option value="January">January</option>
-            <option value="Spring">Spring</option>
-            <option value="Summer I">Summer I</option>
-            <option value="Summer II">Summer II</option>
-            <option value="Summer III">Summer III</option>
-          </select>
-          <p v-if="hasError('semester')" class="error">* semester is required</p>
-      </div>
+         <div class="video-note">
+            All video reserve requests will be delivered as streaming resources to your class’s Learning Management
+            System.
+            If you have questions about video reserves, please email
+            <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.
+         </div>
+         <FormKit v-if="itemOptions.length > 1" type="select" label="Select the item you want" v-model="selectedVideo"
+            placeholder="Select an item" :validation-messages="{ required: 'Item selection is required.' }"
+            :options="itemOptions" validation="required" id="scan-select" />
+         <template v-if="!streamingReserve">
+            <FormKit label="Preferred audio language" type="text" v-model="audioLanguage" />
+            <FormKit type="select" label="Include subtitles?" v-model="subtitles" :options="{ no: 'No', yes: 'Yes' }" />
+            <FormKit v-if="subtitles == 'yes'" label="Subtitles language" type="text" v-model="subtitleLanguage"
+               validation="required" />
+         </template>
 
-      <div class="entry pure-control-group">
-         <label for="learningManagementSystem">Learning Management System</label>
-         <select v-model="reserveRequest.lms" id="learningManagementSystem" aria-required="true" required="required">
-            <option value="">Please indicate in which system your course resides.</option>
-            <option v-for="lmsOption in learningManagementSystems" :key="lmsOption" :value="lmsOption">{{lmsOption}}</option>
-         </select>
-         <p v-if="hasError('lms')" class="error">* learning management system is required.</p>
-      </div>
-      <div class="pure-control-group" v-if="reserveRequest.lms == 'Other'">
-         <label  for="otherLMS">Please specify other LMS </label>
-         <input v-model="reserveRequest.otherLMS" id="otherLMS" aria-required="true" required="required">
-      </div>
-      <div class="video-note">
-        All video reserve requests will be delivered as streaming resources to your class’s Learning Management System.
-          If you have questions about video reserves, please email
-          <a href="mailto:lib-reserves@virginia.edu">lib-reserves@virginia.edu</a>.
-      </div>
-
-
-      <dl>
-        <template v-if="itemOptions.length > 1" >
-          <dt class="label">Select the item you want:</dt>
-          <dd>
-            <select v-model="reserveRequest.selectedVideo" aria-required="true" required="required">
-               <option :value="{}">Select an item</option>
-               <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
-            </select>
-             <p class="error" v-if="hasError('barcode')">* an item selection is required.</p>
-          </dd>
-        </template>
-
-        <template v-if="!streamingReserve">
-         <dt class="label">Preferred audio language</dt>
-         <dd>
-               <input id="audio_language" :aria-label="`preferred audio language`" v-model="audioLanguage" type="text">
-         </dd>
-         <dt class="label">Include subtitles?</dt>
-         <dd>
-               <select :aria-label="`include stubtitles?`" v-model="subtitles">
-               <option value="yes">Yes</option>
-               <option value="no">No</option>
-               </select>
-         </dd>
-         <dt class="label">Subtitles language</dt>
-         <dd>
-               <input :aria-label="`subtitle language desired`" id="subtitle_language" v-model="subtitleLanguage" type="text">
-               <p v-if="hasError('subtitleLanguage')" class="error">* language is required</p>
-         </dd>
-        </template>
-        <dt>Notes</dt>
-        <dd><textarea :aria-label="`notes for this request`" v-model="notes" name="item-notes"></textarea></dd>
-      </dl>
-
-      <div class="controls">
-        <V4Button mode="primary" class="request-button" @click="submit"  :disabled="request.buttonDisabled">Submit Request</V4Button>
-      </div>
-
-    </div>
-  </div>
+         <FormKit label="Notes" type="textarea" v-model="notes" :rows="3" />
+         <V4FormActions :hasCancel="false" submitLabel="Submit Request" submitID="submit-request"
+            :disabled="requestStore.buttonDisabled" />
+      </FormKit>
+   </div>
 </template>
 
 <script setup>
@@ -122,93 +57,50 @@ import { useReserveStore } from "@/stores/reserve"
 import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
 
-const request = useRequestStore()
+const requestStore = useRequestStore()
 const reserveStore = useReserveStore()
 const item = useItemStore()
 const user = useUserStore()
 
-const learningManagementSystems = ['Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other']
-const fieldMap = {
-   "instructorName": "instructor_name",
-   "instructorEmail": "instructor_email",
-   "name": "name",
-   "email": "email",
-   "course": "course",
-   "semester": "semester",
-   "subtitleLanguage": "subtitle_language",
-   "lms": "lms",
-}
-
-const errors = ref([])
-const selectedVideo = ref({})
+const selectedVideo = ref(null)
 const audioLanguage = ref("English")
 const subtitles = ref("no")
 const subtitleLanguage = ref("")
 const notes = ref("")
-const itemOptions = computed(()=>{
-  return request.activeOption.item_options
+
+const itemOptions = computed(() => {
+   let out = []
+   requestStore.activeOption.item_options.forEach( i => {
+      out.push( {label: i.label, value: i })
+   })
+   return out
 })
-const reserveRequest = computed(()=>{
-  return reserveStore.request
+const reserveRequest = computed(() => {
+   return reserveStore.request
 })
-const streamingReserve = computed(()=>{
-  return request.activeOption.streaming_reserve
+const streamingReserve = computed(() => {
+   return requestStore.activeOption.streaming_reserve
 })
 
-onMounted(()=>{
+onMounted(() => {
+   reserveStore.clearRequestList()
    reserveStore.setRequestingUser(user.accountInfo)
    if (itemOptions.value.length == 1){
       selectedVideo.value = itemOptions.value[0]
    }
-   setTimeout( ()=> {
-      document.getElementById("behalf_of").focus()
-   }, 100)
+   document.getElementById("behalf_of").focus()
 })
 
-
-function hasError( val) {
-   return errors.value.includes(val)
-}
 function submit() {
-   errors.value.splice(0, errors.value.length)
-   let proxyRequest = reserveRequest.value.onBehalfOf == "yes"
-   for (let [key, value] of Object.entries(reserveRequest.value)) {
-      if ( proxyRequest == false && (key=="instructorName" || key=="instructorEmail")
-         || (key=="period" || key=="library")) continue
-      if (key=="otherLMS") continue
-      if (value == "") {
-         errors.value.push(key)
-      }
-   }
-   if (reserveRequest.value.lms == "Other" && reserveRequest.value.otherLMS == "" ){
-      errors.value.push('lms')
-   }
-   if (reserveRequest.value.subtitles == "yes" && reserveRequest.value.subtitleLanguage == "") {
-      errors.value.push("subtitleLanguage")
-   }
-
-   if ( itemOptions.value.length > 1 && selectedVideo.value.barcode == "") {
-      errors.value.push("barcode")
-   }
-
-   if ( errors.value.length == 0) {
-      selectedVideo.value.pool = item.details.source
-      selectedVideo.value.catalogKey = item.details.identifier
-      selectedVideo.value.title = item.details.header.title
-      selectedVideo.value.audioLanguage = audioLanguage.value
-      selectedVideo.value.subtitles = subtitles.value
-      selectedVideo.value.subtitleLanguage = subtitleLanguage.value
-      selectedVideo.value.notes = notes.value
-      selectedVideo.value.isVideo = true
-      reserveStore.createVideoReserve(selectedVideo.value)
-   } else {
-      let err = errors.value[0]
-      let eleID = fieldMap[err]
-      let first = document.getElementById(eleID)
-      if ( first ) {
-         first.focus()
-      }
-   }
+   selectedVideo.value.pool = item.details.source
+   selectedVideo.value.catalogKey = item.details.identifier
+   selectedVideo.value.title = item.details.header.title
+   selectedVideo.value.audioLanguage = audioLanguage.value
+   selectedVideo.value.subtitles = subtitles.value
+   selectedVideo.value.subtitleLanguage = subtitleLanguage.value
+   selectedVideo.value.notes = notes.value
+   selectedVideo.value.isVideo = true
+   reserveStore.createVideoReserve(selectedVideo.value)
 }
 </script>
 
@@ -217,113 +109,20 @@ function submit() {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-}
-.working {
-   text-align: center;
-   font-size: 1.25em;
-}
-.working img {
-   margin: 30px 0;
-}
-.reserves-content {
-   width: 80%;
-   margin: 0 auto;
-   min-height: 250px;
-}
-@media only screen and (min-width: 768px) {
-   div.reserves-content  {
-       width: 80%;
-   }
-}
-@media only screen and (max-width: 768px) {
-   div.reserves-content  {
-       width: 95%;
-   }
-   div.reserves-content input, div.reserves-content select {
-      width: 100%;
-   }
-   div.reserves-content label {
-      width: 100% !important;
-   }
-}
-div.note {
-   margin: 15px;
-   text-align: center;
-}
-.video-note, .note.important {
-   font-size: 1.1em;
-}
-.form {
-   margin: 15px;
-   padding-top: 15px;
    text-align: left;
-}
-input, select {
    width: 50%;
+   margin: 0 auto;
+
+   .video-note {
+      text-align: left;
+      padding: 20px 0;
+      font-size: 1.1em;
+   }
 }
-div.reserves-content label {
-   margin-right: 15px;
-   font-weight: bold;
-   color: #444;
-   width: 25%;
-}
-span.hint {
-   font-weight: 100;
-   font-size: 0.8em;
-   display: block;
-}
-h3 {
-   padding: 5px 10px;
-   text-align: left;
-   background-color: var(--color-brand-blue);
-   color: white;
-   margin: 0;
-}
-.video-note {
-   text-align: left;
-   padding: 30px 0;
-}
-div.controls {
-   text-align: right;
-   margin: 15px;
-}
-div.wrapper {
-   background: var(--uvalib-grey-lightest);
-   margin-bottom: 20px;
-}
-div.wrapper-content {
- border: 1px solid var(--uvalib-grey-light);
-}
-dl {
-   margin: 0;
-   display: inline-grid;
-   grid-template-columns: 1fr 1.5fr;
-   grid-column-gap: 10px;
-}
-dt {
-   margin: 0 0 15px 0;
-   font-weight: bold;
-   text-align: right;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-}
-dd {
-   margin: 0 0 15px 0;
-   vertical-align: top;
-}
-dd input, dd select, dd textarea  {
-   border: 1px solid #ccc;
-   padding: 3px 6px;
-   border-radius: 3px;
-   box-sizing: border-box;
-   width: 100%;
-}
-span.error {
-   margin-left: 30%;
-   font-weight: bold;
-   font-style: italic;
-   color: var(--color-error);
+
+@media only screen and (max-width: 768px) {
+   .course-reserves {
+      width: 95%;
+   }
 }
 </style>

@@ -198,7 +198,7 @@ onMounted(()=>{
    let tgtIdx = route.query.idx
    if (tgtIdx) {
       selectedDigitalObjectIdx.value = parseInt(tgtIdx, 10)
-      console.log("set idx to "+selectedDigitalObjectIdx.value)
+      // console.log("set idx to "+selectedDigitalObjectIdx.value)
    }
 
     // listen for events posted from the embedded instance of curio

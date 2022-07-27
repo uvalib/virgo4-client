@@ -190,7 +190,6 @@ export const useReserveStore = defineStore('reserve', {
 
          let v4UserID = userStore.signedInUser
          let data = { userID: v4UserID, request: this.request, items: [video] }
-         console.log(data)
 
          axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
             requestStore.buttonDisabled = true

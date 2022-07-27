@@ -4,17 +4,21 @@
       <dl>
          <dt>User ID:</dt>
          <dd>{{user.signedInUser}}</dd>
-         <template v-if="request.hold.itemLabel">
+         <template v-if="requestStore.requestInfo.itemLabel">
             <dt>Item:</dt>
-            <dd>{{request.hold.itemLabel}}</dd>
-            <dt>Pickup Library:</dt>
-            <dd>{{request.hold.pickupLibrary}}</dd>
+            <dd>{{requestStore.requestInfo.itemLabel}}</dd>
          </template>
-         <template v-if="request.aeon.callNumber">
+         <template v-if="requestStore.requestInfo.pickupLibrary">
+            <dt>Pickup Library:</dt>
+            <dd>{{requestStore.requestInfo.pickupLibrary}}</dd>
+         </template>
+         <template v-if="requestStore.requestInfo.callNumber">
             <dt>CallNumber:</dt>
-            <dd>{{request.aeon.callNumber}}</dd>
+            <dd>{{requestStore.requestInfo.callNumber}}</dd>
+         </template>
+         <template v-if="requestStore.requestInfo.notes">
             <dt>Request Note:</dt>
-            <dd>{{request.aeon.specialRequest}}</dd>
+            <dd>{{requestStore.requestInfo.notes}}</dd>
          </template>
       </dl>
    </div>
@@ -25,7 +29,7 @@ import { onMounted } from "vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 
-const request = useRequestStore()
+const requestStore = useRequestStore()
 const user = useUserStore()
 
 onMounted(()=>{

@@ -1,75 +1,97 @@
 <template>
    <div class="place-hold">
-      <div v-if="itemOptions.length > 1" class="item-selector">
-         <h3>Select the item you want:</h3>
-         <select id="hold-select" v-model="selectedItem" @change="itemSelected" aria-required="true" required="required">
-            <option :value="{}">Select an item</option>
-            <option v-for="l in itemOptions" :key="l.barcode" :value="l">{{l.label}}</option>
-         </select>
-         <p class="error" v-if="request.errors.item_barcode">{{request.errors.item_barcode.join(', ')}}</p>
-      </div>
-      <PickupLibrary />
-      <V4Button mode="primary" class="request-button" @click="placeHold" :disabled="request.buttonDisabled">Place Hold</V4Button>
-      <div v-if="preferences.pickupLibrary.id == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')"
-         class="illiad-prompt ra-box ra-fiy"
-      >
-         It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
-         <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
-      </div>
-      <p class="error" v-if="request.errors.sirsi">{{request.errors.sirsi.join(', ')}}</p>
+      <h2>Request Item</h2>
+      <FormKit type="form" id="hold-request" :actions="false" @submit="placeHold">
+         <FormKit v-if="itemOptions.length > 1" type="select" label="Select the item you want"
+            v-model="selectedItem" placeholder="Select an item"
+            :validation-messages="{required: 'Item selection is required.'}"
+            :options="itemOptions" validation="required" id="scan-select"
+         />
+         <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
+            placeholder="Select a location" @input="pickupLibraryChanged" id="pickup-sel"
+            :options="pickupLibraries" validation="required"
+         />
+         <p>This pickup location is where you will go to retrieve items you've requested.</p>
+         <p>
+            If you cannot pick your item up at the location(s) shown below, please
+            <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
+            to request your item.
+         </p>
+
+         <div v-if="pickupLibrary == 'LEO' && (userStore.noILLiadAccount==true || userStore.accountInfo.leoAddress=='')"
+            class="illiad-prompt ra-box ra-fiy"
+         >
+            It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
+            <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+         </div>
+
+         <p class="error" v-if="requestStore.errors.item_barcode">{{requestStore.errors.item_barcode.join(', ')}}</p>
+         <p class="error" v-if="requestStore.errors.sirsi">{{requestStore.errors.sirsi.join(', ')}}</p>
+         <V4FormActions :hasCancel="false" submitLabel="Place Hold" submitID="submit-hold" :disabled="requestStore.buttonDisabled" />
+      </FormKit>
    </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue"
-import PickupLibrary from "@/components/preferences/PickupLibrary.vue"
 import { useRequestStore } from "@/stores/request"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'
 
-const request = useRequestStore()
+const requestStore = useRequestStore()
 const preferences = usePreferencesStore()
-const user = useUserStore()
-const selectedItem = ref({})
+const userStore = useUserStore()
+
+const selectedItem = ref(null)
+const pickupLibrary = ref(preferences.pickupLibrary.id)
+
+const pickupLibraries = computed(()=>{
+   let out = {}
+   userStore.libraries.forEach(l => {
+      out[l.id] = l.name
+   })
+   return out
+})
 
 const itemOptions = computed(()=>{
-  return request.activeOption.item_options
+   let out = []
+   requestStore.activeOption.item_options.forEach( i => {
+      out.push( {label: i.label, value: {barcode: i.barcode, label: i.label} })
+   })
+   return out
 })
+
+function pickupLibraryChanged() {
+   // when pickup library chanegs, also update preferences
+   let pl = userStore.libraries.find( l=>l.id == pickupLibrary.value)
+   preferences.updatePickupLibrary(pl)
+}
 
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
    if (itemOptions.value.length == 1) {
       selectedItem.value = itemOptions.value[0]
-      itemSelected()
    }
-   setTimeout( () => {
-      let ele = document.getElementById("hold-select")
+   let ele = document.getElementById("hold-select")
+   if ( ele ) {
+      ele.focus()
+   } else {
+      ele = document.getElementById("pickup-sel")
       if ( ele ) {
          ele.focus()
-      } else {
-         ele = document.getElementById("pickup-sel")
-         if ( ele ) {
-            ele.focus()
-         }
       }
-   }, 150)
+   }
 })
 
-function itemSelected() {
-   request.hold.itemLabel = selectedItem.value.label
-   request.hold.itemBarcode = selectedItem.value.barcode
-   request.errors.item_barcode = null
-   request.errors.sirsi = null
-}
 function placeHold() {
-   request.createHold()
+   requestStore.createHold(selectedItem.value, pickupLibrary.value)
 }
 </script>
 
 <style lang="scss" >
 .illiad-prompt {
-   margin: 15px;
+   margin: 15px 0;
    min-height: initial !important;
    a {
       text-decoration: underline !important;
@@ -77,35 +99,12 @@ function placeHold() {
    }
 }
 div.place-hold {
-   display: flex;
-   flex-flow: column wrap;
-   justify-content: space-around;
-   align-items: center;
-   align-content: space-around;
-
-   h2 {
-      margin: 5px 0 10px 0 !important;
-      background: white !important;
-      border: 0 !important;
-      padding: 0px !important;
-   }
-
-   @media only screen and (max-width: 768px) {
-      align-items: flex-start;
+   text-align: left;
+   width: 50%;
+   color: var(--uvalib-text);
+   margin: 0 auto;
+   .error {
+      color: var(--color-error)
    }
 }
-.place-hold > * {
-   margin-bottom: 10px;
-   min-height: 2em;
-}
-.item-selector {
-   padding-bottom: 20px;
-}
-.request-button {
-   padding: 10px;
-}
-.error {
-  color: var(--color-error)
-}
-
 </style>

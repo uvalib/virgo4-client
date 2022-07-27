@@ -86,6 +86,10 @@ export const usePreferencesStore = defineStore('preferences', {
             system.setError(error)
         })
       },
+      updatePickupLibrary( pl ) {
+         this.pickupLibrary = pl
+         this.savePreferences()
+      },
       savePreferences() {
          const userStore = useUserStore()
          let url = `/api/users/${userStore.signedInUser}/preferences`

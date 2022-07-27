@@ -4,7 +4,6 @@ import urlModule from 'url'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
-import { usePreferencesStore } from "@/stores/preferences"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
@@ -13,37 +12,17 @@ export const useRequestStore = defineStore('request', {
       errors: {},
       buttonDisabled: false,
 
+      // info about the last successful request; used on confirm panel
+      requestInfo: {
+         itemLabel: "",
+         pickupLibrary: "",
+         callNumber: "",
+         notes: ""
+      },
+
       // selected request option
       activeOption: {},
 
-      hold: {
-         itemBarcode: '',
-         itemLabel: '',
-         pickupLibrary: ''
-      },
-      aeon: {
-         barcode: '',
-         notes: '',
-         callNumber: '',
-         specialRequest: '',
-         location: ''
-      },
-      scan: {
-         barcode: '',
-         issn: '',
-         type: 'Article',
-         title: '',
-         chapter: '',
-         author: '',
-         volume: '',
-         issue: '',
-         year: '',
-         pages: '',
-         notes: '',
-         library: '',
-         location: '',
-         callNumber: ''
-      },
       openurl: {
          requestType: "Loan",
          documentType: "Book",
@@ -149,10 +128,18 @@ export const useRequestStore = defineStore('request', {
             this.buttonDisabled = false
          )
       },
-      submitScan() {
+      submitScan( scan ) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "scan")
          this.buttonDisabled = true
-         axios.post('/api/requests/scan', this.scan).then(_response => {
+         this.errors = {}
+
+          // track this request so it can be displayed on confirmation panel
+          this.requestInfo.itemLabel = scan.label
+          this.requestInfo.pickupLibrary = ""
+          this.requestInfo.callNumber = scan.callNumber
+          this.requestInfo.notes = scan.notes
+
+         axios.post('/api/requests/scan', scan).then(_response => {
             this.activePanel = "ConfirmationPanel"
          }).catch(e =>
             useSystemStore().setError(e)
@@ -160,17 +147,19 @@ export const useRequestStore = defineStore('request', {
             this.buttonDisabled = false
          )
       },
-      createHold() {
-         const preferences = usePreferencesStore()
+      createHold( item, pickupLibrary) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "createHold")
          this.buttonDisabled = true
-         this.hold.pickupLibrary = preferences.pickupLibrary.id
-         if(this.hold.pickupLibrary == ""){
-            this.errors = {sirsi: ["A pickup location is required."]}
-            this.buttonDisabled = false
-            return
-         }
-         axios.post('/api/requests/hold', this.hold)
+         this.errors = {}
+
+         // track this request so it can be displayed on confirmation panel
+         this.requestInfo.itemLabel = item.label
+         this.requestInfo.pickupLibrary = pickupLibrary
+         this.requestInfo.callNumber = ""
+         this.requestInfo.notes = ""
+
+         let req = {itemLabel: item.label, itemBarcode: item.barcode, pickupLibrary: pickupLibrary}
+         axios.post('/api/requests/hold', req)
             .then(response => {
                if (response.data.hold.errors) {
                   this.errors = response.data.hold.errors
@@ -214,28 +203,29 @@ export const useRequestStore = defineStore('request', {
                this.buttonDisabled = false
             })
       },
-      submitAeon() {
+      submitAeon( item, specialInstructions) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "aeon")
          this.buttonDisabled = true
-         if (this.aeon.barcode == '') {
-            this.errors = {barcode: 'An item must be selected.'}
-            this.buttonDisabled = false
-            return
-         }
+
+         // track this request so it can be displayed on confirmation panel
+         this.requestInfo.itemLabel = item.label
+         this.requestInfo.pickupLibrary = ""
+         this.requestInfo.callNumber = item.callNumber
+         this.requestInfo.notes = specialInstructions
 
          let aeonLink = urlModule.parse(this.activeOption.create_url, true)
-         aeonLink.query["CallNumber"] = this.aeon.callNumber
-         aeonLink.query["ItemVolume"] = this.aeon.callNumber
-         aeonLink.query["ItemNumber"] = this.aeon.barcode
-         aeonLink.query["Notes"] = this.aeon.notes
-         aeonLink.query["Location"] = this.aeon.location
-         aeonLink.query["SpecialRequest"] = this.aeon.specialRequest
+         aeonLink.query["CallNumber"] = item.callNumber
+         aeonLink.query["ItemVolume"] = item.callNumber
+         aeonLink.query["ItemNumber"] = item.barcode
+         aeonLink.query["Notes"] = item.notes
+         aeonLink.query["Location"] = item.location
+         aeonLink.query["SpecialRequest"] = specialInstructions
 
          // search needs to be null to regenerate query below
          aeonLink.search = null
          let aeonUrl = aeonLink.format(aeonLink)
          if (aeonUrl.length > 650){
-            aeonLink.query["Notes"] = this.aeon.notes.substring(0,650) + '...'
+            aeonLink.query["Notes"] = item.notes.substring(0,650) + '...'
             aeonLink.search = null
          }
          window.open(aeonLink.format(aeonLink), "_blank")
