@@ -14,7 +14,7 @@
 
          <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
 
-         <DiBSViewer :barcode="dibsBarcode" v-if="systemStore.isDevServer && dibsBarcode "></DiBSViewer>
+         <DiBSViewer :barcode="dibsBarcode" v-if="dibsBarcode "></DiBSViewer>
 
          <BoundWithItems v-if="item.hasBoundWithItems"/>
          <div class="items" v-if="hasItems || request.hasRequestOptions">
