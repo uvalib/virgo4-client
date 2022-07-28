@@ -51,7 +51,6 @@ import './assets/styles/forms.scss'
 import './assets/styles/uva-colors.css'
 
 import '@fortawesome/fontawesome-pro/css/all.css'
-import 'purecss'
 
 import VueAnnouncer from '@vue-a11y/announcer'
 import '@vue-a11y/announcer/dist/style.css'
