@@ -45,7 +45,7 @@
 
 <script setup>
 import VueCal from 'vue-cal'
-import 'vue-cal/dist/vuecal.css'
+import 'vue-cal/dist/vue-cal.css'
 import { ref } from 'vue'
 import { useCollectionStore } from "@/stores/collection"
 
