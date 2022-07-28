@@ -8,9 +8,8 @@
          <p>
             <b>Important:</b>
             Course materials delivered through the e-reserves system may not meet all accessibility requirements.
-            For information about alternate course materials please contact the Student Disability Access Center at 434-243-5180 or
-            <a href="mailto:sdac@virginia.edu">sdac@virginia.edu</a> or
-            <a href="https://www.studenthealth.virginia.edu/sdac-accommodations-services" target="_blank">learn more about SDAC accommodations and services</a>.
+            For information about disability-related alternate course materials please contact the Student Disability Access Center at 434-243-5180
+            or <a href="mailto:sdacAT@virginia.edu">sdacAT@virginia.edu</a>.
          </p>
          <V4Button @click="activeIframe = true">V  iew this item online</V4Button>
       </div>
