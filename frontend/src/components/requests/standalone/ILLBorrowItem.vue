@@ -17,8 +17,7 @@
          <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
          <FormKit label="Cited In" type="text" v-model="request.cited"/>
          <FormKit label="Will you accept the item in a language other than English?" type="radio"
-            v-model="request.anyLanguage"  validation="required"
-            :options="{true: 'Yes', false: 'No'}"
+            v-model="request.anyLanguage" :options="{'true': 'Yes', 'false': 'No'}"
          />
 
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"

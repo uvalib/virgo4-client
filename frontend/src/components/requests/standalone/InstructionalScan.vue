@@ -34,7 +34,7 @@
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
          <FormKit label="Will you accept the item in a language other than English?" type="radio"
-            v-model="request.anyLanguage" :options="{true: 'Yes', false: 'No'}"
+            v-model="request.anyLanguage" :options="{'true': 'Yes', 'false': 'No'}"
          />
 
          <ILLCopyrightNotice type="instruction" />
