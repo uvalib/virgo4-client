@@ -23,12 +23,12 @@
                                  :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
                               />
                            </template>
-                           <p class="date-hint" v-if="getTermType(term) == 'date'">
-                              Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/>
-                              where YYYY represents a 4 digit year, MM represents a two digit month (01-12), and DD represents a two digit day (01-31).
-                           </p>
                         </div>
                         <FormKit v-else label="" type="text" v-model="term.value"  outer-class="$reset full-width"/>
+                        <p class="date-hint" v-if="getTermType(term) == 'date'">
+                           Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/>
+                           where YYYY represents a 4 digit year, MM represents a two digit month (01-12), and DD represents a two digit day (01-31).
+                        </p>
                      </div>
                   </div>
                   <FormKit v-if="canDeleteCriteria" type="button" @click="removeCriteria(idx)" input-class='icon'><i class="remove fas fa-times-circle"></i></FormKit>
@@ -269,29 +269,24 @@ div.options {
 }
 
 div.query {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-   align-content: center;
-
    .date-criteria {
       display: flex;
       flex: 1 1 auto;
       flex-flow: row wrap;
       margin-right: 0;
       flex-grow: 1;
-      .date-hint {
-         font-size:0.9em;
-         font-weight: 100;
-         box-sizing: border-box;
-         margin: 5px 0 5px 0;
-         display: block;
-         text-align: left;
-      }
       .date-sep {
          font-weight: 500;
          margin: 7px 5px 0 0;
       }
+   }
+    .date-hint {
+      font-size:0.8em;
+      font-weight: 100;
+      box-sizing: border-box;
+      margin: 5px 0 5px 0;
+      display: block;
+      text-align: left;
    }
 }
 </style>
