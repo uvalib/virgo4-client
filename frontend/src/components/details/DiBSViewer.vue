@@ -11,7 +11,7 @@
             For information about disability-related alternate course materials please contact the Student Disability Access Center at 434-243-5180
             or <a href="mailto:sdacAT@virginia.edu">sdacAT@virginia.edu</a>.
          </p>
-         <V4Button @click="activeIframe = true">V  iew this item online</V4Button>
+         <V4Button @click="activeIframe = true">View this item online</V4Button>
       </div>
    </div>
 </template>
