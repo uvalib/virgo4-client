@@ -28,6 +28,10 @@ select,
    margin-bottom: 0.3em;
 }
 
+button.v4-form-input {
+   @include base-button();
+}
+
 .formkit-outer[data-type="radio"] {
    margin-top: 20px;
    .v4-form-help {
