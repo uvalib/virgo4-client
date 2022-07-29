@@ -71,7 +71,7 @@ function pickupLibraryChanged() {
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
    if (itemOptions.value.length == 1) {
-      selectedItem.value = itemOptions.value[0]
+      selectedItem.value = itemOptions.value[0].value
    }
    let ele = document.getElementById("hold-select")
    if ( ele ) {
