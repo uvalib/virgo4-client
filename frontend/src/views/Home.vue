@@ -28,7 +28,7 @@
          </template>
          <AdvancedSearch v-else/>
       </div>
-      <Welcome  v-if="isHomePage && resultStore.hasResults==false" />
+      <Welcome  v-if="isHomePage && resultStore.hasResults==false && queryStore.mode=='basic'" />
       <SearchResults v-if="resultStore.hasResults" />
    </div>
 </template>

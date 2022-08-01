@@ -1,52 +1,50 @@
 <template>
    <div class="advanced-panel" :class="{narrow: resultStore.hasResults}">
-      <div class="advanced-controls">
-         <AdvancedFacets />
-         <div class="advanced-wrap">
-            <FormKit type="form" id="video-request" :actions="false" @submit="doAdvancedSearch">
-               <div v-for="(term,idx) in advancedTerms" :key="idx" class="search-term">
-                  <div class="controls-wrapper">
-                     <div class="options">
-                        <FormKit v-if="idx > 0" type="select" label="" v-model="term.op" :options="['AND', 'OR', 'NOT']" outer-class="$reset op" />
-                        <FormKit type="select" label="" v-model="term.field" :options="queryStore.advancedFields" outer-class="$reset pad-right"/>
-                        <FormKit v-if="getTermType(term) == 'date'" type="select" label="" v-model="term.comparison"
-                           :options="['EQUALS', 'AFTER', 'BEFORE', 'BETWEEN']" outer-class="$reset pad-right"/>
-                     </div>
-                     <div class="query">
-                        <div class="date-criteria" v-if="getTermType(term) == 'date'">
-                           <FormKit label="" type="text" v-model="term.value"  outer-class="$reset full-width"
+      <AdvancedFacets />
+      <div class="advanced-wrap">
+         <FormKit type="form" id="advanced-search" :actions="false" @submit="doAdvancedSearch">
+            <div v-for="(term,idx) in advancedTerms" :key="idx" class="search-term">
+               <div class="controls-wrapper">
+                  <div class="options">
+                     <FormKit v-if="idx > 0" type="select" label="" v-model="term.op" :options="['AND', 'OR', 'NOT']" outer-class="$reset op" />
+                     <FormKit type="select" label="" v-model="term.field" :options="queryStore.advancedFields" outer-class="$reset pad-right"/>
+                     <FormKit v-if="getTermType(term) == 'date'" type="select" label="" v-model="term.comparison"
+                        :options="['EQUALS', 'AFTER', 'BEFORE', 'BETWEEN']" outer-class="$reset pad-right"/>
+                  </div>
+                  <div class="query">
+                     <div class="date-criteria" v-if="getTermType(term) == 'date'">
+                        <FormKit label="" type="text" v-model="term.value"  outer-class="$reset full-width"
+                           :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
+                        />
+                        <template v-if="term.comparison == 'BETWEEN'" >
+                              <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
+                           <FormKit label="" type="text" v-model="term.endVal"  outer-class="$reset full-width"
                               :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
                            />
-                           <template v-if="term.comparison == 'BETWEEN'" >
-                               <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
-                              <FormKit label="" type="text" v-model="term.endVal"  outer-class="$reset full-width"
-                                 :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
-                              />
-                           </template>
-                        </div>
-                        <FormKit v-else label="" type="text" v-model="term.value"  outer-class="$reset full-width"/>
-                        <p class="date-hint" v-if="getTermType(term) == 'date'">
-                           Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/>
-                           where YYYY represents a 4 digit year, MM represents a two digit month (01-12), and DD represents a two digit day (01-31).
-                        </p>
+                        </template>
                      </div>
+                     <FormKit v-else label="" type="text" v-model="term.value"  outer-class="$reset full-width"/>
+                     <p class="date-hint" v-if="getTermType(term) == 'date'">
+                        Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/>
+                        where YYYY represents a 4 digit year, MM represents a two digit month (01-12), and DD represents a two digit day (01-31).
+                     </p>
                   </div>
-                  <FormKit v-if="canDeleteCriteria" type="button" @click="removeCriteria(idx)" input-class='icon'><i class="remove fas fa-times-circle"></i></FormKit>
                </div>
-               <div class="form-acts">
-                  <FormKit type="button" @click="addClicked">Add criteria</FormKit>
-                  <FormKit type="button" @click="saveSearchForm">Save form</FormKit>
-               </div>
-               <PreSearchFilters v-if="resultStore.hasResults==false"/>
-               <div class="controls">
-                  <FormKit v-if="resultStore.hasResults==false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
-                     outer-class="$reset sort" inner-class="$reset sort"
-                     :options="sortOptions"  />
-                  <SourceSelector mode="advanced" :help="false"/>
-               </div>
-               <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
-            </FormKit>
-         </div>
+               <FormKit v-if="canDeleteCriteria" type="button" @click="removeCriteria(idx)" input-class='icon'><i class="remove fas fa-times-circle"></i></FormKit>
+            </div>
+            <div class="form-acts">
+               <FormKit type="button" @click="addClicked">Add criteria</FormKit>
+               <FormKit type="button" @click="saveSearchForm">Save form</FormKit>
+            </div>
+            <PreSearchFilters v-if="resultStore.hasResults==false"/>
+            <div class="controls">
+               <FormKit v-if="resultStore.hasResults==false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
+                  outer-class="$reset sort" inner-class="$reset sort"
+                  :options="sortOptions"  />
+               <SourceSelector mode="advanced" :help="false"/>
+            </div>
+            <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
+         </FormKit>
       </div>
    </div>
 </template>
@@ -200,6 +198,13 @@ onMounted(()=>{
    margin: 0 auto 0 auto;
    text-align: center;
    padding: 10px 5px;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: space-between;
+   .advanced-wrap {
+      flex: 1 1 70%;
+      margin: 0;
+   }
 
    .search-term {
       display: flex;
@@ -239,18 +244,6 @@ onMounted(()=>{
             margin:0;
          }
       }
-   }
-   .form-controls {
-      margin: 0;
-   }
-}
-.advanced-controls {
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: space-between;
-   .advanced-wrap {
-      flex: 1 1 70%;
-      margin: 0;
    }
 }
 
