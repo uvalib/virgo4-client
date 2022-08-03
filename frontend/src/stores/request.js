@@ -208,14 +208,14 @@ export const useRequestStore = defineStore('request', {
          this.buttonDisabled = true
 
          // track this request so it can be displayed on confirmation panel
-         this.requestInfo.itemLabel = item.label
+         this.requestInfo.itemLabel = ""
          this.requestInfo.pickupLibrary = ""
-         this.requestInfo.callNumber = item.callNumber
+         this.requestInfo.callNumber = item.label
          this.requestInfo.notes = specialInstructions
 
          let aeonLink = urlModule.parse(this.activeOption.create_url, true)
-         aeonLink.query["CallNumber"] = item.callNumber
-         aeonLink.query["ItemVolume"] = item.callNumber
+         aeonLink.query["CallNumber"] = item.label
+         aeonLink.query["ItemVolume"] = item.label
          aeonLink.query["ItemNumber"] = item.barcode
          aeonLink.query["Notes"] = item.notes
          aeonLink.query["Location"] = item.location
