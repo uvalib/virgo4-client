@@ -54,7 +54,7 @@ const itemOptions = computed(() => {
 onMounted(() => {
    let ele = document.getElementById("item-select")
    if (itemOptions.value.length == 1) {
-      selectedItem.value = itemOptions.value[0]
+      selectedItem.value = itemOptions.value[0].value
       ele = document.getElementById("item-notes")
    }
    ele.focus()
