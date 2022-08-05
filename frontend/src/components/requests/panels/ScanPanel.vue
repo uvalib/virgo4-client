@@ -1,7 +1,7 @@
 <template>
    <div class="request-scan">
       <h2>Scan Request</h2>
-      <FormKit type="form" id="aeon-request" :actions="false" @submit="submit">
+      <FormKit type="form" id="scan-request" :actions="false" @submit="submit">
          <FormKit v-if="itemOptions.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" placeholder="Select an item" @input="itemSelected"
             :validation-messages="{required: 'Item selection is required.'}"
@@ -72,7 +72,8 @@ const itemOptions = computed(() => {
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
    if (itemOptions.value.length == 1) {
-      scan.value.barcode = itemOptions.value[0].value.barcode
+      selectedItem.value = itemOptions.value[0].value
+      itemSelected()
    }
 
    if (itemOptions.value.length == 1) {
@@ -111,8 +112,8 @@ function itemSelected() {
    scan.value.label = selectedItem.value.label
    scan.value.barcode = selectedItem.value.barcode
    scan.value.library = selectedItem.value.library
-   scan.value.location = selectedItem.value.location
-   scan.value.callNumber = selectedItem.value.callNumber
+   scan.value.location = selectedItem.value.location_id
+   scan.value.callNumber = selectedItem.value.label
 }
 
 function submit() {
