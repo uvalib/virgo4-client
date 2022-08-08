@@ -69,14 +69,14 @@ export const useItemStore = defineStore('item', {
          return Array.isArray(state.availability.bound_with) && state.availability.bound_with.length > 0
       },
       boundIn: state => {
-         if (state.availability){
+         if (state.availability && state.availability.bound_with){
             return state.availability.bound_with.filter(item => item.is_parent == true)
          }else{
             return []
          }
       },
       boundWith: state => {
-         if (state.availability){
+         if (state.availability && state.availability.bound_with){
             return state.availability.bound_with.filter(item => item.is_parent == false)
          }else{
             return []
