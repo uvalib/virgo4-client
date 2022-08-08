@@ -85,7 +85,9 @@ const streamingReserve = computed(() => {
 onMounted(() => {
    reserveStore.clearRequestList()
    reserveStore.setRequestingUser(user.accountInfo)
-   if (itemOptions.value.length == 1){
+   if (itemOptions.value.length == 0){
+      selectedVideo.value = {}
+   } else if (itemOptions.value.length == 1){
       selectedVideo.value = itemOptions.value[0].value
    }
    document.getElementById("behalf_of").focus()

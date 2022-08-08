@@ -102,13 +102,13 @@ function searchClicked() {
    router.push({path: "/search", query: query })
 }
 function nextItem() {
-   let date = this.publishedDate
+   let date = publishedDate.value
    if (date) {
       collection.nextItem(date)
    }
 }
 function prevItem() {
-   let date = this.publishedDate
+   let date = publishedDate.value
    if (date) {
       collection.priorItem(date)
    }

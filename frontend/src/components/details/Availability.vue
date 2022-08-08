@@ -134,12 +134,16 @@ const libraryAvailabilityNotes = computed(()=>{
 })
 
 const dibsBarcode = computed(()=>{
-  let f = item.availability.items.find( f => f.current_location_id == "DIBS")
-  if (f){
-   return f.barcode
-  } else {
-   return null
-  }
+   if (item.availability.items) {
+      let f = item.availability.items.find( f => f.current_location_id == "DIBS")
+      if (f){
+         return f.barcode
+      } else {
+         return null
+      }
+   } else {
+      return null
+   }
 })
 
 function formatValue(val) {
