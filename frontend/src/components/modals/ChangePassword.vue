@@ -87,8 +87,8 @@ const changePassword = ref(null)
 
 // data
 const id = ref("change-password")
-const currPassword = ref("curr-password")
-const newPassword = ref("new-password")
+const currPassword = ref("")
+const newPassword = ref("")
 const passwordToken = ref("")
 const error = ref("")
 const passwordChanged = ref(false)
