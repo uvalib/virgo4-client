@@ -37,7 +37,6 @@
                   Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
                </li>
             </ul>
-             <p>{{newPassword}}</p>
             <div class="message">
                <FormKit type="form" id="change-password" :actions="false" @submit="okClicked">
                   <FormKit v-if="!hasPasswordToken" id="curr-password" label="Current Password" type="password" v-model="currPassword" validation="required" />
@@ -75,6 +74,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from "@/stores/user"
+import { setErrors } from '@formkit/core'
 
 const emit = defineEmits( ['show-forgot-password'])
 
@@ -87,8 +87,8 @@ const changePassword = ref(null)
 
 // data
 const id = ref("change-password")
-const currPassword = ref("")
-const newPassword = ref("")
+const currPassword = ref("curr-password")
+const newPassword = ref("new-password")
 const passwordToken = ref("")
 const error = ref("")
 const passwordChanged = ref(false)
@@ -163,17 +163,18 @@ function okClicked() {
             toggleOk()
          })
       } else {
-         let data  = {current_pin: currPassword, new_pin: newPassword.value}
+         let data  = {current_pin: currPassword.value, new_pin: newPassword.value}
          userStore.changePassword(data).then(() => {
             passwordChanged.value = true
          }).catch((e) => {
-            currPassword.value.focus()
+            document.getElementById("curr-password").focus()
             error.value = "Password change failed.</br>"
             if ( e.response.data.message ) {
                error.value += e.response.data.message
             } else {
                error.value += "Please check your current password."
             }
+            setErrors('change-password', error.value)
          }).finally(()=>{
             toggleOk()
          })
