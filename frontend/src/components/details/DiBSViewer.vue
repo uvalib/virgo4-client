@@ -13,7 +13,7 @@
          </p>
 
          <div class="button-wrapper">
-            <V4Button @click="activeIframe = true">View this item online</V4Button>
+            <V4Button mode="tertiaty" @click="activeIframe = true">View this item online</V4Button>
          </div>
       </div>
    </div>

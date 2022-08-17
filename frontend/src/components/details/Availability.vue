@@ -135,7 +135,7 @@ const libraryAvailabilityNotes = computed(()=>{
 
 const dibsBarcode = computed(()=>{
    if (item.availability.items) {
-      let f = item.availability.items.find( f => f.current_location_id == "DIBS")
+      let f = item.availability.items.find( f => f.home_location_id == "DIBS")
       if (f){
          return f.barcode
       } else {
