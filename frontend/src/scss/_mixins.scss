@@ -30,6 +30,7 @@
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey);
    color: #000;
+   cursor: pointer;
 
    &:focus {
       @include be-accessible();
@@ -42,6 +43,7 @@
 
 @mixin primary-button() {
    @include base-button();
+   cursor: pointer;
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);

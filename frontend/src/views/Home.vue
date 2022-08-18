@@ -28,7 +28,7 @@
          </template>
          <AdvancedSearch v-else/>
       </div>
-      <Welcome  v-if="isHomePage && resultStore.hasResults==false" />
+      <Welcome  v-if="isHomePage && resultStore.hasResults==false && queryStore.mode=='basic'" />
       <SearchResults v-if="resultStore.hasResults" />
    </div>
 </template>
@@ -386,7 +386,6 @@ async function searchClicked() {
       margin: 0 auto 0 auto;
       text-align: center;
       padding: 10px 2vw 10px 2vw;
-      font-size: 0.95em;
    }
    .basic-search {
       display: flex;

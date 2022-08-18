@@ -19,13 +19,13 @@
             >
             <span>Articles Only</span>
          </label>
-         <label for="search-images">
+         <label for="search-images" :class="{'no-pad': props.help==false}">
             <input @click="sourcesClicked('images')" id="search-images" type="radio"
                v-model="queryStore.searchSources" value="images" name="sources"
             >
             <span>Images Only</span>
          </label>
-         <SearchTips />
+         <SearchTips v-if="props.help"/>
       </div>
 </template>
 
@@ -34,6 +34,13 @@ import SearchTips from "@/components/disclosures/SearchTips.vue"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useRouter, useRoute } from 'vue-router'
+
+const props = defineProps({
+   help: {
+      type: Boolean,
+      default: true
+   },
+})
 
 const results = useResultStore()
 const queryStore = useQueryStore()
@@ -67,10 +74,11 @@ function sourcesClicked( setting ) {
    display: flex;
    flex-flow: row wrap;
    justify-content: center;
+   align-items: center;
    label {
       display: flex;
       flex-flow: row nowrap;
-      align-content: center;
+      align-items: center;
       margin: 0;
       padding: 0;
       margin-right: 25px;
@@ -79,12 +87,16 @@ function sourcesClicked( setting ) {
          text-decoration: underline;
       }
    }
+   label.no-pad {
+      margin-right: 0;
+   }
    input {
       cursor: pointer;
-      margin-right: 8px;
+      margin: 0 8px 0 0;
       display: inline-block;
       width: 15px;
       height: 15px;
+      padding:0;
    }
    label.curr_scope {
       cursor: default;

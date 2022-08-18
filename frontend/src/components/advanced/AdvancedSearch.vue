@@ -1,96 +1,50 @@
 <template>
    <div class="advanced-panel" :class="{narrow: resultStore.hasResults}">
-      <div class="advanced-controls">
-         <AdvancedFacets />
-         <div class="advanced-wrap">
-            <div class="criteria">
-               <div v-for="(term,idx) in advancedTerms" :key="idx" class="search-term">
+      <AdvancedFacets />
+      <div class="advanced-wrap">
+         <FormKit type="form" id="advanced-search" :actions="false" @submit="doAdvancedSearch">
+            <div v-for="(term,idx) in advancedTerms" :key="idx" class="search-term">
+               <div class="controls-wrapper">
                   <div class="options">
-                     <template v-if="idx > 0">
-                        <select class="search-term-op" v-model="term.op" :aria-label="`boolean operator for search criteria number ${idx+1}`">
-                           <option value="AND">AND</option>
-                           <option value="OR">OR</option>
-                           <option value="NOT">NOT</option>
-                        </select>
-                     </template>
-                     <select class="field" v-model="term.field" :aria-label="` field name for search criteria number ${idx+1}`">
-                        <option
-                           v-for="fieldObj in queryStore.advancedFields"
-                           :key="fieldObj.value"
-                           :value="fieldObj.value"
-                        >{{fieldObj.label}}</option>
-                     </select>
-                     <template v-if="getTermType(term) == 'date'">
-                        <select class="date-range-type" v-model="term.comparison" :aria-label="`date comparision mode for search criteria ${idx+1}`">
-                           <option value="EQUAL">EQUALS</option>
-                           <option value="AFTER">AFTER</option>
-                           <option value="BEFORE">BEFORE</option>
-                           <option value="BETWEEN">BETWEEN</option>
-                        </select>
-                     </template>
-                     <V4Button v-if="canDeleteCriteria" mode="icon" class="remove" @click="removeCriteria(idx)"
-                        :aria-label="`delete search criteria number ${idx+1}`">
-                        <i class="fas fa-times-circle"></i>
-                     </V4Button>
+                     <FormKit v-if="idx > 0" type="select" label="" v-model="term.op" :options="['AND', 'OR', 'NOT']" outer-class="$reset op" />
+                     <FormKit type="select" label="" v-model="term.field" :options="queryStore.advancedFields" outer-class="$reset pad-right"/>
+                     <FormKit v-if="getTermType(term) == 'date'" type="select" label="" v-model="term.comparison"
+                        :options="['EQUALS', 'AFTER', 'BEFORE', 'BETWEEN']" outer-class="$reset pad-right"/>
                   </div>
-
                   <div class="query">
-                     <template v-if="getTermType(term) == 'date'">
-                        <div class="date-criteria">
-                           <input @keyup.enter="doAdvancedSearch" type="text" v-model="term.value"
-                              :aria-label="`date for search criteria number ${idx+1}`"/>
-                           <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
-                           <input
-                              v-if="term.comparison == 'BETWEEN'"
-                              type="text"
-                              @keyup.enter="doAdvancedSearch"
-                              v-model="term.endVal"
-                              :aria-label="`end date for search criteria ${idx+1}`"
+                     <div class="date-criteria" v-if="getTermType(term) == 'date'">
+                        <FormKit label="" type="text" v-model="term.value"  outer-class="$reset full-width"
+                           :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
+                        />
+                        <template v-if="term.comparison == 'BETWEEN'" >
+                              <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
+                           <FormKit label="" type="text" v-model="term.endVal"  outer-class="$reset full-width"
+                              :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
                            />
-                           <p class="date-hint">Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/>
-                               where YYYY represents a 4 digit year, MM represents a two digit month (01-12), and DD represents a two digit day (01-31).
-                               </p>
-                        </div>
-                     </template>
-                     <template v-else>
-                        <input @keyup.enter="doAdvancedSearch" v-model="term.value" type="text" class="term"
-                           :aria-label="`query string for search criteria number ${idx+1}`"/>
-                     </template>
-                  </div>
-               </div>
-            </div>
-            <div class="controls-wrapper">
-               <SourceSelector mode="advanced"/>
-               <div class="form-acts">
-                  <V4Button mode="icon" id="add-criteria" @click="addClicked">
-                     <i class="fas fa-plus-circle"></i>
-                     <span class="btn-label">Add criteria</span>
-                  </V4Button>
-                  <Confirm  v-if="userStore.isSignedIn && resultStore.hasResults==false" title="Save Search Form" v-on:confirmed="saveSearchForm"
-                     id="savesearch" buttonLabel="Save Form" buttonMode="tertiary"
-                  >
-                     <div>
-                        Save the current advanced search form to your account?<br/>
-                        Once saved, it will be used as the default setup for future advanced searches.<br/>
-                        This can be changed at any time.
+                        </template>
                      </div>
-                  </Confirm>
-
-               </div>
-               <PreSearchFilters v-if="resultStore.hasResults==false"/>
-               <div class="controls">
-                  <div class="v4-sort" v-if="resultStore.hasResults==false">
-                     <label class="sort" for="sort-opt">Sort by:</label>
-                     <select v-model="sortStore.preSearchSort" id="sort-opt" name="sort-opt">
-                        <option v-for="(option) in sortOptions" :key="option.id" :value="option.id ">
-                           {{ option.name }}
-                        </option>
-                     </select>
+                     <FormKit v-else label="" type="text" v-model="term.value"  outer-class="$reset full-width"/>
+                     <p class="date-hint" v-if="getTermType(term) == 'date'">
+                        Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/>
+                        where YYYY represents a 4 digit year, MM represents a two digit month (01-12), and DD represents a two digit day (01-31).
+                     </p>
                   </div>
-                  <V4Button mode="primary" @click="doAdvancedSearch">Search</V4Button>
                </div>
+               <FormKit v-if="canDeleteCriteria" type="button" @click="removeCriteria(idx)" input-class='icon'><i class="remove fas fa-times-circle"></i></FormKit>
             </div>
-         </div>
+            <div class="form-acts">
+               <FormKit type="button" @click="addClicked">Add criteria</FormKit>
+               <FormKit type="button" @click="saveSearchForm">Save form</FormKit>
+            </div>
+            <PreSearchFilters v-if="resultStore.hasResults==false"/>
+            <div class="controls">
+               <FormKit v-if="resultStore.hasResults==false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
+                  outer-class="$reset sort" inner-class="$reset sort"
+                  :options="sortOptions"  />
+               <SourceSelector mode="advanced" :help="false"/>
+            </div>
+            <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
+         </FormKit>
       </div>
    </div>
 </template>
@@ -124,6 +78,8 @@ const filters = useFilterStore()
 const preferences = usePreferencesStore()
 const { assertive } = useAnnouncer()
 
+const dateValidator = [ ['matches', /^\d{4}$|^\d{4}-(0[1-9]|1[012])$|^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/] ]
+
 const canDeleteCriteria = computed(()=>{
    return queryStore.advanced.length > 1
 })
@@ -131,12 +87,18 @@ const advancedTerms = computed(()=>{
    return queryStore.advanced.filter( t => t.field != "filter")
 })
 const sortOptions = computed(()=>{
-   return poolStore.sortOptions("uva_library")
+   let out = []
+   poolStore.sortOptions("uva_library").forEach( s => {
+      out.push( {label: s.name, value: s.id} )
+   })
+   return out
 })
 
 function saveSearchForm() {
    preferences.saveAdvancedSearchTemplate(queryStore.advancedSearchTemplate)
+   systemStore.setMessage("This search setup has been saved and will be used as the default for future advanced searches.<br/>You can change this at any time by saving a new setup.")
 }
+
 function getTermType( term ) {
    let tgtField = queryStore.advancedFields.find( af=> af.value == term.field)
    if (tgtField) {
@@ -150,50 +112,6 @@ async function doAdvancedSearch() {
    let fields = queryStore.advanced.filter( f=>f.value != "")
    if ( fields.length == 1 && fields[0].op == "NOT") {
       systemStore.setSearchError( {message:"The NOT operator requires more than one search critera"} )
-      return
-   }
-
-   let badDate = false
-   queryStore.advanced.filter( f=>f.field == "date" && f.value != "").some( df => {
-      let dateStr = df.value
-      let parts = dateStr.split("-")
-      if (parts.length > 3) {
-         badDate = true
-      } else {
-         parts.forEach( (p,idx) => {
-            switch (idx) {
-            case 0:
-               if ( p.match(/^\d{4}$/) == null ) {
-                  badDate = true
-               }
-               break
-            case 1:
-               // Month
-               if ( p.match(/^(0[1-9]|(1[0-2]))$/) == null ) {
-                     badDate = true
-               }
-               break
-            case 2:
-               // Day
-               if ( p.match(/^(0[1-9])|([12])([0-9])|(3[01])$/) == null ) {
-                     badDate = true
-               }
-               break
-            default:
-               badDate = true
-               break
-            }
-         })
-      }
-      return badDate == true
-   })
-   if ( badDate ) {
-      systemStore.setSearchError(
-         { message:"Dates must match one of the accepted formats: YYYY, YYYY-MM, or YYYY-MM-DD <br/> \
-         where YYYY represents a 4 digit year, <br/> \
-         MM represents a two digit month (01-12), and<br/> \
-         DD represents a two digit day (01-31)." }
-      )
       return
    }
 
@@ -221,6 +139,7 @@ async function doAdvancedSearch() {
    queryStore.userSearched = true
    await router.replace({query: newQ})
 }
+
 function addClicked() {
    queryStore.addCriteria()
    nextTick( () => {
@@ -230,6 +149,7 @@ function addClicked() {
       }
    })
 }
+
 function removeCriteria(idx) {
    queryStore.removeCriteria(idx)
 }
@@ -240,26 +160,44 @@ onMounted(()=>{
 </script>
 
 <style lang="scss" scoped>
-h2 {
-   text-align: left;
-   font-size: 1em;
-   color: #444;
-   margin: 5px 0;
-   display: flex;
-   flex-flow: row nowrap;
-   justify-content: space-between;
-   align-items: center;
+:deep(.op) {
+   margin-right: 5px;
+   flex-basis: content;
+}
+:deep(.pad-right) {
+   margin-right: 5px;
+   flex-grow:1;
+}
+:deep(.full-width) {
+   margin: 0 5px 0 0;
+   flex-grow:1;
+}
+:deep(button.v4-form-input.icon) {
+   border: none;
+   padding:0;
+   margin:0 0 0 3px;
+   background: none;
+   &:hover {
+      background-image: none;
+   }
+   .remove {
+      font-size: 1.5em;
+      color: var(--uvalib-red-emergency);
+      margin: 0;
+      padding: 0;
+      &:hover {
+         color: var(--uvalib-red);
+      }
+   }
+}
+.advanced-panel.narrow {
+   margin: 0;
+   padding: 0 3vw 0 3vw;
 }
 .advanced-panel {
    margin: 0 auto 0 auto;
    text-align: center;
    padding: 10px 5px;
-   font-size: .95em;
-}
-.advanced-panel.narrow {
-   max-width: 800px;
-}
-.advanced-controls {
    display: flex;
    flex-flow: row wrap;
    justify-content: space-between;
@@ -267,177 +205,81 @@ h2 {
       flex: 1 1 70%;
       margin: 0;
    }
-}
-.sep {
-   margin: 0 5px;
+
+   .search-term {
+      display: flex;
+      flex-flow: row nowrap;
+      text-align: left;
+      padding: 10px 10px 5px 10px;
+      margin: 0 0 15px 0;
+      background: var(--uvalib-grey-lightest);
+      border: 1px solid var(--uvalib-grey-light);
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 5px;
+
+      .controls-wrapper {
+         flex-grow: 1;
+      }
+      :deep(.v4-form-input) {
+         margin-bottom: 5px;
+      }
+   }
+   .controls {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-between;
+      align-items: center;
+      :deep(.v4-form-label) {
+         display: inline-block;
+         margin: 0 5px 0 0;
+         font-weight: bold;
+      }
+      :deep(.sort) {
+         display: inline-block;
+      }
+      :deep(.right) {
+         margin-left: auto;
+         button {
+            margin:0;
+         }
+      }
+   }
 }
 
 .form-acts {
    display: flex;
    flex-flow: row nowrap;
    justify-content: space-between;
-   padding-bottom: 20px;
-   margin-bottom: 15px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   #add-criteria {
-      color: var(--uvalib-blue-alt);
-      font-size: 1.6em;
-      display: flex;
-      flex-flow: row nowrap;
-      align-items: center;
-      align-self: center;
-      .btn-label {
-         margin-left: 5px;
-         font-size: 0.7em;
-         color: var(--uvalib-text);
-      }
-   }
-}
-
-div.criteria {
-   text-align: left;
-   position: relative;
+   margin-top: 15px;
 }
 
 div.options {
    display: flex;
    flex-flow: row wrap;
-   align-items: center;
+   align-items: flex-start;
    justify-content: space-between;
 }
 
-.options select {
-   margin: 0 5px 0 0;
-   flex-basis: content;
-}
-div.search-term {
-   select {
-      height: auto !important;
-   }
-   input {
-      margin-top: 5px;
-      margin-bottom: 0 !important;
-   }
-}
-
 div.query {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
-   align-content: center;
-
-   .term {
-      box-sizing: border-box;
-   }
-
-   input[type="text"], .select-criteria {
-      flex: 1 1 auto;
-   }
-
-   .term {
-      margin-bottom: 0;
-   }
-
-   select {
-      width: 100%;
-   }
-
    .date-criteria {
       display: flex;
       flex: 1 1 auto;
       flex-flow: row wrap;
-      align-items: center;
       margin-right: 0;
+      flex-grow: 1;
+      .date-sep {
+         font-weight: 500;
+         margin: 7px 5px 0 0;
+      }
    }
-   .date-hint {
-      font-size:0.95em;
+    .date-hint {
+      font-size:0.8em;
       font-weight: 100;
-      font-style: italic;
-      width: 100%;
       box-sizing: border-box;
-      margin-top: 10px;
+      margin: 5px 0 5px 0;
       display: block;
-   }
-   .date-sep {
-      font-weight: 500;
-   }
-}
-.controls {
-   padding: 10px 0;
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: flex-start;
-   label {
-      font-weight: bold;
-      margin-right: 5px;
-   }
-   button.v4-button {
-      margin-left: auto;
-   }
-}
-.controls .v4-button.clear {
-   margin-right: 10px;
-}
-div.search-term {
-   padding: 10px;
-   margin: 0 0 10px 0;
-   background: var(--uvalib-grey-lightest);
-   outline: 1px solid var(--uvalib-grey-light);
-   width: 100%;
-   box-sizing: border-box;
-   .v4-button.remove {
-      font-size: 1.6em;
-      color: var(--uvalib-red-emergency);
-      margin-left: auto;
-   }
-}
-
-div.search-term .date-criteria > * {
-   margin: 5px 5px 0 0;
-}
-div.search-term .date-criteria input:last-child {
-   margin-right: 0;
-}
-
-div.basic {
-   margin-top: 10px;
-   font-size: 1em;
-   text-align: right;
-}
-.templates {
-   display: flex;
-   flex-flow: row nowrap;
-   justify-content: center;
-   align-content: stretch;
-   font-size: 0.9em;
-   padding-bottom: 5px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-
-   .save-template {
-      color: var(--uvalib-grey-dark);
-      display: flex;
-      flex-flow: row nowrap;
-      align-items: flex-start;
-      justify-content: flex-end;
-      width: 100%;
-      .name-wrap {
-         flex: 1 1 auto;
-         margin-right: 5px;
-         input, p {
-            width: 100%;
-         }
-         p.error {
-            text-align: left;
-            margin: 0;
-         }
-      }
-      button.v4-button {
-         margin-left: 5px !important;
-      }
-      label {
-         font-weight: bold;
-         margin-right: 10px;
-      }
+      text-align: left;
    }
 }
 </style>
