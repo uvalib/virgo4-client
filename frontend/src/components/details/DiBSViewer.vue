@@ -1,7 +1,10 @@
 <template>
    <div class="dibs">
       <template v-if="activeIframe">
-         <iframe title="Digital reserves viewer" :src="systemStore.dibsURL + '/item/' + props.barcode"></iframe>
+         <iframe title="Digital reserves viewer"
+               :src="systemStore.dibsURL + '/item/' + props.barcode"
+               allowfullscreen
+         ></iframe>
       </template>
       <div v-else>
          <p>This item is available online for use with electronic course reserves. You may be required to sign in.</p>
