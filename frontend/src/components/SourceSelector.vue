@@ -7,9 +7,9 @@
             >
             <span>Everything</span>
          </label>
-         <label for="search-catalog" name="sources" :class="{curr_scope: queryStore.searchSources=='uva_library'}" >
+         <label for="search-catalog" :class="{curr_scope: queryStore.searchSources=='uva_library'}" >
             <input  @click="sourcesClicked('uva_library')" id="search-catalog" type="radio"
-               v-model="queryStore.searchSources" value="uva_library"
+               v-model="queryStore.searchSources" value="uva_library"  name="sources"
             >
             <span>Catalog Only</span>
          </label>
