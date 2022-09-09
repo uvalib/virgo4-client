@@ -1,8 +1,14 @@
 <template>
    <div class="dibs">
       <template v-if="activeIframe">
+         <p class="reader-header">
+            <V4Button mode="icon" @click="activeIframe = false" aria-label="Close Reader">
+               <i class="close-icon fal fa-window-close"></i>
+            </V4Button>
+            Electronic Course Reserves
+         </p>
          <iframe title="Digital reserves viewer"
-               :src="systemStore.dibsURL + '/item/' + props.barcode"
+               :src="systemStore.dibsURL + '/item/' + selectedItem"
                allowfullscreen
          ></iframe>
       </template>
@@ -15,8 +21,12 @@
             or <a href="mailto:sdacAT@virginia.edu">sdacAT@virginia.edu</a>.
          </p>
 
-         <div class="button-wrapper">
-            <V4Button mode="tertiaty" @click="activeIframe = true">View this item online</V4Button>
+         <div class="center-wrapper">
+            <FormKit v-if="selectList.length > 1" type="select" label="Volume" v-model="selectedItem"
+            placeholder="Select a volume" @input="(item)=>{selectedItem = item }"
+            :options="selectList" validation="required"
+            />
+            <V4Button mode="tertiaty" @click="activeIframe = true" :disabled="!selectedItem" >View this item online</V4Button>
          </div>
       </div>
    </div>
@@ -29,16 +39,26 @@ import V4Button from "../V4Button.vue";
 const systemStore = useSystemStore()
 
 const props = defineProps({
-   barcode: {
-      type: String,
+   // Expected as {barcode: "", label: ""}
+   items: {
+      type: Array,
       required: true,
    }
 })
 const activeIframe = ref(false)
+const selectedItem = ref()
+const selectList = props.items.map( (i)=>{
+    return {value: i.barcode, label: i.call_number}
+   })
+if(selectList.length == 1){
+   selectedItem.value = selectList[0].value
+}
 
 </script>
 <style lang="scss" scoped>
 .dibs {
+   border: 1px solid var(--uvalib-grey-light);
+   padding: 5px;
    iframe {
       width: 100%;
       height: 80vh;
@@ -46,10 +66,15 @@ const activeIframe = ref(false)
    b {
       margin-right: 5px;
    }
+   .reader-header {
+      margin: 0;
+   }
 
-   .button-wrapper{
+   .center-wrapper{
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      *{margin: 20px 0};
    }
 }
 </style>

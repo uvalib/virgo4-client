@@ -14,7 +14,7 @@
 
          <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
 
-         <DiBSViewer :barcode="dibsBarcode" v-if="dibsBarcode "></DiBSViewer>
+         <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
 
          <BoundWithItems v-if="item.hasBoundWithItems"/>
          <div class="items" v-if="hasItems || request.hasRequestOptions">
@@ -133,16 +133,11 @@ const libraryAvailabilityNotes = computed(()=>{
    return []
 })
 
-const dibsBarcode = computed(()=>{
+const dibsItems = computed(()=>{
    if (item.availability.items) {
-      let f = item.availability.items.find( f => f.home_location_id == "DIBS")
-      if (f){
-         return f.barcode
-      } else {
-         return null
-      }
+      return item.availability.items.filter( f => f.home_location_id == "DIBS")
    } else {
-      return null
+      return []
    }
 })
 
