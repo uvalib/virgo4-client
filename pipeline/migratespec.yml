@@ -11,14 +11,12 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      golang: 1.15
+      golang: 1.x
 #    commands:
 
   pre_build:
     commands:
-      - docker version
-      - PASSWORD=$(aws ecr get-login-password --region $AWS_REGION)
-      - docker login --username AWS --password $PASSWORD $CONTAINER_REGISTRY
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $CONTAINER_REGISTRY
       - latest_build=$(aws --region=$AWS_REGION ssm get-parameter --name /containers/$CONTAINER_IMAGE/latest | grep "Value" | awk -F\" '{print $4}')
 
   build:
