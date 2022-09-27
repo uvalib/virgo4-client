@@ -9,7 +9,7 @@
                      <FormKit v-if="idx > 0" type="select" label="" v-model="term.op" :options="['AND', 'OR', 'NOT']" outer-class="$reset op" />
                      <FormKit type="select" label="" v-model="term.field" :options="queryStore.advancedFields" outer-class="$reset pad-right"/>
                      <FormKit v-if="getTermType(term) == 'date'" type="select" label="" v-model="term.comparison"
-                        :options="['EQUALS', 'AFTER', 'BEFORE', 'BETWEEN']" outer-class="$reset pad-right"/>
+                        :options="['EQUAL', 'AFTER', 'BEFORE', 'BETWEEN']" outer-class="$reset pad-right"/>
                   </div>
                   <div class="query">
                      <div class="date-criteria" v-if="getTermType(term) == 'date'">
