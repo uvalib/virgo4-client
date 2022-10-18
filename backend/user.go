@@ -129,17 +129,17 @@ func (u *ILSUserInfo) CanPurchase() bool {
 
 // CheckoutInfo has sumary info for a checked out item
 type CheckoutInfo struct {
-	ID         string `json:"id"`
-	Barcode    string `json:"barcode"`
-	Title      string `json:"title"`
-	Author     string `json:"author"`
-	CallNumber string `json:"callNumber"`
-	Library    string `json:"library"`
-	DueDate    string `json:"due"`
-	OverDue    bool   `json:"overdue"`
-	Fee        string `json:"overdueFee"`
-	RecallDate string `json:"recallDate"`
-	RenewDate  string `json:"renewDate"`
+	ID            string `json:"id"`
+	Barcode       string `json:"barcode"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	CallNumber    string `json:"callNumber"`
+	Library       string `json:"library"`
+	DueDate       string `json:"due"`
+	OverDue       bool   `json:"overdue"`
+	Fee           string `json:"overdueFee"`
+	RecallDueDate string `json:"recallDueDate"`
+	RenewDate     string `json:"renewDate"`
 }
 
 // ChangePin takes current_pin and new_pin as params in the json POST payload.

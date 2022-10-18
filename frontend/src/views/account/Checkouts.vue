@@ -174,13 +174,13 @@ function formatDueInfo(checkout) {
    if (checkout.overdue) {
       out += "<div class='overdue'>Overdue</div>"
    }
-   if ( checkout.recallDate != "") {
-      out += `<div class='recall'>Recalled ${checkout.recallDate}</div>`
+   if ( checkout.recallDueDate != "") {
+      out += `<div class='recall'>Recall Due ${checkout.recallDueDate.split("T")[0]}</div>`
    }
    return out
 }
 function itemOnNotice(co) {
-   return co.overdue || co.recallDate != ""
+   return co.overdue || co.recallDueDate != ""
 }
 
 onMounted(async () => {

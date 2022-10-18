@@ -134,7 +134,7 @@ export const useUserStore = defineStore('user', {
          return state.claims.homeLibrary == "LAW"
       },
       itemsOnNotice: state => {
-         return state.checkouts.filter( co=> co.overdue || co.recallDate != "")
+         return state.checkouts.filter( co=> co.overdue || co.recallDueDate != "")
       },
       itemsWithFines: state => {
          return state.checkouts.filter( co=> parseFloat(co.overdueFee) > 0 )
@@ -195,8 +195,8 @@ export const useUserStore = defineStore('user', {
             if ( order == "OVERDUE") {
                // Sort recalls to top, then Due date, others are last
                // dates are also sorted inside each group
-               let aRecall = new Date(a.recallDate).valueOf()
-               let bRecall = new Date(b.recallDate).valueOf()
+               let aRecall = new Date(a.recallDueDate).valueOf()
+               let bRecall = new Date(b.recallDueDate).valueOf()
                let aDue = new Date(a.due).valueOf()
                let bDue = new Date(b.due).valueOf()
 
@@ -217,8 +217,8 @@ export const useUserStore = defineStore('user', {
             }
             if (order.includes("DUE")){
                // Sort by due date, then recall, then others last
-               keyA = a.due.split("T")[0] || a.recallDate || "a"
-               keyB = b.due.split("T")[0] || b.recallDate || "a"
+               keyA = a.due.split("T")[0] || a.recallDueDate || "a"
+               keyB = b.due.split("T")[0] || b.recallDueDate || "a"
             }
             if (order.includes("ASC")) {
                if (keyA < keyB) {
