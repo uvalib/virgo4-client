@@ -247,8 +247,11 @@ export const useResultStore = defineStore('result', {
                pool: pool, sort: pr.sort, total: pr.pagination.total, page: 0, timeMS: pr.elapsed_ms,
                hits: [], statusCode: pr.status_code, statusMessage: pr.status_msg
             }
-            if (firstPoolWithHits == -1 && pr.pagination.total > 0) {
-               firstPoolWithHits = idx
+            if (
+              (firstPoolWithHits == -1 && pr.pagination.total > 0) ||
+              (pool.id == "uva_library" && pr.status_code == 408)
+            ) {
+              firstPoolWithHits = idx
             }
 
             // Next, drill into group_list data. It contains a count and a record_list
