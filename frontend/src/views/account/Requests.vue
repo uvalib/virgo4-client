@@ -67,15 +67,8 @@
                            <dt>Item Status:</dt>
                            <dd>{{req.itemStatus}}</dd>
                         </dl>
-                        <p  v-if="systemStore.isDevServer">
-                           <V4Button
-                              mode="tertiary"
-                              @click="deleteHold(req.id)"
-                              :aria-label="`Delete hold on ${req.title}`"
-                              class="delete"
-                           >
-                              Delete Hold
-                           </V4Button>
+                        <p v-if="systemStore.isDevServer">
+                           <V4Button :id="'showCancelModal-' + req.id" mode="tertiary" @click="showCancelHold(req)">Cancel Request</V4Button>
                         </p>
                      </div>
                   </div>
@@ -175,6 +168,49 @@
          </div>
       </div>
    </div>
+
+   <V4Modal ref="cancelHoldModal" class="cancel"
+      title="Cancel Hold?"
+      :buttonID="'showCancelModal-' + (reqToCancel ? reqToCancel.id : '')"
+      buttonMode="tertiary"
+      id="cancelHoldModal"
+      >
+      <template #content>
+         <dl>
+            <dt>Title:</dt>
+            <dd>{{ reqToCancel.title }}</dd>
+            <dt>Call Number:</dt>
+            <dd>{{reqToCancel.callNumber}}</dd>
+            <dt>Hold Status:</dt>
+            <dd>{{reqToCancel.status}}</dd>
+            <dt>Date Placed:</dt>
+            <dd>{{formatDate(reqToCancel.placedDate)}}</dd>
+         </dl>
+
+         <template v-if="reqToCancel.cancellable">
+         <p>Are you sure you want to cancel this request?</p>
+         </template>
+         <template v-else>
+            <p>
+               This hold request is already in progress and can not be cancelled automatically.
+            </p>
+            <p>
+               If you still want to cancel it, please send an email to <br/>
+               <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>
+            </p>
+         </template>
+      </template>
+      <template #controls>
+         <V4Button id="cancelHoldBack" mode="tertiary" @click="hideCancelHold">
+            Back
+         </V4Button>
+
+         <V4Button v-if="reqToCancel.cancellable" id="cancelHoldButton" mode="primary" @click="cancelHold" >
+            Cancel Request
+         </V4Button>
+
+      </template>
+   </V4Modal>
 </template>
 
 <script setup>
@@ -197,6 +233,8 @@ const userStore = useUserStore()
 const requestStore = useRequestStore()
 
 const request = ref("")
+const cancelHoldModal = ref(null)
+const reqToCancel = ref(null)
 
 const illiadRequests = computed(()=>{
    return userStore.requests.illiad.filter( h=> h.transactionStatus != "Checked Out to Customer" &&
@@ -260,8 +298,24 @@ function formatDate(date) {
 function hasNoRequests() {
    return illLoans.value.length == 0 && userStore.requests.holds.length == 0 && digitalRequests.value == 0 && systemStore.ilsError == ""
 }
-function deleteHold(id) {
-   requestStore.deleteHold(id)
+function cancelHold() {
+   if( reqToCancel.value.cancellable ){
+      requestStore.deleteHold(reqToCancel.value.id)
+   }
+   cancelHoldModal.value.hide()
+}
+async function showCancelHold(req) {
+   reqToCancel.value = req
+   await cancelHoldModal.value.show()
+   let tgt = req.cancellable ? 'cancelHoldButton' : 'cancelHoldBack'
+   let ele = document.getElementById(tgt)
+   if (ele) {
+      ele.focus()
+   }
+}
+function hideCancelHold(){
+   reqToCancel.value = null
+   cancelHoldModal.value.hide()
 }
 
 onMounted(() =>{
