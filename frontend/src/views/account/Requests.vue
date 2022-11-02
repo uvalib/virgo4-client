@@ -2,9 +2,6 @@
    <div class="requests">
       <SignInRequired v-if="userStore.isSignedIn == false" targetPage="request information"/>
       <AccountActivities  v-if="userStore.isSignedIn"/>
-      <div class="working" v-if="userStore.lookingUp && userStore.isSignedIn">
-         <V4Spinner message="Looking up requests..." />
-      </div>
       <div class="details" v-if="userStore.isSignedIn">
          <template v-if="!userStore.noILSAccount && !userStore.isBarred">
             <h2>Make a New Request</h2>
@@ -34,6 +31,9 @@
             <h2>Outstanding Requests</h2>
          </template>
          <div class="subcontent">
+            <div class="working" v-if="userStore.lookingUp && userStore.isSignedIn">
+               <V4Spinner message="Looking up requests..." />
+            </div>
             <template v-if="userStore.lookingUp == false && systemStore.ilsError">
                <div class="ils-error">{{systemStore.ilsError}}</div>
             </template>
@@ -196,7 +196,7 @@
             </p>
             <p>
                If you still want to cancel it, please send an email to <br/>
-               <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>
+               <a href="mailto:lib-circ@virginia.edu" target="_blank" @click="cancelHold">lib-circ@virginia.edu</a>
             </p>
          </template>
       </template>
@@ -301,13 +301,23 @@ function hasNoRequests() {
 function cancelHold() {
    if( reqToCancel.value.cancellable ){
       requestStore.deleteHold(reqToCancel.value.id)
+      analytics.trigger('Requests', 'REQUEST_CANCEL_SUBMITTED', "sirsi")
+   }else{
+      analytics.trigger('Requests', 'REQUEST_CANCEL_SUBMITTED', "email")
    }
    cancelHoldModal.value.hide()
 }
 async function showCancelHold(req) {
    reqToCancel.value = req
    await cancelHoldModal.value.show()
-   let tgt = req.cancellable ? 'cancelHoldButton' : 'cancelHoldBack'
+   let tgt = ""
+   if( reqToCancel.value.cancellable ){
+      tgt = 'cancelHoldButton'
+      analytics.trigger('Requests', 'REQUEST_CANCEL_STARTED', "sirsi")
+   }else{
+      tgt = 'cancelHoldBack'
+      analytics.trigger('Requests', 'REQUEST_CANCEL_STARTED', "email")
+   }
    let ele = document.getElementById(tgt)
    if (ele) {
       ele.focus()
