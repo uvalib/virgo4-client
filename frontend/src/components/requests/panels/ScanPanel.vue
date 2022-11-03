@@ -20,7 +20,7 @@
          <FormKit label="Book or Journal Title" type="text" v-model="scan.title" validation="required"/>
          <FormKit label="Chapter or Article Title" type="text" v-model="scan.chapter" validation="required"/>
          <FormKit label="Chapter or Article Author" type="text" v-model="scan.author" validation="required"/>
-         <FormKit label="Year" type="text" v-model="scan.year" placeholder="yyyy" validation="date_format:YYYY"/>
+         <FormKit label="Year" type="text" v-model="scan.year" placeholder="yyyy" validation="required|date_format:YYYY"/>
          <FormKit label="Volume" type="text" v-model="scan.volume"/>
          <FormKit label="Issue" type="text" v-model="scan.issue"/>
          <FormKit label="Pages" type="text" v-model="scan.pages" validation="required|length:1,25" help="(ex: 1-15)"/>
