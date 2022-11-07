@@ -67,7 +67,7 @@
                            <dt>Item Status:</dt>
                            <dd>{{req.itemStatus}}</dd>
                         </dl>
-                        <p v-if="systemStore.isDevServer">
+                        <p>
                            <V4Button :id="'showCancelModal-' + req.id" mode="tertiary" @click="showCancelHold(req)">Cancel Request</V4Button>
                         </p>
                      </div>
@@ -195,17 +195,19 @@
                This hold request is already in progress and can not be cancelled automatically.
             </p>
             <p>
-               If you still want to cancel it, please send an email to <br/>
-               <a href="mailto:lib-circ@virginia.edu" target="_blank" @click="cancelHold">lib-circ@virginia.edu</a>
+               By continuing, an email will be sent to begin the cancellation process.
             </p>
          </template>
+            <FormKit type="form" :actions="false" id="cancelHoldForm" @submit="cancelHold()">
+               <FormKit label="Confirmation Email" id="confirmationEmail" validate="email" type="email" v-model="reqToCancel.confirmationEmail" />
+            </FormKit>
       </template>
       <template #controls>
          <V4Button id="cancelHoldBack" mode="tertiary" @click="hideCancelHold">
             Back
          </V4Button>
 
-         <V4Button v-if="reqToCancel.cancellable" id="cancelHoldButton" mode="primary" @click="cancelHold" >
+         <V4Button type="submit" id="cancelHoldButton" mode="primary" @click="cancelHold()">
             Cancel Request
          </V4Button>
 
@@ -299,26 +301,32 @@ function hasNoRequests() {
    return illLoans.value.length == 0 && userStore.requests.holds.length == 0 && digitalRequests.value == 0 && systemStore.ilsError == ""
 }
 function cancelHold() {
+
+   let form = document.getElementById('cancelHoldForm')
+   if (!form.checkValidity()) {
+      if (form.reportValidity) {
+         form.reportValidity();
+      }
+      return false
+   }
    if( reqToCancel.value.cancellable ){
-      requestStore.deleteHold(reqToCancel.value.id)
       analytics.trigger('Requests', 'REQUEST_CANCEL_SUBMITTED', "sirsi")
    }else{
       analytics.trigger('Requests', 'REQUEST_CANCEL_SUBMITTED', "email")
    }
-   cancelHoldModal.value.hide()
+   requestStore.cancelHold(reqToCancel.value)
+   hideCancelHold()
 }
 async function showCancelHold(req) {
    reqToCancel.value = req
+   reqToCancel.value.confirmationEmail = userStore.singleEmail.toLowerCase()
    await cancelHoldModal.value.show()
-   let tgt = ""
    if( reqToCancel.value.cancellable ){
-      tgt = 'cancelHoldButton'
       analytics.trigger('Requests', 'REQUEST_CANCEL_STARTED', "sirsi")
    }else{
-      tgt = 'cancelHoldBack'
       analytics.trigger('Requests', 'REQUEST_CANCEL_STARTED', "email")
    }
-   let ele = document.getElementById(tgt)
+   let ele = document.getElementById('cancelHoldButton')
    if (ele) {
       ele.focus()
    }

@@ -1,0 +1,19 @@
+_______________________________________________________________________
+Cancel Hold Request
+_______________________________________________________________________
+
+A request has been made to cancel the hold on this item.
+This process may take a few days to complete.
+
+_______________________________________________________________________
+User ID:         {{.UserID}}
+
+Title:           {{.Title}}
+Barcode:         {{.Barcode}}
+Author:          {{.Author}}
+Call Number:     {{.CallNumber}}
+Hold Status:     {{.Status}}
+Pickup Location: {{.PickupLocation}}
+Date Placed:     {{.PlacedDate}}
+Item Status:     {{.ItemStatus}}
+_______________________________________________________________________

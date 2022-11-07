@@ -1,11 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
+	"text/template"
 
 	"github.com/gin-gonic/gin"
 )
@@ -540,31 +541,75 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-// DeleteHold uses ILS Connector V4 API to delete a Hold
+// DeleteHold If the hold is cancellable use ILS Connector V4 API to delete it,
+// otherwise send an email to lib-circ with the cancellation request
 func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 
-	// v4-dev only
-	v4HostHeader := c.Request.Header.Get("V4Host")
-	log.Printf("INFO: delete hold V4Host header: [%s]", v4HostHeader)
-	if !strings.Contains(v4HostHeader, "-dev") && svc.Dev.AuthUser == "" {
-		c.String(http.StatusNotImplemented, "Hold deletion is only available on the staging server")
+	type holdData struct {
+		HoldID            string `json:"id"`
+		UserID            string `json:"userID"`
+		Title             string `json:"title"`
+		Author            string `json:"author"`
+		Barcode           string `json:"barcode"`
+		CallNumber        string `json:"callNumber"`
+		Status            string `json:"status"`
+		PickupLocation    string `json:"pickupLocation"`
+		PlacedDate        string `json:"placedDate"`
+		ItemStatus        string `json:"itemStatus"`
+		Cancellable       bool   `json:"cancellable"`
+		ConfirmationEmail string `json:"confirmationEmail"`
+	}
+	var holdToCancel holdData
+	err := c.ShouldBindJSON(&holdToCancel)
+	if err != nil {
+		log.Printf("ERROR: Unable to parse hold cancellation request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	holdID := c.Param("holdID")
-
-	_, signedIn := c.Get("claims")
-	if signedIn == false {
-		log.Printf("Hold Request requires signin with JWT claims; no claims found")
-		c.String(http.StatusBadRequest, "signin required")
+	v4Claims, err := getJWTClaims(c)
+	if err != nil {
+		c.String(http.StatusBadRequest, "You must be signed in")
+		return
+	}
+	if v4Claims.UserID != holdToCancel.UserID {
+		log.Printf("Cancel Hold user does not match claims")
+		c.String(http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 
-	deleteHoldURL := fmt.Sprintf("%s/v4/requests/hold/%s", svc.ILSAPI, holdID)
-	_, ilsErr := svc.ILSConnectorDelete(deleteHoldURL, c.GetString("jwt"))
-	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
-		return
+	// Hold is able to be cancelled automatically
+	if holdToCancel.Cancellable {
+		deleteHoldURL := fmt.Sprintf("%s/v4/requests/hold/%s", svc.ILSAPI, holdToCancel.HoldID)
+		_, ilsErr := svc.ILSConnectorDelete(deleteHoldURL, c.GetString("jwt"))
+		if ilsErr != nil {
+			c.String(ilsErr.StatusCode, ilsErr.Message)
+			return
+		}
+
+	} else {
+		// Send a lib-circ email to have the hold cancelled manually
+		var renderedEmail bytes.Buffer
+		tpl := template.Must(template.New("cancel_hold.txt").ParseFiles("templates/cancel_hold.txt"))
+		err = tpl.Execute(&renderedEmail, holdToCancel)
+		if err != nil {
+			log.Printf("ERROR: Unable to render cancel hold request email: %s", err.Error())
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		//to := []string{"lib-circ@virginia.edu"}
+		to := []string{"lib-circ@virginia.edu"}
+		cc := holdToCancel.ConfirmationEmail
+
+		eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, CC: cc, From: svc.SMTP.Sender, Body: renderedEmail.String()}
+		sendErr := svc.SendEmail(&eRequest)
+		if sendErr != nil {
+			log.Printf("ERROR: Unable to send hold cancellation email: %s", sendErr.Error())
+			c.String(http.StatusInternalServerError, sendErr.Error())
+			return
+		}
+
 	}
 
 	c.JSON(http.StatusOK, nil)

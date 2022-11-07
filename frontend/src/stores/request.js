@@ -173,21 +173,21 @@ export const useRequestStore = defineStore('request', {
                this.buttonDisabled = false
             )
       },
-      deleteHold(holdId) {
+      cancelHold(holdData) {
          const userStore = useUserStore()
          this.buttonDisabled = true
-         axios.delete('/api/requests/hold/' + holdId)
-            .then(response => {
-               if (response.status == 200) {
-                  userStore.getRequests()
-               } else {
-                  useSystemStore().setError(response.data)
-               }
-            }).catch(e =>
-               useSystemStore().setError(e)
-            ).finally(()=>
-               this.buttonDisabled = false
-            )
+         axios
+           .delete("/api/requests/hold", { data: holdData })
+           .then((response) => {
+             if (response.status == 200) {
+               useSystemStore().setMessage("Your hold cancellation has been received.")
+               userStore.getRequests();
+             } else {
+               useSystemStore().setError(response.data);
+             }
+           })
+           .catch((e) => useSystemStore().setError(e))
+           .finally(() => (this.buttonDisabled = false));
       },
       sendDirectLink() {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
