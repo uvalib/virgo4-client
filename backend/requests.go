@@ -572,11 +572,7 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 		c.String(http.StatusBadRequest, "You must be signed in")
 		return
 	}
-	if v4Claims.UserID != holdToCancel.UserID {
-		log.Printf("Cancel Hold user does not match claims")
-		c.String(http.StatusUnauthorized, "Unauthorized")
-		return
-	}
+	holdToCancel.UserID = v4Claims.UserID
 
 	// Hold is able to be cancelled automatically
 	if holdToCancel.Cancellable {
