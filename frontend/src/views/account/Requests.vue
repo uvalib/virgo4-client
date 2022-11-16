@@ -197,10 +197,10 @@
             <p>
                By continuing, an email will be sent to begin the cancellation process.
             </p>
-         </template>
             <FormKit type="form" :actions="false" id="cancelHoldForm" @submit="cancelHold()">
                <FormKit label="Confirmation Email" id="confirmationEmail" validate="email" type="email" v-model="reqToCancel.confirmationEmail" />
             </FormKit>
+         </template>
       </template>
       <template #controls>
          <V4Button id="cancelHoldBack" mode="tertiary" @click="hideCancelHold">
@@ -303,7 +303,7 @@ function hasNoRequests() {
 function cancelHold() {
 
    let form = document.getElementById('cancelHoldForm')
-   if (!form.checkValidity()) {
+   if (form && !form.checkValidity()) {
       if (form.reportValidity) {
          form.reportValidity();
       }
