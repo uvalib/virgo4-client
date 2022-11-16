@@ -596,9 +596,9 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 
 		//to := []string{"lib-circ@virginia.edu"}
 		to := []string{"lib-circ@virginia.edu"}
-		cc := holdToCancel.ConfirmationEmail
+		confirmation := holdToCancel.ConfirmationEmail
 
-		eRequest := emailRequest{Subject: "Update Contact Info Request", To: to, CC: cc, From: svc.SMTP.Sender, Body: renderedEmail.String()}
+		eRequest := emailRequest{Subject: "Cancel Hold Request", To: to, ReplyTo: confirmation, CC: confirmation, From: svc.SMTP.Sender, Body: renderedEmail.String()}
 		sendErr := svc.SendEmail(&eRequest)
 		if sendErr != nil {
 			log.Printf("ERROR: Unable to send hold cancellation email: %s", sendErr.Error())
