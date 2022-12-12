@@ -23,7 +23,7 @@
             :options="['Fall', 'January', 'Spring', 'Summer I', 'Summer II', 'Summer III']" />
          <FormKit type="select" label="Learning Management System" v-model="reserveRequest.lms" validation="required"
             placeholder="Please select an LMS"
-            :options="['Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other']" />
+            :options="['A&S Canvas', 'Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other']" />
          <FormKit v-if="reserveRequest.lms == 'Other'" label="Please specify other LMS" type="text"
             v-model="reserveRequest.otherLMS" validation="required" />
 
@@ -91,6 +91,7 @@ onMounted(() => {
       selectedVideo.value = itemOptions.value[0].value
    }
    document.getElementById("behalf_of").focus()
+   reserveStore.request.lms = "A&S Canvas"
 })
 
 function submit() {
