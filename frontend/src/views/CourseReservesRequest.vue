@@ -36,7 +36,7 @@
                   :options="['Fall', 'January', 'Spring', 'Summer I', 'Summer II', 'Summer III']" />
                <FormKit type="select" label="Learning Management System" v-model="request.lms" validation="required"
                   placeholder="Please select an LMS"
-                  :options="['A&S Canvas', 'Blackboard', 'Collab', 'Education Canvas', 'Law Canvas', 'SCPS/ISSP Canvas', 'Other']" />
+                  :options="['A&S Canvas', 'Blackboard', 'Collab', 'Law Canvas', 'Other']" />
                <FormKit v-if="request.lms == 'Other'" label="Please specify other LMS" type="text"
                   v-model="request.otherLMS" validation="required" />
 
