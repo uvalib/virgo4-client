@@ -12,7 +12,7 @@
          </h2>
          <div class="viewer" v-if="item.hasDigitalContent">
             <div v-if="fsView" class="restore-view"><V4Button mode="primary" class="small" @click="toggleFullView">Restore View</V4Button></div>
-            <iframe :class="{full: fsView}" :src="curioURL" :width="curioWidth"  :height="curioHeight" allowfullscreen frameborder="0"/>
+            <iframe :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large">
@@ -117,6 +117,15 @@ const selectedDigitalObjectIdx = ref(0)
 const pdfTimerIDs = ref(new Map())
 const ocrTimerIDs = ref(new Map())
 const fsView = ref(false)
+const curioHeight = ref("700px")
+const defaultWidth = ()=>{
+   let w = 800
+   if ( system.displayWidth < 800) {
+      w = system.displayWidth * 0.95
+   }
+   return w + "px"
+}
+const curioWidth = ref(defaultWidth())
 
 const details = computed(()=>{
    return item.details
@@ -175,16 +184,6 @@ const curioURL = computed(()=>{
 
    return url
 })
-const curioWidth = computed(()=>{
-   let w = 800
-   if ( system.displayWidth < 800) {
-      w = system.displayWidth *0.95
-   }
-   return w
-})
-const curioHeight = computed(()=>{
-   return curioWidth.value*0.75
-})
 const hasImage = computed(()=>{
    let iiifField = details.value.detailFields.find( f => f.name=="iiif_image_url")
    if (iiifField) {
@@ -224,6 +223,9 @@ onMounted(()=>{
             qp.push(`page=${curio.page}`)
          }
          history.replaceState(null, null, "?"+qp.join("&"))
+      } else if (e.data.dimensions){
+         curioHeight.value = e.data.dimensions.height
+         curioWidth.value = e.data.dimensions.width
       }
    }
 })
