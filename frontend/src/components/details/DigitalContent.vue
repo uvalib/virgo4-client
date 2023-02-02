@@ -225,7 +225,7 @@ onMounted(()=>{
          history.replaceState(null, null, "?"+qp.join("&"))
       } else if (e.data.dimensions){
          curioHeight.value = e.data.dimensions.height
-         curioWidth.value = e.data.dimensions.width
+         // let Virgo determine the screen width
       }
    }
 })
