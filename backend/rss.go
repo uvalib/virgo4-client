@@ -137,6 +137,7 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 		for _, record := range group.Records {
 			var feedItem feeds.Item
 
+			foundISBN := false
 			for _, field := range record.Fields {
 				switch {
 				case field.Name == "id" || field.Type == "identifier":
@@ -167,8 +168,9 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 						log.Printf("RSS Date parse error: %+v", parseErr)
 					}
 
-				case field.Name == "isbn":
+				case field.Name == "isbn" && foundISBN == false:
 					feedItem.Description += fmt.Sprintf("<p>%s: %s</p>", field.Label, field.Value)
+					foundISBN = true
 				}
 
 				log.Printf("Field: %+v", field)
