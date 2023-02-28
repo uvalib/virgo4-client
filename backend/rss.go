@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -137,17 +138,30 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 		for _, record := range group.Records {
 			var feedItem feeds.Item
 
-			foundISBN := false
+			// Syndetics Unbound will detect all ISBNs in the feed and display images for them.
+			// This can result in multiple images for items, when at most one is desired.
+			// We attempt to prevent this by only including one ISBN in the description field, but
+			// only if the access URL in the source field does not contain any of the known ISBNs.
+
+			var isbns []string
+			var isbnLabel string
+
+			// first, process all fields except ISBN (just collect them for now)
 			for _, field := range record.Fields {
+
+				includeField := field.Display != "optional"
+
 				switch {
 				case field.Name == "id" || field.Type == "identifier":
 					virgoURL := svc.VirgoURL + "/items/" + field.Value
 					feedItem.Id = field.Value
 					feedItem.Link = &feeds.Link{Rel: "self", Href: virgoURL}
 					feedItem.Description += "<p>Virgo URL: " + virgoURL + "</p>"
+					includeField = false
 
 				case field.Name == "access_url" || field.Type == "access-url":
 					feedItem.Source = &feeds.Link{Href: field.Value}
+					includeField = false
 
 				case field.Name == "title_subtitle_edition" || field.Type == "title":
 					feedItem.Title = field.Value
@@ -168,18 +182,52 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 						log.Printf("RSS Date parse error: %+v", parseErr)
 					}
 
-				case field.Name == "isbn" && foundISBN == false:
-					feedItem.Description += fmt.Sprintf("<p>%s: %s</p>", field.Label, field.Value)
-					foundISBN = true
+				case field.Name == "isbn":
+					isbnLabel = field.Label
+					isbns = append(isbns, field.Value)
 				}
 
-				log.Printf("Field: %+v", field)
-				if field.Display != "optional" && !(field.Name == "id" || field.Type == "identifier") {
+				//log.Printf("Field: %+v", field)
+				if includeField == true {
 					feedItem.Description += fmt.Sprintf("<p>%s: %s</p>", field.Label, field.Value)
-
 				}
-
 			}
+
+			// now, add the first ISBN found, but only if the access URL doesn't already
+			// contain the ISBN-10 representation of any of the ISBNs known for this item
+
+			includeISBN := len(isbns) > 0
+
+			for _, isbn := range isbns {
+
+				// validate ISBN by length, and convert to ISBN-10 for search purposes
+
+				switch len(isbn) {
+				case 10:
+					// already in the format we want
+
+				case 13:
+					// convert to ISBN-10
+					isbn = isbn[len(isbn)-10:]
+
+				default:
+					log.Printf("RSS: ignoring possibly invalid ISBN: [%s]", isbn)
+					continue
+				}
+
+				//log.Printf("checking for [%v] in [%v]...", isbn, feedItem.Source.Href)
+				if strings.Contains(feedItem.Source.Href, isbn) == true {
+					//log.Printf("found")
+					includeISBN = false
+					break
+				}
+			}
+
+			if includeISBN == true {
+				//log.Printf("including ISBN")
+				feedItem.Description += fmt.Sprintf("<p>%s: %s</p>", isbnLabel, isbns[0])
+			}
+
 			//log.Printf("RSS ITEM: %+v", feedItem)
 			items = append(items, &feedItem)
 		}
