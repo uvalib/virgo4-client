@@ -105,7 +105,7 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 		log.Printf("RSS query error: %s", err)
 	}
 
-	log.Printf("search: %+v", searchResult)
+	//log.Printf("search: %+v", searchResult)
 
 	now := time.Now()
 	savedURL := svc.VirgoURL + "/search/" + search.Token
@@ -128,6 +128,7 @@ func (svc *ServiceContext) GetRSSFeed(c *gin.Context) {
 	c.Writer.Write([]byte(rss))
 
 }
+
 func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.Item {
 
 	//log.Printf("%+v", poolResults)
@@ -138,18 +139,20 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 		for _, record := range group.Records {
 			var feedItem feeds.Item
 
-			// Syndetics Unbound will detect all ISBNs in the feed and display images for them.
-			// This can result in multiple images for items, when at most one is desired.
-			// We attempt to prevent this by only including one ISBN in the description field, but
-			// only if the access URL in the source field does not contain any of the known ISBNs.
+			// Syndetics Unbound will detect all ISBNs in the description field and display
+			// images for them.  This can result in multiple images for items, when at most
+			// one is desired.  We attempt to prevent this by only including at most one ISBN
+			// in the description field, but only if the access URL in the description field
+			// does not contain any of the known ISBNs.  (This can still result in multiple
+			// images, if the access URL contains an ISBN we do not already know about.)
 
 			var isbns []string
 			var isbnLabel string
 
-			// first, process all fields except ISBN (just collect them for now)
+			// first, add all applicable fields to the description, except ISBN (just collect those for now)
 			for _, field := range record.Fields {
 
-				includeField := field.Display != "optional"
+				addToDesc := field.Display != "optional"
 
 				switch {
 				case field.Name == "id" || field.Type == "identifier":
@@ -157,11 +160,15 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 					feedItem.Id = field.Value
 					feedItem.Link = &feeds.Link{Rel: "self", Href: virgoURL}
 					feedItem.Description += "<p>Virgo URL: " + virgoURL + "</p>"
-					includeField = false
+					addToDesc = false
 
 				case field.Name == "access_url" || field.Type == "access-url":
-					feedItem.Source = &feeds.Link{Href: field.Value}
-					includeField = false
+					// use just the first access URL in both the source and description fields
+					addToDesc = false
+					if feedItem.Source == nil {
+						feedItem.Source = &feeds.Link{Href: field.Value}
+						addToDesc = true
+					}
 
 				case field.Name == "title_subtitle_edition" || field.Type == "title":
 					feedItem.Title = field.Value
@@ -188,7 +195,7 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 				}
 
 				//log.Printf("Field: %+v", field)
-				if includeField == true {
+				if addToDesc == true {
 					feedItem.Description += fmt.Sprintf("<p>%s: %s</p>", field.Label, field.Value)
 				}
 			}
@@ -198,28 +205,30 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 
 			includeISBN := len(isbns) > 0
 
-			for _, isbn := range isbns {
+			if feedItem.Source != nil {
+				for _, isbn := range isbns {
 
-				// validate ISBN by length, and convert to ISBN-10 for search purposes
+					// validate ISBN by length, and convert to ISBN-10 for search purposes
 
-				switch len(isbn) {
-				case 10:
-					// already in the format we want
+					switch len(isbn) {
+					case 10:
+						// already in the format we want
 
-				case 13:
-					// convert to ISBN-10
-					isbn = isbn[len(isbn)-10:]
+					case 13:
+						// convert to ISBN-10
+						isbn = isbn[len(isbn)-10:]
 
-				default:
-					log.Printf("RSS: ignoring possibly invalid ISBN: [%s]", isbn)
-					continue
-				}
+					default:
+						log.Printf("RSS: ignoring possibly invalid ISBN: [%s]", isbn)
+						continue
+					}
 
-				//log.Printf("checking for [%v] in [%v]...", isbn, feedItem.Source.Href)
-				if strings.Contains(feedItem.Source.Href, isbn) == true {
-					//log.Printf("found")
-					includeISBN = false
-					break
+					//log.Printf("checking for [%v] in [%v]...", isbn, feedItem.Source.Href)
+					if strings.Contains(feedItem.Source.Href, isbn) == true {
+						//log.Printf("found")
+						includeISBN = false
+						break
+					}
 				}
 			}
 
@@ -232,6 +241,6 @@ func (svc *ServiceContext) mapFeedItems(poolResults v4api.PoolResult) []*feeds.I
 			items = append(items, &feedItem)
 		}
 	}
-	return items
 
+	return items
 }
