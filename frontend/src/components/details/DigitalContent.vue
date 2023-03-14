@@ -223,7 +223,7 @@ onMounted(()=>{
             qp.push(`page=${curio.page}`)
          }
          history.replaceState(null, null, "?"+qp.join("&"))
-      } else if (e.data.dimensions){
+      } else if (e.data.dimensions && e.data.dimensions.height != "0px"){
          curioHeight.value = e.data.dimensions.height
          // let Virgo determine the screen width
       }
