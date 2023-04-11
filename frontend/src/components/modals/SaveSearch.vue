@@ -2,7 +2,7 @@
    <V4Modal id="save-modal" ref="savemodal" title="Save Search"
       firstFocusID="savename" lastFocusID="save-ok" buttonID="save-modal-open" @opened="opened">
        <template v-slot:button>
-         <V4Button mode="primary" @click="$refs.savemodal.show()" id="save-modal-open" aria-label="save search">
+         <V4Button mode="primary" @click="openSaveClicked()" id="save-modal-open" aria-label="save search">
             Save Search
          </V4Button>
       </template>
@@ -43,7 +43,9 @@
 import { ref, nextTick } from 'vue'
 import { useSearchStore } from "@/stores/search"
 import { useUserStore } from "@/stores/user"
+import { useQueryStore } from "@/stores/query"
 import { useRoute } from 'vue-router'
+import analytics from '@/analytics'
 
 const userStore = useUserStore()
 const searches = useSearchStore()
@@ -57,6 +59,11 @@ const working = ref(false)
 const lastSavedURL = ref("")
 const duplicateSave = ref(false)
 
+function openSaveClicked() {
+   const query = useQueryStore()
+   analytics.trigger('Results', 'SAVE_SEARCH', query.mode)
+   savemodal.value.show()
+}
 function cancelClicked() {
    savemodal.value.hide()
 }

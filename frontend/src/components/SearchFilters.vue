@@ -50,6 +50,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useQueryStore } from "@/stores/query"
+import analytics from '@/analytics'
 
 const route = useRoute()
 const router = useRouter()
@@ -101,6 +102,7 @@ function removeFilter( filter ) {
 }
 
 async function clearClicked() {
+   analytics.trigger('Results', 'CLEAR_ALL_FILTERS', queryStore.mode)
    filters.resetPoolFilters(resultStore.selectedResults.pool.id)
    let query = Object.assign({}, route.query)
    delete query.filter

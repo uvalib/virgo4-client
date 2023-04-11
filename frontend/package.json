@@ -8,7 +8,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@formkit/vue": "^1.0.0-beta.9",
+    "@formkit/vue": "^0.16.4",
     "@fortawesome/fontawesome-pro": "^5.15.3",
     "@vue-a11y/announcer": "^3.1.4",
     "axios": "^0.21.1",

@@ -34,6 +34,7 @@ import SearchTips from "@/components/disclosures/SearchTips.vue"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useRouter, useRoute } from 'vue-router'
+import analytics from '@/analytics'
 
 const props = defineProps({
    help: {
@@ -49,6 +50,7 @@ const route = useRoute()
 
 function sourcesClicked( setting ) {
    if ( queryStore.searchSources  != setting ) {
+      analytics.trigger('Search', 'SCOPE_CHANGED', `${queryStore.mode}|${setting}`)
       queryStore.searchSources = setting
       if (queryStore.queryEntered || route.query.filter ) {
          let query = Object.assign({}, route.query)

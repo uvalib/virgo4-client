@@ -126,6 +126,8 @@ const otherSources = computed(()=>{
 
 function printResults() {
    systemStore.printing = true
+   analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
+
    nextTick( () => {
       let contents = document.getElementById("print-results").innerHTML
       let printFrame = document.createElement('iframe')
@@ -152,8 +154,10 @@ function printResults() {
 async function resetSearch(){
    resultStore.resetSearch()
    if ( queryStore.mode == "basic") {
+      analytics.trigger('Results', 'RESET_SEARCH', "basic")
       router.push(`/search`)
    } else {
+      analytics.trigger('Results', 'RESET_SEARCH', "advanced")
       router.push('/search?mode=advanced')
    }
 }

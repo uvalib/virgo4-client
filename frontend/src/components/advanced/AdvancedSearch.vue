@@ -40,7 +40,7 @@
             <div class="controls">
                <FormKit v-if="resultStore.hasResults==false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
                   outer-class="$reset sort" inner-class="$reset sort"
-                  :options="sortOptions"  />
+                  :options="sortOptions" @change="sortChanged()" />
                <SourceSelector mode="advanced" :help="false"/>
             </div>
             <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
@@ -94,7 +94,12 @@ const sortOptions = computed(()=>{
    return out
 })
 
+function sortChanged() {
+   analytics.trigger('AdvancedSearch', 'SORT_CHANGED', sortStore.preSearchSort)
+}
+
 function saveSearchForm() {
+   analytics.trigger('AdvancedSearch', 'FORM_SAVE_CLICKED', "")
    preferences.saveAdvancedSearchTemplate(queryStore.advancedSearchTemplate)
    systemStore.setMessage("This search setup has been saved and will be used as the default for future advanced searches.<br/>You can change this at any time by saving a new setup.")
 }
@@ -141,6 +146,7 @@ async function doAdvancedSearch() {
 }
 
 function addClicked() {
+   analytics.trigger('AdvancedSearch', 'ADD_CRITERIA', sortStore.preSearchSort)
    queryStore.addCriteria()
    nextTick( () => {
       let out = document.querySelectorAll(".field:last-of-type")
@@ -151,6 +157,9 @@ function addClicked() {
 }
 
 function removeCriteria(idx) {
+   let criteria = queryStore.advanced[idx]
+   let data = JSON.stringify(criteria)
+   analytics.trigger('AdvancedSearch', 'REMOVE_CRITERIA', data)
    queryStore.removeCriteria(idx)
 }
 

@@ -29,6 +29,7 @@
 import { computed } from 'vue'
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
+import analytics from '@/analytics'
 
 const resultStore = useResultStore()
 const filters = useFilterStore()
@@ -58,6 +59,7 @@ function selections( filter ) {
    return out
 }
 async function clearClicked() {
+   analytics.trigger('AdvancedSearch', 'CLEAR_ALL_FILTERS', "")
    filters.preSearchFilters.forEach( pf => {
       let sel = pf.buckets.filter( c => c.selected)
       sel.forEach( fv=>{
