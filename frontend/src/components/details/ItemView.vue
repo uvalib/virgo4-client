@@ -13,7 +13,7 @@
          </span>
       </div>
       <div class="details-content">
-         <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source" from="DETAIL"/>
+         <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"  :expand="preferences.expandDetails" from="DETAIL"/>
          <abbr class="unapi-id" :title="details.itemURL"></abbr>
          <div class="info">
             <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
@@ -22,14 +22,15 @@
                <template v-if="details.header.author">
                   <dt class="label">{{details.header.author.label}}:</dt>
                   <dd class="value">
-                     <V4LinksList id="author-links" :inline="true" :links="getBrowseLinks('author', details.header.author.value)" />
+                     <V4LinksList id="author-links" :inline="true" :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
                   </dd>
                </template>
                <template v-for="(field,idx) in allDisplayFields"  :key="`lv${idx}`">
                   <dt class="label">{{field.label}}:</dt>
                   <dd class="value">
                      <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                        :links="getBrowseLinks('subject', field.value)" />
+                        :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
+                     />
                      <span class="related" v-else-if="field.type=='related-url'">
                         <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
                            <a :id="`rl-${idx}`" class="link-button" :href="v.url" target="_blank">{{v.label}}</a>
@@ -44,8 +45,11 @@
                            More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                         </a>
                      </span>
-                     <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
-                        :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
+                     <template v-else>
+                        <span v-if="preferences.expandDetails" class="value" v-html="utils.fieldValueString(field)"></span>
+                        <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
+                           :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
+                     </template>
                   </dd>
                </template>
                <template v-if="accessURLField && !system.isKiosk">
@@ -112,7 +116,9 @@ import { useResultStore } from "@/stores/result"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useCollectionStore } from "@/stores/collection"
+import { usePreferencesStore } from "@/stores/preferences"
 
+const preferences = usePreferencesStore()
 const collection = useCollectionStore()
 const router = useRouter()
 const route = useRoute()
@@ -159,31 +165,36 @@ const marcXML = computed(()=>{
    return beautify(xml.value).trim()
 })
 
-function returnToSearch() {
+const returnToSearch = (() => {
    router.push( resultStore.lastSearchURL )
-}
-async function nextHitClicked() {
+})
+
+const nextHitClicked = ( async () => {
    await resultStore.nextHit()
    let url = route.fullPath
    let lastSlash = url.lastIndexOf("/")
    url = url.substring(0,lastSlash )+"/"+resultStore.selectedHit.identifier
    router.push(url)
-}
-async function priorHitClicked() {
+})
+
+const priorHitClicked = ( async () => {
    await resultStore.priorHit()
    let url = route.fullPath
    let lastSlash = url.lastIndexOf("/")
    url = url.substring(0,lastSlash )+"/"+resultStore.selectedHit.identifier
    router.push(url)
-}
-function copyrightIconSrc( info ) {
+})
+
+const copyrightIconSrc = (( info ) => {
    let poolDetail = poolStore.poolDetails(details.value.source)
    return poolDetail.url+info.icon
-}
-function extDetailClicked() {
+})
+
+const extDetailClicked = (() => {
    analytics.trigger('Results', 'MORE_DETAILS_CLICKED', details.value.identifier)
-}
-function getBrowseLinks( name, values ) {
+})
+
+const getBrowseLinks = ( ( name, values ) => {
    let out = []
    values.forEach( v => {
       let qp = `${name}: {"${encodeURIComponent(v)}"}`
@@ -191,8 +202,9 @@ function getBrowseLinks( name, values ) {
       out.push(link)
    })
    return out
-}
-function shouldDisplay(field) {
+})
+
+const shouldDisplay =((field) => {
    if ( field.display == 'availability') return false
    if (field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
          field.type == "access-url" || field.type == "sirsi-url" ||
@@ -202,13 +214,14 @@ function shouldDisplay(field) {
 
    if ( system.isKiosk &&  field.type == "related-url" ) return false
    return true
-}
-function fieldLimit( field ) {
+})
+
+const fieldLimit = (( field ) => {
    if (field.name == "subject_summary" ) {
       return 900
    }
    return 300
-}
+})
 </script>
 <style lang="scss" scoped>
 .item-view {

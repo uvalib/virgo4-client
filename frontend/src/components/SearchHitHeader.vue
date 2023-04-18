@@ -17,7 +17,8 @@
          <SearchHitActions :hit="props.hit" :pool="props.pool" :from="props.from" />
       </div>
       <div v-if="props.hit.header.author_display" class="author-wrapper">
-         <TruncatedText :id="`${props.hit.identifier}-author`"
+         <span v-if="props.expand" :id="`${props.hit.identifier}-author`" v-html="props.hit.header.author_display"></span>
+         <TruncatedText v-else :id="`${props.hit.identifier}-author`"
             :text="props.hit.header.author_display" :limit="authorTruncateLength" />
       </div>
    </div>
@@ -51,6 +52,10 @@ const props = defineProps({
       type: String,
       default: ""
    },
+   expand: {
+      type: Boolean,
+      default: false
+   }
 })
 
 const resultStore = useResultStore()
@@ -62,10 +67,10 @@ const authorTruncateLength = computed(()=>{
    return 150
 })
 
-function detailClicked() {
+const detailClicked = (() => {
    resultStore.hitSelected(props.hit.identifier)
    analytics.trigger('Results', 'DETAILS_CLICKED', props.hit.identifier)
-}
+})
 </script>
 
 <style lang="scss" scoped>

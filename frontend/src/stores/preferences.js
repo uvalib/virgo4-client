@@ -10,6 +10,7 @@ export const usePreferencesStore = defineStore('preferences', {
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       collapseGroups: false,
+      expandDetails: false,
       searchTemplate: {
          fields: [],
       }
@@ -25,6 +26,9 @@ export const usePreferencesStore = defineStore('preferences', {
       setPreferences(prefsObj) {
          if (prefsObj.collapseGroups ) {
             this.collapseGroups = prefsObj.collapseGroups
+         }
+         if (prefsObj.expandDetails ) {
+            this.expandDetails = prefsObj.expandDetails
          }
          if ( prefsObj.trackingOptOut) {
             this.trackingOptOut  = prefsObj.trackingOptOut
@@ -76,6 +80,10 @@ export const usePreferencesStore = defineStore('preferences', {
          this.collapseGroups = !this.collapseGroups
          this.savePreferences()
       },
+      toggleExpandDetails() {
+         this.expandDetails = !this.expandDetails
+         this.savePreferences()
+      },
       async loadPreferences() {
          const userStore = useUserStore()
          let url = `/api/users/${userStore.signedInUser}/preferences`
@@ -97,6 +105,7 @@ export const usePreferencesStore = defineStore('preferences', {
             trackingOptOut: this.trackingOptOut,
             pickupLibrary: this.pickupLibrary,
             collapseGroups: this.collapseGroups,
+            expandDetails: this.expandDetails,
             searchTemplate: this.searchTemplate,
          }
          return axios.post(url, data)

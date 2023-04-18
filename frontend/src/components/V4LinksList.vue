@@ -1,6 +1,6 @@
 <template>
    <div :id="props.id" class="links-list">
-      <div v-if="props.links.length <= 5" class="link-list">
+      <div v-if="props.links.length <= 5 || props.expand == true" class="link-list">
          <div  v-for="(val,idx) in truncatedLinks" class="link-wrap" :class="{inline: props.inline}"  :key="`${props.id}-${idx}`">
             <span v-if="!props.inline" class="number">{{idx+1}}.</span>
             <router-link :to="val.url" class="link">{{val.label}}</router-link>
@@ -30,6 +30,7 @@
 <script setup>
 import { computed, ref, nextTick } from "vue"
 import * as utils from '@/utils'
+
 const props = defineProps({
    id: {
       type: String,
@@ -42,26 +43,32 @@ const props = defineProps({
    inline: {
       type: Boolean,
       default: false
+   },
+   expand: {
+      type: Boolean,
+      default: false
    }
 })
 
 const showFull = ref(false)
+
 const truncatedLinks = computed(()=>{
-   if ( showFull.value ) {
+   if ( showFull.value || props.expand ) {
       return props.links
    }
    return props.links.slice(0,5)
 })
 
-function hide() {
+const hide = (() => {
    showFull.value = false
    nextTick( () => {
       let tgt = document.getElementById(props.id+"-cut")
       tgt.focus()
       utils.scrollToItem(tgt)
    })
-}
-function toggle() {
+})
+
+const toggle = (() => {
    showFull.value = !showFull.value
    if ( showFull.value == false ) {
          nextTick( () => {
@@ -73,7 +80,7 @@ function toggle() {
       let firstLink = document.getElementById(`${props.id}-link-1`)
       firstLink.focus()
    }
-}
+})
 </script>
 
 <style lang="scss" scoped>
