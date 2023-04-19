@@ -309,8 +309,8 @@ github.com/ugorji/go/codec v1.2.11 h1:BMaWp1Bb6fHwEtbplGBGJ498wD+LKlNSl25MjdZY4d
 github.com/ugorji/go/codec v1.2.11/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656 h1:iTL8x10EXEyBt057McnLH6NKKySaqbwMbYOplStFhvc=
 github.com/uvalib/virgo4-api v0.0.0-20210111191046-ddb7c758e656/go.mod h1:p+LmQBQahBom6DErthL8iGZU6NgRJ9aN2wM7EE6VBSE=
-github.com/uvalib/virgo4-jwt v0.0.0-20230418121544-fe003de0585f h1:shI5ggFenfq6vqfTBrmMjniYU1TdJ9Qa77YISqTNjHo=
-github.com/uvalib/virgo4-jwt v0.0.0-20230418121544-fe003de0585f/go.mod h1:3pcQ+XdN3q29AExajOiWzASmTGOXsfeEDOKh5VxEKXU=
+github.com/uvalib/virgo4-jwt v0.0.0-20230419010935-28831a15a40d h1:02vS7iI5UTOPYG+GSG+/7RI6Spy+/RlH+ED55eRTRC8=
+github.com/uvalib/virgo4-jwt v0.0.0-20230419010935-28831a15a40d/go.mod h1:3pcQ+XdN3q29AExajOiWzASmTGOXsfeEDOKh5VxEKXU=
 github.com/xhit/go-str2duration v1.2.0/go.mod h1:3cPSlfZlUHVlneIVfePFWcJZsuwf+P1v2SRTV4cUmp4=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

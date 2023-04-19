@@ -66,13 +66,6 @@ const router = createRouter({
          component: () => import('../views/Details.vue')
       },
       {
-         path: '/items/:id',
-         beforeEnter(to, _from) {
-            // redirect to /sources/ with a flag trigger a lookup
-            return `/sources/legacy/items/${to.params.id}`
-         }
-      },
-      {
          path: '/sources/:src/items/:id/browse',
          name: 'shelf-browse',
          component: () => import('../views/ShelfBrowse.vue')
@@ -207,6 +200,13 @@ router.beforeEach( async (to, _from) => {
    const restore = useRestoreStore()
    const userStore = useUserStore()
    systemStore.clearMessage()
+
+   // URLs like /items/PID are legacy format. Redirect to /sources with a legacy source name
+   // when the details page loads, source = legacy will trigger a lookup of the correct source / item and redirect again
+   if (to.path.indexOf("/items") == 0) {
+      let tgtID = to.path.split("/")[2]
+      return `/sources/legacy/items/${tgtID}`
+   }
 
    // signedin page is a temporary redirect after netbadge.
    if ( to.path == "/signedin") {
