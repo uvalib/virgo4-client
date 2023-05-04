@@ -380,7 +380,7 @@ func parseMembership(membershipStr string) v4jwt.RoleEnum {
 	} else if strings.Contains(membershipStr, "lib-virgo4-pda") {
 		out = v4jwt.PDAAdmin
 		log.Printf("INFO: this is a PDA admin user: %s", out.String())
-	} else if strings.Contains(membershipStr, "lib-virgo4-staff") {
+	} else if strings.Contains(membershipStr, "lib-virgo4-staff") || strings.Contains(membershipStr, "lb-scpres-joint") {
 		out = v4jwt.Staff
 		log.Printf("INFO: this is virgo staff: %s", out.String())
 	}
