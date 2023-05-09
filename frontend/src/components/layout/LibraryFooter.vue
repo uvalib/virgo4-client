@@ -59,7 +59,7 @@
                <li><a href="https://www.virginia.edu" aria-label="U V A Home">UVA Home</a></li>
                <li><a href="https://virginia.service-now.com/its?id=home" aria-label="I T S">ITS</a></li>
                <li><a href="https://sisuva.admin.virginia.edu/ihprd/signon.html">SIS</a></li>
-               <li><a href="https://collab.itc.virginia.edu/portal" aria-label="U V A Collab">UVaCollab</a></li>
+               <li><a href="https://collab.itc.virginia.edu/portal" aria-label="UVA Collab">UVaCollab</a></li>
                <li><a href="https://www.virginia.edu/cavalieradvantage/">Cavalier Advantage</a></li>
                <li><a href="https://confluence.lib.virginia.edu/pages/viewpage.action?spaceKey=sw&title=StaffWeb">Library Staff Site</a></li>
                <li><a href="https://analytics.lib.virginia.edu/index.php?module=CoreAdminHome&amp;action=optOut&amp;language=en">Tracking Opt-out</a></li>
