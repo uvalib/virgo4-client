@@ -16,8 +16,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-isatty v0.0.18 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
-	github.com/prometheus/client_golang v1.15.1 // indirect
-	github.com/prometheus/client_model v0.4.0 // indirect
+	github.com/prometheus/common v0.43.0 // indirect
 	github.com/rs/xid v1.5.0
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -25,9 +24,9 @@ require (
 	github.com/uvalib/virgo4-jwt v1.0.0
 	github.com/zsais/go-gin-prometheus v0.1.0
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.8.0 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.5.0
-	gorm.io/gorm v1.25.0
+	gorm.io/gorm v1.25.1
 )
