@@ -19,7 +19,7 @@
                <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
             </p>
             <FormKit type="form" id="forgot-pass" :actions="false" @submit="okClicked">
-               <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Driver's License Number, eg: A12345678" />
+               <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Library ID, eg: C001005101 or TEMP001166" />
                <V4FormActions :hasCancel="!emailSent" submitLabel="OK" :submitID="`${id}-okbtn`"
                   :tabNextOverride="true" @tabnext="nextTabOK"
                   :disabled="okDisabled"
