@@ -73,7 +73,7 @@ type ServiceConfig struct {
 func LoadConfig() *ServiceConfig {
 	var cfg ServiceConfig
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
-	flag.StringVar(&cfg.VirgoURL, "virgo", "https://v4.virginia.edu", "URL to Virgo")
+	flag.StringVar(&cfg.VirgoURL, "virgo", "https://search.virginia.edu", "URL to Virgo")
 	flag.StringVar(&cfg.AvailabilityURL, "availability", "https://availability-ws-dev.internal.lib.virginia.edu", "Availability service URL")
 	flag.StringVar(&cfg.CitationsURL, "citations", "https://collections-ws-dev.internal.lib.virginia.edu", "Citations service URL")
 	flag.StringVar(&cfg.CollectionsURL, "collections", "https://collections-ws-dev.internal.lib.virginia.edu", "Collections service URL")
