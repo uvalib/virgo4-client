@@ -25,6 +25,13 @@
             <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
          </div>
 
+         <div  class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL' ">
+         <p>
+            This item is medium rare and does not circulate. When you request this item from Ivy, it will be delivered to the Small Special Collections Library for you to use in the reading room only.
+         </p>
+         <p><a target="_blank" href="https://library.virginia.edu/hours#special-collections-hours">Small Special Collections Reading Room Hours</a></p>
+         </div>
+
          <p class="error" v-if="requestStore.errors.item_barcode">{{requestStore.errors.item_barcode.join(', ')}}</p>
          <p class="error" v-if="requestStore.errors.sirsi">{{requestStore.errors.sirsi.join(', ')}}</p>
          <V4FormActions :hasCancel="false" submitLabel="Place Hold" submitID="submit-hold" :disabled="requestStore.buttonDisabled" />
@@ -33,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import { useRequestStore } from "@/stores/request"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useUserStore } from "@/stores/user"
@@ -46,7 +53,9 @@ const userStore = useUserStore()
 const selectedItem = ref(null)
 const pickupLibrary = ref(preferences.pickupLibrary.id)
 
-const pickupLibraries = computed(()=>{
+const pickupLibraries = ref({})
+
+const formattedPickupOptions = computed(()=>{
    let out = {}
    userStore.libraries.forEach(l => {
       out[l.id] = l.name
@@ -63,13 +72,34 @@ const itemOptions = computed(()=>{
 })
 
 function pickupLibraryChanged() {
+   if(pickupLibrary.value == "SPEC-COLL"){
+      // Dont remember Medium Rare Location
+      return
+   }
+
    // when pickup library chanegs, also update preferences
    let pl = userStore.libraries.find( l=>l.id == pickupLibrary.value)
    preferences.updatePickupLibrary(pl)
 }
 
+watch(selectedItem, async (newItem, oldItem) => {
+   if( newItem && newItem.label.includes("Ivy limited circulation") ) {
+      // Medium rare items only deliver to Special Collections
+      let medRareLocation = {}
+      medRareLocation["SPEC-COLL"] = "Small Special Collections Reading Room"
+      pickupLibraries.value = medRareLocation
+      pickupLibrary.value = "SPEC-COLL"
+
+   } else if(oldItem && oldItem.label.includes("Ivy limited circulation")){
+      // Reset originals
+      pickupLibraries.value = formattedPickupOptions.value
+      pickupLibrary.value = {}
+   }
+})
+
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
+   pickupLibraries.value = formattedPickupOptions.value
    if (itemOptions.value.length == 1) {
       selectedItem.value = itemOptions.value[0].value
    }
@@ -106,5 +136,9 @@ div.place-hold {
    .error {
       color: var(--color-error)
    }
+}
+.medium-rare-message {
+   border: 2px solid var(--uvalib-red);
+   padding: 10px;
 }
 </style>
