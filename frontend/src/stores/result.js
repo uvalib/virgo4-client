@@ -505,6 +505,12 @@ export const useResultStore = defineStore('result', {
                   message: msg,
                }
                system.setSearchError(err)
+            } else if (error.response && error.response.data && error.response.data.message) {
+               let err = {
+                  message: error.response.data.message,
+               }
+               system.setSearchError(err)
+
             } else if (error.response && error.response.status != 401) {
                let msg = "System error, we regret the inconvenience. If this problem persists, "
                msg += "<a href='https://v4.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
