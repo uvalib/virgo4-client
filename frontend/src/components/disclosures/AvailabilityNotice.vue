@@ -55,7 +55,7 @@ function messageParts() {
 <style lang="scss" scoped>
 #availability-info {
    .icon {
-      color: var(--uvalib-yellow);
+      color: var(--uvalib-red);
       margin-left: 10px;
    }
    .message {
