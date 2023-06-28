@@ -27,7 +27,7 @@
 
          <div  class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL' ">
          <p>
-            This item is medium rare and does not circulate. When you request this item from Ivy, it will be delivered to the Small Special Collections Library for you to use in the reading room only.
+            This item does not circulate. When you request this item from Ivy, it will be delivered to the Small Special Collections Library for you to use in the reading room only.
          </p>
          <p><a target="_blank" href="https://library.virginia.edu/hours#special-collections-hours">Small Special Collections Reading Room Hours</a></p>
          </div>
