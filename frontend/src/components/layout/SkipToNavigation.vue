@@ -67,8 +67,10 @@ function skipToMain() {
    m.focus( {preventScroll:true} )
 }
 function skipToNav() {
-   let m = document.getElementById("searchmenu")
+   let m = document.getElementsByClassName("p-menubar-root-list")[0]
    m.focus( {preventScroll:true} )
+   m = document.getElementsByClassName("p-menuitem")[0]
+   m.classList.add("p-focus")
    toggleNavMenu()
 }
 function skipToSearch() {

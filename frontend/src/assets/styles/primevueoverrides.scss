@@ -59,7 +59,14 @@
 #app div.p-menubar.p-component {
    background-color: var(--uvalib-blue-alt-darkest);
    position: relative;
-   padding: 15px 15px 15px 0;
+   padding: 10px;
+   justify-content: flex-end;
+
+   .p-menubar-end {
+      margin-left: 5px;
+      align-self: center;
+   }
+
    ul.p-menubar-root-list {
       &:focus, &:focus-visible {
          outline: none;
