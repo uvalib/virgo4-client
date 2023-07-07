@@ -2,6 +2,11 @@
    <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu"
       :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
    >
+      <Menubar :model="v4Menu" />
+   </nav>
+   <!-- <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu"
+      :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
+   >
       <ul class="menu-right" role="menubar" aria-label="Virgo Menu"
          @keydown.right.prevent.stop="nextMenu" @keyup.left.prevent.stop="prevMenu"
          @keyup.esc="toggleSubMenu()" @keydown.space.prevent.stop
@@ -164,10 +169,11 @@
             </li>
          </template>
       </ul>
-   </nav>
+   </nav> -->
 </template>
 
 <script setup>
+import Menubar from 'primevue/menubar'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
 import { useUserStore } from "@/stores/user"
@@ -180,353 +186,131 @@ const systemStore = useSystemStore()
 const userStore = useUserStore()
 const results = useResultStore()
 
-const signedInLabel = computed(()=>{
-   return `Signed in as ${userStore.signedInUser}`
-})
+const v4Menu = computed( () => {
+   let menu = [ {label: "Search", to: "/", icon: "icon fal fa-search", command: ()=>searchClicked()}, ]
+   if ( systemStore.isKiosk) return menu
 
-const noFocus = ref(false)
-const menuBarIdx = ref(0)
-const menuBar = ref([
-   {id: "searchmenu", submenu:[], expanded: false},
-   {id: "feedbackmenu", submenu:[], expanded: false},
-   {id: "servicemenu",
-      submenu:["guides", "journalsub", "databasesub", "spacesub", "moresub"],
-      expanded: false, subMenuIdx: 0},
-   {id: "accountmenu", submenu:
-      ["accountsub", "checkoutsub", "digitalsub",  "requestsub", "bookmarksub", "savesub", "prefsub", "adminsub", "outsub"],
-      expanded: false, subMenuIdx: 0},
-   {id: "alertmenu", submenu:[], expanded: false},
-])
+   let nonKiosk = [
+      {label: "Questions? Ask a Librarian", url: "https://www.library.virginia.edu/askalibrarian",
+         target: "_blank", icon: "icon fal fa-comment-dots"},
+      {label: "Library Services", items: [
+         {label: "Subject Guides", url: "https://www.library.virginia.edu/research",
+            target: "_blank", command: ()=>libServiceClicked('Subject Guides')},
+         {label: "Journal Finder", url: "https://guides.lib.virginia.edu/journalfinder",
+            target: "_blank", command: ()=>libServiceClicked('Journal Finder')},
+         {label: "Databases A-Z", url: "https://guides.lib.virginia.edu/az.php",
+            target: "_blank", command: ()=>libServiceClicked('Databases A-Z')},
+         {label: "Spaces & Equipment", url: "https://www.library.virginia.edu/services",
+            target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
+         {label: "Spaces & Equipment", url: "https://www.library.virginia.edu/services",
+            target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
+      ]}
+   ]
 
-onMounted(() => {
-   window.addEventListener("click", resetMenus)
-}),
-onUnmounted(() => {
-   window.removeEventListener("click", resetMenus)
-})
-
-function resetMenus() {
-   menuBarIdx.value = 0
-   closeSubMenus()
-}
-function closeSubMenus() {
-   menuBar.value.forEach( mb => {
-      if (mb.submenu.length > 0) {
-         mb.expanded = false
-         mb.idx = 0
+   let signIn = []
+   if (userStore.isSignedIn) {
+      let items = [
+         {label: "My Information", to: "/account"},
+         {label: "Checkouts", to: "/checkouts"},
+         {label: "Digital Deliveries", to: "/digital-deliveries"},
+         {label: "Requests", to: "/requests"},
+         {label: "Bookmarks", to: "/bookmarks"},
+         {label: "Searches", to: "/searches"},
+         {label: "Preferences", to: "/preferences"},
+      ]
+      if ("userStore.isAdmin || userStore.isPDAAdmin") {
+         items.push({label: "Admin", to: "/admin"})
       }
-   })
-}
-function linkClicked() {
-   noFocus.value = true
-}
-function isOpen( menuID ) {
-   let m = menuBar.value.find( mb => mb.id == menuID)
-   return m.expanded
-}
-function libServiceClicked(serviceName) {
-   resetMenus()
+      items.push({label: "Sign out",  command: ()=>signOut()})
+      signIn = [ {label: `Signed in as ${userStore.signedInUser}`, icon: "icon fal fa-user-circle", items: items} ]
+   } else {
+      signIn = [ {label: "Sign In", to: "/signin", icon: "icon fal fa-user-circle"} ]
+   }
+
+   return menu.concat(nonKiosk).concat(signIn)
+})
+
+const libServiceClicked = ((serviceName) => {
    analytics.trigger('Navigation', 'LIBRARY_SERVICE_CLICKED', serviceName)
-}
+})
+
 function alertClicked() {
    alertStore.clearSeenAlerts()
 }
-function nextMenu() {
-   closeSubMenus()
-   menuBarIdx.value++
-   if (menuBarIdx.value == menuBar.value.length) {
-      menuBarIdx.value = 0
-   }
-   setMenuFocus()
-}
-function prevMenu() {
-   closeSubMenus()
-   menuBarIdx.value--
-   if (menuBarIdx.value < 0) {
-      menuBarIdx.value = menuBar.value.length - 1
-   }
-   setMenuFocus()
-}
-function toggleSubMenu( targetMenu ) {
-   if (!targetMenu) {
-       let menu = menuBar.value[menuBarIdx.value]
-      if ( menu.submenu.length == 0) {
-         return
-      }
-      menu.expanded = !menu.expanded
-      menu.subMenuIdx = 0
-      setMenuFocus()
-   } else {
-      menuBar.value.forEach( (m,idx) => {
-         if (m.id != targetMenu) {
-            m.expanded = false
-         } else {
-            m.expanded = !m.expanded
-            m.subMenuIdx = 0
-            menuBarIdx.value = idx
-            setMenuFocus()
-         }
-      })
-   }
-}
-function nextSubMenu() {
-   let currMenu = menuBar.value[menuBarIdx.value]
-   if ( currMenu.submenu.length == 0) {
-      return
-   }
-   if ( currMenu.expanded ) {
-      currMenu.subMenuIdx++
-   } else {
-      currMenu.expanded = true
-   }
-   if ( currMenu.subMenuIdx == currMenu.submenu.length) {
-      currMenu.subMenuIdx = 0
-   }
-   setMenuFocus()
-}
-function prevSubMenu() {
-   let currMenu = menuBar.value[menuBarIdx.value]
-   if ( currMenu.submenu.length == 0) {
-      return
-   }
-   if ( currMenu.expanded ) {
-      currMenu.subMenuIdx--
-   } else {
-      currMenu.expanded = true
-   }
-   if ( currMenu.subMenuIdx < 0) {
-      currMenu.subMenuIdx = currMenu.submenu.length-1
-   }
-   setMenuFocus()
-}
-function setMenuFocus() {
-   if ( noFocus.value === true) {
-      noFocus.value = false
-      return
-   }
-   let menu = menuBar.value[menuBarIdx.value]
-   if (menu.submenu.length == 0 || menu.expanded == false) {
-      document.getElementById(menu.id).focus({preventScroll:true})
-   } else {
-      nextTick( () => {
-         let subMenuEle = document.getElementById(menu.submenu[menu.subMenuIdx])
-         subMenuEle.focus({preventScroll:true})
-      })
-   }
-}
-function searchClicked() {
+
+const searchClicked = (() => {
    results.resetSearch()
    window.scrollTo({
       top: 0,
       behavior: "auto"
    })
-}
+})
 
-function signOut() {
+const signOut = (() => {
    userStore.signout(true)
-}
-function beforeEnter(el) {
-   el.style.height = '0'
-}
-function enter(el) {
-   el.style.height = el.scrollHeight + 'px'
-}
-function beforeLeave(el) {
-   el.style.height = el.scrollHeight + 'px'
-}
-function leave(el) {
-   el.style.height = '0'
-}
+})
 </script>
 
 <style lang="scss" scoped>
-#app nav.menu.shadow {
+nav.menu.shadow {
    box-shadow: $v4-box-shadow;
 }
-#app nav.menu {
-   text-align: right;
-   padding: 0px;
-   margin: 0;
-   background-color: var(--uvalib-blue-alt-darkest);
-   color: white;
-   display: flex;
-   flex-flow: row wrap;
-   align-items: center;
-   justify-content: space-between;
-   position: relative;
+//    .menu-item.notice {
+//       color: var(--uvalib-yellow);
+//       margin-right: 2px;
+//       font-weight: normal;
+//       .cnt {
+//          font-size: 0.8em;
+//          font-weight: bold;
+//          font-family: sans-serif;
+//          display: inline-block;
+//          position: relative;
+//          top: -6px;
+//          left: -2px;
+//       }
+//    }
 
-   .icon {
-      font-size: 1.3em;
-      margin-right: 5px;
-   }
-
-   ul {
-      display: block;
-      position: relative;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      li {
-         display: inline-block;
-         padding: 0;
-         margin: 0;
-         font-weight: 500;
-         position: relative;
-      }
-   }
-   .signed-in-label {
-      display: inline-block;
-      margin: 0 5px 0 2px;
-   }
-   ul.menu-right {
-      margin: 0 0 0 auto;
-      padding: 10px;
-      li {
-         margin: 0 0 0 20px;
-      }
-   }
-
-   #library-services {
-      top: 29px;
-   }
-   #acct-menu {
-      top: 32px;
-   }
-   ul.dropdown-menu {
-      position: absolute;
-      z-index: 1000;
-      background: white;
-      padding: 0;
-      border-radius: 0 0 5px 5px;
-      border: 1px solid var(--uvalib-grey-light);
-      border-top: none;
-      right: 0;
-      overflow: hidden;
-      transition: 200ms ease-out;
-      display: grid;
-      grid-auto-rows: auto;
-      width: max-content;
-
-      li.submenu {
-         padding: 0;
-         margin: 0;
-         a, div {
-            margin:0;
-            padding: 10px 15px;
-            font-weight: normal;
-            color: var(--uvalib-text-dark);
-            text-align: right;
-            box-sizing: border-box;
-            display: block;
-            cursor: pointer;
-            outline: none;
-            &:hover {
-               text-decoration: underline;
-            }
-            &:focus {
-               background-color: var(--uvalib-brand-blue-lightest);
-               color: var(--uvalib-text-dark);
-            }
-         }
-      }
-   }
-   .menu-item {
-      cursor: pointer;
-      color: white;
-      flex: 0 1 auto;
-      display: inline-block;
-      border-bottom:1px solid transparent;
-
-      &:hover {
-         border-bottom:1px solid white;
-      }
-
-      &:focus {
-         @include be-accessible-light();
-      }
-   }
-   .menu-item.notice {
-      color: var(--uvalib-yellow);
-      margin-right: 2px;
-      font-weight: normal;
-      .cnt {
-         font-size: 0.8em;
-         font-weight: bold;
-         font-family: sans-serif;
-         display: inline-block;
-         position: relative;
-         top: -6px;
-         left: -2px;
-      }
-   }
-
-   .submenu-arrow {
-      transform: rotate(0deg);
-      transition-duration: 200ms;
-   }
-     .submenu-arrow.rotated {
-      transform: rotate(180deg);
-   }
-
-   .alert-bell {
-      position: relative;
-      color: white;
-      cursor: pointer;
-      display: inline-block;
-      margin-left:0px;
-   }
-   .alert-bell.dim {
-      opacity: 0.4;
-      cursor: default;
-      &:hover {
-         border-bottom: none;
-      }
-   }
-   .alert-count {
-         font-size: 1em;
-         font-weight: bold;
-         background: var(--uvalib-yellow);
-         color: var(--uvalib-text-dark);
-         width: 1em;
-         height: 1em;
-         font-family: sans-serif;
-         display: inline-block;
-         text-align: center;
-         border-radius: 15px;
-         padding: 1px;
-         position: absolute;
-         right: -8px;
-         top: -8px;
-      }
-   // .alert-wrap {
-   //    cursor: pointer;
-   //    color: white;
-   //    display: inline-block;
-   //    margin-left:20px;
-   //    &:focus {
-   //       @include be-accessible-light();
-   //    }
-   //    &::hover {
-   //       border-bottom:1px solid white;
-   //    }
-   // }
-}
-
-@media only screen and (max-width: 800px) {
-   i.icon {
-      display: none !important;
-   }
-   #feedbackmenu {
-      padding: 8px 0 8px 0;
-   }
-   #searchmenu {
-      margin-left: 25px !important;
-   }
-   div.alert-wrap {
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      margin-left: 0 !important;
-   }
-}
+//    .alert-bell {
+//       position: relative;
+//       color: white;
+//       cursor: pointer;
+//       display: inline-block;
+//       margin-left:0px;
+//    }
+//    .alert-bell.dim {
+//       opacity: 0.4;
+//       cursor: default;
+//       &:hover {
+//          border-bottom: none;
+//       }
+//    }
+//    .alert-count {
+//          font-size: 1em;
+//          font-weight: bold;
+//          background: var(--uvalib-yellow);
+//          color: var(--uvalib-text-dark);
+//          width: 1em;
+//          height: 1em;
+//          font-family: sans-serif;
+//          display: inline-block;
+//          text-align: center;
+//          border-radius: 15px;
+//          padding: 1px;
+//          position: absolute;
+//          right: -8px;
+//          top: -8px;
+//       }
+//    // .alert-wrap {
+//    //    cursor: pointer;
+//    //    color: white;
+//    //    display: inline-block;
+//    //    margin-left:20px;
+//    //    &:focus {
+//    //       @include be-accessible-light();
+//    //    }
+//    //    &::hover {
+//    //       border-bottom:1px solid white;
+//    //    }
+//    // }
+// }
 </style>
