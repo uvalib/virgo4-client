@@ -6,7 +6,7 @@
          <template #end>
             <span v-if="userStore.isSignedIn && userStore.itemsOnNotice.length > 0">
                <router-link to="/checkouts?overdue=1">
-                  <span  class="menu-item notice">
+                  <span class="menu-item notice">
                      <i class="fas fa-exclamation-triangle"></i><span class="cnt">{{userStore.itemsOnNotice.length}}</span>
                   </span>
                </router-link>
@@ -111,7 +111,7 @@ nav.menu.shadow {
 }
 .menu-item.notice {
    color: var(--uvalib-yellow);
-   margin-right: 2px;
+   margin: 0 0 0 10px;
    font-weight: normal;
    .cnt {
       font-size: 0.8em;
@@ -133,7 +133,7 @@ nav.menu.shadow {
       margin-left:0px;
       font-size: 1.3em;
       display: inline-block;
-      margin: 0 5px 0 10px;
+      margin: 0 5px 0 15px;
    }
    .alert-bell.dim {
       opacity: 0.4;
