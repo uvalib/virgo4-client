@@ -94,9 +94,11 @@
             background: white;
             border-radius: 0 0 5px 5px;
             border: 1px solid var(--uvalib-grey-light);
-            border-top: none;
-            top: 32px;
+            border-top: 0;
+            top: 29px;
+            right: 0;
             width: max-content;
+
             li.p-menuitem {
                span.p-menuitem-text {
                   border: none;
