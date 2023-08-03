@@ -21,6 +21,7 @@
             </div>
             <div class="controls-wrapper">
                <SourceSelector mode="basic"/>
+               <SearchTips />
             </div>
             <div class="search-mode">
                <router-link tabindex="0" to="/search?mode=advanced">Advanced Search</router-link>
@@ -34,6 +35,7 @@
 </template>
 
 <script setup>
+import SearchTips from "@/components/disclosures/SearchTips.vue"
 import SearchResults from "@/components/SearchResults.vue"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"
@@ -425,17 +427,11 @@ async function searchClicked() {
    }
    .controls-wrapper  {
       max-width: 800px;
-      margin: 0 auto 20px auto;
-      .controls {
-         padding: 10px 0;
-         display: flex;
-         flex-flow: row wrap;
-         align-items: center;
-         justify-content: flex-end;
-      }
-      .controls  > * {
-         flex: 0 1 auto;
-      }
+      margin: 15px auto 20px auto;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      align-items: center;
    }
    .search-mode {
       text-align: center;
