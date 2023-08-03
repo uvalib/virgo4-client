@@ -18,7 +18,8 @@
             </div>
             <div class="message-body" id="msgbody" v-html="systemStore.message.content"></div>
             <div class="details" v-if="systemStore.message.detail">
-               <ErrorDetails :details="systemStore.message.detail"/>
+               <p>Details</p>
+               <div class="content" v-html="systemStore.message.detail"></div>
             </div>
             <div class="controls">
                <V4Button id="okbtn" mode="tertiary" @esc="dismiss" :tabOverride="true"
@@ -36,7 +37,6 @@
 
 <script setup>
 import { useSystemStore } from "@/stores/system"
-import ErrorDetails from "@/components/disclosures/ErrorDetails.vue"
 import { computed, onMounted, nextTick } from 'vue'
 
 const systemStore = useSystemStore()
@@ -78,7 +78,15 @@ div.messsage-box {
 
    .details {
       text-align: left;
-      padding: 0 30px 20px 30px;
+      padding: 0 30px 10px 30px;
+      p {
+         font-weight: bold;
+         margin: 5px 0;
+      }
+      .content {
+         padding: 5px 5px 0 15px;
+         font-family: monospace;
+      }
    }
 
    .message {
