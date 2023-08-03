@@ -25,12 +25,10 @@
             >
             <span>Images Only</span>
          </label>
-         <SearchTips v-if="props.help"/>
       </div>
 </template>
 
 <script setup>
-import SearchTips from "@/components/disclosures/SearchTips.vue"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useRouter, useRoute } from 'vue-router'
@@ -72,7 +70,7 @@ function sourcesClicked( setting ) {
 
 .src-targets {
    text-align: left;
-   margin: 15px 0;
+   margin: 0;
    display: flex;
    flex-flow: row wrap;
    justify-content: center;

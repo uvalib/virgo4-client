@@ -1,25 +1,32 @@
 <template>
-   <V4Disclosure id="availability-info">
-      <template v-slot:summary>
-         <span>{{props.label}}</span>
+   <div class="availability-info">
+      <DisclosureButton @clicked="clicked">
+         <span class="btn-txt">{{props.label}}</span>
          <i class="icon fas fa-exclamation-triangle"></i>
-      </template>
-      <template v-slot:content>
-         <div v-if="hasReserveInfo()" class="message">
-            <span>{{mainMessage()}}</span>
-            <ul>
-               <li v-for="(info,idx) in messageParts()" :key="`cr${idx}`">
-                  {{info}}
-               </li>
-            </ul>
+      </DisclosureButton>
+
+      <OverlayPanel ref="availability" class="border">
+         <div class="avail-message-panel">
+            <div v-if="hasReserveInfo()" class="message">
+               <span>{{mainMessage()}}</span>
+               <ul>
+                  <li v-for="(info,idx) in messageParts()" :key="`cr${idx}`">
+                     {{info}}
+                  </li>
+               </ul>
+            </div>
+            <div v-else class="message" v-html="props.message"></div>
          </div>
-         <div v-else class="message" v-html="props.message">
-         </div>
-       </template>
-   </V4Disclosure>
+      </OverlayPanel>
+   </div>
 </template>
 
 <script setup>
+import DisclosureButton from "@/components/disclosures/DisclosureButton.vue"
+import OverlayPanel from 'primevue/overlaypanel'
+import { ref } from 'vue'
+
+const availability = ref(null)
 
 const props = defineProps({
    label: {
@@ -32,13 +39,19 @@ const props = defineProps({
    }
 })
 
-function hasReserveInfo() {
+const clicked = ((event) => {
+   availability.value.toggle(event)
+})
+
+const hasReserveInfo = (() => {
    return props.message.split("\n").length > 1
-}
-function mainMessage() {
+})
+
+const mainMessage = (() => {
    return props.message.split("\n")[0]
-}
-function messageParts() {
+})
+
+const messageParts = (() => {
    let parts = props.message.split("\n")
    parts.shift()
    let out = []
@@ -49,18 +62,24 @@ function messageParts() {
 
    })
    return out
-}
+})
 </script>
 
-<style lang="scss" scoped>
-#availability-info {
+<style lang="scss">
+div.availability-info {
    .icon {
       color: var(--uvalib-red);
       margin-left: 10px;
    }
+}
+div.avail-message-panel {
+   padding: 0;
+   background: var(--uvalib-blue-alt-light);
+   max-width: 400px;
+   font-size: 0.9em;;
+
    .message {
-      margin: 10px 5px 10px 10px;
-      padding: 0;
+      padding: 10px;
    }
    ul {
       margin: 10px 15px;

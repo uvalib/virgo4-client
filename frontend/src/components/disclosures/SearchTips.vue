@@ -1,9 +1,7 @@
 <template>
-   <V4Disclosure id="search-tips" ref="tipsdisclose" @click="clicked">
-      <template v-slot:summary>
-         <span>Help me search</span>
-      </template>
-      <template v-slot:content>
+   <div id="search-tips">
+      <DisclosureButton @clicked="clicked">Help me search</DisclosureButton>
+      <OverlayPanel ref="tips" @show="showDisclosure" class="border">
          <div class="tips">
             <p class="section">How to search</p>
             <ul class="dots">
@@ -11,7 +9,7 @@
                <li>Selecting "Catalog Only" results only in items UVA owns, minus articles and images.</li>
                <li>After searching, you can use Filters to narrow your query.</li>
             </ul>
-             <p class="section pad">Search tips</p>
+               <p class="section pad">Search tips</p>
             <ul>
                <li class="no-pad">
                   <p>Use quotation marks to find exact phrases:</p>
@@ -35,28 +33,35 @@
                <b>NOTE: </b>Nested parentheses within a query are not supported.
             </div>
          </div>
-       </template>
-   </V4Disclosure>
+      </OverlayPanel>
+   </div>
 </template>
 
 <script setup>
+import OverlayPanel from 'primevue/overlaypanel'
+import DisclosureButton from "@/components/disclosures/DisclosureButton.vue"
 import analytics from '@/analytics'
 import { ref } from 'vue'
-const tipsdisclose = ref(null)
-function clicked() {
-   if ( tipsdisclose.value.showFull) {
-      analytics.trigger('Help', 'SEARCH_TIPS')
-   }
-}
+
+const tips = ref(null)
+
+const showDisclosure = (() => {
+   analytics.trigger('Help', 'SEARCH_TIPS')
+})
+const clicked = ((event) => {
+   tips.value.toggle(event)
+})
 </script>
 
 <style lang="scss" scoped>
 div.tips {
-   margin: 5px 10px;
-   font-weight: normal;
+   padding: 15px;
+   background: var(--uvalib-blue-alt-light);
+   font-size: 0.9em;
+
    p.section {
       font-weight: bold;
-      margin: 15px 0 0 0;
+      margin: 0;
       font-size: 1.15em;
    }
    .section.pad {

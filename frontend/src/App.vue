@@ -397,7 +397,7 @@ body {
 
 #v4-navbar {
    transition-duration: 0ms;
-   position: fixed;
+   position: relative;
    left: 0;
    right: 0;
    z-index: 20;
