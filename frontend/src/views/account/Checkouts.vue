@@ -71,6 +71,10 @@
                      </template>
                      <dt class="label">Call number:</dt>
                         <dd>{{co.callNumber}}</dd>
+                     <template v-if="co.currentLocation.toLowerCase() !== 'checked out'">
+                        <dt class="label">Current Location </dt>
+                        <dd> <b>{{ co.currentLocation }}</b> </dd>
+                     </template>
                      <dt class="label">Due Date:</dt>
                         <dd v-html="formatDueInfo(co)"></dd>
                      <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
