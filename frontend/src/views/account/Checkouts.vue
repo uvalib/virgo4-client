@@ -77,8 +77,14 @@
                      </template>
                      <dt class="label">Due Date:</dt>
                         <dd v-html="formatDueInfo(co)"></dd>
-                     <dt class="label" v-if="parseFloat(co.overdueFee)>0">Fine:</dt>
-                        <dd class="fine-value" v-if="parseFloat(co.overdueFee)>0">${{co.overdueFee}}</dd>
+                     <template  v-if="fineIsVisible(co)">
+                        <dt class="label">Fine:</dt>
+                        <dd class="fine-value">${{co.overdueFee}}</dd>
+                     </template>
+                     <template v-if="parseFloat(co.billAmount) > 0">
+                        <dt class="label" >Bill:</dt>
+                        <dd class="fine-value" v-if="parseFloat(co.billAmount)>0">${{co.billAmount}}</dd>
+                     </template>
                      </dl>
                      <div v-if="co.message" class="co-message">
                         {{co.message}}
@@ -185,6 +191,11 @@ function formatDueInfo(checkout) {
 }
 function itemOnNotice(co) {
    return co.overdue || co.recallDueDate != ""
+}
+function fineIsVisible(co) {
+   let f = parseFloat(co.overdueFee)
+   // Show the fine except for when it's $20 and there's a recall due date
+   return f > 0 && (f != 20 || !co.billAmount)
 }
 
 onMounted(async () => {

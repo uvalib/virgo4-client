@@ -95,7 +95,7 @@
                         </AccordionContent>
                      </div>
 
-                     <div v-if="totalFines>0">
+                     <div v-if="userStore.totalFines>0">
                         <AccordionContent layout="narrow" borderWidth="0" id="fines">
                            <template v-slot:title>
                               <label style='font-weight:bold;margin-right:5px'>Total Fines:</label>

@@ -139,6 +139,7 @@ type CheckoutInfo struct {
 	DueDate         string `json:"due"`
 	OverDue         bool   `json:"overdue"`
 	Fee             string `json:"overdueFee"`
+	BillAmount      string `json:"billAmount"`
 	RecallDueDate   string `json:"recallDueDate"`
 	RenewDate       string `json:"renewDate"`
 }
