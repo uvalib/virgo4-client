@@ -10,6 +10,13 @@ export function preProcessHitFields(poolURL, hits) {
       hit.holdings = {}
       hit.header = {}
       hit.fields.forEach(function (field) {
+         // Handle special redirect field.  This field may be present in item details,
+         // or in the only search result of an advanced search for a single identifier.
+         if (field.type == "redirect" && field.value != "") {
+            window.location.href = field.value
+            return
+         }
+
          if (field.value === "" && field.name != "summary_holdings") {
             return
          }
