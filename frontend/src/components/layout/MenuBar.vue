@@ -12,12 +12,13 @@
                </router-link>
             </span>
             <span v-if="systemStore.isKiosk == false" class="alert-wrap">
-               <a role="menuitem" id="alertmenu" class="menu-item" tabindex="0"
+               <a role="menuitem" id="alertmenu" class="menu-item" :tabindex="alertTabIndex"
                   @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
                   @keydown.space.prevent.stop="alertClicked"
                   aria-label="virgo alerts"
+                  :disabled="alertStore.seenCount==0"
                >
-                  <i class="alert-bell icon fal fa-bell" :class="{dim: alertStore.menuCount==0 && alertStore.seenCount==0 || alertStore.menuCount>0}"></i>
+                  <i class="alert-bell icon fal fa-bell" :class="{dim: alertStore.seenCount==0}"></i>
                   <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
                </a>
             </span>
@@ -39,6 +40,14 @@ const alertStore = useAlertStore()
 const systemStore = useSystemStore()
 const userStore = useUserStore()
 const results = useResultStore()
+
+
+const alertTabIndex = computed( () => {
+   if ( alertStore.seenCount > 0) {
+      return 0
+   }
+   return -1
+})
 
 const v4Menu = computed( () => {
    let menu = [ {label: "Search", to: "/", icon: "icon fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
@@ -123,8 +132,12 @@ nav.menu.shadow {
       left: -2px;
    }
 }
-
+#alertmenu {
+   display: inline-block;
+   border-radius: 10px;
+}
 .alert-wrap {
+   display: inline-block;
    .alert-bell {
       position: relative;
       color: white;
@@ -133,7 +146,7 @@ nav.menu.shadow {
       margin-left:0px;
       font-size: 1.3em;
       display: inline-block;
-      margin: 0 5px 0 15px;
+      margin: 0 5px 0 5px;
    }
    .alert-bell.dim {
       opacity: 0.4;
@@ -147,16 +160,14 @@ nav.menu.shadow {
       font-weight: bold;
       background: var(--uvalib-yellow);
       color: var(--uvalib-text-dark);
-      width: 1em;
-      height: 1em;
       font-family: sans-serif;
       display: inline-block;
       text-align: center;
       border-radius: 15px;
-      padding: 1px;
+      padding: 3px 6px 1px 6px;
       position: absolute;
-      right: -8px;
-      top: -8px;
+      right: 1px;
+      top: 0px;
    }
    &:focus {
       @include be-accessible-light();

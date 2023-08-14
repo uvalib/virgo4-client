@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
-import firebase from 'firebase/app'
-import 'firebase/database'
+import { initializeApp } from "firebase/app"
+import { getDatabase, ref, onValue } from "firebase/database"
 
 const  AlertsStorage = "v4SeenAlerts"
 
@@ -97,15 +97,16 @@ export const useAlertStore = defineStore('alert', {
          localStorage.setItem(AlertsStorage, str)
       },
       initDB(cfg) {
-         let db = firebase.initializeApp({
+         const firebaseApp = initializeApp({
             apiKey: cfg.firebase.apiKey,
             authDomain: cfg.firebase.authDomain,
             databaseURL: cfg.firebase.databaseURL,
             projectId: cfg.firebase.projectId,
             appId: cfg.firebase.appId
-         }).database()
-         this.alertsDB = db.ref('library-alerts')
-         this.regionalAlertsDB = db.ref('regionalalerts')
+         })
+         let db = getDatabase(firebaseApp)
+         this.alertsDB = ref(db, 'library-alerts')   // FOR dev data which includes all types of alerts: library-alerts-dev
+         this.regionalAlertsDB = ref(db, 'regionalalerts')
       },
 
       setConfig(cfg) {
@@ -113,7 +114,7 @@ export const useAlertStore = defineStore('alert', {
 
          try {
             this.initDB(cfg)
-            this.alertsDB.on('value', (data) => {
+            onValue(this.alertsDB, (data) => {
                this.alerts.splice(0, this.alerts.length)
                data.forEach(a=>{
                   let aVal = a.val()
@@ -124,7 +125,7 @@ export const useAlertStore = defineStore('alert', {
                this.loadSeenAlerts()
                this.autoHideAlert3()
             })
-            this.regionalAlertsDB.on('value', (data) => {
+            onValue( this.regionalAlertsDB, (data) => {
                this.regionalAlerts.splice(0, this.regionalAlerts.length)
                data.forEach(a=>{
                   let aVal = a.val()
