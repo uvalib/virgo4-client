@@ -71,6 +71,8 @@
                      </template>
                      <dt class="label">Call number:</dt>
                         <dd>{{co.callNumber}}</dd>
+                     <dt class="label">Barcode:</dt>
+                        <dd>{{co.barcode}}</dd>
                      <template v-if="co.currentLocation.toLowerCase() !== 'checked out'">
                         <dt class="label">Current Location </dt>
                         <dd> <b>{{ co.currentLocation }}</b> </dd>

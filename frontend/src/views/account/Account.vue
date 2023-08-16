@@ -89,6 +89,7 @@
                                     <tr><td class="label">Item:</td><td>{{bill.item.title}}</td></tr>
                                     <tr><td/><td>{{bill.item.author}}</td></tr>
                                     <tr><td/><td>{{bill.item.callNumber}}</td></tr>
+                                    <tr><td/><td>{{bill.item.barcode}}</td></tr>
                                  </table>
                               </div>
                            </div>
@@ -126,6 +127,7 @@
                                     <tr><td class="label">Item:</td><td>{{fine.title}}</td></tr>
                                     <tr><td/><td>{{fine.author}}</td></tr>
                                     <tr><td/><td>{{fine.callNumber}}</td></tr>
+                                    <tr><td/><td>{{fine.barcode}}</td></tr>
                                  </table>
                               </div>
                            </div>
