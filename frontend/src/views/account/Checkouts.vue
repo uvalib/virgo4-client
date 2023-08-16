@@ -81,9 +81,13 @@
                         <dt class="label">Fine:</dt>
                         <dd class="fine-value">${{co.overdueFee}}</dd>
                      </template>
-                     <template v-if="parseFloat(co.billAmount) > 0">
-                        <dt class="label" >Bill:</dt>
-                        <dd class="fine-value" v-if="parseFloat(co.billAmount)>0">${{co.billAmount}}</dd>
+                     <template v-for="bill, i in co.bills" :key="i">
+
+                        <template v-if="parseFloat(bill.amount) > 0">
+                           <dt v-if="i == 0" class="label" >Bill{{ co.bills.length > 1 ? 's' : '' }}:</dt>
+                           <dt v-else class="label" ></dt>
+                           <dd class="fine-value">{{bill.label}} ${{bill.amount}}</dd>
+                        </template>
                      </template>
                      </dl>
                      <div v-if="co.message" class="co-message">
@@ -195,7 +199,7 @@ function itemOnNotice(co) {
 function fineIsVisible(co) {
    let f = parseFloat(co.overdueFee)
    // Show the fine except for when it's $20 and there's a recall due date
-   return f > 0 && (f != 20 || !co.billAmount)
+   return f > 0 && (f != 20 || !co.bills)
 }
 
 onMounted(async () => {
@@ -222,6 +226,7 @@ onMounted(async () => {
    padding: 5px 15px;
    width:fit-content;
    margin: 2px 0;
+   border-radius: 5px;
 }
 :deep(.details div.recall) {
    background-color: var(--uvalib-yellow);
@@ -230,6 +235,7 @@ onMounted(async () => {
    padding: 5px 15px;
    width:fit-content;
    margin: 2px 0;
+   border-radius: 5px;
 }
 
 .checkout {
@@ -356,6 +362,7 @@ onMounted(async () => {
   border-radius: 5px;
   font-weight: bold;
   padding: 5px 15px;
+  margin-bottom: 2px;
   width:fit-content;
 }
 i.notice {

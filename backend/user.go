@@ -139,9 +139,15 @@ type CheckoutInfo struct {
 	DueDate         string `json:"due"`
 	OverDue         bool   `json:"overdue"`
 	Fee             string `json:"overdueFee"`
-	BillAmount      string `json:"billAmount"`
+	Bills           []Bill `json:"bills"`
 	RecallDueDate   string `json:"recallDueDate"`
 	RenewDate       string `json:"renewDate"`
+}
+
+// Bill structure
+type Bill struct {
+	Amount string `json:"amount"`
+	Label  string `json:"label"`
 }
 
 // ChangePin takes current_pin and new_pin as params in the json POST payload.

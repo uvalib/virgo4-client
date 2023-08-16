@@ -217,8 +217,8 @@ export const useUserStore = defineStore('user', {
             }
             if (order.includes("DUE")){
                // Sort by due date, then recall, then others last
-               keyA = a.due.split("T")[0] || a.recallDueDate || "a"
-               keyB = b.due.split("T")[0] || b.recallDueDate || "a"
+               keyA = (a.due.split("T")[0] || a.recallDueDate) + a.title.toUpperCase()
+               keyB = (b.due.split("T")[0] || b.recallDueDate ) + b.title.toUpperCase()
             }
             if (order.includes("ASC")) {
                if (keyA < keyB) {
