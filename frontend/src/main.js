@@ -57,16 +57,21 @@ app.use(VueAnnouncer, { router })
 // Primevue setup
 import PrimeVue from 'primevue/config'
 import Button from 'primevue/button'
-import './assets/styles/primevueoverrides.scss'
-import 'primeicons/primeicons.css'
+import ConfirmDialog from 'primevue/confirmdialog'
+import ConfirmationService from 'primevue/confirmationservice'
 
-// only needed if confirm dialog on toast messages are used
-// import ConfirmationService from 'primevue/confirmationservice'
+import 'primevue/resources/themes/saga-blue/theme.css'
+import 'primevue/resources/primevue.min.css'
+import 'primeicons/primeicons.css'
+import './assets/styles/primevueoverrides.scss'
+
+// only needed if toast messages are used
 // import ToastService from 'primevue/toastservice'
-// app.use(ConfirmationService)
 // app.use(ToastService)
 
 app.use(PrimeVue)
+app.use(ConfirmationService)
+app.component("ConfirmDialog", ConfirmDialog)
 app.component("VirgoButton", Button) // Override the default name of primevue Button to VirgoButton (later renae to v4button)
 
 app.mount('#app')

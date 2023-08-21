@@ -1,60 +1,58 @@
-// .p-component-overlay {
-//    .p-dialog {
-//       width:650px;
-//       .p-dialog-header {
-//          padding: 5px 10px;
-//          background: var(--uvalib-teal-lightest);
-//          border-bottom: 1px solid var(--uvalib-teal-light);
-//          .p-dialog-title {
-//             font-size: 1em;
-//          }
-//       }
-//       .p-dialog-content {
-//          padding: 15px 15px 10px 15px;
-//       }
-//       .p-dialog-footer {
-//          padding: 10px 10px 20px 10px;
-//       }
-//    }
-//    .p-dialog.error {
-//       width: 500px;
-//       .p-dialog-header {
-//          padding: 5px 10px;
-//          background: var( --uvalib-red-darker) !important;
-//          .p-dialog-title {
-//             font-size: 1em;
-//             color: white;
-//          }
-//          .p-dialog-header-close-icon {
-//             color: white;
-//          }
-//       }
-//       .p-dialog-content {
-//          padding: 15px;
-//       }
-//       .p-dialog-footer {
-//          padding: 15px 15px 20px 15px;
-//       }
-//    }
-//    .p-dialog.p-confirm-dialog {
-//       max-width: 500px;
-//       .p-dialog-header {
-//          padding: 5px 10px;
-//          background: var(--uvalib-teal-lightest);
-//          border-bottom: 1px solid var(--uvalib-teal-light);
-//          .p-dialog-title {
-//             font-size: 1em;
-//          }
-//       }
-//       .p-dialog-content {
-//          padding-top: 25px;
-//          font-size: 0.9em;
-//       }
-//       button.p-button {
-//          margin-left: 5px;
-//       }
-//    }
-// }
+.p-component-overlay {
+   .p-dialog {
+      font-family: "franklin-gothic-urw", arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      color: var(--color-primary-text);
+
+      .p-dialog-header {
+         background-color: var(--uvalib-blue-alt-light);
+         border-bottom: 2px solid var(--uvalib-blue-alt);
+         padding: 8px 10px;
+         .p-dialog-title {
+            font-weight: 500;
+            font-size: 1.1em;
+         }
+      }
+      .p-dialog-content {
+         background: white;
+         padding: 25px;
+         font-weight: 400;
+         a {
+            color: var(--color-link);
+            font-weight: 500;
+            text-decoration: underline;
+            &:hover {
+               text-decoration: underline;
+            }
+            &:focus {
+               @include be-accessible();
+            }
+         }
+      }
+      .p-dialog-footer {
+         padding: 10px 10px 20px 10px;
+      }
+   }
+   .p-dialog.p-confirm-dialog {
+      max-width: 500px;
+      .p-dialog-header {
+         padding: 5px 10px;
+         background: var(--uvalib-teal-lightest);
+         border-bottom: 1px solid var(--uvalib-teal-light);
+         .p-dialog-title {
+            font-size: 1em;
+         }
+      }
+      .p-dialog-content {
+         padding-top: 25px;
+         font-size: 0.9em;
+      }
+      button.p-button {
+         margin-left: 5px;
+      }
+   }
+}
 
 div.p-overlaypanel {
    background: white;
@@ -92,6 +90,8 @@ button.p-button.p-button-text.disclosure {
    position: relative;
    padding: 10px;
    justify-content: flex-end;
+   border-radius: 0;
+   border: none;
 
    .p-menubar-end {
       margin: 0px 5px 0 10px;
@@ -102,7 +102,13 @@ button.p-button.p-button-text.disclosure {
       &:focus, &:focus-visible {
          outline: none;
       }
+      li.p-menuitem.p-highlight {
+         background: none;
+      }
       li.p-menuitem {
+         .p-menuitem-content {
+            background: none;
+         }
          span.p-menuitem-text {
             border-bottom: 1px solid transparent;
             &:hover {
@@ -110,8 +116,12 @@ button.p-button.p-button-text.disclosure {
             }
          }
          a.p-menuitem-link {
-            color: white;
             margin: 0 0 0 20px;
+            padding:0;
+            .p-menuitem-text,  .p-menuitem-icon, .p-submenu-icon {
+               color: white;
+               margin-left: 0px;
+            }
 
             span.p-menuitem-icon.icon {
                font-size: 1.2em;
@@ -129,34 +139,47 @@ button.p-button.p-button-text.disclosure {
             top: 29px;
             right: 0;
             width: max-content;
+            padding: 0;
+            box-shadow: $v4-box-shadow-light;
 
             li.p-menuitem {
-               span.p-menuitem-text {
-                  border: none;
-               }
                a.p-menuitem-link {
                   margin: 0;
                   padding: 10px 15px;
                   margin: 0 0 0 0;
                   font-weight: 400;
-                  color: var(--uvalib-text-dark);
                   text-align: right;
                   box-sizing: border-box;
                   display: block;
                   cursor: pointer;
                   outline: none;
+                  span.p-menuitem-text {
+                     border: none;
+                     color: var(--uvalib-text-dark);
+                  }
+                  &:hover {
+                     background-color: var(--uvalib-blue-alt-light);
+                  }
                }
             }
             li.p-menuitem.p-focus {
+               .p-menuitem-content {
+                  background: none;
+                  color: var(--uvalib-text-dark);
+               }
                a.p-menuitem-link {
                   outline: none;
-                  background-color: var(--uvalib-brand-blue-lightest);
+                  background-color: var(--uvalib-blue-alt-light);
                   color: var(--uvalib-text-dark);
                }
             }
          }
       }
       li.p-menuitem.p-focus {
+         background: none;
+         .p-menuitem-content {
+            background: none;
+         }
          a.p-menuitem-link {
             outline: 3px dotted var(--uvalib-grey-lightest);
             outline-offset: 3px;

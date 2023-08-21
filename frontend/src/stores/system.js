@@ -17,6 +17,7 @@ export const useSystemStore = defineStore('system', {
          content: "",
          detail: ""
       },
+      showMessage: false,
       version: "unknown",
       availabilityURL: "",
       hsIlliadURL: "",
@@ -51,9 +52,6 @@ export const useSystemStore = defineStore('system', {
       },
       hasTranslateMessage: state => {
          return state.translateMessage.length > 0 && state.seenTranslateMsg == false
-      },
-      hasMessage: state => {
-         return state.message.type == "info" && state.message.content != ""
       },
       hasError: state => {
          return state.message.type == "error" || state.message.type == "ilsError"
@@ -92,24 +90,28 @@ export const useSystemStore = defineStore('system', {
       },
       clearMessage() {
          this.message.type = "none"
-         this.message.title = "",
-         this.message.content = "",
+         this.message.title = ""
+         this.message.content = ""
          this.message.detail = ""
+         this.showMessage = false
       },
       setMessage(msg) {
          this.message.type = "info"
-         this.message.title = "Virgo Message",
-         this.message.content = msg,
+         this.message.title = "Virgo Message"
+         this.message.content = msg
          this.message.detail = ""
+         this.showMessage = true
       },
       setSearchError(errorInfo) {
          this.message.type = "error"
          this.message.title = "Virgo Search Error",
          this.message.content = errorInfo.message,
          this.message.detail = errorInfo.detail
+         this.showMessage = true
          this.reportError(this.message)
       },
       setILSError(error) {
+         this.showMessage = true
          this.message.type = "ilsError"
          this.message.title = "ILS Error",
          this.message.content = error,
@@ -117,18 +119,14 @@ export const useSystemStore = defineStore('system', {
          this.reportError(this.message)
       },
       setError(error) {
-         this.message.type = "none"
-         this.message.title = ""
-         this.message.content = ""
+         this.message.type = "error"
+         this.message.title = "Virgo Error"
          this.message.detail = ""
+         this.showMessage = true
 
          if (error.response) {
-            this.message.type = "error"
-            this.message.title = "Virgo Error"
             this.message.content = error.response.data
          } else if (error.message) {
-            this.message.type = "error"
-            this.message.title = "Virgo Error"
             this.message.content = error.message
             if ( error.details ) {
                this.message.detail = error.details
@@ -137,8 +135,6 @@ export const useSystemStore = defineStore('system', {
                this.message.title = error.title
             }
          } else {
-            this.message.type = "error"
-            this.message.title = "Virgo Error"
             this.message.content = error
          }
          this.reportError(this.message)
