@@ -10,7 +10,6 @@
          <FormKit type="select" label="Format" v-model="request.format"
             :options="['Any', 'CD', 'LP', 'DVD', 'Blu-Ray', 'VHS', 'LD']"
          />
-         <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: will accept other formats, library-use only okay)"
          />
@@ -50,7 +49,6 @@ const itemStore = useItemStore()
 const requestStore = useRequestStore()
 const request = ref({
    borrowType: "AV",
-   date: "",
    title: "",
    author: "",
    year: "",

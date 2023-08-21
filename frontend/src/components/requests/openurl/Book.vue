@@ -12,7 +12,6 @@
       <FormKit label="Edition" type="text" v-model="openurl.edition"/>
       <FormKit label="ISSN/ISBN" type="text" v-model="openurl.issn"/>
       <FormKit label="OCLC" type="text" v-model="openurl.oclc"/>
-      <FormKit label="Need By Date" type="date" v-model="openurl.bydate" validation="required|date_after"/>
       <FormKit label="Cited In" type="text" v-model="openurl.citedin"/>
       <FormKit label="Will you accept the item in a language other than English?" type="radio"
          help="If yes, specify acceptable languages in the notes field."

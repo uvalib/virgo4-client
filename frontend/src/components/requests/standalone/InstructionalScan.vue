@@ -5,7 +5,6 @@
          <FormKit label="Course Information" type="textarea" :rows="2" v-model="request.course" id="course"
             validation="required" help="Please supply the Course Instructor, Course Name, Number, Section and Semester"
          />
-         <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
          <FormKit label="Will you be providing a copy of this material for the Library to scan?" type="radio"
             v-model="request.personalCopy" :options="{true: 'Yes', false: 'No'}"
          />
@@ -55,7 +54,6 @@ const emit = defineEmits( ['submitted', 'canceled'] )
 const request = ref({
    scanType: "INSTRUCTIONAL",
    course: "",
-   date: "",
    personalCopy: "false",
    title: "",
    author: "",
