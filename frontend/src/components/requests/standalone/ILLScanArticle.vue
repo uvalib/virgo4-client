@@ -16,7 +16,6 @@
          <FormKit label="Pages" type="text" v-model="request.pages" validation="required|length:1,25" help="(ex: 1-15)"/>
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
-         <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: missing from shelf, color copies)"
          />
@@ -59,7 +58,6 @@ const request = ref({
    issn: "",
    oclc: "",
    notes: "",
-   date: ""
 })
 
 async function submitClicked() {

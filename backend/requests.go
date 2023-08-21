@@ -14,7 +14,6 @@ import (
 // Baese request structure for ILLiad POST /transaction
 type illiadRequest struct {
 	Username          string
-	NotWantedAfter    string
 	RequestType       string
 	ProcessType       string
 	DocumentType      string
@@ -126,7 +125,6 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 	var req struct {
 		BorrowType    string `json:"borrowType"`
 		DocumentType  string `json:"doctype"`
-		DateNeeded    string `json:"date"`
 		Title         string `json:"title"`
 		Author        string `json:"author"`
 		Publisher     string `json:"publisher"`
@@ -157,8 +155,7 @@ func (svc *ServiceContext) CreateBorrowRequest(c *gin.Context) {
 	}
 
 	log.Printf("Process borrow from %s for %s '%s'", v4Claims.UserID, req.BorrowType, req.Title)
-	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Loan", ProcessType: "Borrowing",
-		NotWantedAfter: req.DateNeeded}
+	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: "Loan", ProcessType: "Borrowing"}
 	borrowReq := illiadBorrowRequest{LoanTitle: req.Title, LoanAuthor: req.Author, LoanDate: req.Year,
 		ItemInfo4: illaidLibraryMapping(req.PickupLibrary)}
 	if req.BorrowType == "AV" {
@@ -222,7 +219,6 @@ func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
 		Pages       string `json:"pages"`
 		ISSN        string `json:"issn"`
 		OCLC        string `json:"oclc"`
-		ByDate      string `json:"bydate"`
 		AnyLanguage string `json:"anylanguage"`
 		CitedIn     string `json:"citedin"`
 		Notes       string `json:"notes"`
@@ -246,7 +242,7 @@ func (svc *ServiceContext) CreateOpenURLRequest(c *gin.Context) {
 	log.Printf("Process OpenURL %s request from %s for '%s'", req.DocType, v4Claims.UserID, req.Title)
 	illiadReq := illiadRequest{Username: v4Claims.UserID, RequestType: req.RequestType,
 		ProcessType: req.ProcessType, DocumentType: req.DocType,
-		TransactionStatus: "Awaiting Request Processing", NotWantedAfter: req.ByDate}
+		TransactionStatus: "Awaiting Request Processing"}
 	var openURLReq interface{}
 	if req.DocType == "Book" {
 		borrowReq := illiadBorrowRequest{illiadRequest: &illiadReq, LoanTitle: req.Title,
@@ -295,7 +291,6 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 		ScanType     string `json:"scanType"` // ARTICLE or INSTRUCTIONAL
 		DocType      string `json:"doctype"`
 		Course       string `json:"course"`
-		DateNeeded   string `json:"date"`
 		PersonalCopy string `json:"personalCopy"`
 		Title        string `json:"title"`
 		Article      string `json:"article"`
@@ -330,7 +325,6 @@ func (svc *ServiceContext) CreateStandaloneScan(c *gin.Context) {
 	illiadReq := illiadRequest{
 		Username:          v4Claims.UserID,
 		RequestType:       "Article",
-		NotWantedAfter:    req.DateNeeded,
 		TransactionStatus: "Standalone Form Scan Request",
 	}
 	scanReq := illiadScanRequest{

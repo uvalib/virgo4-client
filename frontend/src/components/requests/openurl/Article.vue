@@ -17,7 +17,6 @@
        <FormKit label="Notes or Special Instructions" type="textarea" v-model="openurl.notes" :rows="2"
             help="(ex: color copies)"
       />
-      <FormKit label="Need By Date" type="date" v-model="openurl.bydate" validation="required|date_after"/>
 
       <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-openurl-book"
          :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>

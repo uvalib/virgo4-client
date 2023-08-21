@@ -15,11 +15,7 @@
             </tr>
             <tr>
                <td class="label">Title:</td>
-               <td>{{title}}</td>
-            </tr>
-            <tr>
-               <td class="label">Needed By:</td>
-               <td>{{bydate}}</td>
+               <td>{{requestStore.openurl.title}}</td>
             </tr>
          </table>
          <p>
@@ -49,24 +45,6 @@ const user = useUserStore()
 const system = useSystemStore()
 
 const request = ref("pending")
-
-// sysError: state => state.system.error,
-// ...mapFields('requests',[
-// 'openurl.title',
-// 'openurl.article',
-// 'openurl.author',
-// 'openurl.publisher',
-// 'openurl.edition',
-// 'openurl.anylanguage',
-// 'openurl.citedin',
-// 'openurl.volume',
-// 'openurl.issue',
-// 'openurl.month',
-// 'openurl.year',
-// 'openurl.issn',
-// 'openurl.oclc',
-// 'openurl.pages',
-// 'openurl.bydate'
 
 onBeforeRouteUpdate((to) => {
    if (to.query.submitted) {

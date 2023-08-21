@@ -39,7 +39,6 @@ export const useRequestStore = defineStore('request', {
          pages: "",
          issn: "",
          oclc: "",
-         bydate: "",
          anylanguage: "true",
          citedin: "",
          notes: "",

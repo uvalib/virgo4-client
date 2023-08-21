@@ -14,7 +14,6 @@
          <FormKit label="Edition" type="text" v-model="request.edition"/>
          <FormKit label="OCLC Number" type="text" v-model="request.oclc"/>
          <FormKit label="ISBN/ISSN" type="text" v-model="request.issn"/>
-         <FormKit label="Need By Date" type="date" v-model="request.date" validation="required|date_after"/>
          <FormKit label="Cited In" type="text" v-model="request.cited"/>
          <FormKit label="Will you accept the item in a language other than English?" type="radio"
             v-model="request.anyLanguage" :options="{'true': 'Yes', 'false': 'No'}"
@@ -69,7 +68,6 @@ const pickupLibraries = computed(()=>{
 const request = ref({
    borrowType: "ITEM",
    doctype: "",
-   date: "",
    title: "",
    author: "",
    publisher: "",
