@@ -6,7 +6,7 @@
                    borderColor: props.borderColor }"
       >
          <button  @click="accordionClicked" @keydown.prevent.enter="accordionClicked" @keydown.space.prevent="accordionClicked"
-            :class="props.layout" class="title"
+            :class="props.layout" class="title accordion-trigger"
             :aria-expanded="expandedStr"
             :aria-controls="contentID"
             :style="{color: props.color}"

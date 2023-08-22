@@ -8,7 +8,7 @@
       <div v-else-if="userStore.isSignedIn">
          <div class="none" v-if="bookmarkStore.hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
-            <div class="folder" v-for="(folderInfo,idx) in bookmarkStore.bookmarks" :key="folderInfo.id">
+            <div class="folder" v-for="(folderInfo) in bookmarkStore.bookmarks" :key="folderInfo.id">
                <AccordionContent
                   class="bookmark-folder"
                   color="var(--uvalib-grey-darkest)"
@@ -40,19 +40,7 @@
                         <template v-if="!renaming">
                            <V4Button v-if="folderInfo.public" class="copy-link" mode="primary" @click="copyURL(folderInfo)">Copy public URL</V4Button>
                            <V4Button mode="primary" @click="renameClicked(folderInfo)">Rename</V4Button>
-                           <Confirm title="Confirm Delete" buttonLabel="Delete" buttonMode="primary"
-                              v-on:confirmed="removeFolder(folderInfo.id, idx)" style="display: inline-block;"
-                              class="confirm-delete"
-                              :id="`delete-${folderInfo.id}`" >
-                              <div>
-                                 Delete bookmark folder
-                                 <b>{{folderInfo.folder}}</b>? All bookmarks
-                              </div>
-                              <div>contained within it will also be deleted.</div>
-                              <div>
-                                 <br />This cannot be reversed.
-                              </div>
-                           </Confirm>
+                           <V4Button mode="primary" @click="deleteFolderClicked(folderInfo)">Delete</V4Button>
                         </template>
                         <div v-else class="rename">
                            <input @keyup.enter="doRename(folderInfo)"  :id="`rename-folder-${folderInfo.id}`" type="text" v-model="newFolderName"
@@ -76,15 +64,7 @@
                         </V4Button>
                         <PrintBookmarks :srcFolder="folderInfo.id" :id="`print-bookmarks-${folderInfo.id}`"/>
                         <ManageBookmarks :srcFolder="folderInfo.id" :id="`manage-bookmarks-${folderInfo.id}`"/>
-                        <Confirm title="Confirm Delete" buttonLabel="Delete" buttonMode="primary"
-                           v-on:confirmed="removeBookmarks(folderInfo.id)" style="display: inline-block;"
-                           class="confirm-delete"
-                           :id="`delete-bookmarks-${folderInfo.id}`" >
-                           <div>All selected bookmarks in {{folderInfo.folder}} will be deleted.</div>
-                           <div>
-                              <br />This cannot be reversed.
-                           </div>
-                        </Confirm>
+                        <V4Button mode="primary" @click="deleteBookmarksClicked(folderInfo)">Delete</V4Button>
                         <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on video reserves</V4Button>
                      </div>
 
@@ -144,7 +124,7 @@ import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import ManageBookmarks from "@/components/modals/ManageBookmarks.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, computed } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useBookmarkStore } from "@/stores/bookmark"
@@ -154,7 +134,11 @@ import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 import { useRouter } from 'vue-router'
 import V4Button from "../../components/V4Button.vue"
+import { useConfirm } from "primevue/useconfirm"
+import { useToast } from "primevue/usetoast"
 
+const confirm = useConfirm()
+const toast = useToast()
 const userStore = useUserStore()
 const systemStore = useSystemStore()
 const bookmarkStore = useBookmarkStore()
@@ -174,14 +158,55 @@ const submitting = ref(false)
 const expandedFolder = ref(-1)
 const selectAllChecked = ref(false)
 
-function hasSelectedBookmarks() {
+const hasSelectedBookmarks = computed(() => {
    return bookmarkStore.selectedBookmarks(expandedFolder.value ).length > 0
-}
+})
 
-function toggleSettings(folderID) {
+const errorToast = ((title, msg) => {
+   toast.add({severity:'error', summary:  title, detail:  msg, life: 5000})
+})
+const infoToast = ((title, msg) => {
+   toast.add({severity:'success', summary:  title, detail:  msg, life: 3000})
+})
+
+const toggleSettings = ((folderID) => {
    expandedFolder.value = folderID
    bookmarkStore.toggleBookmarkSettings(folderID)
-}
+})
+
+const deleteBookmarksClicked = ((folderInfo) => {
+      if ( hasSelectedBookmarks.value == false) {
+         errorToast("Delete Error", "No bookmarks selected for deletion. Select one or more and try again.")
+         return
+      }
+      confirm.require({
+      message: `All selected bookmarks in {{folderInfo.folder}} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary',
+      accept: () => {
+         bookmarkStore.removeSelectedBookmarks(folderInfo.id)
+      }
+   })
+})
+
+const deleteFolderClicked = ((folderInfo) => {
+   let msg = `Delete bookmark folder <b>${folderInfo.folder}</b>?<br/>All bookmarks contained within it will also be deleted.<br/><br/>This cannot be reversed.`
+   msg += '<br/><br/>Continue?'
+   confirm.require({
+      message: msg,
+      header: 'Confirm Delete Folder',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary',
+      accept: () => {
+         bookmarkStore.removeFolder(folderInfo.id)
+         let eles = document.getElementsByClassName("accordion-trigger")
+         if (eles ) {
+            eles[0].focus()
+         }
+      }
+   })
+})
 
 function renameClicked( folderInfo) {
    renaming.value = true
@@ -214,9 +239,9 @@ function copyURL( folder ) {
    let URL = getPublicURL(folder)
    copyText(URL, undefined, (error, _event) => {
       if (error) {
-         systemStore.setError("Unable to copy public bookmarks URL: "+error)
+         errorToast("Copy Error", "Unable to copy public bookmarks URL: "+error)
       } else {
-         systemStore.setMessage("Public bookmark URL copied to clipboard.")
+         infoToast("Bookmark Copied", "Public bookmark URL copied to clipboard.")
       }
    })
 }
@@ -255,8 +280,8 @@ function toggleAllClicked() {
    }
 }
 async function reserve() {
-   if ( hasSelectedBookmarks() == false) {
-      systemStore.setError("No items have been selected to put on reserve.<br/>Please select one or more and try again.")
+   if ( hasSelectedBookmarks.value == false) {
+      errorToast("Reserve Error", "No items have been selected to put on reserve. Please select one or more and try again.")
       return
    }
 
@@ -283,27 +308,6 @@ function detailsURL(bookmark) {
 function itemURL(bookmark) {
    return itemStore.getItemURL(bookmark.pool, bookmark.identifier)
 }
-
-function removeBookmarks(folderID) {
-   nextTick( ()=>{
-      if ( hasSelectedBookmarks() == false) {
-         systemStore.setError("No bookmarks selected for deletion.<br/>Select one or more and try again.")
-         return
-      }
-      bookmarkStore.removeSelectedBookmarks(folderID)
-   })
-}
-async function removeFolder(folderID, folderIdx) {
-   let focusID = "create-folder-btn"
-   if ( folderIdx < bookmarkStore.bookmarks.length-1) {
-      focusID = bookmarkStore.bookmarks[folderIdx+1].id.toString()+"-header"
-   }
-   await bookmarkStore.removeFolder(folderID)
-   let ele = document.getElementById(focusID)
-   if (ele ) {
-      ele.focus()
-   }
-}
 function openCreate() {
    createOpen.value = true
    nextTick( () => {
@@ -320,8 +324,9 @@ async function createFolder() {
    submitting.value = true
    systemStore.clearMessage()
    if (newFolder.value == "") {
-      systemStore.setError("A new folder name is required.<br/>Please add one and try again.")
+      errorToast("Create Error", "A new folder name is required. Please add one and try again.")
       submitting.value = false
+      document.getElementById("newname").focus()
       return
    }
    await bookmarkStore.addFolder(newFolder.value)

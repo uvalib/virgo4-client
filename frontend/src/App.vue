@@ -2,6 +2,13 @@
    <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
    <MessageBox />
    <SessionExpired />
+   <Toast position="top-center" />
+   <ConfirmDialog position="top">
+      <template #message="slotProps">
+         <i :class="slotProps.message.icon" style="font-size: 2rem; display: inline-block; margin-right: 20px;"></i>
+         <div v-html="slotProps.message.message"></div>
+      </template>
+   </ConfirmDialog>
    <div role="banner" class="site-header" id="v4-header">
       <SkipToNavigation />
       <div class="header-alert" v-if="alertStore.headerAlerts.length > 0">
@@ -59,13 +66,15 @@ import VirgoHeader from "@/components/layout/VirgoHeader.vue"
 import MenuBar from "@/components/layout/MenuBar.vue"
 import SkipToNavigation from "@/components/layout/SkipToNavigation.vue"
 import SessionExpired from "@/components/layout/SessionExpired.vue"
+import ConfirmDialog from 'primevue/confirmdialog'
+import Toast from 'primevue/toast'
 import { useAlertStore } from "@/stores/alert"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
-import { ref, nextTick, computed, onMounted, onUnmounted, onUpdated, watch } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, onUpdated, watch } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
