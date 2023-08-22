@@ -1,19 +1,12 @@
 <template>
    <span v-if="system.isKiosk==false" class="bookmark-container">
-      <V4Button v-if="bookmarkCount == 1" mode="icon" @click="removeBookmarkClicked"
+      <V4Button v-if="bookmarkCount > 0" mode="icon" @click="removeBookmarkClicked"
          :id="props.id"
          role="switch" aria-checked="true"
          :aria-label="`remove bookmark on ${props.data.title}`"
       >
          <i class="bookmark fas fa-bookmark"></i>
       </V4Button>
-      <Confirm v-else-if="bookmarkCount > 1" buttonMode="icon" icon="bookmark fas fa-bookmark"
-         title="Remove multiple bookmarks"
-         v-on:confirmed="removeBookmarkClicked()" :id="`del-multi-bookmark`"
-      >
-         <div>This item is bookmarked in '<b>{{bookmarkCount}}</b> folders. Remove all?</div>
-         <div class="del-detail">This cannot be reversed.</div>
-      </Confirm>
       <V4Button v-else mode="icon" @click="addBookmarkClicked"
          :id="id"
          role="switch" aria-checked="false"
@@ -29,6 +22,7 @@ import { computed } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
+import { useConfirm } from "primevue/useconfirm"
 
 const emit = defineEmits( ['clicked'] )
 
@@ -40,6 +34,7 @@ const props = defineProps({
 
 const system = useSystemStore()
 const bookmarkStore = useBookmarkStore()
+const confirm = useConfirm()
 
 const bookmarkCount = computed(()=>{
    let count = 0
@@ -53,7 +48,23 @@ const bookmarkCount = computed(()=>{
    return count
 })
 
-function removeBookmarkClicked() {
+const removeBookmarkClicked = (() => {
+   if (bookmarkCount.value > 1) {
+      confirm.require({
+         message: `This item is bookmarked in <b>${bookmarkCount.value}</b> folders. Remove all?<br/>This cannot be reversed.<br/><br/>Continue?`,
+         header: 'Confirm Remove Bookmarks',
+         icon: 'pi pi-exclamation-triangle',
+         rejectClass: 'p-button-secondary',
+         accept: () => {
+            removeBookmark()
+         }
+      })
+   } else {
+      removeBookmark()
+   }
+})
+
+const removeBookmark = ( () => {
    bookmarkStore.bookmarks.forEach( folder => {
       folder.bookmarks.forEach( item => {
          if (item.pool == props.data.pool && item.identifier == props.data.identifier) {
@@ -62,10 +73,11 @@ function removeBookmarkClicked() {
       })
    })
    analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', props.data.identifier)
-}
-function addBookmarkClicked() {
+})
+
+const addBookmarkClicked= (() => {
    emit('clicked')
-}
+})
 </script>
 
 <style lang="scss" scoped>

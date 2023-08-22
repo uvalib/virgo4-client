@@ -180,14 +180,14 @@ const deleteBookmarksClicked = ((folderInfo) => {
          return
       }
       confirm.require({
-      message: `All selected bookmarks in {{folderInfo.folder}} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
-      header: 'Confirm Delete',
-      icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
-      accept: () => {
-         bookmarkStore.removeSelectedBookmarks(folderInfo.id)
-      }
-   })
+         message: `All selected bookmarks in {{folderInfo.folder}} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
+         header: 'Confirm Delete',
+         icon: 'pi pi-exclamation-triangle',
+         rejectClass: 'p-button-secondary',
+         accept: () => {
+            bookmarkStore.removeSelectedBookmarks(folderInfo.id)
+         }
+      })
 })
 
 const deleteFolderClicked = ((folderInfo) => {
