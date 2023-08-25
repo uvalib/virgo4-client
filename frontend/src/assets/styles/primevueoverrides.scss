@@ -60,6 +60,9 @@ div.p-overlaypanel {
    font-family: "franklin-gothic-urw", arial, sans-serif;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
+   .p-overlaypanel-content {
+      padding: 0;
+   }
 }
 div.p-overlaypanel.border {
    border: 1px solid var(--uvalib-grey);
@@ -92,6 +95,13 @@ button.p-button.p-button-text.disclosure {
    justify-content: flex-end;
    border-radius: 0;
    border: none;
+
+   .p-menubar-button {
+      color: white;
+      &:hover {
+         background-color: var(--uvalib-blue-alt);
+      }
+   }
 
    .p-menubar-end {
       margin: 0px 5px 0 10px;
@@ -188,9 +198,58 @@ button.p-button.p-button-text.disclosure {
    }
 }
 
-// span.p-button.p-component.p-fileupload-choose {
-//    width: 100%;
-// }
+#app div.p-menubar.p-component.p-menubar-mobile-active {
+   .p-menubar-root-list {
+      background-color: var(--uvalib-brand-blue);
+      .p-menuitem {
+         padding: 10px 0;
+         .p-menuitem-link {
+            margin: 0 10px;
+         }
+         span.p-menuitem-text {
+            color: var(--uvalib-text-dark);
+         }
+         .p-menuitem-icon {
+            display: none;
+         }
+         .p-submenu-list {
+            background-color: var(--uvalib-brand-blue);
+            border-radius: 0;
+            border: none;
+            border-top: 0;
+            width: max-content;
+            padding: 0;
+            box-shadow: none;
+            font-size: 0.9em;
+            margin: 10px 0 0 25px;
+
+            li.p-menuitem {
+               a.p-menuitem-link {
+                  padding: 2px 5px;
+                  span.p-menuitem-text, .p-menuitem-icon {
+                     color: white;
+                  }
+               }
+            }
+
+            li.p-menuitem.p-focus {
+               outline: 3px dotted white;
+
+               .p-menuitem-content {
+                  background: none;
+                  color: var(--uvalib-text-dark);
+               }
+               a.p-menuitem-link {
+                  outline: none;
+                  background-color: var(--uvalib-brand-blue);;
+                  color: white;
+               }
+            }
+         }
+      }
+   }
+}
+
 
 button.p-button.p-button-text {
    background: none;
