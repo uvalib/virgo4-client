@@ -229,6 +229,11 @@ button.p-button.p-button-text.disclosure {
                   span.p-menuitem-text, .p-menuitem-icon {
                      color: white;
                   }
+                  &:hover {
+                     color: white;
+                     background-color: var(--uvalib-brand-blue);
+                     text-decoration: underline;
+                  }
                }
             }
 
@@ -241,7 +246,7 @@ button.p-button.p-button-text.disclosure {
                }
                a.p-menuitem-link {
                   outline: none;
-                  background-color: var(--uvalib-brand-blue);;
+                  background-color: var(--uvalib-brand-blue);
                   color: white;
                }
             }
