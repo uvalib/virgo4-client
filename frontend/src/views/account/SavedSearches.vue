@@ -33,13 +33,9 @@
                            <i class="viewsave fal fa-search"></i>
                         </router-link>
                      </span>
-                     <Confirm title="Confirm Delete" v-on:confirmed="removeSavedSearch(saved.id)"
-                        :id="`del-saved-search-${idx+1}`"
-                        :ariaLabel="`Delete search named ${saved.name}`"
-                     >
-                        <div>Delete saved search '<b>{{saved.name}}</b>'?</div>
-                        <div class="del-detail">This cannot be reversed.</div>
-                     </Confirm>
+                     <V4Button mode="icon" @click="deleteSearchClicked(saved)" :title="`Delete search named ${saved.name}`" >
+                        <i class="trash fal fa-trash-alt"></i>
+                     </V4Button>
                   </span>
                </div>
                <div v-if="saved.public" class="public-controls">
@@ -55,11 +51,8 @@
                   </V4Button>
                </div>
             </div>
-               <div class="controls">
-               <Confirm title="Confirm Delete" v-on:confirmed="removeAllSearches" id="del-all-searches" buttonLabel="Delete all saved searches">
-                  <div>Delete all saved searches?</div>
-                  <div class="del-detail">This cannot be reversed.</div>
-               </Confirm>
+            <div class="controls">
+               <V4Button mode="text" @click="removeAllClicked">Delete all saved searches</V4Button>
             </div>
          </div>
          <div v-if="searchStore.history.length > 0" class="history">
@@ -70,11 +63,8 @@
                   <router-link @mousedown="savedSearchClicked('history')" class="history" :to="h">{{urlToText(h)}}</router-link>
                </template>
             </div>
-               <div class="controls">
-               <Confirm title="Confirm Delete" v-on:confirmed="clearHistory" id="del-history" buttonLabel="Clear search history">
-                  <div>Delete search history?</div>
-                  <div class="del-detail">This cannot be reversed.</div>
-               </Confirm>
+            <div class="controls">
+               <V4Button mode="text" @click="clearHistoryClicked">Clear search history</V4Button>
             </div>
          </div>
       </div>
@@ -111,26 +101,73 @@ import { useSearchStore } from "@/stores/search"
 import { useResultStore } from "@/stores/result"
 import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
+import { useConfirm } from "primevue/useconfirm"
+import { useToast } from "primevue/usetoast"
 
 const results = useResultStore()
 const userStore = useUserStore()
 const systemStore = useSystemStore()
 const searchStore = useSearchStore()
+const confirm = useConfirm()
+const toast = useToast()
 
 const rssmodal = ref(null)
 const rssMessage = ref("")
 const currentFeed = ref({})
 
-async function savedSearchClicked(searchType) {
+const errorToast = ((title, msg) => {
+   toast.add({severity:'error', summary:  title, detail:  msg, life: 5000})
+})
+const infoToast = ((title, msg) => {
+   toast.add({severity:'success', summary:  title, detail:  msg, life: 3000})
+})
+
+const savedSearchClicked = (async (searchType) => {
    if (searchType == "history") {
       analytics.trigger('Navigation', 'SEARCH_HISTORY_CLICKED')
    } else {
       analytics.trigger('Navigation', 'SAVED_SEARCH_CLICKED')
    }
    await results.resetSearch()
-}
+})
 
-function urlToText(url) {
+const deleteSearchClicked = ( (savedSearch) => {
+   confirm.require({
+      message: `Delete saved searched named <b>${savedSearch.name}</b>?<br/>This cannot be reversed.<br/><br/>Continue?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary',
+      accept: () => {
+         searchStore.delete({userID: userStore.signedInUser, searchID: savedSearch.id})
+      }
+   })
+})
+
+const removeAllClicked = (() => {
+   confirm.require({
+      message: `Delete all saved searches?<br/>This cannot be reversed.<br/><br/>Continue?`,
+      header: 'Confirm Delete All',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary',
+      accept: () => {
+         searchStore.deleteAll(userStore.signedInUser)
+      }
+   })
+})
+
+const clearHistoryClicked = (() => {
+   confirm.require({
+      message: `Delete search history?<br/>This cannot be reversed.<br/><br/>Continue?`,
+      header: 'Confirm Clear History',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary',
+      accept: () => {
+         searchStore.clearHistory(userStore.signedInUser)
+      }
+   })
+})
+
+const urlToText = ((url) => {
    if (url.split("?").length === 1) {
       return ""
    }
@@ -151,32 +188,20 @@ function urlToText(url) {
       out = `Advanced Search - ${decodeURI(stripped).replace("|", ", ")}`
    }
    return out
-}
+})
 
-function removeAllSearches() {
-   searchStore.deleteAll(userStore.signedInUser)
-}
-
-function clearHistory() {
-   searchStore.clearHistory(userStore.signedInUser)
-}
-
-function removeSavedSearch(searchID) {
-   searchStore.delete({userID: userStore.signedInUser, searchID: searchID})
-}
-
-function copyURL(token) {
+const copyURL = ((token) => {
    let URL = window.location.protocol + "//" + window.location.host + searchURL(token)
    copyText(URL, undefined, (error, _event) => {
       if (error) {
-         systemStore.setError("Unable to copy public search URL: "+error)
+         errorToast("Copy Error", "Unable to copy public search URL: "+error)
       } else {
-         systemStore.setMessage("Public search URL copied to clipboard.")
+         infoToast("Search Copied", "Public search URL copied to clipboard.")
       }
    })
-}
+})
 
-function copyRSS(token) {
+const copyRSS = ((token) => {
    let URL = rssURL(token)
    copyText(URL, undefined, (error, _event) => {
       if (error) {
@@ -185,27 +210,27 @@ function copyRSS(token) {
          rssMessage.value = `Copied!`
       }
    })
-}
+})
 
-function openRSSModal(rss) {
+const openRSSModal = ((rss) => {
    rssMessage.value = ""
    currentFeed.value = rss
    rssmodal.value.show()
-}
+})
 
-function publicClicked(saved) {
+const publicClicked = ((saved) => {
    saved.public = !saved.public
    saved.userID = userStore.signedInUser
    searchStore.updateVisibility(saved)
-}
+})
 
-function searchURL(key) {
+const searchURL = ((key) => {
    return `/search/${key}`
-}
+})
 
-function rssURL(key){
+const rssURL = ((key) => {
    return `${window.location.protocol}//${window.location.host}/api/searches/${key}/rss`
-}
+})
 
 onMounted(()=>{
    if ( userStore.isSignedIn) {

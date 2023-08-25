@@ -1,10 +1,14 @@
 <template>
    <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
-   <transition name="fade">
-      <div class="dimmer" v-if="showDimmer">
-         <MessageBox />
-      </div>
-   </transition>
+   <MessageBox />
+   <SessionExpired />
+   <Toast position="top-center" />
+   <ConfirmDialog position="top">
+      <template #message="slotProps">
+         <i :class="slotProps.message.icon" style="font-size: 2rem; display: inline-block; margin-right: 20px;"></i>
+         <div v-html="slotProps.message.message"></div>
+      </template>
+   </ConfirmDialog>
    <div role="banner" class="site-header" id="v4-header">
       <SkipToNavigation />
       <div class="header-alert" v-if="alertStore.headerAlerts.length > 0">
@@ -32,7 +36,6 @@
       </div>
    </div>
    <main tabindex="-1" class="v4-content" id="v4-main" role="main">
-      <SessionExpired />
       <VueAnnouncer />
       <h1>{{systemStore.pageTitle}}</h1>
       <template v-if="configuring==false">
@@ -63,13 +66,15 @@ import VirgoHeader from "@/components/layout/VirgoHeader.vue"
 import MenuBar from "@/components/layout/MenuBar.vue"
 import SkipToNavigation from "@/components/layout/SkipToNavigation.vue"
 import SessionExpired from "@/components/layout/SessionExpired.vue"
+import ConfirmDialog from 'primevue/confirmdialog'
+import Toast from 'primevue/toast'
 import { useAlertStore } from "@/stores/alert"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
-import { ref, nextTick, computed, onMounted, onUnmounted, onUpdated, watch } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, onUpdated, watch } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
@@ -86,8 +91,6 @@ const collectionStore = useCollectionStore()
 const headerHeight = ref(0)
 const menuHeight = ref(0)
 const configuring = ref(true)
-
-const showDimmer = computed( () => systemStore.hasMessage || systemStore.sessionExpired || systemStore.hasError )
 
 // extract a ref to headerAlerts from the alertStore so it can be watched directly
 const { headerAlerts } = storeToRefs(alertStore)
@@ -349,13 +352,6 @@ onUpdated(() => {
    }
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .2s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
-
 html,
 body {
    margin: 0;
@@ -366,6 +362,7 @@ body {
    position: fixed !important;
    top: 0;
    width: 100%;
+   z-index: 500;
 }
 #app .screen-reader-text {
    clip: rect(1px, 1px, 1px, 1px);
@@ -393,15 +390,6 @@ body {
    top: 5px;
    width: auto;
    z-index: 100000;
-}
-
-#v4-navbar {
-   transition-duration: 0ms;
-   position: relative;
-   left: 0;
-   right: 0;
-   z-index: 20;
-   box-sizing: border-box;
 }
 
 #app .dimmer {
@@ -522,6 +510,7 @@ body {
       @include be-accessible();
    }
    footer, div.header, nav {
+      z-index: 500;
       a:focus {
          @include be-accessible-light();
       }

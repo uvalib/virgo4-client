@@ -7,7 +7,6 @@
                {{systemStore.translateMessage}}
             </div>
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
-            <label class="screen-reader-text" for="source-select">Search in</label>
             <div class="basic-search">
                <input class="basic"
                   @keyup.enter="searchClicked"

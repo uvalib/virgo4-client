@@ -2,7 +2,7 @@
    <div v-if="userStore.isAdmin" class="libary-admin">
       <h2>
          <span>Pickup Library Management</span>
-         <V4Button class="edit-pl" mode="primary" @click="addClicked">Add</V4Button>
+         <V4Button class="edit-pl" mode="primary" @click="addPickupLibraryClicked">Add</V4Button>
       </h2>
       <div class="content form">
          <div class="row" v-for="(pl,idx) in systemStore.allPickupLibraries" :key="`pl${pl.primaryKey}`">
@@ -20,20 +20,15 @@
                <div class="actions">
                   <V4Checkbox :disabled="editIndex > -1" :checked="pl.enabled" @click="enableClicked(pl)" label="Enabled"/>
                   <V4Button :disabled="editIndex > -1" class="edit-pl" mode="tertiary" @click="editClicked(idx, pl)">Edit</V4Button>
-                  <Confirm class="delete" title="Confirm Delete" v-on:confirmed="deleteLibrary(pl)"
-                     :id="`delete-${pl.id}`" style="margin-right: 10px"
-                     :ariaLabel="`delete pickup library ${pl.name}`">
-                     <div>
-                        Delete pickup library '<b>{{pl.name}}</b>'?
-                        <br />This cannot be reversed.
-                     </div>
-                  </Confirm>
+                  <V4Button :disabled="editIndex > -1" mode="icon" @click="deleteLibrary(pl)" title="Delete pickup library" >
+                     <i class="trash fal fa-trash-alt"></i>
+                  </V4Button>
                </div>
             </template>
          </div>
          <div class="row" v-if="editIndex == systemStore.allPickupLibraries.length">
-            <input class="edit id" v-model="editRec.value.id" />
-            <input class="edit name" v-model="editRec.value.name" />
+            <input class="edit id" v-model="editRec.id" />
+            <input class="edit name" v-model="editRec.name" />
             <div class="actions">
                <V4Button class="edit-pl" mode="tertiary" @click="cancelClicked">Cancel</V4Button>
                <V4Button class="edit-pl" mode="tertiary" @click="addConfirmed">Add</V4Button>
@@ -46,47 +41,63 @@
 <script setup>
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
+import { useConfirm } from "primevue/useconfirm"
 import { ref } from 'vue'
 
 const userStore = useUserStore()
 const systemStore = useSystemStore()
+const confirm = useConfirm()
 
 const editIndex = ref(-1)
 const editRec = ref({primaryKey: 0, id: "", name: "", enabled: false})
 
-function addClicked() {
+const addPickupLibraryClicked = (() => {
    editIndex.value = systemStore.allPickupLibraries.length
    editRec.value.primaryKey = 0
    editRec.value.id = ""
    editRec.value.name = ""
    editRec.value.enabled = true
-}
-async function addConfirmed() {
-   await systemStore.addPickupLibrary(editRec)
+})
+
+const addConfirmed = ( async () => {
+   await systemStore.addPickupLibrary(editRec.value)
    cancelClicked()
-}
-function deleteLibrary(library) {
-   systemStore.deletePickupLibrary(library)
-}
-async function updateClicked() {
-   await systemStore.updatePickupLibrary(editRec)
+})
+
+const deleteLibrary = ( (library) => {
+   confirm.require({
+      message: `Delete pickup library <b>${library.id}</b>?<br/>This cannot be reversed.<br/><br/>Continue?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      rejectClass: 'p-button-secondary',
+      accept: () => {
+         systemStore.deletePickupLibrary(library)
+      }
+   })
+})
+
+const updateClicked = ( async () => {
+   await systemStore.updatePickupLibrary(editRec.value)
    cancelClicked()
-}
-function cancelClicked() {
+})
+
+const cancelClicked = (() => {
    editIndex.value = -1
    editRec.value = {primaryKey: 0, id: "", name: "", enabled: false}
-}
-function enableClicked(pl) {
+})
+
+const enableClicked = ((pl) => {
    pl.enabled = !pl.enabled
    systemStore.updatePickupLibrary(pl)
-}
-function editClicked(idx, rec) {
+})
+
+const editClicked = ( (idx, rec) => {
    editIndex.value = idx
    editRec.value.primaryKey = rec.primaryKey
    editRec.value.id = rec.id
    editRec.value.name = rec.name
    editRec.value.enabled = rec.enabled
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -104,6 +115,14 @@ function editClicked(idx, rec) {
       button.v4-button.edit-pl {
          font-size: 14px;
       }
+   }
+   i.trash {
+      color: black;
+      cursor: pointer;
+      font-size: 1.2em;
+      padding: 2px;
+      display: inline-block;
+      margin: 0 10px 0 25px;
    }
    button.v4-button.edit-pl {
       margin: 0 0 0 20px;
