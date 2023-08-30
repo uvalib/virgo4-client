@@ -3,10 +3,7 @@
       Update my Virgo contact information
    </V4Button>
    <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top" header="Update Contact Info" @hide="showUpdateDialog = false" @show="opened">
-      <p v-if="emailSent">
-         An email has been sent to library staff requesting an update to your contact information.
-      </p>
-      <FormKit v-else type="form" id="update-contact" :actions="false" @submit="submitUpdate">
+      <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate">
          <div class="scroller">
             <div class="section">
                <p class="section-name">Name</p>
@@ -27,12 +24,9 @@
          </div>
          <p v-if="error" class="error" v-html="error"></p>
 
-         <div class="form-controls">
-            <V4Button v-if="emailSent" mode="tertiary" @click="showUpdateDialog = false">OK</V4Button>
-            <template v-else>
-               <V4Button mode="tertiary" @click="showUpdateDialog = false">Cancel</V4Button>
-               <FormKit type="submit" label="Update" wrapper-class="submit-button" :disabled="okDisabled" />
-            </template>
+         <div class="form-controls" >
+            <V4Button mode="tertiary" @click="showUpdateDialog = false">Cancel</V4Button>
+            <FormKit type="submit" label="Update" wrapper-class="submit-button" :disabled="okDisabled" />
          </div>
       </FormKit>
    </Dialog>
@@ -42,7 +36,9 @@
 import { ref } from 'vue'
 import { useUserStore } from "@/stores/user"
 import Dialog from 'primevue/dialog'
+import { useToast } from "primevue/usetoast"
 
+const toast = useToast()
 const userStore = useUserStore()
 
 const showUpdateDialog = ref(false)
@@ -56,7 +52,6 @@ const contact = ref({
    email: ""
 })
 const originalContact = ref({})
-const emailSent = ref(false)
 const error = ref("")
 const okDisabled = ref(false)
 
@@ -69,13 +64,10 @@ const opened = (() => {
    contact.value.lastName = userStore.accountInfo.sirsiProfile.lastName
    contact.value.phone = userStore.accountInfo.sirsiProfile.address1.phone
    contact.value.email = userStore.accountInfo.email
-   emailSent.value = false
    error.value = ""
    okDisabled.value = false
    // Shallow clone
    originalContact.value = {...contact.value}
-   let ele = document.getElementById("firstname")
-   ele.focus()
 })
 
 const submitUpdate = (() => {
@@ -94,7 +86,9 @@ const submitUpdate = (() => {
    okDisabled.value = true
    let info = {newContact: contact.value, oldContact: originalContact.value}
    userStore.updateContactInfo(info).then(() => {
-      emailSent.value = true
+      showUpdateDialog.value = false
+      let msg = "An email has been sent to library staff requesting an update to your contact information."
+      toast.add({severity:'success', summary:  "Request Submitted", detail:  msg, life: 6000})
    }).catch((e) => {
       error.value = "Unable to update contact info. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
       if(e.response.data.message){

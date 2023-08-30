@@ -23,6 +23,7 @@ function parseJwt(token) {
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
+      showForgotPW: false,
       authToken: "",
       authorizing: false,
       signedInUser: "",

@@ -2,14 +2,16 @@
    <V4Button mode="primary" @click="showDialog = true" v-if="!hasPasswordToken" :disabled="showDialog" >
       Change password
    </V4Button>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password" @hide="showDialog = false" @show="opened">
-      <p  v-if="passwordChanged">Your password has been changed.</p>
-      <template v-else-if="expiredToken">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password" @hide="closeChangeDialog" @show="opened">
+      <template v-if="expiredToken">
          <p class="error" v-html="error"></p>
          <p class="error">Please request a new password reset email.</p>
+         <div class="form-controls">
+            <V4Button mode="tertiary" @click="closeExpiredChange">OK</V4Button>
+         </div>
       </template>
       <template v-else>
-         <p>New passwords must:</p>
+         <p>New passwords must: </p>
          <ul>
             <li>
                Contain between 12 and 25 characters
@@ -28,7 +30,7 @@
             </li>
          </ul>
          <FormKit type="form" id="change-password" :actions="false" @submit="submitPasswordChange">
-            <FormKit v-if="!hasPasswordToken" id="curr-password" label="Current Password" type="password" v-model="currPassword" validation="required" />
+            <FormKit v-if="!hasPasswordToken" label="Current Password" type="password" v-model="currPassword" validation="required" />
             <FormKit type="password" name="password" label="New Password" id="new-password"
                :validation="[
                   ['required'],
@@ -41,9 +43,9 @@
                }"
                v-model="newPassword"
             />
-            <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm"/>
+            <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm" v-model="confirmPassword" />
             <div class="form-controls">
-               <V4Button mode="tertiary" @click="showDialog = false">Cancel</V4Button>
+               <V4Button mode="tertiary" @click="closeChangeDialog">Cancel</V4Button>
                <FormKit type="submit" label="Submit" wrapper-class="submit-button" :disabled="okDisabled" />
             </div>
          </FormKit>
@@ -57,9 +59,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from "@/stores/user"
 import { setErrors } from '@formkit/core'
 import Dialog from 'primevue/dialog'
+import { useToast } from "primevue/usetoast"
 
-const emit = defineEmits( ['show-forgot-password'])
-
+const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
@@ -67,9 +69,9 @@ const userStore = useUserStore()
 const showDialog = ref(false)
 const currPassword = ref("")
 const newPassword = ref("")
+const confirmPassword = ref("")
 const passwordToken = ref("")
 const error = ref("")
-const passwordChanged = ref(false)
 const okDisabled = ref(false)
 const expiredToken = ref(false)
 
@@ -88,38 +90,36 @@ const opened = (() => {
    currPassword.value = ""
    newPassword.value = ""
    error.value = ""
-   passwordChanged.value = false
    okDisabled.value = false
 })
 
+const closeChangeDialog = (() => {
+   showDialog.value = false
+   let query = Object.assign({}, route.query)
+   if ( query.token )  {
+      delete query.token
+      router.replace({ query })
+   }
+})
+
+const closeExpiredChange = (() => {
+   showDialog.value = false
+   userStore.showForgotPW = true
+   let query = Object.assign({}, route.query)
+   delete query.token
+   router.replace({ query })
+})
+
 const submitPasswordChange = (() => {
-   if ( passwordChanged.value ) {
-      let query = Object.assign({}, route.query);
-      delete query.token;
-      router.replace({ query });
-      showDialog.value = false
-      return
-   }
-
-   if (expiredToken.value) {
-      // called when the change fails. New content is presented suggesting the user request a
-      // new forgot password token, When OK is cliicked, clear the token and show the forgot popup.
-      let query = Object.assign({}, route.query);
-      delete query.token;
-      router.replace({ query });
-      showDialog.value = false
-      emit("show-forgot-password")
-      return
-   }
-
    okDisabled.value = true
    if (hasPasswordToken.value) {
       let data = {reset_password_token: passwordToken.value, new_password: newPassword.value}
       userStore.changePasswordWithToken(data).then(() => {
-         passwordChanged.value = true
+         showDialog.value = false
+         let msg = "Your password has been changed."
+         toast.add({severity:'success', summary:  "Success", detail:  msg, life: 6000})
       }).catch((e) => {
          expiredToken.value = true
-
          if(e.response.data.message){
             error.value = e.response.data.message
          } else {
@@ -133,7 +133,6 @@ const submitPasswordChange = (() => {
       userStore.changePassword(data).then(() => {
          passwordChanged.value = true
       }).catch((e) => {
-         document.getElementById("curr-password").focus()
          error.value = "Password change failed.</br>"
          if ( e.response.data.message ) {
             error.value += e.response.data.message
@@ -162,7 +161,6 @@ label {
 }
 p.error {
    padding: 0;
-   font-size: 0.8em;
    color: var(  --uvalib-red-emergency);
    text-align: center;
 }

@@ -31,8 +31,8 @@
             </transition>
             <template v-if="!systemStore.ilsError">
                <div class="changes">
-                  <ForgotPassword :trigger="showForgotModal" @closed="onForgotPassClosed" />
-                  <ChangePassword v-if="hasPasswordToken" @show-forgot-password="onShowForgotPassword"/>
+                  <ForgotPassword />
+                  <ChangePassword v-if="hasPasswordToken" />
                </div>
             </template>
             <div class="ils-error" v-if="systemStore.ilsError">{{systemStore.ilsError}}</div>
@@ -59,7 +59,6 @@ const systemStore = useSystemStore()
 const userStore = useUserStore()
 const user = ref('')
 const pin = ref('')
-const showForgotModal = ref(false)
 
 const hasPasswordToken = computed( ()=> {
    return route.query.token && route.query.token.length > 0
@@ -73,18 +72,13 @@ watch(authTriesLeft, (newValue, oldValue) => {
    }
 })
 
-function onForgotPassClosed() {
-   showForgotModal.value = false
-}
-function onShowForgotPassword() {
-   showForgotModal.value = true
-}
-function signinClicked() {
+const signinClicked = (() => {
   userStore.signin({barcode: user.value.trim(), password: pin.value})
-}
-function netbadgeLogin() {
+})
+
+const netbadgeLogin = (() => {
    userStore.netbadge()
-}
+})
 </script>
 
 <style scoped lang="scss">
