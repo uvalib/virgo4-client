@@ -6,7 +6,7 @@
       <p v-if="emailSent">
          An email has been sent to library staff requesting an update to your contact information.
       </p>
-      <FormKit v-else type="form" id="update-contact" :actions="false" @submit="okClicked">
+      <FormKit v-else type="form" id="update-contact" :actions="false" @submit="submitUpdate">
          <div class="scroller">
             <div class="section">
                <p class="section-name">Name</p>
@@ -46,7 +46,6 @@ import Dialog from 'primevue/dialog'
 const userStore = useUserStore()
 
 const showUpdateDialog = ref(false)
-const updateInfo = ref(null)
 const contact = ref({
    userID: "",
    firstName: "",
@@ -60,7 +59,6 @@ const originalContact = ref({})
 const emailSent = ref(false)
 const error = ref("")
 const okDisabled = ref(false)
-const id = ref("update-contact")
 
 const opened = (() => {
    contact.value.userID = userStore.signedInUser
@@ -80,17 +78,8 @@ const opened = (() => {
    ele.focus()
 })
 
-const toggleOK = (() => {
-   okDisabled.value = !okDisabled.value
-})
-
-const okClicked = (() => {
+const submitUpdate = (() => {
    error.value = ""
-   if (emailSent.value == true){
-      updateInfo.value.hide()
-      return
-   }
-
    let hasChanges = false
    for (const [key, value] of Object.entries(contact.value)) {
       if(value != originalContact.value[key]){
@@ -102,7 +91,7 @@ const okClicked = (() => {
       return
    }
 
-   toggleOK()
+   okDisabled.value = true
    let info = {newContact: contact.value, oldContact: originalContact.value}
    userStore.updateContactInfo(info).then(() => {
       emailSent.value = true
@@ -112,7 +101,7 @@ const okClicked = (() => {
          error.value += `: ${e.response.data.message}`
       }
    }).finally(()=>{
-      toggleOK()
+      okDisabled.value = false
    })
 })
 

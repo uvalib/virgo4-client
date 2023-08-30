@@ -41,7 +41,7 @@
 
                <div class="button-bar">
                   <UpdateContactInfo />
-                  <div v-if="userStore.canChangePassword" class="password"><ChangePassword /></div>
+                  <ChangePassword v-if="userStore.canChangePassword" />
                </div>
 
                <div v-if="info.sirsiUnavailable" class="standing-info">
@@ -267,9 +267,6 @@ onMounted(() =>{
    .button-bar {
       padding: 0px 20px;
       text-align: right;
-      .password {
-         margin: 10px 0 0px 0;
-      }
    }
    .fines-head {
       font-weight: bold;

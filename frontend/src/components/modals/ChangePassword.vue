@@ -1,73 +1,54 @@
 <template>
-   <V4Modal :id="id" title="Change Password" ref="changePassword" @opened="opened"
-      firstFocusID="curr-password" :lastFocusID="`${id}-okbtn`"
-      :buttonID="`${id}-open`" :controls="passwordChanged || expiredToken"
-   >
-      <template v-slot:button>
-         <V4Button mode="primary" @click="$refs.changePassword.show()" v-if="!hasPasswordToken" :id="`${id}-open`" >
-            Change Password
-         </V4Button>
+   <V4Button mode="primary" @click="showDialog = true" v-if="!hasPasswordToken" :disabled="showDialog" >
+      Change password
+   </V4Button>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password" @hide="showDialog = false" @show="opened">
+      <p  v-if="passwordChanged">Your password has been changed.</p>
+      <template v-else-if="expiredToken">
+         <p class="error" v-html="error"></p>
+         <p class="error">Please request a new password reset email.</p>
       </template>
-      <template v-slot:content>
-         <template v-if="passwordChanged">
-            <p>
-               Your password has been changed.
-            </p>
-         </template>
-         <template v-else-if="expiredToken">
-            <p class="error" v-html="error"></p>
-            <p class="error">Please request a new password reset email.</p>
-         </template>
-         <template v-else>
-            <p>New passwords must:</p>
-            <ul>
-               <li>
-                  Contain between 12 and 25 characters
-               </li>
-               <li>
-                  Include at least one lower-case letter
-               </li>
-               <li>
-                  Include at least one upper-case letter
-               </li>
-               <li>
-                  Include at least one numeral (digit)
-               </li>
-               <li>
-                  Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
-               </li>
-            </ul>
-            <div class="message">
-               <FormKit type="form" id="change-password" :actions="false" @submit="okClicked">
-                  <FormKit v-if="!hasPasswordToken" id="curr-password" label="Current Password" type="password" v-model="currPassword" validation="required" />
-                  <FormKit type="password" name="password" label="New Password" id="new-password"
-                     :validation="[
-                        ['required'],
-                        ['length',12,25],
-                        ['matches', /^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[a-z])[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
-                     ]"
-                     validation-visibility="blur"
-                     :validation-messages="{
-                        matches: 'Password does not match requirements listed above.',
-                     }"
-                     v-model="newPassword"
-                  />
-                  <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm"/>
-
-                  <V4FormActions :hasCancel="true" submitLabel="OK" :submitID="`${id}-okbtn`"
-                     :tabNextOverride="true" @tabnext="nextTabOK"
-                     @canceled="$refs.changePassword.hide()"/>
-               </FormKit>
+      <template v-else>
+         <p>New passwords must:</p>
+         <ul>
+            <li>
+               Contain between 12 and 25 characters
+            </li>
+            <li>
+               Include at least one lower-case letter
+            </li>
+            <li>
+               Include at least one upper-case letter
+            </li>
+            <li>
+               Include at least one numeral (digit)
+            </li>
+            <li>
+               Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
+            </li>
+         </ul>
+         <FormKit type="form" id="change-password" :actions="false" @submit="submitPasswordChange">
+            <FormKit v-if="!hasPasswordToken" id="curr-password" label="Current Password" type="password" v-model="currPassword" validation="required" />
+            <FormKit type="password" name="password" label="New Password" id="new-password"
+               :validation="[
+                  ['required'],
+                  ['length',12,25],
+                  ['matches', /^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[a-z])[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
+               ]"
+               validation-visibility="blur"
+               :validation-messages="{
+                  matches: 'Password does not match requirements listed above.',
+               }"
+               v-model="newPassword"
+            />
+            <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm"/>
+            <div class="form-controls">
+               <V4Button mode="tertiary" @click="showDialog = false">Cancel</V4Button>
+               <FormKit type="submit" label="Submit" wrapper-class="submit-button" :disabled="okDisabled" />
             </div>
-         </template>
+         </FormKit>
       </template>
-      <template v-if="passwordChanged || expiredToken"  v-slot:controls>
-         <V4Button mode="tertiary" :id="`${id}-okbtn`" @click="okClicked"
-             :focusNextOverride="true" @tabnext="nextTabOK">
-            OK
-         </V4Button>
-      </template>
-   </V4Modal>
+   </Dialog>
 </template>
 
 <script setup>
@@ -75,6 +56,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from "@/stores/user"
 import { setErrors } from '@formkit/core'
+import Dialog from 'primevue/dialog'
 
 const emit = defineEmits( ['show-forgot-password'])
 
@@ -82,11 +64,7 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
-// html element refs
-const changePassword = ref(null)
-
-// data
-const id = ref("change-password")
+const showDialog = ref(false)
 const currPassword = ref("")
 const newPassword = ref("")
 const passwordToken = ref("")
@@ -95,96 +73,83 @@ const passwordChanged = ref(false)
 const okDisabled = ref(false)
 const expiredToken = ref(false)
 
+onMounted(()=> {
+   if (hasPasswordToken.value) {
+      passwordToken.value = route.query.token
+      showDialog.value = true
+   }
+})
+
 const hasPasswordToken = computed(() => {
    return route.query.token && route.query.token.length > 0
 })
 
- onMounted(()=> {
-   if (hasPasswordToken.value) {
-      passwordToken.value = route.query.token
-      changePassword.value.show()
-   }
-})
-
-function opened() {
+const opened = (() => {
    currPassword.value = ""
    newPassword.value = ""
    error.value = ""
    passwordChanged.value = false
    okDisabled.value = false
-   let ele = document.getElementById("curr-password")
-   if (hasPasswordToken.value) {
-      console.log("HAS TOKEN")
-      ele = document.getElementById("new-password")
-   }
-   if ( ele ) {
-      ele.focus()
-   }
-}
+})
 
-function nextTabOK() {
-   changePassword.value.lastFocusTabbed()
-}
-function toggleOk() {
-   okDisabled.value = !okDisabled.value
-}
-function okClicked() {
+const submitPasswordChange = (() => {
    if ( passwordChanged.value ) {
       let query = Object.assign({}, route.query);
       delete query.token;
       router.replace({ query });
-      changePassword.value.hide()
+      showDialog.value = false
       return
-   } else if (expiredToken.value) {
+   }
+
+   if (expiredToken.value) {
       // called when the change fails. New content is presented suggesting the user request a
       // new forgot password token, When OK is cliicked, clear the token and show the forgot popup.
       let query = Object.assign({}, route.query);
       delete query.token;
       router.replace({ query });
-      changePassword.value.hide()
+      showDialog.value = false
       emit("show-forgot-password")
       return
-
-   } else {
-      toggleOk()
-      if (hasPasswordToken.value) {
-         let data = {reset_password_token: passwordToken.value, new_password: newPassword.value}
-         userStore.changePasswordWithToken(data).then(() => {
-            passwordChanged.value = true
-         }).catch((e) => {
-            expiredToken.value = true
-
-            if(e.response.data.message){
-               error.value = e.response.data.message
-            } else {
-               error.value = "Password change failed."
-            }
-         }).finally(()=>{
-            toggleOk()
-         })
-      } else {
-         let data  = {current_pin: currPassword.value, new_pin: newPassword.value}
-         userStore.changePassword(data).then(() => {
-            passwordChanged.value = true
-         }).catch((e) => {
-            document.getElementById("curr-password").focus()
-            error.value = "Password change failed.</br>"
-            if ( e.response.data.message ) {
-               error.value += e.response.data.message
-            } else {
-               error.value += "Please check your current password."
-            }
-            setErrors('change-password', error.value)
-         }).finally(()=>{
-            toggleOk()
-         })
-      }
    }
-}
+
+   okDisabled.value = true
+   if (hasPasswordToken.value) {
+      let data = {reset_password_token: passwordToken.value, new_password: newPassword.value}
+      userStore.changePasswordWithToken(data).then(() => {
+         passwordChanged.value = true
+      }).catch((e) => {
+         expiredToken.value = true
+
+         if(e.response.data.message){
+            error.value = e.response.data.message
+         } else {
+            error.value = "Password change failed."
+         }
+      }).finally(()=>{
+         okDisabled.value =false
+      })
+   } else {
+      let data  = {current_pin: currPassword.value, new_pin: newPassword.value}
+      userStore.changePassword(data).then(() => {
+         passwordChanged.value = true
+      }).catch((e) => {
+         document.getElementById("curr-password").focus()
+         error.value = "Password change failed.</br>"
+         if ( e.response.data.message ) {
+            error.value += e.response.data.message
+         } else {
+            error.value += "Please check your current password."
+         }
+         setErrors('change-password', error.value)
+      }).finally(()=>{
+         okDisabled.value = false
+      })
+   }
+})
 </script>
 
 <style lang="scss" scoped>
-.message {
+p {
    margin: 0;
 }
 input[type=password] {
