@@ -29,6 +29,21 @@
                @include be-accessible();
             }
          }
+         .form-controls {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-end;
+            margin-top: 20px;
+            text-align: right;
+            padding: 0;
+            button:disabled {
+               opacity: 0.2;
+            }
+            .submit-button button {
+               @include primary-button();
+               width: auto;
+            }
+         }
       }
       .p-dialog-footer {
          padding: 10px 10px 20px 10px;

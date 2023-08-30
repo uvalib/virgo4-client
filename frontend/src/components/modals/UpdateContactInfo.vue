@@ -1,60 +1,51 @@
 <template>
-   <V4Modal :id="id" title="Update Contact Info" class="update-modal" ref="updateInfo"
-      @opened="opened" :controls="emailSent"
-      firstFocusID="firstname" :lastFocusID="`${id}-okbtn`"
-      :buttonID="`${id}-open`">
-      <template v-slot:button>
-         <V4Button mode="primary" @click="updateInfo.show()" :id="`${id}-open`" class="trigger">
-            Update my Virgo contact information
-         </V4Button>
-      </template>
-      <template v-slot:content>
-         <template v-if="emailSent">
-            <p>
-               An email has been sent to library staff requesting an update to your contact information.
-            </p>
-         </template>
-         <FormKit v-else type="form" id="update-contact" :actions="false" @submit="okClicked">
-            <div class="scroller">
-               <div class="section">
-                 <p class="section-name">Name</p>
-                 <div class="content">
-                     <FormKit type="text" label="First" v-model="contact.firstName" id="firstname"/>
-                     <FormKit type="text" label="Middle" v-model="contact.middleName"/>
-                     <FormKit type="text" label="Last" v-model="contact.lastName"/>
-                     <FormKit type="text" label="Preferred" v-model="contact.preferredName" help="We will address you by this name if supplied."/>
-                  </div>
-               </div>
-               <div class="section">
-                  <p class="section-name pad-top">Contact</p>
-                  <div class="content">
-                     <FormKit type="email" label="Email" v-model="contact.email" validation="required"/>
-                     <FormKit type="text" label="Phone" v-model="contact.phone"/>
-                  </div>
+   <V4Button mode="primary" @click="showUpdateDialog = true" :disabled="showUpdateDialog">
+      Update my Virgo contact information
+   </V4Button>
+   <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top" header="Update Contact Info" @hide="showUpdateDialog = false" @show="opened">
+      <p v-if="emailSent">
+         An email has been sent to library staff requesting an update to your contact information.
+      </p>
+      <FormKit v-else type="form" id="update-contact" :actions="false" @submit="okClicked">
+         <div class="scroller">
+            <div class="section">
+               <p class="section-name">Name</p>
+               <div class="content">
+                  <FormKit type="text" label="First" v-model="contact.firstName" id="firstname"/>
+                  <FormKit type="text" label="Middle" v-model="contact.middleName"/>
+                  <FormKit type="text" label="Last" v-model="contact.lastName"/>
+                  <FormKit type="text" label="Preferred" v-model="contact.preferredName" help="We will address you by this name if supplied."/>
                </div>
             </div>
-            <p v-if="error" class="error" v-html="error"></p>
-            <V4FormActions :hasCancel="true" submitLabel="OK" :submitID="`${id}-okbtn`"
-               :tabNextOverride="true" @tabnext="nextTabOK"
-               @canceled="updateInfo.hide()"
-            />
-         </FormKit>
-      </template>
-      <template v-if="emailSent"  v-slot:controls>
-         <V4Button mode="tertiary" :id="`${id}-okbtn`" @click="okClicked"
-             :focusNextOverride="true" @tabnext="nextTabOK">
-            OK
-         </V4Button>
-      </template>
-   </V4Modal>
+            <div class="section">
+               <p class="section-name pad-top">Contact</p>
+               <div class="content">
+                  <FormKit type="email" label="Email" v-model="contact.email" validation="required"/>
+                  <FormKit type="text" label="Phone" v-model="contact.phone"/>
+               </div>
+            </div>
+         </div>
+         <p v-if="error" class="error" v-html="error"></p>
+
+         <div class="form-controls">
+            <V4Button v-if="emailSent" mode="tertiary" @click="showUpdateDialog = false">OK</V4Button>
+            <template v-else>
+               <V4Button mode="tertiary" @click="showUpdateDialog = false">Cancel</V4Button>
+               <FormKit type="submit" label="Update" wrapper-class="submit-button" :disabled="okDisabled" />
+            </template>
+         </div>
+      </FormKit>
+   </Dialog>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useUserStore } from "@/stores/user"
+import Dialog from 'primevue/dialog'
 
 const userStore = useUserStore()
 
+const showUpdateDialog = ref(false)
 const updateInfo = ref(null)
 const contact = ref({
    userID: "",
@@ -71,7 +62,7 @@ const error = ref("")
 const okDisabled = ref(false)
 const id = ref("update-contact")
 
-function opened(){
+const opened = (() => {
    contact.value.userID = userStore.signedInUser
    contact.value.email = userStore.accountInfo.email
    contact.value.preferredName = userStore.accountInfo.sirsiProfile.preferredName
@@ -87,14 +78,13 @@ function opened(){
    originalContact.value = {...contact.value}
    let ele = document.getElementById("firstname")
    ele.focus()
-}
-function nextTabOK() {
-   updateInfo.value.lastFocusTabbed()
-}
-function toggleOK(){
+})
+
+const toggleOK = (() => {
    okDisabled.value = !okDisabled.value
-}
-function okClicked() {
+})
+
+const okClicked = (() => {
    error.value = ""
    if (emailSent.value == true){
       updateInfo.value.hide()
@@ -124,15 +114,11 @@ function okClicked() {
    }).finally(()=>{
       toggleOK()
    })
-}
+})
+
 </script>
 
 <style lang="scss" scoped>
-.update-modal{
-   button.v4-button.trigger {
-      margin: 0 !important;
-   }
-}
 p.error {
    text-align: center;
    color: var(--color-error);
