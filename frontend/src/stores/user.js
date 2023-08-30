@@ -45,7 +45,8 @@ export const useUserStore = defineStore('user', {
       noILLiadAccount: false,
       accountRequest: {name: "", id: "", email: "", phone: "", department: "",
          address1: "", address2: "", city: "", state: "", zip: ""},
-      accountRequested: false
+      accountRequested: false,
+      sirsiUnavailable: false
    }),
 
    getters: {
@@ -61,6 +62,7 @@ export const useUserStore = defineStore('user', {
          if (state.signedInUser.length == 0 ) return false
          if (state.noILSAccount == false ) return false
          if (!state.accountInfo.description ) return false
+         if (state.sirsiUnavailable) return false
 
          let desc = state.accountInfo.description.toLowerCase()
          let allowed = desc.includes("alumni") == false
@@ -316,6 +318,7 @@ export const useUserStore = defineStore('user', {
          this.accountInfo.leoAddress = data.leoLocation
          this.noILLiadAccount = !data.hasIlliadAccount
          this.noILSAccount = data.user.noAccount
+         this.sirsiUnavailable = data.user.sirsiUnavailable
          if (localStorage.getItem("v4_requested") ) {
             this.accountRequested = true
          }

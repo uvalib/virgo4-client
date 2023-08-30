@@ -11,7 +11,7 @@
             <h2>Virgo</h2>
             <dl>
                <dt>Name</dt>
-               <dd>{{info.displayName}} <span v-if="info.sirsiProfile.preferredName">({{info.sirsiProfile.preferredName}})</span></dd>
+               <dd>{{info.displayName}} <span v-if="info.sirsiProfile && info.sirsiProfile.preferredName">({{info.sirsiProfile.preferredName}})</span></dd>
                <dt>Login ID</dt>
                <dd>{{info.id}}</dd>
                <dt>Email</dt>
@@ -44,6 +44,9 @@
                   <div v-if="userStore.canChangePassword" class="password"><ChangePassword /></div>
                </div>
 
+               <div v-if="info.sirsiUnavailable" class="standing-info">
+                  User information is currently unavailable. Please try again later.
+               </div>
                <div v-if="systemStore.ilsError" class="standing-info">{{systemStore.ilsError}}</div>
 
                <div v-if="isBillOwed || userStore.totalFines>0" class="outstanding-bill">
