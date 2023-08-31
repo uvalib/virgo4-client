@@ -1,78 +1,74 @@
 <template>
-   <V4Modal :id="props.id" title="Print Details" ref="printmodal" :controls="hasSelectedBookmarks() == false"
-      firstFocusID="titleinput" lastFocusID="print-ok" :buttonID="`${props.id}-open`" @opened="opened">
-      <template v-slot:button>
-         <V4Button mode="primary" @click="printmodal.show()" :id="`${props.id}-open`"
-            aria-label="print details about selected bookmarks"
-         >
-            Print
-         </V4Button>
-      </template>
-      <template v-slot:content>
-         <template v-if="hasSelectedBookmarks() == false">
-            <p>No bookmarks have been selected to print.</p>
-         </template>
-         <div class="print" v-else>
-            <FormKit type="form" id="print" :actions="false" @submit="printClicked">
-               <FormKit id="titleinput" label="Title for printout (optional)" type="text" v-model="title"/>
-               <FormKit label="Notes (optional)" type="textarea" v-model="notes" :rows="5" />
-               <V4FormActions :hasCancel="true" submitLabel="Print" submitID="print-ok"
-                  :tabNextOverride="true" @tabnext="nextTabOK"
-                  @canceled="cancelClicked"/>
-            </FormKit>
-         </div>
-      </template>
-   </V4Modal>
+   <V4Button mode="primary" @click="openClicked" aria-label="print details about selected bookmarks" ref="trigger">
+      Print
+   </V4Button>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Print Details" @hide="closeDialog" @show="opened">
+      <div class="print">
+         <FormKit type="form" id="print" :actions="false" @submit="printClicked">
+            <FormKit id="titleinput" label="Title for printout (optional)" type="text" v-model="title"/>
+            <FormKit label="Notes (optional)" type="textarea" v-model="notes" :rows="5" />
+            <div class="form-controls" >
+               <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
+               <FormKit type="submit" label="Print" wrapper-class="submit-button" :disabled="okDisabled" />
+            </div>
+         </FormKit>
+      </div>
+   </Dialog>
 </template>
 
 <script setup>
 import { useBookmarkStore } from "@/stores/bookmark"
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import analytics from '@/analytics'
+import Dialog from 'primevue/dialog'
+import { useToast } from "primevue/usetoast"
 
+const toast = useToast()
 const bookmarkStore = useBookmarkStore()
 const props = defineProps({
    srcFolder: {
       type: Number,
       required: true
    },
-   id: {
-      type: String,
-      required: true
+})
+
+const trigger = ref()
+const showDialog = ref(false)
+const title = ref("")
+const notes = ref("")
+const okDisabled = ref(false)
+
+const hasSelectedBookmarks = computed(() => {
+   return bookmarkStore.selectedBookmarks(props.srcFolder).length > 0
+})
+
+const openClicked = (() => {
+   if (hasSelectedBookmarks.value == false) {
+      toast.add({severity:'error', summary: "Print Error", detail:  "No bookmarks have been selected to print.", life: 5000})
+   } else {
+      showDialog.value = true
    }
 })
 
-const printmodal = ref(null)
-const title = ref("")
-const notes = ref("")
+const closeDialog = (() => {
+   showDialog.value = false
+   trigger.value.$el.focus()
+})
 
-function hasSelectedBookmarks() {
-   return bookmarkStore.selectedBookmarks(props.srcFolder).length > 0
-}
-
-function opened() {
+const opened = (() => {
    title.value = ""
    notes.value = ""
-   if ( hasSelectedBookmarks() == false ){
-      let btn = document.getElementById(props.id+"-close")
-      btn.focus()
-   } else {
-      let ele = document.getElementById("titleinput")
-      ele.focus()
-   }
-}
-async function printClicked() {
+})
+
+const printClicked = ( async () => {
    analytics.trigger('Bookmarks', 'PRINT_CLICKED')
+   okDisabled.value = true
    let data = { title: title.value, notes: notes.value, folderID: props.srcFolder}
    await bookmarkStore.printBookmarks( data )
-   printmodal.value.hide()
-}
-function cancelClicked() {
-   printmodal.value.hide()
-}
-function nextTabOK() {
-   printmodal.value.lastFocusTabbed()
-}
+   closeDialog()
+   okDisabled.value = false
+})
+
 </script>
 
 <style lang="scss" scoped>
