@@ -1,5 +1,5 @@
 <template>
-   <V4Button mode="primary" @click="showDialog = true" v-if="!hasPasswordToken" :disabled="showDialog" >
+   <V4Button mode="primary" @click="showDialog = true" v-if="!hasPasswordToken" :disabled="showDialog" ref="trigger">
       Change password
    </V4Button>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password" @hide="closeChangeDialog" @show="opened">
@@ -74,6 +74,7 @@ const passwordToken = ref("")
 const error = ref("")
 const okDisabled = ref(false)
 const expiredToken = ref(false)
+const trigger = ref(null)
 
 onMounted(()=> {
    if (hasPasswordToken.value) {
@@ -95,6 +96,7 @@ const opened = (() => {
 
 const closeChangeDialog = (() => {
    showDialog.value = false
+   trigger.value.$el.focus()
    let query = Object.assign({}, route.query)
    if ( query.token )  {
       delete query.token

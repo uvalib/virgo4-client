@@ -1,9 +1,9 @@
 <template>
-   <V4Button mode="text" @click="showDialog = true" class="citations-text-button" icon="fas fa-quote-right" :aria-label="props.ariaLabel">
+   <V4Button mode="text" @click="showDialog = true" class="citations-text-button" icon="fas fa-quote-right" :aria-label="props.ariaLabel" ref="trigger">
       <span class="button-text" :class="{toolbar: props.toolbarButton}">{{props.buttonLabel}}<i class="icon-inline fas fa-quote-right"></i></span>
    </V4Button>
 
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" :header="props.title" @hide="showDialog = false" @show="opened">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" :header="props.title" @hide="closeDialog" @show="opened">
       <div class="citations-content">
          <div class="working" v-if="loading" >
             <V4Spinner message="Gathering citations..."/>
@@ -41,7 +41,7 @@
                aria-label="download RIS citation"
             />
             <V4Button mode="primary" id="copy-citation" @click="copyCitation()">Copy Citation</V4Button>
-            <V4Button mode="primary" @click="showDialog = false">Close</V4Button>
+            <V4Button mode="primary" @click="closeDialog">Close</V4Button>
          </div>
       </div>
    </Dialog>
@@ -96,6 +96,7 @@ const selectedIdx = ref(0)
 const error = ref("")
 const message = ref("")
 const showDialog = ref(false)
+const trigger = ref(null)
 
 const itemID = computed(()=>{
    let parts = props.itemURL.split("/")
@@ -146,6 +147,11 @@ const opened = (() => {
    }).finally( ()=> {
       setInitialFocus()
    })
+})
+
+const closeDialog = (() => {
+   showDialog.value = false
+   trigger.value.$el.focus()
 })
 
 function setInitialFocus() {

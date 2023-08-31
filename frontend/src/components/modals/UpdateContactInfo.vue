@@ -1,8 +1,8 @@
 <template>
-   <V4Button mode="primary" @click="showUpdateDialog = true" :disabled="showUpdateDialog">
+   <V4Button mode="primary" @click="showUpdateDialog = true" :disabled="showUpdateDialog" ref="trigger">
       Update my Virgo contact information
    </V4Button>
-   <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top" header="Update Contact Info" @hide="showUpdateDialog = false" @show="opened">
+   <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top" header="Update Contact Info" @hide="closeDialog" @show="opened">
       <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate">
          <div class="scroller">
             <div class="section">
@@ -25,7 +25,7 @@
          <p v-if="error" class="error" v-html="error"></p>
 
          <div class="form-controls" >
-            <V4Button mode="tertiary" @click="showUpdateDialog = false">Cancel</V4Button>
+            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
             <FormKit type="submit" label="Update" wrapper-class="submit-button" :disabled="okDisabled" />
          </div>
       </FormKit>
@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { useUserStore } from "@/stores/user"
 import Dialog from 'primevue/dialog'
 import { useToast } from "primevue/usetoast"
@@ -54,6 +54,7 @@ const contact = ref({
 const originalContact = ref({})
 const error = ref("")
 const okDisabled = ref(false)
+const trigger = ref(null)
 
 const opened = (() => {
    contact.value.userID = userStore.signedInUser
@@ -68,6 +69,12 @@ const opened = (() => {
    okDisabled.value = false
    // Shallow clone
    originalContact.value = {...contact.value}
+})
+
+const closeDialog = (() => {
+   showUpdateDialog.value = false
+   // document.getElementById("update-trigger").focus()
+   trigger.value.$el.focus()
 })
 
 const submitUpdate = (() => {

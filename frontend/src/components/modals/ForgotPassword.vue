@@ -1,6 +1,6 @@
 <template>
-   <V4Button mode="text" @click="userStore.showForgotPW = true" :disabled="userStore.showForgotPW">Forgot your password?</V4Button>
-   <Dialog v-model:visible="userStore.showForgotPW" :modal="true" position="top" header="Forgot Password" @hide="userStore.showForgotPW = false" @show="opened">
+   <V4Button mode="text" @click="userStore.showForgotPW = true" :disabled="userStore.showForgotPW" ref="trigger">Forgot your password?</V4Button>
+   <Dialog v-model:visible="userStore.showForgotPW" :modal="true" position="top" header="Forgot Password" @hide="closeDialog" @show="opened">
       <p>
          An email will be sent to the address on file with a link to reset your password. If you need assistance, please
          <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
@@ -8,7 +8,7 @@
       <FormKit type="form" id="forgot-pass" :actions="false" @submit="okClicked">
          <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Library ID, eg: C001005101 or TEMP001166" />
          <div class="form-controls" >
-            <V4Button mode="tertiary" @click="userStore.showForgotPW = false">Cancel</V4Button>
+            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
             <FormKit type="submit" label="OK" wrapper-class="submit-button" :disabled="okDisabled" />
          </div>
       </FormKit>
@@ -27,11 +27,17 @@ const userStore = useUserStore()
 const userId = ref("")
 const error = ref("")
 const okDisabled = ref(false)
+const trigger = ref(null)
 
 const opened = (() => {
    userId.value = ""
    error.value = ""
    okDisabled.value = false
+})
+
+const closeDialog = (() => {
+   userStore.showForgotPW = false
+   trigger.value.$el.focus()
 })
 
 const okClicked = (() => {
