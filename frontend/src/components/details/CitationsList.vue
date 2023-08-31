@@ -1,19 +1,19 @@
 <template>
    <span class="citations-list">
-      <Citations title="MLA Citation" :id="`citation-mla-${details.identifier}`" style="margin-right: 10px"
-         :itemURL="details.itemURL" format="mla" buttonLabel="MLA" from="DETAIL" :iconInline="true"
+      <Citations title="MLA Citation"
+         :itemURL="details.itemURL" format="mla" buttonLabel="MLA" from="DETAIL"
          :ariaLabel="`show MLA citation for ${details.header.title}`" >
       </Citations>
-      <Citations title="APA Citation" :id="`citation-apa-${details.identifier}`" style="margin-right: 10px"
-         :itemURL="details.itemURL" format="apa" buttonLabel="APA" from="DETAIL" :iconInline="true"
+      <Citations title="APA Citation"
+         :itemURL="details.itemURL" format="apa" buttonLabel="APA" from="DETAIL"
          :ariaLabel="`show APA citation for ${details.header.title}`" >
       </Citations>
-      <Citations title="Chicago Citation" :id="`citation-cms-${details.identifier}`" style="margin-right: 10px"
-         :itemURL="details.itemURL" format="cms" buttonLabel="Chicago" from="DETAIL" :iconInline="true"
+      <Citations title="Chicago Citation"
+         :itemURL="details.itemURL" format="cms" buttonLabel="Chicago" from="DETAIL"
          :ariaLabel="`show Chicago citation for ${details.header.title}`" >
       </Citations>
-      <Citations title="Bluebook Citation" :id="`citation-lbb-${details.identifier}`" style="margin-right: 10px"
-         :itemURL="details.itemURL" format="lbb" buttonLabel="Bluebook" from="DETAIL" :iconInline="true"
+      <Citations title="Bluebook Citation"
+         :itemURL="details.itemURL" format="lbb" buttonLabel="Bluebook" from="DETAIL"
          :ariaLabel="`show Bluebook citation for ${details.header.title}`" >
       </Citations>
       <V4DownloadButton style="padding-left:0" label="Download RIS" :url="risURL" @click="downloadRISClicked"

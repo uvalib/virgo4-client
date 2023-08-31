@@ -2,9 +2,8 @@
    <div class="icon-wrap">
       <template v-if="showCitations">
          <div class="citation-control">
-            <Citations title="Citations" :id="`citation-${props.hit.identifier}`" style="margin-right: 10px"
-               :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from" :toolbarButton="true"
-               :ariaLabel="`citations for ${props.hit.identifier}`" >
+            <Citations title="Citations" :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from"
+               :ariaLabel="`citations for ${props.hit.identifier}`"  :toolbarButton="true">
             </Citations>
          </div>
       </template>
