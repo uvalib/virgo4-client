@@ -33,15 +33,19 @@
             display: flex;
             flex-flow: row nowrap;
             justify-content: flex-end;
-            margin-top: 20px;
+            margin: 20px 0 0 0;
             text-align: right;
             padding: 0;
             button:disabled {
                opacity: 0.2;
             }
+            button.v4-button {
+               margin: 0 0 0 5px;
+            }
             .submit-button button {
                @include primary-button();
                width: auto;
+               margin-bottom: 0;
             }
          }
       }

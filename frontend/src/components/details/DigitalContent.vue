@@ -64,7 +64,6 @@
                            Download PDF
                         </span>
                         <OCRRequest v-if="user.isSignedIn && item.ocr || item.ocr && item.ocr.status == 'READY'"
-                           :id="'ocr-${item.details.identifier}'"
                            :dcIndex="digitalContentIndex(item)"
                            @ocr-started="ocrStarted(item)"
                         />

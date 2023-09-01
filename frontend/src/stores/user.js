@@ -32,6 +32,7 @@ export const useUserStore = defineStore('user', {
       accountInfo: {},
       claims: {},
       checkouts: [],
+      showRenewSummary: false,
       renewSummary: {renewed: -1, failed: -1, failures: []},
       checkoutsOrder: "AUTHOR_ASC",
       bills: [],
@@ -51,9 +52,6 @@ export const useUserStore = defineStore('user', {
    }),
 
    getters: {
-      hasRenewSummary: (state) => {
-         return state.renewSummary.renewed >= 0
-      },
       canChangePassword(state) {
          if ( this.hasAccountInfo == false ) return false
          if ( state.sessionType == "netbadge") return false
@@ -187,10 +185,11 @@ export const useUserStore = defineStore('user', {
    actions: {
       clearRenewSummary() {
          this.renewSummary = {renewed: -1, failed: -1, failures: []}
+         this.showRenewSummary = false
       },
       setCheckouts(co) {
          this.checkouts = co
-         this.renewSummary = {renewed: -1, failed: -1, failures: []}
+         this.clearRenewSummary()
       },
       sortCheckouts(order) {
          this.checkoutsOrder = order
@@ -257,6 +256,7 @@ export const useUserStore = defineStore('user', {
                this.renewSummary.renewed++
             }
          })
+         this.showRenewSummary = true
       },
       setAuthFailure(data) {
          if (data.response && data.response.data) {
