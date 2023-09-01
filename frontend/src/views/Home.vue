@@ -317,12 +317,6 @@ async function restoreSearchFromQueryParams( query ) {
       if (bmTarget.id != "") {
          showAddBookmark(bmTarget)
          restore.clear()
-      } else if ( restore.restoreSaveSearch ) {
-         let saveBtn = document.getElementById("save-modal-open")
-         if (saveBtn) {
-            saveBtn.focus()
-            saveBtn.click()
-         }
       }
    }
 }

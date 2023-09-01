@@ -12,8 +12,7 @@
             </div>
             <span class="buttons" role="toolbar">
                <V4Button mode="tertiary" @click="resetSearch" >Reset Search</V4Button>
-               <SaveSearch v-if="userStore.isSignedIn"/>
-               <SignInRequired v-else id="save-signin-modal" act="save-search"/>
+               <SaveSearch />
                <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
             </span>
          </template>

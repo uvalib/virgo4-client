@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { useSearchStore } from "@/stores/search"
+
 
 export const useRestoreStore = defineStore('restore', {
 	state: () => ({
@@ -62,6 +64,10 @@ export const useRestoreStore = defineStore('restore', {
                this.bookmarkGroupParent = data.bookmarkGroupParent
                this.bookmarkFrom = data.bookmarkFrom
                this.restoreSaveSearch = data.restoreSaveSearch
+               if ( this.restoreSaveSearch ) {
+                  const searches = useSearchStore()
+                  searches.showSaveDialog = true
+               }
             } catch (e) {
                // NO-OP; just nothing to be restored
             }
