@@ -53,6 +53,7 @@ import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
+import { useBookmarkStore } from "@/stores/bookmark"
 import { storeToRefs } from "pinia"
 
 const router = useRouter()
@@ -313,46 +314,44 @@ async function restoreSearchFromQueryParams( query ) {
          })
       }
 
-      let bmTarget = restore.bookmarkTarget
-      if (bmTarget.id != "") {
-         showAddBookmark(bmTarget)
+      if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SEARCH" ) {
+         handlePendingBookmark()
          restore.clear()
       }
    }
 }
 
-function showAddBookmark( bmRestore ) {
-   let identifier = bmRestore.id
-   let bmData = {pool: resultStore.selectedResults.pool.id, data: null}
-   if ( bmRestore.parent && bmRestore.parent != "") {
-      // find the item in the group that was targeted for a bookmark
-      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == bmRestore.parent)
-      bmData.data = parent.group.find( r=> r.identifier == identifier)
+function handlePendingBookmark() {
+   const bookmarks = useBookmarkStore()
+   let newBM = restore.pendingBookmark
+   let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
 
-      // The group accordion watches this value. When set, the accordion will auto-expand
-      resultStore.setAutoExpandGroupID(bmRestore.parent)
+   let triggerBtn = null
+   if (  newBM.groupParent ) {
+      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.groupParent)
 
-      // once the group is expanded, scroll to the target group item
+      // The group accordion watches this value. When set, the accordion will auto-expand,
+      // adding the target item to the DOM
+      resultStore.setAutoExpandGroupID(parent.identifier)
       setTimeout( ()=>{
-         let sel = `.group-hit[data-identifier="${identifier}"]`
+         let sel = `.group-hit[data-identifier="${newBM.identifier}"]`
          let tgtEle = document.body.querySelector(sel)
          if ( tgtEle ) {
+            triggerBtn = tgtEle.querySelector(".bm-control button")
             utils.scrollToItem(tgtEle)
          }
       }, 250)
-
    } else {
-         let sel = `.hit[data-identifier="${identifier}"]`
-         let tgtEle = document.body.querySelector(sel)
-         if ( tgtEle) {
-            utils.scrollToItem(tgtEle)
-            bmData.data = resultStore.selectedResults.hits.find( r=> r.identifier == identifier)
-         }
+      let sel = `.hit[data-identifier="${newBM.identifier}"]`
+      let tgtEle = document.body.querySelector(sel)
+      if ( tgtEle ) {
+         triggerBtn = tgtEle.querySelector(".bm-control button")
+         utils.scrollToItem(tgtEle)
+      }
    }
-   let bmEle = document.getElementById(`bm-modal-${identifier}-btn`)
-   if (bmEle) {
-      bmEle.focus()
-      bmEle.click()
+
+   if ( showAdd ) {
+      bookmarks.showAddBookmark( newBM, triggerBtn)
    }
 }
 

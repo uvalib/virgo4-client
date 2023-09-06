@@ -24,18 +24,17 @@
 <script setup>
 import BrowseCard from "@/components/details/BrowseCard.vue"
 import BrowsePager from "@/components/details/BrowsePager.vue"
-import { computed, onMounted } from 'vue'
+import { computed, nextTick, onMounted } from 'vue'
 import { useShelfStore } from "@/stores/shelf"
+import { useRestoreStore } from "@/stores/restore"
+import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
+import * as utils from '@/utils'
 
 const props = defineProps({
    hit: {
       type: Object,
       required: true
-   },
-   target: {
-      type: String,
-      default: ""
    },
    pool: {
       type: String,
@@ -44,7 +43,6 @@ const props = defineProps({
 })
 
 const shelfStore = useShelfStore()
-
 
 const currentCallNumber = computed(()=>{
    let f =  props.hit.detailFields.find( f => f.name == "call_number")
@@ -57,37 +55,60 @@ const browseURL = computed(()=>{
    return `/sources/${props.pool}/items/${props.hit.identifier}/browse`
 })
 
-function fullScreenBrowseClicked() {
+const fullScreenBrowseClicked = (() => {
    analytics.trigger('ShelfBrowse', 'FULL_SCREEN_BROWSE_CLICKED', props.hit.identifier)
-}
-function isCurrent(idx) {
+})
+
+const isCurrent = ((idx) => {
    if ( shelfStore.lookingUp ) return false
    let item = shelfStore.browse[idx]
    return item.id == props.hit.identifier
-}
-function browseRestore() {
+})
+
+const browseRestore = (() => {
    shelfStore.showSpinner = false
    shelfStore.getBrowseData(props.hit.identifier )
    analytics.trigger('ShelfBrowse', 'BROWSE_RESTORE_CLICKED', props.hit.identifier)
-}
-async function getInitialBrowseData() {
+})
+
+const getInitialBrowseData = ( async () => {
+   const restore = useRestoreStore()
+   const bookmarks = useBookmarkStore()
+
    shelfStore.browseRange = 3
    let tgt = props.hit.identifier
-   if ( props.target && props.target != "")  {
-      tgt = props.target
+
+   let newBM = null
+   if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SHELF_BROWSE" ) {
+      // if a bookmark add was restored, make it the target of shelf browse (center option)
+      newBM = restore.pendingBookmark
+      tgt = newBM.identifier
+      restore.clear()
    }
+
    await shelfStore.getInitialBrowseData( tgt )
-   if ( shelfStore.hasBrowseData) {
+   if ( shelfStore.hasBrowseData ) {
       analytics.trigger('ShelfBrowse', 'BROWSE_LOADED', props.hit.identifier)
    }
-   if ( props.target && props.target != "")  {
-      let bmEle = document.getElementById(`bm-modal-${props.target}-btn`)
-      if (bmEle) {
-         bmEle.focus()
-         bmEle.click()
-      }
+
+   if ( newBM ) {
+      setTimeout( () => {
+         let cardID = `browse-${tgt}`
+         let tgtCard = document.getElementById(cardID)
+         if ( tgtCard ) {
+            utils.scrollToItem( tgtCard )
+         }
+
+         let cnt =  bookmarks.bookmarkCount( newBM.pool, newBM.identifier )
+         if ( cnt == 0 ) {
+            let sel = `#${cardID} .bookmark`
+            let triggerBtn = document.querySelector( sel )
+            bookmarks.showAddBookmark( newBM, triggerBtn)
+         }
+      }, 500)
    }
-}
+})
+
 onMounted(()=>{
    getInitialBrowseData()
 })

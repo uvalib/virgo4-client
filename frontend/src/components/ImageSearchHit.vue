@@ -4,8 +4,7 @@
          <span class="group-cnt" v-if="props.hit.grouped">{{props.hit.count}} images</span>
          <span class="group-cnt" v-else>1 image</span>
          <span class="buttons">
-            <AddBookmark v-if="userStore.isSignedIn" :data="utils.toBookmarkData(props.pool, props.hit, 'SEARCH')" :id="`bm-modal-${props.hit.identifier}`"/>
-            <SignInRequired v-else :data="utils.toBookmarkData(props.pool, props.hit, 'SEARCH')" :id="`bm-modal-${props.hit.identifier}`" act="bookmark"/>
+            <BookmarkButton :data="utils.toBookmarkData(props.pool, props.hit, 'SEARCH')"/>
          </span>
       </div>
       <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">
@@ -18,11 +17,9 @@
 </template>
 
 <script setup>
-import AddBookmark from "@/components/modals/AddBookmark.vue"
-import SignInRequired from "@/components/modals/SignInRequired.vue"
+import BookmarkButton from "@/components/BookmarkButton.vue"
 import { computed } from 'vue'
 import { useResultStore } from "@/stores/result"
-import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'
 import * as utils from '../utils'
 
@@ -32,7 +29,6 @@ const props = defineProps({
 })
 
 const resultStore = useResultStore()
-const userStore = useUserStore()
 
 const detailsURL = computed(()=>{
    return `/sources/${props.pool}/items/${props.hit.identifier}`

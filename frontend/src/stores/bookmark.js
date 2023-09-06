@@ -5,6 +5,9 @@ import axios from 'axios'
 
 export const useBookmarkStore = defineStore('bookmark', {
 	state: () => ({
+      showAddDialog: false,
+      newBookmark: {},
+      addBoomkarkTrigger: null,
       searching: false,
       public: [],
       bookmarks: [],
@@ -14,6 +17,19 @@ export const useBookmarkStore = defineStore('bookmark', {
       hasBookmarks: state => {
          if ( state.bookmarks.length === 0) return false
          return true
+      },
+      bookmarkCount: state => {
+         return (pool, identifier) => {
+            let count = 0
+            state.bookmarks.forEach( folder => {
+               folder.bookmarks.forEach( item => {
+                  if (item.pool == pool && item.identifier == identifier) {
+                     count++
+                  }
+               })
+            })
+            return count
+         }
       },
       selectedBookmarks: state => {
          return (folderID) => {
@@ -63,6 +79,32 @@ export const useBookmarkStore = defineStore('bookmark', {
       clear() {
          this.$reset()
       },
+
+      showAddBookmark( bmData, trigger ) {
+         this.newBookmark = bmData
+         this.showAddDialog = true
+         this.addBoomkarkTrigger = trigger
+      },
+      async addBookmark( folder  ) {
+         const userStore = useUserStore()
+         let v4UID = userStore.signedInUser
+         let url = `/api/users/${v4UID}/bookmarks/add`
+         let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.identifier}
+         let detail = {title : this.newBookmark.title, author: this.newBookmark.author}
+         data['details'] = JSON.stringify(detail)
+         return axios.post(url, data).then((response) => {
+            this.setBookmarks(response.data)
+         })
+      },
+      clearAddBookmark() {
+         this.newBookmark = {}
+         this.showAddDialog = false
+         if ( this.addBoomkarkTrigger ) {
+            this.addBoomkarkTrigger.focus()
+            this.addBoomkarkTrigger = null
+         }
+      },
+
       setPublicBookmarks(data) {
          this.public.splice(0, this.public.length)
          data.forEach( s => {
@@ -156,24 +198,10 @@ export const useBookmarkStore = defineStore('bookmark', {
             this.setPublicBookmarks(response.data.bookmarks)
             useSystemStore().pageTitle = response.data.folder
             this.searching = false
-          }).catch((error) => {
-             console.error(error)
+          }).catch(() => {
             this.searching = false
             this.router.push("/not_found")
           })
-      },
-
-      // bmData Fields: Folder, Pool, ID, Title. Author optional
-      async addBookmark(bmData ) {
-         const userStore = useUserStore()
-         let v4UID = userStore.signedInUser
-         let url = `/api/users/${v4UID}/bookmarks/add`
-         let data = {folder: bmData.folder, pool: bmData.pool, identifier: bmData.identifier}
-         let detail = {title : bmData.title, author: bmData.author}
-         data['details'] = JSON.stringify(detail)
-         return axios.post(url, data).then((response) => {
-            this.setBookmarks(response.data)
-         })
       },
 
       async addFolder(folder) {

@@ -21,6 +21,7 @@ import { useItemStore } from "@/stores/item"
 import { useResultStore } from "@/stores/result"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
+import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
 import { storeToRefs } from "pinia"
 
@@ -28,6 +29,8 @@ const collection = useCollectionStore()
 const item = useItemStore()
 const resultStore = useResultStore()
 const restore = useRestoreStore()
+const bookmarks = useBookmarkStore()
+
 const route = useRoute()
 
 onBeforeRouteUpdate( async (to) => {
@@ -41,7 +44,6 @@ watch(loadingDigitalContent, (newValue, oldValue) => {
    if (oldValue == true && newValue == false && item.hasDigitalContent ) {
       item.digitalContent.forEach( dc => {
          if (dc.pdf ) {
-            console.log("PDF")
             analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
          }
          if (dc.ocr ) {
@@ -60,23 +62,23 @@ async function getDetails(src, id) {
       return
    }
 
-   let bmTarget = restore.bookmarkTarget
-
    await item.getDetails( src, id )
-
-   if ( bmTarget.origin == "DETAIL" || bmTarget.origin == "COLLECTION" ) {
-      let bmEle = document.getElementById(`bm-modal-${bmTarget.id}-btn`)
-      if (bmEle) {
-         bmEle.focus()
-         bmEle.click()
-      }
-   }
 
    if (item.details && item.details.header) {
       document.title = item.details.header.title
    }
 
    analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
+
+   if ( restore.pendingBookmark && restore.pendingBookmark.origin == "DETAIL" ) {
+      let newBM = restore.pendingBookmark
+      let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
+      if (showAdd) {
+         let triggerBtn = document.querySelector(".title-wrapper .icon-wrap .bookmark")
+         bookmarks.showAddBookmark( newBM, triggerBtn)
+      }
+      restore.clear()
+   }
 
    if (item.isDigitalCollection) {
       analytics.trigger('Results', 'DIGITAL_COLLECTION_ITEM_VIEWED', item.digitalCollectionName )

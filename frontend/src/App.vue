@@ -2,6 +2,7 @@
    <V4Spinner v-if="userStore.authorizing" message="Authorizing..." v-bind:overlay="true" />
    <MessageBox />
    <SessionExpired />
+   <AddBookmark />
    <Toast position="top-center" />
    <ConfirmDialog position="top">
       <template #message="slotProps">
@@ -67,6 +68,7 @@ import MenuBar from "@/components/layout/MenuBar.vue"
 import SkipToNavigation from "@/components/layout/SkipToNavigation.vue"
 import SessionExpired from "@/components/layout/SessionExpired.vue"
 import ConfirmDialog from 'primevue/confirmdialog'
+import AddBookmark from "@/components/modals/AddBookmark.vue"
 import Toast from 'primevue/toast'
 import { useAlertStore } from "@/stores/alert"
 import { useSystemStore } from "@/stores/system"
@@ -74,7 +76,7 @@ import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
-import { ref, nextTick, onMounted, onUnmounted, onUpdated, watch } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, onUpdated, onBeforeMount, watch } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
@@ -148,13 +150,16 @@ async function initVirgo() {
    await systemStore.getConfig()
    await poolStore.getPools()
    await collectionStore.getCollections()
-   configuring.value = false
 
    // Make sure the session is is kept alive
    await userStore.refreshAuth()
 
    if ( userStore.isSignedIn ) {
       await userStore.getAccountInfo()
+
+      // defer configuring until after acccount request is done. details pages require full account
+      // and bookmark info to be loaded before they can be displayed
+      configuring.value = false
       if ( userStore.noILSAccount == false ) {
          userStore.getBillDetails()
          userStore.getCheckouts()
@@ -166,6 +171,8 @@ async function initVirgo() {
       } else {
          analytics.trigger('User', 'NETBADGE_SIGNIN', "other")
       }
+   } else {
+      configuring.value = false
    }
 
    filterStore.getPreSearchFilters()
@@ -206,9 +213,12 @@ function initZotero() {
    }
 }
 
-onMounted(() => {
-   initVirgo()
+onBeforeMount(() => {
    initVersionChecker()
+   initVirgo()
+})
+
+onMounted(() => {
    nextTick( ()=>{
       menuHeight.value = document.getElementById("v4-navbar").offsetHeight
       headerHeight.value = document.getElementById("v4-header").offsetHeight

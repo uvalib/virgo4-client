@@ -415,6 +415,7 @@ export const useUserStore = defineStore('user', {
          }
 
          this.lookingUp = true
+         console.log("request account info")
          return axios.get(`/api/users/${this.signedInUser}`).then((response) => {
             const bookmarks = useBookmarkStore()
             const preferences = usePreferencesStore()
@@ -431,6 +432,7 @@ export const useUserStore = defineStore('user', {
                this.router.push( "/account" )
             }
             this.lookingUp = false
+            console.log("request account info DONE")
           }).catch((error) => {
             const system = useSystemStore()
             system.setError( error)

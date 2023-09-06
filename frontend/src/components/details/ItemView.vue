@@ -87,7 +87,7 @@
             <h2>Bookplates Fund</h2>
             <CollectionHeader :border="false"/>
          </template>
-         <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" :target="browseTarget"/>
+         <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
       </template>
    </div>
 </template>
@@ -127,9 +127,6 @@ const poolStore = usePoolStore()
 const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
-
-const browseTarget = ref("")
-
 
 // details : state => state.item.details,
 const details = computed(()=>{

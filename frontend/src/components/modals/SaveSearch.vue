@@ -1,5 +1,5 @@
 <template>
-   <V4Button mode="primary" @click="openSaveClicked">Save Search</V4Button>
+   <V4Button mode="primary" @click="openSaveClicked" ref="trigger">Save Search</V4Button>
    <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @hide="closeDialog" @show="opened">
       <template v-if="showSignInMessage">
          <p>You must be signed in to save searches.</p>
@@ -84,6 +84,7 @@ const closeDialog = (() => {
 
 const signInClicked = (() => {
    restore.setRestoreSaveSearch()
+   closeDialog()
    router.push("/signin")
 })
 

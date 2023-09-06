@@ -52,7 +52,6 @@ import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
 import FacetSidebar from "@/components/FacetSidebar.vue"
 import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
-import SignInRequired from "@/components/modals/SignInRequired.vue"
 import * as utils from '../utils'
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'

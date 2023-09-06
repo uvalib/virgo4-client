@@ -1,20 +1,14 @@
 import { defineStore } from 'pinia'
 import { useSearchStore } from "@/stores/search"
 
-
 export const useRestoreStore = defineStore('restore', {
 	state: () => ({
       url: "/",
       activeRequest: "",
-      bookmarkID: "",
-      bookmarkFrom: "",
-      bookmarkGroupParent: "",
+      pendingBookmark: null,
       restoreSaveSearch: false
    }),
    getters: {
-      bookmarkTarget: state => {
-         return { id: state.bookmarkID, parent: state.bookmarkGroupParent, origin: state.bookmarkFrom}
-      },
    },
    actions: {
       setURL(url) {
@@ -32,37 +26,31 @@ export const useRestoreStore = defineStore('restore', {
          this.restoreSaveSearch = true
       },
       setBookmarkRecord(data) {
-         this.bookmarkID = data.identifier
-         this.bookmarkFrom = data.origin
-         if ( data.groupParent ) {
-            this.bookmarkGroupParent = data.groupParent
-         }
+         this.pendingBookmark = data
       },
       clear() {
+         console.log("CLEAR RESTORE INFO")
          this.$reset()
       },
       save() {
          const saveData = {
             url: this.url,
             activeRequest: this.activeRequest,
-            bookmarkID: this.bookmarkID,
-            bookmarkFrom: this.bookmarkFrom,
-            bookmarkGroupParent: this.bookmarkGroupParent,
+            pendingBookmark: this.pendingBookmark,
             restoreSaveSearch: this.restoreSaveSearch
          }
          const str = JSON.stringify(saveData)
          localStorage.setItem("v4Cache", str)
       },
       load() {
+         console.log("LOAD RESTORE INFO")
          let restored = localStorage.getItem('v4Cache')
          if (restored ) {
             try {
                let data = JSON.parse(restored)
                this.url = data.url
                this.activeRequest = data.activeRequest
-               this.bookmarkID = data.bookmarkID
-               this.bookmarkGroupParent = data.bookmarkGroupParent
-               this.bookmarkFrom = data.bookmarkFrom
+               this.pendingBookmark = data.pendingBookmark
                this.restoreSaveSearch = data.restoreSaveSearch
                if ( this.restoreSaveSearch ) {
                   const searches = useSearchStore()
@@ -73,6 +61,7 @@ export const useRestoreStore = defineStore('restore', {
             }
          }
          localStorage.removeItem("v4Cache")
+         console.log("LOAD RESTORE INFO DONE")
       }
    }
 })
