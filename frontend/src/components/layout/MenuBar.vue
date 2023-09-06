@@ -65,7 +65,7 @@ const v4Menu = computed( () => {
             target: "_blank", command: ()=>libServiceClicked('Databases A-Z')},
          {label: "Spaces & Equipment", url: "https://www.library.virginia.edu/services",
             target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
-         {label: "Spaces & Equipment", url: "https://www.library.virginia.edu/services",
+         {label: "More Library Services", url: "https://www.library.virginia.edu/services",
             target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
       ]}
    ]
