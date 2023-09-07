@@ -80,7 +80,6 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.$reset()
       },
 
-      // FIXME overlooked COLLECTION... make sure it works
       // origin: SEARCH, DETAIL, COLLECTION, SHELF_BROWSE
       showAddBookmark( pool, hit, trigger, origin ) {
          // all hit data has these in common...

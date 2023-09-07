@@ -29,7 +29,6 @@ export const useRestoreStore = defineStore('restore', {
          this.pendingBookmark = data
       },
       clear() {
-         console.log("CLEAR RESTORE INFO")
          this.$reset()
       },
       save() {
@@ -43,7 +42,6 @@ export const useRestoreStore = defineStore('restore', {
          localStorage.setItem("v4Cache", str)
       },
       load() {
-         console.log("LOAD RESTORE INFO")
          let restored = localStorage.getItem('v4Cache')
          if (restored ) {
             try {
@@ -61,7 +59,6 @@ export const useRestoreStore = defineStore('restore', {
             }
          }
          localStorage.removeItem("v4Cache")
-         console.log("LOAD RESTORE INFO DONE")
       }
    }
 })

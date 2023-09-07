@@ -15,7 +15,7 @@
 import ItemView from "@/components/details/ItemView.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { onMounted, onUpdated, watch } from 'vue'
+import { nextTick, onMounted, onUpdated, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useResultStore } from "@/stores/result"
@@ -70,16 +70,6 @@ async function getDetails(src, id) {
 
    analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
 
-   if ( restore.pendingBookmark && restore.pendingBookmark.origin == "DETAIL" ) {
-      let newBM = restore.pendingBookmark
-      let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
-      if (showAdd) {
-         let triggerBtn = document.querySelector(".title-wrapper .icon-wrap .bookmark")
-         bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "DETAIL")
-      }
-      restore.clear()
-   }
-
    if (item.isDigitalCollection) {
       analytics.trigger('Results', 'DIGITAL_COLLECTION_ITEM_VIEWED', item.digitalCollectionName )
    }
@@ -102,6 +92,18 @@ async function getDetails(src, id) {
          }
       }
    }
+
+   setTimeout( () => {
+      if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
+         let newBM = restore.pendingBookmark
+         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
+         if (showAdd) {
+            let triggerBtn = document.querySelector(".icon-wrap .bookmark")
+            bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "DETAIL")
+         }
+         restore.clear()
+      }
+   }, 500)
 }
 
 function zoteroItemUpdated() {

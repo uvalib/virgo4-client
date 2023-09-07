@@ -137,7 +137,7 @@ const bookmarkClicked = ((id) => {
          margin: 0 auto;
          background: #f2f2f2;
          border: 1px solid var(--uvalib-grey-light);
-         background-image: url('~@/assets/dots.gif');
+         background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
       }

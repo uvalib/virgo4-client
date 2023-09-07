@@ -508,7 +508,7 @@ onUnmounted(()=>{
          margin: 10px;
       }
       img {
-         background-image: url('~@/assets/dots.gif');
+         background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
          min-width: 175px;

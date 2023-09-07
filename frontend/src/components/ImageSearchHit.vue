@@ -90,7 +90,7 @@ function iiifURL(item) {
          display: block;
          min-width: 175px;
          min-height: 175px;
-         background-image: url('/src/assets/dots.gif');
+         background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
       }
