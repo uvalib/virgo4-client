@@ -64,7 +64,6 @@
                            Download PDF
                         </span>
                         <OCRRequest v-if="user.isSignedIn && item.ocr || item.ocr && item.ocr.status == 'READY'"
-                           :id="'ocr-${item.details.identifier}'"
                            :dcIndex="digitalContentIndex(item)"
                            @ocr-started="ocrStarted(item)"
                         />
@@ -509,7 +508,7 @@ onUnmounted(()=>{
          margin: 10px;
       }
       img {
-         background-image: url('~@/assets/dots.gif');
+         background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
          min-width: 175px;

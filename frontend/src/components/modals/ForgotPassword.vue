@@ -1,95 +1,60 @@
 <template>
-   <V4Modal :id="id" title="Forgot Password" ref="forgotPassword" @opened="opened"
-      firstFocusID="forgot-id" :lastFocusID="`${id}-okbtn`"
-      :buttonID="`${id}-open`">
-      <template v-slot:button>
-         <V4Button mode="text" @click="forgotPassword.show()" :id="`${id}-open`">
-            Forgot your password?
-         </V4Button>
-      </template>
-      <template v-slot:content>
-         <template v-if="emailSent">
-            <p>
-               An email has been sent to reset your password.
-            </p>
-         </template>
-         <template v-else>
-             <p>
-               An email will be sent to the address on file with a link to reset your password. If you need assistance, please
-               <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
-            </p>
-            <FormKit type="form" id="forgot-pass" :actions="false" @submit="okClicked">
-               <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Library ID, eg: C001005101 or TEMP001166" />
-               <V4FormActions :hasCancel="!emailSent" submitLabel="OK" :submitID="`${id}-okbtn`"
-                  :tabNextOverride="true" @tabnext="nextTabOK"
-                  :disabled="okDisabled"
-                  @canceled="forgotPassword.hide()"/>
-            </FormKit>
-            <p v-if="error" class="error" v-html="error"></p>
-          </template>
-      </template>
-      <template v-slot:controls>
-         <!-- no dialog controls; the V4FormActions are used instead-->
-      </template>
-   </V4Modal>
+   <V4Button mode="text" @click="userStore.showForgotPW = true" :disabled="userStore.showForgotPW" ref="trigger">Forgot your password?</V4Button>
+   <Dialog v-model:visible="userStore.showForgotPW" :modal="true" position="top" header="Forgot Password" @hide="closeDialog" @show="opened">
+      <p>
+         An email will be sent to the address on file with a link to reset your password. If you need assistance, please
+         <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
+      </p>
+      <FormKit type="form" id="forgot-pass" :actions="false" @submit="okClicked">
+         <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Library ID, eg: C001005101 or TEMP001166" />
+         <div class="form-controls" >
+            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
+            <FormKit type="submit" label="OK" wrapper-class="submit-button" :disabled="okDisabled" />
+         </div>
+      </FormKit>
+      <p v-if="error" class="error" v-html="error"></p>
+   </Dialog>
 </template>
 
 <script setup>
 import { useUserStore } from "@/stores/user"
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import Dialog from 'primevue/dialog'
+import { useToast } from "primevue/usetoast"
 
-const props = defineProps({
-   trigger: {
-      type: Boolean,
-      default: false,
-   },
-})
-
-watch(() => props.trigger, (newtrigger) => {
-   if ( newtrigger ) {
-      forgotPassword.value.show()
-   }
-})
-
-const forgotPassword = ref(null)
-const id = ref("forgot-password")
+const toast = useToast()
+const userStore = useUserStore()
 const userId = ref("")
-const emailSent = ref(false)
 const error = ref("")
 const okDisabled = ref(false)
+const trigger = ref(null)
 
-function opened() {
+const opened = (() => {
    userId.value = ""
-   emailSent.value = false
    error.value = ""
    okDisabled.value = false
-   let ele = document.getElementById("forgot-id")
-   ele.focus()
-}
-function nextTabOK() {
-   forgotPassword.value.lastFocusTabbed()
-}
-function toggleOK(){
-   okDisabled.value = !okDisabled.value
-}
-function okClicked() {
-   if (emailSent.value == true){
-      forgotPassword.value.hide()
-      return
-   }
-   const userStore = useUserStore()
-   toggleOK()
+})
+
+const closeDialog = (() => {
+   userStore.showForgotPW = false
+   trigger.value.$el.focus()
+})
+
+const okClicked = (() => {
+   okDisabled.value = true
    userStore.forgotPassword(userId.value).then(() => {
-      emailSent.value = true
+      userStore.showForgotPW = false
+      let msg = "An email has been sent to reset your password."
+      toast.add({severity:'success', summary:  "Request Submitted", detail:  msg, life: 5000})
    }).catch((e) => {
       error.value = "There's a problem with your account. <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> for help.<br/>"
       if(e.response.data.message){
          error.value += e.response.data.message
       }
    }).finally(()=>{
-      toggleOK()
+      okDisabled.value = false
    })
-}
+})
 </script>
 
 <style lang="scss" scoped>

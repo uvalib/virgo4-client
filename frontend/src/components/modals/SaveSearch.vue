@@ -1,12 +1,13 @@
 <template>
-   <V4Modal id="save-modal" ref="savemodal" title="Save Search"
-      firstFocusID="savename" lastFocusID="save-ok" buttonID="save-modal-open" @opened="opened">
-       <template v-slot:button>
-         <V4Button mode="primary" @click="openSaveClicked()" id="save-modal-open" aria-label="save search">
-            Save Search
-         </V4Button>
+   <V4Button mode="primary" @click="openSaveClicked" ref="trigger">Save Search</V4Button>
+   <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @hide="closeDialog" @show="opened">
+      <template v-if="showSignInMessage">
+         <p>You must be signed in to save searches.</p>
+         <p>
+            <V4Button mode="text" @click="signInClicked" aria-label="sign in to save search">Sign in now</V4Button>
+         </p>
       </template>
-      <template v-slot:content>
+      <template v-else>
          <div v-if="working" class="message working">
             <V4Spinner message="Working..."/>
          </div>
@@ -24,7 +25,6 @@
                   <label for="savename">Search Name</label>
                   <input ref="savename" id="savename" type="text" v-model="searchName"
                      @keyup.enter="saveClicked"
-                     @keydown.shift.tab.stop.prevent="backTabName"
                      aria-required="true" required="required"
                   />
                </div>
@@ -32,11 +32,14 @@
             </div>
          </template>
       </template>
-      <template v-if="saved == false && duplicateSave == false" v-slot:controls>
-         <V4Button mode="tertiary" @click="cancelClicked">Cancel</V4Button>
-         <V4Button mode="primary" id="save-ok" @click="saveClicked" :focusNextOverride="true" @tabnext="nextTabOK">Save</V4Button>
-      </template>
-   </V4Modal>
+      <div class="form-controls" >
+         <V4Button v-if="showSignInMessage || saved || duplicateSave" mode="tertiary" @click="closeDialog">Close</V4Button>
+         <template v-else>
+            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
+            <V4Button mode="primary" @click="saveClicked">Save</V4Button>
+         </template>
+      </div>
+   </Dialog>
 </template>
 
 <script setup>
@@ -44,14 +47,19 @@ import { ref, nextTick } from 'vue'
 import { useSearchStore } from "@/stores/search"
 import { useUserStore } from "@/stores/user"
 import { useQueryStore } from "@/stores/query"
-import { useRoute } from 'vue-router'
+import { useRestoreStore } from '@/stores/restore'
+import { useRoute, useRouter } from 'vue-router'
 import analytics from '@/analytics'
+import Dialog from 'primevue/dialog'
 
 const userStore = useUserStore()
 const searches = useSearchStore()
+const restore = useRestoreStore()
 const route = useRoute()
+const router = useRouter()
 
-const savemodal = ref (null)
+const trigger = ref()
+const showSignInMessage = ref(false)
 const searchName = ref("")
 const error = ref("")
 const saved = ref(false)
@@ -59,20 +67,27 @@ const working = ref(false)
 const lastSavedURL = ref("")
 const duplicateSave = ref(false)
 
-function openSaveClicked() {
-   const query = useQueryStore()
-   analytics.trigger('Results', 'SAVE_SEARCH', query.mode)
-   savemodal.value.show()
-}
-function cancelClicked() {
-   savemodal.value.hide()
-}
-function backTabName() {
-   savemodal.value.firstFocusBackTabbed()
-}
-function nextTabOK() {
-   savemodal.value.lastFocusTabbed()
-}
+const openSaveClicked = (() => {
+   if (userStore.isSignedIn) {
+      const query = useQueryStore()
+      analytics.trigger('Results', 'SAVE_SEARCH', query.mode)
+   } else {
+      showSignInMessage.value = true
+   }
+   searches.showSaveDialog = true
+})
+
+const closeDialog = (() => {
+   searches.showSaveDialog = false
+   trigger.value.$el.focus()
+})
+
+const signInClicked = (() => {
+   restore.setRestoreSaveSearch()
+   closeDialog()
+   router.push("/signin")
+})
+
 function opened() {
    error.value = ""
    saved.value = false
@@ -87,19 +102,14 @@ function opened() {
       let day = (""+date.getDate()).padStart(2,'0')
       let timeStr = `${date.getFullYear()}-${mStr}-${day}:${hours}${minutes}`
       searchName.value = `search-${timeStr}`
-
-      nextTick( () => {
-         const input = document.getElementById('savename')
-         input.focus()
-         input.select()
-      })
    }
 }
-async function saveClicked() {
+const saveClicked = (async () => {
    if ( searchName.value == "") {
-         error.value = "A name is required"
+      error.value = "A name is required"
       return
    }
+
    working.value = true
    let searchURL = route.fullPath
    let req = {name: searchName.value, url: searchURL, isPublic: false, userID: userStore.signedInUser}
@@ -118,7 +128,7 @@ async function saveClicked() {
       duplicateSave.value = false
       saved.value = false
    }
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -130,18 +140,7 @@ label {
    margin: 10px 0 5px 0;
    font-weight: 500;
 }
-#manage {
-   font-weight: 500;
-   color: var(--color-link);
-   cursor: pointer;
-   display: inline-block;
-   text-decoration:none;
-}
-#manage:hover {
-   text-decoration:underline;
-}
-.saved{
-   margin:0;
-   padding: 5px 10px;
+p {
+   margin: 5px 0;
 }
 </style>

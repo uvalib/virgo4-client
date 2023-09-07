@@ -1,51 +1,33 @@
 <template>
-   <V4Modal :id="props.id" title="Extract Item Text" ref="ocrmodal"
-      firstFocusID="wmail" :buttonID="`${id}-open`" @opened="opened" >
-      <template v-slot:button>
-         <V4Button mode="text" @click="ocrClicked" :id="`${props.id}-open`"
-             :aria-label="`dowload full text for ${digitalItem.name}`" style="margin: 0 0 10px 0; font-size: 0.9em;"
-         >
-            Download Full Text
-         </V4Button>
-      </template>
-      <template v-slot:content>
-         <div v-if="mode=='init'" class="searching">
-            <V4Spinner message="Searching for item text..." />
-         </div>
-         <div class="message"  v-else-if="mode=='request'">
-            <p>
-               We will attempt to extract the full text from '{{digitalItem.name}}'. This process
-               can take several minutes to over an hour depending on the size and condition
-               of the document.
-            </p>
-            <p>
-               Please enter your email address below and you will receive an email with the extracted text when it is ready.
-            </p>
-            <label>Email:</label>
-            <input @keyup.enter="okClicked"  id="email" type="text" v-model="email"
-               @keydown.shift.tab.stop.prevent="backTabInput"
-               aria-required="true" required="required"/>
-
-         </div>
-         <div class="message"  v-else-if="mode=='submitted'">
-            <p>
-               <b>Thank you</b>.<br/>Your request has been submitted and you will receive an email when it is ready.
-               <br/>You do not need to remain on this page.
-            </p>
-         </div>
-         <p class="error" v-if="error">{{error}}</p>
-       </template>
-       <template v-slot:controls>
-         <V4Button v-if="mode != 'submitted'" mode="tertiary" id="ocr-cancel" @click="cancelClicked" >
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" id="ocr-ok" @click="okClicked"
-            :focusNextOverride="true" @tabnext="nextTabOK"
-            :focusBackOverride="true" @tabback="backTabOK">
-            OK
-         </V4Button>
-      </template>
-   </V4Modal>
+   <V4Button class="ocr-button" mode="text" @click="ocrClicked" ref="trigger" :aria-label="`dowload full text for ${digitalItem.name}`">
+      Download Full Text
+   </V4Button>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text" @hide="closeDialog" @show="opened">
+      <div v-if="mode=='init'" class="searching">
+         <V4Spinner message="Searching for item text..." />
+      </div>
+      <div class="message" v-else-if="mode=='request'">
+         <p>
+            We will attempt to extract the full text from '{{digitalItem.name}}'. This process
+            can take several minutes to over an hour depending on the size and condition
+            of the document.
+         </p>
+         <p>
+            Please enter your email address below and you will receive an email with the extracted text when it is ready.
+         </p>
+         <label>Email:</label>
+         <input @keyup.enter="okClicked" id="email" type="text" v-model="email" aria-required="true" required="required"/>
+      </div>
+      <div class="message" v-else-if="mode=='submitted'">
+         <p><b>Thank you</b>.<br/><br/>Your request has been submitted and you will receive an email when it is ready.</p>
+         <p>You do not need to remain on this page.</p>
+      </div>
+      <p class="error" v-if="error">{{error}}</p>
+      <div class="form-controls" >
+         <V4Button v-if="mode != 'submitted'" mode="tertiary" @click="closeDialog">Cancel</V4Button>
+         <V4Button mode="primary" @click="okClicked">OK</V4Button>
+      </div>
+   </Dialog>
 </template>
 
 <script setup>
@@ -53,13 +35,10 @@ import { ref, computed, nextTick } from "vue"
 import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'
+import Dialog from 'primevue/dialog'
 
 const emit = defineEmits( ["ocr-started"] )
 const props = defineProps({
-   id: {
-      type: String,
-      required: true
-   },
    dcIndex: {
       type: Number,
       required: true
@@ -69,18 +48,20 @@ const props = defineProps({
 const user = useUserStore()
 const item = useItemStore()
 
-const digitalItem = computed(()=> {
-   return item.digitalContent[props.dcIndex]
-})
-
-const ocrmodal = ref(null)
+const trigger = ref()
+const showDialog = ref(false)
 const email = ref("")
 const error = ref("")
 const mode = ref("init")
 
-async function ocrClicked() {
+const digitalItem = computed(()=> {
+   return item.digitalContent[props.dcIndex]
+})
+
+
+const ocrClicked = ( async () => {
    if (digitalItem.value.ocr.status == "NOT_AVAIL") {
-      ocrmodal.value.show()
+      showDialog.value = true
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
       nextTick( () => {
@@ -91,26 +72,29 @@ async function ocrClicked() {
       await item.downloadOCRText(digitalItem.value)
       mode.value = "init"
    } else {
-      ocrmodal.value.show()
+      showDialog.value = true
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
       nextTick( () => {
          document.getElementById("email").focus()
       })
    }
-}
-function opened() {
+})
+
+const opened = (() => {
    email.value = user.singleEmail
    error.value = ""
-}
-function cancelClicked() {
-   ocrmodal.value.hide()
+})
+
+const closeDialog = (() => {
+   showDialog.value = false
+   trigger.value.$el.focus()
    mode.value = "init"
-}
-async function okClicked() {
+})
+
+const okClicked = (async () => {
    if ( mode.value == "submitted") {
-      ocrmodal.value.hide()
-      mode.value = "init"
+      closeDialog()
       return
    }
    if ( mode.value == "request") {
@@ -124,27 +108,14 @@ async function okClicked() {
          emit("ocr-started")
       }
    }
-}
-function nextTabOK() {
-   if ( mode.value == "request") {
-      document.getElementById("email").focus()
-   } else {
-      document.getElementById("ocr-ok").focus()
-   }
-}
-function backTabOK() {
-   if ( mode.value == "request") {
-      document.getElementById("ocr-cancel").focus()
-   } else {
-      document.getElementById("ocr-ok").focus()
-   }
-}
-function backTabInput() {
-   document.getElementById("ocr-ok").focus()
-}
+})
 </script>
 
 <style lang="scss" scoped>
+.ocr-button {
+   font-size: 0.9em !important;
+   margin-bottom: 10px !important;;
+}
 div.searching {
    text-align: center;
    margin-bottom: 30px;
@@ -162,7 +133,14 @@ p.error {
    margin: 10px;
 }
 .message {
-   margin: 10px 5px 0 5px;
+   margin: 0;
+   width: 400px;
+   p {
+      margin: 0 0 10px 0;
+   }
+   label {
+      margin-top: 10px;
+   }
    input {
       box-sizing: border-box;
       width:100%;

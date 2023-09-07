@@ -8,6 +8,7 @@ export const useSearchStore = defineStore('search', {
       history: [],
       lookingUp: false,
       lastSavedSearchKey: "",
+      showSaveDialog: false
    }),
    actions: {
       setSearches(data) {
@@ -34,6 +35,7 @@ export const useSearchStore = defineStore('search', {
          }
         this.lookingUp = false
       },
+
       getAll(userID) {
          this.lookingUp = true
          axios.get(`/api/users/${userID}/searches`).then((response) => {

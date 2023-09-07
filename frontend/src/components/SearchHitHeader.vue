@@ -134,9 +134,6 @@ const detailClicked = (() => {
    .citation-control {
       padding: 5px;
    }
-   .bm-control {
-      padding: 5px;
-   }
 }
 
 .author-wrapper {

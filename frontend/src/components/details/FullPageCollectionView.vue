@@ -66,7 +66,7 @@ const curioHeight = computed(()=>{
    }
    .viewer iframe {
       margin-top:10px;
-      background-image: url('~@/assets/dots.gif');
+      background-image: url('@/assets/dots.gif');
       background-repeat:no-repeat;
       background-position: center 20%;
       background-color: var(--uvalib-grey-lightest);

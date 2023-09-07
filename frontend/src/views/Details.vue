@@ -15,12 +15,13 @@
 import ItemView from "@/components/details/ItemView.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { onMounted, onUpdated, watch } from 'vue'
+import { nextTick, onMounted, onUpdated, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useResultStore } from "@/stores/result"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
+import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
 import { storeToRefs } from "pinia"
 
@@ -28,6 +29,8 @@ const collection = useCollectionStore()
 const item = useItemStore()
 const resultStore = useResultStore()
 const restore = useRestoreStore()
+const bookmarks = useBookmarkStore()
+
 const route = useRoute()
 
 onBeforeRouteUpdate( async (to) => {
@@ -41,7 +44,6 @@ watch(loadingDigitalContent, (newValue, oldValue) => {
    if (oldValue == true && newValue == false && item.hasDigitalContent ) {
       item.digitalContent.forEach( dc => {
          if (dc.pdf ) {
-            console.log("PDF")
             analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
          }
          if (dc.ocr ) {
@@ -60,17 +62,7 @@ async function getDetails(src, id) {
       return
    }
 
-   let bmTarget = restore.bookmarkTarget
-
    await item.getDetails( src, id )
-
-   if ( bmTarget.origin == "DETAIL" || bmTarget.origin == "COLLECTION" ) {
-      let bmEle = document.getElementById(`bm-modal-${bmTarget.id}-btn`)
-      if (bmEle) {
-         bmEle.focus()
-         bmEle.click()
-      }
-   }
 
    if (item.details && item.details.header) {
       document.title = item.details.header.title
@@ -100,6 +92,18 @@ async function getDetails(src, id) {
          }
       }
    }
+
+   setTimeout( () => {
+      if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
+         let newBM = restore.pendingBookmark
+         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
+         if (showAdd) {
+            let triggerBtn = document.querySelector(".icon-wrap .bookmark")
+            bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "DETAIL")
+         }
+         restore.clear()
+      }
+   }, 500)
 }
 
 function zoteroItemUpdated() {

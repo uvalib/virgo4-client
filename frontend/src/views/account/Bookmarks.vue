@@ -62,8 +62,8 @@
                         <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder)">
                            Export all
                         </V4Button>
-                        <PrintBookmarks :srcFolder="folderInfo.id" :id="`print-bookmarks-${folderInfo.id}`"/>
-                        <ManageBookmarks :srcFolder="folderInfo.id" :id="`manage-bookmarks-${folderInfo.id}`"/>
+                        <PrintBookmarks :srcFolder="folderInfo.id" />
+                        <ManageBookmarks :srcFolder="folderInfo.id" />
                         <V4Button mode="primary" @click="deleteBookmarksClicked(folderInfo)">Delete</V4Button>
                         <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on video reserves</V4Button>
                      </div>

@@ -107,7 +107,7 @@ func LoadConfig() *ServiceConfig {
 
 	// SMTP settings
 	flag.StringVar(&cfg.SMTP.Host, "smtphost", "", "SMTP Host")
-	flag.IntVar(&cfg.SMTP.Port, "smtpport", 0, "SMTP Port")
+	flag.IntVar(&cfg.SMTP.Port, "smtpport", 25, "SMTP Port")
 	flag.StringVar(&cfg.SMTP.User, "smtpuser", "", "SMTP User")
 	flag.StringVar(&cfg.SMTP.Pass, "smtppass", "", "SMTP Password")
 	flag.StringVar(&cfg.SMTP.Sender, "smtpsender", "virgo4@virginia.edu", "SMTP sender email")

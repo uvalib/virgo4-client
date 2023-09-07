@@ -41,6 +41,7 @@ export const useShelfStore = defineStore('shelf', {
          this.browse.splice(0, this.browse.length)
          data.forEach( (b, idx) => {
             b.status = "loading"
+            b.identifier = b.id
             this.browse.push(b)
             if (b.id == id) {
                this.currentIndex = idx

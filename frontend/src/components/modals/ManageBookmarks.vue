@@ -1,54 +1,41 @@
 <template>
-   <V4Modal :id="props.id" title="Manage Bookmark Storage" ref="managemodal"
-      firstFocusID="manage-ok" lastFocusID="manage-ok" :buttonID="`${props.id}-open`" @opened="opened">
-      <template v-slot:button>
-         <V4Button mode="primary" @click="$refs.managemodal.show()" :id="`${props.id}-open`"
-            aria-label="manage selected bookmark storage"
-         >
-            Move/Copy
-         </V4Button>
-      </template>
-      <template v-slot:content>
-         <template v-if="hasSelectedBookmarks() == false">
-            <p>No bookmarks have been selected.</p>
-         </template>
-         <template v-else>
-            <div class="selected-bookmarks scroller">
-               <ul>
-                  <li v-for="bm in bookmarkStore.selectedBookmarks(props.srcFolder)" :key="bm.id">
-                     {{bm.details.title}}
-                  </li>
-               </ul>
-            </div>
-            <div class="move message">
-               <p>Select the folders where you wish to store the bookmark(s):</p>
-               <div class="scroller">
-                  <ul class="folders">
-                     <li v-for="(fi) in bookmarkStore.bookmarks" :key="fi.id">
-                        <V4Checkbox :checked="isSelected(fi.id)" :label="fi.folder"
-                           @click="folderClicked(fi.id)" />
-                     </li>
-                  </ul>
-               </div>
-               <p class="error">{{errorMessage}}</p>
-            </div>
-         </template>
-      </template>
-      <template v-if="hasSelectedBookmarks()" v-slot:controls>
-         <V4Button mode="tertiary" id="copy-cancel" @click="cancelClicked">
-            Cancel
-         </V4Button>
-         <V4Button mode="primary" id="manage-ok" @click="okClicked" :focusNextOverride="true" @tabnext="nextTabOK">
-            OK
-         </V4Button>
-      </template>
-   </V4Modal>
+   <V4Button mode="primary" @click="openClicked" ref="trigger" aria-label="manage selected bookmark storage">
+      Move/Copy
+   </V4Button>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Manage Bookmark Storage" @hide="closeDialog" @show="opened">
+      <div class="selected-bookmarks scroller">
+         <ul>
+            <li v-for="bm in bookmarkStore.selectedBookmarks(props.srcFolder)" :key="bm.id">
+               {{bm.details.title}}
+            </li>
+         </ul>
+      </div>
+      <div class="move message">
+         <p>Select the folders where you wish to store the bookmark(s):</p>
+         <div class="scroller">
+            <ul class="folders">
+               <li v-for="(fi) in bookmarkStore.bookmarks" :key="fi.id">
+                  <V4Checkbox :checked="isSelected(fi.id)" :label="fi.folder"
+                     @click="folderClicked(fi.id)" />
+               </li>
+            </ul>
+         </div>
+         <p class="error">{{errorMessage}}</p>
+         <div class="form-controls" >
+            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
+            <V4Button mode="primary" @click="okClicked" :disabled="okDisabled">OK</V4Button>
+         </div>
+      </div>
+   </Dialog>
 </template>
 
 <script setup>
 import { useBookmarkStore } from "@/stores/bookmark"
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import Dialog from 'primevue/dialog'
+import { useToast } from "primevue/usetoast"
 
+const toast = useToast()
 const bookmarkStore = useBookmarkStore()
 
 const props = defineProps({
@@ -56,56 +43,59 @@ const props = defineProps({
       type: Number,
       required: true
    },
-   id: {
-      type: String,
-      required: true
+})
+
+const trigger = ref()
+const showDialog = ref(false)
+const selectedFolderIDs = ref([])
+const errorMessage = ref("")
+const okDisabled = ref(false)
+
+const hasSelectedBookmarks = computed(() => {
+   return bookmarkStore.selectedBookmarks(props.srcFolder).length > 0
+})
+
+const openClicked = (() => {
+   if (hasSelectedBookmarks.value == false) {
+      toast.add({severity:'error', summary: "Bookmark Error", detail:  "No bookmarks have been selected.", life: 5000})
+   } else {
+      showDialog.value = true
    }
 })
 
-const managemodal = ref(null)
-const selectedFolderIDs = ref([])
-const errorMessage = ref("")
-
-function hasSelectedBookmarks() {
-   return bookmarkStore.selectedBookmarks(props.srcFolder).length > 0
-}
-
-function opened() {
+const opened = (() => {
    errorMessage.value = ""
-   if (hasSelectedBookmarks() == false ){
-      let btn = document.getElementById(props.id+"-close")
-      btn.focus()
-   }
    selectedFolderIDs.value = [ props.srcFolder ]
-}
-function folderClicked(folderID) {
+})
+
+const closeDialog = (() => {
+   showDialog.value = false
+   trigger.value.$el.focus()
+})
+
+const folderClicked = ((folderID) => {
    let fIdx  = selectedFolderIDs.value.findIndex( f => f == folderID)
    if (fIdx > -1) {
       selectedFolderIDs.value.splice(fIdx, 1)
    } else {
       selectedFolderIDs.value.push(folderID)
    }
-}
-function isSelected( folderID) {
+})
+
+const isSelected = ( (folderID) => {
    return selectedFolderIDs.value.includes(folderID)
-}
-async function okClicked() {
-    errorMessage.value = ""
+})
+
+const okClicked = ( async () => {
+   errorMessage.value = ""
    if ( selectedFolderIDs.value.length == 0) {
        errorMessage.value = "Please select at least one folder"
        return
    }
    let data = { sourceFolderID: props.srcFolder, destFolderIDs: selectedFolderIDs.value }
    await bookmarkStore.manageSelectedBookmarks(data)
-   managemodal.value.hide()
-}
-
-function cancelClicked() {
-   managemodal.value.hide()
-}
-function nextTabOK() {
-   managemodal.value.lastFocusTabbed()
-}
+   closeDialog()
+})
 </script>
 
 <style lang="scss" scoped>

@@ -203,24 +203,13 @@ export function scrollToItem( tgtEle ) {
    let nav = document.getElementById("v4-navbar")
    var headerOffset = nav.offsetHeight
    var elementPosition = tgtEle.getBoundingClientRect().top
-   var offsetPosition = elementPosition - headerOffset
+   let pad = window.getComputedStyle(tgtEle, null).getPropertyValue('padding-top')
+   var offsetPosition = elementPosition - headerOffset - parseInt(pad)
    window.scrollBy({
      top: offsetPosition,
      behavior: "smooth"
    })
- }
-
- // Convert a click on bookmark while not signed in into a data structure that can be used
- // to restore the add bookmark after sign in has completed.
- // Pool is the pool where hit is located, origin is the place where the bookmark started.
- // Options: SEARCH, DETAIL, COLLECTION, SHELF_BROWSE
- export function toBookmarkData( pool, hit, origin ) {
-    let bmData = {identifier: hit.identifier, title: hit.header.title, author: hit.header.author_display, pool: pool, origin: origin}
-    if (hit.groupParent) {
-       bmData.groupParent = hit.groupParent
-    }
-    return bmData
- }
+}
 
 export function formatNum(num) {
    if (num == 0) {

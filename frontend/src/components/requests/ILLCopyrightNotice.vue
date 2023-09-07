@@ -28,35 +28,34 @@
     <template v-else-if="props.type == 'instruction'">
       <p class="head">
         <strong>Important Copyright Information<br/>
-        NOTICE OF WARNING CONCERNING COPYRIGHT RESTRICTIONS
+          NOTICE OF WARNING CONCERNING COPYRIGHT RESTRICTIONS
         </strong>
       </p>
       <div class="content">
         <p>
-          N.B. The Fair Use guidelines for Copyright Law are broad in scope and can be difficult to interpret.
-          For this reason, the Library has come up with the following recommendations:
+          N.B. Copyright law is complex, but the Library uses the following rules of thumb in vetting requests:
         </p>
         <p>
-          Materials which may be scanned for the Collab for a course without obtaining copyright permissions:
+          Materials which may be scanned for posting to Canvas for a course without obtaining copyright permissions:
           <ul>
               <li>One chapter from a book</li>
               <li>One article from a journal issue</li>
               <li>Government publications</li>
-              <li>Exams, homework solutions, lecture notes, student papers, etc.</li>
+              <li>Exams, homework solutions, lecture notes, etc., created by you</li>
               <li>Anything for which you own the copyright</li>
               <li>Anything in the public domain</li>
           </ul>
         </p>
         <p>
-          If you wish to go outside of these guidelines, or if you wish to use materials for more than one semester,
-          copyright permission may be sought from the publisher of the journal or book. The Copyright Clearance Center
-          offers a quick and convenient method of obtaining permission. More information on the University's copyright
-          policy is available. The copyright law of the United States (Title 17, US Code) governs the making of photocopies
-          or other reproduction of copyrighted material. Under certain conditions specified in the law, libraries and
-          archives are authorized to furnish a photocopy or other reproduction. One of these specified conditions is that the
-          photocopy or reproduction is not to be used for any other purpose other than private study, scholarship, or research.
-          If a user makes a request for, or later uses, a photocopy or reproduction for purposes in excess of "fair use," that user
-          may be liable for copyright infringement. This institution reserves the right to refuse to accept a copying order if,
+          If you wish to go outside of these guidelines and you believe your use is fair, please consult our page about
+          <a href="https://copyright.library.virginia.edu/user-rights-and-responsibilities/classroom-scanning/" target="_blank">copyright and instructional scanning</a>
+          and contact our Director of Information Policy to learn more about how to apply fair use to your request. If your request exceeds
+          our rules and is not otherwise fair use, you must obtain copyright permission from the publisher of the journal or book.
+          Many academic publishers use the
+          <a href="https://marketplace.copyright.com/rs-ui-web/mp" target="_blank">Copyright Clearance Center</a> (CCC) to manage permissions requests.
+          The University's policy on Adherence to Copyright Protections is available
+          <a href="https://uvapolicy.virginia.edu/policy/GOV-005" target="_blank">here</a>.
+          This institution reserves the right to refuse to accept a copying order if,
           in its judgment, fulfillment of the order would involve violation of copyright law.
         </p>
         <p>

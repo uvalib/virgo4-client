@@ -2,9 +2,8 @@
    <div class="icon-wrap">
       <template v-if="showCitations">
          <div class="citation-control">
-            <Citations title="Citations" :id="`citation-${props.hit.identifier}`" style="margin-right: 10px"
-               :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from" :toolbarButton="true"
-               :ariaLabel="`citations for ${props.hit.identifier}`" >
+            <Citations title="Citations" :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from"
+               :ariaLabel="`citations for ${props.hit.identifier}`"  :toolbarButton="true">
             </Citations>
          </div>
       </template>
@@ -17,26 +16,18 @@
          <ve-progress v-if="generatePDFInProgress" :progress="pdfProgress()" :size="32" thickness="10%"
             style="position: absolute; background: white; top:-2px; left: -6px; cursor: default;"/>
       </span>
-      <V4Button v-if="from=='DETAIL' || from=='COLLECTION'"  mode="icon" @click="shareClicked" :id="`share-${hit.identifier}`"
-         :aria-label="`copy link to ${props.hit.header.title}`"
-      >
+      <V4Button v-if="from=='DETAIL' || from=='COLLECTION'" mode="icon" class="share" @click="shareClicked"  :aria-label="`copy link to ${props.hit.header.title}`">
          <i class="share fal fa-share-alt"></i>
       </V4Button>
-      <div class="bm-control">
-         <AddBookmark v-if="userStore.isSignedIn" :data="utils.toBookmarkData(props.pool, props.hit, props.from)" :id="`bm-modal-${props.hit.identifier}`"/>
-         <SignInRequired v-else  :data="utils.toBookmarkData(props.pool, props.hit, props.from)" :id="`bm-modal-${props.hit.identifier}`" act="bookmark" />
-      </div>
+      <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
    </div>
 </template>
 
 <script setup>
-import AddBookmark from "@/components/modals/AddBookmark.vue"
-import SignInRequired from "@/components/modals/SignInRequired.vue"
+import BookmarkButton from "@/components/BookmarkButton.vue"
 import Citations from "@/components/modals/Citations.vue"
 import analytics from '@/analytics'
-import * as utils from '../utils'
 import { ref, computed } from 'vue'
-import { useUserStore } from "@/stores/user"
 import { useItemStore } from "@/stores/item"
 import { useSystemStore } from "@/stores/system"
 import { copyText } from 'vue3-clipboard'
@@ -59,7 +50,6 @@ const props = defineProps({
 
 const system = useSystemStore()
 const item = useItemStore()
-const userStore = useUserStore()
 const pdfDownloading = ref(false)
 const pdfTimerID = ref(-1)
 
@@ -133,26 +123,28 @@ function shareClicked() {
 </script>
 
 <style lang="scss" scoped>
-.v4-button {
-   margin-right: 8px !important;
-}
 .icon-wrap {
    display: flex;
    flex-flow: row nowrap;
    margin-left: auto;
    align-content: center;
-   i.share {
-      color: #444;
-      cursor: pointer;
-      font-size: 1.4em;
-      display: inline-block;
-      box-sizing: border-box;
-      margin: 0px;
-      padding:0;
-      &:hover {
-         color:var(--uvalib-brand-blue-light);
+
+   button.v4-button.share {
+      margin-right: 8px;
+      i.share {
+         color: #444;
+         cursor: pointer;
+         font-size: 1.4em;
+         display: inline-block;
+         box-sizing: border-box;
+         margin: 0px;
+         padding:0;
+         &:hover {
+            color:var(--uvalib-brand-blue-light);
+         }
       }
    }
+
    .pdf-wrap {
       position: relative;
       display: inline-block;

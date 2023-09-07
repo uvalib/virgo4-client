@@ -1,46 +1,31 @@
 <template>
-   <V4Modal :id="id" title="Select a date" ref="calendardlg"
-      :firstFocusID="`${id}-okbtn`" :lastFocusID="`${id}-okbtn`"
-      :buttonID="`${id}-open`"
-   >
-      <template v-slot:button>
-         <V4Button class="calendar" mode="primary"
-            @click="$refs.calendardlg.show()" :id="`${id}-open`"
-            :aria-label="`view collection calendar`">
-            <span class="label">Calendar</span>
-            <i class="fal fa-calendar-alt"></i>
-         </V4Button>
-      </template>
+   <V4Button class="calendar" mode="primary" @click="showDialog=true" :aria-label="`view collection calendar`" ref="trigger">
+      <span class="label">Calendar</span>
+      <i class="fal fa-calendar-alt"></i>
+   </V4Button>
 
-      <template v-slot:content>
-         <vue-cal
-            id="collection-date-picker"
-            class="vuecal--date-picker"
-            xsmall
-            hide-view-selector
-            click-to-navigate
-            :time="false"
-            :transitions="false"
-            :selectedDate="picked"
-            :minDate="collection.collectionStartDate"
-            :maxDate="collection.collectionEndDate"
-            :disableDays=collection.notPublishedDates
-            active-view="month"
-            :disable-views="['week', 'day']"
-            @view-change="viewChanged($event)"
-            @cell-focus="cellClicked($event)"
-         >
-         </vue-cal>
-         <div class="error">
-             {{error}}
-          </div>
-       </template>
-       <template v-slot:controls>
-          <V4Button mode="primary" :id="`${id}-cancelbtn`" @click="cancelClicked">
-            Close
-         </V4Button>
-      </template>
-   </V4Modal>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog">
+      <vue-cal
+         id="collection-date-picker"
+         class="vuecal--date-picker"
+         xsmall
+         hide-view-selector
+         click-to-navigate
+         :time="false"
+         :transitions="false"
+         :selectedDate="picked"
+         :minDate="collection.collectionStartDate"
+         :maxDate="collection.collectionEndDate"
+         :disableDays=collection.notPublishedDates
+         active-view="month"
+         :disable-views="['week', 'day']"
+         @view-change="viewChanged($event)"
+         @cell-focus="cellClicked($event)"
+      />
+      <div class="error">
+         {{error}}
+      </div>
+   </Dialog>
 </template>
 
 <script setup>
@@ -48,6 +33,7 @@ import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
 import { ref } from 'vue'
 import { useCollectionStore } from "@/stores/collection"
+import Dialog from 'primevue/dialog'
 
 const emit = defineEmits( ['picked' ] )
 const props = defineProps({
@@ -62,12 +48,13 @@ const props = defineProps({
 })
 
 const collection = useCollectionStore()
-const calendardlg = ref(null)
+const showDialog = ref(false)
+const trigger = ref()
 const picked = ref(props.date)
 const error = ref("")
 const currentCalView = ref("month")
 
-function viewChanged(e) {
+const viewChanged = ((e) => {
    currentCalView.value = e.view
    error.value = ""
    let priorYear = picked.value.split("-")[0]
@@ -75,8 +62,9 @@ function viewChanged(e) {
    if (priorYear != newYear) {
       collection.setYear(newYear)
    }
-}
-async function cellClicked(e) {
+})
+
+const cellClicked = ( async (e) => {
    error.value = ""
    let priorYear = picked.value.split("-")[0]
    let y = e.getFullYear()
@@ -91,31 +79,33 @@ async function cellClicked(e) {
    if (currentCalView.value == "month") {
       navigateToDate()
    }
-}
-function navigateToDate() {
+})
+
+const navigateToDate = (() => {
    error.value = ""
    let pid = collection.getPidForDate(picked.value)
    if ( pid != "") {
       emit('picked', pid)
-      calendardlg.value.hide()
+      closeDialog()
    } else {
       error.value = `No ${collection.itemLabel.toLowerCase()} was found for ${picked.value}`
    }
-}
-function cancelClicked() {
+})
+
+const closeDialog = (() => {
    error.value = ""
-   calendardlg.value.hide()
-}
+   showDialog.value = false
+   trigger.value.$el.focus()
+})
 </script>
 
 <style lang="scss" scoped>
 #collection-date-picker {
    width: 300px;
    height: 300px;
-   margin: -10px -10px 5px -10px;
+   margin: 0;
    outline: none;
-   border: none;
-   border-bottom: 1px solid var(--uvalib-grey);
+   border: 1px solid var(--uvalib-grey-light);
    box-shadow: none;
    :deep(.vuecal__cell-content) {
       word-break: normal;

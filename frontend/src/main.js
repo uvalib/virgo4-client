@@ -7,7 +7,6 @@ import V4Button from "@/components/V4Button.vue"
 import V4Checkbox from "@/components/V4Checkbox.vue"
 import V4Spinner from "@/components/V4Spinner.vue"
 import V4Select from "@/components/V4Select.vue"
-import V4Modal from "@/components/modals/V4Modal.vue"
 import V4FormActions from "@/components/V4FormActions.vue"
 
 import { createPinia } from 'pinia'
@@ -40,7 +39,6 @@ app.component('V4Button', V4Button)
 app.component('V4Checkbox', V4Checkbox)
 app.component('V4Spinner', V4Spinner)
 app.component('V4Select', V4Select)
-app.component('V4Modal', V4Modal)
 app.component('V4FormActions', V4FormActions)
 
 import './assets/styles/forms.scss'
