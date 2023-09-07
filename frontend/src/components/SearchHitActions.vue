@@ -110,7 +110,6 @@ async function pdfClicked( ) {
    }, 1000)
 }
 function shareClicked() {
-   console.log(props)
    analytics.trigger('Results', 'SHARE_ITEM_CLICKED', props.hit.identifier)
    let URL = window.location.href
    copyText(URL, undefined, (error, _event) => {
