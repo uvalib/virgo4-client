@@ -46,7 +46,7 @@
                   <span class="sep">|</span>
                   <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
                   <span class="sep">|</span>
-                  <V4Button @click="openRSSModal(saved)" :id="`${saved.token}-open`" mode="text">
+                  <V4Button @click="openRSSModal(`${saved.token}-open`, saved)" :id="`${saved.token}-open`" mode="text">
                      RSS <i class='link fal fa-rss'></i>
                   </V4Button>
                </div>
@@ -68,14 +68,14 @@
             </div>
          </div>
       </div>
-      <Dialog v-model:visible="showRSSModal" :modal="true" position="top" :header='`RSS Feed for "${currentFeed.name}"`'>
+      <Dialog v-model:visible="showRSSModal" :modal="true" position="top" :header='`RSS Feed for "${currentFeed.name}"`' @hide="closeRSSDialog">
          <div class="rss-panel">
             <h3 class="rss-url" v-text="rssURL(currentFeed.token)"></h3>
             <p>This feed contains a live search which will include any new items added to the collection.</p>
             <p><b>Note</b>: RSS feeds are not able to show updates from third party sources including articles.</p>
          </div>
          <div class="form-controls" >
-            <V4Button mode="tertiary" @click="showRSSModal = false">Close</V4Button>
+            <V4Button mode="tertiary" @click="closeRSSDialog">Close</V4Button>
             <V4Button mode="primary" @click="copyRSS(currentFeed.token)">Copy to clipboard</V4Button>
          </div>
       </Dialog>
@@ -105,6 +105,7 @@ const confirm = useConfirm()
 const toast = useToast()
 
 const showRSSModal = ref(false)
+const showRSSTriggerID = ref("")
 const currentFeed = ref({})
 
 const errorToast = ((title, msg) => {
@@ -194,7 +195,6 @@ const copyURL = ((token) => {
 })
 
 const copyRSS = ((token) => {
-   showRSSModal.value = false
    let URL = rssURL(token)
    copyText(URL, undefined, (error, _event) => {
       if (error) {
@@ -203,11 +203,22 @@ const copyRSS = ((token) => {
          infoToast("RSS URL Copied", "RSS URL copied to clipboard.")
       }
    })
+   closeRSSDialog()
 })
 
-const openRSSModal = ((rss) => {
+const closeRSSDialog = (() => {
+   showRSSModal.value = false
+   if ( showRSSTriggerID.value ) {
+      console.log("focus "+showRSSTriggerID.value)
+      document.getElementById( showRSSTriggerID.value ).focus()
+      showRSSTriggerID.value = ""
+   }
+})
+
+const openRSSModal = ((triggerID, rss) => {
    currentFeed.value = rss
    showRSSModal.value = true
+   showRSSTriggerID.value = triggerID
 })
 
 const publicClicked = ((saved) => {
