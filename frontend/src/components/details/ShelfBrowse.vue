@@ -24,7 +24,7 @@
 <script setup>
 import BrowseCard from "@/components/details/BrowseCard.vue"
 import BrowsePager from "@/components/details/BrowsePager.vue"
-import { computed, nextTick, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useShelfStore } from "@/stores/shelf"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
@@ -103,7 +103,7 @@ const getInitialBrowseData = ( async () => {
          if ( cnt == 0 ) {
             let sel = `#${cardID} .bookmark`
             let triggerBtn = document.querySelector( sel )
-            bookmarks.showAddBookmark( newBM, triggerBtn)
+            bookmarks.showAddBookmark( props.pool, newBM, triggerBtn, "SHELF_BROWSE")
          }
       }, 500)
    }

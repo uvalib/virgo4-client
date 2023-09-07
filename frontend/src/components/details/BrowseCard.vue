@@ -24,7 +24,7 @@
             <span class="year">[{{props.data.published_date}}]</span>
             <span class="loc">{{props.data.location}}</span>
          </div>
-         <BookmarkButton :data="bookmarkData(data)" @clicked="bookmarkClicked(props.data.id)"/>
+         <BookmarkButton :pool="props.pool" :hit="data" origin="SHELF_BROWSE"  @clicked="bookmarkClicked(props.data.id)"/>
       </template>
       <template v-else>
          <div class="list details">
@@ -41,7 +41,7 @@
                   </template>
                </span>
             </span>
-            <BookmarkButton :data="bookmarkData(data)" @clicked="bookmarkClicked(props.data.id)"/>
+            <BookmarkButton :pool="props.pool" :hit="props.data" origin="SHELF_BROWSE" @clicked="bookmarkClicked(props.data.id)"/>
          </div>
       </template>
    </div>
@@ -75,15 +75,13 @@ const props = defineProps({
    }
 })
 
-function bookmarkData( item ) {
-   return {pool: props.pool, identifier: item.id, title: item.title, origin: "SHELF_BROWSE" }
-}
-function browseDetailClicked(id) {
+const browseDetailClicked = ((id) => {
    analytics.trigger('ShelfBrowse', 'BROWSE_DETAIL_CLICKED', id)
-}
-function bookmarkClicked(id) {
+})
+
+const bookmarkClicked = ((id) => {
    analytics.trigger('ShelfBrowse', 'BROWSE_BOOKMARK_CLICKED', id)
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -106,13 +104,6 @@ function bookmarkClicked(id) {
    &:hover, &:focus-within, &:focus {
       top: -2px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
-   }
-
-   .bm-control {
-      position: absolute;
-      bottom: 5px;
-      right: 5px;
-      height: 25px;
    }
 
    .thumb-wrap {

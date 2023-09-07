@@ -19,7 +19,7 @@
       <V4Button v-if="from=='DETAIL' || from=='COLLECTION'" mode="icon" class="share" @click="shareClicked"  :aria-label="`copy link to ${props.hit.header.title}`">
          <i class="share fal fa-share-alt"></i>
       </V4Button>
-      <BookmarkButton :data="utils.toBookmarkData(props.pool, props.hit, props.from)"/>
+      <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
    </div>
 </template>
 
@@ -27,7 +27,6 @@
 import BookmarkButton from "@/components/BookmarkButton.vue"
 import Citations from "@/components/modals/Citations.vue"
 import analytics from '@/analytics'
-import * as utils from '../utils'
 import { ref, computed } from 'vue'
 import { useItemStore } from "@/stores/item"
 import { useSystemStore } from "@/stores/system"
@@ -111,6 +110,7 @@ async function pdfClicked( ) {
    }, 1000)
 }
 function shareClicked() {
+   console.log(props)
    analytics.trigger('Results', 'SHARE_ITEM_CLICKED', props.hit.identifier)
    let URL = window.location.href
    copyText(URL, undefined, (error, _event) => {

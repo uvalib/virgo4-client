@@ -4,7 +4,7 @@
          <span class="group-cnt" v-if="props.hit.grouped">{{props.hit.count}} images</span>
          <span class="group-cnt" v-else>1 image</span>
          <span class="buttons">
-            <BookmarkButton :data="utils.toBookmarkData(props.pool, props.hit, 'SEARCH')"/>
+            <BookmarkButton :pool="props.pool" :hit="props.hit" origin="SEARCH"/>
          </span>
       </div>
       <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">
@@ -21,7 +21,6 @@ import BookmarkButton from "@/components/BookmarkButton.vue"
 import { computed } from 'vue'
 import { useResultStore } from "@/stores/result"
 import analytics from '@/analytics'
-import * as utils from '../utils'
 
 const props = defineProps({
    hit: { type: Object, required: true},

@@ -17,8 +17,18 @@ import { useConfirm } from "primevue/useconfirm"
 const emit = defineEmits( ['clicked'] )
 
 const props = defineProps({
-   // Fields: Pool, ID, Title. Author optional
-   data: { type: Object, required: true},
+   pool: {
+      type: String,
+      required: true
+   },
+   hit: {
+      type: Object,
+      required: true
+   },
+   origin: {
+      type: String,
+      required: true
+   }
 })
 
 const system = useSystemStore()
@@ -28,9 +38,9 @@ const bookmarkbtn = ref()
 
 const ariaLabel = computed(() => {
    if ( bookmarkCount.value  > 0 ) {
-      return `remove bookmark on ${props.data.title}`
+      return `remove bookmark on ${props.hit.title}`
    }
-   return `bookmark ${props.data.title}`
+   return `bookmark ${props.hit.title}`
 })
 
 const bookmarkIcon = computed(() => {
@@ -41,12 +51,12 @@ const bookmarkIcon = computed(() => {
 })
 
 const bookmarkCount = computed(()=>{
-   return bookmarkStore.bookmarkCount( props.data.pool, props.data.identifier)
+   return bookmarkStore.bookmarkCount( props.pool, props.hit.identifier)
 })
 
 const bookmarkClicked = (() => {
    if ( bookmarkCount.value == 0) {
-      bookmarkStore.showAddBookmark( props.data, bookmarkbtn.value.$el )
+      bookmarkStore.showAddBookmark( props.pool, props.hit, bookmarkbtn.value.$el, props.origin )
       return
    }
 
@@ -72,12 +82,12 @@ const bookmarkClicked = (() => {
 const removeBookmark = ( () => {
    bookmarkStore.bookmarks.forEach( folder => {
       folder.bookmarks.forEach( item => {
-         if (item.pool == props.data.pool && item.identifier == props.data.identifier) {
+         if (item.pool == props.pool && item.identifier == props.hit.identifier) {
             bookmarkStore.removeBookmark(folder.id, item.id)
          }
       })
    })
-   analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', props.data.identifier)
+   analytics.trigger('Bookmarks', 'REMOVE_BOOKMARK', props.hit.identifier)
    bookmarkbtn.value.$el.focus()
 })
 </script>

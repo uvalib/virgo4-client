@@ -337,7 +337,7 @@ function handlePendingBookmark() {
          let sel = `.group-hit[data-identifier="${newBM.identifier}"]`
          let tgtEle = document.body.querySelector(sel)
          if ( tgtEle ) {
-            triggerBtn = tgtEle.querySelector(".bm-control button")
+            triggerBtn = tgtEle.querySelector("button.bookmark")
             utils.scrollToItem(tgtEle)
          }
       }, 250)
@@ -345,13 +345,13 @@ function handlePendingBookmark() {
       let sel = `.hit[data-identifier="${newBM.identifier}"]`
       let tgtEle = document.body.querySelector(sel)
       if ( tgtEle ) {
-         triggerBtn = tgtEle.querySelector(".bm-control button")
+         triggerBtn = tgtEle.querySelector("button.bookmark")
          utils.scrollToItem(tgtEle)
       }
    }
 
    if ( showAdd ) {
-      bookmarks.showAddBookmark( newBM, triggerBtn)
+      bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "SEARCH")
    }
 }
 

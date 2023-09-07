@@ -80,8 +80,25 @@ export const useBookmarkStore = defineStore('bookmark', {
          this.$reset()
       },
 
-      showAddBookmark( bmData, trigger ) {
-         this.newBookmark = bmData
+      // FIXME overlooked COLLECTION... make sure it works
+      // origin: SEARCH, DETAIL, COLLECTION, SHELF_BROWSE
+      showAddBookmark( pool, hit, trigger, origin ) {
+         // all hit data has these in common...
+         this.newBookmark = {identifier: hit.identifier, pool: pool, origin: origin}
+         if (hit.groupParent) {
+            this.newBookmark.groupParent = hit.groupParent
+         }
+
+         // some bookmarks are directly from search hits; these have header structures (plus basic and details)
+         if (hit.header) {
+            this.newBookmark.title = hit.header.title
+            this.newBookmark.author = hit.header.author_display
+         } else {
+            // other hits are from shelf browse or restore and the structure is simplified, with only title and sometimes author
+            this.newBookmark.title = hit.title
+            this.newBookmark.author = hit.author
+         }
+
          this.showAddDialog = true
          this.addBoomkarkTrigger = trigger
       },

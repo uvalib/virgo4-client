@@ -75,7 +75,7 @@ async function getDetails(src, id) {
       let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
       if (showAdd) {
          let triggerBtn = document.querySelector(".title-wrapper .icon-wrap .bookmark")
-         bookmarks.showAddBookmark( newBM, triggerBtn)
+         bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "DETAIL")
       }
       restore.clear()
    }
