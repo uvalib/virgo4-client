@@ -68,25 +68,17 @@
             </div>
          </div>
       </div>
-      <V4Modal id="rss-modal" ref="rssmodal" :title='`RSS Feed for "${currentFeed.name}"`'
-         firstFocusID="rssCopy" lastFocusID="rssCopy" :buttonID="`${currentFeed.token}-open`"
-      >
-         <template v-slot:content>
+      <Dialog v-model:visible="showRSSModal" :modal="true" position="top" :header='`RSS Feed for "${currentFeed.name}"`'>
+         <div class="rss-panel">
             <h3 class="rss-url" v-text="rssURL(currentFeed.token)"></h3>
             <p>This feed contains a live search which will include any new items added to the collection.</p>
-            <p>Note: RSS feeds are not able to show updates from third party sources including articles.</p>
-         </template>
-          <template v-slot:controls>
-            <span v-html="rssMessage" class="rss-message"></span>
-            <V4Button mode="tertiary" id="rss-modal-close" @click="rssmodal.hide()">
-               Close
-            </V4Button>
-            <V4Button  mode="primary" id="rssCopy" @click="copyRSS(currentFeed.token)"
-               :focusNextOverride="true" @tabnext="rssmodal.lastFocusTabbed()">
-               Copy to clipboard
-            </V4Button>
-         </template>
-      </V4Modal>
+            <p><b>Note</b>: RSS feeds are not able to show updates from third party sources including articles.</p>
+         </div>
+         <div class="form-controls" >
+            <V4Button mode="tertiary" @click="showRSSModal = false">Close</V4Button>
+            <V4Button mode="primary" @click="copyRSS(currentFeed.token)">Copy to clipboard</V4Button>
+         </div>
+      </Dialog>
    </div>
 
 </template>
@@ -103,6 +95,7 @@ import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
+import Dialog from 'primevue/dialog'
 
 const results = useResultStore()
 const userStore = useUserStore()
@@ -111,8 +104,7 @@ const searchStore = useSearchStore()
 const confirm = useConfirm()
 const toast = useToast()
 
-const rssmodal = ref(null)
-const rssMessage = ref("")
+const showRSSModal = ref(false)
 const currentFeed = ref({})
 
 const errorToast = ((title, msg) => {
@@ -202,20 +194,20 @@ const copyURL = ((token) => {
 })
 
 const copyRSS = ((token) => {
+   showRSSModal.value = false
    let URL = rssURL(token)
    copyText(URL, undefined, (error, _event) => {
       if (error) {
-         rssMessage.value = `Unable to automatically copy RSS URL: ${error}`
+         errorToast("RSS Copy Error", "Unable to copy RSS URL: "+error)
       } else {
-         rssMessage.value = `Copied!`
+         infoToast("RSS URL Copied", "RSS URL copied to clipboard.")
       }
    })
 })
 
 const openRSSModal = ((rss) => {
-   rssMessage.value = ""
    currentFeed.value = rss
-   rssmodal.value.show()
+   showRSSModal.value = true
 })
 
 const publicClicked = ((saved) => {
@@ -240,7 +232,7 @@ onMounted(()=>{
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .none {
    text-align: center;
    font-size: 1.25em;
@@ -336,19 +328,28 @@ span.num {
    padding: 10px 0;
    /* text-align: right; */
 }
-h3.rss-url  {
-   background:  var(--uvalib-grey-lightest);
-   padding: 5px 10px;
-   border-bottom: 1px solid  var(--uvalib-grey-light);
-   border-top: 1px solid  var(--uvalib-grey-light);
-   -webkit-user-select: all; /* for Safari */
-  user-select: all;
-}
-.rss-message {
-   margin-right: auto;
-   margin-left: 30%;
-   color: var(--uvalib-green-dark);
-   font-weight: bold;
-   margin-top: 4px;
+.rss-panel {
+   padding: 0;
+   margin: 0;
+   p {
+      padding: 0;
+      margin: 10px 0;
+   }
+   h3.rss-url  {
+      background:  var(--uvalib-grey-lightest);
+      padding: 5px 10px;
+      margin: 0 0 20px 0;
+      border-bottom: 1px solid  var(--uvalib-grey-light);
+      border-top: 1px solid  var(--uvalib-grey-light);
+      -webkit-user-select: all; /* for Safari */
+      user-select: all;
+   }
+   .rss-message {
+      margin-right: auto;
+      margin-left: 30%;
+      color: var(--uvalib-green-dark);
+      font-weight: bold;
+      margin-top: 4px;
+   }
 }
 </style>
