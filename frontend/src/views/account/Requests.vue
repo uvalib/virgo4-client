@@ -68,7 +68,7 @@
                            <dd>{{req.itemStatus}}</dd>
                         </dl>
                         <p>
-                           <V4Button :id="'showCancelModal-' + req.id" mode="tertiary" @click="showCancelHold(req)">Cancel Request</V4Button>
+                           <V4Button ref="canceltrigger" mode="tertiary" @click="showCancelHold(req, idx)">Cancel Request</V4Button>
                         </p>
                      </div>
                   </div>
@@ -169,13 +169,8 @@
       </div>
    </div>
 
-   <V4Modal ref="cancelHoldModal" class="cancel"
-      title="Cancel Hold?"
-      :buttonID="'showCancelModal-' + (reqToCancel ? reqToCancel.id : '')"
-      buttonMode="tertiary"
-      id="cancelHoldModal"
-      >
-      <template #content>
+   <Dialog v-model:visible="showCancelModal" :modal="true" position="top" header="Cancel Hold" @hide="hideCancelHold">
+      <div class="cancel-panel">
          <dl>
             <dt>Title:</dt>
             <dd>{{ reqToCancel.title }}</dd>
@@ -186,33 +181,20 @@
             <dt>Date Placed:</dt>
             <dd>{{formatDate(reqToCancel.placedDate)}}</dd>
          </dl>
-
-         <template v-if="reqToCancel.cancellable">
-         <p>Are you sure you want to cancel this request?</p>
-         </template>
-         <template v-else>
-            <p>
-               This hold request is already in progress and can not be cancelled automatically.
-            </p>
-            <p>
-               By continuing, an email will be sent to begin the cancellation process.
-            </p>
-            <FormKit type="form" :actions="false" id="cancelHoldForm" @submit="cancelHold()">
-               <FormKit label="Confirmation Email" id="confirmationEmail" validate="email" type="email" v-model="reqToCancel.confirmationEmail" />
-            </FormKit>
-         </template>
-      </template>
-      <template #controls>
-         <V4Button id="cancelHoldBack" mode="tertiary" @click="hideCancelHold">
-            Back
-         </V4Button>
-
-         <V4Button type="submit" id="cancelHoldButton" mode="primary" @click="cancelHold()">
-            Cancel Request
-         </V4Button>
-
-      </template>
-   </V4Modal>
+         <FormKit type="form" :actions="false" id="cancelHoldForm" @submit="cancelHold">
+            <p v-if="reqToCancel.cancellable">Are you sure you want to cancel this request?</p>
+            <template v-else>
+               <p>This hold request is already in progress and can not be cancelled automatically.</p>
+               <p>By continuing, an email will be sent to begin the cancellation process.</p>
+               <FormKit label="Confirmation Email" validation="required|email" type="email" v-model="reqToCancel.confirmationEmail" />
+            </template>
+            <div class="form-controls">
+               <V4Button mode="tertiary" @click="hideCancelHold">Back</V4Button>
+               <FormKit type="submit" label="Cancel Request" wrapper-class="submit-button" />
+            </div>
+         </FormKit>
+      </div>
+   </Dialog>
 </template>
 
 <script setup>
@@ -228,14 +210,16 @@ import { useRequestStore } from "@/stores/request"
 import { ref, computed, onMounted } from 'vue'
 import analytics from '@/analytics'
 import AccordionContent from "@/components/AccordionContent.vue"
-
+import Dialog from 'primevue/dialog'
 
 const systemStore = useSystemStore()
 const userStore = useUserStore()
 const requestStore = useRequestStore()
 
 const request = ref("")
-const cancelHoldModal = ref(null)
+const showCancelModal = ref(false)
+const canceltrigger = ref()
+const cancelButtonIdx = ref(-1)
 const reqToCancel = ref(null)
 
 const illiadRequests = computed(()=>{
@@ -246,10 +230,8 @@ const illiadRequests = computed(()=>{
 const illLoans = computed(()=>{
    let out = []
    illiadRequests.value.forEach( r => {
-      // console.log(`PT=${r.processType} RT=${r.requestType}`)
       if (r.processType=="Borrowing" && r.requestType=="Loan") {
          out.push(r)
-         // console.log("ADD LOAN")
       }
    })
    return out
@@ -269,22 +251,27 @@ const digitalRequests = computed(()=>{
    return out
 })
 
-function instructionalScanClick() {
+const instructionalScanClick = (() => {
    request.value = "InstructionalScan"
-}
-function illBorrowClick() {
+})
+
+const illBorrowClick = (() => {
    request.value = "ILLBorrowItem"
-}
-function illBorrowAVClick() {
+})
+
+const illBorrowAVClick = (() => {
    request.value = "ILLBorrowAV"
-}
-function illScanClick() {
+})
+
+const illScanClick = (() => {
    request.value = "ILLScanArticle"
-}
-function cancelRequest() {
+})
+
+const cancelRequest = (() => {
    request.value = ""
-}
-function requestSubmitted() {
+})
+
+const requestSubmitted = (() => {
    if ( systemStore.hasError ) {
       return
    }
@@ -293,34 +280,31 @@ function requestSubmitted() {
    userStore.getRequests()
    systemStore.setMessage("Your request has been submitted.")
    window.scrollTo(0,0)
-}
-function formatDate(date) {
-   return date.split("T")[0];
-}
-function hasNoRequests() {
-   return illLoans.value.length == 0 && userStore.requests.holds.length == 0 && digitalRequests.value == 0 && systemStore.ilsError == ""
-}
-function cancelHold() {
+})
 
-   let form = document.getElementById('cancelHoldForm')
-   if (form && !form.checkValidity()) {
-      if (form.reportValidity) {
-         form.reportValidity();
-      }
-      return false
-   }
-   if( reqToCancel.value.cancellable ){
+const formatDate = ((date) => {
+   return date.split("T")[0];
+})
+
+const hasNoRequests = (() => {
+   return illLoans.value.length == 0 && userStore.requests.holds.length == 0 && digitalRequests.value == 0 && systemStore.ilsError == ""
+})
+
+const cancelHold = (() => {
+   if ( reqToCancel.value.cancellable ){
       analytics.trigger('Requests', 'REQUEST_CANCEL_SUBMITTED', "sirsi")
-   }else{
+   } else {
       analytics.trigger('Requests', 'REQUEST_CANCEL_SUBMITTED', "email")
    }
    requestStore.cancelHold(reqToCancel.value)
    hideCancelHold()
-}
-async function showCancelHold(req) {
+})
+
+const showCancelHold = ((req, reqIndex) => {
    reqToCancel.value = req
    reqToCancel.value.confirmationEmail = userStore.singleEmail.toLowerCase()
-   await cancelHoldModal.value.show()
+   showCancelModal.value = true
+   cancelButtonIdx.value = reqIndex
    if( reqToCancel.value.cancellable ){
       analytics.trigger('Requests', 'REQUEST_CANCEL_STARTED', "sirsi")
    }else{
@@ -330,11 +314,13 @@ async function showCancelHold(req) {
    if (ele) {
       ele.focus()
    }
-}
-function hideCancelHold(){
+})
+
+const hideCancelHold = (() => {
    reqToCancel.value = null
-   cancelHoldModal.value.hide()
-}
+   showCancelModal.value = false
+   canceltrigger.value[cancelButtonIdx.value].$el.focus()
+})
 
 onMounted(() =>{
    if ( userStore.isSignedIn) {
@@ -452,18 +438,19 @@ onMounted(() =>{
    }
 }
 
-
-dl {
-   margin: 0 0 0 10px;
-   display: inline-grid;
-   grid-template-columns: max-content 2fr;
-   grid-column-gap: 15px;
-}
-dt {
-   font-weight: bold;
-   text-align: right;
-}
-dd {
-   margin: 0 0 10px 0;
+.cancel-panel {
+   dl {
+      margin: 0 0 0 10px;
+      display: inline-grid;
+      grid-template-columns: max-content 2fr;
+      grid-column-gap: 15px;
+   }
+   dt {
+      font-weight: bold;
+      text-align: right;
+   }
+   dd {
+      margin: 0 0 10px 0;
+   }
 }
 </style>
