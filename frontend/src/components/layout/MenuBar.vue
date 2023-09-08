@@ -3,6 +3,19 @@
       :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
    >
       <Menubar :model="v4Menu">
+         <template #item="{ label, item, props, root }">
+               <router-link v-if="item.route" v-slot="routerProps" :to="item.route" custom>
+                  <a :href="routerProps.href" v-bind="props.action">
+                     <span v-bind="props.icon" />
+                     <span v-bind="props.label">{{ label }}</span>
+                  </a>
+               </router-link>
+               <a v-else :href="item.url" :target="item.target" v-bind="props.action">
+                  <span v-bind="props.icon" />
+                  <span v-bind="props.label">{{ label }}</span>
+                  <span v-if="item.items" class="pi pi-fw pi-angle-down" v-bind="props.submenuicon" />
+               </a>
+         </template>
          <template #end>
             <span v-if="userStore.isSignedIn && userStore.itemsOnNotice.length > 0">
                <router-link to="/checkouts?overdue=1">
@@ -50,7 +63,7 @@ const alertTabIndex = computed( () => {
 })
 
 const v4Menu = computed( () => {
-   let menu = [ {label: "Search", to: "/", icon: "icon fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
+   let menu = [ {label: "Search", route: "/", icon: "icon fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
    if ( systemStore.isKiosk) return menu
 
    let nonKiosk = [
@@ -63,7 +76,7 @@ const v4Menu = computed( () => {
             target: "_blank", command: ()=>libServiceClicked('Journal Finder')},
          {label: "Databases A-Z", url: "https://guides.lib.virginia.edu/az.php",
             target: "_blank", command: ()=>libServiceClicked('Databases A-Z')},
-         {label: "Spaces & Equipment", url: "https://www.library.virginia.edu/services",
+         {label: "Spaces & Equipment", url: "https://cal.lib.virginia.edu",
             target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
          {label: "More Library Services", url: "https://www.library.virginia.edu/services",
             target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
@@ -73,21 +86,21 @@ const v4Menu = computed( () => {
    let signIn = []
    if (userStore.isSignedIn) {
       let items = [
-         {label: "My Information", to: "/account"},
-         {label: "Checkouts", to: "/checkouts"},
-         {label: "Digital Deliveries", to: "/digital-deliveries"},
-         {label: "Requests", to: "/requests"},
-         {label: "Bookmarks", to: "/bookmarks"},
-         {label: "Searches", to: "/searches"},
-         {label: "Preferences", to: "/preferences"},
+         {label: "My Information", route: "/account"},
+         {label: "Checkouts", route: "/checkouts"},
+         {label: "Digital Deliveries", route: "/digital-deliveries"},
+         {label: "Requests", route: "/requests"},
+         {label: "Bookmarks", route: "/bookmarks"},
+         {label: "Searches", route: "/searches"},
+         {label: "Preferences", route: "/preferences"},
       ]
       if (userStore.isAdmin || userStore.isPDAAdmin) {
-         items.push({label: "Admin", to: "/admin"})
+         items.push({label: "Admin", route: "/admin"})
       }
       items.push({label: "Sign out",  command: ()=>signOut()})
       signIn = [ {label: `Signed in as ${userStore.signedInUser}`, icon: "icon fal fa-user-circle", items: items} ]
    } else {
-      signIn = [ {label: "Sign In", to: "/signin", icon: "icon fal fa-user-circle"} ]
+      signIn = [ {label: "Sign In", route: "/signin", icon: "icon fal fa-user-circle"} ]
    }
 
    return menu.concat(nonKiosk).concat(signIn)
