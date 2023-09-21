@@ -3,11 +3,11 @@ module github.com/uvalib/virgo4-client
 go 1.13
 
 require (
-	github.com/bytedance/sonic v1.10.0 // indirect
+	github.com/bytedance/sonic v1.10.1 // indirect
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/contrib v0.0.0-20221130124618-7e01895a63f2
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-playground/validator/v10 v10.15.3 // indirect
+	github.com/go-playground/validator/v10 v10.15.4 // indirect
 	github.com/gorilla/feeds v1.1.1
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
