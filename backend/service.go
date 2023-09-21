@@ -79,7 +79,7 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	}
 
 	log.Printf("INFO: connecting GORM to postgress...")
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d sslmode=disable",
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%d",
 		cfg.DB.User, cfg.DB.Pass, cfg.DB.Name, cfg.DB.Host, cfg.DB.Port)
 	gdb, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
