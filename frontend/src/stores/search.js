@@ -6,9 +6,11 @@ export const useSearchStore = defineStore('search', {
 	state: () => ({
       saved: [],
       history: [],
-      lookingUp: false,
-      lastSavedSearchKey: "",
-      showSaveDialog: false
+      working: false,
+      searchToken: "",
+      showSaveDialog: false,
+      duplicate: false,
+      searchName: ""
    }),
    actions: {
       setSearches(data) {
@@ -26,31 +28,60 @@ export const useSearchStore = defineStore('search', {
       },
 
       async updateVisibility(data) {
-         this.lookingUp = true
+         this.working = true
          let url = `/api/users/${data.userID}/searches/${data.id}/publish`
          if (data.public) {
             await axios.post(url)
          } else {
             await axios.delete(url)
          }
-        this.lookingUp = false
+        this.working = false
       },
 
       getAll(userID) {
-         this.lookingUp = true
+         this.showSaveDialog = false
+         this.working = true
          axios.get(`/api/users/${userID}/searches`).then((response) => {
             this.setSearches(response.data)
-            this.lookingUp = false
+            this.working = false
           }).catch((error) => {
             const system = useSystemStore()
             system.setError(error)
-            this.lookingUp = false
+            this.working = false
           })
       },
 
+      async exists( userID, url) {
+         this.working = true
+         this.duplicate = false
+         this.searchName = ""
+         this.searchToken = ""
+         let encoded = encodeURIComponent(url)
+         axios.get(`/api/users/${userID}/searches/exists?tgt=${ encoded }`).then((response) => {
+            if (response.data.exists) {
+               this.duplicate = true
+               this.searchName = response.data.name
+               this.searchToken = response.data.token
+            }
+            this.working = false
+         }).catch(() => {
+            // just eat the error and let the save go on
+            this.working = false
+         })
+      },
+
+      // data: {name: searchName.value, url: searchURL, isPublic: false, userID: userStore.signedInUser}
       async save(data) {
-         let resp = await axios.post(`/api/users/${data.userID}/searches`, data)
-         this.lastSavedSearchKey = resp.data.token
+         this.working = true
+         return axios.post(`/api/users/${data.userID}/searches`, data).then((resp) => {
+            this.searchToken = resp.data.token
+            this.searchName = resp.data.name
+            this.working = false
+         }).catch((error) => {
+            const system = useSystemStore()
+            system.setError(error)
+            this.working = false
+         })
       },
 
       updateHistory(userID, fullPath) {
@@ -65,7 +96,7 @@ export const useSearchStore = defineStore('search', {
       async delete( {userID, searchID} ) {
          try {
             await axios.delete(`/api/users/${userID}/searches/${searchID}`)
-            this.lastSavedSearchKey = ""
+            this.searchToken = ""
             let idx = this.saved.findIndex(s => s.id == searchID)
             if (idx > -1) {
                this.saved.splice(idx,1)
@@ -77,26 +108,26 @@ export const useSearchStore = defineStore('search', {
       },
 
       deleteAll(userID) {
-         this.lookingUp = true
+         this.working = true
          axios.delete(`/api/users/${userID}/searches?type=saved`).then((_response) => {
             this.saved.splice(0, this.saved.length)
-            this.lookingUp = false
+            this.working = false
           }).catch((error) => {
             const system = useSystemStore()
             system.setError(error)
-            this.lookingUp = false
+            this.working = false
           })
       },
 
       clearHistory(userID) {
-         this.lookingUp = true
+         this.working = true
          axios.delete(`/api/users/${userID}/searches?type=history`).then((_response) => {
             this.history.splice(0, this.history.length)
-            this.lookingUp = false
+            this.working = false
           }).catch((error) => {
             const system = useSystemStore()
             system.setError(error)
-            this.lookingUp = false
+            this.working = false
           })
       }
    }

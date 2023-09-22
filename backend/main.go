@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "2.3.0"
+const version = "2.3.1"
 
 /**
  * MAIN
@@ -97,6 +97,7 @@ func main() {
 		users.POST("/:uid/contact", svc.RequestContactUpdate)
 
 		users.GET("/:uid/searches", svc.GetUserSavedSearches)
+		users.GET("/:uid/searches/exists", svc.SavedSearchExists)
 		users.POST("/:uid/searches", svc.SaveSearch)
 		users.DELETE("/:uid/searches/:id", svc.DeleteSavedSearch)
 		users.DELETE("/:uid/searches", svc.DeleteAllSavedSearches)

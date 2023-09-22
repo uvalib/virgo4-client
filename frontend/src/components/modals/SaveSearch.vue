@@ -8,35 +8,30 @@
          </p>
       </template>
       <template v-else>
-         <div v-if="working" class="message working">
-            <V4Spinner message="Working..."/>
-         </div>
-         <template v-else>
-            <template v-if="saved">
-               <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
-            </template>
-            <template v-else-if="duplicateSave">
-               <p class="saved">This search has already been saved as '{{searchName}}'.</p>
-               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
-            </template>
-            <div  v-else class="message">
-               <div>
-                  <label for="savename">Search Name</label>
-                  <input ref="savename" id="savename" type="text" v-model="searchName"
-                     @keyup.enter="saveClicked"
-                     aria-required="true" required="required"
-                  />
-               </div>
-               <p class="error">{{error}}</p>
-            </div>
+         <template v-if="saved">
+            <p class="saved">Your search has been saved as '{{searchName}}'.</p>
+            <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
          </template>
+         <template v-else-if="searches.duplicate">
+            <p class="saved">This search has already been saved as '{{searches.searchName}}'.</p>
+            <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+         </template>
+         <div  v-else class="message">
+            <div>
+               <label for="savename">Search Name</label>
+               <input ref="savename" id="savename" type="text" v-model="searchName"
+                  @keyup.enter="saveClicked"
+                  aria-required="true" required="required"
+               />
+            </div>
+            <p class="error">{{error}}</p>
+         </div>
       </template>
       <div class="form-controls" >
-         <V4Button v-if="showSignInMessage || saved || duplicateSave" mode="tertiary" @click="closeDialog">Close</V4Button>
+         <V4Button v-if="showSignInMessage || saved || searches.duplicate" mode="tertiary" @click="closeDialog">Close</V4Button>
          <template v-else>
             <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
-            <V4Button mode="primary" @click="saveClicked">Save</V4Button>
+            <V4Button mode="primary" @click="saveClicked" :disabled="searches.working">Save</V4Button>
          </template>
       </div>
    </Dialog>
@@ -63,9 +58,6 @@ const showSignInMessage = ref(false)
 const searchName = ref("")
 const error = ref("")
 const saved = ref(false)
-const working = ref(false)
-const lastSavedURL = ref("")
-const duplicateSave = ref(false)
 
 const openSaveClicked = (() => {
    if (userStore.isSignedIn) {
@@ -88,12 +80,15 @@ const signInClicked = (() => {
    router.push("/signin")
 })
 
-function opened() {
+const opened = ( async () => {
    error.value = ""
    saved.value = false
-   if ( route.fullPath == lastSavedURL.value) {
-      duplicateSave.value = true
-   } else {
+   searchName.value = ""
+
+   console.log(route.fullPath)
+
+   await searches.exists(userStore.signedInUser, route.fullPath)
+   if ( searches.duplicate == false ) {
       let date = new Date()
       let hours = date.getHours()
       let minutes = date.getMinutes()
@@ -103,31 +98,21 @@ function opened() {
       let timeStr = `${date.getFullYear()}-${mStr}-${day}:${hours}${minutes}`
       searchName.value = `search-${timeStr}`
    }
-}
+})
+
 const saveClicked = (async () => {
    if ( searchName.value == "") {
       error.value = "A name is required"
       return
    }
 
-   working.value = true
    let searchURL = route.fullPath
    let req = {name: searchName.value, url: searchURL, isPublic: false, userID: userStore.signedInUser}
-   try {
-      searches.save(req)
-      saved.value = true
-      working.value = false
-      lastSavedURL.value = searchURL
-      duplicateSave.value = false
-      nextTick( () => {
-         document.getElementById("savename").focus()
-      })
-   } catch(err) {
-      error.value = err.message
-      working.value = false
-      duplicateSave.value = false
-      saved.value = false
-   }
+   await searches.save(req)
+   saved.value = true
+   nextTick( () => {
+      document.getElementById("savename").focus()
+   })
 })
 </script>
 
