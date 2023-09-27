@@ -3,18 +3,12 @@
       :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
    >
       <Menubar :model="v4Menu">
-         <template #item="{ label, item, props, root }">
-               <router-link v-if="item.route" v-slot="routerProps" :to="item.route" custom>
-                  <a :href="routerProps.href" v-bind="props.action">
-                     <span v-bind="props.icon" />
-                     <span v-bind="props.label">{{ label }}</span>
-                  </a>
-               </router-link>
-               <a v-else :href="item.url" :target="item.target" v-bind="props.action">
-                  <span v-bind="props.icon" />
-                  <span v-bind="props.label">{{ label }}</span>
-                  <span v-if="item.items" class="pi pi-fw pi-angle-down" v-bind="props.submenuicon" />
-               </a>
+         <template #item="{ label, item, props }">
+            <a :href="item.url" :target="item.target" v-bind="props.action">
+               <span v-bind="props.icon" />
+               <span v-bind="props.label">{{ label }}</span>
+               <span v-if="item.items" class="pi pi-fw pi-angle-down" v-bind="props.submenuicon" />
+            </a>
          </template>
          <template #end>
             <span v-if="userStore.isSignedIn && userStore.itemsOnNotice.length > 0">
@@ -48,11 +42,13 @@ import { useUserStore } from "@/stores/user"
 import { useAlertStore } from "@/stores/alert"
 import { computed } from 'vue'
 import analytics from '@/analytics'
+import { useRouter } from "vue-router"
 
 const alertStore = useAlertStore()
 const systemStore = useSystemStore()
 const userStore = useUserStore()
 const results = useResultStore()
+const router = useRouter()
 
 
 const alertTabIndex = computed( () => {
@@ -63,7 +59,7 @@ const alertTabIndex = computed( () => {
 })
 
 const v4Menu = computed( () => {
-   let menu = [ {label: "Search", route: "/", icon: "icon fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
+   let menu = [ {label: "Search", icon: "icon fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
    if ( systemStore.isKiosk) return menu
 
    let nonKiosk = [
@@ -86,21 +82,21 @@ const v4Menu = computed( () => {
    let signIn = []
    if (userStore.isSignedIn) {
       let items = [
-         {label: "My Information", route: "/account"},
-         {label: "Checkouts", route: "/checkouts"},
-         {label: "Digital Deliveries", route: "/digital-deliveries"},
-         {label: "Requests", route: "/requests"},
-         {label: "Bookmarks", route: "/bookmarks"},
-         {label: "Searches", route: "/searches"},
-         {label: "Preferences", route: "/preferences"},
+         {label: "My Information", command: ()=>userLinkClicked("/account")},
+         {label: "Checkouts", command: ()=>userLinkClicked("/checkouts")},
+         {label: "Digital Deliveries", command: ()=>userLinkClicked("/digital-deliveries")},
+         {label: "Requests", command: ()=>userLinkClicked("/requests")},
+         {label: "Bookmarks", command: ()=>userLinkClicked("/bookmarks")},
+         {label: "Searches", command: ()=>userLinkClicked("/searches")},
+         {label: "Preferences", command: ()=>userLinkClicked("/preferences")}
       ]
       if (userStore.isAdmin || userStore.isPDAAdmin) {
-         items.push({label: "Admin", route: "/admin"})
+         items.push({label: "Admin", command: ()=>userLinkClicked("/admin")})
       }
       items.push({label: "Sign out",  command: ()=>signOut()})
       signIn = [ {label: `Signed in as ${userStore.signedInUser}`, icon: "icon fal fa-user-circle", items: items} ]
    } else {
-      signIn = [ {label: "Sign In", route: "/signin", icon: "icon fal fa-user-circle"} ]
+      signIn = [ {label: "Sign In", icon: "icon fal fa-user-circle", command: ()=>userLinkClicked("/signin")} ]
    }
 
    return menu.concat(nonKiosk).concat(signIn)
@@ -115,6 +111,7 @@ const alertClicked =(() => {
 })
 
 const searchClicked = (() => {
+   router.push("/")
    results.resetSearch()
    window.scrollTo({
       top: 0,
@@ -122,6 +119,9 @@ const searchClicked = (() => {
    })
 })
 
+const userLinkClicked = ( (tgtRoute) => {
+   router.push(tgtRoute)
+})
 const signOut = (() => {
    userStore.signout(true)
 })
