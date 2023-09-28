@@ -70,7 +70,7 @@
       </div>
       <Dialog v-model:visible="showRSSModal" :modal="true" position="top" :header='`RSS Feed for "${currentFeed.name}"`' @hide="closeRSSDialog">
          <div class="rss-panel">
-            <h3 class="rss-url" v-text="rssURL(currentFeed.token)"></h3>
+            <div class="rss-url" v-text="rssURL(currentFeed.token)"></div>
             <p>This feed contains a live search which will include any new items added to the collection.</p>
             <p><b>Note</b>: RSS feeds are not able to show updates from third party sources including articles.</p>
          </div>
@@ -346,7 +346,7 @@ span.num {
       padding: 0;
       margin: 10px 0;
    }
-   h3.rss-url  {
+   .rss-url  {
       background:  var(--uvalib-grey-lightest);
       padding: 5px 10px;
       margin: 0 0 20px 0;
@@ -354,6 +354,9 @@ span.num {
       border-top: 1px solid  var(--uvalib-grey-light);
       -webkit-user-select: all; /* for Safari */
       user-select: all;
+      word-break: break-all;
+      font-weight: bold;
+      line-height: 1.5em;
    }
    .rss-message {
       margin-right: auto;

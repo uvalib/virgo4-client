@@ -4,6 +4,7 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       color: var(--color-primary-text);
+      min-width: 30%;
 
       .p-dialog-header {
          background-color: var(--uvalib-blue-alt-light);
@@ -33,6 +34,7 @@
             display: flex;
             flex-flow: row nowrap;
             justify-content: flex-end;
+            align-items: stretch;
             margin: 20px 0 0 0;
             text-align: right;
             padding: 0;
@@ -350,16 +352,3 @@ button.p-button.p-button-secondary {
       color: #000 !important;
    }
 }
-
-
-// button.p-button.p-button-text {
-//    padding: 0;
-//    background: none;
-//    border: none;
-//    color: var(--uvalib-blue-alt-dark);
-//    font-weight: 500;
-//    text-decoration: none;
-//    &:hover {
-//       text-decoration: underline;
-//    }
-// }

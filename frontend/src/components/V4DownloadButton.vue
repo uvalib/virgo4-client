@@ -59,7 +59,7 @@ function clicked() {
 .v4-download-button {
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
-   margin: 0 0 5px 10px;
+   margin: 0 0 0 10px;
    border-radius: 5px;
    font-weight: normal;
    padding: 0;
@@ -81,6 +81,7 @@ function clicked() {
       font-weight: 500;
       margin: .5em 1em;
       display: inline-block;
+      font-size: 16px;
    }
    .download-text:hover {
       text-decoration: underline;
@@ -97,6 +98,7 @@ function clicked() {
       font-weight: 500;
       margin: 0;
       display: inline-block;
+      font-size: 16px;
    }
    &:focus {
       @include be-accessible();

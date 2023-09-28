@@ -1,32 +1,34 @@
 <template>
    <V4Button mode="primary" @click="openSaveClicked" ref="trigger">Save Search</V4Button>
    <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @hide="closeDialog" @show="opened">
-      <template v-if="showSignInMessage">
-         <p>You must be signed in to save searches.</p>
-         <p>
-            <V4Button mode="text" @click="signInClicked" aria-label="sign in to save search">Sign in now</V4Button>
-         </p>
-      </template>
-      <template v-else>
-         <template v-if="saved">
-            <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-            <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+      <div class="save-panel">
+         <template v-if="showSignInMessage">
+            <p>You must be signed in to save searches.</p>
+            <p>
+               <V4Button mode="text" @click="signInClicked" aria-label="sign in to save search">Sign in now</V4Button>
+            </p>
          </template>
-         <template v-else-if="searches.duplicate">
-            <p class="saved">This search has already been saved as '{{searches.searchName}}'.</p>
-            <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
-         </template>
-         <div  v-else class="message">
-            <div>
-               <label for="savename">Search Name</label>
-               <input ref="savename" id="savename" type="text" v-model="searchName"
-                  @keyup.enter="saveClicked"
-                  aria-required="true" required="required"
-               />
+         <template v-else>
+            <template v-if="saved">
+               <p class="saved">Your search has been saved as '{{searchName}}'.</p>
+               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+            </template>
+            <template v-else-if="searches.duplicate">
+               <p class="saved">This search has already been saved as '{{searches.searchName}}'.</p>
+               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+            </template>
+            <div  v-else class="message">
+               <div>
+                  <label for="savename">Search Name</label>
+                  <input ref="savename" id="savename" type="text" v-model="searchName"
+                     @keyup.enter="saveClicked"
+                     aria-required="true" required="required"
+                  />
+               </div>
+               <p class="error">{{error}}</p>
             </div>
-            <p class="error">{{error}}</p>
-         </div>
-      </template>
+         </template>
+      </div>
       <div class="form-controls" >
          <V4Button v-if="showSignInMessage || saved || searches.duplicate" mode="tertiary" @click="closeDialog">Close</V4Button>
          <template v-else>
@@ -85,8 +87,6 @@ const opened = ( async () => {
    saved.value = false
    searchName.value = ""
 
-   console.log(route.fullPath)
-
    await searches.exists(userStore.signedInUser, route.fullPath)
    if ( searches.duplicate == false ) {
       let date = new Date()
@@ -118,7 +118,8 @@ const saveClicked = (async () => {
 
 <style lang="scss" scoped>
 input[type=text] {
-   width: 350px;
+   width: 100%;
+   box-sizing: border-box;
 }
 label {
    display: block;

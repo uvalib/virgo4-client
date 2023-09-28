@@ -274,7 +274,7 @@ button.v4-button.citations-text-button {
          justify-content: flex-start;
 
          .v4-button.citation {
-            margin: 0 5px 0 0;
+            margin: 0 5px 10px 0;
             padding: 8px 15px;
             border-radius: 5px;
             color: var(--uvalib-text-dark);
@@ -299,25 +299,6 @@ button.v4-button.citations-text-button {
    .working {
       text-align: center;
       font-size: 1.25em;
-   }
-}
-@media only screen and (min-width: 768px) {
-   .citations-content {
-      max-height: 500px !important;
-      min-width: 550px;
-   }
-   .citation-text {
-      max-height: 420px !important;
-   }
-}
-@media only screen and (max-width: 768px) {
-   .citations-content {
-      max-height: 365px !important;
-      min-width: 350px;
-   }
-   .citation-text {
-      max-height: 260px !important;
-      width: 95%;
    }
 }
 </style>
