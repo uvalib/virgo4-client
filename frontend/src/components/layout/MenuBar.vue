@@ -66,7 +66,7 @@ const v4Menu = computed( () => {
       {label: "Questions? Ask a Librarian", url: "https://www.library.virginia.edu/askalibrarian",
          target: "_blank", icon: "icon fal fa-comment-dots"},
       {label: "Library Services", items: [
-         {label: "Subject Guides", url: "https://www.library.virginia.edu/research",
+         {label: "Subject Guides", url: "https://guides.lib.virginia.edu",
             target: "_blank", command: ()=>libServiceClicked('Subject Guides')},
          {label: "Journal Finder", url: "https://guides.lib.virginia.edu/journalfinder",
             target: "_blank", command: ()=>libServiceClicked('Journal Finder')},
