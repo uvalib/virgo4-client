@@ -24,7 +24,6 @@ export const useResultStore = defineStore('result', {
       selectedHitGroupIdx: -1,
       lastSearchScrollPosition: 0,
       lastSearchURL: "",
-      otherSrcSelection: { id: "", name: "" },
    }),
 
    getters: {
@@ -131,15 +130,6 @@ export const useResultStore = defineStore('result', {
             this.searching = flag
          }
       },
-      updateOtherPoolLabel() {
-         // when a pool is selected from the 'Other' tab and a filter has been applied
-         // this method method is used to update the count in the tab label
-         if (this.otherSrcSelection.id == "") return
-         let res = this.results.find(r => r.pool.id == this.otherSrcSelection.id)
-         let name = `<span class='pool'>${res.pool.name}</span>`
-         name += `<span class='total'>${res.total} hits</span>`
-         this.otherSrcSelection.name = name
-      },
 
       clearSelectedPoolResults() {
          // When the results are cleared, reset pagination, remove pool
@@ -168,7 +158,6 @@ export const useResultStore = defineStore('result', {
             }
             this.results.push(result)
             this.selectedResultsIdx = 0
-            this.otherSrcSelection = { id: "", name: "" }
             this.total = poolResults.pagination.total
             tgtPool = this.results[0]
          } else {
@@ -292,7 +281,6 @@ export const useResultStore = defineStore('result', {
                firstPoolWithHits = 0
             }
             this.selectedResultsIdx = firstPoolWithHits
-            this.otherSrcSelection = { id: "", name: "" }
          }
 
          this.total = data.total_hits
@@ -318,7 +306,6 @@ export const useResultStore = defineStore('result', {
          this.selectedHitIdx = -1
          this.selectedHitGroupIdx = -1
          this.selectedResultsIdx = -1
-         this.otherSrcSelection = { id: "", name: "" }
       },
 
       resetSearch() {
@@ -414,9 +401,6 @@ export const useResultStore = defineStore('result', {
             this.setSearchResults( response.data, query.targetPool )
             sorting.setActivePool( this.results[this.selectedResultsIdx].pool.id )
             this.setSuggestions(response.data.suggestions)
-            if (this.otherSrcSelection.id != "") {
-               this.updateOtherPoolLabel()
-            }
             this.setSearching(false)
             if ( response.data.total_hits == 0) {
                analytics.trigger('Results', 'NO_RESULTS', this.router.currentRoute.value.fullPath)
@@ -491,9 +475,6 @@ export const useResultStore = defineStore('result', {
             }
 
             this.setSearching(false)
-            if (this.otherSrcSelection.id != "") {
-               this.updateOtherPoolLabel()
-            }
          }).catch((error) => {
             console.error("SINGLE POOL SEARCH FAILED: " + JSON.stringify(error))
             this.setSearching(false)
@@ -529,21 +510,7 @@ export const useResultStore = defineStore('result', {
       // Select pool results and get all facet info for the result
       selectPoolResults(resultIdx) {
          if (this.selectedResultsIdx != resultIdx) {
-            const preferences = usePreferencesStore()
-            let otherIdx = preferences.maxTabs - 2 // -1 xero index and -1 for 'other'
             this.selectedResultsIdx = resultIdx
-
-            if (resultIdx > otherIdx && this.otherSrcSelection.id == "") {
-               // this happens when a search is restored. otherSrcSelection is used
-               // to drive the selected option in the other sources tab. Make sure it is
-               /// set correctly
-               let r = this.results[resultIdx]
-               let name = `<span class='pool'>${r.pool.name}</span>`
-               name += `<span class='total'>${r.total} hits</span>`
-               let sel = { id: r.pool.id, name: name, disabled: false }
-               this.otherSrcSelection = sel
-            }
-
             const sortStore = useSortStore()
             sortStore.setActivePool(this.results[this.selectedResultsIdx].pool.id)
          }

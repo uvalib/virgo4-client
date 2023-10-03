@@ -5,17 +5,15 @@
    >
       <SearchSuggestions />
       <div class="results-header" role="heading" aria-level="2">
-         <template v-if="props.showSummary">
-            <div id="search-summary" class="summary">
-               <div class="query">Showing {{utils.formatNum(resultStore.total)}} results for:</div>
-               <div class="qs">{{queryString}}</div>
-            </div>
-            <span class="buttons" role="toolbar">
-               <V4Button mode="tertiary" @click="resetSearch" >Reset Search</V4Button>
-               <SaveSearch />
-               <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
-            </span>
-         </template>
+         <div id="search-summary" class="summary">
+            <div class="query">Showing {{utils.formatNum(resultStore.total)}} results for:</div>
+            <div class="qs">{{queryString}}</div>
+         </div>
+         <span class="buttons" role="toolbar">
+            <V4Button mode="tertiary" @click="resetSearch" >Reset Search</V4Button>
+            <SaveSearch />
+            <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
+         </span>
       </div>
 
       <div class="results-wrapper" >
@@ -31,12 +29,12 @@
                      <span :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</span>
                   </span>
                </V4Button>
-               <Dropdown v-if="resultStore.results.length > preferences.maxTabs" v-model="resultStore.otherSrcSelection" :class="{active: otherSourceName}"
-                  :options="otherSources" optionLabel="name" optionValue="id" placeholder="More" @change="otherPoolSelected">
+               <Dropdown v-if="resultStore.results.length > preferences.maxTabs" v-model="otherSrcSelection" :class="{active: otherSrcSelection}"
+                  :options="otherSources" optionLabel="name" optionValue="id" @change="otherSrcSelected">
                   <template #value>
-                     <div v-if="otherSourceName" class="more-selection">
-                        <div>{{ otherSourceName }}</div>
-                        <div class="total">({{  otherSourceTotal }})</div>
+                     <div v-if="otherSrcInfo" class="more-selection">
+                        <div>{{ otherSrcInfo.name }}</div>
+                        <div class="total">({{  otherSrcInfo.total }})</div>
                      </div>
                      <div v-else class="more">More</div>
                   </template>
@@ -68,12 +66,11 @@ import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import * as utils from '../utils'
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
-import { useUserStore } from "@/stores/user"
 import { useSortStore } from "@/stores/sort"
 import { usePreferencesStore } from "@/stores/preferences"
 import Dropdown from 'primevue/dropdown'
@@ -83,14 +80,11 @@ const route = useRoute()
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
-const userStore = useUserStore()
 const preferences = usePreferencesStore()
 const sortStore = useSortStore()
 const filters = useFilterStore()
 
-const props = defineProps({
-   showSummary: { type: Boolean, default: true},
-})
+const otherSrcSelection = ref("")
 
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
@@ -106,19 +100,12 @@ const sourceTabs = computed(()=>{
    return resultStore.results.slice(0, preferences.maxTabs-1 )
 })
 
-const otherSourceName = computed (() => {
-   let r = resultStore.results.find( r => r.pool.id == resultStore.otherSrcSelection)
+const otherSrcInfo = computed (() => {
+   let r = resultStore.results.find( r => r.pool.id == otherSrcSelection.value)
    if (r) {
-      return r.pool.name
+      return { name: r.pool.name, total: utils.formatNum(r.total)}
    }
-   return ""
-})
-const otherSourceTotal = computed (() => {
-   let r = resultStore.results.find( r => r.pool.id == resultStore.otherSrcSelection)
-   if (r) {
-      return utils.formatNum(r.total)
-   }
-   return "0"
+   return null
 })
 
 const otherSources = computed(()=>{
@@ -144,7 +131,7 @@ const otherSources = computed(()=>{
    return opts
 })
 
-function printResults() {
+const printResults = (() => {
    systemStore.printing = true
    analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
 
@@ -170,8 +157,9 @@ function printResults() {
          systemStore.printing = false
       }, 500)
    })
-}
-async function resetSearch(){
+})
+
+const resetSearch = ( async () => {
    resultStore.resetSearch()
    if ( queryStore.mode == "basic") {
       analytics.trigger('Results', 'RESET_SEARCH', "basic")
@@ -180,8 +168,9 @@ async function resetSearch(){
       analytics.trigger('Results', 'RESET_SEARCH', "advanced")
       router.push('/search?mode=advanced')
    }
-}
-function updateURL( poolID) {
+})
+
+const updateURL = (( poolID) => {
    let query = Object.assign({}, route.query)
    query.pool = poolID
    delete query.filter
@@ -200,27 +189,33 @@ function updateURL( poolID) {
    if ( route.query != query ) {
       router.push({query})
    }
-}
-function poolFailed(p) {
-   return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
-}
-function wasPoolSkipped(p) {
-   return p.statusCode == 408 && p.total == 0
-}
+})
 
-function resultsButtonClicked(resultIdx) {
+const poolFailed = ((p) => {
+   return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
+})
+
+const wasPoolSkipped = ((p) => {
+   return p.statusCode == 408 && p.total == 0
+})
+
+const resultsButtonClicked = ((resultIdx) => {
    if ( resultStore.selectedResultsIdx != resultIdx) {
       let r = resultStore.results[resultIdx]
       if ( poolFailed(r)) return
-      resultStore.otherSrcSelection = {id:"", name:""}
       poolSelected(r.pool.id)
+      otherSrcSelection.value = ""
    }
-}
+})
 
-function poolSelected( id ) {
-   analytics.trigger('Results', 'POOL_SELECTED', id)
+const otherSrcSelected = ((sel) => {
+   poolSelected(sel.value)
+})
 
-   let tgtIdx = resultStore.results.findIndex( r => r.pool.id ==id )
+const poolSelected = (( poolID ) => {
+   analytics.trigger('Results', 'POOL_SELECTED', poolID)
+
+   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == poolID )
    if (tgtIdx > -1 ) {
       resultStore.selectPoolResults(tgtIdx)
       let newPoolID = resultStore.results[tgtIdx].pool.id
@@ -228,20 +223,7 @@ function poolSelected( id ) {
          updateURL(newPoolID)
       }
    }
-}
-
-function otherPoolSelected( sel ) {
-   analytics.trigger('Results', 'POOL_SELECTED', sel.value)
-
-   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == sel.value )
-   if (tgtIdx > -1 ) {
-      resultStore.selectPoolResults(tgtIdx)
-      let newPoolID = resultStore.results[tgtIdx].pool.id
-      if ( route.query.pool != newPoolID ) {
-         updateURL(newPoolID)
-      }
-   }
-}
+})
 </script>
 
 <style scoped lang="scss">
