@@ -66,7 +66,7 @@ import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import * as utils from '../utils'
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -85,6 +85,15 @@ const sortStore = useSortStore()
 const filters = useFilterStore()
 
 const otherSrcSelection = ref("")
+
+onMounted(() => {
+   if (route.query.pool) {
+      let poolIdx = resultStore.results.findIndex( r => r.pool.id == route.query.pool)
+      if (poolIdx >= preferences.maxTabs-1) {
+         otherSrcSelection.value = route.query.pool
+      }
+   }
+})
 
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
