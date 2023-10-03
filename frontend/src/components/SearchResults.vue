@@ -31,11 +31,24 @@
                      <span :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</span>
                   </span>
                </V4Button>
-               <V4Select v-if="resultStore.results.length > preferences.maxTabs" :selections="otherSources"
-                  :background="otherSrcBkg" :color="otherSrcColor"
-                  placeholder="More"
-                  @changed="poolSelected"
-                  v-model="resultStore.otherSrcSelection"/>
+               <Dropdown v-if="resultStore.results.length > preferences.maxTabs" v-model="resultStore.otherSrcSelection" :class="{active: otherSourceName}"
+                  :options="otherSources" optionLabel="name" optionValue="id" placeholder="More" @change="otherPoolSelected">
+                  <template #value>
+                     <div v-if="otherSourceName" class="more-selection">
+                        <div>{{ otherSourceName }}</div>
+                        <div class="total">({{  otherSourceTotal }})</div>
+                     </div>
+                     <div v-else class="more">More</div>
+                  </template>
+                  <template #option="slotProps">
+                     <div class="more-opt">
+                        <span class="other-src">{{ slotProps.option.name }}</span>
+                        <span v-if="slotProps.option.falied" class='total error'>Failed</span>
+                        <span v-else-if="slotProps.option.skipped" class='total error'>Skipped</span>
+                        <span v-else class="total">({{slotProps.option.total}})</span>
+                     </div>
+                  </template>
+               </Dropdown>
             </div>
             <PoolResultDetail v-if="resultStore.selectedResultsIdx > -1" />
             <div  v-if="resultStore.total == 0 && resultStore.selectedResultsIdx == -1" class="none">
@@ -63,6 +76,7 @@ import { useFilterStore } from "@/stores/filter"
 import { useUserStore } from "@/stores/user"
 import { useSortStore } from "@/stores/sort"
 import { usePreferencesStore } from "@/stores/preferences"
+import Dropdown from 'primevue/dropdown'
 
 const router = useRouter()
 const route = useRoute()
@@ -84,20 +98,29 @@ const showPrintButton = computed(()=>{
 const queryString = computed(()=>{
    return queryStore.string.replace(/\{|\}/g, "")
 })
-const otherSrcBkg = computed(()=>{
-   if (resultStore.otherSrcSelection.id == "") return "#FFF"
-   return "var(--uvalib-brand-blue)"
-})
-const otherSrcColor = computed(()=>{
-   if (resultStore.otherSrcSelection.id == "") return "#666"
-   return "white"
-})
+
 const sourceTabs = computed(()=>{
    if (resultStore.results.length <= preferences.maxTabs) {
       return resultStore.results
    }
    return resultStore.results.slice(0, preferences.maxTabs-1 )
 })
+
+const otherSourceName = computed (() => {
+   let r = resultStore.results.find( r => r.pool.id == resultStore.otherSrcSelection)
+   if (r) {
+      return r.pool.name
+   }
+   return ""
+})
+const otherSourceTotal = computed (() => {
+   let r = resultStore.results.find( r => r.pool.id == resultStore.otherSrcSelection)
+   if (r) {
+      return utils.formatNum(r.total)
+   }
+   return "0"
+})
+
 const otherSources = computed(()=>{
    let opts = []
    let others = resultStore.results.slice(preferences.maxTabs-1).sort( (a,b) => {
@@ -107,17 +130,16 @@ const otherSources = computed(()=>{
    })
 
    others.forEach( r=>{
-      let name = `<span class='other-src'><span class='pool'>${r.pool.name}</span>`
+      let opt = {id: r.pool.id, name: r.pool.name, falied: false, skipped: false, total: 0}
       if (poolFailed(r)) {
-         name += "<span class='total error'>Failed</span>"
+         opt.falied = true
       } else if (wasPoolSkipped(r)) {
-         name += "<span class='total'>Skipped</span>"
+         opt.skipped = true
       } else {
-         let t = utils.formatNum(r.total)
-         name += `<span class='total'>(${t || '0'})</span>`
+         opt.total = utils.formatNum(r.total)
       }
-      name += "</span>"
-      opts.push({id: r.pool.id, name: name})
+      if (r.pool.id == "jmrl" ) opt.falied = true
+      opts.push(opt)
    })
    return opts
 })
@@ -207,26 +229,50 @@ function poolSelected( id ) {
       }
    }
 }
+
+function otherPoolSelected( sel ) {
+   analytics.trigger('Results', 'POOL_SELECTED', sel.value)
+
+   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == sel.value )
+   if (tgtIdx > -1 ) {
+      resultStore.selectPoolResults(tgtIdx)
+      let newPoolID = resultStore.results[tgtIdx].pool.id
+      if ( route.query.pool != newPoolID ) {
+         updateURL(newPoolID)
+      }
+   }
+}
 </script>
 
-
 <style scoped lang="scss">
-:deep(.other-src) {
+div.p-dropdown.active {
+   background-color: var(--uvalib-brand-blue);
+   color: white;
+   border: 1px solid var(--uvalib-brand-blue);
+   :deep(.p-dropdown-trigger) {
+      color: white;
+   }
+}
+.more-opt {
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
    padding:0;
    margin:0;
-   .total {
-      margin-left: auto;
+   font-size: 0.9em;
+
+   .other-src {
+      margin-right: 20px;
    }
    .total.error {
       color: var( --uvalib-text-dark );
       font-weight: bold;
+      display: inline-block;
+      margin-left: auto;
    }
-   .pool {
-      margin-right: 5px;
+   .total {
+      margin-left: auto;
    }
 }
 
@@ -292,11 +338,6 @@ div.pool-tabs {
       margin: 0;
       font-weight: normal;
    }
-   .v4-select {
-      margin: 0 -1px 2px 0;
-      border-radius: 5px 5px 0 0;
-      flex: 1 1 auto;
-   }
 }
 
 .pool-tabs .pool.v4-button {
@@ -311,9 +352,7 @@ div.pool-tabs {
    outline: none;
    &:focus {
       z-index: 1;
-      &:focus {
-         @include be-accessible();
-      }
+      @include be-accessible();
    }
 }
 .pool.v4-button:first-child {
@@ -322,6 +361,7 @@ div.pool-tabs {
 .pool.v4-button.showing {
    background-color: var(--uvalib-brand-blue);
    color: #fff;
+   border-bottom: 1px solid var(--uvalib-brand-blue);
 }
 .pool.v4-button.disabled.failed {
    background: var(--uvalib-red-emergency);
