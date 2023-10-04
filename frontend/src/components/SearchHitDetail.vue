@@ -32,21 +32,18 @@
          </router-link>
       </div>
       <div class="digital-content">
-         <V4DownloadButton v-if="pdfDownloadURL"
-            icon="far fa-file-pdf" label="Download PDF" :url="pdfDownloadURL"
-            :aria-label="`download pdf for ${props.hit.header.title}`"
-         />
-         <V4DownloadButton v-if="ocrDownloadURL" icon="far fa-file-alt"
-            label="Download OCR" :url="ocrDownloadURL"
-            :aria-label="`download ocr for ${props.hit.header.title}`"
-         />
+         <a v-if="pdfDownloadURL" :href="pdfDownloadURL" class="download-link" :aria-label="`download pdf for ${props.hit.header.title}`">
+            <i class="icon far fa-file-pdf"></i><div>Download PDF</div>
+         </a>
+         <a v-if="ocrDownloadURL" :href="ocrDownloadURL" class="download-link" :aria-label="`download ocr for ${props.hit.header.title}`">
+            <i class="icon far fa-file-alt"></i><div>Download OCR</div>
+         </a>
       </div>
    </div>
 </template>
 
 <script setup>
 import TruncatedText from "@/components/TruncatedText.vue"
-import V4DownloadButton from "@/components/V4DownloadButton.vue"
 import AccessURLDetails from "@/components/AccessURLDetails.vue"
 import analytics from '@/analytics'
 import * as utils from '../utils'
@@ -94,21 +91,47 @@ const fullTextSnippet = computed(()=>{
    return ""
 })
 
-function detailClicked() {
+const detailClicked = (() => {
    resultStore.hitSelected(props.hit.identifier)
    analytics.trigger('Results', 'DETAILS_CLICKED', props.hit.identifier)
-}
-function getKey(field,idx) {
+})
+
+const getKey = ((field,idx) => {
    return props.hit.identifier+field.value+idx
-}
-function shouldDisplay(field) {
+})
+
+const shouldDisplay = ((field) => {
    if (field.display == 'optional' || field.type == "url" ||
       field.type == "access-url" || field.name.includes("_download_url") ) return false
    return true
-}
+})
 </script>
 
 <style lang="scss" scoped>
+.digital-content {
+   display: flex;
+   flex-flow: row;
+   justify-content: flex-start;
+   align-items: flex-end;
+   padding: 0 5px;
+
+   .download-link {
+      text-align: center;
+      margin-right: 10px;
+      .icon {
+         font-size: 1.7em;
+         display: block;
+         color: var(--uvalib-text);
+      }
+      div {
+         font-size: 0.77em;
+         color: var(--uvalib-text);
+         cursor: pointer;
+         font-weight: normal;
+         margin-top: 2px;
+      }
+   }
+}
 .details {
    display:flex;
    flex-flow: row wrap;
@@ -158,10 +181,6 @@ function shouldDisplay(field) {
       max-height: 124px;
       max-width: 100px;
    }
-}
-
-.digital-content {
-   padding: 0 5px;
 }
 
 @media only screen and (min-width: $breakpoint-mobile) {

@@ -1,8 +1,6 @@
 <template>
-   <button tabindex="0" :role="props.role" class="v4-button"
+   <button tabindex="0" class="v4-button"
       @keydown.esc="escClicked"
-      @keydown.exact.tab="tabNext"
-      @keydown.shift.tab="tabBack"
       :class="{'text-button': props.mode=='text',
                'icon-button': props.mode=='icon',
                'link-button': props.mode=='link',
@@ -20,14 +18,6 @@ const props = defineProps({
       type: String,
       required: true
    },
-   focusNextOverride: {
-      type: Boolean,
-      default: false
-   },
-   focusBackOverride: {
-      type: Boolean,
-      default: false
-   },
    url: {
       type: String,
       default: ""
@@ -36,17 +26,14 @@ const props = defineProps({
       type: String,
       default: ""
    },
-   role: {
-      type: String,
-      default: "button"
-   },
 })
-const emit = defineEmits( ['click', 'esc', 'tabback', 'tabnext' ] )
+const emit = defineEmits( ['click', 'esc' ] )
 
-function escClicked() {
+const escClicked = (() => {
    emit('esc')
-}
-function clicked() {
+})
+
+const clicked = (() => {
    if ( props.url != "") {
       if (props.target != ""){
          window.open(props.url, props.target)
@@ -55,21 +42,7 @@ function clicked() {
       }
    }
    emit('click')
-}
-function tabBack(event) {
-   if (props.focusBackOverride ) {
-      event.stopPropagation()
-      event.preventDefault()
-      emit('tabback')
-   }
-}
-function tabNext(event) {
-   if (props.focusNextOverride ) {
-      event.stopPropagation()
-      event.preventDefault()
-      emit('tabnext')
-   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

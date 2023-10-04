@@ -16,15 +16,13 @@
          :itemURL="details.itemURL" format="lbb" buttonLabel="Bluebook" from="DETAIL"
          :ariaLabel="`show Bluebook citation for ${details.header.title}`" >
       </Citations>
-      <V4DownloadButton style="padding-left:0" label="Download RIS" :url="risURL" @click="downloadRISClicked"
-         icon="fal fa-download" :iconInline="true"
-         :aria-label="`download RIS citation for ${details.header.title}`"
-      />
+      <V4Button mode="text" :url="risURL" @click="downloadRISClicked" :aria-label="`download RIS citation for ${details.header.title}`">
+         <span>Download RIS</span><i class="ris-icon fal fa-download"></i>
+      </V4Button>
    </span>
 </template>
 
 <script setup>
-import V4DownloadButton from "@/components/V4DownloadButton.vue"
 import Citations from "@/components/modals/Citations.vue"
 import { useItemStore } from "@/stores/item"
 import { useSystemStore } from "@/stores/system"
@@ -42,10 +40,18 @@ const risURL = computed(()=>{
    return `${system.citationsURL}/format/ris?item=${encodeURI(details.value.itemURL)}`
 })
 
-function downloadRISClicked() {
+const downloadRISClicked = (() => {
    analytics.trigger('Export', 'RIS_FROM_DETAIL', details.value.identifier)
-}
+})
 </script>
 
 <style lang="scss" scoped>
+.citations-list {
+   button.v4-button {
+      margin-top: 4px;
+   }
+   .ris-icon {
+      margin-left: 10px;
+   }
+}
 </style>
