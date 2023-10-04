@@ -101,9 +101,10 @@ const closeDialog = (() => {
 
 <style lang="scss" scoped>
 #collection-date-picker {
-   width: 300px;
+   width: 100%;
+   max-width: 300px;
    height: 300px;
-   margin: 0;
+   margin: 0 auto;
    outline: none;
    border: 1px solid var(--uvalib-grey-light);
    box-shadow: none;

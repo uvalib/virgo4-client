@@ -30,11 +30,9 @@
          <V4Button v-if="showSignInMessage" mode="tertiary" @click="closeDialog">Close</V4Button>
          <template v-else>
             <V4Button  v-if="showAdd==false" class="left" mode="primary" @click="addFolder">New Folder</V4Button>
-            <span class="right">
             <V4Button v-if="showAdd==false" mode="tertiary" @click="cancelBookmark">Cancel</V4Button>
             <V4Button v-else mode="tertiary" @click="cancelBookmark">Cancel Create</V4Button>
             <V4Button mode="primary" @click="okBookmark">OK</V4Button>
-         </span>
          </template>
       </div>
    </Dialog>
@@ -129,7 +127,6 @@ div.add-content {
       margin-top: 10px;
       border-top: 2px solid  var(--uvalib-blue-alt);
       padding-top: 25px;
-      min-width:350px;
       width: 100%;
 
       label {

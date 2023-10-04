@@ -532,4 +532,7 @@ body {
       @include be-accessible();
    }
 }
+input:focus, select:focus, textarea:focus {
+   @include be-accessible();
+}
 </style>

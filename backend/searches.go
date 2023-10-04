@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -117,6 +118,36 @@ func (svc *ServiceContext) DeleteSavedSearch(c *gin.Context) {
 	c.String(http.StatusOK, "ok")
 }
 
+// SavedSearchExists will check a user saved search list to see if a URL has already been saved
+func (svc *ServiceContext) SavedSearchExists(c *gin.Context) {
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	tgtQuery := strings.TrimSpace(c.Query("tgt"))
+	log.Printf("INFO: check if user %s[%d] has already saved [%s]", v4UserID, userID, tgtQuery)
+
+	resp := struct {
+		Exists bool   `json:"exists"`
+		Token  string `json:"token"`
+		Name   string `json:"name"`
+	}{}
+
+	var existSearch SavedSearch
+	err := svc.GDB.Where("search_url=? and user_id=?", tgtQuery, userID).Limit(1).Find(&existSearch).Error
+	if err != nil {
+		log.Printf("ERROR: unable to determine if user %s has aleady saved [%s]: %s", v4UserID, tgtQuery, err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if existSearch.ID > 0 {
+		resp.Exists = true
+		resp.Token = existSearch.Token
+		resp.Name = existSearch.Name
+	} else {
+		resp.Exists = false
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
 // SaveSearch will save a named search in that saved_searches table along with an access token
 func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	v4UserID := c.Param("uid")
@@ -128,6 +159,7 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 		Success bool   `json:"success"`
 		Message string `json:"message"`
 		Token   string `json:"token"`
+		Name    string `json:"name"`
 	}
 
 	// Make sure the passed request object is well formed JSON
@@ -167,6 +199,7 @@ func (svc *ServiceContext) SaveSearch(c *gin.Context) {
 	resp.Token = search.Token
 	resp.Success = true
 	resp.Message = "Search saved"
+	resp.Name = reqObj.Name
 
 	c.JSON(http.StatusOK, resp)
 }

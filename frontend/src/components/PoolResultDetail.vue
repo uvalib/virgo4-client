@@ -118,7 +118,7 @@ async function loadMoreResults() {
    background: white;
 }
 .desc  {
-   padding: 10px;
+   padding: 15px 10px 10px 10px;
    border-left: 1px solid var(--uvalib-brand-blue);
    border-right: 1px solid var(--uvalib-brand-blue);
    font-size: 0.9em;
@@ -134,7 +134,6 @@ async function loadMoreResults() {
 .pool-results {
    border: 0;
    position: relative;
-   top: -5px;
 }
 div.pool-header {
    font-size: 1em;

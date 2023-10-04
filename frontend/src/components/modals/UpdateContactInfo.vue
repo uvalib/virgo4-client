@@ -120,7 +120,7 @@ p.error {
    }
 }
 .scroller {
-   width: 400px;
+   width: 100%;
    max-height: 55vh;
    overflow: scroll;
    padding: 10px;

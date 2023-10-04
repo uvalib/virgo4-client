@@ -73,6 +73,6 @@ const printClicked = ( async () => {
 
 <style lang="scss" scoped>
 .print {
-   width: 450px;
+   width: 100%;
 }
 </style>

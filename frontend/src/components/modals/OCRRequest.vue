@@ -8,7 +8,7 @@
       </div>
       <div class="message" v-else-if="mode=='request'">
          <p>
-            We will attempt to extract the full text from '{{digitalItem.name}}'. This process
+            We will attempt to extract the full text from '{{digitalItem.name}}'.<br/>This process
             can take several minutes to over an hour depending on the size and condition
             of the document.
          </p>
@@ -134,7 +134,7 @@ p.error {
 }
 .message {
    margin: 0;
-   width: 400px;
+   width: 100%;
    p {
       margin: 0 0 10px 0;
    }

@@ -35,11 +35,11 @@
             <span v-if="error" class="error">{{error}}</span>
          </div>
          <div class="form-controls" >
-            <V4DownloadButton v-if="props.format == 'all'" style="padding-left:0" label="Download RIS" :url="risURL"
-               @click="downloadRISClicked" id="download-citation"
-               icon="fas fa-file-export" :iconInline="true" mode="button"
-               aria-label="download RIS citation"
-            />
+            <V4Button v-if="props.format == 'all'" :url="risURL"
+               @click="downloadRISClicked" aria-label="download RIS citation" mode="primary"
+            >
+               <span>Download RIS</span><i class="ris-icon fas fa-file-export"></i>
+            </V4Button>
             <V4Button mode="primary" id="copy-citation" @click="copyCitation()">Copy Citation</V4Button>
             <V4Button mode="primary" @click="closeDialog">Close</V4Button>
          </div>
@@ -48,7 +48,6 @@
 </template>
 
 <script setup>
-import V4DownloadButton from "@/components/V4DownloadButton.vue"
 import { useItemStore } from "@/stores/item"
 import { useSystemStore } from "@/stores/system"
 import { ref, nextTick, computed} from 'vue'
@@ -192,6 +191,10 @@ const copyCitation = (() => {
 </script>
 
 <style lang="scss" scoped>
+.ris-icon {
+   display: inline-block;
+   padding-left: 10px;
+}
 button.v4-button.citations-text-button {
    cursor: pointer;
    margin-right: 10px;
@@ -274,7 +277,7 @@ button.v4-button.citations-text-button {
          justify-content: flex-start;
 
          .v4-button.citation {
-            margin: 0 5px 0 0;
+            margin: 0 5px 10px 0;
             padding: 8px 15px;
             border-radius: 5px;
             color: var(--uvalib-text-dark);
@@ -299,25 +302,6 @@ button.v4-button.citations-text-button {
    .working {
       text-align: center;
       font-size: 1.25em;
-   }
-}
-@media only screen and (min-width: 768px) {
-   .citations-content {
-      max-height: 500px !important;
-      min-width: 550px;
-   }
-   .citation-text {
-      max-height: 420px !important;
-   }
-}
-@media only screen and (max-width: 768px) {
-   .citations-content {
-      max-height: 365px !important;
-      min-width: 350px;
-   }
-   .citation-text {
-      max-height: 260px !important;
-      width: 95%;
    }
 }
 </style>

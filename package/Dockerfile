@@ -1,7 +1,7 @@
 #
 # build the target application
 #
-FROM public.ecr.aws/docker/library/golang:1.20-alpine3.18 as builder
+FROM public.ecr.aws/docker/library/golang:1.21-alpine3.18 as builder
 RUN apk update && apk upgrade && apk add make npm yarn
 
 # needed for the build

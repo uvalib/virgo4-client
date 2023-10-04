@@ -5,17 +5,15 @@
    >
       <SearchSuggestions />
       <div class="results-header" role="heading" aria-level="2">
-         <template v-if="props.showSummary">
-            <div id="search-summary" class="summary">
-               <div class="query">Showing {{utils.formatNum(resultStore.total)}} results for:</div>
-               <div class="qs">{{queryString}}</div>
-            </div>
-            <span class="buttons" role="toolbar">
-               <V4Button mode="tertiary" @click="resetSearch" >Reset Search</V4Button>
-               <SaveSearch />
-               <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
-            </span>
-         </template>
+         <div id="search-summary" class="summary">
+            <div class="query">Showing {{utils.formatNum(resultStore.total)}} results for:</div>
+            <div class="qs">{{queryString}}</div>
+         </div>
+         <span class="buttons" role="toolbar">
+            <V4Button mode="tertiary" @click="resetSearch" >Reset Search</V4Button>
+            <SaveSearch />
+            <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
+         </span>
       </div>
 
       <div class="results-wrapper" >
@@ -31,11 +29,24 @@
                      <span :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</span>
                   </span>
                </V4Button>
-               <V4Select v-if="resultStore.results.length > preferences.maxTabs" :selections="otherSources"
-                  :background="otherSrcBkg" :color="otherSrcColor"
-                  placeholder="More"
-                  @changed="poolSelected"
-                  v-model="resultStore.otherSrcSelection"/>
+               <Dropdown v-if="resultStore.results.length > preferences.maxTabs" v-model="otherSrcSelection" :class="{active: otherSrcSelection}"
+                  :options="otherSources" optionLabel="name" optionValue="id" @change="otherSrcSelected">
+                  <template #value>
+                     <div v-if="otherSrcInfo" class="more-selection">
+                        <div>{{ otherSrcInfo.name }}</div>
+                        <div class="total">({{  otherSrcInfo.total }})</div>
+                     </div>
+                     <div v-else class="more">More</div>
+                  </template>
+                  <template #option="slotProps">
+                     <div class="more-opt">
+                        <span class="other-src">{{ slotProps.option.name }}</span>
+                        <span v-if="slotProps.option.falied" class='total error'>Failed</span>
+                        <span v-else-if="slotProps.option.skipped" class='total error'>Skipped</span>
+                        <span v-else class="total">({{slotProps.option.total}})</span>
+                     </div>
+                  </template>
+               </Dropdown>
             </div>
             <PoolResultDetail v-if="resultStore.selectedResultsIdx > -1" />
             <div  v-if="resultStore.total == 0 && resultStore.selectedResultsIdx == -1" class="none">
@@ -55,27 +66,33 @@ import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import * as utils from '../utils'
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
-import { useUserStore } from "@/stores/user"
 import { useSortStore } from "@/stores/sort"
 import { usePreferencesStore } from "@/stores/preferences"
+import Dropdown from 'primevue/dropdown'
 
 const router = useRouter()
 const route = useRoute()
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
-const userStore = useUserStore()
 const preferences = usePreferencesStore()
 const sortStore = useSortStore()
 const filters = useFilterStore()
 
-const props = defineProps({
-   showSummary: { type: Boolean, default: true},
+const otherSrcSelection = ref("")
+
+onMounted(() => {
+   if (route.query.pool) {
+      let poolIdx = resultStore.results.findIndex( r => r.pool.id == route.query.pool)
+      if (poolIdx >= preferences.maxTabs-1) {
+         otherSrcSelection.value = route.query.pool
+      }
+   }
 })
 
 const showPrintButton = computed(()=>{
@@ -84,20 +101,22 @@ const showPrintButton = computed(()=>{
 const queryString = computed(()=>{
    return queryStore.string.replace(/\{|\}/g, "")
 })
-const otherSrcBkg = computed(()=>{
-   if (resultStore.otherSrcSelection.id == "") return "#FFF"
-   return "var(--uvalib-brand-blue)"
-})
-const otherSrcColor = computed(()=>{
-   if (resultStore.otherSrcSelection.id == "") return "#666"
-   return "white"
-})
+
 const sourceTabs = computed(()=>{
    if (resultStore.results.length <= preferences.maxTabs) {
       return resultStore.results
    }
    return resultStore.results.slice(0, preferences.maxTabs-1 )
 })
+
+const otherSrcInfo = computed (() => {
+   let r = resultStore.results.find( r => r.pool.id == otherSrcSelection.value)
+   if (r) {
+      return { name: r.pool.name, total: utils.formatNum(r.total)}
+   }
+   return null
+})
+
 const otherSources = computed(()=>{
    let opts = []
    let others = resultStore.results.slice(preferences.maxTabs-1).sort( (a,b) => {
@@ -107,22 +126,21 @@ const otherSources = computed(()=>{
    })
 
    others.forEach( r=>{
-      let name = `<span class='other-src'><span class='pool'>${r.pool.name}</span>`
+      let opt = {id: r.pool.id, name: r.pool.name, falied: false, skipped: false, total: 0}
       if (poolFailed(r)) {
-         name += "<span class='total error'>Failed</span>"
+         opt.falied = true
       } else if (wasPoolSkipped(r)) {
-         name += "<span class='total'>Skipped</span>"
+         opt.skipped = true
       } else {
-         let t = utils.formatNum(r.total)
-         name += `<span class='total'>(${t || '0'})</span>`
+         opt.total = utils.formatNum(r.total)
       }
-      name += "</span>"
-      opts.push({id: r.pool.id, name: name})
+      if (r.pool.id == "jmrl" ) opt.falied = true
+      opts.push(opt)
    })
    return opts
 })
 
-function printResults() {
+const printResults = (() => {
    systemStore.printing = true
    analytics.trigger('Results', 'PRINT_RESULTS', queryStore.mode)
 
@@ -148,8 +166,9 @@ function printResults() {
          systemStore.printing = false
       }, 500)
    })
-}
-async function resetSearch(){
+})
+
+const resetSearch = ( async () => {
    resultStore.resetSearch()
    if ( queryStore.mode == "basic") {
       analytics.trigger('Results', 'RESET_SEARCH', "basic")
@@ -158,8 +177,9 @@ async function resetSearch(){
       analytics.trigger('Results', 'RESET_SEARCH', "advanced")
       router.push('/search?mode=advanced')
    }
-}
-function updateURL( poolID) {
+})
+
+const updateURL = (( poolID) => {
    let query = Object.assign({}, route.query)
    query.pool = poolID
    delete query.filter
@@ -178,27 +198,33 @@ function updateURL( poolID) {
    if ( route.query != query ) {
       router.push({query})
    }
-}
-function poolFailed(p) {
-   return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
-}
-function wasPoolSkipped(p) {
-   return p.statusCode == 408 && p.total == 0
-}
+})
 
-function resultsButtonClicked(resultIdx) {
+const poolFailed = ((p) => {
+   return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
+})
+
+const wasPoolSkipped = ((p) => {
+   return p.statusCode == 408 && p.total == 0
+})
+
+const resultsButtonClicked = ((resultIdx) => {
    if ( resultStore.selectedResultsIdx != resultIdx) {
       let r = resultStore.results[resultIdx]
       if ( poolFailed(r)) return
-      resultStore.otherSrcSelection = {id:"", name:""}
       poolSelected(r.pool.id)
+      otherSrcSelection.value = ""
    }
-}
+})
 
-function poolSelected( id ) {
-   analytics.trigger('Results', 'POOL_SELECTED', id)
+const otherSrcSelected = ((sel) => {
+   poolSelected(sel.value)
+})
 
-   let tgtIdx = resultStore.results.findIndex( r => r.pool.id ==id )
+const poolSelected = (( poolID ) => {
+   analytics.trigger('Results', 'POOL_SELECTED', poolID)
+
+   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == poolID )
    if (tgtIdx > -1 ) {
       resultStore.selectPoolResults(tgtIdx)
       let newPoolID = resultStore.results[tgtIdx].pool.id
@@ -206,27 +232,38 @@ function poolSelected( id ) {
          updateURL(newPoolID)
       }
    }
-}
+})
 </script>
 
-
 <style scoped lang="scss">
-:deep(.other-src) {
+div.p-dropdown.active {
+   background-color: var(--uvalib-brand-blue);
+   color: white;
+   border: 1px solid var(--uvalib-brand-blue);
+   :deep(.p-dropdown-trigger) {
+      color: white;
+   }
+}
+.more-opt {
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
    padding:0;
    margin:0;
-   .total {
-      margin-left: auto;
+   font-size: 0.9em;
+
+   .other-src {
+      margin-right: 20px;
    }
    .total.error {
       color: var( --uvalib-text-dark );
       font-weight: bold;
+      display: inline-block;
+      margin-left: auto;
    }
-   .pool {
-      margin-right: 5px;
+   .total {
+      margin-left: auto;
    }
 }
 
@@ -292,11 +329,6 @@ div.pool-tabs {
       margin: 0;
       font-weight: normal;
    }
-   .v4-select {
-      margin: 0 -1px 2px 0;
-      border-radius: 5px 5px 0 0;
-      flex: 1 1 auto;
-   }
 }
 
 .pool-tabs .pool.v4-button {
@@ -311,9 +343,7 @@ div.pool-tabs {
    outline: none;
    &:focus {
       z-index: 1;
-      &:focus {
-         @include be-accessible();
-      }
+      @include be-accessible();
    }
 }
 .pool.v4-button:first-child {
@@ -322,6 +352,7 @@ div.pool-tabs {
 .pool.v4-button.showing {
    background-color: var(--uvalib-brand-blue);
    color: #fff;
+   border-bottom: 1px solid var(--uvalib-brand-blue);
 }
 .pool.v4-button.disabled.failed {
    background: var(--uvalib-red-emergency);

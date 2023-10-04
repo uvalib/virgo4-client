@@ -1,6 +1,5 @@
 import axios from 'axios'
 import analytics from '../analytics'
-import urlModule from 'url'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
@@ -212,22 +211,17 @@ export const useRequestStore = defineStore('request', {
          this.requestInfo.callNumber = item.label
          this.requestInfo.notes = specialInstructions
 
-         let aeonLink = urlModule.parse(this.activeOption.create_url, true)
-         aeonLink.query["CallNumber"] = item.label
-         aeonLink.query["ItemVolume"] = item.label
-         aeonLink.query["ItemNumber"] = item.barcode
-         aeonLink.query["Notes"] = item.notes
-         aeonLink.query["Location"] = item.location
-         aeonLink.query["SpecialRequest"] = specialInstructions
+         var url = new URL(this.activeOption.create_url)
+         let params = new URLSearchParams(url.search)
+         params.set("CallNumber", item.label)
+         params.set("ItemVolume", item.label)
+         params.set("ItemNumber", item.barcode)
+         params.set("Notes", item.notes)
+         params.set("Location", item.location)
+         params.set("SpecialRequest", specialInstructions)
 
-         // search needs to be null to regenerate query below
-         aeonLink.search = null
-         let aeonUrl = aeonLink.format(aeonLink)
-         if (aeonUrl.length > 650){
-            aeonLink.query["Notes"] = item.notes.substring(0,650) + '...'
-            aeonLink.search = null
-         }
-         window.open(aeonLink.format(aeonLink), "_blank")
+         let aeonUrl = url.origin+url.pathname+"?"+params.toString()
+         window.open(aeonUrl, "_blank")
 
          this.buttonDisabled = false
          this.activePanel = "ConfirmationPanel"

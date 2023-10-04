@@ -34,7 +34,7 @@ Install the migrate binary on your host system. For OSX, the easiest method is b
 
 Define your PSQL connection params in an environment variable, like this:
 
-`export V4DB=postgres://v4user:pass@localhost:5432/virgo4?sslmode=disable`
+`export V4DB=postgres://v4user:pass@localhost:5432/virgo4`
 
 User roles are stored in the v4_role enumerated type. To see values:
 
