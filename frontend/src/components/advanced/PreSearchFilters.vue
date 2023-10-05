@@ -1,5 +1,5 @@
 <template>
-   <div class="filters" v-if="resultStore.hasResults == false">
+   <div class="filters" v-if="resultStore.hasResults == false && !resultStore.searching">
       <div class="filters-head clearfix">
          <span class="title">Selected Filters</span>
          <FormKit v-if="anyFiltersSet" type="button" @click="clearClicked">Clear all</FormKit>

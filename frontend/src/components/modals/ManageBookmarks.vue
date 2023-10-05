@@ -15,8 +15,8 @@
          <div class="scroller">
             <ul class="folders">
                <li v-for="(fi) in bookmarkStore.bookmarks" :key="fi.id">
-                  <V4Checkbox :checked="isSelected(fi.id)" :label="fi.folder"
-                     @click="folderClicked(fi.id)" />
+                  <Checkbox v-model="selectedFolderIDs" :inputId="`tgtf${fi.id}`" :value="fi.id" />
+                  <label :for="`tgtf${fi.id}`" class="cb-label">{{ fi.folder }}</label>
                </li>
             </ul>
          </div>
@@ -34,6 +34,7 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import { ref, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import { useToast } from "primevue/usetoast"
+import Checkbox from 'primevue/checkbox'
 
 const toast = useToast()
 const bookmarkStore = useBookmarkStore()
@@ -71,19 +72,6 @@ const opened = (() => {
 const closeDialog = (() => {
    showDialog.value = false
    trigger.value.$el.focus()
-})
-
-const folderClicked = ((folderID) => {
-   let fIdx  = selectedFolderIDs.value.findIndex( f => f == folderID)
-   if (fIdx > -1) {
-      selectedFolderIDs.value.splice(fIdx, 1)
-   } else {
-      selectedFolderIDs.value.push(folderID)
-   }
-})
-
-const isSelected = ( (folderID) => {
-   return selectedFolderIDs.value.includes(folderID)
 })
 
 const okClicked = ( async () => {
@@ -132,6 +120,9 @@ const okClicked = ( async () => {
       list-style: none;
       padding: 0;
       margin: 0;
+      li {
+         margin: 10px 0;
+      }
    }
 }
 </style>

@@ -104,6 +104,18 @@ div.p-dropdown {
    }
 }
 
+.p-checkbox-box.p-highlight {
+   border-color: var(--uvalib-brand-blue-light);
+   background: var(--uvalib-brand-blue-light);
+}
+label.cb-label {
+   margin-left: 10px;
+   cursor: pointer;
+   &:hover {
+      text-decoration: underline;
+   }
+}
+
 .p-dropdown-items-wrapper {
    border-radius: 5px;
    .p-dropdown-items {

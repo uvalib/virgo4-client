@@ -34,14 +34,15 @@
             </div>
             <div class="form-acts">
                <FormKit type="button" @click="addClicked">Add criteria</FormKit>
-               <FormKit type="button" @click="saveSearchForm">Save form</FormKit>
+               <FormKit v-if="resultStore.hasResults==false && resultStore.searching == false" type="button" @click="saveSearchForm">Save form</FormKit>
+               <SourceSelector v-else :help="false"/>
             </div>
             <PreSearchFilters v-if="resultStore.hasResults==false"/>
-            <div class="controls">
-               <FormKit v-if="resultStore.hasResults==false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
+            <div class="controls" v-if="resultStore.hasResults==false && resultStore.searching == false">
+               <FormKit v-if="resultStore.hasResults==false && resultStore.searching == false" type="select" label="Sort by" v-model="sortStore.preSearchSort"
                   outer-class="$reset sort" inner-class="$reset sort"
                   :options="sortOptions" @change="sortChanged()" />
-               <SourceSelector mode="advanced" :help="false"/>
+               <SourceSelector v-if="resultStore.hasResults==false"  :help="false"/>
             </div>
             <V4FormActions :hasCancel="false" submitLabel="Search" submitID="do-advanced-request" />
          </FormKit>
@@ -253,6 +254,10 @@ onMounted(()=>{
             margin:0;
          }
       }
+   }
+   .controls.results {
+      justify-content: center;
+      padding-top: 10px;
    }
 }
 
