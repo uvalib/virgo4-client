@@ -88,7 +88,6 @@
 import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import { ref, onMounted } from 'vue'
-import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useSearchStore } from "@/stores/search"
 import { useResultStore } from "@/stores/result"
@@ -101,7 +100,6 @@ import Checkbox from 'primevue/checkbox'
 
 const results = useResultStore()
 const userStore = useUserStore()
-const systemStore = useSystemStore()
 const searchStore = useSearchStore()
 const confirm = useConfirm()
 const toast = useToast()
