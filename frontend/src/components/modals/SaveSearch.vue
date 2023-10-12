@@ -1,11 +1,11 @@
 <template>
-   <V4Button mode="primary" @click="openSaveClicked" ref="trigger">Save Search</V4Button>
+   <VirgoButton @click="openSaveClicked" ref="trigger">Save Search</VirgoButton>
    <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @hide="closeDialog" @show="opened">
       <div class="save-panel">
          <template v-if="showSignInMessage">
             <p>You must be signed in to save searches.</p>
             <p>
-               <V4Button mode="text" @click="signInClicked" aria-label="sign in to save search">Sign in now</V4Button>
+               <VirgoButton text @click="signInClicked" aria-label="sign in to save search">Sign in now</VirgoButton>
             </p>
          </template>
          <template v-else>
@@ -30,10 +30,10 @@
          </template>
       </div>
       <div class="form-controls" >
-         <V4Button v-if="showSignInMessage || saved || searches.duplicate" mode="tertiary" @click="closeDialog">Close</V4Button>
+         <VirgoButton v-if="showSignInMessage || saved || searches.duplicate" severity="secondary" @click="closeDialog">Close</VirgoButton>
          <template v-else>
-            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
-            <V4Button mode="primary" @click="saveClicked" :disabled="searches.working">Save</V4Button>
+            <VirgoButton severity="secondary" @click="closeDialog">Cancel</VirgoButton>
+            <VirgoButton @click="saveClicked" :disabled="searches.working">Save</VirgoButton>
          </template>
       </div>
    </Dialog>

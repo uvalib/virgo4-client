@@ -157,12 +157,6 @@ div.p-overlaypanel.border:before {
    border-width: 10px;
 }
 
-button.p-button.p-component {
-   &:focus {
-      box-shadow: none;
-   }
-}
-
 button.p-button.p-button-text.disclosure {
    span.btn-txt {
       display: inline-block;
@@ -355,11 +349,18 @@ button.p-button.p-button-text {
    cursor: pointer;
    padding: 2px;
    border-radius: 0;
+   margin: 0;
    &:hover {
       background: none;
       border: none;
       text-decoration: underline;
    }
+}
+
+button.p-button.p-button-secondary {
+   background-color: var(--uvalib-grey-lightest);
+   border: 1px solid var(--uvalib-grey);
+   color: black;
 }
 
 button.p-button, .p-fileupload.p-fileupload-basic.p-component {
@@ -374,7 +375,7 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
-   margin: 0;
+   margin: 0 0 0 10px;
 
    .p-button-icon.p-button-icon-left {
       display: inline-block;
@@ -391,6 +392,7 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
 
    &:focus {
       @include be-accessible();
+      box-shadow: none;
    }
    .p-fileupload-choose {
       background: none;

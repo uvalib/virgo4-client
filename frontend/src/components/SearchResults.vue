@@ -10,9 +10,9 @@
             <div class="qs">{{queryString}}</div>
          </div>
          <span class="buttons" role="toolbar">
-            <V4Button mode="tertiary" @click="resetSearch" >Reset Search</V4Button>
+            <VirgoButton severity="secondary" @click="resetSearch" >Reset Search</VirgoButton>
             <SaveSearch />
-            <V4Button v-if="showPrintButton" mode="primary" @click="printResults">Print Results</V4Button>
+            <VirgoButton v-if="showPrintButton" @click="printResults">Print Results</VirgoButton>
          </span>
       </div>
 
