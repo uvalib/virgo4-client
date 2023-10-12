@@ -1,10 +1,7 @@
 <template>
-   <V4Button v-if="system.isKiosk==false" mode="icon" @click="bookmarkClicked"
-      role="switch" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn" class="bookmark"
-      :aria-label="ariaLabel"
-   >
-      <i :class="bookmarkIcon"></i>
-   </V4Button>
+   <VirgoButton v-if="system.isKiosk==false" text :icon="bookmarkIcon"
+      :class="{checked: bookmarkCount > 0}" role="switch" @click="bookmarkClicked"
+      :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn" />
 </template>
 
 <script setup>
@@ -13,8 +10,6 @@ import { useSystemStore } from "@/stores/system"
 import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
 import { useConfirm } from "primevue/useconfirm"
-
-const emit = defineEmits( ['clicked'] )
 
 const props = defineProps({
    pool: {
@@ -38,9 +33,9 @@ const bookmarkbtn = ref()
 
 const ariaLabel = computed(() => {
    if ( bookmarkCount.value  > 0 ) {
-      return `remove bookmark on ${props.hit.title}`
+      return `remove bookmark on ${props.hit.header.title}`
    }
-   return `bookmark ${props.hit.title}`
+   return `bookmark ${props.hit.header.title}`
 })
 
 const bookmarkIcon = computed(() => {
@@ -93,23 +88,18 @@ const removeBookmark = ( () => {
 </script>
 
 <style lang="scss" scoped>
-i.bookmark {
-   color: #444;
-   cursor: pointer;
-   font-size: 1.4em;
-   display: inline-block;
-   box-sizing: border-box;
-   padding:0;
-   margin:0;
-   &:focus {
-      @include be-accessible();
-   }
-   &:hover {
-      color:var(--uvalib-brand-blue-light);
-   }
+.p-button.p-component.p-button-icon-only.p-button-text {
+    padding: 0;
+    height: auto;
+    font-size: 1.4em;
+    color: #444;
+    width: auto;
+    border-radius: 5px;
+    &:focus  {
+      box-shadow: none;
+    }
 }
-
-i.fas.bookmark {
+.p-button.p-component.p-button-icon-only.p-button-text.checked {
    color: var(--uvalib-brand-blue-light);
 }
 </style>
