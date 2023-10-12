@@ -157,6 +157,12 @@ div.p-overlaypanel.border:before {
    border-width: 10px;
 }
 
+button.p-button.p-component {
+   &:focus {
+      box-shadow: none;
+   }
+}
+
 button.p-button.p-button-text.disclosure {
    span.btn-txt {
       display: inline-block;

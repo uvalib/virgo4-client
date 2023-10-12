@@ -30,10 +30,8 @@
             <h3 class="lead">{{a.title}}</h3>
             <span class="alert-text" v-html="a.body"></span>
          </div>
-         <V4Button mode="icon" v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
-            @click="dismissAlert(a.uuid)" aria-label="hide alert">
-            <i class="dismiss-icon fal fa-window-close"></i>
-         </V4Button>
+         <VirgoButton v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
+            @click="dismissAlert(a.uuid)" aria-label="hide alert" icon="pi pi-times" />
       </div>
    </div>
    <main tabindex="-1" class="v4-content" id="v4-main" role="main">
@@ -52,7 +50,7 @@
       </div>
       <div v-if="systemStore.newVersion" class="update-pop">
          <div class="msg">A new version of Virgo is available.</div>
-         <V4Button mode="primary" @click="updateClicked">Update Now</V4Button>
+         <VirgoButton @click="updateClicked">Update Now</VirgoButton>
       </div>
       <ScrollToTop />
    </main>
@@ -301,14 +299,14 @@ onUpdated(() => {
          font-size: 1.5em;
          padding-top: .25em;
       }
-      button.v4-button.dismiss-alert.icon-button {
-         height: fit-content;
-         cursor: pointer;
-         margin-left: auto;
-      }
-      .dismiss-icon {
-         font-size: 1.5em;
-         cursor: pointer;
+      button.dismiss-alert {
+         background: transparent;
+         color: #444;
+         border-radius: 20px;
+         height: 30px;
+         padding: 0;
+         width: 45px;
+         border: 1px solid #444;
       }
       .alert-body {
          padding-left: 1.25rem;
@@ -453,14 +451,16 @@ body {
    box-shadow: $v4-box-shadow;
    text-align: right;
    font-size: 0.85em;
+   text-align: center;
    .msg {
       margin-bottom: 10px;
       font-weight: bold;
    }
-   .v4-button {
+   button {
+      display: block;
       width: 100%;
-      margin:0 !important;
    }
+
 }
 
 @media only screen and (min-width: 768px) {
