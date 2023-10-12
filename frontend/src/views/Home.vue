@@ -16,7 +16,7 @@
                   id="search"
                   placeholder="Search Virgo for books, articles, and more"
                >
-               <V4Button @click="searchClicked" class="search" mode="primary">Search</V4Button>
+               <VirgoButton @click="searchClicked" class="search">Search</VirgoButton>
             </div>
             <div class="controls-wrapper">
                <SourceSelector mode="basic"/>

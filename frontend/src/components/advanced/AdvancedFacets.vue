@@ -23,8 +23,8 @@
                         <span :aria-label="`see more ${filterInfo.name} filters`">{{filterInfo.name}}</span>
                      </template>
                      <div class="expanded-item" v-for="fv in filterInfo.buckets.filter(f => f.value)" :key="fv.value">
-                        <V4Checkbox :checked="fv.selected" :label="fv.value"
-                           @click="filterClicked(filterInfo.id, fv.value)"/>
+                        <Checkbox  v-model="fv.selected" :inputId="`${filterInfo.id}-${fv.value}`" :binary="true" />
+                        <label :for="`${filterInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
                         <span class="cnt" v-if="fv.count">({{utils.formatNum(fv.count)}})</span>
                      </div>
                   </AccordionContent>
@@ -38,6 +38,7 @@
 
 <script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
+import Checkbox from 'primevue/checkbox'
 import { computed } from 'vue'
 import * as utils from '@/utils'
 import { useSystemStore } from "@/stores/system"
@@ -48,13 +49,10 @@ const resultStore = useResultStore()
 const systemStore = useSystemStore()
 const filters = useFilterStore()
 
-const startExpanded = computed(()=>{
+const startExpanded = computed(()=> {
    return systemStore.displayWidth > 810
 })
 
-function filterClicked(facetID, value) {
-   filters.toggleFilter("presearch", facetID, value)
-}
 </script>
 <style lang="scss" scoped>
 .filter-sidebar.overlay {
@@ -139,9 +137,13 @@ function filterClicked(facetID, value) {
    align-items: center;
    justify-content: flex-start;
    font-weight: normal;
+   border-bottom: 1px solid var(--uvalib-grey-lightest);
+}
+.expanded-item:first-child {
+   margin-top: 10px;
 }
 span.cnt {
-   margin-left: 5px;
+   margin-right: 10px;
    margin-left: auto;
    font-size: 0.8em;
 }

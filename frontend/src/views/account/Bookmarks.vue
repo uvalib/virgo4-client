@@ -28,8 +28,9 @@
                   <template v-slot:settings>
                      <h4>Folder Settings</h4>
                      <div class="publish">
-                        <V4Checkbox class="public" :checked="folderInfo.public" @click="publicClicked(folderInfo)"
-                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`" label="Public" />
+                        <Checkbox v-model="folderInfo.public" :inputId="`folder${folderInfo.id}`" :binary="true"  @change="publicClicked(folderInfo)"
+                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`"/>
+                        <label :for="`folder${folderInfo.id}`" class="cb-label">Public</label>
                         <span v-if="folderInfo.public" class="public-url">
                            <a :href="getPublicURL(folderInfo)" target="_blank">
                               <span>View</span><i class="link fal fa-external-link-alt"></i>
@@ -71,15 +72,14 @@
                      <table>
                         <tr>
                            <th class="heading checkbox">
-                              <V4Checkbox @click="toggleAllClicked()" :checked="selectAllChecked" aria-label="toggle select all bookmarks"/>
+                              <Checkbox v-model="selectAllChecked" :binary="true" aria-label="toggle select all bookmarks" @change="selectAllChanged"/>
                            </th>
                            <th class="heading">Title</th>
                            <th class="heading">Author</th>
                         </tr>
                         <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
                            <td class="checkbox">
-                              <V4Checkbox :checked="bookmark.selected"  @click="toggleBookmarkSelected(bookmark)"
-                                 :aria-label="ariaLabel(bookmark)"/>
+                              <Checkbox v-model="bookmark.selected" :binary="true" :aria-label="ariaLabel(bookmark)"/>
                               <abbr class="" :title="itemURL(bookmark)" :data-folder-id="folderInfo.id"></abbr>
                            </td>
                            <td>
@@ -136,6 +136,7 @@ import { useRouter } from 'vue-router'
 import V4Button from "../../components/V4Button.vue"
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
+import Checkbox from 'primevue/checkbox'
 
 const confirm = useConfirm()
 const toast = useToast()
@@ -229,9 +230,6 @@ function exportBookmarks(folder) {
 function bookmarkFollowed(identifier) {
    analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
 }
-function toggleBookmarkSelected(bm) {
-   bookmarkStore.toggleBookmarkSelected(expandedFolder.value, bm.id)
-}
 function ariaLabel(bm) {
    return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
 }
@@ -253,7 +251,7 @@ function getTitle(folderInfo) {
    return out
 }
 async function publicClicked(folder) {
-   await bookmarkStore.toggleFolderVisibility({id: folder.id, public: !folder.public})
+   await bookmarkStore.updateFolderVisibility(folder)
 }
 function getPublicURL(folder) {
    let base = window.location.href
@@ -271,8 +269,7 @@ function folderExpanded(folderID) {
 function folderCollapsed(folderID) {
    hideFolderItemsForZotero(folderID)
 }
-function toggleAllClicked() {
-   selectAllChecked.value = !selectAllChecked.value
+function selectAllChanged() {
    if (selectAllChecked.value == false ) {
       bookmarkStore.clearAll( expandedFolder.value )
    } else {

@@ -104,6 +104,18 @@ div.p-dropdown {
    }
 }
 
+.p-checkbox-box.p-highlight {
+   border-color: var(--uvalib-brand-blue-light);
+   background: var(--uvalib-brand-blue-light);
+}
+label.cb-label {
+   margin-left: 10px;
+   cursor: pointer;
+   &:hover {
+      text-decoration: underline;
+   }
+}
+
 .p-dropdown-items-wrapper {
    border-radius: 5px;
    .p-dropdown-items {
@@ -337,11 +349,18 @@ button.p-button.p-button-text {
    cursor: pointer;
    padding: 2px;
    border-radius: 0;
+   margin: 0;
    &:hover {
       background: none;
       border: none;
       text-decoration: underline;
    }
+}
+
+button.p-button.p-button-secondary {
+   background-color: var(--uvalib-grey-lightest);
+   border: 1px solid var(--uvalib-grey);
+   color: black;
 }
 
 button.p-button, .p-fileupload.p-fileupload-basic.p-component {
@@ -356,7 +375,7 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
-   margin: 0;
+   margin: 0 0 0 10px;
 
    .p-button-icon.p-button-icon-left {
       display: inline-block;
@@ -373,6 +392,7 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
 
    &:focus {
       @include be-accessible();
+      box-shadow: none;
    }
    .p-fileupload-choose {
       background: none;

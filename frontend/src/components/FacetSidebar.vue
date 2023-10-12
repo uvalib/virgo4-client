@@ -22,8 +22,8 @@
                   <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
                   <div role="group" :aria-labelledby="facetInfo.id">
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                        <V4Checkbox :checked="fv.selected" :label="fv.value"
-                           @click="filterClicked(facetInfo.id, fv.value)" />
+                        <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @change="filterChanged"/>
+                        <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
                         <span class="cnt" v-if="utils.formatNum(fv.count)">({{utils.formatNum(fv.count)}})</span>
                      </dd>
                      <dd v-if="facetValuesCount(facetInfo) > 5" :key="`more${facetInfo.id}`">
@@ -32,8 +32,8 @@
                               <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
                            </template>
                            <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                              <V4Checkbox :checked="fv.selected" :label="fv.value"
-                                 @click="filterClicked(facetInfo.id, fv.value)"/>
+                              <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @change="filterChanged"/>
+                              <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
                               <span class="cnt">({{utils.formatNum(fv.count)}})</span>
                            </div>
                            <template v-slot:footer>
@@ -51,6 +51,7 @@
 
 <script setup>
 import AccordionContent from "@/components/AccordionContent.vue"
+import Checkbox from 'primevue/checkbox'
 import { computed } from 'vue'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -114,8 +115,7 @@ function addFilterToURL() {
    }
    router.push({ query })
 }
-async function filterClicked(facetID,value) {
-   filterStore.toggleFilter(resultStore.selectedResults.pool.id, facetID, value)
+async function filterChanged() {
    resultStore.clearSelectedPoolResults()
    queryStore.userSearched = true
    addFilterToURL()

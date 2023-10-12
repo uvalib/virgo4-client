@@ -14,8 +14,9 @@
             <div class="row" v-for="(saved,idx) in searchStore.saved"  :key="saved.token">
                <div class="saved-search">
                   <span class="num">{{idx+1}}.</span>
-                  <V4Checkbox class="public" :checked="saved.public" @click="publicClicked(saved)"
-                     :aria-label="`Toggle public visibility of ${saved.name}`" label="Public"/>
+                  <Checkbox v-model="saved.public" :inputId="saved.token" :binary="true"  @change="publicClicked(saved)"
+                     :aria-label="`Toggle public visibility of ${saved.name}`"/>
+                  <label :for="saved.token" class="cb-label">Public</label>
                   <span>
                      <router-link :aria-label="`perform search named ${saved.name}`"
                         @mousedown="savedSearchClicked('saved')"
@@ -87,7 +88,6 @@
 import SignInRequired from "@/components/account/SignInRequired.vue"
 import AccountActivities from "@/components/account/AccountActivities.vue"
 import { ref, onMounted } from 'vue'
-import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useSearchStore } from "@/stores/search"
 import { useResultStore } from "@/stores/result"
@@ -96,10 +96,10 @@ import { copyText } from 'vue3-clipboard'
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
 import Dialog from 'primevue/dialog'
+import Checkbox from 'primevue/checkbox'
 
 const results = useResultStore()
 const userStore = useUserStore()
-const systemStore = useSystemStore()
 const searchStore = useSearchStore()
 const confirm = useConfirm()
 const toast = useToast()
@@ -222,7 +222,6 @@ const openRSSModal = ((triggerID, rss) => {
 })
 
 const publicClicked = ((saved) => {
-   saved.public = !saved.public
    saved.userID = userStore.signedInUser
    searchStore.updateVisibility(saved)
 })
@@ -300,12 +299,16 @@ div.row {
    border-bottom: 1px solid var(--uvalib-grey-light);
    margin-bottom: 5px;
    padding-bottom: 5px;
-}
-span.search-actions {
-   margin-left: auto;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
+   label.cb-label {
+      font-size: 0.85em;
+      margin-right: 20px;
+   }
+   span.search-actions {
+      margin-left: auto;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: flex-start;
+   }
 }
 span.icon i.fal {
    color: var(--uvalib-text);

@@ -18,7 +18,8 @@
                <div class="col id">{{pl.id}}</div>
                <div class="col name">{{pl.name}}</div>
                <div class="actions">
-                  <V4Checkbox :disabled="editIndex > -1" :checked="pl.enabled" @click="enableClicked(pl)" label="Enabled"/>
+                  <Checkbox :disabled="editIndex > -1" v-model="pl.enabled" :inputId="`pl${pl.primaryKey}`" :binary="true"  @change="enableClicked(pl)" />
+                  <label :for="`pl${pl.primaryKey}`" class="cb-label">Enabled</label>
                   <V4Button :disabled="editIndex > -1" class="edit-pl" mode="tertiary" @click="editClicked(idx, pl)">Edit</V4Button>
                   <V4Button :disabled="editIndex > -1" mode="icon" @click="deleteLibrary(pl)" title="Delete pickup library" >
                      <i class="trash fal fa-trash-alt"></i>
@@ -42,6 +43,7 @@
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import { useConfirm } from "primevue/useconfirm"
+import Checkbox from 'primevue/checkbox'
 import { ref } from 'vue'
 
 const userStore = useUserStore()
@@ -87,7 +89,6 @@ const cancelClicked = (() => {
 })
 
 const enableClicked = ((pl) => {
-   pl.enabled = !pl.enabled
    systemStore.updatePickupLibrary(pl)
 })
 

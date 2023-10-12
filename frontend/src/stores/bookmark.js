@@ -142,13 +142,6 @@ export const useBookmarkStore = defineStore('bookmark', {
             this.bookmarks.push(f)
          })
       },
-      setFolderToken(data) {
-         this.bookmarks.forEach( f => {
-            if ( f.id == data.id ) {
-               f.token = data.token
-            }
-         })
-      },
       updateFolder(folder) {
          folder.bookmarks.forEach( b => {
             b.details = JSON.parse(b.details)
@@ -162,16 +155,7 @@ export const useBookmarkStore = defineStore('bookmark', {
             this.bookmarks.splice(idx, 1, folder)
          }
       },
-      toggleBookmarkSelected(folderID, bmID) {
-         let folder = this.bookmarks.find( f => f.id == folderID )
-         if (folder) {
-            folder.bookmarks.forEach(bm => {
-               if ( bm.id == bmID) {
-                  bm.selected = !bm.selected
-               }
-            })
-         }
-      },
+
       selectAll(folderID) {
          let folder = this.bookmarks.find( f => f.id == folderID )
          if (folder) {
@@ -311,21 +295,15 @@ export const useBookmarkStore = defineStore('bookmark', {
             useSystemStore().setError(error)
          })
       },
-      async toggleFolderVisibility(folderVisibility) {
-         this.bookmarks.forEach( f => {
-            if ( f.id == folderVisibility.id ) {
-               f.public = folderVisibility.public
-            }
-         })
+      async updateFolderVisibility(folder) {
          try {
             const userStore = useUserStore()
             let usrID = userStore.signedInUser
-            if (folderVisibility.public) {
-               let resp = await axios.post(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
-               folderVisibility.token = resp.data
-               this.setFolderToken(folderVisibility)
+            if (folder.public) {
+               let resp = await axios.post(`/api/users/${usrID}/bookmarks/folders/${folder.id}/publish`)
+               folder.token = resp.data
             } else {
-               axios.delete(`/api/users/${usrID}/bookmarks/folders/${folderVisibility.id}/publish`)
+               await axios.delete(`/api/users/${usrID}/bookmarks/folders/${folder.id}/publish`)
             }
          } catch (error)  {
             useSystemStore().setError(error)

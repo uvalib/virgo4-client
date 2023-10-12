@@ -4,7 +4,6 @@ import router from './router'
 import { plugin, defaultConfig } from '@formkit/vue'
 
 import V4Button from "@/components/V4Button.vue"
-import V4Checkbox from "@/components/V4Checkbox.vue"
 import V4Spinner from "@/components/V4Spinner.vue"
 import V4FormActions from "@/components/V4FormActions.vue"
 
@@ -35,7 +34,6 @@ const dc = defaultConfig({
 app.use(plugin, dc)
 
 app.component('V4Button', V4Button)
-app.component('V4Checkbox', V4Checkbox)
 app.component('V4Spinner', V4Spinner)
 app.component('V4FormActions', V4FormActions)
 
