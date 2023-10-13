@@ -1,11 +1,9 @@
 <template>
    <section class="browse-controls">
-      <V4Button class="pager" mode="primary" :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="browse previous shelf item">
-         <i class="prior fal fa-chevron-double-left"></i>Previous
-      </V4Button>
-      <V4Button class="pager" mode="primary" :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="browse next shelf item">
-         Next<i class="next fal fa-chevron-double-right"></i>
-      </V4Button>
+      <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="browse previous shelf item"
+         icon="pi pi-angle-double-left" label="Previous"/>
+      <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="browse next shelf item"
+         icon="pi pi-angle-double-right" iconPos="right" label="Next"/>
    </section>
 </template>
 
@@ -30,14 +28,5 @@ function browsePrior() {
    flex-flow: row nowrap;
    justify-content: space-between;
    margin: 10px 0px;
-   .v4-button.pager {
-      margin: 0;
-      i.next {
-         margin: 0 0 0 8px;
-      }
-      i.prior {
-         margin: 0 8px 0 0;
-      }
-   }
 }
 </style>

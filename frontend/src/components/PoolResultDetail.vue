@@ -23,7 +23,7 @@
                   Sorry, the source providing this data took too long to respond.  You may wish to try your search again, or try a different search.
                   If the problem persists, <a href='https://www.library.virginia.edu/askalibrarian' target='_blank'>Ask a Librarian</a> may be able to help.
                </p>
-               <V4Button mode="primary" @click="retrySearch">Retry Search</V4Button>
+               <VirgoButton @click="retrySearch">Retry Search</VirgoButton>
             </div>
             <template v-else>
                <span>No results found</span>
@@ -48,12 +48,10 @@
          <span role="toolbar"  v-if="selectedResults.hits.length > 0">
             <ExpandSearch class="expand-panel" />
 
-            <V4Button v-if="resultStore.hasMoreHits" mode="primary" @click="loadMoreResults">
-               <span v-if="loadingMore">
-                  <V4Spinner v-if="loadingMore" color="white"/>
-               </span>
+            <VirgoButton v-if="resultStore.hasMoreHits" @click="loadMoreResults">
+               <V4Spinner v-if="loadingMore" color="white"/>
                <span v-else>Load More Results</span>
-            </V4Button>
+            </VirgoButton>
          </span>
       </template>
    </div>

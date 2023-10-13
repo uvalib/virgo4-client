@@ -7,17 +7,17 @@
          <div class="filters-section">
             <div class="filters-head">
                <span class="title">Applied Filters</span>
-               <V4Button v-if="hasFilter || hasNaFilter" mode="primary" class="clear-all" @click="clearClicked">Clear All</V4Button>
+               <VirgoButton v-if="hasFilter || hasNaFilter" @click="clearClicked">Clear All</VirgoButton>
             </div>
             <dl class="filter-display" v-if="hasFilter">
                <template  v-for="(values, filter) in appliedFilters" :key="`${filter}-values`">
                   <dt class="label" v-show="filter != 'undefined'">{{filter}}</dt>
                   <dd class="label">
                      <span v-for="fv in values" class="selected" :key="`${filter}-${fv.value}`">
-                        <V4Button mode="icon" class="remove" @click="removeFilter(fv)" :aria-label="`remove filter ${fv.value}`">
+                        <VirgoButton class="remove" @click="removeFilter(fv)" :aria-label="`remove filter ${fv.value}`">
                            <i class="fas fa-times-circle"></i>
                            <span aria-hidden="true">{{fv.value}}</span>
-                        </V4Button>
+                        </VirgoButton>
                      </span>
                   </dd>
                </template>
@@ -32,11 +32,10 @@
             </div>
             <div class="unsupported filter-display" >
                <span v-for="naF in naFilters" class="selected" :key="`na-${naF.value}`">
-                  <V4Button mode="icon" class="remove" @click="removeFilter(naF)"
-                     :aria-label="`remove filter ${naF.value}`">
+                  <VirgoButton class="remove" @click="removeFilter(naF)" :aria-label="`remove filter ${naF.value}`">
                      <i class="fas fa-times-circle"></i>
                      <span aria-hidden="true">{{naF.value}}</span>
-                  </V4Button>
+                  </VirgoButton>
                </span>
             </div>
          </div>
@@ -130,9 +129,8 @@ async function clearClicked() {
       display: flex;
       flex-flow: row wrap;
       align-items: flex-start;
-      button.v4-button {
-         margin-left: auto;
-      }
+      justify-content: space-between;
+
       .title {
          vertical-align: -webkit-baseline-middle;
          padding: 5px 10px;
@@ -152,19 +150,21 @@ async function clearClicked() {
          font-weight: normal;
          margin: 5px 0 10px 20px;
       }
-      .v4-button.remove {
+      button.remove {
          border: 1px solid var(--uvalib-grey-light);
          padding: 2px 15px 2px 3px;
          border-radius: 10px;
          margin-right: 10px;
+         background: white;
+         color: var(--uvalib-text);
          cursor: pointer;
          i {
-            margin-right: 10px;
+            margin: 1px 10px 0 0;
             color: var(--uvalib-red);
          }
          &:hover {
-            border: 1px solid var(--uvalib-grey);
-            text-decoration: underline;
+            box-shadow: $v4-box-shadow-light;
+            text-decoration: none;
          }
       }
    }

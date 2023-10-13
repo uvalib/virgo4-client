@@ -15,7 +15,7 @@
          </router-link>
          <BrowsePager />
          <div class="centered" v-if="!shelfStore.isOriginalItem">
-            <V4Button mode="primary" @click="browseRestore()">Return to {{currentCallNumber}}</V4Button>
+            <VirgoButton @click="browseRestore()">Return to {{currentCallNumber}}</VirgoButton>
          </div>
       </nav>
    </section>

@@ -20,15 +20,14 @@
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
-               <V4Button v-for="(r,idx) in sourceTabs" :key="idx"
-                  class="pool" v-bind:class="{showing: idx == resultStore.selectedResultsIdx}"
-                  mode="text" @click="resultsButtonClicked(idx)"
+               <VirgoButton v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
+                  @click="resultsButtonClicked(idx)"
                >
                   <span>
-                     <span class="pool">{{r.pool.name}}</span>
-                     <span :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</span>
+                     <div class="pool">{{r.pool.name}}</div>
+                     <div :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</div>
                   </span>
-               </V4Button>
+               </VirgoButton>
                <Dropdown v-if="resultStore.results.length > preferences.maxTabs" v-model="otherSrcSelection" :class="{active: otherSrcSelection}"
                   :options="otherSources" optionLabel="name" optionValue="id" @change="otherSrcSelected">
                   <template #value>
@@ -236,14 +235,6 @@ const poolSelected = (( poolID ) => {
 </script>
 
 <style scoped lang="scss">
-div.p-dropdown.active {
-   background-color: var(--uvalib-brand-blue);
-   color: white;
-   border: 1px solid var(--uvalib-brand-blue);
-   :deep(.p-dropdown-trigger) {
-      color: white;
-   }
-}
 .more-opt {
    display: flex;
    flex-flow: row nowrap;
@@ -312,9 +303,11 @@ div.p-dropdown.active {
    .buttons {
       display: flex;
       flex-flow: row nowrap;
+      :deep(button) {
+         margin-left: 10px;
+      }
    }
 }
-
 
 div.pool-tabs {
    font-weight: bold;
@@ -323,46 +316,50 @@ div.pool-tabs {
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
-   span.total {
-      display: block;
-      font-size: 0.75em;
-      margin: 0;
-      font-weight: normal;
+
+   .p-dropdown.active {
+      background-color: var(--uvalib-brand-blue);
+      color: white;
+      border: 1px solid var(--uvalib-brand-blue);
+      :deep(.p-dropdown-trigger) {
+         color: white;
+      }
+   }
+
+   button.pool {
+      padding: 8px 8px 10px 8px;
+      border-radius: 5px 5px 0 0;
+      color: var(--uvalib-text-dark);
+      border: 1px solid var(--uvalib-grey-light);
+      text-align: left;
+      flex: 1 1 auto;
+      background: #FFF;
+
+      .total {
+         font-size: 0.75em;
+         margin: 0;
+         font-weight: normal;
+      }
+
+      &:focus {
+         z-index: 1;
+         @include be-accessible();
+      }
+   }
+   button.pool:first-child {
+      margin-left: 4px;
+   }
+   button.pool.showing {
+      background-color: var(--uvalib-brand-blue);
+      color: #fff;
+      border-bottom: 1px solid var(--uvalib-brand-blue);
+   }
+   button.pool.disabled.failed {
+      background: var(--uvalib-red-emergency);
+      color: white;
+      opacity: 0.5;
    }
 }
-
-.pool-tabs .pool.v4-button {
-   margin: 0;
-   padding: 8px 8px 10px 8px;
-   border-radius: 5px 5px 0 0;
-   color: var(--uvalib-text-dark);
-   border: 1px solid var(--uvalib-grey-light);
-   text-align: left;
-   flex: 1 1 auto;
-   background: #FFF;
-   outline: none;
-   &:focus {
-      z-index: 1;
-      @include be-accessible();
-   }
-}
-.pool.v4-button:first-child {
-  margin-left: 4px;
-}
-.pool.v4-button.showing {
-   background-color: var(--uvalib-brand-blue);
-   color: #fff;
-   border-bottom: 1px solid var(--uvalib-brand-blue);
-}
-.pool.v4-button.disabled.failed {
-   background: var(--uvalib-red-emergency);
-   color: white;
-   opacity: 0.5;
-}
-.pool-tabs .pool.v4-button:last-child {
-   margin-right: -1px;
-}
-
 
 @media only screen and (min-width: $breakpoint-mobile) {
    div.search-results {
@@ -375,7 +372,7 @@ div.pool-tabs {
       margin: 0;
       padding: 0 2vw 20px 2vw;
    }
-   .pool.v4-button:first-child {
+   button.pool:first-child {
       margin-left: -1px;
    }
 }

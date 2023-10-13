@@ -8,17 +8,13 @@
          </div>
       </template>
       <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
-         <V4Button mode="icon" :id="`pdf-${props.hit.identifier}`"
-            @click="pdfClicked" :aria-label="`download pdf for ${props.hit.header.title}`" v-if="!generatePDFInProgress"
-         >
-            <i class="pdf fal fa-file-pdf"></i>
-         </V4Button>
+         <VirgoButton  v-if="!generatePDFInProgress" icon="fal fa-file-pdf" text class="share"
+            @click="pdfClicked" :aria-label="`download pdf for ${props.hit.header.title}`"/>
          <ve-progress v-if="generatePDFInProgress" :progress="pdfProgress()" :size="32" thickness="10%"
             style="position: absolute; background: white; top:-2px; left: -6px; cursor: default;"/>
       </span>
-      <V4Button v-if="from=='DETAIL' || from=='COLLECTION'" mode="icon" class="share" @click="shareClicked"  :aria-label="`copy link to ${props.hit.header.title}`">
-         <i class="share fal fa-share-alt"></i>
-      </V4Button>
+      <VirgoButton v-if="from=='DETAIL' || from=='COLLECTION'" icon="fal fa-share-alt" text
+         class="share" @click="shareClicked" :aria-label="`copy link to ${props.hit.header.title}`" />
       <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
    </div>
 </template>
@@ -31,7 +27,8 @@ import { ref, computed } from 'vue'
 import { useItemStore } from "@/stores/item"
 import { useSystemStore } from "@/stores/system"
 import { copyText } from 'vue3-clipboard'
-import { VeProgress } from "vue-ellipse-progress";
+import { VeProgress } from "vue-ellipse-progress"
+import { useToast } from "primevue/usetoast"
 
 const props = defineProps({
    hit: {
@@ -48,6 +45,7 @@ const props = defineProps({
    },
 })
 
+const toast = useToast()
 const system = useSystemStore()
 const item = useItemStore()
 const pdfDownloading = ref(false)
@@ -114,9 +112,9 @@ function shareClicked() {
    let URL = window.location.href
    copyText(URL, undefined, (error, _event) => {
       if (error) {
-         system.setError("Unable to copy Item URL to clipboard: "+error)
+         toast.add({severity:'success', summary:  "Copy Error", detail: "Unable to copy Item URL to clipboard: "+error, life: 5000})
       } else {
-         system.setMessage("Item URL copied to clipboard.")
+         toast.add({severity:'success', summary:  "Copied", detail:  "Item URL copied to clipboard.", life: 3000})
       }
    })
 }
@@ -127,41 +125,19 @@ function shareClicked() {
    display: flex;
    flex-flow: row nowrap;
    margin-left: auto;
-   align-content: center;
+   justify-content: flex-end;
+   align-items: flex-start;
 
-   button.v4-button.share {
-      margin-right: 8px;
-      i.share {
-         color: #444;
-         cursor: pointer;
-         font-size: 1.4em;
-         display: inline-block;
-         box-sizing: border-box;
-         margin: 0px;
-         padding:0;
-         &:hover {
-            color:var(--uvalib-brand-blue-light);
-         }
-      }
-   }
-
-   .pdf-wrap {
-      position: relative;
+   button.share {
       display: inline-block;
-      width: 31px;
-      height: 30px;
-   }
-}
-i.pdf {
-   color: #444;
-   cursor: pointer;
-   font-size: 1.6em;
-   display: inline-block;
-   box-sizing: border-box;
-   margin: 0px;
-   padding:0;
-   &:hover {
-      color:var(--uvalib-brand-blue-light);
+      margin: 0 10px 0 0;
+      font-size: 1.5em;
+      color: var(--uvalib-text);
+      width: auto;
+      &:hover {
+         text-decoration: none;
+         color: var(--uvalib-brand-blue-light);
+      }
    }
 }
 .citation-control {

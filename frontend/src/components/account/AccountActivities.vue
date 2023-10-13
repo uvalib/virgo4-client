@@ -18,7 +18,7 @@
          <router-link id="preferences-submenu" to="/admin">Admin</router-link>
          <span class="sep">|</span>
       </template>
-      <V4Button mode="text"  @click="signOut">Sign Out</V4Button>
+      <VirgoButton text @click="signOut">Sign Out</VirgoButton>
    </div>
 </template>
 
@@ -40,16 +40,14 @@ async function signOut() {
    margin: 0 10px;
 }
 .activities {
-   text-align: left;
    margin-bottom: 15px;
    padding-bottom: 5px;
    margin-top: 0;
    border-bottom: 2px solid var(--color-brand-blue);
-}
-.activities {
    display: flex;
    flex-flow: row wrap;
    justify-content: center;
+    align-items: center;
 }
 
 #app .activities a.router-link-active {

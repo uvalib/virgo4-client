@@ -16,7 +16,7 @@
             </template>
             <template v-if="results.suggestions.length > 2 && moreVisible == false">
                <span class="sep">|</span>
-               <V4Button mode="text" @click="moreClicked" class="more">Show More...</V4Button>
+               <VirgoButton text @click="moreClicked" class="more">Show More...</VirgoButton>
             </template>
             <template  v-if="results.suggestions.length > 2 && moreVisible == true">
                <template v-for="(s,idx) in results.suggestions.slice(2)"  :key="`sugest${idx+2}`">
@@ -29,7 +29,7 @@
                   </router-link>
                </template>
                <span class="sep">|</span>
-               <V4Button mode="text" @click="lessClicked" class="more">Show Fewer...</V4Button>
+               <VirgoButton text @click="lessClicked" class="more">Show Fewer...</VirgoButton>
             </template>
          </div>
       </div>
@@ -46,24 +46,28 @@ const queryStore  = useQueryStore()
 const results = useResultStore()
 const moreVisible = ref(false)
 
-function suggestionClick(val) {
+const suggestionClick = ((val) => {
    queryStore.userSearched = true
    analytics.trigger('Results', 'AUTHOR_SUGGEST_CLICKED', val)
-}
-function linkLabel(sug) {
+})
+
+const linkLabel = ((sug) => {
    return `${sug.value}, suggested author related to your search`
-}
-function getRelatedLink( sug ) {
+})
+
+const getRelatedLink = ((sug) => {
    let qp = `${sug.type}: {"${encodeURIComponent(sug.value)}"}`
    let url = `/search?mode=advanced&q=${qp}`
    return url
-}
-function moreClicked() {
+})
+
+const moreClicked =(() => {
    moreVisible.value = true
-}
-function lessClicked() {
+})
+
+const lessClicked= (() => {
    moreVisible.value = false
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -91,11 +95,15 @@ h2 {
    margin-top: 5px;
    font-size: 0.9em;
    line-height: 1.5em;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: flex-start;
+   align-items: center;
 }
 .sep {
    margin: 0 5px;
 }
-.more.v4-button {
+button.more {
    font-style: italic;
    font-weight: 100;
 }

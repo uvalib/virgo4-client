@@ -92,8 +92,8 @@ const removeBookmark = ( () => {
 </script>
 
 <style lang="scss" scoped>
-.p-button.p-component.p-button-icon-only.p-button-text {
-    padding: 0;
+button.p-button.p-button-text {
+    padding: 2px;
     height: auto;
     font-size: 1.4em;
     color: #444;
@@ -102,6 +102,10 @@ const removeBookmark = ( () => {
     &:focus  {
       box-shadow: none;
     }
+    &:hover {
+      text-decoration: none;
+      color: var(--uvalib-brand-blue-light);
+   }
 }
 .p-button.p-component.p-button-icon-only.p-button-text.checked {
    color: var(--uvalib-brand-blue-light);

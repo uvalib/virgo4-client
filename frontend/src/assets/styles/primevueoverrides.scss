@@ -41,7 +41,7 @@
             button:disabled {
                opacity: 0.2;
             }
-            button.v4-button {
+            button {
                margin: 0 0 0 10px;
             }
             .submit-button button {
@@ -347,13 +347,20 @@ button.p-button.p-button-text {
    color: var(--color-link);
    font-weight: 500;
    cursor: pointer;
-   padding: 2px;
+   padding: 0;
    border-radius: 0;
    margin: 0;
+   display: inline-block;
    &:hover {
       background: none;
       border: none;
       text-decoration: underline;
+   }
+}
+
+button.p-button-icon-only.p-button {
+   .p-button-label {
+      display: none;
    }
 }
 
@@ -375,7 +382,7 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
-   margin: 0 0 0 10px;
+   width: auto;
 
    .p-button-icon.p-button-icon-left {
       display: inline-block;

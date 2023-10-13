@@ -1,7 +1,7 @@
 <template>
    <div v-if="queryStore.searchSources != 'all'" class="expand-search">
       <div>You are currently searching {{scopeLabel}}. There may be more results if you search everything.</div>
-      <div><V4Button mode="text" aria-label="broaden search" @click="widenSearch">Click to broaden your search to Everything.</V4Button></div>
+      <div><VirgoButton text @click="widenSearch">Click to broaden your search to Everything.</VirgoButton></div>
    </div>
 </template>
 
@@ -36,7 +36,7 @@ function widenSearch() {
    div.expand-search {
       padding: 15px;
       background: white;
-      .v4-button {
+      button {
          margin-top: 5px;
       }
    }

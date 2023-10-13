@@ -1,14 +1,10 @@
 <template>
    <span class=v4-pager>
-      <V4Button mode="small" :disabled="!props.prevAvailable"  @click="emit('prior')" aria-label="previous result">
-         <i class="fal fa-arrow-left"></i>
-      </V4Button>
+      <VirgoButton class="small" :disabled="!props.prevAvailable" icon="pi pi-arrow-left" @click="emit('prior')" aria-label="previous result" />
       <span class="page-info">
          {{utils.formatNum(props.page)}} of {{utils.formatNum(props.total)}}
       </span>
-      <V4Button mode="small"  :disabled="!props.nextAvailable" @click="emit('next')" aria-label="next result">
-         <i class="fal fa-arrow-right"></i>
-      </V4Button>
+      <VirgoButton class="small" :disabled="!props.nextAvailable" icon="pi pi-arrow-right" @click="emit('next')" aria-label="next result" />
    </span>
 </template>
 
@@ -46,6 +42,9 @@ const emit = defineEmits( ['prior', 'next' ] )
    font-weight: normal;
    color: var( --uvalib-text);
    margin: 0, 5px;
+   button.small {
+      padding: 4px 12px;
+   }
    .page-info {
       margin: 0 10px;
       font-size: 12px;
