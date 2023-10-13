@@ -32,10 +32,14 @@ const confirm = useConfirm()
 const bookmarkbtn = ref()
 
 const ariaLabel = computed(() => {
-   if ( bookmarkCount.value  > 0 ) {
-      return `remove bookmark on ${props.hit.header.title}`
+   let title = props.hit.title
+   if (props.hit.header) {
+      title = props.hit.header.title
    }
-   return `bookmark ${props.hit.header.title}`
+   if ( bookmarkCount.value  > 0 ) {
+      return`remove bookmark on ${title}`
+   }
+   return `bookmark ${title}`
 })
 
 const bookmarkIcon = computed(() => {
