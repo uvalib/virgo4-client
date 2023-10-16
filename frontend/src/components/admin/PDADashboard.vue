@@ -6,11 +6,11 @@
       <div class="content form" >
          <h3>Order History</h3>
          <p class="error" v-html="pdaStore.error" v-if="pdaStore.error"></p>
-         <p>
-            <V4Button class="pager" mode="tertiary" @click="pdaStore.getOrders(pdaStore.pagination.prev_page)" :disabled="!pdaStore.pagination.prev_page">Prev</V4Button>
-            Page {{pdaStore.pagination.current_page}} of {{pdaStore.pagination.total_pages}}
-            <V4Button class="pager" mode="tertiary" @click="pdaStore.getOrders(pdaStore.pagination.next_page)" :disabled="!pdaStore.pagination.next_page">Next</V4Button>
-         </p>
+         <div class="pager">
+            <VirgoButton class="pager" severity="secondary" @click="pdaStore.getOrders(pdaStore.pagination.prev_page)" :disabled="!pdaStore.pagination.prev_page">Prev</VirgoButton>
+            <span>Page {{pdaStore.pagination.current_page}} of {{pdaStore.pagination.total_pages}}</span>
+            <VirgoButton class="pager" severity="secondary" @click="pdaStore.getOrders(pdaStore.pagination.next_page)" :disabled="!pdaStore.pagination.next_page">Next</VirgoButton>
+         </div>
          <table>
             <tr>
                <th>Created At</th>
@@ -65,6 +65,20 @@ function convertTZ(date) {
       justify-content: space-between;
       align-items: center;
       display: flex;
+   }
+   div.pager {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-self: start;
+      align-items: center;
+      margin: 0 0 10px 0;
+      span {
+         display: inline-block;
+         margin: 0 10px;
+      }
+      button {
+         font-size: 0.95em;
+      }
    }
    .content.form {
       h3 {

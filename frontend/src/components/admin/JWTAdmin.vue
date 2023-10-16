@@ -12,7 +12,7 @@
             rows="20"
             cols="40"
          ></textarea>
-         <V4Button mode="primary" @click="update">Update JWT</V4Button>
+         <VirgoButton @click="update">Update JWT</VirgoButton>
       </div>
    </div>
 </template>
@@ -50,8 +50,10 @@ function update() {
          border-radius: 5px;
          margin-bottom: 15px;
       }
-      button.v4-button {
+      button {
          margin: 0;
+         display: block;
+         width: 100%;
       }
    }
    p {

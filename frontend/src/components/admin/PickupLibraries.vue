@@ -2,16 +2,16 @@
    <div v-if="userStore.isAdmin" class="libary-admin">
       <h2>
          <span>Pickup Library Management</span>
-         <V4Button class="edit-pl" mode="primary" @click="addPickupLibraryClicked">Add</V4Button>
+         <VirgoButton @click="addPickupLibraryClicked" :disabled="editIndex == systemStore.allPickupLibraries.length">Add</VirgoButton>
       </h2>
       <div class="content form">
          <div class="row" v-for="(pl,idx) in systemStore.allPickupLibraries" :key="`pl${pl.primaryKey}`">
             <template v-if="idx == editIndex">
-               <input class="edit id" v-model="editRec.value.id" />
-               <input class="edit name" v-model="editRec.value.name" />
+               <input class="edit id" v-model="editRec.id" />
+               <input class="edit name" v-model="editRec.name" />
                <div class="actions">
-                  <V4Button class="edit-pl" mode="tertiary" @click="cancelClicked">Cancel</V4Button>
-                  <V4Button class="edit-pl" mode="tertiary" @click="updateClicked">Update</V4Button>
+                  <VirgoButton severity="secondary" @click="cancelClicked">Cancel</VirgoButton>
+                  <VirgoButton severity="secondary" @click="updateClicked">Update</VirgoButton>
                </div>
             </template>
             <template v-else>
@@ -20,19 +20,17 @@
                <div class="actions">
                   <Checkbox :disabled="editIndex > -1" v-model="pl.enabled" :inputId="`pl${pl.primaryKey}`" :binary="true"  @change="enableClicked(pl)" />
                   <label :for="`pl${pl.primaryKey}`" class="cb-label">Enabled</label>
-                  <V4Button :disabled="editIndex > -1" class="edit-pl" mode="tertiary" @click="editClicked(idx, pl)">Edit</V4Button>
-                  <V4Button :disabled="editIndex > -1" mode="icon" @click="deleteLibrary(pl)" title="Delete pickup library" >
-                     <i class="trash fal fa-trash-alt"></i>
-                  </V4Button>
+                  <VirgoButton :disabled="editIndex > -1" severity="secondary" @click="editClicked(idx, pl)">Edit</VirgoButton>
+                  <VirgoButton :disabled="editIndex > -1" @click="deleteLibrary(pl)" title="Delete pickup library" icon="pi pi-trash"/>
                </div>
             </template>
          </div>
-         <div class="row" v-if="editIndex == systemStore.allPickupLibraries.length">
+         <div class="row add" v-if="editIndex == systemStore.allPickupLibraries.length">
             <input class="edit id" v-model="editRec.id" />
             <input class="edit name" v-model="editRec.name" />
             <div class="actions">
-               <V4Button class="edit-pl" mode="tertiary" @click="cancelClicked">Cancel</V4Button>
-               <V4Button class="edit-pl" mode="tertiary" @click="addConfirmed">Add</V4Button>
+               <VirgoButton severity="secondary" @click="cancelClicked">Cancel</VirgoButton>
+               <VirgoButton severity="secondary" @click="addConfirmed">Add</VirgoButton>
             </div>
          </div>
       </div>
@@ -113,8 +111,9 @@ const editClicked = ( (idx, rec) => {
       justify-content: space-between;
       align-items: center;
       display: flex;
-      button.v4-button.edit-pl {
+      button {
          font-size: 14px;
+         padding: 5px 10px;
       }
    }
    i.trash {
@@ -135,6 +134,17 @@ const editClicked = ( (idx, rec) => {
       display: flex;
       flex-flow: column;
       justify-content: flex-start;
+
+      .row.add {
+         margin-top: 20px;
+         button {
+            font-size: 0.85em;
+            padding: 5px 10px;
+         }
+         button:last-of-type {
+            margin-left: 10px;
+         }
+      }
       .row {
          display: flex;
          flex-flow: row nowrap;
@@ -159,8 +169,26 @@ const editClicked = ( (idx, rec) => {
             flex-flow: row nowrap;
             justify-content: space-between;
             align-items: center;
-            .delete {
-               margin: 0 0 0 25px;
+            .cb-label {
+               margin-right: 20px;
+            }
+            button {
+               font-size: 0.85em;
+               padding: 5px 10px;
+            }
+            button:last-of-type {
+               margin-left: 15px;
+            }
+            button.p-button-icon-only {
+               background: transparent;
+               color: var(--uvalib-text);
+               border: none;
+               :deep(.p-button-icon) {
+                  font-size: 1.4em;
+               }
+               .p-button-label {
+                  display: none;
+               }
             }
          }
       }

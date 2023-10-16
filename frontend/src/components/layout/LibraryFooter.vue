@@ -37,7 +37,7 @@
                <li><a href="https://www.library.virginia.edu/renovation/">Renovation</a></li>
                <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
                <li class="give-library">
-                  <V4Button id="give" mode="link" url="https://www.library.virginia.edu/support-library/">Give to the Library</V4Button>
+                  <VirgoButton @click="giveClicked">GIVE TO THE LIBRARY</VirgoButton>
                </li>
             </ul>
          </div>
@@ -94,9 +94,12 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const systemStore = useSystemStore()
 
-function feedbackURL() {
+const feedbackURL =(() => {
    return encodeURIComponent(window.location.href)
-}
+})
+const giveClicked = (() => {
+   window.location.href = "https://www.library.virginia.edu/support-library"
+})
 </script>
 
 <style scoped lang="scss">
@@ -106,112 +109,144 @@ footer {
    border-right: none;
    background-color: var(--uvalib-brand-blue);
    color: white;
-   padding:20px 20px 0 20px;
-   #give {
-      font-weight: bold;
-      &:focus {
-          @include be-accessible-light();
-      }
-   }
+   padding: 20px 20px 0 20px;
+
    i.fa-external-link-alt {
       display: inline-block;
       margin-left: 5px;
    }
 }
-footer p.copy, footer p.gov {
-   vertical-align: middle;
-}
+
 .pre-footer {
-  background-color: var(--uvalib-teal-lightest);
-  color: var(--uvalib-text-dark);
-  padding: 5px 20px;
-  margin: -20px -20px 0 -20px;
-  #feedback:focus {
-     @include be-accessible();
-  }
+   background-color: var(--uvalib-teal-lightest);
+   color: var(--uvalib-text-dark);
+   padding: 5px 20px;
+   margin: -20px -20px 0 -20px;
+
+   #feedback:focus {
+      @include be-accessible();
+   }
 }
+
 .footer-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-gap: 2rem;
-  padding: 0 90px;
-  font-size: 16px;
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr 1fr;
+   grid-gap: 2rem;
+   padding: 0 90px;
+   font-size: 16px;
 }
+
 .footer-bucket {
-  text-align: left;
+   text-align: left;
 }
+
 ul {
-  list-style: none;
-  padding: 0;
+   list-style: none;
+   padding: 0;
 }
+
 ul li {
-  padding-bottom: 14px;
+   padding-bottom: 14px;
 }
+
 .footer-bucket a {
-  color: var(--uvalib-brand-blue-lightest) !important;
+   color: var(--uvalib-brand-blue-lightest) !important;
 }
+
 .footer-bucket i {
-  font-size: 26px;
-  padding-right: 10px;
+   font-size: 26px;
+   padding-right: 10px;
 }
+
 .footer-bucket i:hover {
-  color: white;
+   color: white;
 }
+
 address {
-  margin-top: 25px;
+   margin-top: 25px;
 }
+
 .give-library {
-  font-size: 1.2em;
-  margin-top: 25px;
+   font-size: 1.2em;
+   margin-top: 25px;
+
+   button {
+      font-weight: bold;
+      background-color: var(--uvalib-brand-orange);
+      color: white;
+      border: none;
+      padding: 10px 12px;
+      &:hover  {
+         background-color: var(--uvalib-grey-light);
+         color: var(--uvalib-text-dark);
+         border: none;
+         box-shadow: none;
+         outline: none;
+      }
+
+      &:focus {
+         @include be-accessible-light();
+      }
+   }
 }
+
 .footer-post-container {
-  background-color: var(--uvalib-blue-alt-darkest);
-  color: white;
-  padding: 20px 110px;
-  margin-left: -20px;
-  margin-right: -20px;
-  text-align: left;
-  margin-bottom: 0;
+   background-color: var(--uvalib-blue-alt-darkest);
+   color: white;
+   padding: 20px 110px;
+   margin-left: -20px;
+   margin-right: -20px;
+   text-align: left;
+   margin-bottom: 0;
 }
+
 .footer-post-container div:first-of-type {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-content: stretch;
-    align-items: center;
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   justify-content: flex-start;
+   align-content: stretch;
+   align-items: center;
 }
+
 .footer-post-container a {
-  color: white !important;
+   color: white !important;
 }
+
 .fdl-gov {
-  display: none;
+   display: none;
 }
-a:hover + .fdl-gov {
-  display: block;
+
+a:hover+.fdl-gov {
+   display: block;
 }
+
 .fdl-gov p {
-  padding: 0;
-  margin: 0;
-  font-size: 0.9em;
+   padding: 0;
+   margin: 0;
+   font-size: 0.9em;
 }
+
 #fdl svg {
-    height: 30px;
-    margin-left: -6px;
+   height: 30px;
+   margin-left: -6px;
 }
+
 .version {
    font-size: 0.8em;
 }
+
 @media only screen and (max-width: 768px) {
-  .footer-container {
-    padding: 0 40px;
-    grid-template-columns: 1fr;
-  }
-  .footer-post-container {
-    padding-left: 60px;
-  }
-  .fdl-gov {
-    display: block;
-  }
-}
-</style>
+   .footer-container {
+      padding: 0 40px;
+      grid-template-columns: 1fr;
+   }
+
+   .footer-post-container {
+      padding-left: 60px;
+   }
+
+   .fdl-gov {
+      display: block;
+   }
+}</style>
