@@ -41,9 +41,9 @@ const emit = defineEmits( ['prior', 'next' ] )
    font-size: 16px;
    font-weight: normal;
    color: var( --uvalib-text);
-   margin: 0, 5px;
+   margin: 0, 5px ;
    button.small {
-      padding: 4px 12px;
+      margin: 0;
    }
    .page-info {
       margin: 0 10px;

@@ -116,19 +116,6 @@ const editClicked = ( (idx, rec) => {
          padding: 5px 10px;
       }
    }
-   i.trash {
-      color: black;
-      cursor: pointer;
-      font-size: 1.2em;
-      padding: 2px;
-      display: inline-block;
-      margin: 0 10px 0 25px;
-   }
-   button.v4-button.edit-pl {
-      margin: 0 0 0 20px;
-      font-size: 0.85em;
-      padding: 5px 10px;
-   }
    .content.form {
       padding: 5px 20px 20px 20px;
       display: flex;
@@ -140,9 +127,6 @@ const editClicked = ( (idx, rec) => {
          button {
             font-size: 0.85em;
             padding: 5px 10px;
-         }
-         button:last-of-type {
-            margin-left: 10px;
          }
       }
       .row {
@@ -170,25 +154,14 @@ const editClicked = ( (idx, rec) => {
             justify-content: space-between;
             align-items: center;
             .cb-label {
-               margin-right: 20px;
+               margin-right: 5px;
             }
             button {
                font-size: 0.85em;
                padding: 5px 10px;
             }
-            button:last-of-type {
-               margin-left: 15px;
-            }
-            button.p-button-icon-only {
-               background: transparent;
-               color: var(--uvalib-text);
-               border: none;
-               :deep(.p-button-icon) {
-                  font-size: 1.4em;
-               }
-               .p-button-label {
-                  display: none;
-               }
+            :deep(.p-button-icon) {
+               font-size: 1.4em;
             }
          }
       }

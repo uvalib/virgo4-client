@@ -31,12 +31,10 @@
                            :to="searchURL(saved.token)"
                            :aria-label="`perform search named ${saved.name}`"
                         >
-                           <i class="viewsave fal fa-search"></i>
+                           <i class="fal fa-search"></i>
                         </router-link>
                      </span>
-                     <V4Button mode="icon" @click="deleteSearchClicked(saved)" :title="`Delete search named ${saved.name}`" >
-                        <i class="trash fal fa-trash-alt"></i>
-                     </V4Button>
+                     <VirgoButton @click="deleteSearchClicked(saved)" :aria-label="`Delete search named ${saved.name}`" icon="fal fa-trash-alt"/>
                   </span>
                </div>
                <div v-if="saved.public" class="public-controls">
@@ -45,15 +43,14 @@
                      <i class="link fal fa-external-link-alt"></i>
                   </a>
                   <span class="sep">|</span>
-                  <V4Button mode="text" @click="copyURL(saved.token)">Copy published URL to clipboard</V4Button>
+                  <VirgoButton link @click="copyURL(saved.token)" label="Copy published URL to clipboard"/>
                   <span class="sep">|</span>
-                  <V4Button @click="openRSSModal(`${saved.token}-open`, saved)" :id="`${saved.token}-open`" mode="text">
-                     RSS <i class='link fal fa-rss'></i>
-                  </V4Button>
+                  <VirgoButton link @click="openRSSModal(`${saved.token}-open`, saved)"
+                     :id="`${saved.token}-open`" label="RSS" icon="fal fa-rss" iconPos="right"/>
                </div>
             </div>
             <div class="controls">
-               <V4Button mode="text" @click="removeAllClicked">Delete all saved searches</V4Button>
+               <VirgoButton link @click="removeAllClicked" label="Delete all saved searches"/>
             </div>
          </div>
          <div v-if="searchStore.history.length > 0" class="history">
@@ -65,7 +62,7 @@
                </template>
             </div>
             <div class="controls">
-               <V4Button mode="text" @click="clearHistoryClicked">Clear search history</V4Button>
+               <VirgoButton link @click="clearHistoryClicked" label="Clear search history" />
             </div>
          </div>
       </div>
@@ -76,8 +73,8 @@
             <p><b>Note</b>: RSS feeds are not able to show updates from third party sources including articles.</p>
          </div>
          <div class="form-controls" >
-            <V4Button mode="tertiary" @click="closeRSSDialog">Close</V4Button>
-            <V4Button mode="primary" @click="copyRSS(currentFeed.token)">Copy to clipboard</V4Button>
+            <VirgoButton severity="secondary" @click="closeRSSDialog" label="Close"/>
+            <VirgoButton @click="copyRSS(currentFeed.token)" label="Copy to clipboard"/>
          </div>
       </Dialog>
    </div>
@@ -248,13 +245,6 @@ onMounted(()=>{
    font-size: 1.25em;
    margin-top: 35px;
 }
-.public {
-   margin-right: 20px;
-   cursor: pointer;
-   font-size: 0.85em;
-   cursor: pointer;
-   display: inline-block;
-}
 .history, .saved {
    text-align: left;
 }
@@ -308,20 +298,19 @@ div.row {
       display: flex;
       flex-flow: row nowrap;
       align-items: flex-start;
+      button {
+         margin: 0;
+      }
    }
 }
 span.icon i.fal {
    color: var(--uvalib-text);
-   margin-right: 13px;
-   margin-top: 4px;
-   padding: 2px;
+   margin-right: 15px;
+   margin-top: 2px;
+   padding: 0;
 }
 i.link {
-   margin: 0 0 0 5px;
-}
-.del-detail {
-   font-weight: 100;
-   margin: 15px 0;
+   margin: 0 0 0 10px;
 }
 .details {
    margin-bottom: 35px;

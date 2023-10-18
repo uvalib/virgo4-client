@@ -1,12 +1,7 @@
 <template>
    <div class="options">
       <div class="option" v-for="option in requestStore.requestOptions" :key="option.type">
-         <V4Button
-            mode="tertiary"
-            class="option-button"
-            @click="setActive(option)"
-            v-if="option.button_label"
-         >{{option.button_label}}</V4Button>
+         <VirgoButton severity="secondary" @click="setActive(option)" :label="option.button_label"/>
          <p class="desc" v-if="option.description" v-html="option.description"></p>
       </div>
    </div>
@@ -21,7 +16,7 @@ const requestStore = useRequestStore()
 const user = useUserStore()
 const restore = useRestoreStore()
 
-function setActive(option) {
+const setActive =((option) => {
    let newActive = requestStore.optionMap[option.type]
    let optionSettings = requestStore.findOption(newActive)
    requestStore.alertText = ""
@@ -36,7 +31,7 @@ function setActive(option) {
       requestStore.activePanel = newActive
       requestStore.activeOption = optionSettings
    }
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -48,7 +43,9 @@ function setActive(option) {
    .option {
       text-align: left;
       margin: 20px;
-
+      button {
+         margin: 0;
+      }
       .desc {
          max-width: 300px;
          padding: 0;

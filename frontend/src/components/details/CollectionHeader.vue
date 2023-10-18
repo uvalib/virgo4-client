@@ -6,8 +6,8 @@
             v-model="queryStore.basic"
             placeholder="Search this collection"
          >
-         <V4Button class="search" mode="primary" @click="searchClicked">Search</V4Button>
-         <V4Button class="browse" mode="primary" @click="browseClicked">Browse All</V4Button>
+         <VirgoButton class="search" @click="searchClicked" label="Search"/>
+         <VirgoButton class="browse" @click="browseClicked" label="Browse All" />
       </div>
 
       <div class="text-info">
@@ -25,13 +25,11 @@
       </div>
 
       <div class="seq-nav" v-if="collection.canNavigate && !item.isCollectionHead">
-            <V4Button class="pager prev" mode="primary" @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`">
-               <i class="prior fal fa-arrow-left"></i>Previous {{collection.itemLabel}}
-            </V4Button>
-            <V4Button class="pager" mode="primary" @click="nextItem()"  :aria-label="`next ${collection.itemLabel}`">
-               Next {{collection.itemLabel}}<i class="next fal fa-arrow-right"></i>
-            </V4Button>
-         </div>
+         <VirgoButton @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`"
+            icon="fal fa-arrow-left" :label="`Previous ${collection.itemLabel}`" />
+         <VirgoButton @click="nextItem()"  :aria-label="`next ${collection.itemLabel}`"
+            :label="`Next ${collection.itemLabel}`" icon="fal fa-arrow-right" iconPos="right" />
+      </div>
    </section>
 </template>
 
@@ -206,40 +204,25 @@ function prevItem() {
    }
 
    .cal {
-       font-size: 0.9em;
+      font-size: 0.9em;
       text-align: right;
       margin: 0 10px 5px 0;
-      :deep(.v4-button) {
-         width:160px;
-         padding: 5px 20px;
-      }
    }
-
    .seq-nav {
       display: flex;
       flex-flow: row nowrap;
       justify-content: flex-end;
       margin: 5px 10px 10px 0;
-       font-size: 0.9em;
-      .v4-button.pager {
-         margin: 0 0 0 0;
-         width:160px;
+      font-size: 0.9em;
+      button {
+         width: 160px;
          padding: 5px 20px;
-         i.next {
-            margin: 0 0 0 5px;
+         margin-left: 5px;
+         .p-button-icon-right {
+            margin: 0;
          }
-         i.prior {
-            margin: 0 5px 0 0;
-         }
-      }
-      .v4-button.pager.prev {
-         margin: 0 5px 0 0;
       }
    }
-}
-.viewer {
-   margin-top: 10px;
-   display: inline-block;
 }
 
 @media only screen and (min-width: 768px) {

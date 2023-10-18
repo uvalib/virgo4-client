@@ -1,8 +1,6 @@
 <template>
-   <V4Button class="calendar" mode="primary" @click="showDialog=true" :aria-label="`view collection calendar`" ref="trigger">
-      <span class="label">Calendar</span>
-      <i class="fal fa-calendar-alt"></i>
-   </V4Button>
+   <VirgoButton @click="showDialog=true" aria-label="view collection calendar" ref="trigger"
+      label="Calendar" icon="fal fa-calendar-alt" iconPos="right" class="calendar"/>
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog">
       <vue-cal
@@ -158,7 +156,7 @@ const closeDialog = (() => {
    margin: 10px 0 5px 0;
    font-size: 0.9em;;
 }
-.v4-button.calendar {
+button.calendar {
    margin: 0 !important;
 }
 </style>

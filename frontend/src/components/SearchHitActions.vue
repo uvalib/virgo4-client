@@ -3,7 +3,7 @@
       <template v-if="showCitations">
          <div class="citation-control">
             <Citations title="Citations" :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from"
-               :ariaLabel="`citations for ${props.hit.identifier}`"  :toolbarButton="true">
+               :ariaLabel="`citations for ${props.hit.identifier}`">
             </Citations>
          </div>
       </template>

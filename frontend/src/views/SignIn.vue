@@ -4,7 +4,7 @@
          <h2>UVA Users</h2>
          <p class="subhead">(UVA students, faculty, and staff)</p>
          <div class="section centered">
-            <V4Button id="netbadge" mode="primary" @click="netbadgeLogin">Sign In with Netbadge</V4Button>
+            <VirgoButton @click="netbadgeLogin" label="Sign In with Netbadge"/>
          </div>
       </div>
       <div>
@@ -97,7 +97,7 @@ const netbadgeLogin = (() => {
    }
    .section.centered {
       text-align: center;
-      .v4-button {
+      button {
          margin: 0;
       }
    }

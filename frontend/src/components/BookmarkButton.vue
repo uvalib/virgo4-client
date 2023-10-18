@@ -99,6 +99,7 @@ button.p-button.p-button-text {
     color: #444;
     width: auto;
     border-radius: 5px;
+    margin: 0;
     &:focus  {
       box-shadow: none;
     }

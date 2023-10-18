@@ -6,12 +6,13 @@
       <div class="items" v-if="item.hasDigitalContent || item.googleBooksURL || hasExternalImages">
          <h2 class="buttons">
             <span>View Online</span>
-            <V4Button mode="primary" class="small" @click="toggleFullView" v-if="!collection.isFullPageCollection && item.hasDigitalContent">
-               View Full Screen
-            </V4Button>
+            <VirgoButton v-if="!collection.isFullPageCollection && item.hasDigitalContent"
+               class="small" label="View Full Screen" @click="toggleFullView" />
          </h2>
          <div class="viewer" v-if="item.hasDigitalContent">
-            <div v-if="fsView" class="restore-view"><V4Button mode="primary" class="small" @click="toggleFullView">Restore View</V4Button></div>
+            <div v-if="fsView" class="restore-view">
+               <VirgoButton @click="toggleFullView" label="Restore View" />
+            </div>
             <iframe :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
@@ -374,9 +375,12 @@ onUnmounted(()=>{
       }
       .restore-view {
          position: fixed;
-          z-index: 20000;
-          right: 10px;
-          top: 100px;
+         z-index: 20000;
+         right: 5px;
+         top: 100px;
+         button {
+            border-color: var(--uvalib-brand-blue-lightest);
+         }
       }
    }
 
@@ -402,7 +406,7 @@ onUnmounted(()=>{
          span {
             display: block;
          }
-         button.v4-button.small {
+         button.small {
             border-radius: .25rem;
             font-size: .85rem;
             padding: .5rem 1rem;

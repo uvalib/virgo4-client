@@ -2,17 +2,15 @@
    <div class="dibs">
       <template v-if="activeIframe">
          <p class="reader-header">
-            <V4Button mode="icon" @click="activeIframe = false" aria-label="Close Reader">
-               <i class="close-icon fal fa-window-close"></i>
-            </V4Button>
-            Electronic Course Reserves
+            <VirgoButton @click="activeIframe = false" aria-label="Close Reader" link
+               icon="pi pi-times-circle" label="Electronic Course Reserves" />
          </p>
          <iframe title="Digital reserves viewer"
                :src="systemStore.dibsURL + '/item/' + selectedItem"
                allowfullscreen
          ></iframe>
       </template>
-      <div v-else>
+      <template v-else>
          <p>This item is available online for use with electronic course reserves. You may be required to sign in.</p>
          <p>
             <b>Important:</b>
@@ -23,18 +21,16 @@
 
          <div class="center-wrapper">
             <FormKit v-if="selectList.length > 1" type="select" label="Volume" v-model="selectedItem"
-            placeholder="Select a volume" @input="(item)=>{selectedItem = item }"
-            :options="selectList" validation="required"
+               placeholder="Select a volume" @input="(item)=>{selectedItem = item }" :options="selectList" validation="required"
             />
-            <V4Button mode="tertiaty" @click="activeIframe = true" :disabled="!selectedItem" >View this item online</V4Button>
+            <VirgoButton severity="secondary" @click="activeIframe = true" :disabled="!selectedItem" label="View this item online"/>
          </div>
-      </div>
+      </template>
    </div>
 </template>
 <script setup>
 import { useSystemStore } from "@/stores/system"
 import { ref } from "vue"
-import V4Button from "../V4Button.vue";
 
 const systemStore = useSystemStore()
 
@@ -58,23 +54,30 @@ if(selectList.length == 1){
 <style lang="scss" scoped>
 .dibs {
    border: 1px solid var(--uvalib-grey-light);
-   padding: 5px;
+   padding: 30px;
+   box-shadow: $v4-box-shadow-light;
    iframe {
       width: 100%;
       height: 80vh;
+      border: 1px solid var(--uvalib-grey);
+      outline: none;
    }
    b {
       margin-right: 5px;
    }
    .reader-header {
       margin: 0;
+      button {
+         font-size: 1.15em;
+         margin-bottom: 10px;
+         color: var(--uvalib-text);
+      }
    }
 
    .center-wrapper{
       display: flex;
       flex-direction: column;
       align-items: center;
-      *{margin: 20px 0};
    }
 }
 </style>

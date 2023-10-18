@@ -12,10 +12,10 @@
                <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
             </div>
             <div v-else class="subcontent buttons">
-               <V4Button mode="primary" @click="instructionalScanClick">Instructional Scanning</V4Button>
-               <V4Button mode="primary" @click="illBorrowClick">ILL Borrow Item</V4Button>
-               <V4Button mode="primary" @click="illBorrowAVClick">ILL Borrow A/V</V4Button>
-               <V4Button mode="primary" @click="illScanClick">ILL Scan Chapter/Article</V4Button>
+               <VirgoButton @click="instructionalScanClick" label="Instructional Scanning"/>
+               <VirgoButton @click="illBorrowClick" label="ILL Borrow Item"/>
+               <VirgoButton @click="illBorrowAVClick" label="ILL Borrow A/V"/>
+               <VirgoButton @click="illScanClick" label="ILL Scan Chapter/Article"/>
             </div>
             <div class="subcontent links">
                <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i style="margin-left:5px;" class="fal fa-external-link-alt"></i></a>
@@ -68,7 +68,7 @@
                            <dd>{{req.itemStatus}}</dd>
                         </dl>
                         <p>
-                           <V4Button ref="canceltrigger" mode="tertiary" @click="showCancelHold(req, idx)">Cancel Request</V4Button>
+                           <VirgoButton ref="canceltrigger" severity="secondary" @click="showCancelHold(req, idx)" label="Cancel Request"/>
                         </p>
                      </div>
                   </div>
@@ -189,7 +189,7 @@
                <FormKit label="Confirmation Email" validation="required|email" type="email" v-model="reqToCancel.confirmationEmail" />
             </template>
             <div class="form-controls">
-               <V4Button mode="tertiary" @click="hideCancelHold">Back</V4Button>
+               <VirgoButton severity="secondary" @click="hideCancelHold" label="Back"/>
                <FormKit type="submit" label="Cancel Request" wrapper-class="submit-button" />
             </div>
          </FormKit>
@@ -362,7 +362,7 @@ onMounted(() =>{
       flex-flow: row wrap;
       justify-content: flex-start;
       align-content: center;
-      .v4-button {
+      button.p-button {
          margin:0 10px 10px 0;
          min-width: 275px;
          width: 40%;

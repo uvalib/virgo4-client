@@ -3,11 +3,11 @@
       <div class="add-content" v-if="showSignInMessage">
          <p>You must be signed in to use bookmarks.</p>
          <p>
-            <V4Button mode="text" @click="signInClicked" aria-label="Sign in to bookmark item">Sign in now</V4Button>
+            <VirgoButton link @click="signInClicked" aria-label="Sign in to bookmark item" label="Sign in now"/>
          </p>
       </div>
       <div v-else class="add-content">
-         <div>{{bookmarkStore.newBookmark.identifier}} : <b>{{bookmarkStore.newBookmark.title}}</b></div>
+         <div>{{bookmarkStore.newBookmark.identifier}}: <b>{{bookmarkStore.newBookmark.title}}</b></div>
          <TruncatedText v-if="bookmarkStore.newBookmark.author" id="bookmark-author" :text="bookmarkStore.newBookmark.author" :limit="120" ></TruncatedText>
          <div class="select" >
             <template v-if="showAdd==false">
@@ -27,12 +27,12 @@
          <p class="error">{{bookmarkError}}</p>
       </div>
       <div class="form-controls" >
-         <V4Button v-if="showSignInMessage" mode="tertiary" @click="closeDialog">Close</V4Button>
+         <VirgoButton v-if="showSignInMessage" severity="secondary" @click="closeDialog" label="Close"/>
          <template v-else>
-            <V4Button  v-if="showAdd==false" class="left" mode="primary" @click="addFolder">New Folder</V4Button>
-            <V4Button v-if="showAdd==false" mode="tertiary" @click="cancelBookmark">Cancel</V4Button>
-            <V4Button v-else mode="tertiary" @click="cancelBookmark">Cancel Create</V4Button>
-            <V4Button mode="primary" @click="okBookmark">OK</V4Button>
+            <VirgoButton v-if="showAdd==false" class="left" @click="addFolder" label="New Folder"/>
+            <VirgoButton v-if="showAdd==false" severity="secondary" @click="cancelBookmark" label="Cancel"/>
+            <VirgoButton v-else severity="secondary" @click="cancelBookmark" label="Cancel Create"/>
+            <VirgoButton @click="okBookmark" label="OK"/>
          </template>
       </div>
    </Dialog>
@@ -136,7 +136,7 @@ div.add-content {
       }
 
       input, select {
-       width: 100%;
+         width: 100%;
       }
    }
 

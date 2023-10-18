@@ -15,8 +15,8 @@
             <div class="search-panel">
                <input id="crsearch" v-model="pendingQuery" autocomplete="off" type="text" aria-required="true" required="required">
                <div class="controls">
-                  <V4Button @click="searchClicked('instructor_name')" mode="primary">Search Instructors</V4Button>
-                  <V4Button @click="searchClicked('course_id')" mode="primary">Search Course ID</V4Button>
+                  <VirgoButton @click="searchClicked('instructor_name')" label="Search Instructors"/>
+                  <VirgoButton @click="searchClicked('course_id')" label="Search Course ID"/>
                </div>
                <div class="links">
                   <a href="https://collab.its.virginia.edu/portal" target="_blank">
@@ -118,9 +118,6 @@ div.instructions {
   flex-flow: row wrap;
   align-items: center;
   justify-content: flex-end;
-}
-#app .controls span.v4-button {
-   margin: 0 0 5px 10px;
 }
 .no-match {
   color: var(--uvalib-text);

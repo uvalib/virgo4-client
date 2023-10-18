@@ -1,14 +1,13 @@
 <template>
    <div class="item-view">
       <div class="detail-header">
-         <span v-if="resultStore.selectedHitIdx > -1" class="hidden-spacer"></span>
          <span class="paging" v-if="resultStore.selectedHitIdx > -1">
             <V4Pager :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
                :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
                @next="nextHitClicked" @prior="priorHitClicked"
             />
             <div class="back">
-               <V4Button mode="text" @click="returnToSearch">Return to search results</V4Button>
+               <VirgoButton link @click="returnToSearch" label="Return to search results" />
             </div>
          </span>
       </div>
@@ -261,29 +260,18 @@ const fieldLimit = (( field ) => {
    .detail-header {
       display: flex;
       flex-flow: row wrap;
-      justify-content: center;
+      justify-content: flex-end;
       align-content: center;
       padding-bottom: 15px;
-      .hidden-spacer, .paging {
-         flex:1;
-      }
       .paging {
-         flex: 1;
          display: flex;
          flex-flow: column;
          justify-content: flex-end;
          margin: 0 15px;
       }
       .back {
-         text-align: right;
-         margin: 5px 0;
+         margin: 10px 0 5px 0;
       }
-   }
-   .icon {
-      margin-left: 5px;
-   }
-   :deep(p) {
-      margin: 8px 0;
    }
    .info {
       margin: 15px 0;
@@ -318,9 +306,6 @@ const fieldLimit = (( field ) => {
       margin-top: 15px;
       padding: 15px 0 10px 0;
       text-align: left;
-   }
-   #marc.accordion-content {
-      margin-left: -6em;
    }
    .xml {
       font-weight: normal;

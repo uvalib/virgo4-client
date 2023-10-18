@@ -1,7 +1,5 @@
 <template>
-   <V4Button mode="primary" @click="showUpdateDialog = true" :disabled="showUpdateDialog" ref="trigger">
-      Update my Virgo contact information
-   </V4Button>
+   <VirgoButton @click="showUpdateDialog = true" :disabled="showUpdateDialog" ref="trigger" label="Update my Virgo contact information"/>
    <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top" header="Update Contact Info" @hide="closeDialog" @show="opened">
       <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate">
          <div class="scroller">
@@ -25,7 +23,7 @@
          <p v-if="error" class="error" v-html="error"></p>
 
          <div class="form-controls" >
-            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
+            <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
             <FormKit type="submit" label="Update" wrapper-class="submit-button" :disabled="okDisabled" />
          </div>
       </FormKit>

@@ -74,7 +74,7 @@ function convertTZ(date) {
       margin: 0 0 10px 0;
       span {
          display: inline-block;
-         margin: 0 10px;
+         margin-left: 10px;
       }
       button {
          font-size: 0.95em;

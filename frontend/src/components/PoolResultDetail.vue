@@ -182,9 +182,6 @@ div.pool-header {
       margin: 5px 0;
       font-weight: normal;
    }
-   .v4-button {
-      margin-top:25px;
-   }
 }
 .hit-wrapper.none .error {
    padding: 0;

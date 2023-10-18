@@ -1,14 +1,12 @@
 <template>
-   <V4Button mode="primary" @click="openClicked" aria-label="print details about selected bookmarks" ref="trigger">
-      Print
-   </V4Button>
+   <VirgoButton @click="openClicked" aria-label="print details about selected bookmarks" ref="trigger" label="Print"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Print Details" @hide="closeDialog" @show="opened">
       <div class="print">
          <FormKit type="form" id="print" :actions="false" @submit="printClicked">
             <FormKit id="titleinput" label="Title for printout (optional)" type="text" v-model="title"/>
             <FormKit label="Notes (optional)" type="textarea" v-model="notes" :rows="5" />
             <div class="form-controls" >
-               <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
+               <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
                <FormKit type="submit" label="Print" wrapper-class="submit-button" :disabled="okDisabled" />
             </div>
          </FormKit>

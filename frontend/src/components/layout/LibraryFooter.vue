@@ -170,12 +170,13 @@ address {
    font-size: 1.2em;
    margin-top: 25px;
 
-   button {
+   button.p-button.p-component {
       font-weight: bold;
       background-color: var(--uvalib-brand-orange);
       color: white;
       border: none;
       padding: 10px 12px;
+      margin: 0;
       &:hover  {
          background-color: var(--uvalib-grey-light);
          color: var(--uvalib-text-dark);

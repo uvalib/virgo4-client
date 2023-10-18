@@ -1,7 +1,6 @@
 <template>
-   <V4Button class="ocr-button" mode="text" @click="ocrClicked" ref="trigger" :aria-label="`dowload full text for ${digitalItem.name}`">
-      Download Full Text
-   </V4Button>
+   <VirgoButton class="ocr-button" link @click="ocrClicked" ref="trigger"
+      :aria-label="`dowload full text for ${digitalItem.name}`" label="Download Full Text"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text" @hide="closeDialog" @show="opened">
       <div v-if="mode=='init'" class="searching">
          <V4Spinner message="Searching for item text..." />
@@ -23,9 +22,9 @@
          <p>You do not need to remain on this page.</p>
       </div>
       <p class="error" v-if="error">{{error}}</p>
-      <div class="form-controls" >
-         <V4Button v-if="mode != 'submitted'" mode="tertiary" @click="closeDialog">Cancel</V4Button>
-         <V4Button mode="primary" @click="okClicked">OK</V4Button>
+      <div class="form-controls" v-if="mode!='init'" >
+         <VirgoButton v-if="mode != 'submitted'" severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton @click="okClicked" label="OK"/>
       </div>
    </Dialog>
 </template>
@@ -60,8 +59,8 @@ const digitalItem = computed(()=> {
 
 
 const ocrClicked = ( async () => {
+   showDialog.value = true
    if (digitalItem.value.ocr.status == "NOT_AVAIL") {
-      showDialog.value = true
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
       nextTick( () => {
@@ -69,10 +68,10 @@ const ocrClicked = ( async () => {
       })
    } else if (digitalItem.value.ocr.status == "READY") {
       analytics.trigger('OCR', 'OCR_DOWNLOAD_CLICKED', digitalItem.value.pid)
-      await item.downloadOCRText(digitalItem.value)
       mode.value = "init"
+      await item.downloadOCRText(digitalItem.value)
+      showDialog.value = false
    } else {
-      showDialog.value = true
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
       nextTick( () => {

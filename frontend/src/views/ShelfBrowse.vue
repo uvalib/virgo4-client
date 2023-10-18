@@ -17,13 +17,9 @@
             </div>
          </div>
          <div class="browse-controls full">
-            <V4Button class="pager" mode="primary" :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="previous shelf">
-               <i class="prior pager fal fa-arrow-left"></i>
-            </V4Button>
+            <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="previous shelf" icon="fal fa-arrow-left" label="Previous"/>
             <span class="range" aria-live="polite"><b>CATALOG RANGE:</b>{{firstCall}}&nbsp;-&nbsp;{{lastCall}}</span>
-            <V4Button class="pager" mode="primary" :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="next shelf">
-               <i class="next pager fal fa-arrow-right"></i>
-            </V4Button>
+            <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()" aria-label="next shelf" icon="fal fa-arrow-right" label="Next" iconPos="right"/>
          </div>
          <div class="view-mode">
             <button tabindex="0" class="view" id="view"
@@ -228,13 +224,6 @@ onMounted( async ()=>{
             font-weight: bolder;
          }
       }
-      button.v4-button.pager {
-         margin: 0;
-         i.pager {
-            font-size: 25px;
-         };
-      }
-
    }
 
    .view-mode {
@@ -363,13 +352,10 @@ onMounted( async ()=>{
    div.info  {
       max-width: 90%;
       margin: 0 auto;
-      button.v4-button {
-         width:auto;
-      }
    }
    .browse-controls.full {
        background-color: white;
-       button.v4-button {
+       button {
          width: 100%
       }
       .range {

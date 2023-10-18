@@ -54,17 +54,6 @@ function tabNext(event) {
    margin-top: 5px;
    text-align: right;
    padding: 10px 0;
-   .v4-button {
-      margin-left: 5px;
-   }
-   :deep(.cancel-button button) {
-      @include base-button();
-      width: auto;
-   }
-   :deep(.submit-button button) {
-      @include primary-button();
-      width: auto;
-   }
 }
 .form-controls.center {
    justify-content: center;

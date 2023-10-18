@@ -12,7 +12,7 @@
          </div>
       </div>
       <div class="form-controls">
-         <V4Button mode="tertiary" class="close" @click="closeSummary">OK</V4Button>
+         <VirgoButton severity="secondary" @click="closeSummary" label="OK"/>
       </div>
    </Dialog>
 </template>

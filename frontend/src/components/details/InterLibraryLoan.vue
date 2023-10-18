@@ -4,7 +4,7 @@
          <h2>Availability</h2>
          <div class="request-content">
             <div class="options-panel" v-if="requestStore.activePanel == 'OptionsPanel'">
-               <V4Button mode="tertiary" @click="requestClicked">Request Item</V4Button>
+               <VirgoButton severity="secondary" @click="requestClicked" label="Request Item"/>
                <p class="desc">Make an Interlibrary Loan request for this item.</p>
                <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a></p>
             </div>
@@ -24,7 +24,7 @@
                      <dd>{{submittedPickupLocation}}</dd>
                   </template>
                </dl>
-               <V4Button mode="tertiary" class="reset" id="ill-reset" @click="reset">Back</V4Button>
+               <VirgoButton severity="secondary" class="reset" id="ill-reset" @click="reset" label="Back"/>
             </div>
             <p class="error" v-if="requestStore.alertText" >{{requestStore.alertText}}</p>
          </div>
@@ -132,10 +132,6 @@ onMounted(()=>{
       text-align: center;
       margin: 0;
    }
-   .working {
-      margin-bottom: 25px;
-      text-align: center;
-   }
 }
 .ill-content {
    margin: 0 0 20px 0;
@@ -190,7 +186,6 @@ onMounted(()=>{
    }
 }
 @media only screen and (max-width: 700px) {
-
   .ill-content {
       position: relative;
       border-left: none;

@@ -11,7 +11,7 @@
                   <p class="value">{{course.courseName}}</p>
                   <p class="value-id">{{course.courseID}}</p>
                </span>
-               <V4Button mode="text" v-if="!isExactLookup" @click="copyURL(course.courseID, ir.instructorName )">Copy link to reserves</V4Button>
+               <VirgoButton link v-if="!isExactLookup" @click="copyURL(course.courseID, ir.instructorName )" label="Copy link to reserves"/>
             </div>
            <div class="reserves" v-for="reserve in course.items" :key="reserve.id">
                <ReserveDetail :reserve="reserve" />
@@ -24,14 +24,14 @@
 <script setup>
 import ReserveDetail from "@/components/reserves/ReserveDetail.vue"
 import { useReserveStore } from "@/stores/reserve"
-import { useSystemStore } from "@/stores/system"
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { copyText } from 'vue3-clipboard'
+import { useToast } from "primevue/usetoast"
 
+const toast = useToast()
 const route = useRoute()
 const reserveStore = useReserveStore()
-const systemStore = useSystemStore()
 const isExactLookup = computed(() => {
    if (route.params.id) {
       return true
@@ -39,17 +39,16 @@ const isExactLookup = computed(() => {
    return false
 })
 
-function copyURL( courseID, instructor ) {
+const copyURL = (( courseID, instructor ) => {
    let URL = `${window.location.href}/${encodeURIComponent(courseID)}?instructor=${encodeURIComponent(instructor)}`
    copyText(URL, undefined, (error, _event) => {
       if (error) {
-         systemStore.setError("Unable to copy reserves URL: "+error)
+         toast.add({severity:'error', summary: "Copy Error", detail: `Unable to copy reserves URL: ${error}`, life: 5000})
       } else {
-         systemStore.setMessage("Reserves URL copied to clipboard.")
+         toast.add({severity:'success', summary: "URL Copied", detail: "Reserves URL copied to clipboard.", life: 3000})
       }
    })
-}
-
+})
 </script>
 
 <style scoped lang="scss" >

@@ -1,13 +1,11 @@
 <template>
-   <V4Button mode="primary" @click="showDialog = true" v-if="!hasPasswordToken" :disabled="showDialog" ref="trigger">
-      Change password
-   </V4Button>
+   <VirgoButton  @click="showDialog = true" v-if="!hasPasswordToken" :disabled="showDialog" ref="trigger" label="Change password"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password" @hide="closeChangeDialog" @show="opened">
       <template v-if="expiredToken">
          <p class="error" v-html="error"></p>
          <p class="error">Please request a new password reset email.</p>
          <div class="form-controls">
-            <V4Button mode="tertiary" @click="closeExpiredChange">OK</V4Button>
+            <VirgoButton severity="secondary" @click="closeExpiredChange" label="OK"/>
          </div>
       </template>
       <template v-else>
@@ -45,7 +43,7 @@
             />
             <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm" v-model="confirmPassword" />
             <div class="form-controls">
-               <V4Button mode="tertiary" @click="closeChangeDialog">Cancel</V4Button>
+               <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
                <FormKit type="submit" label="Submit" wrapper-class="submit-button" :disabled="okDisabled" />
             </div>
          </FormKit>

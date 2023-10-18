@@ -275,7 +275,7 @@ const poolSelected = (( poolID ) => {
    align-content: center;
    align-items: center;
    justify-content: space-between;
-   padding-top: 10px;
+   padding-top: 15px;
    margin-bottom: 10px;
    .summary {
       margin: 0 0 0.2vw 0;
@@ -303,9 +303,6 @@ const poolSelected = (( poolID ) => {
    .buttons {
       display: flex;
       flex-flow: row nowrap;
-      :deep(button) {
-         margin-left: 10px;
-      }
    }
 }
 
@@ -316,6 +313,9 @@ div.pool-tabs {
    display: flex;
    flex-flow: row wrap;
    justify-content: flex-start;
+   button {
+      margin: 0;
+   }
 
    .p-dropdown.active {
       background-color: var(--uvalib-brand-blue);
@@ -334,7 +334,6 @@ div.pool-tabs {
       text-align: left;
       flex: 1 1 auto;
       background: #FFF;
-
       .total {
          font-size: 0.75em;
          margin: 0;

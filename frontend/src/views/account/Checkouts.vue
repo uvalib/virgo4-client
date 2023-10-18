@@ -15,14 +15,14 @@
                {{systemStore.ilsError}}
             </div>
             <div class="checkout-tabs">
-               <V4Button mode="primary" @click="visibleTab = 'uva'" v-bind:class="{active: visibleTab == 'uva'}">
-                  UVA Checkouts ({{userStore.checkouts.length}})
+               <VirgoButton @click="visibleTab = 'uva'" v-bind:class="{active: visibleTab == 'uva'}">
+                  <span>UVA Checkouts ({{userStore.checkouts.length}})</span>
                   <V4Spinner v-if="lookingUpUVA" size="12px"/>
-               </V4Button>
-               <V4Button mode="primary" @click="visibleTab = 'ill'" v-bind:class="{active: visibleTab == 'ill'}">
-                  ILL Checkouts ({{illiadCheckouts.length}})
+               </VirgoButton>
+               <VirgoButton @click="visibleTab = 'ill'" v-bind:class="{active: visibleTab == 'ill'}">
+                  <span>ILL Checkouts ({{illiadCheckouts.length}})</span>
                   <V4Spinner v-if="lookingUpILL" size="12px"/>
-               </V4Button>
+               </VirgoButton>
             </div>
             <template v-if="lookingUpUVA == false && visibleTab == 'uva'">
                <div v-if="lookingUpUVA == false && userStore.checkouts.length == 0 && !systemStore.ilsError" class="none">
@@ -44,14 +44,9 @@
                         </select>
                      </span>
                      <span class="checkout-options">
-                        <V4Button v-if="userStore.checkouts.length" id="download-csv-btn"
-                           mode="icon"
-                           @click="downloadCSV()"
-                           title="Download your checkouts as a CSV file" >
-                           <i class="fal fa-download"></i>
-                        </V4Button>
-                        <V4Button  id="renew-all-btn" mode="primary" @click="renewAll">Renew All</V4Button>
-
+                        <VirgoButton v-if="userStore.checkouts.length" @click="downloadCSV" icon="fal fa-download"
+                           aria-label="Download your checkouts as a CSV file" class="csv"/>
+                        <VirgoButton @click="renewAll" label="Renew All"/>
                      </span>
                   </div>
                   <div class="item" v-for="(co,idx) in userStore.checkouts" :key="idx">
@@ -84,7 +79,6 @@
                         <dd class="fine-value">${{co.overdueFee}}</dd>
                      </template>
                      <template v-for="bill, i in co.bills" :key="i">
-
                         <template v-if="parseFloat(bill.amount) > 0">
                            <dt v-if="i == 0" class="label" >Bill{{ co.bills.length > 1 ? 's' : '' }}:</dt>
                            <dt v-else class="label" ></dt>
@@ -95,22 +89,15 @@
                      <div v-if="co.message" class="co-message">
                         {{co.message}}
                      </div>
-                     <div class="renewbar">
-                        <V4Button v-if="!userStore.isBarred" mode="primary"
-                           @click="renewItem(co.barcode)" class="renew"
-                           :aria-label="`renew ${co.title}`"
-                        >
-                           Renew
-                        </V4Button>
+                     <div class="renewbar" v-if="!userStore.isBarred">
+                        <VirgoButton @click="renewItem(co.barcode)"  :aria-label="`renew ${co.title}`" label="Renew"/>
                      </div>
                   </div>
                </div>
             </template>
             <div class="checkout-list" v-if="lookingUpILL == false && visibleTab == 'ill'">
                <div class="controls">
-                  <V4Button mode="primary" class="checkout-options" target="_blank" url="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60">
-                  View Request History <i class="fal fa-external-link-alt"></i>
-                  </V4Button>
+                  <VirgoButton @click="historyClicked" label="View Request History" icon="fal fa-external-link-alt" iconPos="right"/>
                </div>
                <div v-if="illiadCheckouts.length == 0" class="none">
                   You have no ILL checkouts.
@@ -130,7 +117,7 @@
 
                      </dl>
                      <div class="renewbar" v-if="co.renewalsAllowed">
-                        <V4Button mode="primary" target="_blank" :url="renewURL(co)">Renew <i class="fal fa-external-link-alt"></i></V4Button>
+                        <VirgoButton @click="renewILLClicked(co)" label="Renew" icon="fal fa-external-link-alt" iconPos="right"/>
                      </div>
                   </div>
                </div>
@@ -157,35 +144,41 @@ const route = useRoute()
 const lookingUpUVA = ref(true)
 const downloading = ref(false)
 const visibleTab = ref("uva")
+
 const lookingUpILL = computed(() => userStore.lookingUp)
+
 const illiadCheckouts = computed(()=>{
    return userStore.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
 })
 
-function renewURL(item) {
-   return `https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${item.transactionNumber}`
-}
-function sortChanged() {
+const renewILLClicked = ((item) => {
+   let url = `https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${item.transactionNumber}`
+   window.open(url, "_blank")
+})
+const historyClicked = (() => {
+   window.open("https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60", "_blank")
+})
+const sortChanged = (() => {
    userStore.sortCheckouts(userStore.checkoutsOrder)
-}
-function renewItem(barcode) {
+})
+const renewItem = ((barcode) => {
    userStore.renewItem(barcode)
-}
-function renewAll() {
+})
+const renewAll = (() => {
    userStore.renewAll()
-}
-async function downloadCSV(){
+})
+const downloadCSV = ( async () => {
    downloading.value = true
    await userStore.downloadCheckoutsCSV()
    downloading.value = false
-}
-function formatILLDate(dateStr) {
+})
+const formatILLDate = ((dateStr) => {
    if (!dateStr) {
       return "N/A"
    }
    return dateStr.split("T")[0]
-}
-function formatDueInfo(checkout) {
+})
+const formatDueInfo = ((checkout) => {
    let out =  `<div>${checkout.due.split("T")[0]}</div>`
    if (checkout.overdue) {
       out += "<div class='overdue'>Overdue</div>"
@@ -194,15 +187,15 @@ function formatDueInfo(checkout) {
       out += `<div class='recall'>Recall Due ${checkout.recallDueDate.split("T")[0]}</div>`
    }
    return out
-}
-function itemOnNotice(co) {
+})
+const itemOnNotice = ((co) => {
    return co.overdue || co.recallDueDate != ""
-}
-function fineIsVisible(co) {
+})
+const fineIsVisible = ((co) => {
    let f = parseFloat(co.overdueFee)
    // Show the fine except for when it's $20 and there's a recall due date
    return f > 0 && (f != 20 || !co.bills)
-}
+})
 
 onMounted(async () => {
    lookingUpUVA.value = false
@@ -248,25 +241,12 @@ onMounted(async () => {
    margin: 2vw auto 0 auto;
    position: relative;
 
-   .checkout-accordion {
-      margin-bottom: 20px;
-   }
-   .working  {
-      text-align: center;
-      margin: 5px 0 20px 0;
-   }
    .none {
       text-align: center;
       font-size: 1.25em;
-      //margin: 20px 0;
       border: 1px solid var(--uvalib-grey);
       background: var(--uvalib-grey-lightest);
       padding: 10px;
-   }
-   .section-title {
-      font-weight: bold;
-      font-size:1.15em;
-      padding: 5px;
    }
    .details {
       text-align: left;
@@ -279,11 +259,10 @@ onMounted(async () => {
 
    .controls {
       margin: 0;
-      text-align: right;
-      padding: 5px 5px 5px 10px;
+      padding:10px;
       display: flex;
       flex-flow: row wrap;
-      justify-content: flex-start;
+      justify-content: flex-end;
       align-items: center;
       border-bottom: 3px solid var(--uvalib-blue-alt);
       background: white;
@@ -292,21 +271,19 @@ onMounted(async () => {
          font-weight: 500;
          margin-right: 10px;
       }
-      .sort {
-         margin: 5px;
-      }
-
-      #renew-all-btn {
-         margin: 0;
-      }
-      #download-csv-btn {
-         cursor: pointer;
-         font-size: 1.25em;
-         margin: 0 15px;
-      }
 
       .checkout-options{
-         margin-left: auto !important;
+         margin-left: auto;
+         display: flex;
+         flex-flow: row nowrap;
+         align-items: center;
+         button.p-button {
+            margin: 0;
+            &.csv {
+               font-size: 1.4em;
+               margin-right: 15px;
+            }
+         }
       }
    }
 
@@ -372,12 +349,6 @@ i.notice {
    margin-right: 5px;
    font-size: 1.25em;
 }
-v4-button.renew {
-   font-size: 0.75em;
-   float: right;
-   font-weight: 500;
-   margin-top: 10px;
-}
 .barred, .error {
    font-size: 1em;
    font-weight: bold;
@@ -396,30 +367,20 @@ v4-button.renew {
    padding: 10px 0 0 0;
    border-bottom: 20px solid var(--uvalib-brand-blue);
 
-   .v4-button {
-      flex-grow: 1;
-      margin: 5px;
+   button.p-button {
       .v4-spinner.embed {
          width: 80px;
       }
       margin: 0;
-      padding: 8px 8px 10px 8px;
+      padding: 10px;
       border-radius: 5px 5px 0 0;
       color: var(--uvalib-text-dark);
       border: 1px solid var(--uvalib-grey-light);
-      border-bottom: 1px solid var(--uvalib-brand-blue);
-      text-align: left;
       flex: 1 1 auto;
       background: #FFF;
-      outline: none;
-      &:focus {
-         z-index: 1;
-         @include be-accessible();
-      }
-      &:hover {
-         border-bottom: 1px solid var(--uvalib-brand-blue);
-      }
+
       &.active {
+         border: 1px solid var(--uvalib-brand-blue);
          background-color: var(--uvalib-brand-blue);
          color: #fff;
       }

@@ -1,7 +1,5 @@
 <template>
-   <V4Button mode="primary" @click="openClicked" ref="trigger" aria-label="manage selected bookmark storage">
-      Move/Copy
-   </V4Button>
+   <VirgoButton @click="openClicked" ref="trigger" aria-label="manage selected bookmark storage" label="Move/Copy"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Manage Bookmark Storage" @hide="closeDialog" @show="opened">
       <div class="selected-bookmarks scroller">
          <ul>
@@ -22,8 +20,8 @@
          </div>
          <p class="error">{{errorMessage}}</p>
          <div class="form-controls" >
-            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
-            <V4Button mode="primary" @click="okClicked" :disabled="okDisabled">OK</V4Button>
+            <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+            <VirgoButton @click="okClicked" :disabled="okDisabled" label="OK"/>
          </div>
       </div>
    </Dialog>

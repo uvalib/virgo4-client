@@ -39,19 +39,15 @@
                      </div>
                      <div v-if="folderInfo.folder != 'General'" class="folder-actions">
                         <template v-if="!renaming">
-                           <V4Button v-if="folderInfo.public" class="copy-link" mode="primary" @click="copyURL(folderInfo)">Copy public URL</V4Button>
-                           <V4Button mode="primary" @click="renameClicked(folderInfo)">Rename</V4Button>
-                           <V4Button mode="primary" @click="deleteFolderClicked(folderInfo)">Delete</V4Button>
+                           <VirgoButton v-if="folderInfo.public" @click="copyURL(folderInfo)" label="Copy public URL"/>
+                           <VirgoButton @click="renameClicked(folderInfo)" label="Rename"/>
+                           <VirgoButton @click="deleteFolderClicked(folderInfo)" label="Delete"/>
                         </template>
                         <div v-else class="rename">
                            <input @keyup.enter="doRename(folderInfo)"  :id="`rename-folder-${folderInfo.id}`" type="text" v-model="newFolderName"
                                aria-required="true" aria-label="new folder name" required="required"/>
-                           <V4Button mode="tertiary" id="rename-cancel" @click="renaming=false">
-                              Cancel
-                           </V4Button>
-                           <V4Button mode="primary" id="rename-ok" @click="doRename(folderInfo)">
-                              OK
-                           </V4Button>
+                           <VirgoButton severity="secondary" @click="renaming=false" label="Cancel"/>
+                           <VirgoButton @click="doRename(folderInfo)" label="OK"/>
                         </div>
                      </div>
                   </template>
@@ -60,13 +56,11 @@
                   </div>
                   <div v-else class="bookmark-folder-details">
                      <div class="folder-menu">
-                        <V4Button mode="primary" @click="exportBookmarks(folderInfo.folder)">
-                           Export all
-                        </V4Button>
+                        <VirgoButton @click="exportBookmarks(folderInfo.folder)" label="Export all"/>
                         <PrintBookmarks :srcFolder="folderInfo.id" />
                         <ManageBookmarks :srcFolder="folderInfo.id" />
-                        <V4Button mode="primary" @click="deleteBookmarksClicked(folderInfo)">Delete</V4Button>
-                        <V4Button v-if="userStore.canMakeReserves" mode="primary" @click="reserve">Place on video reserves</V4Button>
+                        <VirgoButton @click="deleteBookmarksClicked(folderInfo)" label="Delete"/>
+                        <VirgoButton v-if="userStore.canMakeReserves" @click="reserve" label="Place on video reserves"/>
                      </div>
 
                      <table>
@@ -99,7 +93,7 @@
             </div>
          </template>
          <div class="controls">
-            <V4Button v-if="createOpen==false" @click="openCreate" id="create-folder-btn" mode="primary">Create Folder</V4Button>
+            <VirgoButton v-if="createOpen==false" @click="openCreate" id="create-folder-btn" label="Create Folder"/>
             <div v-else class="create-folder">
                <label for="newname">New Folder:</label>
                <input
@@ -110,8 +104,8 @@
                   type="text"
                   aria-required="true" required="required"
                />
-               <V4Button @click="cancelCreate" :class="{disabled: submitting}" mode="tertiary">Cancel</V4Button>
-               <V4Button @click="createFolder" class="{disabled: submitting}" mode="primary">Create</V4Button>
+               <VirgoButton @click="cancelCreate" :disabled="submitting" severity="secondary" label="Cancel"/>
+               <VirgoButton @click="createFolder" :disabled="submitting" label="Create"/>
             </div>
          </div>
       </div>
@@ -147,10 +141,7 @@ const reserveStore = useReserveStore()
 const itemStore = useItemStore()
 const router = useRouter()
 
-// html element ref
 const folderInput = ref(null)
-
-// local data
 const renaming = ref(false)
 const newFolderName = ref("")
 const createOpen = ref(false)
@@ -181,7 +172,7 @@ const deleteBookmarksClicked = ((folderInfo) => {
          return
       }
       confirm.require({
-         message: `All selected bookmarks in {{folderInfo.folder}} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
+         message: `All selected bookmarks in ${folderInfo.folder} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
          header: 'Confirm Delete',
          icon: 'pi pi-exclamation-triangle',
          rejectClass: 'p-button-secondary',
@@ -409,6 +400,11 @@ div.folder {
       margin: 10px 0 20px 0;
       text-align: left;
    }
+   .folder-actions {
+      button {
+         margin-left: 10px;
+      }
+   }
 }
 .bookmarks {
    min-height: 400px;
@@ -483,11 +479,6 @@ table tr {
 
    .public span {
       font-weight: normal;
-   }
-   .public i.check {
-      margin: 0 5px 0 0;
-      cursor: pointer;
-      font-size: 1em;
    }
    .public-url {
       font-weight: normal;

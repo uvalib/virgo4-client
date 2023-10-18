@@ -1,5 +1,5 @@
 <template>
-   <V4Button mode="text" @click="userStore.showForgotPW = true" :disabled="userStore.showForgotPW" ref="trigger">Forgot your password?</V4Button>
+   <VirgoButton link @click="userStore.showForgotPW = true" :disabled="userStore.showForgotPW" ref="trigger" label="Forgot your password?"/>
    <Dialog v-model:visible="userStore.showForgotPW" :modal="true" position="top" header="Forgot Password" @hide="closeDialog" @show="opened">
       <p>
          An email will be sent to the address on file with a link to reset your password. If you need assistance, please
@@ -8,7 +8,7 @@
       <FormKit type="form" id="forgot-pass" :actions="false" @submit="okClicked">
          <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Library ID, eg: C001005101 or TEMP001166" />
          <div class="form-controls" >
-            <V4Button mode="tertiary" @click="closeDialog">Cancel</V4Button>
+            <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
             <FormKit type="submit" label="OK" wrapper-class="submit-button" :disabled="okDisabled" />
          </div>
       </FormKit>
@@ -58,9 +58,6 @@ const okClicked = (() => {
 </script>
 
 <style lang="scss" scoped>
-.v4-button {
-  margin-top: 2em;
-}
 .password-reset-form{
    margin-bottom:15px;
    display: flex;

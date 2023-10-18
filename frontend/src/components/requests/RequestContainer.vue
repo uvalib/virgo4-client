@@ -1,6 +1,6 @@
 <template>
    <div id="active-panel" ref="activePanel" >
-      <V4Button mode="tertiary" v-if="showReset()" class="reset" @click="reset" v-html="resetLabel()"></V4Button>
+      <VirgoButton severity="secondary" v-if="showReset" class="reset" @click="reset" :label="resetLabel"/>
       <OptionsPanel v-if="requestStore.activePanel == 'OptionsPanel'" />
       <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" />
       <PlaceHoldPanel v-if="requestStore.activePanel == 'PlaceHoldPanel'" />
@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import OptionsPanel from "./panels/OptionsPanel.vue"
 import SignInPanel from "./panels/SignInPanel.vue"
 import PlaceHoldPanel from "./panels/PlaceHoldPanel.vue"
@@ -46,7 +46,7 @@ watch(authorizing, (newValue) => {
    }
 })
 
-async function setupActivePanel() {
+const setupActivePanel = ( async () => {
    if ( user.isSignedIn) {
       await preferences.loadPreferences()
    }
@@ -69,13 +69,13 @@ async function setupActivePanel() {
    if (!requestStore.activePanel){
       requestStore.activePanel = 'OptionsPanel'
    }
-}
+})
 
 onMounted(()=>{
    setupActivePanel()
 })
 
-function reset() {
+const reset = (() => {
    requestStore.reset()
    setTimeout( () => {
       let opts = document.getElementsByClassName("option-button")
@@ -83,26 +83,25 @@ function reset() {
          opts[0].focus()
       }
    },150)
-}
-function showReset() {
+})
+
+const showReset = computed(() => {
    return requestStore.activePanel != "OptionsPanel"
-}
-function resetLabel() {
+})
+const resetLabel = computed(() => {
    if (requestStore.activePanel == 'ConfirmationPanel' || requestStore.activePanel == "ReservedPanel"){
       return "Back"
    } else {
       return "Reset"
    }
-}
+})
 </script>
 
 <style lang="scss" scoped>
 #active-panel {
    padding: 10px;
    position: relative;
-   :deep(.v4-button) {
-      margin:0 !important;
-   }
+
    .reset {
       position: absolute;
       right: 1vw;

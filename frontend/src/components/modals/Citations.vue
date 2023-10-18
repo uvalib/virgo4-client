@@ -1,7 +1,6 @@
 <template>
-   <V4Button mode="text" @click="showDialog = true" class="citations-text-button" icon="fas fa-quote-right" :aria-label="props.ariaLabel" ref="trigger">
-      <span class="button-text" :class="{toolbar: props.toolbarButton}">{{props.buttonLabel}}<i class="icon-inline fas fa-quote-right"></i></span>
-   </V4Button>
+   <VirgoButton link @click="showDialog = true" class="citations-text-button" icon="fas fa-quote-right"
+      :aria-label="props.ariaLabel" ref="trigger" :label="props.buttonLabel" iconPos="right" :class="{toolbar: props.format=='all'}"/>
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" :header="props.title" @hide="closeDialog" @show="opened">
       <div class="citations-content">
@@ -14,9 +13,7 @@
                <label>Choose a citation format</label>
                <ul class="list">
                   <li v-for="(citation,idx) in citations" :key="citation.label">
-                     <V4Button mode="text" :id="`citation-tab${idx}`" class="citation" :class="{selected: idx == selectedIdx}" @click="citationSelected(idx)">
-                        {{citation.label}}
-                     </V4Button>
+                     <VirgoButton :severity="citationType(idx)" @click="citationSelected(idx)" :label="citation.label" class="citation"/>
                   </li>
                </ul>
                <div aria-live="polite">
@@ -35,13 +32,10 @@
             <span v-if="error" class="error">{{error}}</span>
          </div>
          <div class="form-controls" >
-            <V4Button v-if="props.format == 'all'" :url="risURL"
-               @click="downloadRISClicked" aria-label="download RIS citation" mode="primary"
-            >
-               <span>Download RIS</span><i class="ris-icon fas fa-file-export"></i>
-            </V4Button>
-            <V4Button mode="primary" id="copy-citation" @click="copyCitation()">Copy Citation</V4Button>
-            <V4Button mode="primary" @click="closeDialog">Close</V4Button>
+            <VirgoButton v-if="props.format == 'all'" @click="downloadRISClicked" aria-label="download RIS citation"
+               label="Download RIS" icon="fas fa-file-export" iconPos="right"/>
+            <VirgoButton @click="copyCitation" label="Copy Citation" ref="copycitation"/>
+            <VirgoButton @click="closeDialog" label="Close"/>
          </div>
       </div>
    </Dialog>
@@ -72,10 +66,6 @@ const props = defineProps({
       type: String,
       default: ""
    },
-   toolbarButton: {
-      type: Boolean,
-      default: false
-   },
    buttonLabel: {
       type: String,
       default: ""
@@ -96,14 +86,17 @@ const error = ref("")
 const message = ref("")
 const showDialog = ref(false)
 const trigger = ref(null)
+const copycitation = ref()
 
+const citationType =((idx) => {
+   if ( idx == selectedIdx.value ) {
+      return "primary"
+   }
+   return "secondary"
+})
 const itemID = computed(()=>{
    let parts = props.itemURL.split("/")
    return parts[parts.length - 1]
-})
-const risURL = computed(()=>{
-   if (system.citationsURL == "") return ""
-   return `${system.citationsURL}/format/ris?item=${encodeURI(props.itemURL)}`
 })
 const singleFormat = computed(()=>{
    if (props.format == "all") {
@@ -154,17 +147,17 @@ const closeDialog = (() => {
 })
 
 function setInitialFocus() {
-   let btn = document.getElementById("copy-citation")
    if ( props.format == 'all') {
-      btn = document.getElementById("citation-tab0")
-   }
-   if ( btn ) {
+      let btn = document.getElementsByClassName("citation")[0]
       btn.focus()
+   } else {
+      copycitation.value.$el.focus()
    }
 }
 
 const downloadRISClicked = (() => {
    analytics.trigger('Export', risFrom.value, itemID.value)
+   window.location.href=`${system.citationsURL}/format/ris?item=${encodeURI(props.itemURL)}`
 })
 
 const copyCitation = (() => {
@@ -195,43 +188,25 @@ const copyCitation = (() => {
    display: inline-block;
    padding-left: 10px;
 }
-button.v4-button.citations-text-button {
-   cursor: pointer;
-   margin-right: 10px;
-   display: block;
-   &:hover {
-      text-decoration: none;
-   }
-   .button-text {
-      color:var(--color-link);
-      display: block;
-      .icon-inline {
-         margin-left: 5px;
-         display: inline-block;
-         color:var(--color-link);
-         padding: 2px;
-         cursor: pointer;
-         box-sizing: border-box;
-      }
-      &:hover {
-         text-decoration: underline;
-      }
-   }
-   .button-text.toolbar {
-      color: #444;
-      display: flex;
-      flex-flow: row nowrap;
 
-      .icon-inline {
-         color: #444;
-         font-size: .95em;
+button.citations-text-button {
+   padding-top: 2px !important;
+   margin-right: 10px  !important;
+   &.toolbar {
+      :deep(span) {
+         color:  var(--uvalib-text);
       }
       &:hover {
-         color: var(--uvalib-brand-blue-light);
-         text-decoration: none;
-         .icon-inline {
+         :deep(span) {
+            text-decoration: none !important;
             color: var(--uvalib-brand-blue-light);
          }
+      }
+   }
+   &:hover {
+      :deep(span) {
+         text-decoration: underline !important;
+         color: var(--uvalib-link);
       }
    }
 }
@@ -276,19 +251,8 @@ button.v4-button.citations-text-button {
          flex-flow: row wrap;
          justify-content: flex-start;
 
-         .v4-button.citation {
-            margin: 0 5px 10px 0;
-            padding: 8px 15px;
-            border-radius: 5px;
-            color: var(--uvalib-text-dark);
-            border: 1px solid var(--uvalib-grey);
-            text-align: left;
-            // border-bottom: 0;
-            background: var(--uvalib-grey-lightest);
-         }
-         .v4-button.citation.selected {
-            background: var(--uvalib-brand-blue-light);
-            color: white;
+         button.citation {
+            margin: 0 10px 0 0;
          }
       }
       .citation-text {
