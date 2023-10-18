@@ -125,15 +125,14 @@ const otherSources = computed(()=>{
    })
 
    others.forEach( r=>{
-      let opt = {id: r.pool.id, name: r.pool.name, falied: false, skipped: false, total: 0}
+      let opt = {id: r.pool.id, name: r.pool.name, failed: false, skipped: false, total: 0}
       if (poolFailed(r)) {
-         opt.falied = true
+         opt.failed = true
       } else if (wasPoolSkipped(r)) {
          opt.skipped = true
       } else {
          opt.total = utils.formatNum(r.total)
       }
-      if (r.pool.id == "jmrl" ) opt.falied = true
       opts.push(opt)
    })
    return opts
@@ -200,7 +199,7 @@ const updateURL = (( poolID) => {
 })
 
 const poolFailed = ((p) => {
-   return p.statusCode != 408 && p.total == 0 & p.statusCode != 200
+   return (p.statusCode != 408 && p.total == 0 && p.statusCode != 200)
 })
 
 const wasPoolSkipped = ((p) => {
