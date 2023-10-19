@@ -127,7 +127,6 @@ import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 import { useRouter } from 'vue-router'
-import V4Button from "../../components/V4Button.vue"
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
 import Checkbox from 'primevue/checkbox'
