@@ -1,5 +1,5 @@
 <template>
-   <PanelMenu :tabindex="0" class="skip-to"  id="skip-to" ref="skiptomenu"  :model="v4SkipTo"  @keyup.prevent.stop.enter/>
+   <PanelMenu :tabindex="0" class="skip-to"  id="skip-to" ref="skiptomenu"  :model="v4SkipTo"  @keyup.prevent.stop.enter />
 </template>
 
 <script setup>
@@ -9,15 +9,16 @@ import PanelMenu from 'primevue/panelmenu'
 
 const route = useRoute()
 
-const v4SkipTo = computed( () => {
-   let menu = [ {label: "Skip To", class: "top",
-      items: [
-         { label: 'Navigation', visible: true, command: () => { skipToNav() } },
-         { label: 'Main Content', visible: true, command: () => { skipToMain() } },
-         { label: 'Search', visible: route.path == "/search" ||  route.path == "/", command: () => { skipToSearch() } },
-      ]
-   } ]
-   return menu
+const v4SkipTo = computed(() => {
+   return [
+      {  label: "Skip To",
+         items: [
+            { label: 'Navigation', command: () => { skipToNav() } },
+            { label: 'Main Content', command: () => { skipToMain() } },
+            { label: 'Search', visible: route.path == "/search" ||  route.path == "/", command: () => { skipToSearch() } },
+         ]
+      }
+   ]
 })
 
 const skipToMain = (() => {
@@ -64,6 +65,7 @@ const skipToSearch = (() => {
    transition: transform 100ms;
    box-shadow: $v4-box-shadow-light;
    width: 130px;
+   font-size: 0.9em;
    &:active, &:focus, &:hover, &:focus-within {
       transform: translateY(0%);
    }
