@@ -50,7 +50,7 @@
       </div>
       <div v-if="systemStore.newVersion" class="update-pop">
          <div class="msg">A new version of Virgo is available.</div>
-         <VirgoButton @click="updateClicked">Update Now</VirgoButton>
+         <VirgoButton @click="updateClicked" class="update">Update Now</VirgoButton>
       </div>
       <ScrollToTop />
    </main>
@@ -307,6 +307,11 @@ onUpdated(() => {
          padding: 0;
          width: 45px;
          border: 1px solid #444;
+         &:hover {
+            border: 1px solid #444;
+            background: rgba(128,128,128,0.2);
+            box-shadow: $v4-box-shadow-light;
+         }
       }
       .alert-body {
          padding-left: 1.25rem;
@@ -456,9 +461,11 @@ body {
       margin-bottom: 10px;
       font-weight: bold;
    }
-   button {
+   button.update {
       display: block;
-      width: 100%;
+      width: 100% !important;
+      box-sizing: border-box;
+      margin: 0 !important;
    }
 
 }
