@@ -17,9 +17,8 @@ export const useSearchStore = defineStore('search', {
          this.saved = data.saved
          this.history.splice(0, this.history.length)
          data.history.forEach( s => {
-            let url = stripExclude(s)
-            if (url != "/") {
-               this.history.push(  url )
+            if ( s.url != "/") {
+               this.history.push( s.url )
             }
          })
       },
@@ -93,7 +92,7 @@ export const useSearchStore = defineStore('search', {
          }
       },
 
-      async delete( {userID, searchID} ) {
+      async delete( userID, searchID ) {
          try {
             await axios.delete(`/api/users/${userID}/searches/${searchID}`)
             this.searchToken = ""
@@ -132,17 +131,3 @@ export const useSearchStore = defineStore('search', {
       }
    }
 })
-
-function stripExclude( history ) {
-   let url = history.url
-   let idx1 = url.indexOf("&exclude")
-   if (idx1 > -1) {
-      let idx2 = url.indexOf("&", idx1+1)
-      if ( idx2 > -1) {
-         url = url.substring(0,idx1)+url.substring(idx2)
-      } else {
-         url = url.substring(0,idx1)
-      }
-   }
-   return url
-}

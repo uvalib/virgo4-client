@@ -59,10 +59,7 @@ export const usePreferencesStore = defineStore('preferences', {
          this.$reset()
       },
       async saveAdvancedSearchTemplate( template ) {
-         this.searchTemplate.fields.splice(0, this.searchTemplate.fields.length)
-         template.fields.forEach( f => {
-            this.searchTemplate.fields.push(f)
-         })
+         this.searchTemplate = template
          this.savePreferences()
       },
       async toggleOptOut() {

@@ -101,8 +101,6 @@ export const useItemStore = defineStore('item', {
                   dc.ocr.status = "NOT_AVAIL"
                }
             }
-            // splice is reactive, use it to replace the item in array
-            this.digitalContent.splice(dcIdx, 1, dc)
          }
       },
       setDigitalContentData(data) {

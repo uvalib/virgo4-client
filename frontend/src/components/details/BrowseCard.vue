@@ -10,7 +10,7 @@
                   <img  alt="" class="thumb" v-if="props.data.status=='url'" :src="props.data.cover_image_url" />
                </template>
                <span class="no-thumb" v-else>
-                  <span class="title" v-html="utils.truncateTitle(props.data.title)"></span>
+                  <span class="title" v-html="truncateTitle(props.data.title)"></span>
                   <br/>
                   <span class="no">(No image available)</span>
                </span>
@@ -19,7 +19,7 @@
          <div class="details">
             <span class="call">{{props.data.call_number}}</span>
             <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" class="title">
-               {{utils.truncateTitle(props.data.title)}}
+               {{truncateTitle(props.data.title)}}
             </router-link>
             <span class="year">[{{props.data.published_date}}]</span>
             <span class="loc">{{props.data.location}}</span>
@@ -31,7 +31,7 @@
             <span class="index">{{props.index}}.</span>
             <span class="stuff">
                <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" class="title">
-                  {{utils.truncateTitle(props.data.title)}}
+                  {{truncateTitle(props.data.title)}}
                </router-link>
                <span class="year">[{{props.data.published_date}}]</span>
                <span class="callinfo">
@@ -50,7 +50,6 @@
 <script setup>
 import BookmarkButton from "@/components/BookmarkButton.vue"
 import analytics from '@/analytics'
-import * as utils from '@/utils'
 
 const props = defineProps({
    current: {
@@ -73,6 +72,26 @@ const props = defineProps({
       type: Number,
       default: 0
    }
+})
+
+
+const truncateTitle = (( title ) => {
+   if ( title.length <= 90) {
+      return title
+   }
+   let spaceIdx = 90
+   let found = false
+   while ( !found && spaceIdx >0 ) {
+      if ( title[spaceIdx] == ' ') {
+         found = true
+      } else {
+         spaceIdx--
+      }
+   }
+   if ( found) {
+      return `${title.substring(0,spaceIdx).trim()}...`
+   }
+   return title
 })
 
 const browseDetailClicked = ((id) => {

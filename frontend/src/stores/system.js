@@ -79,10 +79,6 @@ export const useSystemStore = defineStore('system', {
          this.sessionExpired = true
          setTimeout(() => {  this.sessionExpired=false }, 15000)
       },
-      closeTraslateMessage() {
-         this.seenTranslateMsg = true
-         this.translateMessage = ""
-      },
       setFatal(err) {
          this.fatal = err
          this.reportError(this.fatal)

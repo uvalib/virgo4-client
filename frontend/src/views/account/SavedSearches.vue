@@ -128,7 +128,7 @@ const deleteSearchClicked = ( (savedSearch) => {
       icon: 'pi pi-exclamation-triangle',
       rejectClass: 'p-button-secondary',
       accept: () => {
-         searchStore.delete({userID: userStore.signedInUser, searchID: savedSearch.id})
+         searchStore.delete( userStore.signedInUser, savedSearch.id )
       }
    })
 })
