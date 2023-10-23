@@ -19,7 +19,8 @@ import { useFeedbackStore } from "@/stores/feedback"
 import { useUserStore } from "@/stores/user"
 import { onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
-import V4FormActions from "../components/V4FormActions.vue";
+import V4FormActions from "../components/V4FormActions.vue"
+import { setFocusID } from '@/utils'
 
 const userStore = useUserStore()
 const feedbackStore = useFeedbackStore()
@@ -39,8 +40,7 @@ onMounted(() => {
    submitted.value = false
    let query = Object.assign({}, route.query)
 
-   let ele = document.getElementById("explain")
-   ele.focus()
+   setFocusID("explain")
 
    // Assign the url in decending usefulness.
    let url = query.url || document.referrer || window.location.origin

@@ -56,6 +56,7 @@ import { useRequestStore } from "@/stores/request"
 import { useReserveStore } from "@/stores/reserve"
 import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
+import { setFocusID } from '@/utils'
 
 const requestStore = useRequestStore()
 const reserveStore = useReserveStore()
@@ -90,11 +91,11 @@ onMounted(() => {
    } else if (itemOptions.value.length == 1){
       selectedVideo.value = itemOptions.value[0].value
    }
-   document.getElementById("behalf_of").focus()
    reserveStore.request.lms = "A&S Canvas"
+   setFocusID("behalf_of")
 })
 
-function submit() {
+const submit = (() => {
    selectedVideo.value.pool = item.details.source
    selectedVideo.value.catalogKey = item.details.identifier
    selectedVideo.value.title = item.details.header.title
@@ -104,7 +105,7 @@ function submit() {
    selectedVideo.value.notes = notes.value
    selectedVideo.value.isVideo = true
    reserveStore.createVideoReserve(selectedVideo.value)
-}
+})
 </script>
 
 <style lang="scss" scoped>

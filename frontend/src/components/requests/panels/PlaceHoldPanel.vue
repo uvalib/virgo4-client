@@ -5,7 +5,7 @@
          <FormKit v-if="itemOptions.length > 1" type="select" label="Select the item you want"
             v-model="selectedItem" placeholder="Select an item"
             :validation-messages="{required: 'Item selection is required.'}"
-            :options="itemOptions" validation="required" id="scan-select"
+            :options="itemOptions" validation="required" id="hold-select"
          />
          <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
             placeholder="Select a location" @input="pickupLibraryChanged" id="pickup-sel"
@@ -45,6 +45,7 @@ import { useRequestStore } from "@/stores/request"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'
+import { setFocusID } from '@/utils'
 
 const requestStore = useRequestStore()
 const preferences = usePreferencesStore()
@@ -71,7 +72,7 @@ const itemOptions = computed(()=>{
    return out
 })
 
-function pickupLibraryChanged() {
+const pickupLibraryChanged = (() => {
    if(pickupLibrary.value == "SPEC-COLL"){
       // Dont remember Medium Rare Location
       return
@@ -80,7 +81,7 @@ function pickupLibraryChanged() {
    // when pickup library chanegs, also update preferences
    let pl = userStore.libraries.find( l=>l.id == pickupLibrary.value)
    preferences.updatePickupLibrary(pl)
-}
+})
 
 watch(selectedItem, async (newItem, oldItem) => {
    if( newItem && newItem.label.includes("Ivy limited circulation") ) {
@@ -102,21 +103,15 @@ onMounted(()=>{
    pickupLibraries.value = formattedPickupOptions.value
    if (itemOptions.value.length == 1) {
       selectedItem.value = itemOptions.value[0].value
-   }
-   let ele = document.getElementById("hold-select")
-   if ( ele ) {
-      ele.focus()
+      setFocusID("pickup-sel")
    } else {
-      ele = document.getElementById("pickup-sel")
-      if ( ele ) {
-         ele.focus()
-      }
+      setFocusID("hold-select")
    }
 })
 
-function placeHold() {
+const placeHold = (() => {
    requestStore.createHold(selectedItem.value, pickupLibrary.value)
-}
+})
 </script>
 
 <style lang="scss" >

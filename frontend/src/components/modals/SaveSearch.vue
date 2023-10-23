@@ -11,17 +11,17 @@
          <template v-else>
             <template v-if="saved">
                <p class="saved">Your search has been saved as '{{searchName}}'.</p>
-               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+               <p class="saved"><router-link v-focus tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
             </template>
             <template v-else-if="searches.duplicate">
                <p class="saved">This search has already been saved as '{{searches.searchName}}'.</p>
-               <p class="saved"><router-link id="savename" tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
+               <p class="saved"><router-link v-focus tabindex="0" to="/searches">Manage your saved searches here</router-link></p>
             </template>
             <div  v-else class="message">
                <div>
                   <label for="savename">Search Name</label>
                   <input ref="savename" id="savename" type="text" v-model="searchName"
-                     @keyup.enter="saveClicked"
+                     @keyup.enter="saveClicked" v-focus
                      aria-required="true" required="required"
                   />
                </div>
@@ -110,9 +110,6 @@ const saveClicked = (async () => {
    let req = {name: searchName.value, url: searchURL, isPublic: false, userID: userStore.signedInUser}
    await searches.save(req)
    saved.value = true
-   nextTick( () => {
-      document.getElementById("savename").focus()
-   })
 })
 </script>
 

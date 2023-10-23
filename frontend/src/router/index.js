@@ -8,6 +8,7 @@ import SignIn from '../views/SignIn.vue'
 import { useSystemStore } from "@/stores/system"
 import { useRestoreStore } from "@/stores/restore"
 import { useUserStore } from "@/stores/user"
+import { setFocusID } from '@/utils'
 
 import VueCookies from 'vue-cookies'
 
@@ -186,12 +187,7 @@ router.afterEach((to, _from) => {
          document.title = "Virgo"
       }
    }
-   setTimeout( () => {
-      let a = document.getElementById("app")
-      if ( a ) {
-         a.focus()
-      }
-   }, 50)
+   setFocusID("app")
 })
 
 // This is called before every URL in the SPA is hit

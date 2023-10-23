@@ -15,7 +15,7 @@
             Please enter your email address below and you will receive an email with the extracted text when it is ready.
          </p>
          <label>Email:</label>
-         <input @keyup.enter="okClicked" id="email" type="text" v-model="email" aria-required="true" required="required"/>
+         <input @keyup.enter="okClicked" id="email" type="text" v-model="email" aria-required="true" required="required" v-focus/>
       </div>
       <div class="message" v-else-if="mode=='submitted'">
          <p><b>Thank you</b>.<br/><br/>Your request has been submitted and you will receive an email when it is ready.</p>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from "vue"
+import { ref, computed } from "vue"
 import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
 import analytics from '@/analytics'
@@ -63,9 +63,6 @@ const ocrClicked = ( async () => {
    if (digitalItem.value.ocr.status == "NOT_AVAIL") {
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
-      nextTick( () => {
-         document.getElementById("email").focus()
-      })
    } else if (digitalItem.value.ocr.status == "READY") {
       analytics.trigger('OCR', 'OCR_DOWNLOAD_CLICKED', digitalItem.value.pid)
       mode.value = "init"
@@ -74,9 +71,6 @@ const ocrClicked = ( async () => {
    } else {
       analytics.trigger('OCR', 'OCR_GENERATE_CLICKED', digitalItem.value.pid)
       mode.value = "request"
-      nextTick( () => {
-         document.getElementById("email").focus()
-      })
    }
 })
 
@@ -100,7 +94,6 @@ const okClicked = (async () => {
       error.value = ""
       if ( email.value == "") {
          error.value =  "An email address is required"
-         document.getElementById("email").focus()
       } else {
          await item.generateOCR( digitalItem.value, email.value )
          mode.value ="submitted"

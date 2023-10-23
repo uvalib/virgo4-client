@@ -48,6 +48,7 @@ import { onMounted, ref } from 'vue'
 import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
+import { setFocusID } from '@/utils'
 
 const emit = defineEmits( ['submitted', 'canceled'] )
 
@@ -70,15 +71,14 @@ const request = ref({
 
 const requestStore = useRequestStore()
 
-async function submitClicked() {
+const submitClicked = (async () => {
    await requestStore.submitILLiadScanRequest(request.value)
    emit('submitted')
-}
+})
 
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
-   let ele = document.getElementById("course")
-   ele.focus()
+   setFocusID("course")
 })
 </script>
 

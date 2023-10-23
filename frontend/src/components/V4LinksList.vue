@@ -28,8 +28,8 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick } from "vue"
-import * as utils from '@/utils'
+import { computed, ref } from "vue"
+import { setFocusID } from '@/utils'
 
 const props = defineProps({
    id: {
@@ -61,24 +61,15 @@ const truncatedLinks = computed(()=>{
 
 const hide = (() => {
    showFull.value = false
-   nextTick( () => {
-      let tgt = document.getElementById(props.id+"-cut")
-      tgt.focus()
-      utils.scrollToItem(tgt)
-   })
+   setFocusID(props.id+"-cut", true)
 })
 
 const toggle = (() => {
    showFull.value = !showFull.value
    if ( showFull.value == false ) {
-         nextTick( () => {
-         let tgt = document.getElementById(props.id+"-cut")
-         tgt.focus()
-         utils.scrollToItem(tgt)
-      })
+      setFocusID(props.id+"-cut", true)
    } else {
-      let firstLink = document.getElementById(`${props.id}-link-1`)
-      firstLink.focus()
+      setFocusID(`${props.id}-link-1`)
    }
 })
 </script>

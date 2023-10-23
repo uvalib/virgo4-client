@@ -3,7 +3,7 @@
 // are classified as header (special rendering), basic (show by default),
 // detailed (hidden by default). Split them into separate sections of the hit. Identifer and
 // cover image are also special and get pulled to top level of hit data
-export function preProcessHitFields(poolURL, hits) {
+export const preProcessHitFields =((poolURL, hits) => {
    hits.forEach(function (hit) {
       hit.basicFields = []
       hit.detailFields = []
@@ -151,9 +151,9 @@ export function preProcessHitFields(poolURL, hits) {
 
       delete hit.fields
    })
-}
+})
 
-export function fieldValueString(field) {
+export const fieldValueString =((field) => {
    if ( Array.isArray(field.value)) {
       let sep = field.separator
       if (sep == "paragraph") {
@@ -176,9 +176,9 @@ export function fieldValueString(field) {
 
    }
    return field.value
-}
+})
 
-export function getGroupHitMetadata(group, hit) {
+export const getGroupHitMetadata = ((group, hit) => {
    hit.header = {}
    if (group.record_list) {
       hit.header = group.record_list[0].header
@@ -197,21 +197,46 @@ export function getGroupHitMetadata(group, hit) {
       hit.header.title = "ERROR: Missing group data"
    }
    delete group.fields
-}
+})
 
-export function scrollToItem( tgtEle ) {
-   let nav = document.getElementById("v4-navbar")
-   var headerOffset = nav.offsetHeight
-   var elementPosition = tgtEle.getBoundingClientRect().top
-   let pad = window.getComputedStyle(tgtEle, null).getPropertyValue('padding-top')
-   var offsetPosition = elementPosition - headerOffset - parseInt(pad)
-   window.scrollBy({
-     top: offsetPosition,
-     behavior: "smooth"
-   })
-}
+export const scrollToItem = (( tgtID, focus=false ) => {
+   setTimeout( () => {
+      let tgtEle = document.getElementById(tgtID)
+      if (tgtEle) {
+         let nav = document.getElementById("v4-navbar")
+         var headerOffset = nav.offsetHeight
+         var elementPosition = tgtEle.getBoundingClientRect().top
+         let pad = window.getComputedStyle(tgtEle, null).getPropertyValue('padding-top')
+         var offsetPosition = elementPosition - headerOffset - parseInt(pad)
+         window.scrollBy({
+            top: offsetPosition,
+            behavior: "smooth"
+         })
+         if ( focus == true ) {
+            tgtEle.focus({preventScroll:true})
+         }
+      }
+   }, 250)
+})
 
-export function formatNum(num) {
+export const setFocusID = ((eleID) => {
+   setTimeout( () => {
+      let ele = document.getElementById(eleID)
+      if (ele) {
+         ele.focus()
+      }
+   }, 50)
+})
+export const setFocusClass = ((className) => {
+   setTimeout( () => {
+      let eles = document.getElementsByClassName(className)
+      if (eles) {
+         eles[0].focus()
+      }
+   }, 50)
+})
+
+export const formatNum = ((num) => {
    if (num == 0) {
       return "0"
    }
@@ -219,4 +244,4 @@ export function formatNum(num) {
       return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
    }
    return ""
-}
+})

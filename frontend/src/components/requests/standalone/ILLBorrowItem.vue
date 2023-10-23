@@ -43,6 +43,7 @@ import { useItemStore } from "@/stores/item"
 import { useUserStore } from "@/stores/user"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useRequestStore } from "@/stores/request"
+import { setFocusID } from '@/utils'
 
 const props = defineProps({
    prefill: {
@@ -82,10 +83,10 @@ const request = ref({
    pickup: "",
 })
 
-async function submitClicked() {
+const submitClicked = ( async () => {
    await requestStore.submitILLiadBorrowRequest(request.value)
    emit('submitted', {title: request.value.title, pickup: request.value.pickup})
-}
+})
 
 onMounted(()=>{
    request.value.pickup = preferences.pickupLibrary.id
@@ -107,8 +108,7 @@ onMounted(()=>{
    } else {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
    }
-   let ele = document.getElementById("item-type")
-   ele.focus()
+   setFocusID("item-type")
 })
 </script>
 

@@ -42,6 +42,7 @@ import { useItemStore } from "@/stores/item"
 import { useRequestStore } from "@/stores/request"
 import { useRestoreStore } from "@/stores/restore"
 import { useUserStore } from "@/stores/user"
+import { setFocusClass, setFocusID } from '@/utils'
 
 const user = useUserStore()
 const item = useItemStore()
@@ -63,23 +64,13 @@ const canMakeRequests = computed(()=>{
 
 function reset(){
    requestStore.reset()
-   nextTick( () => {
-      let opts = document.getElementById("option-button")
-      if (opts.length > 0) {
-         opts[0].focus()
-      }
-   },150)
+   setFocusClass("option-button")
 }
 function requestSubmitted( data ) {
    requestStore.activePanel = 'SubmittedILL'
    submittedTitle.value = data.title
    submittedPickupLocation.value = data.pickup
-   nextTick( () => {
-      let btn = document.getElementById("ill-reset")
-      if (btn) {
-         btn.focus()
-      }
-   })
+   setFocusID("ill-reset")
 }
 function cancelRequest() {
    requestStore.activePanel = 'OptionsPanel'

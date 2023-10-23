@@ -71,7 +71,6 @@ const opened = (() => {
 
 const closeDialog = (() => {
    showUpdateDialog.value = false
-   // document.getElementById("update-trigger").focus()
    trigger.value.$el.focus()
 })
 

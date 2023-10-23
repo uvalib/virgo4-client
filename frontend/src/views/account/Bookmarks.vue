@@ -45,7 +45,7 @@
                         </template>
                         <div v-else class="rename">
                            <input @keyup.enter="doRename(folderInfo)"  :id="`rename-folder-${folderInfo.id}`" type="text" v-model="newFolderName"
-                               aria-required="true" aria-label="new folder name" required="required"/>
+                               aria-required="true" aria-label="new folder name" required="required" v-focus/>
                            <VirgoButton severity="secondary" @click="renaming=false" label="Cancel"/>
                            <VirgoButton @click="doRename(folderInfo)" label="OK"/>
                         </div>
@@ -96,14 +96,7 @@
             <VirgoButton v-if="createOpen==false" @click="openCreate" id="create-folder-btn" label="Create Folder"/>
             <div v-else class="create-folder">
                <label for="newname">New Folder:</label>
-               <input
-                  id="newname"
-                  ref="folderInput"
-                  @keyup.enter="createFolder"
-                  v-model="newFolder"
-                  type="text"
-                  aria-required="true" required="required"
-               />
+               <input id="newname" @keyup.enter="createFolder" v-model="newFolder" type="text" aria-required="true" required="required" v-focus/>
                <VirgoButton @click="cancelCreate" :disabled="submitting" severity="secondary" label="Cancel"/>
                <VirgoButton @click="createFolder" :disabled="submitting" label="Create"/>
             </div>
@@ -130,6 +123,7 @@ import { useRouter } from 'vue-router'
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
 import Checkbox from 'primevue/checkbox'
+import { setFocusID, setFocusClass } from '@/utils'
 
 const confirm = useConfirm()
 const toast = useToast()
@@ -140,7 +134,6 @@ const reserveStore = useReserveStore()
 const itemStore = useItemStore()
 const router = useRouter()
 
-const folderInput = ref(null)
 const renaming = ref(false)
 const newFolderName = ref("")
 const createOpen = ref(false)
@@ -191,10 +184,7 @@ const deleteFolderClicked = ((folderInfo) => {
       rejectClass: 'p-button-secondary',
       accept: () => {
          bookmarkStore.removeFolder(folderInfo.id)
-         let eles = document.getElementsByClassName("accordion-trigger")
-         if (eles ) {
-            eles[0].focus()
-         }
+         setFocusClass("accordion-trigger")
       }
    })
 })
@@ -202,13 +192,6 @@ const deleteFolderClicked = ((folderInfo) => {
 function renameClicked( folderInfo) {
    renaming.value = true
    newFolderName.value = folderInfo.folder
-   nextTick( () => {
-      let ele = document.getElementById("rename-folder-"+folderInfo.id)
-      if (ele) {
-         ele.select()
-         ele.focus()
-      }
-   })
 }
 async function doRename(folderInfo) {
    await bookmarkStore.renameFolder({id: folderInfo.id, name: newFolderName.value})
@@ -297,9 +280,6 @@ function itemURL(bookmark) {
 }
 function openCreate() {
    createOpen.value = true
-   nextTick( () => {
-      folderInput.value.focus()
-   })
 }
 function cancelCreate() {
    if (submitting.value) return
@@ -313,19 +293,14 @@ async function createFolder() {
    if (newFolder.value == "") {
       errorToast("Create Error", "A new folder name is required. Please add one and try again.")
       submitting.value = false
-      document.getElementById("newname").focus()
+      setFocusID("newname")
       return
    }
    await bookmarkStore.addFolder(newFolder.value)
    createOpen.value = false
    submitting.value = false
    newFolder.value = ""
-   nextTick( () => {
-      let btn = document.getElementById("create-folder-btn")
-      if (btn) {
-         btn.focus()
-      }
-   })
+   setFocusID("create-folder-btn")
 }
 
 function showFolderItemsForZotero(folderID) {

@@ -29,7 +29,7 @@ import { useShelfStore } from "@/stores/shelf"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
-import * as utils from '@/utils'
+import { scrollToItem } from '@/utils'
 
 const props = defineProps({
    hit: {
@@ -92,20 +92,12 @@ const getInitialBrowseData = ( async () => {
    }
 
    if ( newBM ) {
-      setTimeout( () => {
-         let cardID = `browse-${tgt}`
-         let tgtCard = document.getElementById(cardID)
-         if ( tgtCard ) {
-            utils.scrollToItem( tgtCard )
-         }
-
-         let cnt =  bookmarks.bookmarkCount( newBM.pool, newBM.identifier )
-         if ( cnt == 0 ) {
-            let sel = `#${cardID} .bookmark`
-            let triggerBtn = document.querySelector( sel )
-            bookmarks.showAddBookmark( props.pool, newBM, triggerBtn, "SHELF_BROWSE")
-         }
-      }, 500)
+      scrollToItem( `browse-${tgt}` )
+      let cnt =  bookmarks.bookmarkCount( newBM.pool, newBM.identifier )
+      if ( cnt == 0 ) {
+         let triggerBtn = document.getElementById(`bm-btn-${ newBM.identifier}`)
+         bookmarks.showAddBookmark( props.pool, newBM, triggerBtn, "SHELF_BROWSE")
+      }
    }
 })
 

@@ -30,6 +30,7 @@ import { useUserStore } from "@/stores/user"
 import { useRestoreStore } from "@/stores/restore"
 import { usePreferencesStore } from "@/stores/preferences"
 import { storeToRefs } from 'pinia'
+import { setFocusClass } from '@/utils'
 
 const user = useUserStore()
 const restore = useRestoreStore()
@@ -77,12 +78,7 @@ onMounted(()=>{
 
 const reset = (() => {
    requestStore.reset()
-   setTimeout( () => {
-      let opts = document.getElementsByClassName("option-button")
-      if (opts.length > 0) {
-         opts[0].focus()
-      }
-   },150)
+   setFocusClass("option-button")
 })
 
 const showReset = computed(() => {

@@ -28,17 +28,13 @@
 import { onMounted } from "vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
+import { setFocusID } from '@/utils'
 
 const requestStore = useRequestStore()
 const user = useUserStore()
 
 onMounted(()=>{
-   setTimeout( () => {
-      let ele = document.getElementById("request-done")
-      if ( ele ) {
-         ele.focus()
-      }
-   }, 150)
+   setFocusID("request-done")
 })
 </script>
 

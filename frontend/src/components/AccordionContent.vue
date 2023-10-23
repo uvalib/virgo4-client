@@ -181,12 +181,6 @@ function accordionClicked() {
 }
 function accordionFooterClicked() {
    accordionClicked()
-   setTimeout( ()=> {
-      let hdr = document.getElementById(`${props.id}-header`)
-      if (hdr) {
-         hdr.focus()
-      }
-   }, 250)
 }
 function onBeforeEnter(el) {
    el.style.height = '0'

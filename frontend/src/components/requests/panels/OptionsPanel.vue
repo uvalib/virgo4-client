@@ -1,7 +1,7 @@
 <template>
    <div class="options">
       <div class="option" v-for="option in requestStore.requestOptions" :key="option.type">
-         <VirgoButton severity="secondary" @click="setActive(option)" :label="option.button_label"/>
+         <VirgoButton severity="secondary" @click="setActive(option)" :label="option.button_label" class="option-button"/>
          <p class="desc" v-if="option.description" v-html="option.description"></p>
       </div>
    </div>

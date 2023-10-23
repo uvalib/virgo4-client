@@ -24,6 +24,7 @@
 import { storeToRefs } from "pinia"
 import { onMounted } from 'vue'
 import { useRequestStore } from "@/stores/request"
+import { setFocusID } from '@/utils'
 
 const emit = defineEmits( ['submitted', 'canceled'] )
 
@@ -32,7 +33,7 @@ const requestStore = useRequestStore()
 const { openurl } = storeToRefs(requestStore)
 
 onMounted(()=>{
-   document.getElementById("title").focus()
+   setFocusID("title")
 })
 
 function submitClicked() {

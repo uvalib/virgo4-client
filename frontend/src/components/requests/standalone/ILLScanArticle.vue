@@ -32,6 +32,7 @@ import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
 import { useRequestStore } from "@/stores/request"
 import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
+import { setFocusID } from '@/utils'
 
 const props = defineProps({
    prefill: {
@@ -81,8 +82,7 @@ onMounted(()=>{
    } else {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadScan")
    }
-   let ele = document.getElementById("item-type")
-   ele.focus()
+   setFocusID("item-type")
 })
 </script>
 

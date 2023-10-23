@@ -40,6 +40,7 @@ import { onMounted, computed } from 'vue'
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 import { usePreferencesStore } from "@/stores/preferences"
+import { setFocusID } from '@/utils'
 
 const emit = defineEmits( ['submitted', 'canceled'] )
 
@@ -59,7 +60,7 @@ const pickupLibraries = computed(()=>{
 
 onMounted(()=>{
    openurl.pickup = preferences.pickupLibrary
-   document.getElementById("title").focus()
+   setFocusID("title")
 })
 
 function submitClicked() {

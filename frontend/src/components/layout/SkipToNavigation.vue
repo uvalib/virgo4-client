@@ -6,6 +6,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import PanelMenu from 'primevue/panelmenu'
+import { setFocusClass, setFocusID } from '@/utils'
 
 const route = useRoute()
 
@@ -22,34 +23,21 @@ const v4SkipTo = computed(() => {
 })
 
 const skipToMain = (() => {
-   setTimeout( () => {
-      let m = document.getElementById("v4-main")
-      m.focus( {preventScroll:true} )
-   }, 150)
+   setFocusID("v4-main")
 })
 
 const skipToNav = (() => {
-   setTimeout( () => {
-      let m = document.getElementsByClassName("p-menubar-root-list")[0]
-      m.focus( {preventScroll:true} )
-      m = document.getElementsByClassName("p-menuitem")[0]
-      m.classList.add("p-focus")
-   }, 150)
+   setFocusClass("p-menubar-root-list")
+   let  m = document.getElementsByClassName("p-menuitem")[0]
+   m.classList.add("p-focus")
 })
 
 const skipToSearch = (() => {
-   setTimeout( () => {
-      let s = document.getElementById("search")
-      s.focus( {preventScroll:true} )
-      if ( s) {
-         s.focus( {preventScroll:true} )
-      } else {
-         s = document.getElementsByClassName("field")[0]
-         if ( s ) {
-            s.focus( {preventScroll:true} )
-         }
-      }
-   }, 150)
+   if ( route.query.mode == "advanced" ) {
+      setFocusClass("v4-form-input")
+   } else {
+      setFocusID("search")
+   }
 })
 </script>
 

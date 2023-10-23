@@ -79,6 +79,7 @@ import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from "pinia"
+import { setFocusID } from '@/utils'
 
 const route = useRoute()
 const alertStore = useAlertStore()
@@ -108,10 +109,8 @@ watch ( headerAlerts, () => {
 function dismissAlert( uuid ) {
    let a = document.getElementById(uuid)
    a.classList.add("dismissed")
-   nextTick( () => {
-      alertStore.dismissAlert(uuid)
-      document.getElementById("alertmenu").focus()
-   });
+   alertStore.dismissAlert(uuid)
+   setFocusID("alertmenu")
 }
 function updateClicked() {
    window.location.reload()

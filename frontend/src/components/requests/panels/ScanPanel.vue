@@ -38,6 +38,7 @@ import { ref, onMounted, computed } from "vue"
 import { useRequestStore } from "@/stores/request"
 import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
+import { setFocusID } from '@/utils'
 
 const requestStore = useRequestStore()
 const itemStore = useItemStore()
@@ -77,15 +78,9 @@ onMounted(()=>{
    }
 
    if (itemOptions.value.length == 1) {
-      let ele = document.getElementById("scan-use")
-      if ( ele ) {
-         ele.focus()
-      }
+      setFocusID("scan-use")
    } else {
-      let ele = document.getElementById("scan-select")
-      if ( ele ) {
-         ele.focus()
-      }
+      setFocusID("scan-select")
    }
 
    scan.value.title = itemStore.details.header.title
@@ -108,17 +103,17 @@ onMounted(()=>{
    }
 })
 
-function itemSelected() {
+const itemSelected =(() => {
    scan.value.label = selectedItem.value.label
    scan.value.barcode = selectedItem.value.barcode
    scan.value.library = selectedItem.value.library
    scan.value.location = selectedItem.value.location_id
    scan.value.callNumber = selectedItem.value.label
-}
+})
 
-function submit() {
+const submit = (() => {
    requestStore.submitScan( scan.value )
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,4 +1,4 @@
-import { createApp, markRaw } from 'vue'
+import { createApp, markRaw, nextTick } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { plugin, defaultConfig } from '@formkit/vue'
@@ -16,6 +16,11 @@ pinia.use(({ store }) => {
 const app = createApp(App)
 app.use(router)
 app.use(pinia)
+
+// add a directive that can be used to autofocus and a plugin that can sefelt set focus
+app.directive('focus', {
+   mounted: (el) => nextTick( ()=> el.focus() )
+})
 
 const dc = defaultConfig({
    plugins: [addErrorAlertIconPlugin, addRequiredNotePlugin],

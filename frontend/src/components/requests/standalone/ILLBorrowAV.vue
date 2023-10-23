@@ -34,6 +34,7 @@ import { useRequestStore } from "@/stores/request"
 import { usePreferencesStore } from "@/stores/preferences"
 import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
+import { setFocusID } from '@/utils'
 
 const props = defineProps({
    prefill: {
@@ -83,8 +84,7 @@ onMounted(()=>{
    } else {
       analytics.trigger('Requests', 'REQUEST_STARTED', "illiadBorrow")
    }
-   let ele = document.getElementById("av-title")
-   ele.focus()
+   setFocusID("av-title")
 })
 
 </script>

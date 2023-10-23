@@ -94,6 +94,7 @@ import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
 import Dialog from 'primevue/dialog'
 import Checkbox from 'primevue/checkbox'
+import { setFocusID } from '@/utils'
 
 const results = useResultStore()
 const userStore = useUserStore()
@@ -206,8 +207,7 @@ const copyRSS = ((token) => {
 const closeRSSDialog = (() => {
    showRSSModal.value = false
    if ( showRSSTriggerID.value ) {
-      console.log("focus "+showRSSTriggerID.value)
-      document.getElementById( showRSSTriggerID.value ).focus()
+      setFocusID( showRSSTriggerID.value )
       showRSSTriggerID.value = ""
    }
 })

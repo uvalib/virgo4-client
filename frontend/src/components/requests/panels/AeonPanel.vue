@@ -37,6 +37,7 @@
 import { onMounted, computed, ref } from "vue"
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
+import { setFocusID } from '@/utils'
 
 const request = useRequestStore()
 
@@ -52,18 +53,19 @@ const itemOptions = computed(() => {
 })
 
 onMounted(() => {
-   let ele = document.getElementById("item-select")
    if (itemOptions.value.length == 1) {
       selectedItem.value = itemOptions.value[0].value
       ele = document.getElementById("item-notes")
+      setFocusID("item-notes")
+   } else {
+      setFocusID("item-select")
    }
-   ele.focus()
    analytics.trigger('Requests', 'REQUEST_STARTED', "aeon")
 })
 
-function submitAeon() {
+const submitAeon = (() => {
    request.submitAeon(selectedItem.value, specialRequest.value)
-}
+})
 </script>
 
 <style lang="scss" scoped>

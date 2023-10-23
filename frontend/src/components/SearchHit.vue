@@ -1,16 +1,16 @@
 <template>
    <div class="inner-hit-wrapper" :class="{group: props.hit.grouped}">
-      <div class="hit" v-bind:data-identifier="props.hit.identifier">
+      <div class="hit" :id="props.hit.identifier">
          <SearchHitHeader :maxLen="60" :count="props.count" :hit="props.hit" :pool="props.pool" from="SEARCH"/>
          <SearchHitDetail :hit="props.hit" :pool="props.pool"/>
       </div>
-      <AccordionContent v-if="props.hit.grouped" :id="props.hit.identifier"
+      <AccordionContent v-if="props.hit.grouped" :id="`group-${props.hit.identifier}`"
          :autoExpandID="results.autoExpandGroupID" :expanded="!preferences.collapseGroups"
          backgroundContent="none" background="var(--uvalib-blue-alt-light)"
          borderColor="var(--uvalib-blue-alt-light)" class="group">
          <template v-slot:title>{{groupTitle}}</template>
          <div v-for="(groupHit,idx) in props.hit.group" :key="`g${idx}`"
-            class="group-hit" v-bind:data-identifier="groupHit.identifier"
+            class="group-hit" :id="groupHit.identifier"
             :class="{last: idx==props.hit.group.length-1, first: idx==0}"
          >
             <SearchHitHeader :maxLen="60" :count="groupHit.number" :hit="groupHit" :pool="pool" from="SEARCH"/>

@@ -3,7 +3,7 @@
       <div class="add-content" v-if="showSignInMessage">
          <p>You must be signed in to use bookmarks.</p>
          <p>
-            <VirgoButton link @click="signInClicked" aria-label="Sign in to bookmark item" label="Sign in now"/>
+            <VirgoButton link @click="signInClicked" aria-label="Sign in to bookmark item" label="Sign in now" v-focus/>
          </p>
       </div>
       <div v-else class="add-content">
@@ -12,7 +12,7 @@
          <div class="select" >
             <template v-if="showAdd==false">
                <label for="folder">Select a folder for the bookmark</label>
-               <select v-model="selectedFolder" id="folder" name="folder">
+               <select v-model="selectedFolder" id="folder" name="folder" v-focus >
                   <option v-for="(folder) in bookmarkStore.sortedFolders" selected=false
                      :key="folder.id" :value="folder.name ">
                      {{ folder.name }}
@@ -21,7 +21,7 @@
             </template>
             <template v-else>
                <label for="new-folder">Create a new folder for the bookmark</label>
-               <input id="new-folder" type="text" v-model="newFolder" @keyup.enter="okBookmark">
+               <input id="new-folder" type="text" v-model="newFolder" @keyup.enter="okBookmark" v-focus>
             </template>
          </div>
          <p class="error">{{bookmarkError}}</p>
@@ -90,9 +90,6 @@ const closeDialog = (() => {
 
 const addFolder = (() => {
    showAdd.value = true
-   nextTick( () => {
-      document.getElementById("new-folder").focus()
-   })
 })
 
 const okBookmark = (async () => {

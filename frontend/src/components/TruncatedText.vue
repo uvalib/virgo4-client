@@ -27,8 +27,8 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
-import * as utils from '@/utils'
+import { ref, computed } from 'vue'
+import { setFocusID } from '@/utils'
 
 const props = defineProps({
    text: {
@@ -58,33 +58,19 @@ const truncatedText = computed(()=>{
    return out
 })
 
-function hide() {
+const hide =(() => {
    showFull.value = false
-   nextTick( () => {
-      let tgtID = `${props.id}-cut`
-      let ele = document.getElementById( tgtID )
-      if (ele) {
-         ele.focus()
-         utils.scrollToItem(ele)
-      }
-   })
-}
-function toggle() {
+   setFocusID(`${props.id}-cut`, true)
+})
+
+const toggle = (() => {
    showFull.value = !showFull.value
-   nextTick( () => {
-      let tgtID = `${props.id}-full`
-      if ( showFull.value == false) {
-         tgtID = `${props.id}-cut`
-      }
-      let ele = document.getElementById( tgtID )
-      if (ele) {
-         ele.focus()
-         if (showFull.value == false) {
-            utils.scrollToItem(ele)
-         }
-      }
-   })
-}
+   let tgtID = `${props.id}-full`
+   if ( showFull.value == false) {
+      tgtID = `${props.id}-cut`
+   }
+   setFocusID(tgtID)
+})
 </script>
 
 <style lang="scss" scoped>

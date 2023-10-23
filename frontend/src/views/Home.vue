@@ -40,9 +40,9 @@ import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"
 import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
-import * as utils from '../utils'
+import { scrollToItem } from '@/utils'
 import analytics from '@/analytics'
-import { ref, onMounted, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -80,14 +80,7 @@ const { searching } = storeToRefs(resultStore)
 watch(searching, (newValue, oldValue) => {
    if (oldValue == true && newValue == false) {
       if (restore.url == "/") {
-         nextTick( () => {
-            let r = document.getElementById("results-container")
-            if (r) {
-               // sometimes results may not be availble - maybe auth session problems for one
-               r.focus({preventScroll:true})
-               utils.scrollToItem(r)
-            }
-         })
+         scrollToItem("results-container", true)
       }
       if ( queryMessage.value != "") {
          systemStore.setMessage(queryMessage.value)
@@ -326,29 +319,14 @@ function handlePendingBookmark() {
    let newBM = restore.pendingBookmark
    let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
 
-   let triggerBtn = null
+   let triggerBtn = document.getElementById(`bm-btn-${ newBM.identifier}`)
    if (  newBM.groupParent ) {
-      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.groupParent)
-
       // The group accordion watches this value. When set, the accordion will auto-expand,
       // adding the target item to the DOM
-      resultStore.setAutoExpandGroupID(parent.identifier)
-      setTimeout( ()=>{
-         let sel = `.group-hit[data-identifier="${newBM.identifier}"]`
-         let tgtEle = document.body.querySelector(sel)
-         if ( tgtEle ) {
-            triggerBtn = tgtEle.querySelector("button.bookmark")
-            utils.scrollToItem(tgtEle)
-         }
-      }, 250)
-   } else {
-      let sel = `.hit[data-identifier="${newBM.identifier}"]`
-      let tgtEle = document.body.querySelector(sel)
-      if ( tgtEle ) {
-         triggerBtn = tgtEle.querySelector("button.bookmark")
-         utils.scrollToItem(tgtEle)
-      }
+      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.groupParent)
+      resultStore.setAutoExpandGroupID(`group-${parent.identifier}`)
    }
+   scrollToItem(newBM.identifier, false)
 
    if ( showAdd ) {
       bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "SEARCH")

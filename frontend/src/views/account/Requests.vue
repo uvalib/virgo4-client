@@ -211,6 +211,7 @@ import { ref, computed, onMounted } from 'vue'
 import analytics from '@/analytics'
 import AccordionContent from "@/components/AccordionContent.vue"
 import Dialog from 'primevue/dialog'
+import { setFocusID } from '@/utils'
 
 const systemStore = useSystemStore()
 const userStore = useUserStore()
@@ -305,15 +306,12 @@ const showCancelHold = ((req, reqIndex) => {
    reqToCancel.value.confirmationEmail = userStore.singleEmail.toLowerCase()
    showCancelModal.value = true
    cancelButtonIdx.value = reqIndex
-   if( reqToCancel.value.cancellable ){
+   if ( reqToCancel.value.cancellable ){
       analytics.trigger('Requests', 'REQUEST_CANCEL_STARTED', "sirsi")
-   }else{
+   } else {
       analytics.trigger('Requests', 'REQUEST_CANCEL_STARTED', "email")
    }
-   let ele = document.getElementById('cancelHoldButton')
-   if (ele) {
-      ele.focus()
-   }
+   setFocusID('cancelHoldButton')
 })
 
 const hideCancelHold = (() => {

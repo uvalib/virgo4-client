@@ -63,10 +63,11 @@
 
 <script setup>
 import BrowseCard from "@/components/details/BrowseCard.vue"
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useShelfStore } from "@/stores/shelf"
 import { useRoute } from 'vue-router'
 import analytics from '@/analytics'
+import { setFocusID } from '@/utils'
 
 const route = useRoute()
 const shelfStore = useShelfStore()
@@ -103,10 +104,7 @@ const lastCall = computed(() =>{
 function selectView( mode ) {
    currViewMode.value = mode
    viewModeOpen.value = false
-   nextTick( () => {
-      let dd = document.getElementById("view")
-      dd.focus()
-   })
+   setFocusID("view")
 }
 function toggleViewMenu() {
    viewModeOpen.value = !viewModeOpen.value
@@ -138,12 +136,7 @@ function prevMenu() {
    focusMenuItem()
 }
 function focusMenuItem() {
-   nextTick( () => {
-      let menu = document.getElementById(currFocus.value)
-      if (menu) {
-         menu.focus()
-      }
-   })
+   setFocusID(currFocus.value)
 }
 function closeViewMenu() {
    viewModeOpen.value = false

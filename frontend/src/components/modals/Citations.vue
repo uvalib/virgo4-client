@@ -29,12 +29,11 @@
          </template>
          <div class="messagebox" aria-live="polite">
             <span v-if="message" class="info">{{message}}</span>
-            <span v-if="error" class="error">{{error}}</span>
          </div>
          <div class="form-controls" >
             <VirgoButton v-if="props.format == 'all'" @click="downloadRISClicked" aria-label="download RIS citation"
                label="Download RIS" icon="fas fa-file-export" iconPos="right"/>
-            <VirgoButton @click="copyCitation" label="Copy Citation" ref="copycitation"/>
+            <VirgoButton @click="copyCitation" label="Copy Citation" v-focus/>
             <VirgoButton @click="closeDialog" label="Close"/>
          </div>
       </div>
@@ -48,6 +47,7 @@ import { ref, nextTick, computed} from 'vue'
 import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 import Dialog from 'primevue/dialog'
+import { useToast } from "primevue/usetoast"
 
 const props = defineProps({
    title: {
@@ -78,15 +78,15 @@ const props = defineProps({
 
 const system = useSystemStore()
 const itemStore = useItemStore()
+const toast = useToast()
+
 const loading = ref(true)
 const failed = ref(false)
 const citations = ref(null)
 const selectedIdx = ref(0)
-const error = ref("")
 const message = ref("")
 const showDialog = ref(false)
 const trigger = ref(null)
-const copycitation = ref()
 
 const citationType =((idx) => {
    if ( idx == selectedIdx.value ) {
@@ -122,7 +122,6 @@ const citationSelected =((idx) => {
 })
 
 const opened = (() => {
-   error.value = ""
    message.value = ""
    loading.value = true
    failed.value = false
@@ -136,8 +135,6 @@ const opened = (() => {
       loading.value = false
       failed.value = true
       citations.value = error
-   }).finally( ()=> {
-      setInitialFocus()
    })
 })
 
@@ -145,15 +142,6 @@ const closeDialog = (() => {
    showDialog.value = false
    trigger.value.$el.focus()
 })
-
-function setInitialFocus() {
-   if ( props.format == 'all') {
-      let btn = document.getElementsByClassName("citation")[0]
-      btn.focus()
-   } else {
-      copycitation.value.$el.focus()
-   }
-}
 
 const downloadRISClicked = (() => {
    analytics.trigger('Export', risFrom.value, itemID.value)
@@ -167,19 +155,13 @@ const copyCitation = (() => {
    div.innerHTML = citation.value
    let text = div.textContent
 
-   // message/errors pop up behind the citation modal on details page, so only show one if we have to
    copyText(text, undefined, (error, _event) => {
       if (error) {
-         error.value =  "Unable to copy "+citation.label+" citation: "+error.toString()
+         toast.add({severity:'error', summary: "Copy Error", detail: "Unable to copy "+citation.label+" citation: "+error.toString(), life: 5000})
       } else {
-         message.value = citation.label+" citation copied to clipboard."
+         toast.add({severity:'success', summary: "Citation Copied", detail: citation.label+" citation copied to clipboard.", life: 3000})
       }
    })
-   nextTick( () => {document.getElementById("copy-citation").focus()} )
-   setTimeout( () => {
-      error.value = ""
-      message.value = ""
-   }, 5000)
 })
 </script>
 
