@@ -20,6 +20,7 @@ import { ref, computed } from 'vue'
 import analytics from '@/analytics'
 import Dialog from 'primevue/dialog'
 import { useToast } from "primevue/usetoast"
+import { setFocusID } from '@/utils'
 
 const toast = useToast()
 const bookmarkStore = useBookmarkStore()
@@ -45,6 +46,7 @@ const openClicked = (() => {
       toast.add({severity:'error', summary: "Print Error", detail:  "No bookmarks have been selected to print.", life: 5000})
    } else {
       showDialog.value = true
+      setFocusID("titleinput")
    }
 })
 

@@ -31,10 +31,11 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 import { useUserStore } from "@/stores/user"
 import Dialog from 'primevue/dialog'
 import { useToast } from "primevue/usetoast"
+import { setFocusID } from '@/utils'
 
 const toast = useToast()
 const userStore = useUserStore()
@@ -67,6 +68,7 @@ const opened = (() => {
    okDisabled.value = false
    // Shallow clone
    originalContact.value = {...contact.value}
+   setFocusID("firstname")
 })
 
 const closeDialog = (() => {

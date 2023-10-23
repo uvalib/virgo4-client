@@ -43,7 +43,7 @@
 <script setup>
 import { useItemStore } from "@/stores/item"
 import { useSystemStore } from "@/stores/system"
-import { ref, nextTick, computed} from 'vue'
+import { ref, computed} from 'vue'
 import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 import Dialog from 'primevue/dialog'

@@ -21,6 +21,7 @@ import { useUserStore } from "@/stores/user"
 import { ref } from 'vue'
 import Dialog from 'primevue/dialog'
 import { useToast } from "primevue/usetoast"
+import { setFocusID } from '@/utils'
 
 const toast = useToast()
 const userStore = useUserStore()
@@ -33,6 +34,7 @@ const opened = (() => {
    userId.value = ""
    error.value = ""
    okDisabled.value = false
+   setFocusID("forgot-id")
 })
 
 const closeDialog = (() => {

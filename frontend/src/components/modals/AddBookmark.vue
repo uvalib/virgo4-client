@@ -40,7 +40,7 @@
 
 <script setup>
 import TruncatedText from "@/components/TruncatedText.vue"
-import { nextTick, ref, computed } from 'vue'
+import { ref, computed } from 'vue'
 import analytics from '@/analytics'
 import { useBookmarkStore } from "@/stores/bookmark"
 import { useUserStore } from "@/stores/user"
