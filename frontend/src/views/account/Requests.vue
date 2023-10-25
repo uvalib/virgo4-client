@@ -5,6 +5,19 @@
       <div class="details" v-if="userStore.isSignedIn">
          <template v-if="!userStore.noILSAccount && !userStore.isBarred">
             <h2>Make a New Request</h2>
+            <div class="regional-alert">
+               <div class="ra-warning">
+                  <div class="alert-title">Interlibrary loan delays; please make requests early</div>
+                  <div>
+                     ILL will be placed on hiatus from Nov. 8-15, as staff and equipment are relocating.
+                     <strong>
+                        If you need <a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">interlibrary loan</a>
+                        items before November 16, please make your book requests no later than October 27 and article requests by November 3.
+                     </strong>
+                     We'll do our very best to complete requests received before that time.
+                  </div>
+               </div>
+            </div>
             <div v-if="!userStore.isUVA">
                <!-- No ILL requests for community borrowers  -->
             </div>
@@ -329,7 +342,9 @@ onMounted(() =>{
 </script>
 
 <style lang="scss" scoped>
-
+.regional-alert{
+   padding: 20px 10px 0 10px;
+}
 .requests {
    min-height: 400px;
    position: relative;

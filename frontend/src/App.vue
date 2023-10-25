@@ -511,6 +511,24 @@ body {
    }
 }
 
+/** regional alert: warning */
+#app .ra-warning {
+   border: 0.2em solid #ECC602;
+   border-radius: 0.5em;
+   padding: 0.75rem 1rem;
+   margin-bottom: 1rem;
+   background-color: #FEF6C8;
+   text-align: left;
+   .alert-title {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 0.5rem;
+   }
+   a {
+      text-decoration: underline;
+   }
+}
+
 .no-wrap {
    white-space: nowrap;
 }
