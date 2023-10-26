@@ -2,24 +2,9 @@
    <VirgoButton @click="showDialog=true" aria-label="view collection calendar" ref="trigger"
       label="Calendar" icon="fal fa-calendar-alt" iconPos="right" class="calendar"/>
 
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog">
-      <vue-cal
-         id="collection-date-picker"
-         class="vuecal--date-picker"
-         xsmall
-         hide-view-selector
-         click-to-navigate
-         :time="false"
-         :transitions="false"
-         :selectedDate="picked"
-         :minDate="collection.collectionStartDate"
-         :maxDate="collection.collectionEndDate"
-         :disableDays=collection.notPublishedDates
-         active-view="month"
-         :disable-views="['week', 'day']"
-         @view-change="viewChanged($event)"
-         @cell-focus="cellClicked($event)"
-      />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened">
+      <Calendar v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
+         :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @update:model-value="datePicked"/>
       <div class="error">
          {{error}}
       </div>
@@ -27,9 +12,10 @@
 </template>
 
 <script setup>
-import VueCal from 'vue-cal'
-import 'vue-cal/dist/vuecal.css'
-import { ref } from 'vue'
+import Calendar from 'primevue/calendar'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { ref,computed } from 'vue'
 import { useCollectionStore } from "@/stores/collection"
 import Dialog from 'primevue/dialog'
 
@@ -48,40 +34,30 @@ const props = defineProps({
 const collection = useCollectionStore()
 const showDialog = ref(false)
 const trigger = ref()
-const picked = ref(props.date)
+const picked = ref()
 const error = ref("")
-const currentCalView = ref("month")
+dayjs.extend(customParseFormat)
 
-const viewChanged = ((e) => {
-   currentCalView.value = e.view
-   error.value = ""
-   let priorYear = picked.value.split("-")[0]
-   let newYear = e.startDate.getFullYear()
-   if (priorYear != newYear) {
-      collection.setYear(newYear)
-   }
+const opened = (() => {
+   picked.value = dayjs(props.date, "YYYY-MM-DD").toDate()
 })
 
-const cellClicked = ( async (e) => {
-   error.value = ""
-   let priorYear = picked.value.split("-")[0]
-   let y = e.getFullYear()
-   let m = `${e.getMonth()+1}`
-   m = m.padStart(2,0)
-   let d = `${e.getDate()}`
-   d = d.padStart(2,0)
-   picked.value = `${y}-${m}-${d}`
-   if (priorYear != y) {
-      await collection.setYear(y)
-   }
-   if (currentCalView.value == "month") {
-      navigateToDate()
-   }
+const minDate = computed(() => {
+   return dayjs(collection.startDate, "YYYY-MM-DD").toDate()
+})
+const maxDate = computed(() => {
+   return dayjs(collection.endDate, "YYYY-MM-DD").toDate()
 })
 
-const navigateToDate = (() => {
+const yearChanged = ((e) => {
+   collection.setYear(""+e.year)
+})
+
+const datePicked = (() => {
+   let pickStr = dayjs(picked.value).format("YYYY-MM-DD")
+   console.log(pickStr)
    error.value = ""
-   let pid = collection.getPidForDate(picked.value)
+   let pid = collection.getPidForDate( pickStr )
    if ( pid != "") {
       emit('picked', pid)
       closeDialog()
@@ -98,6 +74,10 @@ const closeDialog = (() => {
 </script>
 
 <style lang="scss" scoped>
+:deep(.p-disabled) {
+   opacity: 0.2;
+}
+
 #collection-date-picker {
    width: 100%;
    max-width: 300px;
