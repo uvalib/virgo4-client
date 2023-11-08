@@ -1,8 +1,6 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 export const useCollectionStore = defineStore('collection', {
 	state: () => ({
@@ -14,6 +12,7 @@ export const useCollectionStore = defineStore('collection', {
       itemLabel: "Issue",
       startDate: "",
       endDate: "",
+      selectedDate: "",
       currentYear: "",
       notPublishedDates: [],
       yearPublications: [],
@@ -58,8 +57,7 @@ export const useCollectionStore = defineStore('collection', {
 
    actions: {
       updateNotPublishedDates() {
-         dayjs.extend(customParseFormat)
-         this.notPublishedDates = []
+         this.notPublishedDates.splice(0, this.notPublishedDates.length)
          let yearPubs = this.yearPublications.find( yp => yp.year == this.currentYear)
          if (yearPubs) {
             for (let month=1; month<=12; month++) {
@@ -71,8 +69,7 @@ export const useCollectionStore = defineStore('collection', {
                   let tgt = `${this.currentYear}-${monthStr}-${dayStr}`
                   let idx = yearPubs.dates.findIndex( mp => mp.date == tgt)
                   if (idx == -1) {
-                     let tgtDate = dayjs(tgt, "YYYY-MM-DD").toDate()
-                     this.notPublishedDates.push(tgtDate)
+                     this.notPublishedDates.push(tgt)
                   }
                }
             }
@@ -85,14 +82,24 @@ export const useCollectionStore = defineStore('collection', {
                   let dayStr = `${day}`
                   dayStr = dayStr.padStart(2, "0")
                   let tgt = `${this.currentYear}-${monthStr}-${dayStr}`
-                  let tgtDate = dayjs(tgt, "YYYY-MM-DD").toDate()
-                  this.notPublishedDates.push(tgtDate)
+                  this.notPublishedDates.push(tgt)
                }
             }
          }
       },
       clearCollectionDetails() {
-         this.$reset()
+         this.id = ""
+         this.features.splice(0, this.features.length)
+         this.image = null
+         this.title = ""
+         this.description  = ""
+         this.itemLabel = "Issue"
+         this.startDate = ""
+         this.endDate = ""
+         this.filter = ""
+         this.selectedDate = ""
+         this.currentMonth = ""
+         this.currentYear = ""
       },
       setCollectionDetails(data) {
          this.id = data.id
@@ -116,6 +123,11 @@ export const useCollectionStore = defineStore('collection', {
             this.yearPublications.splice(idx,1)
          }
          this.yearPublications.push(newYear)
+      },
+      setSelectedDate(date) {
+         this.selectedDate = date
+         this.currentMonth = date.split("-")[1]
+         this.currentYear = date.split("-")[0]
       },
 
       async getCollections() {
