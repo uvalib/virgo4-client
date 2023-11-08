@@ -7,14 +7,10 @@
             <h2>Make a New Request</h2>
             <div class="regional-alert">
                <div class="ra-warning">
-                  <div class="alert-title">Interlibrary loan delays; please make requests early</div>
+                  <div class="alert-title">Interlibrary loan delays in November</div>
                   <div>
-                     ILL will be placed on hiatus from Nov. 8-15, as staff and equipment are relocating.
-                     <strong>
-                        If you need <a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">interlibrary loan</a>
-                        items before November 16, please make your book requests no later than October 27 and article requests by November 3.
-                     </strong>
-                     We'll do our very best to complete requests received before that time.
+                     ILL will be placed on hiatus from Nov. 8-15, as staff and equipment are relocating,
+                     but every effort will be made to fulfill requests in a timely manner. We appreciate your patience. 
                   </div>
                </div>
             </div>
