@@ -9,8 +9,7 @@
                <div class="ra-warning">
                   <div class="alert-title">Interlibrary loan delays in November</div>
                   <div>
-                     ILL will be placed on hiatus from Nov. 8-15, as staff and equipment are relocating,
-                     but every effort will be made to fulfill requests in a timely manner. We appreciate your patience. 
+                     ILL is on hiatus until Nov. 20, as staff and equipment are relocating, but every effort will be made to fulfill requests in a timely manner. We appreciate your patience.
                   </div>
                </div>
             </div>
