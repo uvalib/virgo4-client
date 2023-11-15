@@ -4,7 +4,7 @@
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened">
       <Calendar v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
-         :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @update:model-value="datePicked"/>
+         :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @month-change="monthChanged" @update:model-value="datePicked"/>
       <div class="error">
          {{error}}
       </div>
@@ -49,13 +49,18 @@ const maxDate = computed(() => {
    return dayjs(collection.endDate, "YYYY-MM-DD").toDate()
 })
 
+const monthChanged = ( (e) => {
+   if ( collection.currentYear != e.year) {
+      collection.setYear(""+e.year)
+   }
+})
+
 const yearChanged = ((e) => {
    collection.setYear(""+e.year)
 })
 
 const datePicked = (() => {
    let pickStr = dayjs(picked.value).format("YYYY-MM-DD")
-   console.log(pickStr)
    error.value = ""
    let pid = collection.getPidForDate( pickStr )
    if ( pid != "") {
