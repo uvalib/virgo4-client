@@ -92,7 +92,18 @@ export const useCollectionStore = defineStore('collection', {
          }
       },
       clearCollectionDetails() {
-         this.$reset()
+         this.id = ""
+         this.title = ""
+         this.description = ""
+         this.itemLabel = "Issue"
+         this.startDate = ""
+         this.endDate = ""
+         this.currentYear = ""
+         this.notPublishedDates = []
+         this.yearPublications = []
+         this.filter = ""
+         this.features = []
+         this.image = null
       },
       setCollectionDetails(data) {
          this.id = data.id
