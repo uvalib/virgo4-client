@@ -222,7 +222,7 @@ onMounted(()=>{
          if ( curio.page) {
             qp.push(`page=${curio.page}`)
          }
-         history.replaceState(null, null, "?"+qp.join("&"))
+         history.replaceState(history.state, '', "?"+qp.join("&"))
       } else if (e.data.dimensions && e.data.dimensions.height != "0px"){
          curioHeight.value = e.data.dimensions.height
          // let Virgo determine the screen width
@@ -251,7 +251,7 @@ function relatedImageClicked( hit ) {
 }
 function viewerClicked(tgtItem) {
    selectedDigitalObjectIdx.value = item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
-   history.replaceState(null, null, "?idx="+selectedDigitalObjectIdx.value)
+   history.replaceState(history.state, '', "?idx="+selectedDigitalObjectIdx.value)
 }
 function isCurrent(tgtItem) {
    let curr = item.digitalContent[selectedDigitalObjectIdx.value]
