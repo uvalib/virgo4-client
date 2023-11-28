@@ -38,7 +38,7 @@
          <div v-else class="value">
             <template v-if="pdfContent.length > 0">
                <div class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></div>
-               <div class="hscroller">
+               <ScrollPanel>
                   <div class="hcontent">
                      <div v-for="item in pdfContent" :key="item.pid"
                         class="download-card" role="button"
@@ -79,7 +79,7 @@
                         </span>
                      </div>
                   </div>
-               </div>
+               </ScrollPanel>
             </template>
          </div>
 
@@ -104,6 +104,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useResultStore } from "@/stores/result"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
+import ScrollPanel from 'primevue/scrollpanel'
 
 const collection = useCollectionStore()
 const item = useItemStore()
@@ -350,6 +351,7 @@ onUnmounted(()=>{
 .digital-content {
    width: 95%;
    margin: 0 auto;
+   overflow: hidden;
 
    .working {
       text-align: center;
@@ -519,25 +521,21 @@ onUnmounted(()=>{
 }
 .do-header {
    background: #efefef;
-   border: 1px solid var(--uvalib-grey-light);
-   border-bottom: 0;
-   padding: 10px 0 5px 0;
+   border-top: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid var(--uvalib-grey-light);
+   padding: 10px 0;
    text-align: center;
 }
-.hscroller {
-   overflow: scroll;
-   background: #efefef;
-   border: 1px solid var(--uvalib-grey-light);
-   border-top: 0;
 
-   .hcontent {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: flex-start;
-      align-items: stretch;
-      padding: 0 15px 15px 15px;
-   }
+.hcontent {
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: flex-start;
+   align-items: flex-start;
+   padding: 0;
+   margin-top: 15px;
 }
+
 :deep(.pdf) {
    padding-top: 0 !important;
 }
