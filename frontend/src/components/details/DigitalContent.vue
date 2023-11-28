@@ -427,7 +427,7 @@ onUnmounted(()=>{
          padding: 15px 10px 10px 10px;
          box-shadow: $v4-box-shadow-light;
          cursor: pointer;
-         min-width: 150px;
+         min-width: 175px;
          background: white;
          &:hover {
             top: -2px;
@@ -465,14 +465,6 @@ onUnmounted(()=>{
              &:focus {
                @include be-accessible();
             }
-         }
-
-         .v4-progress-bar {
-            position: absolute;
-            left: 10px;
-            right: 10px;
-            top: 40%;
-            transform: translateY(-50%);
          }
       }
    }
