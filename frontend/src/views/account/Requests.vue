@@ -5,14 +5,6 @@
       <div class="details" v-if="userStore.isSignedIn">
          <template v-if="!userStore.noILSAccount && !userStore.isBarred">
             <h2>Make a New Request</h2>
-            <div class="regional-alert">
-               <div class="ra-warning">
-                  <div class="alert-title">Interlibrary loan delays in November</div>
-                  <div>
-                     ILL is on hiatus until Nov. 20, as staff and equipment are relocating, but every effort will be made to fulfill requests in a timely manner. We appreciate your patience.
-                  </div>
-               </div>
-            </div>
             <div v-if="!userStore.isUVA">
                <!-- No ILL requests for community borrowers  -->
             </div>
