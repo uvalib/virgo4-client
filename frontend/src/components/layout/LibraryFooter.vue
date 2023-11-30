@@ -20,9 +20,10 @@
                </li>
                <li>
                   <address>
-                  University of Virginia Library<br />
-                  P.O. Box - 400109<br />
-                  Charlottesville, VA 22904<br />
+                     UVA Alderman Library<br />
+                     P.O. Box 400113<br />
+                     160 McCormick Road<br/>
+                     Charlottesville, VA 22904<br />
                   </address>
                </li>
             </ul>
