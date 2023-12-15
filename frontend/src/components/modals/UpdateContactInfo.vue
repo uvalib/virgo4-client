@@ -6,17 +6,21 @@
             <div class="section">
                <p class="section-name">Name</p>
                <div class="content">
-                  <FormKit type="text" label="First" v-model="contact.firstName" id="firstname"/>
-                  <FormKit type="text" label="Middle" v-model="contact.middleName"/>
-                  <FormKit type="text" label="Last" v-model="contact.lastName"/>
-                  <FormKit type="text" label="Preferred" v-model="contact.preferredName" help="We will address you by this name if supplied."/>
+                  <p :v-if="userStore.isUVA">As a Netbadge user, visit <a target="_blank" href="https://in.virginia.edu/profile">https://in.virginia.edu/profile</a> to change your preferred name in the UVA Identity and Access Management Portal.</p>
+                  <FormKit type="text" label="First" :disabled="userStore.isUVA" v-model="contact.firstName" id="firstname"/>
+                  <FormKit type="text" label="Middle" :disabled="userStore.isUVA" v-model="contact.middleName"/>
+                  <FormKit type="text" label="Last" :disabled="userStore.isUVA" v-model="contact.lastName"/>
+                  <FormKit type="text" label="Preferred" :disabled="userStore.isUVA" v-model="contact.preferredName" help="We will address you by this name if supplied."/>
                </div>
             </div>
             <div class="section">
                <p class="section-name pad-top">Contact</p>
                <div class="content">
-                  <FormKit type="email" label="Email" v-model="contact.email" validation="required"/>
-                  <FormKit type="text" label="Phone" v-model="contact.phone"/>
+                  <FormKit type="group">
+                     <FormKit type="email" name="email" label="Email" v-model="contact.email" validation="required" id="email"/>
+                     <FormKit type="email" name="email_confirm" label="Email Confirmation" validation="confirm" />
+                     <FormKit type="text" label="Phone" v-model="contact.phone"/>
+                  </FormKit>
                </div>
             </div>
          </div>
@@ -44,7 +48,7 @@ const showUpdateDialog = ref(false)
 const contact = ref({
    userID: "",
    firstName: "",
-   nickName: "",
+   preferredName: "",
    middleName: "",
    lastName: "",
    phone: "",
@@ -68,7 +72,11 @@ const opened = (() => {
    okDisabled.value = false
    // Shallow clone
    originalContact.value = {...contact.value}
-   setFocusID("firstname")
+   if(userStore.isUVA){
+      setFocusID("email")
+   }else{
+      setFocusID("firstname")
+   }
 })
 
 const closeDialog = (() => {

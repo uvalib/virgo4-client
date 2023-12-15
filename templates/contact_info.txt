@@ -4,16 +4,16 @@ _______________________________________________________________________
 
 Name
 _______________________________________________________________________
-ID:          {{.NewContact.UserID}}
-First Name:  {{formatDiff .NewContact.FirstName .OldContact.FirstName}}
-Nickname:    {{formatDiff .NewContact.NickName .OldContact.NickName}}
-Middle Name: {{formatDiff .NewContact.MiddleName .OldContact.MiddleName}}
-Last Name:   {{formatDiff .NewContact.LastName .OldContact.LastName}}
+ID:             {{.NewContact.UserID}}
+First Name:     {{formatDiff .NewContact.FirstName .OldContact.FirstName}}
+Preferred Name: {{formatDiff .NewContact.PreferredName .OldContact.PreferredName}}
+Middle Name:    {{formatDiff .NewContact.MiddleName .OldContact.MiddleName}}
+Last Name:      {{formatDiff .NewContact.LastName .OldContact.LastName}}
 
 Contact
 _______________________________________________________________________
-Email:       {{formatDiff .NewContact.Email .OldContact.Email}}
-Phone:       {{formatDiff .NewContact.Phone .OldContact.Phone}}
+Email:          {{formatDiff .NewContact.Email .OldContact.Email}}
+Phone:          {{formatDiff .NewContact.Phone .OldContact.Phone}}
 
 {{/*
 Address
