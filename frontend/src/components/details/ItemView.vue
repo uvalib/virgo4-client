@@ -107,7 +107,7 @@ import ShelfBrowse from "@/components/details/ShelfBrowse.vue"
 import DigitalContent from "@/components/details/DigitalContent.vue"
 import analytics from '@/analytics'
 import * as utils from '@/utils'
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { usePoolStore } from "@/stores/pool"
@@ -162,10 +162,12 @@ const marcXML = computed(()=>{
 })
 
 const returnToSearch = (() => {
+   analytics.trigger('Details', 'RETURN_TO_RESULTS_CLICKED', details.value.identifier)
    router.push( resultStore.lastSearchURL )
 })
 
 const nextHitClicked = ( async () => {
+   analytics.trigger('Details', 'NEXT_HIT_CLICKED', details.value.identifier)
    await resultStore.nextHit()
    let url = route.fullPath
    let lastSlash = url.lastIndexOf("/")
@@ -174,6 +176,7 @@ const nextHitClicked = ( async () => {
 })
 
 const priorHitClicked = ( async () => {
+   analytics.trigger('Details', 'PRIOR_HIT_CLICKED', details.value.identifier)
    await resultStore.priorHit()
    let url = route.fullPath
    let lastSlash = url.lastIndexOf("/")

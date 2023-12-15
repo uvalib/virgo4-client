@@ -15,7 +15,7 @@
 import ItemView from "@/components/details/ItemView.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { nextTick, onMounted, onUpdated, watch } from 'vue'
+import { onMounted, onUpdated, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useResultStore } from "@/stores/result"
