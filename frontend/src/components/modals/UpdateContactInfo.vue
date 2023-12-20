@@ -10,7 +10,6 @@
                   <FormKit type="text" label="First" :disabled="userStore.isUVA" v-model="contact.firstName" id="firstname"/>
                   <FormKit type="text" label="Middle" :disabled="userStore.isUVA" v-model="contact.middleName"/>
                   <FormKit type="text" label="Last" :disabled="userStore.isUVA" v-model="contact.lastName"/>
-                  <FormKit type="text" label="Preferred" :disabled="userStore.isUVA" v-model="contact.preferredName" help="We will address you by this name if supplied."/>
                </div>
             </div>
             <div class="section">
@@ -48,7 +47,6 @@ const showUpdateDialog = ref(false)
 const contact = ref({
    userID: "",
    firstName: "",
-   preferredName: "",
    middleName: "",
    lastName: "",
    phone: "",
@@ -62,7 +60,6 @@ const trigger = ref(null)
 const opened = (() => {
    contact.value.userID = userStore.signedInUser
    contact.value.email = userStore.accountInfo.email
-   contact.value.preferredName = userStore.accountInfo.sirsiProfile.preferredName
    contact.value.firstName = userStore.accountInfo.sirsiProfile.firstName
    contact.value.middleName = userStore.accountInfo.sirsiProfile.middleName
    contact.value.lastName = userStore.accountInfo.sirsiProfile.lastName
@@ -128,27 +125,23 @@ p.error {
 }
 .scroller {
    width: 100%;
-   max-height: 55vh;
-   overflow: scroll;
-   padding: 10px;
+   padding: 5px;
    border: 1px solid var(--uvalib-grey-light);
    background: white;
    font-size: 0.9em;
     div.section {
       font-size: 1em;
       font-weight: bold;
-      margin: 0;
       .section-name {
          border-bottom: 1px solid var(--uvalib-grey);
-         padding: 0 0 5px 0;
-         margin:0;
+         margin: 5px;
+      }
+      .pad-top {
+         margin-top: 10px;
       }
       .content {
-         margin-left: 15px;
+         margin-left: 10px;
       }
-   }
-   .pad-top {
-      margin-top: 15px;
    }
 }
 </style>
