@@ -6,7 +6,9 @@
             <div class="section">
                <p class="section-name">Name</p>
                <div class="content">
-                  <p :v-if="userStore.isUVA">As a Netbadge user, visit <a target="_blank" href="https://in.virginia.edu/profile">https://in.virginia.edu/profile</a> to change your preferred name in the UVA Identity and Access Management Portal.</p>
+                  <p :v-if="userStore.isUVA">Virgo pulls your name, shown below, from UVA’s Identity and Access Management system.
+                     Visit <a target="_blank" href="https://in.virginia.edu/profile">https://in.virginia.edu/profile</a> to change your preferred name.
+                  </p>
                   <FormKit type="text" label="First" :disabled="userStore.isUVA" v-model="contact.firstName" id="firstname"/>
                   <FormKit type="text" label="Middle" :disabled="userStore.isUVA" v-model="contact.middleName"/>
                   <FormKit type="text" label="Last" :disabled="userStore.isUVA" v-model="contact.lastName"/>
