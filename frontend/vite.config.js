@@ -8,6 +8,10 @@ const hash = Math.floor(Math.random() * 90000) + 10000
 
 // https://vitejs.dev/config/
 export default defineConfig({
+   define: {
+      // enable hydration mismatch details in production build
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true'
+   },
    plugins: [vue()],
    resolve: {
       alias: {
