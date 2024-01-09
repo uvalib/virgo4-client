@@ -448,19 +448,18 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 func (svc *ServiceContext) RequestContactUpdate(c *gin.Context) {
 	userID := c.Param("uid")
 	type ContactInfo struct {
-		UserID        string `json:"userID"`
-		FirstName     string `json:"firstName"`
-		MiddleName    string `json:"middleName"`
-		LastName      string `json:"lastName"`
-		PreferredName string `json:"preferredName"`
-		Address1      string `json:"address1"`
-		Address2      string `json:"address2"`
-		Address3      string `json:"address3"`
-		City          string `json:"city"`
-		State         string `json:"state"`
-		Zip           string `json:"zip"`
-		Phone         string `json:"phone"`
-		Email         string `json:"email"`
+		UserID     string `json:"userID"`
+		FirstName  string `json:"firstName"`
+		MiddleName string `json:"middleName"`
+		LastName   string `json:"lastName"`
+		Address1   string `json:"address1"`
+		Address2   string `json:"address2"`
+		Address3   string `json:"address3"`
+		City       string `json:"city"`
+		State      string `json:"state"`
+		Zip        string `json:"zip"`
+		Phone      string `json:"phone"`
+		Email      string `json:"email"`
 	}
 	var req struct {
 		NewContact ContactInfo `json:"newContact"`
