@@ -492,10 +492,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		"FINE-ARTS",
 		"SCI-ENG",
 		"MUSIC",
-		"ASTRONOMY":
-		PickupLibrary = "CLEMONS"
-
-	case "IVY":
+		"MAIN":
 		PickupLibrary = "LEO"
 	default:
 		PickupLibrary = scanReq.Library
