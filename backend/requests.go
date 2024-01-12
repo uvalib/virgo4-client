@@ -469,7 +469,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	makeHold := false
 	for _, holdLoc := range []string{"BY-REQUEST", "STACKS", "OVERSIZE", "RESERVE", "REFERENCE", "CUR-PER", "JOURNALS"} {
 		if scanReq.Location == holdLoc {
-			log.Printf("Making hold for %s", scanReq.ItemBarcode)
+			log.Printf("Making hold for %s\n%+v", scanReq.ItemBarcode, scanReq)
 			makeHold = true
 		}
 	}
@@ -489,6 +489,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	PickupLibrary := ""
 	switch scanReq.Library {
 	case
+		"CLEMONS",
 		"FINE-ARTS",
 		"SCI-ENG",
 		"MUSIC",
