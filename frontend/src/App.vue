@@ -306,6 +306,7 @@ onUpdated(() => {
          padding: 0;
          width: 45px;
          border: 1px solid #444;
+         margin-left: auto;
          &:hover {
             border: 1px solid #444;
             background: rgba(128,128,128,0.2);
