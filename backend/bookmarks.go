@@ -38,6 +38,7 @@ type Source struct {
 // Bookmark contains minimal details on a bookmarked item
 type Bookmark struct {
 	ID         int       `json:"id"`
+	Sequence   uint      `json:"sequence"`
 	UserID     int       `json:"-"`
 	FolderID   int       `json:"folder_id"` // foreign key to the owning folder
 	SourceID   int       `json:"-"`         // foreign key to source
@@ -51,7 +52,7 @@ func (svc *ServiceContext) preloadBookmarks() *gorm.DB {
 	return svc.GDB.Debug().Preload("BookmarkFolders", func(db *gorm.DB) *gorm.DB {
 		return db.Order("bookmark_folders.name ASC")
 	}).Preload("BookmarkFolders.Bookmarks", func(db *gorm.DB) *gorm.DB {
-		return db.Order("bookmarks.added_at ASC")
+		return db.Order("bookmarks.sequence, bookmarks.added_at ASC")
 	}).Preload("BookmarkFolders.Bookmarks.Source")
 }
 
@@ -238,6 +239,39 @@ func (svc *ServiceContext) AddBookmark(c *gin.Context) {
 	c.JSON(http.StatusOK, v4User.BookmarkFolders)
 }
 
+// ReorderBookmarks will update the seqence of all bookmarks in the target folder
+func (svc *ServiceContext) ReorderBookmarks(c *gin.Context) {
+	v4UserID := c.Param("uid")
+	userID := c.GetInt("v4id")
+	folderID := c.Param("id")
+	var params []struct {
+		ID       uint `json:"id"`
+		Sequence uint `json:"sequence"`
+	}
+	err := c.ShouldBindJSON(&params)
+	if err != nil {
+		log.Printf("INFO: bad payload for bookmark reorder request: %s", err.Error())
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	log.Printf("INFO: user %s:%d is reordering boolmarks in folder %s: %+v", v4UserID, userID, folderID, params)
+	err = svc.GDB.Transaction(func(tx *gorm.DB) error {
+		for _, bm := range params {
+			seqErr := tx.Exec("update bookmarks set sequence=? where id=?", bm.Sequence, bm.ID).Error
+			if seqErr != nil {
+				return seqErr
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		log.Printf("INFO: reorder request failed: %s", err.Error())
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.String(http.StatusOK, "ok")
+}
+
 // DeleteBookmarks will remove a list of bookmarks from a folder
 func (svc *ServiceContext) DeleteBookmarks(c *gin.Context) {
 	v4UserID := c.Param("uid")
@@ -341,7 +375,9 @@ func (svc *ServiceContext) GetPublicBookmarks(c *gin.Context) {
 	token := c.Param("token")
 	log.Printf("INFO: get public bookmarks for %s", token)
 	var folder BookmarkFolder
-	resp := svc.GDB.Preload("Bookmarks").Preload("Bookmarks.Source").Where("is_public=? and token=?", true, token).First(&folder)
+	resp := svc.GDB.Preload("Bookmarks", func(db *gorm.DB) *gorm.DB {
+		return db.Order("bookmarks.sequence, bookmarks.added_at ASC")
+	}).Preload("Bookmarks.Source").Where("is_public=? and token=?", true, token).First(&folder)
 	if resp.Error != nil {
 		log.Printf("INFO: public bookmarks %s not found: %s", token, resp.Error.Error())
 		c.String(http.StatusNotFound, fmt.Sprintf("%s not found", token))

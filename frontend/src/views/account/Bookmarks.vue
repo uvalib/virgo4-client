@@ -57,37 +57,27 @@
                   <div v-else class="bookmark-folder-details">
                      <div class="folder-menu">
                         <VirgoButton @click="exportBookmarks(folderInfo.folder)" label="Export all"/>
-                        <PrintBookmarks :srcFolder="folderInfo.id" />
-                        <ManageBookmarks :srcFolder="folderInfo.id" />
-                        <VirgoButton @click="deleteBookmarksClicked(folderInfo)" label="Delete"/>
-                        <VirgoButton v-if="userStore.canMakeReserves" @click="reserve" label="Place on video reserves"/>
+                        <PrintBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
+                        <ManageBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
+                        <VirgoButton @click="deleteBookmarksClicked(folderInfo)" label="Delete" :disabled="!hasSelectedBookmarks" />
+                        <VirgoButton v-if="userStore.canMakeReserves" @click="reserve" label="Place on video reserves" :disabled="!hasSelectedBookmarks" />
                      </div>
 
-                     <table>
-                        <tr>
-                           <th class="heading checkbox">
-                              <Checkbox v-model="selectAllChecked" :binary="true" aria-label="toggle select all bookmarks" @change="selectAllChanged"/>
-                           </th>
-                           <th class="heading">Title</th>
-                           <th class="heading">Author</th>
-                        </tr>
-                        <tr v-for="bookmark in folderInfo.bookmarks" :key="bookmark.id">
-                           <td class="checkbox">
-                              <Checkbox v-model="bookmark.selected" :binary="true" :aria-label="ariaLabel(bookmark)"/>
-                              <abbr class="" :title="itemURL(bookmark)" :data-folder-id="folderInfo.id"></abbr>
-                           </td>
-                           <td>
-                              <router-link @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
-                                 {{bookmark.details.title}}
+                     <DataTable :value="folderInfo.bookmarks" dataKey="id" showGridlines
+                        v-model:selection="selections" @rowReorder="onReorder"
+                     >
+                        <Column selectionMode="multiple" headerStyle="width: 3rem" />
+                        <Column field="title" header="Title">
+                           <template #body="slotProps">
+                              <router-link @click="bookmarkFollowed(slotProps.data.identifier)" :to="detailsURL(slotProps.data)">
+                                 {{slotProps.data.details.title}}
                               </router-link>
-                           </td>
-                           <td>
-                              <router-link v-if="bookmark.details.author" @click="bookmarkFollowed(bookmark.identifier)" :to="detailsURL(bookmark)">
-                                 {{bookmark.details.author}}
-                              </router-link>
-                           </td>
-                        </tr>
-                     </table>
+                              <abbr class="" :title="itemURL(slotProps.data)" :data-folder-id="folderInfo.id"></abbr>
+                           </template>
+                        </Column>
+                        <Column field="details.author" header="Author"/>
+                        <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
+                     </DataTable>
                   </div>
                </AccordionContent>
             </div>
@@ -123,6 +113,8 @@ import { useRouter } from 'vue-router'
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
 import Checkbox from 'primevue/checkbox'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 import { setFocusID, setFocusClass } from '@/utils'
 
 const confirm = useConfirm()
@@ -140,10 +132,14 @@ const createOpen = ref(false)
 const newFolder = ref("")
 const submitting = ref(false)
 const expandedFolder = ref(-1)
-const selectAllChecked = ref(false)
+const selections = ref([])
+
+const onReorder = (( event) => {
+   bookmarkStore.reorderFolder(expandedFolder.value, event.value )
+})
 
 const hasSelectedBookmarks = computed(() => {
-   return bookmarkStore.selectedBookmarks(expandedFolder.value ).length > 0
+   return selections.value.length > 0
 })
 
 const errorToast = ((title, msg) => {
@@ -159,17 +155,13 @@ const toggleSettings = ((folderID) => {
 })
 
 const deleteBookmarksClicked = ((folderInfo) => {
-      if ( hasSelectedBookmarks.value == false) {
-         errorToast("Delete Error", "No bookmarks selected for deletion. Select one or more and try again.")
-         return
-      }
       confirm.require({
          message: `All selected bookmarks in ${folderInfo.folder} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
          header: 'Confirm Delete',
          icon: 'pi pi-exclamation-triangle',
          rejectClass: 'p-button-secondary',
          accept: () => {
-            bookmarkStore.removeSelectedBookmarks(folderInfo.id)
+            bookmarkStore.removeSelectedBookmarks(folderInfo.id, selections.value.map( bm => bm.id))
          }
       })
 })
@@ -203,9 +195,6 @@ function exportBookmarks(folder) {
 function bookmarkFollowed(identifier) {
    analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
 }
-function ariaLabel(bm) {
-   return `toggle selection of bookmark for ${bm.details.title} by ${bm.details.author}`
-}
 function copyURL( folder ) {
    let URL = getPublicURL(folder)
    copyText(URL, undefined, (error, _event) => {
@@ -231,9 +220,8 @@ function getPublicURL(folder) {
    return `${base}/${folder.token}`
 }
 function folderOpened(folderID) {
-   bookmarkStore.clearAll( expandedFolder.value )
+   selections.value = []
    expandedFolder.value = folderID
-   selectAllChecked.value = false
 }
 function folderExpanded(folderID) {
    bookmarkStore.closeOtherSettings(folderID)
@@ -242,22 +230,10 @@ function folderExpanded(folderID) {
 function folderCollapsed(folderID) {
    hideFolderItemsForZotero(folderID)
 }
-function selectAllChanged() {
-   if (selectAllChecked.value == false ) {
-      bookmarkStore.clearAll( expandedFolder.value )
-   } else {
-      bookmarkStore.selectAll( expandedFolder.value )
-   }
-}
-async function reserve() {
-   if ( hasSelectedBookmarks.value == false) {
-      errorToast("Reserve Error", "No items have been selected to put on reserve. Please select one or more and try again.")
-      return
-   }
 
+async function reserve() {
    // Set the list, and validate that all items in the list are able to be reserved
-   let items = bookmarkStore.selectedBookmarks(expandedFolder.value)
-   reserveStore.setRequestList(items)
+   reserveStore.setRequestList(selections.value)
    await reserveStore.validateReservesRequest()
    if (reserveStore.invalidReserves.length > 0) {
       let msg = "This button is for use with video reserves only. The following items cannot be placed on video reserves: "
@@ -340,6 +316,9 @@ onMounted(()=>{
 </script>
 
 <style lang="scss" scoped>
+:deep(.p-datatable .p-datatable-tbody > tr.p-highlight) {
+    background: white;
+}
 .rename {
    display:flex;
    flex-flow: row wrap;

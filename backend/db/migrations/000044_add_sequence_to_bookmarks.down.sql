@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE bookmarks DROP COLUMN sequence;
+COMMIT;

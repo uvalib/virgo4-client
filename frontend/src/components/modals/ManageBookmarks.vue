@@ -1,9 +1,9 @@
 <template>
-   <VirgoButton @click="openClicked" ref="trigger" aria-label="manage selected bookmark storage" label="Move/Copy"/>
+   <VirgoButton @click="openClicked" ref="trigger" aria-label="manage selected bookmark storage" label="Move/Copy" :disabled="props.bookmarks.length == 0"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Manage Bookmark Storage" @hide="closeDialog" @show="opened">
       <div class="selected-bookmarks scroller">
          <ul>
-            <li v-for="bm in bookmarkStore.selectedBookmarks(props.srcFolder)" :key="bm.id">
+            <li v-for="bm in props.bookmarks" :key="bm.id">
                {{bm.details.title}}
             </li>
          </ul>
@@ -29,12 +29,10 @@
 
 <script setup>
 import { useBookmarkStore } from "@/stores/bookmark"
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import Dialog from 'primevue/dialog'
-import { useToast } from "primevue/usetoast"
 import Checkbox from 'primevue/checkbox'
 
-const toast = useToast()
 const bookmarkStore = useBookmarkStore()
 
 const props = defineProps({
@@ -42,6 +40,10 @@ const props = defineProps({
       type: Number,
       required: true
    },
+   bookmarks: {
+      type: Array,
+      required: true
+   }
 })
 
 const trigger = ref()
@@ -50,16 +52,8 @@ const selectedFolderIDs = ref([])
 const errorMessage = ref("")
 const okDisabled = ref(false)
 
-const hasSelectedBookmarks = computed(() => {
-   return bookmarkStore.selectedBookmarks(props.srcFolder).length > 0
-})
-
 const openClicked = (() => {
-   if (hasSelectedBookmarks.value == false) {
-      toast.add({severity:'error', summary: "Bookmark Error", detail:  "No bookmarks have been selected.", life: 5000})
-   } else {
-      showDialog.value = true
-   }
+   showDialog.value = true
 })
 
 const opened = (() => {
@@ -69,7 +63,8 @@ const opened = (() => {
 
 const closeDialog = (() => {
    showDialog.value = false
-   trigger.value.$el.focus()
+   // If the act was a move and there are now no bookmarks in the source folder, the trigger button will be gone
+   if ( trigger.value ) trigger.value.$el.focus()
 })
 
 const okClicked = ( async () => {
@@ -78,8 +73,7 @@ const okClicked = ( async () => {
        errorMessage.value = "Please select at least one folder"
        return
    }
-   let data = { sourceFolderID: props.srcFolder, destFolderIDs: selectedFolderIDs.value }
-   await bookmarkStore.manageSelectedBookmarks(data)
+   await bookmarkStore.manageSelectedBookmarks(props.srcFolder, props.bookmarks, selectedFolderIDs.value)
    closeDialog()
 })
 </script>

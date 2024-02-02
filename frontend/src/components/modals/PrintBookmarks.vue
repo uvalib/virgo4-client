@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton @click="openClicked" aria-label="print details about selected bookmarks" ref="trigger" label="Print"/>
+   <VirgoButton @click="openClicked" aria-label="print details about selected bookmarks" ref="trigger" label="Print" :disabled="bookmarks.length == 0"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Print Details" @hide="closeDialog" @show="opened">
       <div class="print">
          <FormKit type="form" id="print" :actions="false" @submit="printClicked">
@@ -16,19 +16,21 @@
 
 <script setup>
 import { useBookmarkStore } from "@/stores/bookmark"
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import analytics from '@/analytics'
 import Dialog from 'primevue/dialog'
-import { useToast } from "primevue/usetoast"
 import { setFocusID } from '@/utils'
 
-const toast = useToast()
 const bookmarkStore = useBookmarkStore()
 const props = defineProps({
    srcFolder: {
       type: Number,
       required: true
    },
+   bookmarks: {
+      type: Array,
+      required: true
+   }
 })
 
 const trigger = ref()
@@ -37,17 +39,9 @@ const title = ref("")
 const notes = ref("")
 const okDisabled = ref(false)
 
-const hasSelectedBookmarks = computed(() => {
-   return bookmarkStore.selectedBookmarks(props.srcFolder).length > 0
-})
-
 const openClicked = (() => {
-   if (hasSelectedBookmarks.value == false) {
-      toast.add({severity:'error', summary: "Print Error", detail:  "No bookmarks have been selected to print.", life: 5000})
-   } else {
-      showDialog.value = true
-      setFocusID("titleinput")
-   }
+   showDialog.value = true
+   setFocusID("titleinput")
 })
 
 const closeDialog = (() => {
@@ -63,8 +57,7 @@ const opened = (() => {
 const printClicked = ( async () => {
    analytics.trigger('Bookmarks', 'PRINT_CLICKED')
    okDisabled.value = true
-   let data = { title: title.value, notes: notes.value, folderID: props.srcFolder}
-   await bookmarkStore.printBookmarks( data )
+   await bookmarkStore.printBookmarks( title.value, notes.value, props.bookmarks )
    closeDialog()
    okDisabled.value = false
 })

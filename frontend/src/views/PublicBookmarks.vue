@@ -1,22 +1,18 @@
 <template>
    <div class="public-bookmarks">
-      <div class="bookmarks-content">
-         <div class="working" v-if="bookmarkStore.searching">
-            <V4Spinner message="Looking up bookmark information..."/>
-         </div>
-         <div v-else>
-            <ul class="bookmarks">
-               <li class="bookmark-wrapper" v-for="(bookmark,idx) in bookmarkStore.public" :key="`BM${idx}`">
-                  <div class="title">
-                     <router-link @click="bookmarkFollowed(bookmark.identifier)"  :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
-                  </div>
-                  <div class="info">
-                     <div class="author">{{bookmark.details.author}}</div>
-                  </div>
-               </li>
-            </ul>
-         </div>
+      <div class="working" v-if="bookmarkStore.searching">
+         <V4Spinner message="Looking up bookmark information..."/>
       </div>
+      <template v-else>
+         <Panel v-for="(bookmark,idx) in bookmarkStore.public" :key="`BM${idx}`" toggleable>
+            <template #header>
+               <router-link @click="bookmarkFollowed(bookmark.identifier)"  :to="detailsURL(bookmark)">{{bookmark.details.title}}</router-link>
+            </template>
+            <div class="info">
+               <div class="author">{{bookmark.details.author}}</div>
+            </div>
+         </Panel>
+      </template>
    </div>
 </template>
 
@@ -25,6 +21,7 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import analytics from '@/analytics'
+import Panel from 'primevue/panel'
 
 const route = useRoute()
 const bookmarkStore = useBookmarkStore()
@@ -41,6 +38,15 @@ function detailsURL(bookmark) {
 </script>
 
 <style lang="scss" scoped>
+
+:deep(.p-panel) {
+   margin-bottom: 20px;
+   box-shadow:  $v4-box-shadow-light;
+   .p-panel-header {
+      background: white;
+   }
+}
+
 .public-bookmarks {
    min-height: 400px;
    position: relative;
@@ -50,14 +56,18 @@ function detailsURL(bookmark) {
 .bookmarks-content {
    margin: 0 auto;
    text-align: left;
+   .working {
+      text-align: center;
+      font-size: 1.25em;
+      margin-bottom: 75px;
+   }
 }
-.working {
-   text-align: center;
-   font-size: 1.25em;
+
+div.info {
+   text-align: left;
+   margin-left: 40px;
 }
-h2 {
-   text-align: center;
-}
+
 @media only screen and (min-width: 768px) {
    .public-bookmarks {
      max-width: 55vw;
@@ -67,37 +77,5 @@ h2 {
    .public-bookmarks {
      max-width: 95vw;
    }
-}
-div.author {
-   margin-bottom: 10px;
-}
-dl.data {
-   margin: 0 0 20px 0;
-   display: inline-grid;
-   grid-template-columns: max-content 2fr;
-   grid-column-gap: 15px;
-   grid-row-gap: 5px;
-}
-dl.data dt {
-   font-weight: bold;
-   text-align: right;
-}
-div.info {
-   margin-left: 40px;
-}
-div.title {
-   font-size: 1.2em;
-   padding-bottom:5px;
-}
-ul.bookmarks {
-   list-style: none;
-   padding: 0;
-}
-.bookmark-wrapper {
-   margin: 10px;
-   border: 1px solid var(--uvalib-grey-light);
-   padding: 10px;
-   box-shadow:  $v4-box-shadow-light;
-   border-radius:3px;
 }
 </style>
