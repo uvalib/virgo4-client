@@ -146,12 +146,13 @@
                         </div>
                         <div v-else>
                            <div>
-                              All fines must be paid at Clemons Library using cash for the exact amount or personal check.
+                              All fines must be paid at Alderman Library using cash for the exact amount or personal check.<br/>
                               We do not take credit cards or any online payments at this time.
                            </div>
                            <div class="addr">
-                              <strong>Clemons Library</strong><br/>
-                              164 McCormick Road<br/>
+                              <strong>Alderman Library</strong><br/>
+                              P.O. Box 400113<br/>
+                              160 McCormick Road<br/>
                               Charlottesville, VA<br/>
                               22904
                            </div>
