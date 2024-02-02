@@ -18,16 +18,14 @@
    </div>
    <div v-else-if="userStore.canRequestAccount == false && userStore.accountRequested == false" class="signup-form no-signup">
       <p class="left">Hello!</p>
-      <p class="left">It appears you do not have a UVA Library circulation account.</p>
+      <p class="left">There is an issue with your library account’s setup or you need to be registered.</p>
       <p class="light left">
-         The UVA Libraries are open to only current students, staff, and faculty.
-         If you are a current student, staff, or faculty and need an account, please contact <a href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>.
+         Please contact us to have this resolved.<br/>
+         You may call us at 434-924-3021, email us <a target="_blank" href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>,
+         or visit us at Alderman Library.
       </p>
       <p class="light left">
          If you are an alum, we apologize for the inconvenience. Please visit a library in person with a state ID to create an account.
-         For information about library access, please visit
-         <a target="_blank" href="https://www.library.virginia.edu/news/covid-19/#access">
-            https://www.library.virginia.edu/news/covid-19/#access</a>.
       </p>
    </div>
    <div v-else-if="userStore.accountRequested == true" class="signup-form pending">
