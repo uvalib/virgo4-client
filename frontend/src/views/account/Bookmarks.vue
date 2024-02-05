@@ -76,6 +76,23 @@
                            </template>
                         </Column>
                         <Column field="details.author" header="Author"/>
+                        <Column field="callNumber" header="Call Number">
+                           <template #body="slotProps">
+                              <template v-if="slotProps.data.details.callNumber">{{slotProps.data.details.callNumber}}</template>
+                              <span v-else class="na">N/A</span>
+                           </template>
+                        </Column>
+                        <Column field="format" header="Format">
+                           <template #body="slotProps">
+                              <template v-if="slotProps.data.details.format">{{slotProps.data.details.format}}</template>
+                              <span v-else class="na">N/A</span>
+                           </template>
+                        </Column>
+                        <Column field="source" header="Source">
+                           <template #body="slotProps">
+                              {{ sourceName(slotProps.data.pool) }}
+                           </template>
+                        </Column>
                         <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
                      </DataTable>
                   </div>
@@ -103,6 +120,7 @@ import ManageBookmarks from "@/components/modals/ManageBookmarks.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import { ref, onMounted, nextTick, computed } from 'vue'
 import { useSystemStore } from "@/stores/system"
+import { usePoolStore } from "@/stores/pool"
 import { useUserStore } from "@/stores/user"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { useReserveStore } from "@/stores/reserve"
@@ -124,6 +142,7 @@ const systemStore = useSystemStore()
 const bookmarkStore = useBookmarkStore()
 const reserveStore = useReserveStore()
 const itemStore = useItemStore()
+const poolStore = usePoolStore()
 const router = useRouter()
 
 const renaming = ref(false)
@@ -147,6 +166,14 @@ const errorToast = ((title, msg) => {
 })
 const infoToast = ((title, msg) => {
    toast.add({severity:'success', summary:  title, detail:  msg, life: 3000})
+})
+
+const sourceName = ((poolID) => {
+   let pool = poolStore.list.find(p => p.id == poolID)
+   if ( pool ) {
+      return pool.name
+   }
+   return poolID
 })
 
 const toggleSettings = ((folderID) => {
@@ -319,6 +346,13 @@ onMounted(()=>{
 :deep(.p-datatable .p-datatable-tbody > tr.p-highlight) {
     background: white;
 }
+:deep(.p-datatable) {
+   font-size: 0.9em;
+}
+.na {
+   color: #ccc;
+   font-style: italic;
+}
 .rename {
    display:flex;
    flex-flow: row wrap;
@@ -380,27 +414,6 @@ div.folder {
    div.bookmarks {
       width: 95%;
    }
-}
-table {
-   border-collapse: collapse;
-   width: 100%;
-   td {
-      padding: 5px 8px;
-      text-align: left;
-      vertical-align: text-top;
-       border: 1px solid var(--uvalib-grey-light);
-   }
-   th {
-      padding: 10px 8px;
-      background-color: #f0f0f0;
-      text-align: left;
-   }
-   th.heading {
-      border: 1px solid var(--uvalib-grey-light);
-   }
-}
-table tr {
-   background-color: white;
 }
 .none {
    text-align: center;

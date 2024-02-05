@@ -84,6 +84,20 @@ export const useBookmarkStore = defineStore('bookmark', {
             this.newBookmark.author = hit.author
          }
 
+         let fields = hit.basicFields.concat( hit.detailFields)
+         fields.forEach( f => {
+            if ( f.name == "format") {
+               if ( Array.isArray(f.value)) {
+                  this.newBookmark.format = f.value.join("; ")
+               } else {
+                  this.newBookmark.format = f.value
+               }
+            }
+            if ( f.name == "call_number") {
+               this.newBookmark.callNumber = f.value
+            }
+         })
+
          this.showAddDialog = true
          this.addBoomkarkTrigger = trigger
       },
@@ -93,6 +107,12 @@ export const useBookmarkStore = defineStore('bookmark', {
          let url = `/api/users/${v4UID}/bookmarks/add`
          let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.identifier}
          let detail = {title : this.newBookmark.title, author: this.newBookmark.author}
+         if ( this.newBookmark.format ) {
+            detail.format = this.newBookmark.format
+         }
+         if ( this.newBookmark.callNumber ) {
+            detail.callNumber = this.newBookmark.callNumber
+         }
          data['details'] = JSON.stringify(detail)
          return axios.post(url, data).then((response) => {
             this.setBookmarks(response.data)
