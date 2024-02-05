@@ -96,6 +96,9 @@ export const useBookmarkStore = defineStore('bookmark', {
             if ( f.name == "call_number") {
                this.newBookmark.callNumber = f.value
             }
+            if ( f.name == "library") {
+               this.newBookmark.library = f.value
+            }
          })
 
          this.showAddDialog = true
@@ -112,6 +115,9 @@ export const useBookmarkStore = defineStore('bookmark', {
          }
          if ( this.newBookmark.callNumber ) {
             detail.callNumber = this.newBookmark.callNumber
+         }
+         if ( this.newBookmark.library ) {
+            detail.library = this.newBookmark.library
          }
          data['details'] = JSON.stringify(detail)
          return axios.post(url, data).then((response) => {

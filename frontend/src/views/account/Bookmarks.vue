@@ -88,6 +88,12 @@
                               <span v-else class="na">N/A</span>
                            </template>
                         </Column>
+                        <Column field="library" header="Library">
+                           <template #body="slotProps">
+                              <template v-if="slotProps.data.details.library">{{slotProps.data.details.library}}</template>
+                              <span v-else class="na">N/A</span>
+                           </template>
+                        </Column>
                         <Column field="source" header="Source">
                            <template #body="slotProps">
                               {{ sourceName(slotProps.data.pool) }}
