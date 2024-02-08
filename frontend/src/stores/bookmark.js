@@ -243,7 +243,12 @@ export const useBookmarkStore = defineStore('bookmark', {
          let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/folders/${folderID}/delete`
          axios.post(url, {bookmarkIDs: bookmarkIDs}).then((response) => {
-            this.updateFolder(response.data)
+            let tgtFolder = this.bookmarks.find( f => f.id == folderID)
+            if (tgtFolder) {
+               tgtFolder.bookmarks = tgtFolder.bookmarks.filter( bm => bookmarkIDs.includes( bm.id ) == false)
+            }  else {
+               this.updateFolder(response.data)
+            }
          }).catch((error) => {
             useSystemStore().setError(error)
          })
