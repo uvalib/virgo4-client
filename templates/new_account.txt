@@ -16,5 +16,5 @@ Mailing Address
 {{.City}}
 {{.State}}, {{.Zip}}
 
-https://cardinal.lib.virginia.edu/cgi-bin/whois.pl?string={{.ID}}
+https://cardinal.lib.virginia.edu/cgi-bin/whois.pl?uid={{.ID}}
 _______________________________________________________________________
