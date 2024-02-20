@@ -70,7 +70,7 @@ export const useUserStore = defineStore('user', {
          // Description includes alumni, so this user can't create a sirsi account.. unless they
          // also have one of these in their description too
          let roles = ["continuing and professional studies student", "contractor", "faculty",
-            "staff", "graduate student", "instructor", "sponsored account staff",
+            "staff", "graduate student", "instructor", "sponsored account",
             "student worker", "undergraduate student"]
          desc.split(",").forEach( r => {
             if ( roles.includes( r.trim() ) ) {
