@@ -39,7 +39,7 @@ export const useUserStore = defineStore('user', {
       requests: {illiad: [], holds: []},
       lookingUp: false,
       renewing: false,
-      authTriesLeft: 5,
+      authTriesLeft: 10,
       authMessage: "",
       lockedOut: false,
       parsedJWT: {},
@@ -272,7 +272,7 @@ export const useUserStore = defineStore('user', {
       clearAuthMessages() {
          this.authMessage = ""
          this.lockedOut = false
-         this.authTriesLeft = 5
+         this.authTriesLeft = 10
       },
       setUserJWT(jwtStr) {
          let parsed = parseJwt(jwtStr)

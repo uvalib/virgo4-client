@@ -99,7 +99,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 		Message      string `json:"message"`
 		AttemptsLeft int    `json:"attemptsLeft"`
 	}
-	resp.AttemptsLeft = 5
+	resp.AttemptsLeft = 10
 	if err := c.BindJSON(&auth); err != nil {
 		log.Printf("Unable to parse params: %s", err.Error())
 		resp.Message = "Invalid request"
@@ -152,7 +152,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 			v4User.AuthTries++
 		}
 	}
-	resp.AttemptsLeft = 5 - v4User.AuthTries
+	resp.AttemptsLeft = 10 - v4User.AuthTries
 	svc.GDB.Model(&v4User).Select("AuthStartedAt", "AuthTries", "AttemptsLeft").Updates(v4User)
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
@@ -164,10 +164,10 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	}
 
 	if string(bodyBytes) != "valid" {
-		// The in verification failed. If this has happened 5 times in a
+		// The in verification failed. If this has happened 10 times in a
 		// minute, lock out the account for one hour
 		log.Printf("ERROR: pin for %s failed authentication", auth.Barcode)
-		if v4User.AuthTries >= 5 {
+		if v4User.AuthTries >= 10 {
 			log.Printf("User %s account is now locked out for 1 hour", v4User.Virgo4ID)
 			resp.Message = "Authentication failed. Your account is now locked for one hour."
 			resp.LockedOut = true

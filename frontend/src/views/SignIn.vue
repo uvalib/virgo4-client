@@ -25,7 +25,10 @@
                   </div>
                   <div v-else class="tries">
                      <div class="auth-msg">{{ userStore.authMessage }}</div>
-                     You have <b>{{userStore.authTriesLeft}}</b> more tries before your account is locked.
+
+                     <p v-if="userStore.authTriesLeft <= 5" >
+                        You have <b>{{userStore.authTriesLeft}}</b> more tries before your account is locked.
+                     </p>
                   </div>
                </div>
             </transition>
