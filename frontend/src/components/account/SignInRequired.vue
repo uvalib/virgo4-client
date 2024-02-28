@@ -2,7 +2,7 @@
    <div class="signout-content" v-if="userStore.isSignedIn == false">
       <h3>You must be signed in to access {{props.targetPage}}.</h3>
       <p>
-         <VirgoButton text label="Sign in now" @click="signInClicked" :aria-label="`Sign Win to view ${props.targetPage}`" />
+         <VirgoButton text label="Sign in now" @click="signInClicked" :aria-label="`Sign in to view ${props.targetPage}`" />
       </p>
    </div>
 </template>
