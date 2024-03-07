@@ -22,7 +22,7 @@
       <p class="light left">
          Please contact us to have this resolved.<br/>
          You may call us at 434-924-3021, email us <a target="_blank" href="mailto:lib-circ@virginia.edu">lib-circ@virginia.edu</a>,
-         or visit us at Alderman Library.
+         or visit us at Shannon Library.
       </p>
       <p class="light left">
          If you are an alum, we apologize for the inconvenience. Please visit a library in person with a state ID to create an account.

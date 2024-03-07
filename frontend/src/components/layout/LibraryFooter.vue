@@ -20,7 +20,7 @@
                </li>
                <li>
                   <address>
-                     UVA Alderman Library<br />
+                     UVA Shannon Library<br />
                      P.O. Box 400113<br />
                      160 McCormick Road<br/>
                      Charlottesville, VA 22904<br />
