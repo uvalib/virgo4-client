@@ -12,7 +12,16 @@
          <p>New passwords must: </p>
          <ul>
             <li>
-               Contain between 6 and 25 characters
+               Contain between 12 and 25 characters
+            </li>
+            <li>
+               Include at least one lower-case letter
+            </li>
+            <li>
+               Include at least one upper-case letter
+            </li>
+            <li>
+               Include at least one numeral (digit)
             </li>
             <li>
                Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
@@ -23,8 +32,8 @@
             <FormKit type="password" name="password" label="New Password" id="new-password"
                :validation="[
                   ['required'],
-                  ['length',6,25],
-                  ['matches', /^[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
+                  ['length',12,25],
+                  ['matches', /^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[a-z])[A-Za-z0-9-!,@#$%&*+()_? ]*$/]
                ]"
                validation-visibility="blur"
                :validation-messages="{
@@ -122,9 +131,7 @@ const submitPasswordChange = (() => {
    } else {
       let data  = {current_pin: currPassword.value, new_pin: newPassword.value}
       userStore.changePassword(data).then(() => {
-         showDialog.value = false
-         let msg = "Your password has been changed."
-         toast.add({severity:'success', summary:  "Success", detail:  msg, life: 6000})
+         passwordChanged.value = true
       }).catch((e) => {
          error.value = "Password change failed.</br>"
          if ( e.response.data.message ) {

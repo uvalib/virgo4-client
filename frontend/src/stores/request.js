@@ -134,6 +134,7 @@ export const useRequestStore = defineStore('request', {
           // track this request so it can be displayed on confirmation panel
           this.requestInfo.itemLabel = scan.label
           this.requestInfo.pickupLibrary = ""
+          this.requestInfo.library = scan.library;
           this.requestInfo.callNumber = scan.callNumber
           this.requestInfo.notes = scan.notes
 
