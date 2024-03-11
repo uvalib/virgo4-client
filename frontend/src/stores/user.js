@@ -604,7 +604,7 @@ export const useUserStore = defineStore('user', {
          return axios.post("/api/change_pin", data)
       },
       changePasswordWithToken(data) {
-         return axios.post("/api/change_password_token", data)
+         return axios.post("/api/change_password_token", data, {_retry: true}) // don't retry
       },
       forgotPassword(barcode) {
          return axios.post("/api/forgot_password", {userBarcode: barcode} )

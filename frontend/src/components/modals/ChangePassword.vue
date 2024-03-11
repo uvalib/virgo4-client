@@ -85,7 +85,9 @@ const opened = (() => {
 
 const closeChangeDialog = (() => {
    showDialog.value = false
-   trigger.value.$el.focus()
+   if(trigger.value) {
+      trigger.value.$el.focus()
+   }
    let query = Object.assign({}, route.query)
    if ( query.token )  {
       delete query.token
@@ -108,7 +110,7 @@ const submitPasswordChange = (() => {
       userStore.changePasswordWithToken(data).then(() => {
          showDialog.value = false
          let msg = "Your password has been changed."
-         toast.add({severity:'success', summary:  "Success", detail:  msg, life: 6000})
+         toast.add({severity:'success', summary:  "Success", detail:  msg, life: 10000})
       }).catch((e) => {
          expiredToken.value = true
          if(e.response.data.message){
