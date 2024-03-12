@@ -475,9 +475,6 @@ export const useUserStore = defineStore('user', {
       },
 
       async getCheckouts() {
-         if ( this.checkouts.length > 0) {
-            return
-         }
          if (this.signedInUser.length == 0 || this.noILSAccount) {
             return
          }
@@ -538,14 +535,11 @@ export const useUserStore = defineStore('user', {
       },
 
       async signout(resetSearch) {
-         if ( this.signedInUser == "") return
-
          const alerts = useAlertStore()
          const savedSearches = useSearchStore()
          const bookmarks = useBookmarkStore()
          const preferences = usePreferencesStore()
 
-         await axios.post("/signout", null)
          this.clear()
          preferences.clear()
          bookmarks.clear()
@@ -556,6 +550,7 @@ export const useUserStore = defineStore('user', {
             results.resetSearch()
          }
          localStorage.removeItem("v4_jwt")
+         await axios.post("/signout", null)
          this.router.push("/signedout")
       },
 

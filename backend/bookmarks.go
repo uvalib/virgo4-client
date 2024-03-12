@@ -70,9 +70,9 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 	log.Printf("User %s:%d adding bookmark folder %s", v4UserID, userID, fp.Name)
 
 	newFolder := BookmarkFolder{UserID: userID, Name: fp.Name, AddedAt: time.Now()}
-	resp := svc.GDB.Create(&newFolder)
-	if resp.Error != nil {
-		log.Printf("ERROR: user %s add folder %s failed: %s", v4UserID, fp.Name, resp.Error.Error())
+	err = svc.GDB.Create(&newFolder).Error
+	if err != nil {
+		log.Printf("ERROR: user %s add folder %s failed: %s", v4UserID, fp.Name, err.Error())
 		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
