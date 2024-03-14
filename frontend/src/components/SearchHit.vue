@@ -2,6 +2,7 @@
    <div class="inner-hit-wrapper" :class="{group: props.hit.grouped}">
       <div class="hit" :id="props.hit.identifier">
          <SearchHitHeader :maxLen="60" :count="props.count" :hit="props.hit" :pool="props.pool" from="SEARCH"/>
+         <ContentAdvisory v-if="hasContentAdvisory" mode="brief"/>
          <SearchHitDetail :hit="props.hit" :pool="props.pool"/>
       </div>
       <AccordionContent v-if="props.hit.grouped" :id="`group-${props.hit.identifier}`"
@@ -14,6 +15,7 @@
             :class="{last: idx==props.hit.group.length-1, first: idx==0}"
          >
             <SearchHitHeader :maxLen="60" :count="groupHit.number" :hit="groupHit" :pool="pool" from="SEARCH"/>
+            <ContentAdvisory v-if="hasContentAdvisory" mode="brief"/>
             <SearchHitDetail :hit="groupHit" :pool="pool"/>
          </div>
          <template v-slot:footer>{{closeGroupTitle}}</template>
@@ -26,6 +28,7 @@ import { computed } from 'vue'
 import SearchHitHeader from "@/components/SearchHitHeader.vue"
 import SearchHitDetail from "@/components/SearchHitDetail.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
+import ContentAdvisory from "@/components/ContentAdvisory.vue"
 import { useResultStore } from "@/stores/result"
 import { usePreferencesStore } from "@/stores/preferences"
 
@@ -38,6 +41,11 @@ const props = defineProps({
    count: {type: Number, required: true}
 })
 
+const hasContentAdvisory = computed(() => {
+   let allFields = [...props.hit.basicFields.concat(props.hit.detailFields)]
+   let idx = allFields.findIndex( f=> f.name=="content_advisory")
+   return idx > -1
+})
 const groupTitle = computed(()=>{
    return `Show this group (${props.hit.group.length})`
 })

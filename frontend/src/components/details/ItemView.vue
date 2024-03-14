@@ -17,6 +17,7 @@
          <div class="info">
             <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
             </div>
+            <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
             <dl class="fields">
                <template v-if="details.header.author">
                   <dt class="label">{{details.header.author.label}}:</dt>
@@ -97,6 +98,7 @@ import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
+import ContentAdvisory from "@/components/ContentAdvisory.vue"
 import beautify from 'xml-beautifier'
 import AccessURLDetails from "@/components/AccessURLDetails.vue"
 import TruncatedText from "@/components/TruncatedText.vue"
@@ -177,7 +179,7 @@ const nextHitClicked = ( async () => {
 
 const priorHitClicked = ( async () => {
    analytics.trigger('Details', 'PRIOR_HIT_CLICKED', details.value.identifier)
-   await resultStore.priorHit()
+   resultStore.priorHit()
    let url = route.fullPath
    let lastSlash = url.lastIndexOf("/")
    url = url.substring(0,lastSlash )+"/"+resultStore.selectedHit.identifier

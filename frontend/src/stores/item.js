@@ -26,6 +26,11 @@ export const useItemStore = defineStore('item', {
          }
          return genTypeF.value
       },
+      hasContentAdvisory: state => {
+         let allFields = [...state.details.basicFields.concat(state.details.detailFields)]
+         let idx = allFields.findIndex( f=> f.name=="content_advisory")
+         return idx > -1
+      },
       isDigitalCollection: state => {
          return state.details.detailFields.findIndex( f=> f.name == 'digital_collection') > -1
       },
