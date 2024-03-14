@@ -49,6 +49,24 @@ const props = defineProps({
          margin: 15px 0 0 0;
       }
    }
+   .advisory.brief {
+      margin: 17px 0;
+      font-size: 15px;
+      padding: 17px 34px;
+      align-items: center;
+      max-width: none;
+      p {
+         margin: 0;
+      }
+      .icon-wrap {
+         margin-right: 17px;
+         padding: 5px;
+         .icon {
+            width: 35px;
+            height: 35px;
+         }
+      }
+   }
 }
 @media only screen and (max-width: 768px) {
    .advisory {
@@ -68,12 +86,11 @@ const props = defineProps({
          margin: 10px 0 0 0;
       }
    }
-}
    .advisory.brief {
       margin: 17px 0;
       font-size: 15px;
-      padding: 17px 34px;
-      align-items: center;
+      padding: 17px 24px 17px 17px;
+      align-items: flex-start;
       max-width: none;
       p {
          margin: 0;
@@ -82,11 +99,12 @@ const props = defineProps({
          margin-right: 17px;
          padding: 5px;
          .icon {
-            width: 35px;
-            height: 35px;
+            width: 30px;
+            height: 30px;
          }
       }
    }
+}
    .advisory {
       background-color: #F3EC45;
       border-radius: 10px;
