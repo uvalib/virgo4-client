@@ -29,11 +29,52 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
+@media only screen and (min-width: 768px) {
+   .advisory {
+      margin: 34px 0 51px 0;
+      max-width: 900px;
+      padding: 34px 68px 34px 34px;
+      h5 {
+         font-size: 20px;
+      }
+      .icon-wrap {
+         margin-right: 34px;
+         .icon {
+            width: 50px;
+            height: 50px;
+         }
+      }
+      p {
+         font-size: 17px;
+         margin: 15px 0 0 0;
+      }
+   }
+}
+@media only screen and (max-width: 768px) {
+   .advisory {
+      padding: 17px 34px 17px 17px;
+      h5 {
+         font-size: 17px;
+      }
+      .icon-wrap {
+         margin-right: 17px;
+         .icon {
+            width: 30px;
+            height: 30px;
+         }
+      }
+      p {
+         font-size: 15px;
+         margin: 10px 0 0 0;
+      }
+   }
+}
    .advisory.brief {
       margin: 17px 0;
       font-size: 15px;
       padding: 17px 34px;
       align-items: center;
+      max-width: none;
       p {
          margin: 0;
       }
@@ -47,36 +88,29 @@ const props = defineProps({
       }
    }
    .advisory {
-      margin: 34px 0 51px 0;
       background-color: #F3EC45;
       border-radius: 10px;
       display: flex;
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: flex-start;
-      padding: 34px 68px 34px 34px;
-      max-width: 900px;
       h5 {
-         font-size: 20px;
          padding: 0;
          margin: 0;
          text-align: left;
+         font-family: "franklin-gothic-urw", arial, sans-serif;
       }
       p {
+         font-family: "franklin-gothic-urw-book", arial, sans-serif;
          padding: 0;
-         margin: 15px 0 0 0;
-         font-size: 17px;
          text-align: left;
       }
       .icon-wrap {
          background-color: #2b2b2b;
          border-radius: 50px;
          padding: 10px;
-         margin-right: 34px;
          .icon {
             display: block;
-            width: 50px;
-            height: 50px;
             background-image: url(/src/assets/eye-slash.svg);
             background-repeat: no-repeat;
             background-position: center center;
