@@ -55,6 +55,7 @@ const props = defineProps({
       justify-content: flex-start;
       align-items: flex-start;
       padding: 34px 68px 34px 34px;
+      max-width: 900px;
       h5 {
          font-size: 20px;
          padding: 0;
