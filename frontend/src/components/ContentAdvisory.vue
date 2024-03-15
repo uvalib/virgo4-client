@@ -5,7 +5,7 @@
          <h5>Content advisory:</h5>
          <p>
             This item may include language or imagery which is offensive, oppressive, harmful, or inappropriate for some contexts; possibly including violence or hate speech.
-            This warning is provided to allow viewers to make an informed choice about ways to engage withthe material, taking appropriate care for themselves and others who may be affected.
+            This warning is provided to allow viewers to make an informed choice about ways to engage with the material, taking appropriate care for themselves and others who may be affected.
          </p>
       </div>
       <div class="text" v-else>
