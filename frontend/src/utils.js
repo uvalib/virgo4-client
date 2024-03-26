@@ -3,13 +3,13 @@
 // are classified as header (special rendering), basic (show by default),
 // detailed (hidden by default). Split them into separate sections of the hit. Identifer and
 // cover image are also special and get pulled to top level of hit data
-export const preProcessHitFields =((poolURL, hits) => {
+export const preProcessHitFields = ((poolURL, hits) => {
    hits.forEach(function (hit) {
       hit.basicFields = []
       hit.detailFields = []
       hit.holdings = {}
       hit.header = {}
-      hit.fields.forEach(function (field) {
+      hit.fields.forEach( field => {
          // Handle special redirect field.  This field may be present in item details,
          // or in the only search result of an advanced search for a single identifier.
          if (field.type == "redirect" && field.value != "") {
@@ -144,6 +144,15 @@ export const preProcessHitFields =((poolURL, hits) => {
             tgtMerged.push(field)
          }
       })
+
+       // HACK
+       let contentAdv = {
+         name: "content_advisory",
+         value: "BLA!",
+         visibility: "detailed",
+         display: "optional"
+      }
+      hit.detailFields.push(contentAdv)
 
       if (!hit.header.author_display && hit.header.author) {
          hit.header.author_display = hit.header.author.value.join(hit.header.author.separator)

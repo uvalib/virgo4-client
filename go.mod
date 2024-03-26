@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.22.0
 
 require (
-	github.com/gin-contrib/cors v1.7.0
+	github.com/gin-contrib/cors v1.7.1
 	github.com/gin-gonic/contrib v0.0.0-20221130124618-7e01895a63f2
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gorilla/feeds v1.1.2
@@ -16,7 +16,7 @@ require (
 	github.com/zsais/go-gin-prometheus v0.1.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.5.7
-	gorm.io/gorm v1.25.7
+	gorm.io/gorm v1.25.8
 )
 
 require (
@@ -44,10 +44,10 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.0 // indirect
 	github.com/prometheus/client_golang v1.19.0 // indirect
 	github.com/prometheus/client_model v0.6.0 // indirect
-	github.com/prometheus/common v0.50.0 // indirect
+	github.com/prometheus/common v0.51.1 // indirect
 	github.com/prometheus/procfs v0.13.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
