@@ -145,15 +145,6 @@ export const preProcessHitFields = ((poolURL, hits) => {
          }
       })
 
-       // HACK
-       let contentAdv = {
-         name: "content_advisory",
-         value: "BLA!",
-         visibility: "detailed",
-         display: "optional"
-      }
-      hit.detailFields.push(contentAdv)
-
       if (!hit.header.author_display && hit.header.author) {
          hit.header.author_display = hit.header.author.value.join(hit.header.author.separator)
       }
