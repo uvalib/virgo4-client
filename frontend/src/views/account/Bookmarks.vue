@@ -78,19 +78,19 @@
                         <Column field="details.author" header="Author"/>
                         <Column field="callNumber" header="Call Number">
                            <template #body="slotProps">
-                              <template v-if="slotProps.data.details.callNumber">{{slotProps.data.details.callNumber}}</template>
+                              <template v-if="slotProps.data.details.callNumber">{{ valueDisplay(slotProps.data.details.callNumber) }}</template>
                               <span v-else class="na">N/A</span>
                            </template>
                         </Column>
                         <Column field="format" header="Format">
                            <template #body="slotProps">
-                              <template v-if="slotProps.data.details.format">{{slotProps.data.details.format}}</template>
+                              <template v-if="slotProps.data.details.format">{{ valueDisplay(slotProps.data.details.format) }}</template>
                               <span v-else class="na">N/A</span>
                            </template>
                         </Column>
                         <Column field="library" header="Library">
                            <template #body="slotProps">
-                              <template v-if="slotProps.data.details.library">{{slotProps.data.details.library}}</template>
+                              <template v-if="slotProps.data.details.library">{{ valueDisplay(slotProps.data.details.library) }}</template>
                               <span v-else class="na">N/A</span>
                            </template>
                         </Column>
@@ -185,6 +185,11 @@ const sourceName = ((poolID) => {
 const toggleSettings = ((folderID) => {
    expandedFolder.value = folderID
    bookmarkStore.toggleBookmarkSettings(folderID)
+})
+
+const valueDisplay = ( (val) => {
+   if ( Array.isArray(val) ) return val.join(", ")
+   return val
 })
 
 const deleteBookmarksClicked = ((folderInfo) => {
