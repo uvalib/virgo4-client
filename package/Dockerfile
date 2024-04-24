@@ -38,7 +38,9 @@ RUN mkdir -p $APP_HOME $APP_HOME/bin $APP_HOME/scripts $APP_HOME/db
 RUN chown -R webservice $APP_HOME && chgrp -R webservice $APP_HOME
 
 # add the migrate tool
-RUN cd $APP_HOME/bin && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+ENV MIGRATE_VERSION v4.17.1
+RUN cd $APP_HOME/bin && curl -L https://github.com/golang-migrate/migrate/releases/download/${MIGRATE_VERSION}/migrate.linux-amd64.tar.gz | tar xvz && rm LICENSE README.md
+
 
 # port and run command
 EXPOSE 8080
