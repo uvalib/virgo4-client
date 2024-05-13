@@ -32,6 +32,9 @@
             <div class="note">
                <b>NOTE: </b>Nested parentheses within a query are not supported.
             </div>
+            <div class="note">
+               <a href="https://guides.lib.virginia.edu/virgo" target="_blank">Learn more about using Virgo</a><i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+            </div>
          </div>
       </OverlayPanel>
    </div>
@@ -58,6 +61,11 @@ div.tips {
    padding: 15px;
    background: var(--uvalib-blue-alt-light);
    font-size: 0.9em;
+
+   a  {
+      color: var(--uvalib-text);
+      font-weight: bold;
+   }
 
    p.section {
       font-weight: bold;
