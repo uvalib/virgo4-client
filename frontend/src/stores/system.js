@@ -58,6 +58,24 @@ export const useSystemStore = defineStore('system', {
       },
       pickupLibraries: state => {
          return state.allPickupLibraries.filter( p => p.enabled == true)
+      },
+      authRequired: store => {
+         return (url) => {
+            // avail, citations and pda requests all require auth
+            if ( url.match(store.availabilityURL) != null || url.match(store.citationsURL) != null  || url.match("pda-ws") != null  ) {
+               return true
+            }
+            // all api requests except /api/pools require auth
+            if ( url.match(/\/api\//) != null && url.match(/\/api\/pools/) == null) {
+               return true
+            }
+            return false
+         }
+      },
+      isAuthRequest: () => {
+         return (url) => {
+            return ( url.indexOf("/api/reauth") == 0 || url.indexOf("/authenticate") == 0 )
+         }
       }
    },
 
@@ -160,45 +178,6 @@ export const useSystemStore = defineStore('system', {
                const alertStore = useAlertStore()
                alertStore.setConfig(response.data)
             }
-
-            // append credentials to header if needed
-            const user = useUserStore()
-            axios.interceptors.request.use( async config => {
-               let url = config.url
-               if ( (url.match(/\/api\//) && !url.match(/\/api\/pools/)) ||
-                     url.match(this.availabilityURL) ||
-                     url.match(this.citationsURL) ||
-                     url.match("pda-ws") ) {
-                  config.headers['Authorization'] = 'Bearer ' + user.authToken
-               }
-               // any requests to the client API should include the host to toggle features
-               // on staging and production
-               if ( url.indexOf("/api") == 0) {
-                  config.headers['V4Host']= window.location.hostname
-               }
-               return config
-            }, error => {
-               return Promise.reject(error)
-            })
-
-            axios.interceptors.response.use(
-               res => res,
-               async err => {
-                  // If the original request was not an auth request, and it resulted in a 401,
-                  // reauth as guest and retry ONCE
-                  var origConfig = err.config
-                  if ( !origConfig.url.match(/\/api\/reauth/) && !origConfig.url.match(/\/authenticate/) ) {
-                     if (err.response && err.response.status == 401 && origConfig._retry !== true) {
-                        origConfig._retry = true
-                        console.log("REFRESH AUTHENTICATION")
-                        await user.refreshAuth()
-                        origConfig.headers['Authorization'] = 'Bearer ' + user.authToken
-                        console.log("RETRY "+origConfig.url+" AS "+user.role)
-                        return axios(origConfig)
-                     }
-                  }
-                  return Promise.reject(err)
-               })
          }).catch((error) => {
             this.setFatal("Unable to get configuration: " + error)
          })

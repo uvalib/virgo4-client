@@ -164,14 +164,33 @@ const router = createRouter({
    },
 })
 
-router.afterEach((to, _from) => {
-   let titles = {home: "Virgo", search: "Virgo", signin: "Sign In", account: "My Information",
+router.afterEach((to) => {
+   const systemStore  = useSystemStore()
+   systemStore.clearMessage()
+
+   // Page header is now in the main app template and driven by the pageTitle
+   // model variable. Ensure it is set correctly for each new page
+   const h1 = {home: "Search", search: "Search", signin: "User Sign In", account: "My Account",
+      checkouts: "My Account", 'digital-deliveries': "My Account",
+      bookmarks: "My Account", requests: "My Account", searches: "My Account", admin: "My Account",
+      preferences: "My Account", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
+      codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found",
+      'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item", forbidden: "Forbidden",
+      'course-reserves': "Course Reserves", 'course-reserves-request': "Course Reserves Request", reserved: "Course Reserves Request"
+   }
+   const pageTitle =  h1[to.name]
+   if (pageTitle) {
+      systemStore.pageTitle = pageTitle
+   }
+
+   // Set the document title as as wekk
+   const titles = {home: "Virgo", search: "Virgo", signin: "Sign In", account: "My Information",
       checkouts: "Checkouts", 'digital-deliveries': "Digital Deliveries",
       bookmarks: "Bookmarks", requests: "Requests", searches: "Saved Searches", forbidden: "Forbidden",
       preferences: "Preferences", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
       'course-reserves': "Course Reserves", admin: "Admin",
    }
-   let title = titles[to.name]
+   const title = titles[to.name]
    if ( title == "Virgo") {
       if (to.query.q) {
          document.title = "Search Results"
@@ -190,12 +209,9 @@ router.afterEach((to, _from) => {
    setFocusID("app")
 })
 
-// This is called before every URL in the SPA is hit
 router.beforeEach( async (to, _from) => {
-   const systemStore  = useSystemStore()
    const restore = useRestoreStore()
    const userStore = useUserStore()
-   systemStore.clearMessage()
 
    // URLs like /items/PID are legacy format. Redirect to /sources with a legacy source name
    // when the details page loads, source = legacy will trigger a lookup of the correct source / item and redirect again
@@ -221,21 +237,6 @@ router.beforeEach( async (to, _from) => {
          }
       }
       return tgtURL
-   }
-
-   // Page header is now in the main app template and driven by the pageTitle
-   // model variable. Ensure it is set correctly for each new page
-   let h1 = {home: "Search", search: "Search", signin: "User Sign In", account: "My Account",
-      checkouts: "My Account", 'digital-deliveries': "My Account",
-      bookmarks: "My Account", requests: "My Account", searches: "My Account", admin: "My Account",
-      preferences: "My Account", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
-      codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found",
-      'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item", forbidden: "Forbidden",
-      'course-reserves': "Course Reserves", 'course-reserves-request': "Course Reserves Request", reserved: "Course Reserves Request"
-   }
-   let title =  h1[to.name]
-   if (title) {
-      systemStore.pageTitle = title
    }
 
    // These pages require signed in user and will automatically netbadge in if not signed in

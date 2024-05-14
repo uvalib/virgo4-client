@@ -313,6 +313,38 @@ export const useUserStore = defineStore('user', {
             }
          }
          localStorage.setItem("v4_jwt", jwtStr)
+
+         // Use the new JWT token in auth headers for all a requests and handle reauth if it expires
+         const system = useSystemStore()
+         axios.interceptors.request.use( async config => {
+            if ( system.authRequired( config.url ) ) {
+               config.headers['Authorization'] = 'Bearer ' + this.authToken
+                // API requests need also host to toggle features on prod / dev
+               if ( config.url.indexOf("/api") == 0 ) {
+                  config.headers['V4Host']= window.location.hostname
+               }
+            }
+            return config
+         }, error => {
+            return Promise.reject(error)
+         })
+
+         axios.interceptors.response.use(
+            res => res,
+            async err => {
+               // Retry non-auth requests that resulted in 401 ONCE
+               if ( system.isAuthRequest( err.config.url ) == false ) {
+                  if (err.response && err.response.status == 401 && err.config._retry !== true) {
+                     err.config._retry = true
+                     await this.refreshAuth()
+                     err.config.headers['Authorization'] = 'Bearer ' + this.authToken
+                     console.log("RETRY "+err.config.url+" AS "+this.role)
+                     return axios(err.config)
+                  }
+               }
+               return Promise.reject(err)
+            }
+         )
       },
       setAccountInfo(data) {
          this.accountInfo = data.user
