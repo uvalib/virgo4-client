@@ -83,22 +83,20 @@ func (svc *ServiceContext) AddBookmarkFolder(c *gin.Context) {
 // PublishBookmarkFolder will move update a folder name
 func (svc *ServiceContext) PublishBookmarkFolder(c *gin.Context) {
 	uid := c.Param("uid")
-	userID := c.GetInt("v4id")
 	fid, _ := strconv.Atoi(c.Param("id"))
 	log.Printf("User %s publish folder %d", uid, fid)
-	svc.setFolderVisibility(c, userID, fid, true)
+	svc.setFolderVisibility(c, fid, true)
 }
 
 // UnpublishBookmarkFolder will move update a folder name
 func (svc *ServiceContext) UnpublishBookmarkFolder(c *gin.Context) {
 	uid := c.Param("uid")
-	userID := c.GetInt("v4id")
 	fid, _ := strconv.Atoi(c.Param("id"))
 	log.Printf("User %s unpublish folder %d", uid, fid)
-	svc.setFolderVisibility(c, userID, fid, false)
+	svc.setFolderVisibility(c, fid, false)
 }
 
-func (svc *ServiceContext) setFolderVisibility(c *gin.Context, uid int, folderID int, public bool) {
+func (svc *ServiceContext) setFolderVisibility(c *gin.Context, folderID int, public bool) {
 	var folder BookmarkFolder
 	resp := svc.GDB.Find(&folder, folderID)
 	if resp.Error != nil {

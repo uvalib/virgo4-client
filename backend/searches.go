@@ -68,13 +68,12 @@ func (svc *ServiceContext) DeleteAllSavedSearches(c *gin.Context) {
 // PublishSavedSearch will make a private search public
 func (svc *ServiceContext) PublishSavedSearch(c *gin.Context) {
 	v4UserID := c.Param("uid")
-	userID := c.GetInt("v4id")
 	searchID, _ := strconv.Atoi(c.Param("id"))
-	log.Printf("User %s[%d] publish saved search %d...", v4UserID, userID, searchID)
-	svc.setSearchVisibility(c, userID, searchID, true)
+	log.Printf("User %s publish saved search %d...", v4UserID, searchID)
+	svc.setSearchVisibility(c, searchID, true)
 }
 
-func (svc *ServiceContext) setSearchVisibility(c *gin.Context, userID int, searchID int, public bool) {
+func (svc *ServiceContext) setSearchVisibility(c *gin.Context, searchID int, public bool) {
 	var search SavedSearch
 	resp := svc.GDB.Find(&search, searchID)
 	if resp.Error != nil {
@@ -95,10 +94,9 @@ func (svc *ServiceContext) setSearchVisibility(c *gin.Context, userID int, searc
 // UnpublishSavedSearch will make a public search private
 func (svc *ServiceContext) UnpublishSavedSearch(c *gin.Context) {
 	v4UserID := c.Param("uid")
-	userID := c.GetInt("v4id")
 	searchID, _ := strconv.Atoi(c.Param("id"))
-	log.Printf("User %s[%d] publish saved search %d...", v4UserID, userID, searchID)
-	svc.setSearchVisibility(c, userID, searchID, false)
+	log.Printf("User %s publish saved search %d...", v4UserID, searchID)
+	svc.setSearchVisibility(c, searchID, false)
 }
 
 // DeleteSavedSearch will delete a saved search with the matching token
