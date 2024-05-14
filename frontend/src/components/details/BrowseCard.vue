@@ -76,10 +76,10 @@ const props = defineProps({
 
 
 const truncateTitle = (( title ) => {
-   if ( title.length <= 90) {
+   if ( title.length <= 100) {
       return title
    }
-   let spaceIdx = 90
+   let spaceIdx = 100
    let found = false
    while ( !found && spaceIdx >0 ) {
       if ( title[spaceIdx] == ' ') {
@@ -110,7 +110,7 @@ const bookmarkClicked = ((id) => {
 .browse-card {
    border: 1px solid var(--uvalib-grey);
    box-shadow: $v4-box-shadow-light;
-   padding: 0 0 40px 0;
+   padding: 0 0 5px 0;
    margin: 5px;
    position: relative;
    display: flex;
@@ -210,13 +210,14 @@ const bookmarkClicked = ((id) => {
    .details {
       background: white;
       padding: 5px 0;
+      height: 230px;
       .call, .loc, .title {
          background: white;
          word-break: break-word;
          -webkit-hyphens: auto;
          -moz-hyphens: auto;
          hyphens: auto;
-         max-width: 95%;
+         max-width: 90%;
          display: block;
          margin: 0 auto;
          font-weight: 500;
