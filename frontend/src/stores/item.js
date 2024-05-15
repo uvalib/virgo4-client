@@ -336,6 +336,10 @@ export const useItemStore = defineStore('item', {
             if ( details.related ) {
                // strip out this item info from related
                details.related = details.related.filter(  r => r.id != details.identifier)
+               // Add this to force all related images to have an advisory for testing
+               // details.related.forEach( r => {
+               //    r.content_advisory = "ADVISORY"
+               // })
             }
             details.source = source
             this.details = details

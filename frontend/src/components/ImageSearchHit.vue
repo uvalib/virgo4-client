@@ -10,12 +10,7 @@
       <router-link @mousedown="detailClicked" class="img-link" :to="detailsURL">
          <div class="wrap">
             <img aria-label=" " :src="iiifURL(props.hit)">
-            <div class="advisory" v-if="hasContentAdvisory">
-               <div class="message">
-                  <span class="icon"></span>
-                  <span>Content Advisory</span>
-               </div>
-            </div>
+            <ImageAdvisory v-if="hasContentAdvisory" />
          </div>
          <div class="metadata-content">
             <div>{{props.hit.header.title}}</div>
@@ -26,6 +21,7 @@
 
 <script setup>
 import BookmarkButton from "@/components/BookmarkButton.vue"
+import ImageAdvisory from "@/components/ImageAdvisory.vue"
 import { computed } from 'vue'
 import { useResultStore } from "@/stores/result"
 import analytics from '@/analytics'

@@ -30,7 +30,10 @@
                <router-link :to="relatedImageURL(r)"  @mousedown="relatedImageClicked(r)"
                   v-for="r in details.related" :key="`r${r.id}`"
                >
-                  <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
+                  <div class="img-wrap">
+                     <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
+                     <ImageAdvisory v-if="r.content_advisory" />
+                  </div>
                </router-link>
             </div>
          </template>
@@ -93,6 +96,7 @@
 </template>
 
 <script setup>
+import ImageAdvisory from "@/components/ImageAdvisory.vue"
 import V4ProgressBar from "@/components/V4ProgressBar.vue"
 import OCRRequest from "@/components/modals/OCRRequest.vue"
 import analytics from '@/analytics'
@@ -504,6 +508,9 @@ onUnmounted(()=>{
       a {
          display: inline-block;
          margin: 10px;
+      }
+      .img-wrap {
+         position: relative;
       }
       img {
          background-image: url('@/assets/dots.gif');
