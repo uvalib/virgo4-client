@@ -15,7 +15,7 @@
 import ItemView from "@/components/details/ItemView.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { onMounted, onUpdated, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useResultStore } from "@/stores/result"
@@ -93,6 +93,8 @@ async function getDetails(src, id) {
       }
    }
 
+   zoteroItemUpdated()
+
    setTimeout( () => {
       if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
          let newBM = restore.pendingBookmark
@@ -107,6 +109,7 @@ async function getDetails(src, id) {
 }
 
 function zoteroItemUpdated() {
+   console.log("zoteroItemUpdated")
    // notify zotero connector of an item change
    document.dispatchEvent(new Event('ZoteroItemUpdated', {
       bubbles: true,
@@ -118,9 +121,6 @@ onMounted(()=>{
    getDetails(route.params.src, route.params.id)
 })
 
-onUpdated(()=>{
-   zoteroItemUpdated()
-})
 </script>
 <style lang="scss" scoped>
 .details {
