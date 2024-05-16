@@ -47,10 +47,7 @@
                   </template>
                </Dropdown>
             </div>
-            <PoolResultDetail v-if="resultStore.selectedResultsIdx > -1" />
-            <div  v-if="resultStore.total == 0 && resultStore.selectedResultsIdx == -1" class="none">
-               No results found
-            </div>
+            <PoolResultDetail />
          </div>
       </div>
    </div>
