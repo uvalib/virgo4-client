@@ -6,6 +6,7 @@ import axios from 'axios'
 
 export const useSystemStore = defineStore('system', {
 	state: () => ({
+      maxPoolTabs: 3, // number of viaible tabs not counting OTHER
       pageTitle: "Search",
       newVersion: false,
       kiosk: false,

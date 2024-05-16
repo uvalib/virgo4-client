@@ -6,7 +6,6 @@ import VueCookies from 'vue-cookies'
 
 export const usePreferencesStore = defineStore('preferences', {
 	state: () => ({
-      maxTabs: 4,
       trackingOptOut: false,
       pickupLibrary: {id: "", name: ""},
       collapseGroups: false,

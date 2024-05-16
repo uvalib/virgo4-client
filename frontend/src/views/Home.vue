@@ -324,7 +324,7 @@ function handlePendingBookmark() {
       // The group accordion watches this value. When set, the accordion will auto-expand,
       // adding the target item to the DOM
       let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.groupParent)
-      resultStore.setAutoExpandGroupID(`group-${parent.identifier}`)
+      resultStore.autoExpandGroupID = `group-${parent.identifier}`
    }
    scrollToItem(newBM.identifier, false)
 

@@ -15,11 +15,11 @@ export const useResultStore = defineStore('result', {
       noSpinner: false,
       searching: false,
       pageSize: 20,
-      results: [],
+      results: [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }],
       suggestions: [],
       total: -1,
       autoExpandGroupID: "",
-      selectedResultsIdx: -1,
+      selectedResultsIdx: 0,
       selectedHitIdx: -1,
       selectedHitGroupIdx: -1,
       lastSearchScrollPosition: 0,
@@ -28,9 +28,6 @@ export const useResultStore = defineStore('result', {
 
    getters: {
       selectedHit: state => {
-         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1) {
-            return {}
-         }
          let hit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
          if (hit.grouped && state.selectedHitGroupIdx > -1 ) {
             return hit.group[state.selectedHitGroupIdx]
@@ -38,30 +35,18 @@ export const useResultStore = defineStore('result', {
          return hit
       },
       nextHitAvailable(state) {
-         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
-            return false
-         }
-         return this.selectedHit.number < this.selectedResults.total
+         return state.selectedHitIdx > -1 && this.selectedHit.number < this.selectedResults.total
       },
       prevHitAvailable(state) {
-         if ( state.selectedResultsIdx == -1 || state.selectedHitIdx == -1 || state.searching == true) {
-            return false
-         }
-         return this.selectedHit.number > 1
+         return state.selectedHitIdx > -1 && this.selectedHit.number > 1
       },
       hasResults: state => {
          return state.total >= 0
       },
       selectedResults: state => {
-         if (state.selectedResultsIdx === -1) {
-            return { total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }
-         }
          return state.results[state.selectedResultsIdx]
       },
       hasMoreHits: state => {
-         if (state.selectedResultsIdx === -1 || state.searching) {
-            return false
-         }
          let tgtResults = state.results[state.selectedResultsIdx]
          let resultsCnt = 0
          tgtResults.hits.forEach( r => {
@@ -79,7 +64,6 @@ export const useResultStore = defineStore('result', {
       hitSelected(identifier) {
          this.selectedHitIdx = -1
          this.selectedHitGroupIdx = -1
-         if ( this.selectedResultsIdx == -1) return
 
          this.results[this.selectedResultsIdx].hits.some( (h,idx) => {
             if (h.identifier == identifier) {
@@ -102,7 +86,7 @@ export const useResultStore = defineStore('result', {
           }
       },
       priorHit() {
-         if ( this.selectedResultsIdx == -1 || this.selectedHitIdx == -1) return
+         if ( this.selectedHitIdx == -1) return
          let currHit = this.results[this.selectedResultsIdx].hits[this.selectedHitIdx]
 
          // are we currently on a grouped result and not on the head?
@@ -119,9 +103,6 @@ export const useResultStore = defineStore('result', {
                this.selectedHitGroupIdx = currHit.group.length-1
             }
          }
-      },
-      setAutoExpandGroupID(id) {
-         this.autoExpandGroupID = id
       },
       setSearching(flag) {
          if (this.noSpinner) {
@@ -212,7 +193,7 @@ export const useResultStore = defineStore('result', {
          // this is called from top level search; resets results from all pools
          const pools = usePoolStore()
          this.total = -1
-         this.results.splice(0, this.results.length)
+         this.results = []
          let firstPoolWithHits = -1
          let tgtPoolIdx = -1
 
@@ -287,7 +268,7 @@ export const useResultStore = defineStore('result', {
       },
 
       setSuggestions(data) {
-         this.suggestions.splice(0, this.suggestions.length)
+         this.suggestions = []
          data.forEach(d => {
             this.suggestions.push(d)
          })
@@ -299,13 +280,14 @@ export const useResultStore = defineStore('result', {
       },
 
       resetSearchResults() {
-         this.results.splice(0, this.results.length)
+         this.suggestions = []
+         this.results = [{ total: 0, hits: [], pool: { description: "", id: "none", name: "None", summary: "", url: "" } }]
          this.total = -1
          this.lastSearchScrollPosition = 0
          this.lastSearchURL = ""
          this.selectedHitIdx = -1
          this.selectedHitGroupIdx = -1
-         this.selectedResultsIdx = -1
+         this.selectedResultsIdx = 0
       },
 
       resetSearch() {
@@ -333,7 +315,7 @@ export const useResultStore = defineStore('result', {
          await this.searchPool(params)
       },
       async nextHit() {
-         if ( this.selectedHitIdx == -1 || this.selectedResultsIdx == -1 ) return
+         if ( this.selectedHitIdx == -1 ) return
 
          // is this the last hit in the currently available results?
          let tgtResults = this.selectedResults
@@ -354,7 +336,6 @@ export const useResultStore = defineStore('result', {
             }
          }
 
-         if ( this.selectedResultsIdx == -1 || this.selectedHitIdx == -1) return
          let currHit = this.results[this.selectedResultsIdx].hits[this.selectedHitIdx]
          if ( currHit.grouped) {
             if ( this.selectedHitGroupIdx == currHit.group.length-1) {

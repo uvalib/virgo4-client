@@ -28,7 +28,7 @@
                      <div :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</div>
                   </span>
                </VirgoButton>
-               <Dropdown v-if="resultStore.results.length > preferences.maxTabs" v-model="otherSrcSelection" :class="{active: otherSrcSelection}"
+               <Dropdown v-if="resultStore.results.length > systemStore.maxPoolTabs" v-model="otherSrcSelection" :class="{active: otherSrcSelection}"
                   :options="otherSources" optionLabel="name" optionValue="id" @change="otherSrcSelected">
                   <template #value>
                      <div v-if="otherSrcInfo" class="more-selection">
@@ -71,7 +71,6 @@ import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useSortStore } from "@/stores/sort"
-import { usePreferencesStore } from "@/stores/preferences"
 import Dropdown from 'primevue/dropdown'
 
 const router = useRouter()
@@ -79,7 +78,6 @@ const route = useRoute()
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
-const preferences = usePreferencesStore()
 const sortStore = useSortStore()
 const filters = useFilterStore()
 
@@ -88,7 +86,7 @@ const otherSrcSelection = ref("")
 onMounted(() => {
    if (route.query.pool) {
       let poolIdx = resultStore.results.findIndex( r => r.pool.id == route.query.pool)
-      if (poolIdx >= preferences.maxTabs-1) {
+      if (poolIdx >= systemStore.maxPoolTabs) {
          otherSrcSelection.value = route.query.pool
       }
    }
@@ -102,10 +100,10 @@ const queryString = computed(()=>{
 })
 
 const sourceTabs = computed(()=>{
-   if (resultStore.results.length <= preferences.maxTabs) {
+   if (resultStore.results.length < systemStore.maxPoolTabs) {
       return resultStore.results
    }
-   return resultStore.results.slice(0, preferences.maxTabs-1 )
+   return resultStore.results.slice(0, systemStore.maxPoolTabs )
 })
 
 const otherSrcInfo = computed (() => {
@@ -118,7 +116,7 @@ const otherSrcInfo = computed (() => {
 
 const otherSources = computed(()=>{
    let opts = []
-   let others = resultStore.results.slice(preferences.maxTabs-1).sort( (a,b) => {
+   let others = resultStore.results.slice(systemStore.maxPoolTabs).sort( (a,b) => {
       if (a.pool.name < b.pool.name) return -1
       if (a.pool.name > b.pool.name) return 1
       return 0
@@ -210,25 +208,21 @@ const resultsButtonClicked = ((resultIdx) => {
    if ( resultStore.selectedResultsIdx != resultIdx) {
       let r = resultStore.results[resultIdx]
       if ( poolFailed(r)) return
-      poolSelected(r.pool.id)
+      poolSelected(resultIdx, r.pool.id)
       otherSrcSelection.value = ""
    }
 })
 
 const otherSrcSelected = ((sel) => {
-   poolSelected(sel.value)
+   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == sel.value )
+   poolSelected(tgtIdx, sel.value)
 })
 
-const poolSelected = (( poolID ) => {
+const poolSelected = (( resultIdx, poolID ) => {
    analytics.trigger('Results', 'POOL_SELECTED', poolID)
-
-   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == poolID )
-   if (tgtIdx > -1 ) {
-      resultStore.selectPoolResults(tgtIdx)
-      let newPoolID = resultStore.results[tgtIdx].pool.id
-      if ( route.query.pool != newPoolID ) {
-         updateURL(newPoolID)
-      }
+   resultStore.selectPoolResults(resultIdx)
+   if ( route.query.pool != poolID ) {
+      updateURL(poolID)
    }
 })
 </script>
