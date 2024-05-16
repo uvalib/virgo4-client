@@ -6,7 +6,6 @@ Name
 _______________________________________________________________________
 ID:             {{.NewContact.UserID}}
 First Name:     {{formatDiff .NewContact.FirstName .OldContact.FirstName}}
-Preferred Name: {{formatDiff .NewContact.PreferredName .OldContact.PreferredName}}
 Middle Name:    {{formatDiff .NewContact.MiddleName .OldContact.MiddleName}}
 Last Name:      {{formatDiff .NewContact.LastName .OldContact.LastName}}
 
