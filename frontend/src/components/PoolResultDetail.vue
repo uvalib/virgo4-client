@@ -137,7 +137,7 @@ div.pool-header {
    font-size: 1em;
    color: white;
    background: var(--uvalib-brand-blue);
-   margin: 0 0 1rem 5px;
+   margin: 0 0 1rem 0;
    text-align: left;
    box-shadow: $v4-box-shadow-light;
 }
@@ -164,7 +164,7 @@ div.pool-header {
     max-width: 250px;
 }
 .hit-wrapper {
-   margin: 0 0 20px 5px;
+   margin: 0 0 20px 0;
 }
 .hit-wrapper.none {
    background: white;
