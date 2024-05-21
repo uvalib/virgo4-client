@@ -157,7 +157,6 @@ export const useReserveStore = defineStore('reserve', {
             let subItem = {catalogKey: item.identifier,
                pool: item.pool,
                title: item.details.title,
-               callNumber: item.details.callNumber,
                author: item.details.author,
                location: item.details.location,
                library: item.details.library,
@@ -168,6 +167,11 @@ export const useReserveStore = defineStore('reserve', {
                audioLanguage: item.audioLanguage,
                subtitles: item.subtitles,
                subtitleLanguage: item.subtitleLanguage
+            }
+            if (Array.isArray(item.details.callNumber)) {
+               subItem.callNumber = item.details.callNumber
+            } else {
+               subItem.callNumber = [item.details.callNumber]
             }
             data.items.push( subItem )
          })
