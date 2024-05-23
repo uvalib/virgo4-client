@@ -16,7 +16,7 @@
 
       <div class="results-wrapper" >
          <FacetSidebar />
-         <TabView @update:activeIndex="resultsSelected" :scrollable="true" :lazy="true" :activeIndex="resultStore.selectedResultsIdx">
+         <TabView @update:activeIndex="resultsSelected" :scrollable="true" :lazy="true">
             <TabPanel v-for="tab in sourceTabs" :key="`tab-${tab.poolID}`">
                <template #header>
                   <div class="pool-tab">
