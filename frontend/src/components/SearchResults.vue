@@ -1,6 +1,8 @@
 <template>
    <PrintedSearchResults v-if="systemStore.printing" />
-   <div tabindex="-1" id="results-container" class="search-results" aria-describedby="search-summary">
+   <div tabindex="-1" id="results-container"
+      class="search-results" aria-describedby="search-summary"
+   >
       <SearchSuggestions />
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
@@ -16,19 +18,37 @@
 
       <div class="results-wrapper" >
          <FacetSidebar />
-         <TabView @update:activeIndex="resultsSelected" :scrollable="true" :lazy="true">
-            <TabPanel v-for="tab in sourceTabs" :key="`tab-${tab.poolID}`">
-               <template #header>
-                  <div class="pool-tab">
-                     <div class="pool">{{ tab.name }}</div>
-                     <div v-if="tab.failed" class='total error'>Failed</div>
-                     <div v-else-if="tab.skipped" class='total error'>Skipped</div>
-                     <div v-else :aria-label="`has ${tab.total} results`" class="total">({{utils.formatNum(tab.total) || '0'}})</div>
-                  </div>
-               </template>
-               <PoolResultDetail />
-            </TabPanel>
-         </TabView>
+         <div class="results-main">
+            <div class="pool-tabs">
+               <VirgoButton v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
+                  @click="resultsButtonClicked(idx)"
+               >
+                  <span>
+                     <div class="pool">{{r.pool.name}}</div>
+                     <div :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</div>
+                  </span>
+               </VirgoButton>
+               <Dropdown v-if="resultStore.results.length > systemStore.maxPoolTabs" v-model="otherSrcSelection" :class="{active: otherSrcSelection}"
+                  :options="otherSources" optionLabel="name" optionValue="id" @change="otherSrcSelected">
+                  <template #value>
+                     <div v-if="otherSrcInfo" class="more-selection">
+                        <div>{{ otherSrcInfo.name }}</div>
+                        <div class="total">({{  otherSrcInfo.total }})</div>
+                     </div>
+                     <div v-else class="more">More</div>
+                  </template>
+                  <template #option="slotProps">
+                     <div class="more-opt">
+                        <span class="other-src">{{ slotProps.option.name }}</span>
+                        <span v-if="slotProps.option.falied" class='total error'>Failed</span>
+                        <span v-else-if="slotProps.option.skipped" class='total error'>Skipped</span>
+                        <span v-else class="total">({{slotProps.option.total}})</span>
+                     </div>
+                  </template>
+               </Dropdown>
+            </div>
+            <PoolResultDetail />
+         </div>
       </div>
    </div>
 </template>
@@ -42,14 +62,13 @@ import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import * as utils from '../utils'
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useSortStore } from "@/stores/sort"
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
+import Dropdown from 'primevue/dropdown'
 
 const router = useRouter()
 const route = useRoute()
@@ -59,6 +78,17 @@ const systemStore = useSystemStore()
 const sortStore = useSortStore()
 const filters = useFilterStore()
 
+const otherSrcSelection = ref("")
+
+onMounted(() => {
+   if (route.query.pool) {
+      let poolIdx = resultStore.results.findIndex( r => r.pool.id == route.query.pool)
+      if (poolIdx >= systemStore.maxPoolTabs) {
+         otherSrcSelection.value = route.query.pool
+      }
+   }
+})
+
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
 })
@@ -67,15 +97,40 @@ const queryString = computed(()=>{
 })
 
 const sourceTabs = computed(()=>{
-   let tabs = []
-   resultStore.results.forEach( r => {
-      let tab = {
-         poolID: r.pool.id, name: r.pool.name, total: r.total,
-         failed:  poolFailed(r), skipped:  poolSkipped(r)
-      }
-      tabs.push(tab)
+   if (resultStore.results.length < systemStore.maxPoolTabs) {
+      return resultStore.results
+   }
+   return resultStore.results.slice(0, systemStore.maxPoolTabs )
+})
+
+const otherSrcInfo = computed (() => {
+   let r = resultStore.results.find( r => r.pool.id == otherSrcSelection.value)
+   if (r) {
+      return { name: r.pool.name, total: utils.formatNum(r.total)}
+   }
+   return null
+})
+
+const otherSources = computed(()=>{
+   let opts = []
+   let others = resultStore.results.slice(systemStore.maxPoolTabs).sort( (a,b) => {
+      if (a.pool.name < b.pool.name) return -1
+      if (a.pool.name > b.pool.name) return 1
+      return 0
    })
-   return tabs
+
+   others.forEach( r=>{
+      let opt = {id: r.pool.id, name: r.pool.name, failed: false, skipped: false, total: 0}
+      if (poolFailed(r)) {
+         opt.failed = true
+      } else if (wasPoolSkipped(r)) {
+         opt.skipped = true
+      } else {
+         opt.total = utils.formatNum(r.total)
+      }
+      opts.push(opt)
+   })
+   return opts
 })
 
 const printResults = (() => {
@@ -141,16 +196,23 @@ const updateURL = (( poolID) => {
 const poolFailed = ((p) => {
    return (p.statusCode != 408 && p.total == 0 && p.statusCode != 200)
 })
-const poolSkipped = ((p) => {
+
+const wasPoolSkipped = ((p) => {
    return p.statusCode == 408 && p.total == 0
 })
 
-const resultsSelected = ((resultIdx) => {
+const resultsButtonClicked = ((resultIdx) => {
    if ( resultStore.selectedResultsIdx != resultIdx) {
       let r = resultStore.results[resultIdx]
       if ( poolFailed(r)) return
       poolSelected(resultIdx, r.pool.id)
+      otherSrcSelection.value = ""
    }
+})
+
+const otherSrcSelected = ((sel) => {
+   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == sel.value )
+   poolSelected(tgtIdx, sel.value)
 })
 
 const poolSelected = (( resultIdx, poolID ) => {
@@ -163,131 +225,135 @@ const poolSelected = (( resultIdx, poolID ) => {
 </script>
 
 <style scoped lang="scss">
-:deep(div.p-tabview-panels) {
-   padding: 0;
-   background: transparent;
+.more-opt {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
+   padding:0;
+   margin:0;
+   font-size: 0.9em;
+
+   .other-src {
+      margin-right: 20px;
+   }
+   .total.error {
+      color: var( --uvalib-text-dark );
+      font-weight: bold;
+      display: inline-block;
+      margin-left: auto;
+   }
+   .total {
+      margin-left: auto;
+   }
+}
+
+.results-main {
+   display: inline-block;
+   flex: 1 1 70%;
 }
 
 .search-results  {
    box-sizing: border-box;
    outline: 0;
    background-color: var(--uvalib-grey-lightest);
+}
 
-   .results-header {
-      display: flex;
-      flex-flow: row wrap;
-      align-content: center;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 15px;
-      margin-bottom: 10px;
-      .summary {
-         margin: 0 0 0.2vw 0;
-         font-weight: 500;
+.results-header {
+   display: flex;
+   flex-flow: row wrap;
+   align-content: center;
+   align-items: center;
+   justify-content: space-between;
+   padding-top: 15px;
+   margin-bottom: 10px;
+   .summary {
+      margin: 0 0 0.2vw 0;
+      font-weight: 500;
+      text-align: left;
+      .qs {
+         margin-left:15px;
+         font-style: italic;
+         font-weight: 100;
+      }
+      span {
+         font-size: 0.85em;
+      }
+      .subtotal {
+         display: block;
+         margin: 2px 0 2px 15px;
+      }
+      .query {
          text-align: left;
-         .qs {
-            margin-left:15px;
-            font-style: italic;
-            font-weight: 100;
-         }
-         span {
-            font-size: 0.85em;
-         }
-         .subtotal {
-            display: block;
-            margin: 2px 0 2px 15px;
-         }
-         .query {
-            text-align: left;
-            margin: 0 0 0.2vw 0;
-            font-weight: bold;
-            font-size: 1.1em;
-         }
+         margin: 0 0 0.2vw 0;
+         font-weight: bold;
+         font-size: 1.1em;
       }
-      .buttons {
-         display: flex;
-         flex-flow: row nowrap;
+   }
+   .buttons {
+      display: flex;
+      flex-flow: row nowrap;
+   }
+}
+
+div.pool-tabs {
+   font-weight: bold;
+   margin: 0;
+   text-align: left;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: flex-start;
+   button {
+      margin: 0;
+   }
+
+   .p-dropdown.active {
+      background-color: var(--uvalib-brand-blue);
+      color: white;
+      border: 1px solid var(--uvalib-brand-blue);
+      :deep(.p-dropdown-trigger) {
+         color: white;
       }
    }
 
-   :deep(button.p-tabview-nav-btn.p-link) {
-      color: var(--uvalib-brand-orange);
-      border: 2px solid var(--uvalib-brand-orange);
-      width: 40px;
-      border-radius: 20px;
-      height: 40px;
-      bottom: 0px;
-      top: auto;
+   button.pool {
+      padding: 8px 8px 10px 8px;
+      border-radius: 5px 5px 0 0;
+      color: var(--uvalib-text-dark);
+      border: 1px solid var(--uvalib-grey-light);
+      text-align: left;
+      flex: 1 1 auto;
+      background: #FFF;
+      .total {
+         font-size: 0.75em;
+         margin: 0;
+         font-weight: normal;
+      }
+
+      &:focus {
+         z-index: 1;
+         @include be-accessible();
+      }
    }
-
-   :deep(.p-tabview-nav)  {
-      border: 0;
-      background: transparent;
-
-
-      .p-tabview-header {
-         flex: 1 1 auto;
-         border: 1px solid var(--uvalib-grey-light);
-         border-radius: 5px 5px 0 0;
-         background: white;
-         a.p-tabview-nav-link  {
-            border: 0;
-            padding: 0.4rem 25px 0.6rem 0.6rem;
-            height: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-         }
-      }
-
-      .pool-tab {
-         display: flex;
-         flex-direction: column;
-         align-items: flex-start;
-         font-size: 0.95em;
-         .pool {
-            text-align: left;
-            color: var(--uvalib-text);
-            // min-width: 90px;
-         }
-         .total {
-            font-size: 0.75em;
-            margin: 0;
-            font-weight: normal;
-            color: var(--uvalib-text);
-         }
-         .total.error {
-            font-weight: bold;
-            color: var(--uvalib-red-darker);
-         }
-      }
-
-      .p-highlight {
-         border: 1px solid var(--uvalib-brand-blue);
-         background: var(--uvalib-brand-blue);
-         a {
-            background-color: var(--uvalib-brand-blue);
-            .pool-tab .pool,  .pool-tab .total {
-               color:white;
-            }
-         }
-      }
+   button.pool:first-child {
+      margin-left: 4px;
+   }
+   button.pool.showing {
+      background-color: var(--uvalib-brand-blue);
+      color: #fff;
+      border-bottom: 1px solid var(--uvalib-brand-blue);
+   }
+   button.pool.disabled.failed {
+      background: var(--uvalib-red-emergency);
+      color: white;
+      opacity: 0.5;
    }
 }
 
 @media only screen and (min-width: $breakpoint-mobile) {
    div.search-results {
       margin: 0;
-      padding: 0 3vw 20px 3vw;
-   }
-   .results-wrapper {
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: space-between;
-      gap: 15px;
-      .p-tabview {
-         flex: 1 1 70%;
-      }
+      padding: 0 5vw 20px 5vw;
    }
 }
 @media only screen and (max-width: $breakpoint-mobile) {
@@ -295,5 +361,20 @@ const poolSelected = (( resultIdx, poolID ) => {
       margin: 0;
       padding: 0 2vw 20px 2vw;
    }
+   button.pool:first-child {
+      margin-left: -1px;
+   }
+}
+.results-wrapper {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: space-between;
+}
+.none {
+   flex: 1 1 auto;
+   font-size: 1.5em;
+   font-weight: 500;
+   padding-bottom: 150px;
+   color: var(--uvalib-text);
 }
 </style>
