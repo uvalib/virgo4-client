@@ -426,23 +426,30 @@ body {
    background: white;
 }
 
-#app h1 {
-   color: var(--uvalib-brand-orange);
-   margin: 25px 0;
-   font-weight: bold;
-   position: relative;
-}
-
-#app a {
-   color: var(--color-link);
-   font-weight: 500;
-   text-decoration: none;
-}
-#app a.alt-color-dark {
-   color: var(--color-link-darker);
-}
-#app a:hover {
-   text-decoration: underline;
+#app {
+   h1 {
+      margin: 25px 0 35px 0;
+      position: relative;
+      font-weight: 700;
+      color: #232D4B !important;
+      line-height: 1.15;
+   }
+   h2 {
+      color: #232D4B !important;
+      text-align: left;
+      margin: 50px 0 30px 0;
+   }
+   a {
+      color: var(--color-link);
+      font-weight: 500;
+      text-decoration: none;
+   }
+   a.alt-color-dark {
+      color: var(--color-link-darker);
+   }
+   a:hover {
+      text-decoration: underline;
+   }
 }
 
 .update-pop {

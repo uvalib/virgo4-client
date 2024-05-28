@@ -134,12 +134,6 @@ onMounted(()=>{
       }
    }
 
-   h2 {
-      margin: 50px 0 10px 0;
-      color: var(--color-primary-orange);
-      text-align: center;
-   }
-
    .to-browse {
       margin: 10px 0 15px 0;
       &:focus {

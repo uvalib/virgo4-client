@@ -154,11 +154,6 @@ function formatValue(val) {
    width: 95%;
    margin: 0 auto;
 
-   h2 {
-      color: var(--color-primary-orange);
-      text-align: center;
-      margin: 50px 0 30px 0;
-   }
    .working {
       margin: 25px;
       text-align: center;
