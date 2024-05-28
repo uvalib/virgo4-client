@@ -472,6 +472,7 @@ button.p-button.p-button-secondary {
    color: var(--uvalib-text);
    &:hover {
       background-color: var(--uvalib-grey-light);
+      border: 1px solid var(--uvalib-grey);
    }
 }
 
@@ -482,5 +483,6 @@ button.p-button.p-button-info {
    color: var(--uvalib-text);
    &:hover {
       background-color: var(--uvalib-blue-alt-med);
+      border: 1px solid var(--uvalib-blue-alt);
    }
 }
