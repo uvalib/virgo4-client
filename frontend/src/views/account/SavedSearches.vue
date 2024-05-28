@@ -43,14 +43,15 @@
                      <i class="link fal fa-external-link-alt"></i>
                   </a>
                   <span class="sep">|</span>
-                  <VirgoButton link @click="copyURL(saved.token)" label="Copy published URL to clipboard"/>
+                  <VirgoButton text @click="copyURL(saved.token)" label="Copy published URL to clipboard"/>
                   <span class="sep">|</span>
-                  <VirgoButton link @click="openRSSModal(`${saved.token}-open`, saved)"
-                     :id="`${saved.token}-open`" label="RSS" icon="fal fa-rss" iconPos="right"/>
+                  <VirgoButton text @click="openRSSModal(`${saved.token}-open`, saved)" :id="`${saved.token}-open`" class="text-icon">
+                     <span>RSS</span><i class="fal fa-rss"></i>
+                  </VirgoButton>
                </div>
             </div>
             <div class="controls">
-               <VirgoButton link @click="removeAllClicked" label="Delete all saved searches"/>
+               <VirgoButton severity="secondary" @click="removeAllClicked" label="Delete all saved searches"/>
             </div>
          </div>
          <div v-if="searchStore.history.length > 0" class="history">
@@ -62,7 +63,7 @@
                </template>
             </div>
             <div class="controls">
-               <VirgoButton link @click="clearHistoryClicked" label="Clear search history" />
+               <VirgoButton severity="secondary" @click="clearHistoryClicked" label="Clear search history" />
             </div>
          </div>
       </div>
@@ -281,7 +282,11 @@ div.saved-search {
    align-items: center;
 }
 .public-controls {
-   text-align: left;
+   display:flex;
+   flex-flow: row wrap;
+   justify-content: flex-start;
+   align-items: center;
+   gap: 5px 10px;
    margin: 8px 0 8px 45px;
    font-size: 0.9em;
 }
@@ -324,12 +329,8 @@ span.num {
   line-height: 1.5em;
   color: var(--uvalib-grey);
 }
-.sep {
-   margin: 0 10px;
-}
 .controls {
    padding: 10px 0;
-   /* text-align: right; */
 }
 .rss-panel {
    padding: 0;

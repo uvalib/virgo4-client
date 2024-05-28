@@ -8,24 +8,24 @@
       <div v-else-if="userStore.isSignedIn">
          <div class="none" v-if="bookmarkStore.hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
-            <div class="folder" v-for="(folderInfo) in bookmarkStore.bookmarks" :key="folderInfo.id">
-               <AccordionContent
-                  class="bookmark-folder"
-                  color="var(--uvalib-grey-darkest)"
-                  background="var(--uvalib-blue-alt-light)"
-                  borderWidth="0 0 3px 0"
-                  borderColor="var(--uvalib-blue-alt)"
-                  :id="folderInfo.id.toString()"
-                  :closeOthers="expandedFolder"
-                  @accordion-clicked="folderOpened(folderInfo.id)"
-                  @accordion-expanded="folderExpanded(folderInfo.id)"
-                  @accordion-collapsed="folderCollapsed(folderInfo.id)"
-                  :hasSettings="true" :showSettings="folderInfo.settingsOpen" @settingsClicked="toggleSettings(folderInfo.id)"
-               >
-                  <template v-slot:title>
-                     <span class="folder-title" v-html="getTitle(folderInfo)"></span>
-                  </template>
-                  <template v-slot:settings>
+            <AccordionContent  v-for="(folderInfo) in bookmarkStore.bookmarks" :key="folderInfo.id"
+               class="bookmark-folder"
+               color="var(--uvalib-grey-darkest)"
+               background="var(--uvalib-blue-alt-light)"
+               borderWidth="0 0 3px 0"
+               borderColor="var(--uvalib-blue-alt)"
+               :id="folderInfo.id.toString()"
+               :closeOthers="expandedFolder"
+               @accordion-clicked="folderOpened(folderInfo.id)"
+               @accordion-expanded="folderExpanded(folderInfo.id)"
+               @accordion-collapsed="folderCollapsed(folderInfo.id)"
+               :hasSettings="true" :showSettings="folderInfo.settingsOpen" @settingsClicked="toggleSettings(folderInfo.id)"
+            >
+               <template v-slot:title>
+                  <span class="folder-title" v-html="getTitle(folderInfo)"></span>
+               </template>
+               <template v-slot:settings>
+                  <div class="settings">
                      <h4>Folder Settings</h4>
                      <div class="publish">
                         <Checkbox v-model="folderInfo.public" :inputId="`folder${folderInfo.id}`" :binary="true"  @change="publicClicked(folderInfo)"
@@ -45,65 +45,65 @@
                         </template>
                         <div v-else class="rename">
                            <input @keyup.enter="doRename(folderInfo)"  :id="`rename-folder-${folderInfo.id}`" type="text" v-model="newFolderName"
-                               aria-required="true" aria-label="new folder name" required="required" v-focus/>
+                              aria-required="true" aria-label="new folder name" required="required" v-focus/>
                            <VirgoButton severity="secondary" @click="renaming=false" label="Cancel"/>
                            <VirgoButton @click="doRename(folderInfo)" label="OK"/>
                         </div>
                      </div>
-                  </template>
-                  <div class="none" v-if="folderInfo.bookmarks.length == 0">
-                     There are no bookmarks in this folder.
                   </div>
-                  <div v-else class="bookmark-folder-details">
-                     <div class="folder-menu">
-                        <VirgoButton @click="exportBookmarks(folderInfo.folder)" label="Export all"/>
-                        <PrintBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
-                        <ManageBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
-                        <VirgoButton @click="deleteBookmarksClicked(folderInfo)" label="Delete" :disabled="!hasSelectedBookmarks" />
-                        <VirgoButton v-if="userStore.canMakeReserves" @click="reserve" label="Place on video reserves" :disabled="!hasSelectedBookmarks" />
-                     </div>
+               </template>
+               <div class="none" v-if="folderInfo.bookmarks.length == 0">
+                  There are no bookmarks in this folder.
+               </div>
+               <div v-else class="bookmark-folder-content">
+                  <div class="folder-menu">
+                     <VirgoButton @click="exportBookmarks(folderInfo.folder)" label="Export all"/>
+                     <PrintBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
+                     <ManageBookmarks :srcFolder="folderInfo.id" :bookmarks="selections" />
+                     <VirgoButton @click="deleteBookmarksClicked(folderInfo)" label="Delete" :disabled="!hasSelectedBookmarks" />
+                     <VirgoButton v-if="userStore.canMakeReserves" @click="reserve" label="Place on video reserves" :disabled="!hasSelectedBookmarks" />
+                  </div>
 
-                     <DataTable :value="folderInfo.bookmarks" dataKey="id" showGridlines
-                        v-model:selection="selections" @rowReorder="onReorder"
-                     >
-                        <Column selectionMode="multiple" headerStyle="width: 3rem" />
-                        <Column field="title" header="Title">
-                           <template #body="slotProps">
-                              <router-link @click="bookmarkFollowed(slotProps.data.identifier)" :to="detailsURL(slotProps.data)">
-                                 {{slotProps.data.details.title}}
-                              </router-link>
-                              <abbr class="" :title="itemURL(slotProps.data)" :data-folder-id="folderInfo.id"></abbr>
-                           </template>
-                        </Column>
-                        <Column field="details.author" header="Author"/>
-                        <Column field="callNumber" header="Call Number">
-                           <template #body="slotProps">
-                              <template v-if="slotProps.data.details.callNumber">{{ valueDisplay(slotProps.data.details.callNumber) }}</template>
-                              <span v-else class="na">N/A</span>
-                           </template>
-                        </Column>
-                        <Column field="format" header="Format">
-                           <template #body="slotProps">
-                              <template v-if="slotProps.data.details.format">{{ valueDisplay(slotProps.data.details.format) }}</template>
-                              <span v-else class="na">N/A</span>
-                           </template>
-                        </Column>
-                        <Column field="library" header="Library">
-                           <template #body="slotProps">
-                              <template v-if="slotProps.data.details.library">{{ valueDisplay(slotProps.data.details.library) }}</template>
-                              <span v-else class="na">N/A</span>
-                           </template>
-                        </Column>
-                        <Column field="source" header="Source">
-                           <template #body="slotProps">
-                              {{ sourceName(slotProps.data.pool) }}
-                           </template>
-                        </Column>
-                        <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
-                     </DataTable>
-                  </div>
-               </AccordionContent>
-            </div>
+                  <DataTable :value="folderInfo.bookmarks" dataKey="id" showGridlines
+                     v-model:selection="selections" @rowReorder="onReorder"
+                  >
+                     <Column selectionMode="multiple" headerStyle="width: 3rem" />
+                     <Column field="title" header="Title">
+                        <template #body="slotProps">
+                           <router-link @click="bookmarkFollowed(slotProps.data.identifier)" :to="detailsURL(slotProps.data)">
+                              {{slotProps.data.details.title}}
+                           </router-link>
+                           <abbr class="" :title="itemURL(slotProps.data)" :data-folder-id="folderInfo.id"></abbr>
+                        </template>
+                     </Column>
+                     <Column field="details.author" header="Author"/>
+                     <Column field="callNumber" header="Call Number">
+                        <template #body="slotProps">
+                           <template v-if="slotProps.data.details.callNumber">{{ valueDisplay(slotProps.data.details.callNumber) }}</template>
+                           <span v-else class="na">N/A</span>
+                        </template>
+                     </Column>
+                     <Column field="format" header="Format">
+                        <template #body="slotProps">
+                           <template v-if="slotProps.data.details.format">{{ valueDisplay(slotProps.data.details.format) }}</template>
+                           <span v-else class="na">N/A</span>
+                        </template>
+                     </Column>
+                     <Column field="library" header="Library">
+                        <template #body="slotProps">
+                           <template v-if="slotProps.data.details.library">{{ valueDisplay(slotProps.data.details.library) }}</template>
+                           <span v-else class="na">N/A</span>
+                        </template>
+                     </Column>
+                     <Column field="source" header="Source">
+                        <template #body="slotProps">
+                           {{ sourceName(slotProps.data.pool) }}
+                        </template>
+                     </Column>
+                     <Column rowReorder headerStyle="width: 3rem" :reorderableColumn="false" />
+                  </DataTable>
+               </div>
+            </AccordionContent>
          </template>
          <div class="controls">
             <VirgoButton v-if="createOpen==false" @click="openCreate" id="create-folder-btn" label="Create Folder"/>
@@ -371,39 +371,40 @@ onMounted(()=>{
       flex-grow: 1;
    }
 }
-.folder-title {
-   padding: 5px;
-   font-weight: bold;
-}
-.folder-menu {
-   display: flex;
-   flex-flow: row wrap;
-   justify-content: flex-end;
-   margin: 10px 0;
-}
-div.folder {
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: flex-start;
+
+div.bookmark-folder {
    margin-bottom: 15px;
-   .folder-buttons {
+   .settings {
+      h4 {
+         margin: 10px 0 20px 0;
+         text-align: left;
+      }
+      .folder-actions {
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: flex-end;
+         gap: 5px 10px;
+      }
+   }
+   .folder-title {
+      padding: 5px;
+      font-weight: bold;
+   }
+   .folder-menu {
       display: flex;
-      flex-flow: row nowrap;
-      padding-right: 5px;
+      flex-flow: row wrap;
+      justify-content: flex-end;
+      gap: 5px 10px;
+      margin: 10px 0;
    }
-}
-.accordion {
-   flex: 1 1 auto;
-   h4 {
-      margin: 10px 0 20px 0;
-      text-align: left;
-   }
-   .folder-actions {
-      button {
-         margin-left: 10px;
+   .bookmark-folder-content {
+      padding: 0 0 10px 10px;
+      .checkbox {
+         padding: 5px 10px;
       }
    }
 }
+
 .bookmarks {
    min-height: 400px;
    position: relative;
@@ -441,6 +442,7 @@ div.folder {
    flex-flow: row nowrap;
    align-items: baseline;
    justify-content: flex-end;
+   gap: 5px 10px;
    input {
       flex-grow: 1;
    }
@@ -469,13 +471,6 @@ div.folder {
       .copy-link {
          margin-right: 15px;
       }
-   }
-}
-
-.bookmark-folder-details {
-   padding: 0 0 10px 10px;
-   .checkbox {
-       padding: 5px 10px;
    }
 }
 </style>

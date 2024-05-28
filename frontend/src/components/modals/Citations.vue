@@ -1,6 +1,8 @@
 <template>
-   <VirgoButton link @click="showDialog = true" class="citations-text-button" icon="fas fa-quote-right"
-      :aria-label="props.ariaLabel" ref="trigger" :label="props.buttonLabel" iconPos="right" :class="{toolbar: props.format=='all'}"/>
+   <VirgoButton text @click="showDialog = true" class="text-icon" :aria-label="props.ariaLabel"
+      ref="trigger" :class="{toolbar: props.format=='all'}">
+      <span>{{ props.buttonLabel }}</span><i class="fas fa-quote-right"></i>
+   </VirgoButton>
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" :header="props.title" @hide="closeDialog" @show="opened">
       <div class="citations-content">

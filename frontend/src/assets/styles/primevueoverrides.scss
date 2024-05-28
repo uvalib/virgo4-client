@@ -368,7 +368,7 @@ button.p-button.p-button-text.disclosure {
 button.p-button.p-button-text {
    background: none;
    border: none;
-   color: var(--color-link);
+   color: var(--uvalib-text);
    font-weight: 500;
    cursor: pointer;
    padding: 0;
@@ -376,9 +376,24 @@ button.p-button.p-button-text {
    margin: 0;
    display: inline-block;
    &:hover {
+      color: var(--color-link);
       background: none;
       border: none;
-      text-decoration: underline;
+      text-decoration: none;
+   }
+}
+
+button.p-button.p-button-text.text-icon {
+   display:flex;
+   flex-flow: row nowrap;
+   justify-content: flex-start;
+   align-items: center;
+   gap: 0 8px;
+   &:hover {
+      color: var(--uvalib-blue-alt);
+      i {
+         color: var(--uvalib-blue-alt);
+      }
    }
 }
 
@@ -414,15 +429,7 @@ button.p-button-icon-only.p-button {
    }
 }
 
-button.p-button.p-button-secondary {
-   background-color: var(--uvalib-grey-lightest);
-   border: 1px solid var(--uvalib-grey);
-   color: black;
-}
-
-button.p-button.p-component {
-   margin: 0 0 5px 10px;
-}
+// primary button
 button.p-button, .p-fileupload.p-fileupload-basic.p-component {
    font-family: inherit;
    font-size: 100%;
@@ -468,18 +475,11 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
 }
 
 button.p-button.p-component.small {
-   padding: 4px 12px;
-   background-color: var(--uvalib-brand-blue-light);
-   border: 1px solid var(--uvalib-brand-blue-light);
-   color: white;
-   &:hover {
-      background-color: var(--uvalib-brand-blue-lighter);
-      border: 1px solid var(--uvalib-brand-blue-lighter);
-      transition: all 0.3s ease;
-   }
+   font-size: .85rem;
+   padding: .5rem 1rem;
 }
 
-button.p-button.p-disabled {
+button.p-button.p-component.p-disabled {
    opacity: 0.3;
 }
 

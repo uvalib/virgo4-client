@@ -207,6 +207,7 @@ const poolSelected = (( resultIdx, poolID ) => {
       .buttons {
          display: flex;
          flex-flow: row nowrap;
+         gap: 5px 10px;
       }
    }
 

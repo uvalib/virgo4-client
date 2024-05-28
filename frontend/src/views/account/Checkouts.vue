@@ -97,7 +97,7 @@
             </template>
             <div class="checkout-list" v-if="lookingUpILL == false && visibleTab == 'ill'">
                <div class="controls">
-                  <VirgoButton @click="historyClicked" label="View Request History" icon="fal fa-external-link-alt" iconPos="right"/>
+                  <VirgoButton @click="historyClicked" link label="View Request History" icon="fal fa-external-link-alt" iconPos="right"/>
                </div>
                <div v-if="illiadCheckouts.length == 0" class="none">
                   You have no ILL checkouts.
@@ -117,7 +117,7 @@
 
                      </dl>
                      <div class="renewbar" v-if="co.renewalsAllowed">
-                        <VirgoButton @click="renewILLClicked(co)" label="Renew" icon="fal fa-external-link-alt" iconPos="right"/>
+                        <VirgoButton @click="renewILLClicked(co)" label="Renew" link icon="fal fa-external-link-alt" iconPos="right"/>
                      </div>
                   </div>
                </div>

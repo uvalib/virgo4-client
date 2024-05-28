@@ -126,21 +126,11 @@ function shareClicked() {
    flex-flow: row nowrap;
    margin-left: auto;
    justify-content: flex-end;
-   align-items: flex-start;
+   align-items: center;
+   gap: 15px;
 
    button.share {
-      display: inline-block;
-      margin: 0 10px 0 0;
       font-size: 1.5em;
-      color: var(--uvalib-text);
-      width: auto;
-      &:hover {
-         text-decoration: none;
-         color: var(--uvalib-brand-blue-light);
-      }
    }
-}
-.citation-control {
-   margin-right: 5px;
 }
 </style>

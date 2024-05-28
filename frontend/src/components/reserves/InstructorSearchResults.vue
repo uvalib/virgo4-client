@@ -11,7 +11,7 @@
                   <p class="value">{{course.courseName}}</p>
                   <p class="value-id">{{course.courseID}}</p>
                </span>
-               <VirgoButton link v-if="!isExactLookup" @click="copyURL(course.courseID, ir.instructorName )" label="Copy link to reserves"/>
+               <VirgoButton v-if="!isExactLookup" severity="secondary" class="small" @click="copyURL(course.courseID, ir.instructorName )" label="Copy link to reserves"/>
             </div>
            <div class="reserves" v-for="reserve in course.items" :key="reserve.id">
                <ReserveDetail :reserve="reserve" />
