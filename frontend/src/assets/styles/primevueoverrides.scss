@@ -56,14 +56,8 @@
             justify-content: flex-end;
             align-items: stretch;
             margin: 20px 0 0 0;
-            text-align: right;
             padding: 0;
-            button:disabled {
-               opacity: 0.2;
-            }
-            button {
-               margin: 0 0 0 10px;
-            }
+            gap: 5px 10px;
             .submit-button button {
                @include primary-button();
                width: auto;
@@ -364,85 +358,19 @@ button.p-button.p-button-text.disclosure {
    }
 }
 
-
-button.p-button.p-button-text {
-   background: none;
-   border: none;
-   color: var(--uvalib-text);
-   font-weight: 500;
-   cursor: pointer;
-   padding: 0;
-   border-radius: 0;
-   margin: 0;
-   display: inline-block;
-   &:hover {
-      color: var(--color-link);
-      background: none;
-      border: none;
-      text-decoration: none;
-   }
-}
-
-button.p-button.p-button-text.text-icon {
-   display:flex;
-   flex-flow: row nowrap;
-   justify-content: flex-start;
-   align-items: center;
-   gap: 0 8px;
-   &:hover {
-      color: var(--uvalib-blue-alt);
-      i {
-         color: var(--uvalib-blue-alt);
-      }
-   }
-}
-
-button.p-button.p-component.p-button-link {
-   background: none;
-   border: none;
-   color: var(--color-link);
-   font-weight: 500;
-   text-decoration: none;
-   box-sizing: border-box;
-   margin: 0;
-   padding: 0;
-   align-items: baseline;
-   border-radius: 0;
-   .p-button-icon.p-button-icon-right {
-      margin-left: 10px;
-   }
-}
-
-button.p-button-icon-only.p-button {
-   background: transparent;
-   color: var(--uvalib-text);
-   border: none;
-   padding: 2px;
-
-   .p-button-label {
-      display: none;
-   }
-   &:hover {
-      background: transparent;
-      border: none;
-      color: var(--uvalib-blue-alt);
-   }
-}
-
 // primary button
-button.p-button, .p-fileupload.p-fileupload-basic.p-component {
-   font-family: inherit;
-   font-size: 100%;
+button.p-button.p-component, .p-fileupload.p-fileupload-basic.p-component {
+   font-size: 1em;
    padding: 0.5em 1em;
    text-decoration: none;
    margin: 0;
    border-radius: 5px;
-   font-weight: 400;
+   font-weight: normal;
    cursor: pointer;
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
-   width: auto;
+   display: inline-block;
 
    .p-button-icon.p-button-icon-left {
       display: inline-block;
@@ -474,6 +402,61 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
    }
 }
 
+button.p-button.p-button-text {
+   background: none;
+   border: none;
+   color: var(--uvalib-text);
+   padding: 0;
+   &:hover {
+      border: none;
+      text-decoration: none;
+   }
+}
+
+button.p-button.p-button-text.text-icon {
+   display:flex;
+   flex-flow: row nowrap;
+   justify-content: flex-start;
+   align-items: center;
+   gap: 0 8px;
+   &:hover {
+      color: var(--uvalib-blue-alt);
+      i {
+         color: var(--uvalib-blue-alt);
+      }
+   }
+}
+
+button.p-button.p-component.p-button-link {
+   background: none;
+   border: none;
+   color: var(--color-link);
+   text-decoration: none;
+   margin: 0;
+   padding: 0;
+   align-items: baseline;
+   border-radius: 0;
+   .p-button-icon.p-button-icon-right {
+      margin-left: 10px;
+   }
+}
+
+button.p-button-icon-only.p-button {
+   background: transparent;
+   color: var(--uvalib-text);
+   border: none;
+   padding: 2px;
+
+   .p-button-label {
+      display: none;
+   }
+   &:hover {
+      background: transparent;
+      border: none;
+      color: var(--uvalib-blue-alt);
+   }
+}
+
 button.p-button.p-component.small {
    font-size: .85rem;
    padding: .5rem 1rem;
@@ -486,11 +469,18 @@ button.p-button.p-component.p-disabled {
 button.p-button.p-button-secondary {
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey);
-   color: #000;
+   color: var(--uvalib-text);
    &:hover {
-      background-image: -webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(40%,rgba(0,0,0,.05)),to(rgba(0,0,0,.1))) !important;
-      background-image: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1)) !important;
-      background-color: var(--uvalib-grey-lightest) !important;
-      color: #000 !important;
+      background-color: var(--uvalib-grey-light);
+   }
+}
+
+// this is the 'subtle' button
+button.p-button.p-button-info {
+   background-color: var(--uvalib-blue-alt-light);
+   border: 1px solid var(--uvalib-blue-alt);
+   color: var(--uvalib-text);
+   &:hover {
+      background-color: var(--uvalib-blue-alt-med);
    }
 }

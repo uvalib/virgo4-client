@@ -32,11 +32,11 @@
          <div class="messagebox" aria-live="polite">
             <span v-if="message" class="info">{{message}}</span>
          </div>
-         <div class="form-controls" >
+         <div class="citation-controls" >
             <VirgoButton v-if="props.format == 'all'" @click="downloadRISClicked" aria-label="download RIS citation"
-               label="Download RIS" icon="fas fa-file-export" iconPos="right"/>
-            <VirgoButton @click="copyCitation" label="Copy Citation" v-focus/>
-            <VirgoButton @click="closeDialog" label="Close"/>
+               label="Download RIS" icon="fal fa-download" iconPos="right" severity="secondary"/>
+            <VirgoButton @click="copyCitation" label="Copy Citation" v-focus severity="secondary"/>
+            <VirgoButton @click="closeDialog" label="Close" severity="secondary" class="close"/>
          </div>
       </div>
    </Dialog>
@@ -168,36 +168,9 @@ const copyCitation = (() => {
 </script>
 
 <style lang="scss" scoped>
-.ris-icon {
-   display: inline-block;
-   padding-left: 10px;
-}
-
-button.citations-text-button {
-   padding-top: 2px !important;
-   margin-right: 10px  !important;
-   &.toolbar {
-      :deep(span) {
-         color:  var(--uvalib-text);
-      }
-      &:hover {
-         :deep(span) {
-            text-decoration: none !important;
-            color: var(--uvalib-brand-blue-light);
-         }
-      }
-   }
-   &:hover {
-      :deep(span) {
-         text-decoration: underline !important;
-         color: var(--uvalib-link);
-      }
-   }
-}
-
 .citations-content {
    max-height: 500px;
-   max-width: 500px;
+   width: 500px;
 
    .messagebox {
       min-height: 30px;
@@ -215,7 +188,7 @@ button.citations-text-button {
       padding: 10px 0 0 0;
       text-align: center;
       color: var( --uvalib-red-emergency);
-       width:100%;
+      width:100%;
    }
 
    label {
@@ -234,16 +207,24 @@ button.citations-text-button {
          display: flex;
          flex-flow: row wrap;
          justify-content: flex-start;
-
-         button.citation {
-            margin: 0 10px 0 0;
-         }
+         gap: 5px 10px;
       }
       .citation-text {
          outline: 0;
          min-height: 75px;
          max-height: 420px;
          overflow: scroll;
+      }
+   }
+   .citation-controls {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      margin: 20px 0 0 0;
+      padding: 0;
+      gap: 5px 10px;
+      .close {
+         margin-left: auto;
       }
    }
 
