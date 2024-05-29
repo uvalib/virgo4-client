@@ -426,6 +426,11 @@ body {
    background: white;
 }
 
+#app .link-icon {
+   display: inline-block;
+   margin-left: 10px;
+}
+
 #app h1 {
    color: var(--uvalib-brand-orange);
    margin: 25px 0;
@@ -546,7 +551,7 @@ body {
    a:focus {
       @include be-accessible();
    }
-   footer, div.header, nav {
+   footer, div.header, nav.menu {
       z-index: 500;
       a:focus {
          @include be-accessible-light();

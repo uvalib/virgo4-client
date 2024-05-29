@@ -97,7 +97,10 @@
             </template>
             <div class="checkout-list" v-if="lookingUpILL == false && visibleTab == 'ill'">
                <div class="controls">
-                  <VirgoButton @click="historyClicked" link label="View Request History" icon="fal fa-external-link-alt" iconPos="right"/>
+                  <a href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
+                     <span>View Request History</span>
+                     <i class="link-icon fal fa-external-link-alt"></i>
+                  </a>
                </div>
                <div v-if="illiadCheckouts.length == 0" class="none">
                   You have no ILL checkouts.
@@ -117,12 +120,14 @@
 
                      </dl>
                      <div class="renewbar" v-if="co.renewalsAllowed">
-                        <VirgoButton @click="renewILLClicked(co)" label="Renew" link icon="fal fa-external-link-alt" iconPos="right"/>
+                        <a :href="`https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${co.transactionNumber}`" target="_blank">
+                           <span>Renew</span>
+                           <i class="link-icon fal fa-external-link-alt"></i>
+                        </a>
                      </div>
                   </div>
                </div>
             </div>
-
          </div>
       </template>
    </div>
@@ -149,14 +154,6 @@ const lookingUpILL = computed(() => userStore.lookingUp)
 
 const illiadCheckouts = computed(()=>{
    return userStore.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
-})
-
-const renewILLClicked = ((item) => {
-   let url = `https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${item.transactionNumber}`
-   window.open(url, "_blank")
-})
-const historyClicked = (() => {
-   window.open("https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60", "_blank")
 })
 const sortChanged = (() => {
    userStore.sortCheckouts(userStore.checkoutsOrder)
@@ -250,6 +247,7 @@ onMounted(async () => {
    }
    .details {
       text-align: left;
+      margin-bottom: 25px;
    }
 }
 
@@ -302,6 +300,10 @@ onMounted(async () => {
       }
       .renewbar {
          text-align: right;
+         padding: 5px;
+         a {
+            font-size: initial;
+         }
       }
       dl {
          margin: 0 0 0 15px;

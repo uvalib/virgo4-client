@@ -28,12 +28,14 @@
                   <div class="settings">
                      <h4>Folder Settings</h4>
                      <div class="publish">
-                        <Checkbox v-model="folderInfo.public" :inputId="`folder${folderInfo.id}`" :binary="true"  @change="publicClicked(folderInfo)"
-                           :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`"/>
-                        <label :for="`folder${folderInfo.id}`" class="cb-label">Public</label>
+                        <span>
+                           <Checkbox v-model="folderInfo.public" :inputId="`folder${folderInfo.id}`" :binary="true"  @change="publicClicked(folderInfo)"
+                              :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`"/>
+                           <label :for="`folder${folderInfo.id}`" class="cb-label">Public</label>
+                        </span>
                         <span v-if="folderInfo.public" class="public-url">
                            <a :href="getPublicURL(folderInfo)" target="_blank">
-                              <span>View</span><i class="link fal fa-external-link-alt"></i>
+                              <span>View</span><i class="link-icon fal fa-external-link-alt"></i>
                            </a>
                         </span>
                      </div>
@@ -455,22 +457,10 @@ div.bookmark-folder {
    display: flex;
    flex-flow: row wrap;
    margin: 15px 0;
+   justify-content: space-between;
 
    .public span {
       font-weight: normal;
-   }
-   .public-url {
-      font-weight: normal;
-      display: inline-block;
-      color: var(--uvalib-grey-dark);
-      margin-left: auto;
-      i {
-         margin: 0 2px 0 7px;
-      }
-
-      .copy-link {
-         margin-right: 15px;
-      }
    }
 }
 </style>

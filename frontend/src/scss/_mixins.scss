@@ -1,12 +1,12 @@
 // SCSS mixin definitions for V4client
 
 @mixin be-accessible(){
-   outline: 3px dotted var( --uvalib-accessibility-highlight );
-   outline-offset: 3px;
+   outline: 2px dotted var( --uvalib-accessibility-highlight );
+   outline-offset: 0.25em;
 }
 @mixin be-accessible-light(){
-   outline: 3px dotted var(--uvalib-grey-lightest);
-   outline-offset: 3px;
+   outline: 2px dotted var(--uvalib-grey-lightest);
+   outline-offset: 0.25em;
 }
 
 @mixin be-accessible-field(){

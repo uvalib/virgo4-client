@@ -7,7 +7,7 @@
          <div class="notice">
             PDF links are available for 30 days after delivery
             <a href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
-               View Request History <i class="fal fa-external-link-alt"></i>
+               View Request History <i class="link-icon fal fa-external-link-alt"></i>
             </a>
          </div>
          <template v-if="webDeliveries.length > 0">

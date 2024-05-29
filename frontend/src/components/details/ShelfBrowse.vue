@@ -143,8 +143,7 @@ onMounted(()=>{
    .to-browse {
       margin: 10px 0 15px 0;
       &:focus {
-         outline: 3px dotted var( --uvalib-accessibility-highlight ) !important;
-         outline-offset: 3px !important;
+         @include be-accessible();
       }
    }
 }

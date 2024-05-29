@@ -32,7 +32,7 @@
                <div v-if="saved.public" class="public-controls">
                   <a  class="view" :href="searchURL(saved.token)" target="_blank">
                      <span>View published search</span>
-                     <i class="link fal fa-external-link-alt"></i>
+                     <i class="link-icon fal fa-external-link-alt"></i>
                   </a>
                   <span class="sep">|</span>
                   <VirgoButton text @click="copyURL(saved.token)" label="Copy published URL to clipboard"/>
@@ -304,9 +304,6 @@ span.icon i.fal {
    margin-right: 15px;
    margin-top: 2px;
    padding: 0;
-}
-i.link {
-   margin: 0 0 0 10px;
 }
 .details {
    margin-bottom: 35px;

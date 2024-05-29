@@ -261,9 +261,9 @@ button.p-button.p-button-text.disclosure {
       .p-menuitem-content {
          a {
             display: inline-block;
-            outline: 3px dotted var(--uvalib-grey-lightest);
+            outline: 2px dotted var(--uvalib-grey-lightest);
             border: none;
-            outline-offset: 3px;
+            outline-offset: 0.25em;
          }
       }
    }
@@ -407,6 +407,7 @@ button.p-button.p-button-text {
    border: none;
    color: var(--uvalib-text);
    padding: 2px 4px;
+   border-radius: 5px;
    &:hover {
       border: none;
       text-decoration: none;
@@ -430,7 +431,7 @@ button.p-button.p-component.p-button-link {
    margin: 0;
    padding: 0;
    align-items: baseline;
-   border-radius: 0;
+   border-radius: 5px;
    .p-button-icon.p-button-icon-right {
       margin-left: 10px;
    }
