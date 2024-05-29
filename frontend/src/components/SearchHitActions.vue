@@ -126,8 +126,8 @@ function shareClicked() {
    flex-flow: row nowrap;
    margin-left: auto;
    justify-content: flex-end;
-   align-items: center;
-   gap: 15px;
+   align-items: flex-start;
+   gap: 5px;
 
    button.share {
       font-size: 1.5em;

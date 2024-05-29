@@ -406,10 +406,11 @@ button.p-button.p-button-text {
    background: none;
    border: none;
    color: var(--uvalib-text);
-   padding: 0;
+   padding: 2px 4px;
    &:hover {
       border: none;
       text-decoration: none;
+      background: var(--uvalib-grey-lightest);
    }
 }
 
@@ -419,12 +420,6 @@ button.p-button.p-button-text.text-icon {
    justify-content: flex-start;
    align-items: center;
    gap: 0 8px;
-   &:hover {
-      color: var(--uvalib-blue-alt);
-      i {
-         color: var(--uvalib-blue-alt);
-      }
-   }
 }
 
 button.p-button.p-component.p-button-link {
@@ -439,6 +434,12 @@ button.p-button.p-component.p-button-link {
    .p-button-icon.p-button-icon-right {
       margin-left: 10px;
    }
+   &:hover {
+      background: none;
+      border: none;
+      color: var(--uvalib-blue-alt);
+      text-decoration: underline;
+   }
 }
 
 button.p-button-icon-only.p-button {
@@ -446,14 +447,14 @@ button.p-button-icon-only.p-button {
    color: var(--uvalib-text);
    border: none;
    padding: 2px;
+   margin:0;
 
    .p-button-label {
       display: none;
    }
    &:hover {
-      background: transparent;
+      background: var(--uvalib-grey-lightest);
       border: none;
-      color: var(--uvalib-blue-alt);
    }
 }
 

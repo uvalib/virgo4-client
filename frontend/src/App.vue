@@ -437,12 +437,14 @@ body {
    color: var(--color-link);
    font-weight: 500;
    text-decoration: none;
+   border-radius: 5px;
 }
 #app a.alt-color-dark {
    color: var(--color-link-darker);
 }
 #app a:hover {
    text-decoration: underline;
+   color: var(--uvalib-blue-alt);
 }
 
 .update-pop {

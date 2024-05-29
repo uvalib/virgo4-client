@@ -26,14 +26,6 @@
                      </router-link>
                   </span>
                   <span class="search-actions">
-                     <span class="icon">
-                        <router-link @mousedown="savedSearchClicked('saved')"
-                           :to="searchURL(saved.token)"
-                           :aria-label="`perform search named ${saved.name}`"
-                        >
-                           <i class="fal fa-search"></i>
-                        </router-link>
-                     </span>
                      <VirgoButton @click="deleteSearchClicked(saved)" :aria-label="`Delete search named ${saved.name}`" icon="fal fa-trash-alt"/>
                   </span>
                </div>
@@ -288,7 +280,6 @@ div.saved-search {
    align-items: center;
    gap: 5px 10px;
    margin: 8px 0 8px 45px;
-   font-size: 0.9em;
 }
 div.row {
    border-bottom: 1px solid var(--uvalib-grey-light);
