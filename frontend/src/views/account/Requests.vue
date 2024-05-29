@@ -362,8 +362,8 @@ onMounted(() =>{
       flex-flow: row wrap;
       justify-content: flex-start;
       align-content: center;
-      button.p-button {
-         margin:0 10px 10px 0;
+      gap: 10px;
+      button {
          min-width: 275px;
          width: 40%;
       }

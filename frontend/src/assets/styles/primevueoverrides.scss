@@ -370,13 +370,13 @@ button.p-button.p-component, .p-fileupload.p-fileupload-basic.p-component {
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
-   display: inline-block;
 
    .p-button-icon.p-button-icon-left {
-      display: inline-block;
       margin-right: 0.5rem;
-      font-weight: 400;
-      line-height: 1;
+   }
+   .p-button-icon.p-button-icon-right {
+      margin-left: 0.5rem;
+      order: 1;
    }
 
    &:hover {
@@ -432,9 +432,6 @@ button.p-button.p-component.p-button-link {
    padding: 0;
    align-items: baseline;
    border-radius: 5px;
-   .p-button-icon.p-button-icon-right {
-      margin-left: 10px;
-   }
    &:hover {
       background: none;
       border: none;
