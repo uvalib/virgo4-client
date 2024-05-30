@@ -358,6 +358,56 @@ button.p-button.p-button-text.disclosure {
    }
 }
 
+// Tab view
+div.p-tabview-panels {
+   padding: 0;
+   background: transparent;
+}
+ul.p-tabview-nav  {
+   border: 0;
+   background: transparent;
+   li.p-tabview-header {
+      flex: 1 1 auto;
+      border: 1px solid var(--uvalib-grey-light);
+      border-radius: 5px 5px 0 0;
+      background: white;
+      a.p-tabview-nav-link  {
+         border: 0;
+         padding: 0.4rem 25px 0.6rem 0.6rem;
+         height: 100%;
+         display: flex;
+         flex-direction: row;
+         align-items: flex-start;
+         color: var(--uvalib-text);
+         &:hover {
+            background: var(--uvalib-grey-lightest);
+            text-decoration: none !important;
+         }
+         &:focus {
+            outline: none !important;
+         }
+         div {
+            color: var(--uvalib-text);
+         }
+      }
+   }
+   li.p-tabview-header.p-highlight {
+      border: 1px solid var(--uvalib-brand-blue);
+      background: var(--uvalib-brand-blue);
+      a.p-tabview-nav-link {
+         background-color: var(--uvalib-brand-blue);
+         color: var(white);
+         cursor: default;
+         &:hover {
+            text-decoration: none !important;
+         }
+         div {
+            color:white;
+         }
+      }
+   }
+}
+
 // primary button
 button.p-button.p-component, .p-fileupload.p-fileupload-basic.p-component {
    font-size: 1em;

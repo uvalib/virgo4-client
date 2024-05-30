@@ -38,6 +38,8 @@ export const useUserStore = defineStore('user', {
       bills: [],
       requests: {illiad: [], holds: []},
       lookingUp: false,
+      lookupILLCheckouts: false,
+      lookupUVACheckouts: false,
       renewing: false,
       authTriesLeft: 10,
       authMessage: "",
@@ -418,8 +420,8 @@ export const useUserStore = defineStore('user', {
       getRequests() {
          if (this.isSignedIn == false) return
          if (this.isGuest) return
-         this.lookingUp = true
 
+         this.lookupILLCheckouts = true
          return axios.all([
             axios.get(`/api/users/${this.signedInUser}/holds`),
             axios.get(`/api/users/${this.signedInUser}/illiad`),
@@ -435,7 +437,7 @@ export const useUserStore = defineStore('user', {
             } else {
                system.setError( error)
             }
-         }).finally(() => { this.lookingUp = false })
+         }).finally(() => { this.lookupILLCheckouts = false })
       },
 
       async getAccountInfo() {
@@ -510,6 +512,8 @@ export const useUserStore = defineStore('user', {
          if (this.signedInUser.length == 0 || this.noILSAccount) {
             return
          }
+
+         this.lookupUVACheckouts = true
          return axios.get(`/api/users/${this.signedInUser}/checkouts`).then((response) => {
             this.setCheckouts(response.data)
             this.sortCheckouts(this.checkoutsOrder)
@@ -520,7 +524,7 @@ export const useUserStore = defineStore('user', {
             } else {
                system.setError( error)
             }
-         })
+         }).finally(() => { this.lookupUVACheckouts = false })
       },
       async downloadCheckoutsCSV() {
          if ( this.checkouts.length == 0) {
