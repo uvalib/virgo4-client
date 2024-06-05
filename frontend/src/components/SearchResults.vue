@@ -19,7 +19,7 @@
          <div class="results-main">
             <div class="pool-tabs">
                <VirgoButton v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
-                  @click="poolTabClicked(idx)"
+                  @click="poolSelected(r.pool.id)"
                >
                   <span>
                      <div class="pool">{{r.pool.name}}</div>
@@ -43,7 +43,7 @@ import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -129,13 +129,6 @@ const updateURL = (( poolID) => {
    }
    if ( route.query != query ) {
       router.push({query})
-   }
-})
-
-const poolTabClicked = ((resultIdx) => {
-   if ( resultStore.selectedResultsIdx != resultIdx) {
-      let r = resultStore.results[resultIdx]
-      poolSelected(r.pool.id)
    }
 })
 
