@@ -2,14 +2,13 @@
    <span class=v4-pager>
       <VirgoButton class="small" :disabled="!props.prevAvailable" icon="pi pi-arrow-left" @click="emit('prior')" aria-label="previous result" />
       <span class="page-info">
-         {{utils.formatNum(props.page)}} of {{utils.formatNum(props.total)}}
+         {{$formatNum(props.page)}} of {{$formatNum(props.total)}}
       </span>
       <VirgoButton class="small" :disabled="!props.nextAvailable" icon="pi pi-arrow-right" @click="emit('next')" aria-label="next result" />
    </span>
 </template>
 
 <script setup>
-import * as utils from '@/utils'
 const props = defineProps({
    total: {
       type: Number,

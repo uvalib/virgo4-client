@@ -25,7 +25,7 @@
                      <div class="expanded-item" v-for="fv in filterInfo.buckets.filter(f => f.value)" :key="fv.value">
                         <Checkbox  v-model="fv.selected" :inputId="`${filterInfo.id}-${fv.value}`" :binary="true" />
                         <label :for="`${filterInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
-                        <span class="cnt" v-if="fv.count">({{utils.formatNum(fv.count)}})</span>
+                        <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>
                      </div>
                   </AccordionContent>
                </template>
@@ -40,7 +40,6 @@
 import AccordionContent from "@/components/AccordionContent.vue"
 import Checkbox from 'primevue/checkbox'
 import { computed } from 'vue'
-import * as utils from '@/utils'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"

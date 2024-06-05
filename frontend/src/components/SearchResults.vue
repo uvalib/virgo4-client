@@ -4,7 +4,7 @@
       <SearchSuggestions />
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
-            <div class="query">Showing {{utils.formatNum(resultStore.total)}} results for:</div>
+            <div class="query">Showing {{$formatNum(resultStore.total)}} results for:</div>
             <div class="qs">{{queryString}}</div>
          </div>
          <span class="buttons" role="toolbar">
@@ -19,31 +19,14 @@
          <div class="results-main">
             <div class="pool-tabs">
                <VirgoButton v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
-                  @click="resultsButtonClicked(idx)"
+                  @click="poolTabClicked(idx)"
                >
                   <span>
                      <div class="pool">{{r.pool.name}}</div>
-                     <div :aria-label="`has ${r.total} results`" class="total">({{utils.formatNum(r.total) || '0'}})</div>
+                     <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
                   </span>
                </VirgoButton>
-               <Dropdown v-if="resultStore.results.length > systemStore.maxPoolTabs" v-model="otherSrcSelection" :class="{active: otherSrcSelection}"
-                  :options="otherSources" optionLabel="name" optionValue="id" @change="otherSrcSelected">
-                  <template #value>
-                     <div v-if="otherSrcInfo" class="more-selection">
-                        <div>{{ otherSrcInfo.name }}</div>
-                        <div class="total">({{  otherSrcInfo.total }})</div>
-                     </div>
-                     <div v-else class="more">More</div>
-                  </template>
-                  <template #option="slotProps">
-                     <div class="more-opt">
-                        <div class="other-src">{{ slotProps.option.name }}</div>
-                        <div v-if="slotProps.option.falied" class='total error'>Failed</div>
-                        <div v-else-if="slotProps.option.skipped" class='total error'>Skipped</div>
-                        <div v-else class="total">({{slotProps.option.total}})</div>
-                     </div>
-                  </template>
-               </Dropdown>
+               <OtherPoolsPicker  v-if="resultStore.results.length > systemStore.maxPoolTabs" @selected="poolSelected" />
             </div>
             <PoolResultDetail />
          </div>
@@ -52,21 +35,20 @@
 </template>
 
 <script setup>
+import OtherPoolsPicker from "@/components/OtherPoolsPicker.vue"
 import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
 import FacetSidebar from "@/components/FacetSidebar.vue"
 import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
-import * as utils from '../utils'
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick, ref, onMounted } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useSortStore } from "@/stores/sort"
-import Dropdown from 'primevue/dropdown'
 
 const router = useRouter()
 const route = useRoute()
@@ -75,17 +57,6 @@ const resultStore = useResultStore()
 const systemStore = useSystemStore()
 const sortStore = useSortStore()
 const filters = useFilterStore()
-
-const otherSrcSelection = ref("")
-
-onMounted(() => {
-   if (route.query.pool) {
-      let poolIdx = resultStore.results.findIndex( r => r.pool.id == route.query.pool)
-      if (poolIdx >= systemStore.maxPoolTabs-1) {
-         otherSrcSelection.value = route.query.pool
-      }
-   }
-})
 
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
@@ -99,36 +70,6 @@ const sourceTabs = computed(()=>{
       return resultStore.results
    }
    return resultStore.results.slice(0, systemStore.maxPoolTabs )
-})
-
-const otherSrcInfo = computed (() => {
-   let r = resultStore.results.find( r => r.pool.id == otherSrcSelection.value)
-   if (r) {
-      return { name: r.pool.name, total: utils.formatNum(r.total)}
-   }
-   return null
-})
-
-const otherSources = computed(()=>{
-   let opts = []
-   let others = resultStore.results.slice(systemStore.maxPoolTabs).sort( (a,b) => {
-      if (a.pool.name < b.pool.name) return -1
-      if (a.pool.name > b.pool.name) return 1
-      return 0
-   })
-
-   others.forEach( r=>{
-      let opt = {id: r.pool.id, name: r.pool.name, failed: false, skipped: false, total: 0}
-      if (poolFailed(r)) {
-         opt.failed = true
-      } else if (poolSkipped(r)) {
-         opt.skipped = true
-      } else {
-         opt.total = utils.formatNum(r.total)
-      }
-      opts.push(opt)
-   })
-   return opts
 })
 
 const printResults = (() => {
@@ -191,24 +132,11 @@ const updateURL = (( poolID) => {
    }
 })
 
-const poolFailed = ((p) => {
-   return (p.statusCode != 408 && p.total == 0 && p.statusCode != 200)
-})
-const poolSkipped = ((p) => {
-   return p.statusCode == 408 && p.total == 0
-})
-
-const resultsButtonClicked = ((resultIdx) => {
+const poolTabClicked = ((resultIdx) => {
    if ( resultStore.selectedResultsIdx != resultIdx) {
       let r = resultStore.results[resultIdx]
-      if ( poolFailed(r)) return
       poolSelected(r.pool.id)
-      otherSrcSelection.value = ""
    }
-})
-
-const otherSrcSelected = ((sel) => {
-   poolSelected(sel.value)
 })
 
 const poolSelected = (( poolID ) => {
@@ -226,23 +154,6 @@ const poolSelected = (( poolID ) => {
 </script>
 
 <style scoped lang="scss">
-.more-opt {
-   font-size: 0.9em;
-   width: 100%;
-   display: flex;
-   flex-flow: row nowrap;
-   justify-content: space-between;
-   gap: 0 20px;
-
-   .total.error {
-      color: var( --uvalib-text-dark );
-      font-weight: bold;
-   }
-   .total {
-      font-size: 0.9em;
-   }
-}
-
 .search-results  {
    box-sizing: border-box;
    outline: 0;
@@ -305,15 +216,6 @@ const poolSelected = (( poolID ) => {
          flex-flow: row wrap;
          justify-content: flex-start;
 
-         .p-dropdown.active {
-            background-color: var(--uvalib-brand-blue);
-            color: white;
-            border: 1px solid var(--uvalib-brand-blue);
-            :deep(.p-dropdown-trigger) {
-               color: white;
-            }
-         }
-
          button.pool {
             padding: 8px 8px 10px 8px;
             border-radius: 5px 5px 0 0;
@@ -332,17 +234,16 @@ const poolSelected = (( poolID ) => {
                z-index: 1;
                @include be-accessible();
             }
+            &:hover {
+               background: #f6f6f6;
+            }
          }
 
          button.pool.showing {
             background-color: var(--uvalib-brand-blue);
             color: #fff;
             border: 1px solid var(--uvalib-brand-blue);
-         }
-         button.pool.disabled.failed {
-            background: var(--uvalib-red-emergency);
-            color: white;
-            opacity: 0.5;
+            cursor: default;
          }
       }
    }

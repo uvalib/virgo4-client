@@ -24,7 +24,7 @@
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
                         <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @change="filterChanged"/>
                         <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
-                        <span class="cnt" v-if="utils.formatNum(fv.count)">({{utils.formatNum(fv.count)}})</span>
+                        <span class="cnt" v-if="$formatNum(fv.count)">({{$formatNum(fv.count)}})</span>
                      </dd>
                      <dd v-if="facetValuesCount(facetInfo) > 5" :key="`more${facetInfo.id}`">
                         <AccordionContent class="more" :id="`${facetInfo.id}-more`" borderWidth="0">
@@ -34,7 +34,7 @@
                            <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
                               <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @change="filterChanged"/>
                               <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
-                              <span class="cnt">({{utils.formatNum(fv.count)}})</span>
+                              <span class="cnt">({{$formatNum(fv.count)}})</span>
                            </div>
                            <template v-slot:footer>
                               <span :aria-label="`see less ${facetInfo.name} filters`"><b>See Less</b></span>
@@ -59,7 +59,6 @@ import { useFilterStore } from "@/stores/filter"
 import { useSystemStore } from "@/stores/system"
 import { usePoolStore } from "@/stores/pool"
 import { useRouter, useRoute } from 'vue-router'
-import * as utils from '../utils'
 
 const route = useRoute()
 const router = useRouter()
