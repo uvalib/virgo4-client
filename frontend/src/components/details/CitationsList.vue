@@ -21,8 +21,9 @@
             :ariaLabel="`show Bluebook citation for ${details.header.title}`"/>
       </li>
       <li>
-         <VirgoButton @click="downloadRISClicked" :aria-label="`download RIS citation for ${details.header.title}`"
-            link icon="fal fa-download" iconPos="right" label="Download RIS" class="ris-button"/>
+         <VirgoButton text @click="downloadRISClicked" :aria-label="`download RIS citation for ${details.header.title}`" class="text-icon">
+            <span>Download RIS</span><i class="fal fa-download"></i>
+         </VirgoButton>
       </li>
    </ul>
 </template>

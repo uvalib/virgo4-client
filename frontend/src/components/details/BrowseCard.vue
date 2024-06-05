@@ -238,8 +238,7 @@ const bookmarkClicked = ((id) => {
          font-weight: bold !important;
          margin-bottom: 5px !important;
          &:focus {
-            outline: 3px dotted var( --uvalib-accessibility-highlight ) !important;
-            outline-offset: 3px !important;
+            @include be-accessible();
          }
       }
    }

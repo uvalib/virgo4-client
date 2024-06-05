@@ -11,7 +11,7 @@
          <div class="instructor" v-for="(inst,idx) in c.instructors" :key="idx">
             <p class="value folder">
                <span>{{inst.instructorName}}</span>
-               <VirgoButton link v-if="!isExactLookup" @click="copyURL(c.courseID, inst.instructorName )" label="Copy link to reserves"/>
+               <VirgoButton v-if="!isExactLookup" severity="secondary" class="small" @click="copyURL(c.courseID, inst.instructorName )" label="Copy link to reserves"/>
             </p>
             <div class="reserves" v-for="reserve in inst.items" :key="reserve.id">
                <ReserveDetail :reserve="reserve" />

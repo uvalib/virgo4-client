@@ -1,10 +1,10 @@
 <template>
    <div class="dibs">
       <template v-if="activeIframe">
-         <p class="reader-header">
-            <VirgoButton @click="activeIframe = false" aria-label="Close Reader" link
+         <div class="reader-header">
+            <VirgoButton @click="activeIframe = false" aria-label="Close Reader" severity="secondary" class="small"
                icon="pi pi-times-circle" label="Electronic Course Reserves" />
-         </p>
+         </div>
          <iframe title="Digital reserves viewer"
                :src="systemStore.dibsURL + '/item/' + selectedItem"
                allowfullscreen

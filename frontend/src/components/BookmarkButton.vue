@@ -1,7 +1,9 @@
 <template>
-   <VirgoButton v-if="system.isKiosk==false" text :icon="bookmarkIcon"
-      :class="{checked: bookmarkCount > 0}" role="switch" @click="bookmarkClicked"
-      :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn" />
+   <VirgoButton v-if="system.isKiosk==false" text role="switch" @click="bookmarkClicked"
+      :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
+      :class="{checked: bookmarkCount > 0}" >
+      <i class="bookmark-icon" :class="bookmarkIcon"></i>
+   </VirgoButton>
 </template>
 
 <script setup>
@@ -92,23 +94,16 @@ const removeBookmark = ( () => {
 </script>
 
 <style lang="scss" scoped>
-button.p-button.p-button-text {
+.bookmark-icon {
     padding: 2px;
-    height: auto;
     font-size: 1.4em;
-    color: #444;
-    width: auto;
+    color: var(--uvalib-text);
     border-radius: 5px;
     margin: 0;
-    &:focus  {
-      box-shadow: none;
-    }
-    &:hover {
-      text-decoration: none;
+}
+.checked {
+   .bookmark-icon {
       color: var(--uvalib-brand-blue-light);
    }
-}
-.p-button.p-component.p-button-icon-only.p-button-text.checked {
-   color: var(--uvalib-brand-blue-light);
 }
 </style>

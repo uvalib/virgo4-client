@@ -18,7 +18,7 @@
          <router-link id="preferences-submenu" to="/admin">Admin</router-link>
          <span class="sep">|</span>
       </template>
-      <VirgoButton text @click="signOut">Sign Out</VirgoButton>
+      <VirgoButton link @click="signOut">Sign Out</VirgoButton>
    </div>
 </template>
 

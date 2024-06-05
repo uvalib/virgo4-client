@@ -56,14 +56,8 @@
             justify-content: flex-end;
             align-items: stretch;
             margin: 20px 0 0 0;
-            text-align: right;
             padding: 0;
-            button:disabled {
-               opacity: 0.2;
-            }
-            button {
-               margin: 0 0 0 10px;
-            }
+            gap: 5px 10px;
             .submit-button button {
                @include primary-button();
                width: auto;
@@ -267,9 +261,9 @@ button.p-button.p-button-text.disclosure {
       .p-menuitem-content {
          a {
             display: inline-block;
-            outline: 3px dotted var(--uvalib-grey-lightest);
+            outline: 2px dotted var(--uvalib-grey-lightest);
             border: none;
-            outline-offset: 3px;
+            outline-offset: 0.25em;
          }
       }
    }
@@ -364,84 +358,75 @@ button.p-button.p-button-text.disclosure {
    }
 }
 
-
-button.p-button.p-button-text {
-   background: none;
-   border: none;
-   color: var(--color-link);
-   font-weight: 500;
-   cursor: pointer;
+// Tab view
+div.p-tabview-panels {
    padding: 0;
-   border-radius: 0;
-   margin: 0;
-   display: inline-block;
-   &:hover {
-      background: none;
-      border: none;
-      text-decoration: underline;
-   }
-}
-
-button.p-button.p-component.p-button-link {
-   background: none;
-   border: none;
-   color: var(--color-link);
-   font-weight: 500;
-   text-decoration: none;
-   box-sizing: border-box;
-   margin: 0;
-   padding: 0;
-   align-items: baseline;
-   border-radius: 0;
-   .p-button-icon.p-button-icon-right {
-      margin-left: 10px;
-   }
-}
-
-button.p-button-icon-only.p-button {
    background: transparent;
-   color: var(--uvalib-text);
-   border: none;
-   padding: 2px;
-
-   .p-button-label {
-      display: none;
+}
+ul.p-tabview-nav  {
+   border: 0;
+   background: transparent;
+   li.p-tabview-header {
+      flex: 1 1 auto;
+      border: 1px solid var(--uvalib-grey-light);
+      border-radius: 5px 5px 0 0;
+      background: white;
+      a.p-tabview-nav-link  {
+         border: 0;
+         padding: 0.4rem 25px 0.6rem 0.6rem;
+         height: 100%;
+         display: flex;
+         flex-direction: row;
+         align-items: flex-start;
+         color: var(--uvalib-text);
+         &:hover {
+            background: var(--uvalib-grey-lightest);
+            text-decoration: none !important;
+         }
+         &:focus {
+            outline: none !important;
+         }
+         div {
+            color: var(--uvalib-text);
+         }
+      }
    }
-   &:hover {
-      background: transparent;
-      border: none;
-      color: var(--uvalib-blue-alt);
+   li.p-tabview-header.p-highlight {
+      border: 1px solid var(--uvalib-brand-blue);
+      background: var(--uvalib-brand-blue);
+      a.p-tabview-nav-link {
+         background-color: var(--uvalib-brand-blue);
+         color: var(white);
+         cursor: default;
+         &:hover {
+            text-decoration: none !important;
+         }
+         div {
+            color:white;
+         }
+      }
    }
 }
 
-button.p-button.p-button-secondary {
-   background-color: var(--uvalib-grey-lightest);
-   border: 1px solid var(--uvalib-grey);
-   color: black;
-}
-
-button.p-button.p-component {
-   margin: 0 0 5px 10px;
-}
-button.p-button, .p-fileupload.p-fileupload-basic.p-component {
-   font-family: inherit;
-   font-size: 100%;
+// primary button
+button.p-button.p-component, .p-fileupload.p-fileupload-basic.p-component {
+   font-size: 1em;
    padding: 0.5em 1em;
    text-decoration: none;
    margin: 0;
    border-radius: 5px;
-   font-weight: 400;
+   font-weight: normal;
    cursor: pointer;
    color: #ffffff;
    background-color: var(--uvalib-brand-blue-light);
    border: 1px solid var(--uvalib-brand-blue-light);
-   width: auto;
 
    .p-button-icon.p-button-icon-left {
-      display: inline-block;
       margin-right: 0.5rem;
-      font-weight: 400;
-      line-height: 1;
+   }
+   .p-button-icon.p-button-icon-right {
+      margin-left: 0.5rem;
+      order: 1;
    }
 
    &:hover {
@@ -467,30 +452,86 @@ button.p-button, .p-fileupload.p-fileupload-basic.p-component {
    }
 }
 
-button.p-button.p-component.small {
-   padding: 4px 12px;
-   background-color: var(--uvalib-brand-blue-light);
-   border: 1px solid var(--uvalib-brand-blue-light);
-   color: white;
+button.p-button.p-button-text {
+   background: none;
+   border: none;
+   color: var(--uvalib-text);
+   padding: 2px 4px;
+   border-radius: 5px;
    &:hover {
-      background-color: var(--uvalib-brand-blue-lighter);
-      border: 1px solid var(--uvalib-brand-blue-lighter);
-      transition: all 0.3s ease;
+      border: none;
+      text-decoration: none;
+      background: var(--uvalib-grey-lightest);
    }
 }
 
-button.p-button.p-disabled {
+button.p-button.p-button-text.text-icon {
+   display:flex;
+   flex-flow: row nowrap;
+   justify-content: flex-start;
+   align-items: center;
+   gap: 0 8px;
+}
+
+button.p-button.p-component.p-button-link {
+   background: none;
+   border: none;
+   color: var(--color-link);
+   text-decoration: none;
+   margin: 0;
+   padding: 0;
+   align-items: baseline;
+   border-radius: 5px;
+   &:hover {
+      background: none;
+      border: none;
+      color: var(--uvalib-blue-alt);
+      text-decoration: underline;
+   }
+}
+
+button.p-button-icon-only.p-button {
+   background: transparent;
+   color: var(--uvalib-text);
+   border: none;
+   padding: 2px;
+   margin:0;
+
+   .p-button-label {
+      display: none;
+   }
+   &:hover {
+      background: var(--uvalib-grey-lightest);
+      border: none;
+   }
+}
+
+button.p-button.p-component.small {
+   font-size: .85rem;
+   padding: .5rem 1rem;
+}
+
+button.p-button.p-component.p-disabled {
    opacity: 0.3;
 }
 
 button.p-button.p-button-secondary {
    background-color: var(--uvalib-grey-lightest);
    border: 1px solid var(--uvalib-grey);
-   color: #000;
+   color: var(--uvalib-text);
    &:hover {
-      background-image: -webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(40%,rgba(0,0,0,.05)),to(rgba(0,0,0,.1))) !important;
-      background-image: linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1)) !important;
-      background-color: var(--uvalib-grey-lightest) !important;
-      color: #000 !important;
+      background-color: var(--uvalib-grey-light);
+      border: 1px solid var(--uvalib-grey);
+   }
+}
+
+// this is the 'subtle' button
+button.p-button.p-button-info {
+   background-color: var(--uvalib-blue-alt-light);
+   border: 1px solid var(--uvalib-blue-alt);
+   color: var(--uvalib-text);
+   &:hover {
+      background-color: var(--uvalib-blue-alt-med);
+      border: 1px solid var(--uvalib-blue-alt);
    }
 }

@@ -26,31 +26,24 @@
                      </router-link>
                   </span>
                   <span class="search-actions">
-                     <span class="icon">
-                        <router-link @mousedown="savedSearchClicked('saved')"
-                           :to="searchURL(saved.token)"
-                           :aria-label="`perform search named ${saved.name}`"
-                        >
-                           <i class="fal fa-search"></i>
-                        </router-link>
-                     </span>
                      <VirgoButton @click="deleteSearchClicked(saved)" :aria-label="`Delete search named ${saved.name}`" icon="fal fa-trash-alt"/>
                   </span>
                </div>
                <div v-if="saved.public" class="public-controls">
                   <a  class="view" :href="searchURL(saved.token)" target="_blank">
                      <span>View published search</span>
-                     <i class="link fal fa-external-link-alt"></i>
+                     <i class="link-icon fal fa-external-link-alt"></i>
                   </a>
                   <span class="sep">|</span>
-                  <VirgoButton link @click="copyURL(saved.token)" label="Copy published URL to clipboard"/>
+                  <VirgoButton text @click="copyURL(saved.token)" label="Copy published URL to clipboard"/>
                   <span class="sep">|</span>
-                  <VirgoButton link @click="openRSSModal(`${saved.token}-open`, saved)"
-                     :id="`${saved.token}-open`" label="RSS" icon="fal fa-rss" iconPos="right"/>
+                  <VirgoButton text @click="openRSSModal(`${saved.token}-open`, saved)" :id="`${saved.token}-open`" class="text-icon">
+                     <span>RSS</span><i class="fal fa-rss"></i>
+                  </VirgoButton>
                </div>
             </div>
             <div class="controls">
-               <VirgoButton link @click="removeAllClicked" label="Delete all saved searches"/>
+               <VirgoButton severity="secondary" @click="removeAllClicked" label="Delete all saved searches"/>
             </div>
          </div>
          <div v-if="searchStore.history.length > 0" class="history">
@@ -62,7 +55,7 @@
                </template>
             </div>
             <div class="controls">
-               <VirgoButton link @click="clearHistoryClicked" label="Clear search history" />
+               <VirgoButton severity="secondary" @click="clearHistoryClicked" label="Clear search history" />
             </div>
          </div>
       </div>
@@ -281,9 +274,12 @@ div.saved-search {
    align-items: center;
 }
 .public-controls {
-   text-align: left;
+   display:flex;
+   flex-flow: row wrap;
+   justify-content: flex-start;
+   align-items: center;
+   gap: 5px 10px;
    margin: 8px 0 8px 45px;
-   font-size: 0.9em;
 }
 div.row {
    border-bottom: 1px solid var(--uvalib-grey-light);
@@ -309,9 +305,6 @@ span.icon i.fal {
    margin-top: 2px;
    padding: 0;
 }
-i.link {
-   margin: 0 0 0 10px;
-}
 .details {
    margin-bottom: 35px;
 }
@@ -324,12 +317,8 @@ span.num {
   line-height: 1.5em;
   color: var(--uvalib-grey);
 }
-.sep {
-   margin: 0 10px;
-}
 .controls {
    padding: 10px 0;
-   /* text-align: right; */
 }
 .rss-panel {
    padding: 0;
