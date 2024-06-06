@@ -2,6 +2,8 @@ import { createApp, markRaw, nextTick } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { plugin, defaultConfig } from '@formkit/vue'
+import formatDatePlugin from './plugins/formatdate'
+import formatNumPlugin from './plugins/formatnum'
 
 import V4Spinner from "@/components/V4Spinner.vue"
 import V4FormActions from "@/components/V4FormActions.vue"
@@ -16,6 +18,9 @@ pinia.use(({ store }) => {
 const app = createApp(App)
 app.use(router)
 app.use(pinia)
+app.use(formatDatePlugin)
+app.use(formatNumPlugin)
+
 
 // add a directive that can be used to autofocus and a plugin that can sefelt set focus
 app.directive('focus', {

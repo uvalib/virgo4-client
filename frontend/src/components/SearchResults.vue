@@ -4,7 +4,7 @@
       <SearchSuggestions />
       <div class="results-header" role="heading" aria-level="2">
          <div id="search-summary" class="summary">
-            <div class="query">Showing {{utils.formatNum(resultStore.total)}} results for:</div>
+            <div class="query">Showing {{$formatNum(resultStore.total)}} results for:</div>
             <div class="qs">{{queryString}}</div>
          </div>
          <span class="buttons" role="toolbar">
@@ -16,30 +16,31 @@
 
       <div class="results-wrapper" >
          <FacetSidebar />
-         <TabView @update:activeIndex="resultsSelected" :scrollable="true" :lazy="true" :activeIndex="resultStore.selectedResultsIdx">
-            <TabPanel v-for="tab in sourceTabs" :key="`tab-${tab.poolID}`">
-               <template #header>
-                  <div class="pool-tab">
-                     <div class="pool">{{ tab.name }}</div>
-                     <div v-if="tab.failed" class='total error'>Failed</div>
-                     <div v-else-if="tab.skipped" class='total error'>Skipped</div>
-                     <div v-else :aria-label="`has ${tab.total} results`" class="total">({{utils.formatNum(tab.total) || '0'}})</div>
-                  </div>
-               </template>
-               <PoolResultDetail />
-            </TabPanel>
-         </TabView>
+         <div class="results-main">
+            <div class="pool-tabs">
+               <VirgoButton v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
+                  @click="poolSelected(r.pool.id)"
+               >
+                  <span>
+                     <div class="pool">{{r.pool.name}}</div>
+                     <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
+                  </span>
+               </VirgoButton>
+               <OtherPoolsPicker  v-if="resultStore.results.length > systemStore.maxPoolTabs" @selected="poolSelected" />
+            </div>
+            <PoolResultDetail />
+         </div>
       </div>
    </div>
 </template>
 
 <script setup>
+import OtherPoolsPicker from "@/components/OtherPoolsPicker.vue"
 import PoolResultDetail from "@/components/PoolResultDetail.vue"
 import PrintedSearchResults from "@/components/PrintedSearchResults.vue"
 import FacetSidebar from "@/components/FacetSidebar.vue"
 import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
-import * as utils from '../utils'
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
 import { computed, nextTick } from 'vue'
@@ -48,8 +49,6 @@ import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useSortStore } from "@/stores/sort"
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
 
 const router = useRouter()
 const route = useRoute()
@@ -67,15 +66,10 @@ const queryString = computed(()=>{
 })
 
 const sourceTabs = computed(()=>{
-   let tabs = []
-   resultStore.results.forEach( r => {
-      let tab = {
-         poolID: r.pool.id, name: r.pool.name, total: r.total,
-         failed:  poolFailed(r), skipped:  poolSkipped(r)
-      }
-      tabs.push(tab)
-   })
-   return tabs
+   if (resultStore.results.length <= systemStore.maxPoolTabs) {
+      return resultStore.results
+   }
+   return resultStore.results.slice(0, systemStore.maxPoolTabs )
 })
 
 const printResults = (() => {
@@ -138,139 +132,111 @@ const updateURL = (( poolID) => {
    }
 })
 
-const poolFailed = ((p) => {
-   return (p.statusCode != 408 && p.total == 0 && p.statusCode != 200)
-})
-const poolSkipped = ((p) => {
-   return p.statusCode == 408 && p.total == 0
-})
-
-const resultsSelected = ((resultIdx) => {
-   if ( resultStore.selectedResultsIdx != resultIdx) {
-      let r = resultStore.results[resultIdx]
-      if ( poolFailed(r)) return
-      poolSelected(resultIdx, r.pool.id)
-   }
-})
-
-const poolSelected = (( resultIdx, poolID ) => {
+const poolSelected = (( poolID ) => {
    analytics.trigger('Results', 'POOL_SELECTED', poolID)
-   resultStore.selectPoolResults(resultIdx)
-   if ( route.query.pool != poolID ) {
-      updateURL(poolID)
+
+   let tgtIdx = resultStore.results.findIndex( r => r.pool.id == poolID )
+   if (tgtIdx > -1 ) {
+      resultStore.selectPoolResults(tgtIdx)
+      let newPoolID = resultStore.results[tgtIdx].pool.id
+      if ( route.query.pool != newPoolID ) {
+         updateURL(newPoolID)
+      }
    }
 })
 </script>
 
 <style scoped lang="scss">
-:deep(div.p-tabview-panels) {
-   padding: 0;
-   background: transparent;
-}
-
 .search-results  {
    box-sizing: border-box;
    outline: 0;
    background-color: var(--uvalib-grey-lightest);
+}
 
-   .results-header {
-      display: flex;
-      flex-flow: row wrap;
-      align-content: center;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 15px;
-      margin-bottom: 10px;
-      .summary {
-         margin: 0 0 0.2vw 0;
-         font-weight: 500;
+.results-header {
+   display: flex;
+   flex-flow: row wrap;
+   align-content: center;
+   align-items: center;
+   justify-content: space-between;
+   padding-top: 15px;
+   margin-bottom: 10px;
+   .summary {
+      margin: 0 0 0.2vw 0;
+      font-weight: 500;
+      text-align: left;
+      .qs {
+         margin-left:15px;
+         font-style: italic;
+         font-weight: 100;
+      }
+      span {
+         font-size: 0.85em;
+      }
+      .subtotal {
+         display: block;
+         margin: 2px 0 2px 15px;
+      }
+      .query {
          text-align: left;
-         .qs {
-            margin-left:15px;
-            font-style: italic;
-            font-weight: 100;
-         }
-         span {
-            font-size: 0.85em;
-         }
-         .subtotal {
-            display: block;
-            margin: 2px 0 2px 15px;
-         }
-         .query {
-            text-align: left;
-            margin: 0 0 0.2vw 0;
-            font-weight: bold;
-            font-size: 1.1em;
-         }
-      }
-      .buttons {
-         display: flex;
-         flex-flow: row nowrap;
-         gap: 5px 10px;
+         margin: 0 0 0.2vw 0;
+         font-weight: bold;
+         font-size: 1.1em;
       }
    }
-
-   :deep(button.p-tabview-nav-btn.p-link) {
-      color: var(--uvalib-brand-orange);
-      border: 2px solid var(--uvalib-brand-orange);
-      width: 40px;
-      border-radius: 20px;
-      height: 40px;
-      bottom: 0px;
-      top: auto;
+   .buttons {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 5px 10px;
    }
+}
 
-   :deep(.p-tabview-nav)  {
-      border: 0;
-      background: transparent;
+.results-wrapper {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: space-between;
+   gap: 15px;
 
+   .results-main {
+      display: inline-block;
+      flex: 1 1 70%;
 
-      .p-tabview-header {
-         flex: 1 1 auto;
-         border: 1px solid var(--uvalib-grey-light);
-         border-radius: 5px 5px 0 0;
-         background: white;
-         a.p-tabview-nav-link  {
-            border: 0;
-            padding: 0.4rem 25px 0.6rem 0.6rem;
-            height: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-         }
-      }
-
-      .pool-tab {
+      div.pool-tabs {
+         font-weight: bold;
+         margin: 0;
+         text-align: left;
          display: flex;
-         flex-direction: column;
-         align-items: flex-start;
-         font-size: 0.95em;
-         .pool {
-            text-align: left;
-            color: var(--uvalib-text);
-            // min-width: 90px;
-         }
-         .total {
-            font-size: 0.75em;
-            margin: 0;
-            font-weight: normal;
-            color: var(--uvalib-text);
-         }
-         .total.error {
-            font-weight: bold;
-            color: var(--uvalib-red-darker);
-         }
-      }
+         flex-flow: row wrap;
+         justify-content: flex-start;
 
-      .p-highlight {
-         border: 1px solid var(--uvalib-brand-blue);
-         background: var(--uvalib-brand-blue);
-         a {
-            background-color: var(--uvalib-brand-blue);
-            .pool-tab .pool,  .pool-tab .total {
-               color:white;
+         button.pool {
+            padding: 8px 8px 10px 8px;
+            border-radius: 5px 5px 0 0;
+            color: var(--uvalib-text-dark);
+            border: 1px solid var(--uvalib-grey-light);
+            text-align: left;
+            flex: 1 1 auto;
+            background: #FFF;
+            .total {
+               font-size: 0.75em;
+               margin: 0;
+               font-weight: normal;
             }
+
+            &:focus {
+               z-index: 1;
+               @include be-accessible();
+            }
+            &:hover {
+               background: #f6f6f6;
+            }
+         }
+
+         button.pool.showing {
+            background-color: var(--uvalib-brand-blue);
+            color: #fff;
+            border: 1px solid var(--uvalib-brand-blue);
+            cursor: default;
          }
       }
    }
@@ -279,16 +245,7 @@ const poolSelected = (( resultIdx, poolID ) => {
 @media only screen and (min-width: $breakpoint-mobile) {
    div.search-results {
       margin: 0;
-      padding: 0 3vw 20px 3vw;
-   }
-   .results-wrapper {
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: space-between;
-      gap: 15px;
-      .p-tabview {
-         flex: 1 1 70%;
-      }
+      padding: 0 5vw 20px 5vw;
    }
 }
 @media only screen and (max-width: $breakpoint-mobile) {
