@@ -64,4 +64,7 @@ function tabNext(event) {
 .form-controls.right {
    justify-content: flex-end;
 }
+.form-controls.spaced {
+   justify-content: space-around;
+}
 </style>

@@ -49,6 +49,7 @@ export const useUserStore = defineStore('user', {
       noILLiadAccount: false,
       accountRequest: {name: "", id: "", email: "", phone: "", department: "",
          address1: "", address2: "", city: "", state: "", zip: ""},
+      tempAccount: {},
       accountRequested: false,
       sirsiUnavailable: false
    }),
@@ -660,6 +661,23 @@ export const useUserStore = defineStore('user', {
       },
       updateContactInfo(info) {
          return axios.post(`/api/users/${info.newContact.userID}/contact`, info )
+      },
+      async submitUserRegistration() {
+         this.lookingUp = true
+         const system = useSystemStore()
+         return axios.post("/api/createTempAccount", this.tempAccount ).then( _ => {
+            this.router.push("/signin").then(_=>{
+               this.lookingUp = false
+               system.setMessage("Thank you for registering. Please check your email for further instructions.")
+            })
+         }).catch ( error => {
+            this.lookingUp = false
+            console.log("Unable to request new account: "+error)
+            let msg = "System error, we regret the inconvenience. If this problem persists, "
+            msg += "<a href='https://search.lib.virginia.edu/feedback' target='_blank'>please contact us.</a>"
+            system.setError(msg)
+         })
+
       }
    }
 })

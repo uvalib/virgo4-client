@@ -545,3 +545,56 @@ func (svc *ServiceContext) CreateAccountRequest(c *gin.Context) {
 
 	c.String(http.StatusOK, "new account request sent")
 }
+
+// TempAccount holds form data to request a temporary Sirsi account
+type TempAccount struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Password  string `json:"password"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Address1  string `json:"address1"`
+	Address2  string `json:"address2"`
+	City      string `json:"city"`
+	State     string `json:"state"`
+	Zip       string `json:"zip"`
+}
+
+// CreateTempAccount accepts a user account request and creates a temporary account in Sirsi via ils-connector
+func (svc *ServiceContext) CreateTempAccount(c *gin.Context) {
+	req := TempAccount{}
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		log.Printf("ERROR: invalid temp account request payload: %v", err)
+		c.String(http.StatusBadRequest, "Invalid temp account request")
+		return
+	}
+	log.Printf("Temp User account request: %+v", req)
+	createURL := fmt.Sprintf("%s/v4/users/register", svc.ILSAPI)
+	_, ilsErr := svc.ILSConnectorPost(createURL, req, c.GetString("jwt"))
+	if ilsErr != nil {
+		log.Printf("Temp account create failed for %s", req.Email)
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	log.Printf("Temp account created for %s", req.Email)
+	c.String(http.StatusCreated, "Temp account created")
+	return
+
+}
+
+// ActivateTempAccount accepts a user account request and creates a temporary account in Sirsi via ils-connector
+func (svc *ServiceContext) ActivateTempAccount(c *gin.Context) {
+
+	activateURL := fmt.Sprintf("%s/v4/users/activate/%s", svc.ILSAPI, c.Param("code"))
+	_, ilsErr := svc.ILSConnectorGet(activateURL, c.GetString("jwt"), svc.HTTPClient)
+	if ilsErr != nil {
+		log.Printf("Temp account activation failed")
+		c.Redirect(http.StatusUnauthorized, "/signin?activated=false")
+		return
+	}
+	log.Printf("Temp account Activated")
+	c.Redirect(http.StatusFound, "/signin?activated=true")
+	return
+
+}
