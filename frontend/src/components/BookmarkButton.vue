@@ -99,7 +99,7 @@ const removeBookmark = ( () => {
     font-size: 1.4em;
     color: var(--uvalib-text);
     border-radius: 5px;
-    margin: 0;
+    margin: 0 auto;
 }
 .checked {
    .bookmark-icon {

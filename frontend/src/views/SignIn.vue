@@ -1,5 +1,13 @@
 <template>
    <div class="signin">
+      <div v-if="route.query.activated == 'true'" class="auth-message success">
+         <p>Thank you, your email has been confirmed.</p>
+         <p>You may now sign in below with your library ID and password.</p>
+      </div>
+      <div v-else-if="route.query.activated == 'false'" class="auth-message">
+         <p>Auth token has expired.</p>
+         <ForgotPassword />
+      </div>
       <div class="netbadge">
          <h2>UVA Users</h2>
          <p class="subhead">(UVA students, faculty, and staff)</p>
@@ -145,6 +153,10 @@ h2 {
    color: var(--uvalib-red-emergency);
    text-align: center;
    margin: 15px 0 15px;
+   &.success {
+      color: var(--uvalib-green-dark);
+
+   }
 }
 .tries {
    font-weight: normal;

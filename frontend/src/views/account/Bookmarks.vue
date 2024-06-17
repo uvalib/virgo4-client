@@ -78,7 +78,12 @@
                            <abbr class="" :title="itemURL(slotProps.data)" :data-folder-id="folderInfo.id"></abbr>
                         </template>
                      </Column>
-                     <Column field="details.author" header="Author"/>
+                     <Column field="details.author" header="Author">
+                        <template #body="slotProps">
+                           <template v-if="slotProps.data.details.author">{{ valueDisplay(slotProps.data.details.author) }}</template>
+                           <span v-else class="na">N/A</span>
+                        </template>
+                     </Column>
                      <Column field="callNumber" header="Call Number">
                         <template #body="slotProps">
                            <template v-if="slotProps.data.details.callNumber">{{ valueDisplay(slotProps.data.details.callNumber) }}</template>

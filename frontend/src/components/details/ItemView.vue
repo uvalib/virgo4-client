@@ -62,7 +62,7 @@
                <dd class="value">
                   <CitationsList />
                </dd>
-               <template v-if="hasExtLink">
+               <template v-if="hasExtLink && system.isKiosk == false">
                   <dd></dd>
                   <dt class="value more">
                      <a :href="extDetailURL" target="_blank" @click="extDetailClicked">

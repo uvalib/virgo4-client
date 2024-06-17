@@ -96,10 +96,10 @@ async function getDetails(src, id) {
    setTimeout( () => {
       if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
          let newBM = restore.pendingBookmark
-         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
+         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
          if (showAdd) {
             let triggerBtn = document.querySelector(".icon-wrap .bookmark")
-            bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "DETAIL")
+            bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "DETAIL")
          }
          restore.clear()
       }

@@ -7,8 +7,8 @@
          </p>
       </div>
       <div v-else class="add-content">
-         <div>{{bookmarkStore.newBookmark.identifier}}: <b>{{bookmarkStore.newBookmark.title}}</b></div>
-         <TruncatedText v-if="bookmarkStore.newBookmark.author" id="bookmark-author" :text="bookmarkStore.newBookmark.author" :limit="120" ></TruncatedText>
+         <div>{{bookmarkStore.newBookmark.hit.identifier}}: <b>{{bookmarkStore.newTitle}}</b></div>
+         <TruncatedText v-if="bookmarkStore.newAuthor" id="bookmark-author" :text="bookmarkStore.newAuthor" :limit="120" ></TruncatedText>
          <div class="select" >
             <template v-if="showAdd==false">
                <label for="folder">Select a folder for the bookmark</label>

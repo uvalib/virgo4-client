@@ -82,7 +82,7 @@ const getInitialBrowseData = ( async () => {
    if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SHELF_BROWSE" ) {
       // if a bookmark add was restored, make it the target of shelf browse (center option)
       newBM = restore.pendingBookmark
-      tgt = newBM.identifier
+      tgt = newBM.hit.identifier
       restore.clear()
    }
 
@@ -93,10 +93,10 @@ const getInitialBrowseData = ( async () => {
 
    if ( newBM ) {
       scrollToItem( `browse-${tgt}` )
-      let cnt =  bookmarks.bookmarkCount( newBM.pool, newBM.identifier )
+      let cnt =  bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier )
       if ( cnt == 0 ) {
-         let triggerBtn = document.getElementById(`bm-btn-${ newBM.identifier}`)
-         bookmarks.showAddBookmark( props.pool, newBM, triggerBtn, "SHELF_BROWSE")
+         let triggerBtn = document.getElementById(`bm-btn-${ newBM.hit.identifier}`)
+         bookmarks.showAddBookmark( props.pool, newBM.hit, triggerBtn, "SHELF_BROWSE")
       }
    }
 })

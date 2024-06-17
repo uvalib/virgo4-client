@@ -6,7 +6,7 @@ import axios from 'axios'
 export const useBookmarkStore = defineStore('bookmark', {
 	state: () => ({
       showAddDialog: false,
-      newBookmark: {},
+      newBookmark: {hit: null, pool: "", origin: ""},
       addBoomkarkTrigger: null,
       searching: false,
       public: [],
@@ -14,6 +14,26 @@ export const useBookmarkStore = defineStore('bookmark', {
    }),
 
    getters: {
+      newAuthor: state => {
+         let author = ""
+         if ( state.newBookmark.hit) {
+            author = state.newBookmark.hit.author
+            if ( state.newBookmark.hit.header ) {
+               author = state.newBookmark.hit.header.author_display
+            }
+         }
+         return author
+      },
+      newTitle: state => {
+         let title = ""
+         if ( state.newBookmark.hit) {
+            title = state.newBookmark.hit.title
+            if ( state.newBookmark.hit.header ) {
+               title = state.newBookmark.hit.header.title
+            }
+         }
+         return title
+      },
       hasBookmarks: state => {
          if ( state.bookmarks.length === 0) return false
          return true
@@ -68,62 +88,43 @@ export const useBookmarkStore = defineStore('bookmark', {
 
       // origin: SEARCH, DETAIL, COLLECTION, SHELF_BROWSE
       showAddBookmark( pool, hit, trigger, origin ) {
-         // all hit data has these in common...
-         this.newBookmark = {identifier: hit.identifier, pool: pool, origin: origin}
-         if (hit.groupParent) {
-            this.newBookmark.groupParent = hit.groupParent
-         }
-
-         // some bookmarks are directly from search hits; these have header structures (plus basic and details)
-         if (hit.header) {
-            this.newBookmark.title = hit.header.title
-            this.newBookmark.author = hit.header.author_display
-         } else {
-            // other hits are from shelf browse or restore and the structure is simplified, with only title and sometimes author
-            this.newBookmark.title = hit.title
-            this.newBookmark.author = hit.author
-         }
-
-         let fields = hit.basicFields.concat( hit.detailFields)
-         fields.forEach( f => {
-            if ( f.name == "format") {
-               if ( Array.isArray(f.value)) {
-                  this.newBookmark.format = f.value.join("; ")
-               } else {
-                  this.newBookmark.format = f.value
-               }
-            }
-            if ( f.name == "call_number") {
-               this.newBookmark.callNumber = f.value
-            }
-            if ( f.name == "library") {
-               this.newBookmark.library = f.value
-            }
-         })
-
+         this.newBookmark = {hit: hit, pool: pool, origin: origin}
          this.showAddDialog = true
          this.addBoomkarkTrigger = trigger
       },
+
       async addBookmark( folder  ) {
          const userStore = useUserStore()
          let v4UID = userStore.signedInUser
          let url = `/api/users/${v4UID}/bookmarks/add`
-         let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.identifier}
-         let detail = {title : this.newBookmark.title, author: this.newBookmark.author}
-         if ( this.newBookmark.format ) {
-            detail.format = this.newBookmark.format
+         let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.hit.identifier}
+         let detail = {title : this.newTitle, author: this.newAuthor}
+
+         if ( this.newBookmark.hit.basicFields ) {
+            let fields =  this.newBookmark.hit.basicFields.concat( this.newBookmark.hit.detailFields )
+            fields.forEach( f => {
+               if ( f.name == "format") {
+                  if ( Array.isArray(f.value)) {
+                     detail.format = f.value.join("; ")
+                  } else {
+                     detail.format = f.value
+                  }
+               }
+               if ( f.name == "call_number") {
+                  detail.callNumber = f.value
+               }
+               if ( f.name == "library") {
+                  detail.library = f.value
+               }
+            })
          }
-         if ( this.newBookmark.callNumber ) {
-            detail.callNumber = this.newBookmark.callNumber
-         }
-         if ( this.newBookmark.library ) {
-            detail.library = this.newBookmark.library
-         }
+
          data['details'] = JSON.stringify(detail)
          return axios.post(url, data).then((response) => {
             this.setBookmarks(response.data)
          })
       },
+
       clearAddBookmark() {
          this.newBookmark = {}
          this.showAddDialog = false

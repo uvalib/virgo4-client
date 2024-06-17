@@ -132,6 +132,9 @@ func main() {
 
 		api.POST("/reauth", svc.RefreshAuthentication)
 
+		api.POST("/createTempAccount", svc.AuthMiddleware, svc.CreateTempAccount)
+		api.GET("/activateTempAccount/:code", svc.ActivateTempAccount)
+
 		admin := api.Group("/admin")
 		{
 			admin.POST("/claims", svc.AuthMiddleware, svc.SetAdminClaims)
@@ -155,7 +158,7 @@ func main() {
 		c.File("./public/index.html")
 	})
 
-	portStr := fmt.Sprintf(":%d", cfg.Port)
+	portStr := fmt.Sprintf("127.0.0.1:%d", cfg.Port)
 	log.Printf("Start service v%s on port %s", version, portStr)
 	// pprof.Register(router)
 	log.Fatal(router.Run(portStr))
