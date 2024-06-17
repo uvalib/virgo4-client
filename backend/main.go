@@ -158,7 +158,7 @@ func main() {
 		c.File("./public/index.html")
 	})
 
-	portStr := fmt.Sprintf("127.0.0.1:%d", cfg.Port)
+	portStr := fmt.Sprintf(":%d", cfg.Port)
 	log.Printf("Start service v%s on port %s", version, portStr)
 	// pprof.Register(router)
 	log.Fatal(router.Run(portStr))
