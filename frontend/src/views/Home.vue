@@ -317,19 +317,19 @@ async function restoreSearchFromQueryParams( query ) {
 function handlePendingBookmark() {
    const bookmarks = useBookmarkStore()
    let newBM = restore.pendingBookmark
-   let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.identifier ) == 0 )
+   let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
 
-   let triggerBtn = document.getElementById(`bm-btn-${ newBM.identifier}`)
-   if (  newBM.groupParent ) {
+   let triggerBtn = document.getElementById(`bm-btn-${ newBM.hit.identifier}`)
+   if (  newBM.hit.groupParent ) {
       // The group accordion watches this value. When set, the accordion will auto-expand,
       // adding the target item to the DOM
-      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.groupParent)
+      let parent = resultStore.selectedResults.hits.find( r=> r.identifier == newBM.hit.groupParent)
       resultStore.autoExpandGroupID = `group-${parent.identifier}`
    }
-   scrollToItem(newBM.identifier, false)
+   scrollToItem(newBM.hit.identifier, false)
 
    if ( showAdd ) {
-      bookmarks.showAddBookmark( newBM.pool, newBM, triggerBtn, "SEARCH")
+      bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "SEARCH")
    }
 }
 
