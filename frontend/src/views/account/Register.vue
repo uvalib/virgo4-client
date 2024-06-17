@@ -53,13 +53,20 @@
 <script setup>
 import { useUserStore } from "@/stores/user"
 import { useRouter } from 'vue-router'
+import { onMounted } from "vue";
 import Panel from 'primevue/panel';
 
 const userStore = useUserStore()
 const router = useRouter()
 
+onMounted(() =>{
+  if ( userStore.isSignedIn ) {
+    router.push("/account")
+  }
+})
+
 async function submitClicked() {
-   userStore.submitUserRegistration()
+  userStore.submitUserRegistration()
 }
 function cancelClicked() {
   router.push("/signin")
@@ -68,21 +75,21 @@ function cancelClicked() {
 </script>
 <style lang="scss" scoped>
 @media only screen and (min-width: 768px) {
-   div.account  {
-       width: 60%;
-   }
+  div.account  {
+    width: 60%;
+  }
 }
 @media only screen and (max-width: 768px) {
-   div.account  {
-      width: 95%;
-   }
+  div.account  {
+    width: 95%;
+  }
 }
 .account {
-   min-height: 400px;
-   position: relative;
-   margin: 2vw auto;
-   text-align: left;
-   color: var(--color-primary-text);
+  min-height: 400px;
+  position: relative;
+  margin: 2vw auto;
+  text-align: left;
+  color: var(--color-primary-text);
 }
 
 .p-panel {
