@@ -1,9 +1,9 @@
 <template>
   <div class="account" v-if="!userStore.lookingUp">
     <ul class="info">
-      <li>Use this form to register for a Virgo account.</li>
+      <li>Use this form to register for a Library Account.</li>
       <li>It is for people <i>other</i> than students, faculty, and staff of the University of Virginia.</li>
-      <li>A Virgo Account does not grant access to online material.</li>
+      <li>A Library Account does not grant access to online material.</li>
       <li>People with UVA NetBadge accounts should instead <router-link to="/signin">sign in with Netbadge.</router-link></li>
       <li>More information:
         <ul>
