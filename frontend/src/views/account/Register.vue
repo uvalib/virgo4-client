@@ -1,9 +1,23 @@
 <template>
   <div class="account" v-if="!userStore.lookingUp">
-    <p>This form is for community patrons to register for a Virgo account.<br />
-      <a target="_blank" href="https://www.library.virginia.edu/policies/circulation">More information about circulation
-        policies can be found here.</a>
-    </p>
+    <ul class="info">
+      <li>Use this form to register for a Virgo account.</li>
+      <li>It is for people <i>other</i> than students, faculty, and staff of the University of Virginia.</li>
+      <li>A Virgo Account does not grant access to online material.</li>
+      <li>People with UVA NetBadge accounts should instead <router-link to="/signin">sign in with Netbadge.</router-link></li>
+      <li>More information:
+        <ul>
+          <li><a target="_blank" href="https://www.library.virginia.edu/policies/circulation">
+              Circulation Policies
+            </a></li>
+          <li><a target="_blank" href="https://www.library.virginia.edu/services/community-patrons">
+              Community Patron Services
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
     <FormKit type="form" id="account-register" :actions="false" @submit="submitClicked"
       incompleteMessage="Sorry, not all fields are filled out correctly.">
       <FormKit label="First Name" type="text" v-model="userStore.tempAccount.firstName" validation="required" />
@@ -90,6 +104,12 @@ function cancelClicked() {
   margin: 2vw auto;
   text-align: left;
   color: var(--color-primary-text);
+}
+.info{
+  margin: 0 auto;
+  li{
+    padding: 5px 0
+  }
 }
 
 .p-panel {
