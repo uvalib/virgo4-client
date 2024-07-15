@@ -573,11 +573,11 @@ func (svc *ServiceContext) CreateTempAccount(c *gin.Context) {
 	createURL := fmt.Sprintf("%s/v4/users/register", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(createURL, req, c.GetString("jwt"))
 	if ilsErr != nil {
-		log.Printf("Temp account create failed for %s", req.Email)
+		log.Printf("ERROR: Temp account create failed for %s \n %s", req.Email, ilsErr.Message)
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
 	}
-	log.Printf("Temp account created for %s", req.Email)
+	log.Printf("INFO: Temp account created for %s", req.Email)
 	c.String(http.StatusCreated, "Temp account created")
 	return
 
@@ -586,14 +586,21 @@ func (svc *ServiceContext) CreateTempAccount(c *gin.Context) {
 // ActivateTempAccount accepts a user account request and creates a temporary account in Sirsi via ils-connector
 func (svc *ServiceContext) ActivateTempAccount(c *gin.Context) {
 
-	activateURL := fmt.Sprintf("%s/v4/users/activate/%s", svc.ILSAPI, c.Param("code"))
-	_, ilsErr := svc.ILSConnectorGet(activateURL, c.GetString("jwt"), svc.HTTPClient)
-	if ilsErr != nil {
-		log.Printf("Temp account activation failed")
-		c.Redirect(http.StatusUnauthorized, "/signin?activated=false")
+	token := c.Query("token")
+	if token == "" {
+		log.Printf("WARN: missing activation token")
+		c.Redirect(http.StatusFound, "/signin?activated=false")
 		return
 	}
-	log.Printf("Temp account Activated")
+
+	activateURL := fmt.Sprintf("%s/v4/users/activate/%s", svc.ILSAPI, token)
+	_, ilsErr := svc.ILSConnectorGet(activateURL, c.GetString("jwt"), svc.HTTPClient)
+	if ilsErr != nil {
+		log.Printf("WARN: Temp account activation failed")
+		c.Redirect(http.StatusFound, "/signin?activated=false")
+		return
+	}
+	log.Printf("INFO: Temp account activated")
 	c.Redirect(http.StatusFound, "/signin?activated=true")
 	return
 

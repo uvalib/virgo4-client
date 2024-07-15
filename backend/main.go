@@ -133,7 +133,7 @@ func main() {
 		api.POST("/reauth", svc.RefreshAuthentication)
 
 		api.POST("/createTempAccount", svc.AuthMiddleware, svc.CreateTempAccount)
-		api.GET("/activateTempAccount/:code", svc.ActivateTempAccount)
+		api.GET("/activateTempAccount", svc.ActivateTempAccount)
 
 		admin := api.Group("/admin")
 		{
