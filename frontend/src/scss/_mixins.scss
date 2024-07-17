@@ -43,11 +43,13 @@
 
 @mixin primary-button() {
    @include base-button();
-   cursor: pointer;
-   color: #ffffff;
-   background-color: var(--uvalib-brand-blue-light);
-   border: 1px solid var(--uvalib-brand-blue-light);
-   margin: 0 0 5px 10px;
+
+   & {
+      color: #ffffff;
+      background-color: var(--uvalib-brand-blue-light);
+      border: 1px solid var(--uvalib-brand-blue-light);
+   }
+
    &:hover {
       background-color: var(--uvalib-brand-blue-lighter);
       border: 1px solid var(--uvalib-brand-blue-lighter);

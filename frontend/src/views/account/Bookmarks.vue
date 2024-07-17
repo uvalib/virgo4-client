@@ -391,6 +391,17 @@ div.bookmark-folder {
          flex-flow: row wrap;
          justify-content: flex-end;
          gap: 5px 10px;
+         .rename {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: flex-end;
+            align-content: stretch;
+            gap: 10px;
+            input {
+               width: 250px;
+               margin: 0;
+            }
+         }
       }
    }
    .folder-title {
@@ -447,11 +458,12 @@ div.bookmark-folder {
    color: var(--uvalib-grey-dark);
    display: flex;
    flex-flow: row nowrap;
-   align-items: baseline;
+   align-items: stretch;
    justify-content: flex-end;
    gap: 5px 10px;
    input {
       flex-grow: 1;
+      margin:0;
    }
 }
 .create-folder label {

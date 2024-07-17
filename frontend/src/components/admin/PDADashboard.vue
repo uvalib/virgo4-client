@@ -81,14 +81,15 @@ function convertTZ(date) {
       }
    }
    .content.form {
-      h3 {
-         font-weight: normal;
-         font-size: 1.1em;
-      }
       padding: 5px 20px 20px 20px;
       display: flex;
       flex-flow: column;
       justify-content: flex-start;
+
+      h3 {
+         font-weight: normal;
+         font-size: 1.1em;
+      }
       table {
          table-layout: auto;
          border-collapse: collapse;

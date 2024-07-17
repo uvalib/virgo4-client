@@ -360,13 +360,10 @@ onMounted(() =>{
    .subcontent.buttons {
       display: flex;
       flex-flow: row wrap;
-      justify-content: flex-start;
+      justify-content: center;
       align-content: center;
       gap: 10px;
-      button {
-         min-width: 275px;
-         width: 40%;
-      }
+      padding: 10px 0;
    }
 
    .ils-error {
@@ -431,10 +428,20 @@ onMounted(() =>{
    div.requests {
       width: 60%;
    }
+   .subcontent.buttons {
+      button {
+         width: 49%;
+      }
+   }
 }
 @media only screen and (max-width: 768px) {
    div.requests {
       width: 95%;
+   }
+   .subcontent.buttons {
+      button {
+         width: 99%;
+      }
    }
 }
 
