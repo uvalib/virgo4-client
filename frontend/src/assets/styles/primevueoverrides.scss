@@ -60,8 +60,6 @@
             gap: 5px 10px;
             .submit-button button {
                @include primary-button();
-               width: auto;
-               margin-bottom: 0;
             }
          }
       }
