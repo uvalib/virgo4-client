@@ -20,8 +20,8 @@
 
     <FormKit type="form" id="account-register" :actions="false" @submit="submitClicked"
       incompleteMessage="Sorry, not all fields are filled out correctly.">
-      <FormKit label="First Name" type="text" v-model="userStore.tempAccount.firstName" validation="required" />
-      <FormKit label="Last Name" type="text" v-model="userStore.tempAccount.lastName" validation="required" />
+      <FormKit label="First Name" type="text" v-model="userStore.tempAccount.firstName" validation="required|length:2" />
+      <FormKit label="Last Name" type="text" v-model="userStore.tempAccount.lastName" validation="required|length:2" />
       <FormKit label="Phone" type="tel" v-model="userStore.tempAccount.phone" placeholder="###-###-####"
         validation-visibility="blur" validation="required|matches:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/"
         :validation-messages="{ matches: 'Phone number must be in the format ###-###-####'}" />
