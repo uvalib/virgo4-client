@@ -162,7 +162,7 @@ const UVA = definePreset(Aura, {
             borderColor: "var(--uvalib-blue-alt-darkest)",
             color: 'var(--uvalib-text)',
             borderRadius: "0px",
-            padding: "0 10px",
+            padding: "5px 10px",
             gap: '.25rem',
          },
          baseItem: {

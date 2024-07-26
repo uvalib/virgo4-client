@@ -151,6 +151,7 @@ nav.menu.shadow {
 }
 .alert-wrap {
    display: inline-block;
+   position: relative;
    .alert-bell {
       position: relative;
       color: white;
@@ -159,7 +160,8 @@ nav.menu.shadow {
       margin-left:0px;
       font-size: 1.3em;
       display: inline-block;
-      margin: 0 5px 0 5px;
+      margin: 5px;
+      border-radius: 50px;
    }
    .alert-bell.dim {
       opacity: 0.4;
@@ -179,8 +181,8 @@ nav.menu.shadow {
       border-radius: 15px;
       padding: 3px 6px 1px 6px;
       position: absolute;
-      right: 1px;
-      top: 0px;
+      right: -8px;
+      top: -14px;
       cursor: pointer;
    }
    &:focus {
