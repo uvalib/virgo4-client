@@ -174,24 +174,6 @@ address {
    button {
       font-weight: bold;
    }
-   //    background-color: var(--uvalib-brand-orange);
-   //    color: white;
-   //    border: none;
-   //    padding: 10px 12px;
-   //    margin: 0;
-   //    &:hover  {
-   //       background-color: var(--uvalib-grey-light);
-   //       color: var(--uvalib-text-dark);
-   //       border: none;
-   //       box-shadow: none;
-   //       outline: none;
-   //    }
-
-   //    &:focus {
-   //       outline: 2px dotted var(--uvalib-grey-lightest);
-   //       outline-offset: 0.25em;
-   //    }
-   // }
 }
 
 .footer-post-container {

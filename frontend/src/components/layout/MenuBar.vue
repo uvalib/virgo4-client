@@ -182,7 +182,7 @@ nav.menu.shadow {
       padding: 3px 6px 1px 6px;
       position: absolute;
       right: -8px;
-      top: -14px;
+      top: -12px;
       cursor: pointer;
    }
    &:focus {

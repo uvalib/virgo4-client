@@ -7,9 +7,9 @@
                <div class="controls-wrapper">
                   <div class="options">
                      <FormKit v-if="idx > 0" type="select" label="" v-model="term.op" :options="['AND', 'OR', 'NOT']" outer-class="$reset op" />
-                     <FormKit type="select" label="" v-model="term.field" :options="queryStore.advancedFields" outer-class="$reset pad-right"/>
+                     <FormKit type="select" label="" v-model="term.field" :options="queryStore.advancedFields" outer-class="$reset full-width"/>
                      <FormKit v-if="getTermType(term) == 'date'" type="select" label="" v-model="term.comparison"
-                        :options="['EQUAL', 'AFTER', 'BEFORE', 'BETWEEN']" outer-class="$reset pad-right"/>
+                        :options="['EQUAL', 'AFTER', 'BEFORE', 'BETWEEN']" outer-class="$reset"/>
                   </div>
                   <div class="query">
                      <div class="date-criteria" v-if="getTermType(term) == 'date'">
@@ -17,7 +17,7 @@
                            :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
                         />
                         <template v-if="term.comparison == 'BETWEEN'" >
-                              <span v-if="term.comparison == 'BETWEEN'" class="date-sep">and</span>
+                           <span v-if="term.comparison == 'BETWEEN'">and</span>
                            <FormKit label="" type="text" v-model="term.endVal"  outer-class="$reset full-width"
                               :validation-messages="{matches: 'Invalid date'}" :validation="dateValidator"
                            />
@@ -170,35 +170,8 @@ onMounted(()=>{
 </script>
 
 <style lang="scss" scoped>
-:deep(.op) {
-   margin-right: 5px;
-   flex-basis: content;
-}
-:deep(.pad-right) {
-   margin-right: 5px;
-   flex-grow:1;
-}
 :deep(.full-width) {
-   margin: 0 5px 0 0;
-   flex-grow:1;
-}
-:deep(button.v4-form-input.icon) {
-   border: none;
-   padding:0;
-   margin:0 0 0 3px;
-   background: none;
-   &:hover {
-      background-image: none;
-   }
-   .remove {
-      font-size: 1.5em;
-      color: var(--uvalib-red-emergency);
-      margin: 0;
-      padding: 0;
-      &:hover {
-         color: var(--uvalib-red);
-      }
-   }
+   flex-grow: 1;
 }
 .advanced-panel.narrow {
    margin: 0;
@@ -214,25 +187,48 @@ onMounted(()=>{
    .advanced-wrap {
       flex: 1 1 70%;
       margin: 0;
+      :deep(form) {
+         display: flex;
+         flex-direction: column;
+         gap: 15px;
+      }
    }
 
    .search-term {
       display: flex;
       flex-flow: row nowrap;
-      text-align: left;
-      padding: 10px 10px 5px 10px;
-      margin: 0 0 15px 0;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 15px;
+      margin: 0;
       background: var(--uvalib-grey-lightest);
       border: 1px solid var(--uvalib-grey-light);
       width: 100%;
       box-sizing: border-box;
       border-radius: 5px;
 
+      :deep(button.v4-form-input.icon) {
+         border: none;
+         padding: 0;
+         margin: 0;
+         background: none;
+         .remove {
+            font-size: 1.5em;
+            color: var(--uvalib-red-emergency);
+            margin: 0;
+            padding: 0;
+            &:hover {
+               color: var(--uvalib-red);
+            }
+         }
+      }
+
       .controls-wrapper {
          flex-grow: 1;
-      }
-      :deep(.v4-form-input) {
-         margin-bottom: 5px;
+         display: flex;
+         flex-direction: column;
+         gap: 10px;
       }
    }
    .controls {
@@ -240,24 +236,6 @@ onMounted(()=>{
       flex-flow: row wrap;
       justify-content: space-between;
       align-items: center;
-      :deep(.v4-form-label) {
-         display: inline-block;
-         margin: 0 5px 0 0;
-         font-weight: bold;
-      }
-      :deep(.sort) {
-         display: inline-block;
-      }
-      :deep(.right) {
-         margin-left: auto;
-         button {
-            margin:0;
-         }
-      }
-   }
-   .controls.results {
-      justify-content: center;
-      padding-top: 10px;
    }
 }
 
@@ -265,14 +243,14 @@ onMounted(()=>{
    display: flex;
    flex-flow: row nowrap;
    justify-content: space-between;
-   margin-top: 15px;
 }
 
 div.options {
    display: flex;
    flex-flow: row wrap;
    align-items: flex-start;
-   justify-content: space-between;
+   justify-content: flex-start;
+   gap: 10px;
 }
 
 div.query {
@@ -280,19 +258,13 @@ div.query {
       display: flex;
       flex: 1 1 auto;
       flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
       margin-right: 0;
       flex-grow: 1;
-      .date-sep {
-         font-weight: 500;
-         margin: 7px 5px 0 0;
-      }
    }
     .date-hint {
-      font-size:0.8em;
-      font-weight: 100;
-      box-sizing: border-box;
-      margin: 5px 0 5px 0;
-      display: block;
       text-align: left;
    }
 }

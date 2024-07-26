@@ -25,7 +25,6 @@ select,
    -webkit-box-sizing: border-box;
    box-sizing: border-box;
    box-shadow: none;
-   margin-bottom: 0.3em;
 }
 
 button.v4-form-input {
@@ -111,7 +110,6 @@ span.req-label {
    margin: 5px 0;
    color: var(--uvalib-red-emergency);
    text-align: center;
-   margin-top: 20px;
 }
 
 .v4-form-label {
@@ -119,10 +117,9 @@ span.req-label {
    flex-flow: row nowrap;
    justify-content: flex-start;
    align-items: center;
-   margin-bottom: 0.3em;
-   margin-top: 20px;
    color: var(--uvalib-text-dark);
    font-weight: normal;
+   margin-bottom: .3em;
 }
 
 .v4-form-input {
