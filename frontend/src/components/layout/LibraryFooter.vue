@@ -38,7 +38,7 @@
                <li><a href="https://www.library.virginia.edu/renovation/">Renovation</a></li>
                <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
                <li class="give-library">
-                  <VirgoButton @click="giveClicked">GIVE TO THE LIBRARY</VirgoButton>
+                  <VirgoButton @click="giveClicked" severity="contrast">GIVE TO THE LIBRARY</VirgoButton>
                </li>
             </ul>
          </div>
@@ -171,25 +171,27 @@ address {
    font-size: 1.2em;
    margin-top: 25px;
 
-   button.p-button.p-component {
+   button {
       font-weight: bold;
-      background-color: var(--uvalib-brand-orange);
-      color: white;
-      border: none;
-      padding: 10px 12px;
-      margin: 0;
-      &:hover  {
-         background-color: var(--uvalib-grey-light);
-         color: var(--uvalib-text-dark);
-         border: none;
-         box-shadow: none;
-         outline: none;
-      }
-
-      &:focus {
-         @include be-accessible-light();
-      }
    }
+   //    background-color: var(--uvalib-brand-orange);
+   //    color: white;
+   //    border: none;
+   //    padding: 10px 12px;
+   //    margin: 0;
+   //    &:hover  {
+   //       background-color: var(--uvalib-grey-light);
+   //       color: var(--uvalib-text-dark);
+   //       border: none;
+   //       box-shadow: none;
+   //       outline: none;
+   //    }
+
+   //    &:focus {
+   //       outline: 2px dotted var(--uvalib-grey-lightest);
+   //       outline-offset: 0.25em;
+   //    }
+   // }
 }
 
 .footer-post-container {

@@ -4,7 +4,7 @@
    <SessionExpired />
    <AddBookmark />
    <Toast position="top-center" />
-   <ConfirmDialog position="top">
+   <ConfirmDialog position="top" :closable="false">
       <template #message="slotProps">
          <i :class="slotProps.message.icon" style="font-size: 2rem; display: inline-block; margin-right: 20px;"></i>
          <div v-html="slotProps.message.message"></div>
@@ -34,9 +34,9 @@
             @click="dismissAlert(a.uuid)" aria-label="hide alert" icon="pi pi-times" />
       </div>
    </div>
-   <main tabindex="-1" class="v4-content" id="v4-main" role="main">
+   <main id="v4main" role="main">
       <VueAnnouncer />
-      <h1>{{systemStore.pageTitle}}</h1>
+      <h1 id="mainheader">{{systemStore.pageTitle}}</h1>
       <template v-if="configuring==false">
          <div v-if="alertStore.pageAlerts(route.path).length > 0" class="regional-alerts">
             <div v-for="ra in alertStore.pageAlerts(route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
@@ -120,14 +120,14 @@ function scrollHandler( ) {
    if ( window.scrollY <= headerHeight.value ) {
       document.getElementById("v4-navbar").classList.remove("sticky")
       if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0) {
-         document.getElementById("v4-main").style.paddingTop = '0px'
+         document.getElementById("v4main").style.paddingTop = '0px'
       } else {
          alerts.style.paddingTop = '0px'
       }
    } else {
       document.getElementById("v4-navbar").classList.add("sticky")
       if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0 ) {
-         document.getElementById("v4-main").style.paddingTop = `${menuHeight.value}px`
+         document.getElementById("v4main").style.paddingTop = `${menuHeight.value}px`
       } else {
          alerts.style.paddingTop = `${menuHeight.value}px`
       }
@@ -542,7 +542,7 @@ body {
 }
 //adding accessibility for keyboard focus
 #app {
-   #v4-main {
+   #v4main {
       outline: 0;
       &:focus {
          outline: 0;

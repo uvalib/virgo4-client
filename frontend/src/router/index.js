@@ -157,6 +157,11 @@ const router = createRouter({
    scrollBehavior(to, _from, _savedPosition) {
       let noScrollPages = ["home", "search"]
 
+      // dont scroll during skip to nav
+      if ( to.hash == "#v4main") {
+         return false
+      }
+
       // dont alter scroll position on search page
       if (noScrollPages.includes(to.name) && to.fullPath != "/search" ) {
          return false
@@ -212,7 +217,11 @@ router.afterEach((to) => {
          document.title = "Virgo"
       }
    }
-   setFocusID("app")
+
+   // dont refocus to app when using skipto nav
+   if (to.hash != "#v4main") {
+      setFocusID("app")
+   }
 })
 
 router.beforeEach( async (to, _from) => {

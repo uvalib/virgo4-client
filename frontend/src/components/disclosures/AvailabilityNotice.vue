@@ -5,7 +5,7 @@
          <i class="icon fas fa-exclamation-triangle"></i>
       </DisclosureButton>
 
-      <OverlayPanel ref="availability" class="border">
+      <Popover ref="availability" class="border">
          <div class="avail-message-panel">
             <div v-if="hasReserveInfo()" class="message">
                <span>{{mainMessage()}}</span>
@@ -17,13 +17,13 @@
             </div>
             <div v-else class="message" v-html="props.message"></div>
          </div>
-      </OverlayPanel>
+      </Popover>
    </div>
 </template>
 
 <script setup>
 import DisclosureButton from "@/components/disclosures/DisclosureButton.vue"
-import OverlayPanel from 'primevue/overlaypanel'
+import Popover from 'primevue/popover'
 import { ref } from 'vue'
 
 const availability = ref(null)

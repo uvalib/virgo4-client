@@ -1,0 +1,48 @@
+#app {
+   button.p-button {
+      white-space: nowrap;
+   }
+
+   div.p-panel-header {
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      margin-bottom: 10px;
+   }
+
+   div.p-menubar {
+      .p-menubar-root-list {
+         margin-left: auto;
+      }
+      .p-menubar-end {
+         margin-left: inherit;
+      }
+      li.p-menubar-item {
+         div.p-menubar-item-content {
+            padding: 0.75rem 1rem;
+            .p-menubar-item-icon {
+               font-size: 1.2em;
+            }
+            a.p-menubar-item-link {
+               padding: 0;
+            }
+            a {
+               color: white;
+               font-weight: 400;
+               &:hover {
+                  text-decoration: none;
+               }
+            }
+         }
+      }
+   }
+}
+
+.p-dialog-mask {
+   .p-dialog {
+      .p-dialog-header {
+         background: var(--uvalib-teal-lightest);
+         border-bottom: 1px solid var(--uvalib-teal-light);
+         border-radius: 4px 4px 0 0;
+         margin-bottom: 10px;
+      }
+   }
+}
