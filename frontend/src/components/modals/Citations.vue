@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton text @click="showDialog = true" class="text-icon" :aria-label="props.ariaLabel"
+   <VirgoButton text rounded @click="showDialog = true" :aria-label="props.ariaLabel"
       ref="trigger" :class="{toolbar: props.format=='all'}">
       <span>{{ props.buttonLabel }}</span><i class="fas fa-quote-right"></i>
    </VirgoButton>

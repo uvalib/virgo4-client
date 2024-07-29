@@ -1,8 +1,7 @@
 <template>
-   <VirgoButton v-if="system.isKiosk==false" text role="switch" @click="bookmarkClicked"
+   <VirgoButton v-if="system.isKiosk==false" text role="switch" @click="bookmarkClicked" :icon="bookmarkIcon" rounded
       :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
       :class="{checked: bookmarkCount > 0}" >
-      <i class="bookmark-icon" :class="bookmarkIcon"></i>
    </VirgoButton>
 </template>
 

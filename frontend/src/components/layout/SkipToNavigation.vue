@@ -20,7 +20,7 @@
    z-index: 9000;
    transition: transform 100ms;
    box-shadow: $v4-box-shadow-light;
-   width: 180px;
+   width: 200px;
    font-size: 0.9em;
    border: 3px solid white;
    &:focus {

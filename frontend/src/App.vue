@@ -431,18 +431,14 @@ body {
    position: relative;
 }
 
-#app a {
+a {
    color: var(--color-link);
    font-weight: 500;
    text-decoration: none;
-   border-radius: 5px;
-}
-#app a.alt-color-dark {
-   color: var(--color-link-darker);
-}
-#app a:hover {
-   text-decoration: underline;
-   color: var(--uvalib-blue-alt);
+   &:hover {
+      text-decoration: underline;
+      color: var(--uvalib-blue-alt);
+   }
 }
 
 .update-pop {
@@ -527,7 +523,7 @@ body {
    white-space: nowrap;
 }
 //adding accessibility for keyboard focus
-#app {
+
    #v4main {
       outline: 0;
       &:focus {
@@ -538,11 +534,14 @@ body {
       outline: 2px dotted var( --uvalib-accessibility-highlight );
       outline-offset: 3px;
    }
+   a:focus {
+      border-radius: 10px;
+   }
    footer, div.header, nav.menu {
       a:focus {
          outline: 2px dotted var(--uvalib-grey-lightest);
          outline-offset: 3px;
       }
    }
-}
+
 </style>

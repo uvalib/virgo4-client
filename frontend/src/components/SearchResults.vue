@@ -18,14 +18,14 @@
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
-               <VirgoButton v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
+               <button v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
                   @click="poolSelected(r.pool.id)"
                >
                   <span>
                      <div class="pool">{{r.pool.name}}</div>
                      <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
                   </span>
-               </VirgoButton>
+               </button>
                <OtherPoolsPicker  v-if="resultStore.results.length > systemStore.maxPoolTabs" @selected="poolSelected" />
             </div>
             <PoolResultDetail />

@@ -72,10 +72,12 @@ const closeGroupTitle = computed(()=>{
       padding: 10px;
       margin: 5px 0px 5px 0px;
       background-color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: flex-start;
+      justify-content: stretch;
    }
-}
-.group {
-   margin-top: 5px;
 }
 </style>
 

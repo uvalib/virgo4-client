@@ -1,11 +1,11 @@
 <template>
-   <Dropdown v-model="selectedPoolID" :class="{active: selectedPoolID}"
+   <Select v-model="selectedPoolID" :class="{active: selectedPoolID}"
       :options="pools" optionLabel="pool.name" optionValue="pool.id"
       @change="emit('selected', selectedPoolID)"
    >
       <template #value>
          <div v-if="selectedPoolID" class="more-selection">
-            <div>{{ selection.pool.name }}</div>
+            <div class="poolname">{{ selection.pool.name }}</div>
             <div class="total">({{  selection.total }})</div>
          </div>
          <div v-else class="more">More</div>
@@ -18,14 +18,14 @@
             <div v-else class="total">({{slotProps.option.total}})</div>
          </div>
       </template>
-   </Dropdown>
+   </Select>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 import { storeToRefs } from "pinia"
 import * as utils from '../utils'
 
@@ -80,34 +80,50 @@ const poolSkipped = ((p) => {
 </script>
 
 <style scoped lang="scss">
-.p-dropdown.p-component {
+.p-select.p-component {
+   text-align: left;
+   flex: 1 1 auto;
+   padding: 8px 8px 10px 8px;
+   border-radius: 4px 4px 0 0;
+   :deep(span.p-select-label) {
+      font-size: .85em;
+      font-weight: normal;
+      padding: 0;
+      .poolname {
+         color: white;
+      }
+      .total {
+         font-size: 0.9em;
+         color: white
+      }
+   }
    &:hover {
       background: #f6f6f6;
       border-color: var(--uvalib-grey-light);
    }
 }
-.p-dropdown.active {
+.p-select.p-component.active {
    background-color: var(--uvalib-brand-blue);
    color: white;
    border: 1px solid var(--uvalib-brand-blue);
-   :deep(.p-dropdown-trigger) {
+   :deep(.p-select-dropdown) {
       color: white;
    }
 }
 .more-opt {
-   font-size: 0.9em;
    width: 100%;
    display: flex;
    flex-flow: row nowrap;
    justify-content: space-between;
-   gap: 0 20px;
+   gap: 20px;
+   padding: 2px 0;
+   .total {
+      font-size: 0.9em;
+   }
 
    .total.error {
       color: var( --uvalib-text-dark );
       font-weight: bold;
-   }
-   .total {
-      font-size: 0.9em;
    }
 }
 </style>

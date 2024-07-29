@@ -29,18 +29,18 @@
             </div>
          </template>
       </div>
-      <div class="form-controls" >
+      <template #footer>
          <VirgoButton v-if="showSignInMessage || saved || searches.duplicate" severity="secondary" @click="closeDialog">Close</VirgoButton>
          <template v-else>
             <VirgoButton severity="secondary" @click="closeDialog">Cancel</VirgoButton>
             <VirgoButton @click="saveClicked" :disabled="searches.working">Save</VirgoButton>
          </template>
-      </div>
+      </template>
    </Dialog>
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 import { useSearchStore } from "@/stores/search"
 import { useUserStore } from "@/stores/user"
 import { useQueryStore } from "@/stores/query"

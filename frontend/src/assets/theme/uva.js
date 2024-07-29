@@ -115,7 +115,7 @@ const UVA = definePreset(Aura, {
                      activeBackground: 'var(--uvalib-grey-lightest)',
                      color: 'var(--uvalib-text)'
                  },
-               }
+               },
             }
          }
       },
