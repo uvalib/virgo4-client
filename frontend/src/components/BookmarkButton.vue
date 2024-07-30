@@ -100,9 +100,4 @@ const removeBookmark = ( () => {
     border-radius: 5px;
     margin: 0 auto;
 }
-.checked {
-   .bookmark-icon {
-      color: var(--uvalib-brand-blue-light);
-   }
-}
 </style>

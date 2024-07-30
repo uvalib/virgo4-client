@@ -1,15 +1,12 @@
 <template>
    <div class="item-view">
-      <div class="detail-header">
-         <span class="paging" v-if="resultStore.selectedHitIdx > -1">
-            <V4Pager :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
-               :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
-               @next="nextHitClicked" @prior="priorHitClicked"
-            />
-            <div class="back">
-               <VirgoButton link @click="returnToSearch" label="Return to search results" />
-            </div>
-         </span>
+      <div class="detail-controls" v-if="resultStore.selectedHitIdx > -1">
+         <V4Pager
+            :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
+            :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
+            @next="nextHitClicked" @prior="priorHitClicked"
+         />
+         <VirgoButton link @click="returnToSearch" label="Return to search results" />
       </div>
       <div class="details-content">
          <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"  :expand="preferences.expandDetails" from="DETAIL"/>
@@ -262,21 +259,12 @@ const fieldLimit = (( field ) => {
          white-space: normal;
       }
    }
-   .detail-header {
+   .detail-controls {
       display: flex;
-      flex-flow: row wrap;
+      flex-direction: column;
       justify-content: flex-end;
-      align-content: center;
-      padding-bottom: 15px;
-      .paging {
-         display: flex;
-         flex-flow: column;
-         justify-content: flex-end;
-         margin: 0 15px;
-      }
-      .back {
-         margin: 10px 0 5px 0;
-      }
+      align-items: flex-end;
+      padding: 0 10px 5px 0;
    }
    .info {
       margin: 15px 0;

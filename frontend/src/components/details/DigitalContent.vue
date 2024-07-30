@@ -459,7 +459,7 @@ onUnmounted(()=>{
             display: flex;
             flex-flow: row nowrap;
             justify-content: center;
-            align-content: center;
+            align-items: center;
             align-items: center;
             display: block;
             i {
