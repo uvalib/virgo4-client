@@ -42,10 +42,7 @@ const setActive =((option) => {
 
    .option {
       text-align: left;
-      margin: 20px;
-      button {
-         margin: 0;
-      }
+      padding: 20px;
       .desc {
          max-width: 300px;
          padding: 0;

@@ -55,7 +55,6 @@ const itemOptions = computed(() => {
 onMounted(() => {
    if (itemOptions.value.length == 1) {
       selectedItem.value = itemOptions.value[0].value
-      ele = document.getElementById("item-notes")
       setFocusID("item-notes")
    } else {
       setFocusID("item-select")
@@ -75,16 +74,10 @@ div.request-aeon {
    justify-content: space-around;
    align-items: center;
    align-content: space-around;
+   gap: 15px;
 
-   h2 {
-      margin-top: 2em;
-      padding-bottom: 0;
-   }
    .request-footer {
       text-align: center;
-   }
-   p {
-      margin: 20px 0
    }
 }
 </style>

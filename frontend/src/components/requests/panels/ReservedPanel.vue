@@ -21,8 +21,11 @@
 div.reserved {
    position: relative;
    margin: 25px auto 50px auto;
-   width:40%;
+   width: 40%;
    color: var(--uvalib-text);
    text-align: left;
+   p {
+      padding: 5px 0;
+   }
 }
 </style>
