@@ -4,6 +4,25 @@ form.formkit-form {
    justify-content: flex-start;
    align-items: stretch;
    gap: 15px;
+   .scroller, .section, .content {
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: 5px;
+      padding: 5px;
+   }
+}
+
+.form-controls {
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: flex-end;
+   align-items: stretch;
+   margin: 10px 0 0 0;
+   padding: 0;
+   gap: 10px;
 }
 
 input[type=color],
@@ -55,6 +74,19 @@ button.v4-form-input {
    &:focus {
       outline: 1px dashed var(--uvalib-accessibility-highlight);
       outline-offset: 2px;
+   }
+}
+
+.submit-button  {
+   button.v4-form-input {
+      color: #ffffff;
+      background-color: var(--uvalib-brand-blue-light);
+      border: 1px solid var(--uvalib-brand-blue-light);
+      &:hover {
+         background-color: var(--uvalib-brand-blue-lighter);
+         border: 1px solid var(--uvalib-brand-blue-lighter);
+         transition: all 0.3s ease;
+      }
    }
 }
 

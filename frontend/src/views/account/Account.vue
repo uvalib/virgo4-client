@@ -246,7 +246,6 @@ onMounted(() =>{
 .account-group {
    border: 1px solid var(--uvalib-grey);
    margin: 20px 0;
-   box-shadow: $v4-box-shadow-light;
    h2 {
       padding: 12px;
       margin: 0;
@@ -266,8 +265,12 @@ onMounted(() =>{
       }
    }
    .button-bar {
-      padding: 0px 20px;
-      text-align: right;
+      padding: 0 15px;
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-end;
+      align-items: flex-start;
+      gap: 5px;
    }
    .fines-head {
       font-weight: bold;

@@ -5,7 +5,7 @@
          <template v-if="showSignInMessage">
             <p>You must be signed in to save searches.</p>
             <p>
-               <VirgoButton text @click="signInClicked" aria-label="sign in to save search">Sign in now</VirgoButton>
+               <VirgoButton link @click="signInClicked" aria-label="sign in to save search" label="Sign in now" v-focus />
             </p>
          </template>
          <template v-else>
