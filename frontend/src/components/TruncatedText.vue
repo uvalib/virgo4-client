@@ -11,23 +11,18 @@
          >
             <div  v-if="!showFull" :id="`${props.id}-cut`" class="truncated"  aria-live="polite" >
                <span class="text" v-html="truncatedText"></span>
-               <span class="trigger" @click.prevent.stop="toggle">
-                  <span class="more">...&nbsp;More</span>
-               </span>
             </div>
             <div v-else class="full" :id="`${props.id}-full`" aria-live="polite" >
                <span class="text" v-html="props.text"></span>
-               <span class="trigger" @click.prevent.stop="toggle" >
-                  <span class="less">...&nbsp;Less</span>
-               </span>
             </div>
+            <VirgoButton tabindex="-1" link @click="toggle" class="trigger" :label="linkLabel"/>
          </div>
       </template>
    </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { setFocusID } from '@/utils'
 
 const props = defineProps({
@@ -47,6 +42,11 @@ const props = defineProps({
 
 const showFull = ref(false)
 
+const linkLabel = computed( () => {
+   if ( showFull.value) return "...Less"
+   return "...More"
+})
+
 const isTruncated = computed(()=>{
    return props.text != truncatedText.value
 })
@@ -60,7 +60,9 @@ const truncatedText = computed(()=>{
 
 const hide =(() => {
    showFull.value = false
+   nextTick( ()=>{
    setFocusID(`${props.id}-cut`, true)
+   })
 })
 
 const toggle = (() => {
@@ -69,6 +71,9 @@ const toggle = (() => {
    if ( showFull.value == false) {
       tgtID = `${props.id}-cut`
    }
+   nextTick( ()=>{
+   setFocusID(tgtID, true)
+   })
    setFocusID(tgtID)
 })
 </script>
@@ -96,21 +101,17 @@ const toggle = (() => {
       text-align: left;
       width: 100%;
       box-sizing: border-box;
+      border-radius: 4px;
       &:focus {
-         @include be-accessible();
+         outline: 1px dashed var(--uvalib-accessibility-highlight);
+         outline-offset: 2px;
       }
    }
 
-   .more, .less {
-      color: var(--color-link);
-      cursor: pointer;
-      margin-left: 0px !important;
-      font-weight: 500;
-      margin-left: 5px;
+   .trigger {
+      font-size: 0.9em;
    }
-   .more:hover, .less:hover {
-      text-decoration: underline;
-   }
+
 }
 
 </style>

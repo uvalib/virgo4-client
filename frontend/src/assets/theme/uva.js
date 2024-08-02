@@ -116,6 +116,9 @@ const UVA = definePreset(Aura, {
                      color: 'var(--uvalib-text)'
                  },
                },
+               link: {
+                  color: `var(--color-link)`,
+               }
             }
          }
       },

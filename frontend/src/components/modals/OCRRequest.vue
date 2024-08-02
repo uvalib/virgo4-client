@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton class="ocr-button" link @click="ocrClicked" ref="trigger"
+   <VirgoButton link @click="ocrClicked" ref="trigger"
       :aria-label="`dowload full text for ${digitalItem.name}`" label="Download Full Text"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text" @hide="closeDialog" @show="opened">
       <div v-if="mode=='init'" class="searching">
@@ -14,18 +14,21 @@
          <p>
             Please enter your email address below and you will receive an email with the extracted text when it is ready.
          </p>
-         <label>Email:</label>
-         <input @keyup.enter="okClicked" id="email" type="text" v-model="email" aria-required="true" required="required" v-focus/>
+         <div class="email">
+            <label>Email:</label>
+            <input @keyup.enter="okClicked" id="email" type="text" v-model="email" aria-required="true" required="required" v-focus/>
+         </div>
       </div>
       <div class="message" v-else-if="mode=='submitted'">
-         <p><b>Thank you</b>.<br/><br/>Your request has been submitted and you will receive an email when it is ready.</p>
+         <p><b>Thank you.</b></p>
+         <p>Your request has been submitted and you will receive an email when it is ready.</p>
          <p>You do not need to remain on this page.</p>
       </div>
       <p class="error" v-if="error">{{error}}</p>
-      <div class="form-controls" v-if="mode!='init'" >
+      <template #footer v-if="mode!='init'" >
          <VirgoButton v-if="mode != 'submitted'" severity="secondary" @click="closeDialog" label="Cancel"/>
          <VirgoButton @click="okClicked" label="OK"/>
-      </div>
+      </template>
    </Dialog>
 </template>
 
@@ -104,21 +107,11 @@ const okClicked = (async () => {
 </script>
 
 <style lang="scss" scoped>
-.ocr-button {
-   font-size: 0.9em !important;
-   margin-bottom: 10px !important;;
-}
 div.searching {
    text-align: center;
    margin-bottom: 30px;
 }
-label {
-   font-weight: bold;
-   margin-top: 20px;
-   display: inline-block;
-}
 p.error {
-   font-size: 0.9em;
    color: var(--uvalib-red-emergency);
    text-align: center;
    padding: 0;
@@ -127,15 +120,17 @@ p.error {
 .message {
    margin: 0;
    width: 100%;
-   p {
-      margin: 0 0 10px 0;
-   }
-   label {
-      margin-top: 10px;
-   }
-   input {
-      box-sizing: border-box;
-      width:100%;
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   justify-content: flex-start;
+   gap: 10px;
+   .email {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 5px;
    }
 }
 </style>

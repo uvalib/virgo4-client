@@ -30,7 +30,7 @@
                      />
                      <span class="related" v-else-if="field.type=='related-url'">
                         <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
-                           <a :id="`rl-${idx}`" class="link-button" :href="v.url" target="_blank">{{v.label}}</a>
+                           <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" />
                         </div>
                      </span>
                      <span class="copyright" v-else-if="field.type=='copyright'">
@@ -231,22 +231,6 @@ const fieldLimit = (( field ) => {
    div.details-content  {
       width: 95%;
       margin: 0 auto;
-      a.link-button {
-         background-color: var(--uvalib-brand-blue-light);
-         border: 1px solid var(--uvalib-brand-blue-light);
-         color: white !important;
-         padding: .5em 1em;
-         border-radius: 5px;
-         display: inline-block;
-         margin: 0px 5px 5px 0 ;
-
-         &:hover {
-            background-color: var(--uvalib-brand-blue-lighter);
-            border: 1px solid var(--uvalib-brand-blue-lighter);
-            transition: all 0.3s ease;
-            text-decoration: none !important;
-         }
-      }
    }
 
    .ra-box.ra-fiy.pad-top {

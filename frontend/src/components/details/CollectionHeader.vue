@@ -172,39 +172,17 @@ function prevItem() {
    .collection-search {
       display: flex;
       flex-flow: row wrap;
-      // align-items: stretch;
-      justify-content: flex-start;
-      margin: 10px 10px 0 auto;
-      font-size: 0.9em;
-
+      align-items: stretch;
+      justify-content: stretch;
+      margin: 0 10px 0 auto;
+      gap: 5px;
       input[type=text] {
-         padding: 5px 10px;
-         border: 1px solid var(--uvalib-grey);
-         border-right: 0;
-         margin: 0 !important;
-         border-radius: 5px 0 0 5px;
          flex: 1 1 auto;
          min-width: 100px;
-
-      }
-
-      .search, .browse {
-         border-radius: 0 5px 5px 0;
-         margin: 0;
-         padding: 5px 20px;
-      }
-      .search {
-         margin-right: 5px;
-      }
-
-      .browse {
-         border-radius: 5px;
-         padding: 5px 20px;
       }
    }
 
    .cal {
-      font-size: 0.9em;
       text-align: right;
       margin: 0 10px 5px 0;
    }
@@ -213,15 +191,7 @@ function prevItem() {
       flex-flow: row nowrap;
       justify-content: flex-end;
       margin: 5px 10px 10px 0;
-      font-size: 0.9em;
-      button {
-         width: 160px;
-         padding: 5px 20px;
-         margin-left: 5px;
-         .p-button-icon-right {
-            margin: 0;
-         }
-      }
+      gap: 5px;
    }
 }
 

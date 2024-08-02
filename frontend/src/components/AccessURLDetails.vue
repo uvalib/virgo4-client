@@ -102,12 +102,6 @@ function remainingLinks( details ) {
 <style lang="scss" scoped>
 .header.full {
    text-align: left;
-   border-bottom: 1px solid var(--color-brand-blue);
-   border-top: 1px solid var(--color-brand-blue);
-   margin-bottom: 10px;
-}
-span.sep {
-   margin: 0 5px;
 }
 span.provider {
    color: var(--uvalib-grey);
@@ -118,10 +112,9 @@ span.provider {
 }
 
 .links.indent {
-   margin: 0 0 0 10px;
+   margin: 0 0 0 20px;
 }
-.links {
-   padding-top: 5px;
+.links, div.provider {
    word-break: break-word;
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
@@ -135,5 +128,16 @@ span.provider {
 }
 .links.full {
    font-size: 1em;
+}
+.provider-link {
+   display: inline-flex;
+   align-items: center;
+   color: var(--color-link);
+   font-weight: 500 !important;
+   img {
+      height: 55px;
+      width: auto !important;
+      margin: 3px 5px 3px 0;
+   }
 }
 </style>
