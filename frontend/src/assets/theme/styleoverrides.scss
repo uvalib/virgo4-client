@@ -1,3 +1,11 @@
+.viewoption {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
+   gap: 10px;
+}
+
 #app {
    button.p-button {
       white-space: nowrap;

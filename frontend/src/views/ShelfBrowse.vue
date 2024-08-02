@@ -22,33 +22,20 @@
             <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()" aria-label="next shelf" icon="fal fa-arrow-right" label="Next" iconPos="right"/>
          </div>
          <div class="view-mode">
-            <button tabindex="0" class="view" id="view"
-               @click.stop="toggleViewMenu"
-               @keyup.esc="closeViewMenu"
-               @key.down.prevent.stop.enter="toggleViewMenu"
-               @keydown.down.prevent.stop="nextMenu"
-               @keydown.up.prevent.stop="prevMenu"
-               @keyup.down.prevent.stop @keyup.up.prevent.stop
-            >
-               <span class="select-header" aria-haspopup="listbox">
-                  <span v-html="viewMode"></span>
-                  <i class="dd-caret fas fa-caret-down" v-bind:style="{ transform: rotation }"></i>
-               </span>
-               <transition name="grow"
-                  v-on:before-enter="beforeEnter" v-on:enter="enter"
-                  v-on:before-leave="beforeLeave" v-on:leave="leave"
-               >
-                  <ul v-show="viewModeOpen" class="view-menu"  @keydown.space.prevent.stop role="group">
-                     <li v-for="vm in viewModes" :key="vm.id" v-html="vm.title" :id="vm.id"
-                        class="mode-item" tabindex="-1"
-                        @keydown.down.prevent.stop="nextMenu"
-                        @keydown.up.prevent.stop="prevMenu"
-                        @keydown.enter.prevent.stop="selectView(vm.id)"
-                        @click.stop.prevent="selectView(vm.id)">
-                     </li>
-                  </ul>
-               </transition>
-            </button>
+            <Select v-model="currViewMode" :options="viewModes" optionLabel="label" optionValue="code">
+                <template #value="slotProps">
+                  <div class="viewoption">
+                     <i :class="viewIcon"></i>
+                     <div>{{ viewLabel }}</div>
+                  </div>
+               </template>
+               <template #option="slotProps">
+                  <div class="viewoption">
+                     <i :class="slotProps.option.icon"></i>
+                     <div>{{ slotProps.option.label }}</div>
+                  </div>
+               </template>
+            </Select>
          </div>
          <div class="browse-detail" >
             <div class="browse-cards" :class="currViewMode">
@@ -63,34 +50,31 @@
 
 <script setup>
 import BrowseCard from "@/components/details/BrowseCard.vue"
+import Select from 'primevue/select'
 import { ref, onMounted, computed } from 'vue'
 import { useShelfStore } from "@/stores/shelf"
 import { useRoute } from 'vue-router'
 import analytics from '@/analytics'
-import { setFocusID } from '@/utils'
 
 const route = useRoute()
 const shelfStore = useShelfStore()
 
-const viewModes = [ {id: 'gallery', title: "<i class='fas fa-grip-horizontal'></i>&nbsp;View gallery"},
-                    {id: 'list', title: "<i class='fal fa-list'></i>&nbsp;View list"}]
+const viewModes = [  {code: 'gallery', label: "View gallery", icon: "fas fa-grip-horizontal"},
+                     {code: 'list', label: "View list", icon: "fal fa-list"} ]
 const currViewMode = ref('gallery')
-const currFocus = ref('gallery')
-const viewModeOpen = ref(false)
 const origTitle = ref("")
 const origCallNumber = ref("")
 const origID = ref("")
 
-const viewMode = computed(() =>{
-   var m = viewModes.find( vm => vm.id == currViewMode.value)
-   return m.title
+const viewIcon = computed(() =>{
+   var m = viewModes.find( vm => vm.code == currViewMode.value)
+   return m.icon
 })
-const rotation = computed(() =>{
-   if ( viewModeOpen.value ) {
-      return "rotate(180deg)"
-   }
-   return "rotate(0deg)"
+const viewLabel = computed(() =>{
+   var m = viewModes.find( vm => vm.code == currViewMode.value)
+   return m.label
 })
+
 const backURL= computed(() =>{
    return `/sources/${route.params.src}/items/${route.params.id}`
 })
@@ -100,47 +84,6 @@ const firstCall = computed(() =>{
 const lastCall = computed(() =>{
    return shelfStore.browse[shelfStore.browse.length-1].call_number
 })
-
-function selectView( mode ) {
-   currViewMode.value = mode
-   viewModeOpen.value = false
-   setFocusID("view")
-}
-function toggleViewMenu() {
-   viewModeOpen.value = !viewModeOpen.value
-}
-function nextMenu() {
-   if ( !viewModeOpen.value ) {
-      viewModeOpen.value = true
-      currFocus.value = 'gallery'
-   } else {
-      if ( currFocus.value =='gallery' ) {
-         currFocus.value = 'list'
-      } else {
-         currFocus.value = 'gallery'
-      }
-   }
-   focusMenuItem()
-}
-function prevMenu() {
-   if ( !viewModeOpen.value ) {
-      viewModeOpen.value = true
-      currFocus.value = 'list'
-   } else {
-      if ( currFocus.value =='gallery' ) {
-         currFocus.value = 'list'
-      } else {
-         currFocus.value = 'gallery'
-      }
-   }
-   focusMenuItem()
-}
-function focusMenuItem() {
-   setFocusID(currFocus.value)
-}
-function closeViewMenu() {
-   viewModeOpen.value = false
-}
 function isCurrent(idx) {
    let item = shelfStore.browse[idx]
    return item.id == origID.value
@@ -152,18 +95,6 @@ function browseNext() {
 function browsePrior() {
    shelfStore.browsePriorPage()
    analytics.trigger('ShelfBrowse', 'BROWSE_PREV_CLICKED')
-}
-function beforeEnter(el) {
-   el.style.height = '0'
-}
-function enter(el) {
-   el.style.height = el.scrollHeight + 'px'
-}
-function beforeLeave(el) {
-   el.style.height = el.scrollHeight + 'px'
-}
-function leave(el) {
-   el.style.height = '0'
 }
 
 onMounted( async ()=>{
@@ -180,6 +111,7 @@ onMounted( async ()=>{
 })
 
 </script>
+
 <style lang="scss" scoped>
 .shelf-browse {
    min-height: 400px;
@@ -198,12 +130,11 @@ onMounted( async ()=>{
       }
       .label {
          margin-right: 5px;
-
       }
    }
 
    .browse-controls.full {
-      margin: 25px 0 25px 0;
+      margin: 25px 0 15px 0;
       display: flex;
       flex-flow: row wrap;
       justify-content: space-between;
@@ -222,77 +153,10 @@ onMounted( async ()=>{
    .view-mode {
       text-align: right;
       margin-right: 15px;
-      .view {
-         display: inline-block;
-         outline: none;
-         cursor: pointer;
-         border: none;
-         background: transparent;
-         text-align: left;
-         padding: 0 10px;
-         text-align: left;
-         color: var(--uvalib-text);
-
-         .select-header {
-            width: 120px;
-            display: flex;
-            flex-flow: row nowrap;
-            text-align: left;
-            justify-content: space-between;
-            span, i {
-               display: inline-block;
-            }
-
-
-         }
-         position: relative;
-         transition: transform 200ms;
-         display: inline-block;
-         cursor: pointer;
-         padding: 0 5px;
-         &:focus {
-            @include be-accessible();
-         }
-      }
-
-      i.dd-caret {
-         margin-left: 5px;
-         display: inline-block;
-         transition: transform 200ms;
-      }
-      .view-menu {
-         text-align: left;
-         transition: 100ms;
-         list-style: none;
-         padding:10px 0 0 0;
-         margin: 0;
-         border-radius: 0 0 5px 5px;
-         border: 1px solid var(--uvalib-grey-light);
-         position: absolute;
-         z-index: 100;
-         background: white;
-         left:0;
-         right:0;
-         box-shadow: $v4-box-shadow;
-         li {
-            line-height: 35px;
-            padding: 0 10px 0 10px;
-            outline: 0;
-            &:hover {
-               background-color: var(--uvalib-brand-blue-lightest);
-               color: var(--uvalib-text-dark);
-            }
-            &:focus {
-               background-color: var(--uvalib-brand-blue-lightest);
-               color: var(--uvalib-text-dark);
-            }
-         }
-
-      }
    }
 
    .browse-detail {
-      margin: 20px 30px 0 30px;
+      margin: 10px 30px 0 30px;
       padding-top: 5px;
    }
 
@@ -307,6 +171,11 @@ onMounted( async ()=>{
       .browse-card {
          width: 100%;
          margin: 0 auto;
+      }
+      .browse-card.list {
+         :deep(a.title) {
+            margin: 0 0;
+         }
       }
    }
 
