@@ -219,7 +219,7 @@ function onAfterLeave(el) {
 .accordion {
    margin:0;
    font-size: 1em;
-   border-radius: 4px;
+
    h3 {
       font-size: 1em;
       font-weight: normal;
@@ -227,7 +227,7 @@ function onAfterLeave(el) {
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
-      border-radius: 4px;
+
       button {
          flex-grow: 1;
          padding: 0;
@@ -244,14 +244,11 @@ function onAfterLeave(el) {
          }
       }
    }
-   h3.expanded {
-      border-radius: 4px 4px 0 0;
-   }
+
    .accordion-settings {
       padding: 0 10px 10px 10px;
       background: var(--uvalib-grey-lightest);
       border: 1px solid var(--uvalib-grey-light);
-      border-radius: 0 0 5px 5px;
       text-align: right;
    }
 
@@ -291,7 +288,6 @@ function onAfterLeave(el) {
       margin:0;
       padding:0;
       text-align: left;
-      border-radius: 0 0 4px 4px;
    }
 }
 </style>
