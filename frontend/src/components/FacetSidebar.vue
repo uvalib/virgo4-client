@@ -127,7 +127,7 @@ async function filterChanged() {
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;
-   box-shadow: $v4-box-shadow-light;
+   box-shadow: var(--uvalib-box-shadow);
    height: fit-content;
 
    .pool-filter-header, .filter {
@@ -136,11 +136,12 @@ async function filterChanged() {
    .body {
       border-top: 0;
       text-align: left;
-      padding: 10px;
+      padding: 0;
       margin: 0;
       background: white;
       position: relative;
       min-height: 150px;
+      padding: 5px 15px 15px 15px;
       span.cnt {
          margin-left: 5px;
          margin-left: auto;
@@ -160,10 +161,10 @@ dl  {
 }
 dt {
    font-weight: bold;
-   margin-top: 10px;
+   margin: 10px 0 5px 0;
 }
-dt:first-child {
-   margin-top:0;
+.group {
+   margin-bottom: 20px;
 }
 dd {
    cursor: pointer;
@@ -175,9 +176,9 @@ dd {
    padding: 3px 2px;
    margin-left: 15px;
    font-weight: normal;
+   gap: 15px;
 }
 i.check {
-   margin-right: 10px;
    color: var(--uvalib-text);
    font-size: 1.2em;
 }
@@ -201,11 +202,12 @@ i.check {
    align-items: center;
    justify-content: flex-start;
    font-weight: normal;
+   gap: 15px;
 }
 .facet-sidebar.overlay {
    position: fixed;
-   left: 5px;
-   right: 5px;
+   left: 0px;
+   right: 0px;
    z-index: 5000;
    bottom: 0px;
    padding: 0;
@@ -216,7 +218,6 @@ i.check {
    justify-content: space-between;
    margin: 0;
    flex: 1 1 auto;
-   box-shadow: $v4-box-shadow;
 
    .body {
       max-height: 450px;

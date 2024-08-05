@@ -27,6 +27,5 @@ function browsePrior() {
    display: flex;
    flex-flow: row nowrap;
    justify-content: space-between;
-   margin: 10px 0px;
 }
 </style>

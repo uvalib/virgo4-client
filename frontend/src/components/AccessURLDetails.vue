@@ -29,10 +29,7 @@
                </div>
                <div class="links" :class="{full: props.mode=='full', indent: hasProviderInfo}">
                   <div v-for="(l,idx) in providerLinks(p)" :key="`${l.url}-${idx}`">
-                     <a class="link-button" :href="l.url" target="_blank" :aria-label="`access ${props.title} ${l.label} with ${providerLabel(p.provider)}`">
-                        <template v-if="l.label">{{l.label}}</template>
-                        <template v-else>{{l.url}}</template>
-                     </a>
+                     <VirgoButton as="a" :label="linkLabel(l)" :href="l.url" target="_blank" :aria-label="`access ${props.title} ${l.label} with ${providerLabel(p.provider)}`"/>
                   </div>
                   <template v-if="props.mode=='brief' && remainingLinks(p)">
                      <div>see {{remainingLinks(p)}} more on details page</div>
@@ -68,6 +65,11 @@ const props = defineProps({
 
 const poolStore = usePoolStore()
 
+const linkLabel = (( providerLink ) => {
+   if (providerLink.label) return providerLink.label
+   return providerLink.url
+})
+
 function hasProviderInfo(provider) {
    return poolStore.findProvider(props.pool, provider) != null
 }
@@ -100,30 +102,6 @@ function remainingLinks( details ) {
 <style lang="scss" scoped>
 .header.full {
    text-align: left;
-   border-bottom: 1px solid var(--color-brand-blue);
-   border-top: 1px solid var(--color-brand-blue);
-   margin-bottom: 10px;
-}
-.provider {
-   a.link-button {
-      background-color: var(--uvalib-brand-blue-light);
-      border: 1px solid var(--uvalib-brand-blue-light);
-      color: white !important;
-      padding: .5em 1em;
-      border-radius: 5px;
-      display: inline-block;
-      margin: 0px 5px 5px 0 ;
-
-      &:hover {
-         background-color: var(--uvalib-brand-blue-lighter);
-         border: 1px solid var(--uvalib-brand-blue-lighter);
-         transition: all 0.3s ease;
-         text-decoration: none !important;
-      }
-   }
-}
-span.sep {
-   margin: 0 5px;
 }
 span.provider {
    color: var(--uvalib-grey);
@@ -136,12 +114,17 @@ span.provider {
 .links.indent {
    margin: 0 0 0 20px;
 }
-.links {
+.links, div.provider {
    word-break: break-word;
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
    hyphens: auto;
    font-size: 0.9em;
+   display: flex;
+   flex-direction: column;
+   gap: 5px;
+   justify-content: flex-start;
+   align-items: flex-start;
 }
 .links.full {
    font-size: 1em;

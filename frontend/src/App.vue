@@ -4,7 +4,7 @@
    <SessionExpired />
    <AddBookmark />
    <Toast position="top-center" />
-   <ConfirmDialog position="top">
+   <ConfirmDialog position="top" :closable="false">
       <template #message="slotProps">
          <i :class="slotProps.message.icon" style="font-size: 2rem; display: inline-block; margin-right: 20px;"></i>
          <div v-html="slotProps.message.message"></div>
@@ -23,20 +23,22 @@
    </div>
    <div class="alerts-list" v-if="!systemStore.isKiosk" id="alerts">
       <div v-for="a in alertStore.menuAlerts" :key="a.uuid" class="alert" :class="a.severity" :id="a.uuid">
-         <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
-         <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
-         <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
-         <div class="alert-body">
-            <h3 class="lead">{{a.title}}</h3>
-            <span class="alert-text" v-html="a.body"></span>
+         <div class="message">
+            <i v-if="a.severity=='alert1'" class="alert-icon fas fa-exclamation-circle"></i>
+            <i v-if="a.severity=='alert2'" class="alert-icon fas fa-exclamation-triangle"></i>
+            <i v-if="a.severity=='alert3'" class="alert-icon fas fa-info-circle"></i>
+            <div class="alert-body">
+               <h3 class="lead">{{a.title}}</h3>
+               <span class="alert-text" v-html="a.body"></span>
+            </div>
          </div>
-         <VirgoButton v-if="a.severity=='alert2' || a.severity=='alert3'" class="dismiss-alert"
+         <VirgoButton v-if="a.severity=='alert2' || a.severity=='alert3'" severity="secondary" text rounded outlined
             @click="dismissAlert(a.uuid)" aria-label="hide alert" icon="pi pi-times" />
       </div>
    </div>
-   <main tabindex="-1" class="v4-content" id="v4-main" role="main">
+   <main id="v4main" role="main">
       <VueAnnouncer />
-      <h1>{{systemStore.pageTitle}}</h1>
+      <h1 id="mainheader">{{systemStore.pageTitle}}</h1>
       <template v-if="configuring==false">
          <div v-if="alertStore.pageAlerts(route.path).length > 0" class="regional-alerts">
             <div v-for="ra in alertStore.pageAlerts(route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
@@ -120,14 +122,14 @@ function scrollHandler( ) {
    if ( window.scrollY <= headerHeight.value ) {
       document.getElementById("v4-navbar").classList.remove("sticky")
       if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0) {
-         document.getElementById("v4-main").style.paddingTop = '0px'
+         document.getElementById("v4main").style.paddingTop = '0px'
       } else {
          alerts.style.paddingTop = '0px'
       }
    } else {
       document.getElementById("v4-navbar").classList.add("sticky")
       if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0 ) {
-         document.getElementById("v4-main").style.paddingTop = `${menuHeight.value}px`
+         document.getElementById("v4main").style.paddingTop = `${menuHeight.value}px`
       } else {
          alerts.style.paddingTop = `${menuHeight.value}px`
       }
@@ -281,7 +283,6 @@ onUpdated(() => {
    text-align: left;
    color: rgb(35, 45, 75);
    font-family: franklin-gothic-urw, arial, sans-serif;
-   box-shadow: $v4-box-shadow;
 
    .alert {
       padding: .5em;
@@ -291,27 +292,19 @@ onUpdated(() => {
       color: var(--uvalib-text-dark);
       display: flex;
       flex-flow: row nowrap;
-      justify-content: flex-start;
+      justify-content: space-between;
       transition-duration: 200ms;
+      .message {
+         display: flex;
+         flex-flow: row nowrap;
+         justify-content: flex-start;
+         align-items: flex-start;
+         gap: 10px;
+      }
       .alert-icon {
          font-weight: 900;
          font-size: 1.5em;
          padding-top: .25em;
-      }
-      button.dismiss-alert {
-         background: transparent;
-         color: #444;
-         border-radius: 20px;
-         height: 30px;
-         padding: 0;
-         width: 45px;
-         border: 1px solid #444;
-         margin-left: auto;
-         &:hover {
-            border: 1px solid #444;
-            background: rgba(128,128,128,0.2);
-            box-shadow: $v4-box-shadow-light;
-         }
       }
       .alert-body {
          padding-left: 1.25rem;
@@ -438,18 +431,14 @@ body {
    position: relative;
 }
 
-#app a {
+a {
    color: var(--color-link);
    font-weight: 500;
    text-decoration: none;
-   border-radius: 5px;
-}
-#app a.alt-color-dark {
-   color: var(--color-link-darker);
-}
-#app a:hover {
-   text-decoration: underline;
-   color: var(--uvalib-blue-alt);
+   &:hover {
+      text-decoration: underline;
+      color: var(--uvalib-blue-alt);
+   }
 }
 
 .update-pop {
@@ -460,21 +449,14 @@ body {
    background: white;
    padding: 10px;
    border: 4px solid var(--uvalib-brand-orange);
-   box-shadow: $v4-box-shadow;
-   text-align: right;
-   font-size: 0.85em;
    text-align: center;
+   padding: 15px;
+   display: flex;
+   flex-direction: column;
+   gap: 15px;
    .msg {
-      margin-bottom: 10px;
-      font-weight: bold;
+      font-size: 1.2em;
    }
-   button.update {
-      display: block;
-      width: 100% !important;
-      box-sizing: border-box;
-      margin: 0 !important;
-   }
-
 }
 
 @media only screen and (min-width: 768px) {
@@ -541,30 +523,25 @@ body {
    white-space: nowrap;
 }
 //adding accessibility for keyboard focus
-#app {
-   #v4-main {
+
+#v4main {
+   outline: 0;
+   &:focus {
       outline: 0;
-      &:focus {
-         outline: 0;
-      }
    }
+}
+a:focus, input:focus, select:focus, textarea:focus, button.pool:focus, .pre-footer a:focus  {
+   outline: 2px dotted var( --uvalib-accessibility-highlight );
+   outline-offset: 3px;
+}
+a:focus {
+   border-radius: 10px;
+}
+footer, div.header, nav.menu {
    a:focus {
-      @include be-accessible();
-   }
-   footer, div.header, nav.menu {
-      z-index: 500;
-      a:focus {
-         @include be-accessible-light();
-      }
-   }
-   input:focus, select:focus {
-      @include be-accessible();
-   }
-   textarea:focus {
-      @include be-accessible();
+      outline: 2px dotted var(--uvalib-grey-lightest);
+      outline-offset: 3px;
    }
 }
-input:focus, select:focus, textarea:focus {
-   @include be-accessible();
-}
+
 </style>

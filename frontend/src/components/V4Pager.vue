@@ -1,10 +1,10 @@
 <template>
    <span class=v4-pager>
-      <VirgoButton class="small" :disabled="!props.prevAvailable" icon="pi pi-arrow-left" @click="emit('prior')" aria-label="previous result" />
+      <VirgoButton small text rounded :disabled="!props.prevAvailable" icon="pi pi-arrow-left" @click="emit('prior')" aria-label="previous result" />
       <span class="page-info">
          {{$formatNum(props.page)}} of {{$formatNum(props.total)}}
       </span>
-      <VirgoButton class="small" :disabled="!props.nextAvailable" icon="pi pi-arrow-right" @click="emit('next')" aria-label="next result" />
+      <VirgoButton small text rounded :disabled="!props.nextAvailable" icon="pi pi-arrow-right" @click="emit('next')" aria-label="next result" />
    </span>
 </template>
 
@@ -40,13 +40,7 @@ const emit = defineEmits( ['prior', 'next' ] )
    font-size: 16px;
    font-weight: normal;
    color: var( --uvalib-text);
-   margin: 0, 5px ;
-   button.small {
-      margin: 0;
-   }
-   .page-info {
-      margin: 0 10px;
-      font-size: 12px;
-   }
+   gap: 5px;
+   font-size: 0.85em;
 }
 </style>

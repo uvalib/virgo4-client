@@ -183,12 +183,12 @@ const shouldDisplay = ((field) => {
    }
 }
 
-@media only screen and (min-width: $breakpoint-mobile) {
+@media only screen and (min-width: 768px) {
    a.img-link {
       margin-left: auto;
    }
 }
-@media only screen and (max-width: $breakpoint-mobile) {
+@media only screen and (max-width: 768px) {
    .details {
       justify-content: center;
       div.basic {

@@ -4,9 +4,10 @@
          :style="{ background: props.background, color: props.color,
                    borderWidth: props.borderWidth, borderStyle: props.borderStyle,
                    borderColor: props.borderColor }"
+         :class="`${expandedClass}`"
       >
          <button  @click="accordionClicked" @keydown.prevent.enter="accordionClicked" @keydown.space.prevent="accordionClicked"
-            :class="props.layout" class="title accordion-trigger"
+            :class="`${props.layout} title accordion-trigger ${expandedClass}`"
             :aria-expanded="expandedStr"
             :aria-controls="contentID"
             :style="{color: props.color}"
@@ -137,6 +138,10 @@ const slots = useSlots()
 const isExpanded = ref(props.expanded)
 const animationDone = ref(true)
 
+const expandedClass = computed(() => {
+   if ( isExpanded.value) return "expanded"
+   return ""
+})
 const expandedStr = computed(()=>{
    if ( isExpanded.value ) {
       return "true"
@@ -214,6 +219,7 @@ function onAfterLeave(el) {
 .accordion {
    margin:0;
    font-size: 1em;
+
    h3 {
       font-size: 1em;
       font-weight: normal;
@@ -221,29 +227,28 @@ function onAfterLeave(el) {
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
+
       button {
          flex-grow: 1;
          padding: 0;
          background: transparent;
          border: none;
          outline: none;
+         font-size: 1em;
       }
       .settings-btn {
          cursor: pointer;
          margin-right: 5px;
-         &:focus {
-            @include be-accessible();
-         }
          .settings-icon {
             font-size: 1.25em;
          }
       }
    }
+
    .accordion-settings {
       padding: 0 10px 10px 10px;
       background: var(--uvalib-grey-lightest);
       border: 1px solid var(--uvalib-grey-light);
-      border-radius: 0 0 5px 5px;
       text-align: right;
    }
 
@@ -260,9 +265,9 @@ function onAfterLeave(el) {
       font-weight: normal;
       width: 100%;
       &:focus {
-         @include be-accessible();
+         outline: 2px dotted var( --uvalib-accessibility-highlight );
+         outline-offset: 3px;
       }
-
       .accordion-icon {
          font-size: 1.25em;
          transform: rotate(0deg);

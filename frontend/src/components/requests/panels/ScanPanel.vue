@@ -73,6 +73,7 @@ const itemOptions = computed(() => {
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
    if (itemOptions.value.length == 1) {
+      console.log("PUPPY")
       selectedItem.value = itemOptions.value[0].value
       itemSelected()
    }
@@ -103,12 +104,14 @@ onMounted(()=>{
    }
 })
 
-const itemSelected =(() => {
-   scan.value.label = selectedItem.value.label
-   scan.value.barcode = selectedItem.value.barcode
-   scan.value.library = selectedItem.value.library
-   scan.value.location = selectedItem.value.location_id
-   scan.value.callNumber = selectedItem.value.label
+const itemSelected = (() => {
+   if ( selectedItem.value ) {
+      scan.value.label = selectedItem.value.label
+      scan.value.barcode = selectedItem.value.barcode
+      scan.value.library = selectedItem.value.library
+      scan.value.location = selectedItem.value.location_id
+      scan.value.callNumber = selectedItem.value.label
+   }
 })
 
 const submit = (() => {

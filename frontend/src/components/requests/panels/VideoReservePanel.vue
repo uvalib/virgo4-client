@@ -117,6 +117,9 @@ const submit = (() => {
    width: 50%;
    margin: 0 auto;
 
+   .note-important {
+      margin: 5px 0 10px 0;
+   }
    .video-note {
       text-align: left;
       padding: 20px 0;

@@ -40,12 +40,12 @@ analytics.trigger('Navigation', 'NOT_FOUND')
       text-align: left;
    }
 }
-@media only screen and (min-width: $breakpoint-mobile) {
+@media only screen and (min-width: 768px) {
    .info  {
        width: 50%;
    }
 }
-@media only screen and (max-width: $breakpoint-mobile) {
+@media only screen and (max-width: 768px) {
    .info  {
        width: 80%;
    }

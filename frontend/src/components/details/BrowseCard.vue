@@ -4,7 +4,7 @@
       <template v-if="props.mode=='gallery'">
          <div class="thumb-wrap">
             <span v-if="props.data.status=='ready'" class="vertical-spacer"></span>
-            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" aria-hidden="true" tabindex="-1">
+            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" tabindex="-1">
                <template v-if="props.data.status=='ready' || props.data.status=='url'">
                   <img  alt="" class="thumb" v-if="props.data.status=='ready'" :src="props.data.image_base64" />
                   <img  alt="" class="thumb" v-if="props.data.status=='url'" :src="props.data.cover_image_url" />
@@ -109,14 +109,14 @@ const bookmarkClicked = ((id) => {
 }
 .browse-card {
    border: 1px solid var(--uvalib-grey);
-   box-shadow: $v4-box-shadow-light;
-   padding: 0 0 5px 0;
-   margin: 5px;
+   padding: 0;
+   margin: 0;
    position: relative;
    display: flex;
    flex-direction: column;
+   align-items: center;
+   justify-content: stretch;
    font-size: .937em;
-   text-align: center;
    box-sizing: border-box;
    width: auto;
 
@@ -202,15 +202,13 @@ const bookmarkClicked = ((id) => {
          display: block;
          margin-top: 5px;;
       }
-      .listbm {
-         display: inline-block;
-         text-align: right;
-      }
    }
    .details {
       background: white;
       padding: 5px 0;
       height: 230px;
+      width: 100%;
+
       .call, .loc, .title {
          background: white;
          word-break: break-word;
@@ -237,9 +235,6 @@ const bookmarkClicked = ((id) => {
       a.title  {
          font-weight: bold !important;
          margin-bottom: 5px !important;
-         &:focus {
-            @include be-accessible();
-         }
       }
    }
 }
@@ -260,11 +255,6 @@ const bookmarkClicked = ((id) => {
       grid-template-columns: 25px 1fr;
       grid-template-rows: max-content 10px;
       grid-row-gap: 15px;
-   }
-   .listbm {
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
    }
    .bar {
       display: none;

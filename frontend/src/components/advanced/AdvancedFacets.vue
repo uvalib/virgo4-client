@@ -1,8 +1,9 @@
 <template>
    <div class="filter-sidebar" :class="{overlay: !startExpanded}" v-if="resultStore.hasResults == false && !resultStore.searching">
       <div class="filters">
-          <AccordionContent class="filter" id="acc-filter-sidebar"
+          <AccordionContent
             background="var(--uvalib-brand-blue)"
+            borderWidth="1px"
             color="white" :expanded="startExpanded"
             borderColor="var(--uvalib-brand-blue)"
             :invert="!startExpanded">
@@ -14,8 +15,6 @@
 
                <template v-else v-for="filterInfo in filters.preSearchFilters.filter( f=> f.hidden !== true)" :key="filterInfo.id">
                   <AccordionContent
-                     :id="`${filterInfo.id}-acc`"
-                     class="filter-list"
                      background="var(--uvalib-grey-lightest)"
                      borderWidth="1px"
                   >
@@ -77,6 +76,7 @@ const startExpanded = computed(()=> {
    .body {
       max-height: 400px;
       overflow: scroll;
+      border-radius: 0 0 4px 4px;
    }
 }
 .working {
@@ -94,6 +94,7 @@ const startExpanded = computed(()=> {
    font-size: 1.25em;
    font-weight: bold;
 }
+
 .filter-sidebar {
    margin: 0px 25px 15px 0px;
    border-radius: 5px 5px 0 0;
@@ -102,8 +103,8 @@ const startExpanded = computed(()=> {
    display: inline-block;
 
    .filters {
-      outline: 1px solid var(--uvalib-grey-light);
       .body {
+         border: 1px solid var(--uvalib-grey-light);
          border-top: 0;
          text-align: left;
          padding: 10px;
@@ -112,38 +113,28 @@ const startExpanded = computed(()=> {
          position: relative;
          min-height: 80px;
          min-height: 150px;
+         display: flex;
+         flex-direction: column;
+         justify-content: flex-start;
+         align-items: stretch;
+         gap: 10px;
+         border-radius: 0 0 4px 4px;
       }
    }
 }
-.heading {
-   background-color: var(--uvalib-brand-blue);
-   text-align: left;
-   padding: 5px 10px;
-   color: white;
-   display: flex;
-   flex-flow: row nowrap;
-   align-items: center;
-   justify-content: space-between;
-   cursor: pointer;
-}
-.filter-list {
-   margin-bottom: 10px;
-}
 .expanded-item {
-   padding: 3px 0 3px 10px;
+   padding: 10px;
    display: flex;
    flex-flow: row nowrap;
    align-items: center;
    justify-content: flex-start;
    font-weight: normal;
-   border-bottom: 1px solid var(--uvalib-grey-lightest);
-}
-.expanded-item:first-child {
-   margin-top: 10px;
-}
-span.cnt {
-   margin-right: 10px;
-   margin-left: auto;
-   font-size: 0.8em;
+   border: 1px solid var(--uvalib-grey-lightest);
+   border-top: 0;
+   gap: 10px;
+   span.cnt {
+      margin-left: auto;
+      font-size: 0.85em;
+   }
 }
 </style>

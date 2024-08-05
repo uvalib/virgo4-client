@@ -114,6 +114,11 @@ const okClicked = ( async () => {
       margin: 0;
       li {
          margin: 10px 0;
+         display: flex;
+         flex-flow: row nowrap;
+         justify-content: flex-start;
+         align-items: center;
+         gap: 10px;
       }
    }
 }

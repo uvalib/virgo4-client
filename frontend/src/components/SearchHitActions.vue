@@ -1,20 +1,16 @@
 <template>
    <div class="icon-wrap">
-      <template v-if="showCitations">
-         <div class="citation-control">
-            <Citations title="Citations" :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from"
-               :ariaLabel="`citations for ${props.hit.identifier}`">
-            </Citations>
-         </div>
-      </template>
+      <Citations v-if="showCitations" title="Citations" :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from"
+         :ariaLabel="`citations for ${props.hit.identifier}`">
+      </Citations>
       <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
-         <VirgoButton  v-if="!generatePDFInProgress" icon="fal fa-file-pdf" text class="share"
+         <VirgoButton  v-if="!generatePDFInProgress" icon="fal fa-file-pdf" text rounded
             @click="pdfClicked" :aria-label="`download pdf for ${props.hit.header.title}`"/>
          <ve-progress v-if="generatePDFInProgress" :progress="pdfProgress()" :size="32" thickness="10%"
             style="position: absolute; background: white; top:-2px; left: -6px; cursor: default;"/>
       </span>
-      <VirgoButton v-if="from=='DETAIL' || from=='COLLECTION'" icon="fal fa-share-alt" text
-         class="share" @click="shareClicked" :aria-label="`copy link to ${props.hit.header.title}`" />
+      <VirgoButton v-if="from=='DETAIL' || from=='COLLECTION'" icon="fal fa-share-alt" text rounded
+         @click="shareClicked" :aria-label="`copy link to ${props.hit.header.title}`" />
       <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
    </div>
 </template>
@@ -127,10 +123,5 @@ function shareClicked() {
    margin-left: auto;
    justify-content: flex-end;
    align-items: flex-start;
-   gap: 5px;
-
-   button.share {
-      font-size: 1.5em;
-   }
 }
 </style>

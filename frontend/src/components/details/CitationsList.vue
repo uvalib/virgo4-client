@@ -21,7 +21,7 @@
             :ariaLabel="`show Bluebook citation for ${details.header.title}`"/>
       </li>
       <li>
-         <VirgoButton text @click="downloadRISClicked" :aria-label="`download RIS citation for ${details.header.title}`" class="text-icon">
+         <VirgoButton text rounded @click="downloadRISClicked" :aria-label="`download RIS citation for ${details.header.title}`">
             <span>Download RIS</span><i class="fal fa-download"></i>
          </VirgoButton>
       </li>
@@ -52,12 +52,12 @@ const downloadRISClicked = (() => {
 .citations-list {
    padding: 0;
    margin: 0;
+   position: relative;
+   left: -17px;
+   top: -5px;
    li {
       list-style: none;
-      padding: 3px 0;
-      button.ris-button {
-         margin-top: 4px;
-      }
+      padding: 0;
    }
 }
 </style>

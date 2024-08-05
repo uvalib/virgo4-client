@@ -115,6 +115,10 @@ const placeHold = (() => {
 </script>
 
 <style lang="scss" >
+p {
+   padding: 0;
+   margin:0;
+}
 .illiad-prompt {
    margin: 15px 0;
    min-height: initial !important;

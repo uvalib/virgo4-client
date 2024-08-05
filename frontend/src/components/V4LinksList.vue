@@ -1,7 +1,7 @@
 <template>
    <div :id="props.id" class="links-list">
-      <div v-if="props.links.length <= 5 || props.expand == true" class="link-list">
-         <div  v-for="(val,idx) in truncatedLinks" class="link-wrap" :class="{inline: props.inline}"  :key="`${props.id}-${idx}`">
+      <div v-if="props.links.length <= 5 || props.expand == true" class="link-list" :class="{inline: props.inline}" >
+         <div  v-for="(val,idx) in truncatedLinks" class="link-wrap" :key="`${props.id}-${idx}`">
             <span v-if="!props.inline" class="number">{{idx+1}}.</span>
             <router-link :to="val.url" class="link">{{val.label}}</router-link>
             <span v-if="props.inline && idx < truncatedLinks.length-1" class="sep">;</span>
@@ -9,19 +9,19 @@
       </div>
       <div v-else tabindex="0" :aria-expanded="showFull.toString()"
             class="truncated-content" :id="`${props.id}-cut`"
-            @keydown.prevent.stop.enter="toggle"
-            @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
+            @keydown.enter="expand"
+            @keydown.space="expand" @keyup.stop.esc="hide"
       >
-         <div :id="`${props.id}-list`" aria-live="polite">
-            <div v-for="(val,idx) in truncatedLinks" class="link-wrap" :class="{inline: props.inline}" :key="`${props.id}-${idx}`">
+         <div :id="`${props.id}-list`" aria-live="polite" class="truncated-links" :class="{inline: props.inline}">
+            <div v-for="(val,idx) in truncatedLinks" class="link-wrap"  :key="`${props.id}-${idx}`">
                <span v-if="!props.inline" class="number">{{idx+1}}.</span>
                <router-link :to="val.url" class="link" :id="`${props.id}-link-${idx+1}`">{{val.label}}</router-link>
                <span v-if="props.inline && idx < truncatedLinks.length-1" class="sep">;</span>
             </div>
-            <div class="controls">
-               <span tabindex="0" role="button" v-if="!showFull" class="more" @click.prevent.stop="toggle">...More ({{props.links.length}} items)</span>
-               <span tabindex="0" role="button" v-else class="less" @click.prevent.stop="toggle">...Less</span>
-            </div>
+         </div>
+         <div class="controls">
+            <VirgoButton v-if="!showFull" link @click="toggle" class="toggle">...More ({{props.links.length}} items)</VirgoButton>
+            <VirgoButton v-else link @click="toggle" class="toggle" label="...Less"/>
          </div>
       </div>
    </div>
@@ -63,6 +63,14 @@ const hide = (() => {
    showFull.value = false
    setFocusID(props.id+"-cut", true)
 })
+const expand = ((event) => {
+   if (showFull.value == false ) {
+      showFull.value = true
+      setFocusID(`${props.id}-link-1`)
+      event.preventDefault()
+      event.stopPropagation()
+   }
+})
 
 const toggle = (() => {
    showFull.value = !showFull.value
@@ -81,13 +89,6 @@ const toggle = (() => {
          margin-right: 5px;
          display: inline-block;
       }
-      .sep {
-         margin: 0 6px 0 2px;
-         font-weight: bold;
-      }
-   }
-   .link-wrap.inline {
-      display: inline-block;
    }
    .truncated-content {
       display: inline-block;
@@ -103,28 +104,37 @@ const toggle = (() => {
       text-align: left;
       width: 100%;
       box-sizing: border-box;
+      border-radius: 4px;
+      .truncated-links.inline {
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: flex-start;
+         align-items: flex-start;
+         gap: 5px;
+      }
       &:focus {
-         @include be-accessible();
+         outline: 1px dashed var(--uvalib-accessibility-highlight);
+         outline-offset: 2px;
       }
    }
    .controls {
-      text-align: right;
       margin-top: 10px;
-      .more, .less {
-         color: var(--color-link);
-         cursor: pointer;
-         margin-left: 0px;
-         font-weight: 500;
-         margin-left: 5px;
+      display: flex;
+      flex-flow: row wrap;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: 5px;
+      .toggle {
          font-size: 0.9em;
-         &:focus {
-            @include be-accessible();
-         }
-         &:hover {
-            text-decoration: underline;
-         }
       }
    }
+}
+.link-list.inline {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: flex-start;
+   align-items: flex-start;
+   gap: 5px;
 }
 </style>
 

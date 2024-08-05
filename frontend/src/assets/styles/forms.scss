@@ -1,3 +1,29 @@
+form.formkit-form {
+   display: flex;
+   flex-direction: column;
+   justify-content: flex-start;
+   align-items: stretch;
+   gap: 15px;
+   .scroller, .section, .content {
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: 15px;
+      padding: 5px;
+   }
+}
+
+.form-controls {
+   display: flex;
+   flex-flow: row nowrap;
+   justify-content: flex-end;
+   align-items: stretch;
+   margin: 10px 0 0 0;
+   padding: 0;
+   gap: 10px;
+}
 
 input[type=color],
 input[type=date],
@@ -13,6 +39,7 @@ input[type=text],
 input[type=time],
 input[type=url],
 input[type=week],
+input,
 select,
 .v4-form-input {
    padding: 0.5em 0.6em;
@@ -25,24 +52,60 @@ select,
    -webkit-box-sizing: border-box;
    box-sizing: border-box;
    box-shadow: none;
-   margin-bottom: 0.3em;
 }
 
 button.v4-form-input {
-   @include base-button();
+   font-family: inherit;
+   font-size: 100%;
+   padding: 0.5em 1em;
+   text-decoration: none;
+   margin: 0;
+   border-radius: 5px;
+   font-weight: 400;
+   background-color: var(--uvalib-grey-lightest);
+   border: 1px solid var(--uvalib-grey);
+   color: #000;
+   cursor: pointer;
+
+   &:hover {
+      background-image: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(40%, rgba(0, 0, 0, .05)), to(rgba(0, 0, 0, .1)));
+      background-image: linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
+   }
+
+   &:focus {
+      outline: 1px dashed var(--uvalib-accessibility-highlight);
+      outline-offset: 2px;
+   }
+}
+
+.submit-button  {
+   button.v4-form-input {
+      color: #ffffff;
+      background-color: var(--uvalib-brand-blue-light);
+      border: 1px solid var(--uvalib-brand-blue-light);
+      &:hover {
+         background-color: var(--uvalib-brand-blue-lighter);
+         border: 1px solid var(--uvalib-brand-blue-lighter);
+         transition: all 0.3s ease;
+      }
+   }
 }
 
 .formkit-outer[data-type="radio"] {
    margin-top: 20px;
+
    .v4-form-help {
       margin: 5px 0 20px 5px;
    }
+
    fieldset {
       border: 1px solid var(--uvalib-grey-light);
       border-radius: 5px;
+
       legend {
          padding: 0 5px;
       }
+
       ul.formkit-options {
          list-style-type: none;
          padding: 0;
@@ -50,25 +113,29 @@ button.v4-form-input {
          display: flex;
          flex-flow: row wrap;
          justify-content: flex-start;
+
          li {
             margin: 5px 0;
+
             .formkit-inner {
                display: inline-block;
             }
          }
       }
-      .v4-form-label  {
+
+      .v4-form-label {
          display: inline-block;
          margin: 0 20px 0 5px;
       }
    }
- }
+}
 
 span.req {
    margin-left: 5px;
    color: var(--uvalib-grey);
    font-size: 0.8em;
 }
+
 i.req {
    font-size: 0.5em;
    margin-right: 3px;
@@ -76,6 +143,7 @@ i.req {
    top: -2px;
    color: var(--uvalib-grey);
 }
+
 span.req-label {
    color: var(--uvalib-text);
 }
@@ -92,7 +160,6 @@ span.req-label {
    margin: 5px 0;
    color: var(--uvalib-red-emergency);
    text-align: center;
-   margin-top: 20px;
 }
 
 .v4-form-label {
@@ -100,10 +167,9 @@ span.req-label {
    flex-flow: row nowrap;
    justify-content: flex-start;
    align-items: center;
-   margin-bottom: 0.3em;
-   margin-top: 20px;
    color: var(--uvalib-text-dark);
    font-weight: normal;
+   margin-bottom: .3em;
 }
 
 .v4-form-input {

@@ -68,9 +68,6 @@ div.check {
    align-items: center;
    label, input {
       cursor: pointer;
-      &:focus {
-         @include be-accessible();
-      }
    }
 }
 </style>
