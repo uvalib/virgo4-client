@@ -59,34 +59,23 @@ function iiifURL(item) {
 <style lang="scss" scoped>
 .image-container {
    display: grid;
-   grid-template-rows: 30px 1fr;
    justify-items: stretch;
    align-items: stretch;
    position: relative;
    width: fit-content;
-   box-shadow: var(--uvalib-box-shadow);
+   border: 1px solid var(--uvalib-grey-light);
 
    .toolbar {
-      padding: 5px 8px 5px 8px;
-      text-align: left;
+      padding: 10px 5px 10px 10px;
       background: white;
       display: flex;
       flex-flow: row nowrap;
       justify-content: space-between;
       align-items: center;
       height: 100%;
-      z-index: 1;
+      gap: 10px;
       border-bottom: 1px solid var(--uvalib-grey-light);
       cursor: default;
-
-      .group-cnt {
-         font-size: 0.8em;
-         color: var(--uvalib-text);
-      }
-
-      .buttons {
-         margin-left: auto;
-      }
    }
 
    .wrap {
@@ -150,7 +139,6 @@ function iiifURL(item) {
       padding: 10px;
       background: white;
       color: var(--uvalib-text);
-      font-size: 0.9em;
       font-weight: normal;
       display: inline-block;
       width: 100%;

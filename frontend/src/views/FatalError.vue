@@ -22,12 +22,12 @@ const systemStore = useSystemStore()
       text-align: center;
    }
 }
-@media only screen and (min-width: $breakpoint-mobile) {
+@media only screen and (min-width: 768px) {
    .fatal-error  {
        width: 50%;
    }
 }
-@media only screen and (max-width: $breakpoint-mobile) {
+@media only screen and (max-width: 768px) {
    .fatal-error {
        width: 80%;
    }

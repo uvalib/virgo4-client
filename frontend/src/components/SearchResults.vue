@@ -241,13 +241,13 @@ const poolSelected = (( poolID ) => {
    }
 }
 
-@media only screen and (min-width: $breakpoint-mobile) {
+@media only screen and (min-width: 768px) {
    div.search-results {
       margin: 0;
       padding: 0 5vw 20px 5vw;
    }
 }
-@media only screen and (max-width: $breakpoint-mobile) {
+@media only screen and (max-width: 768px) {
    div.search-results {
       margin: 0;
       padding: 0 2vw 20px 2vw;
