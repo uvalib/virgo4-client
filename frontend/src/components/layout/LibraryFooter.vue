@@ -1,9 +1,9 @@
 <template>
-   <div class="pre-footer" v-if="route.name != 'feedback'">
-      This is the newest version of the Library catalog.
-      <a :href="`/feedback?url=${feedbackURL()}`" target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
-   </div>
    <footer role="contentinfo">
+      <div class="pre-footer" v-if="route.name != 'feedback'">
+         This is the newest version of the Library catalog.
+         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
+      </div>
       <div class="footer-container">
          <div class="footer-bucket">
             <h3>Contact Us</h3>

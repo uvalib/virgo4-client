@@ -144,7 +144,7 @@ function prevItem() {
          min-width: 150;
          max-width: 190px;
          max-height: none;
-         box-shadow: $v4-box-shadow-light;
+         box-shadow: var(--uvalib-box-shadow);
       }
    }
    .content {

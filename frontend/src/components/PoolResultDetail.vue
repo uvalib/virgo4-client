@@ -139,7 +139,7 @@ div.pool-header {
    background: var(--uvalib-brand-blue);
    margin: 0 0 1rem 0;
    text-align: left;
-   box-shadow: $v4-box-shadow-light;
+   box-shadow: var(--uvalib-box-shadow);
 }
 .pool-name {
    font-weight: bold;
@@ -175,7 +175,6 @@ div.pool-header {
    background: white;
    padding:35px;
    color: var(--uvalib-text);
-   box-shadow:  $v4-box-shadow-light;
    margin-bottom: 1rem;
 
    span {
@@ -222,7 +221,7 @@ div.pool-header {
 }
 .expand-panel {
    margin: 0px 0 25px 0;
-   box-shadow: $v4-box-shadow-light;
+   box-shadow: var(--uvalib-box-shadow);
    border: 1px solid var(--uvalib-grey-light);
 }
 </style>

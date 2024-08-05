@@ -64,7 +64,7 @@ const copyURL = (( courseID, instructor ) => {
    div.instructor {
       margin: 10px 0 25px 0;
       text-align: left;
-      box-shadow: $v4-box-shadow-light;
+      box-shadow: var(--uvalib-box-shadow);
       h3.value {
          margin: 0;
          padding: 10px;

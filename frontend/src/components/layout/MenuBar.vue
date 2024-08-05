@@ -1,7 +1,5 @@
 <template>
-   <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu"
-      :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
-   >
+   <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu">
       <Menubar :model="v4Menu">
          <template #item="{ label, item, props }">
             <a :href="item.url" :target="item.target" v-bind="props.action">
@@ -128,9 +126,6 @@ const signOut = (() => {
 </script>
 
 <style lang="scss" scoped>
-nav.menu.shadow {
-   box-shadow: $v4-box-shadow;
-}
 .menu-item.notice {
    color: var(--uvalib-yellow);
    margin: 0 0 0 10px;

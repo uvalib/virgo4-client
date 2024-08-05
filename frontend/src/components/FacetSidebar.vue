@@ -127,7 +127,7 @@ async function filterChanged() {
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;
-   box-shadow: $v4-box-shadow-light;
+   box-shadow: var(--uvalib-box-shadow);
    height: fit-content;
 
    .pool-filter-header, .filter {
@@ -136,7 +136,7 @@ async function filterChanged() {
    .body {
       border-top: 0;
       text-align: left;
-      padding: 10px;
+      padding: 0;
       margin: 0;
       background: white;
       position: relative;
@@ -206,8 +206,8 @@ i.check {
 }
 .facet-sidebar.overlay {
    position: fixed;
-   left: 5px;
-   right: 5px;
+   left: 0px;
+   right: 0px;
    z-index: 5000;
    bottom: 0px;
    padding: 0;
@@ -218,7 +218,6 @@ i.check {
    justify-content: space-between;
    margin: 0;
    flex: 1 1 auto;
-   box-shadow: $v4-box-shadow;
 
    .body {
       max-height: 450px;

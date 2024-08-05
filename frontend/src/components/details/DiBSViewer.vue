@@ -55,7 +55,7 @@ if(selectList.length == 1){
 .dibs {
    border: 1px solid var(--uvalib-grey-light);
    padding: 30px;
-   box-shadow: $v4-box-shadow-light;
+   box-shadow: var(--uvalib-box-shadow);
    iframe {
       width: 100%;
       height: 80vh;

@@ -530,7 +530,7 @@ a {
       outline: 0;
    }
 }
-a:focus, input:focus, select:focus, textarea:focus, button.pool:focus {
+a:focus, input:focus, select:focus, textarea:focus, button.pool:focus, .pre-footer a:focus  {
    outline: 2px dotted var( --uvalib-accessibility-highlight );
    outline-offset: 3px;
 }

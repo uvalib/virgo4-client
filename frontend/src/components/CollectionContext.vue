@@ -49,7 +49,7 @@ function collectionPidPicked(pid) {
          margin-right: 15px;
       }
       .thumb.bookplate {
-         box-shadow: $v4-box-shadow-light;
+         box-shadow: var(--uvalib-box-shadow);
       }
       .desc {
          margin-right: 25px;

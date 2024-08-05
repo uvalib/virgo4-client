@@ -389,7 +389,7 @@ onUnmounted(()=>{
          padding: 0;
          border-radius: 3px;
          margin-bottom: 15px;
-         box-shadow: $v4-box-shadow-light;
+         box-shadow: var(--uvalib-box-shadow);
       }
    }
 
@@ -480,7 +480,6 @@ onUnmounted(()=>{
          min-width: 175px;
          min-height: 175px;
          background-color: rgb(252, 252, 252);
-         box-shadow: $v4-box-shadow;
          &:hover {
             box-shadow: 0px 2px 8px 0 #444;
          }

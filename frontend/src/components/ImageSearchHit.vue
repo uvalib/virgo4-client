@@ -64,7 +64,7 @@ function iiifURL(item) {
    align-items: stretch;
    position: relative;
    width: fit-content;
-   box-shadow: $v4-box-shadow-light;
+   box-shadow: var(--uvalib-box-shadow);
 
    .toolbar {
       padding: 5px 8px 5px 8px;
@@ -161,7 +161,7 @@ function iiifURL(item) {
 
 .image-container:hover {
    top: -2px;
-   box-shadow: $v4-box-shadow;
+   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 </style>

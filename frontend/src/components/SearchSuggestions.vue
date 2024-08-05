@@ -84,7 +84,7 @@ h2 {
 .wrapper {
    padding: 10px;
    background-color: white;
-   box-shadow:  $v4-box-shadow-light;
+   box-shadow:  var(--uvalib-box-shadow);
 }
 .note  {
    font-weight: 100;

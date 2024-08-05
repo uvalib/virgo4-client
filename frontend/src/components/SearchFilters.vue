@@ -168,8 +168,7 @@ async function clearClicked() {
             color: var(--uvalib-red);
          }
          &:hover {
-            box-shadow: $v4-box-shadow-light;
-            text-decoration: none;
+            background: #f6f6f6;
          }
       }
    }

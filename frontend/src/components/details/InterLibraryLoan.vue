@@ -158,7 +158,7 @@ onMounted(()=>{
    div.request-content {
       border: 1px solid var(--uvalib-grey-light);
       margin-top: 25px;
-      box-shadow: $v4-box-shadow-light;
+      box-shadow: var(--uvalib-box-shadow);
       padding: 20px;
       position: relative;
       text-align: left;
