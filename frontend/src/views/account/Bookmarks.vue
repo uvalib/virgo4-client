@@ -28,7 +28,7 @@
                   <div class="settings">
                      <h4>Folder Settings</h4>
                      <div class="publish">
-                        <span>
+                        <span class="toggle">
                            <Checkbox v-model="folderInfo.public" :inputId="`folder${folderInfo.id}`" :binary="true"  @change="publicClicked(folderInfo)"
                               :aria-label="`Toggle public visibility of bookmark folder ${folderInfo.folder}`"/>
                            <label :for="`folder${folderInfo.id}`" class="cb-label">Public</label>
@@ -131,7 +131,7 @@ import AccountActivities from "@/components/account/AccountActivities.vue"
 import PrintBookmarks from "@/components/modals/PrintBookmarks.vue"
 import ManageBookmarks from "@/components/modals/ManageBookmarks.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
-import { ref, onMounted, nextTick, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { usePoolStore } from "@/stores/pool"
 import { useUserStore } from "@/stores/user"
@@ -204,7 +204,13 @@ const deleteBookmarksClicked = ((folderInfo) => {
          message: `All selected bookmarks in ${folderInfo.folder} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
          header: 'Confirm Delete',
          icon: 'pi pi-exclamation-triangle',
-         rejectClass: 'p-button-secondary',
+         rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary'
+         },
+         acceptProps: {
+            label: 'Delete'
+         },
          accept: () => {
             bookmarkStore.removeSelectedBookmarks(folderInfo.id, selections.value.map( bm => bm.id))
          }
@@ -218,7 +224,13 @@ const deleteFolderClicked = ((folderInfo) => {
       message: msg,
       header: 'Confirm Delete Folder',
       icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Delete Folder'
+      },
       accept: () => {
          bookmarkStore.removeFolder(folderInfo.id)
          setFocusClass("accordion-trigger")
@@ -458,24 +470,27 @@ div.bookmark-folder {
    color: var(--uvalib-grey-dark);
    display: flex;
    flex-flow: row nowrap;
-   align-items: stretch;
+   align-items: center;
    justify-content: flex-end;
-   gap: 5px 10px;
+   gap: 10px;
    input {
       flex-grow: 1;
       margin:0;
    }
 }
-.create-folder label {
-   font-weight: bold;
-   margin-right: 10px;
-}
+
 .publish {
    display: flex;
    flex-flow: row wrap;
    margin: 15px 0;
    justify-content: space-between;
-
+   .toggle {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
+   }
    .public span {
       font-weight: normal;
    }

@@ -18,7 +18,7 @@
          </div>
          <FormKit type="form" id="video-request" :actions="false" @submit="submitRequest"
             incompleteMessage="Sorry, not all fields are filled out correctly.">
-            <div class="narrow">
+            <div class="general">
                <FormKit type="select" label="Is this request on behalf of an instructor?" v-model="request.onBehalfOf"
                   id="behalf_of" :options="{ no: 'No', yes: 'Yes' }" />
                <template v-if="request.onBehalfOf == 'yes'">
@@ -112,6 +112,9 @@ function submitRequest() {
       margin: 10px 0;
    }
 }
+.course-reserves-request {
+   margin-bottom: 25px;
+}
 .reserves-content {
    margin: 0 auto;
    min-height: 250px;
@@ -129,13 +132,14 @@ function submitRequest() {
       text-align: left;
       padding: 10px 10px 0 10px;
    }
-   .narrow {
-      width: 60%;
-      margin: 25px auto 0 auto;
+   .general {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
    }
    div.items {
       border: 1px solid var(--uvalib-grey-light);
-      margin-top: 35px;
       h3 {
          padding: 5px 10px;
          background-color: var(--uvalib-grey-lightest);
@@ -158,17 +162,16 @@ function submitRequest() {
          font-size: 0.8em;
          border: 1px solid var(--uvalib-grey-light);
          margin: 10px;
-         display: inline-block;
+         display: flex;
+         flex-direction: column;
+         gap: 15px;
          max-width: 275px;
          background: white;
          flex-grow: 1;
-      }
-      div.card .title {
-         font-size:1.1em;
-         font-weight: bold;
-      }
-      div.card .author {
-         margin: 5px 0 10px 10px;
+         div.title {
+            font-size:1.1em;
+            font-weight: bold;
+         }
       }
    }
 }

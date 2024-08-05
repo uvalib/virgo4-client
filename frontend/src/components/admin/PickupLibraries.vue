@@ -69,7 +69,13 @@ const deleteLibrary = ( (library) => {
       message: `Delete pickup library <b>${library.id}</b>?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Delete'
+      },
       accept: () => {
          systemStore.deletePickupLibrary(library)
       }

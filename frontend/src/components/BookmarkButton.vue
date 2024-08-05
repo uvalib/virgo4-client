@@ -69,7 +69,13 @@ const bookmarkClicked = (() => {
       message: `This item is bookmarked in <b>${bookmarkCount.value}</b> folders. Remove all?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Remove Bookmarks',
       icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Remove'
+      },
       accept: () => {
          removeBookmark()
       },
