@@ -237,6 +237,26 @@ const UVA = definePreset(Aura, {
             selectedColor: 'var(--uvalib-text)'
          }
       },
+      tabs: {
+         tab: {
+            background: '#ffffff',
+            hoverBackground: '{surface.100}',
+            activeBackground: 'var(--uvalib-brand-blue)',
+            borderWidth: '1px 1px 1px 1px',
+            activeColor: '#ffffff',
+            activeBorderColor: 'var(--uvalib-brand-blue)',
+         },
+         tabpanel: {
+            background: '#ffffff',
+            color: 'var(--uvalib-text)',
+            padding: '0 0 0 0',
+         },
+         activeBar: {
+            height: '1px',
+            bottom: '-1px',
+            background: 'var(--uvalib-grey-light)'
+        },
+      },
       togglebutton: {
          colorScheme: {
             light: {

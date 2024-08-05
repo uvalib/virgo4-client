@@ -413,7 +413,6 @@ onMounted(() =>{
          border: 1px solid var(--uvalib-grey-lightest);
          background: white;
          padding: 5px 10px;
-         box-shadow: $v4-box-shadow-light;
 
          h3 {
             margin: 0 0 15px 0;

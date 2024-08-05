@@ -132,21 +132,4 @@ p.error {
       margin: 5px;
    }
 }
-//    background: white;
-//    font-size: 0.9em;
-//     div.section {
-//       font-size: 1em;
-//       font-weight: bold;
-//       .section-name {
-//          border-bottom: 1px solid var(--uvalib-grey);
-//          margin: 5px;
-//       }
-//       .pad-top {
-//          margin-top: 10px;
-//       }
-//       .content {
-//          margin-left: 10px;
-//       }
-//    }
-// }
 </style>

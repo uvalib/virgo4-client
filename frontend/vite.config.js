@@ -84,18 +84,10 @@ export default defineConfig({
            additionalData: `
              @use 'sass:math';
              @import "@/scss/_variables.scss";
-             @import "@/scss/_mixins.scss";
           `
        },
       },
     },
-   //  configureWebpack: {
-   //    performance: {
-   //      // bump max sizes to 1024
-   //      maxEntrypointSize: 1024000,
-   //      maxAssetSize: 1024000
-   //    }
-   //  },
 })
 
 

@@ -17,7 +17,7 @@
          </span>
          <span class="checkout-options">
             <VirgoButton v-if="userStore.checkouts.length>0" @click="downloadCSV" icon="fal fa-download"
-               aria-label="Download your checkouts as a CSV file" class="csv"/>
+               aria-label="Download your checkouts as a CSV file" class="csv" size="small"/>
             <VirgoButton @click="renewAll" label="Renew All"/>
          </span>
       </div>
@@ -36,31 +36,31 @@
                </template>
             </h3>
             <dl>
-            <template v-if="co.author.length > 0">
-               <dt>Author:</dt>
-               <dd>{{co.author}}</dd>
-            </template>
-            <dt class="label">Call number:</dt>
-               <dd>{{co.callNumber}}</dd>
-            <dt class="label">Barcode:</dt>
-               <dd>{{co.barcode}}</dd>
-            <template v-if="co.currentLocation.toLowerCase() !== 'checked out'">
-               <dt class="label">Current Location </dt>
-               <dd> <b>{{ co.currentLocation }}</b> </dd>
-            </template>
-            <dt class="label">Due Date:</dt>
-               <dd v-html="formatDueInfo(co)"></dd>
-            <template  v-if="fineIsVisible(co)">
-               <dt class="label">Fine:</dt>
-               <dd class="fine-value">${{co.overdueFee}}</dd>
-            </template>
-            <template v-for="bill, i in co.bills" :key="i">
-               <template v-if="parseFloat(bill.amount) > 0">
-                  <dt v-if="i == 0" class="label" >Bill{{ co.bills.length > 1 ? 's' : '' }}:</dt>
-                  <dt v-else class="label" ></dt>
-                  <dd class="fine-value">{{bill.label}} ${{bill.amount}}</dd>
+               <template v-if="co.author.length > 0">
+                  <dt>Author:</dt>
+                  <dd>{{co.author}}</dd>
                </template>
-            </template>
+               <dt class="label">Call number:</dt>
+                  <dd>{{co.callNumber}}</dd>
+               <dt class="label">Barcode:</dt>
+                  <dd>{{co.barcode}}</dd>
+               <template v-if="co.currentLocation.toLowerCase() !== 'checked out'">
+                  <dt class="label">Current Location </dt>
+                  <dd> <b>{{ co.currentLocation }}</b> </dd>
+               </template>
+               <dt class="label">Due Date:</dt>
+                  <dd v-html="formatDueInfo(co)"></dd>
+               <template  v-if="fineIsVisible(co)">
+                  <dt class="label">Fine:</dt>
+                  <dd class="fine-value">${{co.overdueFee}}</dd>
+               </template>
+               <template v-for="bill, i in co.bills" :key="i">
+                  <template v-if="parseFloat(bill.amount) > 0">
+                     <dt v-if="i == 0" class="label" >Bill{{ co.bills.length > 1 ? 's' : '' }}:</dt>
+                     <dt v-else class="label" ></dt>
+                     <dd class="fine-value">{{bill.label}} ${{bill.amount}}</dd>
+                  </template>
+               </template>
             </dl>
             <div v-if="co.message" class="co-message">
                {{co.message}}
@@ -148,14 +148,54 @@ const fineIsVisible = ((co) => {
       border: 1px solid var(--uvalib-grey);
       background: white;
       padding: 10px;
-      box-shadow: $v4-box-shadow-light;
    }
 
    .checkout-list {
-      padding: 10px;
+      padding: 15px;
       min-height: 65px;
       background: var(--uvalib-grey-lightest);
       text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 15px;
+
+      .item {
+         border: 1px solid var(--uvalib-grey-light);
+         background: white;
+         padding: 0;
+
+         h3 {
+            margin: 0 0 15px 0;
+            padding: 10px;
+            border-bottom: 1px solid var(--uvalib-grey);
+         }
+         .renewbar {
+            text-align: right;
+            padding: 0 15px 15px 15px;
+         }
+         dl {
+            margin: 0 0 0 15px;
+            display: inline-grid;
+            grid-template-columns: max-content 2fr;
+            grid-column-gap: 15px;
+            padding: 10px;
+         }
+         dt {
+            font-weight: bold;
+            text-align: right;
+            margin: 0 0 10px 0;
+         }
+         .co-message {
+            font-size: 1em;
+            padding: 5px 10px;
+            margin-bottom: 15px;
+            background-color: var(--uvalib-red-lightest);
+            font-weight: bold;
+            border-radius: 5px;
+         }
+      }
    }
 
    .controls {
@@ -165,12 +205,14 @@ const fineIsVisible = ((co) => {
       flex-flow: row wrap;
       justify-content: flex-end;
       align-items: center;
-      border-bottom: 3px solid var(--uvalib-blue-alt);
+      border-bottom: 1px solid var(--uvalib-grey-light);
       background: white;
-
-      label {
-         font-weight: 500;
-         margin-right: 10px;
+      .sort {
+         display: flex;
+         flex-flow: row nowrap;
+         justify-content: flex-start;
+         align-items: center;
+         gap: 10px;
       }
 
       .checkout-options {
@@ -178,54 +220,7 @@ const fineIsVisible = ((co) => {
          display: flex;
          flex-flow: row nowrap;
          align-items: center;
-         button.p-button {
-            margin: 0;
-            &.csv {
-               font-size: 1.4em;
-               margin-right: 15px;
-            }
-         }
-      }
-   }
-
-   .item {
-      font-size: 0.9em;
-      margin:15px;
-      border: 1px solid var(--uvalib-grey-lightest);
-      background: white;
-      padding: 5px 10px;
-      box-shadow: $v4-box-shadow-light;
-
-      h3 {
-         margin: 0 0 15px 0;
-         padding: 10px;
-         border-bottom: 2px solid var(--uvalib-grey-light);
-      }
-      .renewbar {
-         text-align: right;
-         padding: 5px;
-         a {
-            font-size: initial;
-         }
-      }
-      dl {
-         margin: 0 0 0 15px;
-         display: inline-grid;
-         grid-template-columns: max-content 2fr;
-         grid-column-gap: 15px;
-      }
-      dt {
-         font-weight: bold;
-         text-align: right;
-         margin: 0 0 10px 0;
-      }
-      .co-message {
-         font-size: 1em;
-         padding: 5px 10px;
-         margin-bottom: 15px;
-         background-color: var(--uvalib-red-lightest);
-         font-weight: bold;
-         border-radius: 5px;
+         gap: 10px;
       }
    }
 }

@@ -225,7 +225,6 @@ const poolSelected = (( poolID ) => {
 
             &:focus {
                z-index: 1;
-               @include be-accessible();
             }
             &:hover {
                background: #f6f6f6;

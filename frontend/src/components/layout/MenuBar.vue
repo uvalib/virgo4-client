@@ -185,9 +185,6 @@ nav.menu.shadow {
       top: -12px;
       cursor: pointer;
    }
-   &:focus {
-      @include be-accessible-light();
-   }
 }
 
 </style>

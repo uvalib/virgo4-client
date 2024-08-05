@@ -7,6 +7,9 @@
 }
 
 #app {
+   button.p-tab {
+      border-radius: 5px 5px 0 0;
+   }
    button.p-button {
       white-space: nowrap;
       .p-button-icon {

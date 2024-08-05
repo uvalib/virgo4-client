@@ -13,19 +13,27 @@
             <div v-if="systemStore.ilsError" class="error">
                {{systemStore.ilsError}}
             </div>
-            <TabView @update:activeIndex="tabSelected" :lazy="true">
-               <TabPanel v-for="tab in checkoutTabs" :key="`cotab-${tab.id}`">
-                  <template #header>
+            <Tabs value="uva" :lazy="true">
+               <TabList>
+                  <Tab  v-for="tab in checkoutTabs" :value="tab.id">
                      <div class="tab-header">
-                        <div class="tab-label">{{ tab.label }}</div>
-                        <V4Spinner v-if="tab.id=='uva' && userStore.lookupUVACheckouts" size="12px"/>
-                        <V4Spinner v-if="tab.id=='ill' && userStore.lookupILLCheckouts" size="12px"/>
+                        <span>{{ tab.label }}</span>
+                        <i v-if="tab.id=='uva' && userStore.lookupUVACheckouts" class="pi pi-spin pi-spinner"></i>
+                        <i v-if="tab.id=='ill' && userStore.lookupILLCheckouts" class="pi pi-spin pi-spinner"></i>
                      </div>
-                  </template>
-                  <UVACheckoutsPanel v-if="visibleTab=='uva'" />
-                  <ILLCheckoutsPanel v-if="visibleTab=='ill'" />
-               </TabPanel>
-            </TabView>
+                  </Tab>
+               </TabList>
+               <TabPanels>
+                  <TabPanel value="uva">
+                     <V4Spinner v-if="userStore.lookupUVACheckouts"  message="Loading UVA Checkouts..."/>
+                     <UVACheckoutsPanel v-else/>
+                  </TabPanel>
+                  <TabPanel value="ill">
+                     <V4Spinner v-if="userStore.lookupILLCheckouts"  message="Loading ILL Checkouts..."/>
+                     <ILLCheckoutsPanel v-else />
+                  </TabPanel>
+               </TabPanels>
+            </Tabs>
          </div>
       </template>
    </div>
@@ -42,26 +50,35 @@ import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
-import TabView from 'primevue/tabview'
+import Tabs from 'primevue/tabs'
+import TabList from 'primevue/tablist'
+import Tab from 'primevue/tab'
+import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 
 const systemStore = useSystemStore()
 const userStore = useUserStore()
 const route = useRoute()
-const visibleTab = ref("uva")
 
 const checkoutTabs = computed(() => {
+   let uvaLbl = `UVA Checkouts (${userStore.checkouts.length})`
+   if (userStore.lookupUVACheckouts) {
+      uvaLbl = "UVA Checkouts"
+   }
+   let illLbl = `ILL Checkouts (${illiadCheckouts.value.length})`
+   if (userStore.lookupUVACheckouts) {
+      illLbl = "ILL Checkouts"
+   }
    return [
-      {id: "uva", label: `UVA Checkouts (${userStore.checkouts.length})`},
-      {id: "ill", label: `ILL Checkouts (${illiadCheckouts.value.length})`},
+      {id: "uva", label: uvaLbl},
+      {id: "ill", label: illLbl},
    ]
 })
+
 const illiadCheckouts = computed(()=>{
    return userStore.requests.illiad.filter( h=> h.transactionStatus == "Checked Out to Customer")
 })
-const tabSelected = ( (idx) => {
-   visibleTab.value = checkoutTabs.value[idx].id
-})
+
 onMounted( () => {
    if ( userStore.isSignedIn ) {
       analytics.trigger('Navigation', 'MY_ACCOUNT', "Checkouts")
@@ -89,12 +106,11 @@ onMounted( () => {
    }
 
    div.tab-header {
-      padding: 5px;
       display: flex;
       flex-flow: row nowrap;
       justify-content: space-between;
-      width: 100%;
       align-items: center;
+      gap: 10px;
    }
 
    .barred, .error {

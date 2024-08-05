@@ -64,19 +64,16 @@ const detailsURL = ((bookmark) => {
 
 <style lang="scss" scoped>
 
-:deep(.p-panel) {
-   margin-bottom: 20px;
-   box-shadow:  $v4-box-shadow-light;
-   .p-panel-header {
-      background: white;
-   }
-}
-
 .public-bookmarks {
    min-height: 400px;
    position: relative;
    margin: 2vw auto 6vw;
    color: var(--uvalib-text);
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   justify-content: flex-start;
+   gap: 15px;
 }
 .bookmarks-content {
    margin: 0 auto;

@@ -524,24 +524,24 @@ a {
 }
 //adding accessibility for keyboard focus
 
-   #v4main {
+#v4main {
+   outline: 0;
+   &:focus {
       outline: 0;
-      &:focus {
-         outline: 0;
-      }
    }
-   a:focus, input:focus, select:focus, textarea:focus {
-      outline: 2px dotted var( --uvalib-accessibility-highlight );
+}
+a:focus, input:focus, select:focus, textarea:focus, button.pool:focus {
+   outline: 2px dotted var( --uvalib-accessibility-highlight );
+   outline-offset: 3px;
+}
+a:focus {
+   border-radius: 10px;
+}
+footer, div.header, nav.menu {
+   a:focus {
+      outline: 2px dotted var(--uvalib-grey-lightest);
       outline-offset: 3px;
    }
-   a:focus {
-      border-radius: 10px;
-   }
-   footer, div.header, nav.menu {
-      a:focus {
-         outline: 2px dotted var(--uvalib-grey-lightest);
-         outline-offset: 3px;
-      }
-   }
+}
 
 </style>

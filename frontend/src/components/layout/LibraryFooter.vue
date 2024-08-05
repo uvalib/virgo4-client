@@ -1,11 +1,9 @@
 <template>
+   <div class="pre-footer" v-if="route.name != 'feedback'">
+      This is the newest version of the Library catalog.
+      <a :href="`/feedback?url=${feedbackURL()}`" target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
+   </div>
    <footer role="contentinfo">
-      <div class="pre-footer" v-if="route.name != 'feedback'">
-         This is the newest version of the Library catalog.
-         <router-link id="feedback"
-            :to="`/feedback?url=${feedbackURL()}`"
-            target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></router-link>
-      </div>
       <div class="footer-container">
          <div class="footer-bucket">
             <h3>Contact Us</h3>
@@ -123,10 +121,6 @@ footer {
    color: var(--uvalib-text-dark);
    padding: 5px 20px;
    margin: -20px -20px 0 -20px;
-
-   #feedback:focus {
-      @include be-accessible();
-   }
 }
 
 .footer-container {

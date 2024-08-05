@@ -10,26 +10,23 @@
          <div v-if="illiadCheckouts.length == 0" class="none">
             You have no ILL checkouts.
          </div>
-         <div v-else>
-            <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
-               <h3 class="item-title">{{co.loanTitle}}</h3>
-               <dl>
-                  <dt>Author:</dt>
-                     <dd>{{co.loanAuthor}}</dd>
-                  <template  v-if="co.callNumber">
-                     <dt class="label">Call number:</dt>
-                        <dd>{{co.callNumber}}</dd>
-                  </template>
-                  <dt class="label">Due Date:</dt>
-                     <dd>{{formatILLDate(co.dueDate)}}</dd>
-
-               </dl>
-               <div class="renewbar" v-if="co.renewalsAllowed">
-                  <a :href="`https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${co.transactionNumber}`" target="_blank">
-                     <span>Renew</span>
-                     <i class="link-icon fal fa-external-link-alt"></i>
-                  </a>
-               </div>
+         <div class="item" v-for="(co,idx) in illiadCheckouts" :key="idx">
+            <h3 class="item-title">{{co.loanTitle}}</h3>
+            <dl>
+               <dt>Author:</dt>
+                  <dd>{{co.loanAuthor}}</dd>
+               <template  v-if="co.callNumber">
+                  <dt class="label">Call number:</dt>
+                     <dd>{{co.callNumber}}</dd>
+               </template>
+               <dt class="label">Due Date:</dt>
+                  <dd>{{formatILLDate(co.dueDate)}}</dd>
+            </dl>
+            <div class="renewbar" v-if="co.renewalsAllowed">
+               <a :href="`https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${co.transactionNumber}`" target="_blank">
+                  <span>Renew</span>
+                  <i class="link-icon fal fa-external-link-alt"></i>
+               </a>
             </div>
          </div>
       </div>
@@ -66,14 +63,46 @@ const formatILLDate = ((dateStr) => {
       border: 1px solid var(--uvalib-grey);
       background:white;
       padding: 10px;
-      box-shadow: $v4-box-shadow-light;
    }
 
    .checkout-list {
-      padding: 10px;
+      padding: 15px;
       min-height: 65px;
-      text-align: left;
       background: var(--uvalib-grey-lightest);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 15px;
+      .item {
+         border: 1px solid var(--uvalib-grey-light);
+         background: white;
+         padding: 0;
+
+         h3 {
+            margin: 0 0 15px 0;
+            padding: 10px;
+            border-bottom: 1px solid var(--uvalib-grey);
+         }
+         .renewbar {
+            text-align: right;
+            padding: 10px;
+            border-bottom: 1px solid var(--uvalib-grey);
+         }
+         dl {
+            margin: 0 0 0 15px;
+            display: inline-grid;
+            grid-template-columns: max-content 2fr;
+            grid-column-gap: 15px;
+            padding: 10px;
+         }
+         dt {
+            font-weight: bold;
+            text-align: right;
+            margin: 0 0 10px 0;
+         }
+      }
    }
 
    .controls {
@@ -83,46 +112,8 @@ const formatILLDate = ((dateStr) => {
       flex-flow: row wrap;
       justify-content: flex-end;
       align-items: center;
-      border-bottom: 3px solid var(--uvalib-blue-alt);
+      border-bottom: 1px solid var(--uvalib-grey-light);
       background: white;
-
-      label {
-         font-weight: 500;
-         margin-right: 10px;
-      }
-   }
-
-   .item {
-      font-size: 0.9em;
-      margin:15px;
-      border: 1px solid var(--uvalib-grey-lightest);
-      background: white;
-      padding: 5px 10px;
-      box-shadow: $v4-box-shadow-light;
-
-      h3 {
-         margin: 0 0 15px 0;
-         padding: 10px;
-         border-bottom: 2px solid var(--uvalib-grey-light);
-      }
-      .renewbar {
-         text-align: right;
-         padding: 5px;
-         a {
-            font-size: initial;
-         }
-      }
-      dl {
-         margin: 0 0 0 15px;
-         display: inline-grid;
-         grid-template-columns: max-content 2fr;
-         grid-column-gap: 15px;
-      }
-      dt {
-         font-weight: bold;
-         text-align: right;
-         margin: 0 0 10px 0;
-      }
    }
 }
 </style>
