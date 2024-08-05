@@ -20,14 +20,14 @@
                <div class="actions">
                   <Checkbox :disabled="editIndex > -1" v-model="pl.enabled" :inputId="`pl${pl.primaryKey}`" :binary="true"  @change="enableClicked(pl)" />
                   <label :for="`pl${pl.primaryKey}`" class="cb-label">Enabled</label>
-                  <VirgoButton :disabled="editIndex > -1" severity="secondary" @click="editClicked(idx, pl)">Edit</VirgoButton>
-                  <VirgoButton :disabled="editIndex > -1" @click="deleteLibrary(pl)" title="Delete pickup library" icon="pi pi-trash"/>
+                  <VirgoButton :disabled="editIndex > -1" severity="secondary" @click="editClicked(idx, pl)" label="Edit" />
+                  <VirgoButton :disabled="editIndex > -1" severity="danger" @click="deleteLibrary(pl)" label="Delete" />
                </div>
             </template>
          </div>
          <div class="row add" v-if="editIndex == systemStore.allPickupLibraries.length">
-            <input class="edit id" v-model="editRec.id" />
-            <input class="edit name" v-model="editRec.name" />
+            <input type="text" class="edit id" v-model="editRec.id" />
+            <input  type="text" class="edit name" v-model="editRec.name" />
             <div class="actions">
                <VirgoButton severity="secondary" @click="cancelClicked">Cancel</VirgoButton>
                <VirgoButton severity="secondary" @click="addConfirmed">Add</VirgoButton>
@@ -124,23 +124,14 @@ const editClicked = ( (idx, rec) => {
 
       .row.add {
          margin-top: 20px;
-         button {
-            font-size: 0.85em;
-            padding: 5px 10px;
-         }
       }
       .row {
          display: flex;
          flex-flow: row nowrap;
          justify-content: flex-start;
-         align-items: center;
+         align-items: stretch;
          margin: 5px 0;
-         input.edit {
-            margin-right: 15px;
-            border: 1px solid var(--uvalib-grey-light);
-            border-radius: 5px;
-            padding: 5px;
-         }
+         gap: 10px;
          input.edit.name {
             width: 100%;
          }
@@ -148,21 +139,12 @@ const editClicked = ( (idx, rec) => {
             width: 150px;
          }
          .actions {
-            margin-left: auto;
             display: flex;
             flex-flow: row nowrap;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            .cb-label {
-               margin-right: 5px;
-            }
-            button {
-               font-size: 0.85em;
-               padding: 5px 10px;
-            }
-            :deep(.p-button-icon) {
-               font-size: 1.4em;
-            }
+            flex-grow: 1;
+            gap: 10px;
          }
       }
    }

@@ -94,7 +94,6 @@ function convertTZ(date) {
          table-layout: auto;
          border-collapse: collapse;
          width: 100%;
-         font-size: 0.8em;
          th, td {
             white-space: nowrap;
             padding: 5px 10px;

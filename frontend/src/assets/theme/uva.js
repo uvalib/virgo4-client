@@ -146,7 +146,7 @@ const UVA = definePreset(Aura, {
                root: {
                   background: '#ffffff',
                   borderColor: 'var(--uvalib-grey)',
-                  padding: '10px 10px',
+                  padding: '15px 15px',
                   borderRadius: '4px',
                },
                header: {

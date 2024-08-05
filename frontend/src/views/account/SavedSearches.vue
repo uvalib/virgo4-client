@@ -26,7 +26,7 @@
                      </router-link>
                   </span>
                   <span class="search-actions">
-                     <VirgoButton @click="deleteSearchClicked(saved)" :aria-label="`Delete search named ${saved.name}`" icon="fal fa-trash-alt"/>
+                     <VirgoButton @click="deleteSearchClicked(saved)" label="Delete" severity="secondary" size="small"/>
                   </span>
                </div>
                <div v-if="saved.public" class="public-controls">
@@ -120,7 +120,13 @@ const deleteSearchClicked = ( (savedSearch) => {
       message: `Delete saved searched named <b>${savedSearch.name}</b>?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Delete'
+      },
       accept: () => {
          searchStore.delete( userStore.signedInUser, savedSearch.id )
       }
@@ -132,7 +138,13 @@ const removeAllClicked = (() => {
       message: `Delete all saved searches?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Delete All',
       icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Delete All'
+      },
       accept: () => {
          searchStore.deleteAll(userStore.signedInUser)
       }
@@ -144,7 +156,13 @@ const clearHistoryClicked = (() => {
       message: `Delete search history?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Clear History',
       icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Clear'
+      },
       accept: () => {
          searchStore.clearHistory(userStore.signedInUser)
       }
@@ -270,8 +288,8 @@ div.saved-search {
    display: flex;
    flex-flow: row nowrap;
    align-items: flex-start;
-   font-size: 1.1em;
    align-items: center;
+   gap: 10px;
 }
 .public-controls {
    display:flex;
@@ -280,6 +298,9 @@ div.saved-search {
    align-items: center;
    gap: 5px 10px;
    margin: 8px 0 8px 45px;
+   .view {
+      margin-right: 10px;
+   }
 }
 div.row {
    border-bottom: 1px solid var(--uvalib-grey-light);
@@ -294,9 +315,8 @@ div.row {
       display: flex;
       flex-flow: row nowrap;
       align-items: flex-start;
-      button {
-         margin: 0;
-      }
+      justify-content: center;
+      gap: 10px;
    }
 }
 span.icon i.fal {
