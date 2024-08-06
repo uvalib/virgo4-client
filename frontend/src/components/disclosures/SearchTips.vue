@@ -1,7 +1,7 @@
 <template>
    <div id="search-tips">
       <DisclosureButton @clicked="clicked">Help me search</DisclosureButton>
-      <OverlayPanel ref="tips" @show="showDisclosure" class="border">
+      <Popover ref="tips" @show="showDisclosure" class="border">
          <div class="tips">
             <p class="section">How to search</p>
             <ul class="dots">
@@ -36,12 +36,12 @@
                <a href="https://guides.lib.virginia.edu/virgo" target="_blank">Learn more about using Virgo</a><i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
             </div>
          </div>
-      </OverlayPanel>
+      </Popover>
    </div>
 </template>
 
 <script setup>
-import OverlayPanel from 'primevue/overlaypanel'
+import Popover from 'primevue/popover'
 import DisclosureButton from "@/components/disclosures/DisclosureButton.vue"
 import analytics from '@/analytics'
 import { ref } from 'vue'

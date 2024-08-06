@@ -18,14 +18,14 @@
          <FacetSidebar />
          <div class="results-main">
             <div class="pool-tabs">
-               <VirgoButton v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
+               <button v-for="(r,idx) in sourceTabs" :key="idx" class="pool" :class="{showing: idx == resultStore.selectedResultsIdx}"
                   @click="poolSelected(r.pool.id)"
                >
                   <span>
                      <div class="pool">{{r.pool.name}}</div>
                      <div :aria-label="`has ${r.total} results`" class="total">({{$formatNum(r.total) || '0'}})</div>
                   </span>
-               </VirgoButton>
+               </button>
                <OtherPoolsPicker  v-if="resultStore.results.length > systemStore.maxPoolTabs" @selected="poolSelected" />
             </div>
             <PoolResultDetail />
@@ -225,7 +225,6 @@ const poolSelected = (( poolID ) => {
 
             &:focus {
                z-index: 1;
-               @include be-accessible();
             }
             &:hover {
                background: #f6f6f6;
@@ -242,13 +241,13 @@ const poolSelected = (( poolID ) => {
    }
 }
 
-@media only screen and (min-width: $breakpoint-mobile) {
+@media only screen and (min-width: 768px) {
    div.search-results {
       margin: 0;
       padding: 0 5vw 20px 5vw;
    }
 }
-@media only screen and (max-width: $breakpoint-mobile) {
+@media only screen and (max-width: 768px) {
    div.search-results {
       margin: 0;
       padding: 0 2vw 20px 2vw;

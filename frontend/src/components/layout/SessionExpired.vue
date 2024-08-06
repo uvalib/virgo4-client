@@ -21,21 +21,6 @@ const dismiss = (() => {
 </script>
 
 <style lang="scss" scoped>
-.message-body {
-   max-height: 55vh;
-   overflow-y: auto;
-   text-align: left;
-   padding: 20px 30px 0 30px;
-   font-weight: normal;
-   opacity: 1;
-   visibility: visible;
-   text-align: center;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-   color: var(--uvalib-primary-text);
-}
 </style>
 
 

@@ -28,7 +28,6 @@ const props = defineProps({
 .v4-progress-bar {
    background: #f5f5f5;
    border: 1px solid var(--uvalib-grey-light);
-   box-shadow: $v4-box-shadow;
    border-radius: 5px;
    padding: 10px;
    box-sizing: border-box;

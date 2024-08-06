@@ -1,8 +1,7 @@
 <template>
-   <VirgoButton v-if="system.isKiosk==false" text role="switch" @click="bookmarkClicked"
+   <VirgoButton v-if="system.isKiosk==false" text role="switch" @click="bookmarkClicked" :icon="bookmarkIcon" rounded
       :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
       :class="{checked: bookmarkCount > 0}" >
-      <i class="bookmark-icon" :class="bookmarkIcon"></i>
    </VirgoButton>
 </template>
 
@@ -70,7 +69,13 @@ const bookmarkClicked = (() => {
       message: `This item is bookmarked in <b>${bookmarkCount.value}</b> folders. Remove all?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Remove Bookmarks',
       icon: 'pi pi-exclamation-triangle',
-      rejectClass: 'p-button-secondary',
+      rejectProps: {
+         label: 'Cancel',
+         severity: 'secondary'
+      },
+      acceptProps: {
+         label: 'Remove'
+      },
       accept: () => {
          removeBookmark()
       },
@@ -100,10 +105,5 @@ const removeBookmark = ( () => {
     color: var(--uvalib-text);
     border-radius: 5px;
     margin: 0 auto;
-}
-.checked {
-   .bookmark-icon {
-      color: var(--uvalib-brand-blue-light);
-   }
 }
 </style>

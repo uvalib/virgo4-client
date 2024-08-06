@@ -47,16 +47,12 @@ function tabNext(event) {
 </script>
 
 <style scoped lang="scss">
-:deep(div.formkit-wrapper.submit-button) {
-   margin-left: 10px;
-}
 .form-controls {
    display: flex;
    flex-flow: row nowrap;
    justify-content: flex-end;
-   margin-top: 5px;
-   text-align: right;
-   padding: 10px 0;
+   align-items: flex-start;
+   gap: 10px;
 }
 .form-controls.center {
    justify-content: center;

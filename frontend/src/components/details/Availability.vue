@@ -170,7 +170,6 @@ function formatValue(val) {
    div.items {
       border: 1px solid var(--uvalib-grey-light);
       margin-top: 25px;
-      box-shadow: $v4-box-shadow-light;
    }
 
    div.value {
@@ -225,7 +224,6 @@ function formatValue(val) {
       font-weight: normal;
       text-align: left;
       border-collapse: collapse;
-      box-shadow: $v4-box-shadow-light;
    }
    table td {
       padding: 4px 5px;

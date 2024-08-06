@@ -15,9 +15,9 @@ import { useSystemStore } from "@/stores/system"
 
 const systemStore = useSystemStore()
 
-function dismiss() {
-   //systemStore.clearMessage()
-}
+const dismiss = (() => {
+   systemStore.clearMessage()
+})
 </script>
 
 <style lang="scss" scoped>

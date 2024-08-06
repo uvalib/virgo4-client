@@ -149,12 +149,17 @@ async function clearClicked() {
       dd {
          font-weight: normal;
          margin: 5px 0 10px 20px;
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: flex-start;
+         align-items: flex-start;
+         gap: 10px;
       }
       button.remove {
          border: 1px solid var(--uvalib-grey-light);
          padding: 2px 15px 2px 3px;
          border-radius: 10px;
-         margin-right: 10px;
+         margin: 0px;
          background: white;
          color: var(--uvalib-text);
          cursor: pointer;
@@ -163,8 +168,7 @@ async function clearClicked() {
             color: var(--uvalib-red);
          }
          &:hover {
-            box-shadow: $v4-box-shadow-light;
-            text-decoration: none;
+            background: #f6f6f6;
          }
       }
    }

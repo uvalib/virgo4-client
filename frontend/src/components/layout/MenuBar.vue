@@ -1,7 +1,5 @@
 <template>
-   <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu"
-      :class="{shadow: alertStore.seenCount>0 && alertStore.menuCount==0 || alertStore.menuCount == 0}"
-   >
+   <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu">
       <Menubar :model="v4Menu">
          <template #item="{ label, item, props }">
             <a :href="item.url" :target="item.target" v-bind="props.action">
@@ -19,15 +17,10 @@
                </router-link>
             </span>
             <span v-if="systemStore.isKiosk == false" class="alert-wrap">
-               <a role="menuitem" id="alertmenu" class="menu-item" :tabindex="alertTabIndex"
-                  @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
-                  @keydown.space.prevent.stop="alertClicked"
-                  aria-label="virgo alerts"
-                  :disabled="alertStore.seenCount==0"
-               >
-                  <i class="alert-bell icon fal fa-bell" :class="{dim: alertStore.seenCount==0}"></i>
-                  <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
-               </a>
+               <VirgoButton icon="alert-bell icon fal fa-bell" text rounded aria-label="virgo alerts"
+                  :class="{dim: alertStore.seenCount==0}"
+                  :disabled="alertStore.seenCount==0"  @click="alertClicked" />
+               <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
             </span>
          </template>
       </Menubar>
@@ -128,9 +121,6 @@ const signOut = (() => {
 </script>
 
 <style lang="scss" scoped>
-nav.menu.shadow {
-   box-shadow: $v4-box-shadow;
-}
 .menu-item.notice {
    color: var(--uvalib-yellow);
    margin: 0 0 0 10px;
@@ -150,41 +140,25 @@ nav.menu.shadow {
    border-radius: 10px;
 }
 .alert-wrap {
-   display: inline-block;
-   .alert-bell {
-      position: relative;
-      color: white;
-      cursor: pointer;
-      display: inline-block;
-      margin-left:0px;
-      font-size: 1.3em;
-      display: inline-block;
-      margin: 0 5px 0 5px;
-   }
-   .alert-bell.dim {
-      opacity: 0.4;
-      cursor: default;
-      &:hover {
-         border-bottom: none;
-      }
+   position: relative;
+   display: block;
+   button.dim {
+      opacity: 0.2;
    }
    .alert-count {
       font-size: 1em;
       font-weight: bold;
-      background: var(--uvalib-yellow);
-      color: var(--uvalib-text-dark);
+      background: var(--color-primary-orange);
+      color: white;
       font-family: sans-serif;
       display: inline-block;
       text-align: center;
-      border-radius: 15px;
-      padding: 3px 6px 1px 6px;
+      border-radius: 40px;
+      padding: 4px 8px;
       position: absolute;
-      right: 1px;
-      top: 0px;
-      cursor: pointer;
-   }
-   &:focus {
-      @include be-accessible-light();
+      right: -11px;
+      top: -7px;
+      cursor: default;
    }
 }
 

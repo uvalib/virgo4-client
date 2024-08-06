@@ -1,6 +1,6 @@
 <template>
    <div class="filters" v-if="resultStore.hasResults == false && !resultStore.searching">
-      <div class="filters-head clearfix">
+      <div class="filters-head">
          <span class="title">Selected Filters</span>
          <FormKit v-if="anyFiltersSet" type="button" @click="clearClicked">Clear all</FormKit>
       </div>
@@ -74,7 +74,6 @@ async function clearClicked() {
    background: white;
    color: var(--uvalib-text);
    padding: 20px 5px 15px 5px;
-   margin: 25px 0 10px 0;
    border-bottom: 1px solid var(--uvalib-grey-light);
    border-top: 1px solid var(--uvalib-grey-light);
    text-align: left;
@@ -85,11 +84,6 @@ async function clearClicked() {
       align-items: flex-start;
       justify-content: space-between;
    }
-   .filters-head {
-      :deep(.v4-form-input) {
-         margin-left: auto;
-      }
-   }
    .filter-display {
       margin: 0;
       dt {
@@ -97,7 +91,7 @@ async function clearClicked() {
       }
       dd {
          font-weight: normal;
-         margin: 5px 0 20px 25px;
+         margin: 5px 0 15px 25px;
       }
       .sep {
          margin-right: 8px;

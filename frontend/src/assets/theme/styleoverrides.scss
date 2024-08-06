@@ -1,0 +1,73 @@
+.viewoption {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
+   gap: 10px;
+}
+
+#app {
+   button.p-tab {
+      border-radius: 5px 5px 0 0;
+   }
+   button.p-button {
+      white-space: nowrap;
+      .p-button-icon {
+         font-size: 1.5em;
+      }
+   }
+   button.p-button.checked {
+      .p-button-icon {
+         color: var(--uvalib-brand-blue-light);
+      }
+   }
+   button.p-button-link {
+      margin: 0;
+      padding: 2px 10px;
+      &:hover {
+         text-decoration: underline;
+      }
+   }
+   a.p-button.p-component {
+      &:hover {
+         text-decoration: none;
+      }
+   }
+
+   div.p-panel-header {
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      margin-bottom: 10px;
+   }
+
+   div.p-menubar {
+      border-bottom: 3px solid #232D4B;
+      div.p-menubar-item-content a {
+         &:hover {
+            text-decoration: none;
+            color: var(--uvalib-text);
+         }
+      }
+   }
+}
+
+div.p-select-overlay.p-component {
+   background: white;
+   padding: 0;
+   border: 1px solid var(--uvalib-grey-light);
+   border-radius: 4px;
+   .p-select-option.p-select-option-selected, .p-select-option.p-select-option-selected.focus {
+      background: var(--uvalib-blue-alt-light);
+      color: var(--uvalib-text);
+   }
+}
+
+.p-dialog-mask {
+   .p-dialog {
+      .p-dialog-header {
+         background: var(--uvalib-teal-lightest);
+         border-bottom: 1px solid var(--uvalib-teal-light);
+         border-radius: 4px 4px 0 0;
+         margin-bottom: 20px;
+      }
+   }
+}

@@ -113,33 +113,10 @@ const detailClicked = (() => {
          color: var( --uvalib-grey );
       }
    }
-   .icon-wrap {
-      display: flex;
-      flex-flow: row nowrap;
-      margin-left: auto;
-      align-content: center;
-      i.share {
-         color: #444;
-         cursor: pointer;
-         font-size: 1.4em;
-         display: inline-block;
-         box-sizing: border-box;
-         margin-right: 5px;
-         padding:0;
-         &:hover {
-            color:var(--uvalib-brand-blue-light);
-         }
-      }
-   }
-   .citation-control {
-      padding: 5px;
-   }
 }
 
 .author-wrapper {
    text-align: left;
-   padding-left: 40px;
-   padding-top: 5px;
-   padding-bottom: 10px;
+   padding:0 0 0 40px;
 }
 </style>

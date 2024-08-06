@@ -1,15 +1,12 @@
 <template>
    <div class="item-view">
-      <div class="detail-header">
-         <span class="paging" v-if="resultStore.selectedHitIdx > -1">
-            <V4Pager :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
-               :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
-               @next="nextHitClicked" @prior="priorHitClicked"
-            />
-            <div class="back">
-               <VirgoButton link @click="returnToSearch" label="Return to search results" />
-            </div>
-         </span>
+      <div class="detail-controls" v-if="resultStore.selectedHitIdx > -1">
+         <V4Pager
+            :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
+            :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
+            @next="nextHitClicked" @prior="priorHitClicked"
+         />
+         <VirgoButton link @click="returnToSearch" label="Return to search results" />
       </div>
       <div class="details-content">
          <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"  :expand="preferences.expandDetails" from="DETAIL"/>
@@ -33,7 +30,7 @@
                      />
                      <span class="related" v-else-if="field.type=='related-url'">
                         <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
-                           <a :id="`rl-${idx}`" class="link-button" :href="v.url" target="_blank">{{v.label}}</a>
+                           <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" />
                         </div>
                      </span>
                      <span class="copyright" v-else-if="field.type=='copyright'">
@@ -234,22 +231,6 @@ const fieldLimit = (( field ) => {
    div.details-content  {
       width: 95%;
       margin: 0 auto;
-      a.link-button {
-         background-color: var(--uvalib-brand-blue-light);
-         border: 1px solid var(--uvalib-brand-blue-light);
-         color: white !important;
-         padding: .5em 1em;
-         border-radius: 5px;
-         display: inline-block;
-         margin: 0px 5px 5px 0 ;
-
-         &:hover {
-            background-color: var(--uvalib-brand-blue-lighter);
-            border: 1px solid var(--uvalib-brand-blue-lighter);
-            transition: all 0.3s ease;
-            text-decoration: none !important;
-         }
-      }
    }
 
    .ra-box.ra-fiy.pad-top {
@@ -262,21 +243,12 @@ const fieldLimit = (( field ) => {
          white-space: normal;
       }
    }
-   .detail-header {
+   .detail-controls {
       display: flex;
-      flex-flow: row wrap;
+      flex-direction: column;
       justify-content: flex-end;
-      align-content: center;
-      padding-bottom: 15px;
-      .paging {
-         display: flex;
-         flex-flow: column;
-         justify-content: flex-end;
-         margin: 0 15px;
-      }
-      .back {
-         margin: 10px 0 5px 0;
-      }
+      align-items: flex-end;
+      padding: 0 10px 5px 0;
    }
    .info {
       margin: 15px 0;

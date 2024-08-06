@@ -16,7 +16,7 @@
             </template>
             <template v-if="results.suggestions.length > 2 && moreVisible == false">
                <span class="sep">|</span>
-               <VirgoButton text @click="moreClicked" class="more">Show More...</VirgoButton>
+               <VirgoButton link @click="moreClicked" class="more">Show More...</VirgoButton>
             </template>
             <template  v-if="results.suggestions.length > 2 && moreVisible == true">
                <template v-for="(s,idx) in results.suggestions.slice(2)"  :key="`sugest${idx+2}`">
@@ -29,7 +29,7 @@
                   </router-link>
                </template>
                <span class="sep">|</span>
-               <VirgoButton text @click="lessClicked" class="more">Show Fewer...</VirgoButton>
+               <VirgoButton link @click="lessClicked" class="more">Show Fewer...</VirgoButton>
             </template>
          </div>
       </div>
@@ -84,7 +84,7 @@ h2 {
 .wrapper {
    padding: 10px;
    background-color: white;
-   box-shadow:  $v4-box-shadow-light;
+   box-shadow:  var(--uvalib-box-shadow);
 }
 .note  {
    font-weight: 100;
@@ -99,12 +99,12 @@ h2 {
    flex-flow: row wrap;
    justify-content: flex-start;
    align-items: center;
-}
-.sep {
-   margin: 0 5px;
+   gap: 10px;
 }
 button.more {
    font-style: italic;
    font-weight: 100;
+   padding: 2px 0 !important;
+   font-size:0.99em;
 }
 </style>

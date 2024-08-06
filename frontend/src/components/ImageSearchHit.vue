@@ -59,75 +59,27 @@ function iiifURL(item) {
 <style lang="scss" scoped>
 .image-container {
    display: grid;
-   grid-template-rows: 30px 1fr;
    justify-items: stretch;
    align-items: stretch;
    position: relative;
    width: fit-content;
-   box-shadow: $v4-box-shadow-light;
+   border: 1px solid var(--uvalib-grey-light);
 
    .toolbar {
-      padding: 5px 8px 5px 8px;
-      text-align: left;
+      padding: 10px 5px 10px 10px;
       background: white;
       display: flex;
       flex-flow: row nowrap;
       justify-content: space-between;
       align-items: center;
       height: 100%;
-      z-index: 1;
+      gap: 10px;
       border-bottom: 1px solid var(--uvalib-grey-light);
       cursor: default;
-
-      .group-cnt {
-         font-size: 0.8em;
-         color: var(--uvalib-text);
-      }
-
-      .buttons {
-         margin-left: auto;
-      }
    }
 
    .wrap {
       position: relative;
-      .advisory {
-         position: absolute;
-         top:0;
-         left:0;
-         width:100%;
-         height: 100%;
-         background-color: #2B2B2B;
-         opacity: 0.9;
-         .message {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translate(0, -50%);
-            width: 100%;
-            span.icon {
-               display: block;
-               width: 34px;
-               height: 34px;
-               color: white;
-               background-image: url('@/assets/eye-slash-white.svg');
-               background-repeat:no-repeat;
-               background-position: center center;
-            }
-            span {
-               font-family: "franklin-gothic-urw", arial, sans-serif;
-               -webkit-font-smoothing: antialiased;
-               -moz-osx-font-smoothing: grayscale;
-               padding: 0;
-               color: white;
-               font-size: 17px;
-               font-weight: 500;
-               display: block;
-               margin: 10px auto;
-               text-align: center;
-            }
-         }
-      }
    }
 
    .img-link {
@@ -150,7 +102,6 @@ function iiifURL(item) {
       padding: 10px;
       background: white;
       color: var(--uvalib-text);
-      font-size: 0.9em;
       font-weight: normal;
       display: inline-block;
       width: 100%;
@@ -161,7 +112,7 @@ function iiifURL(item) {
 
 .image-container:hover {
    top: -2px;
-   box-shadow: $v4-box-shadow;
+   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 </style>

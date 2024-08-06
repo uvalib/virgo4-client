@@ -1,11 +1,17 @@
 <template>
    <div class="welcome">
-      <h3 class="borders">Welcome to the newest version of the Virgo catalog</h3>
-      <p>Virgo delivers high-quality search results through an easy-to-use interface that works on any device.</p>
-      <p>You can use Virgo to conduct research, make requests, find and create Course Reserves, organize and share bookmarks, and set personal preferences for your own use of the system.</p>
-      <template v-if="systemStore.isKiosk == false">
-         <p><b>Need assistance?</b> <a href="https://www.library.virginia.edu/askalibrarian/">Ask a Librarian</a> web chat is happy to help with questions large and small.</p>
-      </template>
+      <h3 class="borders">
+         Virgo is the Library catalog, where you can find books, articles, and more.
+      </h3>
+      <p>
+         You can use Virgo to make requests, find and create course reserves, organize and share bookmarks, and set personal preferences for your own use of the system.
+      </p>
+      <p  v-if="systemStore.isKiosk == false">
+         Or, find
+            <a href="https://guides.lib.virginia.edu/az.php" _targtet="_blank">databases</a>,
+            <a href="https://guides.lib.virginia.edu/" _targtet="_blank">subject guides</a>, and
+            <a href="https://guides.lib.virginia.edu/journalfinder" _targtet="_blank">journals</a>.
+      </p>
    </div>
 </template>
 
@@ -16,26 +22,28 @@ const systemStore = useSystemStore()
 
 <style scoped lang="scss">
 @media only screen and (min-width: 768px) {
-  .welcome {
-     width: 60%;
-     padding-bottom:25px;
-  }
+   .welcome {
+      width: 50%;
+      padding-bottom: 25px;
+   }
 }
+
 @media only screen and (max-width: 768px) {
-  .welcome {
-     width: 90%;
-  }
+   .welcome {
+      width: 90%;
+   }
 }
+
 h3.borders {
    border-bottom: 1px solid var(--uvalib-grey-light);
    border-top: 1px solid var(--uvalib-grey-light);
    margin: 0;
    padding: 5px 0;
 }
+
 .welcome {
    margin: 10px auto 50px auto;
    text-align: left;
-   color: var(  --uvalib-text);
+   color: var(--uvalib-text);
 }
-
 </style>

@@ -3,7 +3,7 @@
       label="Calendar" icon="fal fa-calendar-alt" iconPos="right" class="calendar"/>
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened">
-      <Calendar v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
+      <DatePicker v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
          :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @month-change="monthChanged" @update:model-value="datePicked"/>
       <div class="error">
          {{error}}
@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import Calendar from 'primevue/calendar'
+import DatePicker from 'primevue/datepicker'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { ref,computed } from 'vue'

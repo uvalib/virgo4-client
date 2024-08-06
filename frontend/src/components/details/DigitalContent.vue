@@ -59,27 +59,18 @@
                         <img v-if="item.thumbnail" :src="item.thumbnail"/>
                         <span class="label">{{item.name}}</span>
                         <span v-if="generatePDFInProgress(item)" class="label">PDF generating...</span>
-                        <span v-else class="link" tabindex="0"
-                           @click.stop="pdfClicked(item)"
-                           @keyup.stop.enter="pdfClicked(item)"
-                           @keydown.space.prevent.stop="pdfClicked(item)"
-                           :aria-label="`download pdf for ${item.name}`"
-                        >
-                           Download PDF
-                        </span>
+                        <VirgoButton text link label="Download PDF" @click="pdfClicked(item)"
+                           :aria-label="`download pdf for ${item.name}`" />
                         <OCRRequest v-if="user.isSignedIn && item.ocr || item.ocr && item.ocr.status == 'READY'"
                            :dcIndex="digitalContentIndex(item)"
                            @ocr-started="ocrStarted(item)"
                         />
-                        <span class="link" tabindex="0"
-                           @click.stop="viewerClicked(item)"
-                           @keyup.stop.enter="viewerClicked(item)"
-                           @keydown.space.prevent.stop="viewerClicked(item)"
-                           :aria-label="`open ${item.name} in viewer`"
-                        >
+                        <span v-if="isCurrent(item)" class="opened">
                            <i v-if="isCurrent(item)" class="fas fa-check-circle"></i>
-                           Open in Viewer
+                           Opened in Viewer
                         </span>
+                        <VirgoButton v-else text link label="Open in Viewer" @click="viewerClicked(item)"
+                           :aria-label="`open ${item.name} in viewer`" />
                      </div>
                   </div>
                </ScrollPanel>
@@ -384,9 +375,6 @@ onUnmounted(()=>{
          z-index: 20000;
          right: 5px;
          top: 100px;
-         button {
-            border-color: var(--uvalib-brand-blue-lightest);
-         }
       }
    }
 
@@ -401,24 +389,18 @@ onUnmounted(()=>{
          padding: 0;
          border-radius: 3px;
          margin-bottom: 15px;
-         box-shadow: $v4-box-shadow-light;
+         box-shadow: var(--uvalib-box-shadow);
       }
    }
 
    div.items {
       margin: 25px 0 0 0;
       h2.buttons {
-
-         span {
-            display: block;
-         }
-         button.small {
-            border-radius: .25rem;
-            font-size: .85rem;
-            padding: .5rem 1rem;
-            display: block;
-            margin: 10px auto 0 auto;
-         }
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: flex-start;
+         gap: 10px;
       }
 
       .download-card.current {
@@ -426,50 +408,29 @@ onUnmounted(()=>{
       }
       .download-card {
          position: relative;
-         display: inline-block;
-         text-align: center;
-         margin: 5px;
          border: 1px solid var(--uvalib-grey-light);
          padding: 15px 10px 10px 10px;
-         box-shadow: $v4-box-shadow-light;
          cursor: pointer;
          min-width: 175px;
          background: white;
+         display: flex;
+         flex-direction: column;
+         align-items: stretch;
+         justify-content: flex-start;
+         gap: 10px;
+
          &:hover {
             top: -2px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
          }
-
-         &:focus {
-            @include be-accessible();
-         }
-
-         span.label  {
-            display: block;
-            font-weight: 500;
-            font-size:0.9em;
-            margin: 10px 0;
-         }
-         span.link {
-            color: var(--color-link);
-            font-size:0.9em;
-            display: block;
-            font-weight: 500;
-            margin: 5px 0 10px 0;
+         .opened {
             display: flex;
             flex-flow: row nowrap;
-            justify-content: center;
-            align-content: center;
             align-items: center;
-            display: block;
+            justify-content: space-between;
             i {
-               display: inline-block;
-            }
-            &:hover {
-               text-decoration: underline;
-            }
-             &:focus {
-               @include be-accessible();
+               font-size: 1.25em;
+               color: var(--uvalib-green);
             }
          }
       }
@@ -519,7 +480,6 @@ onUnmounted(()=>{
          min-width: 175px;
          min-height: 175px;
          background-color: rgb(252, 252, 252);
-         box-shadow: $v4-box-shadow;
          &:hover {
             box-shadow: 0px 2px 8px 0 #444;
          }
@@ -538,9 +498,10 @@ onUnmounted(()=>{
    display: flex;
    flex-flow: row nowrap;
    justify-content: flex-start;
-   align-items: flex-start;
+   align-items: stretch;
    padding: 0;
    margin-top: 15px;
+   gap: 10px;
 }
 
 :deep(.pdf) {

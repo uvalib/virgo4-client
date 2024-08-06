@@ -21,6 +21,9 @@ app.use(pinia)
 app.use(formatDatePlugin)
 app.use(formatNumPlugin)
 
+// global custom components
+app.component('V4Spinner', V4Spinner)
+app.component('V4FormActions', V4FormActions)
 
 // add a directive that can be used to autofocus and a plugin that can sefelt set focus
 app.directive('focus', {
@@ -42,30 +45,34 @@ const dc = defaultConfig({
 })
 app.use(plugin, dc)
 
-app.component('V4Spinner', V4Spinner)
-app.component('V4FormActions', V4FormActions)
-
-import './assets/styles/forms.scss'
-import './assets/styles/uva-colors.css'
-
-import '@fortawesome/fontawesome-pro/css/all.css'
-
+// announcer
 import VueAnnouncer from '@vue-a11y/announcer'
 import '@vue-a11y/announcer/dist/style.css'
 app.use(VueAnnouncer, { router })
 
+// styles
+import './assets/styles/forms.scss'
+import '@fortawesome/fontawesome-pro/css/all.css'
+import 'primeicons/primeicons.css'
+
+
 // Primevue setup
 import PrimeVue from 'primevue/config'
+import UVA from './assets/theme/uva'
 import Button from 'primevue/button'
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
 
-import 'primevue/resources/themes/saga-blue/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeicons/primeicons.css'
-import './assets/styles/primevueoverrides.scss'
+app.use(PrimeVue, {
+   theme: {
+      preset: UVA,
+      options: {
+         prefix: 'p',
+         darkModeSelector: '.virgo-dark'
+      }
+   }
+})
 
-app.use(PrimeVue)
 app.use(ToastService)
 app.use(ConfirmationService)
 app.component("VirgoButton", Button) // Override the default name of primevue Button to VirgoButton (later renae to v4button)

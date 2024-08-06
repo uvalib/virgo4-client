@@ -2,9 +2,7 @@
    <footer role="contentinfo">
       <div class="pre-footer" v-if="route.name != 'feedback'">
          This is the newest version of the Library catalog.
-         <router-link id="feedback"
-            :to="`/feedback?url=${feedbackURL()}`"
-            target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></router-link>
+         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
       </div>
       <div class="footer-container">
          <div class="footer-bucket">
@@ -38,7 +36,7 @@
                <li><a href="https://www.library.virginia.edu/renovation/">Renovation</a></li>
                <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
                <li class="give-library">
-                  <VirgoButton @click="giveClicked">GIVE TO THE LIBRARY</VirgoButton>
+                  <VirgoButton @click="giveClicked" severity="contrast">GIVE TO THE LIBRARY</VirgoButton>
                </li>
             </ul>
          </div>
@@ -123,10 +121,6 @@ footer {
    color: var(--uvalib-text-dark);
    padding: 5px 20px;
    margin: -20px -20px 0 -20px;
-
-   #feedback:focus {
-      @include be-accessible();
-   }
 }
 
 .footer-container {
@@ -171,24 +165,8 @@ address {
    font-size: 1.2em;
    margin-top: 25px;
 
-   button.p-button.p-component {
+   button {
       font-weight: bold;
-      background-color: var(--uvalib-brand-orange);
-      color: white;
-      border: none;
-      padding: 10px 12px;
-      margin: 0;
-      &:hover  {
-         background-color: var(--uvalib-grey-light);
-         color: var(--uvalib-text-dark);
-         border: none;
-         box-shadow: none;
-         outline: none;
-      }
-
-      &:focus {
-         @include be-accessible-light();
-      }
    }
 }
 

@@ -127,17 +127,11 @@ onMounted(()=>{
       flex-flow: row nowrap;
       overflow: hidden;
       justify-content: center;
-      align-content: stretch;
+      align-items: stretch;
       list-style-type: none;
+      gap: 10px;
       .card-wrap {
          width: 190px;
-      }
-   }
-
-   .to-browse {
-      margin: 10px 0 15px 0;
-      &:focus {
-         @include be-accessible();
       }
    }
 }

@@ -26,7 +26,7 @@
          </div>
          <p class="error">{{bookmarkError}}</p>
       </div>
-      <div class="form-controls" >
+      <template #footer>
          <VirgoButton v-if="showSignInMessage" severity="secondary" @click="closeDialog" label="Close"/>
          <template v-else>
             <VirgoButton v-if="showAdd==false" class="left" @click="addFolder" label="New Folder"/>
@@ -34,7 +34,7 @@
             <VirgoButton v-else severity="secondary" @click="cancelBookmark" label="Cancel Create"/>
             <VirgoButton @click="okBookmark" label="OK"/>
          </template>
-      </div>
+      </template>
    </Dialog>
 </template>
 

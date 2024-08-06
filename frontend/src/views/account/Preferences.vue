@@ -67,7 +67,6 @@ onMounted( async () => {
    margin: 15px 0;
    border: 1px solid var(--uvalib-grey-light);
    padding: 0;
-   box-shadow: $v4-box-shadow-light;
    text-align: left;
 }
 </style>
