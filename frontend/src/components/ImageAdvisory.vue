@@ -17,8 +17,9 @@
    left:0;
    width:100%;
    height: 100%;
-   background-color: #2B2B2B;
-   opacity: 0.9;
+   background-color: rgba(10,10,10,0.6);
+   -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
    .message {
       position: absolute;
       top: 50%;
