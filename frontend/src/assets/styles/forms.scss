@@ -148,6 +148,17 @@ span.req-label {
    color: var(--uvalib-text);
 }
 
+div.sort .formkit-wrapper {
+   display: flex;
+   flex-flow: row nowrap;
+   align-items: center;
+   justify-content: flex-start;
+   gap: 10px;
+   .v4-form-label {
+      font-weight: bold;
+   }
+}
+
 .v4-form-help {
    margin: 5px 0;
    font-size: 0.9em;
