@@ -17,15 +17,10 @@
                </router-link>
             </span>
             <span v-if="systemStore.isKiosk == false" class="alert-wrap">
-               <a role="menuitem" id="alertmenu" class="menu-item" :tabindex="alertTabIndex"
-                  @click="alertClicked" @keydown.prevent.stop.enter="alertClicked"
-                  @keydown.space.prevent.stop="alertClicked"
-                  aria-label="virgo alerts"
-                  :disabled="alertStore.seenCount==0"
-               >
-                  <i class="alert-bell icon fal fa-bell" :class="{dim: alertStore.seenCount==0}"></i>
-                  <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
-               </a>
+               <VirgoButton icon="alert-bell icon fal fa-bell" text rounded aria-label="virgo alerts"
+                  :class="{dim: alertStore.seenCount==0}"
+                  :disabled="alertStore.seenCount==0"  @click="alertClicked" />
+               <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
             </span>
          </template>
       </Menubar>
@@ -145,40 +140,25 @@ const signOut = (() => {
    border-radius: 10px;
 }
 .alert-wrap {
-   display: inline-block;
    position: relative;
-   .alert-bell {
-      position: relative;
-      color: white;
-      cursor: pointer;
-      display: inline-block;
-      margin-left:0px;
-      font-size: 1.3em;
-      display: inline-block;
-      margin: 5px;
-      border-radius: 50px;
-   }
-   .alert-bell.dim {
-      opacity: 0.4;
-      cursor: default;
-      &:hover {
-         border-bottom: none;
-      }
+   display: block;
+   button.dim {
+      opacity: 0.2;
    }
    .alert-count {
       font-size: 1em;
       font-weight: bold;
-      background: var(--uvalib-yellow);
-      color: var(--uvalib-text-dark);
+      background: var(--color-primary-orange);
+      color: white;
       font-family: sans-serif;
       display: inline-block;
       text-align: center;
-      border-radius: 15px;
-      padding: 3px 6px 1px 6px;
+      border-radius: 40px;
+      padding: 4px 8px;
       position: absolute;
-      right: -8px;
-      top: -12px;
-      cursor: pointer;
+      right: -11px;
+      top: -7px;
+      cursor: default;
    }
 }
 
