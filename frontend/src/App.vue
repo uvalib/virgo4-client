@@ -424,6 +424,10 @@ body {
       color: #232D4B !important;
       line-height: 1.15;
    }
+   h2 {
+      color: #232D4B !important;
+      text-align: left;
+   }
 }
 
 #app .link-icon {

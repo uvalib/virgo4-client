@@ -224,7 +224,6 @@ const fieldLimit = (( field ) => {
 <style lang="scss" scoped>
 .item-view {
    h2 {
-      text-align: center;
       margin: 50px 0 30px 0;
    }
    div.details-content  {
