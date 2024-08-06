@@ -16,6 +16,9 @@
          font-size: 1.5em;
       }
    }
+   button.p-button-info {
+      border-width: 2px;
+   }
    button.p-button.checked {
       .p-button-icon {
          color: var(--uvalib-brand-blue-light);

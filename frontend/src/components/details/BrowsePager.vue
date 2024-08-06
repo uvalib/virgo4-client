@@ -1,9 +1,9 @@
 <template>
    <section class="browse-controls">
       <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="browse previous shelf item"
-         icon="pi pi-angle-double-left" label="Previous"/>
+         severity="info" label="Previous"/>
       <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="browse next shelf item"
-         icon="pi pi-angle-double-right" iconPos="right" label="Next"/>
+         severity="info" label="Next"/>
    </section>
 </template>
 

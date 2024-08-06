@@ -17,9 +17,9 @@
             </div>
          </div>
          <div class="browse-controls full">
-            <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="previous shelf" icon="fal fa-arrow-left" label="Previous"/>
+            <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="previous shelf" label="Previous" severity="info"/>
             <span class="range" aria-live="polite"><b>CATALOG RANGE:</b>{{firstCall}}&nbsp;-&nbsp;{{lastCall}}</span>
-            <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()" aria-label="next shelf" icon="fal fa-arrow-right" label="Next" iconPos="right"/>
+            <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()" aria-label="next shelf" label="Next" severity="info"/>
          </div>
          <div class="view-mode">
             <Select v-model="currViewMode" :options="viewModes" optionLabel="label" optionValue="code">
