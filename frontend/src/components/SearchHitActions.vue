@@ -4,12 +4,14 @@
          :ariaLabel="`citations for ${props.hit.identifier}`">
       </Citations>
       <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
-         <VirgoButton  v-if="!generatePDFInProgress" icon="fal fa-file-pdf" text rounded
+         <VirgoButton  v-if="!generatePDFInProgress" icon="fal fa-file-pdf"
+            text rounded size="large"
             @click="pdfClicked" :aria-label="`download pdf for ${props.hit.header.title}`"/>
          <ve-progress v-if="generatePDFInProgress" :progress="pdfProgress()" :size="32" thickness="10%"
             style="position: absolute; background: white; top:-2px; left: -6px; cursor: default;"/>
       </span>
-      <VirgoButton v-if="from=='DETAIL' || from=='COLLECTION'" icon="fal fa-share-alt" text rounded
+      <VirgoButton v-if="from=='DETAIL' || from=='COLLECTION'" icon="fal fa-share-alt"
+         text rounded size="large"
          @click="shareClicked" :aria-label="`copy link to ${props.hit.header.title}`" />
       <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
    </div>

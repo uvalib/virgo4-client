@@ -246,7 +246,8 @@ const fieldLimit = (( field ) => {
       flex-direction: column;
       justify-content: flex-end;
       align-items: flex-end;
-      padding: 0 10px 5px 0;
+      width: 95%;
+      margin: 0 auto;
    }
    .info {
       margin: 15px 0;

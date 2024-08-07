@@ -10,12 +10,6 @@
    button.p-tab {
       border-radius: 5px 5px 0 0;
    }
-   button.p-button {
-      white-space: nowrap;
-      .p-button-icon {
-         font-size: 1.5em;
-      }
-   }
    button.p-button-info {
       border-width: 2px;
    }
@@ -43,7 +37,11 @@
    }
 
    div.p-menubar {
+      // justify-content: flex-end;
       border-bottom: 3px solid #232D4B;
+      // .p-menubar-end {
+      //    margin-left: initial;
+      // }
       div.p-menubar-item-content a {
          &:hover {
             text-decoration: none;

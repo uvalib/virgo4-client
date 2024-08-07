@@ -90,6 +90,16 @@ const UVA = definePreset(Aura, {
          root: {
             paddingY: '.5em',
             paddingX: '1em',
+            sm: {
+               fontSize: '0.875rem',
+               paddingX: '0.625rem',
+               paddingY: '0.375rem'
+           },
+           lg: {
+               fontSize: '1.5rem',
+               paddingX: '1.2rem',
+               paddingY: '0.6rem'
+           },
          },
          colorScheme: {
             light: {

@@ -18,7 +18,7 @@
             </span>
             <span v-if="systemStore.isKiosk == false" class="alert-wrap">
                <VirgoButton icon="alert-bell icon fal fa-bell" text rounded aria-label="virgo alerts"
-                  :class="{dim: alertStore.seenCount==0}"
+                  size="large" :class="{dim: alertStore.seenCount==0}"
                   :disabled="alertStore.seenCount==0"  @click="alertClicked" />
                <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
             </span>
