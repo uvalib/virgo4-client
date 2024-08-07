@@ -1,15 +1,19 @@
 <template>
-   <div class="item-view">
-      <div class="detail-controls" v-if="resultStore.selectedHitIdx > -1">
-         <V4Pager
-            :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
-            :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
-            @next="nextHitClicked" @prior="priorHitClicked"
-         />
-         <VirgoButton link @click="returnToSearch" label="Return to search results" />
+      <div class="item-header" >
+         <div class="title-wrap">
+            <div class="title">{{ details.header.title }}</div>
+            <div v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</div>
+         </div>
+         <span class="nav-wrap"  v-if="resultStore.selectedHitIdx > -1">
+            <V4Pager
+               :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
+               :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
+               @next="nextHitClicked" @prior="priorHitClicked"
+            />
+            <VirgoButton link @click="returnToSearch" label="Return to search results" />
+         </span>
       </div>
       <div class="details-content">
-         <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"  :expand="preferences.expandDetails" from="DETAIL"/>
          <abbr class="unapi-id" :title="details.itemURL"></abbr>
          <div class="info">
             <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
@@ -86,7 +90,6 @@
          </template>
          <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
       </template>
-   </div>
 </template>
 
 <script setup>
@@ -222,87 +225,116 @@ const fieldLimit = (( field ) => {
 })
 </script>
 <style lang="scss" scoped>
-.item-view {
-   h2 {
-      margin: 50px 0 30px 0;
-   }
-   div.details-content  {
-      width: 95%;
-      margin: 0 auto;
-   }
-
-   .ra-box.ra-fiy.pad-top {
-      margin-top: 20px;
-   }
-
-   dl.fields {
-      grid-template-columns: 0.5fr 2fr;
-      dt.label {
-         white-space: normal;
-      }
-   }
-   .detail-controls {
+.item-header {
+   width: 95%;
+   margin: 0 auto;
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: space-between;
+   align-items: flex-start;
+   gap: 50px;
+   .title-wrap {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      align-items: flex-end;
-      width: 95%;
-      margin: 0 auto;
-   }
-   .info {
-      margin: 15px 0;
-      border-top: 4px solid var(--color-brand-blue);
-   }
-   dl {
-      margin-top: 15px;
-      display: inline-grid;
-      grid-template-columns: max-content 2fr;
-      grid-column-gap: 10px;
-      width: 100%;
-   }
-   dt {
-      font-weight: bold;
-      text-align: right;
-      padding: 4px 8px;
-      white-space: nowrap;
-      vertical-align: top;
-   }
-   dd {
-      margin: 0;
-      width: 100%;
-      max-width: 750px;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 10px;
       text-align: left;
-      word-break: break-word;
-      -webkit-hyphens: auto;
-      -moz-hyphens: auto;
-      hyphens: auto;
-      padding: 4px 0px;
-   }
-   .value.more {
-      margin-top: 15px;
-      padding: 15px 0 10px 0;
-      text-align: left;
-   }
-   .xml {
-      font-weight: normal;
-      font-size: 0.8em;
-      border: 1px solid var(--uvalib-grey-light);
-      padding: 10px;
-      margin: 0;
-      border-top: 0;
-   }
-   .copyright {
-      display: flex;
-      flex-flow: row wrap;
-      align-content: center;
-      align-items: center;
-      img {
-         height: 20px;
-         margin-right: 5px;
+      .title {
+         font-size: 1.25rem;
+         font-weight: 700;
       }
-      .cr-note {
-         margin-left: 25px;
+      .subtitle {
+         font-weight: normal;
       }
+      .author {
+         padding:0 0 0 40px;
+         font-weight: normal;
+      }
+   }
+
+}
+
+h2 {
+   margin: 50px 0 30px 0;
+}
+div.details-content  {
+   width: 95%;
+   margin: 0 auto;
+}
+
+.ra-box.ra-fiy.pad-top {
+   margin-top: 20px;
+}
+
+dl.fields {
+   grid-template-columns: 0.5fr 2fr;
+   dt.label {
+      white-space: normal;
+   }
+}
+.detail-controls {
+   display: flex;
+   flex-direction: column;
+   justify-content: flex-end;
+   align-items: flex-end;
+   width: 95%;
+   margin: 0 auto;
+}
+.info {
+   margin: 15px 0;
+   border-top: 4px solid var(--color-brand-blue);
+}
+dl {
+   margin-top: 15px;
+   display: inline-grid;
+   grid-template-columns: max-content 2fr;
+   grid-column-gap: 10px;
+   width: 100%;
+}
+dt {
+   font-weight: bold;
+   text-align: right;
+   padding: 4px 8px;
+   white-space: nowrap;
+   vertical-align: top;
+}
+dd {
+   margin: 0;
+   width: 100%;
+   max-width: 750px;
+   text-align: left;
+   word-break: break-word;
+   -webkit-hyphens: auto;
+   -moz-hyphens: auto;
+   hyphens: auto;
+   padding: 4px 0px;
+}
+.value.more {
+   margin-top: 15px;
+   padding: 15px 0 10px 0;
+   text-align: left;
+}
+.xml {
+   font-weight: normal;
+   font-size: 0.8em;
+   border: 1px solid var(--uvalib-grey-light);
+   padding: 10px;
+   margin: 0;
+   border-top: 0;
+}
+.copyright {
+   display: flex;
+   flex-flow: row wrap;
+   align-content: center;
+   align-items: center;
+   img {
+      height: 20px;
+      margin-right: 5px;
+   }
+   .cr-note {
+      margin-left: 25px;
    }
 }
 </style>

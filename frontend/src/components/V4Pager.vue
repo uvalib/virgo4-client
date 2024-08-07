@@ -37,12 +37,11 @@ const emit = defineEmits( ['prior', 'next' ] )
    display: flex;
    flex-flow: row nowrap;
    justify-content: flex-end;
-   align-content: center;
    align-items: center;
    font-size: 16px;
    font-weight: normal;
    color: var( --uvalib-text);
-   gap: 25px;
+   gap: 34px;
    margin-bottom: 10px;
 }
 </style>
