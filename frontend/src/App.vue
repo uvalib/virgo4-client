@@ -427,6 +427,8 @@ body {
    h2 {
       color: #232D4B !important;
       text-align: left;
+      font-size: 1.3em;
+      margin: 34px 0 17px 0;
    }
 }
 

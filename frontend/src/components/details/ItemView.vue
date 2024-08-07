@@ -59,10 +59,6 @@
                      <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
                   </dd>
                </template>
-               <dt class="label">Citations:</dt>
-               <dd class="value">
-                  <CitationsList />
-               </dd>
                <template v-if="hasExtLink && system.isKiosk == false">
                   <dd></dd>
                   <dt class="value more">
@@ -80,6 +76,7 @@
             </template>
          </div>
       </div>
+      <ActionsPanel :hit="details" :pool="details.source" />
       <DigitalContent />
       <template v-if="details.source != 'images'">
          <Availability v-if="poolStore.hasAvailability(details.source)" />
@@ -93,7 +90,7 @@
 </template>
 
 <script setup>
-import SearchHitHeader from "@/components/SearchHitHeader.vue"
+import ActionsPanel from "@/components/details/ActionsPanel.vue"
 import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
 import AccordionContent from "@/components/AccordionContent.vue"
@@ -104,7 +101,6 @@ import AccessURLDetails from "@/components/AccessURLDetails.vue"
 import TruncatedText from "@/components/TruncatedText.vue"
 import V4LinksList from "@/components/V4LinksList.vue"
 import V4Pager from "@/components/V4Pager.vue"
-import CitationsList from "@/components/details/CitationsList.vue"
 import ShelfBrowse from "@/components/details/ShelfBrowse.vue"
 import DigitalContent from "@/components/details/DigitalContent.vue"
 import analytics from '@/analytics'
@@ -242,7 +238,7 @@ const fieldLimit = (( field ) => {
       gap: 10px;
       text-align: left;
       .title {
-         font-size: 1.25rem;
+         font-size: 1.5rem;
          font-weight: 700;
       }
       .subtitle {

@@ -1,17 +1,14 @@
 <template>
-   <VirgoButton text rounded @click="showDialog = true" :aria-label="props.ariaLabel"
-      ref="trigger" :class="{list: props.format!='all'}">
-      <span>{{ props.buttonLabel }}</span><i class="fas fa-quote-right"></i>
-   </VirgoButton>
-
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" :header="props.title" @hide="closeDialog" @show="opened">
+   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right"
+      @click="showDialog = true" :aria-label="props.ariaLabel" ref="trigger" />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Citations" @hide="closeDialog" @show="opened">
       <div class="citations-content">
          <div class="working" v-if="loading" >
             <V4Spinner message="Gathering citations..."/>
          </div>
          <p v-else-if="failed" class="error">{{citations}}</p>
          <template v-else>
-            <div class="citations" v-if="props.format=='all'">
+            <div class="citations">
                <label>Choose a citation format</label>
                <ul class="list">
                   <li v-for="(citation,idx) in citations" :key="citation.label">
@@ -25,18 +22,13 @@
                   </div>
                </div>
             </div>
-            <div v-else class="citation">
-               <span v-html="citations[0].value"></span>
-            </div>
          </template>
          <div class="messagebox" aria-live="polite">
             <span v-if="message" class="info">{{message}}</span>
          </div>
          <div class="citation-controls" >
-            <VirgoButton v-if="props.format == 'all'" @click="downloadRISClicked" aria-label="download RIS citation"
-               label="Download RIS" icon="fal fa-download" iconPos="right" severity="secondary"/>
-            <VirgoButton @click="copyCitation" label="Copy Citation" v-focus severity="secondary"/>
             <VirgoButton @click="closeDialog" label="Close" severity="secondary" class="close"/>
+            <VirgoButton @click="copyCitation" label="Copy Citation" v-focus/>
          </div>
       </div>
    </Dialog>
@@ -46,29 +38,16 @@
 import { useItemStore } from "@/stores/item"
 import { useSystemStore } from "@/stores/system"
 import { ref, computed} from 'vue'
-import analytics from '@/analytics'
 import { copyText } from 'vue3-clipboard'
 import Dialog from 'primevue/dialog'
 import { useToast } from "primevue/usetoast"
 
 const props = defineProps({
-   title: {
-      type: String,
-      required: true
-   },
    itemURL: {
       type: String,
       required: true
    },
-   format: {
-      type: String,
-      required: true
-   },
    from: {
-      type: String,
-      default: ""
-   },
-   buttonLabel: {
       type: String,
       default: ""
    },
@@ -96,27 +75,10 @@ const citationType =((idx) => {
    }
    return "secondary"
 })
+
 const itemID = computed(()=>{
    let parts = props.itemURL.split("/")
    return parts[parts.length - 1]
-})
-const singleFormat = computed(()=>{
-   if (props.format == "all") {
-      return false
-   }
-   return true
-})
-const risFrom = computed(()=>{
-   if (singleFormat.value) {
-      return ""
-   }
-
-   let from = props.from.toUpperCase()
-   if (from == "") {
-      from = 'MODAL'
-   }
-
-   return 'RIS_FROM_' + from
 })
 
 const citationSelected =((idx) => {
@@ -129,7 +91,7 @@ const opened = (() => {
    failed.value = false
    citations.value = null
 
-   itemStore.getCitations({format: props.format, itemURL: props.itemURL}).then( (response) => {
+   itemStore.getCitations({format: "all", itemURL: props.itemURL}).then( (response) => {
       loading.value = false
       failed.value = false
       citations.value = response.data
@@ -143,11 +105,6 @@ const opened = (() => {
 const closeDialog = (() => {
    showDialog.value = false
    trigger.value.$el.focus()
-})
-
-const downloadRISClicked = (() => {
-   analytics.trigger('Export', risFrom.value, itemID.value)
-   window.location.href=`${system.citationsURL}/format/ris?item=${encodeURI(props.itemURL)}`
 })
 
 const copyCitation = (() => {
@@ -209,23 +166,14 @@ const copyCitation = (() => {
          justify-content: flex-start;
          gap: 5px 10px;
       }
-      .citation-text {
-         outline: 0;
-         min-height: 75px;
-         max-height: 420px;
-         overflow: scroll;
-      }
    }
    .citation-controls {
       display: flex;
       flex-flow: row nowrap;
-      justify-content: flex-start;
+      justify-content: flex-end;
       margin: 20px 0 0 0;
       padding: 0;
       gap: 5px 10px;
-      .close {
-         margin-left: auto;
-      }
    }
 
    .working {

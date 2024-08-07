@@ -1,6 +1,6 @@
 <template>
    <div class="icon-wrap">
-      <Citations v-if="showCitations" title="Citations" :itemURL="props.hit.itemURL" format="all" buttonLabel="Cite" :from="from"
+      <Citations v-if="showCitations" :itemURL="props.hit.itemURL" :from="from"
          :ariaLabel="`citations for ${props.hit.identifier}`">
       </Citations>
       <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
@@ -124,6 +124,6 @@ function shareClicked() {
    flex-flow: row nowrap;
    margin-left: auto;
    justify-content: flex-end;
-   align-items: flex-start;
+   align-items: center;
 }
 </style>
