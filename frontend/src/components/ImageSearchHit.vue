@@ -37,8 +37,7 @@ const detailsURL = computed(()=>{
    return `/sources/${props.pool}/items/${props.hit.identifier}`
 })
 const hasContentAdvisory = computed(() => {
-   let allFields = [...props.hit.basicFields.concat(props.hit.detailFields)]
-   let idx = allFields.findIndex( f=> f.name=="content_advisory")
+   let idx = props.hit.fields.findIndex( f=> f.name=="content_advisory")
    return idx > -1
 })
 
@@ -47,7 +46,7 @@ function detailClicked() {
    analytics.trigger('Results', 'DETAILS_CLICKED', props.hit.identifier)
 }
 function iiifURL(item) {
-   let iiifField = item.basicFields.find( f=>f.name=="iiif_image_url")
+   let iiifField = item.fields.find( f=>f.name=="iiif_image_url")
    if (iiifField) {
       let iiif = iiifField.value
       return `${iiif}/square/250,250/0/default.jpg`

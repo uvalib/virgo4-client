@@ -77,7 +77,7 @@ function cancelRequest() {
 }
 function requestClicked() {
    // NOTE: this is crrently specific to WorldCat. If other sources are added, this will need to be generalized
-   let genTypeF = item.details.basicFields.find( bf => bf.name == "general_format")
+   let genTypeF = item.details.fields.find( bf => bf.name == "general_format")
    if (!genTypeF) {
       requestStore.alertText = "Sorry, this item is not available for an Interlibrary Loan request."
       return

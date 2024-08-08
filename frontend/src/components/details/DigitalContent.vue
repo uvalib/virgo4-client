@@ -127,7 +127,7 @@ const details = computed(()=>{
    return item.details
 })
 const hasExternalImages = computed(()=>{
-   let iiifField = details.value.detailFields.find( f => f.name=="iiif_image_url")
+   let iiifField = details.value.fields.find( f => f.name=="iiif_image_url")
    if (iiifField) return true
    return false
 })
@@ -181,7 +181,7 @@ const curioURL = computed(()=>{
    return url
 })
 const hasImage = computed(()=>{
-   let iiifField = details.value.detailFields.find( f => f.name=="iiif_image_url")
+   let iiifField = details.value.fields.find( f => f.name=="iiif_image_url")
    if (iiifField) {
       return true
    }
@@ -230,7 +230,7 @@ function toggleFullView() {
    fsView.value = !fsView.value
 }
 function imageURL(size) {
-   let iiifField = details.value.detailFields.find( f => f.name=="iiif_image_url")
+   let iiifField = details.value.fields.find( f => f.name=="iiif_image_url")
    if (!iiifField) return ""
    if ( size == 'full') {
       return [`${iiifField.value}/full/1200,/0/default.jpg`]

@@ -7,7 +7,7 @@ import * as utils from '../utils'
 
 export const useItemStore = defineStore('item', {
 	state: () => ({
-      details: {searching: true, source: "", identifier:"", basicFields:[], detailFields:[], related:[] },
+      details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
       googleBooksURL: "",
       googleBookThumbURL: "",
@@ -20,46 +20,45 @@ export const useItemStore = defineStore('item', {
          return state.details.identifier
       },
       generalFormat: state => {
-         let genTypeF = state.details.basicFields.find( bf => bf.name == "general_format")
+         let genTypeF = state.details.fields.find( bf => bf.name == "general_format")
          if (!genTypeF) {
             return ""
          }
          return genTypeF.value
       },
       hasContentAdvisory: state => {
-         let allFields = [...state.details.basicFields.concat(state.details.detailFields)]
-         let idx = allFields.findIndex( f=> f.name=="content_advisory")
+         let idx = state.details.fields.findIndex( f=> f.name=="content_advisory")
          return idx > -1
       },
       isDigitalCollection: state => {
-         return state.details.detailFields.findIndex( f=> f.name == 'digital_collection') > -1
+         return state.details.fields.findIndex( f=> f.name == 'digital_collection') > -1
       },
       digitalCollectionName: state => {
-         let field = state.details.detailFields.find( f=> f.name == 'digital_collection')
+         let field = state.details.fields.find( f=> f.name == 'digital_collection')
          if (field) {
             return field.value
          }
          return ""
       },
       collectionPosition: state => {
-         let field = state.details.detailFields.find( f=> f.name == 'collection_position')
+         let field = state.details.fields.find( f=> f.name == 'collection_position')
          if (field) {
             return field.value.replace(/^\w/, c => c.toUpperCase())
          }
          return ""
       },
       isCollection: state => {
-         return state.details.detailFields.findIndex( f=> f.name == 'collection_context') > -1
+         return state.details.fields.findIndex( f=> f.name == 'collection_context') > -1
       },
       isCollectionHead: state => {
-         return state.details.detailFields.findIndex( f=> f.name == 'collection_head') > -1
+         return state.details.fields.findIndex( f=> f.name == 'collection_head') > -1
       },
       collectionName: state => {
-         let field = state.details.detailFields.find( f=> f.name == 'collection_context')
+         let field = state.details.fields.find( f=> f.name == 'collection_context')
          if (field) {
             return field.value
          } else {
-            field = state.details.detailFields.find( f=> f.name == 'collection_head')
+            field = state.details.fields.find( f=> f.name == 'collection_head')
             if (field) {
                return field.value
             }
@@ -209,10 +208,9 @@ export const useItemStore = defineStore('item', {
          })
       },
       getDigitalContent() {
-         let allFields = this.details.basicFields.concat(this.details.detailFields)
-         let dcField = allFields.find( f=>f.name=="digital_content_url")
+         let dcField = this.details.fields.find( f=>f.name=="digital_content_url")
          if (!dcField) {
-            this.details.detailFields.filter( f => f.type == "oembed-url").forEach( o => {
+            this.details.fields.filter( f => f.type == "oembed-url").forEach( o => {
                this.digitalContent.push({
                   oEmbedURL: o.value,
                   pid: this.details.identifier,
@@ -248,10 +246,7 @@ export const useItemStore = defineStore('item', {
          let tgtName = ""
          let tgtValue = ""
          fields.some(  fName => {
-            let idField = this.details.basicFields.find( f => f.name == fName )
-            if (!idField) {
-               idField = this.details.detailFields.find( f => f.name == fName )
-            }
+            let idField = this.details.fields.find( f => f.name == fName )
             if ( idField ) {
                tgtName = fName
                tgtValue = idField.value[0]

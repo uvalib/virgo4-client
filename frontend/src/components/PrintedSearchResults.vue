@@ -11,7 +11,7 @@
             </div>
             <div class="author" v-if="hit.header.author_display">{{hit.header.author_display}}</div>
             <table class="fields">
-               <template v-for="(field,idx) in hit.basicFields">
+               <template v-for="(field,idx) in hit.fields">
                   <tr :key="`pf${idx}`" class="field" v-if="shouldDisplay(field)">
                      <td class="label">{{field.label}}:</td>
                      <td>{{fieldValue(field)}}</td>
@@ -29,7 +29,7 @@
                   </div>
                   <div class="author" v-if="groupHit.header.author_display">{{groupHit.header.author_display}}</div>
                   <table class="fields">
-                     <template v-for="(field,idx) in groupHit.basicFields">
+                     <template v-for="(field,idx) in groupHit.fields">
                         <tr :key="`pf${idx}`" class="field" v-if="shouldDisplay(field)">
                            <td class="label">{{field.label}}:</td>
                            <td>{{fieldValue(field)}}</td>

@@ -45,7 +45,7 @@ const props = defineProps({
 const shelfStore = useShelfStore()
 
 const currentCallNumber = computed(()=>{
-   let f =  props.hit.detailFields.find( f => f.name == "call_number")
+   let f =  props.hit.fields.find( f => f.name == "call_number")
    if ( f) {
       return f.value
    }

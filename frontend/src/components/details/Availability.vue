@@ -87,7 +87,7 @@ const hasItems = computed(()=>{
    return Array.isArray(item.availability.items) && item.availability.items.length > 0
 })
 const availabilityFields = computed(()=>{
-   return item.details.detailFields.filter( f => f.display == "availability")
+   return item.details.fields.filter( f => f.display == "availability")
 })
 const showAvailability = computed(()=>{
    return hasItems.value || request.hasRequestOptions || availabilityFields.value.length > 0 || item.hasBoundWithItems
@@ -102,28 +102,28 @@ const canMakeRequests = computed(()=>{
    return request.hasRequestOptions
 })
 const availabilityStatement = computed(()=>{
-   let f = item.details.detailFields.find( f=>f.name == "availability_statement")
+   let f = item.details.fields.find( f=>f.name == "availability_statement")
    if (f) {
       return f.value
    }
    return ""
 })
 const accessRestriction = computed(()=>{
-   let f = item.details.detailFields.find( f=>f.name == "access_note")
+   let f = item.details.fields.find( f=>f.name == "access_note")
    if (f) {
       return f.value
    }
    return ""
 })
 const extentOfDigitization = computed(()=>{
-   let f = item.details.detailFields.find( f=>f.name == "extent_of_digitization")
+   let f = item.details.fields.find( f=>f.name == "extent_of_digitization")
    if (f) {
       return f.label + ": " + f.value
    }
    return ""
 })
 const libraryAvailabilityNotes = computed(()=>{
-   let af = item.details.detailFields.find( f => f.name == "library_availability_note")
+   let af = item.details.fields.find( f => f.name == "library_availability_note")
    if (af ) {
       if (Array.isArray(af.value) == false) {
          return [af.value]
