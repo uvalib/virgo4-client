@@ -57,7 +57,7 @@ const props = defineProps({
 })
 
 const publishedDate = computed(()=>{
-   let field = item.details.detailFields.find( f => f.name == "published_date")
+   let field = item.details.fields.find( f => f.name == "published_date")
    if (field) {
       return field.value
    }

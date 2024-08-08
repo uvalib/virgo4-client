@@ -1,12 +1,10 @@
-// Each search ppol hit contains an array of field objects. These may be repeated, but for display
-// purposes they need to be merged into a single field object with an array value. Additionally, the fields
-// are classified as header (special rendering), basic (show by default),
-// detailed (hidden by default). Split them into separate sections of the hit. Identifer and
-// cover image are also special and get pulled to top level of hit data
+// Each search pool hit contains an array of field objects. These may be repeated, but for display
+// purposes they need to be merged into a single field object with an array value.
+// title, subtitle and author are special and get put into a header object.
+// Identifer and cover image are pulled into the top-level  data
 export const preProcessHitFields = ((poolURL, hits) => {
    hits.forEach(function (hit) {
-      hit.basicFields = []
-      hit.detailFields = []
+      var processedFields = []
       hit.holdings = {}
       hit.header = {}
       hit.fields.forEach( field => {
@@ -17,6 +15,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
             return
          }
 
+         // throw away blank valued fields, except for holdings where a blank value is important
          if (field.value === "" && field.name != "summary_holdings") {
             return
          }
@@ -64,7 +63,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
          //    {provider: "hathitrust", links: [ {url: url, label: "v4. 1988"} ] }
          // ]}
          if (field.name=="access_url") {
-            let existing = hit.basicFields.find(f => f.name === field.name)
+            let existing = processedFields.find(f => f.name === field.name)
             if (existing) {
                let provider = field.provider
                let newLink = {url: field.value}
@@ -88,7 +87,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
                }
                newVal.links.push( newLink )
                newF.value.push( newVal )
-               hit.basicFields.push(newF)
+               processedFields.push(newF)
             }
             return
          }
@@ -97,7 +96,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
          // preserve it as an object in the field values array
          if (field.type == "related-url") {
             let val = {url: field.value, label: field.item}
-            let existing = hit.detailFields.find(f => f.name === field.name)
+            let existing = processedFields.find(f => f.name === field.name)
             if (existing) {
                existing.value.push( val )
             } else {
@@ -105,7 +104,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
                delete f.item
                delete f.value
                f.value = [val]
-               hit.detailFields.push(f)
+               processedFields.push(f)
             }
             return
          }
@@ -115,14 +114,8 @@ export const preProcessHitFields = ((poolURL, hits) => {
             return
          }
 
-         // Pick which group the fields belong to
-         let tgtMerged = hit.basicFields
-         if (field.visibility == "detailed" && field.name != "format") {
-            tgtMerged = hit.detailFields
-         }
-
          // convert existing field values to arrays if multiple values found
-         let existing = tgtMerged.find(f => f.name === field.name)
+         let existing = processedFields.find(f => f.name === field.name)
          if (existing) {
             if (Array.isArray(existing.value) === false) {
                existing.value = [existing.value]
@@ -141,7 +134,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
             if (arrayFields.includes(field.name) ) {
                field.value = [field.value]
             }
-            tgtMerged.push(field)
+            processedFields.push(field)
          }
       })
 
@@ -150,6 +143,7 @@ export const preProcessHitFields = ((poolURL, hits) => {
       }
 
       delete hit.fields
+      hit.fields = processedFields
    })
 })
 
@@ -182,8 +176,7 @@ export const getGroupHitMetadata = ((group, hit) => {
    hit.header = {}
    if (group.record_list) {
       hit.header = group.record_list[0].header
-      hit.basicFields = group.record_list[0].basicFields
-      hit.detailFields = group.record_list[0].detailFields
+      hit.fields = group.record_list[0].fields
       hit.cover_image = group.record_list[0].cover_image
       hit.identifier = group.record_list[0].identifier
       hit.itemURL = group.record_list[0].itemURL

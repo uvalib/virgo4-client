@@ -3,7 +3,7 @@
       <div class="details">
          <div class="basic">
             <dl class="fields">
-               <template v-for="(field,idx) in props.hit.basicFields">
+               <template v-for="(field,idx) in props.hit.fields">
                   <template v-if="shouldDisplay(field)">
                      <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
                      <dd :key="getKey(field,`v${idx}`)" >
@@ -60,21 +60,21 @@ const system = useSystemStore()
 const resultStore = useResultStore()
 
 const pdfDownloadURL = computed(()=>{
-   let dc = props.hit.basicFields.find(f => f.name=="pdf_download_url")
+   let dc = props.hit.fields.find(f => f.name=="pdf_download_url")
    if (dc)  {
       return dc.value
    }
    return ""
 })
 const ocrDownloadURL = computed(()=>{
-   let dc = props.hit.basicFields.find(f => f.name=="ocr_download_url")
+   let dc = props.hit.fields.find(f => f.name=="ocr_download_url")
    if (dc)  {
       return dc.value
    }
    return ""
 })
 const accessURLField = computed(()=>{
-   return props.hit.basicFields.find(f => f.name=="access_url")
+   return props.hit.fields.find(f => f.name=="access_url")
 })
 const detailsURL = computed(()=>{
    return `/sources/${props.pool}/items/${props.hit.identifier}`
@@ -84,7 +84,7 @@ const truncateLength = computed(()=>{
    return 80
 })
 const fullTextSnippet = computed(()=>{
-   let sf = props.hit.basicFields.find( f => f.name == "highlighted_match")
+   let sf = props.hit.fields.find( f => f.name == "highlighted_match")
    if (sf ) {
       return sf.value.join("<br/><br/>")
    }

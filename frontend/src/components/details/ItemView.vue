@@ -130,32 +130,29 @@ const user = useUserStore()
 const details = computed(()=>{
    return item.details
 })
-const allFields = computed(()=>{
-   return [...details.value.basicFields.concat(details.value.detailFields)]
-})
 const allDisplayFields = computed(()=>{
-   return allFields.value.filter(f => shouldDisplay(f))
+   return details.value.fields.filter(f => shouldDisplay(f))
 })
 const accessURLField = computed(()=>{
-   return allFields.value.find(f => f.name=="access_url")
+   return details.value.fields.find(f => f.name=="access_url")
 })
 const hasExtLink = computed(()=>{
-   let idx = allFields.value.findIndex( f=> f.name=="sirsi_url")
+   let idx = details.value.fields.findIndex( f=> f.name=="sirsi_url")
    if (idx == -1) {
-         idx = allFields.value.findIndex( f=> f.name=="worldcat_url")
+         idx = details.value.fields.findIndex( f=> f.name=="worldcat_url")
    }
    return idx > -1
 })
 const extDetailURL = computed(()=>{
-   let extLink = allFields.value.find( f=> f.name=="sirsi_url")
+   let extLink = details.value.fields.find( f=> f.name=="sirsi_url")
    if (!extLink) {
-         extLink = allFields.value.find( f=> f.name=="worldcat_url")
+         extLink = details.value.fields.find( f=> f.name=="worldcat_url")
    }
    return extLink.value
 })
 const marcXML = computed(()=>{
    if ( !user.isAdmin ) return ""
-   let xml = allFields.value.find( f => f.type == "marc-xml")
+   let xml = details.value.fields.find( f => f.type == "marc-xml")
    if ( !xml) return ""
    return beautify(xml.value).trim()
 })

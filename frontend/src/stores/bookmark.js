@@ -100,9 +100,8 @@ export const useBookmarkStore = defineStore('bookmark', {
          let data = {folder: folder, pool: this.newBookmark.pool, identifier: this.newBookmark.hit.identifier}
          let detail = {title : this.newTitle, author: this.newAuthor}
 
-         if ( this.newBookmark.hit.basicFields ) {
-            let fields =  this.newBookmark.hit.basicFields.concat( this.newBookmark.hit.detailFields )
-            fields.forEach( f => {
+         if ( this.newBookmark.hit.fields ) {
+            this.newBookmark.hit.fields.forEach( f => {
                if ( f.name == "format") {
                   if ( Array.isArray(f.value)) {
                      detail.format = f.value.join("; ")

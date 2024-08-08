@@ -42,8 +42,7 @@ const props = defineProps({
 })
 
 const hasContentAdvisory = computed(() => {
-   let allFields = [...props.hit.basicFields.concat(props.hit.detailFields)]
-   let idx = allFields.findIndex( f=> f.name=="content_advisory")
+   let idx = props.hit.fields.findIndex( f=> f.name=="content_advisory")
    return idx > -1
 })
 const groupTitle = computed(()=>{

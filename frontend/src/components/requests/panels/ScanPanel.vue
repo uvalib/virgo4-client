@@ -73,7 +73,6 @@ const itemOptions = computed(() => {
 onMounted(()=>{
    analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
    if (itemOptions.value.length == 1) {
-      console.log("PUPPY")
       selectedItem.value = itemOptions.value[0].value
       itemSelected()
    }
@@ -90,7 +89,7 @@ onMounted(()=>{
    } else {
       scan.value.author = "Unknown"
    }
-   let isbn = itemStore.details.detailFields.find( f=>f.name=="isbn")
+   let isbn = itemStore.details.fields.find( f=>f.name=="isbn")
    if (isbn) {
       scan.value.issn = isbn.value.find( i => i.length == 13)
       if (scan.value.issn == "") {
@@ -98,7 +97,7 @@ onMounted(()=>{
       }
    }
 
-   let pubDate = itemStore.details.basicFields.find( f=>f.name=="published_date")
+   let pubDate = itemStore.details.fields.find( f=>f.name=="published_date")
    if (pubDate) {
       scan.value.year = pubDate.value
    }

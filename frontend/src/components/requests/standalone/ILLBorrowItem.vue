@@ -97,11 +97,11 @@ onMounted(()=>{
       }
       request.value.title = item.details.header.title
       request.value.author = item.details.header.author.value.join("; ")
-      let isbnF = item.details.basicFields.find( f => f.name == "isbn")
+      let isbnF = item.details.fields.find( f => f.name == "isbn")
       if (isbnF) {
          request.value.issn = isbnF.value.join(", ")
       }
-      let pubF = item.details.basicFields.find( f => f.name == "publication_date")
+      let pubF = item.details.fields.find( f => f.name == "publication_date")
       if (pubF) {
          request.value.year = pubF.value
       }

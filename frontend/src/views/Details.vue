@@ -85,7 +85,7 @@ async function getDetails(src, id) {
 
       await collection.getCollectionContext( name )
       if ( collection.hasCalendar) {
-         let dateField = item.details.detailFields.find( f => f.name == "published_date")
+         let dateField = item.details.fields.find( f => f.name == "published_date")
          if (dateField) {
             let year = dateField.value.split("-")[0]
             collection.setYear(year)
