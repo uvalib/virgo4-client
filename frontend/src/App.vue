@@ -428,7 +428,7 @@ body {
       color: #232D4B !important;
       text-align: left;
       font-size: 1.3em;
-      margin: 34px 0 17px 0;
+      margin: 50px 0 17px 0;
    }
 }
 

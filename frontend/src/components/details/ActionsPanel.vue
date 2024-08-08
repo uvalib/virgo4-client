@@ -67,6 +67,7 @@ const permalinkClicked = ( () => {
       justify-content: flex-start;
       align-items: flex-start;
       border: 1px solid var(--uvalib-grey-light);
+      border-radius: 0 5px 5px 0;
       .gutter {
          width: 17px;
          background-color:#E6F2F7;
