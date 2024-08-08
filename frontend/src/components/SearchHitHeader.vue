@@ -1,26 +1,24 @@
 <template>
-   <div class="header-wrapper">
-      <div class="title-wrapper">
-         <div class="full-title">
-            <span class="count-wrap" v-if="props.count">
-               <span class="count">{{props.count}}</span>
-            </span>
-            <template v-if="props.link == false">
-               <span class="hit-title" v-html="props.hit.header.title"></span>
-               <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
-            </template>
-            <router-link @mousedown="detailClicked" v-else :to="detailsURL">
-               <span class="hit-title" v-html="props.hit.header.title"></span>
-               <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
-            </router-link>
-         </div>
-         <SearchHitActions :hit="props.hit" :pool="props.pool" :from="props.from" />
+   <div class="title-wrapper">
+      <div class="full-title">
+         <span class="count-wrap" v-if="props.count">
+            <span class="count">{{props.count}}</span>
+         </span>
+         <template v-if="props.link == false">
+            <span class="hit-title" v-html="props.hit.header.title"></span>
+            <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
+         </template>
+         <router-link @mousedown="detailClicked" v-else :to="detailsURL">
+            <span class="hit-title" v-html="props.hit.header.title"></span>
+            <span v-if="props.hit.header.subtitle" class="hit-subtitle" v-html="props.hit.header.subtitle"></span>
+         </router-link>
       </div>
-      <div v-if="props.hit.header.author_display" class="author-wrapper">
-         <span v-if="props.expand" :id="`${props.hit.identifier}-author`" v-html="props.hit.header.author_display"></span>
-         <TruncatedText v-else :id="`${props.hit.identifier}-author`"
-            :text="props.hit.header.author_display" :limit="authorTruncateLength" />
-      </div>
+      <SearchHitActions :hit="props.hit" :pool="props.pool" :from="props.from" />
+   </div>
+   <div v-if="props.hit.header.author_display" class="author-wrapper">
+      <span v-if="props.expand" :id="`${props.hit.identifier}-author`" v-html="props.hit.header.author_display"></span>
+      <TruncatedText v-else :id="`${props.hit.identifier}-author`"
+         :text="props.hit.header.author_display" :limit="authorTruncateLength" />
    </div>
 </template>
 
@@ -76,6 +74,7 @@ const detailClicked = (() => {
 <style lang="scss" scoped>
 
 .title-wrapper {
+   width: 100%;
    text-align: left;
    display: flex;
    flex-flow: row nowrap;
