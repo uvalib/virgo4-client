@@ -13,6 +13,7 @@ export const useItemStore = defineStore('item', {
       googleBookThumbURL: "",
       loadingDigitalContent: false,
       availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
+      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
    }),
 
    getters: {

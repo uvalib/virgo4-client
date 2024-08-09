@@ -16,6 +16,8 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
 import { useConfirm } from "primevue/useconfirm"
 
+const emit = defineEmits( ['clicked'] )
+
 const props = defineProps({
    pool: {
       type: String,
@@ -63,6 +65,7 @@ const bookmarkCount = computed(()=>{
 })
 
 const bookmarkClicked = (() => {
+   emit("clicked")
    if ( bookmarkCount.value == 0) {
       bookmarkStore.showAddBookmark( props.pool, props.hit, bookmarkbtn.value.$el, props.origin )
       return

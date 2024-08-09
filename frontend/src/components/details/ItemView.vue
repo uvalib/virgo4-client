@@ -26,7 +26,7 @@
                      <V4LinksList id="author-links" :inline="true" :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
                   </dd>
                </template>
-               <template v-for="(field,idx) in allDisplayFields"  :key="`lv${idx}`">
+               <template v-for="(field) in allDisplayFields">
                   <dt class="label">{{field.label}}:</dt>
                   <dd class="value">
                      <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
@@ -53,27 +53,29 @@
                      </template>
                   </dd>
                </template>
-               <template v-if="accessURLField && !system.isKiosk">
+               <!-- <template v-if="accessURLField && !system.isKiosk">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
                      <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
                   </dd>
-               </template>
-               <template v-if="hasExtLink && system.isKiosk == false">
-                  <dd></dd>
-                  <dt class="value more">
+               </template> -->
+               <template v-if="hasExtLink && system.isKiosk == false && detailExpanded">
+                  <dt class="label">Full metadata:</dt>
+                  <dd class="value">
                      <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
-                        Full metadata<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                        View<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                      </a>
-                  </dt>
+                  </dd>
                </template>
+               <template v-if="hasMarcXML && detailExpanded">
+                  <dt class="label marc">MARC XML:</dt>
+                  <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
+               </template>
+               <dt class="toggle">
+                  <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"/>
+               </dt>
+               <dd></dd>
             </dl>
-            <template v-if="marcXML">
-               <AccordionContent class="marc" id="maxc-xml">
-                  <template v-slot:title>MARC XML</template>
-                  <pre class="xml">{{marcXML}}</pre>
-               </AccordionContent>
-            </template>
          </div>
       </div>
       <ActionsPanel :hit="details" :pool="details.source" />
@@ -93,10 +95,9 @@
 import ActionsPanel from "@/components/details/ActionsPanel.vue"
 import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
-import AccordionContent from "@/components/AccordionContent.vue"
+import MarcMetadata from "@/components/modals/MarcMetadata.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import ContentAdvisory from "@/components/ContentAdvisory.vue"
-import beautify from 'xml-beautifier'
 import AccessURLDetails from "@/components/AccessURLDetails.vue"
 import TruncatedText from "@/components/TruncatedText.vue"
 import V4LinksList from "@/components/V4LinksList.vue"
@@ -105,7 +106,7 @@ import ShelfBrowse from "@/components/details/ShelfBrowse.vue"
 import DigitalContent from "@/components/details/DigitalContent.vue"
 import analytics from '@/analytics'
 import * as utils from '@/utils'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { usePoolStore } from "@/stores/pool"
@@ -125,13 +126,43 @@ const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
 
+const detailExpanded = ref(false)
+
 // details : state => state.item.details,
 const details = computed(()=>{
    return item.details
 })
+
+const expandLabel = computed (() => {
+   if ( detailExpanded.value ) return "Show less"
+   return "Show more"
+})
+
 const allDisplayFields = computed(()=>{
    return details.value.fields.filter(f => shouldDisplay(f))
 })
+
+const shouldDisplay =((field) => {
+   if ( field.display == 'availability') return false
+   if ( detailExpanded.value ) {
+      if ( field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
+           field.type == "access-url" || field.type == "sirsi-url" ||
+           field.name.includes("_download_url") || (system.isKiosk && field.type == "related-url")  ) {
+         return false
+      }
+   } else {
+      let display = false
+      item.primaryFields.forEach( fn => {
+         if ( field.name == fn) {
+            display = true
+         }
+      })
+      return display
+   }
+
+   return true
+})
+
 const accessURLField = computed(()=>{
    return details.value.fields.find(f => f.name=="access_url")
 })
@@ -149,11 +180,20 @@ const extDetailURL = computed(()=>{
    }
    return extLink.value
 })
+const hasMarcXML = computed(()=>{
+   if ( !user.isAdmin ) return false
+   let xml = details.value.fields.find( f => f.type == "marc-xml")
+   if (xml) return true
+   return false
+})
 const marcXML = computed(()=>{
-   if ( !user.isAdmin ) return ""
    let xml = details.value.fields.find( f => f.type == "marc-xml")
    if ( !xml) return ""
-   return beautify(xml.value).trim()
+   return xml.value
+})
+
+const toggleExpandedView = (() => {
+   detailExpanded.value = !detailExpanded.value
 })
 
 const returnToSearch = (() => {
@@ -196,18 +236,6 @@ const getBrowseLinks = ( ( name, values ) => {
       out.push(link)
    })
    return out
-})
-
-const shouldDisplay =((field) => {
-   if ( field.display == 'availability') return false
-   if (field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
-         field.type == "access-url" || field.type == "sirsi-url" ||
-         field.name.includes("_download_url")  ) {
-      return false
-   }
-
-   if ( system.isKiosk &&  field.type == "related-url" ) return false
-   return true
 })
 
 const fieldLimit = (( field ) => {
@@ -266,6 +294,9 @@ dl.fields {
    dt.label {
       white-space: normal;
    }
+   dt.label.marc {
+      padding-top: 12px;
+   }
 }
 .detail-controls {
    display: flex;
@@ -304,18 +335,14 @@ dd {
    hyphens: auto;
    padding: 4px 0px;
 }
+dt.toggle {
+   margin-top: 15px;
+   text-align: right;
+}
 .value.more {
    margin-top: 15px;
    padding: 15px 0 10px 0;
    text-align: left;
-}
-.xml {
-   font-weight: normal;
-   font-size: 0.8em;
-   border: 1px solid var(--uvalib-grey-light);
-   padding: 10px;
-   margin: 0;
-   border-top: 0;
 }
 .copyright {
    display: flex;
