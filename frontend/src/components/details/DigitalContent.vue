@@ -415,7 +415,7 @@ onUnmounted(()=>{
          background: white;
          display: flex;
          flex-direction: column;
-         align-items: stretch;
+         align-items: flex-start;
          justify-content: flex-start;
          gap: 10px;
 
