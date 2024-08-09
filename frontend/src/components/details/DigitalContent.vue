@@ -3,17 +3,16 @@
       <div class="working" v-if="item.loadingDigitalContent">
          <V4Spinner message="Searching for digital content..." />
       </div>
-      <div class="items" v-if="item.hasDigitalContent || item.googleBooksURL || hasExternalImages">
-         <h2 class="buttons">
-            <span>View Online</span>
-            <VirgoButton v-if="!collection.isFullPageCollection && item.hasDigitalContent"
-               class="small" label="View Full Screen" @click="toggleFullView" />
-         </h2>
+      <div class="items" v-else-if="item.hasDigitalContent || item.googleBooksURL || hasExternalImages">
+         <h2>View Online</h2>
+         <div class="buttons" v-if="!collection.isFullPageCollection && item.hasDigitalContent">
+            <VirgoButton size="small" severity="info" label="View Full Screen" @click="toggleFullView" />
+         </div>
          <div class="viewer" v-if="item.hasDigitalContent">
             <div v-if="fsView" class="restore-view">
-               <VirgoButton @click="toggleFullView" label="Restore View" />
+               <VirgoButton severity="info"  @click="toggleFullView" label="Restore View" />
             </div>
-            <iframe :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
+            <iframe class="curio" :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large">
@@ -40,7 +39,7 @@
 
          <div v-else class="value">
             <template v-if="pdfContent.length > 0">
-               <div class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></div>
+               <h3 class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></h3>
                <ScrollPanel>
                   <div class="hcontent">
                      <div v-for="item in pdfContent" :key="item.pid"
@@ -347,61 +346,10 @@ onUnmounted(()=>{
    width: 95%;
    margin: 0 auto;
    overflow: hidden;
-
-   .working {
-      text-align: center;
-      margin: 20px 0 30px 0;
-      font-size: 0.85em;
-   }
-
-   h2 {
-      color: var(--color-primary-orange);
-      text-align: center;
-      margin: 30px 0 30px 0;
-   }
-
-   div.viewer {
-      margin-bottom: 25px;
-      iframe.full {
-         position: fixed;
-         width: 100%;
-         top: 40px;
-         height: 100%;
-         left: 0;
-         z-index: 10000;
-      }
-      .restore-view {
-         position: fixed;
-         z-index: 20000;
-         right: 5px;
-         top: 100px;
-      }
-   }
-
-   .google {
-      margin-top: 25px;
-      img {
-         display:block;
-         margin: 0 auto;
-      }
-      .google-thumb {
-         border: 1px solid var(--uvalib-grey-light);
-         padding: 0;
-         border-radius: 3px;
-         margin-bottom: 15px;
-         box-shadow: var(--uvalib-box-shadow);
-      }
-   }
+   text-align: left;
 
    div.items {
       margin: 25px 0 0 0;
-      h2.buttons {
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-         justify-content: flex-start;
-         gap: 10px;
-      }
 
       .download-card.current {
          border: 3px solid var(--uvalib-brand-blue-light);
@@ -435,6 +383,58 @@ onUnmounted(()=>{
          }
       }
    }
+
+   .working {
+      text-align: center;
+      margin: 20px 0 30px 0;
+   }
+
+   div.buttons {
+      padding-bottom: 10px;
+   }
+
+   div.viewer {
+      margin-bottom: 25px;
+      iframe.curio {
+         border: 1px solid var(--uvalib-grey-light);
+         border-radius: 5px;
+         background-image: url('@/assets/spinner2.gif');
+         background-repeat:no-repeat;
+         background-position: center center;
+      }
+      iframe.curio.full {
+         position: fixed;
+         width: 100%;
+         top: 60px;
+         height: 100%;
+         left: 0;
+         z-index: 10000;
+         border: none;
+         border-radius: 0;
+      }
+      .restore-view {
+         position: fixed;
+         z-index: 20000;
+         right: 5px;
+         top: 120px;
+      }
+   }
+
+   .google {
+      margin-top: 25px;
+      img {
+         display:block;
+         margin: 0 auto;
+      }
+      .google-thumb {
+         border: 1px solid var(--uvalib-grey-light);
+         padding: 0;
+         border-radius: 3px;
+         margin-bottom: 15px;
+         box-shadow: var(--uvalib-box-shadow);
+      }
+   }
+
    .img-view {
       display: inline-block;
       margin: 0 auto;
@@ -486,12 +486,8 @@ onUnmounted(()=>{
       }
    }
 }
-.do-header {
-   background: #efefef;
-   border-top: 1px solid var(--uvalib-grey-light);
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   padding: 10px 0;
-   text-align: center;
+h3.do-header {
+   margin: 35px 0 5px 0;
 }
 
 .hcontent {

@@ -1,6 +1,6 @@
 <template>
    <div class="details">
-      <div class="working" v-if="item.details.searching || item.loadingDigitalContent || resultStore.searching" >
+      <div class="working" v-if="item.details.searching || resultStore.searching" >
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
