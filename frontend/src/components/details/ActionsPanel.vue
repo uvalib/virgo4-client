@@ -65,13 +65,12 @@ const permalinkClicked = ( () => {
       display: flex;
       flex-flow: row nowrap;
       justify-content: flex-start;
-      align-items: flex-start;
+      align-items: stretch;
       border: 1px solid var(--uvalib-grey-light);
       border-radius: 0 5px 5px 0;
       .gutter {
          width: 17px;
          background-color:#E6F2F7;
-         height: 70px;
          border-right: 1px solid var(--uvalib-grey-light);
       }
       .buttons {
