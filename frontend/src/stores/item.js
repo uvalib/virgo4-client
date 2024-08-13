@@ -27,6 +27,13 @@ export const useItemStore = defineStore('item', {
          }
          return genTypeF.value
       },
+      onlineAccessSources: state => {
+         let sources = state.details.fields.find(f => f.name=="access_url")
+         if (sources) {
+            return sources.value
+         }
+         return []
+      },
       hasContentAdvisory: state => {
          let idx = state.details.fields.findIndex( f=> f.name=="content_advisory")
          return idx > -1

@@ -3,7 +3,7 @@
       <div class="working" v-if="item.availability.searching" >
          <V4Spinner message="Loading Availability..."/>
       </div>
-      <div class="availability-content" v-else-if="showAvailability">
+      <div class="availability-content" v-else>
          <h2>Availability</h2>
          <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
          <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
@@ -13,6 +13,9 @@
          </template>
 
          <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
+
+         <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
+            :title="item.details.header.title" :pool="item.details.source" :sources="item.onlineAccessSources" />
 
          <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
 
@@ -75,13 +78,16 @@ import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 import RequestContainer from "@/components/requests/RequestContainer.vue"
 import BoundWithItems from "@/components/details/BoundWithItems.vue"
 import DiBSViewer from "@/components/details/DiBSViewer.vue"
+import OnlineAccessPanel from "@/components/details/OnlineAccessPanel.vue"
 import { useItemStore } from "@/stores/item"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
+import { useSystemStore } from "@/stores/system"
 
 const item = useItemStore()
 const request = useRequestStore()
 const user = useUserStore()
+const system = useSystemStore()
 
 const hasItems = computed(()=>{
    return Array.isArray(item.availability.items) && item.availability.items.length > 0
@@ -89,9 +95,9 @@ const hasItems = computed(()=>{
 const availabilityFields = computed(()=>{
    return item.details.fields.filter( f => f.display == "availability")
 })
-const showAvailability = computed(()=>{
-   return hasItems.value || request.hasRequestOptions || availabilityFields.value.length > 0 || item.hasBoundWithItems
-})
+// const showAvailability = computed(()=>{
+//    return hasItems.value || request.hasRequestOptions || availabilityFields.value.length > 0 || item.hasBoundWithItems
+// })
 const canMakeRequests = computed(()=>{
    if ( user.noILSAccount) {
       if (request.requestOptions.find( ro => ro.sign_in_required === false)) {

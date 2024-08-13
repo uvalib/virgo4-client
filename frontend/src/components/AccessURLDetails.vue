@@ -1,6 +1,6 @@
 <template>
    <div class="access-urls">
-      <template v-for="(p,idx) in urls" :key="idx">
+      <template v-for="(p) in urls" :key="idx">
          <div class='provider'>
             <template v-if="p.links.length==1">
                <a class="link-button" :href="p.links[0].url" target='_blank'
@@ -31,7 +31,7 @@
                   <div v-for="(l,idx) in providerLinks(p)" :key="`${l.url}-${idx}`">
                      <VirgoButton as="a" :label="linkLabel(l)" :href="l.url" target="_blank" :aria-label="`access ${props.title} ${l.label} with ${providerLabel(p.provider)}`"/>
                   </div>
-                  <template v-if="props.mode=='brief' && remainingLinks(p)">
+                  <template v-if="remainingLinks(p)">
                      <div>see {{remainingLinks(p)}} more on details page</div>
                   </template>
                </div>
@@ -45,10 +45,6 @@
 import { usePoolStore } from "@/stores/pool"
 
 const props = defineProps({
-   mode: {
-      type: String,
-      default: "brief",
-   },
    title: {
       type: String,
       required: true
@@ -89,11 +85,9 @@ function providerHomepage(provider) {
    return ""
 }
 function providerLinks( details ) {
-   if ( props.mode == "full") return details.links
    return details.links.slice(0,10)
 }
 function remainingLinks( details ) {
-   if ( props.mode == "full") return 0
    if ( details.links.length <= 10) return 0
    return details.links.length - 10
 }

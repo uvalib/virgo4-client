@@ -53,12 +53,6 @@
                      </template>
                   </dd>
                </template>
-               <!-- <template v-if="accessURLField && !system.isKiosk">
-                  <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value">
-                     <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
-                  </dd>
-               </template> -->
                <template v-if="hasExtLink && system.isKiosk == false && detailExpanded">
                   <dt class="label">Full metadata:</dt>
                   <dd class="value">
@@ -81,7 +75,7 @@
       <ActionsPanel :hit="details" :pool="details.source" />
       <DigitalContent />
       <template v-if="details.source != 'images'">
-         <Availability v-if="poolStore.hasAvailability(details.source)" />
+         <Availability v-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
          <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
          <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
             <h2>Bookplates Fund</h2>

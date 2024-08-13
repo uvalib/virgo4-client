@@ -20,7 +20,7 @@
                <template v-if="accessURLField && !system.isKiosk">
                   <dt class="label">{{accessURLField.label}}:</dt>
                   <dd class="value">
-                     <AccessURLDetails mode="brief" :title="props.hit.header.title" :pool="props.pool" :urls="accessURLField.value" />
+                     <AccessURLDetails :title="props.hit.header.title" :pool="props.pool" :urls="accessURLField.value" />
                   </dd>
                </template>
             </dl>
