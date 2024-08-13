@@ -334,6 +334,11 @@ dd {
    -moz-hyphens: auto;
    hyphens: auto;
    padding: 4px 0px;
+   .related {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+   }
 }
 dt.toggle {
    margin-top: 15px;
