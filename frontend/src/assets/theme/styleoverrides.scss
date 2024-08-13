@@ -31,6 +31,13 @@
       }
    }
 
+   .p-carousel-item-list .p-carousel-item {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: stretch;
+      justify-content: center;
+   }
+
    div.p-panel-header {
       border-bottom: 1px solid var(--uvalib-grey-light);
       margin-bottom: 10px;

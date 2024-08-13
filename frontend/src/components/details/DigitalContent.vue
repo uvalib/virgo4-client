@@ -40,39 +40,37 @@
          <div v-else class="value">
             <template v-if="pdfContent.length > 0">
                <h3 class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></h3>
-               <ScrollPanel>
-                  <div class="hcontent">
-                     <div v-for="item in pdfContent" :key="item.pid"
-                        class="download-card" role="button"
-                        :class="{current: isCurrent(item)}"
-                        @click.stop="viewerClicked(item)"
-                     >
-                        <V4ProgressBar v-if="generatePDFInProgress(item)" :id="item.name"
-                           :style="{top: pdfTop(item)}"
-                           :percent="item.pdf.status" label="Generating PDF"
+               <Carousel :value="pdfContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions">
+                  <template #item="slotProps">
+                     <div class="download-card" :class="{current: isCurrent(slotProps.data)}" @click.stop="viewerClicked(slotProps.data)">
+                        <V4ProgressBar v-if="generatePDFInProgress(slotProps.data)" :id="slotProps.data.name"
+                           :style="{top: pdfTop(slotProps.data)}"
+                           :percent="slotProps.data.pdf.status" label="Generating PDF"
                         />
-                        <V4ProgressBar v-if="generateOCRInProgress(item)" :id="item.name"
-                           :style="{top: ocrTop(item)}"
-                           :percent="item.ocr.status" label="Extracting Text"
+                        <V4ProgressBar v-if="generateOCRInProgress(slotProps.data)" :id="slotProps.data.name"
+                           :style="{top: ocrTop(slotProps.data)}"
+                           :percent="slotProps.data.ocr.status" label="Extracting Text"
                         />
-                        <img v-if="item.thumbnail" :src="item.thumbnail"/>
-                        <span class="label">{{item.name}}</span>
-                        <span v-if="generatePDFInProgress(item)" class="label">PDF generating...</span>
-                        <VirgoButton text link label="Download PDF" @click="pdfClicked(item)"
-                           :aria-label="`download pdf for ${item.name}`" />
-                        <OCRRequest v-if="user.isSignedIn && item.ocr || item.ocr && item.ocr.status == 'READY'"
-                           :dcIndex="digitalContentIndex(item)"
-                           @ocr-started="ocrStarted(item)"
-                        />
-                        <span v-if="isCurrent(item)" class="opened">
-                           <i v-if="isCurrent(item)" class="fas fa-check-circle"></i>
-                           Opened in Viewer
-                        </span>
-                        <VirgoButton v-else text link label="Open in Viewer" @click="viewerClicked(item)"
-                           :aria-label="`open ${item.name} in viewer`" />
+                        <img v-if="slotProps.data.thumbnail" :src="slotProps.data.thumbnail"/>
+                        <div class="details">
+                           <span class="label">{{slotProps.data.name}}</span>
+                           <span v-if="generatePDFInProgress(slotProps.data)" class="label">PDF generating...</span>
+                           <VirgoButton text link label="Download PDF" @click="pdfClicked(slotProps.data)"
+                              :aria-label="`download pdf for ${slotProps.data.name}`" size="small"/>
+                           <OCRRequest v-if="user.isSignedIn && slotProps.data.ocr || slotProps.data.ocr && slotProps.data.ocr.status == 'READY'"
+                              :dcIndex="digitalContentIndex(slotProps.data)"
+                              @ocr-started="ocrStarted(slotProps.data)"
+                           />
+                           <span v-if="isCurrent(slotProps.data)" class="opened">
+                              <i v-if="isCurrent(slotProps.data)" class="fas fa-check-circle"></i>
+                              Opened in Viewer
+                           </span>
+                           <VirgoButton v-else text link label="Open in Viewer" @click="viewerClicked(slotProps.data)"
+                              :aria-label="`open ${slotProps.data.name} in viewer`" size="small"/>
+                        </div>
                      </div>
-                  </div>
-               </ScrollPanel>
+                  </template>
+               </Carousel>
             </template>
          </div>
 
@@ -89,6 +87,7 @@
 import ImageAdvisory from "@/components/ImageAdvisory.vue"
 import V4ProgressBar from "@/components/V4ProgressBar.vue"
 import OCRRequest from "@/components/modals/OCRRequest.vue"
+import Carousel from 'primevue/carousel'
 import analytics from '@/analytics'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
@@ -98,7 +97,6 @@ import { usePoolStore } from "@/stores/pool"
 import { useResultStore } from "@/stores/result"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
-import ScrollPanel from 'primevue/scrollpanel'
 
 const collection = useCollectionStore()
 const item = useItemStore()
@@ -107,6 +105,34 @@ const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
 const route = useRoute()
+
+const responsiveOptions = ref([
+   {
+        breakpoint: '1400px',
+        numVisible: 6,
+        numScroll: 6
+    },
+    {
+      breakpoint: '1200px',
+      numVisible: 5,
+      numScroll: 5
+   },
+   {
+      breakpoint: '1000px',
+      numVisible: 4,
+      numScroll: 4
+   },
+   {
+      breakpoint: '767px',
+      numVisible: 3,
+      numScroll: 3
+   },
+   {
+      breakpoint: '500px',
+      numVisible: 2,
+      numScroll: 2
+   }
+]);
 
 const selectedDigitalObjectIdx = ref(0)
 const pdfTimerIDs = ref(new Map())
@@ -228,6 +254,7 @@ onMounted(()=>{
 function toggleFullView() {
    fsView.value = !fsView.value
 }
+
 function imageURL(size) {
    let iiifField = details.value.fields.find( f => f.name=="iiif_image_url")
    if (!iiifField) return ""
@@ -357,15 +384,29 @@ onUnmounted(()=>{
       .download-card {
          position: relative;
          border: 1px solid var(--uvalib-grey-light);
-         padding: 15px 10px 10px 10px;
+         padding: 10px 5px 5px 5px;
+         margin: 5px;
          cursor: pointer;
-         min-width: 175px;
+         width: 100%;
          background: white;
-         display: flex;
-         flex-direction: column;
-         align-items: flex-start;
-         justify-content: flex-start;
-         gap: 10px;
+         border-radius: 4px;
+
+         img {
+            display: block;
+            margin: 0 auto;
+         }
+         .label {
+            text-align: center;
+         }
+
+         .details {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+         }
 
          &:hover {
             top: -2px;
@@ -375,7 +416,9 @@ onUnmounted(()=>{
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 5px;
+            font-size: 0.875rem;
             i {
                font-size: 1.25em;
                color: var(--uvalib-green);
@@ -487,21 +530,7 @@ onUnmounted(()=>{
    }
 }
 h3.do-header {
-   margin: 35px 0 5px 0;
-}
-
-.hcontent {
-   display: flex;
-   flex-flow: row nowrap;
-   justify-content: flex-start;
-   align-items: stretch;
-   padding: 0;
-   margin-top: 15px;
-   gap: 10px;
-}
-
-:deep(.pdf) {
-   padding-top: 0 !important;
+   margin: 35px 0 15px 0;
 }
 
 </style>

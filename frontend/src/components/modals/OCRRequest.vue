@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton link @click="ocrClicked" ref="trigger"
+   <VirgoButton link @click="ocrClicked" ref="trigger" size="small"
       :aria-label="`dowload full text for ${digitalItem.name}`" label="Download Full Text"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text" @hide="closeDialog" @show="opened">
       <div v-if="mode=='init'" class="searching">
