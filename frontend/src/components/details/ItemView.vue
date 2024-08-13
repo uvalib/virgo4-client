@@ -275,6 +275,11 @@ const fieldLimit = (( field ) => {
       -moz-hyphens: auto;
       hyphens: auto;
       padding: 4px 0px;
+      .related {
+         display: flex;
+         flex-direction: column;
+         gap: 5px;
+      }
    }
    .value.more {
       margin-top: 15px;
