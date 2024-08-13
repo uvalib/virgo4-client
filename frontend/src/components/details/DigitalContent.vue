@@ -465,10 +465,6 @@ onUnmounted(()=>{
 
    .google {
       margin-top: 25px;
-      img {
-         display:block;
-         margin: 0 auto;
-      }
       .google-thumb {
          border: 1px solid var(--uvalib-grey-light);
          padding: 0;
