@@ -74,14 +74,24 @@ const permalinkClicked = ( () => {
          border-right: 1px solid var(--uvalib-grey-light);
       }
       .buttons {
-         padding-left: 20px;
          display: flex;
          flex-flow: row wrap;
-         justify-content: flex-start;
          align-items: center;
-         gap: 50px;
-         height: 70px;
       }
+   }
+}
+@media only screen and (min-width: 768px) {
+   .buttons {
+      padding: 10px 20px;
+      justify-content: flex-start;
+      gap: 5px 50px;
+   }
+}
+@media only screen and (max-width: 768px) {
+   .buttons {
+      padding: 10px;
+      justify-content: space-between;
+      gap: 5px 10px;
    }
 }
 </style>
