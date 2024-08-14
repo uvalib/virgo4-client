@@ -170,8 +170,8 @@ function formatValue(val) {
    text-align: left;
 
    .avail-message {
-      text-align: center;
-      margin-bottom: 2.5rem;
+      text-align: left;
+      margin-bottom: 2rem;
    }
    div.items {
       border: 1px solid var(--uvalib-grey-light);

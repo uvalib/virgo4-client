@@ -10,10 +10,9 @@
             </VirgoButton>
          </template>
          <template v-else>
-            <div v-if="hasProviderInfo(p.provider)" class="header" :class="{full: props.mode=='full'}">
+            <div v-if="hasProviderInfo(p.provider)" class="header">
                <template v-if="providerHomepage(p.provider)">
                   <a class="provider-link" :aria-label="`${providerLabel(p.provider)} home page`" :href="providerHomepage(p.provider)" target="_blank">
-                     <img v-if="props.mode=='full' && providerLogo(p.provider)" :src="providerLogo(p.provider)" />
                      {{ providerLabel(p.provider) }}
                   </a>
                </template>
@@ -21,7 +20,7 @@
                   <span class='provider'>{{ providerLabel(p.provider) }}</span>
                </template>
             </div>
-            <div class="links" :class="{full: props.mode=='full', indent: hasProviderInfo}">
+            <div class="links" :class="{indent: hasProviderInfo}">
                <div v-for="(l,idx) in providerLinks(p)" :key="`${l.url}-${idx}`">
                   <VirgoButton as="a" :label="linkLabel(l)" :href="l.url" target="_blank" size="small"
                      :aria-label="`access ${props.title} ${l.label} with ${providerLabel(p.provider)}`"/>
@@ -68,11 +67,6 @@ function providerLabel(provider) {
    if ( p ) return p.label
    return provider
 }
-function providerLogo(provider) {
-   let p = poolStore.findProvider(props.pool, provider)
-   if ( p ) return p.logo_url
-   return ""
-}
 function providerHomepage(provider) {
    let p = poolStore.findProvider(props.pool, provider)
    if ( p ) return p.homepage_url
@@ -93,15 +87,9 @@ function remainingLinks( details ) {
    flex-direction: column;
    gap: 5px;
 }
-.header.full {
-   text-align: left;
-}
 span.provider {
    color: var(--uvalib-grey);
    font-weight:  bold;
-}
-.header.full span.provider {
-   font-size: 1.15em;
 }
 
 .links.indent {
@@ -119,18 +107,10 @@ span.provider {
    justify-content: flex-start;
    align-items: flex-start;
 }
-.links.full {
-   font-size: 1em;
-}
 .provider-link {
    display: inline-flex;
    align-items: center;
    color: var(--color-link);
    font-weight: 500 !important;
-   img {
-      height: 55px;
-      width: auto !important;
-      margin: 3px 5px 3px 0;
-   }
 }
 </style>
