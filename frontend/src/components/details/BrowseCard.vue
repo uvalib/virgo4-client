@@ -1,6 +1,5 @@
 <template>
    <div class="browse-card" :class="{current: props.current, list: props.mode!='gallery'}" :aria-current="props.current.toString()" :id="`browse-${props.data.id}`">
-      <i class="current fas fa-caret-down" v-if="props.current"></i>
       <template v-if="props.mode=='gallery'">
          <div class="thumb-wrap">
             <span v-if="props.data.status=='ready'" class="vertical-spacer"></span>
@@ -118,7 +117,6 @@ const bookmarkClicked = ((id) => {
    justify-content: stretch;
    font-size: .937em;
    box-sizing: border-box;
-   width: auto;
 
    &:hover, &:focus-within, &:focus {
       top: -2px;
@@ -189,12 +187,6 @@ const bookmarkClicked = ((id) => {
          }
       }
    }
-   i.current {
-      position: absolute;
-      top: -15px;
-      width: 100%;
-      text-align: center;
-   }
    .details.list {
       display: grid;
       text-align: left;
@@ -208,6 +200,7 @@ const bookmarkClicked = ((id) => {
       padding: 5px 0;
       height: 230px;
       width: 100%;
+      text-align: center;
 
       .call, .loc, .title {
          background: white;
@@ -246,6 +239,9 @@ const bookmarkClicked = ((id) => {
    .details.list {
       grid-template-columns: 50px 1fr 125px;
    }
+   .browse-card {
+      width: 190px;
+   }
 }
 @media only screen and (max-width: 768px) {
    .browse-card.list {
@@ -255,6 +251,9 @@ const bookmarkClicked = ((id) => {
       grid-template-columns: 25px 1fr;
       grid-template-rows: max-content 10px;
       grid-row-gap: 15px;
+   }
+   .browse-card {
+      width: 150px;
    }
    .bar {
       display: none;

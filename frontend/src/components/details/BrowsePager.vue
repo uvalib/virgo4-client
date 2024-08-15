@@ -1,5 +1,5 @@
 <template>
-   <section class="browse-controls">
+   <section class="browse-pager">
       <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="browse previous shelf item"
          severity="info" label="Previous"/>
       <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="browse next shelf item"
@@ -23,7 +23,7 @@ function browsePrior() {
 }
 </script>
 <style lang="scss" scoped>
-.browse-controls {
+.browse-pager {
    display: flex;
    flex-flow: row nowrap;
    justify-content: space-between;

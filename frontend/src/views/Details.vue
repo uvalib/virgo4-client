@@ -130,7 +130,7 @@ onUpdated(()=>{
    margin-top: 2vw;
    margin-bottom: 10vh;
    color: var(--color-primary-text);
-   width: 90%;
+   width: 95%;
    margin: 0 auto;
    text-align: left;
 
