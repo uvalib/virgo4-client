@@ -127,11 +127,6 @@ onMounted(()=>{
       margin: 20px 0 30px 0;
       font-size: 0.85em;
    }
-   .to-browse {
-      display: block;
-      margin: 0 auto;
-   }
-
    .center {
       text-align: centter;
    };

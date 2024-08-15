@@ -120,7 +120,9 @@ const UVA = definePreset(Aura, {
                   }
                },
                info: {
-                  background: '#BFE7F7',
+                  background: 'var(--uvalib-blue-alt-light)',
+                  activeBackground: 'var(--uvalib-blue-alt-light)',
+                  activeColor: '#000000',
                   hoverBackground: '#91d8f2',
                   hoverBorderColor: '#007BAC',
                   borderColor: '#007BAC',
