@@ -370,10 +370,6 @@ onUnmounted(()=>{
 </script>
 <style lang="scss" scoped>
 .digital-content {
-   width: 95%;
-   margin: 0 auto;
-   overflow: hidden;
-   text-align: left;
 
    div.items {
       margin: 25px 0 0 0;

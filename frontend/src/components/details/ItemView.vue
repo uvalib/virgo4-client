@@ -240,8 +240,6 @@ const fieldLimit = (( field ) => {
 </script>
 <style lang="scss" scoped>
 .item-header {
-   width: 95%;
-   margin: 0 auto;
    display: flex;
    flex-flow: row wrap;
    justify-content: space-between;
@@ -272,10 +270,6 @@ const fieldLimit = (( field ) => {
 
 h2 {
    margin: 50px 0 30px 0;
-}
-div.details-content  {
-   width: 95%;
-   margin: 0 auto;
 }
 
 .ra-box.ra-fiy.pad-top {

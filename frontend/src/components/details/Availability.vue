@@ -157,9 +157,6 @@ function formatValue(val) {
 </script>
 <style lang="scss" scoped>
 .availability {
-   width: 95%;
-   margin: 0 auto;
-
    .working {
       margin: 25px;
       text-align: center;

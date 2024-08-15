@@ -58,9 +58,6 @@ const permalinkClicked = ( () => {
 
 <style lang="scss" scoped>
 .actions {
-   width: 95%;
-   margin: 0 auto;
-   text-align: left;
    .panel {
       display: flex;
       flex-flow: row nowrap;
