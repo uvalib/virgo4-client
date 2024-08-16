@@ -44,16 +44,18 @@
    }
 
    div.p-menubar {
-      // justify-content: flex-end;
-      border-bottom: 3px solid #232D4B;
-      // .p-menubar-end {
-      //    margin-left: initial;
-      // }
+      justify-content: flex-end;
+      .p-menubar-end {
+         margin-left: initial;
+      }
       div.p-menubar-item-content a {
          &:hover {
             text-decoration: none;
-            color: var(--uvalib-text);
+            color: #ffffff;
          }
+      }
+      ul.p-menubar-submenu {
+         border-radius: 4px 4px 5px 5px;
       }
    }
 }

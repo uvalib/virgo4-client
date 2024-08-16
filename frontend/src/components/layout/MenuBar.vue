@@ -43,14 +43,6 @@ const userStore = useUserStore()
 const results = useResultStore()
 const router = useRouter()
 
-
-const alertTabIndex = computed( () => {
-   if ( alertStore.seenCount > 0) {
-      return 0
-   }
-   return -1
-})
-
 const v4Menu = computed( () => {
    let menu = [ {label: "Search", icon: "icon fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
    if ( systemStore.isKiosk) return menu
@@ -142,6 +134,9 @@ const signOut = (() => {
 .alert-wrap {
    position: relative;
    display: block;
+   button {
+      color: white;
+   }
    button.dim {
       opacity: 0.2;
    }
