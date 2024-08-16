@@ -79,14 +79,15 @@ const linkLabel = (( providerLink ) => {
       align-items: stretch;
       border: 1px solid var(--uvalib-grey-light);
       border-radius: 0 5px 5px 0;
+      gap: 20px;
       .gutter {
-         width: 17px;
+         flex: 0 0 17px;
          background-color:#E6F2F7;
          border-right: 1px solid var(--uvalib-grey-light);
       }
       .content {
-         flex-grow: 1;
-         padding: 0 15px 15px 15px;
+         flex: 1;
+         padding: 0 20px 25px 0;
          h3 {
             font-size: 1.15em;
             padding-bottom: 10px;

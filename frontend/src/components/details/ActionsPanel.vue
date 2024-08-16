@@ -65,28 +65,29 @@ const permalinkClicked = ( () => {
       align-items: stretch;
       border: 1px solid var(--uvalib-grey-light);
       border-radius: 0 5px 5px 0;
+      gap: 20px;
       .gutter {
-         width: 17px;
+         flex: 0 0 17px;
          background-color:#E6F2F7;
          border-right: 1px solid var(--uvalib-grey-light);
       }
       .buttons {
+         flex: 1;
          display: flex;
          flex-flow: row wrap;
          align-items: center;
+         padding: 10px 20px 10px 0;
       }
    }
 }
 @media only screen and (min-width: 768px) {
    .buttons {
-      padding: 10px 20px;
       justify-content: flex-start;
       gap: 5px 50px;
    }
 }
 @media only screen and (max-width: 768px) {
    .buttons {
-      padding: 10px;
       justify-content: space-between;
       gap: 5px 10px;
    }
