@@ -23,9 +23,9 @@
             </div>
          </div>
 
-         <template v-if="poolMode=='image'">
-            <div v-if="details.related.length > 0" class="related">
-               <label>Related Images</label>
+         <template v-if="poolMode=='image' && details.related.length > 0">
+            <h3>Related images</h3>
+            <div class="related">
                <router-link :to="relatedImageURL(r)"  @mousedown="relatedImageClicked(r)"
                   v-for="r in details.related" :key="`r${r.id}`"
                >
@@ -490,20 +490,19 @@ onUnmounted(()=>{
       }
    }
 
+   h3 {
+      font-size: 1em;
+   }
+
    div.related {
-      width: 90%;
-      margin: 15px auto 0 auto;
-      text-align: left;
-      label {
-         padding:0 0 5px 0;
-         border-bottom: 2px solid var(--color-brand-blue);
-         margin-bottom: 10px;
-         display: block;
-         font-weight: 500;
-      }
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 10px;
+
       a {
          display: inline-block;
-         margin: 10px;
       }
       .img-wrap {
          position: relative;

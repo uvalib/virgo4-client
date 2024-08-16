@@ -156,7 +156,7 @@ onMounted(()=>{
       }
    }
    .browse-controls  {
-      margin: 20px 0 30px 0;
+      margin: 20px 0 0 0;
       text-align: center;
       .recenter {
          margin-top: 10px;

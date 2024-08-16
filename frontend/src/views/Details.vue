@@ -125,13 +125,10 @@ onUpdated(()=>{
 </script>
 <style lang="scss" scoped>
 .details {
-   min-height: 400px;
    position: relative;
-   margin-top: 2vw;
-   margin-bottom: 10vh;
    color: var(--color-primary-text);
    width: 95%;
-   margin: 0 auto;
+   margin: 0 auto 3vh auto;
    text-align: left;
 
    .working {
