@@ -4,7 +4,7 @@
          <V4Spinner message="Getting shelf browse data..." />
       </div>
       <nav aria-labelledby="shelf-title" v-if="!shelfStore.lookingUp && shelfStore.hasBrowseData">
-         <h2 id="shelf-title">Shelf Browse</h2>
+         <h2 id="shelf-title">Shelf browse</h2>
          <ul class="browse-cards" role="list">
             <li v-for="(b,idx) in shelfStore.browse" class="card-wrap" :key="`b${b.id}`">
                <i class="current fas fa-caret-down" v-if="isCurrent(idx)"></i>

@@ -4,7 +4,7 @@
          <V4Spinner message="Searching for digital content..." />
       </div>
       <div class="items" v-else-if="item.hasDigitalContent || item.googleBooksURL || hasExternalImages">
-         <h2>View Online</h2>
+         <h2>View online</h2>
          <div class="buttons" v-if="!collection.isFullPageCollection && item.hasDigitalContent">
             <VirgoButton size="small" severity="info" label="View Full Screen" @click="toggleFullView" />
          </div>
@@ -39,7 +39,7 @@
 
          <div v-else class="value">
             <template v-if="pdfContent.length > 0">
-               <h3 class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></h3>
+               <h3 class='do-header'>{{pdfContent.length}} Digital object<span v-if="pdfContent.length>1">s</span></h3>
                <Carousel :value="pdfContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions">
                   <template #item="slotProps">
                      <div class="download-card" :class="{current: isCurrent(slotProps.data)}" @click.stop="viewerClicked(slotProps.data)">

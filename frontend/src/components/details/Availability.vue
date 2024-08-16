@@ -19,7 +19,6 @@
 
          <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
 
-         <BoundWithItems v-if="item.hasBoundWithItems"/>
          <div class="items" v-if="hasItems || request.hasRequestOptions">
             <RequestContainer v-if="canMakeRequests && !user.isBarred" />
             <ul class="holdings" v-if="item.details.holdings.libraries">
@@ -76,7 +75,6 @@
 import { computed } from "vue"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 import RequestContainer from "@/components/requests/RequestContainer.vue"
-import BoundWithItems from "@/components/details/BoundWithItems.vue"
 import DiBSViewer from "@/components/details/DiBSViewer.vue"
 import OnlineAccessPanel from "@/components/details/OnlineAccessPanel.vue"
 import { useItemStore } from "@/stores/item"

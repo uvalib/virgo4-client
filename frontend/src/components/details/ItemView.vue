@@ -77,6 +77,7 @@
       <template v-if="details.source != 'images'">
          <Availability v-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
          <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
+         <BoundWithItems v-if="item.hasBoundWithItems"/>
          <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
             <h2>Bookplates Fund</h2>
             <CollectionHeader :border="false"/>
@@ -89,6 +90,7 @@
 import ActionsPanel from "@/components/details/ActionsPanel.vue"
 import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
+import BoundWithItems from "@/components/details/BoundWithItems.vue"
 import MarcMetadata from "@/components/modals/MarcMetadata.vue"
 import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import ContentAdvisory from "@/components/ContentAdvisory.vue"
