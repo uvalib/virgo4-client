@@ -40,12 +40,18 @@
    }
 
    div.p-menubar {
-      border-bottom: 3px solid #232D4B;
+      justify-content: flex-end;
+      .p-menubar-end {
+         margin-left: initial;
+      }
       div.p-menubar-item-content a {
          &:hover {
             text-decoration: none;
-            color: var(--uvalib-text);
+            color: #ffffff;
          }
+      }
+      ul.p-menubar-submenu {
+         border-radius: 4px 4px 5px 5px;
       }
    }
 }

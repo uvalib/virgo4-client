@@ -162,11 +162,37 @@ const UVA = definePreset(Aura, {
       menubar: {
          root: {
             borderRadius: "0px",
+            background: 'var(--uvalib-blue-alt-darkest)',
+            borderColor: 'var(--uvalib-blue-alt-darkest)',
+         },
+         baseItem: {
+            borderRadius: '4px',
          },
          item: {
-            focusBackground: 'var(--uvalib-grey-lightest)',
-            activeBackground: 'var(--uvalib-grey-lightest)',
+            focusBackground: 'var(--uvalib-blue-alt)',
+            activeBackground: 'var(--uvalib-blue-alt)',
+            color: '#ffffff',
+            focusColor: '#ffffff',
+            activeColor: '#ffffff',
+            icon: {
+               color: '#ffffff',
+               focusColor: '#ffffff',
+               activeColor: '#ffffff',
+           }
          },
+         submenu: {
+            background: 'var(--uvalib-blue-alt-dark)',
+            borderColor: 'var(--uvalib-blue-alt-dark)',
+            borderRadius: '4px',
+            shadow: '{overlay.navigation.shadow}',
+            mobileIndent: '1rem',
+        },
+        submenuIcon: {
+            size: '{navigation.submenu.icon.size}',
+            color: '#ffffff',
+            focusColor: '#ffffff',
+            activeColor: '#ffffff',
+        },
       },
       panelmenu: {
          panel: {
