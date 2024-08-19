@@ -3,7 +3,7 @@
       <div class="working" v-if="item.loadingDigitalContent">
          <V4Spinner message="Searching for digital content..." />
       </div>
-      <div class="items" v-else-if="item.hasDigitalContent || item.googleBooksURL || hasExternalImages">
+      <div class="items" v-else-if="item.hasDigitalContent || hasExternalImages">
          <h2>View online</h2>
          <div class="buttons" v-if="!collection.isFullPageCollection && item.hasDigitalContent">
             <VirgoButton size="small" severity="info" label="View Full Screen" @click="toggleFullView" />
@@ -72,12 +72,6 @@
                   </template>
                </Carousel>
             </template>
-         </div>
-
-         <div class="google" v-if="item.googleBooksURL">
-            <a :href="item.googleBooksURL" target="_blank" aria-label="google books preview">
-               <img alt="Google Books Preview" class="google-btn" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
-            </a>
          </div>
       </div>
    </div>
@@ -456,17 +450,6 @@ onUnmounted(()=>{
          z-index: 20000;
          right: 5px;
          top: 120px;
-      }
-   }
-
-   .google {
-      margin-top: 25px;
-      .google-thumb {
-         border: 1px solid var(--uvalib-grey-light);
-         padding: 0;
-         border-radius: 3px;
-         margin-bottom: 15px;
-         box-shadow: var(--uvalib-box-shadow);
       }
    }
 

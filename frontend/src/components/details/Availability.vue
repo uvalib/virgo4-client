@@ -176,9 +176,6 @@ function formatValue(val) {
    div.value {
       margin: 10px 0 0 20px;
    }
-   div.google {
-      margin: 25px 0 0 0;
-   }
    label {
       font-weight: bold;
       display: block;

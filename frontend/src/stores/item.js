@@ -9,8 +9,6 @@ export const useItemStore = defineStore('item', {
 	state: () => ({
       details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
-      googleBooksURL: "",
-      googleBookThumbURL: "",
       loadingDigitalContent: false,
       availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
       primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
@@ -248,53 +246,6 @@ export const useItemStore = defineStore('item', {
          })
       },
 
-     getGoogleBooksURL() {
-         let done = false
-         let fields = ["isbn", "lccn", "oclc"]
-         let tgtName = ""
-         let tgtValue = ""
-         fields.some(  fName => {
-            let idField = this.details.fields.find( f => f.name == fName )
-            if ( idField ) {
-               tgtName = fName
-               tgtValue = idField.value[0]
-               done = true
-            }
-            return done == true
-         })
-
-         // no identifier to search. nothing to do
-         if (tgtName == "") return
-
-         let url = `https://www.googleapis.com/books/v1/volumes?q=${tgtName}:${tgtValue}`
-         axios.get(url).then((response) => {
-            let done = false
-            this.googleBookThumbURL = ""
-            this.googleBooksURL = ""
-            response.data.items.some( item => {
-               if (item.accessInfo.viewability != "NO_PAGES") {
-                  if ( this.details.header.title.includes(item.volumeInfo.title)) {
-                     if ( item.volumeInfo.canonicalVolumeLink ) {
-                        this.googleBooksURL = item.volumeInfo.canonicalVolumeLink
-                     } else if ( item.volumeInfo.infoLink ) {
-                        this.googleBooksURL = item.volumeInfo.infoLink
-                     }
-                     else if (item.accessInfo.webReaderLink) {
-                        this.googleBooksURL = item.accessInfo.webReaderLink
-                     }
-                     if (item.volumeInfo.imageLinks.smallThumbnail) {
-                        this.googleBookThumbURL = item.volumeInfo.imageLinks.smallThumbnail
-                     }
-                     done = true
-                  }
-               }
-               return done == true
-            })
-         }).catch( () => {
-            // NO-OP
-         })
-      },
-
       getItemURL( source, identifier ) {
          // get source from poolID
          const poolStore = usePoolStore()
@@ -349,7 +300,6 @@ export const useItemStore = defineStore('item', {
             this.digitalContent.splice(0, this.digitalContent.length)
 
             this.getDigitalContent()
-            this.getGoogleBooksURL()
             if (poolStore.hasAvailability(this.details.source)){
                this.getAvailability()
             }
