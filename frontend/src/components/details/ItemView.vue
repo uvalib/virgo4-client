@@ -80,7 +80,7 @@
          <BoundWithItems v-if="item.hasBoundWithItems"/>
          <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
             <h2>Bookplates Fund</h2>
-            <CollectionHeader :border="false"/>
+            <CollectionHeader />
          </template>
          <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
       </template>
