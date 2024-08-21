@@ -82,7 +82,7 @@
          <h2>Bookplates Fund</h2>
          <CollectionHeader />
       </template>
-      <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
+      <ShelfBrowse v-if="details.source != 'images' && poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
    </template>
 </template>
 
