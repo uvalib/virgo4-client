@@ -1,44 +1,40 @@
 <template>
-   <div class="details-wrap">
-      <div class="details">
-         <div class="basic">
-            <dl class="fields">
-               <template v-for="(field,idx) in props.hit.fields">
-                  <template v-if="shouldDisplay(field)">
-                     <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
-                     <dd :key="getKey(field,`v${idx}`)" >
-                        <TruncatedText :id="`${props.hit.identifier}-${field.name}`"
-                           :text="utils.fieldValueString(field)" :limit="truncateLength"
-                        />
-                     </dd>
-                  </template>
-               </template>
-               <template v-if="fullTextSnippet">
-                   <dt class="label">Full Text Match:</dt>
-                   <dd class="value"><span class="snippet" v-html="fullTextSnippet"></span></dd>
-               </template>
-               <template v-if="accessURLField && !system.isKiosk">
-                  <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value">
-                     <AccessURLDetails mode="brief" :title="props.hit.header.title" :pool="props.pool" :urls="accessURLField.value" />
-                  </dd>
-               </template>
-            </dl>
-         </div>
-         <router-link v-if="props.hit.cover_image" @mousedown="detailClicked"
-            class="img-link" :to="detailsURL"  :aria-label="`${props.hit.header.title}`"
-         >
-            <img class="cover-img" v-if="props.hit.cover_image" aria-label=" " :src="props.hit.cover_image"/>
-         </router-link>
-      </div>
-      <div class="digital-content">
-         <a v-if="pdfDownloadURL" :href="pdfDownloadURL" class="download-link" :aria-label="`download pdf for ${props.hit.header.title}`">
-            <i class="icon far fa-file-pdf"></i><div>Download PDF</div>
-         </a>
-         <a v-if="ocrDownloadURL" :href="ocrDownloadURL" class="download-link" :aria-label="`download ocr for ${props.hit.header.title}`">
-            <i class="icon far fa-file-alt"></i><div>Download OCR</div>
-         </a>
-      </div>
+   <div class="details">
+      <dl class="fields">
+         <template v-for="(field,idx) in props.hit.fields">
+            <template v-if="shouldDisplay(field)">
+               <dt :key="getKey(field,`k${idx}`)">{{field.label}}:</dt>
+               <dd :key="getKey(field,`v${idx}`)" >
+                  <TruncatedText :id="`${props.hit.identifier}-${field.name}`"
+                     :text="utils.fieldValueString(field)" :limit="truncateLength"
+                  />
+               </dd>
+            </template>
+         </template>
+         <template v-if="fullTextSnippet">
+               <dt class="label">Full Text Match:</dt>
+               <dd class="value"><span class="snippet" v-html="fullTextSnippet"></span></dd>
+         </template>
+         <template v-if="accessURLField && !system.isKiosk">
+            <dt class="label">{{accessURLField.label}}:</dt>
+            <dd class="value">
+               <AccessURLDetails mode="brief" :title="props.hit.header.title" :pool="props.pool" :urls="accessURLField.value" />
+            </dd>
+         </template>
+      </dl>
+   </div>
+   <router-link v-if="props.hit.cover_image" @mousedown="detailClicked"
+      class="img-link" :to="detailsURL"  :aria-label="`${props.hit.header.title}`"
+   >
+      <img class="cover-img" v-if="props.hit.cover_image" aria-label=" " :src="props.hit.cover_image"/>
+   </router-link>
+   <div class="digital-content">
+      <a v-if="pdfDownloadURL" :href="pdfDownloadURL" class="download-link" :aria-label="`download pdf for ${props.hit.header.title}`">
+         <i class="icon far fa-file-pdf"></i><div>Download PDF</div>
+      </a>
+      <a v-if="ocrDownloadURL" :href="ocrDownloadURL" class="download-link" :aria-label="`download ocr for ${props.hit.header.title}`">
+         <i class="icon far fa-file-alt"></i><div>Download OCR</div>
+      </a>
    </div>
 </template>
 
@@ -137,32 +133,26 @@ const shouldDisplay = ((field) => {
    flex-flow: row wrap;
    align-items: flex-start;
 
-   div.basic {
-      padding: 5px 10px 10px 40px;
-      flex-grow: 1;
-      max-width:75%;
-
-      dl {
-         margin: 0 0 0 15px;
-         display: inline-grid;
-         grid-template-columns: max-content 2fr;
-         grid-column-gap: 15px;
-      }
-      dt {
-         font-weight: bold;
-         text-align: right;
-      }
-      dd {
-         margin: 0 0 10px 0;
-         word-break: break-word;
-         -webkit-hyphens: auto;
-         -moz-hyphens: auto;
-         hyphens: auto;
-         .snippet {
-            font-size: 0.9em;
-            :deep(em) {
-               font-weight: bold;
-            }
+   dl {
+      margin: 10px 0 0 15px;
+      display: inline-grid;
+      grid-template-columns: max-content 2fr;
+      grid-column-gap: 15px;
+   }
+   dt {
+      font-weight: bold;
+      text-align: right;
+   }
+   dd {
+      margin: 0 0 10px 0;
+      word-break: break-word;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+      hyphens: auto;
+      .snippet {
+         font-size: 0.9em;
+         :deep(em) {
+            font-weight: bold;
          }
       }
    }
