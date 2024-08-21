@@ -18,7 +18,7 @@
                   >
                   <VirgoButton icon="pi pi-search" @click="searchClicked" />
                </div>
-               <VirgoButton class="browse" @click="browseClicked" label="Browse All" />
+               <VirgoButton class="browse" @click="browseClicked" label="Browse All" severity="info"/>
             </div>
          </div>
       </div>
@@ -62,10 +62,11 @@ const publishedDate = computed(()=>{
    return ""
 })
 
-function datePicked(pid) {
+const datePicked = ((pid) => {
    router.push(pid)
-}
-function browseClicked() {
+})
+
+const browseClicked = (() => {
    // Set up the search in the store and flag it is user generated
    filter.reset()
    filter.toggleFilter("presearch", collection.filter, collection.title)
@@ -80,8 +81,9 @@ function browseClicked() {
    query.filter = filter.asQueryParam( "presearch" )
    query.pool = item.details.source
    router.push({path: "/search", query: query })
-}
-function searchClicked() {
+})
+
+const searchClicked = (() => {
    // Set up the search in the store and flag it is user generated
    filter.reset()
    filter.toggleFilter("presearch", collection.filter, collection.title)
@@ -96,31 +98,33 @@ function searchClicked() {
    query.filter = filter.asQueryParam( "presearch" )
    query.pool = item.details.source
    router.push({path: "/search", query: query })
-}
-function nextItem() {
+})
+
+const nextItem = (() => {
    let date = publishedDate.value
    if (date) {
       collection.nextItem(date)
    }
-}
-function prevItem() {
+})
+
+const prevItem = (() => {
    let date = publishedDate.value
    if (date) {
       collection.priorItem(date)
    }
-}
+})
 </script>
+
 <style lang="scss" scoped>
 .collection-panel {
    background-color: white;
-   margin-bottom: 15px;
+   padding-top: 15px;
 
    .collection-header {
       display: flex;
       flex-flow: row wrap;
       justify-content: center;
       gap: 25px;
-      padding: 5px 20px;
       .image {
          .thumb {
             display: block;
@@ -136,44 +140,46 @@ function prevItem() {
       }
       .collection-right-panel {
          flex:1;
+         display: flex;
+         flex-direction: column;
+
          .content {
             .title-row  {
                font-weight: bold;
-               color: var(--uvalib-text);
                font-size: 1.25em;
             }
 
             .desc-row {
-               text-align: left;
                padding: 20px 0 0 0px;
                min-width: 300px;
                margin-bottom: 25px;
                margin-right: 20px;
             }
          }
-      }
-   }
+         .collection-search {
+               display: flex;
+               flex-flow: row wrap;
+               align-items: center;
+               justify-content: space-between;
 
-   .collection-search {
-      display: flex;
-      flex-flow: row wrap;
-      align-items: stretch;
-      justify-content: flex-start;
-      gap: 5px;
-      .search-box {
-         flex: 1;
-         display: flex;
-         flex-flow: row nowrap;
-         align-items: stretch;
-         justify-content: flex-start;
-         input[type=text] {
-            flex: 1 1 auto;
-            min-width: 100px;
-            border-radius: 4px 0 0 4px;
-         }
-         button {
-            border-radius: 0 4px 4px 0;
-         }
+               .search-box {
+                  flex: 1;
+                  display: flex;
+                  flex-flow: row nowrap;
+                  align-items: stretch;
+                  justify-content: flex-start;
+                  input[type=text] {
+                     flex: 1;
+                     min-width: 100px;
+                     width: 100%;
+                     border-radius: 4px 0 0 4px;
+                     font-size: 1.1em;
+                  }
+                  button {
+                     border-radius: 0 4px 4px 0;
+                  }
+               }
+            }
       }
    }
 
@@ -192,17 +198,20 @@ function prevItem() {
 
 @media only screen and (min-width: 768px) {
    .collection-search {
-       width: 40%;
+       width: 85%;
+       gap: 25px;
    }
 }
 @media only screen and (max-width: 935px) {
     .collection-search {
-       width: 75%;
+       width: 95%;
+       gap: 15px;
    }
 }
 @media only screen and (max-width: 768px) {
     .collection-search {
-       width: 95%;
+       width: 100%;
+       gap: 5px;
    }
 }
 </style>

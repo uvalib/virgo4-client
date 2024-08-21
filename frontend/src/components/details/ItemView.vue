@@ -1,89 +1,89 @@
 <template>
-      <div class="item-header" >
-         <div class="title-wrap">
-            <div class="title">{{ details.header.title }}</div>
-            <div v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</div>
-         </div>
-         <span class="nav-wrap"  v-if="resultStore.selectedHitIdx > -1">
-            <V4Pager
-               :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
-               :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
-               @next="nextHitClicked" @prior="priorHitClicked"
-            />
-            <VirgoButton link @click="returnToSearch" label="Return to search results" />
-         </span>
+   <div class="item-header" >
+      <div class="title-wrap">
+         <div class="title">{{ details.header.title }}</div>
+         <div v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</div>
       </div>
-      <div class="details-content">
-         <abbr class="unapi-id" :title="details.itemURL"></abbr>
-         <div class="info">
-            <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
-            </div>
-            <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
-            <dl class="fields">
-               <template v-if="details.header.author">
-                  <dt class="label">{{details.header.author.label}}:</dt>
-                  <dd class="value">
-                     <V4LinksList id="author-links" :inline="true" :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
-                  </dd>
-               </template>
-               <template v-for="(field) in allDisplayFields">
-                  <dt class="label">{{field.label}}:</dt>
-                  <dd class="value">
-                     <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                        :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
-                     />
-                     <span class="related" v-else-if="field.type=='related-url'">
-                        <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
-                           <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" />
-                        </div>
-                     </span>
-                     <span class="copyright" v-else-if="field.type=='copyright'">
-                        <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
-                        <a :href="field.value" target="_blank">{{field.item}}</a>
-                        <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
-                           href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
-                        >
-                           More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
-                        </a>
-                     </span>
-                     <template v-else>
-                        <span v-if="preferences.expandDetails" class="value" v-html="utils.fieldValueString(field)"></span>
-                        <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
-                           :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
-                     </template>
-                  </dd>
-               </template>
-               <template v-if="hasExtLink && system.isKiosk == false && detailExpanded">
-                  <dt class="label">Full metadata:</dt>
-                  <dd class="value">
-                     <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
-                        View<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+      <span class="nav-wrap"  v-if="resultStore.selectedHitIdx > -1">
+         <V4Pager
+            :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
+            :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
+            @next="nextHitClicked" @prior="priorHitClicked"
+         />
+         <VirgoButton link @click="returnToSearch" label="Return to search results" />
+      </span>
+   </div>
+   <div class="details-content">
+      <abbr class="unapi-id" :title="details.itemURL"></abbr>
+      <div class="info">
+         <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
+         </div>
+         <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
+         <dl class="fields">
+            <template v-if="details.header.author">
+               <dt class="label">{{details.header.author.label}}:</dt>
+               <dd class="value">
+                  <V4LinksList id="author-links" :inline="true" :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
+               </dd>
+            </template>
+            <template v-for="(field) in allDisplayFields">
+               <dt class="label">{{field.label}}:</dt>
+               <dd class="value">
+                  <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
+                     :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
+                  />
+                  <span class="related" v-else-if="field.type=='related-url'">
+                     <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
+                        <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" />
+                     </div>
+                  </span>
+                  <span class="copyright" v-else-if="field.type=='copyright'">
+                     <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
+                     <a :href="field.value" target="_blank">{{field.item}}</a>
+                     <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
+                        href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
+                     >
+                        More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                      </a>
-                  </dd>
-               </template>
-               <template v-if="hasMarcXML && detailExpanded">
-                  <dt class="label marc">MARC XML:</dt>
-                  <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
-               </template>
-               <dt class="toggle">
-                  <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"/>
-               </dt>
-               <dd></dd>
-            </dl>
-         </div>
+                  </span>
+                  <template v-else>
+                     <span v-if="preferences.expandDetails" class="value" v-html="utils.fieldValueString(field)"></span>
+                     <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
+                        :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
+                  </template>
+               </dd>
+            </template>
+            <template v-if="hasExtLink && system.isKiosk == false && detailExpanded">
+               <dt class="label">Full metadata:</dt>
+               <dd class="value">
+                  <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
+                     View<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                  </a>
+               </dd>
+            </template>
+            <template v-if="hasMarcXML && detailExpanded">
+               <dt class="label marc">MARC XML:</dt>
+               <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
+            </template>
+            <dt class="toggle">
+               <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"/>
+            </dt>
+            <dd></dd>
+         </dl>
       </div>
-      <ActionsPanel :hit="details" :pool="details.source" />
-      <DigitalContent />
-      <template v-if="details.source != 'images'">
-         <Availability v-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
-         <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
-         <BoundWithItems v-if="item.hasBoundWithItems"/>
-         <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
-            <h2>Bookplates Fund</h2>
-            <CollectionHeader />
-         </template>
-         <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
+   </div>
+   <ActionsPanel :hit="details" :pool="details.source" />
+   <DigitalContent />
+   <template v-if="details.source != 'images'">
+      <Availability v-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
+      <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
+      <BoundWithItems v-if="item.hasBoundWithItems"/>
+      <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
+         <h2>Bookplates Fund</h2>
+         <CollectionHeader />
       </template>
+      <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
+   </template>
 </template>
 
 <script setup>
