@@ -1,10 +1,9 @@
 <template>
    <div class="details">
-      <div class="working" v-if="item.details.searching || resultStore.searching" >
+      <div class="working" v-if="loadingDetails" >
          <V4Spinner message="Looking up details..."/>
       </div>
       <template v-else>
-         <CollectionHeader v-if="collection.isBookplate == false && collection.isAvailable && (item.isCollection || item.isCollectionHead)"/>
          <FullPageCollectionView v-if="collection.isFullPage && item.isCollection && collection.isAvailable" />
          <ItemView v-else />
       </template>
@@ -13,12 +12,10 @@
 
 <script setup>
 import ItemView from "@/components/details/ItemView.vue"
-import CollectionHeader from "@/components/details/CollectionHeader.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { onMounted, onUpdated, watch } from 'vue'
+import { onMounted, onUpdated, watch, ref } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
-import { useResultStore } from "@/stores/result"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
@@ -27,11 +24,11 @@ import { storeToRefs } from "pinia"
 
 const collection = useCollectionStore()
 const item = useItemStore()
-const resultStore = useResultStore()
 const restore = useRestoreStore()
 const bookmarks = useBookmarkStore()
-
 const route = useRoute()
+
+const loadingDetails = ref(true)
 
 onBeforeRouteUpdate( async (to) => {
    // this is needed to load details when a grouped image thumb has been clicked; new content
@@ -57,6 +54,7 @@ async function getDetails(src, id) {
    // if this was called from an old catalog/id url, the src will get
    // set to legacy. in this case, lookup the cat key and redirect to full detail
    // the redirect will trigger a beforeRouteUpdate and that will get fill item detail.
+   loadingDetails.value = true
    if ( src == "legacy" ) {
       await item.lookupCatalogKeyDetail(id )
       return
@@ -104,6 +102,7 @@ async function getDetails(src, id) {
          restore.clear()
       }
    }, 500)
+   loadingDetails.value = false
 }
 
 function zoteroItemUpdated() {
