@@ -72,7 +72,7 @@
          </dl>
       </div>
    </div>
-   <ActionsPanel :hit="details" :pool="details.source" />
+   <ActionsPanel :hit="details" :pool="details.source" from="DETAILS"/>
    <DigitalContent />
    <template v-if="details.source != 'images'">
       <Availability v-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
@@ -80,7 +80,7 @@
       <BoundWithItems v-if="item.hasBoundWithItems"/>
       <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
          <h2>Bookplates Fund</h2>
-         <CollectionHeader />
+         <CollectionPanel />
       </template>
       <ShelfBrowse v-if="details.source != 'images' && poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
    </template>
@@ -92,7 +92,7 @@ import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
 import BoundWithItems from "@/components/details/BoundWithItems.vue"
 import MarcMetadata from "@/components/modals/MarcMetadata.vue"
-import CollectionHeader from "@/components/details/CollectionHeader.vue"
+import CollectionPanel from "@/components/details/CollectionPanel.vue"
 import ContentAdvisory from "@/components/ContentAdvisory.vue"
 import TruncatedText from "@/components/TruncatedText.vue"
 import V4LinksList from "@/components/V4LinksList.vue"

@@ -22,24 +22,10 @@
             </div>
          </div>
       </div>
-
-      <div class="collection-nav">
-         <div class="cal" v-if="collection.canNavigate && !item.isCollectionHead">
-            <CollectionDates v-if="collection.hasCalendar" id="coll-dates" :date="publishedDate" @picked="datePicked" />
-         </div>
-
-         <div class="seq-nav" v-if="collection.canNavigate && !item.isCollectionHead">
-            <VirgoButton @click="prevItem()" :aria-label="`previous ${collection.itemLabel}`"
-               icon="fal fa-arrow-left" :label="`Previous ${collection.itemLabel}`" />
-            <VirgoButton @click="nextItem()"  :aria-label="`next ${collection.itemLabel}`"
-               :label="`Next ${collection.itemLabel}`" icon="fal fa-arrow-right" iconPos="right" />
-         </div>
-      </div>
    </section>
 </template>
 
 <script setup>
-import CollectionDates from "@/components/modals/CollectionDates.vue"
 import { computed } from 'vue'
 import { useCollectionStore } from "@/stores/collection"
 import { useFilterStore } from "@/stores/filter"
@@ -53,18 +39,6 @@ const item = useItemStore()
 const queryStore = useQueryStore()
 const route = useRoute()
 const router = useRouter()
-
-const publishedDate = computed(()=>{
-   let field = item.details.fields.find( f => f.name == "published_date")
-   if (field) {
-      return field.value
-   }
-   return ""
-})
-
-const datePicked = ((pid) => {
-   router.push(pid)
-})
 
 const browseClicked = (() => {
    // Set up the search in the store and flag it is user generated
@@ -98,20 +72,6 @@ const searchClicked = (() => {
    query.filter = filter.asQueryParam( "presearch" )
    query.pool = item.details.source
    router.push({path: "/search", query: query })
-})
-
-const nextItem = (() => {
-   let date = publishedDate.value
-   if (date) {
-      collection.nextItem(date)
-   }
-})
-
-const prevItem = (() => {
-   let date = publishedDate.value
-   if (date) {
-      collection.priorItem(date)
-   }
 })
 </script>
 
@@ -181,18 +141,6 @@ const prevItem = (() => {
                }
             }
       }
-   }
-
-   .cal {
-      text-align: right;
-      margin: 0 10px 5px 0;
-   }
-   .seq-nav {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: flex-end;
-      margin: 5px 10px 10px 0;
-      gap: 5px;
    }
 }
 

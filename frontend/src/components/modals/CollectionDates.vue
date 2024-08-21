@@ -1,6 +1,6 @@
 <template>
    <VirgoButton @click="showDialog=true" aria-label="view collection calendar" ref="trigger"
-      label="Calendar" icon="fal fa-calendar-alt" iconPos="right" class="calendar"/>
+      icon="fal fa-calendar-alt" text rounded size="large"/>
 
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened">
       <DatePicker v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
@@ -140,8 +140,5 @@ const closeDialog = (() => {
    text-align: center;
    margin: 10px 0 5px 0;
    font-size: 0.9em;;
-}
-button.calendar {
-   margin: 0 !important;
 }
 </style>

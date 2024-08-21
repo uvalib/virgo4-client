@@ -129,10 +129,10 @@ onUpdated(()=>{
    width: 95%;
    margin: 0 auto 3vh auto;
    text-align: left;
+   min-height: 400px;
 
    .working {
       text-align: center;
-      font-size: 0.9em;
    }
    .working img {
       margin: 30px 0;
