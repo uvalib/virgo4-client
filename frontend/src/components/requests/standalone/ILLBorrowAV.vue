@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2 v-if="props.prefill==false">ILL Borrow A/V Request</h2>
+      <h3 v-if="props.prefill==false">ILL Borrow A/V Request</h3>
       <FormKit type="form" id="borrow-av" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
          <FormKit label="Title" type="text" v-model="request.title" validation="required"  id="av-title"
             help="All audio/video materials not owned by UVA will be reviewed for purchase before being requested via ILL."
@@ -91,16 +91,6 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .request-panel {
-   padding: 15px;
-   margin-bottom: 25px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   h2 {
-      color: var(--uvalib-text-dark);
-      font-weight: 500;
-      padding: 0;
-      margin: 0 0 15px 0px;
-      font-size: 1.2em;
-   }
    .illiad-prompt {
       margin: 15px;
       a {

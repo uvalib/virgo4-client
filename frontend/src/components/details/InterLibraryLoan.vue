@@ -5,24 +5,18 @@
          <div class="gutter"></div>
          <div class="content">
             <h3>Interlibrary Loan</h3>
-            <div class="message">
-               This item is available with an Interlibrary Loan.
-               <a v-if="!system.isKiosk" href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a>
-            </div>
-            <VirgoButton @click="" label="Request Interlibrary Loan" />
-         </div>
-      </div>
-      <!-- <div class="request-content">
-         <div class="options-panel" v-if="requestStore.activePanel == 'OptionsPanel'">
-            <VirgoButton severity="secondary" @click="requestClicked" label="Request Item"/>
-            <p class="desc">Make an Interlibrary Loan request for this item.</p>
-            <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a></p>
-         </div>
-         <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
-         <ILLBorrowItem v-if="requestStore.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-         <ILLScanArticle v-if="requestStore.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-         <ILLBorrowAV v-if="requestStore.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-         <div  v-if="requestStore.activePanel == 'SubmittedILL'" class="confirmation-panel">
+            <template v-if="requestStore.activePanel == 'OptionsPanel'">
+               <div class="message">
+                  This item is available with an Interlibrary Loan.
+                  <a v-if="!system.isKiosk" href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a>
+               </div>
+               <VirgoButton @click="requestClicked" label="Request Interlibrary Loan" />
+            </template>
+            <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
+            <ILLBorrowItem v-if="requestStore.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+            <ILLScanArticle v-if="requestStore.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+            <ILLBorrowAV v-if="requestStore.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+            <div  v-if="requestStore.activePanel == 'SubmittedILL'" class="confirmation-panel">
             <h3>We have received your request.</h3>
             <dl>
                <dt>User ID:</dt>
@@ -36,8 +30,9 @@
             </dl>
             <VirgoButton severity="secondary" class="reset" id="ill-reset" @click="reset" label="Back"/>
          </div>
+         </div>
          <p class="error" v-if="requestStore.alertText" >{{requestStore.alertText}}</p>
-      </div> -->
+      </div>
    </div>
 </template>
 

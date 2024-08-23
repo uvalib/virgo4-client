@@ -22,10 +22,10 @@
             </div>
 
             <template v-if="request">
-               <ILLBorrowAV v-if="request == 'ILLBorrowAV'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
-               <ILLBorrowItem v-if="request == 'ILLBorrowItem'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
-               <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
-               <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+               <ILLBorrowAV v-if="request == 'ILLBorrowAV'" @canceled="cancelRequest" @submitted="requestSubmitted" />
+               <ILLBorrowItem v-if="request == 'ILLBorrowItem'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+               <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+               <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
             </template>
 
             <h2>Outstanding Requests</h2>
@@ -345,9 +345,6 @@ onMounted(() =>{
       margin: 10px 0 5px 0;
       font-size: 1.25em;
       border-bottom: 1px solid;
-   }
-   .form-panel {
-      border: 1px solid var(--uvalib-blue-alt);
    }
    .subcontent {
       margin-bottom: 0px;

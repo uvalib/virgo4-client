@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2>Instructional Scanning Request</h2>
+      <h3>Instructional Scanning Request</h3>
        <FormKit type="form" id="instructional-scan" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
          <FormKit label="Course Information" type="textarea" :rows="2" v-model="request.course" id="course"
             validation="required" help="Please supply the Course Instructor, Course Name, Number, Section and Semester"
@@ -84,16 +84,6 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .request-panel {
-   padding: 15px;
-   margin-bottom: 25px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   h2 {
-      color: var(--uvalib-text-dark);
-      font-weight: 500;
-      padding: 0;
-      margin: 0 0 15px 0px;
-      font-size: 1.2em;
-   }
    .instruct {
       margin: 10px 0;
       background: var(--uvalib-grey-lightest);

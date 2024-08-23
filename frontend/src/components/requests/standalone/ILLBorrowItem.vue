@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2 v-if="props.prefill==false">ILL Borrow Item Request</h2>
+      <h3 v-if="props.prefill==false">ILL Borrow Item Request</h3>
       <FormKit type="form" id="borrow-item" :actions="false" incompleteMessage="Sorry, not all fields are filled out correctly." @submit="submitClicked">
          <FormKit type="select" label="What would you like to borrow?" v-model="request.doctype" id="item-type" validation="required"
             placeholder="Select an item type"
@@ -114,16 +114,6 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .request-panel {
-   padding: 15px;
-   margin-bottom: 25px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   h2 {
-      color: var(--uvalib-text-dark);
-      font-weight: 500;
-      padding: 0;
-      margin: 0 0 15px 0px;
-      font-size: 1.2em;
-   }
    .illiad-prompt {
       margin: 15px;
       a {
