@@ -65,7 +65,7 @@
                <dt class="label marc">MARC XML:</dt>
                <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
             </template>
-            <dt class="toggle">
+            <dt class="toggle" v-if="showFieldsToggle">
                <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"/>
             </dt>
             <dd></dd>
@@ -75,14 +75,14 @@
    <ActionsPanel :hit="details" :pool="details.source" from="DETAILS"/>
    <DigitalContent />
    <template v-if="details.source != 'images'">
-      <Availability v-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
-      <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
+      <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" /> <!-- pools that support ILL (WorldCat) should not show any other availabilty UI-->
+      <Availability v-else-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
       <BoundWithItems v-if="item.hasBoundWithItems"/>
       <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
          <h2>Bookplates Fund</h2>
          <CollectionPanel />
       </template>
-      <ShelfBrowse v-if="details.source != 'images' && poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
+      <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
    </template>
 </template>
 
@@ -133,28 +133,30 @@ const expandLabel = computed (() => {
    return "Show more"
 })
 
-const allDisplayFields = computed(()=>{
-   return details.value.fields.filter(f => shouldDisplay(f))
+const showFieldsToggle = computed( () => {
+   let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
+   return filteredFields.length > item.primaryFields.length
+})
+
+const allDisplayFields = computed(()=> {
+   let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
+   if ( filteredFields.length < item.primaryFields.length ) {
+      return filteredFields
+   }
+
+   if ( detailExpanded.value ) {
+      return filteredFields
+   }
+   return details.value.fields.filter( f => item.primaryFields.includes(f.name))
 })
 
 const shouldDisplay =((field) => {
-   if ( field.display == 'availability') return false
-   if ( detailExpanded.value ) {
-      if ( field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
-           field.type == "access-url" || field.type == "sirsi-url" ||
-           field.name.includes("_download_url") || (system.isKiosk && field.type == "related-url")  ) {
-         return false
-      }
-   } else {
-      let display = false
-      item.primaryFields.forEach( fn => {
-         if ( field.name == fn) {
-            display = true
-         }
-      })
-      return display
+   if ( field.display == 'availabilty') return false
+   if ( field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
+         field.type == "access-url" || field.type == "sirsi-url" ||
+         field.name.includes("_download_url") || (system.isKiosk && field.type == "related-url")  ) {
+      return false
    }
-
    return true
 })
 

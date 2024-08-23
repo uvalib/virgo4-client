@@ -5,24 +5,28 @@
       </div>
       <div class="availability-content" v-else>
          <h2>Availability</h2>
-         <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
-         <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
-         <div class="avail-message" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
-         <template v-if="libraryAvailabilityNotes">
-            <div class="avail-message" v-for="(note, nidx) in libraryAvailabilityNotes" v-html="note" :key="`note${nidx}`"></div>
-         </template>
-
-         <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
 
          <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
             :title="item.details.header.title" :pool="item.details.source" :sources="item.onlineAccessSources" />
 
          <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
 
-         <div class="items" v-if="hasItems || request.hasRequestOptions">
-            <RequestContainer v-if="canMakeRequests && !user.isBarred" />
+         <div v-if="hasItems">
+            <h2 class="on-shelf">
+               <span>On shelf</span>
+               <span v-if="request.hasRequestOptions && canMakeRequests  && !user.isBarred">
+                  <!-- TODO find request scan and request item buttons-->
+               </span>
+            </h2>
+            <div class="avail-messages-container" v-if="hasAvailMessage">
+               <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
+               <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
+               <div class="avail-message" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
+               <div class="avail-message" v-if="libraryAvailabilityNotes" v-for="(note, nidx) in libraryAvailabilityNotes" v-html="note" :key="`note${nidx}`"></div>
+               <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
+            </div>
             <ul class="holdings" v-if="item.details.holdings.libraries">
-               <li v-for="(lib, idx) in item.details.holdings.libraries" :key="`lib${idx}`">
+               <li v-for="lib in item.details.holdings.libraries">
                   <span class="library">{{lib.library}}</span>
                   <ul class="location">
                      <li v-for="(loc, lidx) in lib.locations" :key="`loc${lidx}`">
@@ -42,30 +46,13 @@
                   </ul>
                </li>
             </ul>
-            <table class="fields" v-if="hasItems">
-               <thead>
-                  <tr>
-                     <th>Library</th>
-                     <th>Current Location</th>
-                     <th>Call Number</th>
-                     <th>Barcode</th>
-                  </tr>
-               </thead>
 
-               <tr v-for="(avalItem,idx) in item.availability.items" :key="`val-${idx}`">
-                  <td class="value">{{formatValue(avalItem.library)}}</td>
-                  <td class="value">{{formatValue(avalItem.current_location)}}</td>
-                  <td class="value">{{formatValue(avalItem.call_number)}}</td>
-                  <td class="value">
-                     <template v-if="avalItem.notice">
-                        <AvailabilityNotice :label="formatValue(avalItem.barcode)" :message="avalItem.notice" />
-                     </template>
-                     <template v-else>
-                        {{formatValue(avalItem.barcode)}}
-                     </template>
-                  </td>
-               </tr>
-            </table>
+            <div class="libraries">
+               <LibraryItemsPanel v-for="lib in item.availability.libraries" :library="lib"/>
+            </div>
+
+            <!-- <RequestContainer v-if="canMakeRequests && !user.isBarred" /> -->
+
          </div>
       </div>
    </div>
@@ -73,7 +60,7 @@
 
 <script setup>
 import { computed } from "vue"
-import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
+import LibraryItemsPanel from "@/components/details/LibraryItemsPanel.vue"
 import RequestContainer from "@/components/requests/RequestContainer.vue"
 import DiBSViewer from "@/components/details/DiBSViewer.vue"
 import OnlineAccessPanel from "@/components/details/OnlineAccessPanel.vue"
@@ -88,14 +75,20 @@ const user = useUserStore()
 const system = useSystemStore()
 
 const hasItems = computed(()=>{
-   return Array.isArray(item.availability.items) && item.availability.items.length > 0
+   return item.availability.libraries.length > 0
 })
-const availabilityFields = computed(()=>{
-   return item.details.fields.filter( f => f.display == "availability")
+const hasAvailMessage = computed( () => {
+   if ( item.availability.error) return true
+   let hasMessage = false
+   item.details.fields.some( f => {
+      if ( f.name == "availability_statement" ||  f.name == "access_note" ||
+           f.name == "extent_of_digitization" ||  f.name == "library_availability_note") {
+         hasMessage = true
+      }
+      return hasMessage == true
+   })
+   return hasMessage
 })
-// const showAvailability = computed(()=>{
-//    return hasItems.value || request.hasRequestOptions || availabilityFields.value.length > 0 || item.hasBoundWithItems
-// })
 const canMakeRequests = computed(()=>{
    if ( user.noILSAccount) {
       if (request.requestOptions.find( ro => ro.sign_in_required === false)) {
@@ -138,19 +131,16 @@ const libraryAvailabilityNotes = computed(()=>{
 })
 
 const dibsItems = computed(()=>{
-   if (item.availability.items) {
-      return item.availability.items.filter( f => f.home_location_id == "DIBS")
-   } else {
-      return []
-   }
+   let items = []
+   item.availability.libraries.forEach( lib => {
+      lib.items.forEach( item => {
+         if ( item.home_location_id == "DIBS") {
+            items.push(item)
+         }
+      })
+   })
+   return items
 })
-
-function formatValue(val) {
-   if ( val == "On Shelf" ) {
-      return "On Shelf Now"
-   }
-   return val
-}
 
 </script>
 <style lang="scss" scoped>
@@ -164,74 +154,53 @@ function formatValue(val) {
    margin: 0 0 20px 0;
    text-align: left;
 
-   .avail-message {
-      text-align: left;
-      margin-bottom: 2rem;
+   .avail-messages-container {
+      display: flex;
+      flex-direction: column;
+      justify-self: flex-start;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--uvalib-grey-light);
+      border-top: 1px solid var(--uvalib-grey-light);
+      margin-bottom: 10px;
+      .avail-message {
+         display: flex;
+         flex-direction: column;
+         justify-self: flex-start;
+         align-items: flex-start;
+         gap: 5px;
+         :deep(p) {
+            margin: 0;
+            padding: 0;
+         }
+      }
    }
-   div.items {
-      border: 1px solid var(--uvalib-grey-light);
-      margin-top: 25px;
-   }
-
-   div.value {
-      margin: 10px 0 0 20px;
-   }
-   label {
-      font-weight: bold;
-      display: block;
-   }
-
-   ul {
-      list-style: none;
-   }
-
    ul.holdings {
-      padding: 15px;
-      border-top: 1px solid var(--uvalib-grey-light);
-      font-weight: bold;
-      margin: 0;
-   }
-
-   span.library {
-      font-size: 1.15em;
-   }
-
-   ul.location  {
-      font-weight: normal;
-      padding-left: 40px;
-      padding-bottom: 10px;
-      span.location {
-         font-weight: bold;
-      }
+      list-style: none;
+      padding: 0;
+      margin: 15px 0;
       li {
-         margin-top: 5px;
+         margin-bottom: 15px;
+         .library {
+            font-weight: bold;
+            margin-bottom: 15px;
+         }
+      }
+      .location, .call {
+         margin: 5px;
+         list-style: none;
+         padding: 0 0 0 5px;
+      }
+      .copy {
+         padding: 0;
+         list-style: none;
       }
    }
-   ul.call, ul.copy  {
-      padding-left: 10px;
-   }
-   ul.copy  {
-      padding-bottom: 10px;
-   }
-   li.note {
-      font-style: italic;
-   }
-
-   table {
-      width: 100%;
-      font-weight: normal;
-      text-align: left;
-      border-collapse: collapse;
-   }
-   table td {
-      padding: 4px 5px;
-      border-top: 1px solid var(--uvalib-grey-light);
-   }
-   table th {
-      padding: 4px 5px;
-      background: var(--uvalib-grey-lightest);
-      border-top: 1px solid var(--uvalib-grey);
-      border-bottom: 1px solid var(--uvalib-grey);
+   .libraries {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
    }
 }
 @media only screen and (max-width: 700px) {

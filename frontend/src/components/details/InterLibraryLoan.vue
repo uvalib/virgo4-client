@@ -1,34 +1,43 @@
 <template>
-   <div class="ill">
-      <div class="ill-content" v-if="canMakeRequests">
-         <h2>Availability</h2>
-         <div class="request-content">
-            <div class="options-panel" v-if="requestStore.activePanel == 'OptionsPanel'">
-               <VirgoButton severity="secondary" @click="requestClicked" label="Request Item"/>
-               <p class="desc">Make an Interlibrary Loan request for this item.</p>
-               <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a></p>
+   <div class="ill-content" v-if="canMakeRequests" aria-live="polite">
+      <h2>Availability</h2>
+      <div class="panel">
+         <div class="gutter"></div>
+         <div class="content">
+            <h3>Interlibrary Loan</h3>
+            <div class="message">
+               This item is available with an Interlibrary Loan.
+               <a v-if="!system.isKiosk" href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a>
             </div>
-            <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
-            <ILLBorrowItem v-if="requestStore.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <ILLScanArticle v-if="requestStore.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <ILLBorrowAV v-if="requestStore.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <div  v-if="requestStore.activePanel == 'SubmittedILL'" class="confirmation-panel">
-               <h3>We have received your request.</h3>
-               <dl>
-                  <dt>User ID:</dt>
-                  <dd>{{user.userId}}</dd>
-                  <dt>Item:</dt>
-                  <dd>{{submittedTitle}}</dd>
-                  <template v-if="submittedTitle">
-                     <dt>Pickup Library:</dt>
-                     <dd>{{submittedPickupLocation}}</dd>
-                  </template>
-               </dl>
-               <VirgoButton severity="secondary" class="reset" id="ill-reset" @click="reset" label="Back"/>
-            </div>
-            <p class="error" v-if="requestStore.alertText" >{{requestStore.alertText}}</p>
+            <VirgoButton @click="" label="Make an Interlibrary Loan request" />
          </div>
       </div>
+      <!-- <div class="request-content">
+         <div class="options-panel" v-if="requestStore.activePanel == 'OptionsPanel'">
+            <VirgoButton severity="secondary" @click="requestClicked" label="Request Item"/>
+            <p class="desc">Make an Interlibrary Loan request for this item.</p>
+            <p class="desc"><a href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a></p>
+         </div>
+         <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
+         <ILLBorrowItem v-if="requestStore.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+         <ILLScanArticle v-if="requestStore.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+         <ILLBorrowAV v-if="requestStore.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+         <div  v-if="requestStore.activePanel == 'SubmittedILL'" class="confirmation-panel">
+            <h3>We have received your request.</h3>
+            <dl>
+               <dt>User ID:</dt>
+               <dd>{{user.userId}}</dd>
+               <dt>Item:</dt>
+               <dd>{{submittedTitle}}</dd>
+               <template v-if="submittedTitle">
+                  <dt>Pickup Library:</dt>
+                  <dd>{{submittedPickupLocation}}</dd>
+               </template>
+            </dl>
+            <VirgoButton severity="secondary" class="reset" id="ill-reset" @click="reset" label="Back"/>
+         </div>
+         <p class="error" v-if="requestStore.alertText" >{{requestStore.alertText}}</p>
+      </div> -->
    </div>
 </template>
 
@@ -37,13 +46,15 @@ import SignInPanel from "../requests/panels/SignInPanel.vue"
 import ILLBorrowItem from "../requests/standalone/ILLBorrowItem.vue"
 import ILLBorrowAV from "../requests/standalone/ILLBorrowAV.vue"
 import ILLScanArticle from "../requests/standalone/ILLScanArticle.vue"
-import { ref, computed, nextTick, onMounted } from "vue"
+import { useSystemStore } from "@/stores/system"
+import { ref, computed, onMounted } from "vue"
 import { useItemStore } from "@/stores/item"
 import { useRequestStore } from "@/stores/request"
 import { useRestoreStore } from "@/stores/restore"
 import { useUserStore } from "@/stores/user"
 import { setFocusClass, setFocusID } from '@/utils'
 
+const system = useSystemStore()
 const user = useUserStore()
 const item = useItemStore()
 const requestStore = useRequestStore()
@@ -109,24 +120,40 @@ onMounted(()=>{
 })
 </script>
 <style lang="scss" scoped>
-.ill {
-   width: 95%;
-   margin: 0 auto;
-
-   h2 {
-      color: var(--color-primary-orange);
-      text-align: center;
-      margin: 50px 0 30px 0;
-   }
-   h3 {
-      color: var(--color-primary-orange);
-      text-align: center;
-      margin: 0;
-   }
-}
 .ill-content {
    margin: 0 0 20px 0;
    text-align: left;
+
+   .panel {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      align-items: stretch;
+      border: 1px solid var(--uvalib-grey-light);
+      border-radius: 0 5px 5px 0;
+      gap: 20px;
+      .gutter {
+         flex: 0 0 17px;
+         background-color:#E6F2F7;
+         border-right: 1px solid var(--uvalib-grey-light);
+      }
+      .content {
+         flex: 1;
+         padding: 0 20px 25px 0;
+         h3 {
+            font-size: 1.15em;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--uvalib-grey-light);
+            margin-bottom: 10px;
+         }
+         .message {
+            padding: 0 0 15px 0;
+            border-bottom: 1px solid var(--uvalib-grey-light);
+            margin-bottom: 25px;
+         }
+      }
+   }
+
    .confirmation-panel {
       text-align: center;
    }

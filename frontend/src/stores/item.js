@@ -10,7 +10,7 @@ export const useItemStore = defineStore('item', {
       details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
       loadingDigitalContent: false,
-      availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
+      availability: {searching: true, titleId: "", display: [], libraries: [], bound_with: [], error: ""},
       primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
    }),
 
@@ -146,7 +146,7 @@ export const useItemStore = defineStore('item', {
          this.$reset()
       },
       clearAvailability() {
-        this.availability = {searching: true, titleId: '', display: [], items: [], bound_with: [], error: ""}
+        this.availability = {searching: true, titleId: '', display: [], libraries: [], bound_with: [], error: ""}
       },
       setCatalogKeyDetails(data) {
          let found = false
@@ -302,6 +302,8 @@ export const useItemStore = defineStore('item', {
             this.getDigitalContent()
             if (poolStore.hasAvailability(this.details.source)){
                this.getAvailability()
+            } else {
+               this.availability.searching = false
             }
             this.details.searching = false
          }).catch( async (error) => {
@@ -325,12 +327,32 @@ export const useItemStore = defineStore('item', {
             if (response.data) {
                this.availability.titleId = response.data.availability.title_id
                this.availability.display = response.data.availability.display
-               this.availability.items = response.data.availability.items
                this.availability.bound_with = response.data.availability.bound_with
+
+               // split availability items into library groupings
+               this.availability.libraries = []
+               if (response.data.availability.items) {
+                  response.data.availability.items.forEach( i => {
+                     let libInfo = {name: i.library, id: i.library_id, items: []}
+                     delete i.library
+                     delete i.library_id
+                     let existingLib = this.availability.libraries.find( al => al.id == libInfo.id)
+                     if ( existingLib ) {
+                        existingLib.items.push( i )
+                     } else {
+                        libInfo.items.push( i )
+                        this.availability.libraries.push( libInfo )
+                     }
+                  })
+               }
+
                requestStore.requestOptions = response.data.availability.request_options
             }
+            console.log("GOT AVAIL")
             this.availability.searching = false
          }).catch((error) => {
+            console.log("GOT AVAIL ERROR")
+            console.log(error)
             this.details.searching = false
             if (error.response && error.response.status != 404) {
                this.availability.error = error.response.data
