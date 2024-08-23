@@ -151,9 +151,8 @@ const allDisplayFields = computed(()=> {
 })
 
 const shouldDisplay =((field) => {
-   if ( field.display == 'availabilty') return false
    if ( field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
-         field.type == "access-url" || field.type == "sirsi-url" ||
+         field.type == "access-url" || field.type == "sirsi-url" || field.display == 'availability' ||
          field.name.includes("_download_url") || (system.isKiosk && field.type == "related-url")  ) {
       return false
    }
