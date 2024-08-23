@@ -348,11 +348,9 @@ export const useItemStore = defineStore('item', {
 
                requestStore.requestOptions = response.data.availability.request_options
             }
-            console.log("GOT AVAIL")
             this.availability.searching = false
          }).catch((error) => {
-            console.log("GOT AVAIL ERROR")
-            console.log(error)
+            console.error(error)
             this.details.searching = false
             if (error.response && error.response.status != 404) {
                this.availability.error = error.response.data

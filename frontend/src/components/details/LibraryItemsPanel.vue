@@ -4,34 +4,30 @@
          <div class="gutter"></div>
          <div class="content">
             <div class="name">{{props.library.name}}</div>
-
-         </div>
-      </div>
-   </section>
-   <!-- <table class="fields" v-if="hasItems">
+            <table>
                <thead>
                   <tr>
-                     <th>Library</th>
-                     <th>Current Location</th>
+                     <th>Location/Status</th>
                      <th>Call Number</th>
                      <th>Barcode</th>
                   </tr>
                </thead>
-
-               <tr v-for="(avalItem,idx) in item.availability.items" :key="`val-${idx}`">
-                  <td class="value">{{formatValue(avalItem.library)}}</td>
-                  <td class="value">{{formatValue(avalItem.current_location)}}</td>
-                  <td class="value">{{formatValue(avalItem.call_number)}}</td>
+               <tr v-for="(item,idx) in library.items" :key="`val-${idx}`">
+                  <td class="value">{{ item.current_location }}</td>
+                  <td class="value">{{ item.call_number }}</td>
                   <td class="value">
-                     <template v-if="avalItem.notice">
-                        <AvailabilityNotice :label="formatValue(avalItem.barcode)" :message="avalItem.notice" />
+                     <template v-if="item.notice">
+                        <AvailabilityNotice :label="item.barcode" :message="item.notice" />
                      </template>
                      <template v-else>
-                        {{formatValue(avalItem.barcode)}}
+                        {{ item.barcode }}
                      </template>
                   </td>
                </tr>
-            </table> -->
+            </table>
+         </div>
+      </div>
+   </section>
 </template>
 
 <script setup>
@@ -44,13 +40,6 @@ const props = defineProps({
       required: true
    },
 })
-
-function formatValue(val) {
-   if ( val == "On Shelf" ) {
-      return "On Shelf Now"
-   }
-   return val
-}
 </script>
 
 <style lang="scss" scoped>
@@ -72,11 +61,18 @@ function formatValue(val) {
          flex: 1;
          padding: 15px 15px 15px 0;
          .name {
-            font-size: 1.1em;
             font-weight: bold;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--uvalib-grey-light);
             margin-bottom: 10px;
+         }
+         table {
+            width: 100%;
+            font-size: 0.9em;
+            th, td {
+               padding: 5px;
+               width: 32%;
+            }
          }
       }
    }

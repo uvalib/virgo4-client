@@ -11,13 +11,13 @@
 
          <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
 
-         <div v-if="hasItems">
-            <h2 class="on-shelf">
+         <div v-if="hasItems" class="on-shelf">
+            <h3>
                <span>On shelf</span>
                <span v-if="request.hasRequestOptions && canMakeRequests  && !user.isBarred">
                   <!-- TODO find request scan and request item buttons-->
                </span>
-            </h2>
+            </h3>
             <div class="avail-messages-container" v-if="hasAvailMessage">
                <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
                <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
@@ -163,7 +163,7 @@ const dibsItems = computed(()=>{
       padding: 15px 0;
       border-bottom: 1px solid var(--uvalib-grey-light);
       border-top: 1px solid var(--uvalib-grey-light);
-      margin-bottom: 10px;
+      margin-bottom: 30px;
       .avail-message {
          display: flex;
          flex-direction: column;
@@ -176,10 +176,15 @@ const dibsItems = computed(()=>{
          }
       }
    }
+   .on-shelf {
+      h3 {
+         margin-top: 30px;
+      }
+   }
    ul.holdings {
       list-style: none;
       padding: 0;
-      margin: 15px 0;
+      margin: 15px 0 30px 0;
       li {
          margin-bottom: 15px;
          .library {

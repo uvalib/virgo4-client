@@ -9,7 +9,7 @@
                This item is available with an Interlibrary Loan.
                <a v-if="!system.isKiosk" href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a>
             </div>
-            <VirgoButton @click="" label="Make an Interlibrary Loan request" />
+            <VirgoButton @click="" label="Request Interlibrary Loan" />
          </div>
       </div>
       <!-- <div class="request-content">
