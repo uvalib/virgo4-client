@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useSearchStore } from "@/stores/search"
+import { useRequestStore } from "@/stores/request"
 
 export const useRestoreStore = defineStore('restore', {
 	state: () => ({
@@ -48,6 +49,10 @@ export const useRestoreStore = defineStore('restore', {
                let data = JSON.parse(restored)
                this.url = data.url
                this.activeRequest = data.activeRequest
+               if ( this.activeRequest != "none") {
+                  const request = useRequestStore()
+                  request.activePanel = this.activeRequest
+               }
                this.pendingBookmark = data.pendingBookmark
                this.restoreSaveSearch = data.restoreSaveSearch
                if ( this.restoreSaveSearch ) {

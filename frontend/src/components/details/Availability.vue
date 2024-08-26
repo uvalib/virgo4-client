@@ -14,8 +14,9 @@
          <div v-if="hasItems" class="on-shelf">
             <h3>
                <span>On shelf</span>
-               <span v-if="request.hasRequestOptions && canMakeRequests  && !user.isBarred">
-                  <!-- TODO find request scan and request item buttons-->
+               <span v-if="request.hasRequestOptions && canMakeRequests  && !user.isBarred" class="req-opts">
+                  <!-- TODO fMORE REQUESTS -->
+                  <PlaceHoldDialog v-if="request.hasRequestOption('hold')" :settings="request.requestOption('hold')" :show="request.activePanel=='hold'"/>
                </span>
             </h3>
             <div class="avail-messages-container" v-if="hasAvailMessage">
@@ -61,7 +62,7 @@
 <script setup>
 import { computed } from "vue"
 import LibraryItemsPanel from "@/components/details/LibraryItemsPanel.vue"
-import RequestContainer from "@/components/requests/RequestContainer.vue"
+import PlaceHoldDialog from "@/components/requests/PlaceHoldDialog.vue"
 import DiBSViewer from "@/components/details/DiBSViewer.vue"
 import OnlineAccessPanel from "@/components/details/OnlineAccessPanel.vue"
 import { useItemStore } from "@/stores/item"
@@ -178,7 +179,18 @@ const dibsItems = computed(()=>{
    }
    .on-shelf {
       h3 {
-         margin-top: 30px;
+         margin: 30px 0;
+         display: flex;
+         flex-flow: row wrap;
+         justify-content: space-between;
+         align-items: center;
+         .req-opts {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: flex-end;
+            align-items: flex-start;
+            gap: 5px;
+         }
       }
    }
    ul.holdings {

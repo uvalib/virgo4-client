@@ -7,6 +7,8 @@ import { useUserStore } from "@/stores/user"
 export const useRequestStore = defineStore('request', {
 	state: () => ({
       alertText: '',
+      // option types:
+      // hold, aeon, pda, scan, directLink, videoReserve
       requestOptions: [],
       errors: {},
       buttonDisabled: false,
@@ -45,30 +47,22 @@ export const useRequestStore = defineStore('request', {
          status: ""
       },
 
-      activePanel: 'OptionsPanel',
-
-      // Map request type to panel Name
-      optionMap: {
-         hold: 'PlaceHoldPanel',
-         aeon: 'AeonPanel',
-         pda: 'PDAPanel',
-         scan: 'ScanPanel',
-         directLink: 'directLink',
-         videoReserve: 'VideoReservePanel'
-      },
+      activePanel: 'none',
    }),
 
    getters: {
       hasRequestOptions: (store) => {
          return Array.isArray(store.requestOptions) && store.requestOptions.length > 0
       },
-      findOption: (store) => {
-         return (panelName) => {
-            let option = store.requestOptions.find(opt => {
-               let foundKey = Object.keys(store.optionMap).find(key => store.optionMap[key] === panelName)
-               return opt.type == foundKey
-            })
-            return option
+      hasRequestOption: (store) => {
+         return (reqType) => {
+            let optIdx  = store.requestOptions.findIndex( ro => ro.type == reqType)
+            return optIdx > -1
+         }
+      },
+      requestOption: (store) => {
+         return (reqType) => {
+            return store.requestOptions.find( ro => ro.type == reqType)
          }
       }
    },
