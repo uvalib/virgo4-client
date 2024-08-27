@@ -6,12 +6,12 @@ import { useUserStore } from "@/stores/user"
 
 export const useRequestStore = defineStore('request', {
 	state: () => ({
-      alertText: '',
       // option types:
       // hold, aeon, pda, scan, directLink, videoReserve
       requestOptions: [],
       errors: {},
-      buttonDisabled: false,
+      working: false,
+      failed: false,
 
       // info about the last successful request; used on confirm panel
       requestInfo: {
@@ -20,9 +20,6 @@ export const useRequestStore = defineStore('request', {
          callNumber: "",
          notes: ""
       },
-
-      // selected request option
-      activeOption: {},
 
       openurl: {
          requestType: "Loan",
@@ -47,7 +44,7 @@ export const useRequestStore = defineStore('request', {
          status: ""
       },
 
-      activePanel: 'none',
+      activePanel: 'none',  // TODO RENAME
    }),
 
    getters: {
@@ -64,6 +61,13 @@ export const useRequestStore = defineStore('request', {
          return (reqType) => {
             return store.requestOptions.find( ro => ro.type == reqType)
          }
+      },
+      items: (store) => {
+         var opts = store.requestOptions.find( ro => ro.type == store.activePanel)
+         if (opts) {
+            return opts.item_options
+         }
+         return []
       }
    },
    actions: {
@@ -92,37 +96,41 @@ export const useRequestStore = defineStore('request', {
 
       async submitOpenURLRequest() {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "openURL")
-         this.buttonDisabled = true
+         this.working = true
+         this.failed = false
          await axios.post('/api/requests/openurl', this.openurl
          ).catch(e =>
             useSystemStore().setError(e)
          ).finally(()=>
-            this.buttonDisabled = false
+            this.working = false
          )
       },
       async submitILLiadBorrowRequest(req) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "illiadBorrow")
-         this.buttonDisabled = true
+         this.working = true
+         this.failed = false
          await axios.post('/api/requests/standalone/borrow', req
          ).catch(e =>
             useSystemStore().setError(e)
          ).finally(()=>
-            this.buttonDisabled = false
+            this.working = false
          )
       },
       async submitILLiadScanRequest(req) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "illiadScan")
-         this.buttonDisabled = true
+         this.working = true
+         this.failed = false
          await axios.post('/api/requests/standalone/scan', req
          ).catch(e =>
             useSystemStore().setError(e)
          ).finally(()=>
-            this.buttonDisabled = false
+            this.working = false
          )
       },
       submitScan( scan ) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "scan")
-         this.buttonDisabled = true
+         this.working = true
+         this.failed = false
          this.errors = {}
 
           // track this request so it can be displayed on confirmation panel
@@ -133,15 +141,17 @@ export const useRequestStore = defineStore('request', {
 
          axios.post('/api/requests/scan', scan).then(_response => {
             this.activePanel = "ConfirmationPanel"
-         }).catch(e =>
+         }).catch( e => {
             useSystemStore().setError(e)
-         ).finally(()=>
-            this.buttonDisabled = false
+            this.failed = true
+         }).finally(()=>
+            this.working = false
          )
       },
-      createHold( item, pickupLibrary) {
+      async createHold( item, pickupLibrary) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "createHold")
-         this.buttonDisabled = true
+         this.working = true
+         this.failed = false
          this.errors = {}
 
          // track this request so it can be displayed on confirmation panel
@@ -151,23 +161,23 @@ export const useRequestStore = defineStore('request', {
          this.requestInfo.notes = ""
 
          let req = {itemLabel: item.label, itemBarcode: item.barcode, pickupLibrary: pickupLibrary}
-         axios.post('/api/requests/hold', req)
+         await axios.post('/api/requests/hold', req)
             .then(response => {
                if (response.data.hold.errors) {
                   this.errors = response.data.hold.errors
-               } else {
-                  this.activePanel = "ConfirmationPanel"
                }
-            }).catch(e =>
+            }).catch(e => {
                // Connenction problem
                useSystemStore().setError(e)
-            ).finally(()=>
-               this.buttonDisabled = false
-            )
+               this.failed = true
+            }).finally(()=>{
+               this.working = false
+               console.log("DONE REQEST")
+            })
       },
       cancelHold(holdData) {
          const userStore = useUserStore()
-         this.buttonDisabled = true
+         this.working = true
          axios
            .delete("/api/requests/hold", { data: holdData })
            .then((response) => {
@@ -179,11 +189,11 @@ export const useRequestStore = defineStore('request', {
              }
            })
            .catch((e) => useSystemStore().setError(e))
-           .finally(() => (this.buttonDisabled = false));
+           .finally(() => (this.working = false))
       },
       sendDirectLink() {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
-         this.buttonDisabled = false
+         this.working = false
          axios.post(this.activeOption.create_url)
             .then(_response => {
                this.activePanel = "ConfirmationPanel"
@@ -192,12 +202,12 @@ export const useRequestStore = defineStore('request', {
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
                useSystemStore().setError(message)
             }).finally(()=>{
-               this.buttonDisabled = false
+               this.working = false
             })
       },
       submitAeon( item, specialInstructions) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "aeon")
-         this.buttonDisabled = true
+         this.working = true
 
          // track this request so it can be displayed on confirmation panel
          this.requestInfo.itemLabel = ""
@@ -217,7 +227,7 @@ export const useRequestStore = defineStore('request', {
          let aeonUrl = url.origin+url.pathname+"?"+params.toString()
          window.open(aeonUrl, "_blank")
 
-         this.buttonDisabled = false
+         this.working = false
          this.activePanel = "ConfirmationPanel"
       },
    }
