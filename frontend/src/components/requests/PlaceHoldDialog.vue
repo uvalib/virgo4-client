@@ -4,7 +4,7 @@
       @show="dialogOpened" @hide="dialogClosed">
       <SignIn v-if="!user.isSignedIn" />
       <div v-else-if="submitted == false" class="hold-request">
-         <div class="row">
+         <div class="row" v-if="requestStore.items.length > 1">
             <label>Select an item<span class="required">(required)</span></label>
             <select v-model="selectedItem" id="hold-sel">
                <option :value="null">Select an item</option>
@@ -20,7 +20,7 @@
             <div class="help">
                <p>This pickup location is where you will go to retrieve items you've requested.</p>
                <p>
-                  If you cannot pick your item up at the location(s) shown below, please
+                  If you cannot pick your item up at the location(s) shown above, please
                   <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
                   to request your item.
                </p>
@@ -100,8 +100,10 @@ watch(() => props.show, (newVal) => {
 
 const pickLibraries = computed(()=>{
    if ( selectedItem.value && selectedItem.value.label.includes("Ivy limited circulation") ) {
+      pickupLibrary.value = "SPEC-COLL"
       return [{id: "SPEC-COLL", name: "Small Special Collections Reading Room"}]
    }
+   pickupLibrary.value = preferences.pickupLibrary.id
    return user.libraries
 })
 
@@ -113,7 +115,6 @@ const dialogOpened = (() =>{
    restore.setURL(route.fullPath)
    restore.save()
    if (user.isSignedIn) {
-      console.log("SIGNED IN")
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
       if ( requestStore.items.length == 1) {
          selectedItem.value =requestStore.items[0]
@@ -125,7 +126,6 @@ const dialogOpened = (() =>{
 })
 
 const dialogClosed = (() =>{
-   console.log("CLOSED")
    requestStore.activePanel = "none"
    restore.setActiveRequest( requestStore.activePanel )
 })
@@ -156,6 +156,9 @@ const placeHold = ( async () => {
    flex-direction: column;
    gap: 15px;
 
+   p {
+      margin: 5px;
+   }
    .required {
       margin-left: 5px;
       color: var(--uvalib-grey);
@@ -167,23 +170,19 @@ const placeHold = ( async () => {
       gap: 5px;
       .help {
          margin-top: 5px;
-         p {
-            margin: 5px;
-         }
       }
 
    }
    .illiad-prompt {
-      margin: 15px 0;
-      min-height: initial !important;
       a {
          text-decoration: underline !important;
          font-weight: 500;
       }
    }
    .medium-rare-message {
+      border-radius: 4px;
       border: 2px solid var(--uvalib-red);
-      padding: 10px;
+      padding: 5px;
    }
 }
 </style>
