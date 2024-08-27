@@ -127,7 +127,8 @@ onUpdated(()=>{
    position: relative;
    color: var(--color-primary-text);
    width: 95%;
-   margin: 0 auto 3vh auto;
+   margin: 0 auto 0 auto;
+   padding-bottom: 4vh;
    text-align: left;
    min-height: 400px;
 

@@ -14,12 +14,12 @@
          <div v-if="hasItems" class="on-shelf">
             <h3>
                <span>On shelf</span>
-               <span v-if="request.hasRequestOptions && canMakeRequests  && !user.isBarred" class="req-opts">
+               <span v-if="canMakeRequests" class="req-opts">
                   <!-- TODO fMORE REQUESTS -->
                   <PlaceHoldDialog v-if="request.hasRequestOption('hold')" :settings="request.requestOption('hold')" :show="request.activePanel=='hold'"/>
                </span>
             </h3>
-            <div class="avail-messages-container" v-if="hasAvailMessage">
+            <div class="avail-messages-container" v-if="system.isKiosk == false && hasAvailMessage">
                <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
                <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
                <div class="avail-message" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
@@ -47,13 +47,9 @@
                   </ul>
                </li>
             </ul>
-
             <div class="libraries">
                <LibraryItemsPanel v-for="lib in item.availability.libraries" :library="lib"/>
             </div>
-
-            <!-- <RequestContainer v-if="canMakeRequests && !user.isBarred" /> -->
-
          </div>
       </div>
    </div>
@@ -91,6 +87,8 @@ const hasAvailMessage = computed( () => {
    return hasMessage
 })
 const canMakeRequests = computed(()=>{
+   if ( system.isKiosk) return false
+   if ( user.isBarred ) return false
    if ( user.noILSAccount) {
       if (request.requestOptions.find( ro => ro.sign_in_required === false)) {
          return true

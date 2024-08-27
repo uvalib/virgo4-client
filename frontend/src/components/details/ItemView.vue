@@ -75,7 +75,7 @@
    <ActionsPanel :hit="details" :pool="details.source" from="DETAILS"/>
    <DigitalContent />
    <template v-if="details.source != 'images'">
-      <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" /> <!-- pools that support ILL (WorldCat) should not show any other availabilty UI-->
+      <InterLibraryLoan v-if="system.isKiosk == false && poolStore.hasInterLibraryLoan(details.source)" /> <!-- pools that support ILL (WorldCat) should not show any other availabilty UI-->
       <Availability v-else-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
       <BoundWithItems v-if="item.hasBoundWithItems"/>
       <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
