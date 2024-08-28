@@ -130,7 +130,6 @@ onMounted(()=>{
       .gutter {
          flex: 0 0 17px;
          background-color:#E6F2F7;
-         border-right: 1px solid var(--uvalib-grey-light);
       }
       .content {
          flex: 1;

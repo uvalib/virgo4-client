@@ -132,7 +132,6 @@ const pdfClicked= ( async() => {
       .gutter {
          flex: 0 0 17px;
          background-color:#E6F2F7;
-         border-right: 1px solid var(--uvalib-grey-light);
       }
       .buttons {
          flex: 1;
