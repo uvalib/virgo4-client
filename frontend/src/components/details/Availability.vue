@@ -14,10 +14,6 @@
          <div v-if="hasItems" class="on-shelf">
             <h3>
                <span>On shelf</span>
-               <span v-if="canMakeRequests" class="req-opts">
-                  <!-- TODO fMORE REQUESTS -->
-                  <PlaceHoldDialog v-if="request.hasRequestOption('hold')" :settings="request.requestOption('hold')" :show="request.activePanel=='hold'"/>
-               </span>
             </h3>
             <div class="avail-messages-container" v-if="system.isKiosk == false && hasAvailMessage">
                <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
@@ -26,6 +22,7 @@
                <div class="avail-message" v-if="libraryAvailabilityNotes" v-for="(note, nidx) in libraryAvailabilityNotes" v-html="note" :key="`note${nidx}`"></div>
                <p class="error" v-if="item.availability.error" v-html="item.availability.error"></p>
             </div>
+            <RequestsPanel v-if="canMakeRequests"/>
             <ul class="holdings" v-if="item.details.holdings.libraries">
                <li v-for="lib in item.details.holdings.libraries">
                   <span class="library">{{lib.library}}</span>
@@ -58,9 +55,9 @@
 <script setup>
 import { computed } from "vue"
 import LibraryItemsPanel from "@/components/details/LibraryItemsPanel.vue"
-import PlaceHoldDialog from "@/components/requests/PlaceHoldDialog.vue"
 import DiBSViewer from "@/components/details/DiBSViewer.vue"
 import OnlineAccessPanel from "@/components/details/OnlineAccessPanel.vue"
+import RequestsPanel from "@/components/details/RequestsPanel.vue"
 import { useItemStore } from "@/stores/item"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"

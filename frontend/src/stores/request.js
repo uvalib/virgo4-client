@@ -193,7 +193,7 @@ export const useRequestStore = defineStore('request', {
       },
       sendDirectLink() {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
-         this.working = false
+         this.working = true
          axios.post(this.activeOption.create_url)
             .then(_response => {
                this.activePanel = "ConfirmationPanel"
