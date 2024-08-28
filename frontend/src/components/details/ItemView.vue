@@ -76,12 +76,15 @@
    <DigitalContent />
    <template v-if="details.source != 'images'">
       <InterLibraryLoan v-if="system.isKiosk == false && poolStore.hasInterLibraryLoan(details.source)" /> <!-- pools that support ILL (WorldCat) should not show any other availabilty UI-->
-      <Availability v-else-if="poolStore.hasAvailability(details.source) || (accessURLField && !system.isKiosk)" />
+      <Availability v-else-if="hasAvailability" />
       <BoundWithItems v-if="item.hasBoundWithItems"/>
       <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
          <h2>Bookplates Fund</h2>
          <CollectionPanel />
       </template>
+      <div v-else-if="item.isCollectionHead" class="collection-head">
+         <CollectionPanel />
+      </div>
       <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
    </template>
 </template>
@@ -134,13 +137,14 @@ const expandLabel = computed (() => {
 })
 
 const showFieldsToggle = computed( () => {
+   if (item.isCollectionHead) return false
    let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
    return filteredFields.length > item.primaryFields.length
 })
 
 const allDisplayFields = computed(()=> {
    let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
-   if ( filteredFields.length < item.primaryFields.length ) {
+   if ( filteredFields.length < item.primaryFields.length || item.isCollectionHead) {
       return filteredFields
    }
 
@@ -148,6 +152,12 @@ const allDisplayFields = computed(()=> {
       return filteredFields
    }
    return details.value.fields.filter( f => item.primaryFields.includes(f.name))
+})
+
+const hasAvailability = computed(() => {
+   if (poolStore.hasAvailability(details.value.source) && item.availability.libraries.length > 0) return true
+   if (accessURLField.value != null && !system.isKiosk) return true
+   return false
 })
 
 const shouldDisplay =((field) => {
@@ -269,6 +279,10 @@ const fieldLimit = (( field ) => {
       }
    }
 
+}
+
+.collection-head {
+   margin-top: 50px;
 }
 
 h2 {
