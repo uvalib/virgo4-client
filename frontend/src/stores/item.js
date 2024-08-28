@@ -346,6 +346,13 @@ export const useItemStore = defineStore('item', {
                   })
                }
 
+               // // HACK IN A SPECIAL ITEM OPTION
+               // if ( response.data.availability.request_options.length > 0) {
+               //    if ( response.data.availability.request_options[0].item_options.length > 1) {
+               //       let last = response.data.availability.request_options[0].item_options.length -1
+               //       response.data.availability.request_options[0].item_options[last].label += " (Ivy limited circulation)"
+               //    }
+               // }
                requestStore.requestOptions = response.data.availability.request_options
             }
             this.availability.searching = false

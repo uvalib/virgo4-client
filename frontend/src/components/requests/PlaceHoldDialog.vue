@@ -1,15 +1,16 @@
 <template>
-   <VirgoButton @click="showDialog=true" ref="trigger" label="Request an item" size="small" />
+   <VirgoButton @click="showDialog=true" label="Request an item" size="small" />
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Request Item"
       @show="dialogOpened" @hide="dialogClosed">
       <SignIn v-if="!user.isSignedIn" />
       <div v-else-if="submitted == false" class="hold-request">
          <div class="row" v-if="requestStore.items.length > 1">
             <label>Select an item<span class="required">(required)</span></label>
-            <select v-model="selectedItem" id="hold-sel">
+            <select v-model="selectedItem" id="item-sel">
                <option :value="null">Select an item</option>
                <option v-for="item in requestStore.items" :value="item">{{ item.label }}</option>
             </select>
+            <div v-if="missing.item" class="missing"><i class="pi pi-exclamation-triangle"></i>Item selection is required</div>
          </div>
          <div class="row">
             <label>Preferred pickup location<span class="required">(required)</span></label>
@@ -17,6 +18,7 @@
                <option :value="null">Select a location</option>
                <option v-for="loc in pickLibraries" :value="loc.id">{{ loc.name }}</option>
             </select>
+            <div v-if="missing.pickuo" class="missing"><i class="pi pi-exclamation-triangle"></i>Pickup location selection is required</div>
             <div class="help">
                <p>This pickup location is where you will go to retrieve items you've requested.</p>
                <p>
@@ -25,26 +27,26 @@
                   to request your item.
                </p>
             </div>
-
-            <div v-if="pickupLibrary == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')"
-               class="illiad-prompt ra-box ra-fiy"
-            >
-               It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
-               <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
-            </div>
-               <div class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL' ">
-               <p>
-                  This item does not circulate. When you request this item from Ivy, it will be delivered to the Small Special Collections Library for you to use in the reading room only.
-               </p>
-               <p>
-                  <a target="_blank" href="https://library.virginia.edu/hours#special-collections-hours">Small Special Collections Reading Room Hours</a>
-               </p>
-            </div>
-
-            <p class="error" v-if="requestStore.errors.item_barcode">{{requestStore.errors.item_barcode.join(', ')}}</p>
-            <p class="error" v-if="requestStore.errors.sirsi">{{requestStore.errors.sirsi.join(', ')}}</p>
-
          </div>
+
+         <div v-if="pickupLibrary == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')"
+            class="illiad-prompt ra-box ra-fiy"
+         >
+            It looks like you haven't specified a LEO delivery location yet. Before we can deliver your item, could you please go
+            <a href="https://www.library.virginia.edu/services/ils/ill/" target="_blank">here</a> and let us know where you would like your item to be delivered.
+         </div>
+            <div class="medium-rare-message" v-if="pickupLibrary == 'SPEC-COLL' ">
+            <p>
+               This item does not circulate. When you request this item from Ivy, it will be delivered to the Small Special Collections Library for you to use in the reading room only.
+            </p>
+            <p>
+               <a target="_blank" href="https://library.virginia.edu/hours#special-collections-hours">Small Special Collections Reading Room Hours</a>
+            </p>
+         </div>
+
+         <p class="error" v-if="requestStore.errors.item_barcode">{{requestStore.errors.item_barcode.join(', ')}}</p>
+         <p class="error" v-if="requestStore.errors.sirsi">{{requestStore.errors.sirsi.join(', ')}}</p>
+
       </div>
       <ConfirmationPanel v-else />
       <template #footer>
@@ -91,6 +93,7 @@ const selectedItem = ref(null)
 const pickupLibrary = ref(preferences.pickupLibrary.id)
 const showDialog = ref(props.show)
 const submitted = ref(false)
+const missing = ref({item: false, pickup: false})
 
 watch(() => props.show, (newVal) => {
    if ( newVal == true ) {
@@ -107,7 +110,8 @@ const pickLibraries = computed(()=>{
    return user.libraries
 })
 
-const dialogOpened = (() =>{
+const dialogOpened = (() => {
+   missing.value = {item: false, pickup: false}
    selectedItem.value = null
    submitted.value = false
    requestStore.activePanel = "hold"
@@ -120,7 +124,7 @@ const dialogOpened = (() =>{
          selectedItem.value =requestStore.items[0]
          setFocusID("pickup-sel")
       } else {
-         setFocusID("hold-sel")
+         setFocusID("item-sel")
       }
    }
 })
@@ -142,6 +146,17 @@ const pickupLibraryChanged = (() => {
 })
 
 const placeHold = ( async () => {
+   missing.value = {item: false, pickup: false}
+   if (selectedItem.value == null) {
+      missing.value.item = true
+      setFocusID("item-sel")
+      return
+   }
+   if (pickupLibrary.value == null || pickupLibrary.value == "") {
+      missing.value.pickup = true
+      setFocusID("pickup-sel")
+      return
+   }
    await requestStore.createHold(selectedItem.value, pickupLibrary.value)
    if ( requestStore.failed == false ) {
       submitted.value = true
@@ -154,7 +169,7 @@ const placeHold = ( async () => {
 .hold-request {
    display: flex;
    flex-direction: column;
-   gap: 15px;
+   gap: 25px;
 
    p {
       margin: 5px;
@@ -171,7 +186,18 @@ const placeHold = ( async () => {
       .help {
          margin-top: 5px;
       }
-
+      .missing {
+         color: var(--uvalib-red-emergency);
+         margin-left: 10px;
+         display: flex;
+         flex-flow: row nowrap;
+         justify-content: flex-start;
+         align-items: center;
+         gap: 10px;
+         i {
+            font-size: 1.15em;
+         }
+      }
    }
    .illiad-prompt {
       a {
