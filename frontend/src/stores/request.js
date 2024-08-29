@@ -172,7 +172,6 @@ export const useRequestStore = defineStore('request', {
                this.failed = true
             }).finally(()=>{
                this.working = false
-               console.log("DONE REQEST")
             })
       },
       cancelHold(holdData) {
@@ -215,7 +214,7 @@ export const useRequestStore = defineStore('request', {
          this.requestInfo.callNumber = item.label
          this.requestInfo.notes = specialInstructions
 
-         var url = new URL(this.activeOption.create_url)
+         var url = new URL(this.requestOption("aeon").create_url)
          let params = new URLSearchParams(url.search)
          params.set("CallNumber", item.label)
          params.set("ItemVolume", item.label)
@@ -228,7 +227,6 @@ export const useRequestStore = defineStore('request', {
          window.open(aeonUrl, "_blank")
 
          this.working = false
-         this.activePanel = "ConfirmationPanel"
       },
    }
 })

@@ -1,19 +1,20 @@
 <template>
-   <VirgoButton @click="showDialog=true" label="Request an item" size="small" />
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Request Item"
-      @show="dialogOpened" @hide="dialogClosed">
+   <RequestDialog trigger="Request an item" title="Request Item" request="Place Hold"
+      :show="request.activePanel=='hold'" :showSubmit="submitted == false && user.isSignedIn" :disabled="request.working"
+      @opened="dialogOpened" @closed="dialogClosed" @submit="placeHold"
+   >
       <SignIn v-if="!user.isSignedIn" />
       <div v-else-if="submitted == false" class="hold-request">
-         <div class="row" v-if="requestStore.items.length > 1">
-            <label>Select an item<span class="required">(required)</span></label>
+         <div class="row" v-if="request.items.length > 1">
+            <label for="item-sel">Select an item<span class="required">(required)</span></label>
             <select v-model="selectedItem" id="item-sel">
                <option :value="null">Select an item</option>
-               <option v-for="item in requestStore.items" :value="item">{{ item.label }}</option>
+               <option v-for="item in request.items" :value="item">{{ item.label }}</option>
             </select>
             <div v-if="missing.item" class="missing"><i class="pi pi-exclamation-triangle"></i>Item selection is required</div>
          </div>
          <div class="row">
-            <label>Preferred pickup location<span class="required">(required)</span></label>
+            <label for="pickup-sel">Preferred pickup location<span class="required">(required)</span></label>
             <select v-model="pickupLibrary" @change="pickupLibraryChanged" id="pickup-sel">
                <option :value="null">Select a location</option>
                <option v-for="loc in pickLibraries" :value="loc.id">{{ loc.name }}</option>
@@ -44,25 +45,18 @@
             </p>
          </div>
 
-         <p class="error" v-if="requestStore.errors.item_barcode">{{requestStore.errors.item_barcode.join(', ')}}</p>
-         <p class="error" v-if="requestStore.errors.sirsi">{{requestStore.errors.sirsi.join(', ')}}</p>
+         <p class="error" v-if="request.errors.item_barcode">{{request.errors.item_barcode.join(', ')}}</p>
+         <p class="error" v-if="request.errors.sirsi">{{request.errors.sirsi.join(', ')}}</p>
 
       </div>
       <ConfirmationPanel v-else />
-      <template #footer>
-         <VirgoButton v-if="submitted" severity="secondary" @click="showDialog=false" label="OK"/>
-         <template v-else>
-            <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
-            <VirgoButton label="Place Hold" :disabled="requestStore.working" @click="placeHold" />
-         </template>
-      </template>
-   </Dialog>
+   </RequestDialog>
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
-import Dialog from 'primevue/dialog'
-import ConfirmationPanel from "./panels/ConfirmationPanel.vue"
+import { ref, computed } from 'vue'
+import RequestDialog from '@/components/requests/RequestDialog.vue'
+import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import SignIn from "@/views/SignIn.vue"
 import { useRestoreStore } from "@/stores/restore"
 import { useRoute } from "vue-router"
@@ -77,29 +71,18 @@ const props = defineProps({
       type: Object,
       required: true
    },
-   show: {
-      type: Boolean,
-      default: false
-   }
 })
 
 const user = useUserStore()
 const restore = useRestoreStore()
-const requestStore = useRequestStore()
+const request = useRequestStore()
 const preferences = usePreferencesStore()
 const route = useRoute()
 
 const selectedItem = ref(null)
 const pickupLibrary = ref(preferences.pickupLibrary.id)
-const showDialog = ref(props.show)
 const submitted = ref(false)
 const missing = ref({item: false, pickup: false})
-
-watch(() => props.show, (newVal) => {
-   if ( newVal == true ) {
-      showDialog.value = true
-   }
-})
 
 const pickLibraries = computed(()=>{
    if ( selectedItem.value && selectedItem.value.label.includes("Ivy limited circulation") ) {
@@ -114,14 +97,14 @@ const dialogOpened = (() => {
    missing.value = {item: false, pickup: false}
    selectedItem.value = null
    submitted.value = false
-   requestStore.activePanel = "hold"
-   restore.setActiveRequest( requestStore.activePanel )
+   request.activePanel = "hold"
+   restore.setActiveRequest( request.activePanel )
    restore.setURL(route.fullPath)
    restore.save()
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
-      if ( requestStore.items.length == 1) {
-         selectedItem.value =requestStore.items[0]
+      if ( request.items.length == 1) {
+         selectedItem.value =request.items[0]
          setFocusID("pickup-sel")
       } else {
          setFocusID("item-sel")
@@ -130,8 +113,8 @@ const dialogOpened = (() => {
 })
 
 const dialogClosed = (() =>{
-   requestStore.activePanel = "none"
-   restore.setActiveRequest( requestStore.activePanel )
+   request.activePanel = "none"
+   restore.setActiveRequest( request.activePanel )
 })
 
 const pickupLibraryChanged = (() => {
@@ -157,8 +140,8 @@ const placeHold = ( async () => {
       setFocusID("pickup-sel")
       return
    }
-   await requestStore.createHold(selectedItem.value, pickupLibrary.value)
-   if ( requestStore.failed == false ) {
+   await request.createHold(selectedItem.value, pickupLibrary.value)
+   if ( request.failed == false ) {
       submitted.value = true
    }
 })

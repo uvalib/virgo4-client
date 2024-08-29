@@ -1,13 +1,14 @@
 <template>
    <section class="requests" aria-live="polite">
-      <PlaceHoldDialog v-if="request.hasRequestOption('hold')" :settings="request.requestOption('hold')" :show="request.activePanel=='hold'"/>
+      <PlaceHoldDialog v-if="request.hasRequestOption('hold')" :settings="request.requestOption('hold')" />
       <VirgoButton v-if="request.hasRequestOption('scan')" label="Request a scan" size="small" />
-      <VirgoButton v-if="request.hasRequestOption('aeon')" label="Request in Special Colections" size="small" />
+      <AeonRequestDialog v-if="request.hasRequestOption('aeon')"  :settings="request.requestOption('aeon')" />
    </section>
 </template>
 
 <script setup>
 import PlaceHoldDialog from "@/components/requests/PlaceHoldDialog.vue"
+import AeonRequestDialog from "@/components/requests/AeonRequestDialog.vue"
 import { useRequestStore } from "@/stores/request"
 
 const request = useRequestStore()
