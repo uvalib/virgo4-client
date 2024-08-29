@@ -65,7 +65,11 @@ export const useRequestStore = defineStore('request', {
       items: (store) => {
          var opts = store.requestOptions.find( ro => ro.type == store.activePanel)
          if (opts) {
-            return opts.item_options
+            let out = []
+            opts.item_options.forEach( i => {
+               out.push( {label: i.label, value: i} )
+            })
+            return out
          }
          return []
       }

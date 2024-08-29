@@ -1,33 +1,26 @@
 <template>
    <RequestDialog trigger="Request an item" title="Request Item" request="Place Hold"
       :show="request.activePanel=='hold'" :showSubmit="submitted == false && user.isSignedIn" :disabled="request.working"
-      @opened="dialogOpened" @closed="dialogClosed" @submit="placeHold"
+      @opened="dialogOpened" @closed="dialogClosed" @submit="holdForm.node.submit()"
    >
       <SignIn v-if="!user.isSignedIn" />
-      <div v-else-if="submitted == false" class="hold-request">
-         <div class="row" v-if="request.items.length > 1">
-            <label for="item-sel">Select an item<span class="required">(required)</span></label>
-            <select v-model="selectedItem" id="item-sel">
-               <option :value="null">Select an item</option>
-               <option v-for="item in request.items" :value="item">{{ item.label }}</option>
-            </select>
-            <div v-if="missing.item" class="missing"><i class="pi pi-exclamation-triangle"></i>Item selection is required</div>
-         </div>
-         <div class="row">
-            <label for="pickup-sel">Preferred pickup location<span class="required">(required)</span></label>
-            <select v-model="pickupLibrary" @change="pickupLibraryChanged" id="pickup-sel">
-               <option :value="null">Select a location</option>
-               <option v-for="loc in pickLibraries" :value="loc.id">{{ loc.name }}</option>
-            </select>
-            <div v-if="missing.pickuo" class="missing"><i class="pi pi-exclamation-triangle"></i>Pickup location selection is required</div>
-            <div class="help">
-               <p>This pickup location is where you will go to retrieve items you've requested.</p>
-               <p>
-                  If you cannot pick your item up at the location(s) shown above, please
-                  <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
-                  to request your item.
-               </p>
-            </div>
+      <FormKit v-else-if="submitted == false" type="form" ref="holdForm" :actions="false" @submit="placeHold">
+         <FormKit v-if="request.items.length > 1" type="select" label="Select the item you want"
+            v-model="selectedItem" id="item-sel" placeholder="Select an item"
+            :validation-messages="{required: 'Item selection is required.'}"
+            :options="request.items" validation="required"
+         />
+         <FormKit type="select" label="Preferred pickup location" v-model="pickupLibrary"
+            placeholder="Select a location" @input="pickupLibraryChanged" id="pickup-sel"
+            :options="pickupLibraries" validation="required"
+         />
+         <div class="help">
+            <p>This pickup location is where you will go to retrieve items you've requested.</p>
+            <p>
+               If you cannot pick your item up at the location(s) shown above, please
+               <a target="_blank" href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=30">use this form</a>
+               to request your item.
+            </p>
          </div>
 
          <div v-if="pickupLibrary == 'LEO' && (user.noILLiadAccount==true || user.accountInfo.leoAddress=='')"
@@ -48,7 +41,7 @@
          <p class="error" v-if="request.errors.item_barcode">{{request.errors.item_barcode.join(', ')}}</p>
          <p class="error" v-if="request.errors.sirsi">{{request.errors.sirsi.join(', ')}}</p>
 
-      </div>
+      </FormKit>
       <ConfirmationPanel v-else />
    </RequestDialog>
 </template>
@@ -79,22 +72,25 @@ const request = useRequestStore()
 const preferences = usePreferencesStore()
 const route = useRoute()
 
+const holdForm = ref()
 const selectedItem = ref(null)
 const pickupLibrary = ref(preferences.pickupLibrary.id)
 const submitted = ref(false)
-const missing = ref({item: false, pickup: false})
 
-const pickLibraries = computed(()=>{
+const pickupLibraries = computed(()=>{
    if ( selectedItem.value && selectedItem.value.label.includes("Ivy limited circulation") ) {
       pickupLibrary.value = "SPEC-COLL"
-      return [{id: "SPEC-COLL", name: "Small Special Collections Reading Room"}]
+      return [{value: "SPEC-COLL", label: "Small Special Collections Reading Room"}]
    }
    pickupLibrary.value = preferences.pickupLibrary.id
-   return user.libraries
+   let libs = []
+   user.libraries.forEach( l => {
+      libs.push({value: l.id, label: l.name})
+   })
+   return libs
 })
 
 const dialogOpened = (() => {
-   missing.value = {item: false, pickup: false}
    selectedItem.value = null
    submitted.value = false
    request.activePanel = "hold"
@@ -129,17 +125,6 @@ const pickupLibraryChanged = (() => {
 })
 
 const placeHold = ( async () => {
-   missing.value = {item: false, pickup: false}
-   if (selectedItem.value == null) {
-      missing.value.item = true
-      setFocusID("item-sel")
-      return
-   }
-   if (pickupLibrary.value == null || pickupLibrary.value == "") {
-      missing.value.pickup = true
-      setFocusID("pickup-sel")
-      return
-   }
    await request.createHold(selectedItem.value, pickupLibrary.value)
    if ( request.failed == false ) {
       submitted.value = true
@@ -149,39 +134,14 @@ const placeHold = ( async () => {
 </script>
 
 <style lang="scss" scoped>
-.hold-request {
-   display: flex;
-   flex-direction: column;
-   gap: 25px;
-
+form {
    p {
       margin: 5px;
    }
-   .required {
-      margin-left: 5px;
-      color: var(--uvalib-grey);
-      font-size: .8em;
+   .help {
+      margin-top: 5px;
    }
-   .row {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      .help {
-         margin-top: 5px;
-      }
-      .missing {
-         color: var(--uvalib-red-emergency);
-         margin-left: 10px;
-         display: flex;
-         flex-flow: row nowrap;
-         justify-content: flex-start;
-         align-items: center;
-         gap: 10px;
-         i {
-            font-size: 1.15em;
-         }
-      }
-   }
+
    .illiad-prompt {
       a {
          text-decoration: underline !important;
