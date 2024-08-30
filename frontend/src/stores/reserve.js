@@ -199,7 +199,7 @@ export const useReserveStore = defineStore('reserve', {
             requestStore.buttonDisabled = true
             this.clearRequestList()
             this.submitted = true
-            requestStore.activePanel = "ReservedPanel"
+            requestStore.activeRequest = "ReservedPanel"
             requestStore.buttonDisabled = false
          }).catch((error) => {
             system.setError(error)

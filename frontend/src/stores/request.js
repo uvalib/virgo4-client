@@ -44,7 +44,7 @@ export const useRequestStore = defineStore('request', {
          status: ""
       },
 
-      activePanel: 'none',  // TODO RENAME
+      activeRequest: 'none',
    }),
 
    getters: {
@@ -63,7 +63,7 @@ export const useRequestStore = defineStore('request', {
          }
       },
       items: (store) => {
-         var opts = store.requestOptions.find( ro => ro.type == store.activePanel)
+         var opts = store.requestOptions.find( ro => ro.type == store.activeRequest)
          if (opts) {
             let out = []
             opts.item_options.forEach( i => {
@@ -198,7 +198,7 @@ export const useRequestStore = defineStore('request', {
          this.working = true
          axios.post(this.activeOption.create_url)
             .then(_response => {
-               this.activePanel = "ConfirmationPanel"
+               this.activeRequest = "ConfirmationPanel"
             }).catch(e => {
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
                useSystemStore().setError(message)

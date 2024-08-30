@@ -51,7 +51,7 @@ export const useRestoreStore = defineStore('restore', {
                this.activeRequest = data.activeRequest
                if ( this.activeRequest != "none") {
                   const request = useRequestStore()
-                  request.activePanel = this.activeRequest
+                  request.activeRequest = this.activeRequest
                }
                this.pendingBookmark = data.pendingBookmark
                this.restoreSaveSearch = data.restoreSaveSearch

@@ -1,6 +1,6 @@
 <template>
    <RequestDialog trigger="Request an item" title="Request Item" request="Place Hold"
-      :show="request.activePanel=='hold'" :showSubmit="submitted == false && user.isSignedIn" :disabled="request.working"
+      :show="request.activeRequest=='hold'" :showSubmit="submitted == false && user.isSignedIn" :disabled="request.working"
       @opened="dialogOpened" @closed="dialogClosed" @submit="holdForm.node.submit()"
    >
       <SignIn v-if="!user.isSignedIn" />
@@ -93,8 +93,8 @@ const pickupLibraries = computed(()=>{
 const dialogOpened = (() => {
    selectedItem.value = null
    submitted.value = false
-   request.activePanel = "hold"
-   restore.setActiveRequest( request.activePanel )
+   request.activeRequest = "hold"
+   restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
    restore.save()
    if (user.isSignedIn) {
@@ -109,8 +109,8 @@ const dialogOpened = (() => {
 })
 
 const dialogClosed = (() =>{
-   request.activePanel = "none"
-   restore.setActiveRequest( request.activePanel )
+   request.activeRequest = "none"
+   restore.setActiveRequest( request.activeRequest )
 })
 
 const pickupLibraryChanged = (() => {

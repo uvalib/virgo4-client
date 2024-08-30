@@ -1,6 +1,6 @@
 <template>
    <RequestDialog trigger="Request in Special Collections" title="Special Collections Request" request="Request"
-      :show="request.activePanel=='aeon'" :showSubmit="submitted == false" :disabled="request.working"
+      :show="request.activeRequest=='aeon'" :showSubmit="submitted == false" :disabled="request.working"
       @opened="dialogOpened" @closed="dialogClosed" @submit="aeonForm.node.submit()"
    >
       <FormKit v-if="submitted == false" type="form" ref="aeonForm" :actions="false" @submit="submitAeon">
@@ -57,7 +57,7 @@ const dialogOpened = (() => {
    submitted.value = false
    selectedItem.value = null
    specialRequest.value = ""
-   request.activePanel = "aeon"
+   request.activeRequest = "aeon"
    if (request.items.length == 1) {
       selectedItem.value =request.items[0]
       setFocusID("aeon-item-notes")
@@ -68,7 +68,7 @@ const dialogOpened = (() => {
 })
 
 const dialogClosed = (() => {
-   request.activePanel = "none"
+   request.activeRequest = "none"
 })
 
 const submitAeon = (() => {

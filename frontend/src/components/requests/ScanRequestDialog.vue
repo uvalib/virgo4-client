@@ -1,6 +1,6 @@
 <template>
    <RequestDialog trigger="Request a scan" title="Scan Request" request="Submit Request"
-      :show="request.activePanel=='scan'" :showSubmit="submitted == false && user.isSignedIn" :disabled="isSubmitDisabled"
+      :show="request.activeRequest=='scan'" :showSubmit="submitted == false && user.isSignedIn" :disabled="isSubmitDisabled"
       @opened="dialogOpened" @closed="dialogClosed" @submit="scanForm.node.submit()"
    >
       <SignIn v-if="!user.isSignedIn" />
@@ -112,8 +112,8 @@ const dialogOpened = (() => {
       callNumber: '',
    }
    submitted.value = false
-   request.activePanel = "scan"
-   restore.setActiveRequest( request.activePanel )
+   request.activeRequest = "scan"
+   restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
    restore.save()
    if (user.isSignedIn) {
@@ -165,8 +165,8 @@ const submit = (async () => {
 })
 
 const dialogClosed = (() =>{
-   request.activePanel = "none"
-   restore.setActiveRequest( request.activePanel )
+   request.activeRequest = "none"
+   restore.setActiveRequest( request.activeRequest )
 })
 
 </script>
