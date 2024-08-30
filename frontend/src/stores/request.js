@@ -200,7 +200,6 @@ export const useRequestStore = defineStore('request', {
             .then(_response => {
                this.activePanel = "ConfirmationPanel"
             }).catch(e => {
-               this.activePanel = "OptionsPanel"
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
                useSystemStore().setError(message)
             }).finally(()=>{

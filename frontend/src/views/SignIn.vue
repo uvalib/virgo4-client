@@ -1,5 +1,5 @@
 <template>
-   <div class="signin">
+   <div class="signin" :class="{embedded: props.embedded == true}">
       <div v-if="route.query.activated == 'true'" class="auth-message success">
          <p>Thank you, your email has been confirmed.</p>
          <p>You may now sign in below with your library ID and password.</p>
@@ -64,6 +64,13 @@ import { useUserStore } from "@/stores/user"
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from "pinia"
+
+const props = defineProps({
+   embedded: {
+      type: Boolean,
+      default: false
+   }
+})
 
 const route = useRoute()
 const systemStore = useSystemStore()
@@ -134,6 +141,9 @@ const netbadgeLogin = (() => {
 }
 h2 {
   margin-bottom: 0;
+}
+.signin.embedded {
+   margin: 0 auto;
 }
 @media only screen and (min-width: 768px) {
    .signin {

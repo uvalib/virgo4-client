@@ -5,17 +5,24 @@
          <div class="gutter"></div>
          <div class="content">
             <h3>Interlibrary Loan</h3>
-            <template v-if="requestStore.activePanel == 'OptionsPanel'">
+            <template v-if="requestStore.activePanel == 'none'">
                <div class="message">
                   This item is available with an Interlibrary Loan.
                   <a v-if="!system.isKiosk" href="https://www.library.virginia.edu/services/ils/ill" target="_blank">Learn more about Interlibrary Loans.</a>
                </div>
-               <VirgoButton @click="requestClicked" label="Request Interlibrary Loan" />
+               <VirgoButton @click="requestClicked" label="Request Interlibrary Loan" id="ill-request-btn"/>
             </template>
-            <SignInPanel v-if="requestStore.activePanel == 'SignInPanel'" :prefill="true" @canceled="cancelRequest" />
-            <ILLBorrowItem v-if="requestStore.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <ILLScanArticle v-if="requestStore.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
-            <ILLBorrowAV v-if="requestStore.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+
+            <template v-if="requestStore.activePanel != 'none' && !user.isSignedIn">
+               <SignIn :embedded="true" />
+               <VirgoButton severity="secondary" class="reset" @click="reset" label="Cancel"/>
+            </template>
+            <template v-else>
+               <ILLBorrowItem v-if="requestStore.activePanel == 'ILLBorrowItem'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+               <ILLScanArticle v-if="requestStore.activePanel == 'ILLScanArticle'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+               <ILLBorrowAV v-if="requestStore.activePanel == 'ILLBorrowAV'" :prefill="true" @canceled="cancelRequest" @submitted="requestSubmitted" />
+            </template>
+
             <div  v-if="requestStore.activePanel == 'SubmittedILL'" class="confirmation-panel">
             <h3>We have received your request.</h3>
             <dl>
@@ -37,7 +44,7 @@
 </template>
 
 <script setup>
-import SignInPanel from "../requests/panels/SignInPanel.vue"
+import SignIn from "@/views/SignIn.vue"
 import ILLBorrowItem from "../requests/standalone/ILLBorrowItem.vue"
 import ILLBorrowAV from "../requests/standalone/ILLBorrowAV.vue"
 import ILLScanArticle from "../requests/standalone/ILLScanArticle.vue"
@@ -47,13 +54,15 @@ import { useItemStore } from "@/stores/item"
 import { useRequestStore } from "@/stores/request"
 import { useRestoreStore } from "@/stores/restore"
 import { useUserStore } from "@/stores/user"
-import { setFocusClass, setFocusID } from '@/utils'
+import { setFocusID } from '@/utils'
+import { useRoute } from "vue-router"
 
 const system = useSystemStore()
 const user = useUserStore()
 const item = useItemStore()
 const requestStore = useRequestStore()
 const restore = useRestoreStore()
+const route = useRoute()
 
 const submittedTitle = ref("")
 const submittedPickupLocation = ref("")
@@ -68,20 +77,24 @@ const canMakeRequests = computed(()=>{
    return true
 })
 
-function reset(){
+const reset = (() => {
    requestStore.reset()
-   setFocusClass("option-button")
-}
-function requestSubmitted( data ) {
+   setFocusID("ill-request-btn")
+})
+
+const requestSubmitted = (( data ) => {
    requestStore.activePanel = 'SubmittedILL'
    submittedTitle.value = data.title
    submittedPickupLocation.value = data.pickup
    setFocusID("ill-reset")
-}
-function cancelRequest() {
-   requestStore.activePanel = 'OptionsPanel'
-}
-function requestClicked() {
+})
+
+const cancelRequest = (() => {
+   requestStore.activePanel = 'none'
+   setFocusID("ill-request-btn")
+})
+
+const requestClicked = (() => {
    // NOTE: this is crrently specific to WorldCat. If other sources are added, this will need to be generalized
    let genTypeF = item.details.fields.find( bf => bf.name == "general_format")
    if (!genTypeF) {
@@ -96,13 +109,13 @@ function requestClicked() {
       tgtForm = "ILLBorrowAV"
    }
 
-   if ( user.isSignedIn ) {
-      requestStore.activePanel = tgtForm
-   } else {
+   requestStore.activePanel = tgtForm
+   if ( !user.isSignedIn ) {
+      restore.setURL(route.fullPath)
       restore.setActiveRequest(tgtForm)
-      requestStore.activePanel = "SignInPanel"
+      restore.save()
    }
-}
+})
 
 onMounted(()=>{
    let restoredPanel = restore.activeRequest
@@ -110,14 +123,19 @@ onMounted(()=>{
       requestStore.activePanel = restoredPanel
       restore.clear()
    } else {
-      requestStore.activePanel = 'OptionsPanel'
+      requestStore.activePanel = 'none'
    }
 })
 </script>
+
 <style lang="scss" scoped>
 .ill-content {
    margin: 0 0 20px 0;
    text-align: left;
+
+   .reset {
+      margin: 0 auto;
+   }
 
    .panel {
       display: flex;
