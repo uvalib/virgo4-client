@@ -36,7 +36,7 @@
             v-model="request.anyLanguage" :options="{'true': 'Yes', 'false': 'No'}"
          />
 
-         <ILLCopyrightNotice type="instruction" />
+         <ILLCopyrightNotice type="instruction" :wide="true"/>
          <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-av"
             :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
       </FormKit>

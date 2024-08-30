@@ -131,7 +131,7 @@ export const useRequestStore = defineStore('request', {
             this.working = false
          )
       },
-      submitScan( scan ) {
+      async submitScan( scan ) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "scan")
          this.working = true
          this.failed = false
@@ -143,9 +143,7 @@ export const useRequestStore = defineStore('request', {
           this.requestInfo.callNumber = scan.callNumber
           this.requestInfo.notes = scan.notes
 
-         axios.post('/api/requests/scan', scan).then(_response => {
-            this.activePanel = "ConfirmationPanel"
-         }).catch( e => {
+         await axios.post('/api/requests/scan', scan).catch( e => {
             useSystemStore().setError(e)
             this.failed = true
          }).finally(()=>
@@ -169,6 +167,7 @@ export const useRequestStore = defineStore('request', {
             .then(response => {
                if (response.data.hold.errors) {
                   this.errors = response.data.hold.errors
+                  this.failed = true
                }
             }).catch(e => {
                // Connenction problem

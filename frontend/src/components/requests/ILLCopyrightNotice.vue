@@ -1,5 +1,5 @@
 <template>
-  <div class="notice">
+  <div class="notice" :class="{wide: props.wide==true}">
     <template v-if="props.type == 'research'">
       <p class="head">
         <strong>Important Copyright Information<br/>
@@ -77,15 +77,19 @@ const props = defineProps({
       validator: (value)=>{
         return ['instruction', 'research'].indexOf(value) !== -1
       }
+    },
+    wide: {
+      type: Boolean,
+      default: false
     }
 })
 </script>
 <style lang="scss" scoped>
 .notice {
-   font-size:0.95em;
+   font-size:0.9em;
    padding: 0;
    border: 1px solid var(--uvalib-red-emergency);
-   margin: 0;
+   margin: 0 auto;
    p {
       margin: 10px 15px;
    }
@@ -98,5 +102,18 @@ const props = defineProps({
    .content {
      padding: 5px;
    }
+}
+.notice.wide {
+  width: auto;
+}
+@media only screen and (min-width: 768px) {
+  .notice {
+    width: 600px;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .notice {
+    width: auto;
+  }
 }
 </style>

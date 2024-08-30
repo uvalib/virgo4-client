@@ -19,7 +19,7 @@
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: missing from shelf, color copies)"
          />
-         <ILLCopyrightNotice type="research" />
+         <ILLCopyrightNotice type="research" :wide="true"/>
          <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-av"
             :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
       </FormKit>

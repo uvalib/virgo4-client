@@ -39,8 +39,6 @@ const dc = defaultConfig({
          messages: '$reset v4-form-invalid',
          help: '$reset v4-form-help',
       },
-      incompleteMessage: false,
-      validationVisibility: 'submit'
    }
 })
 app.use(plugin, dc)

@@ -1,7 +1,7 @@
 <template>
-   <VirgoButton @click="showDialog=true" :label="props.trigger" size="small" :disabled="props.disabled" />
-   <Dialog v-model:visible="showDialog" :modal="true" position="center"
-      :header="props.title" @show="emit('opened')" @hide="emit('closed')"
+   <VirgoButton @click="showDialog=true" :label="props.trigger" :disabled="props.disabled" />
+   <Dialog v-model:visible="showDialog" :modal="true" position="top"
+      :header="props.title" @show="showRequestDialog" @hide="hideRequestDialog"
    >
       <slot></slot>
       <template #footer>
@@ -17,6 +17,9 @@
 <script setup>
 import { ref, watch } from 'vue'
 import Dialog from 'primevue/dialog'
+import { useSystemStore } from "@/stores/system"
+
+const system = useSystemStore()
 
 const props = defineProps({
    trigger: {
@@ -53,6 +56,16 @@ watch(() => props.show, (newVal) => {
    if ( newVal == true ) {
       showDialog.value = true
    }
+})
+
+const showRequestDialog = (() => {
+   system.hideScrollToTop = true
+   emit('opened')
+})
+
+const hideRequestDialog = (() => {
+   system.hideScrollToTop = false
+   emit('closed')
 })
 </script>
 
