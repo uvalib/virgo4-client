@@ -2,6 +2,7 @@
    <section class="requests" aria-live="polite">
       <PlaceHoldDialog v-if="request.hasRequestOption('hold')" :settings="request.requestOption('hold')" />
       <ScanRequestDialog v-if="request.hasRequestOption('scan')"  :settings="request.requestOption('scan')" />
+      <VideoReserveDialog v-if="request.hasRequestOption('videoReserve')"  :settings="request.requestOption('videoReserve')" />
       <AeonRequestDialog v-if="request.hasRequestOption('aeon')"  :settings="request.requestOption('aeon')" />
    </section>
 </template>
@@ -10,6 +11,7 @@
 import PlaceHoldDialog from "@/components/requests/PlaceHoldDialog.vue"
 import AeonRequestDialog from "@/components/requests/AeonRequestDialog.vue"
 import ScanRequestDialog from "@/components/requests/ScanRequestDialog.vue"
+import VideoReserveDialog from "@/components/requests/VideoReserveDialog.vue"
 import { useRequestStore } from "@/stores/request"
 
 const request = useRequestStore()
