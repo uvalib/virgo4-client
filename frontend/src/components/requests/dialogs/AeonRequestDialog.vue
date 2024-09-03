@@ -34,7 +34,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import RequestDialog from '@/components/requests/RequestDialog.vue'
+import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'

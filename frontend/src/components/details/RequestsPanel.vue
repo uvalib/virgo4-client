@@ -12,11 +12,11 @@
 </template>
 
 <script setup>
-import PlaceHoldDialog from "@/components/requests/PlaceHoldDialog.vue"
-import AeonRequestDialog from "@/components/requests/AeonRequestDialog.vue"
-import ScanRequestDialog from "@/components/requests/ScanRequestDialog.vue"
-import VideoReserveDialog from "@/components/requests/VideoReserveDialog.vue"
-import PDADialog from "@/components/requests/PDADialog.vue"
+import PlaceHoldDialog from "@/components/requests/dialogs/PlaceHoldDialog.vue"
+import AeonRequestDialog from "@/components/requests/dialogs/AeonRequestDialog.vue"
+import ScanRequestDialog from "@/components/requests/dialogs/ScanRequestDialog.vue"
+import VideoReserveDialog from "@/components/requests/dialogs/VideoReserveDialog.vue"
+import PDADialog from "@/components/requests/dialogs/PDADialog.vue"
 import { useRequestStore } from "@/stores/request"
 
 const request = useRequestStore()

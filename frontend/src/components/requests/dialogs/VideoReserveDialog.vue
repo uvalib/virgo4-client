@@ -3,7 +3,8 @@
       :show="request.activeRequest=='videoReserve'" :showSubmit="submitted == false" :disabled="request.working"
       @opened="dialogOpened" @closed="dialogClosed" @submit="videoForm.node.submit()"
    >
-      <FormKit v-if="submitted == false" type="form" ref="videoForm" :actions="false" @submit="submit">
+      <SignIn v-if="!user.isSignedIn" />
+      <FormKit v-else-if="submitted == false" type="form" ref="videoForm" :actions="false" @submit="submit">
          <FormKit type="select" label="Is this request on behalf of an instructor?" v-model="reserve.request.onBehalfOf"
             id="behalf_of" :options="{ no: 'No', yes: 'Yes' }" />
          <template v-if="reserve.request.onBehalfOf == 'yes'">
@@ -51,8 +52,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import RequestDialog from '@/components/requests/RequestDialog.vue'
+import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
 import ReservedPanel from "@/components/requests/panels/ReservedPanel.vue"
+import SignIn from "@/views/SignIn.vue"
+import { useRestoreStore } from "@/stores/restore"
+import { useRoute } from "vue-router"
 import { useRequestStore } from "@/stores/request"
 import { useReserveStore } from "@/stores/reserve"
 import { useItemStore } from "@/stores/item"
@@ -69,7 +73,9 @@ const props = defineProps({
 const request = useRequestStore()
 const reserve = useReserveStore()
 const item = useItemStore()
+const route = useRoute()
 const user = useUserStore()
+const restore = useRestoreStore()
 
 const selectedVideo = ref(null)
 const audioLanguage = ref("English")
@@ -86,15 +92,21 @@ const streamingReserve = computed(() => {
 
 const dialogOpened = (() => {
    submitted.value = false
-   reserve.clearRequestList()
-   reserve.setRequestingUser(user.accountInfo)
-   if (request.items.length == 0){
-      selectedVideo.value = {}
-   } else if (request.items.length == 1){
-      selectedVideo.value = request.items[0]
+   request.activeRequest = "videoReserve"
+   restore.setActiveRequest( request.activeRequest )
+   restore.setURL(route.fullPath)
+   restore.save()
+   if (user.isSignedIn) {
+      reserve.clearRequestList()
+      reserve.setRequestingUser(user.accountInfo)
+      if (request.items.length == 0){
+         selectedVideo.value = {}
+      } else if (request.items.length == 1){
+         selectedVideo.value = request.items[0]
+      }
+      reserve.request.lms = "A&S Canvas"
+      setFocusID("behalf_of")
    }
-   reserve.request.lms = "A&S Canvas"
-   setFocusID("behalf_of")
 })
 
 const dialogClosed = (() => {

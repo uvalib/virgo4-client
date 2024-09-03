@@ -14,7 +14,7 @@
 <script setup>
 import { ref } from 'vue'
 import SignIn from "@/views/SignIn.vue"
-import RequestDialog from '@/components/requests/RequestDialog.vue'
+import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import { useRequestStore } from "@/stores/request"
 import { useRestoreStore } from "@/stores/restore"
@@ -50,6 +50,8 @@ const dialogOpened = (async () => {
 
 const dialogClosed = (() => {
    request.activeRequest = "none"
+   restore.setActiveRequest( request.activeRequest )
+   restore.save()
 })
 </script>
 

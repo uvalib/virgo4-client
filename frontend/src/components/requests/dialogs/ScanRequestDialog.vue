@@ -37,7 +37,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import RequestDialog from '@/components/requests/RequestDialog.vue'
+import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
 import SignIn from "@/views/SignIn.vue"
 import ILLCopyrightNotice from '@/components/requests/panels/ILLCopyrightNotice.vue'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
@@ -167,6 +167,7 @@ const submit = (async () => {
 const dialogClosed = (() =>{
    request.activeRequest = "none"
    restore.setActiveRequest( request.activeRequest )
+   restore.save()
 })
 
 </script>

@@ -48,7 +48,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import RequestDialog from '@/components/requests/RequestDialog.vue'
+import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import SignIn from "@/views/SignIn.vue"
 import { useRestoreStore } from "@/stores/restore"
@@ -111,6 +111,7 @@ const dialogOpened = (() => {
 const dialogClosed = (() =>{
    request.activeRequest = "none"
    restore.setActiveRequest( request.activeRequest )
+   restore.save()
 })
 
 const pickupLibraryChanged = (() => {
