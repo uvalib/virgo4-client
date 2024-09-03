@@ -45,7 +45,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
+import ILLCopyrightNotice from '../panels/ILLCopyrightNotice.vue'
 import { useRequestStore } from "@/stores/request"
 import analytics from '@/analytics'
 import { setFocusID } from '@/utils'

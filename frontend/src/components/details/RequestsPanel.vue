@@ -5,6 +5,9 @@
       <VideoReserveDialog v-if="request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
       <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
       <PDADialog v-if="request.hasOption('pda') && request.option('pda').create_url"  :settings="request.option('pda')" />
+      <VirgoButton v-if="request.hasOption('directLink')"  label="Request a scan"
+         @click="directLinkClicked(request.option('directLink').create_url)"
+      />
    </section>
 </template>
 
@@ -17,6 +20,11 @@ import PDADialog from "@/components/requests/PDADialog.vue"
 import { useRequestStore } from "@/stores/request"
 
 const request = useRequestStore()
+
+const directLinkClicked = ( (url) => {
+   let tab = window.open(url, '_blank')
+   tab.focus()
+})
 
 </script>
 

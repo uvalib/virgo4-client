@@ -28,7 +28,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
+import ILLCopyrightNotice from '../panels/ILLCopyrightNotice.vue'
 import { useRequestStore } from "@/stores/request"
 import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'

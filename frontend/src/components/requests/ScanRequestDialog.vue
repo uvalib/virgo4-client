@@ -39,7 +39,7 @@
 import { ref, computed } from 'vue'
 import RequestDialog from '@/components/requests/RequestDialog.vue'
 import SignIn from "@/views/SignIn.vue"
-import ILLCopyrightNotice from '@/components/requests/ILLCopyrightNotice.vue'
+import ILLCopyrightNotice from '@/components/requests/panels/ILLCopyrightNotice.vue'
 import ConfirmationPanel from "@/components/requests/panels/ConfirmationPanel.vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
