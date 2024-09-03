@@ -4,6 +4,7 @@
       <ScanRequestDialog v-if="request.hasOption('scan')"  :settings="request.option('scan')" />
       <VideoReserveDialog v-if="request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
       <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
+      <PDADialog v-if="request.hasOption('pda') && request.option('pda').create_url"  :settings="request.option('pda')" />
    </section>
 </template>
 
@@ -12,6 +13,7 @@ import PlaceHoldDialog from "@/components/requests/PlaceHoldDialog.vue"
 import AeonRequestDialog from "@/components/requests/AeonRequestDialog.vue"
 import ScanRequestDialog from "@/components/requests/ScanRequestDialog.vue"
 import VideoReserveDialog from "@/components/requests/VideoReserveDialog.vue"
+import PDADialog from "@/components/requests/PDADialog.vue"
 import { useRequestStore } from "@/stores/request"
 
 const request = useRequestStore()

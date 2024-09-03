@@ -193,15 +193,15 @@ export const useRequestStore = defineStore('request', {
            .catch((e) => useSystemStore().setError(e))
            .finally(() => (this.working = false))
       },
-      sendDirectLink() {
+      async submitPDARequest() {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
          this.working = true
-         axios.post(this.activeOption.create_url)
-            .then(_response => {
-               this.activeRequest = "ConfirmationPanel"
-            }).catch(e => {
+         this.failed = false
+         await axios.post(this.option("pda").create_url)
+            .catch(e => {
                let message = e.response.data.error || "There was a problem sending this order. Please try again later."
                useSystemStore().setError(message)
+               this.failed = true
             }).finally(()=>{
                this.working = false
             })
