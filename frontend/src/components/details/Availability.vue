@@ -92,7 +92,7 @@ const canMakeRequests = computed(()=>{
       }
       return false
    }
-   return request.hasRequestOptions
+   return request.hasOptions
 })
 const availabilityStatement = computed(()=>{
    let f = item.details.fields.find( f=>f.name == "availability_statement")

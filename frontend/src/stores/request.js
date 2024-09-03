@@ -7,7 +7,7 @@ import { useUserStore } from "@/stores/user"
 export const useRequestStore = defineStore('request', {
 	state: () => ({
       // option types:
-      // hold, aeon, pda, scan, directLink, videoReserve
+      // hold, aeon, scan, videoReserve, pda, directLink
       requestOptions: [],
       errors: {},
       working: false,
@@ -48,16 +48,16 @@ export const useRequestStore = defineStore('request', {
    }),
 
    getters: {
-      hasRequestOptions: (store) => {
+      hasOptions: (store) => {
          return Array.isArray(store.requestOptions) && store.requestOptions.length > 0
       },
-      hasRequestOption: (store) => {
+      hasOption: (store) => {
          return (reqType) => {
             let optIdx  = store.requestOptions.findIndex( ro => ro.type == reqType)
             return optIdx > -1
          }
       },
-      requestOption: (store) => {
+      option: (store) => {
          return (reqType) => {
             return store.requestOptions.find( ro => ro.type == reqType)
          }
@@ -216,7 +216,7 @@ export const useRequestStore = defineStore('request', {
          this.requestInfo.callNumber = item.label
          this.requestInfo.notes = specialInstructions
 
-         var url = new URL(this.requestOption("aeon").create_url)
+         var url = new URL(this.option("aeon").create_url)
          let params = new URLSearchParams(url.search)
          params.set("CallNumber", item.label)
          params.set("ItemVolume", item.label)

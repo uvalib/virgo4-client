@@ -187,23 +187,15 @@ export const useReserveStore = defineStore('reserve', {
          })
       },
 
-      createVideoReserve(video){
-         const requestStore = useRequestStore()
-         const userStore = useUserStore()
+      async createVideoReserve(v4UserID, video){
          const system = useSystemStore()
 
-         let v4UserID = userStore.signedInUser
          let data = { userID: v4UserID, request: this.request, items: [video] }
-
-         axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
-            requestStore.buttonDisabled = true
+         await axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
             this.clearRequestList()
             this.submitted = true
-            requestStore.activeRequest = "ReservedPanel"
-            requestStore.buttonDisabled = false
          }).catch((error) => {
             system.setError(error)
-            requestStore.buttonDisabled = false
          })
       },
 

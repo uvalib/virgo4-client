@@ -1,9 +1,9 @@
 <template>
    <section class="requests" aria-live="polite">
-      <PlaceHoldDialog v-if="request.hasRequestOption('hold')" :settings="request.requestOption('hold')" />
-      <ScanRequestDialog v-if="request.hasRequestOption('scan')"  :settings="request.requestOption('scan')" />
-      <VideoReserveDialog v-if="request.hasRequestOption('videoReserve')"  :settings="request.requestOption('videoReserve')" />
-      <AeonRequestDialog v-if="request.hasRequestOption('aeon')"  :settings="request.requestOption('aeon')" />
+      <PlaceHoldDialog v-if="request.hasOption('hold')" :settings="request.option('hold')" />
+      <ScanRequestDialog v-if="request.hasOption('scan')"  :settings="request.option('scan')" />
+      <VideoReserveDialog v-if="request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
+      <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
    </section>
 </template>
 
