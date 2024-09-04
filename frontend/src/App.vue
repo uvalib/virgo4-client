@@ -363,6 +363,9 @@ body {
    margin: 0;
    padding: 0;
    background-color: var(--uvalib-blue-alt-darkest);
+   font-family: "franklin-gothic-urw", arial, sans-serif;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
 }
 .sticky {
    position: fixed !important;
