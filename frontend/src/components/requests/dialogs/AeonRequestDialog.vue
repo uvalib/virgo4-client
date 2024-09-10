@@ -59,7 +59,7 @@ const dialogOpened = (() => {
    specialRequest.value = ""
    request.activeRequest = "aeon"
    if (request.items.length == 1) {
-      selectedItem.value =request.items[0]
+      selectedItem.value = request.items[0].value
       setFocusID("aeon-item-notes")
    } else {
       setFocusID("aeon-item-sel")

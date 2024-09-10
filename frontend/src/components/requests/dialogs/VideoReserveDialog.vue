@@ -102,7 +102,7 @@ const dialogOpened = (() => {
       if (request.items.length == 0){
          selectedVideo.value = {}
       } else if (request.items.length == 1){
-         selectedVideo.value = request.items[0]
+         selectedVideo.value = request.items[0].value
       }
       reserve.request.lms = "A&S Canvas"
       setFocusID("behalf_of")

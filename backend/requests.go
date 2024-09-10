@@ -93,8 +93,8 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 		PickupLibrary string `json:"pickupLibrary"`
 		ItemBarcode   string `json:"itemBarcode"`
 	}
-	var HoldReq HoldRequest
-	err := c.ShouldBindJSON(&HoldReq)
+	var holdReq HoldRequest
+	err := c.ShouldBindJSON(&holdReq)
 	if err != nil {
 		log.Printf("ERROR: Unable to parse request: %s", err.Error())
 		c.String(http.StatusBadRequest, err.Error())
@@ -107,8 +107,9 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 		return
 	}
 
+	log.Printf("INFO: create hold request: %+v", holdReq)
 	createHoldURL := fmt.Sprintf("%s/v4/requests/hold", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, HoldReq, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, holdReq, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return

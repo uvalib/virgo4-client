@@ -100,7 +100,7 @@ const dialogOpened = (() => {
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
       if ( request.items.length == 1) {
-         selectedItem.value =request.items[0]
+         selectedItem.value = request.items[0].value
          setFocusID("pickup-sel")
       } else {
          setFocusID("item-sel")
@@ -136,6 +136,10 @@ const placeHold = ( async () => {
 
 <style lang="scss" scoped>
 form {
+   .error {
+      color: var(--uvalib-red-emergency);
+      font-style: italic;
+   }
    p {
       margin: 5px;
    }

@@ -119,7 +119,7 @@ const dialogOpened = (() => {
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "scan")
       if ( request.items.length == 1) {
-         selectedItem.value =request.items[0]
+         selectedItem.value = request.items[0].value
          itemSelected()
          setFocusID("scan-pickup-sel")
       } else {
