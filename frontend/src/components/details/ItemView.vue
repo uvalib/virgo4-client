@@ -137,14 +137,15 @@ const expandLabel = computed (() => {
 })
 
 const showFieldsToggle = computed( () => {
-   if (item.isCollectionHead) return false
+   if ( item.isCollectionHead ) return false
+   if ( preferences.expandDetails ) return false
    let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
    return filteredFields.length > item.primaryFields.length
 })
 
 const allDisplayFields = computed(()=> {
    let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
-   if ( filteredFields.length < item.primaryFields.length || item.isCollectionHead) {
+   if ( filteredFields.length < item.primaryFields.length || item.isCollectionHead || preferences.expandDetails) {
       return filteredFields
    }
 
