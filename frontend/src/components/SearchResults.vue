@@ -150,7 +150,7 @@ const poolSelected = (( poolID ) => {
 .search-results  {
    box-sizing: border-box;
    outline: 0;
-   background-color: var(--uvalib-grey-lightest);
+   background-color: #fafafa;
 }
 
 .results-header {
