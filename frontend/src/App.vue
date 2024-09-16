@@ -531,6 +531,8 @@ a {
 //adding accessibility for keyboard focus
 
 #v4main {
+   max-width: 1600px;
+   margin: 0 auto;
    outline: 0;
    &:focus {
       outline: 0;

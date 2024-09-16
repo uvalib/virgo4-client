@@ -1,9 +1,9 @@
 <template>
    <section class="browse-pager">
       <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="browse previous shelf item"
-         severity="info" label="Previous"/>
+         severity="secondary" label="Previous"/>
       <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="browse next shelf item"
-         severity="info" label="Next"/>
+         severity="secondary" label="Next"/>
    </section>
 </template>
 

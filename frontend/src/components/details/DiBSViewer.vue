@@ -6,8 +6,7 @@
             <h3>Access online</h3>
             <template v-if="activeIframe">
                <div class="reader-header">
-                  <VirgoButton @click="activeIframe = false" aria-label="Close Reader" severity="info"
-                     size="small" label="Close electronic course reserves" />
+                  <VirgoButton @click="activeIframe = false" severity="info" size="small" label="Close viewer" />
                </div>
                <iframe title="Digital reserves viewer" :src="system.dibsURL + '/item/' + selectedItem"
                   allowfullscreen></iframe>
@@ -71,27 +70,31 @@ if (selectList.length == 1) {
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border: 1px solid var(--uvalib-grey-light);
-      border-radius: 0 5px 5px 0;
-      gap: 20px;
+      border-radius: 0.5rem;
 
       .gutter {
          flex: 0 0 17px;
-         background-color:#E6F2F7;
+         border-radius: 0.5rem  0 0 0.5rem;
+         background-color:#BFE7F7;
       }
 
       .content {
          flex: 1;
-         padding: 0 20px 25px 0;
+         padding: 0 20px 25px 20px;
+         border: 1px solid var(--uvalib-grey-light);
+         border-radius:  0 0.5rem  0.5rem 0;
 
          .reader-header {
             padding-bottom: 15px;
+            text-align: right;
          }
          iframe {
             width: 100%;
             height: 80vh;
-            border: 1px solid var(--uvalib-grey);
-            outline: none;
+            border: 1px solid var(--uvalib-grey-lightest);
+            outline: 0;
+            border-radius: 0.5rem;
+            background-color: var(--uvalib-grey-lightest);
          }
 
          h3 {

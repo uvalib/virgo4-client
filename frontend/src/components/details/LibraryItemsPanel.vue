@@ -49,16 +49,18 @@ const props = defineProps({
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border: 1px solid var(--uvalib-grey-light);
-      border-radius: 0 5px 5px 0;
-      gap: 20px;
+      border-radius: 0.5rem;
       .gutter {
          flex: 0 0 17px;
-         background-color:#E6F2F7;
+         border-radius: 0.5rem  0 0 0.5rem;
+         background-color:#BFE7F7;
       }
       .content {
          flex: 1;
-         padding: 15px 15px 15px 0;
+         padding: 20px;
+         border: 1px solid var(--uvalib-grey-light);
+         border-radius:  0 0.5rem  0.5rem 0;
+         border-left: 0;
          .name {
             font-weight: bold;
             padding-bottom: 10px;

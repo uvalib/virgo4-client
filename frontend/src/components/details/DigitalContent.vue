@@ -10,7 +10,7 @@
          </div>
          <div class="viewer" v-if="item.hasDigitalContent">
             <div v-if="fsView" class="restore-view">
-               <VirgoButton severity="info"  @click="toggleFullView" label="Restore View" />
+               <VirgoButton severity="info"  @click="toggleFullView" label="Exit full screen" />
             </div>
             <iframe class="curio" :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
          </div>

@@ -3,7 +3,7 @@
       <h2>Actions</h2>
       <div class="panel">
          <div class="gutter"></div>
-         <div class="buttons">
+         <div class="content">
             <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from" :labeled="true"/>
             <Citations :itemURL="props.hit.itemURL" :from="props.from" :ariaLabel="`citations for ${props.hit.identifier}`"/>
             <VirgoButton icon="fal fa-download" text rounded label="Download RIS"
@@ -126,19 +126,21 @@ const pdfClicked= ( async() => {
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border: 1px solid var(--uvalib-grey-light);
-      border-radius: 0 5px 5px 0;
-      gap: 20px;
+      border-radius: 0.5rem;
       .gutter {
          flex: 0 0 17px;
-         background-color:#E6F2F7;
+         border-radius: 0.5rem  0 0 0.5rem;
+         background-color:#BFE7F7;
       }
-      .buttons {
-         flex: 1;
+      .content {
          display: flex;
          flex-flow: row wrap;
          align-items: center;
-         padding: 10px 20px 10px 0;
+         padding: 10px 30px 10px 20px;
+         border: 1px solid var(--uvalib-grey-light);
+         border-radius:  0 0.5rem  0.5rem 0;
+         border-left: 0;
+         gap: 40px;
          .pdf-wrap {
             position: relative;
          }
