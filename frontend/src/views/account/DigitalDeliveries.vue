@@ -143,6 +143,7 @@ div.notice {
    width: 60%;
    margin: 2vw auto 0 auto;
    position: relative;
+   padding-bottom: 25px;
 }
 @media only screen and (min-width: 768px) {
    div.digital-deliveries {

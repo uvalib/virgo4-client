@@ -5,7 +5,7 @@
       <div class="working" v-if="(poolStore.lookingUp || userStore.lookingUp) && userStore.isSignedIn" >
          <V4Spinner message="Loading admin settings..."/>
       </div>
-      <div v-else>
+      <div v-else class="sections">
          <template v-if="userStore.isSignedIn">
             <PickupLibraries class="section" v-if="userStore.isAdmin"/>
             <JWTAdmin class="section" v-if="userStore.isAdmin"/>
@@ -48,11 +48,17 @@ onMounted(() => {
    color: var(--color-primary-text);
    width: 80%;
    margin: 2vw auto 0 auto;
-   .section {
-      margin: 15px 0 40px 0;
-      border: 1px solid var(--uvalib-grey-light);
-      padding: 0;
-      text-align: left;
+   padding-bottom: 50px;
+   .sections {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      .section {
+         margin: 0;
+         border: 1px solid var(--uvalib-grey-light);
+         padding: 0;
+         text-align: left;
+      }
    }
 }
 .working {

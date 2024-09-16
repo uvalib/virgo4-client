@@ -102,7 +102,7 @@ onMounted( () => {
    position: relative;
 
    .details {
-      margin-bottom: 50px;
+      padding-bottom: 50px;
    }
 
    div.tab-header {

@@ -5,7 +5,7 @@
       <div class="working" v-if="bookmarkStore.searching && userStore.isSignedIn || userStore.lookingUp">
          <V4Spinner message="Looking up bookmark information..."/>
       </div>
-      <div v-else-if="userStore.isSignedIn">
+      <div v-else-if="userStore.isSignedIn" class="list">
          <div class="none" v-if="bookmarkStore.hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
             <AccordionContent  v-for="(folderInfo) in bookmarkStore.bookmarks" :key="folderInfo.id"
@@ -391,8 +391,13 @@ onMounted(()=>{
    }
 }
 
+.list {
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
 div.bookmark-folder {
-   margin-bottom: 15px;
    .settings {
       h4 {
          margin: 10px 0 20px 0;
@@ -442,6 +447,7 @@ div.bookmark-folder {
    color: var(--color-primary-text);
    width: 60%;
    margin: 0 auto;
+   padding-bottom: 50px;
 }
 .working {
    text-align: center;

@@ -1,6 +1,6 @@
 <template>
    <div class="pool-options">
-      <h2>Search Preferences</h2>
+      <h3>Search Preferences</h3>
       <div class="grouping">
          <p>
             Related search results are grouped under a single search result. By default, these grouped results are
@@ -43,7 +43,7 @@ const fullDetailClicked = (() => {
 </script>
 
 <style lang="scss" scoped>
-h2 {
+h3 {
    margin: 0;
    padding: 10px 15px;
    background: var(--uvalib-grey-lightest);

@@ -267,13 +267,16 @@ span.info {
    min-height: 400px;
    position: relative;
    color: var(--color-primary-text);
-}
-
-div.searches {
-   width: 60%;
+   padding-bottom: 50px;
    margin: 2vw auto 0 auto;
    text-align: center;
+   .details {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+   }
 }
+
 @media only screen and (min-width: 768px) {
    div.searches {
       width: 60%;
@@ -324,9 +327,6 @@ span.icon i.fal {
    margin-right: 15px;
    margin-top: 2px;
    padding: 0;
-}
-.details {
-   margin-bottom: 35px;
 }
 span.num {
   font-weight: bold;

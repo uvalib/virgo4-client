@@ -1,6 +1,6 @@
 <template>
    <div v-if="systemStore.isDevServer && userStore.isAdmin" class="jwt-admin">
-      <h2>JWT Management</h2>
+      <h3>JWT Management</h3>
       <div class="content form">
          <p>
             Modify your JWT. This could break your session and you may have to
@@ -32,7 +32,7 @@ function update() {
 <style lang="scss" scoped>
 .jwt-admin {
    border: 1px solid var(--uvalib-red-emergency);
-   h2 {
+   h3 {
       margin: 0;
       padding: 10px 15px;
       background: var(--uvalib-grey-lightest);

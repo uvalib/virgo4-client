@@ -8,7 +8,7 @@
       <AccountRequestForm v-if="userStore.noILSAccount == true" />
       <template v-if="userStore.hasAccountInfo">
          <div class="account-group">
-            <h2>Virgo</h2>
+            <h3>Virgo</h3>
             <dl>
                <dt>Name</dt>
                <dd>{{info.displayName}} <span v-if="info.sirsiProfile && info.sirsiProfile.preferredName">({{info.sirsiProfile.preferredName}})</span></dd>
@@ -50,7 +50,7 @@
                <div v-if="systemStore.ilsError" class="standing-info">{{systemStore.ilsError}}</div>
 
                <div v-if="isBillOwed || userStore.totalFines>0" class="outstanding-bill">
-                  <h2 class="fines-head">Billing</h2>
+                  <h3 class="fines-head">Billing</h3>
                   <div class="fines-content">
                      <div class="notes">
                         Your account currently has an outstanding balance.
@@ -164,7 +164,7 @@
          </div>
 
          <div class="account-group" v-if="userStore.canUseLEO">
-            <h2>ILLiad</h2>
+            <h3>ILLiad</h3>
             <dl v-if="info.leoAddress">
                <dt>LEO Delivery Location:</dt>
                <dd>
@@ -180,7 +180,7 @@
          </div>
 
          <div class="account-group">
-            <h2>Special Collections</h2>
+            <h3>Special Collections</h3>
             <p class="sc">
                <a target="_blank" href="https://virginia.aeon.atlas-sys.com/logon" aria-label="Special Collections Account" >
                   Make Small Special Collections requests
@@ -237,21 +237,24 @@ onMounted(() =>{
    }
 }
 .account {
-   min-height: 400px;
    position: relative;
    margin: 2vw auto 0 auto;
    text-align: left;
    color: var(--color-primary-text);
+   padding-bottom: 50px;
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
 }
 .account-group {
-   border: 1px solid var(--uvalib-grey);
-   margin: 20px 0;
-   h2 {
+   border: 1px solid var(--uvalib-grey-light);
+   margin: 0;
+   h3 {
       padding: 12px;
       margin: 0;
       background: var(--uvalib-grey-lightest);
-      color: var(--uvalib-grey-darkest);
-      border-bottom: 1px solid var(--uvalib-grey)
+      color: var(--uvalib-text);
+      border-bottom: 1px solid var(--uvalib-grey-light);
    }
    dl {
       margin: 25px;

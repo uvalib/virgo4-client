@@ -5,7 +5,7 @@
       <div class="working" v-if="(poolStore.lookingUp || userStore.lookingUp) && userStore.isSignedIn" >
          <V4Spinner message="Loading preferences..."/>
       </div>
-      <div v-else>
+      <div v-else class="sections">
          <template v-if="userStore.isSignedIn">
             <Search class="section"/>
             <PickupLibrary class="section"/>
@@ -45,6 +45,7 @@ onMounted( async () => {
    color: var(--color-primary-text);
    width: 60%;
    margin: 2vw auto 0 auto;
+   padding-bottom: 50px;
 }
 .working {
    text-align: center;
@@ -63,10 +64,15 @@ onMounted( async () => {
       width: 95%;
    }
 }
-.section {
-   margin: 15px 0;
-   border: 1px solid var(--uvalib-grey-light);
-   padding: 0;
-   text-align: left;
+.sections {
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   .section {
+      margin: 0;
+      border: 1px solid var(--uvalib-grey-light);
+      padding: 0;
+      text-align: left;
+   }
 }
 </style>
