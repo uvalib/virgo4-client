@@ -240,7 +240,8 @@ onUpdated(() => {
 
 <style lang="scss">
 .configure {
-   margin-bottom: 150px;
+   padding-bottom: 150px;
+   min-height: 500px
 }
 .header-alert {
    background-color: rgb(37, 202, 211);
