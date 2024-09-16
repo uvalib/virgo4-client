@@ -140,8 +140,7 @@ div.notice {
    position: relative;
    margin-top: 2vw;
    color: var(--color-primary-text);
-   width: 60%;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    position: relative;
    padding-bottom: 25px;
 }

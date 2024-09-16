@@ -35,10 +35,7 @@ async function signOut() {
 }
 </script>
 
-<style scoped>
-.sep {
-   margin: 0 10px;
-}
+<style scoped lang="scss">
 .activities {
    margin-bottom: 15px;
    padding-bottom: 5px;
@@ -47,11 +44,18 @@ async function signOut() {
    display: flex;
    flex-flow: row wrap;
    justify-content: center;
-    align-items: center;
+   align-items: center;
+   gap: 2px;
 }
-
+#app .activities a {
+   padding: 4px 8px;
+}
 #app .activities a.router-link-active {
    font-weight: bold;
    color: var(--uvalib-brand-orange);
+   cursor: default;
+   &:hover {
+      text-decoration: none;
+   }
 }
 </style>

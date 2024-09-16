@@ -443,9 +443,8 @@ div.bookmark-folder {
 .bookmarks {
    min-height: 400px;
    position: relative;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto 0 auto;
    color: var(--color-primary-text);
-   width: 60%;
    margin: 0 auto;
    padding-bottom: 50px;
 }

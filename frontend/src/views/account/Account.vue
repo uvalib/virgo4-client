@@ -6,7 +6,7 @@
          <V4Spinner message="Looking up account details..."/>
       </div>
       <AccountRequestForm v-if="userStore.noILSAccount == true" />
-      <template v-if="userStore.hasAccountInfo">
+      <div v-if="userStore.hasAccountInfo" class="groups">
          <div class="account-group">
             <h3>Virgo</h3>
             <dl>
@@ -189,7 +189,7 @@
             </p>
          </div>
 
-      </template>
+      </div>
    </div>
 </template>
 
@@ -238,13 +238,15 @@ onMounted(() =>{
 }
 .account {
    position: relative;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    text-align: left;
    color: var(--color-primary-text);
    padding-bottom: 50px;
+}
+.groups {
    display: flex;
    flex-direction: column;
-   gap: 20px;
+   gap: 25px;
 }
 .account-group {
    border: 1px solid var(--uvalib-grey-light);

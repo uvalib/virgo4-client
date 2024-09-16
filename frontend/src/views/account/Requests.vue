@@ -4,7 +4,7 @@
       <AccountActivities  v-if="userStore.isSignedIn"/>
       <div class="details" v-if="userStore.isSignedIn">
          <template v-if="!userStore.noILSAccount && !userStore.isBarred">
-            <h2>Make a New Request</h2>
+            <h3>Make a New Request</h3>
             <div v-if="!userStore.isUVA">
                <!-- No ILL requests for community borrowers  -->
             </div>
@@ -28,7 +28,7 @@
                <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
             </template>
 
-            <h2>Outstanding Requests</h2>
+            <h3 class="gap">Outstanding Requests</h3>
          </template>
          <div class="subcontent">
             <div class="working" v-if="userStore.lookingUp && userStore.isSignedIn">
@@ -336,15 +336,17 @@ onMounted(() =>{
    min-height: 400px;
    position: relative;
    color: var(--color-primary-text);
-   width: 80%;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    position: relative;
    text-align: left;
 
-   h2 {
+   h3 {
       margin: 10px 0 5px 0;
       font-size: 1.25em;
       border-bottom: 1px solid;
+   }
+   h3.gap {
+      margin: 25px 0 5px 0;
    }
    .subcontent {
       margin-bottom: 0px;
@@ -398,25 +400,6 @@ onMounted(() =>{
       font-weight: bold;
       font-size:1.15em;
       padding: 5px;
-   }
-
-   .request-list {
-      background-color: var(--uvalib-grey-lightest);
-      border: 1px solid var(--uvalib-grey-light);
-
-      .request {
-         font-size: 0.9em;
-         margin:15px;
-         border: 1px solid var(--uvalib-grey-lightest);
-         background: white;
-         padding: 5px 10px;
-
-         h3 {
-            margin: 0 0 15px 0;
-            padding: 10px;
-            border-bottom: 2px solid var(--uvalib-grey-light);
-         }
-      }
    }
 }
 

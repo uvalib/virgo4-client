@@ -268,7 +268,7 @@ span.info {
    position: relative;
    color: var(--color-primary-text);
    padding-bottom: 50px;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    text-align: center;
    .details {
       display: flex;

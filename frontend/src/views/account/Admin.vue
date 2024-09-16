@@ -46,8 +46,7 @@ onMounted(() => {
    min-height: 400px;
    position: relative;
    color: var(--color-primary-text);
-   width: 80%;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    padding-bottom: 50px;
    .sections {
       display: flex;
@@ -69,12 +68,12 @@ onMounted(() => {
    margin: 30px 0;
 }
 @media only screen and (min-width: 768px) {
-   div.preferences  {
-      width: 60%;
+   div.admin  {
+      width: 80%;
    }
 }
 @media only screen and (max-width: 768px) {
-   div.preferences  {
+   div.admin  {
       width: 95%;
    }
 }

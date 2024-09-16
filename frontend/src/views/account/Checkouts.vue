@@ -97,8 +97,7 @@ onMounted( () => {
    min-height: 400px;
    position: relative;
    color: var(--color-primary-text);
-   width: 60%;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    position: relative;
 
    .details {
