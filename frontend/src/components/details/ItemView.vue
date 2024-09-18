@@ -19,7 +19,7 @@
          <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
          </div>
          <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
-         <dl class="fields">
+         <dl class="fields" :aria-expanded="detailExpanded.toString()">
             <template v-if="details.header.author">
                <dt class="label">{{details.header.author.label}}:</dt>
                <dd class="value">

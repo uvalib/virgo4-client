@@ -150,6 +150,7 @@ onMounted(()=>{
          background-color:#BFE7F7;
       }
       .content {
+         flex: 1;
          padding: 5px 30px 25px 25px;
          border: 1px solid var(--uvalib-grey-light);
          border-radius:  0 0.5rem  0.5rem 0;
