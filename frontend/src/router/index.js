@@ -184,7 +184,7 @@ router.afterEach((to) => {
    const h1 = {home: "Search", search: "Search", signin: "User Sign In", account: "My Account",
       checkouts: "My Account", 'digital-deliveries': "My Account",
       bookmarks: "My Account", requests: "My Account", searches: "My Account", admin: "My Account",
-      preferences: "My Account", register: "Register", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
+      preferences: "My Account", register: "Register for a Community Borrower Account", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
       codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found",
       'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item", forbidden: "Forbidden",
       'course-reserves': "Course Reserves", 'course-reserves-request': "Course Reserves Request", reserved: "Course Reserves Request"
