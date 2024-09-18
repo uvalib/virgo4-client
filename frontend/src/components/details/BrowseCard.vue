@@ -3,7 +3,9 @@
       <template v-if="props.mode=='gallery'">
          <div class="thumb-wrap">
             <span v-if="props.data.status=='ready'" class="vertical-spacer"></span>
-            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" tabindex="-1">
+            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`"
+               tabindex="-1" :aria-label="`view item titled ${props.data.title}`"
+            >
                <template v-if="props.data.status=='ready' || props.data.status=='url'">
                   <img  alt="" class="thumb" v-if="props.data.status=='ready'" :src="props.data.image_base64" />
                   <img  alt="" class="thumb" v-if="props.data.status=='url'" :src="props.data.cover_image_url" />
