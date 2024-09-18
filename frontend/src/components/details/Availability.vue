@@ -25,23 +25,14 @@
             <RequestsPanel v-if="canMakeRequests"/>
             <ul class="holdings" v-if="item.details.holdings.libraries">
                <li v-for="lib in item.details.holdings.libraries">
-                  <span class="library">{{lib.library}}</span>
-                  <ul class="location">
-                     <li v-for="(loc, lidx) in lib.locations" :key="`loc${lidx}`">
-                        <span class="location">{{loc.location}}</span>
-                        <ul class="call">
-                           <li v-for="(cn, cidx) in loc.call_numbers" :key="`cn${cidx}`">
-                              {{cn.call_number}}
-                              <ul class="copy">
-                                 <div v-for="(txt, tnidx) in cn.text_notes" :key="`t${tnidx}`">
-                                   <li>{{txt.text}}</li>
-                                   <li class="note" v-if="txt.note">{{txt.note}}</li>
-                                 </div>
-                              </ul>
-                           </li>
-                        </ul>
-                     </li>
-                  </ul>
+                  <div class="library">{{lib.library}}</div>
+                  <div v-for="(loc, lidx) in lib.locations" :key="`loc${lidx}`" class="locations">
+                     <div class="location">{{loc.location}}</div>
+                     <div v-for="cn in loc.call_numbers">
+                        <div class="call">{{ cn.call_number }}</div>
+                        <div class="note" v-for="txt in  cn.text_notes">{{ txt.text }}</div>
+                     </div>
+                  </div>
                </li>
             </ul>
             <div class="libraries">
@@ -196,17 +187,12 @@ const dibsItems = computed(()=>{
          margin-bottom: 15px;
          .library {
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
          }
       }
-      .location, .call {
+      .location, .call, .note {
          margin: 5px;
-         list-style: none;
-         padding: 0 0 0 5px;
-      }
-      .copy {
-         padding: 0;
-         list-style: none;
+         padding: 0 0 0 10px;
       }
    }
    .libraries {
