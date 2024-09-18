@@ -164,10 +164,6 @@ address {
 .give-library {
    font-size: 1.2em;
    margin-top: 25px;
-
-   button {
-      font-weight: bold;
-   }
 }
 
 .footer-post-container {

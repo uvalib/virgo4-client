@@ -111,8 +111,8 @@ const UVA = definePreset(Aura, {
                   color: 'var(--uvalib-text)',
                },
                contrast: {
-                  background: 'var(--uvalib-brand-orange)',
-                  hoverBackground: 'var(--uvalib-brand-orange-dark)',
+                  background: 'var(--uvalib-brand-orange-dark)',
+                  hoverBackground: 'var(--uvalib-brand-orange)',
                   activeBackground: 'var(--uvalib-brand-orange)',
                   focusRing: {
                      color: 'white',
