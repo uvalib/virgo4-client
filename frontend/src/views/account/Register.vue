@@ -1,10 +1,19 @@
 <template>
   <div class="account" v-if="!userStore.lookingUp">
     <ul class="info">
-      <li>Use this form to register for a Library Account.</li>
-      <li>It is for people <i>other</i> than students, faculty, and staff of the University of Virginia.</li>
-      <li>A Library Account does not grant access to online material.</li>
-      <li>People with UVA NetBadge accounts should instead <router-link to="/signin">sign in with Netbadge.</router-link></li>
+      <li>UVA students, staff, and faculty <b>DO NOT</b> use this form. Log in with <router-link to="/signin">Netbadge</router-link>.</li>
+
+      <li>After account creation and email validation, a community borrower may log into Virgo to request books from Ivy and JAG or recall checked out materials.</li>
+      <li>A Community Borrower account does not grant access to online material.</li>
+      <li>To verify your account, please bring a photo ID the first time you visit a UVA Library.
+      <br/>Accepted forms of ID:
+      </li>
+      <ul>
+        <li>Driver’s license</li>
+        <li>Passport</li>
+        <li>College ID + a piece of mail with name and home address.</li>
+      </ul>
+      <li>If not verified, accounts will be deleted after 30 days.</li>
       <li>More information:
         <ul>
           <li><a target="_blank" href="https://www.library.virginia.edu/policies/circulation">
@@ -20,16 +29,18 @@
 
     <FormKit type="form" id="account-register" :actions="false" @submit="submitClicked"
       incompleteMessage="Sorry, not all fields are filled out correctly.">
-      <FormKit label="First Name" type="text" v-model="userStore.tempAccount.firstName" validation="required|length:2" />
-      <FormKit label="Last Name" type="text" v-model="userStore.tempAccount.lastName" validation="required|length:2" />
-      <FormKit label="Phone" type="tel" v-model="userStore.tempAccount.phone" placeholder="###-###-####"
-        validation-visibility="blur" validation="required|matches:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/"
-        :validation-messages="{ matches: 'Phone number must be in the format ###-###-####'}" />
-      <FormKit label="Address Line 1" type="text" v-model="userStore.tempAccount.address1" validation="required" />
-      <FormKit label="Address Line 2" type="text" v-model="userStore.tempAccount.address2" />
-      <FormKit label="City" type="text" v-model="userStore.tempAccount.city" validation="required" />
-      <FormKit label="State" type="text" v-model="userStore.tempAccount.state" validation="required" />
-      <FormKit label="Zip Code" type="text" v-model="userStore.tempAccount.zip" validation="required" />
+      <Panel header="Account Information">
+        <FormKit label="First Name" type="text" v-model="userStore.tempAccount.firstName" validation="required|length:2" />
+        <FormKit label="Last Name" type="text" v-model="userStore.tempAccount.lastName" validation="required|length:2" />
+        <FormKit label="Phone" type="tel" v-model="userStore.tempAccount.phone" placeholder="###-###-####"
+          validation-visibility="blur" validation="required|matches:/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/"
+          :validation-messages="{ matches: 'Phone number must be in the format ###-###-####'}" />
+        <FormKit label="Address Line 1" type="text" v-model="userStore.tempAccount.address1" validation="required" />
+        <FormKit label="Address Line 2" type="text" v-model="userStore.tempAccount.address2" />
+        <FormKit label="City" type="text" v-model="userStore.tempAccount.city" validation="required" />
+        <FormKit label="State" type="text" v-model="userStore.tempAccount.state" validation="required" />
+        <FormKit label="Zip Code" type="text" v-model="userStore.tempAccount.zip" validation="required" />
+      </Panel>
 
       <Panel header="Login credentials">
         <p>Once this form is submitted, we will send you a confirmation email with a link to activate your account.</p>
@@ -98,6 +109,9 @@ function cancelClicked() {
     width: 95%;
   }
 }
+.form-controls {
+  padding-bottom: 20px;
+}
 .account {
   min-height: 400px;
   position: relative;
@@ -107,7 +121,7 @@ function cancelClicked() {
 }
 .info{
   margin: 0 auto;
-  li{
+  li {
     padding: 5px 0
   }
 }
