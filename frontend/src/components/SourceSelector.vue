@@ -1,6 +1,6 @@
 <template>
-      <div class="src-targets">
-         <label class="screen-reader-text">search mode:</label>
+      <fieldset class="src-targets">
+         <legend>search for</legend>
          <label for="search-all">
             <input @click="sourcesClicked('all')" id="search-all" type="radio"
                v-model="queryStore.searchSources" value="all" name="sources"
@@ -25,7 +25,7 @@
             >
             <span>Images Only</span>
          </label>
-      </div>
+      </fieldset>
 </template>
 
 <script setup>
@@ -46,7 +46,7 @@ const queryStore = useQueryStore()
 const router = useRouter()
 const route = useRoute()
 
-function sourcesClicked( setting ) {
+const sourcesClicked = (( setting ) => {
    if ( queryStore.searchSources  != setting ) {
       analytics.trigger('Search', 'SCOPE_CHANGED', `${queryStore.mode}|${setting}`)
       queryStore.searchSources = setting
@@ -63,7 +63,7 @@ function sourcesClicked( setting ) {
          }
       }
    }
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -75,6 +75,10 @@ function sourcesClicked( setting ) {
    flex-flow: row wrap;
    justify-content: center;
    align-items: center;
+   border: none;
+   legend {
+      display: none;
+   }
    label {
       display: flex;
       flex-flow: row nowrap;

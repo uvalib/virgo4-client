@@ -1,8 +1,8 @@
 <template>
    <div class="welcome">
-      <h3 class="borders">
+      <h2 class="borders">
          Virgo is the Library catalog, where you can find books, articles, and more.
-      </h3>
+      </h2>
       <p>
          You can use Virgo to make requests, find and create course reserves, organize and share bookmarks, and set personal preferences for your own use of the system.
       </p>
@@ -34,10 +34,10 @@ const systemStore = useSystemStore()
    }
 }
 
-h3.borders {
+h2.borders {
    border-bottom: 1px solid var(--uvalib-grey-light);
    border-top: 1px solid var(--uvalib-grey-light);
-   margin: 0;
+   margin: 0 !important;
    padding: 5px 0;
 }
 
