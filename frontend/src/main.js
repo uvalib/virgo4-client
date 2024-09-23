@@ -80,24 +80,17 @@ app.mount('#app')
 // Plugins for formkit -------
 
 function addRequiredNotePlugin(node) {
-   var showRequired = true
    node.on('created', () => {
-      if (node.config.disableRequiredDecoration == true) {
-         showRequired = false
-      }
       const schemaFn = node.props.definition.schema
       node.props.definition.schema = (sectionsSchema = {}) => {
-         const isRequired = node.props.parsedRules.some(rule => rule.name === 'required')
-
-         if (isRequired && showRequired) {
-            // this input has the required rule so we modify
-            // the schema to add an astrics to the label.
-            sectionsSchema.label = {
-               attrs: {
-                  innerHTML: `<i class="req fas fa-asterisk"></i><span class="req-label">${node.props.label}</span><span class="req">(required)</span>`
-               },
-               children: null//['$label', '*']
-            }
+         sectionsSchema["label"] = {
+            children: [`$label`, {
+               $el: 'span',
+               if: '$state.required',
+                  attrs: {
+                     innerHTML: "*</i><span class='req'>(required)</span>"
+                  },
+            }]
          }
          return schemaFn(sectionsSchema)
       }
