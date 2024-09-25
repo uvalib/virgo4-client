@@ -18,7 +18,7 @@
          </div>
          <div v-else class="scan-use-note" >
             <div><b>For instructors only: </b></div>
-            <div>Use this form to request a scan for distribution to your students through a course management system (Collab, Canvas, etc).</div>
+            <div>Use this form to request a scan for distribution to your students through<br/>a course management system (Collab, Canvas, etc).</div>
          </div>
          <FormKit label="Book or Journal Title" type="text" v-model="scan.title" validation="required"/>
          <FormKit label="Chapter or Article Title" type="text" v-model="scan.chapter" validation="required"/>

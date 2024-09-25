@@ -102,7 +102,8 @@ const netbadgeLogin = (() => {
 <style scoped lang="scss">
 .signin {
    position: relative;
-   margin: 2vw auto 6vw;
+   margin: 2vw auto 0;
+   padding-bottom: 6vw;
    color: var(--uvalib-text);
    text-align: left;
    div.netbadge {
