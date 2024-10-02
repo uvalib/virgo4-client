@@ -16,9 +16,6 @@ export const useItemStore = defineStore('item', {
    }),
 
    getters: {
-      identifier: state => {
-         return state.details.identifier
-      },
       generalFormat: state => {
          let genTypeF = state.details.fields.find( bf => bf.name == "general_format")
          if (!genTypeF) {
@@ -362,7 +359,7 @@ export const useItemStore = defineStore('item', {
          const requestStore = useRequestStore()
 
          this.clearAvailability()
-         let url = `${system.availabilityURL}/item/${this.identifier}`
+         let url = `${system.availabilityURL}/item/${this.details.identifier}`
          axios.get(url).then((response) => {
             if (response.data) {
                this.availability.titleId = response.data.availability.title_id
