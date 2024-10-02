@@ -1,17 +1,20 @@
 <template>
   <div class="account" v-if="!userStore.lookingUp">
     <ul class="info">
-      <li>UVA students, staff, and faculty <b>DO NOT</b> use this form. Log in with <router-link to="/signin">Netbadge</router-link>.</li>
+      <li>UVA students, staff, and faculty <router-link to="/signin">sign in with Netbadge</router-link>. <b>DO NOT use the form below.</b></li>
 
-      <li>After account creation and email validation, a community borrower may log into Virgo to request books from Ivy and JAG or recall checked out materials.</li>
-      <li>A Community Borrower account does not grant access to online material.</li>
-      <li>To verify your account, please bring a photo ID the first time you visit a UVA Library.
-      <br/>Accepted forms of ID:
-      </li>
+      <li>After you create your account and validate your email, you are considered a “community borrower.” Community borrowers may log into Virgo to request books from Ivy or JAG, or recall checked out materials. </li>
+      <li>A community borrower account does not grant access to online material.</li>
+      <li><b>To keep your account, you must verify your identity within the first 30 days:</b></li>
       <ul>
-        <li>Driver’s license</li>
-        <li>Passport</li>
-        <li>College ID + a piece of mail with name and home address.</li>
+        <li>Please bring a photo ID to a <a href="https://library.virginia.edu/hours" target="_blank">UVA Library location</a>. Accepted forms of ID include:
+          <ul>
+            <li>Driver's license</li>
+            <li>Passport</li>
+            <li>College ID + a piece of mail with name and home address.</li>
+            <li>Military ID + a piece of mail with name and home address.</li>
+          </ul>
+        </li>
       </ul>
       <li>If not verified, accounts will be deleted after 30 days.</li>
       <li>More information:
