@@ -39,12 +39,15 @@
                   </span>
                   <span class="copyright" v-else-if="field.type=='copyright'">
                      <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
-                     <a :href="field.value" target="_blank">{{field.item}}</a>
-                     <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
-                        href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
-                     >
-                        More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
-                     </a>
+                     <template v-if="system.isKiosk == false">
+                        <a :href="field.value" target="_blank">{{field.item}}</a>
+                        <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
+                           href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
+                        >
+                           More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                        </a>
+                     </template>
+                     <span v-else>{{field.item}}</span>
                   </span>
                   <template v-else>
                      <span v-if="preferences.expandDetails" class="value" v-html="utils.fieldValueString(field)"></span>
@@ -61,7 +64,7 @@
                   </a>
                </dd>
             </template>
-            <template v-if="hasMarcXML && detailExpanded">
+            <template v-if="hasMarcXML && detailExpanded && system.isKiosk == false">
                <dt class="label marc">MARC XML:</dt>
                <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
             </template>
