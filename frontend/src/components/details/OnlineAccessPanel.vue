@@ -112,6 +112,9 @@ const linkLabel = (( providerLink ) => {
                display: flex;
                flex-flow: row wrap;
                gap: 10px;
+               .p-button {
+                  flex-grow: 1;
+               }
             }
          }
       }
@@ -119,7 +122,7 @@ const linkLabel = (( providerLink ) => {
 }
 @media only screen and (min-width: 768px) {
    .source {
-      gap: 75px;
+      gap: 15px;
       align-items: center;
       // align-items: flex-start; // for vertical layout
    }
