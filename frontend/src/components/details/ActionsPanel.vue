@@ -126,10 +126,10 @@ const pdfClicked= ( async() => {
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border-radius: 0.5rem;
+      border-radius: 5px;
       .gutter {
          flex: 0 0 17px;
-         border-radius: 0.5rem  0 0 0.5rem;
+         border-radius: 5px  0 0 5px;
          background-color:#BFE7F7;
       }
       .content {
@@ -138,7 +138,7 @@ const pdfClicked= ( async() => {
          align-items: center;
          padding: 10px 30px 10px 20px;
          border: 1px solid var(--uvalib-grey-light);
-         border-radius:  0 0.5rem  0.5rem 0;
+         border-radius:  0 5px  5px 0;
          border-left: 0;
          gap: 40px;
          .pdf-wrap {
@@ -155,7 +155,7 @@ const pdfClicked= ( async() => {
 }
 @media only screen and (max-width: 768px) {
    .buttons {
-      justify-content: space-between;
+      justify-content: space-around;
       gap: 5px 10px;
    }
 }

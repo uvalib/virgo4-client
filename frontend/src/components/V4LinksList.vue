@@ -118,12 +118,7 @@ const toggle = (() => {
       }
    }
    .controls {
-      margin-top: 10px;
-      display: flex;
-      flex-flow: row wrap;
-      align-items: flex-start;
-      justify-content: flex-end;
-      gap: 5px;
+      padding: 5px 0 0 5px;
       .toggle {
          font-size: 0.9em;
       }

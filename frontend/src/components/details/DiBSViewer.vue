@@ -70,11 +70,11 @@ if (selectList.length == 1) {
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border-radius: 0.5rem;
+      border-radius: 5px;
 
       .gutter {
          flex: 0 0 17px;
-         border-radius: 0.5rem  0 0 0.5rem;
+         border-radius: 5px  0 0 5px;
          background-color:#BFE7F7;
       }
 
@@ -82,7 +82,7 @@ if (selectList.length == 1) {
          flex: 1;
          padding: 0 20px 25px 20px;
          border: 1px solid var(--uvalib-grey-light);
-         border-radius:  0 0.5rem  0.5rem 0;
+         border-radius:  0 5px  5px 0;
 
          .reader-header {
             padding-bottom: 15px;
@@ -93,7 +93,7 @@ if (selectList.length == 1) {
             height: 80vh;
             border: 1px solid var(--uvalib-grey-lightest);
             outline: 0;
-            border-radius: 0.5rem;
+            border-radius: 5px;
             background-color: var(--uvalib-grey-lightest);
          }
 

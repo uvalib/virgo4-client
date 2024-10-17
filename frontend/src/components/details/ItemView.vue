@@ -297,15 +297,7 @@ h2 {
    margin-top: 20px;
 }
 
-dl.fields {
-   grid-template-columns: 0.5fr 2fr;
-   dt.label {
-      white-space: normal;
-   }
-   dt.label.marc {
-      padding-top: 12px;
-   }
-}
+
 .detail-controls {
    display: flex;
    flex-direction: column;
@@ -318,40 +310,43 @@ dl.fields {
    margin: 15px 0;
    border-top: 4px solid var(--color-brand-blue);
 }
-dl {
-   margin-top: 15px;
-   display: inline-grid;
+dl.fields {
    grid-template-columns: max-content 2fr;
-   grid-column-gap: 10px;
+   display: inline-grid;
+   grid-column-gap: 20px;
    width: 100%;
-}
-dt {
-   font-weight: bold;
-   text-align: right;
-   padding: 4px 8px;
-   white-space: nowrap;
-   vertical-align: top;
-}
-dd {
-   margin: 0;
-   width: 100%;
-   max-width: 750px;
-   text-align: left;
-   word-break: break-word;
-   -webkit-hyphens: auto;
-   -moz-hyphens: auto;
-   hyphens: auto;
-   padding: 4px 0px;
-   .related {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+   dt {
+      font-weight: bold;
+      text-align: left;
+      padding: 5px 8px;
+      white-space: nowrap;
+      vertical-align: top;
+   }
+   dt.toggle {
+      margin-top: 20px;
+   }
+   dd {
+      margin: 0;
+      width: 100%;
+      // max-width: 750px;
+      text-align: left;
+      word-break: break-word;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+      hyphens: auto;
+      padding: 4px 0px;
+      :deep(p) {
+         padding: 0;
+         margin: 5px 0;
+      }
+      .related {
+         display: flex;
+         flex-direction: column;
+         gap: 5px;
+      }
    }
 }
-dt.toggle {
-   margin-top: 15px;
-   text-align: right;
-}
+
 .value.more {
    margin-top: 15px;
    padding: 15px 0 10px 0;

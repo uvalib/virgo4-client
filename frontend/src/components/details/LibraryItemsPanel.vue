@@ -31,7 +31,6 @@
 </template>
 
 <script setup>
-import { computed } from "vue"
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 
 const props = defineProps({
@@ -49,17 +48,17 @@ const props = defineProps({
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border-radius: 0.5rem;
+      border-radius: 5px;
       .gutter {
          flex: 0 0 17px;
-         border-radius: 0.5rem  0 0 0.5rem;
+         border-radius: 5px  0 0 5px;
          background-color:#BFE7F7;
       }
       .content {
          flex: 1;
          padding: 20px;
          border: 1px solid var(--uvalib-grey-light);
-         border-radius:  0 0.5rem  0.5rem 0;
+         border-radius:  0 5px  5px 0;
          border-left: 0;
          .name {
             font-weight: bold;

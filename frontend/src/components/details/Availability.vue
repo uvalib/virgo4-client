@@ -6,10 +6,11 @@
       <div class="availability-content" v-else>
          <h2>Availability</h2>
 
-         <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
-            :title="item.details.header.title" :pool="item.details.source" :sources="item.onlineAccessSources" />
-
-         <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
+         <div class="online">
+            <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
+               :title="item.details.header.title" :pool="item.details.source" :sources="item.onlineAccessSources" />
+            <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
+         </div>
 
          <div v-if="hasItems" class="on-shelf">
             <h3>
@@ -162,6 +163,11 @@ const dibsItems = computed(()=>{
             padding: 0;
          }
       }
+   }
+   .online {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
    }
    .on-shelf {
       h3 {
