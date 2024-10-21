@@ -32,8 +32,11 @@ import CollectionDates from "@/components/modals/CollectionDates.vue"
 import { useCollectionStore } from "@/stores/collection"
 import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
+const router = useRouter()
 const collection = useCollectionStore ()
 const item = useItemStore()
 const system = useSystemStore()
@@ -66,12 +69,41 @@ const prevItem = (() => {
 const curioURL = computed(()=>{
    let url = ""
    let selDO = item.digitalContent[0]
-   if(selDO) {
+   if (selDO) {
       let idx = selDO.oEmbedURL.indexOf("/oembed")
       url = selDO.oEmbedURL.substring(0, idx)
       url += "/view/" + selDO.pid
+
+      // grab the current URL and split of the details page fragment to be left with the transport and host.
+      // this is needed for curio to trigger events back to V4
+      let currURL = window.location.href
+      let domain = currURL.split("/sources")[0]
+
       if ( system.isDevServer) {
          url = url.replace("curio", "curio-dev.internal")
+      }
+
+      url += "?domain="+domain
+
+      let x = route.query.x
+      if (x) {
+         url += `&x=${x}`
+      }
+      let y = route.query.y
+      if (y) {
+         url += `&y=${y}`
+      }
+      let zoom = route.query.zoom
+      if (zoom) {
+         url += `&zoom=${zoom}`
+      }
+      let rotation = route.query.rotation
+      if (rotation) {
+         url += `&rotation=${rotation}`
+      }
+      let page = route.query.page
+      if (page) {
+         url += `&page=${page}`
       }
    }
    return url
@@ -85,6 +117,33 @@ const curioWidth = computed(()=>{
 const curioHeight = computed(()=>{
    let viewerW = parseInt(curioWidth.value,10)
    return `${viewerW*0.75}px`
+})
+
+onMounted(()=>{
+   window.onmessage = (e) => {
+      if ( e.data.name == "curio") {
+         // convert the curio params object into a query string and use replaceState to update the URL in place
+         // do not use the router as this forces page reloads
+         let qp = []
+         let curio = e.data
+         if ( curio.x) {
+            qp.push(`x=${curio.x}`)
+         }
+         if ( curio.y) {
+            qp.push(`y=${curio.y}`)
+         }
+         if ( curio.zoom) {
+            qp.push(`zoom=${curio.zoom}`)
+         }
+         if ( curio.rotation) {
+            qp.push(`rotation=${curio.rotation}`)
+         }
+         if ( curio.page) {
+            qp.push(`page=${curio.page}`)
+         }
+         history.replaceState(history.state, '', "?"+qp.join("&"))
+      }
+   }
 })
 </script>
 
