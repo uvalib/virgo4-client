@@ -78,11 +78,13 @@ const curioURL = computed(()=>{
 })
 
 const curioWidth = computed(()=>{
-   return `${system.displayWidth*0.95}px`
+   let mainPanelW = document.getElementById("v4main").offsetWidth
+   return `${mainPanelW*0.95}px`
 })
 
 const curioHeight = computed(()=>{
-   return `${system.displayWidth*0.95*0.75}px`
+   let viewerW = parseInt(curioWidth.value,10)
+   return `${viewerW*0.75}px`
 })
 </script>
 
