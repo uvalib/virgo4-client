@@ -13,44 +13,22 @@
 <script setup>
 import ItemView from "@/components/details/ItemView.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
-import { onMounted, onUpdated, watch, ref } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { onMounted, onUpdated, ref, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
-import { storeToRefs } from "pinia"
 
 const collection = useCollectionStore()
 const item = useItemStore()
 const restore = useRestoreStore()
 const bookmarks = useBookmarkStore()
 const route = useRoute()
-
 const loadingDetails = ref(true)
 
-onBeforeRouteUpdate( async (to) => {
-   // this is needed to load details when a grouped image thumb has been clicked; new content
-   // needs to be loaded, but the page remains the same (create not called)
-   getDetails(to.params.src, to.params.id)
-})
-
-const { loadingDigitalContent } = storeToRefs(item)
-watch(loadingDigitalContent, (newValue, oldValue) => {
-   if (oldValue == true && newValue == false && item.hasDigitalContent ) {
-      item.digitalContent.forEach( dc => {
-         if (dc.pdf ) {
-            analytics.trigger('PDF', 'PDF_LINK_PRESENTED', dc.pid)
-         }
-         if (dc.ocr ) {
-            analytics.trigger('OCR', 'OCR_LINK_PRESENTED', dc.pid)
-         }
-      })
-   }
-})
-
-async function getDetails(src, id) {
+const getDetails = ( async (src, id) => {
    // if this was called from an old catalog/id url, the src will get
    // set to legacy. in this case, lookup the cat key and redirect to full detail
    // the redirect will trigger a beforeRouteUpdate and that will get fill item detail.
@@ -68,30 +46,9 @@ async function getDetails(src, id) {
 
    analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
 
-   if (item.isDigitalCollection) {
-      analytics.trigger('Results', 'DIGITAL_COLLECTION_ITEM_VIEWED', item.digitalCollectionName )
-   }
-   if (item.isCollection) {
-      analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', item.collectionName )
-   }
+   getCollectionContext()
 
-   if ( item.isCollection || item.isCollectionHead) {
-      let name = item.collectionName
-      if (!name) {
-         name = item.digitalCollectionName
-      }
-
-      await collection.getCollectionContext( name )
-      if ( collection.hasCalendar) {
-         let dateField = item.details.fields.find( f => f.name == "published_date")
-         if (dateField) {
-            let year = dateField.value.split("-")[0]
-            collection.setYear(year)
-         }
-      }
-   }
-
-   setTimeout( () => {
+   nextTick( async () => {
       if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
          let newBM = restore.pendingBookmark
          let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
@@ -101,12 +58,34 @@ async function getDetails(src, id) {
          }
          restore.clear()
       }
-   }, 500)
-   loadingDetails.value = false
-}
+      loadingDetails.value = false
+   })
+})
+
+const getCollectionContext = (async () => {
+   if ( item.isCollection || item.isCollectionHead) {
+      let collName = item.collectionName
+      if (collName == "") {
+         collName = item.digitalCollectionName
+         analytics.trigger('Results', 'DIGITAL_COLLECTION_ITEM_VIEWED', collName)
+      } else {
+         analytics.trigger('Results', 'COLLECTION_ITEM_VIEWED', collName )
+      }
+
+      await collection.getCollectionContext( collName )
+      if ( collection.hasCalendar) {
+         let dateField = item.details.fields.find( f => f.name == "published_date")
+         if (dateField) {
+            let year = dateField.value.split("-")[0]
+            collection.setYear(year)
+         }
+      }
+   } else {
+      collection.clearCollectionDetails()
+   }
+})
 
 function zoteroItemUpdated() {
-   console.log("zoteroItemUpdated")
    // notify zotero connector of an item change
    document.dispatchEvent(new Event('ZoteroItemUpdated', {
       bubbles: true,

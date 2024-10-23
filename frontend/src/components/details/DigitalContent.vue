@@ -26,14 +26,10 @@
          <template v-if="poolMode=='image' && details.related.length > 0">
             <h3>Related images</h3>
             <div class="related">
-               <router-link :to="relatedImageURL(r)"  @mousedown="relatedImageClicked(r)"
-                  v-for="r in details.related" :key="`r${r.id}`"
-               >
-                  <div class="img-wrap">
-                     <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
-                     <ImageAdvisory v-if="r.content_advisory" />
-                  </div>
-               </router-link>
+               <div class="img-wrap" v-for="r in details.related" :key="`r${r.id}`" @mousedown="relatedImageClicked(r)">
+                  <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
+                  <ImageAdvisory v-if="r.content_advisory" />
+               </div>
             </div>
          </template>
 
@@ -259,12 +255,15 @@ function imageURL(size) {
    }
    return [`${iiifField.value}/full/600,/0/default.jpg`]
 }
-function relatedImageURL( r ) {
-   return `/sources/${details.value.source}/items/${r.id}`
-}
-function relatedImageClicked( hit ) {
-   resultStore.hitSelected(hit.id)
-}
+
+const relatedImageClicked = ( async ( hit ) => {
+   const url =  `/sources/${item.details.source}/items/${hit.id}`
+   await item.getDetails( item.details.source, hit.id )
+   document.title = item.details.header.title
+   analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', hit.id)
+   history.replaceState(history.state, '', url)
+})
+
 function viewerClicked(tgtItem) {
    selectedDigitalObjectIdx.value = item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
    history.replaceState(history.state, '', "?idx="+selectedDigitalObjectIdx.value)

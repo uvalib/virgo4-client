@@ -4,6 +4,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useSystemStore } from "@/stores/system"
 import { useRequestStore } from "@/stores/request"
 import * as utils from '../utils'
+import analytics from '@/analytics'
 
 export const useItemStore = defineStore('item', {
 	state: () => ({
@@ -126,6 +127,7 @@ export const useItemStore = defineStore('item', {
                   generateURL: item.pdf.urls.generate,
                   statusURL: item.pdf.urls.status,
                }
+               analytics.trigger('PDF', 'PDF_LINK_PRESENTED', item.pid)
             }
             if (item.ocr) {
                dc.ocr = {
@@ -134,7 +136,7 @@ export const useItemStore = defineStore('item', {
                   generateURL: item.ocr.urls.generate,
                   statusURL: item.ocr.urls.status,
                }
-
+               analytics.trigger('OCR', 'OCR_LINK_PRESENTED', item.pid)
             }
             this.digitalContent.push(dc)
          })
@@ -262,8 +264,6 @@ export const useItemStore = defineStore('item', {
       },
 
       async getDetails( source, identifier ) {
-         this.clearDetails()
-         this.clearAvailability()
          this.details.searching = true
 
          // get source from poolID
@@ -281,7 +281,7 @@ export const useItemStore = defineStore('item', {
 
          baseURL = pool.url
          let url = baseURL + "/api/resource/" + identifier
-         await axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             let details = response.data
             utils.preProcessHitFields( pool.url, [details] )
             if ( details.related ) {
@@ -292,14 +292,27 @@ export const useItemStore = defineStore('item', {
                //    r.content_advisory = "ADVISORY"
                // })
             }
-            details.source = source
-            this.details = details
+
+            this.details.source = source
+            this.details.identifier = identifier
+            this.details.itemURL = details.itemURL
+            if ( details.cover_image ) {
+               this.details.cover_image = details.cover_image
+            }
+            this.details.header = details.header
+            this.details.fields = details.fields
+            if ( details.related) {
+               this.details.related = details.related
+            }
+            this.details.holdings = details.holdings
+            this.details.searching = false
             this.digitalContent.splice(0, this.digitalContent.length)
 
             this.getDigitalContent()
             if (poolStore.hasAvailability(this.details.source)){
                this.getAvailability()
             } else {
+               this.clearAvailability()
                this.availability.searching = false
             }
             this.details.searching = false
@@ -320,7 +333,7 @@ export const useItemStore = defineStore('item', {
 
          this.clearAvailability()
          let url = `${system.availabilityURL}/item/${this.details.identifier}`
-         axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             if (response.data) {
                this.availability.titleId = response.data.availability.title_id
                this.availability.display = response.data.availability.display
