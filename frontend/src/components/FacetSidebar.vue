@@ -22,7 +22,7 @@
                   <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
                   <div role="group" :aria-labelledby="facetInfo.id">
                      <dd v-for="(fv,idx) in facetValues(facetInfo,0,5)"  :key="valueKey(idx, facetInfo.id)">
-                        <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @change="filterChanged"/>
+                        <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
                         <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
                         <span class="cnt" v-if="$formatNum(fv.count)">({{$formatNum(fv.count)}})</span>
                      </dd>
@@ -32,7 +32,7 @@
                               <span :aria-label="`see more ${facetInfo.name} filters`">See More</span>
                            </template>
                            <div class="expanded-item" v-for="(fv,idx) in facetValues(facetInfo,5)" :key="valueKey(idx, facetInfo.id)">
-                              <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @change="filterChanged"/>
+                              <Checkbox  v-model="fv.selected" :inputId="`${facetInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterChanged(facetInfo.id, fv)"/>
                               <label :for="`${facetInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
                               <span class="cnt">({{$formatNum(fv.count)}})</span>
                            </div>
@@ -59,6 +59,7 @@ import { useFilterStore } from "@/stores/filter"
 import { useSystemStore } from "@/stores/system"
 import { usePoolStore } from "@/stores/pool"
 import { useRouter, useRoute } from 'vue-router'
+import analytics from '@/analytics'
 
 const route = useRoute()
 const router = useRouter()
@@ -114,7 +115,12 @@ function addFilterToURL() {
    }
    router.push({ query })
 }
-async function filterChanged() {
+async function filterChanged(facetID, facetValue) {
+   if (facetValue.selected) {
+      analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
+   } else {
+      analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${facetValue.value}`)
+   }
    resultStore.clearSelectedPoolResults()
    queryStore.userSearched = true
    addFilterToURL()

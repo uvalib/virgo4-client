@@ -22,7 +22,7 @@
                         <span :aria-label="`see more ${filterInfo.name} filters`">{{filterInfo.name}}</span>
                      </template>
                      <div class="expanded-item" v-for="fv in filterInfo.buckets.filter(f => f.value)" :key="fv.value">
-                        <Checkbox  v-model="fv.selected" :inputId="`${filterInfo.id}-${fv.value}`" :binary="true" />
+                        <Checkbox  v-model="fv.selected" :inputId="`${filterInfo.id}-${fv.value}`" :binary="true" @update:modelValue="filterToggled(filterInfo.id, fv)"/>
                         <label :for="`${filterInfo.id}-${fv.value}`" class="cb-label">{{fv.value}}</label>
                         <span class="cnt" v-if="fv.count">({{$formatNum(fv.count)}})</span>
                      </div>
@@ -42,6 +42,7 @@ import { computed } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
+import analytics from '@/analytics'
 
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
@@ -51,6 +52,13 @@ const startExpanded = computed(()=> {
    return systemStore.displayWidth > 810
 })
 
+const filterToggled = ((facetID, facetValue) => {
+   if (facetValue.selected) {
+      analytics.trigger('Filters', 'PRE_SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
+   } else {
+      analytics.trigger('Filters', 'PRE_SEARCH_FILTER_REMOVED', `${facetID}:${facetValue.value}`)
+   }
+})
 </script>
 <style lang="scss" scoped>
 .filter-sidebar.overlay {
