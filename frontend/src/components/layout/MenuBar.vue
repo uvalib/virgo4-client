@@ -107,7 +107,7 @@ const signOut = (() => {
 
 <style lang="scss" scoped>
 .menu-item.notice {
-   color: var(--uvalib-yellow);
+   color: $uva-yellow;
    margin: 0 0 0 10px;
    font-weight: normal;
    .cnt {
@@ -136,7 +136,7 @@ const signOut = (() => {
    .alert-count {
       font-size: 1em;
       font-weight: bold;
-      background: var(--color-primary-orange);
+      background: $uva-brand-orange;
       color: white;
       font-family: sans-serif;
       display: inline-block;

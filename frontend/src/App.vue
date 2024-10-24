@@ -290,7 +290,7 @@ onUpdated(() => {
       font-size: 1.06rem;
       line-height: 1.5;
       position: relative;
-      color: var(--uvalib-text-dark);
+      color: $uva-text-color-dark;
       display: flex;
       flex-flow: row nowrap;
       justify-content: space-between;
@@ -327,25 +327,25 @@ onUpdated(() => {
       opacity: 0;
    }
    .alert.alert1 {
-      background-color: var(--uvalib-red-lightest);
-      border-left: 8px solid var(--uvalib-red-dark);
+      background-color: $uva-red-100;
+      border-left: 8px solid $uva-red-A;
    }
    .alert.alert2 {
-      background-color: var(--uvalib-yellow-light);
-      border-left: 8px solid var(--uvalib-yellow);
+      background-color: $uva-yellow-100;
+      border-left: 8px solid $uva-yellow;
    }
    .alert.alert3 {
-      background-color: var(--uvalib-blue-alt-light);
-      border-left: 8px solid var(--uvalib-blue-alt);
+      background-color: $uva-blue-alt-300;
+      border-left: 8px solid $uva-blue-alt;
    }
 }
 .regional-alerts {
    width: 90%;
    margin: 0 auto 30px auto;
    .regional-alert {
-      color: var( --uvalib-grey-darkest);
-      background-color: var(  --uvalib-teal-lightest);
-      border: 0.2em solid var(--uvalib-teal);
+      color: $uva-text-color-dark;
+      background-color: $uva-teal-200;
+      border: 0.2em solid $uva-teal;
       border-radius: 0.5em;
       padding: 0.75rem 1rem;
       text-align: left;
@@ -363,7 +363,7 @@ html,
 body {
    margin: 0;
    padding: 0;
-   background-color: var(--uvalib-blue-alt-darkest);
+   background-color: $uva-blue-alt-B;
    font-family: "franklin-gothic-urw", arial, sans-serif;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
@@ -417,10 +417,10 @@ body {
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    text-align: center;
-   color: var(--color-primary-text);
+   color: $uva-grey-A;
    margin: 0;
    padding: 0;
-   background: var(--uvalib-grey-lightest);
+   background: $uva-grey-200;
 
    h1 {
       padding: 22px 0 35px 0;
@@ -447,12 +447,12 @@ body {
 }
 
 a {
-   color: var(--color-link);
+   color: $uva-blue-alt-A;
    font-weight: 500;
    text-decoration: none;
    &:hover {
       text-decoration: underline;
-      color: var(--uvalib-blue-alt);
+      color: $uva-blue-alt;
    }
 }
 
@@ -463,7 +463,7 @@ a {
    right: 10px;
    background: white;
    padding: 10px;
-   border: 4px solid var(--uvalib-brand-orange);
+   border: 4px solid $uva-brand-orange;
    text-align: center;
    padding: 15px;
    display: flex;
@@ -505,24 +505,24 @@ a {
       }
    }
    &.ra-fiy {
-      background-color: var(--uvalib-teal-lightest);
-      border-color: var(--uvalib-teal-light);
-      color: var(--uvalib-text-dark);
+      background-color: $uva-teal-200;
+      border-color: $uva-teal-100;
+      color: $uva-text-color-dark;
    }
    &.ra-notice {
-      background-color: var(--uvalib-yellow);
-      border-color: var(--uvalib-yellow-dark);
+      background-color: $uva-yellow;
+      border-color: $uva-yellow-A;
       color: #000;
    }
 }
 
 /** regional alert: warning */
 #app .ra-warning {
-   border: 0.2em solid #ECC602;
+   border: 0.2em solid $uva-yellow;
    border-radius: 0.5em;
    padding: 0.75rem 1rem;
    margin-bottom: 1rem;
-   background-color: #FEF6C8;
+   background-color: $uva-yellow-100;
    text-align: left;
    .alert-title {
       font-weight: bold;
@@ -545,7 +545,7 @@ a {
    }
 }
 a:focus, input:focus, select:focus, textarea:focus, button.pool:focus, .pre-footer a:focus  {
-   outline: 2px dotted var( --uvalib-accessibility-highlight );
+   outline: 2px dotted $uva-brand-blue-100;
    outline-offset: 3px;
 }
 a:focus {
@@ -553,7 +553,7 @@ a:focus {
 }
 footer, div.header, nav.menu {
    a:focus {
-      outline: 2px dotted var(--uvalib-grey-lightest);
+      outline: 2px dotted $uva-grey-200;
       outline-offset: 3px;
    }
 }

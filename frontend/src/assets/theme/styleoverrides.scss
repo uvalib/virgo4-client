@@ -15,7 +15,7 @@
    }
    button.p-button.checked {
       .p-button-icon {
-         color: var(--uvalib-brand-blue-light);
+         color: $uva-brand-blue-100;
       }
    }
    button.p-button-link {
@@ -39,7 +39,7 @@
    }
 
    div.p-panel-header {
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      border-bottom: 1px solid $uva-grey-100;
       margin-bottom: 10px;
    }
 
@@ -63,19 +63,19 @@
 div.p-select-overlay.p-component {
    background: white;
    padding: 0;
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
    border-radius: 4px;
    .p-select-option.p-select-option-selected, .p-select-option.p-select-option-selected.focus {
-      background: var(--uvalib-blue-alt-light);
-      color: var(--uvalib-text);
+      background: $uva-blue-alt-400;
+      color: $uva-text-color-dark;
    }
 }
 
 .p-dialog-mask {
    .p-dialog {
       .p-dialog-header {
-         background: var(--uvalib-teal-lightest);
-         border-bottom: 1px solid var(--uvalib-teal-light);
+         background: $uva-teal-200;
+         border-bottom: 1px solid $uva-teal-100;
          border-radius: 4px 4px 0 0;
          margin-bottom: 20px;
       }

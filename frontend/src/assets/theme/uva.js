@@ -4,6 +4,7 @@ import ripple from '@primevue/themes/aura/ripple'
 import tooltip from '@primevue/themes/aura/tooltip'
 import './uva-colors.css'
 import './styleoverrides.scss'
+import colors from './colors.module.scss'
 
 const UVA = definePreset(Aura, {
    root: {
@@ -18,17 +19,17 @@ const UVA = definePreset(Aura, {
    },
    semantic: {
       primary: {
-         50: 'var(--uvalib-brand-blue-lightest)',
-         100: 'var(--uvalib-brand-blue-lighter)',
-         200: 'var(--uvalib-brand-blue-lighter)',
-         300: 'var(--uvalib-brand-blue-lighter)',
-         400: 'var(--uvalib-brand-blue-light)',
-         500: 'var(--uvalib-brand-blue-light)',
-         600: 'var(--uvalib-brand-blue-light)',
-         700: 'var(--uvalib-brand-blue-light)',
-         800: 'var(--uvalib-brand-blue)',
-         900: 'var(--uvalib-brand-blue)',
-         950: 'var(--uvalib-brand-blue)'
+         50:  colors.brandBlue300,
+         100: colors.brandBlue300,
+         200: colors.brandBlue300,
+         300: colors.brandBlue300,
+         400: colors.brandBlue100,
+         500: colors.brandBlue100,
+         600: colors.brandBlue100,
+         700: colors.brandBlue100,
+         800: colors.brandBlue,
+         900: colors.brandBlue,
+         950: colors.brandBlue
       },
       focusRing: {
          width: '2px',
@@ -46,7 +47,6 @@ const UVA = definePreset(Aura, {
              offset: '3px',
              shadow: 'none'
          },
-         transitionDuration: '{transition.duration}'
       },
       disabledOpacity: '0.3',
       colorScheme: {
@@ -60,7 +60,7 @@ const UVA = definePreset(Aura, {
             highlight: {
                background: '#ffffff',
                focusBackground: '#ffffff',
-               color: 'var(--uvalib-text)',
+               color: colors.textDark,
                focusColor: '#ffffff'
             }
          },
@@ -77,8 +77,8 @@ const UVA = definePreset(Aura, {
          },
          panel: {
             borderWidth: '1px',
-            borderColor: 'var(--uvalib-grey-lightest)',
-            hoverBackground: 'var(--uvalib-grey-lightest)',
+            borderColor: colors.grey200,
+            hoverBackground: colors.grey200,
         },
         content: {
             background: '#ffffff',
@@ -104,24 +104,24 @@ const UVA = definePreset(Aura, {
          colorScheme: {
             light: {
                secondary: {
-                  background: 'var(--uvalib-grey-lightest)',
-                  hoverBackground: 'var(--uvalib-grey-light)',
-                  hoverBorderColor: 'var(--uvalib-grey)',
-                  borderColor: 'var(--uvalib-grey-light)',
-                  color: 'var(--uvalib-text)',
+                  background: colors.grey200,
+                  hoverBackground: colors.grey100,
+                  hoverBorderColor: colors.grey,
+                  borderColor: colors.grey100,
+                  color: colors.textDark,
                },
                contrast: {
-                  background: 'var(--uvalib-brand-orange-dark)',
-                  hoverBackground: 'var(--uvalib-brand-orange)',
-                  activeBackground: 'var(--uvalib-brand-orange)',
+                  background: colors.brandOrangeDark,
+                  hoverBackground: colors.brandOrange,
+                  activeBackground: colors.brandOrange,
                   focusRing: {
                      color: 'white',
                      shadow: 'none'
                   }
                },
                info: {
-                  background: 'var(--uvalib-blue-alt-light)',
-                  activeBackground: 'var(--uvalib-blue-alt-light)',
+                  background: colors.blueAlt300,
+                  activeBackground: colors.blueAlt300,
                   activeColor: '#000000',
                   hoverBackground: '#91d8f2',
                   hoverBorderColor: '#007BAC',
@@ -132,26 +132,26 @@ const UVA = definePreset(Aura, {
                },
                text: {
                   primary: {
-                     hoverBackground: 'var(--uvalib-grey-lightest)',
-                     activeBackground: 'var(--uvalib-grey-lightest)',
-                     color: 'var(--uvalib-text)'
+                     hoverBackground: colors.grey200,
+                     activeBackground: colors.grey200,
+                     color: colors.textDark
                  },
                },
                link: {
-                  color: `var(--color-link)`,
+                  color: colors.linkBase,
                }
             }
          }
       },
       datatable: {
          paginatorTop: {
-            borderColor: 'var(--uvalib-grey-lightest)',
+            borderColor: colors.grey200,
          },
          headerCell: {
-            borderColor: 'var(--uvalib-grey-lightest)',
+            borderColor: colors.grey200,
          },
          bodyCell: {
-            borderColor: 'var(--uvalib-grey-lightest)',
+            borderColor: colors.grey200,
         },
          colorScheme: {
             light: {
@@ -166,7 +166,7 @@ const UVA = definePreset(Aura, {
             light: {
                root: {
                   background: '#ffffff',
-                  borderColor: 'var(--uvalib-grey)',
+                  borderColor: colors.grey,
                   padding: '15px 15px',
                   borderRadius: '4px',
                },
@@ -183,15 +183,15 @@ const UVA = definePreset(Aura, {
       menubar: {
          root: {
             borderRadius: "0px",
-            background: 'var(--uvalib-blue-alt-darkest)',
-            borderColor: 'var(--uvalib-blue-alt-darkest)',
+            background: colors.blueAltDarkest,
+            borderColor: colors.blueAltDarkest,
          },
          baseItem: {
             borderRadius: '4px',
          },
          item: {
-            focusBackground: 'var(--uvalib-blue-alt)',
-            activeBackground: 'var(--uvalib-blue-alt)',
+            focusBackground: colors.blueAlt,
+            activeBackground: colors.blueAlt,
             color: '#ffffff',
             focusColor: '#ffffff',
             activeColor: '#ffffff',
@@ -202,8 +202,8 @@ const UVA = definePreset(Aura, {
            }
          },
          submenu: {
-            background: 'var(--uvalib-blue-alt-dark)',
-            borderColor: 'var(--uvalib-blue-alt-dark)',
+            background: colors.blueAltDark,
+            borderColor: colors.blueAltDark,
             borderRadius: '4px',
             shadow: '{overlay.navigation.shadow}',
             mobileIndent: '1rem',
@@ -230,7 +230,7 @@ const UVA = definePreset(Aura, {
       panel: {
          header: {
             background: '#f8f9fa',
-            borderColor:  'var(--uvalib-grey-light)',
+            borderColor:  colors.grey100,
             borderRadius: '4px 4px 0 0',
             padding: '1rem'
          },
@@ -240,8 +240,8 @@ const UVA = definePreset(Aura, {
       },
       popover: {
          root: {
-            borderColor: 'var(--uvalib-grey-light)',
-            color: 'var(--uvalib-text)',
+            borderColor: colors.grey100,
+            color: colors.textDark,
          },
          content: {
             padding: '0',
@@ -255,30 +255,30 @@ const UVA = definePreset(Aura, {
             disabledColor: '#cacaca',
          },
          option: {
-            selectedFocusBackground: 'var(--uvalib-blue-alt-light)',
-            selectedFocusColor: 'var(--uvalib-text)',
-            selectedBackground: 'var(--uvalib-blue-alt-light)',
-            selectedColor: 'var(--uvalib-text)'
+            selectedFocusBackground: colors.blueAlt300,
+            selectedFocusColor: colors.textDark,
+            selectedBackground: colors.blueAlt300,
+            selectedColor: colors.textDark
          }
       },
       tabs: {
          tab: {
             background: '#ffffff',
             hoverBackground: '{surface.100}',
-            activeBackground: 'var(--uvalib-brand-blue)',
+            activeBackground: colors.brandBlue,
             borderWidth: '1px 1px 1px 1px',
             activeColor: '#ffffff',
-            activeBorderColor: 'var(--uvalib-brand-blue)',
+            activeBorderColor: colors.brandBlue,
          },
          tabpanel: {
             background: '#ffffff',
-            color: 'var(--uvalib-text)',
+            color: colors.textDark,
             padding: '0 0 0 0',
          },
          activeBar: {
             height: '1px',
             bottom: '-1px',
-            background: 'var(--uvalib-grey-light)'
+            background: colors.grey100
         },
       },
       togglebutton: {
@@ -286,12 +286,12 @@ const UVA = definePreset(Aura, {
             light: {
                root: {
                   background: '#ffffff',
-                  checkedBackground: 'var(--uvalib-blue-alt-light)',
+                  checkedBackground: colors.blueAlt300,
                   hoverBackground: '{surface.100}',
-                  borderColor: 'var(--uvalib-grey-light)',
-                  color: 'var(--uvalib-text)',
-                  checkedColor: 'var(--uvalib-text)',
-                  checkedBorderColor: 'var(--uvalib-blue-alt-light)',
+                  borderColor: colors.grey100,
+                  color: colors.textDark,
+                  checkedColor: colors.textDark,
+                  checkedBorderColor: colors.blueAlt300,
                },
             }
          }
