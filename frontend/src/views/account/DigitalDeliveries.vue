@@ -139,7 +139,6 @@ div.notice {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
-   color: var(--color-primary-text);
    margin: 0 auto;
    position: relative;
    padding-bottom: 25px;

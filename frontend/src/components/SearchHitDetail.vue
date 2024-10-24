@@ -117,11 +117,11 @@ const shouldDisplay = ((field) => {
       .icon {
          font-size: 1.7em;
          display: block;
-         color: var(--uvalib-text);
+         color: $uva-text-color-base;
       }
       div {
          font-size: 0.77em;
-         color: var(--uvalib-text);
+         color: $uva-text-color-base;
          cursor: pointer;
          font-weight: normal;
          margin-top: 2px;

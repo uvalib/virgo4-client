@@ -72,10 +72,9 @@ async function clearClicked() {
 <style lang="scss" scoped>
 .filters {
    background: white;
-   color: var(--uvalib-text);
    padding: 20px 5px 15px 5px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   border-top: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid $uva-grey-100;
+   border-top: 1px solid $uva-grey-100;
    text-align: left;
    .filters-head {
       font-weight: bold;

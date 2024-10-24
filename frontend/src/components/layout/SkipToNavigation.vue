@@ -11,7 +11,7 @@
    display: block;
    padding: 10px 20px;
    background: white;
-   color: var(--uvalib-text);
+   color: $uva-text-color-dark;
    position: absolute;
    top: 10px;
    left: 10px;
@@ -25,9 +25,9 @@
    &:focus {
       transform: translateY(0%);
       outline-offset: -3px !important;
-      outline: 1px solid  var(--uvalib-blue-alt-dark) !important;
+      outline: 1px solid  $uva-blue-alt-A !important;
       text-decoration: underline !important;
-      background-color: var(--uvalib-blue-alt-light);
+      background-color: $uva-blue-alt-300;
    }
 }
 </style>

@@ -89,48 +89,6 @@ const closeDialog = (() => {
    height: 300px;
    margin: 0 auto;
    outline: none;
-   border: 1px solid var(--uvalib-grey-light);
-   box-shadow: none;
-   :deep(.vuecal__cell-content) {
-      word-break: normal;
-      border-radius:2px;
-   }
-   :deep(.vuecal__heading) {
-      opacity: 1;
-      border-bottom: 1px solid var(--uvalib-grey);
-      border-top: 1px solid var(--uvalib-grey);
-      background-color: var(--uvalib-grey-lightest);
-   }
-   :deep(.vuecal__cell-content) {
-      font-weight: normal;
-      color: var(--uvalib-text);
-      font-size:1.15em;
-   }
-   :deep(.vuecal__cell--selected) {
-      .vuecal__cell-content {
-         background-color: var(--uvalib-brand-blue-lighter);
-         color: white;
-      }
-   }
-   :deep(.vuecal__cell--out-of-scope.vuecal__cell--selected) {
-      .vuecal__cell-content {
-         color: white;
-      }
-   }
-   :deep(.vuecal__cell--out-of-scope) {
-      .vuecal__cell-content {
-         opacity: 1;
-         color: var(--uvalib-text);
-         font-size: 0.9em;
-      }
-   }
-   :deep(.vuecal__cell--disabled) {
-      .vuecal__cell-content {
-         opacity: .3;
-         font-weight: 100;
-         pointer-events: none;
-      }
-   }
 }
 .label {
    margin-right: 5px;

@@ -45,7 +45,7 @@ const props = defineProps({
    },
    color: {
       type: String,
-      default: "var(--uvalib-brand-orange)"
+      default: "#E57200"
    },
    size: {
       type: String,
@@ -71,7 +71,6 @@ div.v4-spinner {
    padding: 10px 150px 25px 150px;
    display: inline-block;
    font-weight: bold;
-   color: var(--uvalib-text);
    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 div.v4-spinner.embed {
@@ -93,7 +92,6 @@ div.v4-spinner.embed {
    }
 }
 div.v4-spinner h1 {
-  color: var(--uvalib-text);
   border: none;
 }
 .spinner-animation {
@@ -176,7 +174,6 @@ div.v4-spinner h1 {
    animation-delay: 1s;
 }
 div.v4-spinner .book p {
-   color: var(--color-primary-text);
    border: none;
    font-size: 1.25em;
    margin: 0 0 10px 0;

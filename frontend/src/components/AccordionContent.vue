@@ -45,7 +45,6 @@
       >
          <div :id="contentID" class="accordion-content" v-show="isExpanded"
             :aria-labelledby="`${props.id}-header`" role="region"
-            :style="{ background: props.backgroundContent, color: props.color }"
             @click.stop @keyup.stop.enter @keydown.space.stop>
             <slot></slot>
             <button v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
@@ -90,7 +89,7 @@ const props = defineProps({
    },
    color: {
       type: String,
-      default: "var(--uvalib-text-dark)"
+      default: "#2B2B2B"
    },
    borderWidth: {
       type: String,
@@ -98,7 +97,7 @@ const props = defineProps({
    },
    borderColor: {
       type: String,
-      default: "var(--uvalib-grey-light)"
+      default: "#DADADA"
    },
    borderStyle: {
       type: String,
@@ -247,8 +246,8 @@ function onAfterLeave(el) {
 
    .accordion-settings {
       padding: 0 10px 10px 10px;
-      background: var(--uvalib-grey-lightest);
-      border: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border: 1px solid $uva-grey-100;
       text-align: right;
    }
 
@@ -265,7 +264,7 @@ function onAfterLeave(el) {
       font-weight: normal;
       width: 100%;
       &:focus {
-         outline: 2px dotted var( --uvalib-accessibility-highlight );
+         outline: 2px dotted $uva-brand-blue-100;
          outline-offset: 3px;
       }
       .accordion-icon {
@@ -288,6 +287,7 @@ function onAfterLeave(el) {
       margin:0;
       padding:0;
       text-align: left;
+      background: white;
    }
 }
 </style>

@@ -96,7 +96,6 @@ onMounted( () => {
 .checkout {
    min-height: 400px;
    position: relative;
-   color: var(--color-primary-text);
    margin: 0 auto;
    position: relative;
 
@@ -119,8 +118,8 @@ onMounted( () => {
       padding: 10px;
       margin: 15px 0;
       border-radius: 5px;
-      color: var(--uvalib-text);
-      background-color: var(--uvalib-red-lightest);
+      color: $uva-text-color-dark;
+      background-color: $uva-red-100;
    }
 }
 

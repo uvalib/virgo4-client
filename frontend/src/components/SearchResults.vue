@@ -212,8 +212,8 @@ const poolSelected = (( poolID ) => {
          button.pool {
             padding: 8px 8px 10px 8px;
             border-radius: 5px 5px 0 0;
-            color: var(--uvalib-text-dark);
-            border: 1px solid var(--uvalib-grey-light);
+            color: $uva-text-color-dark;
+            border: 1px solid $uva-grey-100;
             text-align: left;
             flex: 1 1 auto;
             background: #FFF;
@@ -232,9 +232,9 @@ const poolSelected = (( poolID ) => {
          }
 
          button.pool.showing {
-            background-color: var(--uvalib-brand-blue);
+            background-color: $uva-brand-blue;
             color: #fff;
-            border: 1px solid var(--uvalib-brand-blue);
+            border: 1px solid $uva-brand-blue;
             cursor: default;
          }
       }

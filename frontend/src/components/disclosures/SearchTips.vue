@@ -59,11 +59,11 @@ const clicked = ((event) => {
 <style lang="scss" scoped>
 div.tips {
    padding: 15px;
-   background: var(--uvalib-blue-alt-light);
+   background: $uva-blue-alt-300;
    font-size: 0.9em;
 
    a  {
-      color: var(--uvalib-text);
+      color: $uva-text-color-base;
       font-weight: bold;
    }
 

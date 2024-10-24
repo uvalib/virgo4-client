@@ -43,8 +43,7 @@ const sortChanged = ( async () => {
 
 <style lang="scss" scoped>
 div.v4-sort {
-   background: white;
-   color: var(--uvalib-text);
+   color :$uva-text-color-base;
    padding: 10px;
    margin-top: 3px;
 

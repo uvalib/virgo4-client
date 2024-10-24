@@ -104,7 +104,7 @@ footer {
    border-bottom: none;
    border-left: none;
    border-right: none;
-   background-color: var(--uvalib-brand-blue);
+   background-color: $uva-brand-blue;
    color: white;
    padding: 20px 20px 0 20px;
 
@@ -115,8 +115,8 @@ footer {
 }
 
 .pre-footer {
-   background-color: var(--uvalib-teal-lightest);
-   color: var(--uvalib-text-dark);
+   background-color: $uva-teal-200;
+   color: $uva-text-color-dark;
    padding: 5px 20px;
    margin: -20px -20px 0 -20px;
 }
@@ -163,7 +163,7 @@ address {
 }
 
 .footer-post-container {
-   background-color: var(--uvalib-blue-alt-darkest);
+   background-color: $uva-blue-alt-B;
    color: white;
    padding: 20px 110px;
    margin-left: -20px;

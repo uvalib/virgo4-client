@@ -68,7 +68,6 @@ const detailsURL = ((bookmark) => {
    min-height: 400px;
    position: relative;
    margin: 2vw auto 6vw;
-   color: var(--uvalib-text);
    display: flex;
    flex-direction: column;
    align-items: stretch;

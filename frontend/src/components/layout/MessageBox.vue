@@ -34,7 +34,6 @@ const dismiss = (() => {
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
    hyphens: auto;
-   color: var(--uvalib-primary-text);
 }
 .details {
    text-align: left;

@@ -80,7 +80,6 @@ const startExpanded = computed(()=> {
    }
 }
 .working {
-   color: var(--uvalib-text);
    text-align: center;
    background: white;
    position: absolute;

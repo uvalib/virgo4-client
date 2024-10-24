@@ -42,7 +42,6 @@ onMounted( async () => {
 .preferences {
    min-height: 400px;
    position: relative;
-   color: var(--color-primary-text);
    margin: 0 auto;
    padding-bottom: 50px;
 }
@@ -69,7 +68,7 @@ onMounted( async () => {
    gap: 20px;
    .section {
       margin: 0;
-      border: 1px solid var(--uvalib-grey-light);
+      border: 1px solid $uva-grey-100;
       padding: 0;
       text-align: left;
    }

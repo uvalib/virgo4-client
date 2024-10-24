@@ -266,7 +266,6 @@ span.info {
 .searches {
    min-height: 400px;
    position: relative;
-   color: var(--color-primary-text);
    padding-bottom: 50px;
    margin: 0 auto;
    text-align: center;
@@ -321,12 +320,6 @@ div.row {
       justify-content: center;
       gap: 10px;
    }
-}
-span.icon i.fal {
-   color: var(--uvalib-text);
-   margin-right: 15px;
-   margin-top: 2px;
-   padding: 0;
 }
 span.num {
   font-weight: bold;

@@ -240,7 +240,6 @@ onMounted(() =>{
    position: relative;
    margin: 0 auto;
    text-align: left;
-   color: var(--color-primary-text);
    padding-bottom: 50px;
 }
 .groups {
@@ -255,7 +254,6 @@ onMounted(() =>{
       padding: 12px;
       margin: 0;
       background: var(--uvalib-grey-lightest);
-      color: var(--uvalib-text);
       border-bottom: 1px solid var(--uvalib-grey-light);
    }
    dl {
@@ -376,8 +374,8 @@ div.notes p {
     padding: 10px;
     margin: 15px 20px;
     border-radius: 5px;
-    color: var(--uvalib-text);
-    background-color: var(--uvalib-red-lightest);
+    color: $uva-text-color-dark;
+    background-color: $uva-red-100;
 }
 
 </style>

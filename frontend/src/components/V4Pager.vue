@@ -40,7 +40,6 @@ const emit = defineEmits( ['prior', 'next' ] )
    align-items: center;
    font-size: 16px;
    font-weight: normal;
-   color: var( --uvalib-text);
    gap: 34px;
    margin-bottom: 10px;
 }

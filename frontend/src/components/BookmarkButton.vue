@@ -110,11 +110,4 @@ const removeBookmark = ( () => {
 </script>
 
 <style lang="scss" scoped>
-.bookmark-icon {
-    padding: 2px;
-    font-size: 1.4em;
-    color: var(--uvalib-text);
-    border-radius: 5px;
-    margin: 0 auto;
-}
 </style>

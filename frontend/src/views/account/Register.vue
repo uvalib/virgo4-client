@@ -120,7 +120,6 @@ function cancelClicked() {
   position: relative;
   margin: 2vw auto;
   text-align: left;
-  color: var(--color-primary-text);
 }
 .info{
   margin: 0 auto;

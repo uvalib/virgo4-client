@@ -363,10 +363,11 @@ html,
 body {
    margin: 0;
    padding: 0;
-   background-color: $uva-blue-alt-B;
    font-family: "franklin-gothic-urw", arial, sans-serif;
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
+   color: $uva-grey-A;
+   background: $uva-brand-blue;
 }
 .sticky {
    position: fixed !important;
@@ -417,7 +418,7 @@ body {
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    text-align: center;
-   color: $uva-grey-A;
+   color: $uva-text-color-base;
    margin: 0;
    padding: 0;
    background: $uva-grey-200;
@@ -426,12 +427,12 @@ body {
       padding: 22px 0 35px 0;
       position: relative;
       font-weight: 700;
-      color: #232D4B !important;
+      color: $uva-brand-blue !important;
       line-height: 1.15;
       margin: 0;
    }
    h2 {
-      color: #232D4B !important;
+      color: $uva-brand-blue !important;
       text-align: left;
       font-size: 1.3em;
       margin: 50px 0 17px 0;

@@ -35,8 +35,8 @@ const systemStore = useSystemStore()
 }
 
 h2.borders {
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   border-top: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid $uva-grey-100;
+   border-top: 1px solid $uva-grey-100;
    margin: 0 !important;
    padding: 5px 0;
 }
@@ -44,6 +44,5 @@ h2.borders {
 .welcome {
    margin: 10px auto 50px auto;
    text-align: left;
-   color: var(--uvalib-text);
 }
 </style>

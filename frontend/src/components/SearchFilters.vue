@@ -113,9 +113,11 @@ async function clearClicked() {
 <style lang="scss" scoped>
 .filters {
    background: white;
-   color: var(--uvalib-text);
+   color: $uva-text-color-dark;
    padding: 5px 5px 10px 5px;
    margin-top: 5px;
+   border-left: 1px solid $uva-grey-200;
+   border-right: 1px solid $uva-grey-200;
    .working {
       padding: 10px 20px;
    }
@@ -156,19 +158,19 @@ async function clearClicked() {
          gap: 10px;
       }
       button.remove {
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          padding: 2px 15px 2px 3px;
          border-radius: 10px;
          margin: 0px;
          background: white;
-         color: var(--uvalib-text);
+         color: $uva-text-color-dark;
          cursor: pointer;
          i {
             margin: 1px 10px 0 0;
-            color: var(--uvalib-red);
+            color: $uva-red;
          }
          &:hover {
-            background: #f6f6f6;
+            background: $uva-grey-200;
          }
       }
    }

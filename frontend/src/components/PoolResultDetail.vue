@@ -114,6 +114,8 @@ async function loadMoreResults() {
 <style lang="scss" scoped>
 .sort-section {
    background: white;
+   border-left: 1px solid $uva-grey-200;
+   border-right: 1px solid $uva-grey-200;
 }
 .desc  {
    padding: 15px 10px 10px 10px;
@@ -174,7 +176,6 @@ div.pool-header {
 .hit-wrapper.none {
    background: white;
    padding:35px;
-   color: var(--uvalib-text);
    margin-bottom: 1rem;
 
    span {

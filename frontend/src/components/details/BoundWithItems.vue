@@ -53,7 +53,7 @@ p.group-header {
       display: flex;
       flex-direction: column;
       gap: 15px;
-      color: var(--uvalib-text);
+      color: $uva-text-color-base;
 
       &:hover {
          top: -2px;

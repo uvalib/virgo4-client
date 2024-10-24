@@ -52,19 +52,10 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-
-:deep(#feedback label) {
-    margin-top: 15px;
-}
-:deep(#feedback input) {
-   width: 100%;
-}
-
 .thanks {
    h3 {
       text-align: center;
       font-size: 1.3em;
-      color: var(--color-primary-text);
       margin: 35px;
       font-weight: 500;
    }
@@ -73,9 +64,9 @@ onMounted(() => {
 
 .feedback {
    width: 60%;
-   margin: 0 auto 25px auto;
+   margin: 0 auto;
    text-align: left;
-   color: var(--color-primary-text);
+   padding-bottom:50px;
 }
 
 @media only screen and (min-width: 768px) {

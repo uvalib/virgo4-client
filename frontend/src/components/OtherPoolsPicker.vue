@@ -122,7 +122,7 @@ const poolSkipped = ((p) => {
    }
 
    .total.error {
-      color: var( --uvalib-text-dark );
+      color: $uva-text-color-dark;
       font-weight: bold;
    }
 }

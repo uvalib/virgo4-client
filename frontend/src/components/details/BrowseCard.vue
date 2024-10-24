@@ -109,7 +109,7 @@ const bookmarkClicked = ((id) => {
    margin: 5px !important;
 }
 .browse-card {
-   border: 1px solid var(--uvalib-grey);
+   border: 1px solid $uva-grey;
    padding: 0;
    margin: 0;
    position: relative;
@@ -155,7 +155,7 @@ const bookmarkClicked = ((id) => {
          display: block;
          margin: 0 auto;
          background: #f2f2f2;
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
@@ -169,7 +169,7 @@ const bookmarkClicked = ((id) => {
          .title {
             background: white;
             opacity: 0.9;
-            color: var(--uvalib-text-dark);
+            color: $uva-text-color-base;
             text-align: center;
             padding: 0;
             margin: 0;
@@ -182,7 +182,7 @@ const bookmarkClicked = ((id) => {
             white-space: normal;
          }
          span.no {
-            color: var(--uvalib-text);
+            color: $uva-text-color-base;
             text-decoration: none;
             margin:  0;
             display: inline-block;
@@ -216,11 +216,11 @@ const bookmarkClicked = ((id) => {
          font-weight: 500;
       }
       .call {
-         background: var(--uvalib-grey-lightest);
+         background: $uva-grey-200;
          max-width: 100%;
          padding: 10px 0;
          margin-bottom: 20px;
-         color: var(--uvalib-text-dark);
+         color: $uva-text-color-dark;
 
       }
       .loc {
@@ -266,6 +266,6 @@ const bookmarkClicked = ((id) => {
 }
 
 .browse-card.current {
-   border: 3px solid var(--uvalib-brand-blue-light);
+   border: 3px solid $uva-brand-blue-100;
 }
 </style>

@@ -104,11 +104,10 @@ const netbadgeLogin = (() => {
    position: relative;
    margin: 2vw auto 0;
    padding-bottom: 6vw;
-   color: var(--uvalib-text);
    text-align: left;
    div.netbadge {
       padding-bottom: 25px;
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      border-bottom: 1px solid $uva-grey-100;
       margin: 25px 0;
    }
    div.section {
@@ -126,7 +125,7 @@ const netbadgeLogin = (() => {
    }
    .community {
       padding-top: 25px;
-      border-top: 1px solid var(--uvalib-grey-light);
+      border-top: 1px solid $uva-grey-100;
       margin: 15px 0;
    }
 }
@@ -137,8 +136,8 @@ const netbadgeLogin = (() => {
     padding: 10px;
     margin: 15px 0;
     border-radius: 5px;
-    color: var(--uvalib-text);
-    background-color: var(--uvalib-red-lightest);
+    color: $uva-text-color-dark;
+    background-color: $uva-red-100;
 }
 h2 {
   margin-bottom: 0;
@@ -161,11 +160,11 @@ h2 {
 }
 .auth-message {
    font-weight: bold;
-   color: var(--uvalib-red-emergency);
+   color: $uva-red-A;
    text-align: center;
    margin: 15px 0 15px;
    &.success {
-      color: var(--uvalib-green-dark);
+      color: $uva-green-A;
 
    }
 }
@@ -176,13 +175,13 @@ h2 {
    font-weight: bold;
 }
 .locked-out {
-   color: var(--uvalib-text);
+   color: $uva-text-color-base;
    font-size: 1em;
    font-weight: bold;
    text-align: center;
    padding: 10px;
    margin: 15px 0;
    border-radius: 5px;
-   background-color: var(--uvalib-red-lightest);
+   background-color: $uva-red-100;
 }
 </style>
