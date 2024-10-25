@@ -367,7 +367,7 @@ body {
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    color: $uva-grey-A;
-   background: $uva-brand-blue;
+   background: $uva-blue-alt-B;
 }
 .sticky {
    position: fixed !important;
@@ -422,6 +422,8 @@ body {
    margin: 0;
    padding: 0;
    background: $uva-grey-200;
+   outline: 0;
+   border: 0;
 
    h1 {
       padding: 22px 0 35px 0;
