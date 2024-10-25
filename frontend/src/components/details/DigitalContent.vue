@@ -84,14 +84,12 @@ import { useRoute } from 'vue-router'
 import { useCollectionStore } from "@/stores/collection"
 import { useItemStore } from "@/stores/item"
 import { usePoolStore } from "@/stores/pool"
-import { useResultStore } from "@/stores/result"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 
 const collection = useCollectionStore()
 const item = useItemStore()
 const poolStore = usePoolStore()
-const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
 const route = useRoute()

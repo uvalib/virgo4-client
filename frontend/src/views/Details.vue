@@ -14,7 +14,7 @@
 import ItemView from "@/components/details/ItemView.vue"
 import FullPageCollectionView from "@/components/details/FullPageCollectionView.vue"
 import { onMounted, onUpdated, ref, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { useCollectionStore } from "@/stores/collection"
 import { useRestoreStore } from "@/stores/restore"
@@ -28,7 +28,11 @@ const bookmarks = useBookmarkStore()
 const route = useRoute()
 const loadingDetails = ref(true)
 
-const getDetails = ( async (src, id) => {
+onBeforeRouteUpdate(async (to) => {
+   getDetails(to.params.src, to.params.id, false)
+})
+
+const getDetails = ( async (src, id, initialPage) => {
    // if this was called from an old catalog/id url, the src will get
    // set to legacy. in this case, lookup the cat key and redirect to full detail
    // the redirect will trigger a beforeRouteUpdate and that will get fill item detail.
@@ -39,27 +43,28 @@ const getDetails = ( async (src, id) => {
    }
 
    await item.getDetails( src, id )
-
+   analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
    if (item.details && item.details.header) {
       document.title = item.details.header.title
    }
-
-   analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', id)
-
    getCollectionContext()
 
-   nextTick( async () => {
-      if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
-         let newBM = restore.pendingBookmark
-         let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
-         if (showAdd) {
-            let triggerBtn = document.querySelector(".icon-wrap .bookmark")
-            bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "DETAIL")
+   if ( initialPage ) {
+      nextTick( async () => {
+         if ( restore.pendingBookmark && (restore.pendingBookmark.origin == "DETAIL" || restore.pendingBookmark.origin == "COLLECTION") ) {
+            let newBM = restore.pendingBookmark
+            let showAdd = ( bookmarks.bookmarkCount( newBM.pool, newBM.hit.identifier ) == 0 )
+            if (showAdd) {
+               let triggerBtn = document.querySelector(".icon-wrap .bookmark")
+               bookmarks.showAddBookmark( newBM.pool, newBM.hit, triggerBtn, "DETAIL")
+            }
+            restore.clear()
          }
-         restore.clear()
-      }
+         loadingDetails.value = false
+      })
+   } else {
       loadingDetails.value = false
-   })
+   }
 })
 
 const getCollectionContext = (async () => {
@@ -94,7 +99,7 @@ function zoteroItemUpdated() {
 }
 
 onMounted(()=>{
-   getDetails(route.params.src, route.params.id)
+   getDetails(route.params.src, route.params.id, true)
 })
 
 onUpdated(()=>{
