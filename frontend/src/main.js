@@ -82,6 +82,9 @@ app.mount('#app')
 // Plugins for formkit -------
 
 function addRequiredNotePlugin(node) {
+   if ( node.props.parsedRules.some(rule => rule.name !== 'required') ) return
+   if ( ['button', 'submit', 'hidden', 'group', 'list', 'meta', 'radio', 'checkbox'].includes(node.props.type) ) return
+
    node.on('created', () => {
       const schemaFn = node.props.definition.schema
       node.props.definition.schema = (sectionsSchema = {}) => {
