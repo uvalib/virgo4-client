@@ -136,7 +136,7 @@ div.v4-spinner h1 {
    transform: translateY(-4%);
    position: relative;
    margin: 0 auto;
-   border: 5px solid var(--uvalib-brand-orange);
+   border: 5px solid $uva-brand-orange;
    width: 140px;
    height: 80px;
    display: flex;
@@ -151,9 +151,9 @@ div.v4-spinner h1 {
    left: 50%;
    top: -5px;
    margin: 0 auto;
-   border-top: 5px solid var(--uvalib-brand-orange);
-   border-bottom: 5px solid var(--uvalib-brand-orange);
-   border-right: 5px solid var(--uvalib-brand-orange);
+   border-top: 5px solid $uva-brand-orange;
+   border-bottom: 5px solid $uva-brand-orange;
+   border-right: 5px solid $uva-brand-orange;
    background: #fff;
    width: 70px;
    height: 80px;

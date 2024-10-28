@@ -40,9 +40,8 @@
             <template v-if="userStore.lookingUp == false && !systemStore.ilsError && userStore.requests.holds.length > 0">
                <AccordionContent
                      class="requests-accordion"
-                     background="var(--uvalib-blue-alt-lightest)"
                      borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-blue-alt)"
+                     borderColor="#007BAC"
                      id="ils-holds"
                >
                   <template v-slot:title><span class="section-title">UVA Holds</span></template>
@@ -78,9 +77,8 @@
             <template v-if="userStore.lookingUp == false && illLoans.length > 0">
                <AccordionContent
                      class="requests-accordion"
-                     background="var(--uvalib-blue-alt-lightest)"
                      borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-blue-alt)"
+                     borderColor="#007BAC"
                      id="ill-holds"
                >
                   <template v-slot:title><span class="section-title">ILL Loan</span></template>
@@ -107,9 +105,8 @@
             <template v-if="userStore.lookingUp == false && digitalRequests.length > 0">
                <AccordionContent
                      class="requests-accordion"
-                     background="var(--uvalib-blue-alt-lightest)"
                      borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-blue-alt)"
+                     borderColor="#007BAC"
                      id="ill-holds"
                >
                   <template v-slot:title><span class="section-title">Digital Delivery Requests</span></template>

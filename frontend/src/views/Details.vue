@@ -109,7 +109,6 @@ onUpdated(()=>{
 <style lang="scss" scoped>
 .details {
    position: relative;
-   color: var(--color-primary-text);
    width: 95%;
    margin: 0 auto 0 auto;
    padding-bottom: 4vh;

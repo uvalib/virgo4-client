@@ -47,6 +47,10 @@
       justify-content: flex-end;
       .p-menubar-end {
          margin-left: initial;
+         display: flex;
+         flex-flow: row nowrap;
+         justify-content: flex-end;
+         align-items: center;
       }
       div.p-menubar-item-content a {
          &:hover {

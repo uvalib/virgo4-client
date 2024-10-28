@@ -248,13 +248,13 @@ onMounted(() =>{
    gap: 25px;
 }
 .account-group {
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
    margin: 0;
    h3 {
       padding: 12px;
       margin: 0;
-      background: var(--uvalib-grey-lightest);
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border-bottom: 1px solid $uva-grey-100;
    }
    dl {
       margin: 25px;
@@ -277,8 +277,8 @@ onMounted(() =>{
    }
    .fines-head {
       font-weight: bold;
-      border-bottom: 1px solid var(--uvalib-grey);
-      border-top: 1px solid var(--uvalib-grey);
+      border-bottom: 1px solid $uva-grey;
+      border-top: 1px solid $uva-grey;
       margin-bottom: 5px;
    }
    .fines-content {
@@ -337,7 +337,7 @@ div.bills, div.fines {
 div.bill, div.fine {
    margin: 10px 0;
    padding: 5px;
-   border: 1px solid var(--uvalib-grey);
+   border: 1px solid $uva-grey;
    border-radius: 5px;
 }
 table td {
@@ -357,7 +357,7 @@ div.notes p {
    margin-top: 35px;
  }
 .payment h3 {
-   border-bottom: 1px solid var(--uvalib-brand-blue);
+   border-bottom: 1px solid $uva-brand-blue;
 }
 .payment b {
    display: inline-block;

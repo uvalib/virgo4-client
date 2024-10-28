@@ -10,10 +10,10 @@
          <template v-else>
             <AccordionContent  v-for="(folderInfo) in bookmarkStore.bookmarks" :key="folderInfo.id"
                class="bookmark-folder"
-               color="var(--uvalib-grey-darkest)"
-               background="var(--uvalib-blue-alt-light)"
+               color={{color.textDark}}
+               background={{color.blueAlt300}}
                borderWidth="0 0 3px 0"
-               borderColor="var(--uvalib-blue-alt)"
+               borderColor={{color.blueAlt}}
                :id="folderInfo.id.toString()"
                :closeOthers="expandedFolder"
                @accordion-clicked="folderOpened(folderInfo.id)"
@@ -147,6 +147,7 @@ import Checkbox from 'primevue/checkbox'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { setFocusID, setFocusClass } from '@/utils'
+import colors from '@/assets/theme/colors.module.scss'
 
 const confirm = useConfirm()
 const toast = useToast()
@@ -444,7 +445,6 @@ div.bookmark-folder {
    min-height: 400px;
    position: relative;
    margin: 0 auto 0 auto;
-   color: var(--color-primary-text);
    margin: 0 auto;
    padding-bottom: 50px;
 }
@@ -472,7 +472,6 @@ div.bookmark-folder {
    margin-bottom: 15px;
 }
 .create-folder {
-   color: var(--uvalib-grey-dark);
    display: flex;
    flex-flow: row nowrap;
    align-items: center;

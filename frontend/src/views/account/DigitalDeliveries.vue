@@ -96,10 +96,10 @@ onMounted(()=>{
 <style lang="scss" scoped>
 div.notice {
    padding: 10px 10px;
-   background: var(--uvalib-grey-lightest);
+   background: $uva-grey-200;
    margin: 0 0 15px 0;
    font-weight: bold;
-   border: 1px solid var(--uvalib-grey);
+   border: 1px solid $uva-grey;
    text-align: center;
    a {
       margin-top: 10px;
@@ -110,14 +110,14 @@ div.notice {
    margin-bottom: 25px;
    h3 {
       margin: 0 0 10px 0;
-      background: var(--uvalib-blue-alt-light);
+      background: $uva-blue-alt-300;
       padding: 5px 10px;
-      border-bottom: 1px solid var(--uvalib-blue-alt);
+      border-bottom: 1px solid $uva-blue-alt;
    }
    .item {
       font-size: 0.9em;
       color: #444;
-      border: 1px solid var(--uvalib-grey);
+      border: 1px solid $uva-grey;
       margin: 0 0 15px 0;
       padding: 0;
       dl {

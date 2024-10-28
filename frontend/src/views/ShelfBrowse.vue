@@ -118,7 +118,6 @@ onMounted( async ()=>{
    position: relative;
    margin-top: 2vw;
    margin-bottom: 10vh;
-   color: var(--color-primary-text);
    width: 100%;
    margin: 0 auto;
 

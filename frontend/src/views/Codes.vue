@@ -59,21 +59,21 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .codes {
    min-height: 400px;
    position: relative;
    margin: 2vw auto 0 auto;
-   color: var(--color-primary-text);
    text-align: left;
+   padding-bottom: 50px;
 }
 :deep(.fa-times-circle) {
-   color: var(--uvalib-red);
+   color: $uva-red;
    font-size: 1.15em;
    opacity: 0.6;
 }
 :deep(.fa-check-circle) {
-   color: var(--uvalib-green-dark);
+   color: $uva-green-A;
    font-size: 1.15em;
 }
 @media only screen and (min-width: 768px) {
@@ -102,15 +102,15 @@ table {
 }
 table td {
    padding: 4px 5px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid $uva-grey-100;
 }
 .center {
    text-align: center;
 }
 table th {
    padding: 4px 5px;
-   background: var(--uvalib-grey-lightest);
-   border-bottom: 1px solid var(--uvalib-grey);
-   border-top: 1px solid var(--uvalib-grey);
+   background: $uva-grey-200;
+   border-bottom: 1px solid $uva-grey;
+   border-top: 1px solid $uva-grey;
 }
 </style>

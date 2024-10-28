@@ -305,7 +305,7 @@ div.saved-search {
    }
 }
 div.row {
-   border-bottom: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid $uva-grey-100;
    margin-bottom: 5px;
    padding-bottom: 5px;
    label.cb-label {
@@ -328,7 +328,7 @@ span.num {
   width: 30px;
   text-align: right;
   line-height: 1.5em;
-  color: var(--uvalib-grey);
+  color:$uva-grey;
 }
 .controls {
    padding: 10px 0;
@@ -341,11 +341,11 @@ span.num {
       margin: 10px 0;
    }
    .rss-url  {
-      background:  var(--uvalib-grey-lightest);
+      background:  $uva-grey-200;
       padding: 5px 10px;
       margin: 0 0 20px 0;
-      border-bottom: 1px solid  var(--uvalib-grey-light);
-      border-top: 1px solid  var(--uvalib-grey-light);
+      border-bottom: 1px solid  $uva-grey-100;
+      border-top: 1px solid  $uva-grey-100;
       -webkit-user-select: all; /* for Safari */
       user-select: all;
       word-break: break-all;
@@ -355,7 +355,7 @@ span.num {
    .rss-message {
       margin-right: auto;
       margin-left: 30%;
-      color: var(--uvalib-green-dark);
+      color: $uva-green-A;
       font-weight: bold;
       margin-top: 4px;
    }

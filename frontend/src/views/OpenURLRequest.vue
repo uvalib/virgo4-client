@@ -183,7 +183,6 @@ onMounted(() => {
    position: relative;
    margin: 0 auto;
    margin-top: 2vw;
-   color: var(--color-primary-text);
    text-align: left;
 }
 table {
