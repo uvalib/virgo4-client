@@ -83,14 +83,17 @@ function addRequiredNotePlugin(node) {
    node.on('created', () => {
       const schemaFn = node.props.definition.schema
       node.props.definition.schema = (sectionsSchema = {}) => {
-         sectionsSchema["label"] = {
-            children: [`$label`, {
-               $el: 'span',
-               if: '$state.required',
-                  attrs: {
-                     innerHTML: "*</i><span class='req'>(required)</span>"
-                  },
-            }]
+         const isRequired = node.props.parsedRules.some(rule => rule.name === 'required')
+         if ( isRequired ) {
+            sectionsSchema["label"] = {
+               children: [`$label`, {
+                  $el: 'span',
+                  if: '$state.required',
+                     attrs: {
+                        innerHTML: "*</i><span class='req'>(required)</span>"
+                     },
+               }]
+            }
          }
          return schemaFn(sectionsSchema)
       }
