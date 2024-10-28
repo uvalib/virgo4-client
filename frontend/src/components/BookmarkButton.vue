@@ -1,8 +1,12 @@
 <template>
-   <VirgoButton v-if="system.isKiosk==false" text role="switch" @click="bookmarkClicked" :icon="bookmarkIcon" rounded
+   <VirgoButton v-if="system.isKiosk==false && !props.labeled"
+      size="large" text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
       :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
-      :class="{checked: bookmarkCount > 0}" >
-   </VirgoButton>
+      :class="{checked: bookmarkCount > 0}" />
+   <VirgoButton v-if="system.isKiosk==false && props.labeled"
+      label="Bookmark" text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
+      :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
+      :class="{checked: bookmarkCount > 0}" />
 </template>
 
 <script setup>
@@ -11,6 +15,8 @@ import { useSystemStore } from "@/stores/system"
 import { useBookmarkStore } from "@/stores/bookmark"
 import analytics from '@/analytics'
 import { useConfirm } from "primevue/useconfirm"
+
+const emit = defineEmits( ['clicked'] )
 
 const props = defineProps({
    pool: {
@@ -24,6 +30,10 @@ const props = defineProps({
    origin: {
       type: String,
       required: true
+   },
+   labeled: {
+      type: Boolean,
+      default: false
    }
 })
 
@@ -55,6 +65,7 @@ const bookmarkCount = computed(()=>{
 })
 
 const bookmarkClicked = (() => {
+   emit("clicked")
    if ( bookmarkCount.value == 0) {
       bookmarkStore.showAddBookmark( props.pool, props.hit, bookmarkbtn.value.$el, props.origin )
       return
@@ -99,11 +110,4 @@ const removeBookmark = ( () => {
 </script>
 
 <style lang="scss" scoped>
-.bookmark-icon {
-    padding: 2px;
-    font-size: 1.4em;
-    color: var(--uvalib-text);
-    border-radius: 5px;
-    margin: 0 auto;
-}
 </style>

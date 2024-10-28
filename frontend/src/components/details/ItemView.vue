@@ -1,115 +1,113 @@
 <template>
-   <div class="item-view">
-      <div class="detail-controls" v-if="resultStore.selectedHitIdx > -1">
+   <div class="item-header" >
+      <div class="title-wrap">
+         <div class="title">{{ details.header.title }}</div>
+         <div v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</div>
+      </div>
+      <span class="nav-wrap"  v-if="resultStore.selectedHitIdx > -1">
          <V4Pager
             :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
             :prevAvailable="resultStore.prevHitAvailable" :nextAvailable="resultStore.nextHitAvailable"
             @next="nextHitClicked" @prior="priorHitClicked"
          />
          <VirgoButton link @click="returnToSearch" label="Return to search results" />
-      </div>
-      <div class="details-content">
-         <SearchHitHeader v-bind:link="false" :hit="details" :pool="details.source"  :expand="preferences.expandDetails" from="DETAIL"/>
-         <abbr class="unapi-id" :title="details.itemURL"></abbr>
-         <div class="info">
-            <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
-            </div>
-            <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
-            <dl class="fields">
-               <template v-if="details.header.author">
-                  <dt class="label">{{details.header.author.label}}:</dt>
-                  <dd class="value">
-                     <V4LinksList id="author-links" :inline="true" :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
-                  </dd>
-               </template>
-               <template v-for="(field,idx) in allDisplayFields"  :key="`lv${idx}`">
-                  <dt class="label">{{field.label}}:</dt>
-                  <dd class="value">
-                     <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
-                        :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
-                     />
-                     <span class="related" v-else-if="field.type=='related-url'">
-                        <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
-                           <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" />
-                        </div>
-                     </span>
-                     <span class="copyright" v-else-if="field.type=='copyright'">
-                        <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
-                        <template v-if="system.isKiosk == false">
-                           <a :href="field.value" target="_blank">{{field.item}}</a>
-                           <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
-                              href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
-                           >
-                              More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
-                           </a>
-                        </template>
-                        <span v-else>{{field.item}}</span>
-                     </span>
-                     <template v-else>
-                        <span v-if="preferences.expandDetails" class="value" v-html="utils.fieldValueString(field)"></span>
-                        <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
-                           :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
-                     </template>
-                  </dd>
-               </template>
-               <template v-if="accessURLField && system.isKiosk == false">
-                  <dt class="label">{{accessURLField.label}}:</dt>
-                  <dd class="value">
-                     <AccessURLDetails mode="full" :title="details.header.title" :pool="details.source" :urls="accessURLField.value" />
-                  </dd>
-               </template>
-               <dt class="label">Citations:</dt>
-               <dd class="value">
-                  <CitationsList />
-               </dd>
-               <template v-if="hasExtLink && system.isKiosk == false">
-                  <dd></dd>
-                  <dt class="value more">
-                     <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
-                        Full metadata<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
-                     </a>
-                  </dt>
-               </template>
-            </dl>
-            <template v-if="marcXML">
-               <AccordionContent class="marc" id="maxc-xml">
-                  <template v-slot:title>MARC XML</template>
-                  <pre class="xml">{{marcXML}}</pre>
-               </AccordionContent>
-            </template>
-         </div>
-      </div>
-      <DigitalContent />
-      <template v-if="details.source != 'images'">
-         <Availability v-if="poolStore.hasAvailability(details.source)" />
-         <InterLibraryLoan v-if="poolStore.hasInterLibraryLoan(details.source)" />
-         <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
-            <h2>Bookplates Fund</h2>
-            <CollectionHeader :border="false"/>
-         </template>
-         <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
-      </template>
+      </span>
    </div>
+   <div class="details-content">
+      <abbr class="unapi-id" :title="details.itemURL"></abbr>
+      <div class="info">
+         <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
+         </div>
+         <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
+         <dl class="fields" :aria-expanded="detailExpanded.toString()">
+            <template v-if="details.header.author">
+               <dt class="label">{{details.header.author.label}}:</dt>
+               <dd class="value">
+                  <V4LinksList id="author-links" :inline="true" :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
+               </dd>
+            </template>
+            <template v-for="(field) in allDisplayFields">
+               <dt class="label">{{field.label}}:</dt>
+               <dd class="value">
+                  <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
+                     :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
+                  />
+                  <span class="related" v-else-if="field.type=='related-url'">
+                     <div class="related-item" v-for="(v,idx) in field.value" :key="`related-${idx}`">
+                        <VirgoButton as="a" :href="v.url" target="_blank" :label="v.label" />
+                     </div>
+                  </span>
+                  <span class="copyright" v-else-if="field.type=='copyright'">
+                     <img :aria-label="`${field.item} icon`" :src="copyrightIconSrc(field)">
+                     <template v-if="system.isKiosk == false">
+                        <a :href="field.value" target="_blank">{{field.item}}</a>
+                        <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
+                           href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
+                        >
+                           More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                        </a>
+                     </template>
+                     <span v-else>{{field.item}}</span>
+                  </span>
+                  <template v-else>
+                     <span v-if="preferences.expandDetails" class="value" v-html="utils.fieldValueString(field)"></span>
+                     <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
+                        :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
+                  </template>
+               </dd>
+            </template>
+            <template v-if="hasExtLink && system.isKiosk == false && detailExpanded">
+               <dt class="label">Full metadata:</dt>
+               <dd class="value">
+                  <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
+                     View<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                  </a>
+               </dd>
+            </template>
+            <template v-if="hasMarcXML && detailExpanded && system.isKiosk == false">
+               <dt class="label marc">MARC XML:</dt>
+               <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
+            </template>
+            <dt class="toggle" v-if="showFieldsToggle">
+               <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"/>
+            </dt>
+            <dd></dd>
+         </dl>
+      </div>
+   </div>
+   <ActionsPanel :hit="details" :pool="details.source" from="DETAIL"/>
+   <DigitalContent />
+   <template v-if="details.source != 'images'">
+      <InterLibraryLoan v-if="system.isKiosk == false && poolStore.hasInterLibraryLoan(details.source)" /> <!-- pools that support ILL (WorldCat) should not show any other availabilty UI-->
+      <Availability v-else-if="hasAvailability" />
+      <BoundWithItems v-if="item.hasBoundWithItems"/>
+      <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
+         <h2>Bookplates Fund</h2>
+         <CollectionPanel />
+      </template>
+      <div v-else-if="item.isCollectionHead" class="collection-head">
+         <CollectionPanel />
+      </div>
+      <ShelfBrowse v-if="poolStore.shelfBrowseSupport(details.source) && !details.searching" :hit="details" :pool="details.source" />
+   </template>
 </template>
 
 <script setup>
-import SearchHitHeader from "@/components/SearchHitHeader.vue"
+import ActionsPanel from "@/components/details/ActionsPanel.vue"
 import Availability from "@/components/details/Availability.vue"
 import InterLibraryLoan from "@/components/details/InterLibraryLoan.vue"
-import AccordionContent from "@/components/AccordionContent.vue"
-import CollectionHeader from "@/components/details/CollectionHeader.vue"
+import BoundWithItems from "@/components/details/BoundWithItems.vue"
+import MarcMetadata from "@/components/modals/MarcMetadata.vue"
+import CollectionPanel from "@/components/details/CollectionPanel.vue"
 import ContentAdvisory from "@/components/ContentAdvisory.vue"
-import beautify from 'xml-beautifier'
-import AccessURLDetails from "@/components/AccessURLDetails.vue"
 import TruncatedText from "@/components/TruncatedText.vue"
 import V4LinksList from "@/components/V4LinksList.vue"
 import V4Pager from "@/components/V4Pager.vue"
-import CitationsList from "@/components/details/CitationsList.vue"
 import ShelfBrowse from "@/components/details/ShelfBrowse.vue"
 import DigitalContent from "@/components/details/DigitalContent.vue"
 import analytics from '@/analytics'
 import * as utils from '@/utils'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useItemStore } from "@/stores/item"
 import { usePoolStore } from "@/stores/pool"
@@ -129,13 +127,52 @@ const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
 
+const detailExpanded = ref(false)
+
 // details : state => state.item.details,
 const details = computed(()=>{
    return item.details
 })
-const allDisplayFields = computed(()=>{
-   return details.value.fields.filter(f => shouldDisplay(f))
+
+const expandLabel = computed (() => {
+   if ( detailExpanded.value ) return "Show less"
+   return "Show more"
 })
+
+const showFieldsToggle = computed( () => {
+   if ( item.isCollectionHead ) return false
+   if ( preferences.expandDetails ) return false
+   let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
+   return filteredFields.length > item.primaryFields.length
+})
+
+const allDisplayFields = computed(()=> {
+   let filteredFields = details.value.fields.filter(f => shouldDisplay(f))
+   if ( filteredFields.length < item.primaryFields.length || item.isCollectionHead || preferences.expandDetails) {
+      return filteredFields
+   }
+
+   if ( detailExpanded.value ) {
+      return filteredFields
+   }
+   return details.value.fields.filter( f => item.primaryFields.includes(f.name))
+})
+
+const hasAvailability = computed(() => {
+   if (poolStore.hasAvailability(details.value.source) && item.availability.libraries.length > 0) return true
+   if (accessURLField.value != null && !system.isKiosk) return true
+   return false
+})
+
+const shouldDisplay =((field) => {
+   if ( field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
+         field.type == "access-url" || field.type == "sirsi-url" || field.display == 'availability' ||
+         field.name.includes("_download_url") || (system.isKiosk && field.type == "related-url")  ) {
+      return false
+   }
+   return true
+})
+
 const accessURLField = computed(()=>{
    return details.value.fields.find(f => f.name=="access_url")
 })
@@ -153,11 +190,20 @@ const extDetailURL = computed(()=>{
    }
    return extLink.value
 })
+const hasMarcXML = computed(()=>{
+   if ( !user.isAdmin ) return false
+   let xml = details.value.fields.find( f => f.type == "marc-xml")
+   if (xml) return true
+   return false
+})
 const marcXML = computed(()=>{
-   if ( !user.isAdmin ) return ""
    let xml = details.value.fields.find( f => f.type == "marc-xml")
    if ( !xml) return ""
-   return beautify(xml.value).trim()
+   return xml.value
+})
+
+const toggleExpandedView = (() => {
+   detailExpanded.value = !detailExpanded.value
 })
 
 const returnToSearch = (() => {
@@ -202,18 +248,6 @@ const getBrowseLinks = ( ( name, values ) => {
    return out
 })
 
-const shouldDisplay =((field) => {
-   if ( field.display == 'availability') return false
-   if (field.display == 'optional' || field.type == "iiif-image-url" || field.type == "url" ||
-         field.type == "access-url" || field.type == "sirsi-url" ||
-         field.name.includes("_download_url")  ) {
-      return false
-   }
-
-   if ( system.isKiosk &&  field.type == "related-url" ) return false
-   return true
-})
-
 const fieldLimit = (( field ) => {
    if (field.name == "subject_summary" ) {
       return 900
@@ -222,93 +256,113 @@ const fieldLimit = (( field ) => {
 })
 </script>
 <style lang="scss" scoped>
-.item-view {
-   h2 {
-      color: var(--color-primary-orange);
-      text-align: center;
-      margin: 50px 0 30px 0;
-   }
-   div.details-content  {
-      width: 95%;
-      margin: 0 auto;
-   }
-
-   .ra-box.ra-fiy.pad-top {
-      margin-top: 20px;
-   }
-
-   dl.fields {
-      grid-template-columns: 0.5fr 2fr;
-      dt.label {
-         white-space: normal;
-      }
-   }
-   .detail-controls {
+.item-header {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: space-between;
+   align-items: flex-start;
+   gap: 50px;
+   .title-wrap {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      align-items: flex-end;
-      padding: 0 10px 5px 0;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 10px;
+      text-align: left;
+      .title {
+         font-size: 1.5rem;
+         font-weight: 700;
+      }
+      .subtitle {
+         font-weight: normal;
+      }
+      .author {
+         padding:0 0 0 40px;
+         font-weight: normal;
+      }
    }
-   .info {
-      margin: 15px 0;
-      border-top: 4px solid var(--color-brand-blue);
-   }
-   dl {
-      margin-top: 15px;
-      display: inline-grid;
-      grid-template-columns: max-content 2fr;
-      grid-column-gap: 10px;
-      width: 100%;
-   }
+
+}
+
+.collection-head {
+   margin-top: 50px;
+}
+
+h2 {
+   margin: 50px 0 30px 0;
+}
+
+.ra-box.ra-fiy.pad-top {
+   margin-top: 20px;
+}
+
+
+.detail-controls {
+   display: flex;
+   flex-direction: column;
+   justify-content: flex-end;
+   align-items: flex-end;
+   width: 95%;
+   margin: 0 auto;
+}
+.info {
+   margin: 15px 0;
+   border-top: 4px solid var(--color-brand-blue);
+}
+dl.fields {
+   grid-template-columns: max-content 2fr;
+   display: inline-grid;
+   grid-column-gap: 20px;
+   width: 100%;
    dt {
       font-weight: bold;
-      text-align: right;
-      padding: 4px 8px;
+      text-align: left;
+      padding: 5px 8px;
       white-space: nowrap;
       vertical-align: top;
+   }
+   dt.toggle {
+      margin-top: 20px;
    }
    dd {
       margin: 0;
       width: 100%;
-      max-width: 750px;
+      // max-width: 750px;
       text-align: left;
       word-break: break-word;
       -webkit-hyphens: auto;
       -moz-hyphens: auto;
       hyphens: auto;
       padding: 4px 0px;
+      :deep(p) {
+         padding: 0;
+         margin: 5px 0;
+      }
       .related {
          display: flex;
          flex-direction: column;
          gap: 5px;
       }
    }
-   .value.more {
-      margin-top: 15px;
-      padding: 15px 0 10px 0;
-      text-align: left;
+}
+
+.value.more {
+   margin-top: 15px;
+   padding: 15px 0 10px 0;
+   text-align: left;
+}
+.copyright {
+   display: flex;
+   flex-flow: row wrap;
+   align-content: center;
+   align-items: center;
+   img {
+      height: 20px;
+      margin-right: 5px;
    }
-   .xml {
-      font-weight: normal;
-      font-size: 0.8em;
-      border: 1px solid var(--uvalib-grey-light);
-      padding: 10px;
-      margin: 0;
-      border-top: 0;
-   }
-   .copyright {
-      display: flex;
-      flex-flow: row wrap;
-      align-content: center;
-      align-items: center;
-      img {
-         height: 20px;
-         margin-right: 5px;
-      }
-      .cr-note {
-         margin-left: 25px;
-      }
+   .cr-note {
+      margin-left: 25px;
    }
 }
 </style>

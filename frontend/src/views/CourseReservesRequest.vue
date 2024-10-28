@@ -113,7 +113,7 @@ function submitRequest() {
    }
 }
 .course-reserves-request {
-   margin-bottom: 25px;
+   padding-bottom: 50px;
 }
 .reserves-content {
    margin: 0 auto;
@@ -139,14 +139,14 @@ function submitRequest() {
       gap: 15px;
    }
    div.items {
-      border: 1px solid var(--uvalib-grey-light);
+      border: 1px solid $uva-grey-100;
       h3 {
          padding: 5px 10px;
-         background-color: var(--uvalib-grey-lightest);
+         background-color: $uva-grey-200;
          font-weight: bold;
          margin:0;
          font-size: 1em;
-         border-bottom: 1px solid var(--uvalib-grey-light);
+         border-bottom: 1px solid $uva-grey-100;
       }
       .list {
          display: flex;
@@ -160,7 +160,7 @@ function submitRequest() {
          text-align: left;
          padding: 10px;
          font-size: 0.8em;
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          margin: 10px;
          display: flex;
          flex-direction: column;

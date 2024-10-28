@@ -96,13 +96,11 @@ onMounted( () => {
 .checkout {
    min-height: 400px;
    position: relative;
-   color: var(--color-primary-text);
-   width: 60%;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    position: relative;
 
    .details {
-      margin-bottom: 50px;
+      padding-bottom: 50px;
    }
 
    div.tab-header {
@@ -120,8 +118,8 @@ onMounted( () => {
       padding: 10px;
       margin: 15px 0;
       border-radius: 5px;
-      color: var(--uvalib-text);
-      background-color: var(--uvalib-red-lightest);
+      color: $uva-text-color-dark;
+      background-color: $uva-red-100;
    }
 }
 

@@ -1,9 +1,9 @@
 <template>
    <div v-if="userStore.isAdmin" class="libary-admin">
-      <h2>
+      <h3>
          <span>Pickup Library Management</span>
          <VirgoButton @click="addPickupLibraryClicked" :disabled="editIndex == systemStore.allPickupLibraries.length">Add</VirgoButton>
-      </h2>
+      </h3>
       <div class="content form">
          <div class="row" v-for="(pl,idx) in systemStore.allPickupLibraries" :key="`pl${pl.primaryKey}`">
             <template v-if="idx == editIndex">
@@ -107,7 +107,7 @@ const editClicked = ( (idx, rec) => {
 
 <style lang="scss" scoped>
 .libary-admin {
-   h2 {
+   h3 {
       margin: 0;
       padding: 10px 15px;
       background: var(--uvalib-grey-lightest);

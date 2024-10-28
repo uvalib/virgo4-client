@@ -1,0 +1,35 @@
+//
+// export the SCSS varibles so they can be imported and used in the theme .js file
+//
+:export {
+   brandBlue300: $uva-brand-blue-300;     // brand-blue-lightest
+   brandBlue200: $uva-brand-blue-200;     // brand-blue-lighter
+   brandBlue100: $uva-brand-blue-100;     // brand-blue-light
+   brandBlue: $uva-brand-blue;            // brand-blue
+
+   brandOrange300: $uva-brand-orange-300; // brand-orange-lightest
+   brandOrange200: $uva-brand-orange-200;
+   brandOrange100: $uva-brand-orange-100;
+   brandOrange: $uva-brand-orange;        // brand-orange
+   brandOrangeDark: $uva-brand-orange-A;
+   brandOrangeDarker: $uva-brand-orange-B;
+
+   blueAlt400: $uva-blue-alt-400;
+   blueAlt300: $uva-blue-alt-300;         // blue-alt-light
+   blueAlt200: $uva-blue-alt-200;         // blue-alt-med
+   blueAlt100: $uva-blue-alt-100;
+   blueAlt: $uva-blue-alt;                // blue-alt
+   blueAltDark: $uva-blue-alt-A;          // blue-alt-dark
+   blueAltDarkest: $uva-blue-alt-B;       // blue-alt-darkest
+
+   grey200: $uva-grey-200;                // grey-lightest
+   grey100: $uva-grey-100;                // grey-light
+   grey50: $uva-grey-50;
+   grey: $uva-grey;                       //grey
+   greyDark: $uva-grey-A;
+   greyDarkest: $uva-grey-B;              // grey-darkest
+
+   textBase: $uva-text-color-base;
+   textDark: $uva-text-color-dark;
+   linkBase: $uva-blue-alt-A;
+}

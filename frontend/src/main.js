@@ -4,20 +4,13 @@ import router from './router'
 import { plugin, defaultConfig } from '@formkit/vue'
 import formatDatePlugin from './plugins/formatdate'
 import formatNumPlugin from './plugins/formatnum'
-
 import V4Spinner from "@/components/V4Spinner.vue"
 import V4FormActions from "@/components/V4FormActions.vue"
-
 import { createPinia } from 'pinia'
-const pinia = createPinia()
-pinia.use(({ store }) => {
-   // all stores can access router with this.router
-   store.router = markRaw(router)
-})
 
 const app = createApp(App)
+
 app.use(router)
-app.use(pinia)
 app.use(formatDatePlugin)
 app.use(formatNumPlugin)
 
@@ -39,8 +32,6 @@ const dc = defaultConfig({
          messages: '$reset v4-form-invalid',
          help: '$reset v4-form-help',
       },
-      incompleteMessage: false,
-      validationVisibility: 'submit'
    }
 })
 app.use(plugin, dc)
@@ -76,6 +67,13 @@ app.use(PrimeVue, {
 app.use(ToastService)
 app.use(ConfirmationService)
 app.component("VirgoButton", Button) // Override the default name of primevue Button to VirgoButton (later renae to v4button)
+
+// Per some suggestions on vue / pinia git hub issue reports, create and add pinia support LAST
+// and use the chained form of the setup. This to avid problems where the vuew dev tools fail to
+// include pinia in the tools
+app.use(createPinia().use( ({ store }) => {
+   store.router = markRaw(router)
+}))
 
 app.mount('#app')
 

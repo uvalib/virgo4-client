@@ -1,9 +1,9 @@
 <template>
-   <section class="browse-controls">
+   <section class="browse-pager">
       <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="browse previous shelf item"
-         icon="pi pi-angle-double-left" label="Previous"/>
+         severity="secondary" label="Previous"/>
       <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()"  aria-label="browse next shelf item"
-         icon="pi pi-angle-double-right" iconPos="right" label="Next"/>
+         severity="secondary" label="Next"/>
    </section>
 </template>
 
@@ -23,7 +23,7 @@ function browsePrior() {
 }
 </script>
 <style lang="scss" scoped>
-.browse-controls {
+.browse-pager {
    display: flex;
    flex-flow: row nowrap;
    justify-content: space-between;

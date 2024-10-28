@@ -5,15 +5,15 @@
       <div class="working" v-if="bookmarkStore.searching && userStore.isSignedIn || userStore.lookingUp">
          <V4Spinner message="Looking up bookmark information..."/>
       </div>
-      <div v-else-if="userStore.isSignedIn">
+      <div v-else-if="userStore.isSignedIn" class="list">
          <div class="none" v-if="bookmarkStore.hasBookmarks == false">You have no bookmarks</div>
          <template v-else>
             <AccordionContent  v-for="(folderInfo) in bookmarkStore.bookmarks" :key="folderInfo.id"
                class="bookmark-folder"
-               color="var(--uvalib-grey-darkest)"
-               background="var(--uvalib-blue-alt-light)"
+               color={{color.textDark}}
+               background={{color.blueAlt300}}
                borderWidth="0 0 3px 0"
-               borderColor="var(--uvalib-blue-alt)"
+               borderColor={{color.blueAlt}}
                :id="folderInfo.id.toString()"
                :closeOthers="expandedFolder"
                @accordion-clicked="folderOpened(folderInfo.id)"
@@ -147,6 +147,7 @@ import Checkbox from 'primevue/checkbox'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { setFocusID, setFocusClass } from '@/utils'
+import colors from '@/assets/theme/colors.module.scss'
 
 const confirm = useConfirm()
 const toast = useToast()
@@ -391,8 +392,13 @@ onMounted(()=>{
    }
 }
 
+.list {
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
 div.bookmark-folder {
-   margin-bottom: 15px;
    .settings {
       h4 {
          margin: 10px 0 20px 0;
@@ -438,10 +444,9 @@ div.bookmark-folder {
 .bookmarks {
    min-height: 400px;
    position: relative;
-   margin: 2vw auto 0 auto;
-   color: var(--color-primary-text);
-   width: 60%;
+   margin: 0 auto 0 auto;
    margin: 0 auto;
+   padding-bottom: 50px;
 }
 .working {
    text-align: center;
@@ -467,7 +472,6 @@ div.bookmark-folder {
    margin-bottom: 15px;
 }
 .create-folder {
-   color: var(--uvalib-grey-dark);
    display: flex;
    flex-flow: row nowrap;
    align-items: center;

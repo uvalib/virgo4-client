@@ -88,7 +88,6 @@ const filterToggled = ((facetID, facetValue) => {
    }
 }
 .working {
-   color: var(--uvalib-text);
    text-align: center;
    background: white;
    position: absolute;

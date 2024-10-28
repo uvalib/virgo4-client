@@ -1,6 +1,6 @@
 <template>
    <div class="request-panel">
-      <h2  v-if="props.prefill==false">ILL Scan Chapter/Article</h2>
+      <h3  v-if="props.prefill==false">ILL Scan Chapter/Article</h3>
       <FormKit type="form" id="scan-article" :actions="false" @submit="submitClicked" incompleteMessage="Sorry, not all fields are filled out correctly.">
          <FormKit type="select" label="What would you like to have scanned?" v-model="request.doctype" id="item-type" validation="required"
             placeholder="Select a document type"
@@ -19,7 +19,7 @@
          <FormKit label="Notes or Special Instructions" type="textarea" v-model="request.notes" :rows="2"
             help="(ex: missing from shelf, color copies)"
          />
-         <ILLCopyrightNotice type="research" />
+         <ILLCopyrightNotice type="research" :wide="true"/>
          <V4FormActions :hasCancel="true" submitLabel="Submit" submitID="submit-borrow-av"
             :disabled="requestStore.buttonDisabled" @canceled="emit('canceled')"/>
       </FormKit>
@@ -28,7 +28,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import ILLCopyrightNotice from '../ILLCopyrightNotice.vue'
+import ILLCopyrightNotice from '../panels/ILLCopyrightNotice.vue'
 import { useRequestStore } from "@/stores/request"
 import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
@@ -88,16 +88,6 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .request-panel {
-   padding: 15px;
-   margin-bottom: 25px;
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   h2 {
-      color: var(--uvalib-text-dark);
-      font-weight: 500;
-      padding: 0;
-      margin: 0 0 15px 0px;
-      font-size: 1.2em;
-   }
    .notice {
       margin-top: 25px;
    }

@@ -1,13 +1,6 @@
 <template>
    <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu">
       <Menubar :model="v4Menu">
-         <template #item="{ label, item, props }">
-            <a :href="item.url" :target="item.target" v-bind="props.action">
-               <span v-bind="props.icon" />
-               <span v-bind="props.label">{{ label }}</span>
-               <span v-if="item.items" class="pi pi-fw pi-angle-down" v-bind="props.submenuicon" />
-            </a>
-         </template>
          <template #end>
             <span v-if="userStore.isSignedIn && userStore.itemsOnNotice.length > 0">
                <router-link to="/checkouts?overdue=1">
@@ -18,7 +11,7 @@
             </span>
             <span v-if="systemStore.isKiosk == false" class="alert-wrap">
                <VirgoButton icon="alert-bell icon fal fa-bell" text rounded aria-label="virgo alerts"
-                  :class="{dim: alertStore.seenCount==0}"
+                  size="large" :class="{dim: alertStore.seenCount==0}"
                   :disabled="alertStore.seenCount==0"  @click="alertClicked" />
                <span v-if="alertStore.seenCount" class="alert-count">{{alertStore.seenCount}}</span>
             </span>
@@ -114,7 +107,7 @@ const signOut = (() => {
 
 <style lang="scss" scoped>
 .menu-item.notice {
-   color: var(--uvalib-yellow);
+   color: $uva-yellow;
    margin: 0 0 0 10px;
    font-weight: normal;
    .cnt {
@@ -143,7 +136,7 @@ const signOut = (() => {
    .alert-count {
       font-size: 1em;
       font-weight: bold;
-      background: var(--color-primary-orange);
+      background: $uva-brand-orange;
       color: white;
       font-family: sans-serif;
       display: inline-block;

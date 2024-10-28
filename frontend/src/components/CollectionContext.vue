@@ -34,8 +34,8 @@ function collectionPidPicked(pid) {
 .collection-context {
    padding: 10px;
    background: white;
-   color: var(--uvalib-text);
-   border-top: 3px solid var(--uvalib-brand-blue);
+   color: $uva-text-color-base;
+   border-top: 3px solid $uva-brand-blue;
 
    .collect-rec {
       margin: 0 0 15px 10px;
@@ -47,9 +47,6 @@ function collectionPidPicked(pid) {
       .thumb {
          width: 100px;
          margin-right: 15px;
-      }
-      .thumb.bookplate {
-         box-shadow: var(--uvalib-box-shadow);
       }
       .desc {
          margin-right: 25px;

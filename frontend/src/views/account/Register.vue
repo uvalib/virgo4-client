@@ -9,7 +9,7 @@
       <ul>
         <li>Please bring a photo ID to a <a href="https://library.virginia.edu/hours" target="_blank">UVA Library location</a>. Accepted forms of ID include:
           <ul>
-            <li>Driver’s license</li>
+            <li>Driver's license</li>
             <li>Passport</li>
             <li>College ID + a piece of mail with name and home address.</li>
             <li>Military ID + a piece of mail with name and home address.</li>
@@ -120,7 +120,6 @@ function cancelClicked() {
   position: relative;
   margin: 2vw auto;
   text-align: left;
-  color: var(--color-primary-text);
 }
 .info{
   margin: 0 auto;

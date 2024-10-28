@@ -4,15 +4,15 @@ import { usePoolStore } from "@/stores/pool"
 import { useSystemStore } from "@/stores/system"
 import { useRequestStore } from "@/stores/request"
 import * as utils from '../utils'
+import analytics from '@/analytics'
 
 export const useItemStore = defineStore('item', {
 	state: () => ({
       details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
-      googleBooksURL: "",
-      googleBookThumbURL: "",
       loadingDigitalContent: false,
-      availability: {searching: true, titleId: "", display: [], items: [], bound_with: [], error: ""},
+      availability: {searching: true, titleId: "", display: [], libraries: [], bound_with: [], error: ""},
+      primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
    }),
 
    getters: {
@@ -22,6 +22,13 @@ export const useItemStore = defineStore('item', {
             return ""
          }
          return genTypeF.value
+      },
+      onlineAccessSources: state => {
+         let sources = state.details.fields.find(f => f.name=="access_url")
+         if (sources) {
+            return sources.value
+         }
+         return []
       },
       hasContentAdvisory: state => {
          let idx = state.details.fields.findIndex( f=> f.name=="content_advisory")
@@ -120,6 +127,7 @@ export const useItemStore = defineStore('item', {
                   generateURL: item.pdf.urls.generate,
                   statusURL: item.pdf.urls.status,
                }
+               analytics.trigger('PDF', 'PDF_LINK_PRESENTED', item.pid)
             }
             if (item.ocr) {
                dc.ocr = {
@@ -128,7 +136,7 @@ export const useItemStore = defineStore('item', {
                   generateURL: item.ocr.urls.generate,
                   statusURL: item.ocr.urls.status,
                }
-
+               analytics.trigger('OCR', 'OCR_LINK_PRESENTED', item.pid)
             }
             this.digitalContent.push(dc)
          })
@@ -137,7 +145,7 @@ export const useItemStore = defineStore('item', {
          this.$reset()
       },
       clearAvailability() {
-        this.availability = {searching: true, titleId: '', display: [], items: [], bound_with: [], error: ""}
+        this.availability = {searching: true, titleId: '', display: [], libraries: [], bound_with: [], error: ""}
       },
       setCatalogKeyDetails(data) {
          let found = false
@@ -237,53 +245,6 @@ export const useItemStore = defineStore('item', {
          })
       },
 
-     getGoogleBooksURL() {
-         let done = false
-         let fields = ["isbn", "lccn", "oclc"]
-         let tgtName = ""
-         let tgtValue = ""
-         fields.some(  fName => {
-            let idField = this.details.fields.find( f => f.name == fName )
-            if ( idField ) {
-               tgtName = fName
-               tgtValue = idField.value[0]
-               done = true
-            }
-            return done == true
-         })
-
-         // no identifier to search. nothing to do
-         if (tgtName == "") return
-
-         let url = `https://www.googleapis.com/books/v1/volumes?q=${tgtName}:${tgtValue}`
-         axios.get(url).then((response) => {
-            let done = false
-            this.googleBookThumbURL = ""
-            this.googleBooksURL = ""
-            response.data.items.some( item => {
-               if (item.accessInfo.viewability != "NO_PAGES") {
-                  if ( this.details.header.title.includes(item.volumeInfo.title)) {
-                     if ( item.volumeInfo.canonicalVolumeLink ) {
-                        this.googleBooksURL = item.volumeInfo.canonicalVolumeLink
-                     } else if ( item.volumeInfo.infoLink ) {
-                        this.googleBooksURL = item.volumeInfo.infoLink
-                     }
-                     else if (item.accessInfo.webReaderLink) {
-                        this.googleBooksURL = item.accessInfo.webReaderLink
-                     }
-                     if (item.volumeInfo.imageLinks.smallThumbnail) {
-                        this.googleBookThumbURL = item.volumeInfo.imageLinks.smallThumbnail
-                     }
-                     done = true
-                  }
-               }
-               return done == true
-            })
-         }).catch( () => {
-            // NO-OP
-         })
-      },
-
       getItemURL( source, identifier ) {
          // get source from poolID
          const poolStore = usePoolStore()
@@ -303,8 +264,6 @@ export const useItemStore = defineStore('item', {
       },
 
       async getDetails( source, identifier ) {
-         this.clearDetails()
-         this.clearAvailability()
          this.details.searching = true
 
          // get source from poolID
@@ -322,7 +281,7 @@ export const useItemStore = defineStore('item', {
 
          baseURL = pool.url
          let url = baseURL + "/api/resource/" + identifier
-         await axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             let details = response.data
             utils.preProcessHitFields( pool.url, [details] )
             if ( details.related ) {
@@ -333,14 +292,28 @@ export const useItemStore = defineStore('item', {
                //    r.content_advisory = "ADVISORY"
                // })
             }
-            details.source = source
-            this.details = details
+
+            this.details.source = source
+            this.details.identifier = identifier
+            this.details.itemURL = details.itemURL
+            if ( details.cover_image ) {
+               this.details.cover_image = details.cover_image
+            }
+            this.details.header = details.header
+            this.details.fields = details.fields
+            if ( details.related) {
+               this.details.related = details.related
+            }
+            this.details.holdings = details.holdings
+            this.details.searching = false
             this.digitalContent.splice(0, this.digitalContent.length)
 
             this.getDigitalContent()
-            this.getGoogleBooksURL()
             if (poolStore.hasAvailability(this.details.source)){
                this.getAvailability()
+            } else {
+               this.clearAvailability()
+               this.availability.searching = false
             }
             this.details.searching = false
          }).catch( async (error) => {
@@ -360,16 +333,41 @@ export const useItemStore = defineStore('item', {
 
          this.clearAvailability()
          let url = `${system.availabilityURL}/item/${this.details.identifier}`
-         axios.get(url).then((response) => {
+         return axios.get(url).then((response) => {
             if (response.data) {
                this.availability.titleId = response.data.availability.title_id
                this.availability.display = response.data.availability.display
-               this.availability.items = response.data.availability.items
                this.availability.bound_with = response.data.availability.bound_with
+
+               // split availability items into library groupings
+               this.availability.libraries = []
+               if (response.data.availability.items) {
+                  response.data.availability.items.forEach( i => {
+                     let libInfo = {name: i.library, id: i.library_id, items: []}
+                     delete i.library
+                     delete i.library_id
+                     let existingLib = this.availability.libraries.find( al => al.id == libInfo.id)
+                     if ( existingLib ) {
+                        existingLib.items.push( i )
+                     } else {
+                        libInfo.items.push( i )
+                        this.availability.libraries.push( libInfo )
+                     }
+                  })
+               }
+
+               // // HACK IN A SPECIAL ITEM OPTION
+               // if ( response.data.availability.request_options.length > 0) {
+               //    if ( response.data.availability.request_options[0].item_options.length > 1) {
+               //       let last = response.data.availability.request_options[0].item_options.length -1
+               //       response.data.availability.request_options[0].item_options[last].label += " (Ivy limited circulation)"
+               //    }
+               // }
                requestStore.requestOptions = response.data.availability.request_options
             }
             this.availability.searching = false
          }).catch((error) => {
+            console.error(error)
             this.details.searching = false
             if (error.response && error.response.status != 404) {
                this.availability.error = error.response.data

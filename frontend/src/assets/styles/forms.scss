@@ -41,6 +41,7 @@ input[type=url],
 input[type=week],
 input,
 select,
+textarea,
 .v4-form-input {
    padding: 0.5em 0.6em;
    display: inline-block;
@@ -62,8 +63,8 @@ button.v4-form-input {
    margin: 0;
    border-radius: 5px;
    font-weight: 400;
-   background-color: var(--uvalib-grey-lightest);
-   border: 1px solid var(--uvalib-grey);
+   background-color: $uva-grey-200;
+   border: 1px solid $uva-grey;
    color: #000;
    cursor: pointer;
 
@@ -73,7 +74,7 @@ button.v4-form-input {
    }
 
    &:focus {
-      outline: 1px dashed var(--uvalib-accessibility-highlight);
+      outline: 1px dashed $uva-brand-blue-100;
       outline-offset: 2px;
    }
 }
@@ -81,11 +82,11 @@ button.v4-form-input {
 .submit-button  {
    button.v4-form-input {
       color: #ffffff;
-      background-color: var(--uvalib-brand-blue-light);
-      border: 1px solid var(--uvalib-brand-blue-light);
+      background-color: $uva-brand-blue-100;
+      border: 1px solid $uva-brand-blue-100;
       &:hover {
-         background-color: var(--uvalib-brand-blue-lighter);
-         border: 1px solid var(--uvalib-brand-blue-lighter);
+         background-color: $uva-brand-blue-200;
+         border: 1px solid $uva-brand-blue-200;
          transition: all 0.3s ease;
       }
    }
@@ -99,7 +100,7 @@ button.v4-form-input {
    }
 
    fieldset {
-      border: 1px solid var(--uvalib-grey-light);
+      border: 1px solid $uva-grey-100;
       border-radius: 5px;
 
       legend {
@@ -132,7 +133,7 @@ button.v4-form-input {
 
 span.req {
    margin-left: 5px;
-   color: var(--uvalib-grey);
+   color: $uva-grey;
    font-size: 0.8em;
 }
 
@@ -141,11 +142,11 @@ i.req {
    margin-right: 3px;
    position: relative;
    top: -2px;
-   color: var(--uvalib-grey);
+   color: $uva-grey;
 }
 
 span.req-label {
-   color: var(--uvalib-text);
+   color: $uva-text-color-base;
 }
 
 div.sort .formkit-wrapper {
@@ -162,15 +163,15 @@ div.sort .formkit-wrapper {
 .v4-form-help {
    margin: 5px 0;
    font-size: 0.9em;
-   color: var(--uvalib-grey);
+   color: $uva-grey;
 }
 
 .v4-form-invalid {
    list-style: none;
    padding: 0;
-   margin: 5px 0;
-   color: var(--uvalib-red-emergency);
-   text-align: center;
+   margin: 10px 0 0 0;
+   color: $uva-red-A;
+   text-align: left;
 }
 
 .v4-form-label {
@@ -178,7 +179,7 @@ div.sort .formkit-wrapper {
    flex-flow: row nowrap;
    justify-content: flex-start;
    align-items: center;
-   color: var(--uvalib-text-dark);
+   color: $uva-text-color-dark;
    font-weight: normal;
    margin-bottom: .2em;
    margin-top: .5em;

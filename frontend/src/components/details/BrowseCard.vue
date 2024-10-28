@@ -1,10 +1,11 @@
 <template>
    <div class="browse-card" :class="{current: props.current, list: props.mode!='gallery'}" :aria-current="props.current.toString()" :id="`browse-${props.data.id}`">
-      <i class="current fas fa-caret-down" v-if="props.current"></i>
       <template v-if="props.mode=='gallery'">
          <div class="thumb-wrap">
             <span v-if="props.data.status=='ready'" class="vertical-spacer"></span>
-            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`" tabindex="-1">
+            <router-link @click="browseDetailClicked(props.data.id)" :to="`/sources/${props.pool}/items/${props.data.id}`"
+               tabindex="-1" :aria-label="`view item titled ${props.data.title}`"
+            >
                <template v-if="props.data.status=='ready' || props.data.status=='url'">
                   <img  alt="" class="thumb" v-if="props.data.status=='ready'" :src="props.data.image_base64" />
                   <img  alt="" class="thumb" v-if="props.data.status=='url'" :src="props.data.cover_image_url" />
@@ -108,7 +109,7 @@ const bookmarkClicked = ((id) => {
    margin: 5px !important;
 }
 .browse-card {
-   border: 1px solid var(--uvalib-grey);
+   border: 1px solid $uva-grey;
    padding: 0;
    margin: 0;
    position: relative;
@@ -118,7 +119,6 @@ const bookmarkClicked = ((id) => {
    justify-content: stretch;
    font-size: .937em;
    box-sizing: border-box;
-   width: auto;
 
    &:hover, &:focus-within, &:focus {
       top: -2px;
@@ -155,7 +155,7 @@ const bookmarkClicked = ((id) => {
          display: block;
          margin: 0 auto;
          background: #f2f2f2;
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
@@ -169,7 +169,7 @@ const bookmarkClicked = ((id) => {
          .title {
             background: white;
             opacity: 0.9;
-            color: var(--uvalib-text-dark);
+            color: $uva-text-color-base;
             text-align: center;
             padding: 0;
             margin: 0;
@@ -182,18 +182,12 @@ const bookmarkClicked = ((id) => {
             white-space: normal;
          }
          span.no {
-            color: var(--uvalib-text);
+            color: $uva-text-color-base;
             text-decoration: none;
             margin:  0;
             display: inline-block;
          }
       }
-   }
-   i.current {
-      position: absolute;
-      top: -15px;
-      width: 100%;
-      text-align: center;
    }
    .details.list {
       display: grid;
@@ -208,6 +202,7 @@ const bookmarkClicked = ((id) => {
       padding: 5px 0;
       height: 230px;
       width: 100%;
+      text-align: center;
 
       .call, .loc, .title {
          background: white;
@@ -221,11 +216,11 @@ const bookmarkClicked = ((id) => {
          font-weight: 500;
       }
       .call {
-         background: var(--uvalib-grey-lightest);
+         background: $uva-grey-200;
          max-width: 100%;
          padding: 10px 0;
          margin-bottom: 20px;
-         color: var(--uvalib-text-dark);
+         color: $uva-text-color-dark;
 
       }
       .loc {
@@ -246,6 +241,9 @@ const bookmarkClicked = ((id) => {
    .details.list {
       grid-template-columns: 50px 1fr 125px;
    }
+   .browse-card {
+      width: 190px;
+   }
 }
 @media only screen and (max-width: 768px) {
    .browse-card.list {
@@ -256,6 +254,9 @@ const bookmarkClicked = ((id) => {
       grid-template-rows: max-content 10px;
       grid-row-gap: 15px;
    }
+   .browse-card {
+      width: 150px;
+   }
    .bar {
       display: none;
    }
@@ -265,6 +266,6 @@ const bookmarkClicked = ((id) => {
 }
 
 .browse-card.current {
-   border: 3px solid var(--uvalib-brand-blue-light);
+   border: 3px solid $uva-brand-blue-100;
 }
 </style>

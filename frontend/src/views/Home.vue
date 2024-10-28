@@ -370,7 +370,6 @@ async function searchClicked() {
       input[type=text].basic {
          font-size: 1.15em;
          padding: 0.5vw 0.75vw;
-         border: 1px solid var(--uvalib-grey);
          border-right: 0;
          margin: 0 !important;
          border-radius: 5px 0 0 5px;

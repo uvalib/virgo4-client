@@ -1,6 +1,6 @@
 <template>
    <div class="privacy">
-      <h2>Privacy</h2>
+      <h3>Privacy</h3>
       <div class="content">
          <div class="line">
             <b>
@@ -44,7 +44,7 @@ function optOutClicked() {
 
 <style lang="scss" scoped>
 div.privacy {
-   h2 {
+   h3 {
       margin: 0;
       padding: 10px 15px;
       background: var(--uvalib-grey-lightest);

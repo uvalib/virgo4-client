@@ -1,6 +1,6 @@
 <template>
    <div class="pickup-options">
-      <h2>Pickup Location</h2>
+      <h3>Pickup Location</h3>
       <div class="content">
          <p>
             This pickup location is where you will go to retrieve items you’ve
@@ -49,7 +49,7 @@ function update() {
       // prevent overflow on small screens
       width: 100%;
     }
-   h2 {
+   h3 {
       margin: 0;
       padding: 10px 15px;
       background: var(--uvalib-grey-lightest);

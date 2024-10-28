@@ -3,17 +3,16 @@
       <div class="working" v-if="item.loadingDigitalContent">
          <V4Spinner message="Searching for digital content..." />
       </div>
-      <div class="items" v-if="item.hasDigitalContent || item.googleBooksURL || hasExternalImages">
-         <h2 class="buttons">
-            <span>View Online</span>
-            <VirgoButton v-if="!collection.isFullPageCollection && item.hasDigitalContent"
-               class="small" label="View Full Screen" @click="toggleFullView" />
-         </h2>
+      <div class="items" v-else-if="item.hasDigitalContent || hasExternalImages">
+         <h2>View online</h2>
+         <div class="buttons" v-if="!collection.isFullPageCollection && item.hasDigitalContent">
+            <VirgoButton size="small" severity="info" label="View Full Screen" @click="toggleFullView" />
+         </div>
          <div class="viewer" v-if="item.hasDigitalContent">
             <div v-if="fsView" class="restore-view">
-               <VirgoButton @click="toggleFullView" label="Restore View" />
+               <VirgoButton severity="info"  @click="toggleFullView" label="Exit full screen" />
             </div>
-            <iframe :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
+            <iframe class="curio" :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large">
@@ -24,63 +23,51 @@
             </div>
          </div>
 
-         <template v-if="poolMode=='image'">
-            <div v-if="details.related.length > 0" class="related">
-               <label>Related Images</label>
-               <router-link :to="relatedImageURL(r)"  @mousedown="relatedImageClicked(r)"
-                  v-for="r in details.related" :key="`r${r.id}`"
-               >
-                  <div class="img-wrap">
-                     <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
-                     <ImageAdvisory v-if="r.content_advisory" />
-                  </div>
-               </router-link>
+         <template v-if="poolMode=='image' && details.related.length > 0">
+            <h3>Related images</h3>
+            <div class="related">
+               <div class="img-wrap" v-for="r in details.related" :key="`r${r.id}`" @mousedown="relatedImageClicked(r)">
+                  <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
+                  <ImageAdvisory v-if="r.content_advisory" />
+               </div>
             </div>
          </template>
 
          <div v-else class="value">
             <template v-if="pdfContent.length > 0">
-               <div class='do-header'>{{pdfContent.length}} Digital Object<span v-if="pdfContent.length>1">s</span></div>
-               <ScrollPanel>
-                  <div class="hcontent">
-                     <div v-for="item in pdfContent" :key="item.pid"
-                        class="download-card" role="button"
-                        :class="{current: isCurrent(item)}"
-                        @click.stop="viewerClicked(item)"
-                     >
-                        <V4ProgressBar v-if="generatePDFInProgress(item)" :id="item.name"
-                           :style="{top: pdfTop(item)}"
-                           :percent="item.pdf.status" label="Generating PDF"
+               <h3 class='do-header'>{{pdfContent.length}} Digital object<span v-if="pdfContent.length>1">s</span></h3>
+               <Carousel :value="pdfContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions">
+                  <template #item="slotProps">
+                     <div class="download-card" :class="{current: isCurrent(slotProps.data)}" @click.stop="viewerClicked(slotProps.data)">
+                        <V4ProgressBar v-if="generatePDFInProgress(slotProps.data)" :id="slotProps.data.name"
+                           :style="{top: pdfTop(slotProps.data)}"
+                           :percent="slotProps.data.pdf.status" label="Generating PDF"
                         />
-                        <V4ProgressBar v-if="generateOCRInProgress(item)" :id="item.name"
-                           :style="{top: ocrTop(item)}"
-                           :percent="item.ocr.status" label="Extracting Text"
+                        <V4ProgressBar v-if="generateOCRInProgress(slotProps.data)" :id="slotProps.data.name"
+                           :style="{top: ocrTop(slotProps.data)}"
+                           :percent="slotProps.data.ocr.status" label="Extracting Text"
                         />
-                        <img v-if="item.thumbnail" :src="item.thumbnail"/>
-                        <span class="label">{{item.name}}</span>
-                        <span v-if="generatePDFInProgress(item)" class="label">PDF generating...</span>
-                        <VirgoButton text link label="Download PDF" @click="pdfClicked(item)"
-                           :aria-label="`download pdf for ${item.name}`" />
-                        <OCRRequest v-if="user.isSignedIn && item.ocr || item.ocr && item.ocr.status == 'READY'"
-                           :dcIndex="digitalContentIndex(item)"
-                           @ocr-started="ocrStarted(item)"
-                        />
-                        <span v-if="isCurrent(item)" class="opened">
-                           <i v-if="isCurrent(item)" class="fas fa-check-circle"></i>
-                           Opened in Viewer
-                        </span>
-                        <VirgoButton v-else text link label="Open in Viewer" @click="viewerClicked(item)"
-                           :aria-label="`open ${item.name} in viewer`" />
+                        <img v-if="slotProps.data.thumbnail" :src="slotProps.data.thumbnail"/>
+                        <div class="details">
+                           <span class="label">{{slotProps.data.name}}</span>
+                           <span v-if="generatePDFInProgress(slotProps.data)" class="label">PDF generating...</span>
+                           <VirgoButton text link label="Download PDF" @click="pdfClicked(slotProps.data)"
+                              :aria-label="`download pdf for ${slotProps.data.name}`" size="small"/>
+                           <OCRRequest v-if="user.isSignedIn && slotProps.data.ocr || slotProps.data.ocr && slotProps.data.ocr.status == 'READY'"
+                              :dcIndex="digitalContentIndex(slotProps.data)"
+                              @ocr-started="ocrStarted(slotProps.data)"
+                           />
+                           <span v-if="isCurrent(slotProps.data)" class="opened">
+                              <i v-if="isCurrent(slotProps.data)" class="fas fa-check-circle"></i>
+                              Opened in Viewer
+                           </span>
+                           <VirgoButton v-else text link label="Open in Viewer" @click="viewerClicked(slotProps.data)"
+                              :aria-label="`open ${slotProps.data.name} in viewer`" size="small"/>
+                        </div>
                      </div>
-                  </div>
-               </ScrollPanel>
+                  </template>
+               </Carousel>
             </template>
-         </div>
-
-         <div class="google" v-if="item.googleBooksURL">
-            <a :href="item.googleBooksURL" target="_blank" aria-label="google books preview">
-               <img alt="Google Books Preview" class="google-btn" src="//books.google.com/intl/en/googlebooks/images/gbs_preview_button1.gif"/>
-            </a>
          </div>
       </div>
    </div>
@@ -90,24 +77,50 @@
 import ImageAdvisory from "@/components/ImageAdvisory.vue"
 import V4ProgressBar from "@/components/V4ProgressBar.vue"
 import OCRRequest from "@/components/modals/OCRRequest.vue"
+import Carousel from 'primevue/carousel'
 import analytics from '@/analytics'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCollectionStore } from "@/stores/collection"
 import { useItemStore } from "@/stores/item"
 import { usePoolStore } from "@/stores/pool"
-import { useResultStore } from "@/stores/result"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
-import ScrollPanel from 'primevue/scrollpanel'
 
 const collection = useCollectionStore()
 const item = useItemStore()
 const poolStore = usePoolStore()
-const resultStore = useResultStore()
 const system = useSystemStore()
 const user = useUserStore()
 const route = useRoute()
+
+const responsiveOptions = ref([
+   {
+        breakpoint: '1400px',
+        numVisible: 6,
+        numScroll: 6
+    },
+    {
+      breakpoint: '1200px',
+      numVisible: 5,
+      numScroll: 5
+   },
+   {
+      breakpoint: '1000px',
+      numVisible: 4,
+      numScroll: 4
+   },
+   {
+      breakpoint: '767px',
+      numVisible: 3,
+      numScroll: 3
+   },
+   {
+      breakpoint: '500px',
+      numVisible: 2,
+      numScroll: 2
+   }
+]);
 
 const selectedDigitalObjectIdx = ref(0)
 const pdfTimerIDs = ref(new Map())
@@ -229,6 +242,7 @@ onMounted(()=>{
 function toggleFullView() {
    fsView.value = !fsView.value
 }
+
 function imageURL(size) {
    let iiifField = details.value.fields.find( f => f.name=="iiif_image_url")
    if (!iiifField) return ""
@@ -239,12 +253,15 @@ function imageURL(size) {
    }
    return [`${iiifField.value}/full/600,/0/default.jpg`]
 }
-function relatedImageURL( r ) {
-   return `/sources/${details.value.source}/items/${r.id}`
-}
-function relatedImageClicked( hit ) {
-   resultStore.hitSelected(hit.id)
-}
+
+const relatedImageClicked = ( async ( hit ) => {
+   const url =  `/sources/${item.details.source}/items/${hit.id}`
+   await item.getDetails( item.details.source, hit.id )
+   document.title = item.details.header.title
+   analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', hit.id)
+   history.replaceState(history.state, '', url)
+})
+
 function viewerClicked(tgtItem) {
    selectedDigitalObjectIdx.value = item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
    history.replaceState(history.state, '', "?idx="+selectedDigitalObjectIdx.value)
@@ -344,64 +361,9 @@ onUnmounted(()=>{
 </script>
 <style lang="scss" scoped>
 .digital-content {
-   width: 95%;
-   margin: 0 auto;
-   overflow: hidden;
-
-   .working {
-      text-align: center;
-      margin: 20px 0 30px 0;
-      font-size: 0.85em;
-   }
-
-   h2 {
-      color: var(--color-primary-orange);
-      text-align: center;
-      margin: 30px 0 30px 0;
-   }
-
-   div.viewer {
-      margin-bottom: 25px;
-      iframe.full {
-         position: fixed;
-         width: 100%;
-         top: 40px;
-         height: 100%;
-         left: 0;
-         z-index: 10000;
-      }
-      .restore-view {
-         position: fixed;
-         z-index: 20000;
-         right: 5px;
-         top: 100px;
-      }
-   }
-
-   .google {
-      margin-top: 25px;
-      img {
-         display:block;
-         margin: 0 auto;
-      }
-      .google-thumb {
-         border: 1px solid var(--uvalib-grey-light);
-         padding: 0;
-         border-radius: 3px;
-         margin-bottom: 15px;
-         box-shadow: var(--uvalib-box-shadow);
-      }
-   }
 
    div.items {
       margin: 25px 0 0 0;
-      h2.buttons {
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-         justify-content: flex-start;
-         gap: 10px;
-      }
 
       .download-card.current {
          border: 3px solid var(--uvalib-brand-blue-light);
@@ -409,15 +371,29 @@ onUnmounted(()=>{
       .download-card {
          position: relative;
          border: 1px solid var(--uvalib-grey-light);
-         padding: 15px 10px 10px 10px;
+         padding: 10px 5px 5px 5px;
+         margin: 5px;
          cursor: pointer;
-         min-width: 175px;
+         width: 100%;
          background: white;
-         display: flex;
-         flex-direction: column;
-         align-items: flex-start;
-         justify-content: flex-start;
-         gap: 10px;
+         border-radius: 4px;
+
+         img {
+            display: block;
+            margin: 0 auto;
+         }
+         .label {
+            text-align: center;
+         }
+
+         .details {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+         }
 
          &:hover {
             top: -2px;
@@ -427,7 +403,9 @@ onUnmounted(()=>{
             display: flex;
             flex-flow: row nowrap;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 5px;
+            font-size: 0.875rem;
             i {
                font-size: 1.25em;
                color: var(--uvalib-green);
@@ -435,6 +413,43 @@ onUnmounted(()=>{
          }
       }
    }
+
+   .working {
+      text-align: center;
+      margin: 20px 0 30px 0;
+   }
+
+   div.buttons {
+      padding-bottom: 10px;
+   }
+
+   div.viewer {
+      margin-bottom: 25px;
+      iframe.curio {
+         border: 1px solid var(--uvalib-grey-light);
+         border-radius: 5px;
+         background-image: url('@/assets/spinner2.gif');
+         background-repeat:no-repeat;
+         background-position: center center;
+      }
+      iframe.curio.full {
+         position: fixed;
+         width: 100%;
+         top: 60px;
+         height: 100%;
+         left: 0;
+         z-index: 10000;
+         border: none;
+         border-radius: 0;
+      }
+      .restore-view {
+         position: fixed;
+         z-index: 20000;
+         right: 5px;
+         top: 120px;
+      }
+   }
+
    .img-view {
       display: inline-block;
       margin: 0 auto;
@@ -455,20 +470,19 @@ onUnmounted(()=>{
       }
    }
 
+   h3 {
+      font-size: 1em;
+   }
+
    div.related {
-      width: 90%;
-      margin: 15px auto 0 auto;
-      text-align: left;
-      label {
-         padding:0 0 5px 0;
-         border-bottom: 2px solid var(--color-brand-blue);
-         margin-bottom: 10px;
-         display: block;
-         font-weight: 500;
-      }
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 10px;
+
       a {
          display: inline-block;
-         margin: 10px;
       }
       .img-wrap {
          position: relative;
@@ -486,26 +500,8 @@ onUnmounted(()=>{
       }
    }
 }
-.do-header {
-   background: #efefef;
-   border-top: 1px solid var(--uvalib-grey-light);
-   border-bottom: 1px solid var(--uvalib-grey-light);
-   padding: 10px 0;
-   text-align: center;
-}
-
-.hcontent {
-   display: flex;
-   flex-flow: row nowrap;
-   justify-content: flex-start;
-   align-items: stretch;
-   padding: 0;
-   margin-top: 15px;
-   gap: 10px;
-}
-
-:deep(.pdf) {
-   padding-top: 0 !important;
+h3.do-header {
+   margin: 35px 0 15px 0;
 }
 
 </style>

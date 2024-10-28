@@ -6,9 +6,9 @@
          <V4Spinner message="Looking up account details..."/>
       </div>
       <AccountRequestForm v-if="userStore.noILSAccount == true" />
-      <template v-if="userStore.hasAccountInfo">
+      <div v-if="userStore.hasAccountInfo" class="groups">
          <div class="account-group">
-            <h2>Virgo</h2>
+            <h3>Virgo</h3>
             <dl>
                <dt>Name</dt>
                <dd>{{info.displayName}} <span v-if="info.sirsiProfile && info.sirsiProfile.preferredName">({{info.sirsiProfile.preferredName}})</span></dd>
@@ -50,7 +50,7 @@
                <div v-if="systemStore.ilsError" class="standing-info">{{systemStore.ilsError}}</div>
 
                <div v-if="isBillOwed || userStore.totalFines>0" class="outstanding-bill">
-                  <h2 class="fines-head">Billing</h2>
+                  <h3 class="fines-head">Billing</h3>
                   <div class="fines-content">
                      <div class="notes">
                         Your account currently has an outstanding balance.
@@ -164,7 +164,7 @@
          </div>
 
          <div class="account-group" v-if="userStore.canUseLEO">
-            <h2>ILLiad</h2>
+            <h3>ILLiad</h3>
             <dl v-if="info.leoAddress">
                <dt>LEO Delivery Location:</dt>
                <dd>
@@ -180,7 +180,7 @@
          </div>
 
          <div class="account-group">
-            <h2>Special Collections</h2>
+            <h3>Special Collections</h3>
             <p class="sc">
                <a target="_blank" href="https://virginia.aeon.atlas-sys.com/logon" aria-label="Special Collections Account" >
                   Make Small Special Collections requests
@@ -189,7 +189,7 @@
             </p>
          </div>
 
-      </template>
+      </div>
    </div>
 </template>
 
@@ -237,21 +237,24 @@ onMounted(() =>{
    }
 }
 .account {
-   min-height: 400px;
    position: relative;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    text-align: left;
-   color: var(--color-primary-text);
+   padding-bottom: 50px;
+}
+.groups {
+   display: flex;
+   flex-direction: column;
+   gap: 25px;
 }
 .account-group {
-   border: 1px solid var(--uvalib-grey);
-   margin: 20px 0;
-   h2 {
+   border: 1px solid $uva-grey-100;
+   margin: 0;
+   h3 {
       padding: 12px;
       margin: 0;
-      background: var(--uvalib-grey-lightest);
-      color: var(--uvalib-grey-darkest);
-      border-bottom: 1px solid var(--uvalib-grey)
+      background: $uva-grey-200;
+      border-bottom: 1px solid $uva-grey-100;
    }
    dl {
       margin: 25px;
@@ -274,8 +277,8 @@ onMounted(() =>{
    }
    .fines-head {
       font-weight: bold;
-      border-bottom: 1px solid var(--uvalib-grey);
-      border-top: 1px solid var(--uvalib-grey);
+      border-bottom: 1px solid $uva-grey;
+      border-top: 1px solid $uva-grey;
       margin-bottom: 5px;
    }
    .fines-content {
@@ -334,7 +337,7 @@ div.bills, div.fines {
 div.bill, div.fine {
    margin: 10px 0;
    padding: 5px;
-   border: 1px solid var(--uvalib-grey);
+   border: 1px solid $uva-grey;
    border-radius: 5px;
 }
 table td {
@@ -354,7 +357,7 @@ div.notes p {
    margin-top: 35px;
  }
 .payment h3 {
-   border-bottom: 1px solid var(--uvalib-brand-blue);
+   border-bottom: 1px solid $uva-brand-blue;
 }
 .payment b {
    display: inline-block;
@@ -371,8 +374,8 @@ div.notes p {
     padding: 10px;
     margin: 15px 20px;
     border-radius: 5px;
-    color: var(--uvalib-text);
-    background-color: var(--uvalib-red-lightest);
+    color: $uva-text-color-dark;
+    background-color: $uva-red-100;
 }
 
 </style>

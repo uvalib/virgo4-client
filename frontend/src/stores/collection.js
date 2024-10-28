@@ -137,6 +137,9 @@ export const useCollectionStore = defineStore('collection', {
          })
       },
       async getCollectionContext(collection) {
+         // ehen paging thru a collection, the data will already be present. dont reload
+         if (this.title == collection) return
+
          const system = useSystemStore()
          this.lookingUp = true
          this.clearCollectionDetails()

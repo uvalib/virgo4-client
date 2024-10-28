@@ -2,7 +2,7 @@
    <transition name="message-transition"
          enter-active-class="animated faster fadeIn"
          leave-active-class="animated faster fadeOut">
-      <div v-if="showScrollTop" role="button"
+      <div v-if="showScrollTop && systemStore.hideScrollToTop == false" role="button"
          @click.stop="backToTop" tab-index="0" aria-label="scroll to top of page"
          class="scroll-to-top" :class="{mobile: smallScreen}"
       >
@@ -43,7 +43,7 @@ onMounted(() => {
    window.addEventListener("scroll", scrollChecker)
 }),
 onUnmounted(() => {
-      window.removeEventListener("scroll", scrollChecker)
+   window.removeEventListener("scroll", scrollChecker)
 })
 </script>
 
@@ -81,7 +81,7 @@ onUnmounted(() => {
    font-weight: 100;
    padding: 0px 12px;
    right: 5px;
-   bottom: 45px;
+   bottom: 5px;
    cursor: pointer;
 }
 .scroll-to-top:hover, .scroll-to-top.mobile:hover {

@@ -1,5 +1,5 @@
 <template>
-  <div class="notice">
+  <div class="notice" :class="{wide: props.wide==true}">
     <template v-if="props.type == 'research'">
       <p class="head">
         <strong>Important Copyright Information<br/>
@@ -37,15 +37,15 @@
         </p>
         <p>
           Materials which may be scanned for posting to Canvas for a course without obtaining copyright permissions:
-          <ul>
-              <li>One chapter from a book</li>
-              <li>One article from a journal issue</li>
-              <li>Government publications</li>
-              <li>Exams, homework solutions, lecture notes, etc., created by you</li>
-              <li>Anything for which you own the copyright</li>
-              <li>Anything in the public domain</li>
-          </ul>
         </p>
+        <ul>
+          <li>One chapter from a book</li>
+          <li>One article from a journal issue</li>
+          <li>Government publications</li>
+          <li>Exams, homework solutions, lecture notes, etc., created by you</li>
+          <li>Anything for which you own the copyright</li>
+          <li>Anything in the public domain</li>
+        </ul>
         <p>
           If you wish to go outside of these guidelines and you believe your use is fair, please consult our page about
           <a href="https://copyright.library.virginia.edu/user-rights-and-responsibilities/classroom-scanning/" target="_blank">copyright and instructional scanning</a>
@@ -77,17 +77,21 @@ const props = defineProps({
       validator: (value)=>{
         return ['instruction', 'research'].indexOf(value) !== -1
       }
+    },
+    wide: {
+      type: Boolean,
+      default: false
     }
 })
 </script>
 <style lang="scss" scoped>
 .notice {
-   font-size:0.95em;
+   font-size:0.9em;
    padding: 0;
    border: 1px solid var(--uvalib-red-emergency);
-   margin: 0;
+   margin: 0 auto;
    p {
-      margin: 10px 15px;
+      margin: 0;
    }
    p.head {
       margin: 0;
@@ -96,7 +100,23 @@ const props = defineProps({
       border-bottom: 1px solid var(--uvalib-red-emergency);
    }
    .content {
-     padding: 5px;
+     padding: 15px;
+     ul {
+      margin:0;
+    }
    }
+}
+.notice.wide {
+  width: auto;
+}
+@media only screen and (min-width: 768px) {
+  .notice {
+    width: 600px;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .notice {
+    width: auto;
+  }
 }
 </style>

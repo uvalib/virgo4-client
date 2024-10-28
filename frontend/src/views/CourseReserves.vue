@@ -77,8 +77,7 @@ onMounted(() => {
    min-height: 400px;
    position: relative;
    margin-top: 2vw;
-   color: var(--uvalib-grey-dark);
-   margin-bottom: 75px;
+   padding-bottom: 75px;
 }
 .working {
    text-align: center;
@@ -121,15 +120,14 @@ div.instructions {
   gap: 5px 10px;
 }
 .no-match {
-  color: var(--uvalib-text);
   text-align: center;
   font-size: 1.25em;
   margin: 15px;
 }
 .total {
    padding: 10px;
-   background: var(--uvalib-brand-blue);
-   border: 5px solid var(--uvalib-brand-blue);
+   background: $uva-brand-blue;
+   border: 5px solid $uva-brand-blue;
    color: white;
    cursor: pointer;
    font-weight: bold;

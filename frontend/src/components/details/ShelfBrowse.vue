@@ -4,18 +4,21 @@
          <V4Spinner message="Getting shelf browse data..." />
       </div>
       <nav aria-labelledby="shelf-title" v-if="!shelfStore.lookingUp && shelfStore.hasBrowseData">
-         <h2 id="shelf-title">Shelf Browse</h2>
+         <h2 id="shelf-title">Shelf browse</h2>
          <ul class="browse-cards" role="list">
             <li v-for="(b,idx) in shelfStore.browse" class="card-wrap" :key="`b${b.id}`">
+               <i class="current fas fa-caret-down" v-if="isCurrent(idx)"></i>
                <BrowseCard :current="isCurrent(idx)" :pool="props.pool" :data="b" style="height:100%"/>
             </li>
          </ul>
-         <router-link @click="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
-            View full page
-         </router-link>
-         <BrowsePager />
-         <div class="centered" v-if="!shelfStore.isOriginalItem">
-            <VirgoButton @click="browseRestore()">Return to {{currentCallNumber}}</VirgoButton>
+         <div class="browse-controls">
+            <router-link @click="fullScreenBrowseClicked" :to="browseURL" class="to-browse" >
+               View full page
+            </router-link>
+            <BrowsePager />
+            <VirgoButton  v-if="!shelfStore.isOriginalItem" class="recenter"
+               @click="browseRestore()" severity="info">Return to {{currentCallNumber}}
+            </VirgoButton>
          </div>
       </nav>
    </section>
@@ -28,6 +31,7 @@ import { computed, onMounted } from 'vue'
 import { useShelfStore } from "@/stores/shelf"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
+import { useSystemStore } from "@/stores/system"
 import analytics from '@/analytics'
 import { scrollToItem } from '@/utils'
 
@@ -43,6 +47,7 @@ const props = defineProps({
 })
 
 const shelfStore = useShelfStore()
+const system = useSystemStore()
 
 const currentCallNumber = computed(()=>{
    let f =  props.hit.fields.find( f => f.name == "call_number")
@@ -75,7 +80,16 @@ const getInitialBrowseData = ( async () => {
    const restore = useRestoreStore()
    const bookmarks = useBookmarkStore()
 
-   shelfStore.browseRange = 3
+   if ( system.displayWidth <= 520 ) {
+      shelfStore.browseRange = 1
+   } else if ( system.displayWidth <= 1000 ) {
+      shelfStore.browseRange = 2
+   } else if ( system.displayWidth <= 1280 ) {
+      shelfStore.browseRange = 3
+   } else {
+      shelfStore.browseRange = 4
+   }
+
    let tgt = props.hit.identifier
 
    let newBM = null
@@ -108,21 +122,17 @@ onMounted(()=>{
 
 <style lang="scss" scoped>
 .shelf-browse {
-   width: 95%;
-   margin: 0 auto;
-
    .working {
       text-align: center;
       margin: 20px 0 30px 0;
-      font-size: 0.85em;
    }
-
    .center {
       text-align: centter;
    };
 
    .browse-cards {
-      padding: 5px 0;
+      padding: 0;
+      margin: 0;
       display: flex;
       flex-flow: row nowrap;
       overflow: hidden;
@@ -131,14 +141,25 @@ onMounted(()=>{
       list-style-type: none;
       gap: 10px;
       .card-wrap {
-         width: 190px;
+         position: relative;
+         padding-top: 15px;
+         i.current {
+            position: absolute;
+            top: -22px;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+            color: var(--uvalib-brand-blue-light);
+            font-size: 3em;
+         }
       }
    }
-
-   h2 {
-      margin: 50px 0 10px 0;
-      color: var(--color-primary-orange);
+   .browse-controls  {
+      margin: 20px 0 0 0;
       text-align: center;
+      .recenter {
+         margin-top: 10px;
+      }
    }
 }
 </style>

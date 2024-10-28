@@ -7,17 +7,17 @@
          :invert="!startExpanded">
          <template v-slot:title>{{poolFilterTitle}}</template>
 
-         <div v-if="!hasFacets" class="no-facets">
-            {{resultStore.selectedResults.pool.name}} does not support filtering
+         <div v-if="!hasFacets" class="body">
+            <div class="no-facets">{{resultStore.selectedResults.pool.name}} does not support filtering</div>
          </div>
          <div v-else class="body">
             <div v-if="filterStore.updatingFacets" class="working">
                <V4Spinner message="Loading filters..."/>
             </div>
-            <div v-if="facets.length == 0" class="no-facets">
+            <div v-else-if="facets.length == 0" class="no-facets">
                Filters are not available for this search
             </div>
-            <dl v-else-if="filterStore.updatingFacets == false">
+            <dl v-else="filterStore.updatingFacets == false">
                <template v-for="facetInfo in facets" :key="facetInfo.id">
                   <dt :id="facetInfo.id">{{facetInfo.name}}</dt>
                   <div role="group" :aria-labelledby="facetInfo.id">
@@ -133,13 +133,13 @@ async function filterChanged(facetID, facetValue) {
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;
-   box-shadow: var(--uvalib-box-shadow);
    height: fit-content;
 
    .pool-filter-header, .filter {
       width: 100%;
    }
    .body {
+      border: 1px solid $uva-grey-100;
       border-top: 0;
       text-align: left;
       padding: 0;
@@ -159,11 +159,9 @@ div.no-facets {
    text-align: center;
    margin:25px 5px;
    font-size: 1.25em;
-   color: var(--uvalib-text);
 }
 dl  {
    margin: 0;
-   color: var(--uvalib-text-dark);
 }
 dt {
    font-weight: bold;
@@ -184,22 +182,8 @@ dd {
    font-weight: normal;
    gap: 15px;
 }
-i.check {
-   color: var(--uvalib-text);
-   font-size: 1.2em;
-}
 .working {
-   color: var(--uvalib-text);
    text-align: center;
-   background: white;
-   position: absolute;
-   left: 0;
-   right: 0;
-   padding: 25px 15px;
-   bottom: 0;
-   top: 0;
-   font-size: 1.25em;
-   font-weight: bold;
 }
 .expanded-item {
    padding: 3px 0;

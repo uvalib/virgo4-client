@@ -1,0 +1,49 @@
+$uva-brand-blue-300: #87B9D9;    // --uvalib-brand-blue-lightest
+$uva-brand-blue-200: #3395D4;    // --uvalib-brand-blue-lighter
+$uva-brand-blue-100: #0370B7;    // --uvalib-brand-blue-light, --uvalib-accessibility-highlight
+$uva-brand-blue: #232D4B;        // --uvalib-brand-blue
+
+$uva-brand-orange-300: #FFEAD6;  // --uvalib-brand-orange-lightest
+$uva-brand-orange-200: #FFC999;
+$uva-brand-orange-100: #FFB370;
+$uva-brand-orange: #E57200;      // --uvalib-brand-orange
+$uva-brand-orange-A: #B35900;    // --uvalib-brand-orange-dark
+$uva-brand-orange-B: #854200;
+
+$uva-blue-alt-400: #E6F2F7;
+$uva-blue-alt-300: #BFE7F7;      // --uvalib-blue-alt-light
+$uva-blue-alt-200: #91D8F2;      // --uvalib-blue-alt-med
+$uva-blue-alt-100: #55C4EC;
+$uva-blue-alt: #007BAC;          // --uvalib-blue-alt
+$uva-blue-alt-A: #005679;        // --uvalib-blue-alt-dark, --color-link
+$uva-blue-alt-B: #141E3C;        // --uvalib-blue-alt-darkest
+
+$uva-teal-200: #C8F2F4;          //  --uvalib-teal-lightest
+$uva-teal-100: #5BD7DE;          //  --uvalib-teal-light
+$uva-teal: #25CAD3;              //  --uvalib-teal
+$uva-teal-A: #1DA1A8;            //  --uvalib-teal-dark
+$uva-teal-B: #16777C;            //  --uvalib-teal-darkest
+
+$uva-green-200: #DDEFDC;
+$uva-green-100: #89CC74;
+$uva-green: #62BB46;
+$uva-green-A: #4E9737;           // --uvalib-green-dark
+
+$uva-red-100: #FBCFDA;           // --uvalib-red-lightest
+$uva-red: #EF3F6B;               // --uvalib-red
+$uva-red-A: #DF1E43;             // --uvalib-red-emergency
+$uva-red-B: #B30000;             // --uvalib-red-darker
+
+$uva-yellow-100: #FEF6C8;        // --uvalib-yellow-light
+$uva-yellow: #ECC602;            // --uvalib-yellow
+$uva-yellow-A: #B99C02;          // --uvalib-yellow-dark
+
+$uva-grey-200: #F1F1F1;          // --uvalib-grey-lightest
+$uva-grey-100: #DADADA;          // --uvalib-grey-light
+$uva-grey-50: #ADADAD;
+$uva-grey: #808080;              // --uvalib-grey
+$uva-grey-A: #4F4F4F;
+$uva-grey-B: #2B2B2B;            // --uvalib-grey-darkest
+
+$uva-text-color-base: $uva-grey-A; // e.g. body text
+$uva-text-color-dark: $uva-grey-B; // e.g. button text

@@ -266,14 +266,16 @@ span.info {
 .searches {
    min-height: 400px;
    position: relative;
-   color: var(--color-primary-text);
+   padding-bottom: 50px;
+   margin: 0 auto;
+   text-align: center;
+   .details {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+   }
 }
 
-div.searches {
-   width: 60%;
-   margin: 2vw auto 0 auto;
-   text-align: center;
-}
 @media only screen and (min-width: 768px) {
    div.searches {
       width: 60%;
@@ -303,7 +305,7 @@ div.saved-search {
    }
 }
 div.row {
-   border-bottom: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid $uva-grey-100;
    margin-bottom: 5px;
    padding-bottom: 5px;
    label.cb-label {
@@ -319,15 +321,6 @@ div.row {
       gap: 10px;
    }
 }
-span.icon i.fal {
-   color: var(--uvalib-text);
-   margin-right: 15px;
-   margin-top: 2px;
-   padding: 0;
-}
-.details {
-   margin-bottom: 35px;
-}
 span.num {
   font-weight: bold;
   margin-right: 15px;
@@ -335,7 +328,7 @@ span.num {
   width: 30px;
   text-align: right;
   line-height: 1.5em;
-  color: var(--uvalib-grey);
+  color:$uva-grey;
 }
 .controls {
    padding: 10px 0;
@@ -348,11 +341,11 @@ span.num {
       margin: 10px 0;
    }
    .rss-url  {
-      background:  var(--uvalib-grey-lightest);
+      background:  $uva-grey-200;
       padding: 5px 10px;
       margin: 0 0 20px 0;
-      border-bottom: 1px solid  var(--uvalib-grey-light);
-      border-top: 1px solid  var(--uvalib-grey-light);
+      border-bottom: 1px solid  $uva-grey-100;
+      border-top: 1px solid  $uva-grey-100;
       -webkit-user-select: all; /* for Safari */
       user-select: all;
       word-break: break-all;
@@ -362,7 +355,7 @@ span.num {
    .rss-message {
       margin-right: auto;
       margin-left: 30%;
-      color: var(--uvalib-green-dark);
+      color: $uva-green-A;
       font-weight: bold;
       margin-top: 4px;
    }

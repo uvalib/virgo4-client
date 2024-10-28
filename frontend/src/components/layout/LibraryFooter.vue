@@ -36,7 +36,8 @@
                <li><a href="https://www.library.virginia.edu/renovation/">Renovation</a></li>
                <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
                <li class="give-library">
-                  <VirgoButton @click="giveClicked" severity="contrast">GIVE TO THE LIBRARY</VirgoButton>
+                  <VirgoButton as="a" label="GIVE TO THE LIBRARY" href="https://www.library.virginia.edu/support-library"
+                     target="_blank" severity="contrast"/>
                </li>
             </ul>
          </div>
@@ -96,9 +97,6 @@ const systemStore = useSystemStore()
 const feedbackURL =(() => {
    return encodeURIComponent(window.location.href)
 })
-const giveClicked = (() => {
-   window.location.href = "https://www.library.virginia.edu/support-library"
-})
 </script>
 
 <style scoped lang="scss">
@@ -106,7 +104,7 @@ footer {
    border-bottom: none;
    border-left: none;
    border-right: none;
-   background-color: var(--uvalib-brand-blue);
+   background-color: $uva-brand-blue;
    color: white;
    padding: 20px 20px 0 20px;
 
@@ -117,8 +115,8 @@ footer {
 }
 
 .pre-footer {
-   background-color: var(--uvalib-teal-lightest);
-   color: var(--uvalib-text-dark);
+   background-color: $uva-teal-200;
+   color: $uva-text-color-dark;
    padding: 5px 20px;
    margin: -20px -20px 0 -20px;
 }
@@ -133,6 +131,17 @@ footer {
 
 .footer-bucket {
    text-align: left;
+   a {
+      color: white;
+   }
+   i {
+      font-size: 26px;
+      padding-right: 10px;
+      &:hover {
+         color: white;
+         text-decoration: underline;
+      }
+   }
 }
 
 ul {
@@ -144,19 +153,6 @@ ul li {
    padding-bottom: 14px;
 }
 
-.footer-bucket a {
-   color: var(--uvalib-brand-blue-lightest) !important;
-}
-
-.footer-bucket i {
-   font-size: 26px;
-   padding-right: 10px;
-}
-
-.footer-bucket i:hover {
-   color: white;
-}
-
 address {
    margin-top: 25px;
 }
@@ -164,14 +160,10 @@ address {
 .give-library {
    font-size: 1.2em;
    margin-top: 25px;
-
-   button {
-      font-weight: bold;
-   }
 }
 
 .footer-post-container {
-   background-color: var(--uvalib-blue-alt-darkest);
+   background-color: $uva-blue-alt-B;
    color: white;
    padding: 20px 110px;
    margin-left: -20px;

@@ -62,7 +62,7 @@ function iiifURL(item) {
    align-items: stretch;
    position: relative;
    width: fit-content;
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
 
    .toolbar {
       padding: 10px 5px 10px 10px;
@@ -73,7 +73,7 @@ function iiifURL(item) {
       align-items: center;
       height: 100%;
       gap: 10px;
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      border-bottom: 1px solid $uva-grey-100;
       cursor: default;
    }
 
@@ -100,12 +100,12 @@ function iiifURL(item) {
    .metadata-content {
       padding: 10px;
       background: white;
-      color: var(--uvalib-text);
+      color: $uva-text-color-base;
       font-weight: normal;
       display: inline-block;
       width: 100%;
       box-sizing: border-box;
-      border-top: 1px solid var(--uvalib-grey-light);
+      border-top: 1px solid $uva-grey-100;
    }
 }
 

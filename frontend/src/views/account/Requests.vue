@@ -4,7 +4,7 @@
       <AccountActivities  v-if="userStore.isSignedIn"/>
       <div class="details" v-if="userStore.isSignedIn">
          <template v-if="!userStore.noILSAccount && !userStore.isBarred">
-            <h2>Make a New Request</h2>
+            <h3>Make a New Request</h3>
             <div v-if="!userStore.isUVA">
                <!-- No ILL requests for community borrowers  -->
             </div>
@@ -22,13 +22,13 @@
             </div>
 
             <template v-if="request">
-               <ILLBorrowAV v-if="request == 'ILLBorrowAV'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
-               <ILLBorrowItem v-if="request == 'ILLBorrowItem'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
-               <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
-               <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted" class="form-panel"/>
+               <ILLBorrowAV v-if="request == 'ILLBorrowAV'" @canceled="cancelRequest" @submitted="requestSubmitted" />
+               <ILLBorrowItem v-if="request == 'ILLBorrowItem'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+               <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
+               <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
             </template>
 
-            <h2>Outstanding Requests</h2>
+            <h3 class="gap">Outstanding Requests</h3>
          </template>
          <div class="subcontent">
             <div class="working" v-if="userStore.lookingUp && userStore.isSignedIn">
@@ -40,9 +40,8 @@
             <template v-if="userStore.lookingUp == false && !systemStore.ilsError && userStore.requests.holds.length > 0">
                <AccordionContent
                      class="requests-accordion"
-                     background="var(--uvalib-blue-alt-lightest)"
                      borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-blue-alt)"
+                     borderColor="#007BAC"
                      id="ils-holds"
                >
                   <template v-slot:title><span class="section-title">UVA Holds</span></template>
@@ -78,9 +77,8 @@
             <template v-if="userStore.lookingUp == false && illLoans.length > 0">
                <AccordionContent
                      class="requests-accordion"
-                     background="var(--uvalib-blue-alt-lightest)"
                      borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-blue-alt)"
+                     borderColor="#007BAC"
                      id="ill-holds"
                >
                   <template v-slot:title><span class="section-title">ILL Loan</span></template>
@@ -107,9 +105,8 @@
             <template v-if="userStore.lookingUp == false && digitalRequests.length > 0">
                <AccordionContent
                      class="requests-accordion"
-                     background="var(--uvalib-blue-alt-lightest)"
                      borderWidth="0 0 3px 0"
-                     borderColor="var(--uvalib-blue-alt)"
+                     borderColor="#007BAC"
                      id="ill-holds"
                >
                   <template v-slot:title><span class="section-title">Digital Delivery Requests</span></template>
@@ -335,19 +332,17 @@ onMounted(() =>{
 .requests {
    min-height: 400px;
    position: relative;
-   color: var(--color-primary-text);
-   width: 80%;
-   margin: 2vw auto 0 auto;
+   margin: 0 auto;
    position: relative;
    text-align: left;
 
-   h2 {
+   h3 {
       margin: 10px 0 5px 0;
       font-size: 1.25em;
       border-bottom: 1px solid;
    }
-   .form-panel {
-      border: 1px solid var(--uvalib-blue-alt);
+   h3.gap {
+      margin: 25px 0 5px 0;
    }
    .subcontent {
       margin-bottom: 0px;
@@ -373,8 +368,8 @@ onMounted(() =>{
       padding: 10px;
       margin: 15px 0;
       border-radius: 5px;
-      color: var(--uvalib-text);
-      background-color: var(--uvalib-red-lightest);
+      color: $uva-text-color-dark;
+      background-color: $uva-red-100;
    }
 
    .working {
@@ -401,25 +396,6 @@ onMounted(() =>{
       font-weight: bold;
       font-size:1.15em;
       padding: 5px;
-   }
-
-   .request-list {
-      background-color: var(--uvalib-grey-lightest);
-      border: 1px solid var(--uvalib-grey-light);
-
-      .request {
-         font-size: 0.9em;
-         margin:15px;
-         border: 1px solid var(--uvalib-grey-lightest);
-         background: white;
-         padding: 5px 10px;
-
-         h3 {
-            margin: 0 0 15px 0;
-            padding: 10px;
-            border-bottom: 2px solid var(--uvalib-grey-light);
-         }
-      }
    }
 }
 

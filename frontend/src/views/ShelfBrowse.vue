@@ -17,9 +17,9 @@
             </div>
          </div>
          <div class="browse-controls full">
-            <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="previous shelf" icon="fal fa-arrow-left" label="Previous"/>
+            <VirgoButton :disabled="!shelfStore.hasPriorItem" @click="browsePrior()" aria-label="previous shelf" label="Previous" severity="secondary"/>
             <span class="range" aria-live="polite"><b>CATALOG RANGE:</b>{{firstCall}}&nbsp;-&nbsp;{{lastCall}}</span>
-            <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()" aria-label="next shelf" icon="fal fa-arrow-right" label="Next" iconPos="right"/>
+            <VirgoButton :disabled="!shelfStore.hasNextItem" @click="browseNext()" aria-label="next shelf" label="Next" severity="secondary"/>
          </div>
          <div class="view-mode">
             <Select v-model="currViewMode" :options="viewModes" optionLabel="label" optionValue="code">
@@ -118,7 +118,6 @@ onMounted( async ()=>{
    position: relative;
    margin-top: 2vw;
    margin-bottom: 10vh;
-   color: var(--color-primary-text);
    width: 100%;
    margin: 0 auto;
 
@@ -193,7 +192,7 @@ onMounted( async ()=>{
       margin: 0 auto;
    }
    .browse-controls.full {
-      background-color: var(--uvalib-grey-lightest);
+      background-color: #fafafa;
    }
    .browse-cards {
       grid-template-columns: repeat(4, 200px);

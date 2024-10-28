@@ -1,10 +1,10 @@
 <template>
    <div class="libary-admin">
-      <h2>
+      <h3>
          <span>PDA Dashboard</span>
-      </h2>
+      </h3>
       <div class="content form" >
-         <h3>Order History</h3>
+         <h4>Order History</h4>
          <p class="error" v-html="pdaStore.error" v-if="pdaStore.error"></p>
          <div class="pager">
             <VirgoButton class="pager" severity="secondary" @click="pdaStore.getOrders(pdaStore.pagination.prev_page)" :disabled="!pdaStore.pagination.prev_page">Prev</VirgoButton>
@@ -12,26 +12,28 @@
             <VirgoButton class="pager" severity="secondary" @click="pdaStore.getOrders(pdaStore.pagination.next_page)" :disabled="!pdaStore.pagination.next_page">Next</VirgoButton>
          </div>
          <table>
-            <tr>
-               <th>Created At</th>
-               <th>Ordered By</th>
-               <th>Hold Library</th>
-               <th>Fund Code</th>
-               <th>Loan Type</th>
-               <th>Barcode</th>
-               <th>Order Number</th>
-               <th class="wide">Title</th>
-            </tr>
-            <tr v-for="o in pdaStore.orders" :key="o.barcode">
-               <td style="width:max-content;">{{convertTZ(o.created_at)}}</td>
-               <td>{{o.computing_id}}</td>
-               <td>{{o.hold_library}}</td>
-               <td>{{o.fund_code}}</td>
-               <td>{{o.loan_type}}</td>
-               <td>{{o.barcode}}</td>
-               <td>{{o.vendor_order_number}}</td>
-               <td class="wrap">{{o.title}}</td>
-            </tr>
+            <tbody>
+               <tr>
+                  <th>Created At</th>
+                  <th>Ordered By</th>
+                  <th>Hold Library</th>
+                  <th>Fund Code</th>
+                  <th>Loan Type</th>
+                  <th>Barcode</th>
+                  <th>Order Number</th>
+                  <th class="wide">Title</th>
+               </tr>
+               <tr v-for="o in pdaStore.orders" :key="o.barcode">
+                  <td style="width:max-content;">{{convertTZ(o.created_at)}}</td>
+                  <td>{{o.computing_id}}</td>
+                  <td>{{o.hold_library}}</td>
+                  <td>{{o.fund_code}}</td>
+                  <td>{{o.loan_type}}</td>
+                  <td>{{o.barcode}}</td>
+                  <td>{{o.vendor_order_number}}</td>
+                  <td class="wrap">{{o.title}}</td>
+               </tr>
+            </tbody>
          </table>
          <p>{{pdaStore.pagination.total_count}} total orders</p>
       </div>
@@ -55,7 +57,7 @@ function convertTZ(date) {
 
 <style lang="scss" scoped>
 .libary-admin {
-   h2 {
+   h3 {
       margin: 0;
       padding: 10px 15px;
       background: var(--uvalib-grey-lightest);
