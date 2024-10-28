@@ -33,7 +33,7 @@ function homeClicked() {
 
 <style scoped lang="scss">
 div.header {
-   background-color: var(--uvalib-brand-blue);
+   background-color: $uva-brand-blue;
    color: white;
    padding: 1vw 20px;
    text-align: left;

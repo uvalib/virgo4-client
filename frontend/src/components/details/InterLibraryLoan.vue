@@ -152,18 +152,18 @@ onMounted(()=>{
       .content {
          flex: 1;
          padding: 5px 30px 25px 25px;
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          border-radius:  0 5px  5px 0;
          border-left: 0;
          h3 {
             font-size: 1.15em;
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--uvalib-grey-light);
+            border-bottom: 1px solid $uva-grey-100;
             margin-bottom: 10px;
          }
          .message {
             padding: 0 0 15px 0;
-            border-bottom: 1px solid var(--uvalib-grey-light);
+            border-bottom: 1px solid $uva-grey-100;
             margin-bottom: 25px;
          }
       }
@@ -198,7 +198,7 @@ onMounted(()=>{
    }
 
    div.request-content {
-      border: 1px solid var(--uvalib-grey-light);
+      border: 1px solid $uva-grey-100;
       margin-top: 25px;
       padding: 20px;
       position: relative;

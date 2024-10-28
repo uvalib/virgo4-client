@@ -366,11 +366,11 @@ onUnmounted(()=>{
       margin: 25px 0 0 0;
 
       .download-card.current {
-         border: 3px solid var(--uvalib-brand-blue-light);
+         border: 3px solid $uva-brand-blue-100;
       }
       .download-card {
          position: relative;
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          padding: 10px 5px 5px 5px;
          margin: 5px;
          cursor: pointer;
@@ -408,7 +408,7 @@ onUnmounted(()=>{
             font-size: 0.875rem;
             i {
                font-size: 1.25em;
-               color: var(--uvalib-green);
+               color: $uva-green;
             }
          }
       }
@@ -426,7 +426,7 @@ onUnmounted(()=>{
    div.viewer {
       margin-bottom: 25px;
       iframe.curio {
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          border-radius: 5px;
          background-image: url('@/assets/spinner2.gif');
          background-repeat:no-repeat;

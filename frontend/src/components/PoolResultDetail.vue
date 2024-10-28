@@ -223,6 +223,6 @@ div.pool-header {
 .expand-panel {
    margin: 0px 0 25px 0;
    box-shadow: var(--uvalib-box-shadow);
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
 }
 </style>

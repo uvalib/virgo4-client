@@ -169,7 +169,7 @@ div.title {
 .viewer {
    margin-top:35px;
    iframe {
-      border: 1px solid var(--uvalib-grey-light);
+      border: 1px solid $uva-grey-100;
       background-image: url('@/assets/spinner2.gif');
       background-repeat:no-repeat;
       background-position: center 25%;

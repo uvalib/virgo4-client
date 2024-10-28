@@ -43,7 +43,7 @@ p.group-header {
 
    .card {
       font-size: 0.9em;
-      border: 1px solid var(--uvalib-grey-light);
+      border: 1px solid $uva-grey-100;
       max-width: 350px;
       background: white;
       padding: 15px;
@@ -65,7 +65,7 @@ p.group-header {
          font-size: 1em;
          font-weight: bold;
          padding-bottom: 15px;
-         border-bottom: 1px solid var(--uvalib-grey-light);
+         border-bottom: 1px solid $uva-grey-100;
       }
 
       p {

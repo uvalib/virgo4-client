@@ -109,7 +109,7 @@ const detailClicked = (() => {
       .count {
          display: inline-block;
          font-size: 0.7em;
-         color: var( --uvalib-grey );
+         color: $uva-grey;
       }
    }
 }

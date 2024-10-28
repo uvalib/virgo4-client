@@ -99,7 +99,7 @@ const poolSkipped = ((p) => {
    }
    &:hover {
       background: #f6f6f6;
-      border-color: var(--uvalib-grey-light);
+      border-color: $uva-grey-100;
    }
 }
 .p-select.p-component.active {

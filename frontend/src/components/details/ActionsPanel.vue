@@ -137,7 +137,7 @@ const pdfClicked= ( async() => {
          flex-flow: row wrap;
          align-items: center;
          padding: 10px 30px 10px 20px;
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          border-radius:  0 5px  5px 0;
          border-left: 0;
          gap: 40px;

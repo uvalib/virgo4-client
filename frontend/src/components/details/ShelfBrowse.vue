@@ -149,7 +149,7 @@ onMounted(()=>{
             width: 100%;
             text-align: center;
             z-index: 1;
-            color: var(--uvalib-brand-blue-light);
+            color: $uva-brand-blue-100;
             font-size: 3em;
          }
       }

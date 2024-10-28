@@ -30,7 +30,7 @@ const beautifiedXML = computed(() => {
 <style lang="scss" scoped>
 .xml {
    font-weight: normal;
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
    padding: 10px;
    margin: 0;
    white-space: pre-wrap;       /* Since CSS 2.1 */

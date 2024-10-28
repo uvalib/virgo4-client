@@ -126,7 +126,7 @@ p.error {
    }
 }
 .scroller {
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
    .section-name {
       border-bottom: 1px solid var(--uvalib-grey);
       margin: 5px;

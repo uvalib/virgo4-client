@@ -202,8 +202,8 @@ onMounted(()=>{
       gap: 10px;
       padding: 15px;
       margin: 0;
-      background: var(--uvalib-grey-lightest);
-      border: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border: 1px solid $uva-grey-100;
       width: 100%;
       box-sizing: border-box;
       border-radius: 5px;
@@ -215,11 +215,11 @@ onMounted(()=>{
          background: none;
          .remove {
             font-size: 1.5em;
-            color: var(--uvalib-red-emergency);
+            color: $uva-red-A;
             margin: 0;
             padding: 0;
             &:hover {
-               color: var(--uvalib-red);
+               color: $uva-red;
             }
          }
       }

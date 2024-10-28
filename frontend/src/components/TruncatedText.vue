@@ -103,8 +103,8 @@ const toggle = (() => {
       box-sizing: border-box;
       border-radius: 4px;
       &:focus {
-         outline: 1px dashed var(--uvalib-accessibility-highlight);
-         outline-offset: 2px;
+         outline: 2px dotted $uva-brand-blue-100;
+         outline-offset: 5px;
       }
    }
 

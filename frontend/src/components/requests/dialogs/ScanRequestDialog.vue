@@ -176,6 +176,6 @@ const dialogClosed = (() =>{
 .scan-use-note {
    padding:5px 0 10px 0;
    font-size: 0.85em;
-   border-bottom: 1px solid var(--uvalib-grey-light);
+   border-bottom: 1px solid $uva-grey-100;
 }
 </style>

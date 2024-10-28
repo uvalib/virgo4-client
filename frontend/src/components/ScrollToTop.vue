@@ -47,17 +47,17 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .scroll-to-top {
    display: flex;
    flex-basis: auto;
    flex-direction: column;
    position: fixed;
    background-color: white;
-   color: var(--uvalib-brand-orange);
+   color: $uva-brand-orange;
    font-size: 2.9em;
    font-weight: 100;
-   border: 2px solid var(--uvalib-brand-orange);
+   border: 2px solid $uva-brand-orange;
    border-radius: 50%;
    cursor: pointer;
    align-items: center;
@@ -71,21 +71,21 @@ onUnmounted(() => {
    width: 56px;
    height: 56px;
    z-index: 9999;
+   &:hover {
+      color: white;
+      background-color: $uva-brand-orange;
+   }
 }
 .scroll-to-top.mobile {
    position: fixed;
    background-color: white;
-   color: var(--uvalib-brand-orange);
-   border: 3px solid var(--uvalib-brand-orange);
+   color: $uva-brand-orange;
+   border: 3px solid $uva-brand-orange;
    font-size: 2em;
    font-weight: 100;
    padding: 0px 12px;
    right: 5px;
    bottom: 5px;
    cursor: pointer;
-}
-.scroll-to-top:hover, .scroll-to-top.mobile:hover {
-  color: white;
-  background-color: var(--uvalib-brand-orange);
 }
 </style>

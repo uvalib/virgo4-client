@@ -68,13 +68,13 @@ const messageParts = (() => {
 <style lang="scss">
 div.availability-info {
    .icon {
-      color: var(--uvalib-red);
+      color: $uva-red;
       margin-left: 10px;
    }
 }
 div.avail-message-panel {
    padding: 0;
-   background: var(--uvalib-blue-alt-light);
+   background: $uva-blue-alt-300;
    max-width: 400px;
    font-size: 0.9em;;
 

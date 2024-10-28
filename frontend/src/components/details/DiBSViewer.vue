@@ -81,7 +81,7 @@ if (selectList.length == 1) {
       .content {
          flex: 1;
          padding: 0 20px 25px 20px;
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          border-radius:  0 5px  5px 0;
 
          .reader-header {
@@ -91,21 +91,21 @@ if (selectList.length == 1) {
          iframe {
             width: 100%;
             height: 80vh;
-            border: 1px solid var(--uvalib-grey-lightest);
+            border: 1px solid $uva-grey-200;
             outline: 0;
             border-radius: 5px;
-            background-color: var(--uvalib-grey-lightest);
+            background-color: $uva-grey-200;
          }
 
          h3 {
             font-size: 1.15em;
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--uvalib-grey-light);
+            border-bottom: 1px solid $uva-grey-100;
          }
 
          .message {
             padding: 0 0 15px 0;
-            border-bottom: 1px solid var(--uvalib-grey-light);
+            border-bottom: 1px solid $uva-grey-100;
             margin-bottom: 25px;
          }
       }

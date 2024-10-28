@@ -2,10 +2,11 @@
    <div class="filter-sidebar" :class="{overlay: !startExpanded}" v-if="resultStore.hasResults == false && !resultStore.searching">
       <div class="filters">
           <AccordionContent
-            background="var(--uvalib-brand-blue)"
+            :background=colors.brandBlue
             borderWidth="1px"
-            color="white" :expanded="startExpanded"
-            borderColor="var(--uvalib-brand-blue)"
+            color="white"
+            :expanded="startExpanded"
+            :borderColor=colors.brandBlue
             :invert="!startExpanded">
             <template v-slot:title>Filters</template>
             <div class="body">
@@ -15,7 +16,7 @@
 
                <template v-else v-for="filterInfo in filters.preSearchFilters.filter( f=> f.hidden !== true)" :key="filterInfo.id">
                   <AccordionContent
-                     background="var(--uvalib-grey-lightest)"
+                     :background=colors.grey200
                      borderWidth="1px"
                   >
                      <template v-slot:title>
@@ -42,6 +43,7 @@ import { computed } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
+import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
 
 const resultStore = useResultStore()
@@ -111,7 +113,7 @@ const filterToggled = ((facetID, facetValue) => {
 
    .filters {
       .body {
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          border-top: 0;
          text-align: left;
          padding: 10px;
@@ -136,7 +138,7 @@ const filterToggled = ((facetID, facetValue) => {
    align-items: center;
    justify-content: flex-start;
    font-weight: normal;
-   border: 1px solid var(--uvalib-grey-lightest);
+   border: 1px solid $uva-grey-200;
    border-top: 0;
    gap: 10px;
    span.cnt {

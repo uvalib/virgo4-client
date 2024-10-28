@@ -102,7 +102,7 @@ const okClicked = ( async () => {
    overflow-y: scroll;
    max-height: 150px;
    margin: 15px 0 10px 0;
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
    background: white;
    padding: 10px 15px;
    overflow-y: scroll;

@@ -89,7 +89,7 @@ onMounted(()=>{
       background: var(--uvalib-grey-lightest);
       padding: 5px 15px;
       border-radius: 5px;
-      border: 1px solid var(--uvalib-grey-light);
+      border: 1px solid $uva-grey-100;
       .addy {
          margin-left: 20px;
       }

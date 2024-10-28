@@ -149,8 +149,8 @@ const dibsItems = computed(()=>{
       align-items: flex-start;
       gap: 10px;
       padding: 15px 0;
-      border-bottom: 1px solid var(--uvalib-grey-light);
-      border-top: 1px solid var(--uvalib-grey-light);
+      border-bottom: 1px solid $uva-grey-100;
+      border-top: 1px solid $uva-grey-100;
       margin-bottom: 30px;
       .avail-message {
          display: flex;

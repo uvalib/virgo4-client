@@ -308,7 +308,6 @@ h2 {
 }
 .info {
    margin: 15px 0;
-   border-top: 4px solid var(--color-brand-blue);
 }
 dl.fields {
    grid-template-columns: max-content 2fr;

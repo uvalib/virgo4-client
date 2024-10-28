@@ -27,32 +27,32 @@ const props = defineProps({
 <style lang="scss" scoped>
 .v4-progress-bar {
    background: #f5f5f5;
-   border: 1px solid var(--uvalib-grey-light);
-   border-radius: 5px;
+   border: 1px solid $uva-grey-100;
+   border-radius: 4px;
    padding: 10px;
    box-sizing: border-box;
+   margin: 0 5px 15px 5px;
+   display: flex;
+   flex-direction: column;
+   gap: 5px;
 
    .label {
       font-size: 0.8em;
-      margin: 0;
       font-weight: bold;
    }
 
    .progress-bar-container {
       box-sizing: border-box;
       display: block;
-      height: 20px;
-      margin: 5px 0 10px 0;
+      height: 15px;
       width: 100%;
-      background: var(--uvalib-grey-light);
-      border: 1px solid var(--uvalib-grey);
-      box-shadow: inset 0 0 4px var(--uvalib-grey);
+      background: $uva-grey-100;
+      border: 1px solid $uva-grey;
       border-radius: 2px;
 
       .progress-bar {
          width: 0%;
-         background-color: var(--uvalib-green );
-         box-shadow: inset 0 0 4px var(--uvalib-grey);
+         background-color: $uva-green;
          border-radius: 2px;
          height: 100%;
          box-sizing: border-box;
