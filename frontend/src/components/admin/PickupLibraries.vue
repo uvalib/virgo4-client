@@ -110,8 +110,8 @@ const editClicked = ( (idx, rec) => {
    h3 {
       margin: 0;
       padding: 10px 15px;
-      background: var(--uvalib-grey-lightest);
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border-bottom: 1px solid $uva-grey-100;
       font-size: 1.2em;
       flex-flow: row nowrap;
       justify-content: space-between;

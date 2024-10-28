@@ -47,8 +47,8 @@ div.privacy {
    h3 {
       margin: 0;
       padding: 10px 15px;
-      background: var(--uvalib-grey-lightest);
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border-bottom: 1px solid $uva-grey-100;
       font-size: 1.2em;
    }
    .content {

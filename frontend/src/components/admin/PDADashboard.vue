@@ -60,8 +60,8 @@ function convertTZ(date) {
    h3 {
       margin: 0;
       padding: 10px 15px;
-      background: var(--uvalib-grey-lightest);
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border-bottom: 1px solid $uva-grey-100;
       font-size: 1.2em;
       flex-flow: row nowrap;
       justify-content: space-between;
@@ -99,12 +99,12 @@ function convertTZ(date) {
          th, td {
             white-space: nowrap;
             padding: 5px 10px;
-            border: 1px solid var(--uvalib-grey-lightest);
+            border: 1px solid $uva-grey-200;
          }
          th {
             white-space: nowrap;
-            background: var(--uvalib-grey-lightest);
-            border: 1px solid var(--uvalib-grey-light);
+            background: $uva-grey-200;
+            border: 1px solid $uva-grey-100;
          }
       }
       td.wrap {

@@ -31,12 +31,12 @@ function update() {
 
 <style lang="scss" scoped>
 .jwt-admin {
-   border: 1px solid var(--uvalib-red-emergency);
+   border: 1px solid $uva-red-A;
    h3 {
       margin: 0;
       padding: 10px 15px;
-      background: var(--uvalib-grey-lightest);
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border-bottom: 1px solid $uva-grey-100;
       font-size: 1.2em;
    }
    .content.form {
@@ -45,7 +45,7 @@ function update() {
       flex-flow: column;
       justify-content: flex-start;
       textarea {
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          padding: 20px;
          border-radius: 5px;
          margin-bottom: 15px;
@@ -57,10 +57,11 @@ function update() {
       }
    }
    p {
-      background: var(--uvalib-red-lightest);
+      background: $uva-red-100;
       padding: 10px;
-      border: 1px solid var(--uvalib-red);
+      border: 1px solid $uva-red-100;
       border-radius: 5px;
+      color: $uva-text-color-dark;
    }
 }
 </style>

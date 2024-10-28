@@ -119,7 +119,7 @@ const fineIsVisible = ((co) => {
 
 <style lang="scss" scoped>
 :deep(.details div.overdue) {
-   background: var(--uvalib-red-emergency);
+   background: $uva-red-A;
    color: white;
    font-weight: bold;
    padding: 5px 15px;
@@ -128,8 +128,8 @@ const fineIsVisible = ((co) => {
    border-radius: 5px;
 }
 :deep(.details div.recall) {
-   background-color: var(--uvalib-yellow);
-   color: var(--uvalib-grey-darkest);
+   background-color: $uva-yellow;
+   color: $uva-text-color-dark;
    font-weight: bold;
    padding: 5px 15px;
    width:fit-content;
@@ -139,13 +139,13 @@ const fineIsVisible = ((co) => {
 
 .checkout-panel {
    background-color: white;
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
    border-top: 0;
 
    .none {
       text-align: center;
       font-size: 1.25em;
-      border: 1px solid var(--uvalib-grey);
+      border: 1px solid $uva-grey;
       background: white;
       padding: 10px;
    }
@@ -153,7 +153,7 @@ const fineIsVisible = ((co) => {
    .checkout-list {
       padding: 15px;
       min-height: 65px;
-      background: var(--uvalib-grey-lightest);
+      background: $uva-grey-200;
       text-align: left;
       display: flex;
       flex-direction: column;
@@ -162,14 +162,15 @@ const fineIsVisible = ((co) => {
       gap: 15px;
 
       .item {
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          background: white;
          padding: 0;
+         border-radius: 5px;
 
          h3 {
             margin: 0 0 15px 0;
             padding: 10px;
-            border-bottom: 1px solid var(--uvalib-grey);
+            border-bottom: 1px solid $uva-grey;
          }
          .renewbar {
             text-align: right;
@@ -191,7 +192,8 @@ const fineIsVisible = ((co) => {
             font-size: 1em;
             padding: 5px 10px;
             margin-bottom: 15px;
-            background-color: var(--uvalib-red-lightest);
+            background-color: $uva-red-100;
+            color: $uva-text-color-dark;
             font-weight: bold;
             border-radius: 5px;
          }
@@ -205,7 +207,7 @@ const fineIsVisible = ((co) => {
       flex-flow: row wrap;
       justify-content: flex-end;
       align-items: center;
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      border-bottom: 1px solid $uva-grey-100;
       background: white;
       .sort {
          display: flex;
@@ -226,7 +228,7 @@ const fineIsVisible = ((co) => {
 }
 
 .fine-value {
-  background: var(--uvalib-red-emergency);
+  background: $uva-red-A;
   color: white;
   border-radius: 5px;
   font-weight: bold;

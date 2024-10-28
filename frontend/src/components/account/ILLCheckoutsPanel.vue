@@ -54,13 +54,13 @@ const formatILLDate = ((dateStr) => {
 <style lang="scss" scoped>
 .checkout-panel {
    background-color: white;
-   border: 1px solid var(--uvalib-grey-light);
+   border: 1px solid $uva-grey-100;
    border-top: 0;
 
    .none {
       text-align: center;
       font-size: 1.25em;
-      border: 1px solid var(--uvalib-grey);
+      border: 1px solid $uva-grey;
       background:white;
       padding: 10px;
    }
@@ -68,27 +68,28 @@ const formatILLDate = ((dateStr) => {
    .checkout-list {
       padding: 15px;
       min-height: 65px;
-      background: var(--uvalib-grey-lightest);
+      background: $uva-grey-200;
       text-align: left;
       display: flex;
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
       gap: 15px;
+
       .item {
-         border: 1px solid var(--uvalib-grey-light);
+         border: 1px solid $uva-grey-100;
          background: white;
          padding: 0;
+         border-radius: 5px;
 
          h3 {
             margin: 0 0 15px 0;
             padding: 10px;
-            border-bottom: 1px solid var(--uvalib-grey);
+            border-bottom: 1px solid $uva-grey;
          }
          .renewbar {
             text-align: right;
             padding: 10px;
-            border-bottom: 1px solid var(--uvalib-grey);
          }
          dl {
             margin: 0 0 0 15px;
@@ -112,7 +113,7 @@ const formatILLDate = ((dateStr) => {
       flex-flow: row wrap;
       justify-content: flex-end;
       align-items: center;
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      border-bottom: 1px solid $uva-grey-100;
       background: white;
    }
 }

@@ -52,8 +52,8 @@ function update() {
    h3 {
       margin: 0;
       padding: 10px 15px;
-      background: var(--uvalib-grey-lightest);
-      border-bottom: 1px solid var(--uvalib-grey-light);
+      background: $uva-grey-200;
+      border-bottom: 1px solid $uva-grey-100;
       font-size: 1.2em;
    }
    div.content {
@@ -75,7 +75,7 @@ function update() {
       display: block;
    }
    .success {
-      color: var(--uvalib-green-dark);
+      color: $uva-green-A;
    }
 
    .fade-leave-active {

@@ -40,7 +40,6 @@ async function signOut() {
    margin-bottom: 15px;
    padding-bottom: 5px;
    margin-top: 0;
-   border-bottom: 2px solid var(--color-brand-blue);
    display: flex;
    flex-flow: row wrap;
    justify-content: center;
@@ -52,7 +51,7 @@ async function signOut() {
 }
 #app .activities a.router-link-active {
    font-weight: bold;
-   color: var(--uvalib-brand-orange);
+   color: $uva-brand-orange;
    cursor: default;
    &:hover {
       text-decoration: none;
