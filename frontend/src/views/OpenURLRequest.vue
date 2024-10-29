@@ -9,14 +9,16 @@
          <h2>Request Submitted</h2>
          <h3>We have received your request.</h3>
          <table>
-            <tr>
-               <td class="label">User ID:</td>
-               <td>{{user.userId}}</td>
-            </tr>
-            <tr>
-               <td class="label">Title:</td>
-               <td>{{requestStore.openurl.title}}</td>
-            </tr>
+            <tbody>
+               <tr>
+                  <td class="label">User ID:</td>
+                  <td>{{user.userId}}</td>
+               </tr>
+               <tr>
+                  <td class="label">Title:</td>
+                  <td>{{requestStore.openurl.title}}</td>
+               </tr>
+            </tbody>
          </table>
          <p>
             You can check the status of this request on your

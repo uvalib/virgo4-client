@@ -77,22 +77,24 @@
                               </div>
                               <div class="bill" v-for="(bill,idx) in userStore.bills" :key="idx">
                                  <table>
-                                    <tr>
-                                       <td class="label">Date:</td>
-                                       <td>{{bill.date}}</td>
-                                    </tr>
-                                    <tr>
-                                       <td class="label">Amount:</td>
-                                       <td>${{bill.amount}}</td>
-                                    </tr>
-                                    <tr>
-                                       <td class="label">Reason:</td>
-                                       <td>{{bill.reason}}</td>
-                                    </tr>
-                                    <tr><td class="label">Item:</td><td>{{bill.item.title}}</td></tr>
-                                    <tr><td/><td>{{bill.item.author}}</td></tr>
-                                    <tr><td/><td>{{bill.item.callNumber}}</td></tr>
-                                    <tr><td/><td>{{bill.item.barcode}}</td></tr>
+                                    <tbody>
+                                       <tr>
+                                          <td class="label">Date:</td>
+                                          <td>{{bill.date}}</td>
+                                       </tr>
+                                       <tr>
+                                          <td class="label">Amount:</td>
+                                          <td>${{bill.amount}}</td>
+                                       </tr>
+                                       <tr>
+                                          <td class="label">Reason:</td>
+                                          <td>{{bill.reason}}</td>
+                                       </tr>
+                                       <tr><td class="label">Item:</td><td>{{bill.item.title}}</td></tr>
+                                       <tr><td/><td>{{bill.item.author}}</td></tr>
+                                       <tr><td/><td>{{bill.item.callNumber}}</td></tr>
+                                       <tr><td/><td>{{bill.item.barcode}}</td></tr>
+                                    </tbody>
                                  </table>
                               </div>
                            </div>
@@ -119,18 +121,20 @@
                               </div>
                               <div class="fine" v-for="(fine,idx) in userStore.itemsWithFines" :key="idx">
                                  <table>
-                                    <tr>
-                                       <td class="label">Due Date:</td>
-                                       <td>{{fine.due.split("T")[0]}}</td>
-                                    </tr>
-                                    <tr>
-                                       <td class="label">Amount:</td>
-                                       <td>${{fine.overdueFee}}</td>
-                                    </tr>
-                                    <tr><td class="label">Item:</td><td>{{fine.title}}</td></tr>
-                                    <tr><td/><td>{{fine.author}}</td></tr>
-                                    <tr><td/><td>{{fine.callNumber}}</td></tr>
-                                    <tr><td/><td>{{fine.barcode}}</td></tr>
+                                    <tbody>
+                                       <tr>
+                                          <td class="label">Due Date:</td>
+                                          <td>{{fine.due.split("T")[0]}}</td>
+                                       </tr>
+                                       <tr>
+                                          <td class="label">Amount:</td>
+                                          <td>${{fine.overdueFee}}</td>
+                                       </tr>
+                                       <tr><td class="label">Item:</td><td>{{fine.title}}</td></tr>
+                                       <tr><td/><td>{{fine.author}}</td></tr>
+                                       <tr><td/><td>{{fine.callNumber}}</td></tr>
+                                       <tr><td/><td>{{fine.barcode}}</td></tr>
+                                    </tbody>
                                  </table>
                               </div>
                            </div>

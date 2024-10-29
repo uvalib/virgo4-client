@@ -429,12 +429,12 @@ body {
       padding: 22px 0 35px 0;
       position: relative;
       font-weight: 700;
-      color: $uva-brand-blue !important;
+      color: $uva-brand-blue;
       line-height: 1.15;
       margin: 0;
    }
    h2 {
-      color: $uva-brand-blue !important;
+      color: $uva-brand-blue;
       text-align: left;
       font-size: 1.3em;
       margin: 50px 0 17px 0;

@@ -12,18 +12,20 @@
                      <th>Barcode</th>
                   </tr>
                </thead>
-               <tr v-for="(item,idx) in library.items" :key="`val-${idx}`">
-                  <td class="value">{{ item.current_location }}</td>
-                  <td class="value">{{ item.call_number }}</td>
-                  <td class="value">
-                     <template v-if="item.notice">
-                        <AvailabilityNotice :label="item.barcode" :message="item.notice" />
-                     </template>
-                     <template v-else>
-                        {{ item.barcode }}
-                     </template>
-                  </td>
-               </tr>
+               <tbody>
+                  <tr v-for="(item,idx) in library.items" :key="`val-${idx}`">
+                     <td class="value">{{ item.current_location }}</td>
+                     <td class="value">{{ item.call_number }}</td>
+                     <td class="value">
+                        <template v-if="item.notice">
+                           <AvailabilityNotice :label="item.barcode" :message="item.notice" />
+                        </template>
+                        <template v-else>
+                           {{ item.barcode }}
+                        </template>
+                     </td>
+                  </tr>
+               </tbody>
             </table>
          </div>
       </div>

@@ -6,35 +6,39 @@
       <AccordionContent id="lib-codes">
          <template v-slot:title>Library Codes</template>
          <table>
-            <tr>
-               <th>ID</th><th>Code</th><th>Name</th>
-               <th class="center">On Shelf</th><th class="center">Circulating</th>
-            </tr>
-            <tr v-for="lc in systemStore.libraryCodes" :key="`loc${lc.id}`">
-               <td>{{lc.id}}</td>
-               <td>{{lc.key}}</td>
-               <td>{{lc.description}}</td>
-               <td class="center" v-html="getIcon(lc.on_shelf)"></td>
-               <td class="center" v-html="getIcon(lc.circulating)"></td>
-            </tr>
+            <tbody>
+               <tr>
+                  <th>ID</th><th>Code</th><th>Name</th>
+                  <th class="center">On Shelf</th><th class="center">Circulating</th>
+               </tr>
+               <tr v-for="lc in systemStore.libraryCodes" :key="`loc${lc.id}`">
+                  <td>{{lc.id}}</td>
+                  <td>{{lc.key}}</td>
+                  <td>{{lc.description}}</td>
+                  <td class="center" v-html="getIcon(lc.on_shelf)"></td>
+                  <td class="center" v-html="getIcon(lc.circulating)"></td>
+               </tr>
+            </tbody>
          </table>
       </AccordionContent>
       <AccordionContent id="loc-codes">
          <template v-slot:title>Location Codes</template>
          <table>
-            <tr>
-               <th>ID</th><th>Code</th><th>Description</th><th>Online</th>
-               <th>Shadowed</th><th>On Shelf</th><th>Circulating</th>
-            </tr>
-            <tr v-for="lc in systemStore.locationCodes" :key="`loc${lc.id}`">
-               <td>{{lc.id}}</td>
-               <td>{{lc.key}}</td>
-               <td>{{lc.description}}</td>
-               <td class="center" v-html="getIcon(lc.online)"></td>
-               <td class="center" v-html="getIcon(lc.shadowed)"></td>
-               <td class="center" v-html="getIcon(lc.on_shelf)"></td>
-               <td class="center" v-html="getIcon(lc.circulating)"></td>
-            </tr>
+            <tbody>
+               <tr>
+                  <th>ID</th><th>Code</th><th>Description</th><th>Online</th>
+                  <th>Shadowed</th><th>On Shelf</th><th>Circulating</th>
+               </tr>
+               <tr v-for="lc in systemStore.locationCodes" :key="`loc${lc.id}`">
+                  <td>{{lc.id}}</td>
+                  <td>{{lc.key}}</td>
+                  <td>{{lc.description}}</td>
+                  <td class="center" v-html="getIcon(lc.online)"></td>
+                  <td class="center" v-html="getIcon(lc.shadowed)"></td>
+                  <td class="center" v-html="getIcon(lc.on_shelf)"></td>
+                  <td class="center" v-html="getIcon(lc.circulating)"></td>
+               </tr>
+            </tbody>
          </table>
       </AccordionContent>
    </div>
