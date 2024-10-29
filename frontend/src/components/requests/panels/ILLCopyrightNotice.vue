@@ -88,7 +88,7 @@ const props = defineProps({
 .notice {
    font-size:0.9em;
    padding: 0;
-   border: 1px solid var(--uvalib-red-emergency);
+   border: 1px solid $uva-red-A;
    margin: 0 auto;
    p {
       margin: 0;
@@ -96,8 +96,8 @@ const props = defineProps({
    p.head {
       margin: 0;
       padding: 5px 15px;
-      background: var(--uvalib-red-lightest);
-      border-bottom: 1px solid var(--uvalib-red-emergency);
+      background: $uva-red-100;
+      border-bottom: 1px solid $uva-red-A;
    }
    .content {
      padding: 15px;

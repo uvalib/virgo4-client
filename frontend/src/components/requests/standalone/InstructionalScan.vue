@@ -86,7 +86,7 @@ onMounted(()=>{
 .request-panel {
    .instruct {
       margin: 10px 0;
-      background: var(--uvalib-grey-lightest);
+      background: $uva-grey-200;
       padding: 5px 15px;
       border-radius: 5px;
       border: 1px solid $uva-grey-100;

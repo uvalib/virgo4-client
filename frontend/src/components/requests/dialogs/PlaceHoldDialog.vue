@@ -137,7 +137,7 @@ const placeHold = ( async () => {
 <style lang="scss" scoped>
 form {
    .error {
-      color: var(--uvalib-red-emergency);
+      color: $uva-red-A;
       font-style: italic;
    }
    p {
@@ -155,7 +155,7 @@ form {
    }
    .medium-rare-message {
       border-radius: 4px;
-      border: 2px solid var(--uvalib-red);
+      border: 2px solid $uva-red;
       padding: 5px;
    }
 }
