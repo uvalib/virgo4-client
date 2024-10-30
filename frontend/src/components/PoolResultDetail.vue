@@ -114,13 +114,13 @@ async function loadMoreResults() {
 <style lang="scss" scoped>
 .sort-section {
    background: white;
-   border-left: 1px solid $uva-grey-200;
-   border-right: 1px solid $uva-grey-200;
+   border: 1px solid $uva-grey-100;
+   border-top: 0;
 }
 .desc  {
    padding: 15px 10px 10px 10px;
-   border-left: 1px solid var(--uvalib-brand-blue);
-   border-right: 1px solid var(--uvalib-brand-blue);
+   border-left: 1px solid $uva-brand-blue;
+   border-right: 1px solid $uva-brand-blue;
    font-size: 0.9em;
 }
 .desc :deep(a) {
@@ -136,12 +136,12 @@ async function loadMoreResults() {
    position: relative;
 }
 div.pool-header {
-   font-size: 1em;
    color: white;
-   background: var(--uvalib-brand-blue);
+   background: $uva-brand-blue;
    margin: 0 0 1rem 0;
    text-align: left;
-   box-shadow: var(--uvalib-box-shadow);
+   // border: 1px solid $uva-grey-100;
+   // border-top: 0;
 }
 .pool-name {
    font-weight: bold;
@@ -193,7 +193,7 @@ div.pool-header {
    margin: 5px 0;
    font-size: 0.75em;
    font-weight: normal;
-   color: var(--uvalib-red);
+   color: $uva-red;
 }
 @media only screen and (max-width: 600px) {
    .hit-wrapper {
@@ -222,7 +222,6 @@ div.pool-header {
 }
 .expand-panel {
    margin: 0px 0 25px 0;
-   box-shadow: var(--uvalib-box-shadow);
    border: 1px solid $uva-grey-100;
 }
 </style>

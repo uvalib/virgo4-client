@@ -103,9 +103,9 @@ const poolSkipped = ((p) => {
    }
 }
 .p-select.p-component.active {
-   background-color: var(--uvalib-brand-blue);
+   background-color: $uva-brand-blue;
    color: white;
-   border: 1px solid var(--uvalib-brand-blue);
+   border: 1px solid $uva-brand-blue;
    :deep(.p-select-dropdown) {
       color: white;
    }

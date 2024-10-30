@@ -36,6 +36,8 @@ function collectionPidPicked(pid) {
    background: white;
    color: $uva-text-color-base;
    border-top: 3px solid $uva-brand-blue;
+   border-left: 1px solid $uva-grey-100;
+   border-right: 1px solid $uva-grey-100;
 
    .collect-rec {
       margin: 0 0 15px 10px;

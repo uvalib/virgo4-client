@@ -2,7 +2,6 @@ import { definePreset } from '@primevue/themes'
 import Aura from '@primevue/themes/aura'
 import ripple from '@primevue/themes/aura/ripple'
 import tooltip from '@primevue/themes/aura/tooltip'
-import './uva-colors.css'
 import './styleoverrides.scss'
 import colors from './colors.module.scss'
 

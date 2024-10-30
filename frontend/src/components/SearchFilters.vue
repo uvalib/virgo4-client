@@ -116,8 +116,8 @@ async function clearClicked() {
    color: $uva-text-color-dark;
    padding: 5px 5px 10px 5px;
    margin-top: 5px;
-   border-left: 1px solid $uva-grey-200;
-   border-right: 1px solid $uva-grey-200;
+   border-left: 1px solid $uva-grey-100;
+   border-right: 1px solid $uva-grey-100;
    .working {
       padding: 10px 20px;
    }

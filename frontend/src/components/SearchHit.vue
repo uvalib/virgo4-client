@@ -7,8 +7,8 @@
       </div>
       <AccordionContent v-if="props.hit.grouped" :id="`group-${props.hit.identifier}`"
          :autoExpandID="results.autoExpandGroupID" :expanded="!preferences.collapseGroups"
-         backgroundContent="none" background="var(--uvalib-blue-alt-light)"
-         borderColor="var(--uvalib-blue-alt-light)" class="group">
+         backgroundContent="none" :background=colors.blueAlt300
+         :borderColor=colors.blueAlt300 class="group">
          <template v-slot:title>{{groupTitle}}</template>
          <div v-for="(groupHit,idx) in props.hit.group" :key="`g${idx}`"
             class="group-hit" :id="groupHit.identifier"
@@ -31,6 +31,7 @@ import AccordionContent from "@/components/AccordionContent.vue"
 import ContentAdvisory from "@/components/ContentAdvisory.vue"
 import { useResultStore } from "@/stores/result"
 import { usePreferencesStore } from "@/stores/preferences"
+import colors from '@/assets/theme/colors.module.scss'
 
 const results = useResultStore()
 const preferences = usePreferencesStore()
@@ -56,7 +57,7 @@ const closeGroupTitle = computed(()=>{
 <style lang="scss" scoped>
 .inner-hit-wrapper {
    padding: 3px;
-   border: 2px solid var(--uvalib-blue-alt-dark);
+   border: 2px solid $uva-blue-alt-A;
 
    .hit {
       width: 100%;
