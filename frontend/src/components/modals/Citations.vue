@@ -135,7 +135,7 @@ const copyCitation = (() => {
    .info {
       padding: 10px 0 0 0;
       text-align: center;
-      color: var( --uvalib-blue-alt-dark);
+      color: $uva-blue-alt-A;
       font-style: italic;
       display: inline-block;
       width:100%;
@@ -144,7 +144,7 @@ const copyCitation = (() => {
       display: inline-block;
       padding: 10px 0 0 0;
       text-align: center;
-      color: var( --uvalib-red-emergency);
+      color: $uva-red-A;
       width:100%;
    }
 

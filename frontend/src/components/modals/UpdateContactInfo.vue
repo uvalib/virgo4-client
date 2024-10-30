@@ -1,6 +1,9 @@
 <template>
    <VirgoButton @click="showUpdateDialog = true" :disabled="showUpdateDialog" ref="trigger" label="Update my Virgo contact information"/>
-   <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top" header="Update Contact Info" @hide="closeDialog" @show="opened">
+   <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top"
+      style="max-width: 600px"
+      header="Update Contact Info" @hide="closeDialog" @show="opened"
+   >
       <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate">
          <div class="scroller">
             <div class="section">
@@ -117,18 +120,25 @@ const submitUpdate = (() => {
 <style lang="scss" scoped>
 p.error {
    text-align: center;
-   color: var(--color-error);
+   color:$uva-red-A;
    font-style: italic;
    :deep(a) {
-      color: var(--color-error) !important;
+      color :$uva-red-A !important;
       font-weight: bold !important;
       text-decoration: underline !important;;
    }
 }
 .scroller {
+   max-height: 400px;
+   overflow-y: scroll;
    border: 1px solid $uva-grey-100;
+   .content {
+      p {
+         margin: 0;
+      }
+   }
    .section-name {
-      border-bottom: 1px solid var(--uvalib-grey);
+      border-bottom: 1px solid $uva-grey;
       margin: 5px;
    }
 }

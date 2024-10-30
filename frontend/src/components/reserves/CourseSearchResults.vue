@@ -1,12 +1,12 @@
 <template>
    <div class="results-panel">
-      <h2 class="query-summary" v-if="reserveStore.query == ''">
+      <div class="query-summary" v-if="reserveStore.query != ''">
          Course reserves for course '{{reserveStore.query}}'
-      </h2>
+      </div>
       <div class="course" v-for="(c,cidx) in reserveStore.courseReserves" :key="`C${cidx}${c.courseID}`">
          <div class="course-name">
-            <h3 class="value">{{c.courseName}}</h3>
-            <p class="value-id">{{c.courseID}}</p>
+            <span class="name">{{c.courseName}}</span>
+            <span>{{c.courseID}}</span>
          </div>
          <div class="instructor" v-for="(inst,idx) in c.instructors" :key="idx">
             <p class="value folder">
@@ -53,52 +53,39 @@ const copyURL = (( courseID, instructor ) => {
 
 <style scoped lang="scss">
 .results-panel {
-   margin: 15px 0;
-   color: var(--uvalib-grey-dark);
-   h2 {
-      text-align: left;
-      margin: 30px 0 5px 0;
-      font-size: 1.2em;
-      font-weight: normal;
-   }
-   div.course {
-      margin: 10px 0 25px 0;
-      text-align: left;
-      box-shadow: var(--uvalib-box-shadow);
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   text-align: left;
 
+   div.course {
+      border: 1px solid $uva-grey-100;
       div.course-name {
-         font-weight: bold;
-         color: var(--uvalib-grey-darkest);
-         padding: 0;
+         display: flex;
+         flex-direction: column;
+         gap: 5px;
          padding: 10px;
-         background: var(--uvalib-teal-lightest);
-         border-bottom: 4px solid var(--uvalib-teal);
+         background: $uva-teal-200;
+         border-bottom: 1px solid $uva-teal-100;
+         .name {
+            font-weight: bold;
+         }
       }
       div.instructor {
          font-weight: bold;
-         color: var(--uvalib-grey-dark);
          padding: 0 0 10px 0;
          background: white;
-         border-top: 2px solid var(--uvalib-grey-lightest);
          div.reserves {
             padding: 0 0 0 25px;
          }
       }
       div.instructor .value.folder {
          padding: 15px 15px 5px 15px;
-         color: var(--uvalib-grey-darkest);
          display: flex;
          flex-flow: row wrap;
          justify-content: space-between;
          align-items: flex-start;
       }
    }
-}
-
-.value, .value-id {
-   margin: 0;
-}
-.value-id {
-  font-weight: normal;
 }
 </style>

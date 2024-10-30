@@ -1,16 +1,16 @@
 <template>
    <div class="results-panel">
-      <h2 v-if="reserveStore.query" class="query-summary">
+      <div class="query-summary" v-if="reserveStore.query != ''">
          Course reserves for instructor '{{reserveStore.query}}'
-      </h2>
+      </div>
       <div class="instructor" v-for="(ir,idx) in reserveStore.courseReserves" :key="idx">
-         <h3 class="value folder">{{ir.instructorName}}</h3>
+         <div class="instructor-name">{{ir.instructorName}}</div>
          <div class="course" v-for="course in ir.courses" :key="course.id">
-            <div class="course-name">
-               <span>
-                  <p class="value">{{course.courseName}}</p>
-                  <p class="value-id">{{course.courseID}}</p>
-               </span>
+            <div class="course-header">
+               <div class="course-name">
+                  <span class="name">{{course.courseName}}</span>
+                  <span>{{course.courseID}}</span>
+               </div>
                <VirgoButton v-if="!isExactLookup" severity="secondary" class="small" @click="copyURL(course.courseID, ir.instructorName )" label="Copy link to reserves"/>
             </div>
            <div class="reserves" v-for="reserve in course.items" :key="reserve.id">
@@ -53,58 +53,39 @@ const copyURL = (( courseID, instructor ) => {
 
 <style scoped lang="scss" >
 .results-panel {
-   margin: 15px 0 25px 0;
-   color: var(--uvalib-grey-dark);
-   h2 {
-      text-align: left;
-      margin: 30px 0 5px 0;
-      font-size: 1.2em;
-      font-weight: normal;
-   }
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   text-align: left;
+
    div.instructor {
-      margin: 10px 0 25px 0;
-      text-align: left;
-      box-shadow: var(--uvalib-box-shadow);
-      h3.value {
-         margin: 0;
+      border: 1px solid $uva-grey-100;
+      .instructor-name {
          padding: 10px;
-         border-bottom: 4px solid var(--uvalib-teal);
+         background: $uva-teal-200;
+         border-bottom: 1px solid $uva-teal-100;
+         font-weight: bold;
       }
       .course {
-         padding-bottom: 15px;
-         div.course-name {
-            font-weight: bold;
-            color: var(--uvalib-grey-darkest);
+         div.course-header {
             padding:  15px 15px 5px 15px;
-            border-top: 2px solid var(--uvalib-grey-lightest);
             display: flex;
             flex-flow: row wrap;
             justify-content: space-between;
             align-items: flex-start;
+            .course-name {
+               display: flex;
+               flex-direction: column;
+               .name {
+                  font-weight: bold;
+               }
+            }
+
+         }
+         div.reserves {
+            padding-left: 20px;
          }
       }
    }
-}
-
-div.reserves {
-   padding: 0 0 0 35px;
-}
-label {
-   font-weight: bold;
-   margin-right: 10px;
-}
-.value, .value-id {
-   margin: 0;
-}
-.value-id {
-  font-weight: normal;
-}
-
-.folder {
-   background: var(--uvalib-teal-lightest);
-   margin: 10px 0 0 0;
-   padding: 8px;
-   color: var(--uvalib-grey-darkest);
-   font-weight: bold;
 }
 </style>

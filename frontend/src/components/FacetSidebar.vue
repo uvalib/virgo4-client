@@ -1,9 +1,9 @@
 <template>
    <section class="facet-sidebar" :class="{overlay: !startExpanded}" role="group">
       <AccordionContent id="pool-filter" class="filter"
-         :background="filterColor"
+         :background=colors.brandBlue
          color="white" :expanded="startExpanded"
-         borderColor="var(--uvalib-brand-blue)"
+         :borderColor=colors.brandBlue
          :invert="!startExpanded">
          <template v-slot:title>{{poolFilterTitle}}</template>
 
@@ -59,6 +59,7 @@ import { useFilterStore } from "@/stores/filter"
 import { useSystemStore } from "@/stores/system"
 import { usePoolStore } from "@/stores/pool"
 import { useRouter, useRoute } from 'vue-router'
+import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
 
 const route = useRoute()
@@ -72,12 +73,7 @@ const poolStore = usePoolStore()
 const hasFacets = computed(()=>{
    return poolStore.facetSupport(resultStore.selectedResults.pool.id)
 })
-const filterColor = computed(()=>{
-   if ( !startExpanded.value ) {
-      return "var(--uvalib-brand-blue)"
-   }
-   return "var(--uvalib-brand-blue)"
-})
+
 const startExpanded = computed(()=>{
    return system.displayWidth > 810
 })

@@ -77,6 +77,6 @@ label {
    margin: 2em auto auto 1em;
 }
 p.error {
-   color: var(--uvalib-red-darker);
+   color: $uva-red-A;
 }
 </style>

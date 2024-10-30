@@ -112,7 +112,7 @@ div.searching {
    margin-bottom: 30px;
 }
 p.error {
-   color: var(--uvalib-red-emergency);
+   color: $uva-red-A;
    text-align: center;
    padding: 0;
    margin: 10px;

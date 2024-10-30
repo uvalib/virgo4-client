@@ -122,7 +122,7 @@ div.add-content {
 
    div.select {
       margin-top: 10px;
-      border-top: 2px solid  var(--uvalib-blue-alt);
+      border-top: 2px solid  $uva-blue-alt;
       padding-top: 25px;
       width: 100%;
 
@@ -138,7 +138,7 @@ div.add-content {
    }
 
    p.error {
-      color: var(--uvalib-red-emergency);
+      color: $uva-red-A;
       text-align: center;
       margin: 5px 0 15px 0;
    }

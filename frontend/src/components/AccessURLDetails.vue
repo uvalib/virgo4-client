@@ -88,7 +88,7 @@ function remainingLinks( details ) {
    gap: 5px;
 }
 span.provider {
-   color: var(--uvalib-grey);
+   color: $uva-grey;
    font-weight:  bold;
 }
 
@@ -110,7 +110,7 @@ span.provider {
 .provider-link {
    display: inline-flex;
    align-items: center;
-   color: var(--color-link);
+   color: $uva-blue-alt-A;
    font-weight: 500 !important;
 }
 </style>

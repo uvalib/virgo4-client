@@ -85,16 +85,12 @@ const okClicked = ( async () => {
    }
 }
 .selected-bookmarks {
-   margin: 0 0 20px 0;
-   border-bottom: 2px solid var(--uvalib-blue-alt);
-   padding: 0;
    ul {
       list-style: decimal;
       padding: 0 0 0 20px;
       margin: 0;
-      font-size: 0.9em;
       li {
-         padding: 3px 0;
+         padding: 5px 0;
       }
    }
 }

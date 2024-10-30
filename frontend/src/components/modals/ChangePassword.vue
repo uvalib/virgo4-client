@@ -156,7 +156,7 @@ label {
 }
 p.error {
    padding: 0;
-   color: var(  --uvalib-red-emergency);
+   color: $uva-red-A;
    text-align: center;
 }
 </style>
