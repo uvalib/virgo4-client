@@ -3,6 +3,7 @@ import Aura from '@primevue/themes/aura'
 import ripple from '@primevue/themes/aura/ripple'
 import tooltip from '@primevue/themes/aura/tooltip'
 import './styleoverrides.scss'
+import './forms.scss'
 import colors from './colors.module.scss'
 
 const UVA = definePreset(Aura, {

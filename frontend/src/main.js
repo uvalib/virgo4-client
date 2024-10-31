@@ -42,7 +42,6 @@ import '@vue-a11y/announcer/dist/style.css'
 app.use(VueAnnouncer, { router })
 
 // styles
-import './assets/styles/forms.scss'
 import '@fortawesome/fontawesome-pro/css/all.css'
 import 'primeicons/primeicons.css'
 

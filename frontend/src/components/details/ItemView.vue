@@ -19,7 +19,7 @@
          <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
          </div>
          <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
-         <dl class="fields" :aria-expanded="detailExpanded.toString()">
+         <dl class="fields" id="detail-fields">
             <template v-if="details.header.author">
                <dt class="label">{{details.header.author.label}}:</dt>
                <dd class="value">
@@ -69,7 +69,8 @@
                <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
             </template>
             <dt class="toggle" v-if="showFieldsToggle">
-               <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"/>
+               <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"
+                  :aria-expanded="detailExpanded.toString()" aria-controls="detail-fields"/>
             </dt>
             <dd></dd>
          </dl>
