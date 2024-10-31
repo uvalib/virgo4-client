@@ -7,7 +7,7 @@
       </div>
       <AccordionContent v-if="props.hit.grouped" :id="`group-${props.hit.identifier}`"
          :autoExpandID="results.autoExpandGroupID" :expanded="!preferences.collapseGroups"
-         backgroundContent="none" :background=colors.blueAlt300
+         :backgroundContent=colors.grey200 :background=colors.blueAlt300
          :borderColor=colors.blueAlt300 class="group">
          <template v-slot:title>{{groupTitle}}</template>
          <div v-for="(groupHit,idx) in props.hit.group" :key="`g${idx}`"
@@ -56,8 +56,9 @@ const closeGroupTitle = computed(()=>{
 
 <style lang="scss" scoped>
 .inner-hit-wrapper {
-   padding: 3px;
+   padding: 2px;
    border: 2px solid $uva-blue-alt-A;
+   background: $uva-grey-200;
 
    .hit {
       width: 100%;

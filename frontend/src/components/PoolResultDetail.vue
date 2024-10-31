@@ -140,11 +140,15 @@ div.pool-header {
    background: $uva-brand-blue;
    margin: 0 0 1rem 0;
    text-align: left;
-   // border: 1px solid $uva-grey-100;
-   // border-top: 0;
-}
-.pool-name {
-   font-weight: bold;
+   .source-logo {
+      background: white;
+      padding: 5px;
+      text-align: left;
+      .logo {
+         max-height:90px;
+         display: inline-block;
+      }
+   }
 }
 .hits-content {
    text-align: left;
@@ -154,9 +158,6 @@ div.pool-header {
    justify-content: flex-start;
    align-items: stretch;
    gap: 20px;
-   .hit-wrapper {
-      margin: 0;
-   }
 }
 .image.hits-content {
   display: grid;
@@ -207,18 +208,6 @@ div.pool-header {
    div.pool-header {
       margin: 0 0 1rem 0;
    }
-}
-.no-more {
-   cursor: default;
-}
-.source-logo {
-   background: white;
-   padding: 5px;
-   text-align: left;
-}
-.source-logo .logo {
-   max-height:90px;
-   display: inline-block;
 }
 .expand-panel {
    margin: 0px 0 25px 0;

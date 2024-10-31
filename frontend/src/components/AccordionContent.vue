@@ -45,7 +45,9 @@
       >
          <div :id="contentID" class="accordion-content" v-show="isExpanded"
             :aria-labelledby="`${props.id}-header`" role="region"
-            @click.stop @keyup.stop.enter @keydown.space.stop>
+            :style="{ background: props.backgroundContent }"
+            @click.stop @keyup.stop.enter @keydown.space.stop
+         >
             <slot></slot>
             <button v-if="hasFooterSlot" @click="accordionFooterClicked" class="footer"
                :style="{ background: props.background, color: props.color,

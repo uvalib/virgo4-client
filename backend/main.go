@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "2.4.2"
+const version = "2.5.0"
 
 /**
  * MAIN
