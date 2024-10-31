@@ -488,12 +488,12 @@ onUnmounted(()=>{
          position: relative;
       }
       img {
+         background-color: $uva-grey-200;
          background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
          min-width: 175px;
          min-height: 175px;
-         background-color: rgb(252, 252, 252);
          &:hover {
             box-shadow: 0px 2px 8px 0 #444;
          }

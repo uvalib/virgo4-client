@@ -57,7 +57,7 @@
                         Click the totals below to see more details.
                      </div>
                      <div v-if="isBillOwed">
-                        <AccordionContent layout="narrow"  borderWidth="0" id="bills">
+                        <AccordionContent borderWidth="0" id="bills">
                            <template v-slot:title>
                               <label style='font-weight:bold;margin-right:5px'>Total Bills:</label>
                               <span>${{info.amountOwed}}</span>
@@ -65,15 +65,15 @@
                            <div class="bills">
                               <div class="info">
                                  <p>
-                                 You have been billed for replacement of the items below. If you have the items, please return them
-                                 and we will remove the replacement bills. If you pay for an item and find it within 90 days,
-                                 you may be refunded the replacement amount.
+                                    You have been billed for replacement of the items below. If you have the items, please return them
+                                    and we will remove the replacement bills. If you pay for an item and find it within 90 days,
+                                    you may be refunded the replacement amount.
                                  </p>
-                                    <h3>Replacement option:</h3>
-                                 <p>
+                                 <h4>Replacement option</h4>
+                                 <div>
                                     If you would like to supply a replacement copy rather than paying the bill, please contact the Library.
                                     The Library reserves the right to refuse a replacement copy.
-                                 </p>
+                                 </div>
                               </div>
                               <div class="bill" v-for="(bill,idx) in userStore.bills" :key="idx">
                                  <table>
@@ -102,7 +102,7 @@
                      </div>
 
                      <div v-if="userStore.totalFines>0">
-                        <AccordionContent layout="narrow" borderWidth="0" id="fines">
+                        <AccordionContent borderWidth="0" id="fines">
                            <template v-slot:title>
                               <label style='font-weight:bold;margin-right:5px'>Total Fines:</label>
                               <span>${{userStore.totalFines}}</span>
@@ -142,7 +142,7 @@
                      </div>
 
                      <div class="payment">
-                        <h3>Payment Information</h3>
+                        <h4>Payment Information</h4>
                         <div v-if="userStore.useSIS">
                            All bills must be paid using SIS.
                            <a target="_blank" href="https://sisuva.admin.virginia.edu/ihprd/signon.html">
@@ -245,6 +245,10 @@ onMounted(() =>{
    margin: 0 auto;
    text-align: left;
    padding-bottom: 50px;
+   h4 {
+      margin: 0 0 5px 0;
+      text-decoration: underline;
+   }
 }
 .groups {
    display: flex;

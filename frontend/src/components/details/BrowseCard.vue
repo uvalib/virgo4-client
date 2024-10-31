@@ -154,11 +154,11 @@ const bookmarkClicked = ((id) => {
          height: 100%;
          display: block;
          margin: 0 auto;
-         background: #f2f2f2;
          border: 1px solid $uva-grey-100;
          background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
+         background-color: $uva-grey-200;
       }
 
       .no-thumb {

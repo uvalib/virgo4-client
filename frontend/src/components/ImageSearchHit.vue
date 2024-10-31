@@ -94,6 +94,7 @@ function iiifURL(item) {
          background-image: url('@/assets/dots.gif');
          background-repeat:no-repeat;
          background-position: center center;
+         background-color: $uva-grey-200;
       }
    }
 

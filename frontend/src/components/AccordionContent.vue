@@ -7,7 +7,7 @@
          :class="`${expandedClass}`"
       >
          <button  @click="accordionClicked" @keydown.prevent.enter="accordionClicked" @keydown.space.prevent="accordionClicked"
-            :class="`${props.layout} title accordion-trigger ${expandedClass}`"
+            :class="`title accordion-trigger ${expandedClass}`"
             :aria-expanded="expandedStr"
             :aria-controls="contentID"
             :style="{color: props.color}"
@@ -76,10 +76,6 @@ const props = defineProps({
    autoExpandID: {
       type: String,
       default: ""
-   },
-   layout: {
-      type: String,
-      default: "normal"
    },
    background: {
       type: String,
