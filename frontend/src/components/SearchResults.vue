@@ -43,12 +43,13 @@ import SaveSearch from "@/components/modals/SaveSearch.vue"
 import SearchSuggestions from "@/components/SearchSuggestions.vue"
 import analytics from '@/analytics'
 import { useRouter, useRoute } from 'vue-router'
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useSortStore } from "@/stores/sort"
+import { scrollToItem } from '@/utils'
 
 const router = useRouter()
 const route = useRoute()
@@ -70,6 +71,12 @@ const sourceTabs = computed(()=>{
       return resultStore.results
    }
    return resultStore.results.slice(0, systemStore.maxPoolTabs )
+})
+
+onMounted( () => {
+   if ( !resultStore.selectedHit ) {
+      scrollToItem("results-container", true)
+   }
 })
 
 const printResults = (() => {

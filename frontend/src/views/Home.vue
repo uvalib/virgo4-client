@@ -1,6 +1,6 @@
 <template>
    <div class="home">
-      <V4Spinner  v-if="searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
+      <V4Spinner  v-if="resultStore.searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel">
          <template v-if="queryStore.mode=='basic'">
             <div v-if="systemStore.hasTranslateMessage" class="translate-message">
@@ -42,7 +42,7 @@ import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
 import analytics from '@/analytics'
-import { ref, onMounted, computed, watch } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
@@ -54,7 +54,6 @@ import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
 import { useBookmarkStore } from "@/stores/bookmark"
-import { storeToRefs } from "pinia"
 
 const router = useRouter()
 const route = useRoute()
@@ -69,24 +68,8 @@ const sortStore = useSortStore()
 const filters = useFilterStore()
 const { polite, assertive } = useAnnouncer()
 
-const queryMessage = ref("")
-
 const isHomePage = computed(()=>{
    return (route.path == "/")
-})
-
-// pull a ref to searching from the result store so it can be watched directly
-const { searching } = storeToRefs(resultStore)
-watch(searching, (newValue, oldValue) => {
-   if (oldValue == true && newValue == false) {
-      if (restore.url == "/") {
-         scrollToItem("results-container", true)
-      }
-      if ( queryMessage.value != "") {
-         systemStore.setMessage(queryMessage.value)
-         queryMessage.value = ""
-      }
-   }
 })
 
 function setPageTitle() {
@@ -197,8 +180,9 @@ function handleLegacyQueries( query ) {
 
    if ( changed) {
       if ( unsupported.length > 0) {
-         queryMessage.value = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
-         queryMessage.value += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
+         let msg = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
+         msg += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
+         systemStore.setMessage(msg)
       }
       router.push({query: newQ, replace: true})
    } else {
@@ -390,9 +374,6 @@ async function searchClicked() {
    div.translate-message {
       margin: 5px 0 15px 0;
       font-size: 0.85em;
-   }
-   span.sep {
-      margin: 0 5px;
    }
    .controls-wrapper  {
       max-width: 800px;

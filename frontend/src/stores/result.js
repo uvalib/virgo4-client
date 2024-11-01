@@ -29,10 +29,8 @@ export const useResultStore = defineStore('result', {
    getters: {
       selectedHit: state => {
          let hit = state.results[state.selectedResultsIdx].hits[state.selectedHitIdx]
-         if (hit) {
-            if (hit.grouped && state.selectedHitGroupIdx > -1 ) {
-               return hit.group[state.selectedHitGroupIdx]
-            }
+         if ( hit && hit.grouped && state.selectedHitGroupIdx > -1 ) {
+            return hit.group[state.selectedHitGroupIdx]
          }
          return hit
       },
