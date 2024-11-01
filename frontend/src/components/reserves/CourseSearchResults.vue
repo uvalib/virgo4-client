@@ -26,9 +26,10 @@ import ReserveDetail from "@/components/reserves/ReserveDetail.vue"
 import { useReserveStore } from "@/stores/reserve"
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { copyText } from 'vue3-clipboard'
+import { useClipboard } from '@vueuse/core'
 import { useToast } from "primevue/usetoast"
 
+const { copy } = useClipboard()
 const toast = useToast()
 const route = useRoute()
 const reserveStore = useReserveStore()
@@ -40,14 +41,8 @@ const isExactLookup = computed(() => {
 })
 
 const copyURL = (( courseID, instructor ) => {
-   let URL = `${window.location.href}/${encodeURIComponent(courseID)}?instructor=${encodeURIComponent(instructor)}`
-   copyText(URL, undefined, (error, _event) => {
-      if (error) {
-         toast.add({severity:'error', summary: "Copy Error", detail: `Unable to copy reserves URL: ${error}`, life: 5000})
-      } else {
-         toast.add({severity:'success', summary: "URL Copied", detail: "Reserves URL copied to clipboard.", life: 3000})
-      }
-   })
+   copy( `${window.location.href}/${encodeURIComponent(courseID)}?instructor=${encodeURIComponent(instructor)}` )
+   toast.add({severity:'success', summary: "URL Copied", detail: "Reserves URL copied to clipboard.", life: 3000})
 })
 </script>
 

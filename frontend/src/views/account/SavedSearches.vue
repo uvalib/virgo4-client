@@ -82,13 +82,14 @@ import { useUserStore } from "@/stores/user"
 import { useSearchStore } from "@/stores/search"
 import { useResultStore } from "@/stores/result"
 import analytics from '@/analytics'
-import { copyText } from 'vue3-clipboard'
+import { useClipboard } from '@vueuse/core'
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
 import Dialog from 'primevue/dialog'
 import Checkbox from 'primevue/checkbox'
 import { setFocusID } from '@/utils'
 
+const { copy } = useClipboard()
 const results = useResultStore()
 const userStore = useUserStore()
 const searchStore = useSearchStore()
@@ -119,7 +120,7 @@ const deleteSearchClicked = ( (savedSearch) => {
    confirm.require({
       message: `Delete saved searched named <b>${savedSearch.name}</b>?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Delete',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'fal fa-exclamation-triangle',
       rejectProps: {
          label: 'Cancel',
          severity: 'secondary'
@@ -137,7 +138,7 @@ const removeAllClicked = (() => {
    confirm.require({
       message: `Delete all saved searches?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Delete All',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'fal fa-exclamation-triangle',
       rejectProps: {
          label: 'Cancel',
          severity: 'secondary'
@@ -155,7 +156,7 @@ const clearHistoryClicked = (() => {
    confirm.require({
       message: `Delete search history?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Clear History',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'fal fa-exclamation-triangle',
       rejectProps: {
          label: 'Cancel',
          severity: 'secondary'
@@ -194,24 +195,13 @@ const urlToText = ((url) => {
 
 const copyURL = ((token) => {
    let URL = window.location.protocol + "//" + window.location.host + searchURL(token)
-   copyText(URL, undefined, (error, _event) => {
-      if (error) {
-         errorToast("Copy Error", "Unable to copy public search URL: "+error)
-      } else {
-         infoToast("Search Copied", "Public search URL copied to clipboard.")
-      }
-   })
+   copy(URL)
+   infoToast("Search Copied", "Public search URL copied to clipboard.")
 })
 
 const copyRSS = ((token) => {
-   let URL = rssURL(token)
-   copyText(URL, undefined, (error, _event) => {
-      if (error) {
-         errorToast("RSS Copy Error", "Unable to copy RSS URL: "+error)
-      } else {
-         infoToast("RSS URL Copied", "RSS URL copied to clipboard.")
-      }
-   })
+   copy( rssURL(token) )
+   infoToast("RSS URL Copied", "RSS URL copied to clipboard.")
    closeRSSDialog()
 })
 

@@ -36,9 +36,8 @@
 
 <script setup>
 import { useItemStore } from "@/stores/item"
-import { useSystemStore } from "@/stores/system"
 import { ref, computed} from 'vue'
-import { copyText } from 'vue3-clipboard'
+import { useClipboard } from '@vueuse/core'
 import Dialog from 'primevue/dialog'
 import { useToast } from "primevue/usetoast"
 
@@ -57,7 +56,7 @@ const props = defineProps({
    }
 })
 
-const system = useSystemStore()
+const { copy } = useClipboard()
 const itemStore = useItemStore()
 const toast = useToast()
 
@@ -109,18 +108,12 @@ const closeDialog = (() => {
 
 const copyCitation = (() => {
    // strip html from citation.  this is safe since the source of the citation is trusted
-   let citation = citations.value[selectedIdx.value]
+   const citation = citations.value[selectedIdx.value]
    var div = document.createElement("div")
    div.innerHTML = citation.value
-   let text = div.textContent
-
-   copyText(text, undefined, (error, _event) => {
-      if (error) {
-         toast.add({severity:'error', summary: "Copy Error", detail: "Unable to copy "+citation.label+" citation: "+error.toString(), life: 5000})
-      } else {
-         toast.add({severity:'success', summary: "Citation Copied", detail: citation.label+" citation copied to clipboard.", life: 3000})
-      }
-   })
+   const text = div.textContent
+   copy(text )
+   toast.add({severity:'success', summary: "Citation Copied", detail: citation.label+" citation copied to clipboard.", life: 3000})
 })
 </script>
 

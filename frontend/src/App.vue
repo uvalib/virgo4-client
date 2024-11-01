@@ -33,7 +33,7 @@
             </div>
          </div>
          <VirgoButton v-if="a.severity=='alert2' || a.severity=='alert3'" severity="secondary" text rounded outlined
-            @click="dismissAlert(a.uuid)" aria-label="hide alert" icon="pi pi-times" />
+            @click="dismissAlert(a.uuid)" aria-label="hide alert" icon="fal fa-times" size="large"/>
       </div>
    </div>
    <main id="v4main" role="main">

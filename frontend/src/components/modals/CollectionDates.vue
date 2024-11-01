@@ -13,8 +13,7 @@
 
 <script setup>
 import DatePicker from 'primevue/datepicker'
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { useDateFormat } from '@vueuse/core'
 import { ref,computed } from 'vue'
 import { useCollectionStore } from "@/stores/collection"
 import Dialog from 'primevue/dialog'
@@ -36,17 +35,16 @@ const showDialog = ref(false)
 const trigger = ref()
 const picked = ref()
 const error = ref("")
-dayjs.extend(customParseFormat)
 
 const opened = (() => {
-   picked.value = dayjs(props.date, "YYYY-MM-DD").toDate()
+   picked.value = new Date(`${props.date}T12:00:00z`)
 })
 
 const minDate = computed(() => {
-   return dayjs(collection.startDate, "YYYY-MM-DD").toDate()
+   return new Date(`${collection.startDate}T12:00:00z`)
 })
 const maxDate = computed(() => {
-   return dayjs(collection.endDate, "YYYY-MM-DD").toDate()
+   return new Date(`${collection.endDate}T12:00:00z`)
 })
 
 const monthChanged = ( (e) => {
@@ -60,7 +58,8 @@ const yearChanged = ((e) => {
 })
 
 const datePicked = (() => {
-   let pickStr = dayjs(picked.value).format("YYYY-MM-DD")
+   let pickStr = useDateFormat(picked.value,"YYYY-MM-DD").value
+   console.log(pickStr)
    error.value = ""
    let pid = collection.getPidForDate( pickStr )
    if ( pid != "") {

@@ -68,7 +68,7 @@ const deleteLibrary = ( (library) => {
    confirm.require({
       message: `Delete pickup library <b>${library.id}</b>?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Delete',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'fal fa-exclamation-triangle',
       rejectProps: {
          label: 'Cancel',
          severity: 'secondary'

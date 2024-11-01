@@ -138,7 +138,7 @@ import { useBookmarkStore } from "@/stores/bookmark"
 import { useReserveStore } from "@/stores/reserve"
 import { useItemStore } from "@/stores/item"
 import analytics from '@/analytics'
-import { copyText } from 'vue3-clipboard'
+import { useClipboard } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import { useConfirm } from "primevue/useconfirm"
 import { useToast } from "primevue/usetoast"
@@ -148,6 +148,7 @@ import Column from 'primevue/column'
 import { setFocusID, setFocusClass } from '@/utils'
 import color from '@/assets/theme/colors.module.scss'
 
+const { copy } = useClipboard()
 const confirm = useConfirm()
 const toast = useToast()
 const userStore = useUserStore()
@@ -203,7 +204,7 @@ const deleteBookmarksClicked = ((folderInfo) => {
       confirm.require({
          message: `All selected bookmarks in ${folderInfo.folder} will be deleted.<br/><br/>This cannot be reversed.<br/><br/>Continue?`,
          header: 'Confirm Delete',
-         icon: 'pi pi-exclamation-triangle',
+         icon: 'fal fa-exclamation-triangle',
          rejectProps: {
             label: 'Cancel',
             severity: 'secondary'
@@ -223,7 +224,7 @@ const deleteFolderClicked = ((folderInfo) => {
    confirm.require({
       message: msg,
       header: 'Confirm Delete Folder',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'fal fa-exclamation-triangle',
       rejectProps: {
          label: 'Cancel',
          severity: 'secondary'
@@ -253,14 +254,8 @@ function bookmarkFollowed(identifier) {
    analytics.trigger('Bookmarks', 'FOLLOW_BOOKMARK', identifier)
 }
 function copyURL( folder ) {
-   let URL = getPublicURL(folder)
-   copyText(URL, undefined, (error, _event) => {
-      if (error) {
-         errorToast("Copy Error", "Unable to copy public bookmarks URL: "+error)
-      } else {
-         infoToast("Bookmark Copied", "Public bookmark URL copied to clipboard.")
-      }
-   })
+   copy(getPublicURL(folder))
+   infoToast("Bookmark Copied", "Public bookmark URL copied to clipboard.")
 }
 function getTitle(folderInfo) {
    let out = folderInfo.folder

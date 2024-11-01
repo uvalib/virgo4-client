@@ -18,8 +18,8 @@
                   <Tab  v-for="tab in checkoutTabs" :value="tab.id">
                      <div class="tab-header">
                         <span>{{ tab.label }}</span>
-                        <i v-if="tab.id=='uva' && userStore.lookupUVACheckouts" class="pi pi-spin pi-spinner"></i>
-                        <i v-if="tab.id=='ill' && userStore.lookupILLCheckouts" class="pi pi-spin pi-spinner"></i>
+                        <i v-if="tab.id=='uva' && userStore.lookupUVACheckouts" class="fas fa-spin fa-spinner-third"></i>
+                        <i v-if="tab.id=='ill' && userStore.lookupILLCheckouts" class="fas fa-spin fa-spinner-third"></i>
                      </div>
                   </Tab>
                </TabList>

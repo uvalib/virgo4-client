@@ -1,8 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { useSystemStore } from "@/stores/system"
-import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { useDateFormat } from '@vueuse/core'
 
 export const useCollectionStore = defineStore('collection', {
 	state: () => ({
@@ -58,7 +57,6 @@ export const useCollectionStore = defineStore('collection', {
 
    actions: {
       updateNotPublishedDates() {
-         dayjs.extend(customParseFormat)
          this.notPublishedDates = []
          let yearPubs = this.yearPublications.find( yp => yp.year == this.currentYear)
          if (yearPubs) {
@@ -71,7 +69,7 @@ export const useCollectionStore = defineStore('collection', {
                   let tgt = `${this.currentYear}-${monthStr}-${dayStr}`
                   let idx = yearPubs.dates.findIndex( mp => mp.date == tgt)
                   if (idx == -1) {
-                     let tgtDate = dayjs(tgt, "YYYY-MM-DD").toDate()
+                     let tgtDate =  new Date(`${tgt}T12:00:00z`)
                      this.notPublishedDates.push(tgtDate)
                   }
                }
@@ -85,7 +83,7 @@ export const useCollectionStore = defineStore('collection', {
                   let dayStr = `${day}`
                   dayStr = dayStr.padStart(2, "0")
                   let tgt = `${this.currentYear}-${monthStr}-${dayStr}`
-                  let tgtDate = dayjs(tgt, "YYYY-MM-DD").toDate()
+                  let tgtDate =  new Date(`${tgt}T12:00:00z`)
                   this.notPublishedDates.push(tgtDate)
                }
             }

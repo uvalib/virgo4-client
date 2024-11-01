@@ -79,7 +79,7 @@ const bookmarkClicked = (() => {
    confirm.require({
       message: `This item is bookmarked in <b>${bookmarkCount.value}</b> folders. Remove all?<br/>This cannot be reversed.<br/><br/>Continue?`,
       header: 'Confirm Remove Bookmarks',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'fal fa-exclamation-triangle',
       rejectProps: {
          label: 'Cancel',
          severity: 'secondary'

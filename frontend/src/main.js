@@ -43,8 +43,6 @@ app.use(VueAnnouncer, { router })
 
 // styles
 import '@fortawesome/fontawesome-pro/css/all.css'
-import 'primeicons/primeicons.css'
-
 
 // Primevue setup
 import PrimeVue from 'primevue/config'

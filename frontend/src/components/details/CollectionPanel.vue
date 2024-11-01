@@ -16,7 +16,7 @@
                      v-model="queryStore.basic"
                      placeholder="Search this collection"
                   >
-                  <VirgoButton icon="pi pi-search" @click="searchClicked" />
+                  <VirgoButton icon="far fa-search" @click="searchClicked" />
                </div>
                <VirgoButton class="browse" @click="browseClicked" label="Browse All" severity="info"/>
             </div>

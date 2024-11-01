@@ -26,12 +26,12 @@ import Citations from "@/components/modals/Citations.vue"
 import analytics from '@/analytics'
 import { useSystemStore } from "@/stores/system"
 import { useItemStore } from "@/stores/item"
-import { copyText } from 'vue3-clipboard'
+import { useClipboard } from '@vueuse/core'
 import { useToast } from "primevue/usetoast"
 import { ref } from 'vue'
 import { VeProgress } from "vue-ellipse-progress"
 
-
+const { copy } = useClipboard()
 const toast = useToast()
 const system = useSystemStore()
 const item = useItemStore()
@@ -61,14 +61,8 @@ const downloadRISClicked = (() => {
 
 const permalinkClicked = ( () => {
    analytics.trigger('Results', 'SHARE_ITEM_CLICKED', props.hit.identifier)
-   let URL = window.location.href
-   copyText(URL, undefined, (error, _event) => {
-      if (error) {
-         toast.add({severity:'success', summary:  "Copy Error", detail: "Unable to copy Item URL to clipboard: "+error, life: 5000})
-      } else {
-         toast.add({severity:'success', summary:  "Copied", detail:  "Item URL copied to clipboard.", life: 3000})
-      }
-   })
+   copy( window.location.href )
+   toast.add({severity:'success', summary:  "Copied", detail:  "Item URL copied to clipboard.", life: 5000})
 })
 
 const pdfProgress = (()  => {
