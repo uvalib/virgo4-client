@@ -2,6 +2,7 @@
    <svg id="library_logo_primary" data-name="library_logo_primary"
       aria-label="University of Virginia Library"
       xmlns="http://www.w3.org/2000/svg"
+      role="img"
       preserveAspectRatio="xMinYMid meet" viewBox="0 0 213 48">
       <g>
          <rect x="109.5" width="0.41" height="48" style="fill: #fff"/>
