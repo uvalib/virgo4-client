@@ -20,8 +20,8 @@
             </div>
          </div>
          <div class="controls">
-            <VirgoButton v-if="!showFull" link @click="toggle" class="toggle">...More ({{props.links.length}} items)</VirgoButton>
-            <VirgoButton v-else link @click="toggle" class="toggle" label="...Less"/>
+            <VirgoButton v-if="!showFull" link @click="toggle" class="toggle">{{ expandText }}</VirgoButton>
+            <VirgoButton v-else link @click="toggle" class="toggle" label="show less"/>
          </div>
       </div>
    </div>
@@ -40,6 +40,10 @@ const props = defineProps({
       type: Array,
       required: true
    },
+   label: {
+      type: String,
+      default: ""
+   },
    inline: {
       type: Boolean,
       default: false
@@ -51,6 +55,13 @@ const props = defineProps({
 })
 
 const showFull = ref(false)
+
+const expandText = computed(() => {
+   if ( props.label == "") {
+      return `...more (${props.links.length} items)`
+   }
+   return `...more ${props.label} (${props.links.length} items)`
+})
 
 const truncatedLinks = computed(()=>{
    if ( showFull.value || props.expand ) {

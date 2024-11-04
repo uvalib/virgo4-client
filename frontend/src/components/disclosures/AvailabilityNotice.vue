@@ -1,10 +1,9 @@
 <template>
    <div class="availability-info">
-      <DisclosureButton @clicked="clicked">
-         <span class="btn-txt">{{props.label}}</span>
+      <VirgoButton text @click="clicked">
          <i class="icon fas fa-exclamation-triangle"></i>
-      </DisclosureButton>
-
+         {{props.label}}
+      </VirgoButton>
       <Popover ref="availability" class="border">
          <div class="avail-message-panel">
             <div v-if="hasReserveInfo()" class="message">
@@ -22,7 +21,6 @@
 </template>
 
 <script setup>
-import DisclosureButton from "@/components/disclosures/DisclosureButton.vue"
 import Popover from 'primevue/popover'
 import { ref } from 'vue'
 
@@ -69,7 +67,6 @@ const messageParts = (() => {
 div.availability-info {
    .icon {
       color: $uva-red;
-      margin-left: 10px;
    }
 }
 div.avail-message-panel {

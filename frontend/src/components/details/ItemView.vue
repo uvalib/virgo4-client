@@ -23,13 +23,14 @@
             <template v-if="details.header.author">
                <dt class="label">{{details.header.author.label}}:</dt>
                <dd class="value">
-                  <V4LinksList id="author-links" :inline="true" :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
+                  <V4LinksList id="author-links" :inline="true" label="authors"
+                     :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
                </dd>
             </template>
             <template v-for="(field) in allDisplayFields">
                <dt class="label">{{field.label}}:</dt>
                <dd class="value">
-                  <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`"
+                  <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`" label="subjects"
                      :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
                   />
                   <span class="related" v-else-if="field.type=='related-url'">
@@ -51,7 +52,7 @@
                   </span>
                   <template v-else>
                      <span v-if="preferences.expandDetails" class="value" v-html="utils.fieldValueString(field)"></span>
-                     <TruncatedText v-else :id="`${details.identifier}-${field.label}`"
+                     <TruncatedText v-else :id="`${details.identifier}-${field.label}`" :label="field.label.toLowerCase()"
                         :text="utils.fieldValueString(field)" :limit="fieldLimit(field)" />
                   </template>
                </dd>
@@ -137,7 +138,7 @@ const details = computed(()=>{
 
 const expandLabel = computed (() => {
    if ( detailExpanded.value ) return "Show less"
-   return "Show more"
+   return "Show more details"
 })
 
 const showFieldsToggle = computed( () => {

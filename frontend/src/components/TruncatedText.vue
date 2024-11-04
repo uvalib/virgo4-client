@@ -34,6 +34,10 @@ const props = defineProps({
       type: Number,
       default: 80
    },
+   label: {
+      type: String,
+      default: "",
+   },
    id: {
       type: String,
       required: true
@@ -43,8 +47,11 @@ const props = defineProps({
 const showFull = ref(false)
 
 const linkLabel = computed( () => {
-   if ( showFull.value) return "...Less"
-   return "...More"
+   if ( showFull.value) return "show less"
+   if ( props.label == "") {
+      return "...more"
+   }
+   return `...more ${props.label}`
 })
 
 const isTruncated = computed(()=>{

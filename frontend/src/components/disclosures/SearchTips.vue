@@ -1,6 +1,6 @@
 <template>
    <div id="search-tips">
-      <DisclosureButton @clicked="clicked">Help me search</DisclosureButton>
+      <VirgoButton text @click="clicked">Help me search</VirgoButton>
       <Popover ref="tips" @show="showDisclosure" class="border">
          <div class="tips">
             <p class="section">How to search</p>
@@ -42,7 +42,6 @@
 
 <script setup>
 import Popover from 'primevue/popover'
-import DisclosureButton from "@/components/disclosures/DisclosureButton.vue"
 import analytics from '@/analytics'
 import { ref } from 'vue'
 
