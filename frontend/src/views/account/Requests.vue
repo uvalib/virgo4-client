@@ -27,7 +27,6 @@
                <ILLScanArticle v-if="request == 'ILLScanArticle'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
                <InstructionalScan v-if="request == 'InstructionalScan'" @canceled="cancelRequest" @submitted="requestSubmitted"/>
             </template>
-
             <h3 class="gap">Outstanding Requests</h3>
          </template>
          <div class="subcontent">
@@ -60,7 +59,7 @@
                            <dt>Deliver To:</dt>
                            <dd>{{req.pickupLocation}}</dd>
                            <dt>Date Placed:</dt>
-                           <dd>{{formatDate(req.placedDate)}}</dd>
+                           <dd>{{$formatDate(req.placedDate)}}</dd>
                            <dt>Position:</dt>
                            <dd>{{req.queuePosition}} of {{req.queueLength}}</dd>
                            <dt>Item Status:</dt>
@@ -93,7 +92,7 @@
                            <dt>Transaction Number:</dt>
                            <dd>{{req.transactionNumber}}</dd>
                            <dt>Date Requested:</dt>
-                           <dd>{{formatDate(req.creationDate)}}</dd>
+                           <dd>{{$formatDate(req.creationDate)}}</dd>
                            <dt>Status:</dt>
                            <dd>{{req.transactionStatus}}</dd>
                         </dl>
@@ -147,7 +146,7 @@
                            <dt>Transaction Number:</dt>
                            <dd>{{req.transactionNumber}}</dd>
                            <dt>Date Requested:</dt>
-                           <dd>{{formatDate(req.creationDate)}}</dd>
+                           <dd>{{$formatDate(req.creationDate)}}</dd>
                            <dt>Status:</dt>
                            <dd>{{req.transactionStatus}}</dd>
                            <template v-if="req.transactionStatus == 'Delivered to Web'">
@@ -176,7 +175,7 @@
             <dt>Hold Status:</dt>
             <dd>{{reqToCancel.status}}</dd>
             <dt>Date Placed:</dt>
-            <dd>{{formatDate(reqToCancel.placedDate)}}</dd>
+            <dd>{{$formatDate(reqToCancel.placedDate)}}</dd>
          </dl>
          <FormKit type="form" :actions="false" id="cancelHoldForm" @submit="cancelHold">
             <p v-if="reqToCancel.cancellable">Are you sure you want to cancel this request?</p>
@@ -278,10 +277,6 @@ const requestSubmitted = (() => {
    userStore.getRequests()
    systemStore.setMessage("Your request has been submitted.")
    window.scrollTo(0,0)
-})
-
-const formatDate = ((date) => {
-   return date.split("T")[0];
 })
 
 const hasNoRequests = (() => {

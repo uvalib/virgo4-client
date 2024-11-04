@@ -86,7 +86,9 @@ import { useItemStore } from "@/stores/item"
 import { usePoolStore } from "@/stores/pool"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
+import { useWindowSize } from '@vueuse/core'
 
+const { width } = useWindowSize()
 const collection = useCollectionStore()
 const item = useItemStore()
 const poolStore = usePoolStore()
@@ -129,8 +131,8 @@ const fsView = ref(false)
 const curioHeight = ref("700px")
 const defaultWidth = ()=>{
    let w = 800
-   if ( system.displayWidth < 800) {
-      w = system.displayWidth * 0.95
+   if ( width.value < 800) {
+      w = width.value * 0.95
    }
    return w + "px"
 }

@@ -56,18 +56,18 @@ import { computed } from 'vue'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
-import { useSystemStore } from "@/stores/system"
 import { usePoolStore } from "@/stores/pool"
 import { useRouter, useRoute } from 'vue-router'
 import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
+import { useWindowSize } from '@vueuse/core'
 
+const { width } = useWindowSize()
 const route = useRoute()
 const router = useRouter()
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const filterStore = useFilterStore()
-const system = useSystemStore()
 const poolStore = usePoolStore()
 
 const hasFacets = computed(()=>{
@@ -75,7 +75,7 @@ const hasFacets = computed(()=>{
 })
 
 const startExpanded = computed(()=>{
-   return system.displayWidth > 810
+   return width.value > 810
 })
 const poolFilterTitle = computed(()=>{
    if ( !startExpanded.value ) {

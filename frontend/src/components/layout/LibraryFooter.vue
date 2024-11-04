@@ -1,5 +1,5 @@
 <template>
-   <footer role="contentinfo">
+   <footer role="contentinfo" id="v4footer">
       <div class="pre-footer" v-if="route.name != 'feedback'">
          This is the newest version of the Library catalog.
          <a :href="`/feedback?url=${feedbackURL()}`" target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
@@ -107,6 +107,7 @@ footer {
    background-color: $uva-brand-blue;
    color: white;
    padding: 20px 20px 0 20px;
+   position: relative;
 
    i.fa-external-link-alt {
       display: inline-block;

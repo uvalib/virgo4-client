@@ -30,7 +30,6 @@ export const useSystemStore = defineStore('system', {
       seenTranslateMsg: false,
       translateMessage: "",
       sessionExpired: false,
-      displayWidth: window.innerWidth,
       locationCodes: [],
       libraryCodes: [],
       allPickupLibraries: [],

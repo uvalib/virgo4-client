@@ -76,12 +76,13 @@ import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useFilterStore } from "@/stores/filter"
 import { useCollectionStore } from "@/stores/collection"
-import { ref, nextTick, onMounted, onUnmounted, onUpdated, onBeforeMount, watch } from 'vue'
+import { ref, onUpdated, onBeforeMount } from 'vue'
 import axios from 'axios'
 import analytics from '@/analytics'
 import { useRoute } from 'vue-router'
-import { storeToRefs } from "pinia"
-import { setFocusID } from '@/utils'
+import { usePinnable } from '@/composables/pin'
+
+usePinnable("v4-navbar", "alerts", "v4main", "v4footer")
 
 const route = useRoute()
 const alertStore = useAlertStore()
@@ -90,50 +91,16 @@ const systemStore = useSystemStore()
 const poolStore = usePoolStore()
 const filterStore = useFilterStore()
 const collectionStore = useCollectionStore()
-
-const headerHeight = ref(0)
-const menuHeight = ref(0)
 const configuring = ref(true)
-
-// extract a ref to headerAlerts from the alertStore so it can be watched directly
-const { headerAlerts } = storeToRefs(alertStore)
-watch ( headerAlerts, () => {
-   // when header alerts change, need to recalc height of header so menu bar sticks properly
-   nextTick( ()=>{
-      let hdr = document.getElementById("v4-header")
-      if ( hdr ) {
-         headerHeight.value = hdr.offsetHeight
-         headerHeight.value -= menuHeight.value
-      }
-   })
-})
 
 function dismissAlert( uuid ) {
    let a = document.getElementById(uuid)
    a.classList.add("dismissed")
    alertStore.dismissAlert(uuid)
-   setFocusID("alertmenu")
 }
+
 function updateClicked() {
    window.location.reload()
-}
-function scrollHandler( ) {
-   let alerts = document.getElementById("alerts")
-   if ( window.scrollY <= headerHeight.value ) {
-      document.getElementById("v4-navbar").classList.remove("sticky")
-      if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0) {
-         document.getElementById("v4main").style.paddingTop = '0px'
-      } else {
-         alerts.style.paddingTop = '0px'
-      }
-   } else {
-      document.getElementById("v4-navbar").classList.add("sticky")
-      if ( !alerts || systemStore.isKiosk || alertStore.headerAlerts.length == 0 ) {
-         document.getElementById("v4main").style.paddingTop = `${menuHeight.value}px`
-      } else {
-         alerts.style.paddingTop = `${menuHeight.value}px`
-      }
-   }
 }
 
 async function initVirgo() {
@@ -217,22 +184,6 @@ onBeforeMount(() => {
    initVirgo()
 })
 
-onMounted(() => {
-   nextTick( ()=>{
-      menuHeight.value = document.getElementById("v4-navbar").offsetHeight
-      headerHeight.value = document.getElementById("v4-header").offsetHeight
-      headerHeight.value -= menuHeight.value
-   })
-   window.addEventListener("scroll", scrollHandler)
-   window.onresize = () => {
-      systemStore.displayWidth = window.innerWidth
-   }
-})
-
-onUnmounted(() => {
-   window.removeEventListener("scroll", scrollHandler)
-})
-
 onUpdated(() => {
    initZotero()
 })
@@ -284,6 +235,7 @@ onUpdated(() => {
    text-align: left;
    color: rgb(35, 45, 75);
    font-family: franklin-gothic-urw, arial, sans-serif;
+   position: relative;
 
    .alert {
       padding: .5em;
@@ -441,6 +393,8 @@ body {
    }
    #v4main {
       background: white;
+      position: relative;
+      display: block;
    }
 }
 

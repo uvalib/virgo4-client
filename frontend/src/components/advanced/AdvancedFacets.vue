@@ -40,18 +40,18 @@
 import AccordionContent from "@/components/AccordionContent.vue"
 import Checkbox from 'primevue/checkbox'
 import { computed } from 'vue'
-import { useSystemStore } from "@/stores/system"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
+import { useWindowSize } from '@vueuse/core'
 
+const { width } = useWindowSize()
 const resultStore = useResultStore()
-const systemStore = useSystemStore()
 const filters = useFilterStore()
 
 const startExpanded = computed(()=> {
-   return systemStore.displayWidth > 810
+   return width.value > 810
 })
 
 const filterToggled = ((facetID, facetValue) => {

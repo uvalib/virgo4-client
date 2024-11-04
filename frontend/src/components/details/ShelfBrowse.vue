@@ -31,9 +31,9 @@ import { computed, onMounted } from 'vue'
 import { useShelfStore } from "@/stores/shelf"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
-import { useSystemStore } from "@/stores/system"
 import analytics from '@/analytics'
 import { scrollToItem } from '@/utils'
+import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps({
    hit: {
@@ -46,8 +46,8 @@ const props = defineProps({
    }
 })
 
+const { width } = useWindowSize()
 const shelfStore = useShelfStore()
-const system = useSystemStore()
 
 const currentCallNumber = computed(()=>{
    let f =  props.hit.fields.find( f => f.name == "call_number")
@@ -80,11 +80,11 @@ const getInitialBrowseData = ( async () => {
    const restore = useRestoreStore()
    const bookmarks = useBookmarkStore()
 
-   if ( system.displayWidth <= 520 ) {
+   if ( width.value <= 520 ) {
       shelfStore.browseRange = 1
-   } else if ( system.displayWidth <= 1000 ) {
+   } else if ( width.value <= 1000 ) {
       shelfStore.browseRange = 2
-   } else if ( system.displayWidth <= 1280 ) {
+   } else if ( width.value <= 1280 ) {
       shelfStore.browseRange = 3
    } else {
       shelfStore.browseRange = 4

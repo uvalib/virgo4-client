@@ -14,11 +14,14 @@
 <script setup>
 import { useSystemStore } from "@/stores/system"
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useWindowSize } from '@vueuse/core'
 
+const { width } = useWindowSize()
 const systemStore = useSystemStore()
 const showScrollTop = ref(false)
+
 const smallScreen = computed( () => {
-   return systemStore.displayWidth <= 810
+   return width.value <= 810
 })
 
 function backToTop() {

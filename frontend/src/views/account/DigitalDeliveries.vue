@@ -48,7 +48,7 @@
                   <dt>Transaction Number:</dt>
                   <dd>{{co.transactionNumber}}</dd>
                   <dt>Date Requested:</dt>
-                  <dd>{{formatDate(co.creationDate)}}</dd>
+                  <dd>{{$formatDate(co.creationDate)}}</dd>
                   <dt>PDF Download:</dt>
                   <dd v-html="getDownloadLink(co)"></dd>
                </dl>
@@ -75,9 +75,6 @@ const webDeliveries = computed(()=>{
    return userStore.requests.illiad.filter( h=> h.transactionStatus == "Delivered to Web")
 })
 
-function formatDate(date) {
-   return date.split("T")[0];
-}
 function getDownloadLink(req) {
    let url = `https://uva.hosts.atlas-sys.com/LOGON/?Action=10&Form=75&Value=${req.transactionNumber}`
    let icon = `<i style="margin-right:5px;" class="more fas fa-link"></i>`
