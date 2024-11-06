@@ -1,5 +1,5 @@
 <template>
-   <RequestDialog trigger="Order this Item" title="Order Iten" request="Submit Order"
+   <RequestDialog trigger="Order this Item" title="Order Item" request="Submit Order"
       :show="request.activeRequest=='pda'" :showSubmit="false" :disabled="request.working"
       @opened="dialogOpened" @closed="dialogClosed"
    >
