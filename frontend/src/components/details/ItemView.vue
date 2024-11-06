@@ -15,7 +15,6 @@
       </span>
    </div>
    <div class="details-content">
-      <h2>Item Details</h2>
       <abbr class="unapi-id" :title="details.itemURL"></abbr>
       <div class="info">
          <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
@@ -280,11 +279,6 @@ const fieldLimit = (( field ) => {
       .subtitle {
          font-weight: normal;
       }
-   }
-}
-.details-content {
-   h2 {
-      margin-top: 25px !important;
    }
 }
 .nav-wrap {

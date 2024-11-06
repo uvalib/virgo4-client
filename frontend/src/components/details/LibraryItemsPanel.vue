@@ -3,7 +3,7 @@
       <div class="panel">
          <div class="gutter"></div>
          <div class="content">
-            <div class="name">{{props.library.name}}</div>
+            <h4>{{props.library.name}}</h4>
             <table>
                <thead>
                   <tr>
@@ -62,11 +62,11 @@ const props = defineProps({
          border: 1px solid $uva-grey-100;
          border-radius:  0 5px  5px 0;
          border-left: 0;
-         .name {
+         h4{
             font-weight: bold;
             padding-bottom: 10px;
             border-bottom: 1px solid $uva-grey-100;
-            margin-bottom: 10px;
+            margin: 0 0 10px 0;
          }
          table {
             width: 100%;

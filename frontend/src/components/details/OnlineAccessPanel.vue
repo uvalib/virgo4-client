@@ -4,7 +4,7 @@
          <div class="gutter"></div>
          <div class="content">
             <h3>Access online</h3>
-            <div class="header">Source</div>
+            <h4>Source</h4>
             <div class='sources'>
                <div class='source' v-for="s in props.sources">
                   <div class="name">
@@ -95,9 +95,9 @@ const linkLabel = (( providerLink ) => {
             border-bottom: 1px solid $uva-grey-100;
             margin-bottom: 10px;
          }
-         .header {
-            font-size: 0.97em;
-            font-weight: bold;
+         h4 {
+            font-size: 1rem;
+            margin: 20px 0 0 0;
          }
          .sources {
             display: flex;

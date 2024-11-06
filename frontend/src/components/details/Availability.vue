@@ -13,9 +13,7 @@
          </div>
 
          <div v-if="hasItems" class="on-shelf">
-            <h3>
-               <span>On shelf</span>
-            </h3>
+            <h3>On shelf</h3>
             <div class="avail-messages-container" v-if="system.isKiosk == false && hasAvailMessage">
                <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
                <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
