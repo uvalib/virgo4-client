@@ -70,7 +70,7 @@ const props = defineProps({
          }
          table {
             width: 100%;
-            font-size: 0.9em;
+            font-size: 1em;
             th, td {
                padding: 5px;
                width: 32%;

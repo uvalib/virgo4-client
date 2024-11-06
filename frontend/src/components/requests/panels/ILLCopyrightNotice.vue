@@ -86,7 +86,7 @@ const props = defineProps({
 </script>
 <style lang="scss" scoped>
 .notice {
-   font-size:0.9em;
+   font-size:1em;
    padding: 0;
    border: 1px solid $uva-red-A;
    margin: 0 auto;

@@ -96,6 +96,6 @@ const closeDialog = (() => {
 .error {
    text-align: center;
    margin: 10px 0 5px 0;
-   font-size: 0.9em;;
+   font-size: 1em;;
 }
 </style>

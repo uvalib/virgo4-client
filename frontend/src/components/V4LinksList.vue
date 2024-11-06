@@ -131,7 +131,7 @@ const toggle = (() => {
    .controls {
       padding: 5px 0 0 5px;
       .toggle {
-         font-size: 0.9em;
+         font-size: 1em;
       }
    }
 }

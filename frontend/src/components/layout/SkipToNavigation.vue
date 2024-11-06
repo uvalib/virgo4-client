@@ -20,7 +20,7 @@
    z-index: 9000;
    transition: transform 100ms;
    width: 200px;
-   font-size: 0.9em;
+   font-size: 1em;
    border: 3px solid white;
    &:focus {
       transform: translateY(0%);

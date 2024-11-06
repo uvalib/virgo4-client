@@ -100,7 +100,7 @@ span.provider {
    -webkit-hyphens: auto;
    -moz-hyphens: auto;
    hyphens: auto;
-   font-size: 0.9em;
+   font-size: 1em;
    display: flex;
    flex-direction: column;
    gap: 5px;

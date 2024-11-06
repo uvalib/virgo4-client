@@ -73,7 +73,7 @@ div.avail-message-panel {
    padding: 0;
    background: $uva-blue-alt-300;
    max-width: 400px;
-   font-size: 0.9em;;
+   font-size: 1em;;
 
    .message {
       padding: 10px;

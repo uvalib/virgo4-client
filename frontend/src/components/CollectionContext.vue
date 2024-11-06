@@ -56,7 +56,7 @@ function collectionPidPicked(pid) {
       .collection {
          font-weight: bold;
          margin: 0 0 5px 0;
-         font-size: 0.9em;
+         font-size: 1em;
       }
    }
 

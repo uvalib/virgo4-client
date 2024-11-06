@@ -42,7 +42,7 @@ p.group-header {
    gap: 15px;
 
    .card {
-      font-size: 0.9em;
+      font-size: 1em;
       border: 1px solid $uva-grey-100;
       max-width: 350px;
       background: white;
