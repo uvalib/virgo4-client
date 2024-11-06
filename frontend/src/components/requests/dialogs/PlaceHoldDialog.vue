@@ -92,6 +92,7 @@ const pickupLibraries = computed(()=>{
 const dialogOpened = (() => {
    selectedItem.value = null
    submitted.value = false
+   request.$reset
    request.activeRequest = "hold"
    restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
