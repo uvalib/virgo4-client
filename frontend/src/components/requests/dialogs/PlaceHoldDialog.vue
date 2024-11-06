@@ -117,14 +117,14 @@ const dialogClosed = (() =>{
    restore.save()
 })
 
-const pickupLibraryChanged = (() => {
-   if(pickupLibrary.value == "SPEC-COLL"){
+const pickupLibraryChanged = ((value) => {
+   if(value == "SPEC-COLL"){
       // Dont remember Medium Rare Location
       return
    }
 
    // when pickup library chanegs, also update preferences
-   let pl = user.libraries.find( l=>l.id == pickupLibrary.value)
+   let pl = user.libraries.find( l=>l.id == value)
    preferences.updatePickupLibrary(pl)
 })
 
