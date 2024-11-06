@@ -1,8 +1,9 @@
 <template>
    <div class="item-header" >
       <div class="title-wrap">
-         <div class="title">{{ details.header.title }}</div>
+         <h1 class="title">{{ details.header.title }}</h1>
          <div v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</div>
+
       </div>
       <span class="nav-wrap"  v-if="resultStore.selectedHitIdx > -1">
          <V4Pager
@@ -14,6 +15,7 @@
       </span>
    </div>
    <div class="details-content">
+      <h2>Item Details</h2>
       <abbr class="unapi-id" :title="details.itemURL"></abbr>
       <div class="info">
          <div v-if="poolStore.itemMessage(details.source)" class="ra-box ra-fiy pad-top" v-html="poolStore.itemMessage(details.source)">
@@ -263,7 +265,7 @@ const fieldLimit = (( field ) => {
    flex-flow: row wrap;
    justify-content: space-between;
    align-items: flex-start;
-   gap: 50px;
+   gap: 30px;
    .title-wrap {
       flex: 1;
       display: flex;
@@ -272,19 +274,21 @@ const fieldLimit = (( field ) => {
       align-items: flex-start;
       gap: 10px;
       text-align: left;
-      .title {
+      h1.title {
          font-size: 1.5rem;
-         font-weight: 700;
       }
       .subtitle {
          font-weight: normal;
       }
-      .author {
-         padding:0 0 0 40px;
-         font-weight: normal;
-      }
    }
-
+}
+.details-content {
+   h2 {
+      margin-top: 25px !important;
+   }
+}
+.nav-wrap {
+   margin-top: 30px;
 }
 
 .collection-head {

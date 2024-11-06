@@ -38,7 +38,7 @@
    </div>
    <main id="v4main" role="main">
       <VueAnnouncer />
-      <h1 id="mainheader">{{systemStore.pageTitle}}</h1>
+      <h1 v-if="route.name != 'details'" id="mainheader">{{systemStore.pageTitle}}</h1>
       <template v-if="configuring==false">
          <div v-if="alertStore.pageAlerts(route.path).length > 0" class="regional-alerts">
             <div v-for="ra in alertStore.pageAlerts(route.path)" :key="ra.uuid" class="regional-alert" :class="ra.severity" :id="ra.uuid">
