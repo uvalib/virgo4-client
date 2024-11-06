@@ -23,7 +23,11 @@ export const useShelfStore = defineStore('shelf', {
          return (state.currentIndex > 0)
       },
       isOriginalItem: state => {
-         return (state.browse[state.currentIndex].id == state.originalId)
+         const currItem = state.browse[state.currentIndex]
+         if (currItem) {
+            return (currItem.id == state.originalId)
+         }
+         return true
       }
    },
 

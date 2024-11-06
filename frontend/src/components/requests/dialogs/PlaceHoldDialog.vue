@@ -74,7 +74,7 @@ const route = useRoute()
 
 const holdForm = ref()
 const selectedItem = ref(null)
-const pickupLibrary = ref(preferences.pickupLibrary.id)
+const pickupLibrary = ref()
 const submitted = ref(false)
 
 const pickupLibraries = computed(()=>{
@@ -82,7 +82,6 @@ const pickupLibraries = computed(()=>{
       pickupLibrary.value = "SPEC-COLL"
       return [{value: "SPEC-COLL", label: "Small Special Collections Reading Room"}]
    }
-   pickupLibrary.value = preferences.pickupLibrary.id
    let libs = []
    user.libraries.forEach( l => {
       libs.push({value: l.id, label: l.name})
@@ -97,6 +96,9 @@ const dialogOpened = (() => {
    restore.setActiveRequest( request.activeRequest )
    restore.setURL(route.fullPath)
    restore.save()
+   if ( preferences.pickupLibrary && preferences.pickupLibrary.id != "") {
+      pickupLibrary.value = preferences.pickupLibrary.id
+   }
    if (user.isSignedIn) {
       analytics.trigger('Requests', 'REQUEST_STARTED', "placeHold")
       if ( request.items.length == 1) {

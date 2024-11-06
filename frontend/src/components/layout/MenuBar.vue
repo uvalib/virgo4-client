@@ -42,18 +42,18 @@ const v4Menu = computed( () => {
 
    let nonKiosk = [
       {label: "Questions? Ask a Librarian", url: "https://www.library.virginia.edu/askalibrarian",
-         target: "_blank", icon: "icon fal fa-comment-dots"},
+         icon: "icon fal fa-comment-dots"},
       {label: "Library Services", items: [
          {label: "Subject Guides", url: "https://guides.lib.virginia.edu",
-            target: "_blank", command: ()=>libServiceClicked('Subject Guides')},
+            command: ()=>libServiceClicked('Subject Guides')},
          {label: "Journal Finder", url: "https://guides.lib.virginia.edu/journalfinder",
-            target: "_blank", command: ()=>libServiceClicked('Journal Finder')},
+            command: ()=>libServiceClicked('Journal Finder')},
          {label: "Databases A-Z", url: "https://guides.lib.virginia.edu/az.php",
-            target: "_blank", command: ()=>libServiceClicked('Databases A-Z')},
+            command: ()=>libServiceClicked('Databases A-Z')},
          {label: "Spaces & Equipment", url: "https://cal.lib.virginia.edu",
-            target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
+            command: ()=>libServiceClicked('Spaces & Equipment')},
          {label: "More Library Services", url: "https://www.library.virginia.edu/services",
-            target: "_blank", command: ()=>libServiceClicked('Spaces & Equipment')},
+            command: ()=>libServiceClicked('Spaces & Equipment')},
       ]}
    ]
 

@@ -2,7 +2,8 @@
    <footer role="contentinfo" id="v4footer">
       <div class="pre-footer" v-if="route.name != 'feedback'">
          This is the newest version of the Library catalog.
-         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
+         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank" aria-describedby="new-window">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
+         <span id="new-window" class=".screen-reader-text">(opens in a new window)</span>
       </div>
       <div class="footer-container">
          <div class="footer-bucket">
@@ -36,8 +37,7 @@
                <li><a href="https://www.library.virginia.edu/renovation/">Renovation</a></li>
                <li><a href="https://www.library.virginia.edu/jobs/fellowships/">Fellowship Opportunities</a></li>
                <li class="give-library">
-                  <VirgoButton as="a" label="GIVE TO THE LIBRARY" href="https://www.library.virginia.edu/support-library"
-                     target="_blank" severity="contrast"/>
+                  <VirgoButton as="a" label="GIVE TO THE LIBRARY" href="https://www.library.virginia.edu/support-library" severity="contrast"/>
                </li>
             </ul>
          </div>
