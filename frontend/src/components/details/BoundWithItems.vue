@@ -56,8 +56,7 @@ p.group-header {
       color: $uva-text-color-base;
 
       &:hover {
-         top: -2px;
-         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
+         box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.12);
          text-decoration: none;
       }
 
