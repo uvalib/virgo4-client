@@ -41,6 +41,5 @@ const emit = defineEmits( ['prior', 'next' ] )
    font-size: 16px;
    font-weight: normal;
    gap: 34px;
-   margin-bottom: 10px;
 }
 </style>

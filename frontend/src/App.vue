@@ -195,12 +195,12 @@ onUpdated(() => {
    min-height: 500px
 }
 .header-alert {
-   background-color: rgb(37, 202, 211);
+   background-color: $uva-teal;
    text-align: center;
    padding: 0.5em;
-   font-size: 1.06rem;
+   font-size: 1rem;
    position: relative;
-   color: rgb(43, 43, 43);
+   color: $uva-text-color-dark;
    line-height: 1.1;
    font-family: franklin-gothic-urw, arial, sans-serif;
    .alert-body {
@@ -210,7 +210,7 @@ onUpdated(() => {
          font-size: 1em;
          font-weight: 400;
          display: inline-block;
-         color: rgb(0, 0, 0);
+         color: $uva-text-color-dark;
          line-height: 1.5;
          margin-left: 5px;
          font-style: normal;
@@ -219,9 +219,11 @@ onUpdated(() => {
             margin-top: 0px;
          }
          a {
-            color: rgb(20, 30, 60) !important;
-            text-decoration: underline !important;
-            font-weight: 400 !important;
+            color: $uva-blue-alt-A;
+            text-decoration: underline;
+            &:hover {
+               color: $uva-blue-alt;
+            }
          }
       }
       .lead {
@@ -233,13 +235,13 @@ onUpdated(() => {
 }
 .alerts-list {
    text-align: left;
-   color: rgb(35, 45, 75);
+   color: $uva-text-color-dark;
    font-family: franklin-gothic-urw, arial, sans-serif;
    position: relative;
 
    .alert {
       padding: .5em;
-      font-size: 1.06rem;
+      font-size: 1rem;
       line-height: 1.5;
       position: relative;
       color: $uva-text-color-dark;
@@ -291,6 +293,7 @@ onUpdated(() => {
       border-left: 8px solid $uva-blue-alt;
    }
 }
+
 .regional-alerts {
    width: 90%;
    margin: 0 auto 30px auto;
@@ -327,43 +330,6 @@ body {
    width: 100%;
    z-index: 500;
 }
-#app .screen-reader-text {
-   clip: rect(1px, 1px, 1px, 1px);
-   position: absolute !important;
-   height: 1px;
-   width: 1px;
-   overflow: hidden;
-}
-
-#app .screen-reader-text:focus {
-   background-color: #f1f1f1;
-   border-radius: 3px;
-   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
-   clip: auto !important;
-   color: #21759b;
-   display: block;
-   font-size: 14px;
-   font-size: 0.875rem;
-   font-weight: bold;
-   height: auto;
-   left: 5px;
-   line-height: normal;
-   padding: 15px 23px 14px;
-   text-decoration: none;
-   top: 5px;
-   width: auto;
-   z-index: 100000;
-}
-
-#app .dimmer {
-   position: fixed;
-   left: 0;
-   top: 0;
-   width: 100%;
-   height: 100%;
-   z-index: 10;
-   background: rgba(0, 0, 0, 0.2);
-}
 
 #app {
    font-family: "franklin-gothic-urw", arial, sans-serif;
@@ -378,7 +344,7 @@ body {
    border: 0;
 
    h1 {
-      padding: 22px 0 35px 0;
+      padding: 3rem 0 35px 0;
       position: relative;
       font-weight: 700;
       color: $uva-brand-blue;
@@ -391,16 +357,28 @@ body {
       font-size: 1.3em;
       margin: 50px 0 17px 0;
    }
+   .link-icon {
+      display: inline-block;
+      margin-left: 10px;
+   }
+   .screen-reader-text {
+      clip: rect(1px, 1px, 1px, 1px);
+      position: absolute !important;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+   }
    #v4main {
       background: white;
       position: relative;
       display: block;
+      max-width: 1600px;
+      margin: 0 auto;
+      outline: 0;
+      &:focus {
+         outline: 0;
+      }
    }
-}
-
-#app .link-icon {
-   display: inline-block;
-   margin-left: 10px;
 }
 
 a {
@@ -493,14 +471,6 @@ a {
 
 //adding accessibility for keyboard focus
 
-#v4main {
-   max-width: 1600px;
-   margin: 0 auto;
-   outline: 0;
-   &:focus {
-      outline: 0;
-   }
-}
 a:focus, input:focus, select:focus, textarea:focus, button.pool:focus, .pre-footer a:focus  {
    outline: 2px dotted $uva-brand-blue-100;
    outline-offset: 3px;

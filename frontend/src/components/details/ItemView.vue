@@ -1,10 +1,9 @@
 <template>
    <div class="item-header" >
-      <div class="title-wrap">
-         <h1 class="title">{{ details.header.title }}</h1>
-         <div v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</div>
-
-      </div>
+      <h1>
+         <span>{{ details.header.title }}</span>
+         <span v-if="details.header.subtitle" class="subtitle">{{ details.header.subtitle }}</span>
+      </h1>
       <span class="nav-wrap"  v-if="resultStore.selectedHitIdx > -1">
          <V4Pager
             :total="resultStore.selectedResults.total" :page="resultStore.selectedHit.number"
@@ -265,24 +264,26 @@ const fieldLimit = (( field ) => {
    justify-content: space-between;
    align-items: flex-start;
    gap: 30px;
-   .title-wrap {
+   h1 {
+      font-size: 1.5rem;
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       align-items: flex-start;
-      gap: 10px;
+      gap: 5px;
       text-align: left;
-      h1.title {
-         font-size: 1.5rem;
-      }
       .subtitle {
          font-weight: normal;
+         font-size: 1.25rem;
       }
    }
 }
 .nav-wrap {
-   margin-top: 30px;
+   margin-top: 3rem;
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
 }
 
 .collection-head {
@@ -303,7 +304,7 @@ h2 {
    flex-direction: column;
    justify-content: flex-end;
    align-items: flex-end;
-   width: 95%;
+   width: 85%;
    margin: 0 auto;
 }
 .info {
@@ -327,7 +328,6 @@ dl.fields {
    dd {
       margin: 0;
       width: 100%;
-      // max-width: 750px;
       text-align: left;
       word-break: break-word;
       -webkit-hyphens: auto;
@@ -346,11 +346,6 @@ dl.fields {
    }
 }
 
-.value.more {
-   margin-top: 15px;
-   padding: 15px 0 10px 0;
-   text-align: left;
-}
 .copyright {
    display: flex;
    flex-flow: row wrap;
