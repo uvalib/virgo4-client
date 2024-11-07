@@ -39,25 +39,28 @@ p.group-header {
    align-items: stretch;
    justify-content: flex-start;
    position: relative;
-   gap: 15px;
+   gap: 2rem;
 
    .card {
       font-size: 1em;
       border: 1px solid $uva-grey-100;
       max-width: 350px;
       background: white;
-      padding: 15px;
+      padding: 1rem;
       border-radius: 4px;
-      cursor: pointer;
+      cursor: pointer !important;
       position: relative;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 1rem;
       color: $uva-text-color-base;
 
       &:hover {
-         box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.12);
+         transition: 0.25s ease-in-out;
+         box-shadow: 0 0 10px 0 $uva-grey-100;
+         z-index: 2;
          text-decoration: none;
+         cursor: pointer !important;
       }
 
       .title {

@@ -121,8 +121,10 @@ const bookmarkClicked = ((id) => {
    box-sizing: border-box;
 
    &:hover, &:focus-within, &:focus {
-      top: -2px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
+      transition: 0.25s ease-in-out;
+      box-shadow: 0 0 10px 0 $uva-grey-100;
+      z-index: 2;
+      text-decoration: none;
    }
 
    .thumb-wrap {

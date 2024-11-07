@@ -481,7 +481,7 @@ onUnmounted(()=>{
       flex-flow: row wrap;
       justify-content: flex-start;
       align-items: flex-start;
-      gap: 10px;
+      gap: 1rem;
 
       a {
          display: inline-block;
@@ -496,8 +496,13 @@ onUnmounted(()=>{
          background-position: center center;
          min-width: 175px;
          min-height: 175px;
+         border-radius: 4px;
+         border: 1px solid $uva-grey-50;
          &:hover {
-            box-shadow: 0px 2px 8px 0 #444;
+            transition: 0.25s ease-in-out;
+            box-shadow: 0 0 10px 0 $uva-grey-50;
+            z-index: 2;
+            text-decoration: none;
          }
       }
    }

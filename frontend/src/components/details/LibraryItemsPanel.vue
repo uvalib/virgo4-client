@@ -7,12 +7,12 @@
                <span>{{props.library.name}}</span>
                <IconField v-if="library.items.length > 7">
                   <InputIcon class="fal fa-search" />
-                  <InputText v-model="filters['global'].value" placeholder="Search holdings" />
+                  <InputText v-model="filters['global'].value" placeholder="Search" />
                </IconField>
             </h4>
             <DataTable :value="library.items" dataKey="barcode" columnResizeMode="expand"
                :alwaysShowPaginator="false"
-               :paginator="true" :rows="7" :rowsPerPageOptions="[7,25,50]"
+               :paginator="true" :rows="10" :rowsPerPageOptions="[10,25,50]"
                paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
                currentPageReportTemplate="{first} - {last} of {totalRecords}" paginatorPosition="bottom"
                v-model:filters="filters" :globalFilterFields="['call_number', 'barcode']"
