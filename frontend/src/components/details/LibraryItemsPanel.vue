@@ -3,37 +3,47 @@
       <div class="panel">
          <div class="gutter"></div>
          <div class="content">
-            <h4>{{props.library.name}}</h4>
-            <table>
-               <thead>
-                  <tr>
-                     <th>Location/Status</th>
-                     <th>Call Number</th>
-                     <th>Barcode</th>
-                  </tr>
-               </thead>
-               <tbody>
-                  <tr v-for="(item,idx) in library.items" :key="`val-${idx}`">
-                     <td class="value">{{ item.current_location }}</td>
-                     <td class="value">{{ item.call_number }}</td>
-                     <td class="value">
-                        <template v-if="item.notice">
-                           <AvailabilityNotice :label="item.barcode" :message="item.notice" />
-                        </template>
-                        <template v-else>
-                           {{ item.barcode }}
-                        </template>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
+            <h4>
+               <span>{{props.library.name}}</span>
+               <IconField v-if="library.items.length > 7">
+                  <InputIcon class="fal fa-search" />
+                  <InputText v-model="filters['global'].value" placeholder="Search holdings" />
+               </IconField>
+            </h4>
+            <DataTable :value="library.items" dataKey="barcode" columnResizeMode="expand"
+               :alwaysShowPaginator="false"
+               :paginator="true" :rows="7" :rowsPerPageOptions="[7,25,50]"
+               paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+               currentPageReportTemplate="{first} - {last} of {totalRecords}" paginatorPosition="bottom"
+               v-model:filters="filters" :globalFilterFields="['call_number', 'barcode']"
+            >
+               <Column field="current_location" header="Location" />
+               <Column field="call_number" header="Call Number" />
+               <Column field="barcode" header="Barcode">
+                  <template #body="slotProps">
+                     <AvailabilityNotice v-if="slotProps.data.notice" :label="slotProps.data.barcode" :message="slotProps.data.notice" />
+                     <span v-else>{{ slotProps.data.barcode }}</span>
+                  </template>
+               </Column>
+            </DataTable>
          </div>
       </div>
    </section>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import InputText from 'primevue/inputtext'
+import { FilterMatchMode } from '@primevue/core/api'
+
+const filters = ref({
+   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+})
 
 const props = defineProps({
    library: {
@@ -44,6 +54,15 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
+:deep(td) {
+   width: 32%;
+}
+:deep(.p-datatable-paginator-bottom) {
+   margin-top: 5px;
+   .p-paginator {
+      padding-bottom: 0;
+   }
+}
 .library-items {
    .panel {
       display: flex;
@@ -54,7 +73,7 @@ const props = defineProps({
       .gutter {
          flex: 0 0 17px;
          border-radius: 5px  0 0 5px;
-         background-color:#BFE7F7;
+         background-color: $uva-blue-alt-300;
       }
       .content {
          flex: 1;
@@ -64,31 +83,15 @@ const props = defineProps({
          border-left: 0;
          h4{
             font-weight: bold;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             border-bottom: 1px solid $uva-grey-100;
             margin: 0 0 10px 0;
-         }
-         table {
-            width: 100%;
-            font-size: 1em;
-            th, td {
-               padding: 5px;
-               width: 32%;
-            }
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+            align-items: flex-end;
          }
       }
-   }
-}
-@media only screen and (min-width: 768px) {
-   .buttons {
-      justify-content: flex-start;
-      gap: 5px 50px;
-   }
-}
-@media only screen and (max-width: 768px) {
-   .buttons {
-      justify-content: space-between;
-      gap: 5px 10px;
    }
 }
 </style>

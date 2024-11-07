@@ -144,22 +144,23 @@ const UVA = definePreset(Aura, {
          }
       },
       datatable: {
-         paginatorTop: {
-            borderColor: colors.grey200,
+         header: {
+            borderWidth: '0 0 0 0',
          },
+         paginatorTop: {
+            borderColor: 'transparent',
+            borderWidth: '0 0 0 0'
+        },
+        paginatorBottom: {
+            borderColor: colors.grey100,
+            borderWidth: '1px 0 0 0'
+        },
          headerCell: {
-            borderColor: colors.grey200,
+            borderColor: 'transparent',
          },
          bodyCell: {
-            borderColor: colors.grey200,
-        },
-         colorScheme: {
-            light: {
-               root: {
-                  borderColor: 'transparent'
-              },
-            }
-         }
+            borderColor: 'transparent',
+        }
       },
       dialog: {
          colorScheme: {
