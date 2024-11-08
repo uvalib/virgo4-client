@@ -1,5 +1,6 @@
 <template>
-   <RequestDialog trigger="Request in Special Collections" title="Special Collections Request" request="Request"
+   <RequestDialog trigger="Request in Special Collections" title="Special Collections Request"
+      request="Next step: Go to Special Collections request system"
       :show="request.activeRequest=='aeon'" :showSubmit="submitted == false" :disabled="request.working"
       @opened="dialogOpened" @closed="dialogClosed" @submit="aeonForm.node.submit()"
    >
@@ -16,10 +17,6 @@
             validation="length:0,250"
          />
          <div class="request-footer">
-            <p>
-               Click "Request" to proceed to the Special Collections request system,
-               where you will be asked to select a visit date.
-            </p>
             <p class="notice" v-html="selectedItem.notice" v-if="selectedItem != null && selectedItem.notice"></p>
             <p>
                Questions? Please contact the Special Collections Library

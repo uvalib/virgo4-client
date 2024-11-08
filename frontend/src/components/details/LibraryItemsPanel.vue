@@ -11,7 +11,7 @@
                </IconField>
             </h4>
             <DataTable :value="library.items" dataKey="barcode" columnResizeMode="expand"
-               :alwaysShowPaginator="false"
+               :alwaysShowPaginator="false" size="small"
                :paginator="true" :rows="10" :rowsPerPageOptions="[10,25,50]"
                paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
                currentPageReportTemplate="{first} - {last} of {totalRecords}" paginatorPosition="bottom"
