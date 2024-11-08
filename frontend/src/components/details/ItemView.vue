@@ -21,14 +21,14 @@
          <ContentAdvisory v-if="item.hasContentAdvisory" mode="full"/>
          <dl class="fields" id="detail-fields">
             <template v-if="details.header.author">
-               <dt class="label">{{details.header.author.label}}:</dt>
+               <dt class="label">{{details.header.author.label}}</dt>
                <dd class="value">
                   <V4LinksList id="author-links" :inline="true" label="authors"
                      :expand="preferences.expandDetails" :links="getBrowseLinks('author', details.header.author.value)" />
                </dd>
             </template>
             <template v-for="(field) in allDisplayFields">
-               <dt class="label">{{field.label}}:</dt>
+               <dt class="label">{{field.label}}</dt>
                <dd class="value">
                   <V4LinksList v-if="field.type == 'subject'" :id="`${field.type}-links`" label="subjects"
                      :expand="preferences.expandDetails" :links="getBrowseLinks('subject', field.value)"
@@ -58,16 +58,17 @@
                </dd>
             </template>
             <template v-if="hasExtLink && system.isKiosk == false && detailExpanded">
-               <dt class="label">Full metadata:</dt>
-               <dd class="value">
+               <dt class="label">
                   <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
-                     View<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                     <span class="full-metadata">Full metadata</span>
+                     <i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
                   </a>
-               </dd>
+               </dt>
+               <dd class="value"/>
             </template>
             <template v-if="hasMarcXML && detailExpanded && system.isKiosk == false">
-               <dt class="label marc">MARC XML:</dt>
-               <dd class="value"><MarcMetadata :xml="marcXML" /></dd>
+               <dt class="label marc"><MarcMetadata :xml="marcXML" /></dt>
+               <dd class="value"></dd>
             </template>
             <dt class="toggle" v-if="showFieldsToggle">
                <VirgoButton :label="expandLabel" @click="toggleExpandedView" severity="info" size="small"
@@ -321,6 +322,21 @@ dl.fields {
       padding: 5px 8px;
       white-space: nowrap;
       vertical-align: top;
+      a {
+         display: flex;
+         flex-flow: row nowrap;
+         gap: 10px;
+         justify-content: flex-start;
+         align-items: center;
+         &:hover {
+            text-decoration: none;
+         }
+         .full-metadata {
+            color: $uva-text-color-dark;
+            font-weight: bold;
+            display: inline-block;
+         }
+      }
    }
    dt.toggle {
       margin-top: 20px;
