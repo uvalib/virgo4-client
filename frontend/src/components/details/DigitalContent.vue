@@ -454,14 +454,11 @@ onUnmounted(()=>{
 
    .img-view {
       display: inline-block;
-      margin: 0 auto;
-      .large {
-         max-width: 100%;
-         height: auto;
-         display: block;
-      }
+      border: 1px solid $uva-grey-100;
+      border-radius: 4px;
+
       .img-toolbar {
-         padding: 10px 0;
+         padding: 15px;
          text-align: right;
          a {
             font-weight: 100 !important;
@@ -497,10 +494,10 @@ onUnmounted(()=>{
          min-width: 175px;
          min-height: 175px;
          border-radius: 4px;
-         border: 1px solid $uva-grey-50;
+         border: 1px solid $uva-grey-100;
          &:hover {
             transition: 0.25s ease-in-out;
-            box-shadow: 0 0 10px 0 $uva-grey-50;
+            box-shadow: 2px 2px 12px 0px $uva-grey-50;
             z-index: 2;
             text-decoration: none;
          }

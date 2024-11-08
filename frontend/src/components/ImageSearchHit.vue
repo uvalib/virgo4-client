@@ -62,7 +62,14 @@ function iiifURL(item) {
    align-items: stretch;
    position: relative;
    width: fit-content;
+   border-radius: 4px;
    border: 1px solid $uva-grey-100;
+   &:hover {
+      transition: 0.25s ease-in-out;
+      box-shadow: 0 0 12px 0 $uva-grey-100;
+      z-index: 2;
+      text-decoration: none;
+   }
 
    .toolbar {
       padding: 10px 5px 10px 10px;
@@ -75,6 +82,7 @@ function iiifURL(item) {
       gap: 10px;
       border-bottom: 1px solid $uva-grey-100;
       cursor: default;
+      border-radius: 4px 4px 0 0;
    }
 
    .wrap {
@@ -107,12 +115,8 @@ function iiifURL(item) {
       width: 100%;
       box-sizing: border-box;
       border-top: 1px solid $uva-grey-100;
+      border-radius: 0 0 4px 4px;
    }
-}
-
-.image-container:hover {
-   top: -2px;
-   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 </style>
