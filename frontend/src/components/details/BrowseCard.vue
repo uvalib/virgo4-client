@@ -109,7 +109,7 @@ const bookmarkClicked = ((id) => {
    margin: 5px !important;
 }
 .browse-card {
-   border: 1px solid $uva-grey;
+   border: 1px solid $uva-grey-100;
    padding: 0;
    margin: 0;
    position: relative;
@@ -119,10 +119,11 @@ const bookmarkClicked = ((id) => {
    justify-content: stretch;
    font-size: .937em;
    box-sizing: border-box;
+   border-radius: 4px;
 
    &:hover, &:focus-within, &:focus {
       transition: 0.25s ease-in-out;
-      box-shadow: 0 0 10px 0 $uva-grey-100;
+      box-shadow: 0 0 12px 0 $uva-grey-100;
       z-index: 2;
       text-decoration: none;
    }
