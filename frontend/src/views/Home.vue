@@ -356,12 +356,12 @@ async function searchClicked() {
          padding: 0.5vw 0.75vw;
          border-right: 0;
          margin: 0 !important;
-         border-radius: 5px 0 0 5px;
+         border-radius: 0.3rem 0 0 0.3rem;
          flex: 1 1 auto;
          min-width: 100px;
       }
       .search {
-         border-radius: 0 5px 5px 0;
+         border-radius: 0 0.3rem 0.3rem 0;
          margin: 0;
          padding: 0 40px;
       }

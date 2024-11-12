@@ -302,7 +302,7 @@ onUpdated(() => {
       color: $uva-text-color-dark;
       background-color: $uva-teal-200;
       border: 0.2em solid $uva-teal;
-      border-radius: 0.5em;
+      border-radius: 0.3rem;
       padding: 0.75rem 1rem;
       text-align: left;
       .alert-text {
@@ -426,7 +426,7 @@ a {
    padding: .75rem 1.25rem;
    margin-bottom: 1rem;
    border: 1px solid transparent;
-   border-radius: .25rem;
+   border-radius: 0.3rem;
    h2{
       &:first-of-type {
          margin-top: .5rem;
@@ -455,7 +455,7 @@ a {
 /** regional alert: warning */
 #app .ra-warning {
    border: 0.2em solid $uva-yellow;
-   border-radius: 0.5em;
+   border-radius: 0.3rem;
    padding: 0.75rem 1rem;
    margin-bottom: 1rem;
    background-color: $uva-yellow-100;
@@ -477,7 +477,7 @@ a:focus, input:focus, select:focus, textarea:focus, button.pool:focus, .pre-foot
    outline-offset: 3px;
 }
 a:focus {
-   border-radius: 10px;
+   border-radius: 0.3rem;
 }
 footer, div.header, nav.menu {
    a:focus {

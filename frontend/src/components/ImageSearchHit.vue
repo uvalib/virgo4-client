@@ -62,7 +62,7 @@ function iiifURL(item) {
    align-items: stretch;
    position: relative;
    width: fit-content;
-   border-radius: 4px;
+   border-radius: 0.3rem;
    border: 1px solid $uva-grey-100;
    &:hover {
       transition: 0.25s ease-in-out;
@@ -82,7 +82,7 @@ function iiifURL(item) {
       gap: 10px;
       border-bottom: 1px solid $uva-grey-100;
       cursor: default;
-      border-radius: 4px 4px 0 0;
+      border-radius: 0.3rem 0.3rem 0 0;
    }
 
    .wrap {
@@ -115,7 +115,7 @@ function iiifURL(item) {
       width: 100%;
       box-sizing: border-box;
       border-top: 1px solid $uva-grey-100;
-      border-radius: 0 0 4px 4px;
+      border-radius: 0 0 0.3rem 0.3rem;
    }
 }
 

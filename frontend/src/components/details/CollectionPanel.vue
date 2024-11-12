@@ -132,11 +132,11 @@ const searchClicked = (() => {
                      flex: 1;
                      min-width: 100px;
                      width: 100%;
-                     border-radius: 4px 0 0 4px;
+                     border-radius: 0.3rem 0 0 0.3rem;
                      font-size: 1.1em;
                   }
                   button {
-                     border-radius: 0 4px 4px 0;
+                     border-radius: 0 0.3rem 0.3rem 0;
                   }
                }
             }

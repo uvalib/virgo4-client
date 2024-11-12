@@ -161,7 +161,7 @@ const shouldDisplay = ((field) => {
       display: inline-block;
    }
    .cover-img {
-      border-radius: 3px;
+      border-radius: 0.3rem;
       margin: 5px;
       max-height: 140px;
       max-width: 140px;

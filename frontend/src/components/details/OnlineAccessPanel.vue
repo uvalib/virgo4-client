@@ -77,17 +77,17 @@ const linkLabel = (( providerLink ) => {
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border-radius: 5px;
+      border-radius: 0.3rem;
       .gutter {
          flex: 0 0 17px;
-         border-radius: 5px  0 0 5px;
+         border-radius: 0.3rem  0 0 0.3rem;
          background-color:#BFE7F7;
       }
       .content {
          flex: 1;
          padding: 5px 25px 25px 25px;
          border: 1px solid $uva-grey-100;
-         border-radius:  0 5px  5px 0;
+         border-radius:  0 0.3rem  0.3rem 0;
          border-left: 0;
          h3 {
             font-size: 1.15em;

@@ -169,7 +169,7 @@ onMounted(()=>{
       background-image: url('@/assets/spinner2.gif');
       background-repeat:no-repeat;
       background-position: center 25%;
-      border-radius: 5px;
+      border-radius: 0.3rem;
    }
 }
 </style>

@@ -378,7 +378,7 @@ onUnmounted(()=>{
          cursor: pointer;
          width: 100%;
          background: white;
-         border-radius: 4px;
+         border-radius: 0.3rem;
 
          img {
             display: block;
@@ -429,7 +429,7 @@ onUnmounted(()=>{
       margin-bottom: 25px;
       iframe.curio {
          border: 1px solid $uva-grey-100;
-         border-radius: 5px;
+         border-radius: 0.3rem;
          background-image: url('@/assets/spinner2.gif');
          background-repeat:no-repeat;
          background-position: center center;
@@ -455,7 +455,7 @@ onUnmounted(()=>{
    .img-view {
       display: inline-block;
       border: 1px solid $uva-grey-100;
-      border-radius: 4px;
+      border-radius: 0.3rem;
 
       .img-toolbar {
          padding: 15px;
@@ -493,7 +493,7 @@ onUnmounted(()=>{
          background-position: center center;
          min-width: 175px;
          min-height: 175px;
-         border-radius: 4px;
+         border-radius: 0.3rem;
          border: 1px solid $uva-grey-100;
          &:hover {
             transition: 0.25s ease-in-out;

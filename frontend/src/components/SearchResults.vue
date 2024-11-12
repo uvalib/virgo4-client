@@ -218,7 +218,7 @@ const poolSelected = (( poolID ) => {
 
          button.pool {
             padding: 8px 8px 10px 8px;
-            border-radius: 5px 5px 0 0;
+            border-radius: 0.3rem 0.3rem 0 0;
             border: 1px solid $uva-grey-100;
             text-align: left;
             flex: 1 1 auto;

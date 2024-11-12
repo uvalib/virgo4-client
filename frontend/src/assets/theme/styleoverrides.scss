@@ -8,7 +8,7 @@
 
 #app {
    button.p-tab {
-      border-radius: 5px 5px 0 0;
+      border-radius: 0.3rem 0.3rem 0 0;
    }
    button.p-button-info {
       border-width: 2px;
@@ -59,7 +59,7 @@
          }
       }
       ul.p-menubar-submenu {
-         border-radius: 4px 4px 5px 5px;
+         border-radius: 0.3rem;
       }
    }
 }
@@ -68,7 +68,7 @@ div.p-select-overlay.p-component {
    background: white;
    padding: 0;
    border: 1px solid $uva-grey-100;
-   border-radius: 4px;
+   border-radius: 0.3rem;
    .p-select-option.p-select-option-selected, .p-select-option.p-select-option-selected.focus {
       background: $uva-blue-alt-300;
       color: $uva-text-color-dark;
@@ -80,7 +80,7 @@ div.p-select-overlay.p-component {
       .p-dialog-header {
          background: $uva-teal-200;
          border-bottom: 1px solid $uva-teal-100;
-         border-radius: 4px 4px 0 0;
+         border-radius: 0.3rem 0.3rem 0 0;
          margin-bottom: 20px;
       }
    }

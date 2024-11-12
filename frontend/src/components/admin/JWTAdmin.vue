@@ -47,7 +47,7 @@ function update() {
       textarea {
          border: 1px solid $uva-grey-100;
          padding: 20px;
-         border-radius: 5px;
+         border-radius: 0.3rem;
          margin-bottom: 15px;
       }
       button {
@@ -60,7 +60,7 @@ function update() {
       background: $uva-red-100;
       padding: 10px;
       border: 1px solid $uva-red-100;
-      border-radius: 5px;
+      border-radius: 0.3rem;
       color: $uva-text-color-dark;
    }
 }

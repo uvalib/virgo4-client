@@ -80,7 +80,7 @@ const formatILLDate = ((dateStr) => {
          border: 1px solid $uva-grey-100;
          background: white;
          padding: 0;
-         border-radius: 5px;
+         border-radius: 0.3rem;
 
          h3 {
             margin: 0 0 15px 0;

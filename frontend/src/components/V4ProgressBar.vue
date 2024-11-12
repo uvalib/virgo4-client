@@ -28,7 +28,7 @@ const props = defineProps({
 .v4-progress-bar {
    background: #f5f5f5;
    border: 1px solid $uva-grey-100;
-   border-radius: 4px;
+   border-radius: 0.3rem;
    padding: 10px;
    box-sizing: border-box;
    margin: 0 5px 15px 5px;
@@ -48,12 +48,12 @@ const props = defineProps({
       width: 100%;
       background: $uva-grey-100;
       border: 1px solid $uva-grey;
-      border-radius: 2px;
+      border-radius: 0.3rem;
 
       .progress-bar {
          width: 0%;
          background-color: $uva-green;
-         border-radius: 2px;
+         border-radius: 0.3rem;
          height: 100%;
          box-sizing: border-box;
          display: block;

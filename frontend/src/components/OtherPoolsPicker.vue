@@ -84,7 +84,7 @@ const poolSkipped = ((p) => {
    text-align: left;
    flex: 1 1 auto;
    padding: 8px 8px 10px 8px;
-   border-radius: 4px 4px 0 0;
+   border-radius: 0.3rem 0.3rem 0 0;
    :deep(span.p-select-label) {
       font-size: .85em;
       font-weight: normal;

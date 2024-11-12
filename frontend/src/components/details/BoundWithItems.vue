@@ -46,7 +46,7 @@ p.group-header {
       max-width: 350px;
       background: white;
       padding: 1rem;
-      border-radius: 4px;
+      border-radius: 0.3rem;
       cursor: pointer !important;
       position: relative;
       display: flex;

@@ -115,7 +115,7 @@ const toggle = (() => {
       text-align: left;
       width: 100%;
       box-sizing: border-box;
-      border-radius: 4px;
+      border-radius: 0.3rem;
       .truncated-links.inline {
          display: flex;
          flex-flow: row wrap;

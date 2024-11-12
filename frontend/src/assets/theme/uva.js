@@ -39,7 +39,7 @@ const UVA = definePreset(Aura, {
       formField: {
          paddingX: '0.75rem',
          paddingY: '0.5rem',
-         borderRadius: '4px',
+         borderRadius: '0.3rem',
          focusRing: {
              width: '1px',
              style: 'dashed',
@@ -169,7 +169,7 @@ const UVA = definePreset(Aura, {
                   background: '#ffffff',
                   borderColor: colors.grey,
                   padding: '15px 15px',
-                  borderRadius: '4px',
+                  borderRadius: '0.3rem',
                },
                header: {
                   padding: '5px 10px',
@@ -188,7 +188,7 @@ const UVA = definePreset(Aura, {
             borderColor: colors.blueAltDarkest,
          },
          baseItem: {
-            borderRadius: '4px',
+            borderRadius: '0.3rem',
          },
          item: {
             focusBackground: colors.blueAlt,
@@ -205,7 +205,7 @@ const UVA = definePreset(Aura, {
          submenu: {
             background: colors.blueAltDark,
             borderColor: colors.blueAltDark,
-            borderRadius: '4px',
+            borderRadius: '0.3rem',
             shadow: '{overlay.navigation.shadow}',
             mobileIndent: '1rem',
         },
@@ -232,7 +232,7 @@ const UVA = definePreset(Aura, {
          header: {
             background: '#f8f9fa',
             borderColor:  colors.grey100,
-            borderRadius: '4px 4px 0 0',
+            borderRadius: '0.3rem 0.3rem 0 0',
             padding: '1rem'
          },
          title: {

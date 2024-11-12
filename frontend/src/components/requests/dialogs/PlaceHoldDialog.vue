@@ -157,7 +157,7 @@ form {
       }
    }
    .medium-rare-message {
-      border-radius: 4px;
+      border-radius: 0.3rem;
       border: 2px solid $uva-red;
       padding: 5px;
    }

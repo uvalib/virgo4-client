@@ -125,7 +125,6 @@ async function filterChanged(facetID, facetValue) {
 <style lang="scss" scoped>
 .facet-sidebar {
    margin: 0px 0px 15px 0px;
-   border-radius: 5px 5px 0 0;
    flex: 1 1 25%;
    min-width: 200px;
    display: inline-block;

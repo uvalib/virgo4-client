@@ -135,7 +135,7 @@ const netbadgeLogin = (() => {
     text-align: center;
     padding: 10px;
     margin: 15px 0;
-    border-radius: 5px;
+    border-radius: 0.3rem;
     color: $uva-text-color-dark;
     background-color: $uva-red-100;
 }
@@ -181,7 +181,7 @@ h2 {
    text-align: center;
    padding: 10px;
    margin: 15px 0;
-   border-radius: 5px;
+   border-radius: 0.3rem;
    background-color: $uva-red-100;
 }
 </style>

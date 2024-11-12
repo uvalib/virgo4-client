@@ -119,7 +119,7 @@ const bookmarkClicked = ((id) => {
    justify-content: stretch;
    font-size: .937em;
    box-sizing: border-box;
-   border-radius: 4px;
+   border-radius: 0.3rem;
 
    &:hover, &:focus-within, &:focus {
       transition: 0.25s ease-in-out;

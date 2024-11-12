@@ -346,7 +346,7 @@ div.bill, div.fine {
    margin: 10px 0;
    padding: 5px;
    border: 1px solid $uva-grey;
-   border-radius: 5px;
+   border-radius: 0.3rem;
 }
 table td {
    padding: 0 5px;
@@ -381,7 +381,7 @@ div.notes p {
     text-align: center;
     padding: 10px;
     margin: 15px 20px;
-    border-radius: 5px;
+    border-radius: 0.3rem;
     color: $uva-text-color-dark;
     background-color: $uva-red-100;
 }

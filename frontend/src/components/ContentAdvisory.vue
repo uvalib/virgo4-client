@@ -107,7 +107,7 @@ const props = defineProps({
 }
    .advisory {
       background-color: #F3EC45;
-      border-radius: 10px;
+      border-radius: 0.3rem;
       display: flex;
       flex-flow: row nowrap;
       justify-content: flex-start;
@@ -133,7 +133,6 @@ const props = defineProps({
             background-repeat: no-repeat;
             background-position: center center;
             background-color: #2b2b2b;
-            border-radius: 40px;
          }
       }
    }

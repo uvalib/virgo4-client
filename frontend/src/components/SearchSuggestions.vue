@@ -85,7 +85,7 @@ h2 {
    padding: 10px;
    background-color: white;
    border: 1px solid $uva-grey-100;
-   border-radius: 4px;
+   border-radius: 0.3rem;
 }
 .note  {
    font-weight: 100;

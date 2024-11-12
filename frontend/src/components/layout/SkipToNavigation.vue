@@ -16,7 +16,7 @@
    top: 10px;
    left: 10px;
    transform: translateY(-150%);
-   border-radius: 5px;
+   border-radius: 0.3rem;
    z-index: 9000;
    transition: transform 100ms;
    width: 200px;

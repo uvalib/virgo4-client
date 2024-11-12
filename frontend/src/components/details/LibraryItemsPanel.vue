@@ -81,17 +81,17 @@ const props = defineProps({
       flex-flow: row nowrap;
       justify-content: flex-start;
       align-items: stretch;
-      border-radius: 5px;
+      border-radius: 0.3rem;
       .gutter {
          flex: 0 0 17px;
-         border-radius: 5px  0 0 5px;
+         border-radius: 0.3rem  0 0 0.3rem;
          background-color: $uva-blue-alt-300;
       }
       .content {
          flex: 1;
          padding: 20px;
          border: 1px solid $uva-grey-100;
-         border-radius:  0 5px  5px 0;
+         border-radius:  0 0.3rem  0.3rem 0;
          border-left: 0;
          h4{
             font-weight: bold;
@@ -102,6 +102,9 @@ const props = defineProps({
             flex-flow: row wrap;
             justify-content: space-between;
             align-items: flex-end;
+            a {
+               font-weight: bold;
+            }
          }
       }
    }

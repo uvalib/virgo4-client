@@ -102,7 +102,7 @@ const okClicked = ( async () => {
    background: white;
    padding: 10px 15px;
    overflow-y: scroll;
-   border-radius: 5px;
+   border-radius: 0.3rem;
 
    ul.folders {
       list-style: none;

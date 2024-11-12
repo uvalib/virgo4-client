@@ -206,7 +206,7 @@ onMounted(()=>{
       border: 1px solid $uva-grey-100;
       width: 100%;
       box-sizing: border-box;
-      border-radius: 5px;
+      border-radius: 0.3rem;
 
       :deep(button.v4-form-input.icon) {
          border: none;

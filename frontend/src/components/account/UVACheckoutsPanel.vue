@@ -125,7 +125,7 @@ const fineIsVisible = ((co) => {
    padding: 5px 15px;
    width:fit-content;
    margin: 2px 0;
-   border-radius: 5px;
+   border-radius: 0.3rem;
 }
 :deep(.details div.recall) {
    background-color: $uva-yellow;
@@ -134,7 +134,7 @@ const fineIsVisible = ((co) => {
    padding: 5px 15px;
    width:fit-content;
    margin: 2px 0;
-   border-radius: 5px;
+   border-radius: 0.3rem;
 }
 
 .checkout-panel {
@@ -165,7 +165,7 @@ const fineIsVisible = ((co) => {
          border: 1px solid $uva-grey-100;
          background: white;
          padding: 0;
-         border-radius: 5px;
+         border-radius: 0.3rem;
 
          h3 {
             margin: 0 0 15px 0;
@@ -195,7 +195,7 @@ const fineIsVisible = ((co) => {
             background-color: $uva-red-100;
             color: $uva-text-color-dark;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 0.3rem;
          }
       }
    }
@@ -230,7 +230,7 @@ const fineIsVisible = ((co) => {
 .fine-value {
   background: $uva-red-A;
   color: white;
-  border-radius: 5px;
+  border-radius: 0.3rem;
   font-weight: bold;
   padding: 5px 15px;
   margin-bottom: 2px;
