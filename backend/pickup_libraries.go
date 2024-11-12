@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -11,6 +12,7 @@ type pickupLibrary struct {
 	ID      int    `json:"primaryKey"`
 	Key     string `json:"id"`
 	Name    string `json:"name"`
+	URL     string `json:"url"`
 	Enabled bool   `json:"enabled"`
 }
 
@@ -26,14 +28,22 @@ func (svc *ServiceContext) UpdatePickupLibrary(c *gin.Context) {
 		return
 	}
 
-	dbResp := svc.GDB.Debug().Model(&plReq).Select("Key", "Name", "Enabled").Updates(plReq)
-	if dbResp.Error != nil {
-		log.Printf("ERROR: unable to update pickup library %s: %s", id, dbResp.Error.Error())
-		c.String(http.StatusInternalServerError, dbResp.Error.Error())
+	var origReq pickupLibrary
+	dbErr := svc.GDB.First(&origReq, plReq.ID).Error
+	if dbErr != nil {
+		log.Printf("ERROR: unable to load pickuplibraray %d: %s", plReq.ID, dbErr.Error())
+		c.String(http.StatusBadRequest, fmt.Sprintf("unable to load pickup library %d details: %s", plReq.ID, dbErr.Error()))
 		return
 	}
 
-	if plReq.Enabled == false {
+	dbErr = svc.GDB.Save(&plReq).Error
+	if dbErr != nil {
+		log.Printf("ERROR: unable to update pickup library %s: %s", id, dbErr.Error())
+		c.String(http.StatusInternalServerError, dbErr.Error())
+		return
+	}
+
+	if plReq.Enabled == false && origReq.Enabled == true {
 		log.Printf("INFO: %s has been disabled; remove it from user preferences", plReq.Key)
 		svc.removePickupLibraryPreferences(plReq.Key)
 	}
@@ -52,10 +62,10 @@ func (svc *ServiceContext) AddPickupLibrary(c *gin.Context) {
 	}
 	log.Printf("INFO: create new pickup library: %+v", plReq)
 
-	dbResp := svc.GDB.Create(&plReq)
-	if dbResp.Error != nil {
-		log.Printf("ERROR: unable to create pickup library: %s", dbResp.Error.Error())
-		c.String(http.StatusInternalServerError, dbResp.Error.Error())
+	dbErr := svc.GDB.Create(&plReq).Error
+	if dbErr != nil {
+		log.Printf("ERROR: unable to create pickup library: %s", dbErr.Error())
+		c.String(http.StatusInternalServerError, dbErr.Error())
 		return
 	}
 
@@ -66,10 +76,10 @@ func (svc *ServiceContext) AddPickupLibrary(c *gin.Context) {
 func (svc *ServiceContext) DeletePickupLibrary(c *gin.Context) {
 	id := c.Param("id")
 	log.Printf("INFO: delete pickup library %s", id)
-	dbResp := svc.GDB.Delete(&pickupLibrary{}, id)
-	if dbResp.Error != nil {
-		log.Printf("ERROR: unable to delete pickup library: %s", dbResp.Error.Error())
-		c.String(http.StatusInternalServerError, dbResp.Error.Error())
+	dbErr := svc.GDB.Delete(&pickupLibrary{}, id).Error
+	if dbErr != nil {
+		log.Printf("ERROR: unable to delete pickup library: %s", dbErr.Error())
+		c.String(http.StatusInternalServerError, dbErr.Error())
 		return
 	}
 

@@ -227,6 +227,7 @@ export const useSystemStore = defineStore('system', {
       },
 
       async updatePickupLibrary(lib) {
+         console.log(lib)
          return axios.post(`/api/pickuplibraries/${lib.primaryKey}/update`, lib).then((response) => {
             let rec = response.data
             let recIdx = this.allPickupLibraries.findIndex( p => p.primaryKey == rec.primaryKey)
@@ -238,7 +239,8 @@ export const useSystemStore = defineStore('system', {
          })
       },
 
-      async addPickupLibrary(lib) {
+      async addPickupLibrary() {
+         const lib = this.allPickupLibraries.pop()
          return axios.post(`/api/pickuplibraries`, lib).then((response) => {
             this.allPickupLibraries.push(response.data)
          }).catch((error) => {

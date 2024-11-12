@@ -2,37 +2,47 @@
    <div v-if="userStore.isAdmin" class="libary-admin">
       <h3>
          <span>Pickup Library Management</span>
-         <VirgoButton @click="addPickupLibraryClicked" :disabled="editIndex == systemStore.allPickupLibraries.length">Add</VirgoButton>
+         <VirgoButton @click="addPickupLibraryClicked">Add</VirgoButton>
       </h3>
       <div class="content form">
-         <div class="row" v-for="(pl,idx) in systemStore.allPickupLibraries" :key="`pl${pl.primaryKey}`">
-            <template v-if="idx == editIndex">
-               <input class="edit id" v-model="editRec.id" />
-               <input class="edit name" v-model="editRec.name" />
-               <div class="actions">
-                  <VirgoButton severity="secondary" @click="cancelClicked">Cancel</VirgoButton>
-                  <VirgoButton severity="secondary" @click="updateClicked">Update</VirgoButton>
-               </div>
-            </template>
-            <template v-else>
-               <div class="col id">{{pl.id}}</div>
-               <div class="col name">{{pl.name}}</div>
-               <div class="actions">
-                  <Checkbox :disabled="editIndex > -1" v-model="pl.enabled" :inputId="`pl${pl.primaryKey}`" :binary="true"  @change="enableClicked(pl)" />
-                  <label :for="`pl${pl.primaryKey}`" class="cb-label">Enabled</label>
-                  <VirgoButton :disabled="editIndex > -1" severity="secondary" @click="editClicked(idx, pl)" label="Edit" />
-                  <VirgoButton :disabled="editIndex > -1" severity="danger" @click="deleteLibrary(pl)" label="Delete" />
-               </div>
-            </template>
-         </div>
-         <div class="row add" v-if="editIndex == systemStore.allPickupLibraries.length">
-            <input type="text" class="edit id" v-model="editRec.id" />
-            <input  type="text" class="edit name" v-model="editRec.name" />
-            <div class="actions">
-               <VirgoButton severity="secondary" @click="cancelClicked">Cancel</VirgoButton>
-               <VirgoButton severity="secondary" @click="addConfirmed">Add</VirgoButton>
-            </div>
-         </div>
+         <DataTable :value="systemStore.allPickupLibraries" size="small" dataKey="primaryKey"
+            editMode="row" @row-edit-save="saveChanges" @row-edit-cancel="editCanceled" v-model:editingRows="editRec"
+         >
+            <Column field="enabled" header="Enabled" style="width: 6rem">
+               <template #body="slotProps">
+                  <span class="enabled" v-if="slotProps.data.enabled">Yes</span>
+                  <span class="disabled" v-else>No</span>
+               </template>
+               <template #editor="{ data, field }">
+                  <ToggleButton v-model="data[field]"onLabel="Yes" offLabel="No" />
+               </template>
+            </Column>
+            <Column field="id" header="ID">
+               <template #editor="{ data, field }">
+                  <InputText v-model="data[field]" fluid />
+                </template>
+            </Column>
+            <Column field="name" header="Name">
+               <template #editor="{ data, field }">
+                  <InputText v-model="data[field]" fluid />
+                </template>
+            </Column>
+            <Column field="url" header="URL">
+               <template #body="slotProps">
+                  <a  v-if="slotProps.data.url" :href="slotProps.data.ur" target="_blank">{{ slotProps.data.url }}</a>
+                  <span v-else class="none">None</span>
+               </template>
+               <template #editor="{ data, field }">
+                  <InputText v-model="data[field]" fluid />
+                </template>
+            </Column>
+            <Column :rowEditor="true" style="width: 6rem" bodyStyle="text-align:center"></Column>
+            <Column style="width: 2rem" bodyStyle="text-align:center">
+               <template #body="slotProps">
+                  <VirgoButton @click="deleteLibrary(slotProps.data)" rounded text icon="fas fa-trash"/>
+               </template>
+            </Column>
+         </DataTable>
       </div>
    </div>
 </template>
@@ -41,27 +51,27 @@
 import { useUserStore } from "@/stores/user"
 import { useSystemStore } from "@/stores/system"
 import { useConfirm } from "primevue/useconfirm"
-import Checkbox from 'primevue/checkbox'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+import ToggleButton from 'primevue/togglebutton'
 import { ref } from 'vue'
 
 const userStore = useUserStore()
 const systemStore = useSystemStore()
 const confirm = useConfirm()
 
-const editIndex = ref(-1)
-const editRec = ref({primaryKey: 0, id: "", name: "", enabled: false})
+const editRec = ref([])
 
 const addPickupLibraryClicked = (() => {
-   editIndex.value = systemStore.allPickupLibraries.length
-   editRec.value.primaryKey = 0
-   editRec.value.id = ""
-   editRec.value.name = ""
-   editRec.value.enabled = true
-})
-
-const addConfirmed = ( async () => {
-   await systemStore.addPickupLibrary(editRec.value)
-   cancelClicked()
+   const newRec = {
+      primaryKey:  0,
+      id: "",
+      name: "",
+      enabled: true
+   }
+   systemStore.allPickupLibraries.push(newRec)
+   editRec.value = [newRec]
 })
 
 const deleteLibrary = ( (library) => {
@@ -82,26 +92,20 @@ const deleteLibrary = ( (library) => {
    })
 })
 
-const updateClicked = ( async () => {
-   await systemStore.updatePickupLibrary(editRec.value)
-   cancelClicked()
-})
+const editCanceled = (event) => {
+   let { newData } = event
+   if ( newData.primaryKey == 0) {
+      systemStore.allPickupLibraries.pop()
+   }
+}
 
-const cancelClicked = (() => {
-   editIndex.value = -1
-   editRec.value = {primaryKey: 0, id: "", name: "", enabled: false}
-})
-
-const enableClicked = ((pl) => {
-   systemStore.updatePickupLibrary(pl)
-})
-
-const editClicked = ( (idx, rec) => {
-   editIndex.value = idx
-   editRec.value.primaryKey = rec.primaryKey
-   editRec.value.id = rec.id
-   editRec.value.name = rec.name
-   editRec.value.enabled = rec.enabled
+const saveChanges = ( (event) => {
+   let { newData } = event
+   if ( newData.primaryKey == 0) {
+      systemStore.addPickupLibrary(editRec.value)
+   } else {
+      systemStore.updatePickupLibrary(newData)
+   }
 })
 </script>
 
@@ -123,35 +127,28 @@ const editClicked = ( (idx, rec) => {
       }
    }
    .content.form {
-      padding: 5px 20px 20px 20px;
-      display: flex;
-      flex-flow: column;
-      justify-content: flex-start;
-
-      .row.add {
-         margin-top: 20px;
+      padding: 20px;
+      .none {
+         color: $uva-grey-50;
+         font-style: italic;
       }
-      .row {
-         display: flex;
-         flex-flow: row nowrap;
-         justify-content: flex-start;
-         align-items: stretch;
-         margin: 5px 0;
-         gap: 10px;
-         input.edit.name {
-            width: 100%;
-         }
-         .col.id {
-            width: 150px;
-         }
-         .actions {
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: flex-end;
-            align-items: center;
-            flex-grow: 1;
-            gap: 10px;
-         }
+      .enabled {
+         background-color: $uva-green-A;
+         color: white;
+         padding: 6px 10px;
+         border-radius: 0.3rem;
+         width: 90%;
+         display: inline-block;
+         text-align: center;
+      }
+      .disabled {
+         background-color: $uva-red-A;
+         color: white;
+         padding: 6px 10px;
+         border-radius: 0.3rem;
+         width: 90%;
+         display: inline-block;
+         text-align: center;
       }
    }
 }

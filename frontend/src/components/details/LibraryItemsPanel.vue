@@ -4,7 +4,8 @@
          <div class="gutter"></div>
          <div class="content">
             <h4>
-               <span>{{props.library.name}}</span>
+               <a v-if="libraryURL" :href="libraryURL" target="_blank">{{ props.library.name }}</a>
+               <span v-else>{{props.library.name}}</span>
                <IconField v-if="library.items.length > 7">
                   <InputIcon class="fal fa-search" />
                   <InputText v-model="filters['global'].value" placeholder="Search" />
@@ -32,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -40,6 +41,17 @@ import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import { FilterMatchMode } from '@primevue/core/api'
+import { useSystemStore } from "@/stores/system"
+
+const system = useSystemStore()
+
+const libraryURL = computed( () => {
+   const lib = system.allPickupLibraries.find( pl => pl.id == (props.library.id) )
+   if ( lib ) {
+      return lib.url
+   }
+   return null
+})
 
 const filters = ref({
    global: { value: null, matchMode: FilterMatchMode.CONTAINS },

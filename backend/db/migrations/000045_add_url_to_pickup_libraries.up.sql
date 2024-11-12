@@ -1,0 +1,3 @@
+BEGIN;
+ALTER TABLE pickup_libraries ADD COLUMN url VARCHAR(80);
+COMMIT;
