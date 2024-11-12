@@ -116,6 +116,7 @@ onUpdated(()=>{
    min-height: 400px;
 
    .working {
+      padding-top: 5%;
       text-align: center;
    }
    .working img {

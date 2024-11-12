@@ -3,7 +3,7 @@
       <V4Spinner message="Loading digital content..." />
    </div>
    <div v-else class="details-content" v-bind:style="{width: curioWidth }">
-      <div class="title">{{ item.details.header.title }}</div>
+      <h1>{{ item.details.header.title }}</h1>
       <ActionsPanel :hit="item.details" :pool="item.details.source" from="COLLECTION" />
 
       <h2>View online</h2>
@@ -148,10 +148,6 @@ onMounted(()=>{
 </script>
 
 <style lang="scss" scoped>
-div.title {
-   font-size: 1.5rem;
-   font-weight: 700;
-}
 .issue-info {
    font-weight: bold;
    margin: 10px 0;

@@ -191,8 +191,9 @@ onUpdated(() => {
 
 <style lang="scss">
 .configure {
-   padding-bottom: 150px;
-   min-height: 500px
+   padding: 5% 0 150px 0;
+   min-height: 500px;
+   font-size: 1.15em;
 }
 .header-alert {
    background-color: $uva-teal;

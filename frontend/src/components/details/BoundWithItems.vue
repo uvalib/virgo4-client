@@ -6,7 +6,6 @@
          <p class="title">{{ boundItem.title }}</p>
          <p>{{ boundItem.author }}</p>
          <p>{{ boundItem.call_number }}</p>
-         <p v-if="'u' + boundItem.title_id != item.identifier">(Click for availability)</p>
       </router-link>
    </div>
 
