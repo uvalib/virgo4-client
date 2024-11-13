@@ -29,10 +29,9 @@
       <template #footer>
          <VirgoButton v-if="showSignInMessage" severity="secondary" @click="closeDialog" label="Close"/>
          <template v-else>
-            <VirgoButton v-if="showAdd==false" class="left" @click="addFolder" label="New Folder"/>
-            <VirgoButton v-if="showAdd==false" severity="secondary" @click="cancelBookmark" label="Cancel"/>
-            <VirgoButton v-else severity="secondary" @click="cancelBookmark" label="Cancel Create"/>
-            <VirgoButton @click="okBookmark" label="OK"/>
+            <VirgoButton v-if="showAdd==false" class="left" severity="info" @click="addFolder" label="Create new folder"/>
+            <VirgoButton severity="secondary" @click="cancelBookmark" label="Cancel"/>
+            <VirgoButton @click="okBookmark" label="Add"/>
          </template>
       </template>
    </Dialog>
@@ -114,6 +113,9 @@ const okBookmark = (async () => {
 </script>
 
 <style lang="scss" scoped>
+.left {
+   margin-right: auto;
+}
 div.add-content {
    p {
       padding: 0;

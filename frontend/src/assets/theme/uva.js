@@ -163,22 +163,23 @@ const UVA = definePreset(Aura, {
         }
       },
       dialog: {
-         colorScheme: {
-            light: {
-               root: {
-                  background: '#ffffff',
-                  borderColor: colors.grey,
-                  padding: '15px 15px',
-                  borderRadius: '0.3rem',
-               },
-               header: {
-                  padding: '5px 10px',
-               },
-               title: {
-                  fontWeight: '600',
-                  fontSize: '1em',
-               }
-            }
+         root: {
+            background: '#ffffff',
+            borderColor: colors.grey,
+            borderRadius: '0.3rem',
+         },
+         header: {
+            padding: '5px 10px',
+         },
+         content: {
+            padding: '1.5rem'
+         },
+         title: {
+            fontWeight: '600',
+            fontSize: '1em',
+         },
+         footer: {
+            gap: '1rem'
          }
       },
       menubar: {
@@ -297,6 +298,33 @@ const UVA = definePreset(Aura, {
             }
          }
       },
+      toast: {
+         root: {
+            borderWidth: '1px'
+         },
+         content: {
+            gap: '1rem'
+         },
+         text: {
+            gap: '0.5rem'
+         },
+         summary: {
+            fontWeight: '400',
+            fontSize: '1.15rem'
+         },
+         icon: {
+            size: '2rem'
+         },
+         colorScheme: {
+            light: {
+               success: {
+                  background: colors.green200,
+                  borderColor: colors.green,
+                  color: colors.textDark
+               }
+            }
+         }
+      }
    },
    directives: {
       tooltip,
