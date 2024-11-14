@@ -85,15 +85,15 @@ const linkLabel = (( providerLink ) => {
       }
       .content {
          flex: 1;
-         padding: 5px 25px 25px 25px;
+         padding: 1rem;
          border: 1px solid $uva-grey-100;
          border-radius:  0 0.3rem  0.3rem 0;
          border-left: 0;
          h3 {
             font-size: 1.15em;
-            padding-bottom: 10px;
+            padding-bottom: 1rem;
             border-bottom: 1px solid $uva-grey-100;
-            margin-bottom: 10px;
+            margin: 0 0 1rem 0;
          }
          h4 {
             font-size: 1rem;
@@ -107,6 +107,7 @@ const linkLabel = (( providerLink ) => {
             .source {
                display: flex;
                flex-flow: row wrap;
+               gap: 1rem;
             }
             .links {
                display: flex;

@@ -314,12 +314,12 @@ h2 {
 dl.fields {
    grid-template-columns: max-content 2fr;
    display: inline-grid;
-   grid-column-gap: 20px;
+   grid-column-gap:  2rem;
    width: 100%;
    dt {
       font-weight: bold;
       text-align: left;
-      padding: 5px 8px;
+      padding: 0.5rem 0;
       white-space: nowrap;
       vertical-align: top;
       a {
@@ -349,7 +349,7 @@ dl.fields {
       -webkit-hyphens: auto;
       -moz-hyphens: auto;
       hyphens: auto;
-      padding: 4px 0px;
+      padding: 0.5rem 0;
       :deep(p) {
          padding: 0;
          margin: 5px 0;

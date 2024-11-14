@@ -89,15 +89,15 @@ const props = defineProps({
       }
       .content {
          flex: 1;
-         padding: 20px;
+         padding: 1rem;
          border: 1px solid $uva-grey-100;
          border-radius:  0 0.3rem  0.3rem 0;
          border-left: 0;
          h4{
             font-weight: bold;
-            padding-bottom: 15px;
+            padding-bottom: 1rem;
             border-bottom: 1px solid $uva-grey-100;
-            margin: 0 0 10px 0;
+            margin: 0 0 1rem 0;
             display: flex;
             flex-flow: row wrap;
             justify-content: space-between;

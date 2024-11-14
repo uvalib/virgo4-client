@@ -90,6 +90,8 @@ const UVA = definePreset(Aura, {
          root: {
             paddingY: '.5em',
             paddingX: '1em',
+            gap: '1rem',
+            borderRadius: '0.3rem',
             sm: {
                fontSize: '0.875rem',
                paddingX: '0.625rem',
@@ -144,9 +146,6 @@ const UVA = definePreset(Aura, {
          }
       },
       datatable: {
-         header: {
-            borderWidth: '0 0 0 0',
-         },
          paginatorTop: {
             borderColor: 'transparent',
             borderWidth: '0 0 0 0'

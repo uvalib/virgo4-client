@@ -80,7 +80,7 @@ if (selectList.length == 1) {
 
       .content {
          flex: 1;
-         padding: 0 20px 25px 20px;
+         padding: 1rem;
          border: 1px solid $uva-grey-100;
          border-radius:  0 0.3rem  0.3rem 0;
 
@@ -99,8 +99,9 @@ if (selectList.length == 1) {
 
          h3 {
             font-size: 1.15em;
-            padding-bottom: 10px;
+            padding-bottom: 1rem;
             border-bottom: 1px solid $uva-grey-100;
+            margin: 0 0 1rem 0;
          }
 
          .message {

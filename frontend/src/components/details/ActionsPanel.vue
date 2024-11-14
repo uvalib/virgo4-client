@@ -130,27 +130,15 @@ const pdfClicked= ( async() => {
          display: flex;
          flex-flow: row wrap;
          align-items: center;
-         padding: 10px 30px 10px 20px;
+         padding: 1rem;
          border: 1px solid $uva-grey-100;
          border-radius:  0 0.3rem  0.3rem 0;
          border-left: 0;
-         gap: 40px;
+         gap: 2rem;
          .pdf-wrap {
             position: relative;
          }
       }
-   }
-}
-@media only screen and (min-width: 768px) {
-   .buttons {
-      justify-content: flex-start;
-      gap: 5px 50px;
-   }
-}
-@media only screen and (max-width: 768px) {
-   .buttons {
-      justify-content: space-around;
-      gap: 5px 10px;
    }
 }
 </style>

@@ -39,14 +39,14 @@ const directLinkClicked = ( (url) => {
    .requests {
       flex-flow: row wrap;
       align-items: flex-start;
-      gap: 10px;
+      gap: 1rem;
    }
 }
 @media only screen and (max-width: 768px) {
    .requests {
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 0.5rem;
       :deep(button.p-button) {
          width:300px;
       }

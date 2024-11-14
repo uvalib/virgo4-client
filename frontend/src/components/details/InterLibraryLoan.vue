@@ -151,15 +151,15 @@ onMounted(()=>{
       }
       .content {
          flex: 1;
-         padding: 5px 30px 25px 25px;
+         padding: 1rem;
          border: 1px solid $uva-grey-100;
          border-radius:  0 0.3rem  0.3rem 0;
          border-left: 0;
          h3 {
             font-size: 1.15em;
-            padding-bottom: 10px;
+            padding-bottom: 1rem;
             border-bottom: 1px solid $uva-grey-100;
-            margin-bottom: 10px;
+            margin: 0 0 1rem 0;
          }
          .message {
             padding: 0 0 15px 0;

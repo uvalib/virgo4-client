@@ -6,7 +6,7 @@
       <div class="availability-content" v-else>
          <h2>Availability</h2>
 
-         <div class="online">
+         <div class="online" v-if="hasOnlineContent">
             <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
                :title="item.details.header.title" :pool="item.details.source" :sources="item.onlineAccessSources" />
             <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
@@ -58,6 +58,11 @@ const request = useRequestStore()
 const user = useUserStore()
 const system = useSystemStore()
 
+const hasOnlineContent = computed( () => {
+   if (item.onlineAccessSources.length > 0 && !system.isKiosk) return true
+   if (dibsItems.length > 0) return true
+   return false
+})
 const hasItems = computed(()=>{
    return item.availability.libraries.length > 0
 })
@@ -151,11 +156,6 @@ const dibsItems = computed(()=>{
       border-top: 1px solid $uva-grey-100;
       margin-bottom: 30px;
       .avail-message {
-         display: flex;
-         flex-direction: column;
-         justify-self: flex-start;
-         align-items: flex-start;
-         gap: 5px;
          :deep(p) {
             margin: 0;
             padding: 0;
@@ -165,9 +165,11 @@ const dibsItems = computed(()=>{
    .online {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 1rem;
    }
    .on-shelf {
+      display: flex;
+      flex-direction: column;
       h3 {
          margin: 30px 0;
          display: flex;
@@ -202,7 +204,7 @@ const dibsItems = computed(()=>{
    .libraries {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 2rem;
    }
 }
 @media only screen and (max-width: 700px) {
