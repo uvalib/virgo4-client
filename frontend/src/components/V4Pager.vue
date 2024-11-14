@@ -1,12 +1,12 @@
 <template>
    <span class=v4-pager>
       <VirgoButton size="small" :disabled="!props.prevAvailable"  severity="secondary"
-         icon="far fa-arrow-left" @click="emit('prior')" aria-label="previous result" />
+         icon="fal fa-arrow-left" @click="emit('prior')" aria-label="previous result" />
       <span class="page-info">
          {{$formatNum(props.page)}} of {{$formatNum(props.total)}}
       </span>
       <VirgoButton size="small"  :disabled="!props.nextAvailable" severity="secondary"
-         icon="far fa-arrow-right" @click="emit('next')" aria-label="next result" />
+         icon="fal fa-arrow-right" @click="emit('next')" aria-label="next result" />
    </span>
 </template>
 

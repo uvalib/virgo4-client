@@ -15,8 +15,8 @@
                   <td>{{lc.id}}</td>
                   <td>{{lc.key}}</td>
                   <td>{{lc.description}}</td>
-                  <td class="center" v-html="getIcon(lc.on_shelf)"></td>
-                  <td class="center" v-html="getIcon(lc.circulating)"></td>
+                  <td class="center"><span :class="getText(lc.on_shelf).toLowerCase()">{{ getText(lc.on_shelf) }}</span></td>
+                  <td class="center"><span :class="getText(lc.circulating).toLowerCase()">{{ getText(lc.circulating) }}</span></td>
                </tr>
             </tbody>
          </table>
@@ -33,10 +33,10 @@
                   <td>{{lc.id}}</td>
                   <td>{{lc.key}}</td>
                   <td>{{lc.description}}</td>
-                  <td class="center" v-html="getIcon(lc.online)"></td>
-                  <td class="center" v-html="getIcon(lc.shadowed)"></td>
-                  <td class="center" v-html="getIcon(lc.on_shelf)"></td>
-                  <td class="center" v-html="getIcon(lc.circulating)"></td>
+                  <td class="center"><span :class="getText(lc.online).toLowerCase()">{{ getText(lc.online) }}</span></td>
+                  <td class="center"><span :class="getText(lc.shadowed).toLowerCase()">{{ getText(lc.shadowed) }}</span></td>
+                  <td class="center"><span :class="getText(lc.on_shelf).toLowerCase()">{{ getText(lc.on_shelf) }}</span></td>
+                  <td class="center"><span :class="getText(lc.circulating).toLowerCase()">{{ getText(lc.circulating) }}</span></td>
                </tr>
             </tbody>
          </table>
@@ -51,11 +51,11 @@ import { onMounted } from "vue"
 
 const systemStore = useSystemStore()
 
-function getIcon( flag ) {
+function getText( flag ) {
    if (flag) {
-      return '<i class="fas fa-check-circle">Y</i>'
+      return 'Yes'
    }
-   return '<i class="fas fa-times-circle">N</i>'
+   return 'No'
 }
 
 onMounted(() => {
@@ -71,14 +71,23 @@ onMounted(() => {
    text-align: left;
    padding-bottom: 50px;
 }
-:deep(.fa-times-circle) {
-   color: $uva-red;
-   font-size: 1.15em;
-   opacity: 0.6;
+span.yes {
+   background: $uva-green-A;
+   padding: 0.5rem 1rem;
+   border-radius: 0.3rem;
+   display: inline-block;
+   color: white;
+   font-size: 0.9em;
+   width: 50px;
 }
-:deep(.fa-check-circle) {
-   color: $uva-green-A;
-   font-size: 1.15em;
+span.no {
+   background: $uva-red-A;
+   padding: 0.5rem 1rem;
+   border-radius: 0.3rem;
+   display: inline-block;
+   color: white;
+   font-size: 0.9em;
+   width: 50px;
 }
 @media only screen and (min-width: 768px) {
    div.codes  {

@@ -39,7 +39,7 @@
             <Column :rowEditor="true" style="width: 6rem" bodyStyle="text-align:center"></Column>
             <Column style="width: 2rem" bodyStyle="text-align:center">
                <template #body="slotProps">
-                  <VirgoButton @click="deleteLibrary(slotProps.data)" rounded text icon="fas fa-trash"/>
+                  <VirgoButton @click="deleteLibrary(slotProps.data)" rounded text icon="fal fa-trash"/>
                </template>
             </Column>
          </DataTable>
