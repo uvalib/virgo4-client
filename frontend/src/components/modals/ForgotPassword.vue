@@ -1,18 +1,20 @@
 <template>
    <VirgoButton link @click="userStore.showForgotPW = true" :disabled="userStore.showForgotPW" ref="trigger" label="Forgot your password?"/>
    <Dialog v-model:visible="userStore.showForgotPW" :modal="true" position="top" header="Forgot Password" @hide="closeDialog" @show="opened">
-      <p>
-         An email will be sent to the address on file with a link to reset your password. If you need assistance, please
-         <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
-      </p>
-      <FormKit type="form" id="forgot-pass" :actions="false" @submit="okClicked">
-         <FormKit label="Library ID" type="text" v-model="userId" id="forgot-id" validation="required" help="Library ID, eg: C001005101 or TEMP001166" />
-         <div class="form-controls" >
-            <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
-            <FormKit type="submit" label="OK" wrapper-class="submit-button" :disabled="okDisabled" />
-         </div>
-      </FormKit>
-      <p v-if="error" class="error" v-html="error"></p>
+      <div class="forgot">
+         <p>
+            An email will be sent to the address on file with a link to reset your password.<br/>If you need assistance, please
+            <a target="_blank" href="https://www.library.virginia.edu/askalibrarian">Ask a Librarian</a>.
+         </p>
+         <label for="forgot-id">Library ID* <span class="required">(required)</span></label>
+         <input type="text" v-model="userId" id="forgot-id" @keyup.enter="searchClicked"/>
+         <div class="help">Library ID, eg: C001005101 or TEMP001166</div>
+         <div v-if="error" class="error" v-html="error"></div>
+      </div>
+      <template #footer>
+         <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton label="OK" @click="okClicked" :disabled="okDisabled" />
+      </template>
    </Dialog>
 </template>
 
@@ -43,6 +45,10 @@ const closeDialog = (() => {
 })
 
 const okClicked = (() => {
+   if  ( userId.value == "" ) {
+      error.value = "Library ID is required"
+      return
+   }
    okDisabled.value = true
    userStore.forgotPassword(userId.value).then(() => {
       userStore.showForgotPW = false
@@ -60,23 +66,24 @@ const okClicked = (() => {
 </script>
 
 <style lang="scss" scoped>
-.password-reset-form{
-   margin-bottom:15px;
+.forgot {
    display: flex;
-}
-input[type=password] {
-   width: 100%;
-}
-label {
-   display: block;
-   margin: 10px 0 2px 0;
-   padding-bottom: .25em;
-   font-weight: bold;
-}
-.hint {
-   margin: 2em auto auto 1em;
-}
-p.error {
-   color: $uva-red-A;
+   flex-direction: column;
+   gap: 10px;
+   label {
+      font-weight: bold;
+   }
+   .required {
+      font-weight: 100;
+      font-size: .8em;
+      color: $uva-grey-50;
+   }
+   .help {
+      font-size: .9em;
+      color: $uva-grey-50;
+   }
+   .error {
+      color: $uva-red-A;
+   }
 }
 </style>

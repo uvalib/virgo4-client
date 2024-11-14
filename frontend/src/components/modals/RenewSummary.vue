@@ -11,9 +11,9 @@
             </ul>
          </div>
       </div>
-      <div class="form-controls">
+      <template #footer>
          <VirgoButton severity="secondary" @click="closeSummary" label="OK" v-focus/>
-      </div>
+      </template>
    </Dialog>
 </template>
 

@@ -65,10 +65,10 @@
             <p>This feed contains a live search which will include any new items added to the collection.</p>
             <p><b>Note</b>: RSS feeds are not able to show updates from third party sources including articles.</p>
          </div>
-         <div class="form-controls" >
+         <template #footer >
             <VirgoButton severity="secondary" @click="closeRSSDialog" label="Close"/>
             <VirgoButton @click="copyRSS(currentFeed.token)" label="Copy to clipboard"/>
-         </div>
+         </template>
       </Dialog>
    </div>
 
