@@ -9,11 +9,11 @@
             <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS"
                @click="downloadRISClicked" :aria-label="`download RIS citation for ${props.hit.header.title}`" />
             <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
-               <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf"
+               <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf fa-lg"
                   label="Download PDF" text rounded @click="pdfClicked"/>
                <ve-progress v-else :progress="pdfProgress()" :size="32" thickness="10%" style="margin-top:5px; cursor: default;"/>
             </span>
-            <VirgoButton icon="fal fa-link" text rounded label="Permalink"
+            <VirgoButton icon="fal fa-link fa-lg" text rounded label="Permalink"
                @click="permalinkClicked" :aria-label="`copy permalink to ${props.hit.header.title}`" />
          </div>
       </div>

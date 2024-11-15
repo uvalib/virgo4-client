@@ -1,5 +1,5 @@
 <template>
-   <VirgoButton text rounded label="Cite" icon="fass fa-quote-right fa-lg"
+   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right fa-lg"
       @click="showDialog = true" :aria-label="props.ariaLabel" ref="trigger" />
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Citations" @hide="closeDialog" @show="opened">
       <div class="citations-content">

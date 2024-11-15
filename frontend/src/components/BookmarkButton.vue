@@ -54,10 +54,14 @@ const ariaLabel = computed(() => {
 })
 
 const bookmarkIcon = computed(() => {
-   if ( bookmarkCount.value > 0 ) {
-      return "bookmark fas fa-bookmark"
+   let sz = ""
+   if ( props.labeled ) {
+      sz = " fa-lg"
    }
-   return "bookmark fal fa-bookmark"
+   if ( bookmarkCount.value > 0 ) {
+      return "bookmark fas fa-bookmark"+sz
+   }
+   return "bookmark fal fa-bookmark"+sz
 })
 
 const bookmarkCount = computed(()=>{
