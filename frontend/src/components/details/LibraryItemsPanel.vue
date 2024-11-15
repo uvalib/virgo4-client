@@ -9,10 +9,6 @@
                   <span :id="`${props.library.id}-link`" class="screen-reader-text">(opens in a new window)</span>
                </template>
                <span v-else>{{props.library.name}}</span>
-               <IconField v-if="library.items.length > 7">
-                  <InputIcon class="fal fa-search" />
-                  <InputText v-model="filters['global'].value" placeholder="Search" />
-               </IconField>
             </h4>
             <DataTable :value="library.items" dataKey="barcode" columnResizeMode="expand"
                :alwaysShowPaginator="false" size="small" ref="libdata"
@@ -23,6 +19,14 @@
             >
                <template #paginatorstart>
                   <span>{{ countDetails }}</span>
+               </template>
+               <template #paginatorend>
+                  <div class="filter" v-if="library.items.length > 7">
+                     <label>
+                        Filter {{ props.library.name }} items
+                        <InputText v-model="filters['global'].value" />
+                     </label>
+                  </div>
                </template>
                <Column field="current_location" header="Location" />
                <Column field="call_number" header="Call Number" />

@@ -1,30 +1,29 @@
 <template>
-   <div class="availability-info">
-      <VirgoButton text @click="clicked">
-         <i class="icon fas fa-exclamation-triangle"></i>
-         {{props.label}}
-      </VirgoButton>
-      <Popover ref="availability" class="border">
-         <div class="avail-message-panel">
-            <div v-if="hasReserveInfo()" class="message">
-               <span>{{mainMessage()}}</span>
-               <ul>
-                  <li v-for="(info,idx) in messageParts()" :key="`cr${idx}`">
-                     {{info}}
-                  </li>
-               </ul>
-            </div>
-            <div v-else class="message" v-html="props.message"></div>
+   <VirgoButton text ref="trigger" @click="showDialog = true">
+      <i class="icon fas fa-exclamation-triangle"></i>
+      {{props.label}}
+   </VirgoButton>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Availability Info" @hide="closeDialog">
+      <div class="avail-message-panel">
+         <div v-if="hasReserveInfo()" class="message">
+            <span>{{mainMessage()}}</span>
+            <ul>
+               <li v-for="(info,idx) in messageParts()" :key="`cr${idx}`">
+                  {{info}}
+               </li>
+            </ul>
          </div>
-      </Popover>
-   </div>
+         <div v-else class="message" v-html="props.message"></div>
+      </div>
+   </Dialog>
 </template>
 
 <script setup>
-import Popover from 'primevue/popover'
+import Dialog from 'primevue/dialog'
 import { ref } from 'vue'
 
-const availability = ref(null)
+const showDialog = ref(false)
+const trigger = ref(null)
 
 const props = defineProps({
    label: {
@@ -37,8 +36,9 @@ const props = defineProps({
    }
 })
 
-const clicked = ((event) => {
-   availability.value.toggle(event)
+const closeDialog = (() => {
+   showDialog.value = false
+   trigger.value.$el.focus()
 })
 
 const hasReserveInfo = (() => {
@@ -64,16 +64,13 @@ const messageParts = (() => {
 </script>
 
 <style lang="scss">
-div.availability-info {
-   .icon {
-      color: $uva-red;
-   }
+.icon {
+   color: $uva-red;
 }
 div.avail-message-panel {
    padding: 0;
-   background: $uva-blue-alt-300;
    max-width: 400px;
-   font-size: 1em;;
+   font-size: 1em;
 
    .message {
       padding: 10px;
