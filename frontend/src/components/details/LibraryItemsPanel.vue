@@ -4,7 +4,10 @@
          <div class="gutter"></div>
          <div class="content">
             <h4>
-               <a v-if="libraryURL" :href="libraryURL" target="_blank">{{ props.library.name }}</a>
+               <template v-if="libraryURL">
+                  <a :href="libraryURL" target="_blank" :aria-describedby="`${props.library.id}-link`">{{ props.library.name }}<i class="fal fa-external-link-alt"></i></a>
+                  <span :id="`${props.library.id}-link`" class="screen-reader-text">(opens in a new window)</span>
+               </template>
                <span v-else>{{props.library.name}}</span>
                <IconField v-if="library.items.length > 7">
                   <InputIcon class="fal fa-search" />
@@ -138,6 +141,10 @@ const firstChanged = (( newFirst) => {
             align-items: flex-end;
             a {
                font-weight: bold;
+               i {
+                  display: inline-block;
+                  margin-left: 10px;
+               }
             }
          }
       }
