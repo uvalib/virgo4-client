@@ -6,7 +6,7 @@
          <div class="content">
             <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from" :labeled="true"/>
             <Citations :itemURL="props.hit.itemURL" :from="props.from"/>
-            <VirgoButton icon="fal fa-download" text rounded label="Download RIS"
+            <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS"
                @click="downloadRISClicked" :aria-label="`download RIS citation for ${props.hit.header.title}`" />
             <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
                <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf"

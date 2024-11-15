@@ -37,12 +37,12 @@ const results = useResultStore()
 const router = useRouter()
 
 const v4Menu = computed( () => {
-   let menu = [ {label: "Search", icon: "icon fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
+   let menu = [ {label: "Search", icon: "fal fa-search", command: ()=>searchClicked(), key: "searchmenu"}, ]
    if ( systemStore.isKiosk) return menu
 
    let nonKiosk = [
       {label: "Questions? Ask a Librarian", url: "https://www.library.virginia.edu/askalibrarian",
-         icon: "icon fal fa-comment-dots"},
+         icon: "fal fa-comment-dots"},
       {label: "Library Services", items: [
          {label: "Subject Guides", url: "https://guides.lib.virginia.edu",
             command: ()=>libServiceClicked('Subject Guides')},
@@ -72,9 +72,9 @@ const v4Menu = computed( () => {
          items.push({label: "Admin", command: ()=>userLinkClicked("/admin")})
       }
       items.push({label: "Sign out",  command: ()=>signOut()})
-      signIn = [ {label: `Signed in as ${userStore.signedInUser}`, icon: "icon fal fa-user-circle", items: items} ]
+      signIn = [ {label: `Signed in as ${userStore.signedInUser}`, icon: "fal fa-user-circle", items: items} ]
    } else {
-      signIn = [ {label: "Sign In", icon: "icon fal fa-user-circle", command: ()=>userLinkClicked("/signin")} ]
+      signIn = [ {label: "Sign In", icon: "fal fa-user-circle", command: ()=>userLinkClicked("/signin")} ]
    }
 
    return menu.concat(nonKiosk).concat(signIn)

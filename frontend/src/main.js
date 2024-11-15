@@ -42,7 +42,12 @@ import '@vue-a11y/announcer/dist/style.css'
 app.use(VueAnnouncer, { router })
 
 // styles
-import '@fortawesome/fontawesome-pro/css/all.css'
+import '@fortawesome/fontawesome-pro/css/fontawesome.css'
+import '@fortawesome/fontawesome-pro/css/brands.css'
+import '@fortawesome/fontawesome-pro/css/solid.css'
+import '@fortawesome/fontawesome-pro/css/light.css'
+import '@fortawesome/fontawesome-pro/css/sharp-solid.css'
+
 
 // Primevue setup
 import PrimeVue from 'primevue/config'
