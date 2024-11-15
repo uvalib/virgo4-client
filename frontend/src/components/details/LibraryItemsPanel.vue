@@ -12,12 +12,15 @@
                </IconField>
             </h4>
             <DataTable :value="library.items" dataKey="barcode" columnResizeMode="expand"
-               :alwaysShowPaginator="false" size="small"
-               :paginator="true" :rows="10" :rowsPerPageOptions="[10,25,50]"
+               :alwaysShowPaginator="false" size="small" ref="libdata"
+               :paginator="true" :rows="10" :rowsPerPageOptions=pageSizes
                paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
-               currentPageReportTemplate="{first} - {last} of {totalRecords}" paginatorPosition="bottom"
-               v-model:filters="filters" :globalFilterFields="['call_number', 'barcode']"
+               currentPageReportTemplate="Page {currentPage} of {totalPages}" paginatorPosition="bottom"
+               v-model:filters="filters" :globalFilterFields="['call_number', 'barcode']" @update:first="firstChanged" @update:rows="pageSizeChanged"
             >
+               <template #paginatorstart>
+                  <span>{{ countDetails }}</span>
+               </template>
                <Column field="current_location" header="Location" />
                <Column field="call_number" header="Call Number" />
                <Column field="barcode" header="Barcode">
@@ -44,7 +47,29 @@ import { FilterMatchMode } from '@primevue/core/api'
 import { useSystemStore } from "@/stores/system"
 
 const system = useSystemStore()
+const currFirst = ref(0)
+const pageSize = ref(10)
 
+
+const pageSizes = computed(() => {
+   let out = [10]
+   if ( props.library.items.length >= 25 ) {
+      out.push(25)
+   }
+   if ( props.library.items.length >= 50 ) {
+      out.push(50)
+   }
+   if ( props.library.items.length >= 100 ) {
+      out.push(100)
+   }
+   return out
+})
+const countDetails = computed( () => {
+   let last = currFirst.value+pageSize.value
+   last = Math.min(last,props.library.items.length)
+   return `${currFirst.value+1}-${last} of ${props.library.items.length}`
+
+})
 const libraryURL = computed( () => {
    const lib = system.allPickupLibraries.find( pl => pl.id == (props.library.id) )
    if ( lib ) {
@@ -62,6 +87,15 @@ const props = defineProps({
       type: Object,
       required: true
    },
+})
+
+const pageSizeChanged = (( newSize) => {
+   console.log("size: "+newSize)
+   pageSize.value = newSize
+})
+const firstChanged = (( newFirst) => {
+   console.log("first: "+newFirst)
+   currFirst.value = newFirst
 })
 </script>
 
