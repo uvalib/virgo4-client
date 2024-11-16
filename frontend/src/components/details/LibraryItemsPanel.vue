@@ -16,6 +16,18 @@
                paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
                currentPageReportTemplate="Page {currentPage} of {totalPages}" paginatorPosition="bottom"
                v-model:filters="filters" :globalFilterFields="['call_number', 'barcode']" @update:first="firstChanged" @update:rows="pageSizeChanged"
+               :pt="{
+                  pcPaginator: {
+                     pcRowPerPageDropdown: {
+                        root: {
+                           'aria-label': 'rows per page'
+                        },
+                        label: {
+                           'aria-controls': null
+                        }
+                     }
+                  }
+               }"
             >
                <template #paginatorstart>
                   <span>{{ countDetails }}</span>
@@ -47,8 +59,6 @@ import { ref, computed } from 'vue'
 import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import InputText from 'primevue/inputtext'
 import { FilterMatchMode } from '@primevue/core/api'
 import { useSystemStore } from "@/stores/system"
