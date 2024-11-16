@@ -1,6 +1,12 @@
 <template>
    <nav v-if="!systemStore.$datafatal" class="menu" aria-label="Virgo Menu">
-      <Menubar :model="v4Menu">
+      <Menubar :model="v4Menu"
+         :pt="{
+            item: {
+               'aria-level': null
+            }
+         }"
+      >
          <template #end>
             <span v-if="userStore.isSignedIn && userStore.itemsOnNotice.length > 0">
                <router-link to="/checkouts?overdue=1">
