@@ -11,7 +11,7 @@
                <span v-else>{{props.library.name}}</span>
             </h4>
             <DataTable :value="library.items" dataKey="barcode" columnResizeMode="expand"
-               :alwaysShowPaginator="false" size="small" ref="libdata"
+               :alwaysShowPaginator="library.items.length > 10" size="small" ref="libdata"
                :paginator="true" :rows="10" :rowsPerPageOptions=pageSizes
                paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
                currentPageReportTemplate="Page {currentPage} of {totalPages}" paginatorPosition="bottom"
