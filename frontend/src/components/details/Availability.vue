@@ -151,10 +151,11 @@ const dibsItems = computed(()=>{
       justify-self: flex-start;
       align-items: flex-start;
       gap: 10px;
-      padding: 15px 0;
-      border-bottom: 1px solid $uva-grey-100;
-      border-top: 1px solid $uva-grey-100;
+      padding: 1rem;
+      border: 1px solid $uva-brand-orange;
       margin-bottom: 30px;
+      border-radius: 0.3rem;
+      background-color: $uva-brand-orange-300;
       .avail-message {
          :deep(p) {
             margin: 0;
