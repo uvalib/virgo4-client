@@ -70,9 +70,6 @@ const pageSize = ref(10)
 
 const pageSizes = computed(() => {
    let out = [10]
-   if ( props.library.items.length >= 25 ) {
-      out.push(25)
-   }
    if ( props.library.items.length >= 50 ) {
       out.push(50)
    }
