@@ -7,10 +7,8 @@
             <span v-if="props.inline && idx < truncatedLinks.length-1" class="sep">;</span>
          </div>
       </div>
-      <div v-else tabindex="0" :aria-expanded="showFull.toString()"
-            class="truncated-content" :id="`${props.id}-cut`"
-            @keydown.enter="expand"
-            @keydown.space="expand" @keyup.stop.esc="hide"
+      <div v-else tabindex="0"  class="truncated-content" :id="`${props.id}-cut`"
+            @keydown.enter="expand" @keydown.space="expand" @keyup.stop.esc="hide"
       >
          <div :id="`${props.id}-list`" aria-live="polite" class="truncated-links" :class="{inline: props.inline}">
             <div v-for="(val,idx) in truncatedLinks" class="link-wrap"  :key="`${props.id}-${idx}`">
@@ -20,8 +18,9 @@
             </div>
          </div>
          <div class="controls">
-            <VirgoButton v-if="!showFull" link @click="toggle" class="toggle">{{ expandText }}</VirgoButton>
-            <VirgoButton v-else link @click="toggle" class="toggle" label="show less"/>
+            <VirgoButton link @click="toggle" class="toggle" :label="expandText"
+               :aria-expanded="showFull" aria-controls="`${props.id}-cut`"
+            />
          </div>
       </div>
    </div>
@@ -57,6 +56,7 @@ const props = defineProps({
 const showFull = ref(false)
 
 const expandText = computed(() => {
+   if ( showFull.value ) return "show less"
    if ( props.label == "") {
       return `...more (${props.links.length} items)`
    }

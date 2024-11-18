@@ -4,10 +4,8 @@
          <div v-html="props.text"></div>
       </div>
       <template v-else>
-         <div tabindex="0" :aria-expanded="showFull.toString()"
-            class="truncated-content"
-            @keydown.prevent.stop.enter="toggle"
-            @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
+         <div tabindex="0" class="truncated-content" :id="`truncated-${props.id}`"
+            @keydown.prevent.stop.enter="toggle" @keydown.space.prevent.stop="toggle" @keyup.stop.esc="hide"
          >
             <div  v-if="!showFull" :id="`${props.id}-cut`" class="truncated"  aria-live="polite" >
                <span class="text" v-html="truncatedText"></span>
@@ -15,7 +13,9 @@
             <div v-else class="full" :id="`${props.id}-full`" aria-live="polite" >
                <span class="text" v-html="props.text"></span>
             </div>
-            <VirgoButton tabindex="-1" link @click="toggle" class="trigger" :label="linkLabel"/>
+            <VirgoButton link @click="toggle" class="trigger" :label="linkLabel"
+               :aria-expanded="showFull.toString()" aria-controls="`truncated-${props.id}`"
+            />
          </div>
       </template>
    </div>
