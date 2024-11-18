@@ -56,7 +56,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import AvailabilityNotice from "@/components/disclosures/AvailabilityNotice.vue"
+import AvailabilityNotice from "@/components/modals/AvailabilityNotice.vue"
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import InputText from 'primevue/inputtext'

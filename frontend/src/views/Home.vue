@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import SearchTips from "@/components/disclosures/SearchTips.vue"
+import SearchTips from "@/components/modals/SearchTips.vue"
 import SearchResults from "@/components/SearchResults.vue"
 import AdvancedSearch from "@/components/advanced/AdvancedSearch.vue"
 import Welcome from "@/components/Welcome.vue"

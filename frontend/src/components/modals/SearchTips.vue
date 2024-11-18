@@ -1,15 +1,15 @@
 <template>
    <div id="search-tips">
-      <VirgoButton text @click="clicked">Help me search</VirgoButton>
-      <Popover ref="tips" @show="showDisclosure" class="border">
+      <VirgoButton text ref="trigger" @click="showDialog = true" label="Help me search"/>
+      <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Help me search">
          <div class="tips">
-            <p class="section">How to search</p>
+            <div class="section">How to search</div>
             <ul class="dots">
                <li>Selecting "Everything" will result in a sorted list of any record in Virgo.</li>
                <li>Selecting "Catalog Only" results only in items UVA owns, minus articles and images.</li>
                <li>After searching, you can use Filters to narrow your query.</li>
             </ul>
-               <p class="section pad">Search tips</p>
+            <div class="section">Search tips</div>
             <ul>
                <li class="no-pad">
                   <p>Use quotation marks to find exact phrases:</p>
@@ -33,57 +33,43 @@
                <b>NOTE: </b>Nested parentheses within a query are not supported.
             </div>
             <div class="note">
-               <a href="https://guides.lib.virginia.edu/virgo" target="_blank">Learn more about using Virgo</a><i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+               <a href="https://guides.lib.virginia.edu/virgo" target="_blank" aria-describedby="guide-window">
+                  Learn more about using Virgo<i style="margin-left:0.5rem;" class="fal fa-external-link-alt"></i>
+               </a>
+               <span id="guide-window" class="screen-reader-text">(opens in a new window)</span>
             </div>
          </div>
-      </Popover>
+      </Dialog>
    </div>
 </template>
 
 <script setup>
-import Popover from 'primevue/popover'
+import Dialog from 'primevue/dialog'
 import analytics from '@/analytics'
 import { ref } from 'vue'
 
-const tips = ref(null)
+const showDialog = ref(false)
+const trigger = ref(null)
 
 const showDisclosure = (() => {
    analytics.trigger('Help', 'SEARCH_TIPS')
-})
-const clicked = ((event) => {
-   tips.value.toggle(event)
 })
 </script>
 
 <style lang="scss" scoped>
 div.tips {
-   padding: 15px;
-   background: $uva-blue-alt-300;
-   font-size: 0.9em;
-
-   a  {
-      color: $uva-text-color-base;
+   display: flex;
+   flex-direction: column;
+   gap: 1rem;
+   .section {
       font-weight: bold;
-   }
-
-   p.section {
-      font-weight: bold;
-      margin: 0;
-      font-size: 1.15em;
-   }
-   .section.pad {
-      margin-top: 30px;
-   }
-
-   .note {
-      margin: 25px 0 10px 0;
    }
    ul.dots {
       list-style-type: disc;
    }
    ul {
       list-style-type: none;
-      padding: 0px 0 0 20px;
+      padding: 0 0 0 20px;
       margin: 0;
    }
    ul p {

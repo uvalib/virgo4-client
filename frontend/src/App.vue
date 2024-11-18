@@ -324,6 +324,14 @@ body {
    -moz-osx-font-smoothing: grayscale;
    color: $uva-grey-A;
    background: $uva-blue-alt-B;
+
+   .screen-reader-text {
+      clip: rect(1px, 1px, 1px, 1px);
+      position: absolute !important;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+   }
 }
 .sticky {
    position: fixed !important;
@@ -361,13 +369,6 @@ body {
    .link-icon {
       display: inline-block;
       margin-left: 10px;
-   }
-   .screen-reader-text {
-      clip: rect(1px, 1px, 1px, 1px);
-      position: absolute !important;
-      height: 1px;
-      width: 1px;
-      overflow: hidden;
    }
    #v4main {
       background: white;
