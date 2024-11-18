@@ -12,7 +12,7 @@
             </h4>
             <DataTable :value="library.items" dataKey="barcode" columnResizeMode="expand"
                :alwaysShowPaginator="library.items.length > 10" size="small" ref="libdata"
-               :paginator="true" :rows="10" :rowsPerPageOptions=pageSizes
+               :paginator="true" :rows="10" :rowsPerPageOptions=[10,50,100]
                paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
                currentPageReportTemplate="Page {currentPage} of {totalPages}" paginatorPosition="bottom"
                v-model:filters="filters" :globalFilterFields="['call_number', 'barcode']" @update:first="firstChanged" @update:rows="pageSizeChanged"
@@ -67,17 +67,6 @@ const system = useSystemStore()
 const currFirst = ref(0)
 const pageSize = ref(10)
 
-
-const pageSizes = computed(() => {
-   let out = [10]
-   if ( props.library.items.length >= 50 ) {
-      out.push(50)
-   }
-   if ( props.library.items.length >= 100 ) {
-      out.push(100)
-   }
-   return out
-})
 const countDetails = computed( () => {
    let last = currFirst.value+pageSize.value
    last = Math.min(last,props.library.items.length)
