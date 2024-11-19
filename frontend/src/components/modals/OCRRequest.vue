@@ -125,6 +125,10 @@ p.error {
    align-items: stretch;
    justify-content: flex-start;
    gap: 10px;
+   p {
+      margin: 0;
+      padding: 0;
+   }
    .email {
       display: flex;
       flex-direction: column;

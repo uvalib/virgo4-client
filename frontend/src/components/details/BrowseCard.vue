@@ -269,6 +269,6 @@ const bookmarkClicked = ((id) => {
 }
 
 .browse-card.current {
-   border: 3px solid $uva-brand-blue-100;
+   border: 2px solid $uva-brand-blue-100;
 }
 </style>

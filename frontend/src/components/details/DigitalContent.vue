@@ -39,14 +39,14 @@
                <Carousel :value="pdfContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions">
                   <template #item="slotProps">
                      <div class="download-card" :class="{current: isCurrent(slotProps.data)}" @click.stop="viewerClicked(slotProps.data)">
-                        <V4ProgressBar v-if="generatePDFInProgress(slotProps.data)" :id="slotProps.data.name"
-                           :style="{top: pdfTop(slotProps.data)}"
-                           :percent="slotProps.data.pdf.status" label="Generating PDF"
-                        />
-                        <V4ProgressBar v-if="generateOCRInProgress(slotProps.data)" :id="slotProps.data.name"
-                           :style="{top: ocrTop(slotProps.data)}"
-                           :percent="slotProps.data.ocr.status" label="Extracting Text"
-                        />
+                        <div class="progress" v-if="generatePDFInProgress(slotProps.data)">
+                           <div>Generating PDF...</div>
+                           <ProgressBar :value="slotProps.data.pdf.status.replace('%','')" :showValue="false" style="height:10px"/>
+                        </div>
+                        <div class="progress" v-if="generateOCRInProgress(slotProps.data)">
+                           <div>Extracting text...</div>
+                           <ProgressBar :value="slotProps.data.ocr.status.replace('%','')" :showValue="false" style="height:10px"/>
+                        </div>
                         <img v-if="slotProps.data.thumbnail" :src="slotProps.data.thumbnail"/>
                         <div class="details">
                            <span class="label">{{slotProps.data.name}}</span>
@@ -75,7 +75,6 @@
 
 <script setup>
 import ImageAdvisory from "@/components/ImageAdvisory.vue"
-import V4ProgressBar from "@/components/V4ProgressBar.vue"
 import OCRRequest from "@/components/modals/OCRRequest.vue"
 import Carousel from 'primevue/carousel'
 import analytics from '@/analytics'
@@ -87,6 +86,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useWindowSize } from '@vueuse/core'
+import ProgressBar from 'primevue/progressbar'
 
 const { width } = useWindowSize()
 const collection = useCollectionStore()
@@ -275,18 +275,7 @@ function isCurrent(tgtItem) {
 function digitalContentIndex( tgtItem ) {
    return item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
 }
-function ocrTop(tgtItem) {
-   if ( generatePDFInProgress(tgtItem) ) {
-      return "65%"
-   }
-   return "40%"
-}
-function pdfTop(tgtItem) {
-   if ( generateOCRInProgress(tgtItem) ) {
-      return "30%"
-   }
-   return "40%"
-}
+
 function generatePDFInProgress(tgtItem) {
    if ( !tgtItem.pdf) return false
    return !( tgtItem.pdf.status == "READY" || tgtItem.pdf.status == "ERROR" || tgtItem.pdf.status == "FAILED" ||
@@ -363,17 +352,27 @@ onUnmounted(()=>{
 </script>
 <style lang="scss" scoped>
 .digital-content {
-
+   .progress {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 0.85em;
+      background-color: #f5f5f5;
+      border-radius: 0.3rem;
+      border: 1px solid $uva-grey-100;
+      padding: 0.5rem;
+      margin-bottom: 10px;
+   }
    div.items {
       margin: 25px 0 0 0;
 
       .download-card.current {
-         border: 3px solid $uva-brand-blue-100;
+         border: 2px solid $uva-brand-blue-100;
       }
       .download-card {
          position: relative;
          border: 1px solid $uva-grey-100;
-         padding: 10px 5px 5px 5px;
+         padding: 10px;
          margin: 5px;
          cursor: pointer;
          width: 100%;
@@ -398,8 +397,10 @@ onUnmounted(()=>{
          }
 
          &:hover {
-            top: -2px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0,1);
+            transition: 0.25s ease-in-out;
+            box-shadow: 0 0 12px 0 $uva-grey-100;
+            z-index: 2;
+            text-decoration: none;
          }
          .opened {
             display: flex;

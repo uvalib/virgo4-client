@@ -11,7 +11,10 @@
             <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
                <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf fa-lg"
                   label="Download PDF" text rounded @click="pdfClicked"/>
-               <ve-progress v-else :progress="pdfProgress()" :size="32" thickness="10%" style="margin-top:5px; cursor: default;"/>
+               <div v-else class="progress">
+                  <div>Generating PDF...</div>
+                  <ProgressBar :value="pdfProgress()" :showValue="false" style="width:175px;height:8px"/>
+               </div>
             </span>
             <VirgoButton icon="fal fa-link fa-lg" text rounded label="Permalink"
                @click="permalinkClicked" :aria-label="`copy permalink to ${props.hit.header.title}`" />
@@ -29,7 +32,7 @@ import { useItemStore } from "@/stores/item"
 import { useClipboard } from '@vueuse/core'
 import { useToast } from "primevue/usetoast"
 import { ref } from 'vue'
-import { VeProgress } from "vue-ellipse-progress"
+import ProgressBar from 'primevue/progressbar'
 
 const { copy } = useClipboard()
 const toast = useToast()
@@ -70,7 +73,6 @@ const pdfProgress = (()  => {
    let pdfDC = item.digitalContent.find( dc => dc.pdf )
    if ( pdfDC ) {
       let status = pdfDC.pdf.status
-      console.log(status)
       if (status == "READY" || status == "100%") {
          pdfDownloading.value = false
          return 100
@@ -137,6 +139,13 @@ const pdfClicked= ( async() => {
          gap: 2rem;
          .pdf-wrap {
             position: relative;
+         }
+         .progress {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85em;
          }
       }
    }
