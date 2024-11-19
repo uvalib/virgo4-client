@@ -4,7 +4,7 @@
       style="max-width: 600px"
       header="Update Contact Info" @hide="closeDialog" @show="opened"
    >
-      <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate">
+      <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate" ref="contactform">
          <div class="scroller">
             <div class="section">
                <p class="section-name">Name</p>
@@ -29,12 +29,11 @@
             </div>
          </div>
          <p v-if="error" class="error" v-html="error"></p>
-
-         <div class="form-controls" >
-            <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
-            <FormKit type="submit" label="Update" wrapper-class="submit-button" :disabled="okDisabled" />
-         </div>
       </FormKit>
+      <template #footer>
+         <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton @click="contactform.node.submit()" label="Update" :disabled="okDisabled"/>
+      </template>
    </Dialog>
 </template>
 
@@ -61,6 +60,7 @@ const originalContact = ref({})
 const error = ref("")
 const okDisabled = ref(false)
 const trigger = ref(null)
+const contactform = ref()
 
 const opened = (() => {
    contact.value.userID = userStore.signedInUser

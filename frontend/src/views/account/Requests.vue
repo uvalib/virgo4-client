@@ -177,19 +177,19 @@
             <dt>Date Placed:</dt>
             <dd>{{$formatDate(reqToCancel.placedDate)}}</dd>
          </dl>
-         <FormKit type="form" :actions="false" id="cancelHoldForm" @submit="cancelHold">
+         <FormKit type="form" :actions="false" id="cancelHoldForm" @submit="cancelHold" ref="cancelform">
             <p v-if="reqToCancel.cancellable">Are you sure you want to cancel this request?</p>
             <template v-else>
                <p>This hold request is already in progress and can not be cancelled automatically.</p>
                <p>By continuing, an email will be sent to begin the cancellation process.</p>
                <FormKit label="Confirmation Email" validation="required|email" type="email" v-model="reqToCancel.confirmationEmail" />
             </template>
-            <div class="form-controls">
-               <VirgoButton severity="secondary" @click="hideCancelHold" label="Back"/>
-               <FormKit type="submit" label="Cancel Request" wrapper-class="submit-button" />
-            </div>
          </FormKit>
       </div>
+      <template #footer>
+         <VirgoButton severity="secondary" @click="hideCancelHold" label="Back"/>
+         <VirgoButton @click="cancelform.node.submit()" label="Cancel Request"/>
+      </template>
    </Dialog>
 </template>
 
@@ -216,6 +216,7 @@ const requestStore = useRequestStore()
 const request = ref("")
 const showCancelModal = ref(false)
 const canceltrigger = ref()
+const cancelform = ref()
 const cancelButtonIdx = ref(-1)
 const reqToCancel = ref(null)
 

@@ -18,7 +18,7 @@
                Optional special characters allowed: ! , @ # $ % & * + ( ) _ - ?
             </li>
          </ul>
-         <FormKit type="form" id="change-password" :actions="false" @submit="submitPasswordChange">
+         <FormKit type="form" id="change-password" :actions="false" @submit="submitPasswordChange" ref="pwform">
             <FormKit v-if="!hasPasswordToken" label="Current Password" type="password" v-model="currPassword" validation="required" />
             <FormKit type="password" name="password" label="New Password" id="new-password"
                :validation="[
@@ -33,11 +33,11 @@
                v-model="newPassword"
             />
             <FormKit type="password" name="password_confirm" label="Confirm password" validation="required|confirm" v-model="confirmPassword" />
-            <div class="form-controls">
-               <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
-               <FormKit type="submit" label="Submit" wrapper-class="submit-button" :disabled="okDisabled" />
-            </div>
          </FormKit>
+      </template>
+      <template #footer>
+         <VirgoButton severity="secondary" @click="closeChangeDialog" label="Cancel"/>
+         <VirgoButton @click="pwform.node.submit()" label="Submit" :disabled="okDisabled" />
       </template>
    </Dialog>
 </template>
@@ -64,6 +64,7 @@ const error = ref("")
 const okDisabled = ref(false)
 const expiredToken = ref(false)
 const trigger = ref(null)
+const pwform = ref()
 
 onMounted(()=> {
    if (hasPasswordToken.value) {

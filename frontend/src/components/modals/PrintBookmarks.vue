@@ -2,15 +2,15 @@
    <VirgoButton @click="openClicked" aria-label="print details about selected bookmarks" ref="trigger" label="Print" :disabled="bookmarks.length == 0"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Print Details" @hide="closeDialog" @show="opened" style="width: 75%" :maximizable="true">
       <div class="print">
-         <FormKit type="form" id="print" :actions="false" @submit="printClicked">
+         <FormKit type="form" id="print" :actions="false" @submit="printClicked" ref="printform">
             <FormKit id="titleinput" label="Title for printout (optional)" type="text" v-model="title"/>
             <FormKit label="Notes (optional)" type="textarea" v-model="notes" :rows="5" />
-            <div class="form-controls" >
-               <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
-               <FormKit type="submit" label="Print" wrapper-class="submit-button" :disabled="okDisabled" />
-            </div>
          </FormKit>
       </div>
+      <template #footer>
+         <VirgoButton severity="secondary" @click="closeDialog" label="Cancel"/>
+         <VirgoButton @click="printform.node.submit()" label="Print"/>
+      </template>
    </Dialog>
 </template>
 
@@ -33,6 +33,7 @@ const props = defineProps({
    }
 })
 
+const printform = ref()
 const trigger = ref()
 const showDialog = ref(false)
 const title = ref("")
