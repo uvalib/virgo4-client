@@ -12,7 +12,8 @@
             <div v-if="fsView" class="restore-view">
                <VirgoButton severity="info"  @click="toggleFullView" label="Exit full screen" />
             </div>
-            <iframe class="curio" :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"  allowfullscreen frameborder="0"/>
+            <iframe class="curio" :class="{full: fsView}" :src="curioURL" :width="curioWidth" :height="curioHeight"
+               allowfullscreen frameborder="0" :title="`viewer for ${item.details.header.title}`" />
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large">
@@ -34,9 +35,9 @@
          </template>
 
          <div v-else class="value">
-            <template v-if="pdfContent.length > 0">
-               <h3 class='do-header'>{{pdfContent.length}} Digital object<span v-if="pdfContent.length>1">s</span></h3>
-               <Carousel :value="pdfContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions">
+            <template v-if="item.digitalContent.length > 0">
+               <h3 class='do-header'>{{item.digitalContent.length}} Digital object<span v-if="item.digitalContent.length>1">s</span></h3>
+               <Carousel :value="item.digitalContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions" @update:page="carouselPaged" :showIndicators="false">
                   <template #item="slotProps">
                      <div class="download-card" :class="{current: isCurrent(slotProps.data)}" @click.stop="viewerClicked(slotProps.data)">
                         <div class="progress" v-if="generatePDFInProgress(slotProps.data)">
@@ -47,22 +48,23 @@
                            <div>Extracting text...</div>
                            <ProgressBar :value="slotProps.data.ocr.status.replace('%','')" :showValue="false" style="height:10px"/>
                         </div>
-                        <img v-if="slotProps.data.thumbnail" :src="slotProps.data.thumbnail"/>
+                        <img v-if="slotProps.data.thumbnail" :src="slotProps.data.thumbnail" role="presentation"/>
                         <div class="details">
                            <span class="label">{{slotProps.data.name}}</span>
-                           <span v-if="generatePDFInProgress(slotProps.data)" class="label">PDF generating...</span>
-                           <VirgoButton text link label="Download PDF" @click="pdfClicked(slotProps.data)"
-                              :aria-label="`download pdf for ${slotProps.data.name}`" size="small"/>
-                           <OCRRequest v-if="user.isSignedIn && slotProps.data.ocr || slotProps.data.ocr && slotProps.data.ocr.status == 'READY'"
-                              :dcIndex="digitalContentIndex(slotProps.data)"
-                              @ocr-started="ocrStarted(slotProps.data)"
-                           />
-                           <span v-if="isCurrent(slotProps.data)" class="opened">
-                              <i v-if="isCurrent(slotProps.data)" class="fas fa-check-circle"></i>
-                              Opened in Viewer
-                           </span>
-                           <VirgoButton v-else text link label="Open in Viewer" @click="viewerClicked(slotProps.data)"
-                              :aria-label="`open ${slotProps.data.name} in viewer`" size="small"/>
+                              <span v-if="generatePDFInProgress(slotProps.data)" class="label">PDF generating...</span>
+                              <VirgoButton text link label="Download PDF" @click="pdfClicked(slotProps.data)" :tabindex="carouselTabIndex[slotProps.index]"
+                                 :aria-label="`download pdf for ${slotProps.data.name}`" size="small"/>
+                              <OCRRequest v-if="user.isSignedIn && slotProps.data.ocr || slotProps.data.ocr && slotProps.data.ocr.status == 'READY'"
+                                 :dcIndex="digitalContentIndex(slotProps.data)"
+                                 :tabindex="carouselTabIndex[slotProps.index]"
+                                 @ocr-started="ocrStarted(slotProps.data)"
+                              />
+                              <span v-if="isCurrent(slotProps.data)" class="opened">
+                                 <i v-if="isCurrent(slotProps.data)" class="fas fa-check-circle"></i>
+                                 Opened in Viewer
+                              </span>
+                              <VirgoButton v-else text link label="Open in Viewer" @click="viewerClicked(slotProps.data)"
+                                 :aria-label="`open ${slotProps.data.name} in viewer`" size="small" :tabindex="carouselTabIndex[slotProps.index]"/>
                         </div>
                      </div>
                   </template>
@@ -78,7 +80,7 @@ import ImageAdvisory from "@/components/ImageAdvisory.vue"
 import OCRRequest from "@/components/modals/OCRRequest.vue"
 import Carousel from 'primevue/carousel'
 import analytics from '@/analytics'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCollectionStore } from "@/stores/collection"
 import { useItemStore } from "@/stores/item"
@@ -87,6 +89,7 @@ import { useSystemStore } from "@/stores/system"
 import { useUserStore } from "@/stores/user"
 import { useWindowSize } from '@vueuse/core'
 import ProgressBar from 'primevue/progressbar'
+import { storeToRefs } from "pinia"
 
 const { width } = useWindowSize()
 const collection = useCollectionStore()
@@ -137,6 +140,27 @@ const defaultWidth = ()=>{
    return w + "px"
 }
 const curioWidth = ref(defaultWidth())
+const carouselTabIndex = ref([])
+
+const { loadingDigitalContent } = storeToRefs(item)
+watch( loadingDigitalContent, (newValue) => {
+   if ( newValue == false) {
+      // carousel initially starts on image 0 and shows 7.. all the rest are hidden
+      carouselTabIndex.value = Array(item.digitalContent.length).fill(0)
+      carouselTabIndex.value.fill(-1,7)
+   }
+})
+
+const carouselPaged = ( (pg) => {
+   const startIdx = pg*7
+   for ( var i=0; i<item.digitalContent.length; i++) {
+      if ( i < startIdx || i > startIdx+7 ) {
+         carouselTabIndex.value[i] = -1
+      } else {
+         carouselTabIndex.value[i] = 0
+      }
+   }
+})
 
 const details = computed(()=>{
    return item.details
@@ -146,9 +170,7 @@ const hasExternalImages = computed(()=>{
    if (iiifField) return true
    return false
 })
-const pdfContent = computed(()=>{
-   return item.digitalContent.filter( dc => dc.pdf)
-})
+
 const poolMode = computed(()=>{
    let poolDetail = poolStore.poolDetails(details.value.source)
    return poolDetail.mode

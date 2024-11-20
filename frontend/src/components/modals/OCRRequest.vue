@@ -1,6 +1,5 @@
 <template>
-   <VirgoButton link @click="ocrClicked" ref="trigger" size="small"
-      :aria-label="`dowload full text for ${digitalItem.name}`" label="Download Full Text"/>
+   <VirgoButton link @click="ocrClicked" ref="trigger" size="small" :tabindex="props.tabindex" label="Download full text"/>
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text" @hide="closeDialog" @show="opened">
       <div v-if="mode=='init'" class="searching">
          <V4Spinner message="Searching for item text..." />
@@ -45,6 +44,10 @@ const props = defineProps({
       type: Number,
       required: true
    },
+   tabindex: {
+      type: Number,
+      default:0
+   }
 })
 
 const user = useUserStore()

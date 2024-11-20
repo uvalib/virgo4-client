@@ -1,6 +1,5 @@
 <template>
-   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right fa-lg"
-      @click="showDialog = true" :aria-label="props.ariaLabel" ref="trigger" />
+   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right fa-lg" @click="showDialog = true" ref="trigger" />
    <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Citations" @hide="closeDialog" @show="opened">
       <div class="citations-content">
          <div class="working" v-if="loading" >
@@ -47,10 +46,6 @@ const props = defineProps({
       type: String,
       default: ""
    },
-   ariaLabel: {
-      type: String,
-      default: ""
-   }
 })
 
 const { copy } = useClipboard()

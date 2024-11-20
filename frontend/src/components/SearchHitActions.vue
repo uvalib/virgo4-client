@@ -1,8 +1,6 @@
 <template>
    <div class="icon-wrap">
-      <Citations v-if="showCitations" :itemURL="props.hit.itemURL" :from="from"
-         :ariaLabel="`citations for ${props.hit.identifier}`">
-      </Citations>
+      <Citations v-if="showCitations" :itemURL="props.hit.itemURL" :from="from"/>
       <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from"/>
    </div>
 </template>
