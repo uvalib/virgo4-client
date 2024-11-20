@@ -123,7 +123,7 @@ const bookmarkClicked = ((id) => {
 
    &:hover, &:focus-within, &:focus {
       transition: 0.25s ease-in-out;
-      box-shadow: 0 0 12px 0 $uva-grey-100;
+      box-shadow: 0 0 10px 0 $uva-grey-100;
       z-index: 2;
       text-decoration: none;
    }
