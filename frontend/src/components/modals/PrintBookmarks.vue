@@ -1,6 +1,8 @@
 <template>
    <VirgoButton @click="openClicked" aria-label="print details about selected bookmarks" ref="trigger" label="Print" :disabled="bookmarks.length == 0"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Print Details" @hide="closeDialog" @show="opened" style="width: 75%" :maximizable="true">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Print Details"
+      @hide="closeDialog" @show="opened" style="width: 75%" :draggable="false"
+   >
       <div class="print">
          <FormKit type="form" id="print" :actions="false" @submit="printClicked" ref="printform">
             <FormKit id="titleinput" label="Title for printout (optional)" type="text" v-model="title"/>

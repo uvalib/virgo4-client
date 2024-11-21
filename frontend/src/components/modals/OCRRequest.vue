@@ -1,6 +1,8 @@
 <template>
    <VirgoButton link @click="ocrClicked" ref="trigger" size="small" :tabindex="props.tabindex" label="Download full text"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text" @hide="closeDialog" @show="opened">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Extract Item Text"
+      @hide="closeDialog" @show="opened" :draggable="false"
+   >
       <div v-if="mode=='init'" class="searching">
          <V4Spinner message="Searching for item text..." />
       </div>

@@ -1,5 +1,5 @@
 <template>
-   <Dialog v-model:visible="systemStore.sessionExpired" :modal="true" header="Notice" @hide="dismiss" position="top">
+   <Dialog v-model:visible="systemStore.sessionExpired" :modal="true" header="Notice" @hide="dismiss" position="top" :draggable="false">
       <div class="message-body">
          Your Virgo session has expired.
          <p>

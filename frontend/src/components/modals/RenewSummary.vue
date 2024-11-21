@@ -1,5 +1,5 @@
 <template>
-   <Dialog v-model:visible="userStore.showRenewSummary" :modal="true" position="top" header="Renew Summary" @hide="closeSummary">
+   <Dialog v-model:visible="userStore.showRenewSummary" :modal="true" position="top" header="Renew Summary" @hide="closeSummary" :draggable="false">
       <div class="renew-content">
          <div v-if="userStore.renewSummary.renewed > 0"><strong>{{userStore.renewSummary.renewed}}</strong> items successfully renewed.</div>
          <div v-if="userStore.renewSummary.failed > 0" class="fails">

@@ -1,6 +1,8 @@
 <template>
    <VirgoButton @click="openSaveClicked" ref="trigger">Save Search</VirgoButton>
-   <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search" @hide="closeDialog" @show="opened">
+   <Dialog v-model:visible="searches.showSaveDialog" :modal="true" position="top" header="Save Search"
+      @hide="closeDialog" @show="opened" :draggable="false"
+   >
       <div class="save-panel">
          <template v-if="showSignInMessage">
             <p>You must be signed in to save searches.</p>

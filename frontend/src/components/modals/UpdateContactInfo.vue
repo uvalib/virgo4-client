@@ -1,7 +1,7 @@
 <template>
    <VirgoButton @click="showUpdateDialog = true" :disabled="showUpdateDialog" ref="trigger" label="Update my Virgo contact information"/>
    <Dialog v-model:visible="showUpdateDialog" :modal="true" position="top"
-      style="max-width: 600px"
+      style="max-width: 600px" :draggable="false"
       header="Update Contact Info" @hide="closeDialog" @show="opened"
    >
       <FormKit type="form" id="update-contact" :actions="false" @submit="submitUpdate" ref="contactform">

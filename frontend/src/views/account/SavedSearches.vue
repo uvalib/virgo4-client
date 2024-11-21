@@ -59,7 +59,9 @@
             </div>
          </div>
       </div>
-      <Dialog v-model:visible="showRSSModal" :modal="true" position="top" :header='`RSS Feed for "${currentFeed.name}"`' @hide="closeRSSDialog">
+      <Dialog v-model:visible="showRSSModal" :modal="true" position="top" :header='`RSS Feed for "${currentFeed.name}"`'
+         @hide="closeRSSDialog" :draggable="false"
+      >
          <div class="rss-panel">
             <div class="rss-url" v-text="rssURL(currentFeed.token)"></div>
             <p>This feed contains a live search which will include any new items added to the collection.</p>

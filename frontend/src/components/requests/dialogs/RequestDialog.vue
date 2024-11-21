@@ -1,6 +1,6 @@
 <template>
    <VirgoButton @click="showDialog=true" :label="props.trigger" :disabled="props.disabled" />
-   <Dialog v-model:visible="showDialog" :modal="true" position="top"
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" :draggable="false"
       :header="props.title" @show="showRequestDialog" @hide="hideRequestDialog"
    >
       <slot></slot>

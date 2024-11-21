@@ -1,6 +1,6 @@
 <template>
    <Dialog v-model:visible="systemStore.showMessage" :modal="true" position="top"
-      :header="systemStore.message.title" @hide="dismiss">
+      :header="systemStore.message.title" @hide="dismiss" :draggable="false">
       <div class="message-body" id="msgbody" v-html="systemStore.message.content"></div>
       <div class="details" v-if="systemStore.message.detail">
          <p>Details</p>

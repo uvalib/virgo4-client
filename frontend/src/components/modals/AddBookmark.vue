@@ -1,5 +1,7 @@
 <template>
-   <Dialog v-model:visible="bookmarkStore.showAddDialog" :modal="true" position="top" header="Add Bookmark" @hide="closeDialog" @show="opened">
+   <Dialog v-model:visible="bookmarkStore.showAddDialog" :modal="true" position="top" header="Add Bookmark"
+      @hide="closeDialog" @show="opened" :draggable="false"
+   >
       <div class="add-content" v-if="showSignInMessage">
          <p>You must be signed in to use bookmarks.</p>
          <p>

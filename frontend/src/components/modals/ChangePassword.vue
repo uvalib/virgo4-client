@@ -1,6 +1,8 @@
 <template>
    <VirgoButton  @click="showDialog = true" v-if="!hasPasswordToken" :disabled="showDialog" ref="trigger" label="Change password"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password" @hide="closeChangeDialog" @show="opened">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Change Password"
+      @hide="closeChangeDialog" @show="opened" :draggable="false"
+   >
       <template v-if="expiredToken">
          <p class="error" v-html="error"></p>
          <p class="error">Please request a new password reset email.</p>

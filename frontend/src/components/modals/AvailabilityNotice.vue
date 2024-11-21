@@ -3,7 +3,7 @@
       <i class="icon fas fa-exclamation-triangle"></i>
       {{props.label}}
    </VirgoButton>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Availability Info" @hide="closeDialog">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Availability Info" @hide="closeDialog" :draggable="false">
       <div class="avail-message-panel">
          <div v-if="hasReserveInfo()" class="message">
             <span>{{mainMessage()}}</span>

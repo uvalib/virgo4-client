@@ -2,7 +2,7 @@
    <VirgoButton @click="showDialog=true" aria-label="view collection calendar" ref="trigger"
       icon="fal fa-calendar-alt" text rounded size="large"/>
 
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Select a date" @hide="closeDialog" @show="opened" :draggable="false">
       <DatePicker v-model="picked"  inline dateFormat="yy-mm-dd" :disabledDates="collection.notPublishedDates"
          :minDate="minDate" :maxDate="maxDate" @year-change="yearChanged" @month-change="monthChanged" @update:model-value="datePicked"/>
       <div class="error">

@@ -1,6 +1,8 @@
 <template>
-   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right fa-lg" @click="showDialog = true" ref="trigger" />
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Citations" @hide="closeDialog" @show="opened">
+   <VirgoButton text rounded label="Cite" icon="fas fa-quote-right fa-lg" @click="showDialog = true" ref="trigger"/>
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Citations"
+      @hide="closeDialog" @show="opened" :draggable="false"
+   >
       <div class="citations-content">
          <div class="working" v-if="loading" >
             <V4Spinner message="Gathering citations..."/>

@@ -165,7 +165,7 @@
       </div>
    </div>
 
-   <Dialog v-model:visible="showCancelModal" :modal="true" position="top" header="Cancel Hold" @hide="hideCancelHold">
+   <Dialog v-model:visible="showCancelModal" :modal="true" position="top" header="Cancel Hold" @hide="hideCancelHold" :draggable="false">
       <div class="cancel-panel">
          <dl>
             <dt>Title:</dt>

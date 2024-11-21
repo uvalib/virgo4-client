@@ -1,6 +1,8 @@
 <template>
    <VirgoButton @click="openClicked" ref="trigger" aria-label="manage selected bookmark storage" label="Move/Copy" :disabled="props.bookmarks.length == 0"/>
-   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Manage Bookmark Storage" @hide="closeDialog" @show="opened">
+   <Dialog v-model:visible="showDialog" :modal="true" position="top" header="Manage Bookmark Storage"
+      @hide="closeDialog" @show="opened" :draggable="false"
+   >
       <div class="panels">
          <div class="panel">
             <p>Selected bookmark(s):</p>
