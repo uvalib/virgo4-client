@@ -27,7 +27,7 @@
 <script setup>
 import BrowseCard from "@/components/details/BrowseCard.vue"
 import BrowsePager from "@/components/details/BrowsePager.vue"
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useShelfStore } from "@/stores/shelf"
 import { useRestoreStore } from "@/stores/restore"
 import { useBookmarkStore } from "@/stores/bookmark"
@@ -48,6 +48,23 @@ const props = defineProps({
 
 const { width } = useWindowSize()
 const shelfStore = useShelfStore()
+
+watch( width, (newValue) => {
+   var newRange = 4
+   if ( newValue <= 600 ) {
+      newRange = 1
+   } else if ( newValue <= 1150 ) {
+      newRange = 2
+   } else if ( newValue <= 1575 ) {
+      newRange = 3
+   }
+   if ( newRange !=  shelfStore.browseRange ) {
+      // console.log("SIZE CHANGE "+newRange+" W: "+newValue)
+      shelfStore.browseRange = newRange
+      shelfStore.showSpinner = false
+      shelfStore.getBrowseData(props.hit.identifier )
+   }
+})
 
 const currentCallNumber = computed(()=>{
    let f =  props.hit.fields.find( f => f.name == "call_number")
@@ -80,14 +97,13 @@ const getInitialBrowseData = ( async () => {
    const restore = useRestoreStore()
    const bookmarks = useBookmarkStore()
 
-   if ( width.value <= 520 ) {
+   shelfStore.browseRange = 4
+   if ( width.value <= 600 ) {
       shelfStore.browseRange = 1
-   } else if ( width.value <= 1000 ) {
+   } else if ( width.value <= 1150 ) {
       shelfStore.browseRange = 2
-   } else if ( width.value <= 1280 ) {
+   } else if ( width.value <= 1575 ) {
       shelfStore.browseRange = 3
-   } else {
-      shelfStore.browseRange = 4
    }
 
    let tgt = props.hit.identifier
@@ -139,7 +155,7 @@ onMounted(()=>{
       justify-content: center;
       align-items: stretch;
       list-style-type: none;
-      gap: 10px;
+      gap: 1rem;
       .card-wrap {
          position: relative;
          padding-top: 15px;
