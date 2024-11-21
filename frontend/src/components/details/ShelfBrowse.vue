@@ -7,7 +7,6 @@
          <h2 id="shelf-title">Shelf browse</h2>
          <ul class="browse-cards" role="list">
             <li v-for="(b,idx) in shelfStore.browse" class="card-wrap" :key="`b${b.id}`">
-               <i class="current fas fa-caret-down" v-if="isCurrent(idx)"></i>
                <BrowseCard :current="isCurrent(idx)" :pool="props.pool" :data="b" style="height:100%"/>
             </li>
          </ul>
@@ -17,7 +16,7 @@
             </router-link>
             <BrowsePager />
             <VirgoButton  v-if="!shelfStore.isOriginalItem" class="recenter"
-               @click="browseRestore()" severity="info">Return to {{currentCallNumber}}
+               @click="browseRestore()" severity="secondary">Return to {{currentCallNumber}}
             </VirgoButton>
          </div>
       </nav>
@@ -142,9 +141,6 @@ onMounted(()=>{
       text-align: center;
       margin: 20px 0 30px 0;
    }
-   .center {
-      text-align: centter;
-   };
 
    .browse-cards {
       padding: 0;
@@ -156,19 +152,6 @@ onMounted(()=>{
       align-items: stretch;
       list-style-type: none;
       gap: 1rem;
-      .card-wrap {
-         position: relative;
-         padding-top: 15px;
-         i.current {
-            position: absolute;
-            top: -22px;
-            width: 100%;
-            text-align: center;
-            z-index: 1;
-            color: $uva-brand-blue-100;
-            font-size: 3em;
-         }
-      }
    }
    .browse-controls  {
       margin: 20px 0 0 0;
