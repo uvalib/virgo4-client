@@ -40,6 +40,9 @@
                      </label>
                   </div>
                </template>
+               <template #empty>
+                  <div class="no-results">No results found.</div>
+               </template>
                <Column field="current_location" header="Location" />
                <Column field="call_number" header="Call Number" />
                <Column field="barcode" header="Barcode">
@@ -111,6 +114,12 @@ const firstChanged = (( newFirst) => {
    .p-paginator {
       padding-bottom: 0;
    }
+}
+.no-results {
+   text-align: center;
+   font-size: 1.15em;
+   margin: 1rem;
+   font-weight: 100;
 }
 .library-items {
    .panel {

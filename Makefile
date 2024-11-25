@@ -49,6 +49,14 @@ dep:
 	$(GOMOD) tidy
 	$(GOMOD) verify
 
+dep-web:
+	cd frontend && npm upgrade
+
+dep-svc:
+	$(GOGET) -u ./backend/...
+	$(GOMOD) tidy
+	$(GOMOD) verify
+
 check:
 	go install honnef.co/go/tools/cmd/staticcheck
 	$(HOME)/go/bin/staticcheck -checks all,-S1002,-ST1003 backend/*.go
