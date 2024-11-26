@@ -6,8 +6,7 @@
          <div class="content">
             <BookmarkButton :pool="props.pool" :hit="props.hit" :origin="props.from" :labeled="true"/>
             <Citations :itemURL="props.hit.itemURL" :from="props.from"/>
-            <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS"
-               @click="downloadRISClicked" :aria-label="`download RIS citation for ${props.hit.header.title}`" />
+            <VirgoButton icon="fal fa-download fa-lg" text rounded label="Download RIS" @click="downloadRISClicked"/>
             <span class="pdf-wrap" v-if="from=='COLLECTION'"  >
                <VirgoButton  v-if="!pdfDownloading" icon="fal fa-file-pdf fa-lg"
                   label="Download PDF" text rounded @click="pdfClicked"/>
@@ -16,8 +15,7 @@
                   <ProgressBar :value="pdfProgress()" :showValue="false" style="width:175px;height:8px"/>
                </div>
             </span>
-            <VirgoButton icon="fal fa-link fa-lg" text rounded label="Permalink"
-               @click="permalinkClicked" :aria-label="`copy permalink to ${props.hit.header.title}`" />
+            <VirgoButton icon="fal fa-link fa-lg" text rounded label="Permalink" @click="permalinkClicked" />
          </div>
       </div>
    </section>

@@ -18,19 +18,20 @@
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
             <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large">
             <div class="img-toolbar">
-               <a target="_blank" :href="imageURL('max')">
+               <a target="_blank" :href="imageURL('max')" :aria-describedby="`${item.details.identifier}-fullsize-link`">
                   View full size<i class="fal fa-external-link-alt"></i>
                </a>
+               <span :id="`${item.details.identifier}-fullsize-link`" class="screen-reader-text">(opens in a new window)</span>
             </div>
          </div>
 
          <template v-if="poolMode=='image' && details.related.length > 0">
             <h3>Related images</h3>
             <div class="related">
-               <div class="img-wrap" v-for="r in details.related" :key="`r${r.id}`" @mousedown="relatedImageClicked(r)">
+               <router-link class="img-wrap" v-for="r in details.related" :key="`r${r.id}`" :to="`/sources/${item.details.source}/items/${r.id}`">
                   <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
                   <ImageAdvisory v-if="r.content_advisory" />
-               </div>
+               </router-link>
             </div>
          </template>
 
@@ -263,11 +264,11 @@ onMounted(()=>{
    }
 })
 
-function toggleFullView() {
+const toggleFullView = (() => {
    fsView.value = !fsView.value
-}
+})
 
-function imageURL(size) {
+const imageURL = ((size) => {
    let iiifField = details.value.fields.find( f => f.name=="iiif_image_url")
    if (!iiifField) return ""
    if ( size == 'full') {
@@ -276,39 +277,35 @@ function imageURL(size) {
       return [`${iiifField.value}/full/full/0/default.jpg`]
    }
    return [`${iiifField.value}/full/600,/0/default.jpg`]
-}
-
-const relatedImageClicked = ( async ( hit ) => {
-   const url =  `/sources/${item.details.source}/items/${hit.id}`
-   await item.getDetails( item.details.source, hit.id )
-   document.title = item.details.header.title
-   analytics.trigger('Results', 'ITEM_DETAIL_VIEWED', hit.id)
-   history.replaceState(history.state, '', url)
 })
 
-function viewerClicked(tgtItem) {
+const viewerClicked = ((tgtItem) => {
    selectedDigitalObjectIdx.value = item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
    history.replaceState(history.state, '', "?idx="+selectedDigitalObjectIdx.value)
-}
-function isCurrent(tgtItem) {
+})
+
+const isCurrent = ((tgtItem) => {
    let curr = item.digitalContent[selectedDigitalObjectIdx.value]
    return (curr.pid == tgtItem.pid)
-}
-function digitalContentIndex( tgtItem ) {
-   return item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
-}
+})
 
-function generatePDFInProgress(tgtItem) {
+const digitalContentIndex = (( tgtItem ) => {
+   return item.digitalContent.findIndex( i => i.pid == tgtItem.pid)
+})
+
+const generatePDFInProgress = ((tgtItem) => {
    if ( !tgtItem.pdf) return false
    return !( tgtItem.pdf.status == "READY" || tgtItem.pdf.status == "ERROR" || tgtItem.pdf.status == "FAILED" ||
       tgtItem.pdf.status == "NOT_AVAIL" ||  tgtItem.pdf.status == "UNKNOWN")
-}
-function generateOCRInProgress(tgtItem) {
+})
+
+const generateOCRInProgress =((tgtItem) => {
    if ( !tgtItem.ocr) return false
    return !( tgtItem.ocr.status == "READY" ||  tgtItem.ocr.status == "ERROR" || tgtItem.ocr.status == "FAILED" ||
       tgtItem.ocr.status == "NOT_AVAIL" ||  tgtItem.ocr.status == "UNKNOWN")
-}
-async function pdfClicked( tgtItem ) {
+})
+
+const pdfClicked = ( async ( tgtItem ) => {
    await item.getPDFStatus(tgtItem )
    if (tgtItem.pdf.status == "READY" || tgtItem.pdf.status == "100%") {
       analytics.trigger('PDF', 'PDF_DOWNLOAD_CLICKED', tgtItem.pid)
@@ -340,8 +337,9 @@ async function pdfClicked( tgtItem ) {
       }, 1000)
       pdfTimerIDs.value.set(tgtItem.pid, pdfTimerID)
    }
-}
-function ocrStarted(tgtItem) {
+})
+
+const ocrStarted = ((tgtItem) => {
    if (ocrTimerIDs.value.has(tgtItem.pid) == false) {
       let ocrTimerID = setInterval( async () => {
          await item.getOCRStatus( tgtItem )
@@ -358,7 +356,7 @@ function ocrStarted(tgtItem) {
       }, 5000)
       ocrTimerIDs.value.set(item.pid, ocrTimerID)
    }
-}
+})
 
 onUnmounted(()=>{
    ocrTimerIDs.value.forEach( (timerID, _pid) => {

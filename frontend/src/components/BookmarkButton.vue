@@ -1,11 +1,11 @@
 <template>
-   <VirgoButton v-if="system.isKiosk==false && !props.labeled"
-      size="large" text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
-      :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
+   <VirgoButton v-if="system.isKiosk==false && !props.labeled" size="large"
+      text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
+      :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
       :class="{checked: bookmarkCount > 0}" />
-   <VirgoButton v-if="system.isKiosk==false && props.labeled"
-      label="Bookmark" text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
-      :aria-label="ariaLabel" :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
+   <VirgoButton v-if="system.isKiosk==false && props.labeled" label="Bookmark"
+      text rounded role="switch" @click="bookmarkClicked" :icon="bookmarkIcon"
+      :aria-checked="bookmarkCount > 0" ref="bookmarkbtn"
       :class="{checked: bookmarkCount > 0}" />
 </template>
 
@@ -41,17 +41,6 @@ const system = useSystemStore()
 const bookmarkStore = useBookmarkStore()
 const confirm = useConfirm()
 const bookmarkbtn = ref()
-
-const ariaLabel = computed(() => {
-   let title = props.hit.title
-   if (props.hit.header) {
-      title = props.hit.header.title
-   }
-   if ( bookmarkCount.value  > 0 ) {
-      return`remove bookmark on ${title}`
-   }
-   return `bookmark ${title}`
-})
 
 const bookmarkIcon = computed(() => {
    let sz = ""
