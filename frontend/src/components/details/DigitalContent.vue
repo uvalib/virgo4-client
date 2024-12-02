@@ -16,7 +16,7 @@
                allowfullscreen frameborder="0" :title="`viewer for ${item.details.header.title}`" />
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
-            <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large">
+            <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large" :alt="item.details.header.title">
             <div class="img-toolbar">
                <a target="_blank" :href="imageURL('max')" :aria-describedby="`${item.details.identifier}-fullsize-link`">
                   View full size<i class="fal fa-external-link-alt"></i>
@@ -28,10 +28,13 @@
          <template v-if="poolMode=='image' && details.related.length > 0">
             <h3>Related images</h3>
             <div class="related">
-               <router-link class="img-wrap" v-for="r in details.related" :key="`r${r.id}`" :to="`/sources/${item.details.source}/items/${r.id}`">
-                  <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" />
-                  <ImageAdvisory v-if="r.content_advisory" />
-               </router-link>
+               <div class="related-image" v-for="r in details.related" :key="`r${r.id}`" >
+                  <router-link class="img-wrap" :to="`/sources/${item.details.source}/items/${r.id}`">
+                     <img :src="`${r.iiif_image_url}/square/200,200/0/default.jpg`" :alt="r.title" />
+                     <ImageAdvisory v-if="r.content_advisory" />
+                  </router-link>
+                  <router-link :to="`/sources/${item.details.source}/items/${r.id}`">{{ r.title }}</router-link>
+               </div>
             </div>
          </template>
 
@@ -500,6 +503,14 @@ onUnmounted(()=>{
       justify-content: flex-start;
       align-items: flex-start;
       gap: 1rem;
+      .related-image {
+         display: flex;
+         flex-direction: column;
+         gap: 5px;
+         a {
+            max-width: 200px;
+         }
+      }
 
       a {
          display: inline-block;
