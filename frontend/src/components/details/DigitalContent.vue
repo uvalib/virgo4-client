@@ -16,13 +16,13 @@
                allowfullscreen frameborder="0" :title="`viewer for ${item.details.header.title}`" />
          </div>
          <div v-else-if="hasImage" class="img-view large" ref="viewer">
-            <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large" :alt="item.details.header.title">
             <div class="img-toolbar">
-               <a target="_blank" :href="imageURL('max')" :aria-describedby="`${item.details.identifier}-fullsize-link`">
-                  View full size<i class="fal fa-external-link-alt"></i>
-               </a>
+               <VirgoButton as="a" label="View full size" severity="info" size="small"
+                  :aria-describedby="`${item.details.identifier}-fullsize-link`" :href="imageURL('max')" target="_blank" rel="noopener"
+               />
                <span :id="`${item.details.identifier}-fullsize-link`" class="screen-reader-text">(opens in a new window)</span>
             </div>
+            <img :src="imageURL('med')" :data-src="imageURL('full')" class="thumb large" :alt="item.details.header.title">
          </div>
 
          <template v-if="poolMode=='image' && details.related.length > 0">
@@ -482,18 +482,8 @@ onUnmounted(()=>{
 
    .img-view {
       display: inline-block;
-      border: 1px solid $uva-grey-100;
-      border-radius: 0.3rem;
-
       .img-toolbar {
-         padding: 15px;
-         text-align: right;
-         a {
-            font-weight: 100 !important;
-            i {
-               margin-left: 8px;
-            }
-         }
+         padding: 0 0 10px 0;
       }
    }
 
