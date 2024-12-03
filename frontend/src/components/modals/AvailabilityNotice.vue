@@ -65,7 +65,8 @@ const messageParts = (() => {
 
 <style lang="scss">
 .icon {
-   color: $uva-red;
+   color: $uva-brand-orange;
+   font-size: 1.25em;
 }
 div.avail-message-panel {
    padding: 0;

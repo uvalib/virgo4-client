@@ -126,6 +126,9 @@ const signOut = (() => {
       left: -2px;
    }
 }
+:deep(.alert-bell.icon) {
+   color: white;
+}
 #alertmenu {
    display: inline-block;
    border-radius: 10px;

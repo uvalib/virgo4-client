@@ -41,7 +41,7 @@
          <div v-else class="value">
             <template v-if="item.digitalContent.length > 0">
                <h3 class='do-header'>{{item.digitalContent.length}} Digital object<span v-if="item.digitalContent.length>1">s</span></h3>
-               <Carousel :value="item.digitalContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions" @update:page="carouselPaged" :showIndicators="false">
+               <Carousel :value="item.digitalContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions" @update:page="carouselPaged" :showIndicators="showCarouselIndicators">
                   <template #item="slotProps">
                      <div class="download-card" :class="{current: isCurrent(slotProps.data)}" @click.stop="viewerClicked(slotProps.data)">
                         <div class="progress" v-if="generatePDFInProgress(slotProps.data)">
@@ -164,6 +164,10 @@ const carouselPaged = ( (pg) => {
          carouselTabIndex.value[i] = 0
       }
    }
+})
+
+const showCarouselIndicators = computed(() => {
+   return width.value >= 992
 })
 
 const details = computed(()=>{
