@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue"
+import { onMounted, nextTick } from "vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
 import { setFocusID } from '@/utils'
@@ -34,7 +34,7 @@ const requestStore = useRequestStore()
 const user = useUserStore()
 
 onMounted(()=>{
-   setFocusID("request-done")
+   nextTick( () =>  setFocusID("request-done") )
 })
 </script>
 

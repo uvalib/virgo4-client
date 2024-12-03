@@ -1,6 +1,6 @@
 <template>
    <RequestDialog trigger="Request a scan" title="Scan Request" request="Submit Request"
-      :show="request.activeRequest=='scan'" :showSubmit="submitted == false && user.isSignedIn" :disabled="isSubmitDisabled"
+      :show="request.activeRequest=='scan'" :showSubmit="submitted == false && user.isSignedIn" :disabled="request.working"
       @opened="dialogOpened" @closed="dialogClosed" @submit="scanForm.node.submit()"
    >
       <SignIn v-if="!user.isSignedIn" />
@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import RequestDialog from '@/components/requests/dialogs/RequestDialog.vue'
 import SignIn from "@/views/SignIn.vue"
 import ILLCopyrightNotice from '@/components/requests/panels/ILLCopyrightNotice.vue'
@@ -82,14 +82,6 @@ const scan = ref({
 })
 const submitted = ref(false)
 const scanForm = ref()
-
-const isSubmitDisabled = computed(() => {
-   if (request.working) return true
-   if (scanForm.value  ) {
-      return scanForm.value.node.context.state.valid == false
-   }
-   return false
-})
 
 const dialogOpened = (() => {
    console.log(scanForm.value.node.context.state.valid)

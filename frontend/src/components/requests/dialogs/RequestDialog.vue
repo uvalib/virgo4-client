@@ -9,7 +9,7 @@
             <VirgoButton severity="secondary" @click="showDialog=false" label="Cancel"/>
             <VirgoButton :label="props.request" :disabled="props.disabled" @click="emit('submit')" />
          </template>
-         <VirgoButton v-else severity="secondary" @click="showDialog=false" label="Close"/>
+         <VirgoButton v-else severity="secondary" id="request-done" @click="showDialog=false" label="Close"/>
       </template>
    </Dialog>
 </template>
