@@ -6,7 +6,7 @@
       <div class="items" v-else-if="item.hasDigitalContent || hasExternalImages">
          <h2>View online</h2>
          <div class="buttons" v-if="!collection.isFullPageCollection && item.hasDigitalContent">
-            <VirgoButton size="small" severity="info" label="View Full Screen" @click="toggleFullView" />
+            <VirgoButton size="small" severity="info" label="View full screen" @click="toggleFullView" />
          </div>
          <div class="viewer" v-if="item.hasDigitalContent">
             <div v-if="fsView" class="restore-view">
