@@ -38,6 +38,9 @@
                <LibraryItemsPanel v-for="lib in item.availability.libraries" :library="lib"/>
             </div>
          </div>
+         <div class="online-requests" v-else-if="request.hasOptions">
+            <RequestsPanel v-if="canMakeRequests"/>
+         </div>
       </div>
    </div>
 </template>
@@ -167,6 +170,9 @@ const dibsItems = computed(()=>{
       display: flex;
       flex-direction: column;
       gap: 1rem;
+   }
+   .online-requests {
+      margin-top: 1rem;
    }
    .on-shelf {
       display: flex;
