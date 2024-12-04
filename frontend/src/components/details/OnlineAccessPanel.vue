@@ -64,7 +64,11 @@ const providerHomepage = ((provider) => {
 
 const linkLabel = (( providerLink ) => {
    if (providerLink.label) return providerLink.label
-   return providerLink.url
+   var labelURL = providerLink.url
+   if ( labelURL.length > 75 ) {
+      labelURL = labelURL.substring(0, 75) + "..."
+   }
+   return labelURL
 })
 
 </script>
