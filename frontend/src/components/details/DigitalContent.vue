@@ -39,9 +39,9 @@
          </template>
 
          <div v-else class="value">
-            <template v-if="item.digitalContent.length > 0">
-               <h3 class='do-header'>{{item.digitalContent.length}} Digital object<span v-if="item.digitalContent.length>1">s</span></h3>
-               <Carousel :value="item.digitalContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions" @update:page="carouselPaged" :showIndicators="showCarouselIndicators">
+            <template v-if="pdfContent.length > 0">
+               <h3 class='do-header'>{{pdfContent.length}} Digital object<span v-if="pdfContent.length>1">s</span></h3>
+               <Carousel :value="pdfContent" :numVisible="7" :numScroll="7" :responsiveOptions="responsiveOptions" @update:page="carouselPaged" :showIndicators="showCarouselIndicators">
                   <template #item="slotProps">
                      <div class="download-card" :class="{current: isCurrent(slotProps.data)}" @click.stop="viewerClicked(slotProps.data)">
                         <div class="progress" v-if="generatePDFInProgress(slotProps.data)">
@@ -178,7 +178,9 @@ const hasExternalImages = computed(()=>{
    if (iiifField) return true
    return false
 })
-
+const pdfContent = computed(()=>{
+   return item.digitalContent.filter( dc => dc.pdf)
+})
 const poolMode = computed(()=>{
    let poolDetail = poolStore.poolDetails(details.value.source)
    return poolDetail.mode
