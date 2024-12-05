@@ -1,8 +1,7 @@
 <template>
    <footer role="contentinfo" id="v4footer">
       <div class="pre-footer" v-if="route.name != 'feedback'">
-         This is the newest version of the Library catalog.
-         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank" aria-describedby="new-window">Please give us your feedback.<i class="fal fa-external-link-alt"></i></a>
+         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank" aria-describedby="new-window">We welcome your feedback about the Library catalog.<i class="fal fa-external-link-alt"></i></a>
          <span id="new-window" class="screen-reader-text">(opens in a new window)</span>
       </div>
       <div class="footer-container">
