@@ -10,7 +10,9 @@
                   <div class="name">
                      <a v-if="providerHomepage(s.provider)" class="provider-link"
                         :aria-label="`${providerLabel(s.provider)} home page`"
-                        :href="providerHomepage(s.provider)" target="_blank" >
+                        :href="providerHomepage(s.provider)" target="_blank"
+                        aria-describedby="external-link"
+                     >
                         {{ providerLabel(s.provider) }}
                      </a>
                      <span v-else>
@@ -19,8 +21,7 @@
                   </div>
                   <div class="links">
                      <template  v-for="l in s.links">
-                        <VirgoButton as="a" :label="linkLabel(l)" :href="l.url" target="_blank"
-                           :aria-label="`access ${props.title} ${l.label} with ${providerLabel(s.provider)}`"/>
+                        <VirgoButton as="a" :label="linkLabel(l, s.provider)" :href="l.url" target="_blank" aria-describedby="external-link"/>
                      </template>
                   </div>
                </div>
@@ -62,13 +63,9 @@ const providerHomepage = ((provider) => {
    return ""
 })
 
-const linkLabel = (( providerLink ) => {
-   if (providerLink.label) return providerLink.label
-   var labelURL = providerLink.url
-   if ( labelURL.length > 75 ) {
-      labelURL = labelURL.substring(0, 75) + "..."
-   }
-   return labelURL
+const linkLabel = (( link, provider ) => {
+   if (link.label) return link.label
+   return `Access item with ${providerLabel(provider)}`
 })
 
 </script>

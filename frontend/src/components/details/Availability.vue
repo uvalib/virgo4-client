@@ -5,7 +5,7 @@
       </div>
       <div class="availability-content" v-else>
          <h2>Availability</h2>
-
+         <span id="external-link" class="screen-reader-text">(opens in a new window)</span>
          <div class="online" v-if="hasOnlineContent">
             <OnlineAccessPanel v-if="item.onlineAccessSources.length > 0 && !system.isKiosk"
                :title="item.details.header.title" :pool="item.details.source" :sources="item.onlineAccessSources" />
