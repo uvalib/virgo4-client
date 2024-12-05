@@ -59,7 +59,6 @@ const yearChanged = ((e) => {
 
 const datePicked = (() => {
    let pickStr = useDateFormat(picked.value,"YYYY-MM-DD").value
-   console.log(pickStr)
    error.value = ""
    let pid = collection.getPidForDate( pickStr )
    if ( pid != "") {

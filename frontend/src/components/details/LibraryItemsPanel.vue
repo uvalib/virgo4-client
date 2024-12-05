@@ -96,11 +96,9 @@ const props = defineProps({
 })
 
 const pageSizeChanged = (( newSize) => {
-   console.log("size: "+newSize)
    pageSize.value = newSize
 })
 const firstChanged = (( newFirst) => {
-   console.log("first: "+newFirst)
    currFirst.value = newFirst
 })
 </script>

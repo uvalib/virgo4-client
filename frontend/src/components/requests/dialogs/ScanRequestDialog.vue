@@ -84,7 +84,6 @@ const submitted = ref(false)
 const scanForm = ref()
 
 const dialogOpened = (() => {
-   console.log(scanForm.value.node.context.state.valid)
    selectedItem.value = null
    scan.value = {
       label: '',

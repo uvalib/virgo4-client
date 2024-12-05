@@ -21,7 +21,6 @@ const props = defineProps({
 
 const beautifiedXML = computed(() => {
    let out = beautify(props.xml).trim()
-   console.log(out)
    return out
 })
 

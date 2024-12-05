@@ -52,7 +52,6 @@ export function usePinnable( pinID, alertsID, scrollID, footerID ) {
    })
 
    onMounted( () => {
-      console.log(document.getElementById(scrollID))
       alerts.value = document.getElementById(alertsID)
       main.value = document.getElementById(scrollID)
       footer.value = document.getElementById(footerID)

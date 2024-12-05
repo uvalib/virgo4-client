@@ -356,6 +356,13 @@ export const useItemStore = defineStore('item', {
                   })
                }
 
+               // sort avvailability libraries by name
+               this.availability.libraries.sort( (a,b) => {
+                  if (a.name > b.name) return 1
+                  if (a.name < b.name) return -1
+                  return 0
+               })
+
                // // HACK IN A SPECIAL ITEM OPTION
                // if ( response.data.availability.request_options.length > 0) {
                //    if ( response.data.availability.request_options[0].item_options.length > 1) {
