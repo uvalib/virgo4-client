@@ -34,7 +34,7 @@
             </div>
             <div class="note">
                <a href="https://guides.lib.virginia.edu/virgo" target="_blank" aria-describedby="guide-window">
-                  Learn more about using Virgo<i style="margin-left:0.5rem;" class="fal fa-external-link-alt"></i>
+                  Learn more about using Virgo<i style="margin-left:0.5rem;" aria-hidden="true" class="fal fa-external-link-alt"></i>
                </a>
                <span id="guide-window" class="screen-reader-text">(opens in a new window)</span>
             </div>

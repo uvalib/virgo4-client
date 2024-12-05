@@ -1,7 +1,7 @@
 <template>
    <footer role="contentinfo" id="v4footer">
       <div class="pre-footer" v-if="route.name != 'feedback'">
-         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank" aria-describedby="new-window">We welcome your feedback about the Library catalog.<i class="fal fa-external-link-alt"></i></a>
+         <a :href="`/feedback?url=${feedbackURL()}`" target="_blank" aria-describedby="new-window">We welcome your feedback about the Library catalog.<i aria-hidden="true" class="fal fa-external-link-alt"></i></a>
          <span id="new-window" class="screen-reader-text">(opens in a new window)</span>
       </div>
       <div class="footer-container">

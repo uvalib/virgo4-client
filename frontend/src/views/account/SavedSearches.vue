@@ -32,7 +32,7 @@
                <div v-if="saved.public" class="public-controls">
                   <a  class="view" :href="searchURL(saved.token)" target="_blank">
                      <span>View published search</span>
-                     <i class="link-icon fal fa-external-link-alt"></i>
+                     <i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                   </a>
                   <span class="sep">|</span>
                   <VirgoButton text @click="copyURL(saved.token)" label="Copy published URL to clipboard"/>

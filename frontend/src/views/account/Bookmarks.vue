@@ -34,7 +34,7 @@
                         </span>
                         <span v-if="folderInfo.public" class="public-url">
                            <a :href="getPublicURL(folderInfo)" target="_blank">
-                              <span>View</span><i class="link-icon fal fa-external-link-alt"></i>
+                              <span>View</span><i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                            </a>
                         </span>
                      </div>

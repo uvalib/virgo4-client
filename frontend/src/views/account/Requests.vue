@@ -9,7 +9,7 @@
                <!-- No ILL requests for community borrowers  -->
             </div>
             <div v-else-if="userStore.isHSLUser" class="subcontent">
-               <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i class="link-icon fal fa-external-link-alt"></i></a>
+               <a :href="systemStore.hsILLiadURL" target="_blank">Health Sciences ILLiad Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
             <div v-else class="subcontent buttons">
                <VirgoButton @click="instructionalScanClick" label="Instructional Scanning"/>
@@ -18,7 +18,7 @@
                <VirgoButton @click="illScanClick" label="ILL Scan Chapter/Article"/>
             </div>
             <div class="subcontent links">
-               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i class="link-icon fal fa-external-link-alt"></i></a>
+               <a href="https://www.library.virginia.edu/services/purchase-requests/" target="_blank">Purchase Request<i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i></a>
             </div>
 
             <template v-if="request">

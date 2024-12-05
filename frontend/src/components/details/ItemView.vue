@@ -45,7 +45,7 @@
                         <a  v-if="field.name == 'copyright_and_permissions'" class="cr-note"
                            href="https://www.library.virginia.edu/policies/use-of-materials" target="_blank"
                         >
-                           More about Rights and Permissions<i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                           More about Rights and Permissions<i style="margin-left:5px;" aria-hidden="true" class="fal fa-external-link-alt"></i>
                         </a>
                      </template>
                      <span v-else>{{field.item}}</span>
@@ -61,7 +61,7 @@
                <dt class="label">
                   <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
                      <span class="full-metadata">Full metadata</span>
-                     <i style="margin-left:5px;" class="fal fa-external-link-alt"></i>
+                     <i style="margin-left:5px;" aria-hidden="true" class="fal fa-external-link-alt"></i>
                   </a>
                </dt>
                <dd class="value"/>

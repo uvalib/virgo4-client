@@ -3,7 +3,7 @@
       <div class="controls">
          <a href="https://uva.hosts.atlas-sys.com/remoteauth/illiad.dll?Action=10&Form=60" target="_blank">
             <span>View Request History</span>
-            <i class="link-icon fal fa-external-link-alt"></i>
+            <i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
          </a>
       </div>
       <div class="checkout-list">
@@ -25,7 +25,7 @@
             <div class="renewbar" v-if="co.renewalsAllowed">
                <a :href="`https://uva.hosts.atlas-sys.com/RemoteAuth/illiad.dll?Action=10&Form=67&Value=${co.transactionNumber}`" target="_blank">
                   <span>Renew</span>
-                  <i class="link-icon fal fa-external-link-alt"></i>
+                  <i aria-hidden="true" class="link-icon fal fa-external-link-alt"></i>
                </a>
             </div>
          </div>
