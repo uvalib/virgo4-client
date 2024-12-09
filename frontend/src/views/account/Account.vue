@@ -150,8 +150,14 @@
                         </div>
                         <div v-else>
                            <div>
-                              All fines must be paid at Shannon Library using cash for the exact amount or personal check.<br/>
-                              We do not take credit cards or any online payments at this time.
+                              <p>
+                                 <a href="https://pci.foc.virginia.edu/UVA_Library_Circulation" target="_blank">The Library offers an online payment option</a>.
+                                 You will need to enter the total amount billed to pay.
+                              </p>
+                              <p>
+                                 To pay fines in person, visit Shannon Library. We can only accept cash for the exact amount or personal check.<br/>
+                                 To mail a check, send to:
+                              </p>
                            </div>
                            <div class="addr">
                               <strong>Shannon Library</strong><br/>
