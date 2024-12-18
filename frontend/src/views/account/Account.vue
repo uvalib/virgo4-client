@@ -155,7 +155,7 @@
                                  You will need to enter the total amount billed to pay.
                               </p>
                               <p>
-                                 To pay fines in person, visit Shannon Library. We can only accept cash for the exact amount or personal check.<br/>
+                                 To pay fines in person, visit Shannon Library. We can only accept cash for the exact amount or personal check.
                                  Please make the check out to <b>UVA Library</b>.<br/>
                                  To mail a check, send to:
                               </p>
