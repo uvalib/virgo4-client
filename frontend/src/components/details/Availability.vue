@@ -62,9 +62,8 @@ const user = useUserStore()
 const system = useSystemStore()
 
 const hasOnlineContent = computed( () => {
-   if (item.onlineAccessSources.length > 0 && !system.isKiosk) return true
-   if (dibsItems.length > 0) return true
-   return false
+   if ( system.isKiosk ) return false
+   return (item.onlineAccessSources.length > 0 || dibsItems.value.length > 0 )
 })
 const hasItems = computed(()=>{
    return item.availability.libraries.length > 0
