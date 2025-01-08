@@ -374,7 +374,7 @@ func (svc *ServiceContext) LogClientError(c *gin.Context) {
 // GetCodes will return the raw library and location codes from the ILS connector
 func (svc *ServiceContext) GetCodes(c *gin.Context) {
 	log.Printf("Get ILS connector codes")
-	userURL := fmt.Sprintf("%s/v4/availability/list", svc.ILSAPI)
+	userURL := fmt.Sprintf("%s/availability/list", svc.ILSAPI)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)

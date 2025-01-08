@@ -156,7 +156,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	svc.GDB.Model(&v4User).Select("AuthStartedAt", "AuthTries", "AttemptsLeft").Updates(v4User)
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
-	authURL := fmt.Sprintf("%s/v4/users/%s/check_pin", svc.ILSAPI, auth.Barcode)
+	authURL := fmt.Sprintf("%s/users/%s/check_pin", svc.ILSAPI, auth.Barcode)
 	bodyBytes, ilsErr := svc.ILSConnectorPost(authURL, auth, c.GetString("jwt"))
 	if ilsErr != nil && ilsErr.StatusCode == 503 {
 		c.String(503, "PIN sign in is temporarily unavailable. Please try again later.")
@@ -318,7 +318,7 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 	guestJWT, _ := v4jwt.Mint(guestClaim, 1*time.Minute, svc.JWTKey)
 
 	log.Printf("Get ILS Connector data for user %s", v4User.Virgo4ID)
-	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, v4User.Virgo4ID)
+	userURL := fmt.Sprintf("%s/users/%s", svc.ILSAPI, v4User.Virgo4ID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, guestJWT, svc.HTTPClient)
 	if ilsErr != nil {
 		return "", errors.New(ilsErr.Message)

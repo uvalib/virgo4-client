@@ -108,7 +108,7 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 	}
 
 	log.Printf("INFO: create hold request: %+v", holdReq)
-	createHoldURL := fmt.Sprintf("%s/v4/requests/hold", svc.ILSAPI)
+	createHoldURL := fmt.Sprintf("%s/requests/hold", svc.ILSAPI)
 	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, holdReq, c.GetString("jwt"))
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -506,7 +506,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 		IlliadTN:      fmt.Sprintf("%d", illiadResp.TransactionNumber),
 	}
 
-	createHoldURL := fmt.Sprintf("%s/v4/requests/scan", svc.ILSAPI)
+	createHoldURL := fmt.Sprintf("%s/requests/scan", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
 	if ilsErr != nil {
 		// The ILLiad request was successful so the item needs to be moved to a special queue
@@ -569,7 +569,7 @@ func (svc *ServiceContext) DeleteHold(c *gin.Context) {
 
 	// Hold is able to be cancelled automatically
 	if holdToCancel.Cancellable {
-		deleteHoldURL := fmt.Sprintf("%s/v4/requests/hold/%s", svc.ILSAPI, holdToCancel.HoldID)
+		deleteHoldURL := fmt.Sprintf("%s/requests/hold/%s", svc.ILSAPI, holdToCancel.HoldID)
 		_, ilsErr := svc.ILSConnectorDelete(deleteHoldURL, c.GetString("jwt"))
 		if ilsErr != nil {
 			c.String(ilsErr.StatusCode, ilsErr.Message)

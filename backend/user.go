@@ -167,7 +167,7 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 		return
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
-	pinURL := fmt.Sprintf("%s/v4/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
+	pinURL := fmt.Sprintf("%s/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
 	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
 	if ilsErr != nil {
 		log.Printf("User %s pin change failed", qp.UserBarcode)
@@ -192,7 +192,7 @@ func (svc *ServiceContext) ChangePasswordWithToken(c *gin.Context) {
 		return
 	}
 	log.Printf("Attempting to change pin with token")
-	pinURL := fmt.Sprintf("%s/v4/users/change_password_with_token", svc.ILSAPI)
+	pinURL := fmt.Sprintf("%s/users/change_password_with_token", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
 	if ilsErr != nil {
 		log.Printf("User pin change with token failed")
@@ -215,7 +215,7 @@ func (svc *ServiceContext) ForgotPassword(c *gin.Context) {
 		return
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
-	pinURL := fmt.Sprintf("%s/v4/users/forgot_password", svc.ILSAPI)
+	pinURL := fmt.Sprintf("%s/users/forgot_password", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
 	if ilsErr != nil {
 		log.Printf("User %s password reset failed", qp.UserBarcode)
@@ -230,7 +230,7 @@ func (svc *ServiceContext) ForgotPassword(c *gin.Context) {
 func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get bills for user %s with ILS Connector...", userID)
-	userURL := fmt.Sprintf("%s/v4/users/%s/bills", svc.ILSAPI, userID)
+	userURL := fmt.Sprintf("%s/users/%s/bills", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		if ilsErr.StatusCode == 503 {
@@ -269,11 +269,11 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 		Barcode     string `json:"item_barcode"`
 	}
 	log.Printf("Renew checkouts [%s] for user %s with ILS Connector...", qp.Barcode, userID)
-	renewURL := fmt.Sprintf("%s/v4/request/renewAll", svc.ILSAPI)
+	renewURL := fmt.Sprintf("%s/request/renewAll", svc.ILSAPI)
 	ilsReq.ComputingID = userID
 	ilsReq.Barcode = qp.Barcode
 	if qp.Barcode != "all" {
-		renewURL = fmt.Sprintf("%s/v4/request/renew", svc.ILSAPI)
+		renewURL = fmt.Sprintf("%s/request/renew", svc.ILSAPI)
 	}
 	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq, c.GetString("jwt"))
 	if err != nil {
@@ -282,7 +282,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	}
 
 	// Get all of the user checkouts after the renew so dates/status are updated
-	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
+	userURL := fmt.Sprintf("%s/users/%s/checkouts", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -308,7 +308,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
-	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts", svc.ILSAPI, userID)
+	userURL := fmt.Sprintf("%s/users/%s/checkouts", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
 		if ilsErr.StatusCode == 503 {
@@ -332,7 +332,7 @@ func (svc *ServiceContext) GetUserCheckouts(c *gin.Context) {
 func (svc *ServiceContext) DownloadUserCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get checkouts for user %s with ILS Connector...", userID)
-	userURL := fmt.Sprintf("%s/v4/users/%s/checkouts.csv", svc.ILSAPI, userID)
+	userURL := fmt.Sprintf("%s/users/%s/checkouts.csv", svc.ILSAPI, userID)
 	bodyBytes, ilsStatus := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 
 	if ilsStatus != nil {
@@ -355,7 +355,7 @@ func (svc *ServiceContext) DownloadUserCheckouts(c *gin.Context) {
 func (svc *ServiceContext) GetUserHolds(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get holds for user %s with ILS Connector...", userID)
-	userURL := fmt.Sprintf("%s/v4/users/%s/holds", svc.ILSAPI, userID)
+	userURL := fmt.Sprintf("%s/users/%s/holds", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
 		if ilsErr.StatusCode == 503 {
@@ -382,7 +382,7 @@ func (svc *ServiceContext) GetUser(c *gin.Context) {
 	userID := c.Param("uid")
 	log.Printf("Get info for user %s with ILS Connector...", userID)
 
-	userURL := fmt.Sprintf("%s/v4/users/%s", svc.ILSAPI, userID)
+	userURL := fmt.Sprintf("%s/users/%s", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -570,7 +570,7 @@ func (svc *ServiceContext) CreateTempAccount(c *gin.Context) {
 		return
 	}
 	log.Printf("Temp User account request: %+v", req)
-	createURL := fmt.Sprintf("%s/v4/users/register", svc.ILSAPI)
+	createURL := fmt.Sprintf("%s/users/register", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(createURL, req, c.GetString("jwt"))
 	if ilsErr != nil {
 		log.Printf("ERROR: Temp account create failed for %s \n %s", req.Email, ilsErr.Message)
@@ -593,7 +593,7 @@ func (svc *ServiceContext) ActivateTempAccount(c *gin.Context) {
 		return
 	}
 
-	activateURL := fmt.Sprintf("%s/v4/users/activate/%s", svc.ILSAPI, token)
+	activateURL := fmt.Sprintf("%s/users/activate/%s", svc.ILSAPI, token)
 	_, ilsErr := svc.ILSConnectorGet(activateURL, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("WARN: Temp account activation failed")
