@@ -8,23 +8,23 @@
   },
   "dependencies": {
     "@formkit/vue": "^1.6.9",
-    "@fortawesome/fontawesome-pro": "^6.7.1",
-    "@primevue/themes": "^4.2.4",
+    "@fortawesome/fontawesome-pro": "^6.7.2",
+    "@primevue/themes": "^4.2.5",
     "@vue-a11y/announcer": "^3.1.4",
-    "@vueuse/core": "^12.0.0",
-    "@vueuse/integrations": "^12.0.0",
+    "@vueuse/core": "^12.4.0",
+    "@vueuse/integrations": "^12.4.0",
     "axios": "^1.7.9",
-    "firebase": "^11.0.2",
+    "firebase": "^11.1.0",
     "pinia": "^2.3.0",
-    "primevue": "^4.2.4",
+    "primevue": "^4.2.5",
     "vue": "^3.5.13",
-    "vue-cookies": "^1.8.4",
+    "vue-cookies": "^1.8.5",
     "vue-router": "^4.5.0",
     "xml-beautifier": "^0.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
-    "sass-embedded": "^1.82.0",
+    "sass-embedded": "^1.83.1",
     "vite": "^5.4.11"
   }
 }

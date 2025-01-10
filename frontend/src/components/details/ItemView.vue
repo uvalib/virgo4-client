@@ -57,7 +57,7 @@
                   </template>
                </dd>
             </template>
-            <template v-if="hasExtLink && system.isKiosk == false && (detailExpanded || preferences.expandDetails)">
+            <template v-if="system.isKiosk == false && extDetailURL && (detailExpanded || preferences.expandDetails)">
                <dt class="label">
                   <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
                      <span class="full-metadata">Full metadata</span>
@@ -179,19 +179,15 @@ const shouldDisplay =((field) => {
 const accessURLField = computed(()=>{
    return details.value.fields.find(f => f.name=="access_url")
 })
-const hasExtLink = computed(()=>{
-   let idx = details.value.fields.findIndex( f=> f.name=="sirsi_url")
-   if (idx == -1) {
-         idx = details.value.fields.findIndex( f=> f.name=="worldcat_url")
-   }
-   return idx > -1
-})
+
 const extDetailURL = computed(()=>{
    let extLink = details.value.fields.find( f=> f.name=="sirsi_url")
-   if (!extLink) {
-         extLink = details.value.fields.find( f=> f.name=="worldcat_url")
-   }
-   return extLink.value
+   if (extLink) return extLink.value
+
+   extLink = details.value.fields.find( f=> f.name=="worldcat_url")
+   if (extLink) return extLink.value
+
+   return null
 })
 const hasMarcXML = computed(()=>{
    if ( !user.isAdmin ) return false
