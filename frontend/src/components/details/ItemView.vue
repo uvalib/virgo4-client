@@ -57,7 +57,7 @@
                   </template>
                </dd>
             </template>
-            <template v-if="hasExtLink && system.isKiosk == false && detailExpanded">
+            <template v-if="hasExtLink && system.isKiosk == false && (detailExpanded || preferences.expandDetails)">
                <dt class="label">
                   <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
                      <span class="full-metadata">Full metadata</span>
