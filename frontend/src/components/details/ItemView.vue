@@ -57,7 +57,7 @@
                   </template>
                </dd>
             </template>
-            <template v-if="system.isKiosk == false && extDetailURL && (detailExpanded || preferences.expandDetails)">
+            <template v-if="system.isKiosk == false && extDetailURL && (detailExpanded || preferences.expandDetails || showFieldsToggle == false)">
                <dt class="label">
                   <a :href="extDetailURL" target="_blank" @click="extDetailClicked">
                      <span class="full-metadata">Full metadata</span>
@@ -328,7 +328,7 @@ dl.fields {
             text-decoration: none;
          }
          .full-metadata {
-            color: $uva-text-color-dark;
+            color: $uva-text-color-base;
             font-weight: bold;
             display: inline-block;
          }
