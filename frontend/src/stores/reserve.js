@@ -42,13 +42,17 @@ export const useReserveStore = defineStore('reserve', {
    },
 
    actions: {
-      markInvalidReserveItem(idx) {
-         if (idx <0 || idx >= this.requestList.length) return
-         this.requestList[idx].valid = false
+      markInvalidReserveItem(id) {
+         var idx = this.requestList.findIndex( r => r.identifier == id)
+         if (idx > -1) {
+            this.requestList[idx].valid = false
+         }
       },
-      updateReserveVideoFlag( {idx, flag} ) {
-         if (idx <0 || idx >= this.requestList.length) return
-         this.requestList[idx].video = flag
+      updateReserveVideoFlag( id, flag ) {
+         var idx = this.requestList.findIndex( r => r.identifier == id)
+         if (idx > -1) {
+            this.requestList[idx].video = flag
+         }
       },
       updateReservedItemsPeriod() {
          this.requestList.forEach(item => {
@@ -132,9 +136,9 @@ export const useReserveStore = defineStore('reserve', {
             response.data.forEach( async (item, idx) => {
                // for now, only video items can be put on course reserve
                if (item.reserve == false || item.is_video == false ) {
-                  this.markInvalidReserveItem(idx)
+                  this.markInvalidReserveItem(item.id)
                } else {
-                  this.updateReserveVideoFlag({idx: idx, flag: item.is_video})
+                  this.updateReserveVideoFlag(item.id, item.is_video)
                }
             })
 
