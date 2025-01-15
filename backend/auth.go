@@ -342,6 +342,7 @@ func (svc *ServiceContext) generateJWT(c *gin.Context, v4User *User, authMethod 
 		v4Claims.UseSIS = false
 		v4Claims.Role = v4jwt.Guest
 	} else {
+		v4Claims.Barcode = ilsUser.Barcode
 		v4Claims.HomeLibrary = ilsUser.HomeLibrary
 		v4Claims.Profile = ilsUser.Profile
 		v4Claims.CanLEO = (ilsUser.HomeLibrary != "UVA-LIB")
