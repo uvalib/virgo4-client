@@ -4,7 +4,10 @@
       <ScanRequestDialog v-if="request.hasOption('scan')"  :settings="request.option('scan')" />
       <VideoReserveDialog v-if="request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
       <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
-      <PDADialog v-if="request.hasOption('pda') && request.option('pda').create_url"  :settings="request.option('pda')" />
+      <template v-if="request.hasOption('pda')">
+         <PDADialog v-if="request.option('pda').create_url" :settings="request.option('pda')" />
+         <div v-else v-html="request.option('pda').description"></div>
+      </template>
       <VirgoButton v-if="request.hasOption('directLink')"  label="Request a scan"
          @click="directLinkClicked(request.option('directLink').create_url)"
       />
