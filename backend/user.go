@@ -168,7 +168,7 @@ func (svc *ServiceContext) ChangePin(c *gin.Context) {
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
 	pinURL := fmt.Sprintf("%s/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
-	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("User %s pin change failed", qp.UserBarcode)
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -193,7 +193,7 @@ func (svc *ServiceContext) ChangePasswordWithToken(c *gin.Context) {
 	}
 	log.Printf("Attempting to change pin with token")
 	pinURL := fmt.Sprintf("%s/users/change_password_with_token", svc.ILSAPI)
-	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("User pin change with token failed")
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -216,7 +216,7 @@ func (svc *ServiceContext) ForgotPassword(c *gin.Context) {
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
 	pinURL := fmt.Sprintf("%s/users/forgot_password", svc.ILSAPI)
-	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"))
+	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("User %s password reset failed", qp.UserBarcode)
 		c.String(ilsErr.StatusCode, ilsErr.Message)
@@ -264,18 +264,23 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 		return
 	}
 
-	var ilsReq struct {
+	ilsReq := struct {
 		ComputingID string `json:"computing_id"`
 		Barcode     string `json:"item_barcode"`
+	}{
+		ComputingID: userID,
+		Barcode:     qp.Barcode,
 	}
 	log.Printf("Renew checkouts [%s] for user %s with ILS Connector...", qp.Barcode, userID)
-	renewURL := fmt.Sprintf("%s/request/renewAll", svc.ILSAPI)
-	ilsReq.ComputingID = userID
-	ilsReq.Barcode = qp.Barcode
+
+	// FIXME: with the new ILSConnect, the below can go away and be just: renewURL := fmt.Sprintf("%s/request/renew", svc.ILSAPI)
+	renewURL := fmt.Sprintf("%s/requests/renewAll", svc.ILSAPI)
 	if qp.Barcode != "all" {
 		renewURL = fmt.Sprintf("%s/request/renew", svc.ILSAPI)
 	}
-	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq, c.GetString("jwt"))
+	// END FIXME ================================================================================================================
+
+	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq, c.GetString("jwt"), svc.RenewHTTPClient)
 	if err != nil {
 		c.String(err.StatusCode, err.Message)
 		return
@@ -571,7 +576,7 @@ func (svc *ServiceContext) CreateTempAccount(c *gin.Context) {
 	}
 	log.Printf("Temp User account request: %+v", req)
 	createURL := fmt.Sprintf("%s/users/register", svc.ILSAPI)
-	_, ilsErr := svc.ILSConnectorPost(createURL, req, c.GetString("jwt"))
+	_, ilsErr := svc.ILSConnectorPost(createURL, req, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("ERROR: Temp account create failed for %s \n %s", req.Email, ilsErr.Message)
 		c.String(ilsErr.StatusCode, ilsErr.Message)

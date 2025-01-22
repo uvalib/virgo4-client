@@ -454,18 +454,13 @@ func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, httpClient *h
 }
 
 // ILSConnectorPost sends a POST to the ILS connector and returns results
-func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt string) ([]byte, *RequestError) {
+func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt string, httpClient *http.Client) ([]byte, *RequestError) {
 	log.Printf("ILS Connector POST request: %s", url)
 	startTime := time.Now()
 	b, _ := json.Marshal(values)
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	req.Header.Add("Content-type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwt))
-	httpClient := svc.HTTPClient
-	if strings.Index(url, "/renewAll") > -1 {
-		log.Printf("User renewAll request detected. Increase timeout to 30 seconds")
-		httpClient = svc.RenewHTTPClient
-	}
 	rawResp, rawErr := httpClient.Do(req)
 	resp, err := handleAPIResponse(url, rawResp, rawErr)
 	elapsedNanoSec := time.Since(startTime)

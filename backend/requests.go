@@ -109,7 +109,7 @@ func (svc *ServiceContext) CreateHold(c *gin.Context) {
 
 	log.Printf("INFO: create hold request: %+v", holdReq)
 	createHoldURL := fmt.Sprintf("%s/requests/hold", svc.ILSAPI)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, holdReq, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorPost(createHoldURL, holdReq, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		c.String(ilsErr.StatusCode, ilsErr.Message)
 		return
@@ -507,7 +507,7 @@ func (svc *ServiceContext) CreateScan(c *gin.Context) {
 	}
 
 	createHoldURL := fmt.Sprintf("%s/requests/scan", svc.ILSAPI)
-	_, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"))
+	_, ilsErr := svc.ILSConnectorPost(createHoldURL, ilsScan, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		// The ILLiad request was successful so the item needs to be moved to a special queue
 		// then fail the response

@@ -128,7 +128,10 @@ async function initVirgo() {
       configuring.value = false
       if ( userStore.noILSAccount == false ) {
          userStore.getBillDetails()
-         userStore.getCheckouts()
+         if (route.name != 'checkouts') {
+            // the checkouts page always asks for latest checkout info, so dont ask here too
+            userStore.getCheckouts()
+         }
       }
       if ( userStore.isUndergraduate ) {
          analytics.trigger('User', 'NETBADGE_SIGNIN', "undergraduate")

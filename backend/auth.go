@@ -157,7 +157,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
 	authURL := fmt.Sprintf("%s/users/%s/check_pin", svc.ILSAPI, auth.Barcode)
-	bodyBytes, ilsErr := svc.ILSConnectorPost(authURL, auth, c.GetString("jwt"))
+	bodyBytes, ilsErr := svc.ILSConnectorPost(authURL, auth, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil && ilsErr.StatusCode == 503 {
 		c.String(503, "PIN sign in is temporarily unavailable. Please try again later.")
 		return
