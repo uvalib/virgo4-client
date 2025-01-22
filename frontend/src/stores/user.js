@@ -277,7 +277,7 @@ export const useUserStore = defineStore('user', {
          this.lockedOut = false
          this.authTriesLeft = 10
       },
-      setUserJWT(jwtStr) {
+      async setUserJWT(jwtStr) {
          let parsed = parseJwt(jwtStr)
          if( parsed.role === "admin" ) {
             this.parsedJWT = JSON.stringify(parsed,undefined, 2);
@@ -291,7 +291,9 @@ export const useUserStore = defineStore('user', {
             canPlaceReserve: parsed.canPlaceReserve,
             useSIS: parsed.useSIS,
             isUVA: parsed.isUva,
+            Barcode: parsed.barcode,
          }
+
          this.authMessage = ""
          this.lockedOut = false
          this.signedInUser = parsed.userId
@@ -315,6 +317,14 @@ export const useUserStore = defineStore('user', {
                this.accountRequested = true
             }
          }
+
+         if (this.isSignedIn && parsed.barcode == "") {
+            console.log("BAD CLAIMS; EXPIRE SESSION")
+            await this.signout(false)
+            useSystemStore().setSessionExpired()
+            return
+         }
+
          localStorage.setItem("v4_jwt", jwtStr)
 
          // Use the new JWT token in auth headers for all a requests and handle reauth if it expires
