@@ -29,7 +29,7 @@
                   This item may have a time limit, or a limited number of concurrent users.
                </div>
                <VirgoButton @click="activeIframe = true" :disabled="!selectedItem"
-                  label="Click to see if this item is currently available for loan" />
+                  label="Check to see if this item is currently available for loan" />
             </template>
          </div>
       </div>
