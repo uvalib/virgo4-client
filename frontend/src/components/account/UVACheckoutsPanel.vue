@@ -18,7 +18,7 @@
          <span class="checkout-options">
             <VirgoButton v-if="userStore.checkouts.length>0" @click="downloadCSV" icon="fal fa-download"
                aria-label="Download your checkouts as a CSV file" class="csv" size="small"/>
-            <VirgoButton @click="renewAll" label="Renew All"/>
+            <VirgoButton @click="userStore.renew('all')" label="Renew All"/>
          </span>
       </div>
       <div class="checkout-list">
@@ -66,7 +66,7 @@
                {{co.message}}
             </div>
             <div class="renewbar" v-if="!userStore.isBarred">
-               <VirgoButton @click="renewItem(co.barcode)"  :aria-label="`renew ${co.title}`" label="Renew"/>
+               <VirgoButton @click="userStore.renew(co.barcode)"  :aria-label="`renew ${co.title}`" label="Renew"/>
             </div>
          </div>
       </div>
@@ -84,12 +84,6 @@ const downloading = ref(false)
 
 const sortChanged = (() => {
    userStore.sortCheckouts(userStore.checkoutsOrder)
-})
-const renewItem = ((barcode) => {
-   userStore.renewItem(barcode)
-})
-const renewAll = (() => {
-   userStore.renewAll()
 })
 const downloadCSV = ( async () => {
    downloading.value = true

@@ -483,30 +483,12 @@ export const useUserStore = defineStore('user', {
           })
       },
 
-      renewItem(barcode) {
+      renew(barcode) {
          if (this.isSignedIn == false) return
          if (this.isGuest) return
 
          this.renewing = true
          let data = {item_barcode: barcode}
-         axios.post(`/api/users/${this.signedInUser}/checkouts/renew`, data).then((response) => {
-            this.setCheckouts(response.data.checkouts)
-            this.sortCheckouts(this.checkoutsOrder)
-            this.setRenewResults(response.data.renewResults)
-            this.renewing = false
-          }).catch((error) => {
-            const system = useSystemStore()
-            system.setError( error)
-            this.renewing = false
-          })
-      },
-
-      renewAll() {
-         if (this.isSignedIn == false) return
-         if (this.isGuest) return
-
-         this.renewing = true
-         let data = {item_barcode: "all"}
          axios.post(`/api/users/${this.signedInUser}/checkouts/renew`, data).then((response) => {
             this.setCheckouts(response.data.checkouts)
             this.sortCheckouts(this.checkoutsOrder)

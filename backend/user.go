@@ -273,13 +273,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	}
 	log.Printf("Renew checkouts [%s] for user %s with ILS Connector...", qp.Barcode, userID)
 
-	// FIXME: with the new ILSConnect, the below can go away and be just: renewURL := fmt.Sprintf("%s/request/renew", svc.ILSAPI)
-	renewURL := fmt.Sprintf("%s/requests/renewAll", svc.ILSAPI)
-	if qp.Barcode != "all" {
-		renewURL = fmt.Sprintf("%s/request/renew", svc.ILSAPI)
-	}
-	// END FIXME ================================================================================================================
-
+	renewURL := fmt.Sprintf("%s/requests/renew", svc.ILSAPI)
 	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq, c.GetString("jwt"), svc.RenewHTTPClient)
 	if err != nil {
 		c.String(err.StatusCode, err.Message)
@@ -287,6 +281,7 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	}
 
 	// Get all of the user checkouts after the renew so dates/status are updated
+	log.Printf("INFO: renew successful; refreshing checkouts list")
 	userURL := fmt.Sprintf("%s/users/%s/checkouts", svc.ILSAPI, userID)
 	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
 	if ilsErr != nil {
