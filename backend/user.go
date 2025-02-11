@@ -151,23 +151,22 @@ type Bill struct {
 	Label  string `json:"label"`
 }
 
-// ChangePin takes current_pin and new_pin as params in the json POST payload.
-// It changes the pin to new_pin.
-func (svc *ServiceContext) ChangePin(c *gin.Context) {
+// ChangePassword takes currPassword and newPassword as params in the json POST payload and changed the password to newPassword
+func (svc *ServiceContext) ChangePassword(c *gin.Context) {
 	var qp struct {
-		CurrPin     string `json:"current_pin"`
-		NewPin      string `json:"new_pin"`
-		UserBarcode string `json:"barcode"`
+		CurrPassword string `json:"currPassword"`
+		NewPassword  string `json:"newPassword"`
+		UserBarcode  string `json:"barcode"`
 	}
 
 	qpErr := c.ShouldBindJSON(&qp)
 	if qpErr != nil {
-		log.Printf("ERROR: invalid change_pin payload: %v", qpErr)
+		log.Printf("ERROR: invalid change_password payload: %v", qpErr)
 		c.String(http.StatusBadRequest, "Invalid request")
 		return
 	}
 	log.Printf("User %s is attempting to change pin...", qp.UserBarcode)
-	pinURL := fmt.Sprintf("%s/users/%s/change_pin", svc.ILSAPI, qp.UserBarcode)
+	pinURL := fmt.Sprintf("%s/users/change_password", svc.ILSAPI)
 	_, ilsErr := svc.ILSConnectorPost(pinURL, qp, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil {
 		log.Printf("User %s pin change failed", qp.UserBarcode)
@@ -187,7 +186,7 @@ func (svc *ServiceContext) ChangePasswordWithToken(c *gin.Context) {
 
 	qpErr := c.ShouldBindJSON(&qp)
 	if qpErr != nil {
-		log.Printf("ERROR: invalid change_pin payload: %v", qpErr)
+		log.Printf("ERROR: invalid change_password_token payload: %v", qpErr)
 		c.String(http.StatusBadRequest, "Invalid request")
 		return
 	}

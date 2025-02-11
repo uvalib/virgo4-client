@@ -156,17 +156,17 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 	svc.GDB.Model(&v4User).Select("AuthStartedAt", "AuthTries", "AttemptsLeft").Updates(v4User)
 
 	log.Printf("Validate user barcode %s with ILS Connector...", auth.Barcode)
-	authURL := fmt.Sprintf("%s/users/%s/check_pin", svc.ILSAPI, auth.Barcode)
+	authURL := fmt.Sprintf("%s/users/check_password", svc.ILSAPI)
 	bodyBytes, ilsErr := svc.ILSConnectorPost(authURL, auth, c.GetString("jwt"), svc.HTTPClient)
 	if ilsErr != nil && ilsErr.StatusCode == 503 {
-		c.String(503, "PIN sign in is temporarily unavailable. Please try again later.")
+		c.String(503, "Password sign in is temporarily unavailable. Please try again later.")
 		return
 	}
 
 	if string(bodyBytes) != "valid" {
 		// The in verification failed. If this has happened 10 times in a
 		// minute, lock out the account for one hour
-		log.Printf("ERROR: pin for %s failed authentication", auth.Barcode)
+		log.Printf("ERROR: password for %s failed authentication", auth.Barcode)
 		if v4User.AuthTries >= 10 {
 			log.Printf("User %s account is now locked out for 1 hour", v4User.Virgo4ID)
 			resp.Message = "Authentication failed. Your account is now locked for one hour."
@@ -183,7 +183,7 @@ func (svc *ServiceContext) PublicAuthentication(c *gin.Context) {
 		return
 	}
 
-	log.Printf("%s passed pin check", auth.Barcode)
+	log.Printf("%s passed password check", auth.Barcode)
 	resp.SignedIn = true
 
 	log.Printf("Generate JWT for %s", auth.Barcode)

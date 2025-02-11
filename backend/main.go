@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "2.5.0"
+const version = "2.6.0"
 
 /**
  * MAIN
@@ -78,7 +78,7 @@ func main() {
 
 		api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
 		api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
-		api.POST("/change_pin", svc.AuthMiddleware, svc.ChangePin)
+		api.POST("/change_password", svc.AuthMiddleware, svc.ChangePassword)
 		api.POST("/change_password_token", svc.ChangePasswordWithToken)
 		api.POST("/forgot_password", svc.ForgotPassword)
 		api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)

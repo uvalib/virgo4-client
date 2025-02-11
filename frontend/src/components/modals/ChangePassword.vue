@@ -125,7 +125,7 @@ const submitPasswordChange = (() => {
          okDisabled.value =false
       })
    } else {
-      let data  = {current_pin: currPassword.value, new_pin: newPassword.value}
+      let data  = {currPassword: currPassword.value, newPassword: newPassword.value}
       userStore.changePassword(data).then(() => {
          showDialog.value = false
          let msg = "Your password has been changed."
