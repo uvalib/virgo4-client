@@ -37,14 +37,14 @@ const picked = ref()
 const error = ref("")
 
 const opened = (() => {
-   picked.value = new Date(`${props.date}T12:00:00z`)
+   picked.value = new Date(`${props.date}T12:00:00Z`)
 })
 
 const minDate = computed(() => {
-   return new Date(`${collection.startDate}T12:00:00z`)
+   return new Date(`${collection.startDate}T12:00:00Z`)
 })
 const maxDate = computed(() => {
-   return new Date(`${collection.endDate}T12:00:00z`)
+   return new Date(`${collection.endDate}T12:00:00Z`)
 })
 
 const monthChanged = ( (e) => {

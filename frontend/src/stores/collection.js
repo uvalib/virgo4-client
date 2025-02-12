@@ -69,7 +69,7 @@ export const useCollectionStore = defineStore('collection', {
                   let tgt = `${this.currentYear}-${monthStr}-${dayStr}`
                   let idx = yearPubs.dates.findIndex( mp => mp.date == tgt)
                   if (idx == -1) {
-                     let tgtDate =  new Date(`${tgt}T12:00:00z`)
+                     let tgtDate =  new Date(`${tgt}T12:00:00Z`)
                      this.notPublishedDates.push(tgtDate)
                   }
                }
@@ -83,7 +83,7 @@ export const useCollectionStore = defineStore('collection', {
                   let dayStr = `${day}`
                   dayStr = dayStr.padStart(2, "0")
                   let tgt = `${this.currentYear}-${monthStr}-${dayStr}`
-                  let tgtDate =  new Date(`${tgt}T12:00:00z`)
+                  let tgtDate =  new Date(`${tgt}T12:00:00Z`)
                   this.notPublishedDates.push(tgtDate)
                }
             }
