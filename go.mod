@@ -12,7 +12,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/rs/xid v1.6.0
 	github.com/uvalib/virgo4-api v0.0.0-20241126213111-b647424688f9
-	github.com/uvalib/virgo4-jwt v1.1.0
+	github.com/uvalib/virgo4-jwt v1.2.0
 	github.com/zsais/go-gin-prometheus v0.1.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.5.11
@@ -29,7 +29,7 @@ require (
 	github.com/gin-contrib/sse v1.0.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.24.0 // indirect
+	github.com/go-playground/validator/v10 v10.25.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

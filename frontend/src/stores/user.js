@@ -348,6 +348,12 @@ export const useUserStore = defineStore('user', {
          axios.interceptors.response.use(
             res => res,
             async err => {
+               if (err.response && err.response.status == 406) {
+                  // 406 is returned when JWT versions are mismatched. force a signout
+                  await this.signout(false)
+                  system.setSessionExpired()
+                  return Promise.reject(err)
+               }
                if (err.response && err.response.status == 426) {
                   this.router.push("/newversion")
                   return Promise.reject(err)

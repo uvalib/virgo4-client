@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "2.7.0"
+const version = "2.7.1"
 
 /**
  * MAIN
@@ -72,73 +72,73 @@ func main() {
 	router.POST("/authorize", svc.Authorize)
 	router.POST("/signout", svc.SignOut)
 
-	api := router.Group("/api", svc.versionMiddleware)
+	api := router.Group("/api")
+	api.Use(svc.versionMiddleware)
+
+	api.POST("/error", svc.LogClientError)
+
+	api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
+	api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
+	api.POST("/change_password", svc.AuthMiddleware, svc.ChangePassword)
+	api.POST("/change_password_token", svc.ChangePasswordWithToken)
+	api.POST("/forgot_password", svc.ForgotPassword)
+	api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
+	api.GET("/searches/:token/rss", svc.GetRSSFeed)
+
+	users := api.Group("/users").Use(svc.AuthMiddleware, svc.UserMiddleware)
+	users.GET("/:uid", svc.GetUser)
+	users.GET("/:uid/illiad", svc.GetILLiadRequests)
+	users.GET("/:uid/bills", svc.GetUserBills)
+	users.GET("/:uid/checkouts.csv", svc.DownloadUserCheckouts)
+	users.GET("/:uid/checkouts", svc.GetUserCheckouts)
+	users.GET("/:uid/holds", svc.GetUserHolds)
+	users.POST("/:uid/checkouts/renew", svc.RenewCheckouts)
+	users.GET("/:uid/preferences", svc.GetPreferences)
+	users.POST("/:uid/preferences", svc.SavePreferences)
+	users.POST("/:uid/contact", svc.RequestContactUpdate)
+
+	users.GET("/:uid/searches", svc.GetUserSavedSearches)
+	users.GET("/:uid/searches/exists", svc.SavedSearchExists)
+	users.POST("/:uid/searches", svc.SaveSearch)
+	users.DELETE("/:uid/searches/:id", svc.DeleteSavedSearch)
+	users.DELETE("/:uid/searches", svc.DeleteAllSavedSearches)
+	users.POST("/:uid/searches/:id/publish", svc.PublishSavedSearch)
+	users.DELETE("/:uid/searches/:id/publish", svc.UnpublishSavedSearch)
+
+	users.POST("/:uid/bookmarks/manage", svc.ManageBookmarkStorage)
+	users.POST("/:uid/bookmarks/folders/add", svc.AddBookmarkFolder)
+	users.DELETE("/:uid/bookmarks/folders/:id", svc.DeleteBookmarkFolder)
+	users.POST("/:uid/bookmarks/folders/:id/delete", svc.DeleteBookmarks)
+	users.POST("/:uid/bookmarks/folders/:id/sort", svc.ReorderBookmarks)
+	users.POST("/:uid/bookmarks/folders/:id", svc.UpdateBookmarkFolder)
+	users.DELETE("/:uid/bookmarks/folders/:id/publish", svc.UnpublishBookmarkFolder)
+	users.POST("/:uid/bookmarks/folders/:id/publish", svc.PublishBookmarkFolder)
+	users.POST("/:uid/bookmarks/add", svc.AddBookmark)
+
+	api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
+	api.DELETE("/requests/hold", svc.AuthMiddleware, svc.DeleteHold)
+	api.POST("/requests/scan", svc.AuthMiddleware, svc.CreateScan)
+	api.POST("/requests/standalone/scan", svc.AuthMiddleware, svc.CreateStandaloneScan)
+	api.POST("/requests/standalone/borrow", svc.AuthMiddleware, svc.CreateBorrowRequest)
+	api.POST("/requests/openurl", svc.AuthMiddleware, svc.CreateOpenURLRequest)
+	api.POST("/requests/account", svc.AuthMiddleware, svc.CreateAccountRequest)
+
+	api.POST("/pickuplibraries", svc.AuthMiddleware, svc.AddPickupLibrary)
+	api.POST("/pickuplibraries/:id/update", svc.AuthMiddleware, svc.UpdatePickupLibrary)
+	api.DELETE("/pickuplibraries/:id", svc.AuthMiddleware, svc.DeletePickupLibrary)
+
+	api.GET("/pda", svc.AuthMiddleware, svc.getPdaReport)
+
+	api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
+
+	api.POST("/reauth", svc.RefreshAuthentication)
+
+	api.POST("/createTempAccount", svc.AuthMiddleware, svc.CreateTempAccount)
+	api.GET("/activateTempAccount", svc.ActivateTempAccount)
+
+	admin := api.Group("/admin")
 	{
-		api.POST("/error", svc.LogClientError)
-
-		api.GET("/bookmarks/:token", svc.GetPublicBookmarks)
-		api.GET("/codes", svc.AuthMiddleware, svc.GetCodes)
-		api.POST("/change_password", svc.AuthMiddleware, svc.ChangePassword)
-		api.POST("/change_password_token", svc.ChangePasswordWithToken)
-		api.POST("/forgot_password", svc.ForgotPassword)
-		api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
-		api.GET("/searches/:token/rss", svc.GetRSSFeed)
-
-		users := api.Group("/users").Use(svc.AuthMiddleware, svc.UserMiddleware)
-		users.GET("/:uid", svc.GetUser)
-		users.GET("/:uid/illiad", svc.GetILLiadRequests)
-		users.GET("/:uid/bills", svc.GetUserBills)
-		users.GET("/:uid/checkouts.csv", svc.DownloadUserCheckouts)
-		users.GET("/:uid/checkouts", svc.GetUserCheckouts)
-		users.GET("/:uid/holds", svc.GetUserHolds)
-		users.POST("/:uid/checkouts/renew", svc.RenewCheckouts)
-		users.GET("/:uid/preferences", svc.GetPreferences)
-		users.POST("/:uid/preferences", svc.SavePreferences)
-		users.POST("/:uid/contact", svc.RequestContactUpdate)
-
-		users.GET("/:uid/searches", svc.GetUserSavedSearches)
-		users.GET("/:uid/searches/exists", svc.SavedSearchExists)
-		users.POST("/:uid/searches", svc.SaveSearch)
-		users.DELETE("/:uid/searches/:id", svc.DeleteSavedSearch)
-		users.DELETE("/:uid/searches", svc.DeleteAllSavedSearches)
-		users.POST("/:uid/searches/:id/publish", svc.PublishSavedSearch)
-		users.DELETE("/:uid/searches/:id/publish", svc.UnpublishSavedSearch)
-
-		users.POST("/:uid/bookmarks/manage", svc.ManageBookmarkStorage)
-		users.POST("/:uid/bookmarks/folders/add", svc.AddBookmarkFolder)
-		users.DELETE("/:uid/bookmarks/folders/:id", svc.DeleteBookmarkFolder)
-		users.POST("/:uid/bookmarks/folders/:id/delete", svc.DeleteBookmarks)
-		users.POST("/:uid/bookmarks/folders/:id/sort", svc.ReorderBookmarks)
-		users.POST("/:uid/bookmarks/folders/:id", svc.UpdateBookmarkFolder)
-		users.DELETE("/:uid/bookmarks/folders/:id/publish", svc.UnpublishBookmarkFolder)
-		users.POST("/:uid/bookmarks/folders/:id/publish", svc.PublishBookmarkFolder)
-		users.POST("/:uid/bookmarks/add", svc.AddBookmark)
-
-		api.POST("/requests/hold", svc.AuthMiddleware, svc.CreateHold)
-		api.DELETE("/requests/hold", svc.AuthMiddleware, svc.DeleteHold)
-		api.POST("/requests/scan", svc.AuthMiddleware, svc.CreateScan)
-		api.POST("/requests/standalone/scan", svc.AuthMiddleware, svc.CreateStandaloneScan)
-		api.POST("/requests/standalone/borrow", svc.AuthMiddleware, svc.CreateBorrowRequest)
-		api.POST("/requests/openurl", svc.AuthMiddleware, svc.CreateOpenURLRequest)
-		api.POST("/requests/account", svc.AuthMiddleware, svc.CreateAccountRequest)
-
-		api.POST("/pickuplibraries", svc.AuthMiddleware, svc.AddPickupLibrary)
-		api.POST("/pickuplibraries/:id/update", svc.AuthMiddleware, svc.UpdatePickupLibrary)
-		api.DELETE("/pickuplibraries/:id", svc.AuthMiddleware, svc.DeletePickupLibrary)
-
-		api.GET("/pda", svc.AuthMiddleware, svc.getPdaReport)
-
-		api.POST("/feedback", svc.AuthMiddleware, svc.SendFeedback)
-
-		api.POST("/reauth", svc.RefreshAuthentication)
-
-		api.POST("/createTempAccount", svc.AuthMiddleware, svc.CreateTempAccount)
-		api.GET("/activateTempAccount", svc.ActivateTempAccount)
-
-		admin := api.Group("/admin")
-		{
-			admin.POST("/claims", svc.AuthMiddleware, svc.SetAdminClaims)
-		}
+		admin.POST("/claims", svc.AuthMiddleware, svc.SetAdminClaims)
 	}
 
 	auth := router.Group("/authenticate")

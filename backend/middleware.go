@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -71,15 +72,21 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	log.Printf("Validating JWT auth token...")
+	log.Printf("Validating JWT auth token [%s]...", tokenStr)
 	v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
 	if jwtErr != nil {
-		log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
-		c.AbortWithStatus(http.StatusUnauthorized)
+		if errors.Is(err, &v4jwt.VersionError{}) {
+			log.Printf("JWT version for %s error: %s", tokenStr, jwtErr.Error())
+			c.AbortWithStatus(http.StatusNotAcceptable)
+		} else {
+			log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
+			c.AbortWithStatus(http.StatusUnauthorized)
+		}
 		return
 	}
 
 	// add the parsed claims and signed JWT string to the request context so other handlers can access it.
+	log.Printf("INFO: jwt is valid; authorization successful")
 	c.Set("jwt", tokenStr)
 	c.Set("claims", v4Claims)
 	log.Printf("got bearer token: [%s]: %+v", tokenStr, v4Claims)

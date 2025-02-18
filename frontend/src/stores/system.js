@@ -134,6 +134,10 @@ export const useSystemStore = defineStore('system', {
          this.reportError(this.message)
       },
       setError(error) {
+         if (error.status == 406) {
+            // 406 is returned on jwt mismatch. do not show or report this as an error
+            return
+         }
          this.message.type = "error"
          this.message.title = "Virgo Error"
          this.message.detail = ""
