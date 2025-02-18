@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Home from '../views/Home.vue'
-
-// import Details from '../views/Details.vue'
 import SignIn from '../views/SignIn.vue'
 
 import { useSystemStore } from "@/stores/system"
@@ -148,6 +146,12 @@ const router = createRouter({
          component: () => import('../views/Forbidden.vue')
       },
       {
+         path: '/newversion',
+         name: 'newversion',
+         component: () => import('../views/NewVersion.vue')
+
+      },
+      {
          path: '/:pathMatch(.*)*',
          name: "not_found",
          component: () => import('../views/NotFound.vue')
@@ -185,7 +189,7 @@ router.afterEach((to) => {
       checkouts: "My Account", 'digital-deliveries': "My Account",
       bookmarks: "My Account", requests: "My Account", searches: "My Account", admin: "My Account",
       preferences: "My Account", register: "Register for a Community Borrower Account", fatal_error: "Virgo System Error", 'shelf-browse': "Shelf Browse",
-      codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found",
+      codes: "Codes", signedout: "Signed Out", details: "Item Details", not_found: "404 error: Page not found", newversion: "Virgo Update",
       'public-bookmarks': "Public Bookmarks", feedback: "Virgo Feedback", openurl: "Request an Item", forbidden: "Forbidden",
       'course-reserves': "Course Reserves", 'course-reserves-request': "Course Reserves Request", reserved: "Course Reserves Request"
    }

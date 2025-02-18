@@ -12,7 +12,7 @@ import (
 )
 
 // Version of the service
-const version = "2.6.0"
+const version = "2.7.0"
 
 /**
  * MAIN
@@ -72,7 +72,7 @@ func main() {
 	router.POST("/authorize", svc.Authorize)
 	router.POST("/signout", svc.SignOut)
 
-	api := router.Group("/api")
+	api := router.Group("/api", svc.versionMiddleware)
 	{
 		api.POST("/error", svc.LogClientError)
 

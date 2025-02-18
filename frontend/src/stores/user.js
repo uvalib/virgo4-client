@@ -330,6 +330,9 @@ export const useUserStore = defineStore('user', {
          // Use the new JWT token in auth headers for all a requests and handle reauth if it expires
          const system = useSystemStore()
          axios.interceptors.request.use( async config => {
+            if ( config.url.indexOf("/api") == 0 ) {
+               config.headers['X-Virgo-Version'] = system.version
+            }
             if ( system.authRequired( config.url ) ) {
                config.headers['Authorization'] = 'Bearer ' + this.authToken
                 // API requests need also host to toggle features on prod / dev
@@ -345,6 +348,10 @@ export const useUserStore = defineStore('user', {
          axios.interceptors.response.use(
             res => res,
             async err => {
+               if (err.response && err.response.status == 426) {
+                  this.router.push("/newversion")
+                  return Promise.reject(err)
+               }
                // Retry non-auth requests that resulted in 401 ONCE
                if ( system.isAuthRequest( err.config.url ) == false ) {
                   if (err.response && err.response.status == 401 && err.config._retry !== true) {

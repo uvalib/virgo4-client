@@ -10,6 +10,19 @@ import (
 	"github.com/uvalib/virgo4-jwt/v4jwt"
 )
 
+func (svc *ServiceContext) versionMiddleware(c *gin.Context) {
+	clientVer := c.Request.Header.Get("X-Virgo-Version")
+	log.Printf("INFO: version middleware got [%s]", clientVer)
+	verMap := svc.determineVersion()
+	vString := fmt.Sprintf("%s.%s", verMap["version"], verMap["build"])
+	if clientVer != vString {
+		log.Printf("INFO: version mismatch")
+		c.AbortWithStatus(http.StatusUpgradeRequired)
+		return
+	}
+	c.Next()
+}
+
 // UserMiddleware will extract the userID from params and lookup a DB ID for that user.
 // It also verifies the JWT user matches the provided ID
 // If one cannot be found, the request will be aborted

@@ -148,16 +148,18 @@ async function initVirgo() {
 }
 
 function initVersionChecker() {
+   // get the initial version at startup and cache it in the system store
    systemStore.getVersion()
-   var currBuild = "unknown"
+
+   // request version every few minutes and compare it against the system version
    setInterval(() => {
       axios.get("/version").then((response) => {
-         if ( currBuild == "unknown" ) {
-            currBuild = response.data.build
-         }
-         else if (currBuild != response.data.build) {
-            systemStore.newVersion = true
-         }
+         // if the version is different from the startup version, set a flag to
+         // show a small new version update popup. Additionally, there is an api interceptor
+         // setup in user.js that sends the system verion with each request. If it doesn't match
+         // the current server version, the client will redirect to an 'update now' page to firce the issue.
+         let newVer = `${response.data.version}.${response.data.build}`
+         systemStore.newVersion = (newVer != systemStore.version)
       }).catch((error) => {
          // no need to show a big error box; just try again later. If there is
          // really a connectivity problem, other calls will fail and provide more information

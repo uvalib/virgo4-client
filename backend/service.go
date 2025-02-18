@@ -143,6 +143,10 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 
 // GetVersion reports the version of the serivce
 func (svc *ServiceContext) GetVersion(c *gin.Context) {
+	c.JSON(http.StatusOK, svc.determineVersion())
+}
+
+func (svc *ServiceContext) determineVersion() map[string]string {
 	build := "unknown"
 	// cos our CWD is the bin directory
 	files, _ := filepath.Glob("../buildtag.*")
@@ -153,7 +157,7 @@ func (svc *ServiceContext) GetVersion(c *gin.Context) {
 	vMap := make(map[string]string)
 	vMap["version"] = svc.Version
 	vMap["build"] = build
-	c.JSON(http.StatusOK, vMap)
+	return vMap
 }
 
 // HealthCheck reports the health of the server
