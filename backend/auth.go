@@ -223,7 +223,17 @@ func (svc *ServiceContext) RefreshAuthentication(c *gin.Context) {
 		c.String(http.StatusUnauthorized, "unauthorized request")
 		return
 	}
-	v4Claims, _ := v4jwt.Validate(refreshed, svc.JWTKey)
+	v4Claims, jwtErr := v4jwt.Validate(refreshed, svc.JWTKey)
+	if jwtErr != nil {
+		if errors.Is(err, &v4jwt.VersionError{}) {
+			log.Printf("ERROR: refresehed jwt has bad version: %s", jwtErr.Error())
+			c.AbortWithStatus(http.StatusNotAcceptable)
+		} else {
+			log.Printf("ERROR: signature for refreshed jwt is invalid: %s", jwtErr.Error())
+			c.AbortWithStatus(http.StatusUnauthorized)
+		}
+		return
+	}
 
 	log.Printf("Regenerate long-lived refresh token for %s", v4Claims.UserID)
 	refreshToken = xid.New().String()

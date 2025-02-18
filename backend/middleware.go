@@ -76,10 +76,10 @@ func (svc *ServiceContext) AuthMiddleware(c *gin.Context) {
 	v4Claims, jwtErr := v4jwt.Validate(tokenStr, svc.JWTKey)
 	if jwtErr != nil {
 		if errors.Is(err, &v4jwt.VersionError{}) {
-			log.Printf("JWT version for %s error: %s", tokenStr, jwtErr.Error())
+			log.Printf("INFO: jwt version for %s mismatch: %s", tokenStr, jwtErr.Error())
 			c.AbortWithStatus(http.StatusNotAcceptable)
 		} else {
-			log.Printf("JWT signature for %s is invalid: %s", tokenStr, jwtErr.Error())
+			log.Printf("INFO: signature for %s is invalid: %s", tokenStr, jwtErr.Error())
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
 		return
