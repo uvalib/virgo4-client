@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net"
@@ -25,29 +25,28 @@ import (
 
 // ServiceContext contains common data used by all handlers
 type ServiceContext struct {
-	Version           string
-	AvailabilityURL   string
-	VirgoURL          string
-	CitationsURL      string
-	CollectionsURL    string
-	ShelfBrowseURL    string
-	SearchAPI         string
-	FeedbackEmail     string
-	ILSAPI            string
-	PDAAPI            string
-	CatalogPoolURL    string
-	JWTKey            string
-	Dev               DevConfig
-	Firebase          FirebaseConfig
-	PendingTranslates map[string]string
-	GDB               *gorm.DB
-	SMTP              SMTPConfig
-	Illiad            IlliadConfig
-	FastHTTPClient    *http.Client
-	HTTPClient        *http.Client
-	SlowHTTPClient    *http.Client
-	RenewHTTPClient   *http.Client
-	DibsURL           string
+	Version         string
+	AvailabilityURL string
+	VirgoURL        string
+	CitationsURL    string
+	CollectionsURL  string
+	ShelfBrowseURL  string
+	SearchAPI       string
+	FeedbackEmail   string
+	ILSAPI          string
+	PDAAPI          string
+	CatalogPoolURL  string
+	JWTKey          string
+	Dev             DevConfig
+	Firebase        FirebaseConfig
+	GDB             *gorm.DB
+	SMTP            SMTPConfig
+	Illiad          IlliadConfig
+	FastHTTPClient  *http.Client
+	HTTPClient      *http.Client
+	SlowHTTPClient  *http.Client
+	RenewHTTPClient *http.Client
+	DibsURL         string
 }
 
 // RequestError contains http status code and message for a
@@ -91,20 +90,6 @@ func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 		log.Printf("Using dev mode for SMTP; all messages will be logged instead of delivered")
 	} else {
 		log.Printf("Using SMTP host: %s", ctx.SMTP.Host)
-	}
-
-	ctx.PendingTranslates = make(map[string]string)
-	file, err := os.Open("pendingTranslate.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		bits := strings.Split(line, "=")
-		log.Printf("Pending Translate:  %s", line)
-		ctx.PendingTranslates[strings.TrimSpace(bits[0])] = strings.TrimSpace(bits[1])
 	}
 
 	log.Printf("Create HTTP client for external service calls")
@@ -311,30 +296,23 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		Filter string `json:"filter"`
 	}
 	type config struct {
-		SearchAPI        string          `json:"searchAPI"`
-		AvailabilityURL  string          `json:"availabilityURL"`
-		CitationsURL     string          `json:"citationsURL"`
-		ColectionsURL    string          `json:"collectionsURL"`
-		ShelfBrowseURL   string          `json:"shelfBrowseURL"`
-		HealthSciURL     string          `json:"hsILLiadURL"`
-		DibsURL          string          `json:"dibsURL"`
-		TranslateMessage string          `json:"translateMessage"`
-		KioskMode        bool            `json:"kiosk"`
-		DevServer        bool            `json:"devServer"`
-		Firebase         *FirebaseConfig `json:"firebase,omitempty"`
-		PickupLibraries  []pickupLibrary `json:"pickupLibraries"`
+		SearchAPI       string          `json:"searchAPI"`
+		AvailabilityURL string          `json:"availabilityURL"`
+		CitationsURL    string          `json:"citationsURL"`
+		ColectionsURL   string          `json:"collectionsURL"`
+		ShelfBrowseURL  string          `json:"shelfBrowseURL"`
+		HealthSciURL    string          `json:"hsILLiadURL"`
+		DibsURL         string          `json:"dibsURL"`
+		KioskMode       bool            `json:"kiosk"`
+		DevServer       bool            `json:"devServer"`
+		Firebase        *FirebaseConfig `json:"firebase,omitempty"`
+		PickupLibraries []pickupLibrary `json:"pickupLibraries"`
 	}
-	acceptLang := strings.Split(c.GetHeader("Accept-Language"), ",")[0]
-	log.Printf("Accept-Language=%s", acceptLang)
 	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL,
 		ColectionsURL:   svc.CollectionsURL,
 		AvailabilityURL: svc.AvailabilityURL, ShelfBrowseURL: svc.ShelfBrowseURL,
 		HealthSciURL: svc.Illiad.HealthSciURL, KioskMode: false,
 		DibsURL: svc.DibsURL,
-	}
-	if msg, ok := svc.PendingTranslates[acceptLang]; ok {
-		log.Printf("Adding translate message to config")
-		cfg.TranslateMessage = msg
 	}
 	if svc.Firebase.APIKey != "" {
 		cfg.Firebase = &svc.Firebase
@@ -362,7 +340,7 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 // LogClientError accepts an error message from the client and logs it
 func (svc *ServiceContext) LogClientError(c *gin.Context) {
 	agent := c.Request.UserAgent()
-	body, _ := ioutil.ReadAll(c.Request.Body)
+	body, _ := io.ReadAll(c.Request.Body)
 	build := "unknown"
 	files, _ := filepath.Glob("../buildtag.*")
 	if len(files) == 1 {

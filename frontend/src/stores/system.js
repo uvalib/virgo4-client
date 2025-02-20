@@ -27,8 +27,6 @@ export const useSystemStore = defineStore('system', {
       shelfBrowseURL: "",
       dibsURL: "",
       searchAPI: "",
-      seenTranslateMsg: false,
-      translateMessage: "",
       sessionExpired: false,
       locationCodes: [],
       libraryCodes: [],
@@ -50,9 +48,6 @@ export const useSystemStore = defineStore('system', {
       },
       isDevServer: state => {
          return state.devServer
-      },
-      hasTranslateMessage: state => {
-         return state.translateMessage.length > 0 && state.seenTranslateMsg == false
       },
       hasError: state => {
          return state.message.type == "error" || state.message.type == "ilsError"
@@ -161,7 +156,6 @@ export const useSystemStore = defineStore('system', {
 
       setConfig(cfg) {
          this.searchAPI = cfg.searchAPI
-         this.translateMessage = cfg.translateMessage
          this.kiosk = cfg.kiosk
          this.devServer = cfg.devServer
          this.availabilityURL = cfg.availabilityURL

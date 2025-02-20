@@ -3,9 +3,6 @@
       <V4Spinner  v-if="resultStore.searching" message="Searching..." v-bind:overlay="true" v-bind:dots="false"/>
       <div class="search-panel">
          <template v-if="queryStore.mode=='basic'">
-            <div v-if="systemStore.hasTranslateMessage" class="translate-message">
-               {{systemStore.translateMessage}}
-            </div>
             <label class="screen-reader-text" for="search">Search Virgo for books, articles, and more.</label>
             <div class="basic-search">
                <input class="basic"
