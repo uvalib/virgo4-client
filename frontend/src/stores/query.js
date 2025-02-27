@@ -117,9 +117,17 @@ export const useQueryStore = defineStore('query', {
          this.advanced.filter( f => f.field == "date" && f.comparison == "BETWEEN").forEach( df => {
             if ( df.value == "" && df.endVal != "") {
                df.comparison = "BEFORE"
-            }
-            if ( df.value != "" && df.endVal == "") {
+            } else if ( df.value != "" && df.endVal == "") {
                df.comparison = "AFTER"
+            } else {
+               if ( df.value > df.endVal) {
+                  let v = df.value
+                  df.value = df.endVal
+                  df.endVal = v
+               } else if ( df.value > df.endVal) {
+                  df.endVal = ""
+                  df.comparison = "EQUAL"
+               }
             }
          })
       },
