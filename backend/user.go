@@ -253,7 +253,7 @@ func (svc *ServiceContext) GetUserBills(c *gin.Context) {
 func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	userID := c.Param("uid")
 	var qp struct {
-		Barcode string `json:"item_barcode"`
+		Barcodes []string `json:"barcodes"`
 	}
 
 	qpErr := c.ShouldBindJSON(&qp)
@@ -264,13 +264,13 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 	}
 
 	ilsReq := struct {
-		ComputingID string `json:"computing_id"`
-		Barcode     string `json:"item_barcode"`
+		ComputingID string   `json:"computing_id"`
+		Barcodes    []string `json:"barcodes"`
 	}{
 		ComputingID: userID,
-		Barcode:     qp.Barcode,
+		Barcodes:    qp.Barcodes,
 	}
-	log.Printf("Renew checkouts [%s] for user %s with ILS Connector...", qp.Barcode, userID)
+	log.Printf("Renew checkouts [%s] for user %s with ILS Connector...", qp.Barcodes, userID)
 
 	renewURL := fmt.Sprintf("%s/requests/renew", svc.ILSAPI)
 	rawRespBytes, err := svc.ILSConnectorPost(renewURL, ilsReq, c.GetString("jwt"), svc.RenewHTTPClient)
@@ -279,27 +279,8 @@ func (svc *ServiceContext) RenewCheckouts(c *gin.Context) {
 		return
 	}
 
-	// Get all of the user checkouts after the renew so dates/status are updated
-	log.Printf("INFO: renew successful; refreshing checkouts list")
-	userURL := fmt.Sprintf("%s/users/%s/checkouts", svc.ILSAPI, userID)
-	bodyBytes, ilsErr := svc.ILSConnectorGet(userURL, c.GetString("jwt"), svc.SlowHTTPClient)
-	if ilsErr != nil {
-		c.String(ilsErr.StatusCode, ilsErr.Message)
-		return
-	}
-	var checkouts []CheckoutInfo
-	if err := json.Unmarshal(bodyBytes, &checkouts); err != nil {
-		log.Printf("ERROR: unable to parse user checkouts: %s", err.Error())
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	type outStruct struct {
-		Checkouts    []CheckoutInfo `json:"checkouts"`
-		RenewResults interface{}    `json:"renewResults"`
-	}
-	out := outStruct{Checkouts: checkouts}
-	json.Unmarshal(rawRespBytes, &out.RenewResults)
+	var out any
+	json.Unmarshal(rawRespBytes, &out)
 	c.JSON(http.StatusOK, out)
 }
 
