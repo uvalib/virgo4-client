@@ -245,18 +245,22 @@ export const useUserStore = defineStore('user', {
          })
       },
       setRenewResults(renewResults) {
+          // renewResults: {renwed: results: [{barcode,dueDate,recallDueDate,renewalDate,message,status,success}]
          this.renewSummary.renewed = 0
          this.renewSummary.failed = 0
          renewResults.results.forEach( renew => {
-            if (renew.success == false) {
-               this.renewSummary.failed++
-               this.renewSummary.failures.push({barcode: renew.barcode, message: renew.message})
-               let co = this.checkouts.find( co => co.barcode == renew.barcode)
-               if ( co ) {
+            let co = this.checkouts.find( co => co.barcode == renew.barcode)
+            if ( co ) {
+               if (renew.success == false) {
+                  this.renewSummary.failed++
+                  this.renewSummary.failures.push({barcode: renew.barcode, message: renew.message})
                   co.message = renew.message
+               } else {
+                  co.due = renew.dueDate
+                  co.recallDueDate = renew.recallDueDate
+                  co.renewDate = renew.renewalDate
+                  this.renewSummary.renewed++
                }
-            } else {
-               this.renewSummary.renewed++
             }
          })
          this.showRenewSummary = true
@@ -501,11 +505,12 @@ export const useUserStore = defineStore('user', {
          if (this.isGuest) return
 
          this.renewing = true
-         let data = {item_barcode: barcode}
+         let data = {barcodes: [barcode]}
+         if ( barcode == "all") {
+            data.barcodes = this.checkouts.map( co => co.barcode)
+         }
          axios.post(`/api/users/${this.signedInUser}/checkouts/renew`, data).then((response) => {
-            this.setCheckouts(response.data.checkouts)
-            this.sortCheckouts(this.checkoutsOrder)
-            this.setRenewResults(response.data.renewResults)
+            this.setRenewResults(response.data)
             this.renewing = false
           }).catch((error) => {
             const system = useSystemStore()
