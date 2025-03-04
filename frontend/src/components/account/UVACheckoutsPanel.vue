@@ -184,8 +184,8 @@ const fineIsVisible = ((co) => {
          }
          .co-message {
             font-size: 1em;
-            padding: 5px 10px;
-            margin-bottom: 15px;
+            padding: 0.5rem 1rem;
+            margin: 0 15px 15px 15px;
             background-color: $uva-red-100;
             color: $uva-text-color-dark;
             font-weight: bold;

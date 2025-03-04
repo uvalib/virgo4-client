@@ -245,10 +245,10 @@ export const useUserStore = defineStore('user', {
          })
       },
       setRenewResults(renewResults) {
-          // renewResults: {renwed: results: [{barcode,dueDate,recallDueDate,renewalDate,message,status,success}]
+          // renewResults: [{barcode,dueDate,recallDueDate,renewalDate,message,status,success}]
          this.renewSummary.renewed = 0
          this.renewSummary.failed = 0
-         renewResults.results.forEach( renew => {
+         renewResults.forEach( renew => {
             let co = this.checkouts.find( co => co.barcode == renew.barcode)
             if ( co ) {
                if (renew.success == false) {
