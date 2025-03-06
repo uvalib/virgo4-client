@@ -132,7 +132,7 @@ export const useReserveStore = defineStore('reserve', {
 
          const system = useSystemStore()
          this.working = true
-         return axios.post(`${system.availabilityURL}/reserves/validate`, {items: itemIds}).then( response => {
+         return axios.post(`/api/coursereserves/validate`, {items: itemIds}).then( response => {
             response.data.forEach( async (item, idx) => {
                // for now, only video items can be put on course reserve
                if (item.reserve == false || item.is_video == false ) {

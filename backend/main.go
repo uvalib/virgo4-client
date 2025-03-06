@@ -85,6 +85,8 @@ func main() {
 	api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 	api.GET("/searches/:token/rss", svc.GetRSSFeed)
 
+	api.POST("/coursereserves/validate", svc.AuthMiddleware, svc.validateCourseReserves)
+
 	users := api.Group("/users").Use(svc.AuthMiddleware, svc.UserMiddleware)
 	users.GET("/:uid", svc.GetUser)
 	users.GET("/:uid/illiad", svc.GetILLiadRequests)
