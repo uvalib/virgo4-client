@@ -9,6 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (svc *ServiceContext) searchCourseReserves(c *gin.Context) {
+	url := fmt.Sprintf("%s/course_reserves/search?type=%s&query=%s", svc.ILSAPI, c.Query("type"), c.Query("query"))
+	resp, ilsErr := svc.ILSConnectorGet(url, c.GetString("jwt"), svc.HTTPClient)
+	if ilsErr != nil {
+		log.Printf("ERROR: course reserves search failed: %s", ilsErr.Message)
+		c.String(ilsErr.StatusCode, ilsErr.Message)
+		return
+	}
+	var out any
+	json.Unmarshal(resp, &out)
+	c.JSON(http.StatusOK, out)
+}
+
 func (svc *ServiceContext) validateCourseReserves(c *gin.Context) {
 	v4Claims, err := getJWTClaims(c)
 	if err != nil {
@@ -44,4 +57,8 @@ func (svc *ServiceContext) validateCourseReserves(c *gin.Context) {
 	var out any
 	json.Unmarshal(resp, &out)
 	c.JSON(http.StatusOK, out)
+}
+
+func (svc *ServiceContext) createCourseReserves(c *gin.Context) {
+	c.String(http.StatusNotImplemented, "not implemented")
 }

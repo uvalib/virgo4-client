@@ -212,7 +212,7 @@ export const useReserveStore = defineStore('reserve', {
          const system = useSystemStore()
          this.resetResults(data.type)
          let typeParam = "type="+data.type
-         let url = `${system.availabilityURL}/reserves/search?${typeParam}&query=${qs}`
+         let url = `/api/coursereserves/search?${typeParam}&query=${qs}`
          axios.get(url).then((response) => {
             this.setCourseReserves(response.data)
             this.working = false
