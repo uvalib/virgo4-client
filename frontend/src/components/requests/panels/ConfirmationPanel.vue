@@ -3,7 +3,7 @@
       <h2>We have received your request.</h2>
       <p>You'll receive an email when your request is ready.</p>
       <p>
-         <VirgoButton link @click="cleanup(); router.push('/requests')">View outstanding requests in your Account.</VirgoButton>
+         <VirgoButton link @click="cleanup(); router.push({path: '/requests', hash: '#ils-holds'})">View outstanding requests in your Account.</VirgoButton>
       </p>
       <dl>
          <dt>User ID:</dt>

@@ -38,6 +38,7 @@
             </template>
             <template v-if="userStore.lookingUp == false && !systemStore.ilsError && userStore.requests.holds.length > 0">
                <AccordionContent
+                     :expanded="$route.hash == '#ils-holds'"
                      class="requests-accordion"
                      borderWidth="0 0 3px 0"
                      borderColor="#007BAC"
