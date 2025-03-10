@@ -1,6 +1,10 @@
 <template>
    <div class="confirmation-panel">
       <h2>We have received your request.</h2>
+      <p>You'll receive an email when your request is ready.</p>
+      <p>
+         <VirgoButton link @click="cleanup(); router.push('/requests')">View outstanding requests in your Account.</VirgoButton>
+      </p>
       <dl>
          <dt>User ID:</dt>
          <dd>{{user.signedInUser}}</dd>
@@ -28,19 +32,28 @@
 import { onMounted, nextTick } from "vue"
 import { useRequestStore } from "@/stores/request"
 import { useUserStore } from "@/stores/user"
+import { useRestoreStore } from "@/stores/restore"
 import { setFocusID } from '@/utils'
+import router from "@/router"
 
 const requestStore = useRequestStore()
 const user = useUserStore()
+const restore = useRestoreStore()
 
 onMounted(()=>{
    nextTick( () =>  setFocusID("request-done") )
 })
+function cleanup(){
+   requestStore.activeRequest = "none"
+   requestStore.errors = {}
+   restore.setActiveRequest( requestStore.activeRequest )
+   restore.save()
+}
 </script>
 
 <style scoped lang="scss">
 .confirmation-panel{
-   h2 {
+   h2, p {
       text-align: center;
    }
    dl {
