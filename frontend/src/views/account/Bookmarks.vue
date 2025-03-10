@@ -295,9 +295,11 @@ async function reserve() {
       })
       msg += "</ul>Please deselect these items and try again." +
          "<p><a target=\"_blank\" href=\"https://www.library.virginia.edu/services/course-reserves\">Learn more about placing various types of course reserves.</a> </p>"
-      systemStore.setError(msg)
+      systemStore.setMessage(msg)
    } else {
-      router.push("/course-reserves-request")
+      if (systemStore.hasError == false) {
+         router.push("/course-reserves-request")
+      }
    }
 }
 function detailsURL(bookmark) {

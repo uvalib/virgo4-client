@@ -20,7 +20,8 @@
 <style lang="scss" scoped>
 div.reserved {
    position: relative;
-   margin: 25px auto 50px auto;
+   margin: 0 auto;
+   padding-bottom: 50px;
    width: 40%;
    text-align: left;
    p {

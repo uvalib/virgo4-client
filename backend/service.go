@@ -436,7 +436,7 @@ func (svc *ServiceContext) ILSConnectorGet(url string, jwt string, httpClient *h
 }
 
 // ILSConnectorPost sends a POST to the ILS connector and returns results
-func (svc *ServiceContext) ILSConnectorPost(url string, values interface{}, jwt string, httpClient *http.Client) ([]byte, *RequestError) {
+func (svc *ServiceContext) ILSConnectorPost(url string, values any, jwt string, httpClient *http.Client) ([]byte, *RequestError) {
 	log.Printf("ILS Connector POST request: %s", url)
 	startTime := time.Now()
 	b, _ := json.Marshal(values)
@@ -486,7 +486,7 @@ func (svc *ServiceContext) PDAGet(path string, jwt string) ([]byte, *RequestErro
 }
 
 // SearchPost sends a POST to the search pool and returns results
-func (svc *ServiceContext) SearchPost(body interface{}, jwt string) ([]byte, *RequestError) {
+func (svc *ServiceContext) SearchPost(body any, jwt string) ([]byte, *RequestError) {
 	url := svc.CatalogPoolURL
 	log.Printf("Seach Pool POST request: %s", url)
 	startTime := time.Now()

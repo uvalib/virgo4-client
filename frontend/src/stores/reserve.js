@@ -144,6 +144,7 @@ export const useReserveStore = defineStore('reserve', {
 
             this.working = false
          }).catch((error) => {
+            console.error(error)
             system.setError(error)
             this.working = false
          })
@@ -181,7 +182,7 @@ export const useReserveStore = defineStore('reserve', {
          })
 
          const system = useSystemStore()
-         axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
+         axios.post(`/api/coursereserves`, data).then((_response) => {
             this.clearRequestList()
             this.submitted = true
             this.working = false
@@ -195,7 +196,7 @@ export const useReserveStore = defineStore('reserve', {
          const system = useSystemStore()
 
          let data = { userID: v4UserID, request: this.request, items: [video] }
-         await axios.post(`${system.availabilityURL}/reserves`, data).then((_response) => {
+         await axios.post(`/api/coursereserves`, data).then((_response) => {
             this.clearRequestList()
             this.submitted = true
          }).catch((error) => {
