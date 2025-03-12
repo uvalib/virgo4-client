@@ -5,8 +5,13 @@
       <VideoReserveDialog v-if="request.hasOption('videoReserve')"  :settings="request.option('videoReserve')" />
       <AeonRequestDialog v-if="request.hasOption('aeon')"  :settings="request.option('aeon')" />
       <template v-if="request.hasOption('pda')">
-         <PDADialog v-if="request.option('pda').create_url" :settings="request.option('pda')" />
-         <div v-else v-html="request.option('pda').description"></div>
+         <PDADialog :settings="request.option('pda')" v-if="request.option('pda').create_url" />
+         <div  v-else>
+            This item is now on order. Learn more about
+            <a href="https://library.virginia.edu/about-available-to-order-items" aria-label="Available to Order"
+               style="text-decoration: underline;" target="_blank" title="Available to Order (Opens in a new window.)"
+               class="piwik_link">Available to Order</a> items.
+         </div>
       </template>
       <VirgoButton v-if="request.hasOption('directLink')"  label="Request a scan"
          @click="directLinkClicked(request.option('directLink').create_url)"

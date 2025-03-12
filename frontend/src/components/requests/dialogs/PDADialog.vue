@@ -3,11 +3,22 @@
       :show="request.activeRequest=='pda'" :showSubmit="false" :disabled="request.working"
       @opened="dialogOpened" @closed="dialogClosed"
    >
-      <SignIn v-if="!user.isSignedIn" />
-      <div v-else-if="submitted==false" class="working">
-         <V4Spinner message="Sending Order..."></V4Spinner>
-      </div>
-      <ConfirmationPanel v-else />
+      <template #info>
+         <div class="pda-about">
+            Learn more about
+            <a href="https://library.virginia.edu/about-available-to-order-items" aria-label="Available to Order"
+               style="text-decoration: underline;" target="_blank"
+               title="Available to Order (Opens in a new window.)"
+               class="piwik_link">Available to Order</a> items.
+         </div>
+      </template>
+      <template #default>
+         <SignIn v-if="!user.isSignedIn" />
+         <div v-else-if="submitted==false" class="working">
+            <V4Spinner message="Sending Order..."></V4Spinner>
+         </div>
+         <ConfirmationPanel v-else />
+      </template>
    </RequestDialog>
 </template>
 
@@ -56,6 +67,9 @@ const dialogClosed = (() => {
 </script>
 
 <style lang="scss" scoped>
+.pda-about {
+   margin: 15px 0 0 0;
+}
 .working {
    text-align: center;
    margin: 0 100px 25px 100px;
