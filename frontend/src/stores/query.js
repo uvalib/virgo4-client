@@ -19,6 +19,7 @@ export const useQueryStore = defineStore('query', {
          { value: "keyword", label: "Keyword", type: "text" },
          { value: "identifier", label: "Identifier", type: "text" },
          { value: "title", label: "Title", type: "text" },
+         { value: "series", label: "Series", type: "text" },
          { value: "fulltext", label: "Full Text", type: "text" },
          { value: "journal_title", label: "Journal Title", type: "text" },
          { value: "author", label: "Author", type: "text" },
