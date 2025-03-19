@@ -85,6 +85,8 @@ func main() {
 	api.GET("/searches/:token", svc.AuthMiddleware, svc.GetSearch)
 	api.GET("/searches/:token/rss", svc.GetRSSFeed)
 
+	api.GET("/availability/:id", svc.AuthMiddleware, svc.getItemAvailability)
+
 	api.POST("/coursereserves", svc.AuthMiddleware, svc.createCourseReserves)
 	api.POST("/coursereserves/validate", svc.AuthMiddleware, svc.validateCourseReserves)
 	api.GET("/coursereserves/search", svc.AuthMiddleware, svc.searchCourseReserves)
