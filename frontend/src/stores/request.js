@@ -221,7 +221,7 @@ export const useRequestStore = defineStore('request', {
          params.set("CallNumber", item.label)
          params.set("ItemVolume", item.label)
          params.set("ItemNumber", item.barcode)
-         params.set("Notes", item.notes)
+         params.set("Notes", item.sc_notes)
          params.set("Location", item.location)
          params.set("SpecialRequest", specialInstructions)
 

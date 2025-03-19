@@ -328,21 +328,19 @@ export const useItemStore = defineStore('item', {
       },
 
       async getAvailability() {
-         const system = useSystemStore()
          const requestStore = useRequestStore()
 
          this.clearAvailability()
-         let url = `${system.availabilityURL}/item/${this.details.identifier}`
+         let url = `/api/availability/${this.details.identifier}`
          return axios.get(url).then((response) => {
             if (response.data) {
-               this.availability.titleId = response.data.availability.title_id
-               this.availability.display = response.data.availability.display
-               this.availability.bound_with = response.data.availability.bound_with
+               this.availability.titleId = response.data.title_id
+               this.availability.bound_with = response.data.bound_with
 
                // split availability items into library groupings
                this.availability.libraries = []
-               if (response.data.availability.items) {
-                  response.data.availability.items.forEach( i => {
+               if (response.data.items) {
+                  response.data.items.forEach( i => {
                      let libInfo = {name: i.library, id: i.library_id, items: []}
                      delete i.library
                      delete i.library_id
@@ -364,13 +362,13 @@ export const useItemStore = defineStore('item', {
                })
 
                // // HACK IN A SPECIAL ITEM OPTION
-               // if ( response.data.availability.request_options.length > 0) {
-               //    if ( response.data.availability.request_options[0].item_options.length > 1) {
-               //       let last = response.data.availability.request_options[0].item_options.length -1
-               //       response.data.availability.request_options[0].item_options[last].label += " (Ivy limited circulation)"
+               // if ( response.data.request_options.length > 0) {
+               //    if ( response.data.request_options[0].item_options.length > 1) {
+               //       let last = response.data.request_options[0].item_options.length -1
+               //       response.data.request_options[0].item_options[last].label += " (Ivy limited circulation)"
                //    }
                // }
-               requestStore.requestOptions = response.data.availability.request_options
+               requestStore.requestOptions = response.data.request_options
             }
             this.availability.searching = false
          }).catch((error) => {
