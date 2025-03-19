@@ -29,7 +29,7 @@
                      <div class="location">{{loc.location}}</div>
                      <div v-for="cn in loc.call_numbers">
                         <div class="call">{{ cn.call_number }}</div>
-                        <div class="note" v-for="txt in  cn.text_notes">{{ txt.text }}</div>
+                        <div class="note" v-for="txt in  cn.text_notes">{{ txt.text }} {{ txt.note }}</div>
                      </div>
                   </div>
                </li>
