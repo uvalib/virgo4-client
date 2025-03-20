@@ -10,6 +10,7 @@ export const useQueryStore = defineStore('query', {
       advanced: [
          { op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" },
+         { op: "AND", value: "", field: "series", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" },
          { op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" },
@@ -136,6 +137,7 @@ export const useQueryStore = defineStore('query', {
          this.advanced.splice(0, this.advanced.length)
          this.advanced.push({ op: "AND", value: "", field: "keyword", comparison: "EQUAL", endVal: "" })
          this.advanced.push({ op: "AND", value: "", field: "title", comparison: "EQUAL", endVal: "" })
+         this.advanced.push({ op: "AND", value: "", field: "series", comparison: "EQUAL", endVal: "" })
          this.advanced.push({ op: "AND", value: "", field: "author", comparison: "EQUAL", endVal: "" })
          this.advanced.push({ op: "AND", value: "", field: "subject", comparison: "EQUAL", endVal: "" })
          this.advanced.push({ op: "AND", value: "", field: "date", comparison: "BETWEEN", endVal: "" })
