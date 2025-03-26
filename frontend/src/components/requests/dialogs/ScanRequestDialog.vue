@@ -9,6 +9,7 @@
             v-model="selectedItem" id="scan-item-sel" placeholder="Select an item"
             :validation-messages="{required: 'Item selection is required.'}"
             :options="request.items" validation="required"
+            @change="itemSelected($event)"
          />
          <FormKit type="select" label="Scan purpose" id="scan-use"
             v-model="scan.type"  :options="{'Article': 'Research', 'Collab': 'Instruction'}"
