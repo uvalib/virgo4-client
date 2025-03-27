@@ -12,10 +12,11 @@
             <DiBSViewer :items="dibsItems" v-if="dibsItems.length > 0"></DiBSViewer>
          </div>
 
+         <div class="avail-statement ra-box ra-fiy pad-top" v-if="availabilityStatement" v-html="availabilityStatement"></div>
+
          <div v-if="hasItems" class="on-shelf">
             <h3>On shelf</h3>
             <div class="avail-messages-container" v-if="system.isKiosk == false && hasAvailMessage">
-               <div class="avail-message" v-if="availabilityStatement" v-html="availabilityStatement"></div>
                <div class="avail-message" v-if="accessRestriction" v-html="accessRestriction"></div>
                <div class="avail-message" v-if="extentOfDigitization" v-html="extentOfDigitization"></div>
                <div class="avail-message" v-if="libraryAvailabilityNotes" v-for="(note, nidx) in libraryAvailabilityNotes" v-html="note" :key="`note${nidx}`"></div>
@@ -92,6 +93,7 @@ const canMakeRequests = computed(()=>{
    return request.hasOptions
 })
 const availabilityStatement = computed(()=>{
+   console.log("EFIIRHPRIUGHFRPIGUH")
    let f = item.details.fields.find( f=>f.name == "availability_statement")
    if (f) {
       return f.value
@@ -127,7 +129,7 @@ const dibsItems = computed(()=>{
    let items = []
    item.availability.libraries.forEach( lib => {
       lib.items.forEach( item => {
-         if ( item.home_location_id == "DIBS") {
+         if ( item.dibs ) {
             items.push(item)
          }
       })
@@ -141,6 +143,13 @@ const dibsItems = computed(()=>{
    .working {
       margin: 25px;
       text-align: center;
+   }
+}
+
+.avail-statement {
+   :deep(p) {
+      margin: 0;
+      padding: 0;
    }
 }
 .availability-content {

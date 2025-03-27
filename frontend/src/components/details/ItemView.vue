@@ -82,7 +82,7 @@
    <DigitalContent />
    <template v-if="details.source != 'images'">
       <InterLibraryLoan v-if="system.isKiosk == false && poolStore.hasInterLibraryLoan(details.source)" /> <!-- pools that support ILL (WorldCat) should not show any other availabilty UI-->
-      <Availability v-else-if="hasAvailability" />
+      <Availability v-else-if="item.isCollectionHead == false" />
       <BoundWithItems v-if="item.hasBoundWithItems"/>
       <template v-if="collection.isBookplate && collection.isAvailable && (item.isCollection || item.isCollectionHead)">
          <h2>Bookplates Fund</h2>
@@ -159,12 +159,6 @@ const allDisplayFields = computed(()=> {
       return filteredFields
    }
    return details.value.fields.filter( f => item.primaryFields.includes(f.name))
-})
-
-const hasAvailability = computed(() => {
-   if (poolStore.hasAvailability(details.value.source) && item.availability.libraries.length > 0) return true
-   if (accessURLField.value != null && !system.isKiosk) return true
-   return false
 })
 
 const shouldDisplay =((field) => {
