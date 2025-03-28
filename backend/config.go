@@ -49,24 +49,23 @@ type DevConfig struct {
 
 // ServiceConfig defines all of the v4client service configuration parameters
 type ServiceConfig struct {
-	Port            int
-	AvailabilityURL string
-	VirgoURL        string
-	CitationsURL    string
-	CollectionsURL  string
-	ShelfBrowseURL  string
-	SearchAPI       string
-	FeedbackEmail   string
-	ILSAPI          string
-	PDAAPI          string
-	CatalogPoolURL  string
-	JWTKey          string
-	Dev             DevConfig
-	DB              DBConfig
-	SMTP            SMTPConfig
-	Illiad          IlliadConfig
-	Firebase        FirebaseConfig
-	DibsURL         string
+	Port           int
+	VirgoURL       string
+	CitationsURL   string
+	CollectionsURL string
+	ShelfBrowseURL string
+	SearchAPI      string
+	FeedbackEmail  string
+	ILSAPI         string
+	PDAAPI         string
+	CatalogPoolURL string
+	JWTKey         string
+	Dev            DevConfig
+	DB             DBConfig
+	SMTP           SMTPConfig
+	Illiad         IlliadConfig
+	Firebase       FirebaseConfig
+	DibsURL        string
 }
 
 // LoadConfig will load the service configuration from env/cmdline
@@ -74,7 +73,6 @@ func LoadConfig() *ServiceConfig {
 	var cfg ServiceConfig
 	flag.IntVar(&cfg.Port, "port", 8080, "Service port (default 8080)")
 	flag.StringVar(&cfg.VirgoURL, "virgo", "https://search.virginia.edu", "URL to Virgo")
-	flag.StringVar(&cfg.AvailabilityURL, "availability", "https://availability-ws-dev.internal.lib.virginia.edu", "Availability service URL")
 	flag.StringVar(&cfg.CitationsURL, "citations", "https://collections-ws-dev.internal.lib.virginia.edu", "Citations service URL")
 	flag.StringVar(&cfg.CollectionsURL, "collections", "https://collections-ws-dev.internal.lib.virginia.edu", "Collections service URL")
 	flag.StringVar(&cfg.ShelfBrowseURL, "shelf", "https://shelf-browse-ws-dev.internal.lib.virginia.edu", "Shelf Browse service URL")
@@ -167,7 +165,6 @@ func LoadConfig() *ServiceConfig {
 	if cfg.JWTKey == "" {
 		log.Fatal("jwtkey param is required")
 	}
-	log.Printf("Availability URL: %s", cfg.AvailabilityURL)
 	if cfg.DibsURL == "" {
 		log.Fatal("dibsurl param is required")
 	} else {

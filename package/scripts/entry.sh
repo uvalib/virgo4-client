@@ -19,7 +19,6 @@ fi
 
 cd bin; ./v4srv \
    -virgo ${V4_URL} \
-   -availability ${V4_AVAILABILITY} \
    -citations ${V4_CITATIONS} \
    -collections ${V4_COLLECTIONS} \
    -search ${V4_SEARCH_API} \

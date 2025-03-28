@@ -8,17 +8,13 @@
       <dl>
          <dt>User ID:</dt>
          <dd>{{user.signedInUser}}</dd>
-         <template v-if="requestStore.requestInfo.itemLabel">
+         <template v-if="requestStore.requestInfo.callNumber">
             <dt>Item:</dt>
-            <dd>{{requestStore.requestInfo.itemLabel}}</dd>
+            <dd>{{requestStore.requestInfo.callNumber}}</dd>
          </template>
          <template v-if="requestStore.requestInfo.pickupLibrary">
             <dt>Pickup Library:</dt>
             <dd>{{requestStore.requestInfo.pickupLibrary}}</dd>
-         </template>
-         <template v-if="requestStore.requestInfo.callNumber">
-            <dt>CallNumber:</dt>
-            <dd>{{requestStore.requestInfo.callNumber}}</dd>
          </template>
          <template v-if="requestStore.requestInfo.notes">
             <dt>Request Note:</dt>

@@ -26,7 +26,6 @@ import (
 // ServiceContext contains common data used by all handlers
 type ServiceContext struct {
 	Version         string
-	AvailabilityURL string
 	VirgoURL        string
 	CitationsURL    string
 	CollectionsURL  string
@@ -59,22 +58,21 @@ type RequestError struct {
 // InitService will initialize the service context based on the config parameters
 func InitService(version string, cfg *ServiceConfig) (*ServiceContext, error) {
 	ctx := ServiceContext{Version: version,
-		AvailabilityURL: cfg.AvailabilityURL,
-		VirgoURL:        cfg.VirgoURL,
-		SearchAPI:       cfg.SearchAPI,
-		CitationsURL:    cfg.CitationsURL,
-		CollectionsURL:  cfg.CollectionsURL,
-		ShelfBrowseURL:  cfg.ShelfBrowseURL,
-		JWTKey:          cfg.JWTKey,
-		FeedbackEmail:   cfg.FeedbackEmail,
-		ILSAPI:          cfg.ILSAPI,
-		PDAAPI:          cfg.PDAAPI,
-		CatalogPoolURL:  cfg.CatalogPoolURL,
-		SMTP:            cfg.SMTP,
-		Illiad:          cfg.Illiad,
-		Dev:             cfg.Dev,
-		Firebase:        cfg.Firebase,
-		DibsURL:         cfg.DibsURL,
+		VirgoURL:       cfg.VirgoURL,
+		SearchAPI:      cfg.SearchAPI,
+		CitationsURL:   cfg.CitationsURL,
+		CollectionsURL: cfg.CollectionsURL,
+		ShelfBrowseURL: cfg.ShelfBrowseURL,
+		JWTKey:         cfg.JWTKey,
+		FeedbackEmail:  cfg.FeedbackEmail,
+		ILSAPI:         cfg.ILSAPI,
+		PDAAPI:         cfg.PDAAPI,
+		CatalogPoolURL: cfg.CatalogPoolURL,
+		SMTP:           cfg.SMTP,
+		Illiad:         cfg.Illiad,
+		Dev:            cfg.Dev,
+		Firebase:       cfg.Firebase,
+		DibsURL:        cfg.DibsURL,
 	}
 
 	log.Printf("INFO: connecting GORM to postgress...")
@@ -196,20 +194,6 @@ func (svc *ServiceContext) HealthCheck(c *gin.Context) {
 		}
 	}
 
-	if svc.AvailabilityURL != "" {
-		apiURL := fmt.Sprintf("%s/version", svc.AvailabilityURL)
-		resp, err := svc.FastHTTPClient.Get(apiURL)
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-		if err != nil {
-			log.Printf("ERROR: Failed response from Availability Service PING: %s - %s", err.Error(), svc.AvailabilityURL)
-			hcMap["availabilty"] = hcResp{Healthy: false, Message: err.Error()}
-		} else {
-			hcMap["availabilty"] = hcResp{Healthy: true}
-		}
-	}
-
 	var schema struct {
 		Version int  `db:"version"`
 		Dirty   bool `db:"dirty"`
@@ -297,7 +281,6 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 	}
 	type config struct {
 		SearchAPI       string          `json:"searchAPI"`
-		AvailabilityURL string          `json:"availabilityURL"`
 		CitationsURL    string          `json:"citationsURL"`
 		ColectionsURL   string          `json:"collectionsURL"`
 		ShelfBrowseURL  string          `json:"shelfBrowseURL"`
@@ -309,9 +292,9 @@ func (svc *ServiceContext) GetConfig(c *gin.Context) {
 		PickupLibraries []pickupLibrary `json:"pickupLibraries"`
 	}
 	cfg := config{SearchAPI: svc.SearchAPI, CitationsURL: svc.CitationsURL,
-		ColectionsURL:   svc.CollectionsURL,
-		AvailabilityURL: svc.AvailabilityURL, ShelfBrowseURL: svc.ShelfBrowseURL,
-		HealthSciURL: svc.Illiad.HealthSciURL, KioskMode: false,
+		ColectionsURL:  svc.CollectionsURL,
+		ShelfBrowseURL: svc.ShelfBrowseURL,
+		HealthSciURL:   svc.Illiad.HealthSciURL, KioskMode: false,
 		DibsURL: svc.DibsURL,
 	}
 	if svc.Firebase.APIKey != "" {

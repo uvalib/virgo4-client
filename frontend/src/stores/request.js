@@ -67,7 +67,7 @@ export const useRequestStore = defineStore('request', {
          if (opts) {
             let out = []
             opts.item_options.forEach( i => {
-               out.push( {label: i.label, value: i} )
+               out.push( {label: i.call_number, value: i} )
             })
             return out
          }
@@ -138,7 +138,6 @@ export const useRequestStore = defineStore('request', {
          this.errors = {}
 
           // track this request so it can be displayed on confirmation panel
-          this.requestInfo.itemLabel = scan.label
           this.requestInfo.pickupLibrary = ""
           this.requestInfo.callNumber = scan.callNumber
           this.requestInfo.notes = scan.notes
@@ -150,6 +149,7 @@ export const useRequestStore = defineStore('request', {
             this.working = false
          )
       },
+
       async createHold( item, pickupLibrary) {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "createHold")
          this.working = true
@@ -157,12 +157,11 @@ export const useRequestStore = defineStore('request', {
          this.errors = {}
 
          // track this request so it can be displayed on confirmation panel
-         this.requestInfo.itemLabel = item.label
          this.requestInfo.pickupLibrary = pickupLibrary
-         this.requestInfo.callNumber = ""
+         this.requestInfo.callNumber = item.call_number
          this.requestInfo.notes = ""
 
-         let req = {itemLabel: item.label, itemBarcode: item.barcode, pickupLibrary: pickupLibrary}
+         let req = {itemBarcode: item.barcode, pickupLibrary: pickupLibrary}
          await axios.post('/api/requests/hold', req)
             .then(response => {
                if (response.data.hold.errors) {
@@ -177,6 +176,7 @@ export const useRequestStore = defineStore('request', {
                this.working = false
             })
       },
+
       cancelHold(holdData) {
          const userStore = useUserStore()
          this.working = true
@@ -193,6 +193,7 @@ export const useRequestStore = defineStore('request', {
            .catch((e) => useSystemStore().setError(e))
            .finally(() => (this.working = false))
       },
+
       async submitPDARequest() {
          analytics.trigger('Requests', 'REQUEST_SUBMITTED', "pda")
          this.working = true
@@ -211,15 +212,14 @@ export const useRequestStore = defineStore('request', {
          this.working = true
 
          // track this request so it can be displayed on confirmation panel
-         this.requestInfo.itemLabel = ""
          this.requestInfo.pickupLibrary = ""
-         this.requestInfo.callNumber = item.label
+         this.requestInfo.callNumber = item.call_number
          this.requestInfo.notes = specialInstructions
 
          var url = new URL(this.option("aeon").create_url)
          let params = new URLSearchParams(url.search)
-         params.set("CallNumber", item.label)
-         params.set("ItemVolume", item.label)
+         params.set("CallNumber", item.call_number)
+         params.set("ItemVolume", item.call_number)   // TODO is this a mistake? Volume is set by the availability service
          params.set("ItemNumber", item.barcode)
          params.set("Notes", item.sc_notes)
          params.set("Location", item.location)

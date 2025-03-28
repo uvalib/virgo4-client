@@ -78,7 +78,7 @@ const pickupLibrary = ref()
 const submitted = ref(false)
 
 const pickupLibraries = computed(()=>{
-   if ( selectedItem.value && selectedItem.value.label.includes("Ivy limited circulation") ) {
+   if ( selectedItem.value && selectedItem.value.call_number.includes("Ivy limited circulation") ) {
       pickupLibrary.value = "SPEC-COLL"
       return [{value: "SPEC-COLL", label: "Small Special Collections Reading Room"}]
    }

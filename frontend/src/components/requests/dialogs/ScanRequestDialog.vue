@@ -65,7 +65,6 @@ const route = useRoute()
 
 const selectedItem = ref(null)
 const scan = ref({
-   label: '',
    barcode: '',
    issn: '',
    type: 'Article',
@@ -87,7 +86,6 @@ const scanForm = ref()
 const dialogOpened = (() => {
    selectedItem.value = null
    scan.value = {
-      label: '',
       barcode: '',
       issn: '',
       type: 'Article',
@@ -141,11 +139,10 @@ const dialogOpened = (() => {
 
 const itemSelected = (() => {
    if ( selectedItem.value ) {
-      scan.value.label = selectedItem.value.label
       scan.value.barcode = selectedItem.value.barcode
       scan.value.library = selectedItem.value.library
       scan.value.location = selectedItem.value.location_id
-      scan.value.callNumber = selectedItem.value.label
+      scan.value.callNumber = selectedItem.value.call_number
    }
 })
 

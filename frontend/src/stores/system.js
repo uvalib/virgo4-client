@@ -20,7 +20,6 @@ export const useSystemStore = defineStore('system', {
       },
       showMessage: false,
       version: "unknown",
-      availabilityURL: "",
       hsIlliadURL: "",
       citationsURL: "",
       collectionsURL: "",
@@ -57,8 +56,8 @@ export const useSystemStore = defineStore('system', {
       },
       authRequired: store => {
          return (url) => {
-            // avail, citations and pda requests all require auth
-            if ( url.match(store.availabilityURL) != null || url.match(store.citationsURL) != null  || url.match("pda-ws") != null  ) {
+            //  citations and pda requests require auth
+            if ( url.match(store.citationsURL) != null  || url.match("pda-ws") != null  ) {
                return true
             }
             // all api requests except /api/pools require auth
@@ -158,7 +157,6 @@ export const useSystemStore = defineStore('system', {
          this.searchAPI = cfg.searchAPI
          this.kiosk = cfg.kiosk
          this.devServer = cfg.devServer
-         this.availabilityURL = cfg.availabilityURL
          this.citationsURL = cfg.citationsURL
          this.collectionsURL = cfg.collectionsURL
          this.hsILLiadURL = cfg.hsILLiadURL

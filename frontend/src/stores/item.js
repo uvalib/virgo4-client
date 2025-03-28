@@ -11,7 +11,7 @@ export const useItemStore = defineStore('item', {
       details: {searching: true, source: "", identifier:"", fields:[], related:[] },
       digitalContent: [],
       loadingDigitalContent: false,
-      availability: {searching: true, titleId: "", display: [], libraries: [], bound_with: [], error: ""},
+      availability: {searching: true, titleId: "", libraries: [], bound_with: [], error: ""},
       primaryFields: ["author", "format", "published_date", "subject", "subject_summary"]
    }),
 
@@ -145,7 +145,7 @@ export const useItemStore = defineStore('item', {
          this.$reset()
       },
       clearAvailability() {
-        this.availability = {searching: true, titleId: '', display: [], libraries: [], bound_with: [], error: ""}
+        this.availability = {searching: true, titleId: '', libraries: [], bound_with: [], error: ""}
       },
       setCatalogKeyDetails(data) {
          let found = false
@@ -336,23 +336,7 @@ export const useItemStore = defineStore('item', {
             if (response.data) {
                this.availability.titleId = response.data.title_id
                this.availability.bound_with = response.data.bound_with
-
-               // split availability items into library groupings
-               this.availability.libraries = []
-               if (response.data.items) {
-                  response.data.items.forEach( i => {
-                     let libInfo = {name: i.library, id: i.library_id, items: []}
-                     delete i.library
-                     delete i.library_id
-                     let existingLib = this.availability.libraries.find( al => al.id == libInfo.id)
-                     if ( existingLib ) {
-                        existingLib.items.push( i )
-                     } else {
-                        libInfo.items.push( i )
-                        this.availability.libraries.push( libInfo )
-                     }
-                  })
-               }
+               this.availability.libraries = response.data.libraries
 
                // sort avvailability libraries by name
                this.availability.libraries.sort( (a,b) => {
