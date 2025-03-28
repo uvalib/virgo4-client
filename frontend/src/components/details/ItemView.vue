@@ -66,7 +66,7 @@
                   </a>
                </dd>
             </template>
-            <template v-if="hasMarcXML && detailExpanded && system.isKiosk == false">
+            <template v-if="hasMarcXML && system.isKiosk == false &&  (detailExpanded || preferences.expandDetails)">
                <dt class="label marc"><MarcMetadata :xml="marcXML" /></dt>
                <dd class="value"></dd>
             </template>
