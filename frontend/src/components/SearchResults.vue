@@ -109,9 +109,10 @@ const printResults = (() => {
 
 const resetSearch = ( async () => {
    resultStore.resetSearch()
+   queryStore.searchSources = "all"
    if ( queryStore.mode == "basic") {
       analytics.trigger('Results', 'RESET_SEARCH', "basic")
-      router.push(`/search`)
+      router.push("/")
    } else {
       analytics.trigger('Results', 'RESET_SEARCH', "advanced")
       router.push('/search?mode=advanced')
