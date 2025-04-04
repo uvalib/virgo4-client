@@ -40,7 +40,7 @@ import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
 import analytics from '@/analytics'
 import { onMounted, computed } from 'vue'
-import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useRestoreStore } from "@/stores/restore"
@@ -51,6 +51,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
 import { useBookmarkStore } from "@/stores/bookmark"
+import { watchDeep } from '@vueuse/core'
 
 const router = useRouter()
 const route = useRoute()
@@ -76,12 +77,12 @@ function setPageTitle() {
    }
 }
 
-onBeforeRouteUpdate((to) => {
-   console.log("NEW HOME ROUTE "+ to.fullPath)
+watchDeep( route, () => {
+   console.log("NEW HOME ROUTE "+ route.fullPath)
    if ( queryStore.userSearched && userStore.isSignedIn) {
-      searchStore.updateHistory(userStore.signedInUser, to.fullPath)
+      searchStore.updateHistory(userStore.signedInUser, route.fullPath)
    }
-   restoreSearchFromQueryParams(to.query)
+   restoreSearchFromQueryParams()
    setPageTitle()
 })
 
@@ -92,7 +93,11 @@ onMounted( async () =>{
       // Load the search from the token and restore it
       await queryStore.loadSearch(token)
    }
-   handleLegacyQueries( route.query )
+   if ( route.query.pool ) {
+      // if a pool is set on initial page load, narrow the search to just that pool
+      queryStore.searchSources = route.query.pool
+   }
+   restoreSearchFromQueryParams()
    setPageTitle()
 
    if ( queryStore.mode == "basic") {
@@ -100,94 +105,8 @@ onMounted( async () =>{
    }
 })
 
-function handleLegacyQueries( query ) {
-   let unsupported = []
-   var changed = false
-   let newQ = Object.assign({}, query )
-
-   // Scope and exclude are not used, but preserve the target pool
-   if (newQ.exclude) {
-      unsupported.push("exclude="+newQ.exclude)
-      delete newQ.exclude
-      changed = true
-   }
-   if (newQ.scope ) {
-      if (newQ.scope != "all") {
-         unsupported.push("scope="+newQ.scope)
-      }
-      changed = true
-      delete newQ.scope
-   }
-   if ( newQ.mode == "basic") {
-      delete newQ.mode
-      changed = true
-   }
-   if (newQ.filter && newQ.filter.indexOf("Facet") > -1) {
-      unsupported.push("filter="+newQ.filter)
-      delete newQ.filter
-      changed = true
-   }
-   if (newQ.pool && !poolStore.poolDetails(newQ.pool)) {
-      unsupported.push("pool="+newQ.pool)
-      delete newQ.pool
-      changed = true
-   }
-
-   let queryStr = newQ.q
-   if ( queryStr) {
-      let idx0 = queryStr.indexOf(" AND filter:")
-      if ( idx0 > -1) {
-         unsupported.push("q="+newQ.q)
-         newQ.q = queryStr.substring(0,idx0).trim()
-         changed = true
-      } else {
-         idx0 = queryStr.indexOf("filter:")
-         if ( idx0 > -1) {
-            unsupported.push("q="+newQ.q)
-            queryStr = queryStr.replace(/filter:.*AND\s/g, '')
-            queryStr = queryStr.replace(/filter:.*}/g, '')
-            newQ.q = queryStr
-            changed = true
-         }
-      }
-   }
-
-   if ( newQ.q == "" && !newQ.filter) {
-      let msg = "<p>This query has no supported parameters, and cannot be issued. Please fix the issues below and retry.</p>"
-      msg += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
-      systemStore.setMessage(msg)
-      router.push("/")
-      return
-   }
-
-   queryStore.searchSources = "all"
-   if (newQ.pool == "images") {
-      queryStore.searchSources = "images"
-   } else if (newQ.pool == "articles") {
-      queryStore.searchSources = "articles"
-   } else if (newQ.pool == "uva_library") {
-      queryStore.searchSources = "uva_library"
-   } if (newQ.pool == "hathitrust") {
-      queryStore.searchSources = "hathitrust"
-   } if (newQ.pool == "jmrl") {
-      queryStore.searchSources = "jmrl"
-   } if (newQ.pool == "worldcat") {
-      queryStore.searchSources = "worldcat"
-   }
-
-   if ( changed) {
-      if ( unsupported.length > 0) {
-         let msg = "<p>This query contained unsupported parameters. It was automatically simplified to provide results.</p>"
-         msg += `<p><b>Unsupported parameters:</b></p><div style="margin-left: 15px">${unsupported.join("<br/>")}</div>`
-         systemStore.setMessage(msg)
-      }
-      router.push({query: newQ, replace: true})
-   } else {
-      restoreSearchFromQueryParams(route.query)
-   }
-}
-
-async function restoreSearchFromQueryParams( query ) {
+async function restoreSearchFromQueryParams( ) {
+   var query = route.query
    if  (!query.q) {
       // only reset the search when there is NO query present,
       // otherwise the search is re-excuted each time a tab changes

@@ -59,7 +59,7 @@ const sourcesClicked = (( setting ) => {
             query.q = queryStore.string
             query.pool = setting
             queryStore.userSearched = true
-            router.push({ query })
+            router.push({path: "/search", query: query })
          }
       }
    }
