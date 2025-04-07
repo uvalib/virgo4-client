@@ -12,6 +12,11 @@ import (
 )
 
 func (svc *ServiceContext) versionMiddleware(c *gin.Context) {
+	if strings.Contains(c.Request.URL.Path, "activateTempAccount") {
+		log.Printf("INFO: temp account activation skips version checks")
+		c.Next()
+		return
+	}
 	clientVer := c.Request.Header.Get("X-Virgo-Version")
 	log.Printf("INFO: version middleware got [%s]", clientVer)
 	verMap := svc.determineVersion()
