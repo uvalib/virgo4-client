@@ -48,10 +48,11 @@ import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { scrollToItem } from '@/utils'
-import { routeutils } from '@/routeutils'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const router = useRouter()
 const route = useRoute()
+const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
@@ -124,7 +125,7 @@ const poolSelected = (( poolID ) => {
    let newPoolID = resultStore.results[tgtIdx].pool.id
    if ( route.query.pool != newPoolID ) {
       queryStore.targetPool = newPoolID
-      routeutils.setPoolParams(router, route.query)
+      routeUtils.poolChanged()
    }
 })
 </script>

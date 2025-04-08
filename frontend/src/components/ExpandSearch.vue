@@ -9,11 +9,12 @@
 import { computed } from 'vue'
 import { useQueryStore } from "@/stores/query"
 import { useRouter, useRoute } from 'vue-router'
-import { routeutils } from '@/routeutils'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const queryStore = useQueryStore()
 const router = useRouter()
 const route = useRoute()
+const routeUtils = useRouteUtils(router, route)
 
 const scopeLabel = computed(()=>{
    if ( queryStore.searchSources == 'articles') return "Articles only"
@@ -24,7 +25,7 @@ const scopeLabel = computed(()=>{
 
 function widenSearch() {
    queryStore.widenSearch()
-   routeutils.scopeChanged(router, route.query)
+   routeUtils.scopeChanged()
 }
 </script>
 <style lang="scss" scoped>

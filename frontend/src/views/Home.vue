@@ -38,7 +38,6 @@ import Welcome from "@/components/Welcome.vue"
 import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
-import { routeutils } from '@/routeutils'
 import analytics from '@/analytics'
 import { onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -51,9 +50,11 @@ import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { watchDeep } from '@vueuse/core'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const router = useRouter()
 const route = useRoute()
+const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const restore = useRestoreStore()
@@ -62,6 +63,7 @@ const searchStore = useSearchStore()
 const userStore = useUserStore()
 const poolStore = usePoolStore()
 const { polite, assertive } = useAnnouncer()
+
 
 const isHomePage = computed(()=>{
    return (route.path == "/")
@@ -103,7 +105,7 @@ onMounted( async () =>{
 })
 
 const handleQueryParamChange = ( async( ) => {
-   routeutils.mapQueryParams(router, route.query, async (pool) => {
+   routeUtils.queryParamsChanged(async (pool) => {
       assertive(`search in progress`)
       if (pool == "all") {
          await resultStore.searchAllPools()
@@ -149,7 +151,7 @@ async function searchClicked() {
    } else {
       analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_OUT")
    }
-   routeutils.setBasicSearchParams(router, route.query)
+   routeUtils.searchChanged()
 }
 </script>
 

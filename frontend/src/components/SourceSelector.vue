@@ -32,7 +32,7 @@
 import { useQueryStore } from "@/stores/query"
 import { useRouter, useRoute } from 'vue-router'
 import analytics from '@/analytics'
-import { routeutils } from '@/routeutils'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const props = defineProps({
    help: {
@@ -44,13 +44,14 @@ const props = defineProps({
 const queryStore = useQueryStore()
 const router = useRouter()
 const route = useRoute()
+const routeUtils = useRouteUtils(router, route)
 
 const sourcesClicked = (( setting ) => {
    if ( queryStore.searchSources  != setting ) {
       analytics.trigger('Search', 'SCOPE_CHANGED', `${queryStore.mode}|${setting}`)
       queryStore.searchSources = setting
       if (queryStore.queryEntered || route.query.filter ) {
-         routeutils.scopeChanged(router, route.query)
+         routeUtils.scopeChanged()
       }
    }
 })

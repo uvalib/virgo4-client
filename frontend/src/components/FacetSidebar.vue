@@ -53,7 +53,6 @@
 import AccordionContent from "@/components/AccordionContent.vue"
 import Checkbox from 'primevue/checkbox'
 import { computed } from 'vue'
-import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { usePoolStore } from "@/stores/pool"
@@ -61,12 +60,12 @@ import { useRouter, useRoute } from 'vue-router'
 import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
 import { useWindowSize } from '@vueuse/core'
-import { routeutils } from '@/routeutils'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const { width } = useWindowSize()
 const route = useRoute()
 const router = useRouter()
-const queryStore = useQueryStore()
+const routeUtils = useRouteUtils(router, route)
 const resultStore = useResultStore()
 const filterStore = useFilterStore()
 const poolStore = usePoolStore()
@@ -108,7 +107,7 @@ async function filterChanged(facetID, facetValue) {
       analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${facetValue.value}`)
    }
    resultStore.clearSelectedPoolResults()
-   routeutils.setFilterParam(router, route.query)
+   routeUtils.filterChanged()
 }
 </script>
 <style lang="scss" scoped>

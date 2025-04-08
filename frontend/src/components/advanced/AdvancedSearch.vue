@@ -66,10 +66,11 @@ import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
-import { routeutils } from '@/routeutils'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const router = useRouter()
 const route = useRoute()
+const routeUtils = useRouteUtils(router, route)
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
@@ -136,7 +137,7 @@ async function doAdvancedSearch() {
       }
    }
 
-   routeutils.setAdvancedSearchParams(router,  route.query)
+   routeUtils.searchChanged()
 }
 
 function addClicked() {

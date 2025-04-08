@@ -31,7 +31,7 @@ import { useFilterStore } from "@/stores/filter"
 import { useItemStore } from "@/stores/item"
 import { useQueryStore } from "@/stores/query"
 import { useRoute, useRouter } from 'vue-router'
-import { routeutils } from '@/routeutils'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const collection = useCollectionStore ()
 const filter = useFilterStore()
@@ -39,20 +39,21 @@ const item = useItemStore()
 const queryStore = useQueryStore()
 const route = useRoute()
 const router = useRouter()
+const routeUtils = useRouteUtils(router, route)
 
 const browseClicked = (() => {
    filter.reset()
    filter.toggleFilter("presearch", collection.filter, collection.title)
    queryStore.clear()
    queryStore.setTargetPool(item.details.source)
-   routeutils.setCollectionSearchParams(router, route.query )
+   routeUtils.collectionSearchChanged()
 })
 
 const searchClicked = (() => {
    filter.reset()
    filter.toggleFilter("presearch", collection.filter, collection.title)
    queryStore.setTargetPool(item.details.source)
-   routeutils.setCollectionSearchParams(router, route.query)
+   routeUtils.collectionSearchChanged()
 })
 </script>
 

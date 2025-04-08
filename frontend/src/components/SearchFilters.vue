@@ -50,10 +50,11 @@ import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useQueryStore } from "@/stores/query"
 import analytics from '@/analytics'
-import { routeutils } from '@/routeutils'
+import { useRouteUtils } from '@/composables/routeutils'
 
 const route = useRoute()
 const router = useRouter()
+const routeUtils = useRouteUtils(router, route)
 const resultStore = useResultStore()
 const filters = useFilterStore()
 const queryStore = useQueryStore()
@@ -90,13 +91,13 @@ const appliedFilters = computed(()=>{
 function removeFilter( filter ) {
    filters.toggleFilter(resultStore.selectedResults.pool.id, filter.facet_id, filter.value)
    resultStore.clearSelectedPoolResults()
-   routeutils.setFilterParam(router, route.query )
+   routeUtils.filterChanged()
 }
 
 async function clearClicked() {
    analytics.trigger('Results', 'CLEAR_ALL_FILTERS', queryStore.mode)
    filters.resetPoolFilters(resultStore.selectedResults.pool.id)
-   routeutils.setFilterParam(router, route.query)
+   routeUtils.filterChanged()
 }
 </script>
 
