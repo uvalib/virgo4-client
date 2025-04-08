@@ -50,6 +50,7 @@ import { useResultStore } from "@/stores/result"
 import { useFilterStore } from "@/stores/filter"
 import { useQueryStore } from "@/stores/query"
 import analytics from '@/analytics'
+import { routeutils } from '@/routeutils'
 
 const route = useRoute()
 const router = useRouter()
@@ -87,26 +88,15 @@ const appliedFilters = computed(()=>{
 })
 
 function removeFilter( filter ) {
-   queryStore.userSearched = true
-   let query = Object.assign({}, route.query)
-   delete query.page
-   delete query.filter
    filters.toggleFilter(resultStore.selectedResults.pool.id, filter.facet_id, filter.value)
    resultStore.clearSelectedPoolResults()
-   let fqp = filters.asQueryParam( resultStore.selectedResults.pool.id )
-   if (fqp) {
-      query.filter = fqp
-   }
-   router.push({ query })
+   routeutils.setFilterParam(router, route.query )
 }
 
 async function clearClicked() {
    analytics.trigger('Results', 'CLEAR_ALL_FILTERS', queryStore.mode)
    filters.resetPoolFilters(resultStore.selectedResults.pool.id)
-   let query = Object.assign({}, route.query)
-   delete query.filter
-   queryStore.userSearched = true
-   router.push({ query })
+   routeutils.setFilterParam(router, route.query)
 }
 </script>
 

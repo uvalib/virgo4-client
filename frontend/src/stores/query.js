@@ -258,6 +258,10 @@ export const useQueryStore = defineStore('query', {
          })
          this.targetPool = ""
       },
+      widenSearch() {
+         this.targetPool = ""
+         this.searchSources = "all"
+      },
 
       async loadSearch(token) {
          try {

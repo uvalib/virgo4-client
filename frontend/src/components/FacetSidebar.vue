@@ -61,6 +61,7 @@ import { useRouter, useRoute } from 'vue-router'
 import colors from '@/assets/theme/colors.module.scss'
 import analytics from '@/analytics'
 import { useWindowSize } from '@vueuse/core'
+import { routeutils } from '@/routeutils'
 
 const { width } = useWindowSize()
 const route = useRoute()
@@ -99,18 +100,7 @@ function facetValues(facet, start, end) {
 function valueKey(idx, facetID) {
    return facetID+"_val_"+idx
 }
-function addFilterToURL() {
-   // changing the filter resetes paging
-   let query = Object.assign({}, route.query)
-   delete query.page
-   let fqp = filterStore.asQueryParam( resultStore.selectedResults.pool.id )
-   if (fqp.length == 0) {
-      delete query.filter
-   } else if ( route.query.filter != fqp ) {
-      query.filter = fqp
-   }
-   router.push({ query })
-}
+
 async function filterChanged(facetID, facetValue) {
    if (facetValue.selected) {
       analytics.trigger('Filters', 'SEARCH_FILTER_SET', `${facetID}:${facetValue.value}`)
@@ -118,8 +108,7 @@ async function filterChanged(facetID, facetValue) {
       analytics.trigger('Filters', 'SEARCH_FILTER_REMOVED', `${facetID}:${facetValue.value}`)
    }
    resultStore.clearSelectedPoolResults()
-   queryStore.userSearched = true
-   addFilterToURL()
+   routeutils.setFilterParam(router, route.query)
 }
 </script>
 <style lang="scss" scoped>

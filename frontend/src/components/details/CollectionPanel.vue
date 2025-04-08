@@ -26,12 +26,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import { useCollectionStore } from "@/stores/collection"
 import { useFilterStore } from "@/stores/filter"
 import { useItemStore } from "@/stores/item"
 import { useQueryStore } from "@/stores/query"
 import { useRoute, useRouter } from 'vue-router'
+import { routeutils } from '@/routeutils'
 
 const collection = useCollectionStore ()
 const filter = useFilterStore()
@@ -41,37 +41,18 @@ const route = useRoute()
 const router = useRouter()
 
 const browseClicked = (() => {
-   // Set up the search in the store and flag it is user generated
    filter.reset()
    filter.toggleFilter("presearch", collection.filter, collection.title)
+   queryStore.clear()
    queryStore.setTargetPool(item.details.source)
-   queryStore.userSearched = true
-
-   // use the model to setup the URL
-   let query = Object.assign({}, route.query)
-   delete query.page
-   delete query.filter
-   delete query.q
-   query.filter = filter.asQueryParam( "presearch" )
-   query.pool = item.details.source
-   router.push({path: "/search", query: query })
+   routeutils.setCollectionSearchParams(router, route.query )
 })
 
 const searchClicked = (() => {
-   // Set up the search in the store and flag it is user generated
    filter.reset()
    filter.toggleFilter("presearch", collection.filter, collection.title)
    queryStore.setTargetPool(item.details.source)
-   queryStore.userSearched = true
-
-   // use the model to setup the URL
-   let query = Object.assign({}, route.query)
-   delete query.page
-   delete query.filter
-   query.q = queryStore.string
-   query.filter = filter.asQueryParam( "presearch" )
-   query.pool = item.details.source
-   router.push({path: "/search", query: query })
+   routeutils.setCollectionSearchParams(router, route.query)
 })
 </script>
 

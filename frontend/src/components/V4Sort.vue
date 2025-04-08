@@ -16,6 +16,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useRouter, useRoute } from 'vue-router'
 import analytics from '@/analytics'
+import { routeutils } from '@/routeutils'
 
 const router = useRouter()
 const route = useRoute()
@@ -34,10 +35,8 @@ const canSort = computed(() => {
 })
 
 const sortChanged = ( async () => {
-   let query = Object.assign({}, route.query)
-   query.sort = sortStore.activeSort
-   analytics.trigger('Results', 'SORT_CHANGED', `${query.mode}|${sortStore.activeSort}`)
-   router.push({query})
+   analytics.trigger('Results', 'SORT_CHANGED', `${route.query.mode}|${sortStore.activeSort}`)
+   routeutils.setSortParam(router, route.query)
 })
 </script>
 

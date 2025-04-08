@@ -9,6 +9,7 @@
 import { computed } from 'vue'
 import { useQueryStore } from "@/stores/query"
 import { useRouter, useRoute } from 'vue-router'
+import { routeutils } from '@/routeutils'
 
 const queryStore = useQueryStore()
 const router = useRouter()
@@ -22,14 +23,8 @@ const scopeLabel = computed(()=>{
 })
 
 function widenSearch() {
-   queryStore.searchSources = "all"
-   let query = Object.assign({}, route.query )
-   if (query.q) {
-      delete query.page
-      delete query.pool
-      queryStore.userSearched = true
-      router.push({ query })
-   }
+   queryStore.widenSearch()
+   routeutils.scopeChanged(router, route.query)
 }
 </script>
 <style lang="scss" scoped>

@@ -66,6 +66,7 @@ import { usePoolStore } from "@/stores/pool"
 import { useSortStore } from "@/stores/sort"
 import { useFilterStore } from "@/stores/filter"
 import { usePreferencesStore } from "@/stores/preferences"
+import { routeutils } from '@/routeutils'
 
 const router = useRouter()
 const route = useRoute()
@@ -135,15 +136,7 @@ async function doAdvancedSearch() {
       }
    }
 
-   let newQ = Object.assign({}, route.query)
-   newQ.q = queryStore.string
-   if ( resultStore.hasResults == false && filters.preSearchFilterApplied ) {
-      filters.promotePreSearchFilters()
-      newQ.filter = filters.asQueryParam('presearch')
-   }
-   sortStore.promotePreSearchSort( poolStore.list )
-   queryStore.userSearched = true
-   await router.replace({query: newQ})
+   routeutils.setAdvancedSearchParams(router,  route.query)
 }
 
 function addClicked() {

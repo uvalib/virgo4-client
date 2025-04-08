@@ -30,9 +30,9 @@
 
 <script setup>
 import { useQueryStore } from "@/stores/query"
-import { useResultStore } from "@/stores/result"
 import { useRouter, useRoute } from 'vue-router'
 import analytics from '@/analytics'
+import { routeutils } from '@/routeutils'
 
 const props = defineProps({
    help: {
@@ -41,7 +41,6 @@ const props = defineProps({
    },
 })
 
-const results = useResultStore()
 const queryStore = useQueryStore()
 const router = useRouter()
 const route = useRoute()
@@ -51,16 +50,7 @@ const sourcesClicked = (( setting ) => {
       analytics.trigger('Search', 'SCOPE_CHANGED', `${queryStore.mode}|${setting}`)
       queryStore.searchSources = setting
       if (queryStore.queryEntered || route.query.filter ) {
-         let query = Object.assign({}, route.query)
-         delete query.page
-         if (queryStore.searchSources == query.pool && queryStore.searchSources != "all") {
-            results.dropOtherResults(queryStore.searchSources)
-         } else {
-            query.q = queryStore.string
-            query.pool = setting
-            queryStore.userSearched = true
-            router.push({path: "/search", query: query })
-         }
+         routeutils.scopeChanged(router, route.query)
       }
    }
 })

@@ -38,6 +38,7 @@ import Welcome from "@/components/Welcome.vue"
 import SourceSelector from "@/components/SourceSelector.vue"
 import { useAnnouncer } from '@vue-a11y/announcer'
 import { scrollToItem } from '@/utils'
+import { routeutils } from '@/routeutils'
 import analytics from '@/analytics'
 import { onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -48,8 +49,6 @@ import { useSystemStore } from "@/stores/system"
 import { useSearchStore } from "@/stores/search"
 import { useUserStore } from "@/stores/user"
 import { usePoolStore } from "@/stores/pool"
-import { useSortStore } from "@/stores/sort"
-import { useFilterStore } from "@/stores/filter"
 import { useBookmarkStore } from "@/stores/bookmark"
 import { watchDeep } from '@vueuse/core'
 
@@ -62,8 +61,6 @@ const systemStore = useSystemStore()
 const searchStore = useSearchStore()
 const userStore = useUserStore()
 const poolStore = usePoolStore()
-const sortStore = useSortStore()
-const filters = useFilterStore()
 const { polite, assertive } = useAnnouncer()
 
 const isHomePage = computed(()=>{
@@ -82,7 +79,7 @@ watchDeep( route, () => {
    if ( queryStore.userSearched && userStore.isSignedIn) {
       searchStore.updateHistory(userStore.signedInUser, route.fullPath)
    }
-   restoreSearchFromQueryParams()
+   handleQueryParamChange()
    setPageTitle()
 })
 
@@ -97,121 +94,34 @@ onMounted( async () =>{
       // if a pool is set on initial page load, narrow the search to just that pool
       queryStore.searchSources = route.query.pool
    }
-   restoreSearchFromQueryParams()
+   handleQueryParamChange()
    setPageTitle()
 
    if ( queryStore.mode == "basic") {
       polite(`virgo search has loaded`)
    }
+
+   if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SEARCH" ) {
+      handlePendingBookmark()
+      restore.clear()
+   }
 })
 
-async function restoreSearchFromQueryParams( ) {
-   var query = route.query
-   if  (!query.q) {
-      // only reset the search when there is NO query present,
-      // otherwise the search is re-excuted each time a tab changes
-      resultStore.resetSearch()
-   }
-
-   // Interrogate query params and convert them to a search in the model (if present)
-   let oldQ = queryStore.string
-   if (query.mode == 'advanced') {
-      queryStore.setAdvancedSearch()
-   } else {
-      queryStore.setBasicSearch()
-   }
-
-   let targetPool = "presearch"
-   let oldFilterParam = ""
-   let oldSort = ""
-   let poolChanged = false
-
-   if ( query.pool ) {
-      poolChanged = (query.pool != queryStore.targetPool)
-      targetPool = query.pool
-      queryStore.setTargetPool(targetPool)
-
-      // get sort from URL (but preserve current sort)...
-      let oldSortObj = sortStore.poolSort(targetPool)
-      oldSort = `${oldSortObj.sort_id}_${oldSortObj.order}`
-      if (query.sort  ) {
-         sortStore.setPoolSort(targetPool, query.sort)
-         sortStore.setActivePool(targetPool)
+async function handleQueryParamChange( ) {
+   routeutils.mapQueryParams(router, route.query, async (pool) => {
+      assertive(`search in progress`)
+      if (pool == "all") {
+         await resultStore.searchAllPools()
       } else {
-         sortStore.setPoolSort(targetPool, oldSort)
-         sortStore.setActivePool(targetPool)
+         await resultStore.searchPool({pool: poolStore.poolDetails(pool)})
       }
-   }
-
-   // get pool filters from URL (but preserve current)...
-   oldFilterParam = filters.asQueryParam(targetPool)
-   if (query.filter) {
-      filters.restoreFromURL(query.filter, targetPool )
-   } else {
-      filters.resetPoolFilters(targetPool)
-   }
-
-   if ( query.q ) {
-      queryStore.restoreFromURL(query.q)
-   }
-
-   // If there is a query or filter in params it may be necessary to run a search
-   if ( query.q || query.filter) {
-      // console.log(`Q: ${queryStore.string} vs ${oldQ}`)
-      // console.log(`F: ${filters.asQueryParam(targetPool)} vs ${oldFilterParam}`)
-      // console.log(`S: ${sortStore.activeSort} vs ${oldSort}`)
-      // console.log(`U: ${queryStore.userSearched}`)
-
-      // only re-run search when query, sort or filtering has changed
-      if ( queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam ||
-            sortStore.activeSort != oldSort || queryStore.userSearched == true ) {
-         resultStore.resetSearchResults()
-         let changed = queryStore.string != oldQ || filters.asQueryParam(targetPool) != oldFilterParam || queryStore.userSearched == true
-
-         if ( queryStore.userSearched ) {
-            queryStore.userSearched = false
-         }
-
-         assertive(`search in progress`)
-         if (queryStore.searchSources == "all") {
-            await resultStore.searchAllPools()
-         } else {
-            let p = poolStore.poolDetails(queryStore.searchSources)
-            await resultStore.searchPool({pool: p})
-         }
-         filters.getSelectedResultFacets(changed)
-      } else {
-         if (poolChanged) {
-            filters.getSelectedResultFacets(false)
-         }
-      }
-
-      // make sure the currently selected pool is always in URL
-      if (resultStore.selectedResults.pool.id != "none" && query.pool != resultStore.selectedResults.pool.id) {
-         let newQ = Object.assign({}, query)
-         newQ.pool = resultStore.selectedResults.pool.id
-         await router.replace({query: newQ})
-      }
-
-      // make sure the currently selected pool SORT is always in URL. This should only happen the first time a search is made
-      if ( oldSort != "" && query.sort === undefined ) {
-         let newQ = Object.assign({}, query)
-         newQ.sort = oldSort
-         await router.replace({query: newQ})
-      }
-
       if ( resultStore.lastSearchScrollPosition > 0 && (route.path == "/" || route.path == "/search")) {
          window.scrollTo({
             top: resultStore.lastSearchScrollPosition,
             behavior: "auto"
          })
       }
-
-      if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SEARCH" ) {
-         handlePendingBookmark()
-         restore.clear()
-      }
-   }
+   })
 }
 
 function handlePendingBookmark() {
@@ -239,10 +149,7 @@ async function searchClicked() {
    } else {
       analytics.trigger('Search', 'BASIC_SEARCH', "SIGNED_OUT")
    }
-   let newQ = Object.assign({}, route.query)
-   newQ.q = queryStore.string
-   queryStore.userSearched = true
-   await router.replace({query: newQ})
+   routeutils.setBasicSearchParams(router, route.query)
 }
 </script>
 

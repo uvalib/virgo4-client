@@ -47,17 +47,14 @@ import { computed, nextTick, onMounted } from 'vue'
 import { useSystemStore } from "@/stores/system"
 import { useQueryStore } from "@/stores/query"
 import { useResultStore } from "@/stores/result"
-import { useFilterStore } from "@/stores/filter"
-import { useSortStore } from "@/stores/sort"
 import { scrollToItem } from '@/utils'
+import { routeutils } from '@/routeutils'
 
 const router = useRouter()
 const route = useRoute()
 const queryStore = useQueryStore()
 const resultStore = useResultStore()
 const systemStore = useSystemStore()
-const sortStore = useSortStore()
-const filters = useFilterStore()
 
 const showPrintButton = computed(()=>{
    return resultStore.selectedResults.pool.id=='uva_library' || resultStore.selectedResults.pool.id=='articles'
@@ -119,37 +116,15 @@ const resetSearch = ( async () => {
    }
 })
 
-const updateURL = (( poolID) => {
-   let query = Object.assign({}, route.query)
-   query.pool = poolID
-   delete query.filter
-   delete query.sort
-   delete query.page
-   let fqp = filters.asQueryParam( poolID )
-   if (fqp.length > 0) {
-      query.filter = fqp
-   }
-   if (sortStore.activeSort.length > 0) {
-      query.sort = sortStore.activeSort
-   }
-   if (resultStore.selectedResults.page > 0) {
-      query.page = resultStore.selectedResults.page +1
-   }
-   if ( route.query != query ) {
-      router.push({query})
-   }
-})
-
 const poolSelected = (( poolID ) => {
    analytics.trigger('Results', 'POOL_SELECTED', poolID)
 
    let tgtIdx = resultStore.results.findIndex( r => r.pool.id == poolID )
-   if (tgtIdx > -1 ) {
-      resultStore.selectPoolResults(tgtIdx)
-      let newPoolID = resultStore.results[tgtIdx].pool.id
-      if ( route.query.pool != newPoolID ) {
-         updateURL(newPoolID)
-      }
+   resultStore.selectPoolResults(tgtIdx)
+   let newPoolID = resultStore.results[tgtIdx].pool.id
+   if ( route.query.pool != newPoolID ) {
+      queryStore.targetPool = newPoolID
+      routeutils.setPoolParams(router, route.query)
    }
 })
 </script>
