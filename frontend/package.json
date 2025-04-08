@@ -11,8 +11,8 @@
     "@fortawesome/fontawesome-pro": "^6.7.2",
     "@primeuix/themes": "^1.0.1",
     "@vue-a11y/announcer": "^3.1.4",
-    "@vueuse/core": "^13.0.0",
-    "@vueuse/integrations": "^13.0.0",
+    "@vueuse/core": "^13.1.0",
+    "@vueuse/integrations": "^13.1.0",
     "axios": "^1.8.4",
     "firebase": "^11.6.0",
     "pinia": "^3.0.1",
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
-    "sass-embedded": "^1.86.2",
+    "sass-embedded": "^1.86.3",
     "vite": "^6.2.5"
   }
 }

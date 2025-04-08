@@ -100,14 +100,9 @@ onMounted( async () =>{
    if ( queryStore.mode == "basic") {
       polite(`virgo search has loaded`)
    }
-
-   if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SEARCH" ) {
-      handlePendingBookmark()
-      restore.clear()
-   }
 })
 
-async function handleQueryParamChange( ) {
+const handleQueryParamChange = ( async( ) => {
    routeutils.mapQueryParams(router, route.query, async (pool) => {
       assertive(`search in progress`)
       if (pool == "all") {
@@ -115,14 +110,19 @@ async function handleQueryParamChange( ) {
       } else {
          await resultStore.searchPool({pool: poolStore.poolDetails(pool)})
       }
-      if ( resultStore.lastSearchScrollPosition > 0 && (route.path == "/" || route.path == "/search")) {
-         window.scrollTo({
-            top: resultStore.lastSearchScrollPosition,
-            behavior: "auto"
-         })
+      if ( restore.pendingBookmark && restore.pendingBookmark.origin == "SEARCH" ) {
+         handlePendingBookmark()
+         restore.clear()
+      } else {
+         if ( resultStore.lastSearchScrollPosition > 0 && (route.path == "/" || route.path == "/search")) {
+            window.scrollTo({
+               top: resultStore.lastSearchScrollPosition,
+               behavior: "auto"
+            })
+         }
       }
    })
-}
+})
 
 function handlePendingBookmark() {
    const bookmarks = useBookmarkStore()
